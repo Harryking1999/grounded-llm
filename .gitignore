@@ -1,0 +1,48 @@
+# Python and test caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Environments and local tools
+.venv/
+venv/
+node_modules/
+.idea/
+.vscode/
+.codex/cache/
+
+# Secrets and machine-local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*credential*
+*password*
+
+# Scratch and generated runtime state
+tmp/
+.tmp_*/
+runs/
+logs/
+outputs/
+wandb/
+ray_results/
+
+# Datasets, models, and checkpoints live outside source control
+data/raw/
+data/cache/
+models/
+checkpoints/
+durable/
+*.pt
+*.pth
+*.ckpt
+*.distcp
+*.safetensors
+*.parquet
+*.arrow

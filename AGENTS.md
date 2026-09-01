@@ -20,9 +20,22 @@ Keep exactly one current status page. Update an authoritative file instead of cr
 - Maintain genuine interest and give a clear recommendation. Confidence must come from a concrete mechanism or result, not from confident wording.
 - When the user's intent and the current evidence conflict, explain the evidence and tradeoff rather than agreeing reflexively or acting around the user.
 
-## First-principles research discipline
+## First-principles inquiry
 
-Before calling a component a state model or world model, identify:
+“First principles” here means investigating the essence and causal structure of the problem, not beginning from a standard formalism or decomposing it into a fixed checklist. Ask what phenomenon actually needs explaining, what must be true for it to occur, and which assumptions come only from familiar terminology, benchmarks, or current methods.
+
+Treat statistical regularities, benchmark correlations, scaling trends, and recurring empirical patterns as **second-principles evidence**. They are useful clues and constraints, but they do not by themselves explain the mechanism. Do not replace “why does this happen?” with “this pattern often appears,” and do not mistake prediction from a correlation for understanding of the underlying cause.
+
+Maintain this angle throughout the project:
+
+- seek the smallest causal account that explains the phenomenon;
+- ask what remains invariant when wording, representation, task, or implementation changes;
+- distinguish a mechanism from a proxy that merely tracks it;
+- question inherited definitions such as “state,” “reasoning,” “intelligence,” and “world model” when they obscure rather than clarify;
+- use existing theories and mathematical formalisms as tools, not as premises that force the answer;
+- let surprising or negative experiments revise the question itself, not only the proposed solution.
+
+Formalization should follow and sharpen the inquiry rather than substitute for it. When a state-transition description is useful, identify:
 
 1. environment state `s_t`;
 2. observation `o_t` and what information it omits;
@@ -40,7 +53,7 @@ Keep these capabilities separate unless evidence connects them:
 - search/planning over future states;
 - choosing and expressing an action.
 
-Do not assume that token processing implies the absence of latent state. Do not call an observation encoder a world model merely because it compresses pixels or tokens. A world-model claim requires evidence that the learned representation supports future prediction or intervention across meaningful changes in observations, actions, or rules.
+Do not assume that token processing implies the absence of latent state. Do not call an observation encoder a world model merely because it compresses pixels or tokens. A world-model claim requires evidence that the learned representation supports future prediction or intervention across meaningful changes in observations, actions, or rules. These criteria are working tools for testing the idea, not the definition of first-principles thinking.
 
 ## Research loop
 

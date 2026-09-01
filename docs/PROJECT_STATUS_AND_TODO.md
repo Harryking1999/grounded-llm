@@ -19,6 +19,7 @@ The immediate objective is not to train a model. It is to make the claim and ben
 - The primary LLM condition uses no external solver or code for move selection.
 - Deterministic code may maintain the true environment and score legal moves/wins as a referee.
 - State estimation, transition prediction, rule application, and planning will be measured separately.
+- First-principles inquiry means pursuing the essential causal account of the failure. Statistical regularities and benchmark patterns are evidence, not substitutes for mechanism.
 - Harness complexity and validation must remain proportional to the question being tested.
 
 ## Current evidence boundary
@@ -30,7 +31,7 @@ The immediate objective is not to train a model. It is to make the claim and ben
 
 ## Ordered TODO
 
-1. Agree on the conceptual contract: environment state, observations, actions, transition, objective, and the information/interface available to the LLM and state model.
+1. Identify the phenomenon at its causal core: what exactly fails when the model loses the situation, what rival mechanisms could produce the same behavior, and whether “missing state” is a cause or only a description. Introduce state/action formalism only where it helps distinguish these explanations.
 2. Formalize a small family of rule predicates, including the proposed “four then right turn” pattern, with unambiguous examples and boundary cases.
 3. Build the minimal deterministic environment/referee and tests. Do not implement a solver in the primary agent path.
 4. Create a frozen baseline set spanning valid/invalid states, equivalent histories, next-state queries, terminal judgment, and move choice; include standard and held-out rule variants.

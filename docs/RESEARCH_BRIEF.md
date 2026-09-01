@@ -12,7 +12,9 @@ Our working proposal is to introduce an explicit **state model** that maintains 
 
 This is deliberately weaker and more defensible than saying that an LLM has "only language ability" or that the new component is already a world model.
 
-## First-principles formulation
+## Working formalization
+
+The equations below are a provisional instrument for making experiments precise. They do not define the essence of the problem and should be discarded or revised if they hide the mechanism we are trying to understand. The first-principles question comes earlier: what capability is actually missing when an LLM loses track of a situation, and is “state” the cause, a useful description, or only a correlated proxy?
 
 Let an environment have latent state `s_t`, observation `o_t`, action `a_t`, and transition dynamics
 

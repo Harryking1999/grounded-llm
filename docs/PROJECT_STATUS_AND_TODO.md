@@ -1,50 +1,50 @@
-# Project status and ordered TODO
+# 项目状态与有序 TODO
 
-Updated: 2026-09-02
+更新时间：2026-09-02
 
-This is the only current status page. It records stable decisions and ordered work, not transient process IDs, ports, scratch observations, or raw logs.
+这是唯一的当前状态页。它记录稳定决策和有序工作，不记录临时进程 ID、端口、随手观察或原始日志。
 
-## Current objective
+## 当前目标
 
-Determine whether an explicit learned state model can improve an LLM's state estimation, action-conditioned prediction, and planning, especially under unfamiliar rules or representations.
+判断一个显式的学习状态模型能否提升 LLM 的状态估计、以动作为条件的预测和规划能力，尤其是在陌生规则或表征下。
 
-The immediate objective is not to train a model. It is to make the claim and benchmark discriminative enough that a positive result cannot be explained by ordinary game memorization, clearer prompting, deterministic parsing, or tool-assisted search.
+眼下的目标不是训练模型，而是让研究主张和 benchmark 具有足够的区分力，使正面结果无法被普通游戏记忆、更清晰的提示词、确定性解析或工具辅助搜索所解释。
 
-## Established project decisions
+## 已确立的项目决策
 
-- This directory is an independent Git repository rather than a subproject in the OPD history.
-- The prior Feishu document is treated as motivation around cognitive maps, predictive representations, and planning; it does not establish novelty for this project.
-- “State model” is the neutral component name until its architecture and evidence justify a stronger label.
-- Standard tic-tac-toe and Gomoku are calibration tasks, not sufficient novelty evidence.
-- The primary LLM condition uses no external solver or code for move selection.
-- Deterministic code may maintain the true environment and score legal moves/wins as a referee.
-- State estimation, transition prediction, rule application, and planning will be measured separately.
-- First-principles inquiry means pursuing the essential causal account of the failure. Statistical regularities and benchmark patterns are evidence, not substitutes for mechanism.
-- Harness complexity and validation must remain proportional to the question being tested.
+- 本目录是独立 Git 仓库，而不是 OPD 历史中的子项目。
+- 之前的飞书文档被视为认知地图、预测性表征和规划方面的动机；它不能证明本项目具有新颖性。
+- 在架构和证据足以支持更强称呼之前，使用“状态模型”作为中性组件名称。
+- 标准井字棋和五子棋是校准任务，不是充分的新颖性证据。
+- 主要 LLM 条件不使用外部求解器，也不使用代码选择落子。
+- 确定性代码可以维护真实环境，并作为裁判判断动作是否合法以及是否获胜。
+- 分别测量状态估计、转移预测、规则应用和规划。
+- 第一性原理探究意味着寻找失败现象的本质性因果解释。统计规律和 benchmark 模式是证据，不能替代机制。
+- harness 复杂度和验证强度必须与待回答的问题成比例。
 
-## Current evidence boundary
+## 当前证据边界
 
-- We have an initial qualitative observation that LLM game reasoning can look strong on familiar five-in-a-row terminology and play.
-- We do not yet have a controlled baseline, model/version record, fixed prompts, randomized state set, or quantitative result.
-- We therefore cannot yet conclude that LLMs lack a state representation, that Gomoku is difficult, or that a learned auxiliary network will improve performance.
-- The modified-pattern idea is not evaluable until its rule is written as a deterministic predicate.
+- 我们目前只有一项初步定性观察：LLM 在熟悉的五子棋术语和对局上可能表现得很强。
+- 我们尚无受控 baseline、模型／版本记录、固定提示词、随机化状态集合或定量结果。
+- 因此，我们目前不能断定 LLM 缺少状态表征、五子棋对其困难，或学习得到的辅助网络能够提升表现。
+- 在修改后的图案规则被写成确定性判定条件之前，该想法无法被评测。
 
-## Ordered TODO
+## 有序 TODO
 
-1. Identify the phenomenon at its causal core: what exactly fails when the model loses the situation, what rival mechanisms could produce the same behavior, and whether “missing state” is a cause or only a description. Introduce state/action formalism only where it helps distinguish these explanations.
-2. Formalize a small family of rule predicates, including the proposed “four then right turn” pattern, with unambiguous examples and boundary cases.
-3. Build the minimal deterministic environment/referee and tests. Do not implement a solver in the primary agent path.
-4. Create a frozen baseline set spanning valid/invalid states, equivalent histories, next-state queries, terminal judgment, and move choice; include standard and held-out rule variants.
-5. Evaluate one or more LLM baselines without tools and classify failures by stage rather than relying on win rate alone.
-6. Use the failure decomposition to choose the smallest mechanism: better state presentation, recurrent scratchpad, learned state estimator, learned transition model, or planner.
-7. Only then implement the learned state model and compare it against matched deterministic-state, extra-context, extra-compute, and tool-assisted controls.
-8. In parallel with steps 1–5, map the closest prior work by concrete mechanism and evaluation: cognitive maps, latent/world models, recurrent memory/state tracking, neural algorithmic reasoning, model-based RL, and LLM planning.
-9. Promote a result to a paper claim only after held-out rule or representation transfer, matched controls, and at least one non-game task support the same mechanism.
+1. 识别现象的因果核心：当模型无法把握当前情境时，究竟什么发生了失败；哪些竞争机制会产生相同表现；“缺少状态”究竟是原因还是一种描述。只有当状态／动作形式化有助于区分这些解释时，才引入它。
+2. 无歧义地形式化一小组规则判定条件，包括拟议的“连续四个，然后右拐”图案，并给出示例和边界情况。
+3. 构建最小确定性环境／裁判及测试。不要在主要 agent 路径中实现求解器。
+4. 建立冻结的 baseline 集，覆盖有效／无效状态、等价历史、下一状态问题、终止判断和落子选择；同时包括标准规则和留出规则变体。
+5. 在无工具条件下评测一个或多个 LLM baseline，并按照失败阶段进行分类，而不是只看胜率。
+6. 根据失败拆分选择最小机制：更好的状态呈现、循环式草稿本、学习状态估计器、学习转移模型或规划器。
+7. 只有到这一步，才实现学习状态模型，并与匹配的确定性状态、额外上下文、额外计算和工具辅助对照进行比较。
+8. 与步骤 1–5 并行，按照具体机制和评测梳理最接近的已有工作：认知地图、潜在／世界模型、循环记忆／状态跟踪、神经算法推理、基于模型的 RL 和 LLM 规划。
+9. 只有在完成留出规则或表征迁移、匹配对照，并且至少一个非游戏任务支持同一机制后，才把结果提升为论文主张。
 
-## Next discussion checkpoint
+## 下一次讨论检查点
 
-Before code is added, settle the answers to these three questions:
+在添加代码之前，需要确定以下三个问题：
 
-1. Is the proposed module expected to infer the current state, learn the transition dynamics, or both?
-2. Does the LLM receive the module's state as text/tokens, or are we considering an internal neural interface?
-3. Is the first paper claim about better diagnosis of LLM state failures, a new state-model architecture, or a generalization result enabled by that architecture?
+1. 拟议组件是负责推断当前状态、学习转移动力学，还是同时负责两者？
+2. LLM 通过文本／token 接收该组件的状态，还是考虑内部神经接口？
+3. 第一项论文主张是更好地诊断 LLM 的状态失败、一种新的状态模型架构，还是由该架构实现的泛化结果？

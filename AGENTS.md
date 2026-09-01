@@ -1,95 +1,95 @@
-# Project agent instructions
+# 项目代理说明
 
-## Project scope
+## 项目范围
 
-This repository is a new research project about whether an explicit state model can improve an LLM's state estimation, transition prediction, reasoning, and planning. It is independent from the parent OPD project. Reuse general experiment discipline from OPD, but do not import OPD-specific runs, launchers, terminology, remote state, or lifecycle gates.
+本仓库是一个新研究项目，研究显式状态模型能否提升 LLM 的状态估计、转移预测、推理和规划能力。本项目独立于上层 OPD 项目。可以复用 OPD 中通用的实验纪律，但不得引入 OPD 专属的运行、启动脚本、术语、远程状态或生命周期 gate。
 
-## Authoritative project sources
+## 权威项目来源
 
-- Current status and ordered TODO: `docs/PROJECT_STATUS_AND_TODO.md`
-- Current research claim, definitions, and falsification criteria: `docs/RESEARCH_BRIEF.md`
-- Experiment-specific contracts: `experiments/<study>/configs/` once a study exists
+- 当前状态与有序 TODO：`docs/PROJECT_STATUS_AND_TODO.md`
+- 当前研究主张、定义与证伪标准：`docs/RESEARCH_BRIEF.md`
+- 实验专属合同：形成具体研究后放在 `experiments/<study>/configs/`
 
-Keep exactly one current status page. Update an authoritative file instead of creating dated or version-suffixed alternatives. Do not duplicate machine-readable parameters in prose after formal configs exist.
+只保留一个当前状态页。应更新权威文件，而不是创建带日期或版本后缀的替代文件。正式配置存在后，不要在说明文字里复制一套机器可读参数。
 
-## Collaboration and authority
+## 协作与权限
 
-- Follow the user's stated scope and priorities. Do not silently broaden the project or turn a discussion into an implementation, remote run, purchase, publication, push, or deployment.
-- Proceed autonomously with read-only investigation and small, reversible local steps that directly support an authorized task. Ask before a costly experiment, a material research fork, external communication, destructive cleanup, or a change that commits the project to a substantially different claim.
-- Treat user instructions as decisions, but not as evidence that a scientific premise is true. Surface contradictions, hidden assumptions, negative results, and simpler explanations directly.
-- Maintain genuine interest and give a clear recommendation. Confidence must come from a concrete mechanism or result, not from confident wording.
-- When the user's intent and the current evidence conflict, explain the evidence and tradeoff rather than agreeing reflexively or acting around the user.
+- 服从用户明确给出的范围和优先级。不得暗中扩大项目，也不得擅自把讨论变成实现、远程运行、购买、发表、推送或部署。
+- 对直接支持已授权任务的只读调查和小型、可逆本地步骤，可以自主推进。开展高成本实验、作出实质性研究分叉、对外沟通、破坏性清理，或把项目带向明显不同的研究主张之前，必须询问用户。
+- 将用户指令视为决策，但不把它当作某个科学前提为真的证据。直接指出矛盾、隐藏假设、负结果和更简单的解释。
+- 保持真实兴趣，并给出明确建议。自信必须来自具体机制或结果，而不是来自自信的措辞。
+- 当用户意图与当前证据冲突时，应解释证据和权衡，而不是条件反射式赞同或绕开用户自行行动。
 
-## First-principles inquiry
+## 第一性原理探究
 
-“First principles” here means investigating the essence and causal structure of the problem, not beginning from a standard formalism or decomposing it into a fixed checklist. Ask what phenomenon actually needs explaining, what must be true for it to occur, and which assumptions come only from familiar terminology, benchmarks, or current methods.
+这里的“第一性原理”是指探究问题的本质与因果结构，而不是从标准形式化框架出发，或把问题拆成固定检查清单。应追问：真正需要解释的现象是什么；该现象发生必须满足什么条件；哪些假设仅仅来自熟悉的术语、benchmark 或现有方法。
 
-Treat statistical regularities, benchmark correlations, scaling trends, and recurring empirical patterns as **second-principles evidence**. They are useful clues and constraints, but they do not by themselves explain the mechanism. Do not replace “why does this happen?” with “this pattern often appears,” and do not mistake prediction from a correlation for understanding of the underlying cause.
+将统计规律、benchmark 相关性、scaling 趋势和反复出现的经验模式视为**第二性原理层面的证据**。它们是有用的线索和约束，但本身不能解释机制。不能用“这种模式经常出现”替代“为什么会发生”，也不能把依靠相关性做出的预测误认为对根本原因的理解。
 
-Maintain this angle throughout the project:
+在整个项目中保持这一探究角度：
 
-- seek the smallest causal account that explains the phenomenon;
-- ask what remains invariant when wording, representation, task, or implementation changes;
-- distinguish a mechanism from a proxy that merely tracks it;
-- question inherited definitions such as “state,” “reasoning,” “intelligence,” and “world model” when they obscure rather than clarify;
-- use existing theories and mathematical formalisms as tools, not as premises that force the answer;
-- let surprising or negative experiments revise the question itself, not only the proposed solution.
+- 寻找能够解释现象的最小因果说明；
+- 追问当措辞、表征、任务或实现改变时，什么仍保持不变；
+- 区分机制与仅仅跟随机制变化的代理指标；
+- 当“状态”“推理”“智能”“世界模型”等继承而来的定义造成遮蔽而非澄清时，对其提出质疑；
+- 把已有理论和数学形式化当作工具，而不是强迫答案服从的前提；
+- 让意外或负面实验修正问题本身，而不只是修正拟议的解决方案。
 
-Formalization should follow and sharpen the inquiry rather than substitute for it. When a state-transition description is useful, identify:
+形式化应当跟随并深化探究，而不是取代探究。当状态转移描述确实有帮助时，再明确：
 
-1. environment state `s_t`;
-2. observation `o_t` and what information it omits;
-3. action `a_t`;
-4. transition rule `p(s_{t+1} | s_t, a_t)`;
-5. task objective or reward;
-6. what the LLM receives, stores, predicts, and controls.
+1. 环境状态 `s_t`；
+2. 观测 `o_t` 以及其中缺失的信息；
+3. 动作 `a_t`；
+4. 转移规则 `p(s_{t+1} | s_t, a_t)`；
+5. 任务目标或奖励；
+6. LLM 接收、存储、预测和控制的内容。
 
-Keep these capabilities separate unless evidence connects them:
+除非证据将下列能力联系起来，否则应保持区分：
 
-- parsing/perception of an observation;
-- estimating and maintaining the current state;
-- predicting action-conditioned transitions;
-- evaluating goals or terminal conditions;
-- search/planning over future states;
-- choosing and expressing an action.
+- 对观测的解析／感知；
+- 对当前状态的估计与维护；
+- 预测以动作为条件的状态转移；
+- 判断目标或终止条件；
+- 对未来状态进行搜索／规划；
+- 选择并表达动作。
 
-Do not assume that token processing implies the absence of latent state. Do not call an observation encoder a world model merely because it compresses pixels or tokens. A world-model claim requires evidence that the learned representation supports future prediction or intervention across meaningful changes in observations, actions, or rules. These criteria are working tools for testing the idea, not the definition of first-principles thinking.
+不能因为模型处理 token 就假设它不存在潜在状态。不能仅仅因为一个观测编码器压缩了像素或 token，就把它称为世界模型。若要提出世界模型主张，需要证据表明：当观测、动作或规则发生有意义的变化时，学到的表征仍然支持未来预测或干预。这些标准是检验想法的工作工具，不是第一性原理思维的定义。
 
-## Research loop
+## 研究循环
 
-For each important claim:
+对于每个重要主张：
 
-1. state the claim in testable language;
-2. describe the proposed mechanism;
-3. identify the strongest trivial or memorization-based alternative;
-4. find the closest prior work and inspect its concrete information flow, loss, and evaluation rather than relying on broad labels;
-5. design the lowest-cost experiment that separates the explanations;
-6. record observation, inference, uncertainty, and next decision separately.
+1. 用可检验的语言陈述主张；
+2. 描述拟议机制；
+3. 找出最强的平凡解释或基于记忆的替代解释；
+4. 找到最接近的已有工作，检查其具体信息流、损失和评测，而不是依赖宽泛标签；
+5. 设计成本最低、但能够区分不同解释的实验；
+6. 分别记录观察、推断、不确定性和下一项决策。
 
-Standard games may be heavily represented in training data. Prefer controlled rule changes, equivalent state re-encodings, counterfactual transitions, and held-out compositions when testing generalization. A result on ordinary tic-tac-toe or Gomoku alone is not evidence for a new state mechanism.
+标准游戏可能在训练数据中大量出现。检验泛化时，应优先使用受控规则变化、等价状态的重新编码、反事实转移和留出组合。仅凭普通井字棋或五子棋上的结果，不能证明存在新的状态机制。
 
-## Experiment harness
+## 实验 harness
 
-- Put each durable study under `experiments/<study>/` only after it has a concrete hypothesis or evaluator.
-- Use `README.md` for the study's hypothesis, baselines, metrics, and current conclusion; `configs/` for formal machine-readable runs; `src/` for reusable implementation; and `tests/` for targeted correctness checks.
-- Store generated runs, logs, model artifacts, and large datasets outside Git under ignored paths such as `runs/`, `logs/`, `models/`, or `data/raw/`. Commit only source, compact formal configs, and decision-relevant summaries.
-- Keep the environment/referee separate from the evaluated agent. Code that validates legal moves or scores wins is allowed as harness infrastructure; code used by the agent to search or choose a move is a distinct tool-assisted condition and must not be mixed with the primary no-tool result.
-- Start with the closest simple baseline. Add a learned component only after the baseline failure is localized to state estimation, transition prediction, or planning.
-- Use matched prompts, states, rules, and budgets across comparisons. Report illegal-action rate, state/transition accuracy, task success, and presentation consistency when relevant; do not hide null or negative results.
-- A quick smoke may be run with a command and a short note. Formal or costly runs require one committed config and one clear output directory, not a stack of generic preflight gates.
+- 只有在具备具体假设或评测器之后，才在 `experiments/<study>/` 下建立需要长期维护的研究目录。
+- 使用 `README.md` 记录该研究的假设、baseline、指标和当前结论；使用 `configs/` 保存正式运行的机器可读合同；使用 `src/` 保存可复用实现；使用 `tests/` 保存针对性的正确性检查。
+- 生成的运行、日志、模型产物和大型数据集应放在 Git 之外的忽略路径中，例如 `runs/`、`logs/`、`models/` 或 `data/raw/`。只提交源代码、紧凑的正式配置和与决策有关的摘要。
+- 将环境／裁判与被评测 agent 分开。验证合法动作或判断胜负的代码可以作为 harness 基础设施；若代码被 agent 用来搜索或选择落子，则构成独立的工具辅助条件，不能与主要的无工具结果混在一起。
+- 从最接近且简单的 baseline 开始。只有当 baseline 的失败被定位到状态估计、转移预测或规划之后，才添加学习组件。
+- 各项比较使用匹配的提示词、状态、规则和预算。相关时报告非法动作率、状态／转移准确率、任务成功率和不同呈现方式下的一致性；不得隐藏零结果或负结果。
+- 快速 smoke 可以只运行一条命令并留下简短记录。正式或高成本运行需要一个已提交配置和一个清晰输出目录，而不是一叠通用预检 gate。
 
-## Proportional checks
+## 成比例的检查
 
-- Inspect enough to form one plausible hypothesis, make the smallest reversible change, and run the cheapest check that can falsify it.
-- Every additional check must address a concrete failure risk. Do not stack syntax, manifest, hash, consistency, and lifecycle gates that prove the same thing.
-- Do not compute hashes or build manifests unless artifact identity cannot be established from the Git commit, formal config, and run path.
-- Avoid speculative abstractions, broad grids, automatic recovery systems, and placeholder scripts. Let observed failures justify additional machinery.
+- 只检查到足以形成一个合理假设的程度，做最小可逆改动，并运行能够证伪它的最便宜检查。
+- 每项额外检查都必须对应一个具体失败风险。不要堆叠证明同一件事的语法、manifest、哈希、一致性和生命周期 gate。
+- 除非无法通过 Git commit、正式配置和运行路径确定产物身份，否则不要计算哈希或构建 manifest。
+- 避免推测性的抽象、宽泛网格、自动恢复系统和占位脚本。只有观察到的失败才应成为增加这些机制的理由。
 
-## Git and source discipline
+## Git 与源代码纪律
 
-- Treat this repository as the authoritative source history. Before editing, run `git status --short` and preserve unrelated changes.
-- Prefer existing authoritative interfaces. Do not leave copied `*_old`, `*_final`, `*_v2`, node-specific scripts, or temporary diagnostics in tracked source.
-- Stage only intended files or hunks. Review both the unstaged and staged diff before committing.
-- Keep one logical change per commit. A completed source or documentation change ends in a commit unless the user explicitly requests otherwise or the work is intentionally incomplete.
-- Commit messages state what changed and why. Do not amend, rebase shared history, force-push, or destroy recoverability without explicit user authorization.
-- Never commit credentials, private tokens, raw model artifacts, checkpoints, generated caches, or machine-specific runtime state.
+- 将本仓库视为权威源代码历史。编辑前运行 `git status --short`，并保留无关改动。
+- 优先使用已有权威接口。不要在受跟踪源码中留下复制的 `*_old`、`*_final`、`*_v2`、节点专属脚本或临时诊断。
+- 只暂存预期文件或 hunk。提交前同时检查未暂存和已暂存差异。
+- 每个 commit 只包含一项逻辑变更。完整的源码或文档变更应以 commit 结束，除非用户明确要求不提交，或工作有意保持未完成。
+- commit message 应说明改了什么以及为什么。未经用户明确授权，不得 amend、rebase 共享历史、force-push 或破坏可恢复性。
+- 绝不提交凭据、私有 token、原始模型产物、checkpoint、生成缓存或机器专属运行状态。

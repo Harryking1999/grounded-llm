@@ -1,123 +1,123 @@
-# Research brief: explicit state for LLM reasoning
+# 研究简述：为 LLM 推理引入显式状态
 
-Status: working hypothesis, not a settled paper claim
+状态：工作假设，不是已经确定的论文主张
 
-Updated: 2026-09-02
+更新时间：2026-09-02
 
-## Starting motivation
+## 起始动机
 
-Modern LLMs show substantial general competence, but fluent token generation is not by itself evidence that a model can reliably identify and maintain the task-relevant state. When the current state is wrong or inconsistent, later transition reasoning and planning can fail even if the model knows the vocabulary and rules.
+现代 LLM 展现出相当强的通用能力，但流畅的 token 生成本身不能证明模型能够可靠地识别并维护与任务有关的状态。如果当前状态错误或不一致，那么即使模型知道相关词汇和规则，后续的转移推理与规划仍可能失败。
 
-Our working proposal is to introduce an explicit **state model** that maintains task state and predicts how it changes. The state model would provide structured state knowledge to an LLM, with the goal of improving both correctness and generalization across tasks or rule variants.
+我们当前的提议是引入一个显式的**状态模型**，用它维护任务状态并预测状态如何变化。状态模型将向 LLM 提供结构化状态知识，目标是同时提升模型在不同任务或规则变体上的正确性和泛化能力。
 
-This is deliberately weaker and more defensible than saying that an LLM has "only language ability" or that the new component is already a world model.
+这是一种有意弱化、也更可辩护的表述；它没有声称 LLM“只有语言能力”，也没有声称新组件已经是世界模型。
 
-## Working formalization
+## 工作形式化
 
-The equations below are a provisional instrument for making experiments precise. They do not define the essence of the problem and should be discarded or revised if they hide the mechanism we are trying to understand. The first-principles question comes earlier: what capability is actually missing when an LLM loses track of a situation, and is “state” the cause, a useful description, or only a correlated proxy?
+下面的方程只是暂时用来精确定义实验的工具。它们不定义问题本质；如果它们遮蔽了我们试图理解的机制，就应当被丢弃或修改。第一性原理问题发生在形式化之前：当 LLM 无法把握当前情境时，真正缺失的能力是什么？“状态”是原因、有用的描述，还是仅仅相关的代理变量？
 
-Let an environment have latent state `s_t`, observation `o_t`, action `a_t`, and transition dynamics
+设环境具有潜在状态 `s_t`、观测 `o_t`、动作 `a_t` 和转移动力学：
 
 ```text
 o_t = g(s_t)
 s_{t+1} ~ T(s_t, a_t).
 ```
 
-From observation/action history, the proposed state model maintains a representation
+拟议的状态模型根据观测／动作历史维护如下表征：
 
 ```text
 z_t = F(o_0:t, a_0:t-1)
 ```
 
-that should be sufficient for one or more of the following:
+该表征应当足以支持以下一项或多项能力：
 
-1. reconstructing task-relevant properties of `s_t`;
-2. predicting `s_{t+1}` or `o_{t+1}` after an intervention `a_t`;
-3. determining legality, goals, and terminal conditions;
-4. supporting planning without relearning each surface encoding or rule combination.
+1. 重建 `s_t` 中与任务有关的属性；
+2. 预测干预动作 `a_t` 之后的 `s_{t+1}` 或 `o_{t+1}`；
+3. 判断合法性、目标和终止条件；
+4. 支持规划，而不必针对每一种表层编码或规则组合重新学习。
 
-The interface between `z_t` and the LLM, the training signal for `F`, and whether `F` is recurrent, symbolic-neural, or another architecture remain open.
+`z_t` 与 LLM 之间的接口、`F` 的训练信号，以及 `F` 应采用循环架构、符号—神经架构还是其他架构，目前都保持开放。
 
-## When the term “world model” is earned
+## 何时才足以使用“世界模型”这一称呼
 
-A component is not a meaningful world model merely because it encodes pixels, text, or board tokens. For this project, the stronger label requires evidence that its state is action-conditioned and predictively useful:
+一个组件不会仅仅因为编码了像素、文本或棋盘 token，就成为有意义的世界模型。对于本项目，若要使用这一更强称呼，需要证据表明其状态以动作为条件，并且具有预测用途：
 
-- the same underlying state is recognized across equivalent observations;
-- predicted changes follow interventions rather than surface correlations;
-- the representation retains information sufficient for future task outcomes;
-- the mechanism transfers to held-out states, encodings, or rule compositions.
+- 面对等价观测时，能够识别出相同的底层状态；
+- 预测出的变化遵循干预，而不是表面相关性；
+- 该表征保留了足以判断未来任务结果的信息；
+- 该机制可以迁移到留出的状态、编码方式或规则组合。
 
-A multimodal alignment module, board parser, language summary, deterministic rule engine, transition model, and planner are different objects. They may be useful baselines or components, but should not be collapsed into one claim.
+多模态对齐模块、棋盘解析器、语言摘要、确定性规则引擎、转移模型和规划器是不同对象。它们可以成为有用的 baseline 或组件，但不应被压缩成同一个主张。
 
-## Initial benchmark family
+## 初始 benchmark 家族
 
-The first candidate environments are:
+首批候选环境包括：
 
-- 3×3 tic-tac-toe;
-- Gomoku-like play on a reduced board;
-- rule variants such as changing the required run length;
-- a nonstandard local pattern, provisionally described as “four in a row followed by a right turn.”
+- 3×3 井字棋；
+- 在缩小棋盘上进行的类五子棋游戏；
+- 改变获胜所需连续棋子数等规则变体；
+- 一种非标准局部图案，暂时描述为“连续四个，然后右拐”。
 
-The last rule is promising because it breaks a familiar task prior, but it must be formalized unambiguously: allowed rotations/reflections, exact shape, overlines, blockers, simultaneous wins, board boundary behavior, and draw conditions.
+最后一条规则有潜力，因为它破坏了熟悉的任务先验；但必须把它无歧义地形式化，包括允许的旋转／镜像、精确形状、超过规定长度的连续棋子、阻挡、同时获胜、棋盘边界行为和和棋条件。
 
-Standard game play alone is a weak test because frontier LLMs may have memorized strategies and terminology. The useful tests are controlled perturbations:
+仅测试标准游戏是很弱的检验，因为前沿 LLM 可能已经记住了相关策略和术语。更有用的检验是受控扰动：
 
-- change board size, win predicate, coordinate names, or move order;
-- present identical states through different histories or encodings;
-- present counterfactual actions and request exact next states;
-- combine familiar atomic rules in held-out ways;
-- separate state questions from move selection.
+- 改变棋盘大小、获胜判定、坐标名称或落子顺序；
+- 通过不同历史或编码呈现同一个状态；
+- 给出反事实动作，并要求精确预测下一状态；
+- 以留出方式组合熟悉的原子规则；
+- 将状态问题与落子选择分开。
 
-## Capability decomposition and metrics
+## 能力拆分与指标
 
-| Capability | Question | Example metric |
+| 能力 | 问题 | 示例指标 |
 |---|---|---|
-| State estimation | Does the model know the actual current board/state? | exact state reconstruction, consistency across equivalent histories |
-| Rule application | Does it recognize legal and terminal states under the stated rule? | legality accuracy, terminal/winner accuracy |
-| Transition prediction | Can it predict the result of a specified action? | exact next-state accuracy |
-| Planning | Can it select actions that achieve the goal? | win/draw rate against fixed opponents |
-| Generalization | Does the mechanism survive changes not seen in training? | held-out rule/encoding/composition performance |
+| 状态估计 | 模型是否知道真实的当前棋盘／状态？ | 精确状态重建、等价历史之间的一致性 |
+| 规则应用 | 模型能否依据给定规则识别合法状态和终止状态？ | 合法性准确率、终止／获胜者准确率 |
+| 转移预测 | 模型能否预测执行指定动作后的结果？ | 精确下一状态准确率 |
+| 规划 | 模型能否选择实现目标的动作？ | 面对固定对手时的胜／和率 |
+| 泛化 | 面对训练中未见的变化时，该机制能否保持有效？ | 留出规则／编码／组合上的表现 |
 
-Illegal-action rate should always be reported for interactive play. Aggregate win rate alone can hide whether a failure came from perception, state maintenance, rule application, or search.
+交互式对局始终应报告非法动作率。仅报告总胜率可能掩盖失败究竟来自感知、状态维护、规则应用还是搜索。
 
-## Essential comparison conditions
+## 必要比较条件
 
-1. LLM only, text history, no external tools.
-2. LLM only, canonical rendered board, no external tools.
-3. LLM plus a deterministic, correct state representation supplied by the harness. This is an oracle-state upper/control condition, not the proposed learned method.
-4. LLM plus the learned state model.
-5. Tool-assisted search or a conventional game solver, reported separately as an oracle/control.
+1. 仅使用 LLM，输入文本历史，不使用外部工具。
+2. 仅使用 LLM，输入规范化渲染的棋盘，不使用外部工具。
+3. LLM 加上由 harness 提供的、确定且正确的状态表征。这是 oracle-state 上界／对照条件，不是拟议的学习方法。
+4. LLM 加上学习得到的状态模型。
+5. 工具辅助搜索或传统游戏求解器，作为 oracle／对照单独报告。
 
-The referee may be code. It may parse actions, update the true environment, reject illegal moves, and compute the winner. If code searches moves or recommends where the LLM should play, it changes the evaluated agent and counts as tool assistance.
+裁判可以由代码实现。它可以解析动作、更新真实环境、拒绝非法动作并判断获胜者。如果代码搜索动作或向 LLM 推荐落子位置，它就改变了被评测 agent，因此属于工具辅助。
 
-## Main confounds
+## 主要混淆因素
 
-- **Training contamination:** standard games and their strategies are common in pretraining and post-training data.
-- **Prompt scaffolding:** a carefully rendered board can repair perception without adding a learned state model.
-- **Hidden search:** code execution or repeated self-query can improve play while bypassing the proposed mechanism.
-- **Rule ambiguity:** a failure may reflect an underspecified new rule rather than weak state reasoning.
-- **Module capacity:** improvement may come from extra parameters or compute rather than explicit state.
-- **Evaluator leakage:** letting the agent query the deterministic referee can turn a scorer into a planner.
-- **Overclaiming:** better game performance does not by itself establish human-like state understanding or a general world model.
+- **训练污染：**标准游戏及其策略在预训练和后训练数据中很常见。
+- **提示词脚手架：**精心渲染的棋盘可能在不添加学习状态模型的情况下修复感知。
+- **隐藏搜索：**代码执行或反复自我询问可能绕开拟议机制并改善游戏表现。
+- **规则歧义：**失败可能来自新规则定义不充分，而不是状态推理能力弱。
+- **模块容量：**提升可能来自更多参数或计算量，而不是显式状态。
+- **评测器泄漏：**允许 agent 查询确定性裁判，可能把评分器变成规划器。
+- **过度主张：**游戏表现更好本身不能证明模型具备类人的状态理解或通用世界模型。
 
-## Falsification criteria
+## 证伪标准
 
-The core hypothesis weakens substantially if any of these hold:
+如果出现下列任一情况，核心假设都会显著削弱：
 
-- canonical board rendering or a deterministic state summary closes the gap without a learned state model;
-- failures persist even when the correct state is supplied, localizing the bottleneck to rules or planning;
-- the learned module helps only on trained surface encodings and not on equivalent re-encodings;
-- gains disappear after matching compute, context length, and information supplied to the LLM;
-- transition predictions are not more accurate under counterfactual actions;
-- a simple recurrent textual scratchpad matches the proposed module.
+- 规范棋盘渲染或确定性状态摘要在不使用学习状态模型的情况下就弥合了差距；
+- 即使提供正确状态，失败依然存在，从而把瓶颈定位到规则或规划；
+- 学习组件只对训练过的表层编码有帮助，对等价的重新编码没有帮助；
+- 匹配计算量、上下文长度和提供给 LLM 的信息后，增益消失；
+- 在反事实动作下，转移预测没有变得更准确；
+- 简单的循环式文本草稿本可以达到拟议组件的效果。
 
-Negative results are decision-relevant: they tell us whether the next mechanism should target state estimation, dynamics, or planning.
+负结果与决策直接相关：它们会告诉我们，下一个机制应该针对状态估计、动力学还是规划。
 
-## Questions that must be answered before architecture work
+## 架构工作之前必须回答的问题
 
-1. What exact information is hidden from or difficult for the base LLM?
-2. Is the state fully observable but hard to maintain, or partially observable and genuinely inferential?
-3. Must the state model learn transitions, or only filter and compress history?
-4. How is state injected into the LLM: text, tokens, cross-attention, recurrent memory, or another interface?
-5. What variation is held out so that “generalization” cannot mean memorizing the new benchmark?
-6. What result would distinguish the proposed mechanism from a parser, scratchpad, or search algorithm?
+1. 对基础 LLM 而言，究竟有哪些信息被隐藏或难以处理？
+2. 状态是完全可观测但难以维护，还是部分可观测、确实需要推断？
+3. 状态模型必须学习转移，还是只需要过滤并压缩历史？
+4. 状态如何注入 LLM：文本、token、cross-attention、循环记忆还是其他接口？
+5. 应当留出什么变化，才能保证“泛化”不是记住了新 benchmark？
+6. 什么结果可以把拟议机制与解析器、草稿本或搜索算法区分开？

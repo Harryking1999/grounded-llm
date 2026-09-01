@@ -1,28 +1,28 @@
-# State-aware LLM reasoning
+# 具备状态意识的 LLM 推理
 
-This is a new research workspace for testing a narrow question:
+这是一个新的研究工作区，用于检验一个范围明确的问题：
 
-> Can an explicit, learned state model improve an LLM's ability to maintain the current state, predict action-conditioned changes, and plan under unfamiliar task rules?
+> 一个显式的、通过学习得到的状态模型，能否提升 LLM 维护当前状态、预测以动作为条件的变化，以及在陌生任务规则下进行规划的能力？
 
-The wording is intentionally provisional. We have not yet established that current LLM failures come from a missing state representation, that the required component should be a small neural network, or that the resulting system warrants the term *world model*.
+这段表述有意保持暂定状态。我们尚未证明当前 LLM 的失败源于状态表征缺失，也尚未证明所需组件应当是一个小型神经网络，更未证明最终系统足以被称为*世界模型*。
 
-## Current direction
+## 当前方向
 
-The initial testbed will use small, exactly simulatable tasks such as tic-tac-toe, reduced-board Gomoku, and controlled rule variants. These environments let us separate:
+初始测试平台将采用能够被精确模拟的小型任务，例如井字棋、缩小棋盘的五子棋，以及受控规则变体。这些环境使我们能够区分：
 
-- state reconstruction from a history or observation;
-- legal and terminal-state judgment;
-- next-state prediction under an action;
-- planning and action selection;
-- memorized competence on standard rules from generalization to new rules.
+- 从历史或观测中重建状态；
+- 判断动作合法性和终止状态；
+- 预测执行一个动作后的下一状态；
+- 规划与动作选择；
+- 对标准规则的记忆性能力，以及对新规则的泛化能力。
 
-The primary comparison will keep the evaluated LLM tool-free. A deterministic program may act as the referee and scorer; programmatic search used to choose the model's move is reported separately as a tool-assisted control.
+主要比较中的被评测 LLM 不使用工具。确定性程序可以充当裁判和评分器；若使用程序搜索来选择模型落子，则应作为工具辅助对照单独报告。
 
-## Repository map
+## 仓库结构
 
-- `AGENTS.md`: collaboration, reasoning, experiment, and Git rules
-- `docs/RESEARCH_BRIEF.md`: working definitions, hypotheses, confounds, and falsification criteria
-- `docs/PROJECT_STATUS_AND_TODO.md`: the only current status page and ordered next actions
-- `experiments/`: durable studies once their contracts are concrete
+- `AGENTS.md`：协作、推理、实验和 Git 规则
+- `docs/RESEARCH_BRIEF.md`：工作定义、假设、混淆因素与证伪标准
+- `docs/PROJECT_STATUS_AND_TODO.md`：唯一当前状态页及有序后续行动
+- `experiments/`：当合同明确后建立的长期研究目录
 
-Large datasets, logs, checkpoints, and generated runs are intentionally excluded from Git.
+大型数据集、日志、checkpoint 和生成的运行结果有意不纳入 Git。

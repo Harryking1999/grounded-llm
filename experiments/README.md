@@ -1,32 +1,32 @@
-# Experiment harness
+# 实验 harness
 
-Create a study directory only when there is a concrete hypothesis or evaluator. The default shape is:
+只有在具备具体假设或评测器时，才创建研究目录。默认结构为：
 
 ```text
 experiments/<study>/
-  README.md          hypothesis, baselines, metrics, current conclusion
-  configs/           committed machine-readable formal run contracts
-  src/               reusable environment or method implementation
-  tests/             targeted correctness tests
+  README.md          假设、baseline、指标、当前结论
+  configs/           已提交的机器可读正式运行合同
+  src/               可复用的环境或方法实现
+  tests/             针对性的正确性测试
 ```
 
-Generated state belongs outside tracked source:
+生成状态应放在受跟踪源码之外：
 
 ```text
-runs/<run_id>/       resolved config, predictions, metrics, logs, artifacts
+runs/<run_id>/       解析后的配置、预测、指标、日志、产物
 ```
 
-`runs/` is ignored by Git. Promote only compact, decision-relevant results into the study README or the authoritative project status.
+Git 会忽略 `runs/`。只有紧凑且与决策有关的结果，才应提升到研究 README 或权威项目状态中。
 
-## Minimal run contract
+## 最小运行合同
 
-A formal run should identify:
+正式运行应明确：
 
-- model and inference settings;
-- environment/rule version and dataset split;
-- observation encoding and available tools;
-- random seed where applicable;
-- primary metrics;
-- source commit and output directory.
+- 模型与推理设置；
+- 环境／规则版本与数据集划分；
+- 观测编码和可用工具；
+- 适用时的随机种子；
+- 主要指标；
+- 源代码 commit 与输出目录。
 
-Exploratory smokes do not need production-grade manifests. Record only enough to reproduce the observation that informs the next decision.
+探索性 smoke 不需要生产级 manifest。只记录足以复现那项会影响下一步决策的观察即可。

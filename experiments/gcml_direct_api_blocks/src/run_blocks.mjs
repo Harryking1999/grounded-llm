@@ -12,12 +12,19 @@ if (!apiKey) throw new Error("Set GND_API_KEY or OPENAI_API_KEY in the process e
 if (!model) throw new Error("Set GND_MODEL or OPENAI_MODEL in the process environment.");
 if (!['responses', 'chat'].includes(apiStyle)) throw new Error("GND_API_STYLE must be responses or chat.");
 
-const grids = [
+const defaultGrids = [
   "0000111010/0000011110/0000000011/0000000111/0000001111/0000000100/0000011100/0000110000/0000000000/0000000000",
   "0000000000/0000000000/0000000000/0000000000/0000000000/0111100010/0000111010/0011101110/0000001111/0000000010",
   "0000000000/0000000000/1011000000/1111100000/1110111000/0011001000/0011011000/0001000000/0000000000/0000000000",
 ];
-const caseGrid = [0, 1, 2, 0, 1, 2, 1, 2];
+const grids = process.env.GCML_GRID_LIST ? JSON.parse(process.env.GCML_GRID_LIST) : defaultGrids;
+const caseGrid = process.env.GCML_CASE_GRID ? JSON.parse(process.env.GCML_CASE_GRID) : [0, 1, 2, 0, 1, 2, 1, 2];
+if (!Array.isArray(grids) || grids.length === 0 || grids.some((grid) => typeof grid !== "string")) {
+  throw new Error("GCML_GRID_LIST must be a JSON array of grid strings.");
+}
+if (!Array.isArray(caseGrid) || caseGrid.length === 0 || caseGrid.some((index) => !Number.isInteger(index) || index < 0 || index >= grids.length)) {
+  throw new Error("GCML_CASE_GRID must be a JSON array of valid grid indexes.");
+}
 const shapes = {
   0: [[0, 0], [0, 1], [1, 0]],
   1: [[0, 0], [1, 0], [1, 1]],
@@ -121,6 +128,7 @@ const results = await Promise.all(caseGrid.map((gridIndex, i) => {
   const grid = grids[gridIndex];
   return callModel(promptFor(grid)).then(({ data, text }) => ({
     case: i + 1,
+    grid_index: gridIndex,
     input_grid: grid,
     raw_output: text,
     response: data,
@@ -128,6 +136,7 @@ const results = await Promise.all(caseGrid.map((gridIndex, i) => {
   })).catch((error) => ({ case: i + 1, input_grid: grid, error: String(error), verdict: { pass: false } }));
 }));
 
+const passCount = results.filter((result) => result.verdict?.pass).length;
 const summary = {
   started_at: startedAt,
   finished_at: new Date().toISOString(),
@@ -135,15 +144,17 @@ const summary = {
   base_url: baseUrl,
   api_style: apiStyle,
   reasoning_effort: reasoningEffort,
+  sample_count: results.length,
+  pass_count: passCount,
   cases: results,
-  pass_at_8: results.filter((result) => result.verdict?.pass).length,
+  pass_at_n: `${passCount}/${results.length}`,
 };
 mkdirSync(dirname(`${outDir}/run.json`), { recursive: true });
 writeFileSync(`${outDir}/run.json`, JSON.stringify(summary, null, 2), "utf8");
 console.log(JSON.stringify({
   model,
   api_style: apiStyle,
-  pass_at_8: `${summary.pass_at_8}/8`,
+  pass_at_n: summary.pass_at_n,
   cases: results.map((result) => ({ case: result.case, verdict: result.verdict, error: result.error || null })),
   output: `${outDir}/run.json`,
 }, null, 2));

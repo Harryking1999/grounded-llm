@@ -133,7 +133,7 @@ const summary = {
   model,
   base_url: baseUrl,
   api_style: apiStyle,
-  cases: results.map(({ response, ...result }) => result),
+  cases: results,
   pass_at_8: results.filter((result) => result.verdict?.pass).length,
 };
 mkdirSync(dirname(`${outDir}/run.json`), { recursive: true });

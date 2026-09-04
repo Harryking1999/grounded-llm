@@ -5,6 +5,7 @@ const apiKey = process.env.GND_API_KEY || process.env.OPENAI_API_KEY;
 const baseUrl = (process.env.GND_BASE_URL || process.env.OPENAI_BASE_URL || "https://api.openai.com/v1").replace(/\/+$/, "");
 const model = process.env.GND_MODEL || process.env.OPENAI_MODEL;
 const apiStyle = (process.env.GND_API_STYLE || "responses").toLowerCase();
+const reasoningEffort = process.env.GND_REASONING_EFFORT || "medium";
 const outDir = resolve(process.env.GCML_RUN_DIR || "runs/gcml_direct_api_blocks/latest");
 
 if (!apiKey) throw new Error("Set GND_API_KEY or OPENAI_API_KEY in the process environment.");
@@ -100,7 +101,7 @@ function judge(gridText, raw) {
 
 async function callModel(prompt) {
   const body = apiStyle === "responses"
-    ? { model, input: prompt, max_output_tokens: 2000 }
+    ? { model, input: prompt, reasoning: { effort: reasoningEffort }, max_output_tokens: 2000 }
     : { model, messages: [{ role: "user", content: prompt }], max_tokens: 2000 };
   const endpoint = `${baseUrl}/${apiStyle === "responses" ? "responses" : "chat/completions"}`;
   const response = await fetch(endpoint, {
@@ -133,6 +134,7 @@ const summary = {
   model,
   base_url: baseUrl,
   api_style: apiStyle,
+  reasoning_effort: reasoningEffort,
   cases: results,
   pass_at_8: results.filter((result) => result.verdict?.pass).length,
 };

@@ -6,7 +6,7 @@ const baseUrl = (process.env.GND_BASE_URL || process.env.OPENAI_BASE_URL || "htt
 const model = process.env.GND_MODEL || process.env.OPENAI_MODEL;
 const apiStyle = (process.env.GND_API_STYLE || "responses").toLowerCase();
 const reasoningEffort = process.env.GND_REASONING_EFFORT || "medium";
-const outDir = resolve(process.env.GCML_RUN_DIR || "runs/gcml_direct_api_blocks/latest");
+const outDir = resolve(process.env.GCML_RUN_DIR || "experiments/gcml_direct_api_blocks/runs/latest");
 
 if (!apiKey) throw new Error("Set GND_API_KEY or OPENAI_API_KEY in the process environment.");
 if (!model) throw new Error("Set GND_MODEL or OPENAI_MODEL in the process environment.");
@@ -126,14 +126,16 @@ async function callModel(prompt) {
 const startedAt = new Date().toISOString();
 const results = await Promise.all(caseGrid.map((gridIndex, i) => {
   const grid = grids[gridIndex];
-  return callModel(promptFor(grid)).then(({ data, text }) => ({
+  const prompt = promptFor(grid);
+  return callModel(prompt).then(({ data, text }) => ({
     case: i + 1,
     grid_index: gridIndex,
     input_grid: grid,
+    prompt,
     raw_output: text,
     response: data,
     verdict: judge(grid, text),
-  })).catch((error) => ({ case: i + 1, input_grid: grid, error: String(error), verdict: { pass: false } }));
+  })).catch((error) => ({ case: i + 1, input_grid: grid, prompt, error: String(error), verdict: { pass: false } }));
 }));
 
 const passCount = results.filter((result) => result.verdict?.pass).length;

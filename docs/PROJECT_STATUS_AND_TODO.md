@@ -20,7 +20,7 @@
 
 ## 当前证据与未决事项
 
-已确认两项任务均来自 [GCML 正式论文](https://www.nature.com/articles/s42256-026-01254-4)，并定位 [官方代码及数据](https://github.com/LH-cbicr/GCML)。原始设置、文件、具体用例与代码差异记录在 [GCML 任务说明](GCML_TASKS.md)。当前只保留两项直接兼容文本 API 基线：Blocks 使用 GCML 8-object 测试切片，16 条独立调用的执行结果为 `pass@16=12/16=0.7500`；path32 使用官方固定 32-node 图和 8 组 start/goal（每组独立采样 2 次），16 条调用全部到达目标，`pass@16=16/16=1.0000`，其中最短路径 `5/16`、模型自报 `final_node` 正确 `16/16`。模型为 `gpt-5.6-luna`，推理强度 `medium`，均无 agent 工具面。完整请求、响应和逐案裁判结果分别保存在 `runs/gcml_direct_api_blocks/clawnode_luna_20260904_16/run.json` 与 `runs/gcml_direct_api_path32/clawnode_luna_20260904_16/run.json`；脚本、配置和简洁 setup 见对应 `experiments/gcml_direct_api_*` 目录；尚未训练状态网络。
+已确认两项任务均来自 [GCML 正式论文](https://www.nature.com/articles/s42256-026-01254-4)，并定位 [官方代码及数据](https://github.com/LH-cbicr/GCML)。原始设置、文件、具体用例与代码差异记录在 [GCML 任务说明](GCML_TASKS.md)。当前只保留两项直接兼容文本 API 基线：Blocks 使用 GCML 8-object 测试切片，16 条独立调用的执行结果为 `pass@16=12/16=0.7500`；path32 使用官方固定 32-node 图和 8 组 start/goal（每组独立采样 2 次），16 条调用全部到达目标，`pass@16=16/16=1.0000`，其中最短路径 `5/16`、模型自报 `final_node` 正确 `16/16`。模型为 `gpt-5.6-luna`，推理强度 `medium`，均无 agent 工具面。完整请求、响应、summary 和逐案裁判结果分别保存在实验目录下的单一 `experiments/gcml_direct_api_blocks/runs/clawnode_luna_20260904_16/run.json` 与 `experiments/gcml_direct_api_path32/runs/clawnode_luna_20260904_16/run.json`；脚本、配置和带逐字 prompt 的 setup 见对应 `experiments/gcml_direct_api_*` 目录；尚未训练状态网络。
 
 需保留的证据边界：发布的积木候选轨迹生成调用精确合法性检查与棋盘更新，这是对虚拟推演实现的描述，不意味着实际动作后不应得到环境反馈；图 notebook 的部分参数不同于论文正文；5 块测试切片发现 18/2000 个轮廓与训练集平移后重合，8 块测试切片对 5 块训练集未发现此类重合。当前 Blocks 16 条直接 API 结果是小批诊断，不是泛化结论：1 条首个动作非法，3 条动作合法但未清空且错误报告 solved，未出现格式失败。当前 path32 16 条都到达目标，但只有 5 条最短，说明该 pair 套件对到达目标不够难，后续应优先增加更长、更多分支或更接近的 start/goal；最短性与执行成功分开报告。所有 pass@16 的 16 表示独立 API 采样条数，不是 path32 步数上限。
 
@@ -31,7 +31,7 @@
 | 任务 | 当前安排 | 进入测试前需明确的内容 |
 | --- | --- | --- |
 | GCML 二维积木轮廓分解 | 必测；原始文件与样例已定位 | 将原始二值轮廓、8 种带方向形状和移除规则转为英文；明确实际动作后的新观测、虚拟推演可用信息及步数预算 |
-| GCML 32 节点图路径 | 直接 API 16 条已完成；当前样例偏简单 | 使用官方固定邻接矩阵；按到达目标验收，最短性由独立 BFS 单独报告，不设置动作步数上限；下一步设计更难的 start/goal 套件 |
+| GCML 32 节点图路径 | 直接 API 16 条已完成；node-only 样例偏简单 | 保留官方固定邻接矩阵和无步数上限控制；下一步优先评估 `(node, checkpoint_phase)` 组合状态变式，另设 config，按到达目标、checkpoint 顺序和产品图最短性分开报告 |
 | 翻花绳 | 已讨论认可候选抽象，复杂任务暂缓 | 定义状态等价关系与动作；尝试三维坐标直线／线段表示，检验交叉、穿绕和接触约束是否被保留 |
 | 华容道、鲁班锁 | 暂缓 | 明确具体版本、状态表示、基本动作、合法性和目标条件 |
 | 文字棋类 | 不作为主攻方向，保留为动机与后续验证方案 | 选择规则明确的棋种；会议对五子棋保留意见，也讨论过增加构型复杂度，但尚未选定棋种 |

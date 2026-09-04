@@ -91,13 +91,13 @@ $$
 
 ### Luna 直接 API 小批基线（2026-09-04）
 
-两项任务均通过兼容文本 API 直接调用 gpt-5.6-luna，推理强度为 medium，不创建 Codex task，也不提供浏览器、终端、文件、屏幕、仓库或其他 agent 工具。提示词只包含 GCML 任务规则、完整观测和可解析 JSON 输出合同；每条调用独立，原始 prompt、完整 API response、模型输出和外部裁判 verdict 保存在忽略目录 runs/，正式合同与复现实验脚本保存在对应 experiments/gcml_direct_api_* 目录。
+两项任务均通过兼容文本 API 直接调用 gpt-5.6-luna，推理强度为 medium，不创建 Codex task，也不提供浏览器、终端、文件、屏幕、仓库或其他 agent 工具。提示词只包含 GCML 任务规则、完整观测和可解析 JSON 输出合同；每条调用独立，原始 prompt、完整 API response、模型输出、summary 和外部裁判 verdict 保存在对应实验目录下的单一 `run.json`，正式合同与复现实验脚本也在对应 `experiments/gcml_direct_api_*` 目录。
 
 **Blocks setup 与结果**：使用 GCML tiling_order_10x10_8obj.h5 的测试切片。首轮 8 条覆盖原始行 18000--18002，第二轮 8 条使用此前未用的原始行 18003--18010；每条最多 8 个动作，非法动作立即停止，目标是清空 10×10 网格。两轮均为 6/8，合并 pass@16=12/16=0.7500：1 条首个动作越界非法，3 条动作全合法但没有清空且错误报告 solved，0 条格式失败。
 
 **path32 setup 与结果**：使用 GCML commit ff76859b71a2bc2056b50f5e052475351c007f76 中固定的 32-node 无向图，8 组 start/goal pair 各独立采样 2 次，共 16 次；不限制路径长度。输出为完整 path、逐步公开 rationale 和 final_node。外部裁判逐步验证 from 是否等于当前节点以及边是否存在，非法边立即停止；独立 BFS 计算最短长度。16/16 到达目标，pass@16=16/16=1.0000；最短路径 5/16，final_node 自报正确 16/16。到达目标与最优路径分开统计。
 
-完整结果分别见 runs/gcml_direct_api_blocks/clawnode_luna_20260904_16/run.json 和 runs/gcml_direct_api_path32/clawnode_luna_20260904_16/run.json。Blocks 的 12/16 暴露了可定位的合法性与状态收尾问题；path32 的 16/16 说明当前 pair 套件对到达目标偏简单，后续优先增加更长、更多分支或更接近的 start/goal，而不是立即引入状态网络。
+完整结果分别见 `experiments/gcml_direct_api_blocks/runs/clawnode_luna_20260904_16/run.json` 和 `experiments/gcml_direct_api_path32/runs/clawnode_luna_20260904_16/run.json`。Blocks 的 12/16 暴露了可定位的合法性与状态收尾问题；path32 的 16/16 说明当前 pair 套件对到达目标偏简单，后续优先增加组合状态，而不是立即把更长的 node-only 路径当作状态任务。
 
 这只是定位用小批，不是泛化结论。结果将后续对照拆成规则/格式、当前状态维护、单步转移、目标判断和规划五个轴；在状态网络训练前，先用匹配提示和独立实例检验更简单解释。
 

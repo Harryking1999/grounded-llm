@@ -7,7 +7,7 @@ const model = process.env.GND_MODEL || process.env.OPENAI_MODEL;
 const apiStyle = (process.env.GND_API_STYLE || "responses").toLowerCase();
 const reasoningEffort = process.env.GND_REASONING_EFFORT || "medium";
 const configPath = resolve(process.env.GCML_PATH32_CONFIG || "experiments/gcml_direct_api_path32/configs/path32_v1.json");
-const outDir = resolve(process.env.GCML_RUN_DIR || "runs/gcml_direct_api_path32/latest");
+const outDir = resolve(process.env.GCML_RUN_DIR || "experiments/gcml_direct_api_path32/runs/latest");
 
 if (!apiKey) throw new Error("Set GND_API_KEY or OPENAI_API_KEY in the process environment.");
 if (!model) throw new Error("Set GND_MODEL or OPENAI_MODEL in the process environment.");

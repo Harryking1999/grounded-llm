@@ -37,10 +37,23 @@ def analyze(suite, runs):
     by_case = defaultdict(list)
     for record in records:
         by_case[record["case_id"]].append(record)
-    studies, path_failures = [], []
+    studies, path_failures, block_illegal_moves = [], [], []
     for record in records:
         case = cases[record["case_id"]]
         verdict = record["verdict"]
+        illegal = verdict.get("illegal_action")
+        if case["condition"].startswith("blocks") and illegal:
+            action = illegal["action"]
+            key = tuple(action.get(k) for k in ("shape_id", "row", "col")) if isinstance(action, dict) else ()
+            index = blocks.BY_ACTION.get(key) if all(type(v) is int for v in key) else None
+            detail = {"case_id": case["id"], "replicate": record["replicate"], **illegal}
+            if index is not None:
+                initial = blocks.from_grid(case["grid"])
+                current = blocks.from_grid(verdict["trace"][-1]["remaining_grid"]) if verdict["trace"] else initial
+                empty_overlap = blocks.PLACEMENTS[index][0] & ~current
+                detail["initially_empty_cells"] = [divmod(i, blocks.SIZE) for i in blocks.cells(empty_overlap & ~initial)]
+                detail["previously_removed_cells"] = [divmod(i, blocks.SIZE) for i in blocks.cells(empty_overlap & initial)]
+            block_illegal_moves.append(detail)
         loss = verdict.get("first_irrecoverable_action")
         if loss and loss["kind"] == "untileable":
             solve = blocks.solver()
@@ -49,6 +62,17 @@ def analyze(suite, runs):
             minimum, reference_ids = solve(before)
             if minimum is None or solve(after)[0] is not None:
                 raise AssertionError("Invalid dead-end diagnosis")
+            # Exact-cover witness pieces are disjoint, so their order is free.
+            # Show the alternative that protects newly unsupported cells first,
+            # or otherwise overlaps the losing removal most directly.
+            supported_cells = 0
+            for index in blocks.legal_indices(after):
+                supported_cells |= blocks.PLACEMENTS[index][0]
+            unsupported_cells = after & ~supported_cells
+            removed = before ^ after
+            reference_ids = sorted(reference_ids, key=lambda index: (
+                (blocks.PLACEMENTS[index][0] & unsupported_cells).bit_count(),
+                (blocks.PLACEMENTS[index][0] & removed).bit_count()), reverse=True)
             # The reference from the same pre-action state demonstrates a concrete
             # alternative; it is never supplied to model inference.
             studies.append({"case_id": case["id"], "replicate": record["replicate"],
@@ -65,7 +89,9 @@ def analyze(suite, runs):
                                   "failure_type": verdict.get("failure_type"),
                                   "shortest_moves": case["reference"]["length"],
                                   "attempted_moves": verdict.get("attempted_moves"),
-                                  "illegal_move": verdict.get("illegal_move")})
+                                  "illegal_move": verdict.get("illegal_move"),
+                                  "legal_prefix_switch_reports_correct": verdict.get("switch_reports_correct"),
+                                  "legal_prefix_switch_reports_evaluated": verdict.get("switch_reports_evaluated")})
     studies.sort(key=lambda item: (item["first_loss"]["locally_supported_after"],
                                   -item["case_successes"], item["supported_prefix_length_capped"]), reverse=True)
     independent_studies, included = [], set()
@@ -79,6 +105,10 @@ def analyze(suite, runs):
         if not selected:
             continue
         block_stats[condition] = {"boards": len(selected)}
+        successes = [r for r in records if r["condition"] == condition and r["verdict"].get("pass")]
+        block_stats[condition]["successful_answers"] = len(successes)
+        block_stats[condition]["successful_answers_exceeding_construction_count"] = sum(
+            r["verdict"]["attempted_actions"] > cases[r["case_id"]]["construction_objects"] for r in successes)
         for key in ("occupied_cells", "minimum_actions", "initial_legal_actions", "dead_end_fraction",
                     "locally_supported_dead_end_fraction"):
             values = [c["diagnostics"][key] for c in selected]
@@ -88,7 +118,8 @@ def analyze(suite, runs):
             "missing_samples": [{"case_id": c, "replicate": r} for c, r in sorted(expected - seen)],
             "summary": summaries, "selected_block_statistics": block_stats,
             "dead_end_sample_count": len(studies), "dead_end_independent_board_count": len(included),
-            "case_studies": independent_studies, "path_failures": path_failures,
+            "case_studies": independent_studies, "block_illegal_moves": block_illegal_moves,
+            "path_failures": path_failures,
             "prior_failed_attempts": len(prior_failed_attempts),
             "transport_errors": dict(Counter(r.get("api_error") for r in records + prior_failed_attempts if r.get("api_error"))),
             "incomplete_responses": sum(r.get("response_status") != "completed" and not r.get("api_error")

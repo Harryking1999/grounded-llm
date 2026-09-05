@@ -174,6 +174,9 @@ def continuation_samples(previous, cases, config):
         if not record.get("api_error") and record.get("response_status") == "completed":
             completed.append(record)
         else:
+            error_code = (record.get("response", {}).get("error") or {}).get("code")
+            if not record.get("api_error") and error_code not in ("upstream_error", "server_error"):
+                raise ValueError(f"Prior sample {key} is not a confirmed service failure; do not resample budget-limited or unexplained incomplete answers")
             transport_failures.append(record)
     return completed, transport_failures
 

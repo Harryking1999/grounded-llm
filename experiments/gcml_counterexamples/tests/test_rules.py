@@ -136,6 +136,10 @@ class Statistics(unittest.TestCase):
         self.assertEqual([r["replicate"] for r in errors], [2])
         with self.assertRaises(ValueError):
             continuation_samples(previous, [{**case, "budget": 8}], config)
+        previous["cases"][1] = {**base, "replicate": 2, "response_status": "incomplete",
+                                "response": {"error": None, "incomplete_details": {"reason": "max_output_tokens"}}}
+        with self.assertRaises(ValueError):
+            continuation_samples(previous, [case], config)
 
     def test_stream_uses_final_response_and_detects_incomplete_stream(self):
         events = [{"type": "response.created", "response": {"status": "in_progress"}},

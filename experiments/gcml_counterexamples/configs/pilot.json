@@ -1,0 +1,46 @@
+{
+  "study": "gcml_counterexamples",
+  "purpose": "Find reproducible failures in solvable GCML-style tasks before training a state model.",
+  "seed": 20260905,
+  "source_commit": "ff76859b71a2bc2056b50f5e052475351c007f76",
+  "official_dataset": "literature_review/gcml_archive/GCML-ff76859b71a2bc2056b50f5e052475351c007f76/dataset/tiling_order_10x10_8obj.h5",
+  "graph_config": "experiments/gcml_direct_api_path32/configs/path32_v1.json",
+  "previous_blocks_run": "experiments/gcml_direct_api_blocks/runs/clawnode_luna_20260904_16/run.json",
+  "blocks": {
+    "grid_size": 10,
+    "shape_rows": ["11/10", "10/11", "11/01", "01/11", "1/1", "11", "1/1/1", "111"],
+    "official_rows": [18000, 20000],
+    "official_pool_size": 256,
+    "random8_count": 16,
+    "generated_objects": 12,
+    "generated_pool_size": 96,
+    "random12_count": 16,
+    "replicates": 8,
+    "proxy_rollouts": 16,
+    "latent_prefix_cap": 3,
+    "selection": "Uniformly sample independent boards without using trap or proxy scores. Exclude previously tested silhouettes and translation duplicates. Retain offline trap diagnostics for case studies, not selection of the primary API suite."
+  },
+  "path": {
+    "shortest_pair_count": 16,
+    "shortest_replicates": 8,
+    "gate_bits": [1, 2],
+    "gate_layouts_per_bit_count": 4,
+    "initial_masks": [0, 1],
+    "gate_replicates": 8,
+    "gate_reference_length_limit": 24,
+    "max_layout_attempts": 3000,
+    "minimum_closed_gate_detour": 2,
+    "gate_semantics": "All gates are undirected. Check every gate on an edge before moving, using the current mask; after arrival, flip the bit of any switch at the destination. Starting at a switch does not flip it. Goal depends only on the node."
+  },
+  "api": {
+    "model": "gpt-5.6-luna",
+    "base_url": "https://clawnode.top/v1",
+    "style": "responses",
+    "reasoning_effort": "medium",
+    "max_output_tokens": 8000,
+    "concurrency": 4,
+    "timeout_seconds": 300,
+    "max_calls": 512,
+    "automatic_retries": 0
+  }
+}

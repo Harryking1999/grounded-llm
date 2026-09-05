@@ -8,7 +8,7 @@ import unittest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 import blocks
 import path as path_task
-from run import aggregate, continuation_samples, prompt_for, read_response
+from run import aggregate, continuation_samples, final_sample, prompt_for, read_response
 
 
 class BlocksRules(unittest.TestCase):
@@ -138,6 +138,11 @@ class Statistics(unittest.TestCase):
             continuation_samples(previous, [{**case, "budget": 8}], config)
         previous["cases"][1] = {**base, "replicate": 2, "response_status": "incomplete",
                                 "response": {"error": None, "incomplete_details": {"reason": "max_output_tokens"}}}
+        kept, errors = continuation_samples(previous, [case], config)
+        self.assertEqual([r["replicate"] for r in kept], [1, 2])
+        self.assertEqual(errors, [])
+        self.assertTrue(final_sample(previous["cases"][1]))
+        previous["cases"][1]["response"]["incomplete_details"] = None
         with self.assertRaises(ValueError):
             continuation_samples(previous, [case], config)
 
@@ -161,6 +166,20 @@ class Statistics(unittest.TestCase):
         self.assertEqual(report["pass_at_8"], .5)
         rows[-1]["api_error"] = "HTTP 500"
         self.assertEqual(aggregate(rows, cases)["blocks8"]["valid_pass8_case_groups"], 1)
+
+    def test_budgeted_pass8_keeps_truncated_trials_in_denominator(self):
+        cases = [{"id": "a", "replicates": 8}, {"id": "b", "replicates": 8}]
+        rows = [{"case_id": c["id"], "condition": "blocks8", "response_status": "completed",
+                 "verdict": {"pass": c["id"] == "a" and i == 0}} for c in cases for i in range(8)]
+        rows[-1].update({"response_status": "incomplete", "output_tokens": 32000,
+                         "response": {"error": None, "incomplete_details": {"reason": "max_output_tokens"}},
+                         "verdict": {"pass": False, "failure_type": "budget_truncated"}})
+        summary = aggregate(rows, cases)["blocks8"]
+        self.assertEqual(summary["pass_at_8"], 1)
+        self.assertEqual(summary["budgeted_pass_at_8"], .5)
+        self.assertEqual(summary["budget_truncated_responses"], 1)
+        self.assertEqual(summary["final_samples"], 16)
+        self.assertEqual(summary["all_final_sample_output_tokens"], 32000)
 
 
 if __name__ == "__main__":

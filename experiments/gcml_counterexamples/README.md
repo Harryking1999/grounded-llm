@@ -101,8 +101,11 @@ one scheduled sample before concurrent calls and stops scheduling on API errors.
 After an observed transport interruption, `--continue-from <stopped run.json>` retains
 every completed answer, including model failures, and schedules only missing answers.
 It rejects changed prompts or model budgets and archives prior transport failures.
-Only transport errors and explicit upstream/server errors are eligible to be filled;
-budget-limited or unexplained incomplete answers require separate treatment.
+Only transport errors and explicit upstream/server errors are eligible to be filled.
+A response explicitly truncated by its output-token budget is retained as a final
+failed trial, and scheduling continues; unexplained incomplete responses still stop
+the run. Budgeted pass@8 includes truncated trials in its eight-attempt denominator,
+while completed-response-only pass@8 remains separately available.
 Analyze the continuation output alone, since it includes the retained answers.
 SSE streaming addresses the gateway timeout observed for long buffered requests; only
 the final response object is judged. Inspect actual returned token use and limits:
@@ -114,17 +117,21 @@ requested output-token cap as expected.
 ### DeepSeek Flash comparison
 
 The user authorized a second model on the same suite. The comparison contract is
-[`configs/deepseek_flash.json`](configs/deepseek_flash.json); it overrides only the
-model and endpoint and inherits the saved suite's other API settings. All cases,
+[`configs/deepseek_flash.json`](configs/deepseek_flash.json); it overrides the
+model, endpoint, output-token cap and request concurrency. All cases,
 prompts, rules, eight calls per case, and offline judges remain identical. Run it
 with `--api-config experiments/gcml_counterexamples/configs/deepseek_flash.json`
 and a separate output directory after setting the corresponding API credential.
 
 DeepSeek's official [thinking-mode documentation](https://api-docs.deepseek.com/guides/thinking_mode/)
-maps the requested `medium` to its `high` effort. The inherited output-token cap is
-only a matched request: Luna's gateway did not enforce it. Report actual token use
-and any truncated responses, without treating them as completed incorrect plans or
-refilling them as connection errors. No model result is available yet.
+maps the requested `medium` to its `high` effort. The first scheduled trial under
+the inherited cap exhausted its entire budget on reasoning and returned no answer;
+it remains in `runs/deepseek_flash/run.json` as a separate preliminary observation.
+Luna's gateway did not enforce that cap. The formal group therefore starts all
+samples afresh with a uniformly larger cap, under the updated committed contract,
+in `runs/deepseek_flash_full/`. This is not matched compute. Report actual token use
+and truncations separately; neither the preliminary trial nor any resampled model
+failure is added to the formal eight samples. No formal result is available yet.
 
 ### Luna completed pilot
 

@@ -20,7 +20,7 @@
 
 ## 当前证据与未决事项
 
-用户已授权加入 DeepSeek Flash 对照，复用 Luna 的同一批实例、提示词、无动作数限制积木规则与最短路裁判。正式对照配置见 [`deepseek_flash.json`](../experiments/gcml_counterexamples/configs/deepseek_flash.json)，仅切换模型和官方接口。其 `medium` 请求映射到 DeepSeek 自身的 `high`，因此需同时报告实际 token 与截断情况，不能视为计算量严格相同。目前尚无该模型结果。
+用户已授权加入 DeepSeek Flash 对照，复用 Luna 的同一批实例、提示词、无动作数限制积木规则与最短路裁判。正式对照配置见 [`deepseek_flash.json`](../experiments/gcml_counterexamples/configs/deepseek_flash.json)。首次按 Luna 请求上限调用时，预算全部用于推理，没有产生答案；这条截断记录单独保留。由于 Luna 网关未执行该上限，DeepSeek 正式组统一放宽 token 预算后完整重启，不混入初试记录。其 `medium` 请求映射到自身的 `high`，需报告实际 token 与截断情况，不能视为计算量严格相同。目前尚无正式组结果。
 
 新研究 [`gcml_counterexamples`](../experiments/gcml_counterexamples/README.md) 已建立正式配置、独立实例生成和精确裁判。当前配置见该研究 `configs/pilot.json`，不在本页重复机器参数。范围为原始 8 块、新生成 12 块、原图最短路、含开关门的最短路；按每题八次采样报告真正的 pass@8（候选中至少一次成功），路径另报仅到达目标的指标。用户明确要求积木取消动作步数限制：全程合法并最终清空即成功，生成积木数与最少移除步数仅作诊断；已有带限制调用单独保留，新提示词重新测试。所有新样本先确定再调用模型；开关门包含不同初始状态的配对，不能把配对算成独立布局。
 

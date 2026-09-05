@@ -4,11 +4,13 @@
   "suite": "experiments/gcml_counterexamples/runs/uncapped/suite.json",
   "api": {
     "model": "deepseek-v4-flash",
-    "base_url": "https://api.deepseek.com"
+    "base_url": "https://api.deepseek.com",
+    "max_output_tokens": 32000,
+    "concurrency": 16
   },
   "inheritance": "Other API settings and all cases come from the saved suite generated using configs/pilot.json. No prompts, reference solutions, or sampling counts are changed.",
   "reasoning_note": "The inherited request uses medium. DeepSeek maps medium to its high thinking effort; this is not a claim of matched compute across providers.",
-  "budget_note": "Retain the same requested output token cap. Inspect actual usage and truncations; the Luna gateway did not enforce the requested cap. Do not resample a budget-limited answer as a service error.",
+  "budget_note": "The first 8000-token trial exhausted its cap entirely on reasoning without a final answer. Preserve it separately in runs/deepseek_flash/run.json. Start all 512 formal trials afresh with a uniformly larger 32000-token cap; do not combine conditions. This is a more generous requested budget than Luna, not a matched-compute comparison. Any further truncation is a failed budgeted trial, not a completed incorrect plan; retain it without resampling. Report both all-final-trial budgeted pass@8 and completed-response-only groups.",
   "model_version_note": "Official documentation checked 2026-09-06 identifies the current Flash alias as DeepSeek-V4-Flash-0731. Preserve returned model fields in raw logs; the endpoint exposes a rolling alias.",
   "references": [
     "https://api-docs.deepseek.com/",

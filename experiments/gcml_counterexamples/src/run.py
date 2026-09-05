@@ -123,6 +123,17 @@ def evaluate(case, raw):
     return {**verdict, "parseable": True, "strict_json": strict}
 
 
+def budget_truncated(record):
+    return (not record.get("api_error") and record.get("response_status") == "incomplete"
+            and not record.get("response", {}).get("error")
+            and (record.get("response", {}).get("incomplete_details") or {}).get("reason") == "max_output_tokens")
+
+
+def final_sample(record):
+    """A budget-truncated trial is final and must never be silently resampled."""
+    return not record.get("api_error") and (record.get("response_status") == "completed" or budget_truncated(record))
+
+
 def aggregate(records, cases):
     groups = defaultdict(list)
     by_case = defaultdict(list)
@@ -135,6 +146,7 @@ def aggregate(records, cases):
         case_ids = sorted({r["case_id"] for r in rows})
         complete = [key for key in case_ids if len(by_case[key]) == case_lookup[key]["replicates"]]
         valid8 = [key for key in complete if all(not r.get("api_error") and r.get("response_status") == "completed" for r in by_case[key])]
+        budgeted8 = [key for key in complete if all(final_sample(r) for r in by_case[key])]
         passes = sum(r["verdict"].get("pass", False) for r in rows)
         eligible = [r for r in rows if not r.get("api_error") and r.get("response_status") == "completed"]
         failures = Counter(r["verdict"].get("failure_type") or "success" for r in rows)
@@ -146,18 +158,24 @@ def aggregate(records, cases):
                    "solved_case_groups": sum(any(r["verdict"].get("pass") for r in by_case[key]) for key in valid8),
                    "failure_counts": dict(failures),
                    "per_case": {key: {"n": len(by_case[key]), "successes": sum(r["verdict"].get("pass", False) for r in by_case[key])} for key in case_ids}}
+        summary.update({"final_samples": sum(final_sample(r) for r in rows),
+                        "budget_truncated_responses": sum(budget_truncated(r) for r in rows),
+                        "budgeted_pass8_case_groups": len(budgeted8),
+                        "budgeted_solved_case_groups": sum(any(r["verdict"].get("pass") for r in by_case[key]) for key in budgeted8),
+                        "budgeted_pass_at_8": sum(any(r["verdict"].get("pass") for r in by_case[key]) for key in budgeted8) / len(budgeted8) if budgeted8 else None})
         if condition.startswith("path"):
             summary["execution_successes"] = sum(r["verdict"].get("execution_pass", False) for r in rows)
             summary["execution_pass_at_8"] = sum(any(r["verdict"].get("execution_pass") for r in by_case[key]) for key in valid8) / len(valid8) if valid8 else None
         for name in ("output_tokens", "reasoning_tokens", "elapsed_seconds"):
             values = [r[name] for r in eligible if isinstance(r.get(name), (int, float))]
             summary[name] = {"sum": sum(values), "median": statistics.median(values), "max": max(values)} if values else None
+        summary["all_final_sample_output_tokens"] = sum(r.get("output_tokens") or 0 for r in rows if final_sample(r))
         summaries[condition] = summary
     return summaries
 
 
 def continuation_samples(previous, cases, config):
-    """Retain every completed answer, including failures, after a transport stop."""
+    """Retain every final trial, including failures and truncations, after a stop."""
     for field in ("model", "base_url", "reasoning_effort", "max_output_tokens", "style"):
         if previous["api_config"][field] != config[field]:
             raise ValueError(f"Continuation changes API field {field}")
@@ -171,7 +189,7 @@ def continuation_samples(previous, cases, config):
         seen.add(key)
         if record["request"]["input"] != prompt_for(case):
             raise ValueError(f"Continuation changes prompt for {case['id']}")
-        if not record.get("api_error") and record.get("response_status") == "completed":
+        if final_sample(record):
             completed.append(record)
         else:
             error_code = (record.get("response", {}).get("error") or {}).get("code")
@@ -209,7 +227,7 @@ def call(case, replicate, config, key):
                        "input_tokens": usage.get("input_tokens")})
         record["verdict"] = evaluate(case, raw)
         if data.get("status") != "completed":
-            record["verdict"] = {"pass": False, "failure_type": "incomplete_response", "partial_verdict": record["verdict"]}
+            record["verdict"] = {"pass": False, "failure_type": "budget_truncated" if budget_truncated(record) else "incomplete_response", "partial_verdict": record["verdict"]}
     except urllib.error.HTTPError as error:
         record["api_error"] = f"HTTP {error.code}"
         record["api_error_detail"] = error.read().decode(errors="replace").replace(key, "[redacted]")[:2000]
@@ -271,7 +289,8 @@ def main():
                "suite_path": args.suite, "api_config": config, "planned_calls": len(jobs),
                "api_config_path": args.api_config, "comparison_config": comparison,
                "continued_from": args.continue_from, "prior_failed_attempts": prior_failed_attempts,
-               "retained_completed_responses": len(previous_records),
+               "retained_completed_responses": sum(r.get("response_status") == "completed" for r in previous_records),
+               "retained_final_samples": len(previous_records),
                "started_at": datetime.now(timezone.utc).isoformat(), "status": "running", "cases": previous_records}
 
     def save():
@@ -296,7 +315,7 @@ def main():
     first_case, first_replicate = jobs[0]
     first = call(first_case, first_replicate, config, key)
     accept(first)
-    stopped = bool(first.get("api_error") or first.get("response_status") != "completed")
+    stopped = not final_sample(first)
     remaining = iter(jobs[1:])
     with ThreadPoolExecutor(max_workers=config["concurrency"]) as executor:
         pending = set()
@@ -308,7 +327,7 @@ def main():
             for future in done:
                 record = future.result()
                 accept(record)
-                if record.get("api_error") or record.get("response_status") != "completed":
+                if not final_sample(record):
                     stopped = True
             if not stopped:
                 for case, replicate in itertools.islice(remaining, config["concurrency"] - len(pending)):

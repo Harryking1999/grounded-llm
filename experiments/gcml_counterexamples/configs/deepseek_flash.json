@@ -1,0 +1,18 @@
+{
+  "study": "gcml_counterexamples",
+  "purpose": "Evaluate DeepSeek Flash on exactly the same uncapped blocks and shortest-path cases as Luna, with eight independent calls per case.",
+  "suite": "experiments/gcml_counterexamples/runs/uncapped/suite.json",
+  "api": {
+    "model": "deepseek-v4-flash",
+    "base_url": "https://api.deepseek.com"
+  },
+  "inheritance": "Other API settings and all cases come from the saved suite generated using configs/pilot.json. No prompts, reference solutions, or sampling counts are changed.",
+  "reasoning_note": "The inherited request uses medium. DeepSeek maps medium to its high thinking effort; this is not a claim of matched compute across providers.",
+  "budget_note": "Retain the same requested output token cap. Inspect actual usage and truncations; the Luna gateway did not enforce the requested cap. Do not resample a budget-limited answer as a service error.",
+  "model_version_note": "Official documentation checked 2026-09-06 identifies the current Flash alias as DeepSeek-V4-Flash-0731. Preserve returned model fields in raw logs; the endpoint exposes a rolling alias.",
+  "references": [
+    "https://api-docs.deepseek.com/",
+    "https://api-docs.deepseek.com/guides/thinking_mode/",
+    "https://api-docs.deepseek.com/api/create-response/"
+  ]
+}

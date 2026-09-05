@@ -1,6 +1,6 @@
 # GCML counterexamples: broad pass@8 pilot
 
-This study tests whether Luna can reliably produce complete legal tilings and
+This study tests whether API models can reliably produce complete legal tilings and
 shortest paths across independent task instances. It is a task-selection study
 before state-network training. One-shot complete plans are the intended protocol
 at this stage; no intermediate feedback or model-side tools are available.
@@ -110,6 +110,23 @@ the earlier endpoint did not echo/enforce the
 requested output-token cap as expected.
 
 ## Results
+
+### DeepSeek Flash comparison
+
+The user authorized a second model on the same suite. The comparison contract is
+[`configs/deepseek_flash.json`](configs/deepseek_flash.json); it overrides only the
+model and endpoint and inherits the saved suite's other API settings. All cases,
+prompts, rules, eight calls per case, and offline judges remain identical. Run it
+with `--api-config experiments/gcml_counterexamples/configs/deepseek_flash.json`
+and a separate output directory after setting the corresponding API credential.
+
+DeepSeek's official [thinking-mode documentation](https://api-docs.deepseek.com/guides/thinking_mode/)
+maps the requested `medium` to its `high` effort. The inherited output-token cap is
+only a matched request: Luna's gateway did not enforce it. Report actual token use
+and any truncated responses, without treating them as completed incorrect plans or
+refilling them as connection errors. No model result is available yet.
+
+### Luna completed pilot
 
 The suites have been generated and exact references verified. Targeted checks cover
 exhaustive tiny tilings, alternative solutions, budget enforcement, stop-on-illegal

@@ -225,6 +225,7 @@ def call(case, replicate, config, key):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--suite", default="experiments/gcml_counterexamples/runs/uncapped/suite.json")
+    parser.add_argument("--api-config", help="Committed comparison config; overrides only API settings, preserving the suite")
     parser.add_argument("--out", required=True)
     parser.add_argument("--condition", action="append")
     parser.add_argument("--limit", type=int)
@@ -232,6 +233,12 @@ def main():
     args = parser.parse_args()
     suite = json.loads((ROOT / args.suite).read_text())
     config = suite["config"]["api"]
+    comparison = None
+    if args.api_config:
+        comparison = json.loads((ROOT / args.api_config).read_text())
+        if (ROOT / comparison["suite"]).resolve() != (ROOT / args.suite).resolve():
+            raise ValueError("Comparison config must refer to the selected suite")
+        config = {**config, **comparison["api"]}
     key = os.environ.get("GND_API_KEY") or os.environ.get("OPENAI_API_KEY")
     if not key:
         raise ValueError("Set GND_API_KEY in the process environment")
@@ -262,6 +269,7 @@ def main():
         raise FileExistsError("Choose a new run directory; existing results are never overwritten")
     payload = {"source_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
                "suite_path": args.suite, "api_config": config, "planned_calls": len(jobs),
+               "api_config_path": args.api_config, "comparison_config": comparison,
                "continued_from": args.continue_from, "prior_failed_attempts": prior_failed_attempts,
                "retained_completed_responses": len(previous_records),
                "started_at": datetime.now(timezone.utc).isoformat(), "status": "running", "cases": previous_records}

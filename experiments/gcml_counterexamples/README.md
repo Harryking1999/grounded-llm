@@ -18,7 +18,8 @@ Do not infer a new model result from offline difficulty scores.
 - **Generated twelve-block silhouettes:** use the original shapes and grid.
   Repeatedly choose a nonoverlapping placement adjacent to the existing silhouette.
   Retain the construction decomposition as a solvability witness. The judge accepts
-  every legal decomposition within the budget, including shorter alternatives.
+  every complete legal decomposition without an action-count cap. Construction
+  count and exact minimum removals are metadata, not success constraints.
 - **Original graph shortest paths:** preserve every distinct pair from the previous
   pilot and add random distinct pairs. Unlike the old prompt, this prompt explicitly
   requires a shortest path. Arrival and optimality are scored separately.
@@ -38,8 +39,10 @@ removals. Exact minimum lengths and overlap/trap statistics are retained per boa
 ## Offline analysis and case studies
 
 The exact-cover solver records the minimum number of removals and a witness, or
-proves that a residual silhouette cannot be tiled. It distinguishes an untileable
-state from one that only exceeds the remaining action budget.
+proves that a residual silhouette cannot be tiled. The current block protocol has
+no action-count cap. The judge retains optional cap handling only to audit historical
+runs. The model's action count divided by the minimum is an efficiency diagnostic
+for successful plans, never an extra success requirement.
 
 For each initial board it examines all legal first removals. A trap can leave an
 obvious unsupported cell, or leave every cell covered by some legal placement while
@@ -80,17 +83,18 @@ From the repository root, using Python with `h5py` available for dataset extract
 python experiments/gcml_counterexamples/src/prepare.py
 python -m unittest discover -s experiments/gcml_counterexamples/tests -v
 $env:GND_API_KEY = '...'
-python -u experiments/gcml_counterexamples/src/run.py --condition path_shortest --out experiments/gcml_counterexamples/runs/pilot/path_shortest
-python -u experiments/gcml_counterexamples/src/run.py --condition blocks8 --condition blocks12 --out experiments/gcml_counterexamples/runs/pilot/blocks
-python -u experiments/gcml_counterexamples/src/run.py --condition path_gates1 --condition path_gates2 --out experiments/gcml_counterexamples/runs/pilot/path_gates
+python -u experiments/gcml_counterexamples/src/run.py --condition path_shortest --out experiments/gcml_counterexamples/runs/uncapped/path_shortest
+python -u experiments/gcml_counterexamples/src/run.py --condition blocks8 --condition blocks12 --out experiments/gcml_counterexamples/runs/uncapped/blocks
+python -u experiments/gcml_counterexamples/src/run.py --condition path_gates1 --condition path_gates2 --out experiments/gcml_counterexamples/runs/uncapped/path_gates
 ```
 
 The runner records the source commit and complete request body without authorization
 headers. It saves each completed sample atomically in the combined `run.json`. It
 does not overwrite an existing run or retry failed requests automatically. It checks
 one scheduled sample before concurrent calls and stops scheduling on API errors.
-Inspect
-actual returned token use and limits: the earlier endpoint did not echo/enforce the
+SSE streaming avoids the gateway timeout observed for long buffered requests; only
+the final response object is judged. Inspect actual returned token use and limits:
+the earlier endpoint did not echo/enforce the
 requested output-token cap as expected.
 
 ## Current evidence
@@ -98,5 +102,10 @@ requested output-token cap as expected.
 The suites have been generated and exact references verified. Targeted checks cover
 exhaustive tiny tilings, alternative solutions, budget enforcement, stop-on-illegal
 behavior, the historical failure points, gate timing, repeated-node product states,
-shortestness, and pass@8 grouping. API evaluation is the next step; no new model
-success/failure rate is claimed here yet.
+shortestness, pass@8 grouping, unlimited valid decompositions, and streamed response
+completion. The original graph shortest-path batch completed with 116/128 shortest
+paths and pass@8 of 16/16. The first capped block batch stopped after gateway 524
+errors (four model responses, three API errors); those outputs are historical only.
+The uncapped block batch uses new prompts and does not reuse capped model answers.
+Switch-gate shortest paths are also being evaluated. Full results will replace this
+interim evidence once the batches finish.

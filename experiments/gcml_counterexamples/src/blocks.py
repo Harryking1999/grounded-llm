@@ -132,7 +132,7 @@ def plausible_prefix(mask, cap):
 def diagnose(mask, budget, rng, rollouts=16, prefix_cap=3):
     solve = solver()
     minimum, witness = solve(mask)
-    if minimum is None or minimum > budget:
+    if minimum is None or (budget is not None and minimum > budget):
         raise ValueError("Candidate has no solution within its action budget")
     legal = legal_indices(mask)
     traps = []
@@ -146,13 +146,15 @@ def diagnose(mask, budget, rng, rollouts=16, prefix_cap=3):
                           "plausible_prefix_cap": prefix_cap,
                           "plausible_prefix_length_capped": plausible_prefix(after, prefix_cap)
                           if supported else -1})
-        elif remaining_min > budget - 1:
+        elif budget is not None and remaining_min > budget - 1:
             budget_traps += 1
     successes = {"random": 0, "largest_first": 0}
     for policy in successes:
         for _ in range(rollouts):
             remaining = mask
-            for _ in range(budget):
+            # Each legal removal clears at least two cells, so this bound follows
+            # from the rules and cannot exclude any legal complete decomposition.
+            for _ in range(budget if budget is not None else mask.bit_count() // 2):
                 options = legal_indices(remaining)
                 if not options:
                     break
@@ -173,13 +175,14 @@ def diagnose(mask, budget, rng, rollouts=16, prefix_cap=3):
             "reference_actions": [PLACEMENTS[i][1] for i in witness]}
 
 
-def judge(grid, actions, budget):
+def judge(grid, actions, budget=None):
     mask = from_grid(grid)
     if not isinstance(actions, list):
         return {"pass": False, "legal": False, "failure_type": "missing_actions", "trace": []}
     solve = solver()
     trace, first_loss, illegal = [], None, None
-    for step, action in enumerate(actions[:budget], 1):
+    initial_minimum, _ = solve(mask)
+    for step, action in enumerate(actions if budget is None else actions[:budget], 1):
         before = mask
         try:
             mask = apply(mask, action)
@@ -189,17 +192,19 @@ def judge(grid, actions, budget):
         minimum, _ = solve(mask)
         record = {"step": step, "action": action, "remaining_grid": to_grid(mask),
                   "remaining_cells": mask.bit_count(), "minimum_remaining_actions": minimum}
-        if first_loss is None and (minimum is None or minimum > budget - step):
+        if first_loss is None and (minimum is None or (budget is not None and minimum > budget - step)):
             first_loss = {"step": step, "kind": "untileable" if minimum is None else "budget_only",
                           "before_grid": to_grid(before), "after_grid": to_grid(mask),
                           "action": action, "locally_supported_after": locally_supported(mask)}
         trace.append(record)
     solved = mask == 0
-    failure = ("illegal_action" if illegal else "too_many_actions" if len(actions) > budget
+    failure = ("illegal_action" if illegal else "too_many_actions" if budget is not None and len(actions) > budget
                else "dead_end" if not solved and first_loss and first_loss["kind"] == "untileable"
-               else "budget_exhausted" if not solved and len(actions) >= budget
+               else "budget_exhausted" if not solved and budget is not None and len(actions) >= budget
                else "stopped_early" if not solved else None)
     return {"pass": failure is None, "legal": illegal is None, "solved": solved,
+            "minimum_actions": initial_minimum,
+            "action_efficiency_ratio": len(actions) / initial_minimum if failure is None and initial_minimum else None,
             "attempted_actions": len(actions), "executed_actions": len(trace),
             "failure_type": failure, "illegal_action": illegal,
             "first_irrecoverable_action": first_loss,

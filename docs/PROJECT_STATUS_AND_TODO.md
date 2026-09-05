@@ -20,7 +20,7 @@
 
 ## 当前证据与未决事项
 
-新研究 [`gcml_counterexamples`](../experiments/gcml_counterexamples/README.md) 已建立正式配置、独立实例生成和精确裁判。当前配置见该研究 `configs/pilot.json`，不在本页重复机器参数。范围为原始 8 块、新生成 12 块、原图最短路、含开关门的最短路；按每题八次采样报告真正的 pass@8（候选中至少一次成功），路径另报仅到达目标的指标。所有新样本先确定再调用模型；开关门包含不同初始状态的配对，不能把配对算成独立布局。尚未取得本轮 API 结果。
+新研究 [`gcml_counterexamples`](../experiments/gcml_counterexamples/README.md) 已建立正式配置、独立实例生成和精确裁判。当前配置见该研究 `configs/pilot.json`，不在本页重复机器参数。范围为原始 8 块、新生成 12 块、原图最短路、含开关门的最短路；按每题八次采样报告真正的 pass@8（候选中至少一次成功），路径另报仅到达目标的指标。用户明确要求积木取消动作步数限制：全程合法并最终清空即成功，生成积木数与最少移除步数仅作诊断；已有带限制调用单独保留，新提示词重新测试。所有新样本先确定再调用模型；开关门包含不同初始状态的配对，不能把配对算成独立布局。原图最短路已完成，116/128 次输出最短，pass@8=16/16；积木与开关门批次尚未完成。
 
 已确认两项任务均来自 [GCML 正式论文](https://www.nature.com/articles/s42256-026-01254-4)，并定位 [官方代码及数据](https://github.com/LH-cbicr/GCML)。原始设置、文件、具体用例与代码差异记录在 [GCML 任务说明](GCML_TASKS.md)。当前只保留两项直接兼容文本 API 基线：Blocks 使用 GCML 8-object 测试切片，16 条独立调用的执行结果为 `pass@16=12/16=0.7500`；path32 使用官方固定 32-node 图和 8 组 start/goal（每组独立采样 2 次），16 条调用全部到达目标，`pass@16=16/16=1.0000`，其中最短路径 `5/16`、模型自报 `final_node` 正确 `16/16`。模型为 `gpt-5.6-luna`，推理强度 `medium`，均无 agent 工具面。完整请求、响应、summary 和逐案裁判结果分别保存在实验目录下的单一 `experiments/gcml_direct_api_blocks/runs/clawnode_luna_20260904_16/run.json` 与 `experiments/gcml_direct_api_path32/runs/clawnode_luna_20260904_16/run.json`；脚本、配置和带逐字 prompt 的 setup 见对应 `experiments/gcml_direct_api_*` 目录；尚未训练状态网络。
 

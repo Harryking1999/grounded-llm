@@ -8,6 +8,7 @@
   "previous_blocks_run": "experiments/gcml_direct_api_blocks/runs/clawnode_luna_20260904_16/run.json",
   "blocks": {
     "grid_size": 10,
+    "action_cap": null,
     "shape_rows": ["11/10", "10/11", "11/01", "01/11", "1/1", "11", "1/1/1", "111"],
     "official_rows": [18000, 20000],
     "official_pool_size": 256,
@@ -36,6 +37,7 @@
     "model": "gpt-5.6-luna",
     "base_url": "https://clawnode.top/v1",
     "style": "responses",
+    "stream": true,
     "reasoning_effort": "medium",
     "max_output_tokens": 8000,
     "concurrency": 4,

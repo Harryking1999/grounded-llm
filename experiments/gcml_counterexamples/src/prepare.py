@@ -43,7 +43,7 @@ def load_official(config, rng):
             if current:
                 raise ValueError(f"Official witness does not clear row {row}")
             pool.append({"id": f"blocks8_row{row}", "condition": "blocks8",
-                         "grid": blocks.to_grid(mask), "budget": 8,
+                         "grid": blocks.to_grid(mask), "budget": config["blocks"]["action_cap"],
                          "source_hdf5_row": row, "construction_objects": 8,
                          "construction_reference": reference})
             if len(pool) == config["blocks"]["official_pool_size"]:
@@ -93,7 +93,7 @@ def generate_blocks(config, rng, seen):
             raise AssertionError("Generated witness failed")
         pool.append({"id": f"blocks{objects}_generated{len(pool):03d}",
                      "condition": f"blocks{objects}", "grid": blocks.to_grid(mask),
-                     "budget": objects, "construction_objects": objects,
+                     "budget": options["action_cap"], "construction_objects": objects,
                      "generator": "uniform placement among nonoverlapping adjacent placements",
                      "construction_reference": additions})
     return pool
@@ -183,7 +183,7 @@ def prepare_paths(config, rng):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", default="experiments/gcml_counterexamples/configs/pilot.json")
-    parser.add_argument("--out", default="experiments/gcml_counterexamples/runs/pilot/suite.json")
+    parser.add_argument("--out", default="experiments/gcml_counterexamples/runs/uncapped/suite.json")
     args = parser.parse_args()
     config = json.loads((ROOT / args.config).read_text())
     rng = random.Random(config["seed"])

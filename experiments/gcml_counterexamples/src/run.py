@@ -22,9 +22,12 @@ ROOT = Path(__file__).resolve().parents[3]
 
 def prompt_for(case):
     if case["condition"].startswith("blocks"):
+        budget_text = (f"Use at most {case['budget']} actions. A solution within this budget exists."
+                       if case["budget"] is not None else
+                       "There is no action-count limit. A complete decomposition exists. You do not need to minimize the number of actions.")
         return f"""Task: Remove reusable shapes from this 10x10 binary grid until every cell is 0.
 
-Rules: 1 means occupied and 0 means empty. An action is (shape_id, row, col), with zero-based row and column and the shape's top-left bounding-box anchor. An action is legal only when every 1-cell of the shape overlaps a current 1; a legal action sets those cells to 0. There is no gravity and no inventory limit. Shapes: 0=11/10, 1=10/11, 2=11/01, 3=01/11, 4=1/1, 5=11, 6=1/1/1, 7=111. Use at most {case['budget']} actions. A solution within this budget exists. Any valid decomposition is accepted; you do not need to recover a particular reference decomposition.
+Rules: 1 means occupied and 0 means empty. An action is (shape_id, row, col), with zero-based row and column and the shape's top-left bounding-box anchor. An action is legal only when every 1-cell of the shape overlaps a current 1; a legal action sets those cells to 0. There is no gravity and no inventory limit. Shapes: 0=11/10, 1=10/11, 2=11/01, 3=01/11, 4=1/1, 5=11, 6=1/1/1, 7=111. {budget_text} Any valid decomposition is accepted; you do not need to recover a particular reference decomposition.
 
 Initial grid rows, from row 0 through row 9 (each character is column 0 through column 9):
 {chr(10).join(case['grid'].split('/'))}
@@ -82,6 +85,31 @@ def parse_output(raw):
             return None, False
 
 
+def read_response(response, streaming):
+    if not streaming:
+        return json.loads(response.read().decode())
+    last_response = None
+    event_types = Counter()
+    # Responses SSE uses one JSON data line per event. Only complete response
+    # objects are used for verdicts; token deltas are never treated as a final answer.
+    for line in response:
+        line = line.decode("utf-8").strip()
+        if not line.startswith("data:"):
+            continue
+        payload = line[5:].strip()
+        if payload == "[DONE]":
+            break
+        event = json.loads(payload)
+        event_types[event.get("type", "unknown")] += 1
+        if isinstance(event.get("response"), dict):
+            last_response = event["response"]
+        if event.get("type") in ("response.completed", "response.incomplete", "response.failed"):
+            return last_response, dict(event_types)
+    if last_response is None:
+        raise ValueError("Stream ended without a response object")
+    return last_response, dict(event_types)
+
+
 def evaluate(case, raw):
     output, strict = parse_output(raw)
     if not isinstance(output, dict):
@@ -133,6 +161,8 @@ def call(case, replicate, config, key):
     body = {"model": config["model"], "input": prompt,
             "reasoning": {"effort": config["reasoning_effort"]},
             "max_output_tokens": config["max_output_tokens"], "tools": []}
+    if config.get("stream"):
+        body["stream"] = True
     start = time.monotonic()
     record = {"case_id": case["id"], "condition": case["condition"], "replicate": replicate,
               "request": body, "started_at": datetime.now(timezone.utc).isoformat()}
@@ -142,7 +172,10 @@ def call(case, replicate, config, key):
                                           "User-Agent": "Mozilla/5.0"})
     try:
         with urllib.request.urlopen(req, timeout=config["timeout_seconds"]) as response:
-            data = json.loads(response.read().decode())
+            if config.get("stream"):
+                data, record["stream_event_counts"] = read_response(response, True)
+            else:
+                data = read_response(response, False)
         raw = extract_text(data)
         usage = data.get("usage", {})
         record.update({"response": data, "response_status": data.get("status"),
@@ -165,7 +198,7 @@ def call(case, replicate, config, key):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--suite", default="experiments/gcml_counterexamples/runs/pilot/suite.json")
+    parser.add_argument("--suite", default="experiments/gcml_counterexamples/runs/uncapped/suite.json")
     parser.add_argument("--out", required=True)
     parser.add_argument("--condition", action="append")
     parser.add_argument("--limit", type=int)

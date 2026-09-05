@@ -129,9 +129,9 @@ def render_study(study, target):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--suite", default="experiments/gcml_counterexamples/runs/pilot/suite.json")
+    parser.add_argument("--suite", default="experiments/gcml_counterexamples/runs/uncapped/suite.json")
     parser.add_argument("--run", action="append", required=True)
-    parser.add_argument("--out", default="experiments/gcml_counterexamples/runs/pilot/analysis.json")
+    parser.add_argument("--out", default="experiments/gcml_counterexamples/runs/uncapped/analysis.json")
     parser.add_argument("--render", type=int, default=0)
     args = parser.parse_args()
     suite = json.loads((ROOT / args.suite).read_text())

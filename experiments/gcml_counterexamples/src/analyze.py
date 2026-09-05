@@ -14,11 +14,13 @@ ROOT = Path(__file__).resolve().parents[3]
 def analyze(suite, runs):
     cases = {c["id"]: c for c in suite["cases"]}
     records, seen = [], set()
-    run_info = []
+    run_info, prior_failed_attempts = [], []
     for filename in runs:
         payload = json.loads(filename.read_text())
         run_info.append({"path": str(filename.relative_to(ROOT)), "status": payload["status"],
-                         "source_commit": payload["source_commit"], "calls": len(payload["cases"])})
+                         "source_commit": payload["source_commit"], "calls": len(payload["cases"]),
+                         "continued_from": payload.get("continued_from")})
+        prior_failed_attempts.extend(payload.get("prior_failed_attempts", []))
         for record in payload["cases"]:
             key = record["case_id"], record["replicate"]
             if key in seen:
@@ -87,8 +89,10 @@ def analyze(suite, runs):
             "summary": summaries, "selected_block_statistics": block_stats,
             "dead_end_sample_count": len(studies), "dead_end_independent_board_count": len(included),
             "case_studies": independent_studies, "path_failures": path_failures,
-            "transport_errors": dict(Counter(r.get("api_error") for r in records if r.get("api_error"))),
-            "incomplete_responses": sum(r.get("response_status") != "completed" and not r.get("api_error") for r in records)}
+            "prior_failed_attempts": len(prior_failed_attempts),
+            "transport_errors": dict(Counter(r.get("api_error") for r in records + prior_failed_attempts if r.get("api_error"))),
+            "incomplete_responses": sum(r.get("response_status") != "completed" and not r.get("api_error")
+                                        for r in records + prior_failed_attempts)}
 
 
 def render_study(study, target):

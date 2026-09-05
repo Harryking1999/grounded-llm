@@ -8,7 +8,7 @@ import unittest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 import blocks
 import path as path_task
-from run import aggregate, prompt_for, read_response
+from run import aggregate, continuation_samples, prompt_for, read_response
 
 
 class BlocksRules(unittest.TestCase):
@@ -121,6 +121,22 @@ class PathRules(unittest.TestCase):
 
 
 class Statistics(unittest.TestCase):
+    def test_continuation_keeps_model_failures_and_rejects_changed_prompt(self):
+        case = {"id": "board", "condition": "blocks8", "replicates": 8,
+                "grid": "0000000000/" * 9 + "0000000011", "budget": None}
+        config = {"model": "test", "base_url": "https://example.invalid/v1",
+                  "reasoning_effort": "medium", "max_output_tokens": 8000, "style": "responses"}
+        base = {"case_id": "board", "request": {"input": prompt_for(case)},
+                "verdict": {"pass": False}}
+        previous = {"api_config": config, "cases": [
+            {**base, "replicate": 1, "response_status": "completed"},
+            {**base, "replicate": 2, "api_error": "URLError"}]}
+        kept, errors = continuation_samples(previous, [case], {**config, "stream": True})
+        self.assertEqual([r["replicate"] for r in kept], [1])
+        self.assertEqual([r["replicate"] for r in errors], [2])
+        with self.assertRaises(ValueError):
+            continuation_samples(previous, [{**case, "budget": 8}], config)
+
     def test_stream_uses_final_response_and_detects_incomplete_stream(self):
         events = [{"type": "response.created", "response": {"status": "in_progress"}},
                   {"type": "response.output_text.delta", "delta": "partial"},

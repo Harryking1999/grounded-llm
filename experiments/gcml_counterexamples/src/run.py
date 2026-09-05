@@ -156,6 +156,28 @@ def aggregate(records, cases):
     return summaries
 
 
+def continuation_samples(previous, cases, config):
+    """Retain every completed answer, including failures, after a transport stop."""
+    for field in ("model", "base_url", "reasoning_effort", "max_output_tokens", "style"):
+        if previous["api_config"][field] != config[field]:
+            raise ValueError(f"Continuation changes API field {field}")
+    lookup = {case["id"]: case for case in cases}
+    completed, transport_failures, seen = [], list(previous.get("prior_failed_attempts", [])), set()
+    for record in previous["cases"]:
+        case = lookup[record["case_id"]]
+        key = record["case_id"], record["replicate"]
+        if key in seen or not 1 <= record["replicate"] <= case["replicates"]:
+            raise ValueError(f"Invalid prior sample {key}")
+        seen.add(key)
+        if record["request"]["input"] != prompt_for(case):
+            raise ValueError(f"Continuation changes prompt for {case['id']}")
+        if not record.get("api_error") and record.get("response_status") == "completed":
+            completed.append(record)
+        else:
+            transport_failures.append(record)
+    return completed, transport_failures
+
+
 def call(case, replicate, config, key):
     prompt = prompt_for(case)
     body = {"model": config["model"], "input": prompt,
@@ -189,8 +211,9 @@ def call(case, replicate, config, key):
         record["api_error"] = f"HTTP {error.code}"
         record["api_error_detail"] = error.read().decode(errors="replace").replace(key, "[redacted]")[:2000]
         record["verdict"] = {"pass": False, "failure_type": "api_error"}
-    except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as error:
+    except (urllib.error.URLError, TimeoutError, ValueError) as error:
         record["api_error"] = type(error).__name__
+        record["api_error_detail"] = str(error).replace(key, "[redacted]")[:2000]
         record["verdict"] = {"pass": False, "failure_type": "api_error"}
     record["elapsed_seconds"] = round(time.monotonic() - start, 3)
     return record
@@ -202,6 +225,7 @@ def main():
     parser.add_argument("--out", required=True)
     parser.add_argument("--condition", action="append")
     parser.add_argument("--limit", type=int)
+    parser.add_argument("--continue-from", help="Prior stopped run with identical prompts; retain all completed answers")
     args = parser.parse_args()
     suite = json.loads((ROOT / args.suite).read_text())
     config = suite["config"]["api"]
@@ -214,8 +238,16 @@ def main():
     if config["style"] != "responses":
         raise ValueError("This study uses the Responses API contract")
     cases = [c for c in suite["cases"] if not args.condition or c["condition"] in args.condition]
+    previous_records, prior_failed_attempts = [], []
+    if args.continue_from:
+        previous = json.loads((ROOT / args.continue_from).read_text())
+        if previous["status"] != "stopped_api_error":
+            raise ValueError("Only a stopped API run can be continued")
+        previous_records, prior_failed_attempts = continuation_samples(previous, cases, config)
+    retained = {(r["case_id"], r["replicate"]) for r in previous_records}
     jobs = [(c, r) for c in cases for r in range(1, c["replicates"] + 1)]
     random.Random(suite["config"]["seed"] + 30000).shuffle(jobs)
+    jobs = [(case, replicate) for case, replicate in jobs if (case["id"], replicate) not in retained]
     if args.limit is not None:
         jobs = jobs[:args.limit]
     if not jobs or len(jobs) > config["max_calls"]:
@@ -227,7 +259,9 @@ def main():
         raise FileExistsError("Choose a new run directory; existing results are never overwritten")
     payload = {"source_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
                "suite_path": args.suite, "api_config": config, "planned_calls": len(jobs),
-               "started_at": datetime.now(timezone.utc).isoformat(), "status": "running", "cases": []}
+               "continued_from": args.continue_from, "prior_failed_attempts": prior_failed_attempts,
+               "retained_completed_responses": len(previous_records),
+               "started_at": datetime.now(timezone.utc).isoformat(), "status": "running", "cases": previous_records}
 
     def save():
         payload["summary"] = aggregate(payload["cases"], cases)
@@ -239,7 +273,7 @@ def main():
     def accept(record):
         payload["cases"].append(record)
         save()
-        print(json.dumps({"done": len(payload["cases"]), "total": len(jobs),
+        print(json.dumps({"done": len(payload["cases"]), "total": len(jobs) + len(retained),
                           "case": record["case_id"], "replicate": record["replicate"],
                           "pass": record["verdict"].get("pass"),
                           "failure": record["verdict"].get("failure_type"),
@@ -263,7 +297,7 @@ def main():
             for future in done:
                 record = future.result()
                 accept(record)
-                if record.get("api_error"):
+                if record.get("api_error") or record.get("response_status") != "completed":
                     stopped = True
             if not stopped:
                 for case, replicate in itertools.islice(remaining, config["concurrency"] - len(pending)):

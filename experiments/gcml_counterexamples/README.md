@@ -92,7 +92,11 @@ The runner records the source commit and complete request body without authoriza
 headers. It saves each completed sample atomically in the combined `run.json`. It
 does not overwrite an existing run or retry failed requests automatically. It checks
 one scheduled sample before concurrent calls and stops scheduling on API errors.
-SSE streaming avoids the gateway timeout observed for long buffered requests; only
+After an observed transport interruption, `--continue-from <stopped run.json>` retains
+every completed answer, including model failures, and schedules only missing answers.
+It rejects changed prompts or model budgets and archives prior transport failures.
+Analyze the continuation output alone, since it includes the retained answers.
+SSE streaming addresses the gateway timeout observed for long buffered requests; only
 the final response object is judged. Inspect actual returned token use and limits:
 the earlier endpoint did not echo/enforce the
 requested output-token cap as expected.

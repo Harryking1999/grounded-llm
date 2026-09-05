@@ -87,7 +87,9 @@ python -u experiments/gcml_counterexamples/src/run.py --condition path_gates1 --
 
 The runner records the source commit and complete request body without authorization
 headers. It saves each completed sample atomically in the combined `run.json`. It
-does not overwrite an existing run or retry failed requests automatically. Inspect
+does not overwrite an existing run or retry failed requests automatically. It checks
+one scheduled sample before concurrent calls and stops scheduling on API errors.
+Inspect
 actual returned token use and limits: the earlier endpoint did not echo/enforce the
 requested output-token cap as expected.
 

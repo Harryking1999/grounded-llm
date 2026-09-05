@@ -1,9 +1,10 @@
 """Direct text API evaluation. Exact solvers run only after model output arrives."""
 import argparse
 from collections import Counter, defaultdict
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 from datetime import datetime, timezone
 import json
+import itertools
 import os
 from pathlib import Path
 import random
@@ -137,7 +138,8 @@ def call(case, replicate, config, key):
               "request": body, "started_at": datetime.now(timezone.utc).isoformat()}
     req = urllib.request.Request(config["base_url"].rstrip("/") + "/responses",
                                  data=json.dumps(body).encode(), method="POST",
-                                 headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"})
+                                 headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json",
+                                          "User-Agent": "Mozilla/5.0"})
     try:
         with urllib.request.urlopen(req, timeout=config["timeout_seconds"]) as response:
             data = json.loads(response.read().decode())
@@ -151,8 +153,8 @@ def call(case, replicate, config, key):
         if data.get("status") != "completed":
             record["verdict"] = {"pass": False, "failure_type": "incomplete_response", "partial_verdict": record["verdict"]}
     except urllib.error.HTTPError as error:
-        # HTTP bodies can contain arbitrary gateway text; don't print it or keys.
         record["api_error"] = f"HTTP {error.code}"
+        record["api_error_detail"] = error.read().decode(errors="replace").replace(key, "[redacted]")[:2000]
         record["verdict"] = {"pass": False, "failure_type": "api_error"}
     except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as error:
         record["api_error"] = type(error).__name__
@@ -201,19 +203,39 @@ def main():
         temporary.replace(run_path)
 
     save()
+    def accept(record):
+        payload["cases"].append(record)
+        save()
+        print(json.dumps({"done": len(payload["cases"]), "total": len(jobs),
+                          "case": record["case_id"], "replicate": record["replicate"],
+                          "pass": record["verdict"].get("pass"),
+                          "failure": record["verdict"].get("failure_type"),
+                          "seconds": record["elapsed_seconds"]}), flush=True)
+
+    # The gateway rejected urllib's default user agent on the first actual run.
+    # Validate one real scheduled sample before launching concurrent calls, and
+    # keep only a bounded number in flight so service failures stop new requests.
+    first_case, first_replicate = jobs[0]
+    first = call(first_case, first_replicate, config, key)
+    accept(first)
+    stopped = bool(first.get("api_error") or first.get("response_status") != "completed")
+    remaining = iter(jobs[1:])
     with ThreadPoolExecutor(max_workers=config["concurrency"]) as executor:
-        pending = {executor.submit(call, case, replicate, config, key): (case["id"], replicate)
-                   for case, replicate in jobs}
-        for future in as_completed(pending):
-            record = future.result()
-            payload["cases"].append(record)
-            save()
-            print(json.dumps({"done": len(payload["cases"]), "total": len(jobs),
-                              "case": record["case_id"], "replicate": record["replicate"],
-                              "pass": record["verdict"].get("pass"),
-                              "failure": record["verdict"].get("failure_type"),
-                              "seconds": record["elapsed_seconds"]}), flush=True)
-    payload["status"] = "completed"
+        pending = set()
+        if not stopped:
+            for case, replicate in itertools.islice(remaining, config["concurrency"]):
+                pending.add(executor.submit(call, case, replicate, config, key))
+        while pending:
+            done, pending = wait(pending, return_when=FIRST_COMPLETED)
+            for future in done:
+                record = future.result()
+                accept(record)
+                if record.get("api_error"):
+                    stopped = True
+            if not stopped:
+                for case, replicate in itertools.islice(remaining, config["concurrency"] - len(pending)):
+                    pending.add(executor.submit(call, case, replicate, config, key))
+    payload["status"] = "stopped_api_error" if stopped else "completed"
     payload["finished_at"] = datetime.now(timezone.utc).isoformat()
     save()
     print(json.dumps({"output": str(run_path), "summary": payload["summary"]}), flush=True)

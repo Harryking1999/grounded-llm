@@ -263,6 +263,35 @@ twelve. Successful lengths range from 7–11 and 12–17, respectively. These ar
 decompositions. Their outcomes under a different prompt cannot be inferred by simply
 imposing the old cap after the fact.
 
+### Illustrated Luna case report
+
+The [Chinese report](results/luna_case_studies.md) covers 18 recorded failures
+across all five conditions and 15 distinct instances. It includes nine block
+diagrams and nine complete 32-node diagrams. Each path figure marks the start,
+goal, switches, current state, failed decision and verified shortest route.
+Solid gray roads are traversable in the pictured state; dashed red roads are
+closed. This is a state snapshot, not a claim that a gate stays closed for the
+whole plan. Switches independently toggle their controlled road groups.
+
+The main text explains the error, its cause, a valid alternative and a proposed
+diagnostic; expandable sections retain full replay details. Multiple samples
+from one instance are explicitly identified. The single-switch condition has
+only one instance with failures, shown as two route patterns.
+
+The analysis separates initial empty-cell overlap, reuse of removed cells,
+legal dead-end moves, premature stopping, gate violations and nonoptimal routes.
+A legal path first loses optimality when `1 + d(after) - d(before) > 0`, using
+exact remaining distances in the actual state. Differing from one arbitrary
+shortest witness does not count as an error.
+
+Run `python experiments/gcml_counterexamples/src/case_studies.py` from the repository
+root to reproduce the report, 18 figures, `index.html`, and `evidence.json` in
+`runs/luna_case_studies/`. This offline analysis uses
+[post hoc selections](configs/luna_case_studies.json), not a new API condition.
+All 512 source answers are rejudged and every illustrated alternative is replayed.
+Rendering uses matplotlib, networkx and an installed CJK font such as Microsoft
+YaHei or Noto Sans CJK SC.
+
 ### Block failures and case studies
 
 Final stopping reasons are 26 illegal actions, two dead ends and one premature stop

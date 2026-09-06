@@ -131,7 +131,93 @@ Luna's gateway did not enforce that cap. The formal group therefore starts all
 samples afresh with a uniformly larger cap, under the updated committed contract,
 in `runs/deepseek_flash_full/`. This is not matched compute. Report actual token use
 and truncations separately; neither the preliminary trial nor any resampled model
-failure is added to the formal eight samples. No formal result is available yet.
+failure is added to the formal eight samples.
+
+All **512 formal trials on 64 cases** are now collected and audited. Of these,
+444 have completed answers and 68 are explicitly budget-truncated trials. Every
+case has eight final trials; no model failure or truncation was replaced. Two
+connection failures were archived and filled. The final retained run is
+`runs/deepseek_flash_finish/run.json`, with exact replay in that directory's
+`analysis.json`. The compact report, including per-case comparisons and auxiliary
+format diagnostics, is [`results/deepseek_flash.json`](results/deepseek_flash.json).
+The paired heatmap is `runs/deepseek_flash_finish/paired_successes.png`.
+
+| Condition | Luna successes / trials | Flash successes / trials | Flash budget truncations | Luna pass@8 | Flash budgeted pass@8 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Official eight-block silhouettes | 99/128 | 115/128 | 13 | 15/16 | 16/16 |
+| Generated twelve-block silhouettes | 72/128 | 74/128 | 54 | 15/16 | 16/16 |
+| Original graph | 116/128 | 127/128 | 0 | 16/16 | 16/16 |
+| One switch | 60/64 | 61/64 | 0 | 8/8 | 8/8 |
+| Two switches | 40/64 | 61/64 | 1 | 7/8 | 8/8 |
+
+The Flash pass@8 column includes truncations as unsuccessful attempts. Excluding
+all case groups with any truncation would leave only eight eight-block boards and
+one twelve-block board; that conditional score must not replace the full-suite
+result. In the stored report both denominators are explicit. Flash has **no 0/8
+case in this suite**. The three Luna 0/8 cases score 6/8 (`blocks8_row18465`), 4/8
+(`blocks12_generated025`), and 7/8 (`path_gates2_layout0_mask0`) for Flash; every
+remaining attempt on those three cases is a budget truncation.
+
+**Failure types differ substantially.** All 189 completed Flash block answers
+clear the board legally. No completed block answer contains an illegal move or
+enters an irreversible dead end. Of the 68 truncations overall, 67 have no final
+answer text and one ends inside an incomplete action object. Their failure does
+not establish that Flash chose an incorrect full decomposition. The twelve-block
+boards `generated011`, `generated050`, and `generated090` each have only one
+success out of eight; the other seven attempts exhaust the budget. These are
+useful fixed-budget reliability cases, distinct from completed wrong plans.
+
+Six completed path answers fail the original output/judge contract:
+
+- Two omit the required outer JSON object. Wrapping their unedited move arrays
+  yields valid shortest paths. This auxiliary diagnosis changes no primary score;
+  the format-normalized rates would be 128/128 for original paths and 62/64 for
+  one switch.
+- Two on `path_gates1_layout0_mask1` submit `4 -> 8 -> 7 -> 16 -> 19`, using the
+  nonexistent edge `7 -> 16`. Inserting node 17 between 7 and 16 gives a shortest
+  five-edge reference, but that correction is never made for primary scoring.
+- Two on `path_gates2_layout2` reach the goal legally but use 8 instead of 7 moves
+  from initial mask 0, and 10 instead of 5 from mask 1. For the latter, the shortest
+  path is `6 -> 7 -> 20 -> 21 -> 22 -> 12`; the model needlessly flips switch 0 off
+  and back on before a longer detour. All its state reports are correct.
+
+Across the gate conditions, every evaluated switch report on a legal prefix is
+correct (731/731; malformed answers are excluded here). There is no observed closed-
+gate violation in completed Flash answers. These data locate its observed path
+errors in graph-edge use and optimal planning, not in the reported switch updates.
+
+**Inference use is material to interpretation.** Actual output tokens, including
+reasoning and truncated trials, total 7,609,454 for Flash versus 826,705 for Luna
+(about 9.20 times as many provider-reported tokens). This is not a FLOP ratio:
+tokenizers, inference controls and endpoints differ. Flash medians across all
+trials are 20,962 (eight blocks), 29,356 (twelve blocks), 961.5 (original paths),
+4,672.5 (one switch), and 12,343.5 (two switches). The block medians among completed
+answers alone are 20,120 and 23,427. One truncated response reports 32,001 tokens,
+one above the requested cap; the maximum is preserved in the report.
+
+"Output only JSON" constrains the final answer, not the API's thinking mode.
+The requested `medium` enables DeepSeek's `high` thinking effort. The
+[Responses API](https://api-docs.deepseek.com/api/create-response/)
+counts both reasoning and final-answer tokens against `max_output_tokens`; the
+judge reads only the message output, while the raw log retains separate reasoning
+items. Of the 7,609,454 output tokens, 7,559,136 (99.34%) are reasoning tokens;
+50,318 are non-reasoning output. One truncated eight-block sample spends 31,898
+tokens reasoning and is cut off after 102 answer tokens. Thus these truncations
+mostly reflect unfinished reasoning, not long final explanations. Disabling
+thinking would require an explicit API mode change and constitute a different
+baseline; it is not accomplished by asking for a concise final answer.
+
+Flash also benefits from accepting any legal complete decomposition: 69/115
+successful eight-block plans and 62/74 successful twelve-block plans exceed their
+construction counts. The eleven-action successful Flash answer on `row18465` is
+one concrete example. Construction counts must remain separate from action limits.
+
+The comparison supports retaining Luna's observed errors as model-specific evidence
+and adding Flash as a stronger baseline at its measured operating point. It does
+not establish cross-model inability to solve these instances. The research target
+remains useful: test whether an explicit state-and-transition interface improves
+reliability under a fixed inference budget and reduces avoidable reasoning work.
+The present baseline results do not yet demonstrate that such an interface will do so.
 
 ### Luna completed pilot
 
@@ -250,12 +336,32 @@ reports already present in this prompt.
 
 ## Implications for the next experiment
 
-Keep the current complete-plan protocol and fixed per-instance sampling as the
-counterexample baseline. **Do not add sixteen-piece cases in this pilot:** original
-eight-piece, generated twelve-piece and two-switch tests already yield 0/8 instances,
-and their concrete failure mechanisms are more actionable now than another scale.
-The following are proposed follow-ups, not additional
-conditions silently included in these results:
+Keep the current complete-plan protocol, uncapped block actions and fixed per-case
+sampling as the counterexample baseline. Luna yields repeatable failed instances;
+Flash solves each case in at least one of eight trials, with a substantially larger
+observed token cost. The following are proposed follow-ups, not additional conditions
+already run:
+
+- **Broaden gate dependencies before increasing graph size.** Original paths are
+  effectively saturated for Flash once the single formatting error is separated.
+  Increase independent gate layouts and introduce a small three/four-switch set
+  with ordered subgoals and revisits that can close a previously opened gate. Match
+  shortest-path length bands across conditions so extra difficulty is not simply
+  a longer answer. Exact product-state BFS keeps solvability and optimality auditable.
+- **Keep blocks, but postpone a blind sixteen-piece expansion.** Flash already
+  exhausts its budget on 54/128 twelve-block trials while every completed block
+  answer succeeds. Larger boards could mainly increase blank outputs. Use the
+  existing proved trap candidates as a separately labeled diagnostic set, including
+  legal removals that preserve local cell support yet make full completion impossible.
+  Choose those instances by offline structure before querying either model; retain
+  the randomly selected primary suite and its successful outcomes.
+- **Measure budget dependence on a small fixed diagnostic set.** The cross-provider
+  result changes both the model and its actual inference use. Before attributing a
+  gain to a state component, compare baseline and component within the same model,
+  with enforced budgets and equal sampling. First use a small budget/effort control
+  on the observed truncated cases to establish how often extra reasoning produces
+  a usable answer. Track successful attempts, pass@8, truncation and actual tokens
+  together. A single initial truncated trial is not an eight-sample low-budget baseline.
 
 - **Observation-to-state encoding:** compare the binary-row input with an equivalent
   indexed coordinate representation on the same boards. The illegal-action audit
@@ -263,7 +369,8 @@ conditions silently included in these results:
   identifies whether an observation encoder or an update mechanism is the more
   useful first component; retain the original-input result as well.
 - **Using the state during action evaluation:** in the gate case, the model reports
-  the state accurately yet violates a gate. A learned interface should support
+  the state accurately yet Luna violates a gate; Flash sometimes uses a nonexistent
+  graph edge or takes a nonoptimal route. A learned interface should support
   action-conditioned consequences and validity, in addition to state queries.
   Evaluate those predictions separately before attributing planning gains to them.
 - **Planning beyond immediate legality:** retain the first irreversible block move,

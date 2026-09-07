@@ -1,0 +1,37 @@
+{
+  "study": "sol_dag_blocks",
+  "seed": 20260907,
+  "samples_per_condition": 16,
+  "replicates": 8,
+  "graph_config": "experiments/gcml_direct_api_path32/configs/path32_v1.json",
+  "blocks": {
+    "grid_size": 10,
+    "construction_counts": [8, 12],
+    "shape_rows": ["11/10", "10/11", "11/01", "01/11", "1/1/1", "111", "011/110", "10/11/01", "110/011", "01/11/10"],
+    "shape_subclasses": ["L3", "L3", "L3", "L3", "I3", "I3", "SZ4", "SZ4", "SZ4", "SZ4"],
+    "selection": "Generate connected boards by uniform choice among feasible nonoverlapping adjacent placements; reject translation duplicates across both conditions. No difficulty selection.",
+    "action_cap": null,
+    "state_report": "board_after: array of ten length-ten binary strings after each removal"
+  },
+  "path": {
+    "orientation": "Independent hidden random topological permutation per graph; direct every base edge forward in that order.",
+    "pair_selection": "Reject DAGs with no eligible pair, then uniformly choose among ordered pairs whose shortest distance is at least minimum_shortest_moves.",
+    "minimum_shortest_moves": 4,
+    "presentation": "Independently shuffle node rows and each outgoing neighbor list, fixed across eight replicates.",
+    "objective": "shortest",
+    "allow_revisits": false,
+    "switches": false
+  },
+  "api": {
+    "model": "gpt-5.6-sol",
+    "base_url": "https://api.smilecodex.space/v1",
+    "style": "responses",
+    "stream": true,
+    "reasoning_effort": "medium",
+    "max_output_tokens": 16000,
+    "concurrency": 4,
+    "timeout_seconds": 600,
+    "max_calls": 384,
+    "automatic_retries": 0
+  }
+}

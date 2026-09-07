@@ -151,8 +151,12 @@ def main():
                     continue
                 accept(record)
                 if not transport.final_sample(record):
-                    stopped = "stopped_api_error"
-    payload["status"] = stopped or "completed"
+                    # An exhausted individual service-error slot remains visibly
+                    # unresolved; finish the other authorized trials if the
+                    # overall service failure cap has not been reached.
+                    if not retryable(record) or service_total >= config["maximum_archived_service_failures"]:
+                        stopped = "stopped_api_error"
+    payload["status"] = stopped or ("completed" if all(transport.final_sample(r) for r in payload["cases"]) else "stopped_api_error")
     payload["finished_at"] = datetime.now(timezone.utc).isoformat()
     save()
     print(json.dumps({"output": str(out), "status": payload["status"], "final_samples": sum(transport.final_sample(r) for r in payload["cases"])}), flush=True)

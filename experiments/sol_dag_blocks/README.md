@@ -39,7 +39,9 @@ python experiments/sol_dag_blocks/src/run.py --api-config experiments/sol_dag_bl
 python experiments/sol_dag_blocks/src/analyze.py --run experiments/sol_dag_blocks/runs/sol_medium/run.json
 ```
 
-生成器拒绝覆盖已有 `runs/suite.json`。配置须先提交再正式运行。`run.py` 复用已有 `gcml_counterexamples/src/run.py` 的 Responses API 调用、增量保存和服务失败续跑接口，通过替换提示词/评估入口使用本研究规则；旧实验源码不变。首个请求使用正式样本并计入 384 次，成功完成后以配置中的并发数推进。无自动重试，服务错误停止新请求；已在途请求完成后保存。已确认服务错误可用 `--continue-from` 指向旧记录并选择新输出目录补齐，保留所有完成或预算截断试验。
+生成器拒绝覆盖已有 `runs/suite.json`。配置须先提交再正式运行。`run.py` 复用已有 `gcml_counterexamples/src/run.py` 的 Responses API 调用与续跑校验接口，使用本研究调度、提示词和裁判；旧实验源码不变。首个请求使用正式样本并计入 384 次，成功完成后以配置中的并发数推进；同合同续跑已有完成答案时直接恢复并发。无自动重试，服务错误停止新请求；已在途请求完成后保存。已确认服务错误可用 `--continue-from` 指向旧记录并选择新输出目录补齐，保留所有完成或预算截断试验。运行中可创建 `runs/stop_requested`，调度器停止补充新请求、收齐在途结果后退出；续跑前移除该标记。
+
+用户在正式运行开始后要求从四并发提高到十二并发。初始四个完成答案全部保留；旧调度器不支持在线调整，切换时最多四个可能在途槽位单独归档为客户端中断，并在新阶段补齐。中断请求未收到最终答案，不作为模型失败，也不混入正式八次分母。当前主运行目录为 `runs/sol_medium_c12/`，接续 `runs/sol_medium/continuation.json`；后者保留初始原始记录和切换说明。发送总数最多比正式试验数多四次（若后续服务故障另行补齐，将额外记录）。网关早期返回的 `max_output_tokens` 为 null，不能确认其执行了请求上限。
 
 最小测试覆盖：48 个参考解重放、形状和 DAG 规则、初始空格/重复移除/越界/空洞、错误棋盘与格式、逆向边/回访/非最短、截断不重采。
 

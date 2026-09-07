@@ -7,7 +7,7 @@ import unittest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from tasks import CONFIG, TASKS
 from prepare import prepare
-from run import evaluate, transport
+from run import evaluate, transport, classify_service_failure
 from analyze import summarize
 
 
@@ -88,6 +88,14 @@ class StudyTests(unittest.TestCase):
         verdict = evaluate(case, "```json\n" + raw + "\n```")
         self.assertTrue(verdict["pass"])
         self.assertFalse(verdict["contract_pass"])
+
+    def test_gateway_errors_separate_from_model_truncation(self):
+        record = {"response_status": "failed", "response": {"error": {"code": "gateway_concurrency_limit"}}}
+        self.assertEqual(classify_service_failure(record)["api_error"], "gateway_concurrency_limit")
+        self.assertFalse(transport.final_sample(record))
+        truncated = {"response_status": "incomplete", "response": {"incomplete_details": {"reason": "max_output_tokens"}}}
+        self.assertNotIn("api_error", classify_service_failure(truncated))
+        self.assertTrue(transport.final_sample(truncated))
 
     def test_summary_counts_inputs_once_and_truncation_in_pass8(self):
         case = self.suite["cases"][0]

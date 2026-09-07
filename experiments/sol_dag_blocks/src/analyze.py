@@ -24,7 +24,9 @@ def summarize(run, suite):
             if replay != record["verdict"]:
                 raise ValueError(f"Replay mismatch: {record['case_id']} replicate {record['replicate']}")
     result = {"source_commit": run["source_commit"], "run_status": run["status"], "api_config": run["api_config"],
-              "service_failures_archived": len(run.get("prior_failed_attempts", [])), "conditions": {}}
+              "service_failures_archived": sum(r.get("api_error") != "client_interrupted_for_concurrency_change" for r in run.get("prior_failed_attempts", [])),
+              "client_interruption_slots_upper_bound": sum(r.get("api_error") == "client_interrupted_for_concurrency_change" for r in run.get("prior_failed_attempts", [])),
+              "conditions": {}}
     for condition, task in TASKS.items():
         selected = [c for c in cases.values() if c["condition"] == condition]
         rows = [r for r in run["cases"] if r["condition"] == condition]

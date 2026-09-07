@@ -36,6 +36,19 @@ transport.prompt_for = prompt_for
 transport.evaluate = evaluate
 
 
+def classify_service_failure(record):
+    error = (record.get("response", {}).get("error") or {})
+    if record.get("response_status") == "failed" and error.get("code") in (
+            "gateway_concurrency_limit", "server_error", "upstream_error"):
+        record["api_error"] = error["code"]
+        record["verdict"] = {"pass": False, "failure_type": "api_error"}
+    return record
+
+
+def call(case, replicate, config, key):
+    return classify_service_failure(transport.call(case, replicate, config, key))
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--suite", default="experiments/sol_dag_blocks/runs/suite.json")
@@ -57,6 +70,8 @@ def main():
         previous = json.loads((ROOT / args.continue_from).read_text(encoding="utf-8"))
         if previous["status"] not in ("stopped_api_error", "stopped_requested"):
             raise ValueError("Only stopped runs may be continued")
+        for record in previous["cases"]:
+            classify_service_failure(record)
         retained, archived = transport.continuation_samples(previous, cases, config)
     done_keys = {(r["case_id"], r["replicate"]) for r in retained}
     jobs = [(c, n) for c in cases for n in range(1, c["replicates"] + 1)]
@@ -92,7 +107,7 @@ def main():
     # The previous phase already validated this identical model/endpoint contract.
     if not retained:
         case, replicate = next(remaining)
-        record = transport.call(case, replicate, config, key)
+        record = call(case, replicate, config, key)
         accept(record)
         if not transport.final_sample(record):
             stopped = "stopped_api_error"
@@ -103,7 +118,7 @@ def main():
                 stopped = "stopped_requested"
             if not stopped:
                 for case, replicate in itertools.islice(remaining, config["concurrency"] - len(pending)):
-                    pending.add(executor.submit(transport.call, case, replicate, config, key))
+                    pending.add(executor.submit(call, case, replicate, config, key))
             if not pending:
                 break
             completed, pending = wait(pending, return_when=FIRST_COMPLETED)

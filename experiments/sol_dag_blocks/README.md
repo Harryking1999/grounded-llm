@@ -1,6 +1,6 @@
 # Sol：新形状积木与单向无环路径初测
 
-按照 2026-09-07 用户确认的实验修改方案，单独测试 8-block、12-block、32 节点 DAG，各 16 个实例、每题八次采样，共 384 次正式试验。只测 `gpt-5.6-sol`、`medium`。完整运行合同以 [`configs/sol_medium.json`](configs/sol_medium.json) 为准。全部 384 个完整答案已采集并通过最终重放验收。逐题与形状统计见 [`results/summary.json`](results/summary.json)，完整解读见 [`results/report.md`](results/report.md)。
+按照 2026-09-07 用户确认的实验修改方案，单独测试 8-block、12-block、32 节点 DAG，各 16 个实例、每题八次采样，共 384 次正式试验。只测 `gpt-5.6-sol`、`medium`。完整运行合同以 [`configs/sol_medium.json`](configs/sol_medium.json) 为准。全部 384 个完整答案已采集并通过最终重放验收。逐题与形状统计见 [`results/summary.json`](results/summary.json)，完整解读及三个图解案例见 [`results/report.md`](results/report.md)。
 
 
 ## 当前结论

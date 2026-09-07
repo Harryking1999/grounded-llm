@@ -1,12 +1,11 @@
 """Use the existing Responses transport/continuation interface with this study's tasks."""
 import importlib.util
 import argparse
+from collections import Counter, deque
 from concurrent.futures import ThreadPoolExecutor, wait, FIRST_COMPLETED
 from datetime import datetime, timezone
-import itertools
 import json
 import os
-from pathlib import Path
 import random
 import subprocess
 import sys
@@ -47,6 +46,11 @@ def classify_service_failure(record):
 
 def call(case, replicate, config, key):
     return classify_service_failure(transport.call(case, replicate, config, key))
+
+
+def retryable(record):
+    code = record.get("api_error", "")
+    return code in ("gateway_concurrency_limit", "server_error", "upstream_error", "HTTP 429") or code.startswith("HTTP 5")
 
 
 def main():
@@ -102,11 +106,15 @@ def main():
                           "replicate": record["replicate"], "pass": record["verdict"].get("pass"),
                           "failure": record["verdict"].get("failure_type"), "seconds": record["elapsed_seconds"]}), flush=True)
 
-    stopped, remaining = None, iter(jobs)
+    stopped, remaining = None, deque(jobs)
+    lookup = {c["id"]: c for c in cases}
+    service_counts = Counter((r["case_id"], r["replicate"]) for r in archived if r.get("api_error") != "client_interrupted_for_concurrency_change")
+    service_total = sum(service_counts.values())
+    active_limit = config["concurrency"]
     save()
     # The previous phase already validated this identical model/endpoint contract.
     if not retained:
-        case, replicate = next(remaining)
+        case, replicate = remaining.popleft()
         record = call(case, replicate, config, key)
         accept(record)
         if not transport.final_sample(record):
@@ -117,13 +125,30 @@ def main():
             if not stopped and (ROOT / args.stop_file).exists():
                 stopped = "stopped_requested"
             if not stopped:
-                for case, replicate in itertools.islice(remaining, config["concurrency"] - len(pending)):
+                for _ in range(min(len(remaining), active_limit - len(pending))):
+                    case, replicate = remaining.popleft()
                     pending.add(executor.submit(call, case, replicate, config, key))
             if not pending:
                 break
             completed, pending = wait(pending, return_when=FIRST_COMPLETED)
             for future in completed:
                 record = future.result()
+                slot = record["case_id"], record["replicate"]
+                if (not stopped and retryable(record) and service_counts[slot] < config["automatic_retries"]
+                        and service_total < config["maximum_archived_service_failures"]):
+                    service_counts[slot] += 1
+                    service_total += 1
+                    payload["prior_failed_attempts"].append(record)
+                    # Delay retries by placing them after untouched trials. This
+                    # responds only to observed, explicitly identified service errors.
+                    remaining.append((lookup[record["case_id"]], record["replicate"]))
+                    if record.get("api_error") == "gateway_concurrency_limit":
+                        active_limit = max(1, active_limit - 1)
+                        payload["effective_concurrency_after_gateway_limit"] = active_limit
+                    save()
+                    print(json.dumps({"service_failure_archived": slot, "error": record["api_error"],
+                                      "retry_queued": True, "active_limit": active_limit}), flush=True)
+                    continue
                 accept(record)
                 if not transport.final_sample(record):
                     stopped = "stopped_api_error"

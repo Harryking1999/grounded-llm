@@ -3,12 +3,17 @@ import json
 from pathlib import Path
 import sys
 import unittest
+from unittest.mock import patch
+import tempfile
+import contextlib
+import io
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from tasks import CONFIG, TASKS
 from prepare import prepare
 from run import evaluate, transport, classify_service_failure
 from analyze import summarize
+import run as study_run
 
 
 class StudyTests(unittest.TestCase):
@@ -96,6 +101,38 @@ class StudyTests(unittest.TestCase):
         truncated = {"response_status": "incomplete", "response": {"incomplete_details": {"reason": "max_output_tokens"}}}
         self.assertNotIn("api_error", classify_service_failure(truncated))
         self.assertTrue(transport.final_sample(truncated))
+
+    def test_scheduler_retries_service_error_without_replacing_final_answers(self):
+        case = copy.deepcopy(self.suite["cases"][-1])
+        case["replicates"] = 2
+        raw = json.dumps({"path": case["reference"]["path"], "final_node": case["goal"]})
+        calls = []
+
+        def fake_call(c, n, config, key):
+            calls.append(n)
+            record = {"case_id": c["id"], "condition": c["condition"], "replicate": n,
+                      "elapsed_seconds": 0, "request": {"input": TASKS[c["condition"]].prompt(c)}}
+            if len(calls) == 2:
+                return {**record, "api_error": "server_error", "verdict": {"pass": False, "failure_type": "api_error"}}
+            return {**record, "response_status": "completed", "raw_output": raw, "verdict": evaluate(c, raw)}
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            suite_path, config_path = root / "suite.json", root / "config.json"
+            config = copy.deepcopy(CONFIG)
+            config["suite"] = str(suite_path)
+            config["api"]["max_calls"] = 2
+            suite_path.write_text(json.dumps({"config": config, "cases": [case]}))
+            config_path.write_text(json.dumps(config))
+            argv = ["run.py", "--suite", str(suite_path), "--api-config", str(config_path), "--out", str(root / "out"), "--stop-file", str(root / "stop")]
+            with patch.object(sys, "argv", argv), patch.dict("os.environ", {"GND_API_KEY": "test"}), patch.object(study_run, "call", fake_call), contextlib.redirect_stdout(io.StringIO()):
+                study_run.main()
+            result = json.loads((root / "out/run.json").read_text())
+            self.assertEqual(result["status"], "completed")
+            self.assertEqual(len(result["cases"]), 2)
+            self.assertEqual(len(result["prior_failed_attempts"]), 1)
+            self.assertEqual(calls[1], calls[2])
+            self.assertNotEqual(calls[0], calls[2])
 
     def test_summary_counts_inputs_once_and_truncation_in_pass8(self):
         case = self.suite["cases"][0]

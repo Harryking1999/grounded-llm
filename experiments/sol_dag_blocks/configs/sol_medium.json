@@ -33,6 +33,8 @@
     "concurrency": 12,
     "timeout_seconds": 600,
     "max_calls": 384,
-    "automatic_retries": 0
+    "automatic_retries": 2,
+    "maximum_archived_service_failures": 16,
+    "service_retry_policy": "Only confirmed gateway concurrency/server/upstream failures and HTTP 429/5xx are queued behind untouched trials; completed model failures and token truncations are never retried. Stop when a slot exhausts two retries or the global service failure cap is reached."
   }
 }

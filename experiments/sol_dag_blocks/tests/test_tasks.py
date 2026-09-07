@@ -8,6 +8,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from tasks import CONFIG, TASKS
 from prepare import prepare
 from run import evaluate, transport
+from analyze import summarize
 
 
 class StudyTests(unittest.TestCase):
@@ -87,6 +88,26 @@ class StudyTests(unittest.TestCase):
         verdict = evaluate(case, "```json\n" + raw + "\n```")
         self.assertTrue(verdict["pass"])
         self.assertFalse(verdict["contract_pass"])
+
+    def test_summary_counts_inputs_once_and_truncation_in_pass8(self):
+        case = self.suite["cases"][0]
+        task = TASKS[case["condition"]]
+        mask = task.from_grid(case["grid"])
+        actions = copy.deepcopy(case["construction_reference"])
+        for action in actions:
+            mask = task.apply(mask, action)
+            action["board_after"] = task.to_rows(mask)
+        raw = json.dumps({"actions": actions, "final_status": "solved"})
+        rows = [{"case_id": case["id"], "condition": case["condition"], "replicate": i,
+                 "response_status": "completed", "raw_output": raw, "verdict": evaluate(case, raw)} for i in range(1, 8)]
+        rows.append({"case_id": case["id"], "condition": case["condition"], "replicate": 8,
+                     "response_status": "incomplete", "response": {"incomplete_details": {"reason": "max_output_tokens"}},
+                     "verdict": {"pass": False, "failure_type": "budget_truncated"}})
+        summary = summarize({"cases": rows, "source_commit": "test", "status": "completed", "api_config": CONFIG["api"]}, {"cases": [case]})["conditions"]["blocks8"]
+        self.assertEqual(summary["sample_success_rate"], 7 / 8)
+        self.assertEqual(summary["pass_at_8"], 1)
+        self.assertEqual(summary["shapes"]["by_id"]["input_construction"]["total"], 8)
+        self.assertEqual(summary["shapes"]["by_id"]["output_successful"]["total"], 56)
 
 
 if __name__ == "__main__":

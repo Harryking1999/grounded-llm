@@ -1,6 +1,17 @@
 # Sol：新形状积木与单向无环路径初测
 
-按照 2026-09-07 用户确认的实验修改方案，单独测试 8-block、12-block、32 节点 DAG，各 16 个实例、每题八次采样，共 384 次正式试验。只测 `gpt-5.6-sol`、`medium`。完整运行合同以 [`configs/sol_medium.json`](configs/sol_medium.json) 为准。当前已完成离线生成与裁判验证，API 结果待运行后填写。
+按照 2026-09-07 用户确认的实验修改方案，单独测试 8-block、12-block、32 节点 DAG，各 16 个实例、每题八次采样，共 384 次正式试验。只测 `gpt-5.6-sol`、`medium`。完整运行合同以 [`configs/sol_medium.json`](configs/sol_medium.json) 为准。全部 384 个完整答案已采集并通过最终重放验收。逐题与形状统计见 [`results/summary.json`](results/summary.json)，完整解读见 [`results/report.md`](results/report.md)。
+
+
+## 当前结论
+
+| 条件 | 任务成功 | 成功率 | pass@8 | 完整合同通过 |
+| --- | ---: | ---: | ---: | ---: |
+| 8-block | 91/128 | 71.1% | 16/16 | 82/128 |
+| 12-block | 69/128 | 53.9% | 13/16 | 67/128 |
+| 单向 DAG | 119/128 | 93.0% | 16/16 | 119/128 |
+
+12-block 的 `blocks12_05`、`blocks12_09`、`blocks12_13` 均为 0/8，24 次输出中有 21 次空计划、3 次非法动作。逐步棋盘在合法前缀上的完全正确率为 8-block 777/802（96.9%）、12-block 973/1008（96.5%）；六个非法积木答案此前有非空且全部自报正确的合法前缀。明确禁止初始空格仍未消除违规，但稳定失败以空计划为主，不能全部归因于状态维护。形状子类的输入/输出频率已统计；S/Z 输出占比较低不能直接当作识别准确率下降，因为合法分解不唯一。
 
 ## 假设与边界
 
@@ -41,7 +52,9 @@ python experiments/sol_dag_blocks/src/analyze.py --run experiments/sol_dag_block
 
 生成器拒绝覆盖已有 `runs/suite.json`。配置须先提交再正式运行。`run.py` 复用已有 `gcml_counterexamples/src/run.py` 的 Responses API 调用与续跑校验接口，使用本研究调度、提示词和裁判；旧实验源码不变。首个请求使用正式样本并计入 384 次，成功完成后以配置中的并发数推进；同合同续跑已有完成答案时直接恢复并发。因实际遇到网关并发限制和服务器过载，后续阶段仅对明确的限流/服务错误有限重试，重试次数与总服务故障上限见配置；失败槽位排在尚未尝试的槽位后。若明确触发网关并发限制，运行期并发逐次下降并记录实际值。单槽位耗尽重试后保持未完成并继续其他试验；达到全局服务故障上限时停止补充新请求，收齐在途结果后保存。已确认服务错误也可用 `--continue-from` 指向旧记录并选择新输出目录补齐，保留所有完成或预算截断试验。运行中可创建 `runs/stop_requested`，调度器停止补充新请求、收齐在途结果后退出；续跑前移除该标记。
 
-用户在正式运行开始后要求从四并发提高到十二并发。初始四个完成答案全部保留；旧调度器不支持在线调整，切换时最多四个可能在途槽位单独归档为客户端中断，并在新阶段补齐。中断请求未收到最终答案，不作为模型失败，也不混入正式八次分母。当前主运行目录为 `runs/sol_medium_c12/`，接续 `runs/sol_medium/continuation.json`；后者保留初始原始记录和切换说明。发送总数最多比正式试验数多四次（若后续服务故障另行补齐，将额外记录）。网关返回的 `max_output_tokens` 为 null，已有响应实际输出 16,539 token，超过原请求上限。用户随后明确不要求限制 token；保留原请求以保持同轮一致，不因超出它重跑或判失败。本轮不视为严格 token 预算实验。API 的 output_tokens 包含 reasoning_tokens；报告区分推理 token 与二者差值（非推理输出），不能把全部输出用量当作最终 JSON 长度。
+正式结果位于 `runs/sol_medium_recovery/run.json`，来源提交为 `528c43c`；该记录通过 `continued_from` 保留全部历史阶段。采样从四并发按用户要求提高到十二并发，网关限流后实际降至十并发；随后修复了连接重置处理并断点续跑。22 次确认服务/连接错误与最多 24 个可能在途的客户端中断请求单独归档；不把它们算作模型失败，且没有重采已保存的完整失败答案。
+
+网关没有返回有效的 max_output_tokens，实际输出曾超过请求上限。用户明确不要求限制 token；本轮保留同一请求参数，不因超出上限而重跑或判失败，也不视为严格 token 预算实验。output_tokens 包含 reasoning_tokens，完整结果分别报告推理和非推理差值。
 
 最小测试覆盖：48 个参考解重放、形状和 DAG 规则、初始空格/重复移除/越界/空洞、错误棋盘与格式、逆向边/回访/非最短、截断不重采。
 
@@ -50,15 +63,6 @@ python experiments/sol_dag_blocks/src/analyze.py --run experiments/sol_dag_block
 
 ## 后台执行与最终验收
 
-用户要求由脚本采样、结束后统一验收。`src/batch.py` 启动采样脚本，结束后自动重放全部完整输出并生成分析，最后写入 Git 忽略的 `runs/finalization.json`。`ready_for_acceptance` 只在三组最终试验数和每题八次记录全部齐全时出现；不完整或脚本错误写 `needs_attention`，不会伪装完成。后台日志在对应运行目录的 `console.log`。
+`src/batch.py` 在独立后台启动采样，结束后重放全部完整输出并生成分析，写入 Git 忽略的 `runs/finalization.json`。只有三组最终试验数和每题八次记录全部齐全，才标记可验收；不完整或脚本错误明确保留。运行中按用户要求不逐批通知，最终统一验收。
 
-切换独立后台执行前，工具会话中的采样进程已消失，52 个完整答案保存在 `runs/sol_medium_main/run.json`；均已保留。该阶段最多十个可能在途槽位另记客户端中断，接续文件为 `runs/sol_medium_main/continuation.json`。加上之前并发切换，客户端中断发送数的上界为十四；确认服务错误另外计数。新调度器增量保存在途槽位，后台执行继承已观察到的网关并发限制。当前后台输出目录为 `runs/sol_medium_background/`，分析生成在其 `analysis/` 子目录；正式验收后将紧凑结果提升到 `results/`。
-
-已在进程环境设置密钥后，可在 Windows 独立后台启动（不将密钥写入命令参数文件）：
-
-```powershell
-Start-Process python -WindowStyle Hidden -ArgumentList @('experiments/sol_dag_blocks/src/batch.py', '--continue-from', 'experiments/sol_dag_blocks/runs/sol_medium_main/continuation.json', '--out', 'experiments/sol_dag_blocks/runs/sol_medium_background')
-```
-
-
-续跑说明：保留 `runs/sol_medium_reconnected/continuation.json` 中的 180 个完整答案，恢复权限后由独立后台脚本在 `runs/sol_medium_recovery/` 补齐剩余试验。此前流式连接重置（WinError 10054）导致调度器退出；异常捕获和有限重试已修复，九项测试通过，正式续跑前提交修复。已完成模型失败不重采；退出时未保存的在途结果另作未知的客户端中断记录。网络沙箱拒绝连接（WinError 10013）不会自动重试。
+本次验收核对了固定种子下 48 个输入、384 个唯一且完整的预期槽位、每次模型/medium/提示词/无工具合同、全部答案重放，以及六个历史接续阶段中所有已保存最终答案的保留情况。九项针对性测试通过。原始响应、日志、接续记录及未知中断槽位均在 `runs/` 保留；只有紧凑结果与源码提交到 Git。

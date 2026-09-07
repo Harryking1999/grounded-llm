@@ -1,0 +1,909 @@
+{
+  "source_commit": "528c43cfc6dae70ef278b7dea7ca153419b37510",
+  "run_status": "completed",
+  "api_config": {
+    "model": "gpt-5.6-sol",
+    "base_url": "https://api.smilecodex.space/v1",
+    "style": "responses",
+    "stream": true,
+    "reasoning_effort": "medium",
+    "max_output_tokens": 16000,
+    "concurrency": 12,
+    "timeout_seconds": 600,
+    "max_calls": 384,
+    "automatic_retries": 2,
+    "maximum_archived_service_failures": 64,
+    "service_retry_policy": "Only confirmed gateway concurrency/server/upstream failures, HTTP 429/5xx, ConnectionResetError, and Windows connection timeout 10060 are queued behind untouched trials; completed model failures and token truncations are never retried. Permission-denied 10013 is not retried. Leave an exhausted slot unresolved while finishing other trials; stop dispatch globally at the service failure cap."
+  },
+  "service_failures_archived": 22,
+  "client_interruption_slots_upper_bound": 24,
+  "conditions": {
+    "blocks8": {
+      "planned_samples": 128,
+      "final_samples": 128,
+      "completed_responses": 128,
+      "budget_truncations": 0,
+      "current_service_failures": 0,
+      "successes": 91,
+      "sample_success_rate": 0.7109375,
+      "contract_successes": 82,
+      "execution_successes": 91,
+      "pass8_eligible_cases": 16,
+      "pass8_solved_cases": 16,
+      "pass_at_8": 1.0,
+      "zero_of_8_cases": [],
+      "failure_counts": {
+        "success": 91,
+        "stopped_early": 27,
+        "illegal_action": 10
+      },
+      "illegal_answers": 10,
+      "illegal_answer_rate_completed": 0.078125,
+      "first_illegal_reasons": {
+        "initial_empty_overlap": 9,
+        "already_removed_overlap": 1
+      },
+      "input_tokens": 619520,
+      "output_tokens": 676152,
+      "reasoning_tokens": 614293,
+      "non_reasoning_output_tokens": 61859,
+      "token_breakdown_available_samples": 128,
+      "strict_json_responses": 111,
+      "returned_models": {
+        "gpt-5.6-sol": 128
+      },
+      "returned_reasoning_settings": {
+        "{\"context\": \"all_turns\", \"effort\": \"medium\", \"mode\": \"standard\", \"summary\": null}": 128
+      },
+      "returned_output_limits": {
+        "None": 128
+      },
+      "per_case": {
+        "blocks8_00": {
+          "n": 8,
+          "successes": 3,
+          "contract_successes": 0,
+          "complete": true
+        },
+        "blocks8_01": {
+          "n": 8,
+          "successes": 7,
+          "contract_successes": 7,
+          "complete": true
+        },
+        "blocks8_02": {
+          "n": 8,
+          "successes": 7,
+          "contract_successes": 7,
+          "complete": true
+        },
+        "blocks8_03": {
+          "n": 8,
+          "successes": 5,
+          "contract_successes": 5,
+          "complete": true
+        },
+        "blocks8_04": {
+          "n": 8,
+          "successes": 8,
+          "contract_successes": 8,
+          "complete": true
+        },
+        "blocks8_05": {
+          "n": 8,
+          "successes": 7,
+          "contract_successes": 7,
+          "complete": true
+        },
+        "blocks8_06": {
+          "n": 8,
+          "successes": 5,
+          "contract_successes": 5,
+          "complete": true
+        },
+        "blocks8_07": {
+          "n": 8,
+          "successes": 6,
+          "contract_successes": 6,
+          "complete": true
+        },
+        "blocks8_08": {
+          "n": 8,
+          "successes": 8,
+          "contract_successes": 8,
+          "complete": true
+        },
+        "blocks8_09": {
+          "n": 8,
+          "successes": 2,
+          "contract_successes": 0,
+          "complete": true
+        },
+        "blocks8_10": {
+          "n": 8,
+          "successes": 6,
+          "contract_successes": 2,
+          "complete": true
+        },
+        "blocks8_11": {
+          "n": 8,
+          "successes": 6,
+          "contract_successes": 6,
+          "complete": true
+        },
+        "blocks8_12": {
+          "n": 8,
+          "successes": 4,
+          "contract_successes": 4,
+          "complete": true
+        },
+        "blocks8_13": {
+          "n": 8,
+          "successes": 6,
+          "contract_successes": 6,
+          "complete": true
+        },
+        "blocks8_14": {
+          "n": 8,
+          "successes": 8,
+          "contract_successes": 8,
+          "complete": true
+        },
+        "blocks8_15": {
+          "n": 8,
+          "successes": 3,
+          "contract_successes": 3,
+          "complete": true
+        }
+      },
+      "state_reports": {
+        "evaluated_legal_prefix_steps": 802,
+        "correct": 777,
+        "valid": 802,
+        "exact_accuracy": 0.9688279301745636,
+        "cell_accuracy_missing_as_wrong": 0.9991271820448878
+      },
+      "shapes": {
+        "by_id": {
+          "input_construction": {
+            "total": 128,
+            "counts": {
+              "0": 13,
+              "1": 18,
+              "2": 15,
+              "3": 17,
+              "4": 11,
+              "5": 10,
+              "6": 14,
+              "7": 10,
+              "8": 8,
+              "9": 12
+            },
+            "probabilities": {
+              "0": 0.1015625,
+              "1": 0.140625,
+              "2": 0.1171875,
+              "3": 0.1328125,
+              "4": 0.0859375,
+              "5": 0.078125,
+              "6": 0.109375,
+              "7": 0.078125,
+              "8": 0.0625,
+              "9": 0.09375
+            }
+          },
+          "output_all_parsed": {
+            "total": 872,
+            "counts": {
+              "0": 126,
+              "1": 109,
+              "2": 134,
+              "3": 115,
+              "4": 109,
+              "5": 115,
+              "6": 58,
+              "7": 41,
+              "8": 31,
+              "9": 34
+            },
+            "probabilities": {
+              "0": 0.1444954128440367,
+              "1": 0.125,
+              "2": 0.1536697247706422,
+              "3": 0.13188073394495411,
+              "4": 0.125,
+              "5": 0.13188073394495411,
+              "6": 0.06651376146788991,
+              "7": 0.047018348623853214,
+              "8": 0.03555045871559633,
+              "9": 0.0389908256880734
+            }
+          },
+          "output_legal_prefix": {
+            "total": 802,
+            "counts": {
+              "0": 111,
+              "1": 103,
+              "2": 125,
+              "3": 107,
+              "4": 97,
+              "5": 97,
+              "6": 56,
+              "7": 41,
+              "8": 31,
+              "9": 34
+            },
+            "probabilities": {
+              "0": 0.13840399002493767,
+              "1": 0.128428927680798,
+              "2": 0.15586034912718205,
+              "3": 0.13341645885286782,
+              "4": 0.12094763092269327,
+              "5": 0.12094763092269327,
+              "6": 0.06982543640897755,
+              "7": 0.05112219451371571,
+              "8": 0.03865336658354115,
+              "9": 0.04239401496259352
+            }
+          },
+          "output_successful": {
+            "total": 758,
+            "counts": {
+              "0": 107,
+              "1": 100,
+              "2": 117,
+              "3": 101,
+              "4": 92,
+              "5": 90,
+              "6": 51,
+              "7": 39,
+              "8": 29,
+              "9": 32
+            },
+            "probabilities": {
+              "0": 0.14116094986807387,
+              "1": 0.13192612137203166,
+              "2": 0.15435356200527706,
+              "3": 0.13324538258575197,
+              "4": 0.12137203166226913,
+              "5": 0.11873350923482849,
+              "6": 0.06728232189973615,
+              "7": 0.051451187335092345,
+              "8": 0.03825857519788918,
+              "9": 0.04221635883905013
+            }
+          }
+        },
+        "by_subclass": {
+          "input_construction": {
+            "total": 128,
+            "counts": {
+              "I3": 21,
+              "L3": 63,
+              "SZ4": 44
+            },
+            "probabilities": {
+              "I3": 0.1640625,
+              "L3": 0.4921875,
+              "SZ4": 0.34375
+            }
+          },
+          "output_all_parsed": {
+            "total": 872,
+            "counts": {
+              "I3": 224,
+              "L3": 484,
+              "SZ4": 164
+            },
+            "probabilities": {
+              "I3": 0.25688073394495414,
+              "L3": 0.555045871559633,
+              "SZ4": 0.18807339449541285
+            }
+          },
+          "output_legal_prefix": {
+            "total": 802,
+            "counts": {
+              "I3": 194,
+              "L3": 446,
+              "SZ4": 162
+            },
+            "probabilities": {
+              "I3": 0.24189526184538654,
+              "L3": 0.5561097256857855,
+              "SZ4": 0.20199501246882792
+            }
+          },
+          "output_successful": {
+            "total": 758,
+            "counts": {
+              "I3": 182,
+              "L3": 425,
+              "SZ4": 151
+            },
+            "probabilities": {
+              "I3": 0.24010554089709762,
+              "L3": 0.5606860158311345,
+              "SZ4": 0.19920844327176782
+            }
+          }
+        },
+        "unknown_output_shape_ids": 0,
+        "output_presence_given_input_presence_completed_responses": {
+          "0": {
+            "eligible_trials": 80,
+            "output_contains_shape": 64,
+            "probability": 0.8
+          },
+          "1": {
+            "eligible_trials": 88,
+            "output_contains_shape": 48,
+            "probability": 0.5454545454545454
+          },
+          "2": {
+            "eligible_trials": 104,
+            "output_contains_shape": 73,
+            "probability": 0.7019230769230769
+          },
+          "3": {
+            "eligible_trials": 88,
+            "output_contains_shape": 56,
+            "probability": 0.6363636363636364
+          },
+          "4": {
+            "eligible_trials": 72,
+            "output_contains_shape": 47,
+            "probability": 0.6527777777777778
+          },
+          "5": {
+            "eligible_trials": 72,
+            "output_contains_shape": 56,
+            "probability": 0.7777777777777778
+          },
+          "6": {
+            "eligible_trials": 88,
+            "output_contains_shape": 40,
+            "probability": 0.45454545454545453
+          },
+          "7": {
+            "eligible_trials": 72,
+            "output_contains_shape": 31,
+            "probability": 0.4305555555555556
+          },
+          "8": {
+            "eligible_trials": 56,
+            "output_contains_shape": 12,
+            "probability": 0.21428571428571427
+          },
+          "9": {
+            "eligible_trials": 72,
+            "output_contains_shape": 25,
+            "probability": 0.3472222222222222
+          }
+        }
+      }
+    },
+    "blocks12": {
+      "planned_samples": 128,
+      "final_samples": 128,
+      "completed_responses": 128,
+      "budget_truncations": 0,
+      "current_service_failures": 0,
+      "successes": 69,
+      "sample_success_rate": 0.5390625,
+      "contract_successes": 67,
+      "execution_successes": 69,
+      "pass8_eligible_cases": 16,
+      "pass8_solved_cases": 13,
+      "pass_at_8": 0.8125,
+      "zero_of_8_cases": [
+        "blocks12_05",
+        "blocks12_09",
+        "blocks12_13"
+      ],
+      "failure_counts": {
+        "success": 69,
+        "stopped_early": 44,
+        "illegal_action": 15
+      },
+      "illegal_answers": 15,
+      "illegal_answer_rate_completed": 0.1171875,
+      "first_illegal_reasons": {
+        "already_removed_overlap": 4,
+        "initial_empty_overlap": 11
+      },
+      "input_tokens": 619520,
+      "output_tokens": 975578,
+      "reasoning_tokens": 891026,
+      "non_reasoning_output_tokens": 84552,
+      "token_breakdown_available_samples": 128,
+      "strict_json_responses": 94,
+      "returned_models": {
+        "gpt-5.6-sol": 128
+      },
+      "returned_reasoning_settings": {
+        "{\"context\": \"all_turns\", \"effort\": \"medium\", \"mode\": \"standard\", \"summary\": null}": 128
+      },
+      "returned_output_limits": {
+        "None": 128
+      },
+      "per_case": {
+        "blocks12_00": {
+          "n": 8,
+          "successes": 7,
+          "contract_successes": 7,
+          "complete": true
+        },
+        "blocks12_01": {
+          "n": 8,
+          "successes": 8,
+          "contract_successes": 7,
+          "complete": true
+        },
+        "blocks12_02": {
+          "n": 8,
+          "successes": 6,
+          "contract_successes": 6,
+          "complete": true
+        },
+        "blocks12_03": {
+          "n": 8,
+          "successes": 7,
+          "contract_successes": 7,
+          "complete": true
+        },
+        "blocks12_04": {
+          "n": 8,
+          "successes": 7,
+          "contract_successes": 6,
+          "complete": true
+        },
+        "blocks12_05": {
+          "n": 8,
+          "successes": 0,
+          "contract_successes": 0,
+          "complete": true
+        },
+        "blocks12_06": {
+          "n": 8,
+          "successes": 6,
+          "contract_successes": 6,
+          "complete": true
+        },
+        "blocks12_07": {
+          "n": 8,
+          "successes": 5,
+          "contract_successes": 5,
+          "complete": true
+        },
+        "blocks12_08": {
+          "n": 8,
+          "successes": 4,
+          "contract_successes": 4,
+          "complete": true
+        },
+        "blocks12_09": {
+          "n": 8,
+          "successes": 0,
+          "contract_successes": 0,
+          "complete": true
+        },
+        "blocks12_10": {
+          "n": 8,
+          "successes": 2,
+          "contract_successes": 2,
+          "complete": true
+        },
+        "blocks12_11": {
+          "n": 8,
+          "successes": 1,
+          "contract_successes": 1,
+          "complete": true
+        },
+        "blocks12_12": {
+          "n": 8,
+          "successes": 8,
+          "contract_successes": 8,
+          "complete": true
+        },
+        "blocks12_13": {
+          "n": 8,
+          "successes": 0,
+          "contract_successes": 0,
+          "complete": true
+        },
+        "blocks12_14": {
+          "n": 8,
+          "successes": 6,
+          "contract_successes": 6,
+          "complete": true
+        },
+        "blocks12_15": {
+          "n": 8,
+          "successes": 2,
+          "contract_successes": 2,
+          "complete": true
+        }
+      },
+      "state_reports": {
+        "evaluated_legal_prefix_steps": 1008,
+        "correct": 973,
+        "valid": 1008,
+        "exact_accuracy": 0.9652777777777778,
+        "cell_accuracy_missing_as_wrong": 0.999375
+      },
+      "shapes": {
+        "by_id": {
+          "input_construction": {
+            "total": 192,
+            "counts": {
+              "0": 15,
+              "1": 22,
+              "2": 17,
+              "3": 25,
+              "4": 18,
+              "5": 16,
+              "6": 20,
+              "7": 14,
+              "8": 21,
+              "9": 24
+            },
+            "probabilities": {
+              "0": 0.078125,
+              "1": 0.11458333333333333,
+              "2": 0.08854166666666667,
+              "3": 0.13020833333333334,
+              "4": 0.09375,
+              "5": 0.08333333333333333,
+              "6": 0.10416666666666667,
+              "7": 0.07291666666666667,
+              "8": 0.109375,
+              "9": 0.125
+            }
+          },
+          "output_all_parsed": {
+            "total": 1186,
+            "counts": {
+              "0": 174,
+              "1": 184,
+              "2": 160,
+              "3": 152,
+              "4": 156,
+              "5": 190,
+              "6": 50,
+              "7": 35,
+              "8": 51,
+              "9": 34
+            },
+            "probabilities": {
+              "0": 0.1467116357504216,
+              "1": 0.1551433389544688,
+              "2": 0.13490725126475547,
+              "3": 0.1281618887015177,
+              "4": 0.1315345699831366,
+              "5": 0.16020236087689713,
+              "6": 0.04215851602023609,
+              "7": 0.02951096121416526,
+              "8": 0.04300168634064081,
+              "9": 0.02866779089376054
+            }
+          },
+          "output_legal_prefix": {
+            "total": 1008,
+            "counts": {
+              "0": 132,
+              "1": 164,
+              "2": 141,
+              "3": 136,
+              "4": 118,
+              "5": 164,
+              "6": 45,
+              "7": 29,
+              "8": 47,
+              "9": 32
+            },
+            "probabilities": {
+              "0": 0.13095238095238096,
+              "1": 0.1626984126984127,
+              "2": 0.13988095238095238,
+              "3": 0.1349206349206349,
+              "4": 0.11706349206349206,
+              "5": 0.1626984126984127,
+              "6": 0.044642857142857144,
+              "7": 0.028769841269841268,
+              "8": 0.04662698412698413,
+              "9": 0.031746031746031744
+            }
+          },
+          "output_successful": {
+            "total": 902,
+            "counts": {
+              "0": 117,
+              "1": 150,
+              "2": 123,
+              "3": 122,
+              "4": 105,
+              "5": 155,
+              "6": 35,
+              "7": 25,
+              "8": 44,
+              "9": 26
+            },
+            "probabilities": {
+              "0": 0.12971175166297116,
+              "1": 0.1662971175166297,
+              "2": 0.13636363636363635,
+              "3": 0.1352549889135255,
+              "4": 0.1164079822616408,
+              "5": 0.17184035476718404,
+              "6": 0.038802660753880266,
+              "7": 0.02771618625277162,
+              "8": 0.04878048780487805,
+              "9": 0.028824833702882482
+            }
+          }
+        },
+        "by_subclass": {
+          "input_construction": {
+            "total": 192,
+            "counts": {
+              "I3": 34,
+              "L3": 79,
+              "SZ4": 79
+            },
+            "probabilities": {
+              "I3": 0.17708333333333334,
+              "L3": 0.4114583333333333,
+              "SZ4": 0.4114583333333333
+            }
+          },
+          "output_all_parsed": {
+            "total": 1186,
+            "counts": {
+              "I3": 346,
+              "L3": 670,
+              "SZ4": 170
+            },
+            "probabilities": {
+              "I3": 0.2917369308600337,
+              "L3": 0.5649241146711635,
+              "SZ4": 0.1433389544688027
+            }
+          },
+          "output_legal_prefix": {
+            "total": 1008,
+            "counts": {
+              "I3": 282,
+              "L3": 573,
+              "SZ4": 153
+            },
+            "probabilities": {
+              "I3": 0.27976190476190477,
+              "L3": 0.5684523809523809,
+              "SZ4": 0.15178571428571427
+            }
+          },
+          "output_successful": {
+            "total": 902,
+            "counts": {
+              "I3": 260,
+              "L3": 512,
+              "SZ4": 130
+            },
+            "probabilities": {
+              "I3": 0.28824833702882485,
+              "L3": 0.5676274944567627,
+              "SZ4": 0.14412416851441243
+            }
+          }
+        },
+        "unknown_output_shape_ids": 0,
+        "output_presence_given_input_presence_completed_responses": {
+          "0": {
+            "eligible_trials": 72,
+            "output_contains_shape": 45,
+            "probability": 0.625
+          },
+          "1": {
+            "eligible_trials": 96,
+            "output_contains_shape": 62,
+            "probability": 0.6458333333333334
+          },
+          "2": {
+            "eligible_trials": 72,
+            "output_contains_shape": 44,
+            "probability": 0.6111111111111112
+          },
+          "3": {
+            "eligible_trials": 104,
+            "output_contains_shape": 51,
+            "probability": 0.49038461538461536
+          },
+          "4": {
+            "eligible_trials": 88,
+            "output_contains_shape": 49,
+            "probability": 0.5568181818181818
+          },
+          "5": {
+            "eligible_trials": 80,
+            "output_contains_shape": 55,
+            "probability": 0.6875
+          },
+          "6": {
+            "eligible_trials": 96,
+            "output_contains_shape": 37,
+            "probability": 0.3854166666666667
+          },
+          "7": {
+            "eligible_trials": 80,
+            "output_contains_shape": 24,
+            "probability": 0.3
+          },
+          "8": {
+            "eligible_trials": 96,
+            "output_contains_shape": 35,
+            "probability": 0.3645833333333333
+          },
+          "9": {
+            "eligible_trials": 104,
+            "output_contains_shape": 28,
+            "probability": 0.2692307692307692
+          }
+        }
+      }
+    },
+    "path_dag": {
+      "planned_samples": 128,
+      "final_samples": 128,
+      "completed_responses": 128,
+      "budget_truncations": 0,
+      "current_service_failures": 0,
+      "successes": 119,
+      "sample_success_rate": 0.9296875,
+      "contract_successes": 119,
+      "execution_successes": 119,
+      "pass8_eligible_cases": 16,
+      "pass8_solved_cases": 16,
+      "pass_at_8": 1.0,
+      "zero_of_8_cases": [],
+      "failure_counts": {
+        "success": 119,
+        "illegal_move": 9
+      },
+      "illegal_answers": 9,
+      "illegal_answer_rate_completed": 0.0703125,
+      "first_illegal_reasons": {
+        "nonexistent_directed_edge": 4,
+        "from_mismatch": 5
+      },
+      "input_tokens": 619904,
+      "output_tokens": 24364,
+      "reasoning_tokens": 18260,
+      "non_reasoning_output_tokens": 6104,
+      "token_breakdown_available_samples": 128,
+      "strict_json_responses": 128,
+      "returned_models": {
+        "gpt-5.6-sol": 128
+      },
+      "returned_reasoning_settings": {
+        "{\"context\": \"all_turns\", \"effort\": \"medium\", \"mode\": \"standard\", \"summary\": null}": 128
+      },
+      "returned_output_limits": {
+        "None": 128
+      },
+      "per_case": {
+        "path_dag_00": {
+          "n": 8,
+          "successes": 8,
+          "contract_successes": 8,
+          "complete": true
+        },
+        "path_dag_01": {
+          "n": 8,
+          "successes": 7,
+          "contract_successes": 7,
+          "complete": true
+        },
+        "path_dag_02": {
+          "n": 8,
+          "successes": 8,
+          "contract_successes": 8,
+          "complete": true
+        },
+        "path_dag_03": {
+          "n": 8,
+          "successes": 7,
+          "contract_successes": 7,
+          "complete": true
+        },
+        "path_dag_04": {
+          "n": 8,
+          "successes": 8,
+          "contract_successes": 8,
+          "complete": true
+        },
+        "path_dag_05": {
+          "n": 8,
+          "successes": 7,
+          "contract_successes": 7,
+          "complete": true
+        },
+        "path_dag_06": {
+          "n": 8,
+          "successes": 8,
+          "contract_successes": 8,
+          "complete": true
+        },
+        "path_dag_07": {
+          "n": 8,
+          "successes": 7,
+          "contract_successes": 7,
+          "complete": true
+        },
+        "path_dag_08": {
+          "n": 8,
+          "successes": 7,
+          "contract_successes": 7,
+          "complete": true
+        },
+        "path_dag_09": {
+          "n": 8,
+          "successes": 8,
+          "contract_successes": 8,
+          "complete": true
+        },
+        "path_dag_10": {
+          "n": 8,
+          "successes": 4,
+          "contract_successes": 4,
+          "complete": true
+        },
+        "path_dag_11": {
+          "n": 8,
+          "successes": 8,
+          "contract_successes": 8,
+          "complete": true
+        },
+        "path_dag_12": {
+          "n": 8,
+          "successes": 8,
+          "contract_successes": 8,
+          "complete": true
+        },
+        "path_dag_13": {
+          "n": 8,
+          "successes": 8,
+          "contract_successes": 8,
+          "complete": true
+        },
+        "path_dag_14": {
+          "n": 8,
+          "successes": 8,
+          "contract_successes": 8,
+          "complete": true
+        },
+        "path_dag_15": {
+          "n": 8,
+          "successes": 8,
+          "contract_successes": 8,
+          "complete": true
+        }
+      },
+      "shortest_length_counts": {
+        "4": 14,
+        "5": 2
+      }
+    }
+  },
+  "run_path": "experiments/sol_dag_blocks/runs/sol_medium_recovery/run.json",
+  "acceptance": {
+    "date": "2026-09-07",
+    "deterministic_cases_match": true,
+    "unique_expected_slots": 384,
+    "complete_responses_replayed": 384,
+    "prior_phases_checked": 6,
+    "all_saved_final_answers_retained": true,
+    "matched_request_model_effort_prompts_and_no_tools": true,
+    "tests_passed": 9
+  }
+}

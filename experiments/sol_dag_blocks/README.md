@@ -35,7 +35,7 @@ DAG 使用原 32 节点无向图为骨架，每个实例独立抽隐藏拓扑顺
 python -m unittest discover -s experiments/sol_dag_blocks/tests -v
 python experiments/sol_dag_blocks/src/prepare.py
 # 在当前进程环境中设置 GND_API_KEY；不要将密钥写入文件或提交。
-python experiments/sol_dag_blocks/src/run.py --out experiments/sol_dag_blocks/runs/sol_medium
+python experiments/sol_dag_blocks/src/run.py --api-config experiments/sol_dag_blocks/configs/sol_medium.json --out experiments/sol_dag_blocks/runs/sol_medium
 python experiments/sol_dag_blocks/src/analyze.py --run experiments/sol_dag_blocks/runs/sol_medium/run.json
 ```
 

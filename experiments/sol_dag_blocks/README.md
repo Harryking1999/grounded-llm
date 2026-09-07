@@ -59,3 +59,6 @@ python experiments/sol_dag_blocks/src/analyze.py --run experiments/sol_dag_block
 ```powershell
 Start-Process python -WindowStyle Hidden -ArgumentList @('experiments/sol_dag_blocks/src/batch.py', '--continue-from', 'experiments/sol_dag_blocks/runs/sol_medium_main/continuation.json', '--out', 'experiments/sol_dag_blocks/runs/sol_medium_background')
 ```
+
+
+续跑说明：保留 `runs/sol_medium_reconnected/continuation.json` 中的 180 个完整答案，恢复权限后由独立后台脚本在 `runs/sol_medium_recovery/` 补齐剩余试验。此前流式连接重置（WinError 10054）导致调度器退出；异常捕获和有限重试已修复，九项测试通过，正式续跑前提交修复。已完成模型失败不重采；退出时未保存的在途结果另作未知的客户端中断记录。网络沙箱拒绝连接（WinError 10013）不会自动重试。

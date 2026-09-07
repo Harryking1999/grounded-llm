@@ -9,6 +9,7 @@ import os
 import random
 import subprocess
 import sys
+import time
 from tasks import CONFIG, ROOT, TASKS
 
 LEGACY = ROOT / "experiments/gcml_counterexamples/src"
@@ -45,12 +46,29 @@ def classify_service_failure(record):
 
 
 def call(case, replicate, config, key):
-    return classify_service_failure(transport.call(case, replicate, config, key))
+    started_at, start = datetime.now(timezone.utc).isoformat(), time.monotonic()
+    try:
+        return classify_service_failure(transport.call(case, replicate, config, key))
+    except ConnectionResetError as error:
+        # urllib's streaming read can raise this outside URLError. Return an
+        # infrastructure record so one reset cannot discard other in-flight results.
+        request = {"model": config["model"], "input": prompt_for(case),
+                   "reasoning": {"effort": config["reasoning_effort"]},
+                   "max_output_tokens": config["max_output_tokens"], "tools": []}
+        if config.get("stream"):
+            request["stream"] = True
+        return {"case_id": case["id"], "condition": case["condition"], "replicate": replicate,
+                "request": request, "started_at": started_at,
+                "api_error": "ConnectionResetError", "api_error_detail": str(error).replace(key, "[redacted]")[:2000],
+                "elapsed_seconds": round(time.monotonic() - start, 3),
+                "verdict": {"pass": False, "failure_type": "api_error"}}
 
 
 def retryable(record):
     code = record.get("api_error", "")
-    return code in ("gateway_concurrency_limit", "server_error", "upstream_error", "HTTP 429") or code.startswith("HTTP 5")
+    return (code in ("gateway_concurrency_limit", "server_error", "upstream_error", "HTTP 429", "ConnectionResetError")
+            or code.startswith("HTTP 5")
+            or code == "URLError" and "WinError 10060" in record.get("api_error_detail", ""))
 
 
 def main():

@@ -102,6 +102,17 @@ class StudyTests(unittest.TestCase):
         self.assertNotIn("api_error", classify_service_failure(truncated))
         self.assertTrue(transport.final_sample(truncated))
 
+    def test_stream_connection_reset_becomes_saved_retryable_infrastructure_error(self):
+        case = self.suite["cases"][-1]
+        with patch.object(transport, "call", side_effect=ConnectionResetError("WinError 10054: reset")):
+            record = study_run.call(case, 1, CONFIG["api"], "test-secret")
+        self.assertEqual(record["api_error"], "ConnectionResetError")
+        self.assertEqual(record["request"]["input"], TASKS[case["condition"]].prompt(case))
+        self.assertTrue(study_run.retryable(record))
+        self.assertFalse(transport.final_sample(record))
+        self.assertTrue(study_run.retryable({"api_error": "URLError", "api_error_detail": "WinError 10060"}))
+        self.assertFalse(study_run.retryable({"api_error": "URLError", "api_error_detail": "WinError 10013"}))
+
     def test_scheduler_retries_service_error_without_replacing_final_answers(self):
         case = copy.deepcopy(self.suite["cases"][-1])
         case["replicates"] = 2

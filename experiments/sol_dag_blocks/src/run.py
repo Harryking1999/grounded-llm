@@ -91,7 +91,8 @@ def main():
                "suite_path": args.suite, "api_config": config, "api_config_path": args.api_config,
                "planned_calls": len(jobs), "continued_from": args.continue_from,
                "prior_failed_attempts": archived, "retained_final_samples": len(retained),
-               "started_at": datetime.now(timezone.utc).isoformat(), "status": "running", "cases": retained}
+               "started_at": datetime.now(timezone.utc).isoformat(), "status": "running", "cases": retained,
+               "inflight_slots": []}
 
     def save():
         payload["summary"] = transport.aggregate(payload["cases"], cases)
@@ -108,14 +109,18 @@ def main():
 
     stopped, remaining = None, deque(jobs)
     lookup = {c["id"]: c for c in cases}
-    service_counts = Counter((r["case_id"], r["replicate"]) for r in archived if r.get("api_error") != "client_interrupted_for_concurrency_change")
+    service_counts = Counter((r["case_id"], r["replicate"]) for r in archived if not r.get("api_error", "").startswith("client_interrupted"))
     service_total = sum(service_counts.values())
-    active_limit = config["concurrency"]
+    active_limit = min(config["concurrency"], previous.get("effective_concurrency_after_gateway_limit", config["concurrency"])) if args.continue_from else config["concurrency"]
+    payload["effective_concurrency_after_gateway_limit"] = active_limit
     save()
     # The previous phase already validated this identical model/endpoint contract.
     if not retained:
         case, replicate = remaining.popleft()
+        payload["inflight_slots"].append([case["id"], replicate])
+        save()
         record = call(case, replicate, config, key)
+        payload["inflight_slots"].remove([case["id"], replicate])
         accept(record)
         if not transport.final_sample(record):
             stopped = "stopped_api_error"
@@ -127,12 +132,15 @@ def main():
             if not stopped:
                 for _ in range(min(len(remaining), active_limit - len(pending))):
                     case, replicate = remaining.popleft()
+                    payload["inflight_slots"].append([case["id"], replicate])
+                    save()
                     pending.add(executor.submit(call, case, replicate, config, key))
             if not pending:
                 break
             completed, pending = wait(pending, return_when=FIRST_COMPLETED)
             for future in completed:
                 record = future.result()
+                payload["inflight_slots"].remove([record["case_id"], record["replicate"]])
                 slot = record["case_id"], record["replicate"]
                 if (not stopped and retryable(record) and service_counts[slot] < config["automatic_retries"]
                         and service_total < config["maximum_archived_service_failures"]):

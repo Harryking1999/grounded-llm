@@ -24,8 +24,8 @@ def summarize(run, suite):
             if replay != record["verdict"]:
                 raise ValueError(f"Replay mismatch: {record['case_id']} replicate {record['replicate']}")
     result = {"source_commit": run["source_commit"], "run_status": run["status"], "api_config": run["api_config"],
-              "service_failures_archived": sum(r.get("api_error") != "client_interrupted_for_concurrency_change" for r in run.get("prior_failed_attempts", [])),
-              "client_interruption_slots_upper_bound": sum(r.get("api_error") == "client_interrupted_for_concurrency_change" for r in run.get("prior_failed_attempts", [])),
+              "service_failures_archived": sum(not r.get("api_error", "").startswith("client_interrupted") for r in run.get("prior_failed_attempts", [])),
+              "client_interruption_slots_upper_bound": sum(r.get("api_error", "").startswith("client_interrupted") for r in run.get("prior_failed_attempts", [])),
               "conditions": {}}
     for condition, task in TASKS.items():
         selected = [c for c in cases.values() if c["condition"] == condition]
@@ -56,6 +56,9 @@ def summarize(run, suite):
                    "input_tokens": sum(r.get("input_tokens") or 0 for r in final),
                    "output_tokens": sum(r.get("output_tokens") or 0 for r in final),
                    "reasoning_tokens": sum(r.get("reasoning_tokens") or 0 for r in final),
+                   "non_reasoning_output_tokens": sum(r["output_tokens"] - r["reasoning_tokens"] for r in final if isinstance(r.get("output_tokens"), int) and isinstance(r.get("reasoning_tokens"), int)),
+                   "token_breakdown_available_samples": sum(isinstance(r.get("output_tokens"), int) and isinstance(r.get("reasoning_tokens"), int) for r in final),
+                   "strict_json_responses": sum(r["verdict"].get("strict_json", False) for r in complete),
                    "returned_models": dict(Counter(r.get("response", {}).get("model", "missing") for r in final)),
                    "returned_reasoning_settings": dict(Counter(json.dumps(r.get("response", {}).get("reasoning"), sort_keys=True) for r in final)),
                    "returned_output_limits": dict(Counter(str(r.get("response", {}).get("max_output_tokens")) for r in final)),
@@ -111,6 +114,7 @@ def markdown(summary, run_path):
     lines += ["", "pass@8 仅在八次均已有最终试验记录的实例上计算；预算截断计失败。完整合同通过额外要求严格 JSON、正确最终状态与积木每一步完整棋盘报告。非法答案计数限完整响应。", ""]
     for name, s in summary["conditions"].items():
         lines += [f"## {name}", "", f"失败分类：`{json.dumps(s['failure_counts'], ensure_ascii=False)}`。八次全失败实例：`{s['zero_of_8_cases']}`。", ""]
+        lines += [f"严格 JSON：{s['strict_json_responses']}/{s['completed_responses']}；输出 token 共 {s['output_tokens']:,}，其中推理 {s['reasoning_tokens']:,}，非推理差值 {s['non_reasoning_output_tokens']:,}（可拆分 {s['token_breakdown_available_samples']}/{s['final_samples']} 次）。", ""]
         if "state_reports" in s:
             state = s["state_reports"]
             lines += [f"合法前缀逐步棋盘完全正确：{state['correct']}/{state['evaluated_legal_prefix_steps']}；格式有效：{state['valid']}/{state['evaluated_legal_prefix_steps']}。缺失报告计错，非法动作及后续不评价。", "",

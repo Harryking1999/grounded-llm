@@ -1,4 +1,4 @@
-"""Three compact post-hoc cases; render only retained outputs and verified witnesses."""
+"""Four compact post-hoc cases; render only retained outputs and verified witnesses."""
 import json
 from pathlib import Path
 import matplotlib
@@ -18,7 +18,7 @@ def tile(task, action):
     return task.by_action[tuple(action[k] for k in ("shape_id", "row", "col"))]
 
 
-def board(ax, task, mask, title, highlight=0, bad=0, pieces=None):
+def board(ax, task, mask, title, highlight=0, bad=0, pieces=None, marked=0):
     colors, numbers = {}, {}
     for n, action in enumerate(pieces or [], 1):
         for i in range(100):
@@ -31,6 +31,8 @@ def board(ax, task, mask, title, highlight=0, bad=0, pieces=None):
         ax.add_patch(Rectangle((c, r), 1, 1, facecolor=fill, edgecolor="#d1d8df", lw=.7))
         if i in numbers:
             ax.text(c+.5, r+.5, str(numbers[i]), ha="center", va="center", fontsize=9)
+        if marked >> i & 1:
+            ax.add_patch(Rectangle((c+.04, r+.04), .92, .92, fill=False, edgecolor=RED, lw=3))
         if bad >> i & 1:
             ax.add_patch(Rectangle((c+.03, r+.03), .94, .94, facecolor="#fff0f0", edgecolor=RED, lw=2))
             ax.plot([c+.2,c+.8], [r+.2,r+.8], color=RED, lw=2)
@@ -121,7 +123,43 @@ def main():
     fig.text(.5,.1,"模型提交：29 → 9 → 8 → 17（非法）     |     验证最短路：29 → 9 → 8 → 7 → 17（4 步）",ha="center",fontsize=13)
     fig.text(.5,.045,"全图保留 32 个节点与所有真实有向边；红虚线不是图中的边，图上长度不代表代价。",ha="center",fontsize=10)
     save(fig,"C3_missing_edge.png")
-    print("Three selected outputs replayed; empty-plan witness and shortest route verified; figures rendered.")
+
+    # C4 chart contract: compare the retained legal move with a verified alternative.
+    # Four 10x10 static panels share coordinates; orange marks the move, a red
+    # outline marks the occupied singleton, numbered pieces show an offline witness.
+    # Source: blocks12_10 replicate 1, trace steps 3/4; no new model sampling.
+    case, record, task = selected("blocks12_10", 1)
+    v = record["verdict"]
+    before = task.from_grid(v["trace"][2]["remaining_grid"])
+    step = v["trace"][3]
+    action = step["action"]
+    assert tuple(action[k] for k in ("shape_id", "row", "col")) == (1, 4, 4)
+    current = task.apply(before, action)
+    assert current == task.from_grid(step["remaining_grid"])
+    assert current == task.from_grid(action["board_after"]) and step["state_report_correct"]
+    singleton = 1 << 53  # (row 5, col 3), surrounded by empty orthogonal neighbors.
+    assert current & singleton and not current & sum(1 << i for i in (43, 52, 54, 63))
+    assert not any(mask & singleton and mask & current == mask for mask, _ in task.placements)
+    assert v["illegal_action"]["step"] == 6
+    # A disjoint nine-piece cover of the BEFORE state proves this was avoidable.
+    # Put the S/Z piece containing (5,3) first; all nine moves are replayed below.
+    alternative = [dict(zip(("shape_id", "row", "col"), a)) for a in
+                   [(6,4,3), (3,8,2), (2,4,6), (2,6,7), (4,6,9),
+                    (0,8,7), (8,8,4), (3,6,3), (4,5,5)]]
+    cleared = before
+    for a in alternative:
+        cleared = task.apply(cleared, a)
+    assert cleared == 0 and tile(task, alternative[0]) & singleton
+    fig, axes = plt.subplots(1,4,figsize=(14,4.5))
+    board(axes[0],task,before,"第 4 步前：仍有解\n橙色三格均可合法移除",highlight=tile(task,action))
+    board(axes[1],task,current,"第 4 步后：(5,3) 孤立\n模型自报棋盘也完全正确",marked=singleton)
+    board(axes[2],task,before,"回到第 4 步前：另一条路\n9 步合法分解，数字为顺序",pieces=alternative)
+    board(axes[3],task,cleared,"替代方案重放后\n棋盘清空")
+    fig.suptitle("C4 · blocks12_10 · 第 1 次采样 · 合法动作与孤立格",fontsize=16)
+    fig.text(.5,.03,"实际第 4 步：shape 1 @ (4,4)。红框是仍占用的孤立格；右侧为未提供给模型的离线替代解。",ha="center",fontsize=11)
+    fig.tight_layout(rect=(0,.08,1,.9))
+    save(fig,"C4_legal_trap.png")
+    print("Four selected outputs replayed; witnesses, singleton trap and shortest route verified; figures rendered.")
 
 
 if __name__=="__main__":

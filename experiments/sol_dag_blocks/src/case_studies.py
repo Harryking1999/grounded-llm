@@ -159,7 +159,33 @@ def main():
     fig.text(.5,.03,"实际第 4 步：shape 1 @ (4,4)。红框是仍占用的孤立格；右侧为未提供给模型的离线替代解。",ha="center",fontsize=11)
     fig.tight_layout(rect=(0,.08,1,.9))
     save(fig,"C4_legal_trap.png")
-    print("Four selected outputs replayed; witnesses, singleton trap and shortest route verified; figures rendered.")
+
+    # C5: a state-report error propagates through the remaining plan and the
+    # final status. The action sequence is legal; only the reported board is
+    # wrong from step 5 onward.
+    case, record, task = selected("blocks8_15", 5)
+    v = record["verdict"]
+    assert v["legal"] and not v["solved"] and v["executed_actions"] == 9
+    assert v["state_reports_correct"] == 4 and not v["reported_status_correct"]
+    step5 = v["trace"][4]
+    actual5 = task.from_grid(step5["remaining_grid"])
+    reported5 = task.from_grid(step5["action"]["board_after"])
+    actual_final = task.from_grid(v["remaining_grid"])
+    reported_final = task.from_grid(v["trace"][-1]["action"]["board_after"])
+    singleton = 1 << (5 * 10 + 2)  # (row 5, col 2), omitted by the report.
+    assert not step5["state_report_correct"]
+    assert actual5 & singleton and not reported5 & singleton
+    assert actual_final == singleton and reported_final == 0
+    fig, axes = plt.subplots(1, 4, figsize=(14, 4.5))
+    board(axes[0], task, actual5, "第 5 步后：真实棋盘\n(5,2) 仍占用", marked=singleton)
+    board(axes[1], task, reported5, "第 5 步后：模型棋盘\n漏报 (5,2)", marked=singleton)
+    board(axes[2], task, actual_final, "第 9 步后：真实棋盘\n仍余 1 格", marked=singleton)
+    board(axes[3], task, reported_final, "第 9 步后：模型报告\n空棋盘 / solved", marked=singleton)
+    fig.suptitle("C5 · blocks8_15 · 第 5 次采样 · 状态输出错误", fontsize=16)
+    fig.text(.5, .03, "真实第 5 行：0110000000；模型报告：0100000000。红框标出持续漏报的 (5,2)。", ha="center", fontsize=11)
+    fig.tight_layout(rect=(0, .08, 1, .9))
+    save(fig, "C5_state_report_error.png")
+    print("Five selected outputs replayed; witnesses, singleton trap, state-report error and shortest route verified; figures rendered.")
 
 
 if __name__=="__main__":

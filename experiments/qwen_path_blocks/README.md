@@ -41,4 +41,4 @@ python experiments/qwen_path_blocks/src/run.py \
 当前状态：迁移脚本和正式合同已建立，等待本轮完整批次结果。
 
 若 16,384 token 条件出现大量积木截断，可使用 `configs/thinking_32768.json` 追加匹配批次。
-该合同把服务上下文扩大到 49,152，并将并发降低以保留更长 KV cache；其结果与 16K 条件分开报告。
+该合同将服务上下文设为官方 Qwen3 运行时接受的 40,960 token，并将并发降低以保留更长 KV cache；其结果与 16K 条件分开报告。

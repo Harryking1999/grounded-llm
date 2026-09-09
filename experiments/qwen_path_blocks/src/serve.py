@@ -24,6 +24,7 @@ def main():
                TORCHINDUCTOR_CACHE_DIR=str(cache / 'inductor'))
     command = [sys.executable, '-m', 'sglang.launch_server', '--model-path', args.model_path,
                '--host', '127.0.0.1', '--port', str(args.port),
+               '--nccl-port', str(args.port + 10000),
                '--tp-size', str(len(args.gpus.split(','))), '--dtype', serving['dtype'],
                '--context-length', str(serving['context_length']),
                '--mem-fraction-static', str(serving['mem_fraction_static']),

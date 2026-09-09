@@ -46,6 +46,7 @@ def main():
     p.add_argument('--suite', required=True)
     p.add_argument('--model-id', required=True)
     p.add_argument('--model-path', required=True)
+    p.add_argument('--tokenizer-path')
     p.add_argument('--endpoints', nargs='+', required=True)
     p.add_argument('--out', required=True)
     p.add_argument('--smoke-only', action='store_true')
@@ -59,13 +60,15 @@ def main():
     assert all(c['replicates'] == config['replicates'] for c in suite['cases'])
     from transformers import AutoTokenizer
     import importlib.metadata
-    tokenizer = AutoTokenizer.from_pretrained(args.model_path, local_files_only=True)
+    tokenizer_path = args.tokenizer_path or args.model_path
+    tokenizer = AutoTokenizer.from_pretrained(tokenizer_path, local_files_only=True)
     out = Path(args.out).resolve()
     out.mkdir(parents=True, exist_ok=True)
     record_dir = out / 'samples'
     record_dir.mkdir(exist_ok=True)
     metadata = out / 'run_config.json'
     identity = {'config': config, 'model_id': args.model_id, 'model_path': args.model_path,
+                'tokenizer_path': tokenizer_path,
                 'suite_path': str(Path(args.suite).resolve()),
                 'source_commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()}
     if metadata.exists():

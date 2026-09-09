@@ -6,6 +6,19 @@ from pathlib import Path
 import shutil
 
 
+def verify_model_files(directory):
+    index = directory / 'model.safetensors.index.json'
+    if not index.exists():
+        raise RuntimeError(f'Missing safetensors index: {index}')
+    files = set(json.loads(index.read_text())['weight_map'].values())
+    missing = [name for name in sorted(files)
+               if not (directory / name).is_file() or (directory / name).stat().st_size == 0]
+    if missing:
+        raise RuntimeError(f'Incomplete model; missing final shard files: {missing}')
+    if any(directory.glob('*.safetensors.incomplete')):
+        raise RuntimeError('Incomplete safetensors temporary files remain')
+
+
 def main():
     p = argparse.ArgumentParser()
     p.add_argument('--model-id', required=True)
@@ -26,6 +39,7 @@ def main():
             if source.is_file() and (source.suffix in ('.json', '.safetensors', '.txt', '.md')
                     or source.name in ('LICENSE', '.gitattributes', '.msc', '.mdl', '.mv')):
                 shutil.copy2(source, destination / source.name)
+    verify_model_files(destination)
     (destination / 'grounded_download_complete.json').write_text(json.dumps({
         'model_id': args.model_id, 'revision': args.revision, 'provider': 'ModelScope',
         'model_dir': str(destination), 'staging_dir': str(staging)}, indent=2))

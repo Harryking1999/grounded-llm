@@ -18,7 +18,8 @@ def main():
     serving = json.loads(Path(args.config).read_text())['serving']
     cache = Path(args.cache_dir).resolve()
     cache.mkdir(parents=True, exist_ok=True)
-    env = dict(os.environ, CUDA_VISIBLE_DEVICES=args.gpus,
+    env = dict(os.environ, PATH=str(Path(sys.executable).parent) + os.pathsep + os.environ.get('PATH', ''),
+               CUDA_VISIBLE_DEVICES=args.gpus,
                HF_HOME=str(cache / 'huggingface'), TRITON_CACHE_DIR=str(cache / 'triton'),
                TORCHINDUCTOR_CACHE_DIR=str(cache / 'inductor'))
     command = [sys.executable, '-m', 'sglang.launch_server', '--model-path', args.model_path,

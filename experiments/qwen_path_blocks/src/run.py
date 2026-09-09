@@ -14,6 +14,11 @@ import sys
 import time
 import urllib.request
 
+RUNNER_DIR = Path(__file__).resolve().parent
+if str(RUNNER_DIR) not in sys.path:
+    sys.path.insert(0, str(RUNNER_DIR))
+from content_eval import evaluate as evaluate_content
+
 ROOT = Path(__file__).resolve().parents[3]
 SOL = ROOT / 'experiments/sol_dag_blocks/src'
 sys.path.insert(0, str(SOL))
@@ -32,7 +37,7 @@ def split_thinking(text):
 
 def verdict_for(case, text, finish):
     reasoning, answer, closed = split_thinking(text)
-    verdict = sol.evaluate(case, answer)
+    verdict = evaluate_content(case, answer, sol.TASKS)
     if finish == 'length':
         verdict = {'pass': False, 'failure_type': 'budget_truncated', 'partial_verdict': verdict}
     elif finish != 'stop':
@@ -158,6 +163,9 @@ def main():
     # Only summarize after the whole dispatched batch has finished.
     if errors:
         raise RuntimeError(f'{len(errors)} unresolved transport/adapter errors; explicit resume is available')
+    # The task environment is unchanged; this evaluation intentionally ignores
+    # JSON wrapping while preserving the old contract diagnostics.
+    sol.evaluate = lambda case, raw: evaluate_content(case, raw, sol.TASKS)
     analyze_spec = importlib.util.spec_from_file_location('sol_analysis', SOL / 'analyze.py')
     analyze = importlib.util.module_from_spec(analyze_spec)
     sys.modules['run'] = sol

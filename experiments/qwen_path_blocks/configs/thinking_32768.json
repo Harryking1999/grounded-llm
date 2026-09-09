@@ -24,5 +24,5 @@
   "concurrency_per_endpoint": 12,
   "timeout_seconds": 10800,
   "smoke_conditions": ["path_dag", "blocks8"],
-  "evaluation": "Same Sol prompts and judge as the 16K contract. Final answers after </think> are scored; length truncations remain failed final trials. This is a separate budget condition and must not be combined with 16K accuracy."
+  "evaluation": "Same Sol prompts and deterministic content-only judge as the 16K contract. Final answers after </think> are scored without requiring a strict JSON object; unambiguous JSON arrays are normalized. Length truncations remain failed final trials. This is a separate budget condition and must not be combined with 16K accuracy."
 }

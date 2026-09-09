@@ -33,8 +33,28 @@ class AdapterTests(unittest.TestCase):
         answer = json.dumps({'path': [{'from': 0, 'to': 1}], 'final_node': 1})
         _, extracted, verdict = runner.verdict_for(self.case, '<think>{}\n</think>\n' + answer, 'stop')
         self.assertEqual(extracted, answer)
-        self.assertEqual(verdict, runner.sol.evaluate(self.case, answer))
+        self.assertEqual(verdict, runner.evaluate_content(self.case, answer, runner.sol.TASKS))
         self.assertTrue(verdict['pass'])
+
+    def test_path_array_is_scored_by_content(self):
+        answer = '[{"from": 0, "to": 1}], 1'
+        _, _, verdict = runner.verdict_for(self.case, '<think>checked</think>' + answer, 'stop')
+        self.assertTrue(verdict['pass'])
+        self.assertFalse(verdict['strict_json'])
+        self.assertEqual(verdict['content_parse_mode'], 'path_move_array')
+
+    def test_action_array_is_scored_by_content(self):
+        from prepare import prepare
+        case = next(c for c in prepare()['cases'] if c['condition'] == 'blocks8')
+        task = runner.sol.TASKS['blocks8']
+        mask = task.from_grid(case['grid'])
+        actions = copy.deepcopy(case['construction_reference'])
+        for action in actions:
+            mask = task.apply(mask, action)
+            action['board_after'] = task.to_rows(mask)
+        verdict = runner.evaluate_content(case, json.dumps(actions) + '\n"final_status": "solved"', runner.sol.TASKS)
+        self.assertTrue(verdict['pass'])
+        self.assertEqual(verdict['content_parse_mode'], 'action_array')
 
     def test_truncation_is_failure_even_with_final_json(self):
         _, _, verdict = runner.verdict_for(self.case, '</think>{"path":[{"from":0,"to":1}],"final_node":1}', 'length')

@@ -24,5 +24,5 @@
   "concurrency_per_endpoint": 24,
   "timeout_seconds": 7200,
   "smoke_conditions": ["path_dag", "blocks8"],
-  "evaluation": "Exact Sol prompts and judge, final answer after </think> only; length truncations count as failed final trials and are never resampled. Preserve raw generation and reasoning. Transport errors remain unresolved and are archived."
+  "evaluation": "Exact Sol prompts and deterministic task environment; score content after </think> without requiring a strict JSON object. Unambiguous JSON arrays of actions or path moves are normalized before the same judge runs. Length truncations remain failed final trials and are never resampled; raw generation and format provenance are retained."
 }

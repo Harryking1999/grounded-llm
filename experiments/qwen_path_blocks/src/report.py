@@ -9,6 +9,8 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument('--runs', nargs='+', required=True)
     p.add_argument('--baseline-summary', required=True)
+    p.add_argument('--conditions', nargs='+',
+                   help='Conditions to include; defaults to all conditions in the first Qwen summary.')
     p.add_argument('--out', required=True)
     args = p.parse_args()
     models = {}
@@ -18,11 +20,11 @@ def main():
         root = Path(directory)
         summary = json.loads((root / 'summary.json').read_text())
         run = json.loads((root / 'run.json').read_text())
-        if run['status'] != 'completed' or len(run['cases']) != 384:
-            raise ValueError(f'Batch is incomplete: {directory}')
         suite = json.loads((root / 'suite.json').read_text())
         suites.append(suite)
         expected = {(c['id'], n) for c in suite['cases'] for n in range(1, c['replicates'] + 1)}
+        if run['status'] != 'completed' or len(run['cases']) != len(expected):
+            raise ValueError(f'Batch is incomplete: {directory}; expected {len(expected)} slots')
         slots = [(r['case_id'], r['replicate']) for r in run['cases']]
         if len(set(slots)) != len(slots) or set(slots) != expected:
             raise ValueError('Batch does not cover the fixed sample slots exactly')
@@ -32,16 +34,24 @@ def main():
     if len(models) != 3 or any(s['cases'] != suites[0]['cases'] for s in suites):
         raise ValueError('Need all three models on identical cases')
     baseline = json.loads(Path(args.baseline_summary).read_text())
+    conditions = args.conditions or list(next(iter(models.values()))['conditions'])
+    for condition in conditions:
+        if condition not in baseline['conditions']:
+            raise ValueError(f'Baseline has no {condition} condition')
+        if any(condition not in summary['conditions'] for summary in models.values()):
+            raise ValueError(f'A Qwen batch has no {condition} condition')
     comparisons = {'gpt-5.6-sol (gateway)': baseline, **models}
-    lines = ['# Qwen thinking 匹配基线结果', '',
-        '固定 Sol 的 48 个输入、英文完整计划提示词和裁判，每题八次。三种 Qwen 均开启 thinking；'
-        '截断计入准确率分母。GPT 是已有网关返回的 Sol 结果。', '',
+    lines = ['# Qwen thinking 结果', '',
+        f'固定输入、英文完整计划提示词和裁判，每题八次；本报告包含 {", ".join(conditions)}。'
+        '三种 Qwen 均开启 thinking，截断计入准确率分母；Qwen 主指标按内容判分，JSON 合同仅保留为诊断。'
+        'GPT 是已有网关返回的 Sol 结果。', '',
         '| 模型 | 条件 | 成功 / 尝试 | 准确率 | pass@8 | 截断 | 非法完整答案 |',
         '| --- | --- | ---: | ---: | ---: | ---: | ---: |']
     compact = {}
     for model, summary in comparisons.items():
         compact[model] = {}
-        for condition, s in summary['conditions'].items():
+        for condition in conditions:
+            s = summary['conditions'][condition]
             lines.append(f"| {model} | {condition} | {s['successes']}/{s['final_samples']} | "
                          f"{s['sample_success_rate']:.1%} | {s['pass8_solved_cases']}/{s['pass8_eligible_cases']} | "
                          f"{s['budget_truncations']} | {s['illegal_answers']} |")
@@ -53,9 +63,11 @@ def main():
     lines += ['', '## 失败与状态报告', '']
     for model, summary in models.items():
         lines += [f'### {model}', '', f'原始运行：`{run_paths[model]}`。', '']
-        for condition, s in summary['conditions'].items():
+        for condition in conditions:
+            s = summary['conditions'][condition]
             lines += [f"- {condition}：失败分类 `{json.dumps(s['failure_counts'], ensure_ascii=False)}`；"
-                      f"0/8 实例 `{s['zero_of_8_cases']}`；完整合同通过 {s['contract_successes']}/{s['final_samples']}。"]
+                      f"0/8 实例 `{s['zero_of_8_cases']}`；严格 JSON 合同（仅诊断）"
+                      f"{s['contract_successes']}/{s['final_samples']}。"]
             if 'state_reports' in s:
                 state = s['state_reports']
                 lines += [f"  合法前缀逐步棋盘完全正确 {state['correct']}/{state['evaluated_legal_prefix_steps']}。"]

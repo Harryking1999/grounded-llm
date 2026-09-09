@@ -39,3 +39,6 @@ python experiments/qwen_path_blocks/src/run.py \
 原始模型可只读复用既有目录；不引入 OPD 的训练脚本或运行流程。
 
 当前状态：迁移脚本和正式合同已建立，等待本轮完整批次结果。
+
+若 16,384 token 条件出现大量积木截断，可使用 `configs/thinking_32768.json` 追加匹配批次。
+该合同把服务上下文扩大到 49,152，并将并发降低以保留更长 KV cache；其结果与 16K 条件分开报告。

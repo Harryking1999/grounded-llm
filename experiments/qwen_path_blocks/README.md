@@ -13,6 +13,8 @@ GPT 的 medium 与 Qwen thinking 没有等价计算量保证；输出预算包�
 运行环境需 SGLang、PyTorch、Transformers，当前验证环境记录在实际运行
 `run_config.json`。模型路径、端口、GPU 和输出位置均由 CLI 提供；源码不绑定机器。
 模型若缺失可通过 ModelScope `snapshot_download` 下载官方模型到用户指定目录。
+`src/download.py --model-id Qwen/Qwen3-4B --model-dir "$MODEL_PATH" --staging-dir "$LOCAL_STAGING"`
+提供可续传的下载入口；共享盘小文件写入较慢时，将临时分片留在本地盘，再保存完整权重。
 
 ```sh
 python experiments/qwen_path_blocks/src/serve.py \

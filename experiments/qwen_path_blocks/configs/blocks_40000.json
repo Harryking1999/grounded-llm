@@ -1,0 +1,29 @@
+{
+  "study": "qwen_blocks_long_budget",
+  "baseline_config": "experiments/sol_dag_blocks/configs/sol_medium.json",
+  "suite": "experiments/sol_dag_blocks/runs/suite.json",
+  "conditions": ["blocks8", "blocks12"],
+  "models": ["Qwen/Qwen3-4B", "Qwen/Qwen3-8B", "Qwen/Qwen3-32B"],
+  "enable_thinking": true,
+  "seed": 20260910,
+  "replicates": 8,
+  "max_calls_per_model": 256,
+  "sampling": {
+    "max_new_tokens": 40000,
+    "temperature": 0.6,
+    "top_p": 0.95,
+    "top_k": 20,
+    "min_p": 0.0,
+    "repetition_penalty": 1.0
+  },
+  "serving": {
+    "dtype": "bfloat16",
+    "context_length": 40960,
+    "mem_fraction_static": 0.85,
+    "max_running_requests": 4
+  },
+  "concurrency_per_endpoint": 2,
+  "timeout_seconds": 14400,
+  "smoke_conditions": ["blocks8", "blocks12"],
+  "evaluation": "Fixed blocks prompts and deterministic content-only environment judge. Final answers after </think> are scored without requiring a strict JSON object; unambiguous JSON action arrays are normalized. Incomplete 40,000-token generations remain failed final trials. The 40,000-token limit plus the longest 548-token prompt stays within Qwen3's 40,960-token serving limit."
+}

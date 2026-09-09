@@ -36,10 +36,10 @@ def main():
     source = Path(args.run_dir).resolve()
     run = json.loads((source / 'run.json').read_text())
     suite = json.loads((source / 'suite.json').read_text())
-    if run.get('status') != 'completed' or len(run.get('cases', [])) != 384:
-        raise ValueError('Content-only scoring requires a completed 384-slot raw batch')
     expected = {(case['id'], replicate) for case in suite['cases']
                 for replicate in range(1, case['replicates'] + 1)}
+    if run.get('status') != 'completed' or len(run.get('cases', [])) != len(expected):
+        raise ValueError(f'Content-only scoring requires a completed {len(expected)}-slot raw batch')
     actual = [(record['case_id'], record['replicate']) for record in run['cases']]
     if len(actual) != len(set(actual)) or set(actual) != expected:
         raise ValueError('Raw batch does not cover the fixed slots exactly')

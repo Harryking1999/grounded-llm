@@ -56,6 +56,21 @@ class AdapterTests(unittest.TestCase):
         self.assertTrue(verdict['pass'])
         self.assertEqual(verdict['content_parse_mode'], 'action_array')
 
+    def test_blocks_subset_has_the_formal_256_slots(self):
+        from prepare import prepare
+        import select_suite
+        suite = prepare()
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source, output = root / 'suite.json', root / 'blocks.json'
+            source.write_text(json.dumps(suite))
+            with patch.object(sys, 'argv', ['select_suite.py', '--suite', str(source), '--out', str(output),
+                                             '--conditions', 'blocks8', 'blocks12']):
+                select_suite.main()
+            blocks = json.loads(output.read_text())
+        self.assertEqual({case['condition'] for case in blocks['cases']}, {'blocks8', 'blocks12'})
+        self.assertEqual(sum(case['replicates'] for case in blocks['cases']), 256)
+
     def test_truncation_is_failure_even_with_final_json(self):
         _, _, verdict = runner.verdict_for(self.case, '</think>{"path":[{"from":0,"to":1}],"final_node":1}', 'length')
         self.assertFalse(verdict['pass'])

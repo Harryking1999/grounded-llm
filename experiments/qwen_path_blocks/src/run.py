@@ -60,7 +60,10 @@ def main():
     config = json.loads(Path(args.config).read_text())
     suite = json.loads(Path(args.suite).read_text())
     assert args.model_id in config['models']
-    assert len(suite['cases']) == 48
+    requested_conditions = config.get('conditions')
+    if requested_conditions and {case['condition'] for case in suite['cases']} != set(requested_conditions):
+        raise ValueError('Suite conditions do not match the formal contract')
+    assert suite['cases']
     assert sum(c['replicates'] for c in suite['cases']) == config['max_calls_per_model']
     assert all(c['replicates'] == config['replicates'] for c in suite['cases'])
     from transformers import AutoTokenizer

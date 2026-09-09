@@ -44,3 +44,9 @@ python experiments/qwen_path_blocks/src/run.py \
 
 若 16,384 token 条件出现大量积木截断，可使用 `configs/thinking_32768.json` 追加匹配批次。
 该合同将服务上下文设为官方 Qwen3 运行时接受的 40,960 token，并将并发降低以保留更长 KV cache；其结果与 16K 条件分开报告。
+
+若目标是尽量排除输出预算作为积木失败原因，使用 `configs/blocks_40000.json` 配合
+`src/select_suite.py --conditions blocks8 blocks12` 生成 256 槽的 blocks-only suite。40,000
+输出 token 加上最长 548-token 输入仍低于 Qwen3 的 40,960-token 上限；该合同将每个服务
+的并发降至 2，以便为长 KV cache 留出空间。它是以积木为中心的独立预算条件，不能与
+16K 或全套 32K 条件合并。

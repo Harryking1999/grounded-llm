@@ -23,7 +23,7 @@ spec.loader.exec_module(sol)
 
 
 def split_thinking(text):
-    # The official template supplies the opening <think> in the input.
+    # Official template revisions either supply <think> or let the model emit it.
     if '</think>' not in text:
         return text, '', False
     reasoning, answer = text.split('</think>', 1)
@@ -83,7 +83,8 @@ def main():
         prompt = sol.prompt_for(case)
         rendered = tokenizer.apply_chat_template([{'role': 'user', 'content': prompt}],
             tokenize=False, add_generation_prompt=True, enable_thinking=config['enable_thinking'])
-        assert rendered.endswith('<think>\n')
+        assert rendered.endswith(('<|im_start|>assistant\n', '<think>\n'))
+        assert 'enable_thinking' in tokenizer.chat_template
         ids = tokenizer.encode(rendered, add_special_tokens=False)
         if len(ids) + config['sampling']['max_new_tokens'] > config['serving']['context_length']:
             raise ValueError('Context would reduce the requested output budget')

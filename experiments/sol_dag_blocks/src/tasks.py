@@ -125,6 +125,7 @@ class Blocks12Task(BlocksTask):
 
 class DagTask:
     condition = "path_dag"
+    edge_error = "nonexistent_directed_edge"
 
     def shortest(self, case):
         queue, parents = deque([case["start"]]), {case["start"]: None}
@@ -166,7 +167,7 @@ Output only valid JSON with a path array of objects containing integer from and 
             if not isinstance(move, dict) or type(move.get("from")) is not int or move["from"] != node:
                 reason = "from_mismatch"
             elif type(move.get("to")) is not int or move["to"] not in case["neighbors"][str(node)]:
-                reason = "nonexistent_directed_edge"
+                reason = self.edge_error
             elif move["to"] in seen:
                 reason = "repeated_node"
             if reason:
@@ -189,4 +190,28 @@ Output only valid JSON with a path array of objects containing integer from and 
                 "illegal_move": illegal, "trace": trace}
 
 
-TASKS = {"blocks8": Blocks8Task(CONFIG["blocks"]), "blocks12": Blocks12Task(CONFIG["blocks"]), "path_dag": DagTask()}
+class UndirectedPathTask(DagTask):
+    """Shortest-path judge for a case whose adjacency lists are symmetric."""
+
+    condition = "path_undirected_256"
+    edge_error = "nonexistent_undirected_edge"
+
+    def prompt(self, case):
+        node_count = case.get("node_count", len(case["neighbors"]))
+        adjacency = "\n".join(
+            f"{node}: {', '.join(map(str, case['neighbors'][str(node)])) or '(none)'}"
+            for node in case["node_order"])
+        return f'''Task: Find a SHORTEST valid path from node {case['start']} to node {case['goal']} in this {node_count}-node undirected graph. Minimize the number of edges traversed. A valid path exists.
+
+Rules: Nodes are numbered 0 through {node_count - 1}. Each move costs 1. "u: v1, v2" lists every neighbor of u. Edges are bidirectional: if v is listed under u, the same edge is also listed under v, and you may traverse it in either direction. Each node, including the start, may be visited at most once. Node numbers and presentation order carry no spatial or numerical ordering. There is no additional step limit; any shortest path is accepted.
+
+Neighbors:
+{adjacency}
+
+Plan the complete path before answering and verify edge legality and shortestness. The judge starts at the stated start and stops at the first illegal move. There is no intermediate feedback.
+
+Output only valid JSON with a path array of objects containing integer from and to fields, and a final_node integer. Use one object per move. Do not include markdown or a reasoning transcript.'''
+
+
+TASKS = {"blocks8": Blocks8Task(CONFIG["blocks"]), "blocks12": Blocks12Task(CONFIG["blocks"]),
+         "path_dag": DagTask(), "path_undirected_256": UndirectedPathTask()}

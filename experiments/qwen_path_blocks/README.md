@@ -50,3 +50,8 @@ python experiments/qwen_path_blocks/src/run.py \
 输出 token 加上最长 548-token 输入仍低于 Qwen3 的 40,960-token 上限；该合同将每个服务
 的并发降至 2，以便为长 KV cache 留出空间。它是以积木为中心的独立预算条件，不能与
 16K 或全套 32K 条件合并。
+
+`configs/path256_bidirectional_16k.json` 是独立的 256 节点稀疏双向最短路条件。使用
+`src/prepare_path_suite.py --config ... --out "$SUITE_PATH"` 冻结一个 16 题、每题 8 次的
+suite；图为固定的 3-regular 连通图，节点行和邻居顺序按题目打乱。它保留 16,384 token
+上限，截断计失败，不能与原 32 节点 DAG 或 40K 积木条件合并。

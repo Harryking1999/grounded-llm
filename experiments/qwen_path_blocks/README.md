@@ -40,7 +40,8 @@ python experiments/qwen_path_blocks/src/run.py \
 共享结果根目录由本次运行指定在用户的 `experiment/grounded_llm` 下，独立于 OPD。
 原始模型可只读复用既有目录；不引入 OPD 的训练脚本或运行流程。
 
-当前状态：迁移脚本和正式合同已建立，等待本轮完整批次结果。
+本轮结果见 [验收报告](results/report.md)：path 按最终 256 节点双向图、blocks 按
+16k 输出预算汇报，包含准确率、可见思考案例及截断前错误重分类。
 
 若 16,384 token 条件出现大量积木截断，可使用 `configs/thinking_32768.json` 追加匹配批次。
 该合同将服务上下文设为官方 Qwen3 运行时接受的 40,960 token，并将并发降低以保留更长 KV cache；其结果与 16K 条件分开报告。
@@ -55,3 +56,18 @@ python experiments/qwen_path_blocks/src/run.py \
 `src/prepare_path_suite.py --config ... --out "$SUITE_PATH"` 冻结一个 16 题、每题 8 次的
 suite；图为固定的 3-regular 连通图，节点行和邻居顺序按题目打乱。它保留 16,384 token
 上限，截断计失败，不能与原 32 节点 DAG 或 40K 积木条件合并。
+
+## 离线验收与截断归因
+
+`src/acceptance_audit.py` 读取已完成原始运行，复用任务裁判，输出紧凑诊断证据：
+
+```sh
+python experiments/qwen_path_blocks/src/acceptance_audit.py \
+  --runs "$RUN_4B" "$RUN_8B" "$RUN_32B" \
+  --conditions blocks8 blocks12 --out "$AUDIT_PATH"
+```
+
+Path 将 `--conditions` 改为 `path_undirected_256`。原始准确率不改变；实际触顶单独标记。
+触顶前最终答案的已确定动作若非法，优先归非法；合法路径前缀若已不可能最短，归非最短。
+未完成的数字不猜测，未定案思考不自动当作答案，剩余截断仅称原因未决。完整报告中的
+思考行为摘要需人工检查原始 `reasoning_text`，不能从内容判分派生文件中恢复。

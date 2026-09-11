@@ -1,34 +1,15 @@
-# 具备状态认知的 LLM
+# Grounded LLM with Cognitive Maps
 
-LLM 已经具有相当的智能，但基于 token 的语言能力不能代表人类总体的智慧。我们的研究设想是：LLM 在语言推理过程中不能真实、稳定地感知自己所处的当前状态，可能发生遗忘，因此难以进一步正确推理和泛化。
+研究显式状态模型能否帮助冻结的 LLM 更准确地估计状态、预测动作后果并完成规划。共享状态表示、跨任务迁移与交互学习是研究目标，尚未得到实验验证。
 
-我们希望通过一个新网络引入状态认知，使模型能够自己建模并预测“我现在处于什么状态”。这里的状态不是环境直接提供的 ground truth。模型直接得到的只是语言等观测；它必须根据观测和交互历史形成自己的内部状态，并随着动作继续预测和更新。
+## 阅读入口
 
-这与 AlphaGo 直接看到完整棋盘不同。棋盘本身已经给出了 AlphaGo 所处的状态，而只有语言能力的 LLM 看不到这样的状态，只能通过观测来建模和预测。
+- [当前状态与有序 TODO](docs/PROJECT_STATUS_AND_TODO.md)：唯一当前进度页。
+- [研究简述](docs/RESEARCH_BRIEF.md)：研究定义、已确定约束与证伪标准。
+- [Qwen 验收报告](experiments/qwen_path_blocks/results/report.md)：最终双向 path256 与 blocks 16k，含准确率、截断重分类与案例。
+- [Sol 基线](experiments/sol_dag_blocks/README.md)、[Luna / Flash 基线](experiments/gcml_counterexamples/README.md)：历史独立条件。
+- [GCML 任务来源](docs/GCML_TASKS.md)、[候选设计备忘](PROJECT_ROADMAP.md)。
 
-参考工作给出了一种实现：用 `Q` 和 `V` 把从观测建立的状态认知及动作造成的影响映射到同一空间：
+## 仓库约定
 
-$$
-Q o_{t+1}=Q o_t+V a_t
-$$
-
-参考工作定义的误差为：
-
-$$
-e_t=Q o_{t+1}-(Q o_t+V a_t)
-$$
-
-在这个参考机制中，`Q o_t` 不是外部真实状态的编码，而是 AI 根据观测形成的内部状态认知。参考工作使用 `e_t` 直接更新，但这不构成本项目的方法限制。我们可以考虑反向传播或其他训练方式；具体网络和更新方法取决于任务场景与实现难度。
-
-本项目最困难、也是最核心的问题是状态认知的表示：希望最终只用一个共享模型表示不同任务中的各种状态，并通过多任务联合训练获得跨任务泛化能力。这个网络还应能在聊天／交互过程中继续学习。
-
-总体目标是检验“有语义的模型加上状态认知，是否优于只有语义的模型”，并探索 **grounded language is better than token language**。下棋、搭积木等具有可建模状态的任务，是当前用于构造反例和开展实验的候选环境。
-
-## 仓库结构
-
-- `AGENTS.md`：协作、推理、实验和 Git 规则
-- `docs/RESEARCH_BRIEF.md`：当前研究构想、机制和开放问题
-- `docs/PROJECT_STATUS_AND_TODO.md`：唯一当前状态页及有序后续行动
-- `experiments/`：当合同明确后建立的长期研究目录
-
-大型数据集、日志、checkpoint 和生成的运行结果有意不纳入 Git。
+实验在 `experiments/<study>/` 下保存说明、正式配置、可复用源码、针对性测试及紧凑结果。原始生成、日志、数据和模型放在忽略目录中。协作与 Git 纪律见 [AGENTS.md](AGENTS.md)。

@@ -142,13 +142,13 @@ connection failures were archived and filled. The final retained run is
 format diagnostics, is [`results/deepseek_flash.json`](results/deepseek_flash.json).
 The paired heatmap is `runs/deepseek_flash_finish/paired_successes.png`.
 
-| Condition | Luna successes / trials | Flash successes / trials | Flash budget truncations | Luna pass@8 | Flash budgeted pass@8 |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| Official eight-block silhouettes | 99/128 | 115/128 | 13 | 15/16 | 16/16 |
-| Generated twelve-block silhouettes | 72/128 | 74/128 | 54 | 15/16 | 16/16 |
-| Original graph | 116/128 | 127/128 | 0 | 16/16 | 16/16 |
-| One switch | 60/64 | 61/64 | 0 | 8/8 | 8/8 |
-| Two switches | 40/64 | 61/64 | 1 | 7/8 | 8/8 |
+| Condition                          | Luna successes / trials | Flash successes / trials | Flash budget truncations | Luna pass@8 | Flash budgeted pass@8 |
+| ---------------------------------- | ----------------------: | -----------------------: | -----------------------: | ----------: | --------------------: |
+| Official eight-block silhouettes   |                  99/128 |                  115/128 |                       13 |       15/16 |                 16/16 |
+| Generated twelve-block silhouettes |                  72/128 |                   74/128 |                       54 |       15/16 |                 16/16 |
+| Original graph                     |                 116/128 |                  127/128 |                        0 |       16/16 |                 16/16 |
+| One switch                         |                   60/64 |                    61/64 |                        0 |         8/8 |                   8/8 |
+| Two switches                       |                   40/64 |                    61/64 |                        1 |         7/8 |                   8/8 |
 
 The Flash pass@8 column includes truncations as unsuccessful attempts. Excluding
 all case groups with any truncation would leave only eight eight-block boards and

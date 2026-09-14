@@ -128,6 +128,10 @@ def plot(raw, compact, output):
 def save(fig, stem):
     for ext in ['png', 'svg', 'pdf']:
         fig.savefig(str(stem) + '.' + ext, dpi=180)
+        if ext == 'svg':
+            path = Path(str(stem) + '.svg')
+            text = path.read_text(encoding='utf-8')
+            path.write_text('\n'.join(line.rstrip() for line in text.splitlines()) + '\n', encoding='utf-8')
 
 
 if __name__ == '__main__':

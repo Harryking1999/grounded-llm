@@ -125,7 +125,7 @@ Sol 新形状 12 块任务已核实为逐次输出成功 `69/128 = 53.91%`，`pa
 
 两种结构都保持 Qwen 原有参数冻结，只训练状态 adapter 以及新增的状态接口模块。它们分别比较状态作为输入序列的一部分，以及状态作为外部 memory 被读取。
 
-1. **输入层 state tokens**：将 100 维状态向量输入可训练 adapter/projector，映射为 current 和 goal 的连续输入向量，再输入冻结 Qwen。远端举例各用一个 token，但 token 数量尚未确定；压成一个 token 是否损失可用结构需实测。一次调用的概念序列为：
+1. **输入层 state tokens**：将 100 维状态向量输入可训练 adapter/projector，映射为 current 和 goal 的连续输入向量，再输入冻结 Qwen。远端举例各用一个 token；用户现已指定首轮比较每个状态 1／2／4 个向量，具体分块与匹配预算见[试点设计](experiments/state_interface_pilot/README.md)。一个高维向量并非必然装不下网格，关键是冻结 LLM 的可读性，不能预设更多向量更好。一次调用的概念序列为：
 
    ```text
    <im_start>user

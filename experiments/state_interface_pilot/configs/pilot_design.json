@@ -33,22 +33,46 @@
       "dropout": 0.0,
       "inference_state_conditioned_weights": false
     },
-    "S": {
-      "input": "continuous_row_embeddings",
+    "S1": {
+      "input": "continuous_spatial_block_embeddings",
       "training": "report_only_state_adapter",
-      "mlp_dims": [10, 256, 4096],
-      "activation": "gelu",
-      "bias": true,
-      "shared_current_goal_mlp": true,
-      "row_embeddings": 10,
-      "role_embeddings": 2,
-      "tokens_per_state": 10,
-      "initial_state_inputs": ["goal", "current"],
-      "append_current_after_committed_action": true,
-      "repeat_goal_after_each_action": false,
-      "give_redundant_exact_text_state": false,
-      "initialization": "pytorch_linear_defaults_and_normal_0_0.02_for_row_role_embeddings"
+      "tokens_per_state": 1,
+      "block_grid": [1, 1],
+      "block_shape": [10, 10],
+      "mlp_dims": [100, 256, 4096]
+    },
+    "S2": {
+      "input": "continuous_spatial_block_embeddings",
+      "training": "report_only_state_adapter",
+      "tokens_per_state": 2,
+      "block_grid": [2, 1],
+      "block_shape": [5, 10],
+      "mlp_dims": [50, 256, 4096]
+    },
+    "S4": {
+      "input": "continuous_spatial_block_embeddings",
+      "training": "report_only_state_adapter",
+      "tokens_per_state": 4,
+      "block_grid": [2, 2],
+      "block_shape": [5, 5],
+      "mlp_dims": [25, 256, 4096]
     }
+  },
+  "state_interface": {
+    "activation": "gelu",
+    "bias": true,
+    "shared_mlp_across_blocks": true,
+    "shared_current_goal_mlp": true,
+    "share_weights_between_S1_S2_S4": false,
+    "block_order": "row_major",
+    "within_block_flatten_order": "row_major",
+    "block_position_embeddings": "one_per_block",
+    "role_embeddings": 2,
+    "initial_state_inputs": ["goal", "current"],
+    "append_current_after_committed_action": true,
+    "repeat_goal_after_each_action": false,
+    "give_redundant_exact_text_state": false,
+    "initialization": "pytorch_linear_defaults_and_normal_0_0.02_for_block_role_embeddings"
   },
   "data": {
     "seed": 20260913,
@@ -80,6 +104,7 @@
     }
   },
   "alignment": {
+    "condition_order": ["T1", "S1", "S2", "S4"],
     "format": "non_thinking_chat_report",
     "enable_thinking": false,
     "use_chat_thinking_labels": false,
@@ -109,6 +134,7 @@
     "generation_format_validation": "non_thinking_report_generation_and_latest_state_readout_in_continuous_sequence"
   },
   "evaluation": {
+    "conditions": ["T0", "T1", "S1", "S2", "S4"],
     "seed": 20260914,
     "enable_thinking": false,
     "temperature": 0.7,
@@ -146,15 +172,23 @@
     "state_goal_intervention_pairs": 16,
     "intervention_current_pairs": 8,
     "intervention_goal_pairs": 8,
-    "intervention_conditions": ["T0", "T1", "S"],
+    "intervention_conditions": ["T0", "T1", "S1", "S2", "S4"],
     "history_ablation_instances": 32,
-    "history_ablation_conditions": ["T0", "S"],
+    "history_ablation_conditions": ["T0", "S1", "S2", "S4"],
     "history_ablation": "latest_state_goal_only",
     "subset_selection": "fixed_balanced_selection_before_model_outputs"
   },
   "analysis": {
-    "primary": "paired_episode_success_difference_S_minus_T0",
-    "secondary": "paired_episode_success_difference_S_minus_T1",
+    "primary": "paired_episode_success_difference_S1_minus_T0",
+    "secondary": [
+      "paired_episode_success_difference_S2_minus_T0",
+      "paired_episode_success_difference_S4_minus_T0",
+      "paired_episode_success_difference_each_S_variant_minus_T1",
+      "paired_episode_success_difference_S2_and_S4_minus_S1"
+    ],
+    "token_count_comparison": "joint_token_count_and_spatial_partition_comparison_not_pure_token_count_effect",
+    "architecture_selection_uses_test": false,
+    "secondary_comparison_claim": "exploratory_report_all_variants_without_best_of_three_confirmatory_claim",
     "interval": "paired_bootstrap_over_instances",
     "report_strata": ["construction_count", "empty_vs_nonempty_goal"],
     "report_caps_separately_from_known_errors": true,

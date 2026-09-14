@@ -1,0 +1,2617 @@
+{
+  "complete": true,
+  "source_revision": "b31cced1c1eab99c8d7b69f3e3570d82387e9a93",
+  "python": "3.11.13",
+  "numpy": "2.2.6",
+  "device": "CPU",
+  "cases": [
+    {
+      "case": "official32",
+      "nodes": 32,
+      "seed": 0,
+      "official_graph": true,
+      "directed_actions": 96,
+      "degree_min": 2,
+      "degree_max": 5,
+      "action_coverage": 1.0,
+      "minimum_action_visits": 39,
+      "dataset_transitions": 6200,
+      "processed_transitions": 124000,
+      "training_seconds": 1.2222108389250934,
+      "total_seconds": 1.2909124759025872,
+      "spearman_initial": 0.08178699875687478,
+      "spearman_final": 0.9407547903313501,
+      "transition_mse_initial": 2.0042117846898813,
+      "transition_mse_final": 5.144062572759952e-11,
+      "reach_initial": 0.09274193548387097,
+      "reach_final": 0.9979838709677419,
+      "shortest_final": 0.9304435483870968,
+      "first_action_progress_final": 0.9616935483870968,
+      "stretch_success_only": 1.0192400192400193,
+      "v_norm_cv_final": 0.13803672790527344,
+      "sqrt_fit_r2_final": 0.8257384081353364,
+      "initial_buckets": [
+        {
+          "graph_distance": 1,
+          "pairs": 48,
+          "latent_mean": 44.64940660559412,
+          "latent_sd": 0.9452428596395204
+        },
+        {
+          "graph_distance": 2,
+          "pairs": 87,
+          "latent_mean": 44.563580079119085,
+          "latent_sd": 1.030313580520591
+        },
+        {
+          "graph_distance": 3,
+          "pairs": 102,
+          "latent_mean": 44.54954577971774,
+          "latent_sd": 0.989526222508576
+        },
+        {
+          "graph_distance": 4,
+          "pairs": 103,
+          "latent_mean": 44.643489327668675,
+          "latent_sd": 1.0960057481340322
+        },
+        {
+          "graph_distance": 5,
+          "pairs": 83,
+          "latent_mean": 44.62806622699476,
+          "latent_sd": 0.9539926493268518
+        },
+        {
+          "graph_distance": 6,
+          "pairs": 52,
+          "latent_mean": 44.87355608431296,
+          "latent_sd": 1.117771074501226
+        },
+        {
+          "graph_distance": 7,
+          "pairs": 20,
+          "latent_mean": 45.10380354832092,
+          "latent_sd": 1.096348853919998
+        },
+        {
+          "graph_distance": 8,
+          "pairs": 1,
+          "latent_mean": 45.47683802975362,
+          "latent_sd": 0.0
+        }
+      ],
+      "final_buckets": [
+        {
+          "graph_distance": 1,
+          "pairs": 48,
+          "latent_mean": 3.523499409506453,
+          "latent_sd": 0.4863954360368204
+        },
+        {
+          "graph_distance": 2,
+          "pairs": 87,
+          "latent_mean": 5.364862252244358,
+          "latent_sd": 0.9368015456157991
+        },
+        {
+          "graph_distance": 3,
+          "pairs": 102,
+          "latent_mean": 7.255016159409307,
+          "latent_sd": 1.0644610927201708
+        },
+        {
+          "graph_distance": 4,
+          "pairs": 103,
+          "latent_mean": 8.97119170470878,
+          "latent_sd": 1.213966205221749
+        },
+        {
+          "graph_distance": 5,
+          "pairs": 83,
+          "latent_mean": 10.583721384841956,
+          "latent_sd": 0.9699705872554062
+        },
+        {
+          "graph_distance": 6,
+          "pairs": 52,
+          "latent_mean": 11.914987076257507,
+          "latent_sd": 0.5420374990754792
+        },
+        {
+          "graph_distance": 7,
+          "pairs": 20,
+          "latent_mean": 12.810943057100179,
+          "latent_sd": 0.4954856827876746
+        },
+        {
+          "graph_distance": 8,
+          "pairs": 1,
+          "latent_mean": 13.54889455216678,
+          "latent_sd": 0.0
+        }
+      ]
+    },
+    {
+      "case": "random32_seed0",
+      "nodes": 32,
+      "seed": 0,
+      "official_graph": false,
+      "directed_actions": 84,
+      "degree_min": 2,
+      "degree_max": 5,
+      "action_coverage": 1.0,
+      "minimum_action_visits": 45,
+      "dataset_transitions": 6200,
+      "processed_transitions": 124000,
+      "training_seconds": 1.2743813474662602,
+      "total_seconds": 1.353472603019327,
+      "spearman_initial": -0.03034359502893906,
+      "spearman_final": 0.8853478462475651,
+      "transition_mse_initial": 2.0269721699360463,
+      "transition_mse_final": 1.090269428651172e-12,
+      "reach_initial": 0.06451612903225806,
+      "reach_final": 1.0,
+      "shortest_final": 0.8850806451612904,
+      "first_action_progress_final": 0.9405241935483871,
+      "stretch_success_only": 1.0285150249615975,
+      "v_norm_cv_final": 0.13482911884784698,
+      "sqrt_fit_r2_final": 0.7940549448357539,
+      "initial_buckets": [
+        {
+          "graph_distance": 1,
+          "pairs": 42,
+          "latent_mean": 44.91674124741716,
+          "latent_sd": 0.8830547573624067
+        },
+        {
+          "graph_distance": 2,
+          "pairs": 73,
+          "latent_mean": 44.6627353920665,
+          "latent_sd": 1.0140901410877003
+        },
+        {
+          "graph_distance": 3,
+          "pairs": 116,
+          "latent_mean": 44.614256414096246,
+          "latent_sd": 0.9587894593008723
+        },
+        {
+          "graph_distance": 4,
+          "pairs": 127,
+          "latent_mean": 44.54083528448258,
+          "latent_sd": 1.0040371026301775
+        },
+        {
+          "graph_distance": 5,
+          "pairs": 87,
+          "latent_mean": 44.635335490463575,
+          "latent_sd": 1.0848011667985653
+        },
+        {
+          "graph_distance": 6,
+          "pairs": 37,
+          "latent_mean": 44.63761149842997,
+          "latent_sd": 1.3102356818868979
+        },
+        {
+          "graph_distance": 7,
+          "pairs": 13,
+          "latent_mean": 45.19502142176031,
+          "latent_sd": 0.9785997728518999
+        },
+        {
+          "graph_distance": 8,
+          "pairs": 1,
+          "latent_mean": 46.41964368202075,
+          "latent_sd": 0.0
+        }
+      ],
+      "final_buckets": [
+        {
+          "graph_distance": 1,
+          "pairs": 42,
+          "latent_mean": 3.879832345741938,
+          "latent_sd": 0.5231143781734472
+        },
+        {
+          "graph_distance": 2,
+          "pairs": 73,
+          "latent_mean": 6.030983283371377,
+          "latent_sd": 0.7745708522487801
+        },
+        {
+          "graph_distance": 3,
+          "pairs": 116,
+          "latent_mean": 7.4753211294455975,
+          "latent_sd": 1.0862575183721666
+        },
+        {
+          "graph_distance": 4,
+          "pairs": 127,
+          "latent_mean": 8.796982736911149,
+          "latent_sd": 1.2296677572748258
+        },
+        {
+          "graph_distance": 5,
+          "pairs": 87,
+          "latent_mean": 10.22570127269616,
+          "latent_sd": 1.0743035614315675
+        },
+        {
+          "graph_distance": 6,
+          "pairs": 37,
+          "latent_mean": 11.612360204260161,
+          "latent_sd": 0.9067136831184298
+        },
+        {
+          "graph_distance": 7,
+          "pairs": 13,
+          "latent_mean": 12.884108595520187,
+          "latent_sd": 0.605998357423644
+        },
+        {
+          "graph_distance": 8,
+          "pairs": 1,
+          "latent_mean": 13.386457529854127,
+          "latent_sd": 0.0
+        }
+      ]
+    },
+    {
+      "case": "random32_seed1",
+      "nodes": 32,
+      "seed": 1,
+      "official_graph": false,
+      "directed_actions": 112,
+      "degree_min": 2,
+      "degree_max": 6,
+      "action_coverage": 1.0,
+      "minimum_action_visits": 33,
+      "dataset_transitions": 6200,
+      "processed_transitions": 124000,
+      "training_seconds": 1.2312121829017997,
+      "total_seconds": 1.29577171895653,
+      "spearman_initial": -0.032236948608931254,
+      "spearman_final": 0.786719919514525,
+      "transition_mse_initial": 2.05328414969346,
+      "transition_mse_final": 2.776181651619372e-10,
+      "reach_initial": 0.09375,
+      "reach_final": 1.0,
+      "shortest_final": 0.8991935483870968,
+      "first_action_progress_final": 0.9183467741935484,
+      "stretch_success_only": 1.0386424731182797,
+      "v_norm_cv_final": 0.09949428588151932,
+      "sqrt_fit_r2_final": 0.6442873480930673,
+      "initial_buckets": [
+        {
+          "graph_distance": 1,
+          "pairs": 56,
+          "latent_mean": 45.16959261517867,
+          "latent_sd": 1.2267947486859467
+        },
+        {
+          "graph_distance": 2,
+          "pairs": 131,
+          "latent_mean": 44.88094802480373,
+          "latent_sd": 1.1216808891703531
+        },
+        {
+          "graph_distance": 3,
+          "pairs": 192,
+          "latent_mean": 44.93975061857996,
+          "latent_sd": 1.1123253412616843
+        },
+        {
+          "graph_distance": 4,
+          "pairs": 106,
+          "latent_mean": 44.89371645341615,
+          "latent_sd": 1.2431180597127707
+        },
+        {
+          "graph_distance": 5,
+          "pairs": 11,
+          "latent_mean": 45.22930449743718,
+          "latent_sd": 1.1851493863146167
+        }
+      ],
+      "final_buckets": [
+        {
+          "graph_distance": 1,
+          "pairs": 56,
+          "latent_mean": 2.9993650016702964,
+          "latent_sd": 0.2984656965925338
+        },
+        {
+          "graph_distance": 2,
+          "pairs": 131,
+          "latent_mean": 4.087653165821754,
+          "latent_sd": 0.5377585297009794
+        },
+        {
+          "graph_distance": 3,
+          "pairs": 192,
+          "latent_mean": 4.817098627648711,
+          "latent_sd": 0.6407739281434318
+        },
+        {
+          "graph_distance": 4,
+          "pairs": 106,
+          "latent_mean": 5.568348115178254,
+          "latent_sd": 0.6582774530631245
+        },
+        {
+          "graph_distance": 5,
+          "pairs": 11,
+          "latent_mean": 6.499084738783538,
+          "latent_sd": 0.6489339629392945
+        }
+      ]
+    },
+    {
+      "case": "random32_seed2",
+      "nodes": 32,
+      "seed": 2,
+      "official_graph": false,
+      "directed_actions": 108,
+      "degree_min": 2,
+      "degree_max": 5,
+      "action_coverage": 1.0,
+      "minimum_action_visits": 38,
+      "dataset_transitions": 6200,
+      "processed_transitions": 124000,
+      "training_seconds": 1.3241101866587996,
+      "total_seconds": 1.3801119131967425,
+      "spearman_initial": 0.0017876703791234378,
+      "spearman_final": 0.8527236574123922,
+      "transition_mse_initial": 1.9958388279027348,
+      "transition_mse_final": 4.2740671598589805e-11,
+      "reach_initial": 0.11693548387096774,
+      "reach_final": 1.0,
+      "shortest_final": 0.8981854838709677,
+      "first_action_progress_final": 0.9223790322580645,
+      "stretch_success_only": 1.0386592741935483,
+      "v_norm_cv_final": 0.11466391384601593,
+      "sqrt_fit_r2_final": 0.7305355345894182,
+      "initial_buckets": [
+        {
+          "graph_distance": 1,
+          "pairs": 54,
+          "latent_mean": 44.54702723633985,
+          "latent_sd": 0.8929307850756029
+        },
+        {
+          "graph_distance": 2,
+          "pairs": 123,
+          "latent_mean": 44.727000441860326,
+          "latent_sd": 0.9027783570939448
+        },
+        {
+          "graph_distance": 3,
+          "pairs": 167,
+          "latent_mean": 44.70240184495922,
+          "latent_sd": 0.8754060628100155
+        },
+        {
+          "graph_distance": 4,
+          "pairs": 113,
+          "latent_mean": 44.76472922867925,
+          "latent_sd": 0.9572515242210463
+        },
+        {
+          "graph_distance": 5,
+          "pairs": 34,
+          "latent_mean": 44.59107123040582,
+          "latent_sd": 0.7056499201736193
+        },
+        {
+          "graph_distance": 6,
+          "pairs": 5,
+          "latent_mean": 44.04889370507582,
+          "latent_sd": 0.4604778631694213
+        }
+      ],
+      "final_buckets": [
+        {
+          "graph_distance": 1,
+          "pairs": 54,
+          "latent_mean": 3.0907044865349778,
+          "latent_sd": 0.35438968851884173
+        },
+        {
+          "graph_distance": 2,
+          "pairs": 123,
+          "latent_mean": 4.291897347114883,
+          "latent_sd": 0.6077611970961947
+        },
+        {
+          "graph_distance": 3,
+          "pairs": 167,
+          "latent_mean": 5.255418708868255,
+          "latent_sd": 0.7606330727670785
+        },
+        {
+          "graph_distance": 4,
+          "pairs": 113,
+          "latent_mean": 6.293529541511512,
+          "latent_sd": 0.8232377619821163
+        },
+        {
+          "graph_distance": 5,
+          "pairs": 34,
+          "latent_mean": 7.595533187597783,
+          "latent_sd": 0.5735658853531713
+        },
+        {
+          "graph_distance": 6,
+          "pairs": 5,
+          "latent_mean": 8.877014013291213,
+          "latent_sd": 0.16799395360954258
+        }
+      ]
+    },
+    {
+      "case": "random64_seed0",
+      "nodes": 64,
+      "seed": 0,
+      "official_graph": false,
+      "directed_actions": 190,
+      "degree_min": 2,
+      "degree_max": 5,
+      "action_coverage": 1.0,
+      "minimum_action_visits": 45,
+      "dataset_transitions": 12400,
+      "processed_transitions": 248000,
+      "training_seconds": 2.173330910038203,
+      "total_seconds": 2.327365627977997,
+      "spearman_initial": -0.04707509308149393,
+      "spearman_final": 0.8511862256937506,
+      "transition_mse_initial": 2.042968047790395,
+      "transition_mse_final": 4.9484278318984174e-12,
+      "reach_initial": 0.05009920634920635,
+      "reach_final": 0.9910714285714286,
+      "shortest_final": 0.8075396825396826,
+      "first_action_progress_final": 0.890625,
+      "stretch_success_only": 1.0504576004576005,
+      "v_norm_cv_final": 0.11317151039838791,
+      "sqrt_fit_r2_final": 0.7741964561638995,
+      "initial_buckets": [
+        {
+          "graph_distance": 1,
+          "pairs": 95,
+          "latent_mean": 45.078078778046724,
+          "latent_sd": 0.9575479907290589
+        },
+        {
+          "graph_distance": 2,
+          "pairs": 191,
+          "latent_mean": 45.07555311831349,
+          "latent_sd": 0.9858904339453693
+        },
+        {
+          "graph_distance": 3,
+          "pairs": 345,
+          "latent_mean": 44.9689661088953,
+          "latent_sd": 0.9338496074757392
+        },
+        {
+          "graph_distance": 4,
+          "pairs": 475,
+          "latent_mean": 44.9283073863672,
+          "latent_sd": 0.9690190297507528
+        },
+        {
+          "graph_distance": 5,
+          "pairs": 493,
+          "latent_mean": 44.964128803536916,
+          "latent_sd": 1.041411379704221
+        },
+        {
+          "graph_distance": 6,
+          "pairs": 294,
+          "latent_mean": 44.934444402806264,
+          "latent_sd": 1.0161485262975918
+        },
+        {
+          "graph_distance": 7,
+          "pairs": 107,
+          "latent_mean": 44.768054688441346,
+          "latent_sd": 1.00726987047516
+        },
+        {
+          "graph_distance": 8,
+          "pairs": 16,
+          "latent_mean": 44.8791634406857,
+          "latent_sd": 1.0272981996591157
+        }
+      ],
+      "final_buckets": [
+        {
+          "graph_distance": 1,
+          "pairs": 95,
+          "latent_mean": 3.6283489710127226,
+          "latent_sd": 0.4106250134280012
+        },
+        {
+          "graph_distance": 2,
+          "pairs": 191,
+          "latent_mean": 5.3540236947172515,
+          "latent_sd": 0.7319394399999286
+        },
+        {
+          "graph_distance": 3,
+          "pairs": 345,
+          "latent_mean": 6.503884639526723,
+          "latent_sd": 0.8628998990123076
+        },
+        {
+          "graph_distance": 4,
+          "pairs": 475,
+          "latent_mean": 7.4759548917199785,
+          "latent_sd": 0.8241187817556833
+        },
+        {
+          "graph_distance": 5,
+          "pairs": 493,
+          "latent_mean": 8.264303931133124,
+          "latent_sd": 0.8350113026761046
+        },
+        {
+          "graph_distance": 6,
+          "pairs": 294,
+          "latent_mean": 9.129493463764712,
+          "latent_sd": 0.8250834155818919
+        },
+        {
+          "graph_distance": 7,
+          "pairs": 107,
+          "latent_mean": 9.965419716895745,
+          "latent_sd": 0.7430721667094027
+        },
+        {
+          "graph_distance": 8,
+          "pairs": 16,
+          "latent_mean": 10.49802555082152,
+          "latent_sd": 0.5747324473604539
+        }
+      ]
+    },
+    {
+      "case": "random64_seed1",
+      "nodes": 64,
+      "seed": 1,
+      "official_graph": false,
+      "directed_actions": 200,
+      "degree_min": 2,
+      "degree_max": 6,
+      "action_coverage": 1.0,
+      "minimum_action_visits": 43,
+      "dataset_transitions": 12400,
+      "processed_transitions": 248000,
+      "training_seconds": 2.2012247685343027,
+      "total_seconds": 2.3694286420941353,
+      "spearman_initial": -0.03647671393677299,
+      "spearman_final": 0.8106130772301551,
+      "transition_mse_initial": 2.0390678825554076,
+      "transition_mse_final": 7.131927167589098e-12,
+      "reach_initial": 0.054563492063492064,
+      "reach_final": 0.9744543650793651,
+      "shortest_final": 0.785218253968254,
+      "first_action_progress_final": 0.8745039682539683,
+      "stretch_success_only": 1.0634888315214097,
+      "v_norm_cv_final": 0.10951690375804901,
+      "sqrt_fit_r2_final": 0.6568079398991702,
+      "initial_buckets": [
+        {
+          "graph_distance": 1,
+          "pairs": 100,
+          "latent_mean": 45.03127196419601,
+          "latent_sd": 1.207545158391364
+        },
+        {
+          "graph_distance": 2,
+          "pairs": 225,
+          "latent_mean": 44.92259082520673,
+          "latent_sd": 1.0843439450560663
+        },
+        {
+          "graph_distance": 3,
+          "pairs": 438,
+          "latent_mean": 44.853421096194836,
+          "latent_sd": 1.1018429444925975
+        },
+        {
+          "graph_distance": 4,
+          "pairs": 565,
+          "latent_mean": 44.8848168919569,
+          "latent_sd": 1.1285968132654214
+        },
+        {
+          "graph_distance": 5,
+          "pairs": 444,
+          "latent_mean": 44.89905360113367,
+          "latent_sd": 1.129201293248294
+        },
+        {
+          "graph_distance": 6,
+          "pairs": 182,
+          "latent_mean": 44.69081192553081,
+          "latent_sd": 1.0847718208271453
+        },
+        {
+          "graph_distance": 7,
+          "pairs": 50,
+          "latent_mean": 44.733262283970255,
+          "latent_sd": 1.1490912019974397
+        },
+        {
+          "graph_distance": 8,
+          "pairs": 11,
+          "latent_mean": 44.93522260918888,
+          "latent_sd": 1.2686608291284838
+        },
+        {
+          "graph_distance": 9,
+          "pairs": 1,
+          "latent_mean": 43.20786623869177,
+          "latent_sd": 0.0
+        }
+      ],
+      "final_buckets": [
+        {
+          "graph_distance": 1,
+          "pairs": 100,
+          "latent_mean": 3.4416447720412155,
+          "latent_sd": 0.3769183815479563
+        },
+        {
+          "graph_distance": 2,
+          "pairs": 225,
+          "latent_mean": 4.892413067187519,
+          "latent_sd": 0.7135083161295838
+        },
+        {
+          "graph_distance": 3,
+          "pairs": 438,
+          "latent_mean": 5.822217190524099,
+          "latent_sd": 0.8829629821287701
+        },
+        {
+          "graph_distance": 4,
+          "pairs": 565,
+          "latent_mean": 6.670043676929458,
+          "latent_sd": 1.0235222813831224
+        },
+        {
+          "graph_distance": 5,
+          "pairs": 444,
+          "latent_mean": 7.6288710041101195,
+          "latent_sd": 1.1249505329880445
+        },
+        {
+          "graph_distance": 6,
+          "pairs": 182,
+          "latent_mean": 8.800798202778473,
+          "latent_sd": 1.2092846954659504
+        },
+        {
+          "graph_distance": 7,
+          "pairs": 50,
+          "latent_mean": 10.454784057748292,
+          "latent_sd": 1.1625710812938015
+        },
+        {
+          "graph_distance": 8,
+          "pairs": 11,
+          "latent_mean": 11.695493322758445,
+          "latent_sd": 0.3648113772838148
+        },
+        {
+          "graph_distance": 9,
+          "pairs": 1,
+          "latent_mean": 12.355250289320411,
+          "latent_sd": 0.0
+        }
+      ]
+    },
+    {
+      "case": "random64_seed2",
+      "nodes": 64,
+      "seed": 2,
+      "official_graph": false,
+      "directed_actions": 178,
+      "degree_min": 2,
+      "degree_max": 5,
+      "action_coverage": 1.0,
+      "minimum_action_visits": 41,
+      "dataset_transitions": 12400,
+      "processed_transitions": 248000,
+      "training_seconds": 2.107229897286743,
+      "total_seconds": 2.2045499882660806,
+      "spearman_initial": 0.023606763466881158,
+      "spearman_final": 0.832471258066509,
+      "transition_mse_initial": 2.023735882133592,
+      "transition_mse_final": 5.02906271251718e-12,
+      "reach_initial": 0.04017857142857143,
+      "reach_final": 0.9781746031746031,
+      "shortest_final": 0.7914186507936508,
+      "first_action_progress_final": 0.8824404761904762,
+      "stretch_success_only": 1.0522603150455585,
+      "v_norm_cv_final": 0.1023099273443222,
+      "sqrt_fit_r2_final": 0.7407561734231215,
+      "initial_buckets": [
+        {
+          "graph_distance": 1,
+          "pairs": 89,
+          "latent_mean": 44.86172141005977,
+          "latent_sd": 0.9065603074059082
+        },
+        {
+          "graph_distance": 2,
+          "pairs": 165,
+          "latent_mean": 44.80679647538096,
+          "latent_sd": 0.8716686765635495
+        },
+        {
+          "graph_distance": 3,
+          "pairs": 278,
+          "latent_mean": 44.767148486996525,
+          "latent_sd": 0.8837053708977671
+        },
+        {
+          "graph_distance": 4,
+          "pairs": 404,
+          "latent_mean": 44.769226979594485,
+          "latent_sd": 0.8859492416055966
+        },
+        {
+          "graph_distance": 5,
+          "pairs": 445,
+          "latent_mean": 44.789467814552,
+          "latent_sd": 0.8952721271029012
+        },
+        {
+          "graph_distance": 6,
+          "pairs": 337,
+          "latent_mean": 44.8657601376914,
+          "latent_sd": 0.9332254600121964
+        },
+        {
+          "graph_distance": 7,
+          "pairs": 200,
+          "latent_mean": 44.8139350788957,
+          "latent_sd": 0.8725254547029458
+        },
+        {
+          "graph_distance": 8,
+          "pairs": 86,
+          "latent_mean": 44.800351490275226,
+          "latent_sd": 1.0544912813458254
+        },
+        {
+          "graph_distance": 9,
+          "pairs": 12,
+          "latent_mean": 45.154443297851934,
+          "latent_sd": 0.7389478219007353
+        }
+      ],
+      "final_buckets": [
+        {
+          "graph_distance": 1,
+          "pairs": 89,
+          "latent_mean": 3.800266492040938,
+          "latent_sd": 0.3888022249631789
+        },
+        {
+          "graph_distance": 2,
+          "pairs": 165,
+          "latent_mean": 5.667057204804161,
+          "latent_sd": 0.7410955760028344
+        },
+        {
+          "graph_distance": 3,
+          "pairs": 278,
+          "latent_mean": 6.918080885006412,
+          "latent_sd": 0.9304719491495859
+        },
+        {
+          "graph_distance": 4,
+          "pairs": 404,
+          "latent_mean": 7.791826976605609,
+          "latent_sd": 1.097860223109036
+        },
+        {
+          "graph_distance": 5,
+          "pairs": 445,
+          "latent_mean": 8.613124972569441,
+          "latent_sd": 1.1811448401341533
+        },
+        {
+          "graph_distance": 6,
+          "pairs": 337,
+          "latent_mean": 9.552749785750857,
+          "latent_sd": 1.071807189523734
+        },
+        {
+          "graph_distance": 7,
+          "pairs": 200,
+          "latent_mean": 10.434697920033866,
+          "latent_sd": 0.8695467143055734
+        },
+        {
+          "graph_distance": 8,
+          "pairs": 86,
+          "latent_mean": 11.173226016675496,
+          "latent_sd": 0.7321829908410079
+        },
+        {
+          "graph_distance": 9,
+          "pairs": 12,
+          "latent_mean": 12.08936930149705,
+          "latent_sd": 0.9389569383552081
+        }
+      ]
+    },
+    {
+      "case": "random128_seed0",
+      "nodes": 128,
+      "seed": 0,
+      "official_graph": false,
+      "directed_actions": 394,
+      "degree_min": 2,
+      "degree_max": 6,
+      "action_coverage": 1.0,
+      "minimum_action_visits": 39,
+      "dataset_transitions": 24800,
+      "processed_transitions": 496000,
+      "training_seconds": 4.3763935710303485,
+      "total_seconds": 4.663683149032295,
+      "spearman_initial": -0.04234476527371643,
+      "spearman_final": 0.753055811381738,
+      "transition_mse_initial": 2.0328205109684787,
+      "transition_mse_final": 1.5668728554522106e-11,
+      "reach_initial": 0.029773622047244094,
+      "reach_final": 0.9118479330708661,
+      "shortest_final": 0.6803026574803149,
+      "first_action_progress_final": 0.8291092519685039,
+      "stretch_success_only": 1.0776666784458728,
+      "v_norm_cv_final": 0.08524557948112488,
+      "sqrt_fit_r2_final": 0.6091809540366016,
+      "initial_buckets": [
+        {
+          "graph_distance": 1,
+          "pairs": 197,
+          "latent_mean": 44.96861667808781,
+          "latent_sd": 0.9492701526494125
+        },
+        {
+          "graph_distance": 2,
+          "pairs": 441,
+          "latent_mean": 44.86761160931254,
+          "latent_sd": 1.012759083115617
+        },
+        {
+          "graph_distance": 3,
+          "pairs": 928,
+          "latent_mean": 44.92098567617923,
+          "latent_sd": 0.9963626175307516
+        },
+        {
+          "graph_distance": 4,
+          "pairs": 1680,
+          "latent_mean": 44.91756634727452,
+          "latent_sd": 0.9744533390311914
+        },
+        {
+          "graph_distance": 5,
+          "pairs": 2170,
+          "latent_mean": 44.88237703412066,
+          "latent_sd": 0.9888472279223143
+        },
+        {
+          "graph_distance": 6,
+          "pairs": 1722,
+          "latent_mean": 44.82236319728825,
+          "latent_sd": 0.9976826570921982
+        },
+        {
+          "graph_distance": 7,
+          "pairs": 795,
+          "latent_mean": 44.77868528575567,
+          "latent_sd": 0.9351096941815371
+        },
+        {
+          "graph_distance": 8,
+          "pairs": 182,
+          "latent_mean": 44.81802218007107,
+          "latent_sd": 0.9237226190038618
+        },
+        {
+          "graph_distance": 9,
+          "pairs": 13,
+          "latent_mean": 44.65885277407954,
+          "latent_sd": 0.6370482218694559
+        }
+      ],
+      "final_buckets": [
+        {
+          "graph_distance": 1,
+          "pairs": 197,
+          "latent_mean": 3.5662570496269956,
+          "latent_sd": 0.30400398183008404
+        },
+        {
+          "graph_distance": 2,
+          "pairs": 441,
+          "latent_mean": 5.132244256365558,
+          "latent_sd": 0.5639512483283453
+        },
+        {
+          "graph_distance": 3,
+          "pairs": 928,
+          "latent_mean": 6.033290436599613,
+          "latent_sd": 0.7306474661682787
+        },
+        {
+          "graph_distance": 4,
+          "pairs": 1680,
+          "latent_mean": 6.611895062827231,
+          "latent_sd": 0.8554605611966027
+        },
+        {
+          "graph_distance": 5,
+          "pairs": 2170,
+          "latent_mean": 7.196708322968672,
+          "latent_sd": 0.9234020026755634
+        },
+        {
+          "graph_distance": 6,
+          "pairs": 1722,
+          "latent_mean": 7.914911147615145,
+          "latent_sd": 0.9171080146861251
+        },
+        {
+          "graph_distance": 7,
+          "pairs": 795,
+          "latent_mean": 8.715614255819013,
+          "latent_sd": 0.8826719303686726
+        },
+        {
+          "graph_distance": 8,
+          "pairs": 182,
+          "latent_mean": 9.591695851069035,
+          "latent_sd": 0.913963275037106
+        },
+        {
+          "graph_distance": 9,
+          "pairs": 13,
+          "latent_mean": 10.524885070613253,
+          "latent_sd": 0.8093869102896408
+        }
+      ]
+    },
+    {
+      "case": "random128_seed1",
+      "nodes": 128,
+      "seed": 1,
+      "official_graph": false,
+      "directed_actions": 400,
+      "degree_min": 2,
+      "degree_max": 5,
+      "action_coverage": 1.0,
+      "minimum_action_visits": 35,
+      "dataset_transitions": 24800,
+      "processed_transitions": 496000,
+      "training_seconds": 4.382664499338716,
+      "total_seconds": 4.645497860852629,
+      "spearman_initial": -0.0039568402132736675,
+      "spearman_final": 0.727584607235263,
+      "transition_mse_initial": 2.016515926318031,
+      "transition_mse_final": 4.690241639480713e-11,
+      "reach_initial": 0.023068405511811024,
+      "reach_final": 0.9202755905511811,
+      "shortest_final": 0.6840551181102362,
+      "first_action_progress_final": 0.8233267716535433,
+      "stretch_success_only": 1.0836273448773448,
+      "v_norm_cv_final": 0.0879567340016365,
+      "sqrt_fit_r2_final": 0.5217743780217432,
+      "initial_buckets": [
+        {
+          "graph_distance": 1,
+          "pairs": 200,
+          "latent_mean": 44.779646574632494,
+          "latent_sd": 1.122805132388954
+        },
+        {
+          "graph_distance": 2,
+          "pairs": 473,
+          "latent_mean": 44.79094021086133,
+          "latent_sd": 0.9760660423572632
+        },
+        {
+          "graph_distance": 3,
+          "pairs": 1043,
+          "latent_mean": 44.72279086822523,
+          "latent_sd": 1.0095954231318167
+        },
+        {
+          "graph_distance": 4,
+          "pairs": 1865,
+          "latent_mean": 44.76360135188017,
+          "latent_sd": 1.0252708925429672
+        },
+        {
+          "graph_distance": 5,
+          "pairs": 2253,
+          "latent_mean": 44.75713650938806,
+          "latent_sd": 1.0368766208110038
+        },
+        {
+          "graph_distance": 6,
+          "pairs": 1578,
+          "latent_mean": 44.77516541622335,
+          "latent_sd": 1.0168993271499431
+        },
+        {
+          "graph_distance": 7,
+          "pairs": 547,
+          "latent_mean": 44.750503186111665,
+          "latent_sd": 1.0625906735771913
+        },
+        {
+          "graph_distance": 8,
+          "pairs": 135,
+          "latent_mean": 44.55662396707691,
+          "latent_sd": 1.0695687194595584
+        },
+        {
+          "graph_distance": 9,
+          "pairs": 31,
+          "latent_mean": 44.32300592202808,
+          "latent_sd": 1.0855148338365084
+        },
+        {
+          "graph_distance": 10,
+          "pairs": 3,
+          "latent_mean": 43.81825916503069,
+          "latent_sd": 0.47783003553860054
+        }
+      ],
+      "final_buckets": [
+        {
+          "graph_distance": 1,
+          "pairs": 200,
+          "latent_mean": 3.4792641728720697,
+          "latent_sd": 0.3060231432084865
+        },
+        {
+          "graph_distance": 2,
+          "pairs": 473,
+          "latent_mean": 4.903227084968682,
+          "latent_sd": 0.6046495941277888
+        },
+        {
+          "graph_distance": 3,
+          "pairs": 1043,
+          "latent_mean": 5.684161518813148,
+          "latent_sd": 0.7979704892943655
+        },
+        {
+          "graph_distance": 4,
+          "pairs": 1865,
+          "latent_mean": 6.23848656384207,
+          "latent_sd": 0.9397241144309871
+        },
+        {
+          "graph_distance": 5,
+          "pairs": 2253,
+          "latent_mean": 6.82639069145073,
+          "latent_sd": 1.090597423034806
+        },
+        {
+          "graph_distance": 6,
+          "pairs": 1578,
+          "latent_mean": 7.644236451758025,
+          "latent_sd": 1.3139059334221943
+        },
+        {
+          "graph_distance": 7,
+          "pairs": 547,
+          "latent_mean": 9.115337139987883,
+          "latent_sd": 1.5514752579953415
+        },
+        {
+          "graph_distance": 8,
+          "pairs": 135,
+          "latent_mean": 11.006532627039379,
+          "latent_sd": 1.1057186108101194
+        },
+        {
+          "graph_distance": 9,
+          "pairs": 31,
+          "latent_mean": 12.19972978891173,
+          "latent_sd": 0.5208746393747665
+        },
+        {
+          "graph_distance": 10,
+          "pairs": 3,
+          "latent_mean": 12.892675224654647,
+          "latent_sd": 0.29542879549236056
+        }
+      ]
+    },
+    {
+      "case": "random128_seed2",
+      "nodes": 128,
+      "seed": 2,
+      "official_graph": false,
+      "directed_actions": 356,
+      "degree_min": 2,
+      "degree_max": 5,
+      "action_coverage": 1.0,
+      "minimum_action_visits": 48,
+      "dataset_transitions": 24800,
+      "processed_transitions": 496000,
+      "training_seconds": 4.5452888193540275,
+      "total_seconds": 4.801509944722056,
+      "spearman_initial": -0.025167058440211106,
+      "spearman_final": 0.781807212603439,
+      "transition_mse_initial": 2.018260482069158,
+      "transition_mse_final": 1.2694240067164335e-12,
+      "reach_initial": 0.022883858267716536,
+      "reach_final": 0.8784448818897638,
+      "shortest_final": 0.657111220472441,
+      "first_action_progress_final": 0.8248646653543307,
+      "stretch_success_only": 1.073995292561469,
+      "v_norm_cv_final": 0.09870674461126328,
+      "sqrt_fit_r2_final": 0.6740088194878264,
+      "initial_buckets": [
+        {
+          "graph_distance": 1,
+          "pairs": 178,
+          "latent_mean": 44.80668563307023,
+          "latent_sd": 0.8899221749825736
+        },
+        {
+          "graph_distance": 2,
+          "pairs": 350,
+          "latent_mean": 44.83595508592127,
+          "latent_sd": 0.8964323805514953
+        },
+        {
+          "graph_distance": 3,
+          "pairs": 694,
+          "latent_mean": 44.769348150839775,
+          "latent_sd": 0.9239685240514558
+        },
+        {
+          "graph_distance": 4,
+          "pairs": 1248,
+          "latent_mean": 44.75009485588351,
+          "latent_sd": 0.9201671231321805
+        },
+        {
+          "graph_distance": 5,
+          "pairs": 1759,
+          "latent_mean": 44.75486327811049,
+          "latent_sd": 0.9183573934426499
+        },
+        {
+          "graph_distance": 6,
+          "pairs": 1764,
+          "latent_mean": 44.72744778460015,
+          "latent_sd": 0.9246581205512584
+        },
+        {
+          "graph_distance": 7,
+          "pairs": 1217,
+          "latent_mean": 44.71125026023496,
+          "latent_sd": 0.9463312705403281
+        },
+        {
+          "graph_distance": 8,
+          "pairs": 594,
+          "latent_mean": 44.65758251245314,
+          "latent_sd": 0.9546431511037508
+        },
+        {
+          "graph_distance": 9,
+          "pairs": 239,
+          "latent_mean": 44.79924902847888,
+          "latent_sd": 0.9171094025092624
+        },
+        {
+          "graph_distance": 10,
+          "pairs": 75,
+          "latent_mean": 44.96389859289992,
+          "latent_sd": 1.0059451518642732
+        },
+        {
+          "graph_distance": 11,
+          "pairs": 10,
+          "latent_mean": 45.24792114143576,
+          "latent_sd": 0.6887381443082867
+        }
+      ],
+      "final_buckets": [
+        {
+          "graph_distance": 1,
+          "pairs": 178,
+          "latent_mean": 3.8477103637422285,
+          "latent_sd": 0.3797939441797976
+        },
+        {
+          "graph_distance": 2,
+          "pairs": 350,
+          "latent_mean": 5.798543555008638,
+          "latent_sd": 0.6115083558675946
+        },
+        {
+          "graph_distance": 3,
+          "pairs": 694,
+          "latent_mean": 6.938214377882663,
+          "latent_sd": 0.8373783242124809
+        },
+        {
+          "graph_distance": 4,
+          "pairs": 1248,
+          "latent_mean": 7.633851324237114,
+          "latent_sd": 0.9864101463324566
+        },
+        {
+          "graph_distance": 5,
+          "pairs": 1759,
+          "latent_mean": 8.255546511968413,
+          "latent_sd": 1.028363506923043
+        },
+        {
+          "graph_distance": 6,
+          "pairs": 1764,
+          "latent_mean": 8.898228157203311,
+          "latent_sd": 1.0212483244584838
+        },
+        {
+          "graph_distance": 7,
+          "pairs": 1217,
+          "latent_mean": 9.658013738435708,
+          "latent_sd": 1.0197160490323296
+        },
+        {
+          "graph_distance": 8,
+          "pairs": 594,
+          "latent_mean": 10.616978804424539,
+          "latent_sd": 0.9531130047816088
+        },
+        {
+          "graph_distance": 9,
+          "pairs": 239,
+          "latent_mean": 11.523986121341135,
+          "latent_sd": 0.7597945005381187
+        },
+        {
+          "graph_distance": 10,
+          "pairs": 75,
+          "latent_mean": 12.225862495082847,
+          "latent_sd": 0.67440967079337
+        },
+        {
+          "graph_distance": 11,
+          "pairs": 10,
+          "latent_mean": 12.86746499857146,
+          "latent_sd": 0.43059774054812194
+        }
+      ]
+    },
+    {
+      "case": "random256_seed0",
+      "nodes": 256,
+      "seed": 0,
+      "official_graph": false,
+      "directed_actions": 738,
+      "degree_min": 2,
+      "degree_max": 5,
+      "action_coverage": 1.0,
+      "minimum_action_visits": 35,
+      "dataset_transitions": 49600,
+      "processed_transitions": 992000,
+      "training_seconds": 9.663062826730311,
+      "total_seconds": 10.989994500298053,
+      "spearman_initial": 0.00684932699336639,
+      "spearman_final": 0.6781524172990473,
+      "transition_mse_initial": 2.0213308090920683,
+      "transition_mse_final": 1.604683939180547e-11,
+      "reach_initial": 0.010723039215686275,
+      "reach_final": 0.7912071078431373,
+      "shortest_final": 0.5524509803921569,
+      "first_action_progress_final": 0.7757352941176471,
+      "stretch_success_only": 1.0941666980969982,
+      "v_norm_cv_final": 0.07831531763076782,
+      "sqrt_fit_r2_final": 0.48274577864082135,
+      "initial_buckets": [
+        {
+          "graph_distance": 1,
+          "pairs": 369,
+          "latent_mean": 44.83683705126484,
+          "latent_sd": 1.0336826442173224
+        },
+        {
+          "graph_distance": 2,
+          "pairs": 767,
+          "latent_mean": 44.79286718162081,
+          "latent_sd": 0.9961929532470274
+        },
+        {
+          "graph_distance": 3,
+          "pairs": 1592,
+          "latent_mean": 44.83262896463553,
+          "latent_sd": 0.975364948096363
+        },
+        {
+          "graph_distance": 4,
+          "pairs": 3057,
+          "latent_mean": 44.816946158991826,
+          "latent_sd": 0.9702042775121249
+        },
+        {
+          "graph_distance": 5,
+          "pairs": 5250,
+          "latent_mean": 44.823111079109296,
+          "latent_sd": 0.9794833794833879
+        },
+        {
+          "graph_distance": 6,
+          "pairs": 7311,
+          "latent_mean": 44.80921695070607,
+          "latent_sd": 0.9736033679870942
+        },
+        {
+          "graph_distance": 7,
+          "pairs": 7292,
+          "latent_mean": 44.82904302739273,
+          "latent_sd": 0.9825451816448977
+        },
+        {
+          "graph_distance": 8,
+          "pairs": 4654,
+          "latent_mean": 44.85300511755433,
+          "latent_sd": 0.9851395325641421
+        },
+        {
+          "graph_distance": 9,
+          "pairs": 1837,
+          "latent_mean": 44.87141460767191,
+          "latent_sd": 0.9993865787476368
+        },
+        {
+          "graph_distance": 10,
+          "pairs": 435,
+          "latent_mean": 44.77891687696405,
+          "latent_sd": 0.9856681858057492
+        },
+        {
+          "graph_distance": 11,
+          "pairs": 71,
+          "latent_mean": 44.57325546211667,
+          "latent_sd": 0.9926419976997223
+        },
+        {
+          "graph_distance": 12,
+          "pairs": 5,
+          "latent_mean": 44.696944480767534,
+          "latent_sd": 0.6519589728053792
+        }
+      ],
+      "final_buckets": [
+        {
+          "graph_distance": 1,
+          "pairs": 369,
+          "latent_mean": 3.7888490561840866,
+          "latent_sd": 0.2967235691575218
+        },
+        {
+          "graph_distance": 2,
+          "pairs": 767,
+          "latent_mean": 5.587348762876628,
+          "latent_sd": 0.5634072429404422
+        },
+        {
+          "graph_distance": 3,
+          "pairs": 1592,
+          "latent_mean": 6.611511353609175,
+          "latent_sd": 0.7952881963966315
+        },
+        {
+          "graph_distance": 4,
+          "pairs": 3057,
+          "latent_mean": 7.238656496912648,
+          "latent_sd": 0.9361482619261927
+        },
+        {
+          "graph_distance": 5,
+          "pairs": 5250,
+          "latent_mean": 7.687454592515659,
+          "latent_sd": 1.011698251744505
+        },
+        {
+          "graph_distance": 6,
+          "pairs": 7311,
+          "latent_mean": 8.110851369577373,
+          "latent_sd": 1.0559048057086706
+        },
+        {
+          "graph_distance": 7,
+          "pairs": 7292,
+          "latent_mean": 8.626056657685352,
+          "latent_sd": 1.0867074148190523
+        },
+        {
+          "graph_distance": 8,
+          "pairs": 4654,
+          "latent_mean": 9.288846859956381,
+          "latent_sd": 1.1344170530535411
+        },
+        {
+          "graph_distance": 9,
+          "pairs": 1837,
+          "latent_mean": 10.182035554455897,
+          "latent_sd": 1.2394522996763038
+        },
+        {
+          "graph_distance": 10,
+          "pairs": 435,
+          "latent_mean": 11.40435466581088,
+          "latent_sd": 1.2444799022206772
+        },
+        {
+          "graph_distance": 11,
+          "pairs": 71,
+          "latent_mean": 12.724923476876638,
+          "latent_sd": 0.9684869243644089
+        },
+        {
+          "graph_distance": 12,
+          "pairs": 5,
+          "latent_mean": 14.194931332773303,
+          "latent_sd": 0.5019489946922812
+        }
+      ]
+    },
+    {
+      "case": "random256_seed1",
+      "nodes": 256,
+      "seed": 1,
+      "official_graph": false,
+      "directed_actions": 796,
+      "degree_min": 2,
+      "degree_max": 7,
+      "action_coverage": 1.0,
+      "minimum_action_visits": 37,
+      "dataset_transitions": 49600,
+      "processed_transitions": 992000,
+      "training_seconds": 9.013933207374066,
+      "total_seconds": 10.318115240894258,
+      "spearman_initial": -0.028907352513043626,
+      "spearman_final": 0.6419241866107144,
+      "transition_mse_initial": 2.007341010083188,
+      "transition_mse_final": 3.10200324468032e-11,
+      "reach_initial": 0.01205575980392157,
+      "reach_final": 0.720343137254902,
+      "shortest_final": 0.5224571078431373,
+      "first_action_progress_final": 0.7501685049019607,
+      "stretch_success_only": 1.0890538080520855,
+      "v_norm_cv_final": 0.08113496005535126,
+      "sqrt_fit_r2_final": 0.41655712245307874,
+      "initial_buckets": [
+        {
+          "graph_distance": 1,
+          "pairs": 398,
+          "latent_mean": 44.67904397109903,
+          "latent_sd": 1.0010131768793884
+        },
+        {
+          "graph_distance": 2,
+          "pairs": 919,
+          "latent_mean": 44.77575858734161,
+          "latent_sd": 1.0428590823784782
+        },
+        {
+          "graph_distance": 3,
+          "pairs": 2095,
+          "latent_mean": 44.75306423497884,
+          "latent_sd": 0.9806426403841622
+        },
+        {
+          "graph_distance": 4,
+          "pairs": 4282,
+          "latent_mean": 44.72813947745448,
+          "latent_sd": 0.9979825305242424
+        },
+        {
+          "graph_distance": 5,
+          "pairs": 7253,
+          "latent_mean": 44.72530644027628,
+          "latent_sd": 1.0129046663053207
+        },
+        {
+          "graph_distance": 6,
+          "pairs": 8748,
+          "latent_mean": 44.70639466623686,
+          "latent_sd": 1.0095082642138111
+        },
+        {
+          "graph_distance": 7,
+          "pairs": 6158,
+          "latent_mean": 44.65804407374502,
+          "latent_sd": 1.016418272035062
+        },
+        {
+          "graph_distance": 8,
+          "pairs": 2276,
+          "latent_mean": 44.6178524246207,
+          "latent_sd": 1.004760792165824
+        },
+        {
+          "graph_distance": 9,
+          "pairs": 466,
+          "latent_mean": 44.717135659183356,
+          "latent_sd": 1.0934451054943921
+        },
+        {
+          "graph_distance": 10,
+          "pairs": 45,
+          "latent_mean": 44.94812227971388,
+          "latent_sd": 0.9399318913878623
+        }
+      ],
+      "final_buckets": [
+        {
+          "graph_distance": 1,
+          "pairs": 398,
+          "latent_mean": 3.542190181576489,
+          "latent_sd": 0.2873922670222603
+        },
+        {
+          "graph_distance": 2,
+          "pairs": 919,
+          "latent_mean": 5.090769295113222,
+          "latent_sd": 0.5215438601895998
+        },
+        {
+          "graph_distance": 3,
+          "pairs": 2095,
+          "latent_mean": 5.917519065683378,
+          "latent_sd": 0.6989875240541878
+        },
+        {
+          "graph_distance": 4,
+          "pairs": 4282,
+          "latent_mean": 6.396094275576719,
+          "latent_sd": 0.8112268978085991
+        },
+        {
+          "graph_distance": 5,
+          "pairs": 7253,
+          "latent_mean": 6.760720117650524,
+          "latent_sd": 0.8775945315851917
+        },
+        {
+          "graph_distance": 6,
+          "pairs": 8748,
+          "latent_mean": 7.159375902280164,
+          "latent_sd": 0.9364391097227712
+        },
+        {
+          "graph_distance": 7,
+          "pairs": 6158,
+          "latent_mean": 7.713240652010413,
+          "latent_sd": 1.0312799919821334
+        },
+        {
+          "graph_distance": 8,
+          "pairs": 2276,
+          "latent_mean": 8.584902210768336,
+          "latent_sd": 1.1625841835211232
+        },
+        {
+          "graph_distance": 9,
+          "pairs": 466,
+          "latent_mean": 9.759681519010911,
+          "latent_sd": 1.1242560592584698
+        },
+        {
+          "graph_distance": 10,
+          "pairs": 45,
+          "latent_mean": 10.698827772831605,
+          "latent_sd": 0.8180843332849981
+        }
+      ]
+    },
+    {
+      "case": "random256_seed2",
+      "nodes": 256,
+      "seed": 2,
+      "official_graph": false,
+      "directed_actions": 762,
+      "degree_min": 2,
+      "degree_max": 6,
+      "action_coverage": 1.0,
+      "minimum_action_visits": 35,
+      "dataset_transitions": 49600,
+      "processed_transitions": 992000,
+      "training_seconds": 8.620699048507959,
+      "total_seconds": 9.953701634891331,
+      "spearman_initial": -0.016708216364158517,
+      "spearman_final": 0.677782952277918,
+      "transition_mse_initial": 2.007708247086975,
+      "transition_mse_final": 4.56119740295535e-11,
+      "reach_initial": 0.011274509803921568,
+      "reach_final": 0.7445465686274509,
+      "shortest_final": 0.5339460784313725,
+      "first_action_progress_final": 0.7736213235294118,
+      "stretch_success_only": 1.0878750689388705,
+      "v_norm_cv_final": 0.09287386387586594,
+      "sqrt_fit_r2_final": 0.49063684730848234,
+      "initial_buckets": [
+        {
+          "graph_distance": 1,
+          "pairs": 381,
+          "latent_mean": 44.68761766700876,
+          "latent_sd": 0.9429904552969229
+        },
+        {
+          "graph_distance": 2,
+          "pairs": 826,
+          "latent_mean": 44.70495682446335,
+          "latent_sd": 0.9867785468105733
+        },
+        {
+          "graph_distance": 3,
+          "pairs": 1765,
+          "latent_mean": 44.687238249028574,
+          "latent_sd": 0.927010882778564
+        },
+        {
+          "graph_distance": 4,
+          "pairs": 3488,
+          "latent_mean": 44.70643050762956,
+          "latent_sd": 0.938288826934435
+        },
+        {
+          "graph_distance": 5,
+          "pairs": 5962,
+          "latent_mean": 44.714288594044014,
+          "latent_sd": 0.9393077381433257
+        },
+        {
+          "graph_distance": 6,
+          "pairs": 7914,
+          "latent_mean": 44.690304871119025,
+          "latent_sd": 0.9465259988169241
+        },
+        {
+          "graph_distance": 7,
+          "pairs": 6860,
+          "latent_mean": 44.694733309094524,
+          "latent_sd": 0.9524204647828394
+        },
+        {
+          "graph_distance": 8,
+          "pairs": 3527,
+          "latent_mean": 44.69272706208931,
+          "latent_sd": 0.9425212303812741
+        },
+        {
+          "graph_distance": 9,
+          "pairs": 1219,
+          "latent_mean": 44.67978827849944,
+          "latent_sd": 0.9567789134787557
+        },
+        {
+          "graph_distance": 10,
+          "pairs": 435,
+          "latent_mean": 44.553469256683584,
+          "latent_sd": 1.0294880568248617
+        },
+        {
+          "graph_distance": 11,
+          "pairs": 196,
+          "latent_mean": 44.27372124445643,
+          "latent_sd": 0.943188960911032
+        },
+        {
+          "graph_distance": 12,
+          "pairs": 56,
+          "latent_mean": 44.21046852258227,
+          "latent_sd": 0.9093591871432434
+        },
+        {
+          "graph_distance": 13,
+          "pairs": 11,
+          "latent_mean": 44.58347973928084,
+          "latent_sd": 0.9380191523156378
+        }
+      ],
+      "final_buckets": [
+        {
+          "graph_distance": 1,
+          "pairs": 381,
+          "latent_mean": 3.6813943154721804,
+          "latent_sd": 0.3419027076619978
+        },
+        {
+          "graph_distance": 2,
+          "pairs": 826,
+          "latent_mean": 5.362231712599441,
+          "latent_sd": 0.6327573206543153
+        },
+        {
+          "graph_distance": 3,
+          "pairs": 1765,
+          "latent_mean": 6.325226988093287,
+          "latent_sd": 0.834171058947202
+        },
+        {
+          "graph_distance": 4,
+          "pairs": 3488,
+          "latent_mean": 6.8965537437218725,
+          "latent_sd": 0.9681889246697007
+        },
+        {
+          "graph_distance": 5,
+          "pairs": 5962,
+          "latent_mean": 7.323169579640408,
+          "latent_sd": 1.0522801770654366
+        },
+        {
+          "graph_distance": 6,
+          "pairs": 7914,
+          "latent_mean": 7.7605034245938205,
+          "latent_sd": 1.130948511846877
+        },
+        {
+          "graph_distance": 7,
+          "pairs": 6860,
+          "latent_mean": 8.361006298963204,
+          "latent_sd": 1.2695124531257218
+        },
+        {
+          "graph_distance": 8,
+          "pairs": 3527,
+          "latent_mean": 9.33308750141055,
+          "latent_sd": 1.533978466413546
+        },
+        {
+          "graph_distance": 9,
+          "pairs": 1219,
+          "latent_mean": 10.951177259927814,
+          "latent_sd": 1.814719810175896
+        },
+        {
+          "graph_distance": 10,
+          "pairs": 435,
+          "latent_mean": 12.942203107139738,
+          "latent_sd": 1.4318642296837014
+        },
+        {
+          "graph_distance": 11,
+          "pairs": 196,
+          "latent_mean": 13.911582563620684,
+          "latent_sd": 0.9057483086878888
+        },
+        {
+          "graph_distance": 12,
+          "pairs": 56,
+          "latent_mean": 14.487195050934202,
+          "latent_sd": 0.7703010490925186
+        },
+        {
+          "graph_distance": 13,
+          "pairs": 11,
+          "latent_mean": 15.343343157380325,
+          "latent_sd": 0.6247910231914433
+        }
+      ]
+    },
+    {
+      "case": "random512_seed0",
+      "nodes": 512,
+      "seed": 0,
+      "official_graph": false,
+      "directed_actions": 1534,
+      "degree_min": 2,
+      "degree_max": 6,
+      "action_coverage": 1.0,
+      "minimum_action_visits": 34,
+      "dataset_transitions": 99200,
+      "processed_transitions": 1984000,
+      "training_seconds": 17.561340352054685,
+      "total_seconds": 24.168338662944734,
+      "spearman_initial": 0.0022930439531602897,
+      "spearman_final": 0.5687355083921892,
+      "transition_mse_initial": 2.0207132750684047,
+      "transition_mse_final": 3.0653167355355923e-11,
+      "reach_initial": 0.005939640410958904,
+      "reach_final": 0.5080036081213307,
+      "shortest_final": 0.36896862769080235,
+      "first_action_progress_final": 0.7126268957925636,
+      "stretch_success_only": 1.0811356166760198,
+      "v_norm_cv_final": 0.07509321719408035,
+      "sqrt_fit_r2_final": 0.32529430328581954,
+      "initial_buckets": [
+        {
+          "graph_distance": 1,
+          "pairs": 767,
+          "latent_mean": 44.82751050793461,
+          "latent_sd": 1.019714606699698
+        },
+        {
+          "graph_distance": 2,
+          "pairs": 1709,
+          "latent_mean": 44.791547038772215,
+          "latent_sd": 0.9699393817109808
+        },
+        {
+          "graph_distance": 3,
+          "pairs": 3863,
+          "latent_mean": 44.778542519590175,
+          "latent_sd": 1.0091190427573866
+        },
+        {
+          "graph_distance": 4,
+          "pairs": 8304,
+          "latent_mean": 44.805187006983864,
+          "latent_sd": 0.9926399708850111
+        },
+        {
+          "graph_distance": 5,
+          "pairs": 16348,
+          "latent_mean": 44.80293851192384,
+          "latent_sd": 1.0054575786796989
+        },
+        {
+          "graph_distance": 6,
+          "pairs": 27065,
+          "latent_mean": 44.80021082903579,
+          "latent_sd": 1.0049817056866286
+        },
+        {
+          "graph_distance": 7,
+          "pairs": 33193,
+          "latent_mean": 44.81093171006134,
+          "latent_sd": 1.0011851503802611
+        },
+        {
+          "graph_distance": 8,
+          "pairs": 25781,
+          "latent_mean": 44.80418069906371,
+          "latent_sd": 0.9927892841514844
+        },
+        {
+          "graph_distance": 9,
+          "pairs": 11031,
+          "latent_mean": 44.8078839321954,
+          "latent_sd": 0.9903421113302922
+        },
+        {
+          "graph_distance": 10,
+          "pairs": 2456,
+          "latent_mean": 44.80787985984952,
+          "latent_sd": 0.9628888671286161
+        },
+        {
+          "graph_distance": 11,
+          "pairs": 288,
+          "latent_mean": 44.86473542955369,
+          "latent_sd": 0.8416381615162536
+        },
+        {
+          "graph_distance": 12,
+          "pairs": 11,
+          "latent_mean": 45.416002470677796,
+          "latent_sd": 0.5680643291331986
+        }
+      ],
+      "final_buckets": [
+        {
+          "graph_distance": 1,
+          "pairs": 767,
+          "latent_mean": 3.675417373079291,
+          "latent_sd": 0.2759961398505649
+        },
+        {
+          "graph_distance": 2,
+          "pairs": 1709,
+          "latent_mean": 5.330379190845664,
+          "latent_sd": 0.5487353918720893
+        },
+        {
+          "graph_distance": 3,
+          "pairs": 3863,
+          "latent_mean": 6.2251018975927455,
+          "latent_sd": 0.7728248245150141
+        },
+        {
+          "graph_distance": 4,
+          "pairs": 8304,
+          "latent_mean": 6.728485117435208,
+          "latent_sd": 0.9120215259593685
+        },
+        {
+          "graph_distance": 5,
+          "pairs": 16348,
+          "latent_mean": 7.053481095234932,
+          "latent_sd": 0.9951198047229108
+        },
+        {
+          "graph_distance": 6,
+          "pairs": 27065,
+          "latent_mean": 7.348198741329884,
+          "latent_sd": 1.0501987742755896
+        },
+        {
+          "graph_distance": 7,
+          "pairs": 33193,
+          "latent_mean": 7.72454759599152,
+          "latent_sd": 1.088405943451699
+        },
+        {
+          "graph_distance": 8,
+          "pairs": 25781,
+          "latent_mean": 8.28044515206065,
+          "latent_sd": 1.1122846212508926
+        },
+        {
+          "graph_distance": 9,
+          "pairs": 11031,
+          "latent_mean": 9.049610497710246,
+          "latent_sd": 1.0948315213851054
+        },
+        {
+          "graph_distance": 10,
+          "pairs": 2456,
+          "latent_mean": 9.977239133569743,
+          "latent_sd": 1.0238802790659978
+        },
+        {
+          "graph_distance": 11,
+          "pairs": 288,
+          "latent_mean": 10.943282489429844,
+          "latent_sd": 0.9113967696075546
+        },
+        {
+          "graph_distance": 12,
+          "pairs": 11,
+          "latent_mean": 11.727032954126512,
+          "latent_sd": 0.5921653365082884
+        }
+      ]
+    },
+    {
+      "case": "random512_seed1",
+      "nodes": 512,
+      "seed": 1,
+      "official_graph": false,
+      "directed_actions": 1516,
+      "degree_min": 2,
+      "degree_max": 6,
+      "action_coverage": 1.0,
+      "minimum_action_visits": 37,
+      "dataset_transitions": 99200,
+      "processed_transitions": 1984000,
+      "training_seconds": 17.55667977873236,
+      "total_seconds": 22.924283505883068,
+      "spearman_initial": -0.007733384756828785,
+      "spearman_final": 0.5938283384885814,
+      "transition_mse_initial": 2.011633721201906,
+      "transition_mse_final": 1.0223350605249556e-11,
+      "reach_initial": 0.005354849559686888,
+      "reach_final": 0.522069165851272,
+      "shortest_final": 0.37881069593933464,
+      "first_action_progress_final": 0.7246284858121331,
+      "stretch_success_only": 1.0797151208034141,
+      "v_norm_cv_final": 0.07843846827745438,
+      "sqrt_fit_r2_final": 0.3616982987751983,
+      "initial_buckets": [
+        {
+          "graph_distance": 1,
+          "pairs": 758,
+          "latent_mean": 44.7271039556034,
+          "latent_sd": 0.9901029200609642
+        },
+        {
+          "graph_distance": 2,
+          "pairs": 1663,
+          "latent_mean": 44.76287410648447,
+          "latent_sd": 1.0025559078616206
+        },
+        {
+          "graph_distance": 3,
+          "pairs": 3651,
+          "latent_mean": 44.7051336492152,
+          "latent_sd": 0.9958078819251537
+        },
+        {
+          "graph_distance": 4,
+          "pairs": 7625,
+          "latent_mean": 44.706964467126205,
+          "latent_sd": 0.998729677666778
+        },
+        {
+          "graph_distance": 5,
+          "pairs": 14715,
+          "latent_mean": 44.71511252110399,
+          "latent_sd": 0.9949015936245694
+        },
+        {
+          "graph_distance": 6,
+          "pairs": 24619,
+          "latent_mean": 44.71123527482736,
+          "latent_sd": 0.9923120852862208
+        },
+        {
+          "graph_distance": 7,
+          "pairs": 31380,
+          "latent_mean": 44.70207027189779,
+          "latent_sd": 1.0063765779851164
+        },
+        {
+          "graph_distance": 8,
+          "pairs": 26684,
+          "latent_mean": 44.700994601325995,
+          "latent_sd": 1.0119089670923624
+        },
+        {
+          "graph_distance": 9,
+          "pairs": 13598,
+          "latent_mean": 44.69013344055814,
+          "latent_sd": 1.0218136945220997
+        },
+        {
+          "graph_distance": 10,
+          "pairs": 4537,
+          "latent_mean": 44.69477497362552,
+          "latent_sd": 1.020730190629736
+        },
+        {
+          "graph_distance": 11,
+          "pairs": 1268,
+          "latent_mean": 44.75864952490165,
+          "latent_sd": 1.0419346612849676
+        },
+        {
+          "graph_distance": 12,
+          "pairs": 275,
+          "latent_mean": 44.70713037880521,
+          "latent_sd": 0.9924580222023595
+        },
+        {
+          "graph_distance": 13,
+          "pairs": 32,
+          "latent_mean": 44.85849436534349,
+          "latent_sd": 0.9480427714547114
+        },
+        {
+          "graph_distance": 14,
+          "pairs": 9,
+          "latent_mean": 44.82727486496859,
+          "latent_sd": 1.0775450218084701
+        },
+        {
+          "graph_distance": 15,
+          "pairs": 2,
+          "latent_mean": 45.224297053538606,
+          "latent_sd": 1.3158273905983613
+        }
+      ],
+      "final_buckets": [
+        {
+          "graph_distance": 1,
+          "pairs": 758,
+          "latent_mean": 3.702907805844995,
+          "latent_sd": 0.2904490901406449
+        },
+        {
+          "graph_distance": 2,
+          "pairs": 1663,
+          "latent_mean": 5.394612092995197,
+          "latent_sd": 0.5653677763258792
+        },
+        {
+          "graph_distance": 3,
+          "pairs": 3651,
+          "latent_mean": 6.332630652037515,
+          "latent_sd": 0.773415857009923
+        },
+        {
+          "graph_distance": 4,
+          "pairs": 7625,
+          "latent_mean": 6.850796094818091,
+          "latent_sd": 0.9083891800181128
+        },
+        {
+          "graph_distance": 5,
+          "pairs": 14715,
+          "latent_mean": 7.1777201530024435,
+          "latent_sd": 0.9870972987151989
+        },
+        {
+          "graph_distance": 6,
+          "pairs": 24619,
+          "latent_mean": 7.4577005383266215,
+          "latent_sd": 1.043722890505767
+        },
+        {
+          "graph_distance": 7,
+          "pairs": 31380,
+          "latent_mean": 7.8012787169049504,
+          "latent_sd": 1.1128776067544948
+        },
+        {
+          "graph_distance": 8,
+          "pairs": 26684,
+          "latent_mean": 8.312000023955491,
+          "latent_sd": 1.2249497125670379
+        },
+        {
+          "graph_distance": 9,
+          "pairs": 13598,
+          "latent_mean": 9.12197225310326,
+          "latent_sd": 1.3915891433969512
+        },
+        {
+          "graph_distance": 10,
+          "pairs": 4537,
+          "latent_mean": 10.398417742859463,
+          "latent_sd": 1.5119552522440667
+        },
+        {
+          "graph_distance": 11,
+          "pairs": 1268,
+          "latent_mean": 11.85206095593872,
+          "latent_sd": 1.3011181409401222
+        },
+        {
+          "graph_distance": 12,
+          "pairs": 275,
+          "latent_mean": 12.930490621215414,
+          "latent_sd": 1.0267089617491991
+        },
+        {
+          "graph_distance": 13,
+          "pairs": 32,
+          "latent_mean": 14.306582658657367,
+          "latent_sd": 1.130549186042858
+        },
+        {
+          "graph_distance": 14,
+          "pairs": 9,
+          "latent_mean": 15.524383503693343,
+          "latent_sd": 0.7403296534414254
+        },
+        {
+          "graph_distance": 15,
+          "pairs": 2,
+          "latent_mean": 15.74402483169966,
+          "latent_sd": 0.42943697106180956
+        }
+      ]
+    },
+    {
+      "case": "random512_seed2",
+      "nodes": 512,
+      "seed": 2,
+      "official_graph": false,
+      "directed_actions": 1506,
+      "degree_min": 2,
+      "degree_max": 6,
+      "action_coverage": 1.0,
+      "minimum_action_visits": 35,
+      "dataset_transitions": 99200,
+      "processed_transitions": 1984000,
+      "training_seconds": 17.39022501371801,
+      "total_seconds": 23.294874651823193,
+      "spearman_initial": -0.004310835892665877,
+      "spearman_final": 0.5920305382687701,
+      "transition_mse_initial": 2.0048181042358286,
+      "transition_mse_final": 2.2568077407821327e-11,
+      "reach_initial": 0.005469514432485323,
+      "reach_final": 0.5106256115459883,
+      "shortest_final": 0.3703484283268102,
+      "first_action_progress_final": 0.7168809625733855,
+      "stretch_success_only": 1.0822517951531918,
+      "v_norm_cv_final": 0.08389896154403687,
+      "sqrt_fit_r2_final": 0.35928049922809,
+      "initial_buckets": [
+        {
+          "graph_distance": 1,
+          "pairs": 753,
+          "latent_mean": 44.65539591595093,
+          "latent_sd": 0.9766246793576807
+        },
+        {
+          "graph_distance": 2,
+          "pairs": 1631,
+          "latent_mean": 44.66683381753333,
+          "latent_sd": 0.9944814144812019
+        },
+        {
+          "graph_distance": 3,
+          "pairs": 3537,
+          "latent_mean": 44.72656629607642,
+          "latent_sd": 0.962643860270214
+        },
+        {
+          "graph_distance": 4,
+          "pairs": 7369,
+          "latent_mean": 44.687908766259795,
+          "latent_sd": 0.9850476022195026
+        },
+        {
+          "graph_distance": 5,
+          "pairs": 14245,
+          "latent_mean": 44.693233964925675,
+          "latent_sd": 0.9819894484444995
+        },
+        {
+          "graph_distance": 6,
+          "pairs": 23887,
+          "latent_mean": 44.69114386541571,
+          "latent_sd": 0.9793361520889293
+        },
+        {
+          "graph_distance": 7,
+          "pairs": 31244,
+          "latent_mean": 44.68802973446301,
+          "latent_sd": 0.9853581999637115
+        },
+        {
+          "graph_distance": 8,
+          "pairs": 27283,
+          "latent_mean": 44.70737444095712,
+          "latent_sd": 0.9883388242264313
+        },
+        {
+          "graph_distance": 9,
+          "pairs": 14702,
+          "latent_mean": 44.6793720228189,
+          "latent_sd": 0.9757720514471275
+        },
+        {
+          "graph_distance": 10,
+          "pairs": 4949,
+          "latent_mean": 44.64168033295585,
+          "latent_sd": 0.9721440846982711
+        },
+        {
+          "graph_distance": 11,
+          "pairs": 1060,
+          "latent_mean": 44.58035773826851,
+          "latent_sd": 0.8933937605058196
+        },
+        {
+          "graph_distance": 12,
+          "pairs": 141,
+          "latent_mean": 44.559384929361194,
+          "latent_sd": 0.9426830045731336
+        },
+        {
+          "graph_distance": 13,
+          "pairs": 15,
+          "latent_mean": 44.36717560959777,
+          "latent_sd": 0.9587590784384075
+        }
+      ],
+      "final_buckets": [
+        {
+          "graph_distance": 1,
+          "pairs": 753,
+          "latent_mean": 3.7385182172550993,
+          "latent_sd": 0.3136560489409095
+        },
+        {
+          "graph_distance": 2,
+          "pairs": 1631,
+          "latent_mean": 5.454330518830401,
+          "latent_sd": 0.6211230824611781
+        },
+        {
+          "graph_distance": 3,
+          "pairs": 3537,
+          "latent_mean": 6.408854572810209,
+          "latent_sd": 0.8575532628899474
+        },
+        {
+          "graph_distance": 4,
+          "pairs": 7369,
+          "latent_mean": 6.952048507017948,
+          "latent_sd": 1.0023692030093112
+        },
+        {
+          "graph_distance": 5,
+          "pairs": 14245,
+          "latent_mean": 7.3011430046410455,
+          "latent_sd": 1.09679828350601
+        },
+        {
+          "graph_distance": 6,
+          "pairs": 23887,
+          "latent_mean": 7.603000782708624,
+          "latent_sd": 1.1657207885218088
+        },
+        {
+          "graph_distance": 7,
+          "pairs": 31244,
+          "latent_mean": 7.984948107927722,
+          "latent_sd": 1.2155081245890482
+        },
+        {
+          "graph_distance": 8,
+          "pairs": 27283,
+          "latent_mean": 8.563905294180401,
+          "latent_sd": 1.2868926804146605
+        },
+        {
+          "graph_distance": 9,
+          "pairs": 14702,
+          "latent_mean": 9.403520484991448,
+          "latent_sd": 1.398246157490128
+        },
+        {
+          "graph_distance": 10,
+          "pairs": 4949,
+          "latent_mean": 10.54217285176675,
+          "latent_sd": 1.4568150651245366
+        },
+        {
+          "graph_distance": 11,
+          "pairs": 1060,
+          "latent_mean": 11.851189111818742,
+          "latent_sd": 1.3616609105539228
+        },
+        {
+          "graph_distance": 12,
+          "pairs": 141,
+          "latent_mean": 13.15629835105351,
+          "latent_sd": 1.1107966944593004
+        },
+        {
+          "graph_distance": 13,
+          "pairs": 15,
+          "latent_mean": 14.151736265793712,
+          "latent_sd": 1.151783907068594
+        }
+      ]
+    }
+  ],
+  "scaling": [
+    {
+      "nodes": 32,
+      "independent_maps": 3,
+      "spearman_initial": {
+        "mean": -0.02026429108624896,
+        "sd_across_maps": 0.019121008087896914,
+        "min": -0.032236948608931254,
+        "max": 0.0017876703791234378
+      },
+      "spearman_final": {
+        "mean": 0.8415971410581609,
+        "sd_across_maps": 0.050246557171115876,
+        "min": 0.786719919514525,
+        "max": 0.8853478462475651
+      },
+      "reach_initial": {
+        "mean": 0.09173387096774194,
+        "sd_across_maps": 0.026267770606442302,
+        "min": 0.06451612903225806,
+        "max": 0.11693548387096774
+      },
+      "reach_final": {
+        "mean": 1.0,
+        "sd_across_maps": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "shortest_final": {
+        "mean": 0.8941532258064516,
+        "sd_across_maps": 0.00787323556038974,
+        "min": 0.8850806451612904,
+        "max": 0.8991935483870968
+      },
+      "first_action_progress_final": {
+        "mean": 0.9270833333333334,
+        "sd_across_maps": 0.011813438058633722,
+        "min": 0.9183467741935484,
+        "max": 0.9405241935483871
+      },
+      "transition_mse_final": {
+        "mean": 1.0714970206305939e-10,
+        "sd_across_maps": 1.4909162177567026e-10,
+        "min": 1.090269428651172e-12,
+        "max": 2.776181651619372e-10
+      }
+    },
+    {
+      "nodes": 64,
+      "independent_maps": 3,
+      "spearman_initial": {
+        "mean": -0.019981681183795254,
+        "sd_across_maps": 0.0381188377370379,
+        "min": -0.04707509308149393,
+        "max": 0.023606763466881158
+      },
+      "spearman_final": {
+        "mean": 0.8314235203301382,
+        "sd_across_maps": 0.020306856227279544,
+        "min": 0.8106130772301551,
+        "max": 0.8511862256937506
+      },
+      "reach_initial": {
+        "mean": 0.048280423280423285,
+        "sd_across_maps": 0.007362911401525236,
+        "min": 0.04017857142857143,
+        "max": 0.054563492063492064
+      },
+      "reach_final": {
+        "mean": 0.9812334656084656,
+        "sd_across_maps": 0.008720618058187656,
+        "min": 0.9744543650793651,
+        "max": 0.9910714285714286
+      },
+      "shortest_final": {
+        "mean": 0.7947255291005292,
+        "sd_across_maps": 0.01152228824798807,
+        "min": 0.785218253968254,
+        "max": 0.8075396825396826
+      },
+      "first_action_progress_final": {
+        "mean": 0.8825231481481483,
+        "sd_across_maps": 0.00806083383581251,
+        "min": 0.8745039682539683,
+        "max": 0.890625
+      },
+      "transition_mse_final": {
+        "mean": 5.703139237334899e-12,
+        "sd_across_maps": 1.2380233068174282e-12,
+        "min": 4.9484278318984174e-12,
+        "max": 7.131927167589098e-12
+      }
+    },
+    {
+      "nodes": 128,
+      "independent_maps": 3,
+      "spearman_initial": {
+        "mean": -0.023822887975733734,
+        "sd_across_maps": 0.019229230179331733,
+        "min": -0.04234476527371643,
+        "max": -0.0039568402132736675
+      },
+      "spearman_final": {
+        "mean": 0.7541492104068134,
+        "sd_across_maps": 0.027127833940424815,
+        "min": 0.727584607235263,
+        "max": 0.781807212603439
+      },
+      "reach_initial": {
+        "mean": 0.02524196194225722,
+        "sd_across_maps": 0.003925617391146641,
+        "min": 0.022883858267716536,
+        "max": 0.029773622047244094
+      },
+      "reach_final": {
+        "mean": 0.9035228018372704,
+        "sd_across_maps": 0.022123130527155012,
+        "min": 0.8784448818897638,
+        "max": 0.9202755905511811
+      },
+      "shortest_final": {
+        "mean": 0.673822998687664,
+        "sd_across_maps": 0.014593933278279734,
+        "min": 0.657111220472441,
+        "max": 0.6840551181102362
+      },
+      "first_action_progress_final": {
+        "mean": 0.8257668963254593,
+        "sd_across_maps": 0.0029949599650370327,
+        "min": 0.8233267716535433,
+        "max": 0.8291092519685039
+      },
+      "transition_mse_final": {
+        "mean": 2.1280189652015223e-11,
+        "sd_across_maps": 2.3328284769982443e-11,
+        "min": 1.2694240067164335e-12,
+        "max": 4.690241639480713e-11
+      }
+    },
+    {
+      "nodes": 256,
+      "independent_maps": 3,
+      "spearman_initial": {
+        "mean": -0.012922080627945249,
+        "sd_across_maps": 0.018176527451380913,
+        "min": -0.028907352513043626,
+        "max": 0.00684932699336639
+      },
+      "spearman_final": {
+        "mean": 0.6659531853958932,
+        "sd_across_maps": 0.020810543314965468,
+        "min": 0.6419241866107144,
+        "max": 0.6781524172990473
+      },
+      "reach_initial": {
+        "mean": 0.011351102941176472,
+        "sd_across_maps": 0.0006696535843870834,
+        "min": 0.010723039215686275,
+        "max": 0.01205575980392157
+      },
+      "reach_final": {
+        "mean": 0.7520322712418301,
+        "sd_across_maps": 0.036020166429456754,
+        "min": 0.720343137254902,
+        "max": 0.7912071078431373
+      },
+      "shortest_final": {
+        "mean": 0.5362847222222222,
+        "sd_across_maps": 0.015133077635004334,
+        "min": 0.5224571078431373,
+        "max": 0.5524509803921569
+      },
+      "first_action_progress_final": {
+        "mean": 0.7665083741830067,
+        "sd_across_maps": 0.014190162578463617,
+        "min": 0.7501685049019607,
+        "max": 0.7757352941176471
+      },
+      "transition_mse_final": {
+        "mean": 3.0892948622720724e-11,
+        "sd_across_maps": 1.478297700941186e-11,
+        "min": 1.604683939180547e-11,
+        "max": 4.56119740295535e-11
+      }
+    },
+    {
+      "nodes": 512,
+      "independent_maps": 3,
+      "spearman_initial": {
+        "mean": -0.0032503922321114576,
+        "sd_across_maps": 0.0050966384742328775,
+        "min": -0.007733384756828785,
+        "max": 0.0022930439531602897
+      },
+      "spearman_final": {
+        "mean": 0.5848647950498469,
+        "sd_across_maps": 0.01399726535689235,
+        "min": 0.5687355083921892,
+        "max": 0.5938283384885814
+      },
+      "reach_initial": {
+        "mean": 0.005588001467710372,
+        "sd_across_maps": 0.0003098781503594258,
+        "min": 0.005354849559686888,
+        "max": 0.005939640410958904
+      },
+      "reach_final": {
+        "mean": 0.5135661285061971,
+        "sd_across_maps": 0.007479636258437606,
+        "min": 0.5080036081213307,
+        "max": 0.522069165851272
+      },
+      "shortest_final": {
+        "mean": 0.37270925065231575,
+        "sd_across_maps": 0.005328854322614371,
+        "min": 0.36896862769080235,
+        "max": 0.37881069593933464
+      },
+      "first_action_progress_final": {
+        "mean": 0.7180454480593608,
+        "sd_across_maps": 0.006084945405239328,
+        "min": 0.7126268957925636,
+        "max": 0.7246284858121331
+      },
+      "transition_mse_final": {
+        "mean": 2.114819845614227e-11,
+        "sd_across_maps": 1.0288653716050395e-11,
+        "min": 1.0223350605249556e-11,
+        "max": 3.0653167355355923e-11
+      }
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 # GCML 原始任务、设置与用例
 
-核对日期：2026-09-04。这里记录参考实验的来源与核对结果；项目进度仍以 [项目状态](PROJECT_STATUS_AND_TODO.md) 为准。已完成 Luna 直接兼容 API 的 Blocks 与 32-node path 英文纯语言小批；尚未复现 GCML 训练。
+原始核对日期：2026-09-04；训练说明更新：2026-09-14。这里记录参考实验的来源与核对结果；项目进度仍以 [项目状态](PROJECT_STATUS_AND_TODO.md) 为准。已完成 Luna 直接兼容 API 的 Blocks 与 32-node path 英文纯语言小批；现已完成独立 Q/V 局部规则的[机制复现与规模检验](../experiments/cml_map_scaling/results/report.md)，未复现完整 GCML 训练及规划系统。下文标为“本次”的提取检查仍指原始核对。
 
 ## 权威来源
 

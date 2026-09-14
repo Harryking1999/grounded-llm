@@ -36,4 +36,10 @@ OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python -m experiments.cml_map_scaling.s
 
 ## 当前结论
 
-尚未运行。实现正确性和开发机成本先校准；所有正负结果均保留。该阶段不能证明 LLM 状态使用改善，也不外推到共享跨图模型。
+已完成全部 16 张地图。原始图的距离秩相关从 0.082 升至 0.941；随机图的该指标随规模从 0.842 降至 0.585，简单余弦选择器的到达率从 100% 降至 51.36%。全部动作已探索、转移拟合误差很低，仍未保证可靠规划。完整结论、统计口径及限制见[结果报告](results/report.md)。该阶段不能证明 LLM 状态使用改善，也不外推到共享跨图模型。
+
+生成报告与图表（额外依赖 Matplotlib 3.10.6）：
+
+```bash
+python -m experiments.cml_map_scaling.src.report --run-dir runs/cml_step1 --output experiments/cml_map_scaling/results
+```

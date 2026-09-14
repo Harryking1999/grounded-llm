@@ -1,0 +1,254 @@
+{
+  "date": "2026-09-14",
+  "source_commit": "0fdaa713cf10a2a723fec4a9b75c46470be3dfdd",
+  "config_path": "experiments/qwen_path_blocks/configs/sol_path256_pilot.json",
+  "run_paths": [
+    "runs/sol_path256_16k/pilot/run.json",
+    "runs/sol_path256_16k/pilot_retry/run.json"
+  ],
+  "status": "pilot_finished",
+  "api_attempts": 6,
+  "valid_answers": 3,
+  "service_errors": 3,
+  "shortest_path_successes": 3,
+  "legal_arrivals": 3,
+  "incomplete_model_responses": 0,
+  "unresolved_case_ids": [
+    "path_undirected_256_03"
+  ],
+  "output_token_range": [
+    964,
+    1469
+  ],
+  "output_tokens_total_reported": 3445,
+  "reasoning_tokens_total_reported": 3197,
+  "over_requested_budget_answers": 0,
+  "validation": {
+    "all_prompts_match_frozen_qwen_prompts": true,
+    "all_completed_answers_replayed": true,
+    "no_completed_answer_resampled": true
+  },
+  "attempts": [
+    {
+      "phase": "pilot",
+      "case_id": "path_undirected_256_01",
+      "start": 51,
+      "goal": 92,
+      "reference_moves": 8,
+      "response_status": "completed",
+      "api_error": null,
+      "elapsed_seconds": 106.172,
+      "success": true,
+      "legal_arrival": true,
+      "failure_type": null,
+      "answer_moves": 8,
+      "input_tokens": 7419,
+      "output_tokens": 1012,
+      "reasoning_tokens": 932,
+      "exceeds_requested_budget": false,
+      "returned_model": "gpt-5.6-sol",
+      "returned_output_limit": null,
+      "returned_temperature": 1.0,
+      "returned_top_p": 0.98,
+      "returned_reasoning_effort": "medium",
+      "returned_instruction_characters": 21334,
+      "returned_tools": [],
+      "response_output_types": [
+        "reasoning",
+        "reasoning",
+        "message"
+      ]
+    },
+    {
+      "phase": "pilot",
+      "case_id": "path_undirected_256_00",
+      "start": 4,
+      "goal": 98,
+      "reference_moves": 9,
+      "response_status": null,
+      "api_error": "HTTPError",
+      "elapsed_seconds": 120.719,
+      "success": false,
+      "legal_arrival": false,
+      "failure_type": "api_error",
+      "answer_moves": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "reasoning_tokens": null,
+      "exceeds_requested_budget": null
+    },
+    {
+      "phase": "pilot",
+      "case_id": "path_undirected_256_02",
+      "start": 211,
+      "goal": 219,
+      "reference_moves": 8,
+      "response_status": null,
+      "api_error": "HTTPError",
+      "elapsed_seconds": 120.578,
+      "success": false,
+      "legal_arrival": false,
+      "failure_type": "api_error",
+      "answer_moves": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "reasoning_tokens": null,
+      "exceeds_requested_budget": null
+    },
+    {
+      "phase": "pilot",
+      "case_id": "path_undirected_256_03",
+      "start": 155,
+      "goal": 182,
+      "reference_moves": 8,
+      "response_status": null,
+      "api_error": "HTTPError",
+      "elapsed_seconds": 120.656,
+      "success": false,
+      "legal_arrival": false,
+      "failure_type": "api_error",
+      "answer_moves": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "reasoning_tokens": null,
+      "exceeds_requested_budget": null
+    },
+    {
+      "phase": "pilot_retry",
+      "case_id": "path_undirected_256_00",
+      "start": 4,
+      "goal": 98,
+      "reference_moves": 9,
+      "response_status": "completed",
+      "api_error": null,
+      "elapsed_seconds": 39.906,
+      "success": true,
+      "legal_arrival": true,
+      "failure_type": null,
+      "answer_moves": 9,
+      "input_tokens": 7419,
+      "output_tokens": 964,
+      "reasoning_tokens": 876,
+      "exceeds_requested_budget": false,
+      "returned_model": "gpt-5.6-sol",
+      "returned_output_limit": null,
+      "returned_temperature": 1.0,
+      "returned_top_p": 0.98,
+      "returned_reasoning_effort": "medium",
+      "returned_instruction_characters": 21334,
+      "returned_tools": [],
+      "response_output_types": [
+        "reasoning",
+        "reasoning",
+        "message"
+      ]
+    },
+    {
+      "phase": "pilot_retry",
+      "case_id": "path_undirected_256_02",
+      "start": 211,
+      "goal": 219,
+      "reference_moves": 8,
+      "response_status": "completed",
+      "api_error": null,
+      "elapsed_seconds": 42.094,
+      "success": true,
+      "legal_arrival": true,
+      "failure_type": null,
+      "answer_moves": 8,
+      "input_tokens": 7419,
+      "output_tokens": 1469,
+      "reasoning_tokens": 1389,
+      "exceeds_requested_budget": false,
+      "returned_model": "gpt-5.6-sol",
+      "returned_output_limit": null,
+      "returned_temperature": 1.0,
+      "returned_top_p": 0.98,
+      "returned_reasoning_effort": "medium",
+      "returned_instruction_characters": 21334,
+      "returned_tools": [],
+      "response_output_types": [
+        "reasoning",
+        "reasoning",
+        "reasoning",
+        "message"
+      ]
+    }
+  ],
+  "same_case_qwen_context": [
+    {
+      "case_id": "path_undirected_256_00",
+      "sol_valid_trials": 1,
+      "sol_successes": 1,
+      "path_4b": {
+        "trials": 8,
+        "successes": 0
+      },
+      "path_8b": {
+        "trials": 8,
+        "successes": 1
+      },
+      "path_32b": {
+        "trials": 8,
+        "successes": 0
+      }
+    },
+    {
+      "case_id": "path_undirected_256_01",
+      "sol_valid_trials": 1,
+      "sol_successes": 1,
+      "path_4b": {
+        "trials": 8,
+        "successes": 0
+      },
+      "path_8b": {
+        "trials": 8,
+        "successes": 0
+      },
+      "path_32b": {
+        "trials": 8,
+        "successes": 0
+      }
+    },
+    {
+      "case_id": "path_undirected_256_02",
+      "sol_valid_trials": 1,
+      "sol_successes": 1,
+      "path_4b": {
+        "trials": 8,
+        "successes": 1
+      },
+      "path_8b": {
+        "trials": 8,
+        "successes": 0
+      },
+      "path_32b": {
+        "trials": 8,
+        "successes": 7
+      }
+    },
+    {
+      "case_id": "path_undirected_256_03",
+      "sol_valid_trials": 0,
+      "sol_successes": 0,
+      "path_4b": {
+        "trials": 8,
+        "successes": 1
+      },
+      "path_8b": {
+        "trials": 8,
+        "successes": 1
+      },
+      "path_32b": {
+        "trials": 8,
+        "successes": 1
+      }
+    }
+  ],
+  "limits": [
+    "Three successful answers on three fixed cases do not estimate reliable full-suite accuracy or pass@8.",
+    "Six API attempts include three gateway errors; service errors are not model failures and usage for them is unknown.",
+    "Successful outputs are below the requested cap, but gateway enforcement remains unverified; returned sampling differs and responses include added instructions.",
+    "Single-concurrency follow-ups succeeded after concurrent failures; this does not isolate concurrency as the cause."
+  ]
+}

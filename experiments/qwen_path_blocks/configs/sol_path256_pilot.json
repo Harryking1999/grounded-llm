@@ -6,10 +6,22 @@
     "path_undirected_256_00",
     "path_undirected_256_01",
     "path_undirected_256_02",
-    "path_undirected_256_03"
+    "path_undirected_256_03",
+    "path_undirected_256_04",
+    "path_undirected_256_05",
+    "path_undirected_256_06",
+    "path_undirected_256_07",
+    "path_undirected_256_08",
+    "path_undirected_256_09",
+    "path_undirected_256_10",
+    "path_undirected_256_11",
+    "path_undirected_256_12",
+    "path_undirected_256_13",
+    "path_undirected_256_14",
+    "path_undirected_256_15"
   ],
-  "replicates": 1,
-  "selection": "First four cases in the frozen Qwen suite, selected before observing Sol path answers.",
+  "replicates": 2,
+  "selection": "Cumulative 20 final trials: all 16 frozen cases once, then the first four cases once more, in suite order. Retain all three previously obtained answers. Selection does not depend on model success; completed wrong answers and budget truncations count toward 20.",
   "api": {
     "base_url": "https://jarodfund.xyz/v1",
     "model": "gpt-5.6-sol",
@@ -18,10 +30,13 @@
     "temperature": 0.6,
     "top_p": 0.95,
     "stream": true,
-    "concurrency": 2,
+    "concurrency": 1,
     "timeout_seconds": 900,
-    "automatic_retries": 0
+    "automatic_retries": 3,
+    "maximum_service_failures": 30,
+    "service_retry_policy": "Retry only identified gateway/HTTP 429/5xx or connection/timeout failures, behind untouched slots. Allow up to three retries per slot including archived failures; stop at 30 new service failures. Never replace final model failures or truncations."
   },
-  "comparison_limits": "User authorized a small pilot after the gateway ignored token caps and returned different sampling settings. Record actual output and returned settings; do not label this a strictly matched 16k evaluation. Qwen top_k/min_p/repetition_penalty and per-slot sampling seeds are not exposed by this Responses request.",
-  "evaluation": "Reuse the Qwen content decoder and undirected shortest-path judge. Incomplete responses fail. For completed responses, report task outcome separately from whether reported output tokens exceed the requested cap. No pass@8 is estimated from this pilot."
+  "comparison_limits": "User authorized expansion to 20 final answers under the previously disclosed gateway budget/sampling mismatch. Retain the original pilot answers. Qwen top_k/min_p/repetition_penalty and per-slot sampling seeds are not exposed by this Responses request.",
+  "evaluation": "Reuse the Qwen content decoder and undirected shortest-path judge. Incomplete responses fail. For completed responses, report task outcome separately from whether reported output tokens exceed the requested cap. No pass@8 is estimated from this pilot.",
+  "target_samples": 20
 }

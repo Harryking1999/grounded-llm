@@ -76,6 +76,8 @@ class ApiPilotTests(unittest.TestCase):
         record.update(response_status="incomplete", response={"incomplete_details": {"reason": "unknown"}})
         self.assertFalse(runner.retryable(record))
         self.assertFalse(runner.transport.final_sample(record))
+        record.update(response_status="in_progress", stream_event_counts={"error": 1})
+        self.assertTrue(runner.retryable(record))
 
 
 if __name__ == "__main__":

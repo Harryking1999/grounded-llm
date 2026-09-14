@@ -80,6 +80,9 @@ def retryable(record):
     """Only identified infrastructure failures may be sampled again."""
     if transport.final_sample(record):
         return False
+    if (record.get("response_status") in {"in_progress", "queued"}
+            and record.get("stream_event_counts", {}).get("error", 0) > 0):
+        return True
     status = record.get("http_status", 0)
     if status == 429 or 500 <= status < 600:
         return True

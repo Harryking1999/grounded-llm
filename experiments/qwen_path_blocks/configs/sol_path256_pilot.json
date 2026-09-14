@@ -1,0 +1,27 @@
+{
+  "study": "sol_path256_api_pilot",
+  "qwen_contract": "experiments/qwen_path_blocks/configs/path256_bidirectional_16k.json",
+  "suite": "runs/sol_path256_16k/suite.json",
+  "case_ids": [
+    "path_undirected_256_00",
+    "path_undirected_256_01",
+    "path_undirected_256_02",
+    "path_undirected_256_03"
+  ],
+  "replicates": 1,
+  "selection": "First four cases in the frozen Qwen suite, selected before observing Sol path answers.",
+  "api": {
+    "base_url": "https://jarodfund.xyz/v1",
+    "model": "gpt-5.6-sol",
+    "reasoning_effort": "medium",
+    "max_output_tokens": 16384,
+    "temperature": 0.6,
+    "top_p": 0.95,
+    "stream": true,
+    "concurrency": 2,
+    "timeout_seconds": 900,
+    "automatic_retries": 0
+  },
+  "comparison_limits": "User authorized a small pilot after the gateway ignored token caps and returned different sampling settings. Record actual output and returned settings; do not label this a strictly matched 16k evaluation. Qwen top_k/min_p/repetition_penalty and per-slot sampling seeds are not exposed by this Responses request.",
+  "evaluation": "Reuse the Qwen content decoder and undirected shortest-path judge. Incomplete responses fail. For completed responses, report task outcome separately from whether reported output tokens exceed the requested cap. No pass@8 is estimated from this pilot."
+}

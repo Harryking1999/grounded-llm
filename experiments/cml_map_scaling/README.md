@@ -34,7 +34,7 @@ OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python -m experiments.cml_map_scaling.s
 
 ## 运行与产物
 
-唯一正式合同为 [configs/step1.json](configs/step1.json)，不在说明文字中复制参数。代码只需 NumPy；顺序更新适合小型 CPU 数组，使用开发机 CPU，避免逐转移 GPU kernel 调度开销。CPU/GPU 不是待比较条件。
+首轮正式合同为 [configs/step1.json](configs/step1.json)，不在说明文字中复制参数。代码只需 NumPy；顺序更新适合小型 CPU 数组，使用开发机 CPU，避免逐转移 GPU kernel 调度开销。CPU/GPU 不是待比较条件。
 
 ```bash
 python -m unittest discover -s experiments/cml_map_scaling/tests -v
@@ -46,9 +46,17 @@ OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python -m experiments.cml_map_scaling.s
 
 ## 当前结论
 
-**Step 1 核心目标已完成：全部测试规模均学出了全局远近关系。** 共训练 16 张独立地图，原始图距离秩相关从 0.082 升至 0.941；随机图在 32–512 节点上的平均相关为 0.842–0.585，均高于接近零的初始化对照。全部节点和动作已覆盖，转移拟合误差很低，为下一步冻结 LLM 的地图／状态适配提供了已训练表示与评测基线。简单余弦选择器的到达率作为读出参考，完整数值和方法口径见[结果报告](results/report.md)。
+重跑的四个条件、共 64 张地图已全部完成，全部有向动作的后继识别均为 100%。128 维、1000 维、2048 维及完整梯度更新都能学好转移；512 节点的距离相关分别为 0.559、0.585、0.590 和 0.541。完整结果见[报告](results/report.md)，下一步讨论见 [STEP2_DISCUSSION.md](STEP2_DISCUSSION.md)。
 
-生成报告与图表（额外依赖 Matplotlib 3.10.6）：
+导出重跑的逐图数据与分组摘要：
+
+```bash
+python -m experiments.cml_map_scaling.src.explore_report --run-dir runs/cml_step1_exploration --output experiments/cml_map_scaling/results
+```
+
+首轮图表的再生成方式：
+
+（额外依赖 Matplotlib 3.10.6）：
 
 ```bash
 python -m experiments.cml_map_scaling.src.report --run-dir runs/cml_step1 --output experiments/cml_map_scaling/results

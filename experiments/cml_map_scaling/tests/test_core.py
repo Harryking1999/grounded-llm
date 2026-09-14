@@ -3,7 +3,7 @@ import unittest
 import numpy as np
 
 from experiments.cml_map_scaling.src.core import (
-    action_catalog, cosine_policy, evaluate_policy, geometry, local_update,
+    action_catalog, cosine_policy, evaluate_policy, geometry, local_update, gradient_update,
     random_graph, rankdata, sample_walks, shortest_distances, train_epoch,
 )
 
@@ -19,6 +19,28 @@ class CoreTest(unittest.TestCase):
         np.testing.assert_allclose(v[0], v0[0] + .01 * error)
         np.testing.assert_array_equal(q[[0, 2]], q0[[0, 2]])
         np.testing.assert_array_equal(v[1], v0[1])
+
+    def test_full_gradient_matches_numerical_loss_gradient(self):
+        q = np.array([[1., 2.], [5., 8.], [9., 10.]])
+        v = np.array([[.5, 1.], [7., 9.]])
+        def loss():
+            return .5 * np.sum((q[1] - q[0] - v[0]) ** 2)
+        numerical = []
+        for array in [q, v]:
+            grad = np.zeros_like(array)
+            for index in np.ndindex(array.shape):
+                old = array[index]
+                array[index] = old + 1e-5
+                plus = loss()
+                array[index] = old - 1e-5
+                minus = loss()
+                array[index] = old
+                grad[index] = (plus - minus) / 2e-5
+            numerical.append(grad)
+        q0, v0 = q.copy(), v.copy()
+        gradient_update(q, v, (0, 0, 1), .1, .01)
+        np.testing.assert_allclose(q, q0 - .1 * numerical[0])
+        np.testing.assert_allclose(v, v0 - .01 * numerical[1])
 
     def test_repeated_destination_updates_are_not_dropped(self):
         q = np.array([[0.], [1.], [2.]])
@@ -62,6 +84,8 @@ class CoreTest(unittest.TestCase):
         v = q[actions[:, 1]] - q[actions[:, 0]]
         result, _ = geometry(q, v, actions, shortest_distances(adj), np.ones(4))
         self.assertEqual(result['transition_mse_all_actions'], 0)
+        self.assertEqual(result['successor_retrieval_accuracy'], 1)
+        self.assertGreater(result['latent_pair_min'], 0)
         self.assertIsNone(result['spearman'])
 
 

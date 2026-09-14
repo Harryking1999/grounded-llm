@@ -71,10 +71,25 @@ def local_update(q, v, transition, eta_q, eta_v):
     v[action] += eta_v * error
 
 
-def train_epoch(q, v, walks, order, eta_q, eta_v):
+def gradient_update(q, v, transition, eta_q, eta_v):
+    """SGD gradient of 0.5 * sum((q_dest - q_source - v_action)**2).
+
+    Analytic gradients are equivalent to backpropagation through this loss.
+    Use a sum over coordinates so effective per-coordinate steps do not shrink
+    with dimension; report per-coordinate MSE separately.
+    """
+    source, action, destination = transition
+    error = q[destination] - q[source] - v[action]
+    q[destination] -= eta_q * error
+    q[source] += eta_q * error
+    v[action] += eta_v * error
+
+
+def train_epoch(q, v, walks, order, eta_q, eta_v, method="local"):
+    update = {"local": local_update, "full_gradient": gradient_update}[method]
     for i in order:
         for transition in walks[i]:
-            local_update(q, v, transition, eta_q, eta_v)
+            update(q, v, transition, eta_q, eta_v)
 
 
 def rankdata(values):
@@ -120,6 +135,13 @@ def geometry(q, v, actions, graph_distances, visits):
     return {
         "pairs": len(dg), "spearman": spearman(dg, ds),
         "latent_pair_mean": float(ds.mean()),
+        "latent_pair_min": float(ds.min()),
+        "state_centered_rms": float(np.sqrt(np.mean((q.astype(np.float64) - q.astype(np.float64).mean(axis=0)) ** 2))),
+        "successor_retrieval_accuracy": float(np.mean(np.argmin(
+            np.sum((q[actions[:, 0]] + v).astype(np.float64) ** 2, axis=1)[:, None]
+            + np.sum(q.astype(np.float64) ** 2, axis=1)[None, :]
+            - 2 * (q[actions[:, 0]] + v).astype(np.float64) @ q.astype(np.float64).T,
+            axis=1) == actions[:, 1])),
         "sqrt_fit_scale": c,
         "sqrt_fit_rmse": float(np.sqrt(np.mean(fit_error ** 2))),
         "sqrt_fit_r2": 1 - float(fit_error @ fit_error) / total_variance if total_variance else None,

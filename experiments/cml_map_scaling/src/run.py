@@ -61,7 +61,7 @@ def run_case(config, spec, output):
         if epoch:
             order = replay.permutation(count)
             before = time.perf_counter()
-            train_epoch(q, v, walks, order, train['eta_q'], train['eta_v'])
+            train_epoch(q, v, walks, order, train['eta_q'], train['eta_v'], train.get('method', 'local'))
             train_seconds += time.perf_counter() - before
         if epoch in train['snapshot_epochs']:
             metrics, pair_data = geometry(q, v, actions, distances, visits)

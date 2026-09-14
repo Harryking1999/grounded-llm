@@ -57,6 +57,22 @@ python experiments/qwen_path_blocks/src/run.py \
 suite；图为固定的 3-regular 连通图，节点行和邻居顺序按题目打乱。它保留 16,384 token
 上限，截断计失败，不能与原 32 节点 DAG 或 40K 积木条件合并。
 
+## Sol API 同题测试：预算兼容性待解决
+
+2026-09-14 用户授权通过 `https://jarodfund.xyz` 测试 `gpt-5.6-sol`，沿用上述
+path256 无向图与 16k 条件。已保存待运行的 suite 和提示词，并确认 suite 与三个 Qwen
+验收批次完全相同、邻接表对称、全部参考路径通过原裁判。尚未启动正式 path 试验。
+
+[接口探针摘要](results/sol_api_compatibility.json)记录了阻碍：Responses 的
+`max_output_tokens`、Chat Completions 的 `max_completion_tokens` 和 `max_tokens`
+均请求 32 token，却分别报告输出 302、203、203 token，正常完成而非截断。
+Responses 还返回空的输出上限，以及不同于请求的 temperature/top_p 和额外系统指令。
+这不能证明该网关也一定忽略 16k，但不足以确认预算与提示条件匹配；三个探针不是 path
+样本，不进入成功率或 pass@8。原始响应位于 Git 忽略的 `runs/sol_path256_16k/`，不含请求密钥。
+
+继续正式条件需要能执行输出上限的接口；若用户接受预算未受控的条件，应单独记录该变更，
+不能把请求参数当作实际执行证据。此次仅完成探针与离线同题核对，没有新增模型性能结论。
+
 ## 离线验收与截断归因
 
 `src/acceptance_audit.py` 读取已完成原始运行，复用任务裁判，输出紧凑诊断证据：

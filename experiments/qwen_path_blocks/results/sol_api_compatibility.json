@@ -1,0 +1,59 @@
+{
+  "checked_on": "2026-09-14",
+  "status": "blocked_budget_compatibility",
+  "model": "gpt-5.6-sol",
+  "base_url": "https://jarodfund.xyz/v1",
+  "formal_path_trials": 0,
+  "qwen_contract": "experiments/qwen_path_blocks/configs/path256_bidirectional_16k.json",
+  "prepared_suite": "runs/sol_path256_16k/suite.json",
+  "prepared_prompts": "runs/sol_path256_16k/prompts.json",
+  "suite_verification": {
+    "matches_archived_qwen_4b_8b_32b": true,
+    "node_count": 256,
+    "orientation": "undirected",
+    "symmetric_adjacency": true,
+    "reference_paths_replayed": 16,
+    "planned_trials": 128
+  },
+  "probes": [
+    {
+      "raw_path": "runs/sol_path256_16k/compatibility_probe.json",
+      "endpoint": "/v1/responses",
+      "request_limit_field": "max_output_tokens",
+      "requested_output_limit": 32,
+      "returned_model": "gpt-5.6-sol",
+      "reported_output_tokens": 302,
+      "status": "completed",
+      "limit_exceeded": true,
+      "returned_max_output_tokens": null,
+      "requested_temperature": 0.6,
+      "returned_temperature": 1.0,
+      "requested_top_p": 0.95,
+      "returned_top_p": 0.98,
+      "returned_instruction_characters": 21334,
+      "returned_tools": []
+    },
+    {
+      "raw_path": "runs/sol_path256_16k/chat_compatibility_probe.json",
+      "endpoint": "/v1/chat/completions",
+      "request_limit_field": "max_completion_tokens",
+      "requested_output_limit": 32,
+      "returned_model": "gpt-5.6-sol",
+      "reported_output_tokens": 203,
+      "status": "stop",
+      "limit_exceeded": true
+    },
+    {
+      "raw_path": "runs/sol_path256_16k/chat_max_tokens_probe.json",
+      "endpoint": "/v1/chat/completions",
+      "request_limit_field": "max_tokens",
+      "requested_output_limit": 32,
+      "returned_model": "gpt-5.6-sol",
+      "reported_output_tokens": 203,
+      "status": "stop",
+      "limit_exceeded": true
+    }
+  ],
+  "interpretation": "All three small-limit probes exceeded the requested 32-token output cap. These probes do not establish whether a 16,384-token cap will be honored. No formal path trial was launched under an unverified budget. Responses metadata also differs from requested sampling settings and contains additional instructions.",
+  "required_next_decision": "Use an endpoint that enforces the requested output cap, or obtain explicit authorization for a separate budget-uncontrolled condition."
+}

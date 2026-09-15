@@ -48,10 +48,10 @@ OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python -m experiments.cml_map_scaling.s
 
 重跑的四个条件、共 64 张地图已全部完成，全部有向动作的后继识别均为 100%。128 维、1000 维、2048 维及完整梯度更新都能学好转移；512 节点的距离相关分别为 0.559、0.585、0.590 和 0.541。完整结果见[报告](results/report.md)，下一步讨论见 [STEP2_DISCUSSION.md](STEP2_DISCUSSION.md)。
 
-导出重跑的逐图数据与分组摘要：
+导出重跑的逐图数据、分组摘要与远近关系图（绘图依赖 Matplotlib）：
 
 ```bash
-python -m experiments.cml_map_scaling.src.explore_report --run-dir runs/cml_step1_exploration --output experiments/cml_map_scaling/results
+python -m experiments.cml_map_scaling.src.explore_report --run-dir runs/cml_step1_exploration --output experiments/cml_map_scaling/results --figures
 ```
 
 首轮图表的再生成方式：

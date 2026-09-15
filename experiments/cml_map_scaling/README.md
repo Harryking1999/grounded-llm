@@ -70,4 +70,4 @@ python -m experiments.cml_map_scaling.src.report --run-dir runs/cml_step1 --outp
 python -m experiments.cml_map_scaling.src.roadmap --input-root runs/cml_step1_exploration/local1000 --output experiments/cml_map_scaling/results
 ```
 
-输出独立单图和并排图的 PNG／SVG／PDF，以及每张图的节点坐标、真实边表和投影指标。
+输出独立单图、规模并排图和各规模“原图随机布局—学习地图 t-SNE”对照图的 PNG／SVG／PDF，以及每张图的节点坐标、真实边表和投影指标。追加 `--pairs-only` 可只更新原图／学习地图对照。

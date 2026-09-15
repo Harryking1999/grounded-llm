@@ -6,15 +6,17 @@
 
 ## 先看一张学出来的认知地图
 
-**32 节点的地图已经可以呈现为清晰的 roadmap。** 下图沿用 GCML 论文图 b 的表达方式：将学到的 Q 向量用 t-SNE 投影到二维，再画出环境中的真实连边。白圈是节点，黑点是起点，红星是目标。
+**同一张图，从交错的连边展开为清晰的认知地图。** 下图模仿 GCML 论文 a／b 的对照：左侧是原图的固定随机布局，右侧是学到的 Q 向量的 t-SNE 布局。两侧节点、边及其连接关系完全相同，只改变绘图位置。白圈是节点；右侧黑点为起点，红星为目标。
 
-![32 节点认知地图的 t-SNE 可视化](roadmap_official32.png)
+![32 节点：原图与学习地图的对照](roadmap_pair_official32.png)
 
-选用本轮的原始 32 节点图、局部更新条件，包含 32 个节点和 48 条无向边。起点与目标选为图距离最远的一对节点（2→26，相隔 8 步）。节点位置来自 Q 的 t-SNE 投影，全部真实连边均保留；仅对整幅投影作旋转与等比例缩放以便阅读。
+选用本轮的原始 32 节点图、局部更新条件，包含 32 个节点和 48 条无向边。起点与目标选为图距离最远的一对节点（2→26，相隔 8 步）。右侧节点位置来自 Q 的 t-SNE 投影，全部真实连边均保留；仅对整幅投影作旋转与等比例缩放以便阅读。左侧原图没有预设几何坐标，随机布局仅用于展示其拓扑，不代表训练前 Q 的投影。
 
 ### 扩展到 128 和 256 节点
 
-![32、128、256 节点认知地图的并排对照](roadmap_comparison.png)
+![128 节点：原图与学习地图的对照](roadmap_pair_random128_seed0.png)
+
+![256 节点：原图与学习地图的对照](roadmap_pair_random256_seed0.png)
 
 三张图使用相同的 t-SNE 参数。较大图取各自的 seed 0 case，局部邻域仍可辨认，整体连边更密、交叉更多。建议用 32 节点图作主文示例，用 128／256 节点图展示规模扩展后的结构。
 
@@ -26,7 +28,7 @@
 
 二维图直观展示地图结构；下面的距离曲线和主指标在原始表示空间中计算。尤其对较大图，t-SNE 投影会改变全局距离，二者结合阅读。
 
-绘图配置见 [roadmap_visualization.json](../configs/roadmap_visualization.json)，基础 t-SNE 参数沿用 [GCML 发布实现的 `run_t_sne`](https://github.com/LH-cbicr/GCML/blob/ff76859b71a2bc2056b50f5e052475351c007f76/gcml_abstract_graph.ipynb)。三个 case 按正式训练配置和固定种子在本地重建，最终距离相关、转移 MSE 和平均表示距离与已保存结果核对一致。单图可单独使用：[32 节点](roadmap_official32.svg)、[128 节点](roadmap_random128_seed0.svg)、[256 节点](roadmap_random256_seed0.svg)；节点坐标、边表和投影指标保存在同目录。
+绘图配置见 [roadmap_visualization.json](../configs/roadmap_visualization.json)，基础 t-SNE 参数沿用 [GCML 发布实现的 `run_t_sne`](https://github.com/LH-cbicr/GCML/blob/ff76859b71a2bc2056b50f5e052475351c007f76/gcml_abstract_graph.ipynb)。三个 case 按正式训练配置和固定种子在本地重建，最终距离相关、转移 MSE 和平均表示距离与已保存结果核对一致。对照图可单独使用：[32 节点](roadmap_pair_official32.svg)、[128 节点](roadmap_pair_random128_seed0.svg)、[256 节点](roadmap_pair_random256_seed0.svg)；节点坐标、边表和投影指标保存在同目录。
 
 ## 远近关系：图上越远，表示空间中平均也越远
 

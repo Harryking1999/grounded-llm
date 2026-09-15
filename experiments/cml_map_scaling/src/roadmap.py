@@ -21,7 +21,7 @@ from .report import save
 from .run import ROOT, write_json
 
 
-def draw(ax, data, title):
+def draw(ax, data, title, mark_endpoints=True):
     xy, edges = data['xy'], data['edges']
     n, start, goal = len(xy), data['start'], data['goal']
     linewidth = 1.15 if n == 32 else (.65 if n == 128 else .45)
@@ -30,13 +30,14 @@ def draw(ax, data, title):
     size = 60 if n == 32 else (21 if n == 128 else 12)
     ax.scatter(xy[:, 0], xy[:, 1], s=size, facecolor='white',
                edgecolor='#999999', linewidth=.8, zorder=2)
-    ax.scatter(*xy[start], s=155 if n == 32 else 105, color='black', zorder=3)
-    ax.scatter(*xy[goal], s=560 if n == 32 else 390, marker='*',
-               facecolor='white', edgecolor='#ed3e2e', linewidth=2.0, zorder=4)
-    for node, text, dy in [(start, 'Start node', -24), (goal, 'Goal node', 22)]:
-        ax.annotate(text, xy[node], xytext=(0, dy), textcoords='offset points',
-                    ha='center', va='center', fontsize=10, zorder=5,
-                    bbox={'facecolor': 'white', 'edgecolor': 'none', 'pad': 1.3})
+    if mark_endpoints:
+        ax.scatter(*xy[start], s=155 if n == 32 else 105, color='black', zorder=3)
+        ax.scatter(*xy[goal], s=560 if n == 32 else 390, marker='*',
+                   facecolor='white', edgecolor='#ed3e2e', linewidth=2.0, zorder=4)
+        for node, text, dy in [(start, 'Start node', -24), (goal, 'Goal node', 22)]:
+            ax.annotate(text, xy[node], xytext=(0, dy), textcoords='offset points',
+                        ha='center', va='center', fontsize=10, zorder=5,
+                        bbox={'facecolor': 'white', 'edgecolor': 'none', 'pad': 1.3})
     span = np.ptp(xy, axis=0)
     ax.set_xlim(xy[:, 0].min() - .13 * span.max(), xy[:, 0].max() + .13 * span.max())
     ax.set_ylim(xy[:, 1].min() - .18 * span.max(), xy[:, 1].max() + .18 * span.max())
@@ -50,6 +51,7 @@ def main():
     parser.add_argument('--input-root', type=Path, required=True,
                         help='Directory containing case folders with inputs.npz and map.npz')
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--pairs-only', action='store_true', help='Export original/map comparisons without regenerating standalone maps')
     parser.add_argument('--config', type=Path, default=ROOT / 'experiments/cml_map_scaling/configs/roadmap_visualization.json')
     args = parser.parse_args()
     config = json.loads(args.config.read_text(encoding='utf-8'))
@@ -71,7 +73,13 @@ def main():
         rotation = np.array([[np.cos(angle), -np.sin(angle)], [np.sin(angle), np.cos(angle)]])
         xy = (raw_xy - raw_xy.mean(axis=0)) @ rotation.T
         xy /= np.ptp(xy, axis=0).max()
-        panel = {'case': case, 'xy': xy, 'edges': edges, 'start': int(start), 'goal': int(goal)}
+        rng = np.random.default_rng(config['original_layout']['seed'])
+        random_values = rng.uniform(size=(len(q), 2))
+        radius, theta = np.sqrt(random_values[:, 0]), 2 * np.pi * random_values[:, 1]
+        original_xy = np.column_stack([radius * np.cos(theta), radius * np.sin(theta)])
+        original_xy = (original_xy - original_xy.mean(axis=0)) / np.ptp(original_xy, axis=0).max()
+        panel = {'case': case, 'xy': xy, 'original_xy': original_xy, 'edges': edges,
+                 'start': int(start), 'goal': int(goal)}
         panels.append(panel)
         i, j = np.triu_indices(len(q), 1)
         metrics.append({'case': case, 'nodes': len(q), 'edges': len(edges),
@@ -82,22 +90,32 @@ def main():
                         'tsne_kl_divergence': float(model.kl_divergence_)})
         with (args.output / f'roadmap_{case}_nodes.csv').open('w', newline='', encoding='utf-8') as stream:
             writer = csv.writer(stream)
-            writer.writerow(['node', 'tsne_x', 'tsne_y', 'display_x', 'display_y', 'role'])
+            writer.writerow(['node', 'tsne_x', 'tsne_y', 'display_x', 'display_y', 'role', 'original_x', 'original_y'])
             for node, point in enumerate(xy):
-                writer.writerow([node, *raw_xy[node], *point, 'start' if node == start else 'goal' if node == goal else 'node'])
+                writer.writerow([node, *raw_xy[node], *point,
+                                 'start' if node == start else 'goal' if node == goal else 'node', *original_xy[node]])
         np.savetxt(args.output / f'roadmap_{case}_edges.csv', edges, fmt='%d', delimiter=',',
                    header='source,target', comments='')
-        fig, ax = plt.subplots(figsize=(5.1, 5.1))
-        draw(ax, panel, f'{len(q)} nodes')
-        fig.subplots_adjust(left=.05, right=.95, bottom=.04, top=.92)
-        save(fig, args.output / f'roadmap_{case}')
+        if not args.pairs_only:
+            fig, ax = plt.subplots(figsize=(5.1, 5.1))
+            draw(ax, panel, f'{len(q)} nodes')
+            fig.subplots_adjust(left=.05, right=.95, bottom=.04, top=.92)
+            save(fig, args.output / f'roadmap_{case}')
+            plt.close(fig)
+        fig, axes = plt.subplots(1, 2, figsize=(10.2, 5.2))
+        draw(axes[0], {**panel, 'xy': original_xy}, 'a   Original graph (random layout)', mark_endpoints=False)
+        draw(axes[1], panel, 'b   Learned map (t-SNE)')
+        fig.suptitle(f'{len(q)} nodes  |  {len(edges)} edges', fontsize=11, y=.99)
+        fig.subplots_adjust(left=.025, right=.975, bottom=.025, top=.86, wspace=.1)
+        save(fig, args.output / f'roadmap_pair_{case}')
         plt.close(fig)
-    fig, axes = plt.subplots(1, len(panels), figsize=(14.4, 5.1))
-    for index, (ax, panel) in enumerate(zip(axes, panels)):
-        draw(ax, panel, f'{"abc"[index]}   {len(panel["xy"])} nodes')
-    fig.subplots_adjust(left=.025, right=.975, bottom=.03, top=.91, wspace=.12)
-    save(fig, args.output / 'roadmap_comparison')
-    plt.close(fig)
+    if not args.pairs_only:
+        fig, axes = plt.subplots(1, len(panels), figsize=(14.4, 5.1))
+        for index, (ax, panel) in enumerate(zip(axes, panels)):
+            draw(ax, panel, f'{"abc"[index]}   {len(panel["xy"])} nodes')
+        fig.subplots_adjust(left=.025, right=.975, bottom=.03, top=.91, wspace=.12)
+        save(fig, args.output / 'roadmap_comparison')
+        plt.close(fig)
     write_json(args.output / 'roadmap_summary.json', {'config': config,
                'sklearn': sklearn.__version__, 'numpy': np.__version__, 'cases': metrics})
     print(json.dumps(metrics, indent=2))

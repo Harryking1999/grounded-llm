@@ -61,3 +61,13 @@ python -m experiments.cml_map_scaling.src.explore_report --run-dir runs/cml_step
 ```bash
 python -m experiments.cml_map_scaling.src.report --run-dir runs/cml_step1 --output experiments/cml_map_scaling/results
 ```
+
+## Roadmap 可视化
+
+原始 32 节点图及 128／256 节点 seed 0 case 的 t-SNE 图见[结果报告](results/report.md)。绘图合同为 [configs/roadmap_visualization.json](configs/roadmap_visualization.json)，保留全部真实连边，使用固定参数与种子。除已有绘图依赖外，需要 scikit-learn 1.7.2；本次运行使用 SciPy 1.16.2。
+
+```bash
+python -m experiments.cml_map_scaling.src.roadmap --input-root runs/cml_step1_exploration/local1000 --output experiments/cml_map_scaling/results
+```
+
+输出独立单图和并排图的 PNG／SVG／PDF，以及每张图的节点坐标、真实边表和投影指标。

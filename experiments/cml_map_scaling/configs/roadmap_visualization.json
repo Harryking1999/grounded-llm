@@ -1,0 +1,22 @@
+{
+  "condition": "local1000",
+  "cases": ["official32", "random128_seed0", "random256_seed0"],
+  "selection": "original_small_graph_and_seed0_at_each_requested_larger_size",
+  "embedding": "final_Q_rows_without_preprocessing",
+  "tsne": {
+    "n_components": 2,
+    "perplexity": 12,
+    "early_exaggeration": 3,
+    "learning_rate": 20,
+    "init": "pca",
+    "random_state": 123456,
+    "max_iter": 1000,
+    "method": "barnes_hut",
+    "angle": 0.5
+  },
+  "source_settings": "GCML run_t_sne function defaults, with explicit random seed and iteration limit",
+  "endpoints": "first_unordered_pair_at_graph_diameter",
+  "display": "rigid_rotation_to_place_start_goal_at_65_degrees_then_uniform_scale",
+  "edges": "all_true_undirected_edges_once_no_filtering",
+  "training_config": "experiments/cml_map_scaling/configs/step1.json"
+}

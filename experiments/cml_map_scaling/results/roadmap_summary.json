@@ -1,0 +1,68 @@
+{
+  "config": {
+    "condition": "local1000",
+    "cases": [
+      "official32",
+      "random128_seed0",
+      "random256_seed0"
+    ],
+    "selection": "original_small_graph_and_seed0_at_each_requested_larger_size",
+    "embedding": "final_Q_rows_without_preprocessing",
+    "tsne": {
+      "n_components": 2,
+      "perplexity": 12,
+      "early_exaggeration": 3,
+      "learning_rate": 20,
+      "init": "pca",
+      "random_state": 123456,
+      "max_iter": 1000,
+      "method": "barnes_hut",
+      "angle": 0.5
+    },
+    "source_settings": "GCML run_t_sne function defaults, with explicit random seed and iteration limit",
+    "endpoints": "first_unordered_pair_at_graph_diameter",
+    "display": "rigid_rotation_to_place_start_goal_at_65_degrees_then_uniform_scale",
+    "edges": "all_true_undirected_edges_once_no_filtering",
+    "training_config": "experiments/cml_map_scaling/configs/step1.json"
+  },
+  "sklearn": "1.7.2",
+  "numpy": "2.5.3",
+  "cases": [
+    {
+      "case": "official32",
+      "nodes": 32,
+      "edges": 48,
+      "start": 2,
+      "goal": 26,
+      "endpoint_graph_distance": 8,
+      "high_dim_spearman": 0.9407547903313501,
+      "projection_spearman": 0.9059773752425904,
+      "trustworthiness_k5": 0.9880208333333333,
+      "tsne_kl_divergence": 0.09311577677726746
+    },
+    {
+      "case": "random128_seed0",
+      "nodes": 128,
+      "edges": 197,
+      "start": 19,
+      "goal": 48,
+      "endpoint_graph_distance": 9,
+      "high_dim_spearman": 0.753055811381738,
+      "projection_spearman": 0.5431889229787974,
+      "trustworthiness_k5": 0.9687369791666667,
+      "tsne_kl_divergence": 0.7290510535240173
+    },
+    {
+      "case": "random256_seed0",
+      "nodes": 256,
+      "edges": 369,
+      "start": 14,
+      "goal": 32,
+      "endpoint_graph_distance": 12,
+      "high_dim_spearman": 0.6781524172990473,
+      "projection_spearman": 0.5145935619695312,
+      "trustworthiness_k5": 0.9805727066532258,
+      "tsne_kl_divergence": 0.9346418380737305
+    }
+  ]
+}

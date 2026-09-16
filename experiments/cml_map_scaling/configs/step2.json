@@ -1,7 +1,7 @@
 {
   "study": "cml_map_scaling_step2",
   "contract_status": "implementation_spec_not_yet_runnable",
-  "scope": "fixed_graph_state_readout_and_one_step_action_with_full_text_graph",
+  "scope": "report_only_training_then_one_step_action_evaluation_with_full_text_graph",
   "assets": {
     "step1_contract": "experiments/cml_map_scaling/configs/exploration.json",
     "condition": "local1000",
@@ -56,23 +56,11 @@
   "conditions": [
     {
       "name": "linear_report",
-      "adapter": "linear",
-      "action_loss_weight": 0.0
+      "adapter": "linear"
     },
     {
       "name": "mlp_report",
-      "adapter": "mlp",
-      "action_loss_weight": 0.0
-    },
-    {
-      "name": "linear_joint",
-      "adapter": "linear",
-      "action_loss_weight": 0.1
-    },
-    {
-      "name": "mlp_joint",
-      "adapter": "mlp",
-      "action_loss_weight": 0.1
+      "adapter": "mlp"
     }
   ],
   "data": {
@@ -91,11 +79,7 @@
       "goal"
     ],
     "require_all_nodes_in_training": true,
-    "report_shuffle_seed": 18,
-    "action_shuffle_seed": 19,
-    "action_pool": "all_ordered_training_pairs",
-    "action_sampling": "continuous_shuffled_cycles_without_replacement_within_cycle",
-    "action_training_target": "lowest_id_among_legal_strictly_distance_reducing_successors"
+    "report_shuffle_seed": 18
   },
   "prompts": {
     "language": "en",
@@ -131,7 +115,6 @@
   "training": {
     "epochs": 10,
     "report_batch_size": 32,
-    "action_batch_size_per_joint_step": 4,
     "drop_last_report_batch": false,
     "initial_microbatch_size": 1,
     "optimizer": "AdamW",
@@ -144,9 +127,25 @@
     "weight_decay": 0.0,
     "schedule": "constant",
     "gradient_clip_norm": 1.0,
-    "loss": "mean_of_per_answer_mean_token_cross_entropy_including_answer_end",
+    "loss": {
+      "name": "report_answer_cross_entropy",
+      "teacher_forcing": true,
+      "target": "tokenized_correct_node_id_followed_by_native_answer_end",
+      "ignore_index": -100,
+      "masked_positions": [
+        "prompt",
+        "state_slots",
+        "assistant_prefix",
+        "padding"
+      ],
+      "causal_alignment": "logits_at_t_minus_1_predict_label_at_t_shift_once",
+      "token_reduction": "mean_over_each_answers_unmasked_tokens_including_end",
+      "batch_reduction": "mean_of_per_sample_losses",
+      "gradient_accumulation": "microbatch_mean_times_microbatch_size_over_actual_effective_batch_size",
+      "trainable_parameters": "adapter_only",
+      "auxiliary_terms": []
+    },
     "mask_prompt_labels": true,
-    "joint_initialization": "same_initial_weights_as_corresponding_report_condition_not_warm_start",
     "checkpoint_selection": [
       "max_validation_report_exact_accuracy",
       "min_validation_report_loss",
@@ -154,7 +153,11 @@
     ],
     "validation_frequency": "each_epoch",
     "early_stopping": false,
-    "report_fixed_final_checkpoint_too": true
+    "report_fixed_final_checkpoint_too": true,
+    "tasks": [
+      "report_current",
+      "report_goal"
+    ]
   },
   "generation": {
     "do_sample": false,
@@ -204,7 +207,9 @@
     "successful_action": "adjacency[u,v] and graph_distance[v,g] < graph_distance[u,g]",
     "accept_all_successful_next_nodes": true,
     "test_after_all_conditions_and_checkpoint_choices_are_fixed": true,
-    "single_seed_pilot_no_significance_claim": true
+    "single_seed_pilot_no_significance_claim": true,
+    "action_split": "test",
+    "action_labels_used_for_training": false
   },
   "state_update": {
     "step2_episode_length": 1,

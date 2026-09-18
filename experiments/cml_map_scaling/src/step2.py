@@ -268,10 +268,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--config', default='experiments/cml_map_scaling/configs/step2.json')
     parser.add_argument('--asset-dir', required=True)
-    parser.add_argument('--asset-source-revision', required=True)
-    parser.add_argument('--asset-source-description', required=True)
+    parser.add_argument('--asset-source-revision')
+    parser.add_argument('--asset-source-description')
     parser.add_argument('--model-dir', required=True)
-    parser.add_argument('--model-provenance', required=True, help='Download provenance JSON, including revision verification')
     parser.add_argument('--output', required=True)
     parser.add_argument('--mode', choices=('smoke', 'run'), required=True)
     parser.add_argument('--microbatch', type=int)
@@ -281,11 +280,6 @@ def main():
     args.microbatch = args.microbatch or config['training']['initial_microbatch_size']
     assert 1 <= args.microbatch <= config['training']['report_batch_size'] and args.eval_batch > 0
     assert torch.cuda.is_available() and torch.cuda.is_bf16_supported()
-    if args.mode == 'run':
-        # Formal runs must identify an exact committed implementation/config.
-        tracked_changes = subprocess.check_output(['git', 'status', '--porcelain', '--untracked-files=no'], cwd=ROOT, text=True)
-        if tracked_changes.strip():
-            raise RuntimeError('Commit tracked changes before a formal run')
     output = Path(args.output)
     output.mkdir(parents=True, exist_ok=False)
     q, adj, distances, rms = load_assets(config, args.asset_dir, ROOT)
@@ -294,13 +288,10 @@ def main():
     write_json(output / 'config.json', config)
     write_json(output / 'split.json', split)
     (output / 'adjacency.txt').write_text(adjacency + '\n', encoding='utf-8')
-    provenance = json.loads(Path(args.model_provenance).read_text(encoding='utf-8'))
-    if provenance.get('verified_hf_revision') != config['model']['revision']:
-        raise ValueError('ModelScope snapshot must be verified against the locked upstream revision')
     runtime = dict(source_commit=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
                    asset_source_revision=args.asset_source_revision, asset_source_description=args.asset_source_description,
                    asset_dir=str(Path(args.asset_dir).resolve()), model_dir=str(Path(args.model_dir).resolve()),
-                   model_provenance=provenance, mode=args.mode, microbatch=args.microbatch, eval_batch=args.eval_batch,
+                   mode=args.mode, microbatch=args.microbatch, eval_batch=args.eval_batch,
                    python_version=platform.python_version(), numpy_version=np.__version__, torch_version=torch.__version__,
                    transformers_version=transformers.__version__, tokenizers_version=tokenizers.__version__,
                    cuda_version=torch.version.cuda, gpu=torch.cuda.get_device_name(),

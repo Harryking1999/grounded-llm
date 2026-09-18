@@ -1,0 +1,43 @@
+{
+  "study": "cml_step2_action_supervision_scaling",
+  "base_source_commit": "aafa2a599ee4055214831b1506f5d95b0fc4787f",
+  "base_condition": "mlp_report",
+  "base_checkpoint": "selected",
+  "cases": ["random64_seed0", "random128_seed0", "random256_seed0"],
+  "action_data": {
+    "source_split": "train",
+    "unordered_pairs_per_node": 1.25,
+    "directions": "both",
+    "pair_seed": 19,
+    "label_seed": 20,
+    "label_rule": "Fixed seeded choice among all legal distance-decreasing neighbors; evaluation accepts every such neighbor."
+  },
+  "report_replay": {
+    "source_split": "train",
+    "examples_per_node": 2.5,
+    "seed": 21,
+    "selection": "Cover each node and report role once, then fill to the action-example count by seeded permutation."
+  },
+  "conditions": [
+    {"name": "report_continuation", "pool": "report_replay_twice"},
+    {"name": "report_plus_action", "pool": "report_replay_plus_actions"}
+  ],
+  "training": {
+    "epochs": 10,
+    "report_batch_size": 32,
+    "learning_rate": 0.0001,
+    "shuffle_seed": 22,
+    "trainable": "same_MLP_only",
+    "freeze": ["Q", "V", "LLM"],
+    "cache_frozen_prefix": true,
+    "loss": "same_per_answer_mean_cross_entropy_including_native_EOS",
+    "optimizer_other_settings": "inherit_base_run",
+    "prompt": "original_canonical_only",
+    "selection": "fixed_final_epoch_no_test_or_validation_selection",
+    "compute_matching": "Per graph, both conditions see the same 5N samples per epoch and 10 epochs. Action supervision replaces half of the report-only control presentations."
+  },
+  "evaluation": {
+    "mode": "train_only_here_then_matched_full_text_eval",
+    "primary_comparison": "report_plus_action versus equal-budget report_continuation on each graph's unchanged test split"
+  }
+}

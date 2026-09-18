@@ -1,0 +1,26 @@
+{
+  "study": "step2_action_supervision_training_fit_and_report_retention",
+  "training": false,
+  "base_source_commit": "aafa2a599ee4055214831b1506f5d95b0fc4787f",
+  "node_counts": [64, 128, 256],
+  "checkpoint": "final",
+  "conditions": [
+    {"name": "report_continuation", "adapter": "mlp", "checkpoint_source": "continuation", "checkpoint_condition": "report_continuation", "checkpoint": "final"},
+    {"name": "report_plus_action", "adapter": "mlp", "checkpoint_source": "continuation", "checkpoint_condition": "report_plus_action", "checkpoint": "final"}
+  ],
+  "templates": ["canonical", "heldout"],
+  "action_decoding": ["free", "node_id_grammar"],
+  "report_decoding": ["free"],
+  "generation": {"max_new_tokens": 16, "batch_size": 8, "do_sample": false, "attempts": 1},
+  "data": {
+    "seen_actions": "Read actual continuation training_data.json actions, canonical template only. Do not sample a replacement training set.",
+    "test": "Read original split.json test pairs. Expand report_current, report_goal, and action with the existing canonical/heldout prompts."
+  },
+  "input": "Original training-compatible input: same visible text graph, current and goal supplied by two adapter slots, original node-ID answer instruction.",
+  "scoring": {
+    "actions": "Report every legal distance-decreasing successor as correct, plus agreement with the one stored training label as a separate metric.",
+    "reports": "Generated current/goal IDs and both-report correctness, without output grammar.",
+    "format": "Original strict node-ID parser. Free output failures and token-limit hits reported separately; global node-ID grammar diagnoses formatting without revealing legal neighbors."
+  },
+  "interpretation": "Exploratory diagnosis of optimization, same-graph pair generalization, template transfer, and report retention. This substitution-format assessment is separate from the main matched full-text augmentation evaluation; it does not establish roadmap benefit over text. No optimization or checkpoint selection is performed."
+}

@@ -1,0 +1,266 @@
+{
+  "study": "cml_map_scaling_step2",
+  "contract_status": "executed",
+  "scope": "report_only_training_then_one_step_action_evaluation_with_full_text_graph",
+  "assets": {
+    "step1_contract": "experiments/cml_map_scaling/configs/exploration.json",
+    "condition": "local1000",
+    "case": "official32",
+    "checkpoint": "final",
+    "map_file": "map.npz",
+    "inputs_file": "inputs.npz",
+    "graph_reference": "experiments/gcml_direct_api_path32/configs/path32_v1.json",
+    "node_count": 32,
+    "state_dim": 1000,
+    "q_storage": "node_by_dimension",
+    "input_keys": [
+      "adjacency",
+      "actions",
+      "graph_distances"
+    ],
+    "freeze_QV": true
+  },
+  "model": {
+    "id": "Qwen/Qwen3-4B-Instruct-2507",
+    "revision": "cdbee75f17c01a7cc42f958dc650907174af0554",
+    "modelscope_revision": "master",
+    "tokenizer_revision": "cdbee75f17c01a7cc42f958dc650907174af0554",
+    "mode": "instruct_only_non_thinking",
+    "dtype": "bfloat16",
+    "quantization": null,
+    "freeze_all_parameters": true,
+    "dropout": "disabled_via_eval_mode",
+    "adapter_insertion": "input_embeddings",
+    "state_tokens_per_role": 1,
+    "train_role_embeddings": false,
+    "model_card": "https://huggingface.co/Qwen/Qwen3-4B-Instruct-2507",
+    "chat_template": "native_tokenizer_template_no_enable_thinking_argument"
+  },
+  "adapter": {
+    "input_scaling": "divide_all_q_by_single_frozen_global_rms",
+    "parameter_dtype": "float32",
+    "output_cast": "model_dtype",
+    "linear": {
+      "bias": true
+    },
+    "mlp": {
+      "hidden_dim": 1024,
+      "activation": "GELU",
+      "bias": true
+    },
+    "initialization": "torch_linear_default",
+    "initialization_seed": 17,
+    "shared_across_nodes_and_roles": true,
+    "output_normalization": null,
+    "geometry_regularization": null
+  },
+  "conditions": [
+    {
+      "name": "linear_report",
+      "adapter": "linear"
+    },
+    {
+      "name": "mlp_report",
+      "adapter": "mlp"
+    }
+  ],
+  "data": {
+    "node_labels": "canonical_zero_based_decimal_ids",
+    "exclude_start_equals_goal": true,
+    "pair_order": "lexicographic_unordered_pairs_then_numpy_default_rng_permutation",
+    "split_seed": 17,
+    "unordered_pair_counts": {
+      "train": 396,
+      "validation": 50,
+      "test": 50
+    },
+    "directions": "both_directions_in_same_split",
+    "report_roles": [
+      "current",
+      "goal"
+    ],
+    "require_all_nodes_in_training": true,
+    "report_shuffle_seed": 18
+  },
+  "prompts": {
+    "language": "en",
+    "system": "You are solving a task on a fixed, undirected, unweighted graph. Follow the requested output format.",
+    "user": "Nodes are numbered from 0 to {max_node_id}. One move follows one edge.\nAdjacency list:\n{adjacency}\n{state_block}\n{question}",
+    "state_blocks": {
+      "canonical": "Current node: {current_state}\nGoal node: {goal_state}",
+      "heldout": "Goal node: {goal_state}\nCurrent node: {current_state}"
+    },
+    "questions": {
+      "canonical": {
+        "report_current": "Report the current node. Output only its node ID.",
+        "report_goal": "Report the goal node. Output only its node ID.",
+        "action": "Choose a next node adjacent to the current node whose shortest-path distance to the goal is strictly smaller. Output only the next node ID."
+      },
+      "heldout": {
+        "report_current": "Which node is the current location? Reply with the node ID only.",
+        "report_goal": "Which node is the destination? Reply with the node ID only.",
+        "action": "Take one legal step that reduces the minimum number of remaining edges to the destination. Reply with only the node ID reached by that step."
+      }
+    },
+    "adjacency_serialization": "one_line_per_node_ascending_ids_and_neighbors_as_node_colon_space_comma_space_list",
+    "graph_visible_in_all_tasks_and_conditions": true,
+    "train_and_select_template": "canonical",
+    "test_templates": [
+      "canonical",
+      "heldout"
+    ],
+    "answer_style": "node_id_only",
+    "few_shot_examples": false,
+    "inject_distance_or_candidate_answers": false
+  },
+  "training": {
+    "epochs": 10,
+    "report_batch_size": 32,
+    "drop_last_report_batch": false,
+    "initial_microbatch_size": 1,
+    "optimizer": "AdamW",
+    "learning_rate": 0.001,
+    "betas": [
+      0.9,
+      0.999
+    ],
+    "epsilon": 1e-08,
+    "weight_decay": 0.0,
+    "schedule": "constant",
+    "gradient_clip_norm": 1.0,
+    "loss": {
+      "name": "report_answer_cross_entropy",
+      "teacher_forcing": true,
+      "target": "tokenized_correct_node_id_followed_by_native_answer_end",
+      "ignore_index": -100,
+      "masked_positions": [
+        "prompt",
+        "state_slots",
+        "assistant_prefix",
+        "padding"
+      ],
+      "causal_alignment": "logits_at_t_minus_1_predict_label_at_t_shift_once",
+      "token_reduction": "mean_over_each_answers_unmasked_tokens_including_end",
+      "batch_reduction": "mean_of_per_sample_losses",
+      "gradient_accumulation": "microbatch_mean_times_microbatch_size_over_actual_effective_batch_size",
+      "trainable_parameters": "adapter_only",
+      "auxiliary_terms": []
+    },
+    "mask_prompt_labels": true,
+    "checkpoint_selection": [
+      "max_validation_report_exact_accuracy",
+      "min_validation_report_loss",
+      "earliest_epoch"
+    ],
+    "validation_frequency": "each_epoch",
+    "early_stopping": false,
+    "report_fixed_final_checkpoint_too": true,
+    "tasks": [
+      "report_current",
+      "report_goal"
+    ]
+  },
+  "generation": {
+    "do_sample": false,
+    "num_beams": 1,
+    "attempts_per_item": 1,
+    "max_new_tokens": 16,
+    "stop": "native_assistant_answer_end",
+    "parser": "strip_whitespace_then_fullmatch_0_or_nonzero_digit_followed_by_digits_then_range_check",
+    "truncate_input": false,
+    "retry_or_answer_repair": false
+  },
+  "evaluation": {
+    "unit": "ordered_start_goal_pair",
+    "text_control": "same_frozen_LM_with_true_current_and_goal_decimal_ids_no_adapter_no_training",
+    "checkpoints": [
+      "initial",
+      "selected",
+      "final"
+    ],
+    "perturbations_on_selected_canonical": [
+      "swap_current_and_goal_embeddings"
+    ],
+    "swap_scoring": "both_original_labels_and_swapped_semantic_labels_reported_separately",
+    "accuracy_denominator": "all_items_in_the_named_split_template_and_condition",
+    "primary": [
+      "current_report_exact_accuracy",
+      "goal_report_exact_accuracy",
+      "both_reports_correct_rate",
+      "one_step_success_rate"
+    ],
+    "diagnostics": [
+      "format_valid_rate",
+      "node_id_valid_rate",
+      "action_legal_rate",
+      "success_by_graph_distance",
+      "action_success_when_both_reports_correct",
+      "action_output_change_under_swap"
+    ],
+    "geometry": "spearman_graph_distance_vs_euclidean_distance_over_all_unordered_node_pairs_average_tie_ranks",
+    "geometry_representations": [
+      "raw_Q",
+      "adapter_initial",
+      "adapter_selected",
+      "adapter_final"
+    ],
+    "geometry_is_selection_criterion": false,
+    "successful_action": "adjacency[u,v] and graph_distance[v,g] < graph_distance[u,g]",
+    "accept_all_successful_next_nodes": true,
+    "test_after_all_conditions_and_checkpoint_choices_are_fixed": true,
+    "single_seed_pilot_no_significance_claim": true,
+    "action_split": "test",
+    "action_labels_used_for_training": false
+  },
+  "state_update": {
+    "step2_episode_length": 1,
+    "external_state_owner": "environment_executor",
+    "future_executed_move": "validate_edge_then_set_u_to_v_and_lookup_Q_row",
+    "use_report_to_overwrite_state": false,
+    "latent_V_rollout": false,
+    "search_tools_or_feedback_before_action": false
+  },
+  "smoke": {
+    "training_report_examples": 8,
+    "optimizer_steps": 8,
+    "reuse_smoke_weights_for_formal_run": false,
+    "record": [
+      "adapter_gradient",
+      "frozen_parameter_grad_absent",
+      "report_loss_before_after",
+      "answer_mask_and_multitoken_example",
+      "peak_gpu_memory",
+      "seconds_per_step"
+    ]
+  },
+  "runtime_binding_required": {
+    "asset_source_revision": null,
+    "python_version": null,
+    "numpy_version": null,
+    "torch_version": null,
+    "transformers_version": null,
+    "tokenizers_version": null
+  },
+  "outputs": {
+    "root": "runs/cml_step2",
+    "refuse_overwrite": true,
+    "shared": [
+      "config.json",
+      "runtime.json",
+      "split.json",
+      "adjacency.txt",
+      "text_control.jsonl"
+    ],
+    "per_condition": [
+      "initial.safetensors",
+      "selected.safetensors",
+      "final.safetensors",
+      "train.jsonl",
+      "validation.jsonl",
+      "predictions.jsonl",
+      "geometry.json",
+      "summary.json"
+    ],
+    "summary": "experiments/cml_map_scaling/results/step2_report.md"
+  }
+}

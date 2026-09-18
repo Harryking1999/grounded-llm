@@ -1,0 +1,52 @@
+{
+  "study": "cml_map_scaling_step2_few_action_pilot",
+  "base_run": "run_1791d00",
+  "base_source_commit": "1791d001e62254e2fa19678667a710658bc06098",
+  "base_condition": "mlp_report",
+  "base_checkpoint": "selected",
+  "rationale": "The matched node-ID grammar diagnostic preserved near-perfect MLP reports but only 8/100 and 6/100 actions succeeded. Test whether a small action-supervised continuation improves use of the readable states.",
+  "scope": "exploratory_fixed_graph_report_to_action_transfer",
+  "action_data": {
+    "source_split": "train",
+    "unordered_pairs": 40,
+    "directions": "both",
+    "pair_seed": 19,
+    "label_seed": 20,
+    "label_rule": "Choose one uniformly sampled legal distance-decreasing successor per ordered training pair; keep that label fixed. Evaluation accepts all successful successors."
+  },
+  "report_replay": {
+    "source_split": "train",
+    "examples": 80,
+    "seed": 21,
+    "selection": "Seeded permutation: first retain one report for every node and role, then fill to 80 from remaining examples."
+  },
+  "conditions": [
+    {"name": "report_continuation", "pool": "report_replay_twice"},
+    {"name": "report_plus_action", "pool": "report_replay_plus_80_actions"}
+  ],
+  "training": {
+    "epochs": 10,
+    "samples_per_epoch": 160,
+    "report_batch_size": 32,
+    "learning_rate": 0.0001,
+    "shuffle_seed": 22,
+    "trainable": "same_MLP_only",
+    "freeze": ["Q", "V", "LLM"],
+    "loss": "same_per_answer_mean_cross_entropy_including_native_EOS",
+    "optimizer_other_settings": "inherit_base_run",
+    "prompt": "original_canonical_only",
+    "selection": "fixed_final_epoch_no_test_or_validation_selection",
+    "compute_matching": "Both conditions use 1600 sample presentations and 50 updates; action supervision replaces half the report-only control presentations."
+  },
+  "evaluation": {
+    "checkpoint": "final",
+    "validation_templates": ["canonical"],
+    "test_templates": ["canonical", "heldout"],
+    "tasks": ["report_current", "report_goal", "action"],
+    "decoding": ["free", "node_id_grammar"],
+    "prompts_budget_parser_and_judge": "unchanged_from_base_run",
+    "geometry": "same_496_unordered_pairs",
+    "test_reuse": "Previously inspected pairs; post-hoc exploratory result, not a new confirmatory test.",
+    "decision": "Require an action gain over equal-budget report continuation under the same decoding condition, and inspect report retention plus heldout-template behavior. No claim of geometry use or cross-graph generalization."
+  }
+}

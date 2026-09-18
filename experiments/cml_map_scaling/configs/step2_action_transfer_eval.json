@@ -1,0 +1,29 @@
+{
+  "study": "cml_step2_action_training_transfer_to_full_text",
+  "base_source_commit": "1791d001e62254e2fa19678667a710658bc06098",
+  "training": false,
+  "conditions": [
+    {"name": "text_baseline", "adapter": null},
+    {"name": "text_plus_mlp_report", "adapter": "mlp", "checkpoint_source": "base", "checkpoint_condition": "mlp_report", "checkpoint": "selected"},
+    {"name": "text_plus_report_continuation", "adapter": "mlp", "checkpoint_source": "continuation", "checkpoint_condition": "report_continuation", "checkpoint": "final"},
+    {"name": "text_plus_report_plus_action", "adapter": "mlp", "checkpoint_source": "continuation", "checkpoint_condition": "report_plus_action", "checkpoint": "final"}
+  ],
+  "checkpoint": "selected",
+  "split": "test",
+  "tasks": ["action"],
+  "templates": ["canonical"],
+  "roadmap_scope": "Current and goal Q rows, one continuous token each; all conditions have the same text graph and explicit current/goal IDs.",
+  "prompts": {
+    "system": "You are solving a task on a fixed, undirected, unweighted graph.",
+    "user": "Nodes are numbered from 0 to {max_node_id}. One move follows one edge.\nAdjacency list:\n{adjacency}\nCurrent node: {u}\nGoal node: {g}{roadmap_block}\n\nChoose one next node adjacent to the current node whose shortest-path distance to the goal is strictly smaller. You may give a brief explanation. Clearly state your chosen move at the end as: Next node: <node ID>.",
+    "roadmap_block": "\n\nAdditional roadmap representation of the same current and goal states:\nCurrent node: {current_slot}\nGoal node: {goal_slot}"
+  },
+  "generation": {"do_sample": false, "num_beams": 1, "max_new_tokens": 4096, "attempts_per_item": 1, "grammar_constraint": false, "retry": false},
+  "scoring": {
+    "decision": "Extract the explicit decision before graph scoring; unresolved outputs require separate semantic review.",
+    "successful_action": "Any adjacent node with strictly smaller shortest-path distance to the goal.",
+    "accuracy_denominator": "All 100 ordered test pairs per condition."
+  },
+  "comparison": "Within-item matched four conditions: frozen text baseline; selected report MLP; equal-budget report-only continuation; report-plus-action continuation. All use the exact existing full-text prompt and generation policy.",
+  "interpretation": "Exploratory reuse of a fixed graph and previously inspected test pairs. The old action continuation was trained with hidden text IDs; this evaluates transfer to matched full-text augmentation. Compare action training chiefly to equal-budget report continuation. Additional vector tokens may affect completion as well as graph reasoning."
+}

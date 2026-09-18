@@ -1,0 +1,44 @@
+{
+  "study": "step2_decision_and_relations",
+  "training": false,
+  "base_training_source": "aafa2a5",
+  "checkpoint": "selected",
+  "seed": 20260918,
+  "action_tasks": [
+    "neighbor_direct",
+    "neighbor_reason"
+  ],
+  "probe_tasks": [
+    "distance_compare",
+    "transition_compare"
+  ],
+  "conditions": [
+    "text",
+    "linear_correct",
+    "linear_mismatch",
+    "mlp_correct",
+    "mlp_mismatch"
+  ],
+  "probe_extra_conditions": [
+    "linear_latent",
+    "mlp_latent"
+  ],
+  "generation": {
+    "reason_tokens": 512,
+    "batch_size": 8,
+    "do_sample": false,
+    "attempts": 1
+  },
+  "data": {
+    "action": "Original 100 directed test pairs, unchanged.",
+    "distance": "One unequal-distance B for each original (u,g), excluding u,g; include A/B reversal for balanced 200 questions.",
+    "transition": "Every legal neighbor B of each original (u,g); no class resampling; macro and per-class accuracy.",
+    "mismatch": "Single seeded node derangement shared across adapter types and tasks; same mapped node for repeated roles."
+  },
+  "interpretation": "Exploratory fixed-graph reuse. Neighbor oracle exposes legality, not distances. Latent-only 3-slot probes are a separate out-of-training-format diagnostic, not matched augmentation baselines.",
+  "node_counts": [
+    64,
+    128,
+    256
+  ]
+}

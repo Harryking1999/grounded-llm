@@ -1,0 +1,1047 @@
+{
+  "study": "cml_step2_action_training_transfer_to_full_text",
+  "acceptance_date": "2026-09-18",
+  "status": "32_64_128_256_reviewed",
+  "semantic_policy": "Accept declared natural-language actions independent of formatting. Later verification does not erase a selection without a replacement; the last explicit selection supersedes an earlier one. Never infer a choice from graph truth.",
+  "cases": {
+    "official32": {
+      "node_count": 32,
+      "status": "complete_semantic_review",
+      "run": "/zhanghanyue/experiment/grounded_llm/runs/cml_step2_action_transfer/run_116be47",
+      "summary": {
+        "conditions": {
+          "text_baseline": {
+            "total": 100,
+            "decision_identified": {
+              "successes": 95,
+              "total": 100,
+              "rate": 0.95
+            },
+            "node_id_valid": {
+              "successes": 95,
+              "total": 100,
+              "rate": 0.95
+            },
+            "action_legal": {
+              "successes": 95,
+              "total": 100,
+              "rate": 0.95
+            },
+            "one_step_success": {
+              "successes": 92,
+              "total": 100,
+              "rate": 0.92
+            },
+            "token_limit": {
+              "successes": 6,
+              "total": 100,
+              "rate": 0.06
+            },
+            "needs_review": 0,
+            "mean_generated_tokens": 2003.75,
+            "success_by_graph_distance": {
+              "1": {
+                "successes": 6,
+                "total": 6,
+                "rate": 1.0
+              },
+              "2": {
+                "successes": 9,
+                "total": 10,
+                "rate": 0.9
+              },
+              "3": {
+                "successes": 18,
+                "total": 18,
+                "rate": 1.0
+              },
+              "4": {
+                "successes": 29,
+                "total": 30,
+                "rate": 0.9666666666666667
+              },
+              "5": {
+                "successes": 14,
+                "total": 16,
+                "rate": 0.875
+              },
+              "6": {
+                "successes": 8,
+                "total": 10,
+                "rate": 0.8
+              },
+              "7": {
+                "successes": 8,
+                "total": 10,
+                "rate": 0.8
+              }
+            }
+          },
+          "text_plus_mlp_report": {
+            "total": 100,
+            "decision_identified": {
+              "successes": 95,
+              "total": 100,
+              "rate": 0.95
+            },
+            "node_id_valid": {
+              "successes": 95,
+              "total": 100,
+              "rate": 0.95
+            },
+            "action_legal": {
+              "successes": 95,
+              "total": 100,
+              "rate": 0.95
+            },
+            "one_step_success": {
+              "successes": 92,
+              "total": 100,
+              "rate": 0.92
+            },
+            "token_limit": {
+              "successes": 5,
+              "total": 100,
+              "rate": 0.05
+            },
+            "needs_review": 0,
+            "mean_generated_tokens": 2142.61,
+            "success_by_graph_distance": {
+              "1": {
+                "successes": 6,
+                "total": 6,
+                "rate": 1.0
+              },
+              "2": {
+                "successes": 10,
+                "total": 10,
+                "rate": 1.0
+              },
+              "3": {
+                "successes": 17,
+                "total": 18,
+                "rate": 0.9444444444444444
+              },
+              "4": {
+                "successes": 29,
+                "total": 30,
+                "rate": 0.9666666666666667
+              },
+              "5": {
+                "successes": 14,
+                "total": 16,
+                "rate": 0.875
+              },
+              "6": {
+                "successes": 8,
+                "total": 10,
+                "rate": 0.8
+              },
+              "7": {
+                "successes": 8,
+                "total": 10,
+                "rate": 0.8
+              }
+            }
+          },
+          "text_plus_report_continuation": {
+            "total": 100,
+            "decision_identified": {
+              "successes": 95,
+              "total": 100,
+              "rate": 0.95
+            },
+            "node_id_valid": {
+              "successes": 95,
+              "total": 100,
+              "rate": 0.95
+            },
+            "action_legal": {
+              "successes": 95,
+              "total": 100,
+              "rate": 0.95
+            },
+            "one_step_success": {
+              "successes": 91,
+              "total": 100,
+              "rate": 0.91
+            },
+            "token_limit": {
+              "successes": 8,
+              "total": 100,
+              "rate": 0.08
+            },
+            "needs_review": 0,
+            "mean_generated_tokens": 2213.94,
+            "success_by_graph_distance": {
+              "1": {
+                "successes": 6,
+                "total": 6,
+                "rate": 1.0
+              },
+              "2": {
+                "successes": 9,
+                "total": 10,
+                "rate": 0.9
+              },
+              "3": {
+                "successes": 15,
+                "total": 18,
+                "rate": 0.8333333333333334
+              },
+              "4": {
+                "successes": 30,
+                "total": 30,
+                "rate": 1.0
+              },
+              "5": {
+                "successes": 13,
+                "total": 16,
+                "rate": 0.8125
+              },
+              "6": {
+                "successes": 8,
+                "total": 10,
+                "rate": 0.8
+              },
+              "7": {
+                "successes": 10,
+                "total": 10,
+                "rate": 1.0
+              }
+            }
+          },
+          "text_plus_report_plus_action": {
+            "total": 100,
+            "decision_identified": {
+              "successes": 94,
+              "total": 100,
+              "rate": 0.94
+            },
+            "node_id_valid": {
+              "successes": 94,
+              "total": 100,
+              "rate": 0.94
+            },
+            "action_legal": {
+              "successes": 94,
+              "total": 100,
+              "rate": 0.94
+            },
+            "one_step_success": {
+              "successes": 90,
+              "total": 100,
+              "rate": 0.9
+            },
+            "token_limit": {
+              "successes": 8,
+              "total": 100,
+              "rate": 0.08
+            },
+            "needs_review": 0,
+            "mean_generated_tokens": 2115.04,
+            "success_by_graph_distance": {
+              "1": {
+                "successes": 6,
+                "total": 6,
+                "rate": 1.0
+              },
+              "2": {
+                "successes": 9,
+                "total": 10,
+                "rate": 0.9
+              },
+              "3": {
+                "successes": 17,
+                "total": 18,
+                "rate": 0.9444444444444444
+              },
+              "4": {
+                "successes": 28,
+                "total": 30,
+                "rate": 0.9333333333333333
+              },
+              "5": {
+                "successes": 14,
+                "total": 16,
+                "rate": 0.875
+              },
+              "6": {
+                "successes": 7,
+                "total": 10,
+                "rate": 0.7
+              },
+              "7": {
+                "successes": 9,
+                "total": 10,
+                "rate": 0.9
+              }
+            }
+          }
+        },
+        "matched_comparison": {
+          "text_plus_mlp_report": {
+            "both_success": 84,
+            "augmentation_only": 8,
+            "baseline_only": 8,
+            "both_failure": 0,
+            "success_difference_percentage_points": 0.0
+          },
+          "text_plus_report_continuation": {
+            "both_success": 85,
+            "augmentation_only": 6,
+            "baseline_only": 7,
+            "both_failure": 2,
+            "success_difference_percentage_points": -1.0000000000000009
+          },
+          "text_plus_report_plus_action": {
+            "both_success": 83,
+            "augmentation_only": 7,
+            "baseline_only": 9,
+            "both_failure": 1,
+            "success_difference_percentage_points": -2.0000000000000018
+          }
+        },
+        "failure_categories": {
+          "text_baseline": {
+            "success": 92,
+            "legal_not_closer": 3,
+            "no_unique_decision": 5
+          },
+          "text_plus_mlp_report": {
+            "success": 92,
+            "no_unique_decision": 5,
+            "legal_not_closer": 3
+          },
+          "text_plus_report_continuation": {
+            "success": 91,
+            "no_unique_decision": 5,
+            "legal_not_closer": 4
+          },
+          "text_plus_report_plus_action": {
+            "success": 90,
+            "legal_not_closer": 4,
+            "no_unique_decision": 6
+          }
+        },
+        "reference_condition": "text_baseline",
+        "manual_review_counts": {
+          "text_baseline": 12,
+          "text_plus_mlp_report": 7,
+          "text_plus_report_continuation": 13,
+          "text_plus_report_plus_action": 10
+        },
+        "decision_statuses": {
+          "text_baseline": {
+            "identified": 95,
+            "unanswered": 5
+          },
+          "text_plus_mlp_report": {
+            "identified": 95,
+            "unanswered": 5
+          },
+          "text_plus_report_continuation": {
+            "identified": 95,
+            "unanswered": 5
+          },
+          "text_plus_report_plus_action": {
+            "identified": 94,
+            "unanswered": 6
+          }
+        },
+        "source_commit": "116be4794d6c20adc183199828d0d7e88a974e89",
+        "base_source_commit": "1791d001e62254e2fa19678667a710658bc06098",
+        "evaluated_records": 400,
+        "unresolved_semantic_reviews": 0,
+        "completed_utc": "2026-09-17T17:58:48Z",
+        "started_utc": "2026-09-17T17:08:04Z",
+        "interpretation": "Exploratory reuse of a fixed graph and previously inspected test pairs. The old action continuation was trained with hidden text IDs; this evaluates transfer to matched full-text augmentation. Compare action training chiefly to equal-budget report continuation. Additional vector tokens may affect completion as well as graph reasoning.",
+        "training": false,
+        "roadmap_scope": "Current and goal Q rows, one continuous token each; all conditions have the same text graph and explicit current/goal IDs.",
+        "wall_seconds": 3044.0
+      },
+      "primary_comparison": {
+        "reference_condition": "text_plus_report_continuation",
+        "action_condition": "text_plus_report_plus_action",
+        "paired_counts": {
+          "both_success": 85,
+          "report_only": 6,
+          "both_failure": 4,
+          "action_only": 5,
+          "net_success_gain": -1
+        }
+      }
+    },
+    "random64_seed0": {
+      "node_count": 64,
+      "status": "complete_semantic_review",
+      "run": "/zhanghanyue/experiment/grounded_llm/runs/cml_step2_action_scaling/run_81dbc05/random64_seed0/evaluation",
+      "summary": {
+        "conditions": {
+          "text_plus_report_continuation": {
+            "total": 100,
+            "decision_identified": {
+              "successes": 86,
+              "total": 100,
+              "rate": 0.86
+            },
+            "node_id_valid": {
+              "successes": 86,
+              "total": 100,
+              "rate": 0.86
+            },
+            "action_legal": {
+              "successes": 86,
+              "total": 100,
+              "rate": 0.86
+            },
+            "one_step_success": {
+              "successes": 76,
+              "total": 100,
+              "rate": 0.76
+            },
+            "token_limit": {
+              "successes": 22,
+              "total": 100,
+              "rate": 0.22
+            },
+            "needs_review": 0,
+            "mean_generated_tokens": 2705.62,
+            "success_by_graph_distance": {
+              "1": {
+                "successes": 2,
+                "total": 2,
+                "rate": 1.0
+              },
+              "2": {
+                "successes": 8,
+                "total": 8,
+                "rate": 1.0
+              },
+              "3": {
+                "successes": 24,
+                "total": 26,
+                "rate": 0.9230769230769231
+              },
+              "4": {
+                "successes": 15,
+                "total": 22,
+                "rate": 0.6818181818181818
+              },
+              "5": {
+                "successes": 8,
+                "total": 16,
+                "rate": 0.5
+              },
+              "6": {
+                "successes": 13,
+                "total": 16,
+                "rate": 0.8125
+              },
+              "7": {
+                "successes": 6,
+                "total": 10,
+                "rate": 0.6
+              }
+            }
+          },
+          "text_plus_report_plus_action": {
+            "total": 100,
+            "decision_identified": {
+              "successes": 88,
+              "total": 100,
+              "rate": 0.88
+            },
+            "node_id_valid": {
+              "successes": 88,
+              "total": 100,
+              "rate": 0.88
+            },
+            "action_legal": {
+              "successes": 88,
+              "total": 100,
+              "rate": 0.88
+            },
+            "one_step_success": {
+              "successes": 83,
+              "total": 100,
+              "rate": 0.83
+            },
+            "token_limit": {
+              "successes": 15,
+              "total": 100,
+              "rate": 0.15
+            },
+            "needs_review": 0,
+            "mean_generated_tokens": 2573.84,
+            "success_by_graph_distance": {
+              "1": {
+                "successes": 2,
+                "total": 2,
+                "rate": 1.0
+              },
+              "2": {
+                "successes": 8,
+                "total": 8,
+                "rate": 1.0
+              },
+              "3": {
+                "successes": 23,
+                "total": 26,
+                "rate": 0.8846153846153846
+              },
+              "4": {
+                "successes": 16,
+                "total": 22,
+                "rate": 0.7272727272727273
+              },
+              "5": {
+                "successes": 13,
+                "total": 16,
+                "rate": 0.8125
+              },
+              "6": {
+                "successes": 14,
+                "total": 16,
+                "rate": 0.875
+              },
+              "7": {
+                "successes": 7,
+                "total": 10,
+                "rate": 0.7
+              }
+            }
+          }
+        },
+        "matched_comparison": {
+          "text_plus_report_plus_action": {
+            "both_success": 67,
+            "augmentation_only": 16,
+            "baseline_only": 9,
+            "both_failure": 8,
+            "success_difference_percentage_points": 6.999999999999995
+          }
+        },
+        "failure_categories": {
+          "text_plus_report_continuation": {
+            "success": 76,
+            "no_unique_decision": 14,
+            "legal_not_closer": 10
+          },
+          "text_plus_report_plus_action": {
+            "success": 83,
+            "no_unique_decision": 12,
+            "legal_not_closer": 5
+          }
+        },
+        "reference_condition": "text_plus_report_continuation",
+        "manual_review_counts": {
+          "text_plus_report_continuation": 26,
+          "text_plus_report_plus_action": 22
+        },
+        "decision_statuses": {
+          "text_plus_report_continuation": {
+            "identified": 86,
+            "unanswered": 14
+          },
+          "text_plus_report_plus_action": {
+            "identified": 88,
+            "unanswered": 12
+          }
+        },
+        "source_commit": "81dbc05cbb7e18f58bb01895fc158570bf75bf6a",
+        "base_source_commit": "aafa2a599ee4055214831b1506f5d95b0fc4787f",
+        "evaluated_records": 200,
+        "unresolved_semantic_reviews": 0,
+        "completed_utc": "2026-09-17T19:11:10Z",
+        "started_utc": "2026-09-17T17:28:13Z",
+        "interpretation": "Exploratory within-graph action-supervision transfer. Only two previously unevaluated checkpoints are generated; old scaling text/report baselines remain separate existing evidence. Compare action continuation chiefly against matched report continuation, not across graph sizes.",
+        "training": false,
+        "roadmap_scope": "Current and goal Q rows, one continuous token each; all conditions have the same text graph and explicit current/goal IDs.",
+        "wall_seconds": 6177.0
+      },
+      "primary_comparison": {
+        "reference_condition": "text_plus_report_continuation",
+        "action_condition": "text_plus_report_plus_action",
+        "paired_counts": {
+          "both_success": 67,
+          "both_failure": 8,
+          "action_only": 16,
+          "report_only": 9,
+          "net_success_gain": 7
+        }
+      },
+      "training": {
+        "source_commit": "81dbc05",
+        "completed": true,
+        "sample_presentations_per_condition": 3200,
+        "report_plus_action_epoch1_mixed_ce": 1.1317902706544771,
+        "report_plus_action_epoch10_mixed_ce": 0.2950736787344795,
+        "interpretation": "Teacher-forced cross-entropy, not generated training accuracy. The action condition averages report replay and action answers. No post-continuation state-report or relationship-probe acceptance is claimed.",
+        "report_continuation_epoch1_ce": 4.5680351809096466e-05,
+        "report_continuation_epoch10_ce": 1.2566614069342563e-06
+      }
+    },
+    "random128_seed0": {
+      "node_count": 128,
+      "status": "complete_semantic_review",
+      "run": "/zhanghanyue/experiment/grounded_llm/runs/cml_step2_action_scaling/run_81dbc05/random128_seed0/evaluation",
+      "interrupted_record_count": 156,
+      "expected_records": 200,
+      "missing_at_resume": 44,
+      "resume_source_commit": "e86e721",
+      "training": {
+        "source_commit": "81dbc05",
+        "completed": true,
+        "sample_presentations_per_condition": 6400,
+        "report_plus_action_epoch1_mixed_ce": 0.9963998201493297,
+        "report_plus_action_epoch10_mixed_ce": 0.22105633889893853,
+        "interpretation": "Teacher-forced cross-entropy, not generated training accuracy. The action condition averages report replay and action answers. No post-continuation state-report or relationship-probe acceptance is claimed.",
+        "report_continuation_epoch1_ce": 2.6185157596003707e-06,
+        "report_continuation_epoch10_ce": 1.852089407061719e-07
+      },
+      "summary": {
+        "conditions": {
+          "text_plus_report_continuation": {
+            "total": 100,
+            "decision_identified": {
+              "successes": 55,
+              "total": 100,
+              "rate": 0.55
+            },
+            "node_id_valid": {
+              "successes": 55,
+              "total": 100,
+              "rate": 0.55
+            },
+            "action_legal": {
+              "successes": 53,
+              "total": 100,
+              "rate": 0.53
+            },
+            "one_step_success": {
+              "successes": 47,
+              "total": 100,
+              "rate": 0.47
+            },
+            "token_limit": {
+              "successes": 50,
+              "total": 100,
+              "rate": 0.5
+            },
+            "needs_review": 0,
+            "mean_generated_tokens": 3500.31,
+            "success_by_graph_distance": {
+              "1": {
+                "successes": 4,
+                "total": 4,
+                "rate": 1.0
+              },
+              "2": {
+                "successes": 5,
+                "total": 6,
+                "rate": 0.8333333333333334
+              },
+              "3": {
+                "successes": 8,
+                "total": 12,
+                "rate": 0.6666666666666666
+              },
+              "4": {
+                "successes": 15,
+                "total": 24,
+                "rate": 0.625
+              },
+              "5": {
+                "successes": 12,
+                "total": 30,
+                "rate": 0.4
+              },
+              "6": {
+                "successes": 2,
+                "total": 12,
+                "rate": 0.16666666666666666
+              },
+              "7": {
+                "successes": 1,
+                "total": 8,
+                "rate": 0.125
+              },
+              "8": {
+                "successes": 0,
+                "total": 4,
+                "rate": 0.0
+              }
+            }
+          },
+          "text_plus_report_plus_action": {
+            "total": 100,
+            "decision_identified": {
+              "successes": 55,
+              "total": 100,
+              "rate": 0.55
+            },
+            "node_id_valid": {
+              "successes": 55,
+              "total": 100,
+              "rate": 0.55
+            },
+            "action_legal": {
+              "successes": 54,
+              "total": 100,
+              "rate": 0.54
+            },
+            "one_step_success": {
+              "successes": 47,
+              "total": 100,
+              "rate": 0.47
+            },
+            "token_limit": {
+              "successes": 47,
+              "total": 100,
+              "rate": 0.47
+            },
+            "needs_review": 0,
+            "mean_generated_tokens": 3244.8,
+            "success_by_graph_distance": {
+              "1": {
+                "successes": 4,
+                "total": 4,
+                "rate": 1.0
+              },
+              "2": {
+                "successes": 5,
+                "total": 6,
+                "rate": 0.8333333333333334
+              },
+              "3": {
+                "successes": 7,
+                "total": 12,
+                "rate": 0.5833333333333334
+              },
+              "4": {
+                "successes": 13,
+                "total": 24,
+                "rate": 0.5416666666666666
+              },
+              "5": {
+                "successes": 11,
+                "total": 30,
+                "rate": 0.36666666666666664
+              },
+              "6": {
+                "successes": 2,
+                "total": 12,
+                "rate": 0.16666666666666666
+              },
+              "7": {
+                "successes": 4,
+                "total": 8,
+                "rate": 0.5
+              },
+              "8": {
+                "successes": 1,
+                "total": 4,
+                "rate": 0.25
+              }
+            }
+          }
+        },
+        "matched_comparison": {
+          "text_plus_report_plus_action": {
+            "both_success": 32,
+            "augmentation_only": 15,
+            "baseline_only": 15,
+            "both_failure": 38,
+            "success_difference_percentage_points": 0.0
+          }
+        },
+        "failure_categories": {
+          "text_plus_report_continuation": {
+            "legal_not_closer": 6,
+            "no_unique_decision": 45,
+            "success": 47,
+            "other_nonadjacent": 2
+          },
+          "text_plus_report_plus_action": {
+            "no_unique_decision": 45,
+            "success": 47,
+            "legal_not_closer": 7,
+            "other_nonadjacent": 1
+          }
+        },
+        "reference_condition": "text_plus_report_continuation",
+        "manual_review_counts": {
+          "text_plus_report_continuation": 51,
+          "text_plus_report_plus_action": 49
+        },
+        "decision_statuses": {
+          "text_plus_report_continuation": {
+            "identified": 55,
+            "unanswered": 45
+          },
+          "text_plus_report_plus_action": {
+            "unanswered": 45,
+            "identified": 55
+          }
+        },
+        "source_commit": "81dbc05cbb7e18f58bb01895fc158570bf75bf6a",
+        "base_source_commit": "aafa2a599ee4055214831b1506f5d95b0fc4787f",
+        "evaluated_records": 200,
+        "unresolved_semantic_reviews": 0,
+        "completed_utc": "2026-09-18T00:13:15Z",
+        "started_utc": "2026-09-17T17:34:19Z",
+        "interpretation": "Exploratory within-graph action-supervision transfer. Only two previously unevaluated checkpoints are generated; old scaling text/report baselines remain separate existing evidence. Compare action continuation chiefly against matched report continuation, not across graph sizes.",
+        "training": false,
+        "roadmap_scope": "Current and goal Q rows, one continuous token each; all conditions have the same text graph and explicit current/goal IDs.",
+        "wall_seconds": 23936.0
+      },
+      "primary_comparison": {
+        "reference_condition": "text_plus_report_continuation",
+        "action_condition": "text_plus_report_plus_action",
+        "paired_counts": {
+          "both_success": 32,
+          "action_only": 15,
+          "report_only": 15,
+          "both_failure": 38,
+          "net_success_gain": 0
+        }
+      }
+    },
+    "random256_seed0": {
+      "node_count": 256,
+      "status": "complete_semantic_review",
+      "run": "/zhanghanyue/experiment/grounded_llm/runs/cml_step2_action_scaling/run_81dbc05/random256_seed0/evaluation",
+      "interrupted_record_count": 80,
+      "expected_records": 200,
+      "missing_at_resume": 120,
+      "resume_source_commit": "e86e721",
+      "training": {
+        "source_commit": "81dbc05",
+        "completed": true,
+        "sample_presentations_per_condition": 12800,
+        "report_plus_action_epoch1_mixed_ce": 1.9858811335814799,
+        "report_plus_action_epoch10_mixed_ce": 0.22299714740343007,
+        "interpretation": "Teacher-forced cross-entropy, not generated training accuracy. The action condition averages report replay and action answers. No post-continuation state-report or relationship-probe acceptance is claimed.",
+        "report_continuation_epoch1_ce": 4.743385895411567e-06,
+        "report_continuation_epoch10_ce": 2.4137534599399937e-07
+      },
+      "summary": {
+        "conditions": {
+          "text_plus_report_continuation": {
+            "total": 100,
+            "decision_identified": {
+              "successes": 26,
+              "total": 100,
+              "rate": 0.26
+            },
+            "node_id_valid": {
+              "successes": 26,
+              "total": 100,
+              "rate": 0.26
+            },
+            "action_legal": {
+              "successes": 26,
+              "total": 100,
+              "rate": 0.26
+            },
+            "one_step_success": {
+              "successes": 21,
+              "total": 100,
+              "rate": 0.21
+            },
+            "token_limit": {
+              "successes": 77,
+              "total": 100,
+              "rate": 0.77
+            },
+            "needs_review": 0,
+            "mean_generated_tokens": 3759.35,
+            "success_by_graph_distance": {
+              "1": {
+                "successes": 2,
+                "total": 2,
+                "rate": 1.0
+              },
+              "3": {
+                "successes": 1,
+                "total": 2,
+                "rate": 0.5
+              },
+              "4": {
+                "successes": 5,
+                "total": 16,
+                "rate": 0.3125
+              },
+              "5": {
+                "successes": 3,
+                "total": 16,
+                "rate": 0.1875
+              },
+              "6": {
+                "successes": 4,
+                "total": 28,
+                "rate": 0.14285714285714285
+              },
+              "7": {
+                "successes": 3,
+                "total": 20,
+                "rate": 0.15
+              },
+              "8": {
+                "successes": 3,
+                "total": 14,
+                "rate": 0.21428571428571427
+              },
+              "9": {
+                "successes": 0,
+                "total": 2,
+                "rate": 0.0
+              }
+            }
+          },
+          "text_plus_report_plus_action": {
+            "total": 100,
+            "decision_identified": {
+              "successes": 32,
+              "total": 100,
+              "rate": 0.32
+            },
+            "node_id_valid": {
+              "successes": 32,
+              "total": 100,
+              "rate": 0.32
+            },
+            "action_legal": {
+              "successes": 32,
+              "total": 100,
+              "rate": 0.32
+            },
+            "one_step_success": {
+              "successes": 24,
+              "total": 100,
+              "rate": 0.24
+            },
+            "token_limit": {
+              "successes": 71,
+              "total": 100,
+              "rate": 0.71
+            },
+            "needs_review": 0,
+            "mean_generated_tokens": 3740.66,
+            "success_by_graph_distance": {
+              "1": {
+                "successes": 2,
+                "total": 2,
+                "rate": 1.0
+              },
+              "3": {
+                "successes": 1,
+                "total": 2,
+                "rate": 0.5
+              },
+              "4": {
+                "successes": 6,
+                "total": 16,
+                "rate": 0.375
+              },
+              "5": {
+                "successes": 5,
+                "total": 16,
+                "rate": 0.3125
+              },
+              "6": {
+                "successes": 4,
+                "total": 28,
+                "rate": 0.14285714285714285
+              },
+              "7": {
+                "successes": 3,
+                "total": 20,
+                "rate": 0.15
+              },
+              "8": {
+                "successes": 3,
+                "total": 14,
+                "rate": 0.21428571428571427
+              },
+              "9": {
+                "successes": 0,
+                "total": 2,
+                "rate": 0.0
+              }
+            }
+          }
+        },
+        "matched_comparison": {
+          "text_plus_report_plus_action": {
+            "both_success": 11,
+            "augmentation_only": 13,
+            "baseline_only": 10,
+            "both_failure": 66,
+            "success_difference_percentage_points": 3.0
+          }
+        },
+        "failure_categories": {
+          "text_plus_report_continuation": {
+            "no_unique_decision": 74,
+            "success": 21,
+            "legal_not_closer": 5
+          },
+          "text_plus_report_plus_action": {
+            "success": 24,
+            "no_unique_decision": 68,
+            "legal_not_closer": 8
+          }
+        },
+        "reference_condition": "text_plus_report_continuation",
+        "manual_review_counts": {
+          "text_plus_report_continuation": 77,
+          "text_plus_report_plus_action": 73
+        },
+        "decision_statuses": {
+          "text_plus_report_continuation": {
+            "unanswered": 74,
+            "identified": 26
+          },
+          "text_plus_report_plus_action": {
+            "identified": 32,
+            "unanswered": 68
+          }
+        },
+        "source_commit": "81dbc05cbb7e18f58bb01895fc158570bf75bf6a",
+        "base_source_commit": "aafa2a599ee4055214831b1506f5d95b0fc4787f",
+        "evaluated_records": 200,
+        "unresolved_semantic_reviews": 0,
+        "completed_utc": "2026-09-18T01:38:05Z",
+        "started_utc": "2026-09-17T18:07:22Z",
+        "interpretation": "Exploratory within-graph action-supervision transfer. Only two previously unevaluated checkpoints are generated; old scaling text/report baselines remain separate existing evidence. Compare action continuation chiefly against matched report continuation, not across graph sizes.",
+        "training": false,
+        "roadmap_scope": "Current and goal Q rows, one continuous token each; all conditions have the same text graph and explicit current/goal IDs.",
+        "wall_seconds": 27043.0
+      },
+      "primary_comparison": {
+        "reference_condition": "text_plus_report_continuation",
+        "action_condition": "text_plus_report_plus_action",
+        "paired_counts": {
+          "both_success": 11,
+          "action_only": 13,
+          "report_only": 10,
+          "both_failure": 66,
+          "net_success_gain": 3
+        }
+      }
+    }
+  },
+  "interpretation": "Action supervision has no gain at 32 or 128 and a modest exploratory gain at 64 versus equal-budget report continuation. 256 remains incomplete. New saved-checkpoint fit, retention and relational diagnostics have been launched separately.",
+  "additional_evaluations": {
+    "source_commit": "5fe9c94",
+    "training": false,
+    "status": "launched_sanity_passed",
+    "assessment_config": "experiments/cml_map_scaling/configs/step2_action_assessment.json",
+    "diagnostics_config": "experiments/cml_map_scaling/configs/step2_action_diagnostics.json",
+    "assessment_run": "runs/cml_step2_action_assessment/run_5fe9c94",
+    "diagnostics_run": "runs/cml_step2_action_diagnostics/run_5fe9c94",
+    "comparison": "Equal-budget report continuation versus report-plus-action final weights, with original saved items. No repeated old text or original-report baselines."
+  }
+}

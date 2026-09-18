@@ -53,7 +53,7 @@
     "directories": ["training", "evaluation/new_permuted", "evaluation/existing_fixed_reference"],
     "weights": ["initial.safetensors", "final.safetensors"],
     "records": ["train.jsonl", "predictions.jsonl", "summary.json", "runtime.json", "completed.json"],
-    "report": "experiments/cml_map_scaling/results/step2_permutation_report.md",
+    "report": "experiments/cml_map_scaling/results/step2_acceptance.md",
     "overwrite": false
   },
   "interpretation": "Only the repeatedly relabeled report adapter is newly trained, independently for 64 and 128 nodes. Match each original fixed-label report run's initialization, full physical training data, sample order and update budget; use its existing weights as the reference on identical new test permutations without retraining. Preserve original identity outputs rather than regenerating them. This is not action training, an exact-distance test or cross-graph generalization. Structure matching to a fixed graph can explain success, and failure does not establish that Q lacks relational information."

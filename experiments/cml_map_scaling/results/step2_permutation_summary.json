@@ -1,0 +1,637 @@
+{
+  "study": "cml_step2_repeated_relabeling_report",
+  "source_commit": "27743f8",
+  "run": "/zhanghanyue/experiment/grounded_llm/runs/cml_step2_permutation_report/run_27743f8",
+  "cases": {
+    "random64_seed0": {
+      "training": {
+        "sample_presentations": 31680,
+        "optimizer_updates": 990,
+        "train_seconds": 541.5663723922335
+      },
+      "checkpoints": {
+        "new_permuted": {
+          "blocks": {
+            "identity_seen_pairs__identity__free": {
+              "current": {
+                "successes": 1,
+                "total": 80,
+                "rate": 0.0125
+              },
+              "goal": {
+                "successes": 2,
+                "total": 80,
+                "rate": 0.025
+              },
+              "both": {
+                "successes": 0,
+                "total": 80,
+                "rate": 0.0
+              }
+            },
+            "identity_test_pairs__identity__free": {
+              "current": {
+                "successes": 2,
+                "total": 100,
+                "rate": 0.02
+              },
+              "goal": {
+                "successes": 3,
+                "total": 100,
+                "rate": 0.03
+              },
+              "both": {
+                "successes": 0,
+                "total": 100,
+                "rate": 0.0
+              }
+            },
+            "seen_permutation_seen_pairs__train_0__free": {
+              "current": {
+                "successes": 0,
+                "total": 18,
+                "rate": 0.0
+              },
+              "goal": {
+                "successes": 0,
+                "total": 14,
+                "rate": 0.0
+              },
+              "both": {
+                "successes": 0,
+                "total": 32,
+                "rate": 0.0
+              }
+            },
+            "unseen_permutation_seen_pairs__test_0__free": {
+              "current": {
+                "successes": 0,
+                "total": 80,
+                "rate": 0.0
+              },
+              "goal": {
+                "successes": 0,
+                "total": 80,
+                "rate": 0.0
+              },
+              "both": {
+                "successes": 0,
+                "total": 80,
+                "rate": 0.0
+              }
+            },
+            "unseen_permutation_test_pairs__test_0__free": {
+              "current": {
+                "successes": 4,
+                "total": 100,
+                "rate": 0.04
+              },
+              "goal": {
+                "successes": 2,
+                "total": 100,
+                "rate": 0.02
+              },
+              "both": {
+                "successes": 0,
+                "total": 100,
+                "rate": 0.0
+              }
+            },
+            "unseen_permutation_seen_pairs__test_1__free": {
+              "current": {
+                "successes": 2,
+                "total": 80,
+                "rate": 0.025
+              },
+              "goal": {
+                "successes": 1,
+                "total": 80,
+                "rate": 0.0125
+              },
+              "both": {
+                "successes": 0,
+                "total": 80,
+                "rate": 0.0
+              }
+            },
+            "unseen_permutation_test_pairs__test_1__free": {
+              "current": {
+                "successes": 1,
+                "total": 100,
+                "rate": 0.01
+              },
+              "goal": {
+                "successes": 1,
+                "total": 100,
+                "rate": 0.01
+              },
+              "both": {
+                "successes": 0,
+                "total": 100,
+                "rate": 0.0
+              }
+            },
+            "unseen_permutation_seen_pairs__test_2__free": {
+              "current": {
+                "successes": 2,
+                "total": 80,
+                "rate": 0.025
+              },
+              "goal": {
+                "successes": 3,
+                "total": 80,
+                "rate": 0.0375
+              },
+              "both": {
+                "successes": 0,
+                "total": 80,
+                "rate": 0.0
+              }
+            },
+            "unseen_permutation_test_pairs__test_2__free": {
+              "current": {
+                "successes": 2,
+                "total": 100,
+                "rate": 0.02
+              },
+              "goal": {
+                "successes": 3,
+                "total": 100,
+                "rate": 0.03
+              },
+              "both": {
+                "successes": 0,
+                "total": 100,
+                "rate": 0.0
+              }
+            },
+            "unseen_permutation_seen_pairs__test_3__free": {
+              "current": {
+                "successes": 1,
+                "total": 80,
+                "rate": 0.0125
+              },
+              "goal": {
+                "successes": 1,
+                "total": 80,
+                "rate": 0.0125
+              },
+              "both": {
+                "successes": 0,
+                "total": 80,
+                "rate": 0.0
+              }
+            },
+            "unseen_permutation_test_pairs__test_3__free": {
+              "current": {
+                "successes": 2,
+                "total": 100,
+                "rate": 0.02
+              },
+              "goal": {
+                "successes": 2,
+                "total": 100,
+                "rate": 0.02
+              },
+              "both": {
+                "successes": 0,
+                "total": 100,
+                "rate": 0.0
+              }
+            }
+          },
+          "equivariance": {
+            "inverse_label_consistency": {
+              "successes": 1,
+              "total": 800,
+              "rate": 0.00125
+            },
+            "both_correct": {
+              "successes": 0,
+              "total": 800,
+              "rate": 0.0
+            },
+            "interpretation": "Consistent wrong identities count for consistency, but never for both_correct."
+          }
+        },
+        "existing_fixed_reference": {
+          "blocks": {
+            "identity_test_pairs__identity__free": {
+              "current": {
+                "successes": 100,
+                "total": 100,
+                "rate": 1.0
+              },
+              "goal": {
+                "successes": 100,
+                "total": 100,
+                "rate": 1.0
+              },
+              "both": {
+                "successes": 100,
+                "total": 100,
+                "rate": 1.0
+              }
+            },
+            "unseen_permutation_test_pairs__test_0__free": {
+              "current": {
+                "successes": 1,
+                "total": 100,
+                "rate": 0.01
+              },
+              "goal": {
+                "successes": 2,
+                "total": 100,
+                "rate": 0.02
+              },
+              "both": {
+                "successes": 0,
+                "total": 100,
+                "rate": 0.0
+              }
+            },
+            "unseen_permutation_test_pairs__test_1__free": {
+              "current": {
+                "successes": 1,
+                "total": 100,
+                "rate": 0.01
+              },
+              "goal": {
+                "successes": 1,
+                "total": 100,
+                "rate": 0.01
+              },
+              "both": {
+                "successes": 0,
+                "total": 100,
+                "rate": 0.0
+              }
+            },
+            "unseen_permutation_test_pairs__test_2__free": {
+              "current": {
+                "successes": 1,
+                "total": 100,
+                "rate": 0.01
+              },
+              "goal": {
+                "successes": 1,
+                "total": 100,
+                "rate": 0.01
+              },
+              "both": {
+                "successes": 0,
+                "total": 100,
+                "rate": 0.0
+              }
+            },
+            "unseen_permutation_test_pairs__test_3__free": {
+              "current": {
+                "successes": 0,
+                "total": 100,
+                "rate": 0.0
+              },
+              "goal": {
+                "successes": 0,
+                "total": 100,
+                "rate": 0.0
+              },
+              "both": {
+                "successes": 0,
+                "total": 100,
+                "rate": 0.0
+              }
+            }
+          },
+          "equivariance": {
+            "inverse_label_consistency": {
+              "successes": 7,
+              "total": 800,
+              "rate": 0.00875
+            },
+            "both_correct": {
+              "successes": 7,
+              "total": 800,
+              "rate": 0.00875
+            },
+            "interpretation": "Consistent wrong identities count for consistency, but never for both_correct."
+          }
+        }
+      }
+    },
+    "random128_seed0": {
+      "training": {
+        "sample_presentations": 63360,
+        "optimizer_updates": 1980,
+        "train_seconds": 2279.365148222074
+      },
+      "checkpoints": {
+        "new_permuted": {
+          "blocks": {
+            "identity_seen_pairs__identity__free": {
+              "current": {
+                "successes": 1,
+                "total": 160,
+                "rate": 0.00625
+              },
+              "goal": {
+                "successes": 2,
+                "total": 160,
+                "rate": 0.0125
+              },
+              "both": {
+                "successes": 0,
+                "total": 160,
+                "rate": 0.0
+              }
+            },
+            "identity_test_pairs__identity__free": {
+              "current": {
+                "successes": 2,
+                "total": 100,
+                "rate": 0.02
+              },
+              "goal": {
+                "successes": 1,
+                "total": 100,
+                "rate": 0.01
+              },
+              "both": {
+                "successes": 0,
+                "total": 100,
+                "rate": 0.0
+              }
+            },
+            "seen_permutation_seen_pairs__train_0__free": {
+              "current": {
+                "successes": 0,
+                "total": 18,
+                "rate": 0.0
+              },
+              "goal": {
+                "successes": 0,
+                "total": 14,
+                "rate": 0.0
+              },
+              "both": {
+                "successes": 0,
+                "total": 32,
+                "rate": 0.0
+              }
+            },
+            "unseen_permutation_seen_pairs__test_0__free": {
+              "current": {
+                "successes": 1,
+                "total": 160,
+                "rate": 0.00625
+              },
+              "goal": {
+                "successes": 1,
+                "total": 160,
+                "rate": 0.00625
+              },
+              "both": {
+                "successes": 0,
+                "total": 160,
+                "rate": 0.0
+              }
+            },
+            "unseen_permutation_test_pairs__test_0__free": {
+              "current": {
+                "successes": 0,
+                "total": 100,
+                "rate": 0.0
+              },
+              "goal": {
+                "successes": 0,
+                "total": 100,
+                "rate": 0.0
+              },
+              "both": {
+                "successes": 0,
+                "total": 100,
+                "rate": 0.0
+              }
+            },
+            "unseen_permutation_seen_pairs__test_1__free": {
+              "current": {
+                "successes": 1,
+                "total": 160,
+                "rate": 0.00625
+              },
+              "goal": {
+                "successes": 2,
+                "total": 160,
+                "rate": 0.0125
+              },
+              "both": {
+                "successes": 0,
+                "total": 160,
+                "rate": 0.0
+              }
+            },
+            "unseen_permutation_test_pairs__test_1__free": {
+              "current": {
+                "successes": 0,
+                "total": 100,
+                "rate": 0.0
+              },
+              "goal": {
+                "successes": 2,
+                "total": 100,
+                "rate": 0.02
+              },
+              "both": {
+                "successes": 0,
+                "total": 100,
+                "rate": 0.0
+              }
+            },
+            "unseen_permutation_seen_pairs__test_2__free": {
+              "current": {
+                "successes": 0,
+                "total": 160,
+                "rate": 0.0
+              },
+              "goal": {
+                "successes": 0,
+                "total": 160,
+                "rate": 0.0
+              },
+              "both": {
+                "successes": 0,
+                "total": 160,
+                "rate": 0.0
+              }
+            },
+            "unseen_permutation_test_pairs__test_2__free": {
+              "current": {
+                "successes": 1,
+                "total": 100,
+                "rate": 0.01
+              },
+              "goal": {
+                "successes": 1,
+                "total": 100,
+                "rate": 0.01
+              },
+              "both": {
+                "successes": 0,
+                "total": 100,
+                "rate": 0.0
+              }
+            },
+            "unseen_permutation_seen_pairs__test_3__free": {
+              "current": {
+                "successes": 3,
+                "total": 160,
+                "rate": 0.01875
+              },
+              "goal": {
+                "successes": 2,
+                "total": 160,
+                "rate": 0.0125
+              },
+              "both": {
+                "successes": 0,
+                "total": 160,
+                "rate": 0.0
+              }
+            },
+            "unseen_permutation_test_pairs__test_3__free": {
+              "current": {
+                "successes": 0,
+                "total": 100,
+                "rate": 0.0
+              },
+              "goal": {
+                "successes": 0,
+                "total": 100,
+                "rate": 0.0
+              },
+              "both": {
+                "successes": 0,
+                "total": 100,
+                "rate": 0.0
+              }
+            }
+          },
+          "equivariance": {
+            "inverse_label_consistency": {
+              "successes": 0,
+              "total": 800,
+              "rate": 0.0
+            },
+            "both_correct": {
+              "successes": 0,
+              "total": 800,
+              "rate": 0.0
+            },
+            "interpretation": "Consistent wrong identities count for consistency, but never for both_correct."
+          }
+        },
+        "existing_fixed_reference": {
+          "blocks": {
+            "identity_test_pairs__identity__free": {
+              "current": {
+                "successes": 100,
+                "total": 100,
+                "rate": 1.0
+              },
+              "goal": {
+                "successes": 100,
+                "total": 100,
+                "rate": 1.0
+              },
+              "both": {
+                "successes": 100,
+                "total": 100,
+                "rate": 1.0
+              }
+            },
+            "unseen_permutation_test_pairs__test_0__free": {
+              "current": {
+                "successes": 5,
+                "total": 100,
+                "rate": 0.05
+              },
+              "goal": {
+                "successes": 3,
+                "total": 100,
+                "rate": 0.03
+              },
+              "both": {
+                "successes": 0,
+                "total": 100,
+                "rate": 0.0
+              }
+            },
+            "unseen_permutation_test_pairs__test_1__free": {
+              "current": {
+                "successes": 0,
+                "total": 100,
+                "rate": 0.0
+              },
+              "goal": {
+                "successes": 0,
+                "total": 100,
+                "rate": 0.0
+              },
+              "both": {
+                "successes": 0,
+                "total": 100,
+                "rate": 0.0
+              }
+            },
+            "unseen_permutation_test_pairs__test_2__free": {
+              "current": {
+                "successes": 0,
+                "total": 100,
+                "rate": 0.0
+              },
+              "goal": {
+                "successes": 0,
+                "total": 100,
+                "rate": 0.0
+              },
+              "both": {
+                "successes": 0,
+                "total": 100,
+                "rate": 0.0
+              }
+            },
+            "unseen_permutation_test_pairs__test_3__free": {
+              "current": {
+                "successes": 2,
+                "total": 100,
+                "rate": 0.02
+              },
+              "goal": {
+                "successes": 2,
+                "total": 100,
+                "rate": 0.02
+              },
+              "both": {
+                "successes": 0,
+                "total": 100,
+                "rate": 0.0
+              }
+            }
+          },
+          "equivariance": {
+            "inverse_label_consistency": {
+              "successes": 12,
+              "total": 800,
+              "rate": 0.015
+            },
+            "both_correct": {
+              "successes": 12,
+              "total": 800,
+              "rate": 0.015
+            },
+            "interpretation": "Consistent wrong identities count for consistency, but never for both_correct."
+          }
+        }
+      }
+    }
+  }
+}

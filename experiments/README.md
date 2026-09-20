@@ -1,5 +1,17 @@
 # 实验 harness
 
+## 阅读入口
+
+| 研究 | 内容 |
+| --- | --- |
+| [cml_map_scaling](cml_map_scaling/README.md) | 当前主线：Q/V 地图结果与 Step 2 接口 runbook |
+| [qwen_path_blocks](qwen_path_blocks/README.md) | Qwen thinking 寻路／积木基线与 Sol 小批参考 |
+| [sol_dag_blocks](sol_dag_blocks/README.md) | Sol 新形状积木与有向图基线 |
+| [gcml_counterexamples](gcml_counterexamples/README.md) | Luna／Flash 基线与错误案例 |
+| [state_interface_pilot](state_interface_pilot/README.md) | 后续积木接口设计，尚未运行 |
+
+## 目录约定
+
 只有在具备具体假设或评测器时，才创建研究目录。默认结构为：
 
 ```text

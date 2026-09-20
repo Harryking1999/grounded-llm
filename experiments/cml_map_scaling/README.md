@@ -71,3 +71,14 @@ python -m experiments.cml_map_scaling.src.roadmap --input-root runs/cml_step1_ex
 ```
 
 输出独立单图、规模并排图和各规模“原图随机布局—学习地图 t-SNE”对照图的 PNG／SVG／PDF，以及每张图的节点坐标、真实边表和投影指标。追加 `--pairs-only` 可只更新原图／学习地图对照。
+
+### 二维长边与延长训练的比较
+
+128／256 节点 seed 0 图中，二维最长的 5 条单步边在高维中仅为平均单步边长的 1.02–1.16 倍；从 20 轮续训到 100 轮，距离秩相关基本不变。这两个 case 的结果支持二维投影拉伸的解释。图、逐边数据和各轮比较已加入[报告](results/report.md)。合同见 [long_edge_diagnostic.json](configs/long_edge_diagnostic.json)。
+
+以下输入目录应包含局部 1000 维条件的两个 case，每个 case 含 20 轮 `map.npz` 及其 `inputs.npz`；续训使用原数据和连续的重放随机序列。第二条命令仅导出结果，复用已有二维坐标，不重新拟合 t-SNE。
+
+```bash
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 python -m experiments.cml_map_scaling.src.long_edges --input-root runs/cml_step1_exploration/local1000 --run-dir runs/cml_long_edges_100
+python -m experiments.cml_map_scaling.src.long_edges --input-root runs/cml_step1_exploration/local1000 --run-dir runs/cml_long_edges_100 --output experiments/cml_map_scaling/results
+```

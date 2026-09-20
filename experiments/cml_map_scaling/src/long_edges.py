@@ -122,7 +122,7 @@ def export(config, input_root, run_dir, output):
         right.set_ylabel('二维边长 / 二维平均单步边长')
         right.set_title('同一条边在高维与二维中的相对长度', loc='left')
         right.set_ylim(0, 8.5)
-        right.set_xlim(.55, 1.3)
+        right.set_xlim(.7, 1.4)
     fig.subplots_adjust(left=.035, right=.97, bottom=.075, top=.95, wspace=.24, hspace=.27)
     save(fig, output / 'long_edge_projection')
     plt.close(fig)

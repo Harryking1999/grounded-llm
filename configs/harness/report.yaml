@@ -1,0 +1,50 @@
+schema_version: 1
+base_config: experiments/cml_map_scaling/configs/step2.json
+mode: run
+output: runs/harness_report
+data:
+  graph_path: experiments/gcml_direct_api_path32/configs/path32_v1.json
+  split_path: data/cache/official32/split.json
+  create_split: false
+model:
+  directory: models/Qwen3-4B-Instruct-2507
+  provenance: models/Qwen3-4B-Instruct-2507/provenance.json
+  device: cuda
+input: &latent
+  graph_text: true
+  current_id_text: false
+  goal_id_text: false
+  current_vector: true
+  goal_vector: true
+train_input: *latent
+eval_input: *latent
+train:
+  enabled: true
+  task: state_report
+  selection: validation
+eval:
+  task: [state_report, one_step_action]
+  split: test
+  templates: [canonical, heldout]
+  batch_size: 8
+  decoding: free
+conditions:
+  - name: linear_report
+    adapter: linear
+    evaluate_checkpoints: [initial, selected, final]
+  - name: mlp_report
+    adapter: mlp
+    evaluate_checkpoints: [initial, selected, final]
+  - name: text_control
+    adapter: null
+    train: false
+    train_input: &text
+      graph_text: true
+      current_id_text: true
+      goal_id_text: true
+      current_vector: false
+      goal_vector: false
+    eval_input: *text
+scoring:
+  type: strict_node
+diagnostics: [template_consistency, swap, geometry]

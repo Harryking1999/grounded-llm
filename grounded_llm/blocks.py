@@ -15,13 +15,19 @@ def resolve_blocks_config(raw, root):
     config = {k: copy.deepcopy(raw[k]) for k in keys}
     if raw.get('source_commit'):
         config['source_commit'] = raw['source_commit']
+    config['execution'] = copy.deepcopy(raw.get('execution', {'phase': 'all', 'shard_index': 0, 'num_shards': 1}))
+    execution = config['execution']
+    if not 0 <= execution['shard_index'] < execution['num_shards']:
+        raise ValueError('Invalid evaluation shard')
+    if execution['phase'] == 'eval' and not execution.get('training_run'):
+        raise ValueError('Evaluation requires a saved dataset/training run')
     config['assets'] = {'state_dim': raw['assets']['state_dim']}
     config['training'] = {k: config['training'][k] for k in (
         'enabled', 'epochs', 'report_batch_size', 'initial_microbatch_size', 'shuffle_seed',
         'tasks', 'selection', 'learning_rate', 'betas', 'epsilon', 'weight_decay', 'gradient_clip_norm')}
     config['generation'] = {k: config['generation'][k] for k in (
         'do_sample', 'num_beams', 'attempts_per_item', 'max_new_tokens', 'report_max_new_tokens', 'context_limit')}
-    config['evaluation'] = {k: config['evaluation'][k] for k in ('report_probe_count', 'paired_bootstrap_samples')}
+    config['evaluation'] = {k: config['evaluation'][k] for k in ('report_probe_count', 'paired_bootstrap_samples', 'report_batch_size')}
     if config['schema_version'] != 1 or config['mode'] != 'run':
         raise ValueError('Blocks requires schema 1 run mode')
     spec = config['blocks']

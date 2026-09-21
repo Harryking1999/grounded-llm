@@ -48,6 +48,14 @@ class BlocksTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             strict_json('{"row":1,"row":2}')
 
+    def test_inherited_numeric_contract_and_shard_validation(self):
+        self.assertIsInstance(self.config['training']['epsilon'], float)
+        self.assertEqual(self.config['assets'], {'state_dim': 100})
+        raw = load_config('experiments/state_interface_pilot/configs/blocks_smoke.json')
+        raw['execution'] = dict(phase='eval', shard_index=2, num_shards=2)
+        with self.assertRaises(ValueError):
+            resolve_blocks_config(raw, ROOT)
+
     def test_rollout_injects_only_after_correct_step(self):
         case = self.dataset['test'][0]
         task = self.task

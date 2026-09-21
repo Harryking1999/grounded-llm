@@ -81,11 +81,11 @@ class BlocksInterface:
         return losses(self, items, adapter)
 
     @torch.no_grad()
-    def generate_report(self, item, adapter):
-        batch = self.batch([item], adapter)
-        ids = generate_ids(self.model, batch['inputs_embeds'], batch['attention_mask'],
-                           self.generation_config(self.config['generation']['report_max_new_tokens']))[0].tolist()
-        return self.decode(ids)
+    def generate_reports(self, items, adapter):
+        batch = self.batch(items, adapter)
+        generated = generate_ids(self.model, batch['inputs_embeds'], batch['attention_mask'],
+                           self.generation_config(self.config['generation']['report_max_new_tokens']))
+        return [self.decode(ids.tolist()) for ids in generated]
 
     def generation_config(self, budget):
         return GenerationConfig(do_sample=False, num_beams=1, max_new_tokens=budget,

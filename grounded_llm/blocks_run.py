@@ -2,7 +2,7 @@
 from pathlib import Path
 import time
 
-from .artifacts import append_json, write_json
+from .artifacts import append_json, write_json, read_json, chunks
 from .blocks import (build_blocks_dataset, report_examples, planning_prompt,
                      score_step, strict_json, summarize_blocks)
 
@@ -64,7 +64,19 @@ def run_blocks(config):
     output = Path(config['output'])
     output.mkdir(parents=True, exist_ok=False)
     write_json(output / 'config.json', config)
-    task, dataset = build_blocks_dataset(config)
+    execution = config['execution']
+    phase = execution['phase']
+    if phase == 'eval':
+        from experiments.sol_dag_blocks.src.tasks import BlocksTask
+        source = Path(execution['training_run'])
+        source_config = read_json(source / 'config.json')
+        for key in ('blocks', 'model', 'adapter', 'generation', 'training'):
+            if source_config[key] != config[key]:
+                raise ValueError(f'Evaluation disagrees with saved training contract: {key}')
+        task = BlocksTask(read_json(config['blocks']['rules_config'])['blocks'])
+        dataset = read_json(source / 'dataset.json')
+    else:
+        task, dataset = build_blocks_dataset(config)
     write_json(output / 'dataset.json', dataset)
     write_json(output / 'provenance.json', provenance(config))
     model, tokenizer = load_model(config)
@@ -75,21 +87,24 @@ def run_blocks(config):
 
     def validate(active_interface, active_adapter, items, epoch):
         correct = 0
-        for item in items:
-            raw = active_interface.generate_report(item, active_adapter)
-            try:
-                matched = strict_json(raw) == item['rows']
-            except ValueError:
-                matched = False
-            correct += matched
-            append_json(output / 'report_predictions.jsonl', dict(id=item['id'], epoch=epoch,
-                        correct=matched, raw_output=raw, expected=item['rows']))
+        for batch in chunks(items, config['evaluation']['report_batch_size']):
+            for item, raw in zip(batch, active_interface.generate_reports(batch, active_adapter)):
+                try:
+                    matched = strict_json(raw) == item['rows']
+                except ValueError:
+                    matched = False
+                correct += matched
+                append_json(output / 'report_predictions.jsonl', dict(id=item['id'], epoch=epoch,
+                            correct=matched, raw_output=raw, expected=item['rows']))
         print(dict(epoch=epoch, report_correct=correct, total=len(items)), flush=True)
         return correct, len(items)
 
     torch.cuda.reset_peak_memory_stats()
     started = time.perf_counter()
-    if config['smoke']['enabled']:
+    if phase == 'eval':
+        if execution['condition'] != 'text':
+            load_adapter(source / 'adapter/selected.safetensors', adapter, interface.device)
+    elif config['smoke']['enabled']:
         items = training[:config['smoke']['training_report_examples']]
         optimizer = optimizer_for(config, adapter)
         before = mean_loss(interface, adapter, items, config['training']['initial_microbatch_size'])
@@ -115,18 +130,25 @@ def run_blocks(config):
         directory.mkdir()
         train(interface, adapter, training, validation, directory, validate)
         load_adapter(directory / 'selected.safetensors', adapter, interface.device)
-    write_json(output / 'training_cost.json', dict(seconds=time.perf_counter() - started,
-               peak_memory_bytes=torch.cuda.max_memory_allocated(),
-               trainable_parameters=sum(p.numel() for p in adapter.parameters())))
+    if phase != 'eval':
+        write_json(output / 'training_cost.json', dict(seconds=time.perf_counter() - started,
+                   peak_memory_bytes=torch.cuda.max_memory_allocated(),
+                   trainable_parameters=sum(p.numel() for p in adapter.parameters())))
     adapter.eval().requires_grad_(False)
     probe_count = config['evaluation']['report_probe_count']
     # Interleave difficulties so the readout probe covers the same difficulty range.
     probes = report_examples(sorted(dataset['test'], key=lambda c: (c['id'].rsplit('_', 1)[-1], c['difficulty'])))[:probe_count]
-    correct, total = validate(interface, adapter, probes, 'heldout_selected')
-    write_json(output / 'readout.json', dict(correct=correct, total=total))
+    correct, total = None, None
+    if phase != 'eval':
+        correct, total = validate(interface, adapter, probes, 'heldout_selected')
+        write_json(output / 'readout.json', dict(correct=correct, total=total))
+    if phase == 'train':
+        return dict(status='trained', readout_correct=correct, readout_total=total)
     rows = []
-    for case in dataset['test']:
+    for case in dataset['test'][execution['shard_index']::execution['num_shards']]:
         for condition in config['conditions']:
+            if execution.get('condition') and condition['name'] != execution['condition']:
+                continue
             row = episode(interface, adapter if condition['adapter'] else None, task, case, config)
             append_json(output / 'episodes.jsonl', row)
             rows.append(row)

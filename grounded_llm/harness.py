@@ -324,6 +324,11 @@ def main(argv=None):
     parser.add_argument('--model-dir')
     parser.add_argument('--model-provenance')
     parser.add_argument('--source-commit', help='Source revision when running a committed git archive')
+    parser.add_argument('--blocks-phase', choices=('all', 'train', 'eval'), default='all')
+    parser.add_argument('--training-run')
+    parser.add_argument('--condition', choices=('text', 'text_token'))
+    parser.add_argument('--shard-index', type=int, default=0)
+    parser.add_argument('--num-shards', type=int, default=1)
     args = parser.parse_args(argv)
     config = load_config(args.config)
     for key in ('output', 'predictions'):
@@ -338,6 +343,9 @@ def main(argv=None):
         config['model']['provenance'] = args.model_provenance
     if args.source_commit:
         config['source_commit'] = args.source_commit
+    if config.get('task_family') == 'blocks':
+        config['execution'] = dict(phase=args.blocks_phase, training_run=args.training_run,
+                                   condition=args.condition, shard_index=args.shard_index, num_shards=args.num_shards)
     config = resolve_config(config)
     if Path(config['output']).exists():
         raise FileExistsError('Choose a new output directory; existing results are never overwritten')

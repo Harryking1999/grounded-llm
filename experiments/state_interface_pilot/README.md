@@ -48,6 +48,12 @@ python -m grounded_llm.harness \
 测试题不参与选择。每个输出目录保存已解析合同、源码提交、模型来源、软件版本、数据划分、权重、
 原始逐步 token/文字与逐项裁判结果。已有输出目录拒绝覆盖。
 
+多卡执行仍使用同一入口：`--blocks-phase train` 只训练与读出评测；
+`--blocks-phase eval --training-run "$TRAIN" --condition text_token --shard-index 0 --num-shards 7`
+读取该运行已保存的数据及选中权重，仅执行索引对应的题目。文字组将 condition 改为 text，
+可以在训练过程中运行，因为不依赖权重。评测先检查输入、训练及生成配置与来源一致，
+分片只改变调度，不改变题目、预算、prompt 或 batch 内采样。报告生成可批处理，规划每题独立。
+
 ## 结果怎么读
 
 主比较为各难度配对解题率差；同时报告合法动作数、动作和报告均正确的连续步数、报告准确率、失败类型及成本。

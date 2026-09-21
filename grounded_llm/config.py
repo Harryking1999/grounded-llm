@@ -1,5 +1,6 @@
 """Resolve inherited configs and validate the executable harness contract."""
 import copy
+import json
 from pathlib import Path
 import yaml
 from .artifacts import ROOT
@@ -26,7 +27,8 @@ def load_config(path, root=ROOT, _seen=None):
     if path in seen:
         raise ValueError('Config inheritance cycle')
     seen.add(path)
-    config = yaml.safe_load(path.read_text(encoding='utf-8'))
+    raw_text = path.read_text(encoding='utf-8')
+    config = json.loads(raw_text) if path.suffix.lower() == '.json' else yaml.safe_load(raw_text)
     if not isinstance(config, dict):
         raise ValueError('Config must be a mapping')
     base = load_config(config['base_config'], root, seen) if config.get('base_config') else {}

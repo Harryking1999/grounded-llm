@@ -12,7 +12,7 @@
     "attention": "sdpa"
   },
   "assets": {"state_dim": 100},
-  "adapter": {"mlp": {"hidden_dim": 256}},
+  "adapter": {"input_scaling": "raw_binary_pixels_no_scaling", "mlp": {"hidden_dim": 256}},
   "conditions": [{"name": "text", "adapter": null}, {"name": "text_token", "adapter": "mlp"}],
   "blocks": {
     "rules_config": "experiments/sol_dag_blocks/configs/sol_medium.json",
@@ -39,7 +39,7 @@
     "shuffle_seed": 18,
     "tasks": ["report_board"],
     "selection": "validation",
-    "learning_rate": 0.001
+    "learning_rate": 0.0001
   },
   "generation": {
     "do_sample": false,

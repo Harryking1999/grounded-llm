@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 import random
 
-from .artifacts import read_json
+from .artifacts import read_json, read_jsonl, write_json
 from experiments.sol_dag_blocks.src.tasks import BlocksTask
 
 
@@ -19,7 +19,7 @@ def resolve_blocks_config(raw, root):
     execution = config['execution']
     if not 0 <= execution['shard_index'] < execution['num_shards']:
         raise ValueError('Invalid evaluation shard')
-    if execution['phase'] == 'eval' and not execution.get('training_run'):
+    if execution['phase'] in ('eval', 'summarize') and not execution.get('training_run'):
         raise ValueError('Evaluation requires a saved dataset/training run')
     config['assets'] = {'state_dim': raw['assets']['state_dim']}
     config['training'] = {k: config['training'][k] for k in (
@@ -176,4 +176,35 @@ def summarize_blocks(rows, config):
             changes[metric] = dict(mean_difference=float(diff.mean()),
                                    descriptive_95_percent_interval=np.quantile(bootstrap, [.025, .975]).tolist())
         result['paired'][f'blocks{difficulty}'] = dict(n=len(complete), **changes)
+    return result
+
+
+def collect_blocks_runs(training_run, episode_runs, output):
+    """Combine completed shards once, rejecting omissions and repeated episodes."""
+    training_run = Path(training_run)
+    config = read_json(training_run / 'config.json')
+    dataset = read_json(training_run / 'dataset.json')
+    expected = {(case['id'], condition['name']) for case in dataset['test'] for condition in config['conditions']}
+    seen, rows = set(), []
+    for directory in map(Path, episode_runs):
+        saved = read_json(directory / 'config.json')
+        for key in ('blocks', 'model', 'adapter', 'generation', 'training'):
+            if saved[key] != config[key]:
+                raise ValueError(f'Shard contract differs: {directory}, {key}')
+        for row in read_jsonl(directory / 'episodes.jsonl'):
+            key = row['id'], row['condition']
+            if key not in expected or key in seen:
+                raise ValueError(f'Unexpected or repeated episode: {key}')
+            seen.add(key)
+            rows.append(row)
+    if seen != expected:
+        raise ValueError(f'Incomplete paired evaluation: {len(seen)} / {len(expected)}')
+    result = summarize_blocks(rows, config)
+    result.update(readout=read_json(training_run / 'readout.json'),
+                  training=read_json(training_run / 'adapter/training_summary.json'),
+                  training_cost=read_json(training_run / 'training_cost.json'),
+                  source_runs=[str(p) for p in episode_runs], training_run=str(training_run))
+    output = Path(output)
+    output.mkdir(parents=True, exist_ok=False)
+    write_json(output / 'summary.json', result)
     return result

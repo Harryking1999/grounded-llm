@@ -1,11 +1,13 @@
 """Contract tests: no recovery, exact reporting and strictly matched continuations."""
 import copy
 import json
+import tempfile
+from pathlib import Path
 import unittest
 
-from grounded_llm.artifacts import ROOT
+from grounded_llm.artifacts import ROOT, write_json, append_json
 from grounded_llm.blocks import (build_blocks_dataset, planning_prompt, resolve_blocks_config,
-                                score_step, strict_json, summarize_blocks)
+                                score_step, strict_json, summarize_blocks, collect_blocks_runs)
 from grounded_llm.blocks_run import episode
 from grounded_llm.config import load_config
 
@@ -98,6 +100,29 @@ class BlocksTests(unittest.TestCase):
         self.assertNotIn('construction_reference', prompt)
         self.assertIn('board_after', prompt)
         self.assertIn('0-cells are holes', prompt)
+
+    def test_collector_requires_complete_unique_pairs(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            training, shard = root / 'train', root / 'shard'
+            training.mkdir()
+            shard.mkdir()
+            for directory in (training, shard):
+                write_json(directory / 'config.json', self.config)
+            write_json(training / 'dataset.json', {'test': [{'id': 'a'}]})
+            for name in ('readout.json', 'training_cost.json'):
+                write_json(training / name, {})
+            (training / 'adapter').mkdir()
+            write_json(training / 'adapter/training_summary.json', {})
+            row = dict(id='a', difficulty=2, solved=False, failure='illegal_action', steps=[],
+                       legal_actions=0, accepted_steps=0, generated_tokens=1, prefill_tokens=2, seconds=1)
+            append_json(shard / 'episodes.jsonl', dict(row, condition='text'))
+            with self.assertRaises(ValueError):
+                collect_blocks_runs(training, [shard], root / 'missing')
+            append_json(shard / 'episodes.jsonl', dict(row, condition='text_token'))
+            self.assertEqual(collect_blocks_runs(training, [shard], root / 'complete')['episodes'], 2)
+            with self.assertRaises(ValueError):
+                collect_blocks_runs(training, [shard, shard], root / 'duplicate')
 
 
 if __name__ == '__main__':

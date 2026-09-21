@@ -324,7 +324,8 @@ def main(argv=None):
     parser.add_argument('--model-dir')
     parser.add_argument('--model-provenance')
     parser.add_argument('--source-commit', help='Source revision when running a committed git archive')
-    parser.add_argument('--blocks-phase', choices=('all', 'train', 'eval'), default='all')
+    parser.add_argument('--blocks-phase', choices=('all', 'train', 'eval', 'summarize'), default='all')
+    parser.add_argument('--episode-runs', nargs='+')
     parser.add_argument('--training-run')
     parser.add_argument('--condition', choices=('text', 'text_token'))
     parser.add_argument('--shard-index', type=int, default=0)
@@ -350,6 +351,11 @@ def main(argv=None):
     if Path(config['output']).exists():
         raise FileExistsError('Choose a new output directory; existing results are never overwritten')
     if config.get('task_family') == 'blocks':
+        if args.blocks_phase == 'summarize':
+            from .blocks import collect_blocks_runs
+            result = collect_blocks_runs(args.training_run, args.episode_runs, config['output'])
+            print(f"blocks complete: {config['output']}; {result}")
+            return
         from .blocks_run import run_blocks
         result = run_blocks(config)
         print(f"blocks complete: {config['output']}; {result}")

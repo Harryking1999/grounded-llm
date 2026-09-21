@@ -3,11 +3,30 @@ import unittest
 from grounded_llm.artifacts import ROOT
 from grounded_llm.blocks import build_blocks_dataset, resolve_blocks_config
 from grounded_llm.blocks_readout import (build_readout_dataset, state_key, coverage_summary,
-                                        report_training_items, report_question, report_target, spatial_probe_items)
+                                        report_training_items, report_question, report_target, spatial_probe_items,
+                                        summarize_spatial_probe)
 from grounded_llm.config import load_config
 
 
 class ReadoutDataTests(unittest.TestCase):
+    def test_spatial_metrics_distinguish_correct_flip_from_constant_or_wrong_context(self):
+        import json
+        records = []
+        # Exact pair; constant answer; correct localized flip with wrong other pixels; invalid output.
+        for pair, predictions in enumerate([('010', '011'), ('010', '010'), ('100', '101'), ('invalid', '011')]):
+            for variant, target, prediction in zip(('original', 'one_pixel_flip'), ('010', '011'), predictions):
+                records.append(dict(pair=str(pair), variant=variant, target=json.dumps(target),
+                                    raw_output=json.dumps(prediction)))
+        result = summarize_spatial_probe(records)
+        self.assertEqual(result['pairs'], 4)
+        self.assertEqual(result['pairs_valid'], 3)
+        self.assertEqual(result['pairs_both_correct'], 1)
+        self.assertEqual(result['flip_bit_both_correct'], 2)
+        self.assertEqual(result['localized_correct_change'], 2)
+        self.assertEqual(result['rows_correct'], 4)
+        self.assertEqual(result['unchanged_cells_total'], 8)
+        self.assertEqual(result['unchanged_cells_equal'], 6)
+
     def test_row_target_and_matched_training_presentations(self):
         board = dict(id='a', task='report_board', rows=['001', '110', '010'])
         full = report_training_items([board], dict(seed=19, full_board_repeats=3, rows_per_board=0))

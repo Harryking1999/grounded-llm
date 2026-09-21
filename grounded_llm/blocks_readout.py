@@ -58,6 +58,54 @@ def spatial_probe_items(boards, spec):
     return pairs
 
 
+def summarize_spatial_probe(records):
+    """Count exact rows and localized responses to saved single-pixel interventions.
+
+    Invalid outputs receive no credit. Localized change does not imply the other
+    pixels are correct; full row/pair accuracy remains a separate metric.
+    """
+    import json
+    groups = {}
+    summary = dict(total=len(records), rows_correct=0, valid_rows=0,
+                   cell_matches=0, total_cells=0, pairs=0, pairs_valid=0,
+                   pairs_both_correct=0, flip_bit_both_correct=0,
+                   localized_correct_change=0, unchanged_cells_equal=0,
+                   unchanged_cells_total=0)
+    for record in records:
+        target = json.loads(record['target'])
+        try:
+            output = json.loads(record['raw_output'])
+        except ValueError:
+            output = None
+        valid = isinstance(output, str) and len(output) == len(target) and set(output) <= {'0', '1'}
+        if not valid:
+            output = None
+        summary['valid_rows'] += valid
+        summary['rows_correct'] += output == target
+        summary['total_cells'] += len(target)
+        summary['cell_matches'] += sum(a == b for a, b in zip(output, target)) if valid else 0
+        groups.setdefault(record['pair'], {})[record['variant']] = (target, output)
+    for pair in groups.values():
+        before, pred_before = pair['original']
+        after, pred_after = pair['one_pixel_flip']
+        changed = [i for i, (a, b) in enumerate(zip(before, after)) if a != b]
+        if len(before) != len(after) or len(changed) != 1:
+            raise ValueError('Spatial probe targets must differ at exactly one cell')
+        index = changed[0]
+        summary['pairs'] += 1
+        summary['unchanged_cells_total'] += len(before) - 1
+        summary['pairs_both_correct'] += pred_before == before and pred_after == after
+        if pred_before is None or pred_after is None:
+            continue
+        summary['pairs_valid'] += 1
+        flip_correct = pred_before[index] == before[index] and pred_after[index] == after[index]
+        same = sum(pred_before[i] == pred_after[i] for i in range(len(before)) if i != index)
+        summary['flip_bit_both_correct'] += flip_correct
+        summary['unchanged_cells_equal'] += same
+        summary['localized_correct_change'] += flip_correct and same == len(before) - 1
+    return summary
+
+
 def state_key(task, mask):
     return task.normalized_key(mask) if mask else ('empty',)
 

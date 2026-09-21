@@ -188,7 +188,7 @@ def run_blocks(config):
         # Keep this training stage entirely separate from the already inspected planning test set.
         selected = read_json(output / 'adapter/training_summary.json')
         if config.get('spatial_probe'):
-            from .blocks_readout import spatial_probe_items, report_target
+            from .blocks_readout import spatial_probe_items, report_target, summarize_spatial_probe
             probes = spatial_probe_items(readout_data['validation'], config['spatial_probe'])
             records = []
             for batch in chunks(probes, config['evaluation']['report_batch_size']):
@@ -203,10 +203,7 @@ def run_blocks(config):
                                category=item['category'])
                     records.append(row)
                     append_json(output / 'spatial_probe.jsonl', row)
-            pairs = [records[i:i+2] for i in range(0, len(records), 2)]
-            write_json(output / 'spatial_probe_summary.json', dict(
-                rows_correct=sum(r['correct'] for r in records), total=len(records),
-                pairs_both_correct=sum(all(r['correct'] for r in p) for p in pairs), pairs=len(pairs)))
+            write_json(output / 'spatial_probe_summary.json', summarize_spatial_probe(records))
             # Read a matched category sample from training to separate fitting from generalization.
             train_probes = spatial_probe_items(readout_data['train'], config['spatial_probe'])[::2]
             train_probes = [dict(item, task='report_board') for item in train_probes]

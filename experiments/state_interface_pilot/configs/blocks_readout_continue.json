@@ -1,0 +1,9 @@
+{
+  "base_config": "experiments/state_interface_pilot/configs/blocks_readout.json",
+  "training": {"epochs": 4, "validation_interval": 2},
+  "spatial_probe": {"boards": 32, "seed": 29},
+  "blocks": {
+    "row_report_prompt": "Read row {row} of the CURRENT board encoded by the state token. Row and column indices are zero-based. Output only a JSON string of exactly ten binary digits for columns 0 through 9 in that row."
+  },
+  "readout_supervision": {"seed": 19, "full_board_repeats": 5, "rows_per_board": 0}
+}

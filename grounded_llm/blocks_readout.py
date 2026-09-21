@@ -3,6 +3,61 @@ from collections import Counter
 import random
 
 
+def report_training_items(boards, spec):
+    """Expand the same boards into a matched number of full/row reports."""
+    rng = random.Random(spec['seed'])
+    items = []
+    for board in boards:
+        for repeat in range(spec['full_board_repeats']):
+            items.append(dict(board, id=f"{board['id']}_full{repeat}"))
+        for row in rng.sample(range(len(board['rows'])), spec['rows_per_board']):
+            items.append(dict(board, id=f"{board['id']}_row{row}", task='report_row', report_row=row))
+    return items
+
+
+def report_question(config, item):
+    if item['task'] == 'report_row':
+        row = item['report_row']
+        if type(row) is not int or not 0 <= row < len(item['rows']):
+            raise ValueError('Report row is outside the board')
+        return config['blocks']['row_report_prompt'].format(row=row)
+    if item['task'] != 'report_board':
+        raise ValueError('Unknown readout task')
+    return config['blocks']['report_prompt']
+
+
+def report_target(item):
+    import json
+    target = item['rows'][item['report_row']] if item['task'] == 'report_row' else item['rows']
+    return json.dumps(target, separators=(',', ':'))
+
+
+def spatial_probe_items(boards, spec):
+    """Balanced category sample, paired row queries differing in exactly one pixel."""
+    rng = random.Random(spec['seed'])
+    groups = {}
+    for item in boards:
+        groups.setdefault(item['category'], []).append(item)
+    for values in groups.values():
+        rng.shuffle(values)
+    selected = []
+    while len(selected) < min(spec['boards'], len(boards)):
+        for category in sorted(groups):
+            if groups[category] and len(selected) < spec['boards']:
+                selected.append(groups[category].pop())
+    pairs = []
+    for item in selected:
+        row, col = rng.randrange(len(item['rows'])), rng.randrange(len(item['rows'][0]))
+        original = dict(item, task='report_row', report_row=row, probe_pair=item['id'], variant='original')
+        rows = list(item['rows'])
+        cells = list(rows[row])
+        cells[col] = '1' if cells[col] == '0' else '0'
+        rows[row] = ''.join(cells)
+        changed = dict(original, id=item['id'] + '_flip', rows=rows, variant='one_pixel_flip', flipped_col=col)
+        pairs.extend([original, changed])
+    return pairs
+
+
 def state_key(task, mask):
     return task.normalized_key(mask) if mask else ('empty',)
 

@@ -77,7 +77,7 @@ def run_blocks(config):
                 raise ValueError(f'Evaluation disagrees with saved training contract: {key}')
         task = BlocksTask(read_json(config['blocks']['rules_config'])['blocks'])
         dataset = read_json(source / 'dataset.json')
-    elif phase == 'fit':
+    elif phase == 'fit' or (phase == 'train' and execution.get('training_run')):
         from experiments.sol_dag_blocks.src.tasks import BlocksTask
         task = BlocksTask(read_json(config['blocks']['rules_config'])['blocks'])
         dataset = read_json(Path(execution['training_run']) / 'dataset.json')
@@ -90,7 +90,14 @@ def run_blocks(config):
         if phase != 'train':
             raise ValueError('Diverse readout learning is training-only; no automatic planning')
         from .blocks_readout import build_readout_dataset, coverage_summary
-        readout_data = build_readout_dataset(task, dataset, config['readout_data'])
+        if execution.get('training_run'):
+            source_path = Path(execution['training_run'])
+            source_config = read_json(source_path / 'config.json')
+            if source_config['readout_data'] != config['readout_data']:
+                raise ValueError('Continuation must retain the same saved readout dataset contract')
+            readout_data = read_json(source_path / 'readout_dataset.json')
+        else:
+            readout_data = build_readout_dataset(task, dataset, config['readout_data'])
         write_json(output / 'readout_dataset.json', readout_data)
         write_json(output / 'coverage.json', coverage_summary(readout_data))
     model, tokenizer = load_model(config)
@@ -104,6 +111,12 @@ def run_blocks(config):
     validation = report_examples(dataset['validation'])
     if readout_data is not None:
         training, validation = readout_data['train'], readout_data['validation']
+        if config.get('readout_supervision'):
+            from .blocks_readout import report_training_items
+            training = report_training_items(training, config['readout_supervision'])
+            if set(i['task'] for i in training) - set(config['training']['tasks']):
+                raise ValueError('Training pool includes an unauthorized report task')
+            write_json(output / 'training_items.json', training)
     if phase == 'fit':
         # Fixed training boards only; neither development nor test labels guide this diagnostic.
         count = config['fit_diagnostic']['examples_per_difficulty']
@@ -174,6 +187,30 @@ def run_blocks(config):
     if readout_data is not None:
         # Keep this training stage entirely separate from the already inspected planning test set.
         selected = read_json(output / 'adapter/training_summary.json')
+        if config.get('spatial_probe'):
+            from .blocks_readout import spatial_probe_items, report_target
+            probes = spatial_probe_items(readout_data['validation'], config['spatial_probe'])
+            records = []
+            for batch in chunks(probes, config['evaluation']['report_batch_size']):
+                for item, raw in zip(batch, interface.generate_reports(batch, adapter)):
+                    try:
+                        parsed = strict_json(raw)
+                    except ValueError:
+                        parsed = None
+                    row = dict(id=item['id'], pair=item['probe_pair'], variant=item['variant'],
+                               correct=parsed == item['rows'][item['report_row']], raw_output=raw,
+                               target=report_target(item), report_row=item['report_row'],
+                               category=item['category'])
+                    records.append(row)
+                    append_json(output / 'spatial_probe.jsonl', row)
+            pairs = [records[i:i+2] for i in range(0, len(records), 2)]
+            write_json(output / 'spatial_probe_summary.json', dict(
+                rows_correct=sum(r['correct'] for r in records), total=len(records),
+                pairs_both_correct=sum(all(r['correct'] for r in p) for p in pairs), pairs=len(pairs)))
+            # Read a matched category sample from training to separate fitting from generalization.
+            train_probes = spatial_probe_items(readout_data['train'], config['spatial_probe'])[::2]
+            train_probes = [dict(item, task='report_board') for item in train_probes]
+            validate(interface, adapter, train_probes, 'training_selected_diagnostic')
         result = dict(status='readout_training_complete', training=selected,
                       ready_for_planning=False, planning_not_run=True)
         write_json(output / 'readout_training_summary.json', result)

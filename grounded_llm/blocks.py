@@ -31,6 +31,10 @@ def resolve_blocks_config(raw, root):
         config['fit_diagnostic'] = copy.deepcopy(raw['fit_diagnostic'])
     if raw.get('readout_data'):
         config['readout_data'] = copy.deepcopy(raw['readout_data'])
+    if raw.get('readout_supervision'):
+        config['readout_supervision'] = copy.deepcopy(raw['readout_supervision'])
+    if raw.get('spatial_probe'):
+        config['spatial_probe'] = copy.deepcopy(raw['spatial_probe'])
     config['generation'] = {k: config['generation'][k] for k in (
         'do_sample', 'num_beams', 'attempts_per_item', 'max_new_tokens', 'report_max_new_tokens', 'context_limit')}
     config['evaluation'] = {k: config['evaluation'][k] for k in ('report_probe_count', 'paired_bootstrap_samples', 'report_batch_size')}
@@ -50,7 +54,7 @@ def resolve_blocks_config(raw, root):
         raise ValueError('First pilot supports one token and empty goals')
     if config['conditions'] != [{'name': 'text', 'adapter': None}, {'name': 'text_token', 'adapter': 'mlp'}]:
         raise ValueError('Pilot requires the fixed paired text/text_token conditions')
-    if config['training']['tasks'] != ['report_board']:
+    if not set(config['training']['tasks']) <= {'report_board', 'report_row'}:
         raise ValueError('No action supervision in this study')
     if config['generation']['do_sample'] or config['generation']['attempts_per_item'] != 1:
         raise ValueError('One greedy trajectory per condition')

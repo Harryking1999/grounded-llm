@@ -6,6 +6,7 @@ from transformers import GenerationConfig, StoppingCriteria, StoppingCriteriaLis
 from .interface import replace_vectors
 from .training import losses
 from .inference import generate_ids
+from .blocks_readout import report_question, report_target
 
 
 class CompleteObject(StoppingCriteria):
@@ -70,9 +71,9 @@ class BlocksInterface:
                     position_ids=positions, labels=labels)
 
     def batch(self, items, adapter, supervised=False):
-        prompts = [self.chat(self.config['blocks']['report_prompt'] + '\nCurrent state: ' + self.slot)
-                   for _ in items]
-        answers = [self.encode(json.dumps(item['rows'], separators=(',', ':'))) + [self.end_id]
+        prompts = [self.chat(report_question(self.config, item) + '\nCurrent state: ' + self.slot)
+                   for item in items]
+        answers = [self.encode(report_target(item)) + [self.end_id]
                    for item in items] if supervised else None
         sequences = [p + a for p, a in zip(prompts, answers)] if supervised else prompts
         return self.tensor_batch(sequences, [[item['rows']] for item in items], adapter, answers)

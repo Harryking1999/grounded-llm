@@ -7,7 +7,8 @@ import unittest
 
 from grounded_llm.artifacts import ROOT, write_json, append_json
 from grounded_llm.blocks import (build_blocks_dataset, planning_prompt, resolve_blocks_config,
-                                score_step, strict_json, summarize_blocks, collect_blocks_runs)
+                                score_step, strict_json, summarize_blocks, collect_blocks_runs, report_diagnostics,
+                                require_readable_adapter)
 from grounded_llm.blocks_run import episode
 from grounded_llm.config import load_config
 
@@ -111,7 +112,7 @@ class BlocksTests(unittest.TestCase):
                 write_json(directory / 'config.json', self.config)
             write_json(training / 'dataset.json', {'test': [{'id': 'a'}]})
             for name in ('readout.json', 'training_cost.json'):
-                write_json(training / name, {})
+                write_json(training / name, {'correct': 0, 'total': 1} if name == 'readout.json' else {})
             (training / 'adapter').mkdir()
             write_json(training / 'adapter/training_summary.json', {})
             row = dict(id='a', difficulty=2, solved=False, failure='illegal_action', steps=[],
@@ -123,6 +124,23 @@ class BlocksTests(unittest.TestCase):
             self.assertEqual(collect_blocks_runs(training, [shard], root / 'complete')['episodes'], 2)
             with self.assertRaises(ValueError):
                 collect_blocks_runs(training, [shard, shard], root / 'duplicate')
+
+    def test_empty_baseline_does_not_hide_occupied_cell_failure(self):
+        row = dict(epoch='heldout', expected=['01', '00'], raw_output='["00","00"]')
+        value = report_diagnostics([row])['heldout']
+        self.assertEqual(value['cell_matches'], 3)
+        self.assertEqual(value['true_positive_occupied'], 0)
+        self.assertEqual(value['all_zero_outputs'], 1)
+
+    def test_zero_readout_blocks_planning(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / 'adapter'
+            path.mkdir()
+            write_json(path / 'training_summary.json', {'selected_validation_accuracy': 0})
+            with self.assertRaises(ValueError):
+                require_readable_adapter(tmp, self.config)
+            write_json(path / 'training_summary.json', {'selected_validation_accuracy': 1})
+            require_readable_adapter(tmp, self.config)
 
 
 if __name__ == '__main__':

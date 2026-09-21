@@ -4,7 +4,7 @@ import time
 
 from .artifacts import append_json, write_json, read_json, chunks
 from .blocks import (build_blocks_dataset, report_examples, planning_prompt,
-                     score_step, strict_json, summarize_blocks)
+                     score_step, strict_json, summarize_blocks, require_readable_adapter)
 
 
 def episode(interface, adapter, task, case, config):
@@ -62,10 +62,12 @@ def run_blocks(config):
     from .blocks_interface import BlocksInterface
 
     output = Path(config['output'])
-    output.mkdir(parents=True, exist_ok=False)
-    write_json(output / 'config.json', config)
     execution = config['execution']
     phase = execution['phase']
+    if phase == 'eval' and execution.get('condition') != 'text':
+        require_readable_adapter(execution['training_run'], config)
+    output.mkdir(parents=True, exist_ok=False)
+    write_json(output / 'config.json', config)
     if phase == 'eval':
         from experiments.sol_dag_blocks.src.tasks import BlocksTask
         source = Path(execution['training_run'])
@@ -75,6 +77,10 @@ def run_blocks(config):
                 raise ValueError(f'Evaluation disagrees with saved training contract: {key}')
         task = BlocksTask(read_json(config['blocks']['rules_config'])['blocks'])
         dataset = read_json(source / 'dataset.json')
+    elif phase == 'fit':
+        from experiments.sol_dag_blocks.src.tasks import BlocksTask
+        task = BlocksTask(read_json(config['blocks']['rules_config'])['blocks'])
+        dataset = read_json(Path(execution['training_run']) / 'dataset.json')
     else:
         task, dataset = build_blocks_dataset(config)
     write_json(output / 'dataset.json', dataset)
@@ -84,6 +90,14 @@ def run_blocks(config):
     adapter = make_adapter(config, 'mlp', model.config.hidden_size, interface.device)
     training = report_examples(dataset['train'])
     validation = report_examples(dataset['validation'])
+    if phase == 'fit':
+        # Fixed training boards only; neither development nor test labels guide this diagnostic.
+        count = config['fit_diagnostic']['examples_per_difficulty']
+        selected = [c for difficulty in config['blocks']['construction_counts']
+                    for c in [c for c in dataset['train'] if c['difficulty'] == difficulty][:count]]
+        training = [dict(id=c['id'], rows=c['grid'].split('/'), task='report_board') for c in selected]
+        validation = training
+        write_json(output / 'fit_items.json', training)
 
     def validate(active_interface, active_adapter, items, epoch):
         correct = 0
@@ -135,6 +149,34 @@ def run_blocks(config):
                    peak_memory_bytes=torch.cuda.max_memory_allocated(),
                    trainable_parameters=sum(p.numel() for p in adapter.parameters())))
     adapter.eval().requires_grad_(False)
+    if phase == 'fit':
+        correct, total = validate(interface, adapter, training, 'fit_selected')
+        # Rotate inputs while retaining original labels: a genuine reader follows the
+        # changed state, so original-label accuracy should fall.
+        rotated = training[1:] + training[:1]
+        outputs = interface.generate_reports(rotated, adapter)
+        original_matches, changed_matches = 0, 0
+        for original, changed, raw in zip(training, rotated, outputs):
+            try:
+                parsed = strict_json(raw)
+            except ValueError:
+                parsed = None
+            original_matches += parsed == original['rows']
+            changed_matches += parsed == changed['rows']
+            append_json(output / 'input_rotation.jsonl', dict(original_id=original['id'],
+                        input_id=changed['id'], raw_output=raw, follows_changed_input=parsed == changed['rows']))
+        result = dict(status='fit_diagnostic_only', exact=correct, total=total,
+                      rotated_original_matches=original_matches, rotated_input_matches=changed_matches,
+                      ready_for_planning=False)
+        write_json(output / 'fit_summary.json', result)
+        return result
+    if phase != 'eval' and not config['smoke']['enabled']:
+        try:
+            require_readable_adapter(output, config)
+        except ValueError as error:
+            result = dict(status='readout_not_ready', reason=str(error), ready_for_planning=False)
+            write_json(output / 'readout.json', result)
+            return result
     probe_count = config['evaluation']['report_probe_count']
     # Interleave difficulties so the readout probe covers the same difficulty range.
     probes = report_examples(sorted(dataset['test'], key=lambda c: (c['id'].rsplit('_', 1)[-1], c['difficulty'])))[:probe_count]
@@ -144,6 +186,10 @@ def run_blocks(config):
         write_json(output / 'readout.json', dict(correct=correct, total=total))
     if phase == 'train':
         return dict(status='trained', readout_correct=correct, readout_total=total)
+    if phase == 'all':
+        if config['smoke']['enabled']:
+            return dict(status='smoke_only_no_planning', readout_correct=correct, readout_total=total)
+        require_readable_adapter(output, config)
     rows = []
     for case in dataset['test'][execution['shard_index']::execution['num_shards']]:
         for condition in config['conditions']:

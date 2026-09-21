@@ -39,7 +39,7 @@ def train(interface, adapter, items, validation, output, validate):
             total_loss += loss * len(batch)
             append_json(output / 'train.jsonl', dict(epoch=epoch, step=step, samples=len(batch), loss=loss, gradient_norm=grad))
         row = dict(epoch=epoch, loss=total_loss / len(items), seconds=time.perf_counter() - started)
-        if spec['selection'] == 'validation':
+        if spec['selection'] == 'validation' and (epoch % spec.get('validation_interval', 1) == 0 or epoch == spec['epochs']):
             val_loss = mean_loss(interface, adapter, validation, microbatch)
             correct, count = validate(interface, adapter, validation, epoch)
             rank = (-correct / count, val_loss, epoch)
@@ -48,6 +48,8 @@ def train(interface, adapter, items, validation, output, validate):
                 save_adapter(output / 'selected.safetensors', adapter)
             row.update(validation_loss=val_loss, validation_correct=correct, validation_total=count, selected_epoch=selected_epoch)
         append_json(output / 'validation.jsonl', row)
+        if 'validation_correct' in row:
+            print(row, flush=True)
     save_adapter(output / 'final.safetensors', adapter)
     if spec['selection'] == 'final':
         selected_epoch = spec['epochs']

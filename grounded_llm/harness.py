@@ -324,7 +324,7 @@ def main(argv=None):
     parser.add_argument('--model-dir')
     parser.add_argument('--model-provenance')
     parser.add_argument('--source-commit', help='Source revision when running a committed git archive')
-    parser.add_argument('--blocks-phase', choices=('all', 'train', 'eval', 'summarize'), default='all')
+    parser.add_argument('--blocks-phase', choices=('all', 'train', 'fit', 'eval', 'summarize'), default='all')
     parser.add_argument('--episode-runs', nargs='+')
     parser.add_argument('--training-run')
     parser.add_argument('--condition', choices=('text', 'text_token'))

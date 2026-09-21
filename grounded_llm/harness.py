@@ -327,6 +327,7 @@ def main(argv=None):
     parser.add_argument('--blocks-phase', choices=('all', 'train', 'fit', 'eval', 'summarize'), default='all')
     parser.add_argument('--episode-runs', nargs='+')
     parser.add_argument('--training-run')
+    parser.add_argument('--adapter-init', help='Explicit adapter weights; optimizer is freshly initialized')
     parser.add_argument('--condition', choices=('text', 'text_token'))
     parser.add_argument('--shard-index', type=int, default=0)
     parser.add_argument('--num-shards', type=int, default=1)
@@ -346,7 +347,8 @@ def main(argv=None):
         config['source_commit'] = args.source_commit
     if config.get('task_family') == 'blocks':
         config['execution'] = dict(phase=args.blocks_phase, training_run=args.training_run,
-                                   condition=args.condition, shard_index=args.shard_index, num_shards=args.num_shards)
+                                   condition=args.condition, shard_index=args.shard_index, num_shards=args.num_shards,
+                                   adapter_init=args.adapter_init)
     config = resolve_config(config)
     if Path(config['output']).exists():
         raise FileExistsError('Choose a new output directory; existing results are never overwritten')

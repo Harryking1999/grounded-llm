@@ -85,11 +85,25 @@ def run_blocks(config):
         task, dataset = build_blocks_dataset(config)
     write_json(output / 'dataset.json', dataset)
     write_json(output / 'provenance.json', provenance(config))
+    readout_data = None
+    if config.get('readout_data'):
+        if phase != 'train':
+            raise ValueError('Diverse readout learning is training-only; no automatic planning')
+        from .blocks_readout import build_readout_dataset, coverage_summary
+        readout_data = build_readout_dataset(task, dataset, config['readout_data'])
+        write_json(output / 'readout_dataset.json', readout_data)
+        write_json(output / 'coverage.json', coverage_summary(readout_data))
     model, tokenizer = load_model(config)
     interface = BlocksInterface(config, model, tokenizer)
     adapter = make_adapter(config, 'mlp', model.config.hidden_size, interface.device)
+    if execution.get('adapter_init'):
+        if phase not in ('train', 'fit'):
+            raise ValueError('Adapter initialization applies only to training')
+        load_adapter(execution['adapter_init'], adapter, interface.device)
     training = report_examples(dataset['train'])
     validation = report_examples(dataset['validation'])
+    if readout_data is not None:
+        training, validation = readout_data['train'], readout_data['validation']
     if phase == 'fit':
         # Fixed training boards only; neither development nor test labels guide this diagnostic.
         count = config['fit_diagnostic']['examples_per_difficulty']
@@ -101,6 +115,7 @@ def run_blocks(config):
 
     def validate(active_interface, active_adapter, items, epoch):
         correct = 0
+        records = []
         for batch in chunks(items, config['evaluation']['report_batch_size']):
             for item, raw in zip(batch, active_interface.generate_reports(batch, active_adapter)):
                 try:
@@ -108,8 +123,15 @@ def run_blocks(config):
                 except ValueError:
                     matched = False
                 correct += matched
-                append_json(output / 'report_predictions.jsonl', dict(id=item['id'], epoch=epoch,
-                            correct=matched, raw_output=raw, expected=item['rows']))
+                row = dict(id=item['id'], epoch=epoch, category=item.get('category', 'constructed'),
+                           correct=matched, raw_output=raw, expected=item['rows'])
+                records.append(row)
+                append_json(output / 'report_predictions.jsonl', row)
+        from .blocks import report_diagnostics
+        summary = dict(epoch=epoch, overall=report_diagnostics(records), by_category={
+            category: report_diagnostics([r for r in records if r['category'] == category])
+            for category in sorted({r['category'] for r in records})})
+        append_json(output / 'readout_validation.jsonl', summary)
         print(dict(epoch=epoch, report_correct=correct, total=len(items)), flush=True)
         return correct, len(items)
 
@@ -149,6 +171,13 @@ def run_blocks(config):
                    peak_memory_bytes=torch.cuda.max_memory_allocated(),
                    trainable_parameters=sum(p.numel() for p in adapter.parameters())))
     adapter.eval().requires_grad_(False)
+    if readout_data is not None:
+        # Keep this training stage entirely separate from the already inspected planning test set.
+        selected = read_json(output / 'adapter/training_summary.json')
+        result = dict(status='readout_training_complete', training=selected,
+                      ready_for_planning=False, planning_not_run=True)
+        write_json(output / 'readout_training_summary.json', result)
+        return result
     if phase == 'fit':
         correct, total = validate(interface, adapter, training, 'fit_selected')
         # Rotate inputs while retaining original labels: a genuine reader follows the

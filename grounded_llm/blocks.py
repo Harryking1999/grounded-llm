@@ -29,6 +29,8 @@ def resolve_blocks_config(raw, root):
     config['readout_requirement'] = copy.deepcopy(raw.get('readout_requirement', {'minimum_exact_accuracy': 0.95}))
     if raw.get('fit_diagnostic'):
         config['fit_diagnostic'] = copy.deepcopy(raw['fit_diagnostic'])
+    if raw.get('readout_data'):
+        config['readout_data'] = copy.deepcopy(raw['readout_data'])
     config['generation'] = {k: config['generation'][k] for k in (
         'do_sample', 'num_beams', 'attempts_per_item', 'max_new_tokens', 'report_max_new_tokens', 'context_limit')}
     config['evaluation'] = {k: config['evaluation'][k] for k in ('report_probe_count', 'paired_bootstrap_samples', 'report_batch_size')}

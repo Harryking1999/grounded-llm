@@ -63,6 +63,23 @@ python -m grounded_llm.harness \
 `--blocks-phase fit --training-run "$TRAIN"` 读取原训练划分中固定棋盘。
 只做小集报告拟合与输入状态轮换检查，不启动规划、不测测试集；不将小集拟合正确率当泛化能力。
 
+## 多样像素状态的报告训练
+
+按用户补充要求，[blocks_readout.json](configs/blocks_readout.json) 覆盖不同占据率、合法移除中间态、
+多个不连通区域、孤立格、带孔洞局部区域及逐格破坏后的中间态。全空和全满是训练边界样本，
+不计作未见开发样本。像素读出不要求棋盘有解；后续规划题仍由原 `BlocksTask` 生成有解实例。
+生成器见 `grounded_llm/blocks_readout.py`，标签始终是完整二值棋盘，无动作或隐藏分解监督。
+原棋盘派生样本不跨家族划分，完全相同或平移等价状态不跨训练／开发／原规划测试集。
+
+使用同一 harness 的 `--blocks-phase train`，该配置仅允许报告训练，不自动解题。
+保存 `readout_dataset.json`、`coverage.json` 以及按状态类别分层的 `readout_validation.jsonl`；
+同时记录完整棋盘、格式有效性、全零输出、逐格匹配与占据格召回的原始计数。
+训练 epoch 数是本次运行预算，是否学会由自由生成读出决定。
+
+小集两百步后仅 2/8 正确但 loss 仍下降。`blocks_fit_continue.json` 用于进一步定位是否训练不足；
+`--adapter-init` 明确加载原权重，优化器重新初始化，不能称为恢复相同优化器轨迹。
+多样状态训练从头初始化，不使用小集诊断权重。
+
 ## 结果怎么读
 
 主比较为各难度配对解题率差；同时报告合法动作数、动作和报告均正确的连续步数、报告准确率、失败类型及成本。

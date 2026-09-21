@@ -15,6 +15,7 @@
 | 积木规则和真实转移 | 已有 `experiments/sol_dag_blocks/src/tasks.py::BlocksTask` |
 | 积木数据、逐步严格判分、配对指标 | `grounded_llm/blocks.py` |
 | 不同覆盖率、中间态、孤立格的读出数据 | `grounded_llm/blocks_readout.py` |
+| 坐标与标签均衡的单格采样、逐格重建指标 | `grounded_llm/blocks_cell.py` |
 | 像素输入、状态报告序列、JSON 边界 | `grounded_llm/blocks_interface.py` |
 | 积木训练回调和逐步 episode 编排 | `grounded_llm/blocks_run.py` |
 

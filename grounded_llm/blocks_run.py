@@ -64,6 +64,16 @@ def run_blocks(config):
     output = Path(config['output'])
     execution = config['execution']
     phase = execution['phase']
+    if execution.get('resume_checkpoint'):
+        if phase != 'train' or not execution.get('training_run') or execution.get('adapter_init'):
+            raise ValueError('Resume requires a training run and cannot also initialize separate adapter weights')
+        source = Path(execution['training_run'])
+        if Path(execution['resume_checkpoint']).resolve().parent != (source / 'adapter').resolve():
+            raise ValueError('Resume checkpoint must belong to the saved dataset run')
+        previous = read_json(source / 'config.json')
+        for key in ('blocks', 'model', 'adapter', 'readout_data', 'readout_supervision', 'cell_readout'):
+            if previous.get(key) != config.get(key):
+                raise ValueError(f'Resume contract differs: {key}')
     if phase == 'eval' and execution.get('condition') != 'text':
         require_readable_adapter(execution['training_run'], config)
     output.mkdir(parents=True, exist_ok=False)
@@ -117,6 +127,14 @@ def run_blocks(config):
             if set(i['task'] for i in training) - set(config['training']['tasks']):
                 raise ValueError('Training pool includes an unauthorized report task')
             write_json(output / 'training_items.json', training)
+        if config.get('cell_readout'):
+            from .blocks_cell import BalancedCellQueries, all_queries
+            training = BalancedCellQueries(readout_data['train'], config['cell_readout'])
+            validation = all_queries(readout_data['validation'])
+            write_json(output / 'cell_sampling.json', dict(
+                samples_per_epoch=len(training), validation_queries=len(validation),
+                balanced_over='coordinate_and_label', resampled_each_epoch=True,
+                per_board_sampling_not_uniform=True, specification=config['cell_readout']))
     if phase == 'fit':
         # Fixed training boards only; neither development nor test labels guide this diagnostic.
         count = config['fit_diagnostic']['examples_per_difficulty']
@@ -127,6 +145,30 @@ def run_blocks(config):
         write_json(output / 'fit_items.json', training)
 
     def validate(active_interface, active_adapter, items, epoch):
+        if config.get('cell_readout'):
+            from .blocks_cell import summarize_cells, all_queries
+            records = []
+            for batch in chunks(items, config['evaluation']['report_batch_size']):
+                for row in active_interface.predict_cells(batch, active_adapter):
+                    row['epoch'] = epoch
+                    append_json(output / 'cell_predictions.jsonl', row)
+                    records.append(row)
+            result = summarize_cells(records)
+            summary = dict(epoch=epoch, overall=result, by_category={
+                category: summarize_cells([r for r in records if r['category'] == category])
+                for category in sorted({r['category'] for r in records})})
+            append_json(output / 'cell_validation.jsonl', summary)
+            print(dict(epoch=epoch, cell_correct=result['correct'], total=result['total'],
+                       exact_boards=result['board_exact'], boards=result['complete_boards']), flush=True)
+            if isinstance(epoch, int):
+                from .blocks_readout import spatial_probe_items
+                categories = {b['category'] for b in readout_data['validation']}
+                pool = [b for b in readout_data['train'] if b['category'] in categories]
+                spec = config['cell_readout']
+                train_boards = spatial_probe_items(pool, dict(boards=spec['training_probe_boards'],
+                                                             seed=spec['diagnostic_seed']))[::2]
+                validate(active_interface, active_adapter, all_queries(train_boards), f'training_epoch_{epoch}')
+            return result['correct'], result['total'], result['mean_loss']
         correct = 0
         records = []
         for batch in chunks(items, config['evaluation']['report_batch_size']):
@@ -177,7 +219,7 @@ def run_blocks(config):
     else:
         directory = output / 'adapter'
         directory.mkdir()
-        train(interface, adapter, training, validation, directory, validate)
+        train(interface, adapter, training, validation, directory, validate, resume=execution.get('resume_checkpoint'))
         load_adapter(directory / 'selected.safetensors', adapter, interface.device)
     if phase != 'eval':
         write_json(output / 'training_cost.json', dict(seconds=time.perf_counter() - started,
@@ -185,6 +227,8 @@ def run_blocks(config):
                    trainable_parameters=sum(p.numel() for p in adapter.parameters())))
     adapter.eval().requires_grad_(False)
     if readout_data is not None:
+        if config.get('cell_readout') and config['smoke']['enabled']:
+            return dict(status='cell_smoke_complete', planning_not_run=True, ready_for_planning=False)
         # Keep this training stage entirely separate from the already inspected planning test set.
         selected = read_json(output / 'adapter/training_summary.json')
         if config.get('spatial_probe'):

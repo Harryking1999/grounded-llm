@@ -1,0 +1,26 @@
+{
+  "base_config": "experiments/state_interface_pilot/configs/blocks_readout.json",
+  "study": "blocks_single_token_cell_readout",
+  "blocks": {
+    "training_target": "queried_cell_single_bit",
+    "cell_report_prompt": "Read the CURRENT board encoded by the state token. What is the value at row {row}, column {col}? Rows and columns are zero-based, from 0 to 9. Output exactly one digit: 0 for empty, 1 for occupied."
+  },
+  "cell_readout": {
+    "seed": 31,
+    "samples_per_coordinate_label": 32,
+    "training_probe_boards": 32,
+    "diagnostic_seed": 29,
+    "loss": "full_vocabulary_cross_entropy_one_answer_bit_no_eos",
+    "selection_metric": "unconstrained_cell_accuracy",
+    "evaluation": "all_coordinates_of_every_validation_board"
+  },
+  "training": {
+    "tasks": ["report_cell"],
+    "epochs": 200,
+    "validation_interval": 10,
+    "validate_first_epoch": true,
+    "validation_loss_from_callback": true,
+    "save_training_state": true,
+    "convergence": {"minimum_epochs": 50, "checks": 5, "relative_min_improvement": 0.005}
+  }
+}

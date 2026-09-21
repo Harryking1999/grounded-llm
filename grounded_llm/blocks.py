@@ -26,6 +26,9 @@ def resolve_blocks_config(raw, root):
         'enabled', 'epochs', 'report_batch_size', 'initial_microbatch_size', 'shuffle_seed',
         'tasks', 'selection', 'learning_rate', 'betas', 'epsilon', 'weight_decay', 'gradient_clip_norm')}
     config['training']['validation_interval'] = raw['training'].get('validation_interval', 1)
+    for key in ('convergence', 'save_training_state', 'validation_loss_from_callback', 'validate_first_epoch'):
+        if key in raw['training']:
+            config['training'][key] = copy.deepcopy(raw['training'][key])
     config['readout_requirement'] = copy.deepcopy(raw.get('readout_requirement', {'minimum_exact_accuracy': 0.95}))
     if raw.get('fit_diagnostic'):
         config['fit_diagnostic'] = copy.deepcopy(raw['fit_diagnostic'])
@@ -35,6 +38,8 @@ def resolve_blocks_config(raw, root):
         config['readout_supervision'] = copy.deepcopy(raw['readout_supervision'])
     if raw.get('spatial_probe'):
         config['spatial_probe'] = copy.deepcopy(raw['spatial_probe'])
+    if raw.get('cell_readout'):
+        config['cell_readout'] = copy.deepcopy(raw['cell_readout'])
     config['generation'] = {k: config['generation'][k] for k in (
         'do_sample', 'num_beams', 'attempts_per_item', 'max_new_tokens', 'report_max_new_tokens', 'context_limit')}
     config['evaluation'] = {k: config['evaluation'][k] for k in ('report_probe_count', 'paired_bootstrap_samples', 'report_batch_size')}
@@ -54,7 +59,7 @@ def resolve_blocks_config(raw, root):
         raise ValueError('First pilot supports one token and empty goals')
     if config['conditions'] != [{'name': 'text', 'adapter': None}, {'name': 'text_token', 'adapter': 'mlp'}]:
         raise ValueError('Pilot requires the fixed paired text/text_token conditions')
-    if not set(config['training']['tasks']) <= {'report_board', 'report_row'}:
+    if not set(config['training']['tasks']) <= {'report_board', 'report_row', 'report_cell'}:
         raise ValueError('No action supervision in this study')
     if config['generation']['do_sample'] or config['generation']['attempts_per_item'] != 1:
         raise ValueError('One greedy trajectory per condition')
@@ -66,6 +71,8 @@ def resolve_blocks_config(raw, root):
 def require_readable_adapter(training_run, config):
     """Training completion alone never authorizes planning with an adapter."""
     saved_config = Path(training_run) / 'config.json'
+    if saved_config.exists() and read_json(saved_config).get('cell_readout'):
+        raise ValueError('Cell-query accuracy is not full-board generation; planning transfer requires a separate protocol')
     if saved_config.exists() and read_json(saved_config).get('execution', {}).get('phase') == 'fit':
         raise ValueError('Small-set fit is not independent validation and cannot authorize planning')
     path = Path(training_run) / 'adapter/training_summary.json'

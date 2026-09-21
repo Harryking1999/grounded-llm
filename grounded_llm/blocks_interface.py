@@ -73,13 +73,40 @@ class BlocksInterface:
     def batch(self, items, adapter, supervised=False):
         prompts = [self.chat(report_question(self.config, item) + '\nCurrent state: ' + self.slot)
                    for item in items]
-        answers = [self.encode(report_target(item)) + [self.end_id]
+        answers = [self.encode(report_target(item)) + ([] if item['task'] == 'report_cell' else [self.end_id])
                    for item in items] if supervised else None
         sequences = [p + a for p, a in zip(prompts, answers)] if supervised else prompts
         return self.tensor_batch(sequences, [[item['rows']] for item in items], adapter, answers)
 
     def losses(self, items, adapter):
         return losses(self, items, adapter)
+
+    @torch.no_grad()
+    def predict_cells(self, items, adapter):
+        """One unconstrained next-token read per query, with full-vocabulary CE."""
+        bit_ids = [self.encode(str(bit)) for bit in (0, 1)]
+        if any(len(ids) != 1 for ids in bit_ids):
+            raise ValueError('Cell readout requires a single vocabulary token for each bit')
+        bit_ids = [ids[0] for ids in bit_ids]
+        batch = self.batch(items, adapter)
+        output = self.model.model(inputs_embeds=batch['inputs_embeds'],
+                                  attention_mask=batch['attention_mask'],
+                                  position_ids=batch['position_ids'], use_cache=False)
+        logits = self.model.lm_head(output.last_hidden_state[:, -1]).float()
+        targets = torch.tensor([int(report_target(item)) for item in items], device=self.device)
+        binary_logits = logits[:, bit_ids]
+        losses = torch.nn.functional.cross_entropy(logits, torch.tensor(bit_ids, device=self.device)[targets], reduction='none')
+        binary_losses = torch.nn.functional.cross_entropy(binary_logits, targets, reduction='none')
+        predictions = logits.argmax(-1).tolist()
+        binary_predictions = binary_logits.argmax(-1).tolist()
+        bit_probs = binary_logits.softmax(-1)[:, 1].tolist()
+        return [dict(board_id=item['board_id'], category=item['category'], row=item['report_row'],
+                     col=item['report_col'], board_cells=len(''.join(item['rows'])), target=int(report_target(item)),
+                     predicted=bit_ids.index(pred) if pred in bit_ids else None,
+                     predicted_token=pred, binary_predicted=binary_predictions[index],
+                     occupied_probability=bit_probs[index], loss=float(losses[index]),
+                     binary_loss=float(binary_losses[index]))
+                for index, (item, pred) in enumerate(zip(items, predictions))]
 
     @torch.no_grad()
     def generate_reports(self, items, adapter):

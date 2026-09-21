@@ -91,6 +91,37 @@ python -m grounded_llm.harness \
 开发集继续以完整棋盘报告选模；另保存类别平衡的训练集读出和开发集单像素翻转后的行读出诊断。
 部分像素准确或行报告成功不能直接放行规划。
 
+## 单格查询 CE 与断点续训
+
+用户指出小集每板训练次数远多于多样集，随后指定改用单格查询重新训练。
+短程结果只描述当时权重，不能比较收敛后的泛化能力。完整报告长程续训尚未启动，本轮改为
+[blocks_cell.json](configs/blocks_cell.json)：重新初始化 adapter，保持冻结 Qwen 与单个状态 token，
+只训练 `p(bit | token, row, col)` 的普通全词表交叉熵。只监督一个答案 bit，无 EOS、行报告、完整棋盘或 swap loss。
+前缀不包含其他真实格子的答案；没有额外可训练解码器。
+
+采样器每轮重新从既有训练棋盘抽取查询，精确均衡坐标 × 0/1；不声称每张棋盘采样次数均等，
+也不声称这完全消除了覆盖率相关性。模型选取按全部开发棋盘、全部坐标的未约束下一 token 正确率，再按 CE。
+同时报告占据／空格准确率、类别平衡准确率，以及逐格拼回棋盘的 exact；另报告只在 0/1 logits 间选择的诊断结果，
+不与未约束输出混合。逐格重建成功不等于完整棋盘自回归生成成功，也不能直接放行原规划协议。
+每次验证都读取固定训练子集，帮助区分未拟合与泛化差距。
+
+共同平台期要求训练 loss 与开发 loss 均无明显改善，且开发主指标不再改善。
+预算、门槛、检查间隔以配置为准。它是操作性停止标准，不是全局最优或读出成功的证明；
+预算耗尽仍未进入平台时必须标为未确认收敛。
+
+长程训练保存 `adapter/latest.pt`，包含 adapter、优化器、洗牌状态、已完成轮数、历史曲线和选中权重，
+通过临时文件替换避免中断写入破坏上一检查点。节点中断后用同一份已提交代码和配置，在新输出目录中运行：
+
+```sh
+python -m grounded_llm.harness --config experiments/state_interface_pilot/configs/blocks_cell.json \
+  --model-dir "$MODEL" --model-provenance "$MODEL/step2_provenance.json" --blocks-phase train \
+  --training-run "$PREVIOUS" --resume-checkpoint "$PREVIOUS/adapter/latest.pt" --output "$NEW_RUN"
+```
+
+`--resume-checkpoint` 与 `--adapter-init` 互斥；前者恢复训练状态，后者只是加载权重重新优化。
+恢复后的预算轮数包括检查点已经完成的轮数，每轮查询由轮号确定，不重新抽取已完成轮次。
+小型确定性测试确认中断恢复后的参数与连续训练一致；不承诺不同 GPU／软件环境下逐位复现。
+
 ## 结果怎么读
 
 主比较为各难度配对解题率差；同时报告合法动作数、动作和报告均正确的连续步数、报告准确率、失败类型及成本。

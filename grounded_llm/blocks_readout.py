@@ -16,6 +16,11 @@ def report_training_items(boards, spec):
 
 
 def report_question(config, item):
+    if item['task'] == 'report_cell':
+        row, col = item['report_row'], item['report_col']
+        if type(row) is not int or type(col) is not int or not (0 <= row < len(item['rows']) and 0 <= col < len(item['rows'][row])):
+            raise ValueError('Cell coordinate is outside the board')
+        return config['blocks']['cell_report_prompt'].format(row=row, col=col)
     if item['task'] == 'report_row':
         row = item['report_row']
         if type(row) is not int or not 0 <= row < len(item['rows']):
@@ -28,6 +33,8 @@ def report_question(config, item):
 
 def report_target(item):
     import json
+    if item['task'] == 'report_cell':
+        return item['rows'][item['report_row']][item['report_col']]
     target = item['rows'][item['report_row']] if item['task'] == 'report_row' else item['rows']
     return json.dumps(target, separators=(',', ':'))
 

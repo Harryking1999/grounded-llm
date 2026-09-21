@@ -18,7 +18,22 @@ def load_adapter(path, adapter, device):
     adapter.load_state_dict(load_file(str(path), device=str(device)))
     return adapter
 
-def train(interface, adapter, items, validation, output, validate):
+def joint_loss_plateau(history, spec):
+    """Operational plateau of both losses, never a claim of successful learning."""
+    checks = [row for row in history if 'validation_loss' in row]
+    if not spec or not checks or checks[-1]['epoch'] < spec['minimum_epochs'] or len(checks) < spec['checks']:
+        return False
+    window = checks[-spec['checks']:]
+    for key in ('loss', 'validation_loss'):
+        first = window[0][key]
+        improvement = (first - min(row[key] for row in window[1:])) / max(abs(first), 1e-12)
+        if improvement >= spec['relative_min_improvement']:
+            return False
+    first_accuracy = window[0]['validation_correct'] / window[0]['validation_total']
+    return max(row['validation_correct'] / row['validation_total'] for row in window[1:]) <= first_accuracy
+
+
+def train(interface, adapter, items, validation, output, validate, resume=None):
     """One training loop for report, action and matched replay conditions.
 
     validate is supplied by the harness. It returns (correct, total), keeping
@@ -28,9 +43,29 @@ def train(interface, adapter, items, validation, output, validate):
     microbatch = spec['initial_microbatch_size']
     optimizer = optimizer_for(interface.config, adapter)
     rng = np.random.default_rng(spec['shuffle_seed'])
+    best, selected_epoch, selected_state = None, None, None
+    start_epoch, history = 0, []
+    if resume:
+        state = torch.load(resume, map_location='cpu', weights_only=True)
+        previous_spec = state['training_spec']
+        if ({k: v for k, v in previous_spec.items() if k != 'epochs'} !=
+                {k: v for k, v in spec.items() if k != 'epochs'} or state['samples'] != len(items)):
+            raise ValueError('Resume must retain optimizer, supervision and dataset size')
+        adapter.load_state_dict(state['adapter'])
+        optimizer.load_state_dict(state['optimizer'])
+        rng.bit_generator.state = state['shuffle_state']
+        torch.set_rng_state(state['torch_rng_state'])
+        start_epoch, history = state['completed_epoch'], state['history']
+        best, selected_epoch, selected_state = state['best'], state['selected_epoch'], state['selected_adapter']
+        if start_epoch >= spec['epochs']:
+            raise ValueError('No unfinished training epochs in requested budget')
+        if selected_state is not None:
+            save_file(selected_state, str(output / 'selected.safetensors'))
     save_adapter(output / 'initial.safetensors', adapter)
-    best, selected_epoch = None, None
-    for epoch in range(1, spec['epochs'] + 1):
+    stop_reason = 'budget_exhausted'
+    for epoch in range(start_epoch + 1, spec['epochs'] + 1):
+        if hasattr(items, 'set_epoch'):
+            items.set_epoch(epoch)
         ordered = [items[int(i)] for i in rng.permutation(len(items))]
         total_loss = 0.0
         started = time.perf_counter()
@@ -39,25 +74,43 @@ def train(interface, adapter, items, validation, output, validate):
             total_loss += loss * len(batch)
             append_json(output / 'train.jsonl', dict(epoch=epoch, step=step, samples=len(batch), loss=loss, gradient_norm=grad))
         row = dict(epoch=epoch, loss=total_loss / len(items), seconds=time.perf_counter() - started)
-        if spec['selection'] == 'validation' and (epoch % spec.get('validation_interval', 1) == 0 or epoch == spec['epochs']):
-            val_loss = mean_loss(interface, adapter, validation, microbatch)
-            correct, count = validate(interface, adapter, validation, epoch)
+        if spec['selection'] == 'validation' and (epoch % spec.get('validation_interval', 1) == 0 or epoch == spec['epochs'] or (epoch == 1 and spec.get('validate_first_epoch'))):
+            if spec.get('validation_loss_from_callback'):
+                correct, count, val_loss = validate(interface, adapter, validation, epoch)
+            else:
+                val_loss = mean_loss(interface, adapter, validation, microbatch)
+                correct, count = validate(interface, adapter, validation, epoch)
             rank = (-correct / count, val_loss, epoch)
             if best is None or rank < best:
                 best, selected_epoch = rank, epoch
                 save_adapter(output / 'selected.safetensors', adapter)
+                selected_state = {k: v.detach().cpu().clone() for k, v in adapter.state_dict().items()}
             row.update(validation_loss=val_loss, validation_correct=correct, validation_total=count, selected_epoch=selected_epoch)
         append_json(output / 'validation.jsonl', row)
+        history.append(row)
+        plateau = joint_loss_plateau(history, spec.get('convergence'))
+        if spec.get('save_training_state') and ('validation_loss' in row or epoch == spec['epochs']):
+            # One replaceable checkpoint, written atomically; preserves optimizer and shuffle on restart.
+            temporary = output / 'latest.pt.tmp'
+            torch.save(dict(adapter=adapter.state_dict(), optimizer=optimizer.state_dict(),
+                            shuffle_state=rng.bit_generator.state, torch_rng_state=torch.get_rng_state(),
+                            completed_epoch=epoch, history=history, best=best, selected_epoch=selected_epoch,
+                            selected_adapter=selected_state, training_spec=spec, samples=len(items)), temporary)
+            temporary.replace(output / 'latest.pt')
         if 'validation_correct' in row:
             print(row, flush=True)
+        if plateau:
+            stop_reason = 'joint_loss_plateau'
+            break
     save_adapter(output / 'final.safetensors', adapter)
     if spec['selection'] == 'final':
-        selected_epoch = spec['epochs']
+        selected_epoch = epoch
         save_adapter(output / 'selected.safetensors', adapter)
-    result = dict(selected_epoch=selected_epoch, final_epoch=spec['epochs'],
+    result = dict(selected_epoch=selected_epoch, final_epoch=epoch, requested_epochs=spec['epochs'],
+                  stop_reason=stop_reason, resumed_from_epoch=start_epoch,
                   selected_validation_accuracy=-best[0] if best else None,
                   selected_validation_loss=best[1] if best else None,
-                  samples=len(items), sample_presentations=len(items) * spec['epochs'])
+                  samples=len(items), sample_presentations=len(items) * epoch)
     write_json(output / 'training_summary.json', result)
     return result
 

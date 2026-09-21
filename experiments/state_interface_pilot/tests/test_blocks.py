@@ -54,6 +54,10 @@ class BlocksTests(unittest.TestCase):
     def test_inherited_numeric_contract_and_shard_validation(self):
         self.assertIsInstance(self.config['training']['epsilon'], float)
         self.assertEqual(self.config['assets'], {'state_dim': 100})
+        long_run = resolve_blocks_config(load_config('experiments/state_interface_pilot/configs/blocks_cell.json'), ROOT)
+        self.assertTrue(long_run['training']['save_training_state'])
+        self.assertIn('convergence', long_run['training'])
+        self.assertIn('cell_readout', long_run)
         raw = load_config('experiments/state_interface_pilot/configs/blocks_smoke.json')
         raw['execution'] = dict(phase='eval', shard_index=2, num_shards=2)
         with self.assertRaises(ValueError):

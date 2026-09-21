@@ -8,6 +8,36 @@ from grounded_llm.training import answer_losses
 
 
 class TensorTests(unittest.TestCase):
+    def test_cell_ce_supervises_only_the_bit_and_matches_answer_free_inference(self):
+        from grounded_llm.blocks_cell import all_queries
+        model = Qwen3ForCausalLM(Qwen3Config(vocab_size=32, hidden_size=16, intermediate_size=32,
+                    num_hidden_layers=1, num_attention_heads=2, num_key_value_heads=1, head_dim=8))
+        model.eval().requires_grad_(False)
+        interface = object.__new__(BlocksInterface)
+        interface.config = {'generation': {'context_limit': 64},
+                            'blocks': {'cell_report_prompt': 'row {row} col {col}'}}
+        interface.device, interface.dtype = torch.device('cpu'), torch.float32
+        interface.model, interface.pad_id, interface.slot_id, interface.end_id = model, 0, 99, 3
+        prompts = []
+        def chat(text):
+            prompts.append(text)
+            return [1, 99, 2]
+        interface.chat = chat
+        interface.encode = lambda text: [5 + int(text)]
+        interface.slot = '<STATE>'
+        adapter = torch.nn.Linear(4, 16)
+        items = all_queries([dict(id='a', category='test', rows=['01', '10'])])
+        batch = interface.batch(items, adapter, supervised=True)
+        self.assertEqual((batch['labels'] != -100).sum().item(), len(items))
+        self.assertTrue(torch.all(batch['labels'][:, -1] == torch.tensor([5, 6, 6, 5])))
+        predictions = interface.predict_cells(items, adapter)
+        trained_losses = interface.losses(items, adapter)
+        torch.testing.assert_close(trained_losses.detach(), torch.tensor([r['loss'] for r in predictions]), rtol=1e-5, atol=1e-6)
+        self.assertTrue(all('01' not in prompt and '10' not in prompt for prompt in prompts))
+        trained_losses.mean().backward()
+        self.assertGreater(adapter.weight.grad.abs().sum().item(), 0)
+        self.assertTrue(all(p.grad is None for p in model.parameters()))
+
     def test_multiple_state_slots_gradients_and_answer_mask(self):
         model = Qwen3ForCausalLM(Qwen3Config(vocab_size=32, hidden_size=16, intermediate_size=32,
                     num_hidden_layers=1, num_attention_heads=2, num_key_value_heads=1, head_dim=8))

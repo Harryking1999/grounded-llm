@@ -112,6 +112,9 @@ def run_blocks(config):
         write_json(output / 'coverage.json', coverage_summary(readout_data))
     model, tokenizer = load_model(config)
     interface = BlocksInterface(config, model, tokenizer)
+    if config.get('runtime', {}).get('readout_devices'):
+        from .parallel_readout import configure_parallel_readout
+        configure_parallel_readout(interface, config['runtime']['readout_devices'])
     adapter = make_adapter(config, 'mlp', model.config.hidden_size, interface.device)
     if execution.get('adapter_init'):
         if phase not in ('train', 'fit'):
@@ -198,17 +201,19 @@ def run_blocks(config):
     elif config['smoke']['enabled']:
         items = training[:config['smoke']['training_report_examples']]
         optimizer = optimizer_for(config, adapter)
-        before = mean_loss(interface, adapter, items, config['training']['initial_microbatch_size'])
+        smoke_microbatch = config.get('runtime', {}).get('microbatch_size', config['training']['initial_microbatch_size'])
+        before = mean_loss(interface, adapter, items, smoke_microbatch)
         curve = []
         for i in range(config['smoke']['optimizer_steps']):
-            loss, grad = update(interface, adapter, optimizer, items, config['training']['initial_microbatch_size'])
+            loss, grad = update(interface, adapter, optimizer, items, smoke_microbatch)
             curve.append(dict(step=i + 1, loss=loss, gradient=grad))
             print(curve[-1], flush=True)
-        after = mean_loss(interface, adapter, items, config['training']['initial_microbatch_size'])
+        after = mean_loss(interface, adapter, items, smoke_microbatch)
         batch = interface.batch(items[:2], adapter, supervised=True)
         slot_labels_masked = bool(torch.all(batch['labels'][batch['input_ids'] == interface.slot_id] == -100))
         result = dict(loss_before=before, loss_after=after, curve=curve,
-                      frozen_gradients_absent=all(p.grad is None for p in model.parameters()),
+                      frozen_gradients_absent=all(p.grad is None for replica in getattr(interface, 'frozen_models', [model])
+                                                 for p in replica.parameters()),
                       slot_labels_masked=slot_labels_masked,
                       seconds=time.perf_counter() - started,
                       peak_memory_bytes=torch.cuda.max_memory_allocated())

@@ -58,6 +58,9 @@ class BlocksTests(unittest.TestCase):
         self.assertTrue(long_run['training']['save_training_state'])
         self.assertIn('convergence', long_run['training'])
         self.assertIn('cell_readout', long_run)
+        parallel = resolve_blocks_config(load_config('experiments/state_interface_pilot/configs/blocks_cell_parallel.json'), ROOT)
+        self.assertEqual(parallel['training'], long_run['training'])
+        self.assertEqual(parallel['runtime']['readout_devices'], ['cuda:0', 'cuda:1'])
         raw = load_config('experiments/state_interface_pilot/configs/blocks_smoke.json')
         raw['execution'] = dict(phase='eval', shard_index=2, num_shards=2)
         with self.assertRaises(ValueError):

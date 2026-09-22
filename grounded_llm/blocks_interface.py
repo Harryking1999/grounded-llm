@@ -89,10 +89,8 @@ class BlocksInterface:
             raise ValueError('Cell readout requires a single vocabulary token for each bit')
         bit_ids = [ids[0] for ids in bit_ids]
         batch = self.batch(items, adapter)
-        output = self.model.model(inputs_embeds=batch['inputs_embeds'],
-                                  attention_mask=batch['attention_mask'],
-                                  position_ids=batch['position_ids'], use_cache=False)
-        logits = self.model.lm_head(output.last_hidden_state[:, -1]).float()
+        from .parallel_readout import readout
+        logits = readout(self, batch, supervised=False)
         targets = torch.tensor([int(report_target(item)) for item in items], device=self.device)
         binary_logits = logits[:, bit_ids]
         losses = torch.nn.functional.cross_entropy(logits, torch.tensor(bit_ids, device=self.device)[targets], reduction='none')

@@ -40,6 +40,8 @@ def resolve_blocks_config(raw, root):
         config['spatial_probe'] = copy.deepcopy(raw['spatial_probe'])
     if raw.get('cell_readout'):
         config['cell_readout'] = copy.deepcopy(raw['cell_readout'])
+    if raw.get('runtime'):
+        config['runtime'] = copy.deepcopy(raw['runtime'])
     config['generation'] = {k: config['generation'][k] for k in (
         'do_sample', 'num_beams', 'attempts_per_item', 'max_new_tokens', 'report_max_new_tokens', 'context_limit')}
     config['evaluation'] = {k: config['evaluation'][k] for k in ('report_probe_count', 'paired_bootstrap_samples', 'report_batch_size')}

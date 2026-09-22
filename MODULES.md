@@ -9,6 +9,7 @@
 | 冻结模型与 tokenizer | `grounded_llm/model.py` |
 | Linear／MLP 和向量槽替换 | `grounded_llm/interface.py` |
 | 答案 loss、优化、训练、选模、权重保存 | `grounded_llm/training.py` |
+| 冻结 LLM 的持久副本、样本分片与梯度汇回 | `grounded_llm/parallel_readout.py` |
 | 模型 generation 调用 | `grounded_llm/inference.py` |
 | JSON 产物读写 | `grounded_llm/artifacts.py` |
 | 图数据、模板、裁判 | `grounded_llm/data.py`、`prompts.py`、`scoring.py` |

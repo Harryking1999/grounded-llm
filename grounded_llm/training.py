@@ -40,7 +40,7 @@ def train(interface, adapter, items, validation, output, validate, resume=None):
     the task judge outside loss/optimizer/checkpoint code.
     """
     spec = interface.config['training']
-    microbatch = spec['initial_microbatch_size']
+    microbatch = interface.config.get('runtime', {}).get('microbatch_size', spec['initial_microbatch_size'])
     optimizer = optimizer_for(interface.config, adapter)
     rng = np.random.default_rng(spec['shuffle_seed'])
     best, selected_epoch, selected_state = None, None, None
@@ -148,7 +148,7 @@ def update(interface, adapter, optimizer, items, microbatch):
                                          error_if_nonfinite=True)
     if not torch.isfinite(grad) or grad <= 0:
         raise FloatingPointError('Adapter gradient must be finite and nonzero')
-    if any(p.grad is not None for p in interface.model.parameters()):
+    if any(p.grad is not None for model in getattr(interface, 'frozen_models', [interface.model]) for p in model.parameters()):
         raise RuntimeError('Frozen LM received parameter gradients')
     optimizer.step()
     return total, float(grad)
@@ -181,11 +181,9 @@ def checkpoint_for_condition(condition, spec, base, continuation=None):
     return path
 
 def losses(self, items, adapter):
+    from .parallel_readout import readout
     batch = self.batch(items, adapter, supervised=True)
-    output = self.model.model(inputs_embeds=batch['inputs_embeds'],
-                              attention_mask=batch['attention_mask'],
-                              position_ids=batch['position_ids'], use_cache=False)
-    return answer_losses(output.last_hidden_state, batch['labels'], self.model.lm_head)
+    return readout(self, batch, supervised=True)
 
 def cached_losses(self, items, adapter):
     if adapter is None or any(item['task'] not in ('report_current','report_goal','action') for item in items):

@@ -42,7 +42,11 @@ adapter 不接收查询行号，始终编码完整棋盘。
 新配置 [blocks_cell.json](../configs/blocks_cell.json) 只预测 `p(bit | state token, row, col)`，
 重新初始化 adapter，在全部开发棋盘全部坐标上统计结果。
 `cell_smoke_84b4819/` 小批 16 次更新将 CE 从 10.455 降至 2.006，冻结梯度与状态槽标签检查通过。
-正式 `cell_84b4819/` 已开始参数更新，随后 SSH 不可达，尚未取得完整开发集结果。
+2026-09-22 恢复访问后确认 `cell_84b4819/` 已训练至第 75 轮第 10 步，最后完整检查点在第 70 轮。
+第 70 轮开发集 CE 0.42983，单格 28,338/35,600（79.60%），占据格 7,676/9,926、空格 20,662/25,674，
+两类平均准确率 78.91%，逐格重建整板 0/356；无非 0/1 输出。
+固定训练子集单格 2,574/3,200（80.44%），整板 0/32，训练 CE 与开发 CE 仍有改善，未确认收敛。
+从第 70 轮检查点在 `cell_resume_84b4819/` 恢复同一训练；不重新初始化优化器，不切换监督目标。
 
 ## 产物来源
 
@@ -51,5 +55,6 @@ adapter 不接收查询行号，始终编码完整棋盘。
 - 小集：`fit_506c201/` 与 `fit_continue_3e463c1/fit_summary.json`。
 - 多样训练：`readout_3e463c1/adapter/training_summary.json`、`readout_validation.jsonl`、`readout_dataset.json`。
 - 位置监督对照：`readout_continue_3e44a67/`、`readout_rows_3e44a67/` 中的训练与空间探针摘要。
+- Cell：`cell_84b4819/cell_validation.jsonl`、`adapter/latest.pt`；接续产物为 `cell_resume_84b4819/`。
 
 此前在读出失败后启动的规划评测不能用于判断有效状态 token 的规划价值；本阶段只解决读出。

@@ -4,7 +4,7 @@ import time
 
 from .artifacts import append_json, write_json, read_json, chunks
 from .blocks import (build_blocks_dataset, report_examples, planning_prompt,
-                     score_step, strict_json, summarize_blocks, require_readable_adapter)
+                     score_step, strict_json, summarize_blocks, require_readable_adapter, same_blocks_contract)
 
 
 def episode(interface, adapter, task, case, config):
@@ -72,7 +72,9 @@ def run_blocks(config):
             raise ValueError('Resume checkpoint must belong to the saved dataset run')
         previous = read_json(source / 'config.json')
         for key in ('blocks', 'model', 'adapter', 'readout_data', 'readout_supervision', 'cell_readout'):
-            if previous.get(key) != config.get(key):
+            matches = (same_blocks_contract(previous[key], config[key]) if key == 'blocks'
+                       else previous.get(key) == config.get(key))
+            if not matches:
                 raise ValueError(f'Resume contract differs: {key}')
     if phase == 'eval' and execution.get('condition') != 'text':
         require_readable_adapter(execution['training_run'], config)

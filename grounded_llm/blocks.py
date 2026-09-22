@@ -70,6 +70,11 @@ def resolve_blocks_config(raw, root):
     return config
 
 
+def same_blocks_contract(left, right):
+    """Archive locations may change on resume; prompts and actual rules may not."""
+    return dict(left, rules_config=read_json(left['rules_config'])) == dict(right, rules_config=read_json(right['rules_config']))
+
+
 def require_readable_adapter(training_run, config):
     """Training completion alone never authorizes planning with an adapter."""
     saved_config = Path(training_run) / 'config.json'

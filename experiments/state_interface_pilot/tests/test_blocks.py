@@ -8,12 +8,23 @@ import unittest
 from grounded_llm.artifacts import ROOT, write_json, append_json
 from grounded_llm.blocks import (build_blocks_dataset, planning_prompt, resolve_blocks_config,
                                 score_step, strict_json, summarize_blocks, collect_blocks_runs, report_diagnostics,
-                                require_readable_adapter)
+                                require_readable_adapter, same_blocks_contract)
 from grounded_llm.blocks_run import episode
 from grounded_llm.config import load_config
 
 
 class BlocksTests(unittest.TestCase):
+    def test_resume_accepts_relocated_identical_rules_but_rejects_changed_rules_or_prompt(self):
+        with tempfile.TemporaryDirectory() as folder:
+            first, second = Path(folder) / 'first.json', Path(folder) / 'second.json'
+            write_json(first, {'blocks': {'size': 10}})
+            write_json(second, {'blocks': {'size': 10}})
+            left, right = dict(rules_config=str(first), prompt='read'), dict(rules_config=str(second), prompt='read')
+            self.assertTrue(same_blocks_contract(left, right))
+            self.assertFalse(same_blocks_contract(left, dict(right, prompt='plan')))
+            write_json(second, {'blocks': {'size': 8}})
+            self.assertFalse(same_blocks_contract(left, right))
+
     @classmethod
     def setUpClass(cls):
         cls.config = resolve_blocks_config(load_config('experiments/state_interface_pilot/configs/blocks_smoke.json'), ROOT)

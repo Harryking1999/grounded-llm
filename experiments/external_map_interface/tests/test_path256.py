@@ -5,10 +5,16 @@ import numpy as np
 from experiments.external_map_interface.src.evaluate_path256 import run_trial, summarize
 from experiments.external_map_interface.src.interface import graph_prompt
 from experiments.external_map_interface.src.q_map import GraphQMap
+from experiments.external_map_interface.src.planner import parse_action_id
 from experiments.external_map_interface.src.transitions import GraphEnvironment, environment_from_suite
 
 
 class Path256ContractTest(unittest.TestCase):
+    def test_unambiguous_fenced_json_is_recovered(self):
+        self.assertEqual(parse_action_id('```json\n{"action_id": 28, "to_node": 251}\n```'), 28)
+        with self.assertRaises(ValueError):
+            parse_action_id('```json\n{"action_id": "28"}\n```')
+
     def test_suite_order_and_revisit_rule_and_learned_score(self):
         suite = {"cases": [{"node_count": 3, "neighbors": {"0": [1], "1": [2, 0], "2": [1]},
                             "node_order": [2, 0, 1]}]}

@@ -7,6 +7,10 @@ import urllib.request
 def parse_action_id(text: str) -> int:
     # Qwen thinking output may include a closed reasoning section.
     answer = text.split("</think>", 1)[-1].strip()
+    if answer.startswith("```"):
+        lines = answer.splitlines()
+        if len(lines) >= 3 and lines[0].lower() in ("```", "```json") and lines[-1] == "```":
+            answer = "\n".join(lines[1:-1]).strip()
     value = json.loads(answer)
     if not isinstance(value, dict) or type(value.get("action_id")) is not int:
         raise ValueError("Expected JSON with integer action_id")

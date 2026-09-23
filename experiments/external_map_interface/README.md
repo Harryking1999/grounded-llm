@@ -27,6 +27,8 @@ python -m experiments.external_map_interface.src.evaluate \
 
 `src/blocks_q_map.py` 是**单张初始棋盘绑定**的最小训练试验。它直接复用 [BlocksTask](../sol_dag_blocks/src/tasks.py) 的 10×10 棋盘、`shape_id,row,col` 动作及合法移除，使用现有 case 的构造解和随机合法 rollout 收集 `(o1,a,o2)`。状态 Q 按这张棋盘内观察到的完整 mask 建表；同一个动作三元组在多个转移中共用一个 V 行。训练直接调用图 Step 1 的 `local_update`，没有改 Q/V 目标。产物保存在 `runs/`，不保证覆盖未见棋盘或所有可达状态。
 
+`configs/blocks_q_expanded_pilot.json` 在同一 `blocks8_00` 棋盘上增加合法 rollout 采样和训练轮数，用来检查更多 transition 对拟合误差与目标距离排序的影响。它沿用上述共享 `V_a` 定义，不引入 `V(Q,a)`；仍不是跨初始棋盘泛化实验。
+
 ```bash
 python -m experiments.external_map_interface.src.blocks_q_map \
   --config experiments/external_map_interface/configs/blocks_q_pilot.json \

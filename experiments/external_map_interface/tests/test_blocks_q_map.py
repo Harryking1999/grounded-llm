@@ -1,10 +1,24 @@
 import unittest
 
-from experiments.external_map_interface.src.blocks_q_map import collect_transitions, train_map
+import numpy as np
+
+from experiments.external_map_interface.src.blocks_q_map import (
+    collect_transitions, coverage_diagnostic, train_map)
 from experiments.sol_dag_blocks.src.tasks import TASKS
 
 
 class BlocksMapTest(unittest.TestCase):
+    def test_coverage_separates_trained_action_from_unseen_successor(self):
+        class TwoTiles:
+            placements = [(1, {}), (2, {})]
+
+        coverage = coverage_diagnostic(TwoTiles(), [0, 3],
+                                       np.array([[1, 0, 0]], dtype=np.int32))
+        self.assertEqual(coverage["trained_action_rows"], 1)
+        self.assertEqual(coverage["legal_candidates_from_seen_states"], 2)
+        self.assertEqual(coverage["legal_candidates_with_trained_V"], 1)
+        self.assertEqual(coverage["legal_successors_with_tabular_Q"], 0)
+
     def test_real_actions_share_v_across_board_states(self):
         task = TASKS["blocks8"]
         first_tile, first_action = task.placements[0]

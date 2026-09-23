@@ -59,6 +59,24 @@ def train_map(states, actions, transitions, config):
     return q, v, float(np.mean(residual.astype(np.float64) ** 2))
 
 
+def coverage_diagnostic(task, states, transitions):
+    """How much of one board's legal state graph has a tabular Q entry?"""
+    seen_states = set(states)
+    trained_actions = set(map(int, transitions[:, 1]))
+    legal = trained_v = next_q = 0
+    for state in states:
+        for action_id, (tile, _) in enumerate(task.placements):
+            if tile & state == tile:
+                legal += 1
+                trained_v += action_id in trained_actions
+                next_q += (state ^ tile) in seen_states
+    return {"action_catalog_size": len(task.placements),
+            "trained_action_rows": len(trained_actions),
+            "legal_candidates_from_seen_states": legal,
+            "legal_candidates_with_trained_V": trained_v,
+            "legal_successors_with_tabular_Q": next_q}
+
+
 def immediate_dead_diagnostic(task, case, states, q):
     """Known dead ends have no legal removal and are nonempty; no solver oracle."""
     goal = states.index(0)
@@ -107,12 +125,14 @@ def main():
     states, actions, transitions = collect_transitions(task, case, config["episodes"], config["seed"])
     q, v, mse = train_map(states, actions, transitions, config)
     diagnostic = immediate_dead_diagnostic(task, case, states, q)
+    coverage = coverage_diagnostic(task, states, transitions)
     args.out.mkdir(parents=True)
     np.savez_compressed(args.out / "map.npz", q=q, v=v, states=np.array([str(s) for s in states]),
                         actions=actions, transitions=transitions)
     (args.out / "summary.json").write_text(json.dumps({
         "case_id": args.case_id, "states": len(states), "shared_action_ids": len(actions),
         "sampled_unique_transitions": len(transitions), "transition_mse": mse,
+        "coverage": coverage,
         "diagnostic": diagnostic,
     }, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 

@@ -58,7 +58,7 @@ class TransformersCaller:
         self.torch = torch
         self.tokenizer = AutoTokenizer.from_pretrained(model_path, local_files_only=True)
         self.model = AutoModelForCausalLM.from_pretrained(
-            model_path, local_files_only=True, torch_dtype="auto"
+            model_path, local_files_only=True, dtype="auto"
         ).to("cuda").eval()
         self.enable_thinking = enable_thinking
         self.max_new_tokens = max_new_tokens
@@ -71,7 +71,8 @@ class TransformersCaller:
         ).to(self.model.device)
         with self.torch.inference_mode():
             output = self.model.generate(
-                input_ids, max_new_tokens=self.max_new_tokens, do_sample=False,
+                input_ids, attention_mask=self.torch.ones_like(input_ids),
+                max_new_tokens=self.max_new_tokens, do_sample=False,
                 pad_token_id=self.tokenizer.eos_token_id,
             )
         generated = output[0, input_ids.shape[1]:]

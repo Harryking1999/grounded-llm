@@ -1,0 +1,13 @@
+{
+  "scope": "one_initial_blocks_board_only",
+  "seed": 20260923,
+  "episodes": 200,
+  "state_dim": 128,
+  "q_init_std": 1.0,
+  "v_init_std": 0.1,
+  "epochs": 100,
+  "eta_q": 0.1,
+  "eta_v": 0.01,
+  "update": "reuse_cml_step1_local_update",
+  "sampling": "construction_witness_plus_random_legal_removal_rollouts"
+}

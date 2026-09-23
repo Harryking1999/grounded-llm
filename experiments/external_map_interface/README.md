@@ -10,7 +10,7 @@
 
 ## 图实验入口
 
-`configs/path32_smoke.json` 是一个双起终点 smoke 合同。输入为 Step 1 同一 case 目录下的 `inputs.npz` 与 `map.npz`；可使用已训练的 128 维 Q/V，不需要额外 adapter。模型路径与 SGLang endpoint 是运行参数，产物写入 Git 忽略的 `runs/`。`plain`、`reasoning` 不读 Q/V；`distance` 在同一图和候选动作上增加 learned-map 距离。每步原始回答都会留档；非法动作、输出截断和步数上限分别计数。三方正式比较仍需选定匹配的模型版本、提示、预算与测试起终点，当前 smoke 不能替代该比较。此前 Qwen Instruct 与 Qwen thinking 的历史结果配置不同，只能作参考。
+`configs/path32_smoke.json` 是一个双起终点 smoke 合同。输入为 Step 1 同一 case 目录下的 `inputs.npz` 与 `map.npz`；可使用已训练的 128 维 Q/V，不需要额外 adapter。模型路径与运行 backend 是运行参数；有 SGLang 服务时传 `--endpoint`，在节点上直接加载模型时用 `--backend transformers`。产物写入 Git 忽略的 `runs/`。`plain`、`reasoning` 不读 Q/V；`distance` 在同一图和候选动作上增加 learned-map 距离。每步原始回答都会留档；非法动作、输出截断和步数上限分别计数。三方正式比较仍需选定匹配的模型版本、提示、预算与测试起终点，当前 smoke 不能替代该比较。此前 Qwen Instruct 与 Qwen thinking 的历史结果配置不同，只能作参考。
 
 ```bash
 python -m experiments.external_map_interface.src.evaluate \

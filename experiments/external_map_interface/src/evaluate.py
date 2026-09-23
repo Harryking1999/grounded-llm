@@ -8,7 +8,7 @@ import subprocess
 from experiments.cml_map_scaling.src.core import shortest_distances
 
 from .interface import graph_prompt
-from .planner import SGLangCaller, parse_action_id
+from .planner import SGLangCaller, TransformersCaller, parse_action_id
 from .q_map import GraphQMap
 from .transitions import GraphEnvironment
 
@@ -68,7 +68,8 @@ def main() -> None:
     parser.add_argument("--inputs", type=Path, required=True)
     parser.add_argument("--map", type=Path, required=True)
     parser.add_argument("--model-path", required=True)
-    parser.add_argument("--endpoint", required=True)
+    parser.add_argument("--backend", choices=["sglang", "transformers"], default="sglang")
+    parser.add_argument("--endpoint", help="Required for the SGLang backend")
     parser.add_argument("--condition", choices=["plain", "reasoning", "distance"], required=True)
     parser.add_argument("--out", type=Path, required=True)
     args = parser.parse_args()
@@ -79,9 +80,16 @@ def main() -> None:
         raise ValueError("Map and inputs must come from the same Step 1 case directory")
     env = GraphEnvironment.load(args.inputs)
     q_map = GraphQMap.load(args.map, len(env.adjacency), len(env.actions)) if args.condition == "distance" else None
-    caller = SGLangCaller(args.model_path, args.endpoint,
-                           enable_thinking=args.condition != "plain",
-                           max_new_tokens=config["max_new_tokens"])
+    if args.backend == "sglang":
+        if not args.endpoint:
+            parser.error("--endpoint is required for the SGLang backend")
+        caller = SGLangCaller(args.model_path, args.endpoint,
+                               enable_thinking=args.condition != "plain",
+                               max_new_tokens=config["max_new_tokens"])
+    else:
+        caller = TransformersCaller(args.model_path,
+                                    enable_thinking=args.condition != "plain",
+                                    max_new_tokens=config["max_new_tokens"])
     truth = shortest_distances(env.adjacency)  # Evaluation only; never sent to caller.
     records = []
     for start, goal in config["pairs"]:
@@ -93,6 +101,7 @@ def main() -> None:
     source_commit = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
     args.out.write_text(json.dumps({"source_commit": source_commit,
                                    "config": config, "condition": args.condition,
+                                   "backend": args.backend,
                                    "inputs": str(args.inputs.resolve()),
                                    "map": str(args.map.resolve()) if q_map is not None else None,
                                    "model_path": args.model_path,

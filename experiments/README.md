@@ -9,6 +9,7 @@
 | [sol_dag_blocks](sol_dag_blocks/README.md) | Sol 新形状积木与有向图基线 |
 | [gcml_counterexamples](gcml_counterexamples/README.md) | Luna／Flash 基线与错误案例 |
 | [state_interface_pilot](state_interface_pilot/README.md) | 已运行的积木连续 token 读出实验，现为 previous approach |
+| [external_map_interface](external_map_interface/README.md) | 当前显式候选地图距离接口与单棋盘积木 Q/V 试验 |
 
 ## 目录约定
 

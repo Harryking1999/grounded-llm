@@ -1,8 +1,10 @@
-# Step 2 Runbook：地图接口训练与一步动作评测
+# Previous approach：Step 2 地图到连续 token 的接口方案
+
+本文封存此前的 roadmap／Q → Adapter → LLM 连续 state token 路线，保留原设计和配置供复现；不再作为当前执行方案，也不在本目录加入新的显式 roadmap 接口。当前方向见[研究简述](../../docs/RESEARCH_BRIEF.md)和[项目状态页](../../docs/PROJECT_STATUS_AND_TODO.md)。
 
 **目标：只用状态报告训练接口，再检验它能否支持一步动作选择。** 首轮比较 Linear 与 MLP；多 token、打乱编号和少量动作监督均留作后续解决方案。
 
-本文用于实施，原始想法与会议批注保留在 [STEP2_DISCUSSION.md](STEP2_DISCUSSION.md)。参数和精确 prompt 统一放在 [configs/step2.json](configs/step2.json)。目前尚未实现 Step 2 runner；本轮交付是执行方案。
+以下是当时的实施规格；原始想法与会议批注保留在 [STEP2_DISCUSSION.md](STEP2_DISCUSSION.md)。参数和精确 prompt 统一放在 [configs/step2.json](configs/step2.json)。图 Step 2 runner 尚未实现。
 
 ## 1. 模型与信息流
 

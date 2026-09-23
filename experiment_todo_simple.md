@@ -1,6 +1,6 @@
-# Grounded LLM 实验逻辑简版
+# Previous approach：Grounded LLM 连续状态接口讨论简版
 
-> 整合自远端 `3681416` 与 2026-09-13 飞书讨论。本文解释方案，不维护执行进度；当前证据与有序工作见 [项目状态页](docs/PROJECT_STATUS_AND_TODO.md)，机制、来源及未决项见 [详版](EXPERIMENT_TODO.md)。
+> 整合自远端 `3681416` 与 2026-09-13 飞书讨论。本文封存旧的连续 state token／memory 接口讨论；下文“当前”“下一步”“建议”均属于当时语境，不维护执行进度。现行方向见 [研究简述](docs/RESEARCH_BRIEF.md) 与 [项目状态页](docs/PROJECT_STATUS_AND_TODO.md)，原机制与来源见 [详版](EXPERIMENT_TODO.md)。
 
 ## 总问题
 

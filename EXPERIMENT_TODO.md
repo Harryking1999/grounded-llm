@@ -1,8 +1,8 @@
-# Grounded LLM 实验设计讨论
+# Previous approach：Grounded LLM 连续状态接口设计讨论
 
-> 来源：远端 `origin/main` 的 `3681416`（2026-09-12），结合 [飞书讨论](https://zcnhpsd26tyi.feishu.cn/wiki/X9NZw0K4zizI2vkM14OcK4tXnXd) 于 2026-09-13 校正。保留远端文件名，内容用于设计讨论；唯一当前状态与有序 TODO 见 [项目状态页](docs/PROJECT_STATUS_AND_TODO.md)。下文区分讨论方案、已核实结果和研究建议，不代表已启动训练。
+> 来源：远端 `origin/main` 的 `3681416`（2026-09-12），结合 [飞书讨论](https://zcnhpsd26tyi.feishu.cn/wiki/X9NZw0K4zizI2vkM14OcK4tXnXd) 于 2026-09-13 校正。本文封存旧的 Q／棋盘 → adapter → 连续 state token → LLM 路线；保留原文件名和当时的设计语境。下文的“当前”“下一步”“建议”均不是现行指令；现行研究定义与有序 TODO 见 [研究简述](docs/RESEARCH_BRIEF.md) 和 [项目状态页](docs/PROJECT_STATUS_AND_TODO.md)。
 
-具体首轮提案见 [状态接口试点设计](experiments/state_interface_pilot/README.md)：按用户 2026-09-14 最新决定，采用 Qwen3 非 thinking 模式、积木输入层接口与同一 assistant 序列中的状态注入，并保留准确文字状态和同报告训练的文字对照；配置尚待实现。
+当时的首轮提案见 [状态接口试点设计](experiments/state_interface_pilot/README.md)；后续实际积木合同与结果也保留在该目录。该段原提案不再是当前实施方案。
 
 ## 一、核心研究问题
 

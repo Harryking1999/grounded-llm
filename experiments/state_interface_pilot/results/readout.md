@@ -1,10 +1,11 @@
 # 单 token 棋盘读出诊断
 
+本页记录 previous approach 的历史实验结果。连续 token 读出训练已不再是当前路线；现行研究定义与 TODO 见[研究简述](../../../docs/RESEARCH_BRIEF.md)和[项目状态页](../../../docs/PROJECT_STATUS_AND_TODO.md)。
+
 ## 已确认结果
 
 同一冻结 Qwen3-4B-Instruct-2507 接收 MLP 编码的一个连续 token。输入是完整 10×10 二值棋盘；
-训练仅监督状态报告，没有动作标签。具体合同见 [配置目录](../configs/)，当前运行进度见
-[项目状态页](../../../docs/PROJECT_STATUS_AND_TODO.md)。
+训练仅监督状态报告，没有动作标签。原合同见 [配置目录](../configs/)。
 
 | 训练 | 自由生成完整棋盘 | 解释范围 |
 | --- | ---: | --- |
@@ -57,4 +58,4 @@ adapter 不接收查询行号，始终编码完整棋盘。
 - 位置监督对照：`readout_continue_3e44a67/`、`readout_rows_3e44a67/` 中的训练与空间探针摘要。
 - Cell：`cell_84b4819/cell_validation.jsonl`、`adapter/latest.pt`；接续产物为 `cell_resume_84b4819/`。
 
-此前在读出失败后启动的规划评测不能用于判断有效状态 token 的规划价值；本阶段只解决读出。
+此前在读出失败后启动的规划评测不能用于判断有效状态 token 的规划价值；该读出路线现已封存。

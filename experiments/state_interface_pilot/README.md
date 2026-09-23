@@ -1,6 +1,8 @@
-# Blocks Step 2：文字状态加连续 token 是否改善逐步解题
+# Previous approach：Blocks Step 2 连续 token 读出与逐步解题
 
-按 2026-09-21 用户决定，当前执行合同为 [blocks_step2.json](configs/blocks_step2.json)。
+本目录封存原积木棋盘 → MLP → LLM 连续 state token 路线。以下合同、运行命令和结果说明用于复现历史实验，不再是当前下一步；新的显式 roadmap 接口不会加入本目录。当前方向见[研究简述](../../docs/RESEARCH_BRIEF.md)和[项目状态页](../../docs/PROJECT_STATUS_AND_TODO.md)。
+
+按 2026-09-21 当时的决定，原执行合同为 [blocks_step2.json](configs/blocks_step2.json)。
 它取代旧的 [pilot_design.json](configs/pilot_design.json) 提案：仅比较文字与文字加 token，
 自报错误立即失败，暂不测十二块，不展开多模型、多 token、LoRA 或非空目标条件。
 
@@ -136,4 +138,4 @@ cell 验证同样分片后按原顺序汇总。断点可从单卡切到双卡，
 
 如果读出不准，规划零增益不能解释为状态 token 原理无效；如果读出准但规划不改善，则支持读取与使用是不同瓶颈。
 文字组已能解的容易题用于识别上限，困难题用于观察失败位置，不将跨协议历史基线直接混入当前对照。
-当前执行进展只维护于 [项目状态页](../../docs/PROJECT_STATUS_AND_TODO.md)，结果出来后在本目录保存紧凑摘要。
+该路线的已确认结果见[读出报告](results/readout.md)，原配置和运行记录继续保留。

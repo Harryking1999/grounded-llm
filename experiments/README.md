@@ -4,11 +4,11 @@
 
 | 研究 | 内容 |
 | --- | --- |
-| [cml_map_scaling](cml_map_scaling/README.md) | 当前主线：Q/V 地图结果与 Step 2 接口 runbook |
+| [cml_map_scaling](cml_map_scaling/README.md) | 寻路 Q/V 地图结果；图 Step 2 token 接口方案已封存 |
 | [qwen_path_blocks](qwen_path_blocks/README.md) | Qwen thinking 寻路／积木基线与 Sol 小批参考 |
 | [sol_dag_blocks](sol_dag_blocks/README.md) | Sol 新形状积木与有向图基线 |
 | [gcml_counterexamples](gcml_counterexamples/README.md) | Luna／Flash 基线与错误案例 |
-| [state_interface_pilot](state_interface_pilot/README.md) | 后续积木接口设计，尚未运行 |
+| [state_interface_pilot](state_interface_pilot/README.md) | 已运行的积木连续 token 读出实验，现为 previous approach |
 
 ## 目录约定
 

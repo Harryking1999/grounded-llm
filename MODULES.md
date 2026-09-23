@@ -1,4 +1,6 @@
-# 功能唯一实现
+# Previous approach：连续 token 实验的功能归属
+
+本页记录图／积木连续 state token 实验的现有代码归属，供复现和维护旧结果使用；不规定新显式 roadmap 接口的模块设计。当前方向见[研究简述](docs/RESEARCH_BRIEF.md)。
 
 本分支复用 `codex/experiment-harness` 的已提交实现（`cdd9e58`），通过
 `python -m grounded_llm.harness --config ...` 运行；不另写 Blocks 训练器。

@@ -1,6 +1,6 @@
 # Related Work
 
-目前关注两条线：**地图如何提供状态与动作结构，以及 LLM 为什么读得出状态却未必能持续用好。**
+目前关注：**显式地图如何提供状态与动作后果，以及 LLM 如何据此规划。**
 
 ## 1. GCML：用认知地图生成面向目标的轨迹
 
@@ -16,7 +16,7 @@ Hui Lin、Yukun Yang、Rong Zhao、Giovanni Pezzulo、Wolfgang Maass，*Nature M
 
 *首图展示二维地图、动作读出和不同噪声下的想象轨迹。图源：Lin 等，Fig. 1；从原 PDF 提取，图内内容未改动，[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)。*
 
-**对我们的参考。** Q/V 的转移学习是 Step 1 的直接起点；图寻路和积木也提供了可计算状态、合法动作与目标的任务。接下来要回答的是：这类地图接入冻结 LLM 后，能否被读懂并用于动作选择。论文的地图规划成功不直接等于 LLM 接口有效。
+**对我们的参考。** Q/V 的转移学习是 Step 1 的直接起点；图寻路和积木也提供了可计算状态、合法动作与目标的任务。当前要检验的是：显式地图提供当前状态、候选动作后果和目标关系后，LLM 能否利用这些信息规划。论文的地图规划成功不直接等于这一接口有效。
 
 ## 2. 汉诺塔：已有状态表征会在生成过程中退化
 
@@ -32,4 +32,20 @@ Devin Pereira、Willem Zuidema，arXiv 预印本，2026。
 
 *首图区分整塔搬运与起终点均分散的任务；它是任务示意，状态退化与注入结果见正文第 5 节。图源：Pereira、Zuidema，Fig. 1；从原 PDF 提取，图内内容未改动，[CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/)。*
 
-**对我们的参考。** 可作为“让状态信息在推理中持续可用”的动机：问题可能出在已有表征的保持和使用。其“外部跟踪状态＋重新注入”的机制与我们的方向直接相关，也支持把状态读取、表征保持和动作选择分开评测。当前 Step 2 先测读取与单步使用，持续保持留给后续多步实验。
+**对我们的参考。** 可作为“让状态信息在推理中持续可用”的动机：问题可能出在已有表征的保持和使用。其外部跟踪状态的机制与我们的方向相关，也支持把状态读取、表征保持和动作选择分开评测。
+
+## 3. RAP：将推理显式视为基于世界模型的规划
+
+**Reasoning with Language Model is Planning with World Model**
+
+Shibo Hao 等，*EMNLP*，2023。
+
+[论文](https://aclanthology.org/2023.emnlp-main.507/) · [arXiv PDF](https://arxiv.org/pdf/2305.14992)
+
+**摘要。** RAP 将推理显式视为规划，并维护推理过程中的 world state。同一个 LLM 既充当 reasoning agent，也被复用为 world model：后者根据当前 state 和 action 预测后续 state。RAP 再结合 reward 与蒙特卡洛树搜索（MCTS），探索并比较多个推理或动作路径。其重要动机是 LLM 缺乏可靠的内部 world model，难以预测状态和模拟动作的长期后果。
+
+![RAP Fig. 1：LLM world model 与规划搜索](docs/figures/related_work/rap_fig1.png)
+
+*首图对比直接生成推理链与基于 world state、reward 和搜索的 RAP。图源：Hao 等，Fig. 1；从 [EMNLP 正式论文 PDF](https://aclanthology.org/2023.emnlp-main.507.pdf) 提取，图内内容未改动，[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)。*
+
+**对我们的参考。** RAP 主要让 LLM 自身充当 world model；我们当前探索的是由显式 external cognitive map／roadmap 向 LLM 提供状态与动作后果。

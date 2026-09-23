@@ -2,6 +2,7 @@
 
 import argparse
 from collections import Counter
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
 from pathlib import Path
 import subprocess
@@ -128,10 +129,10 @@ def main():
         identity_path.write_text(json.dumps(identity, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     record_dir = args.out / "samples"
     record_dir.mkdir(exist_ok=True)
-    for index, (case, replicate) in enumerate(slots):
+    def sample(index, case, replicate):
         path = record_dir / f"{case['id']}__{replicate}.json"
         if path.exists():
-            continue
+            return None
         record = run_trial(case, replicate, env, q_map, caller, config, args.endpoints[index % len(args.endpoints)])
         temporary = path.with_suffix(".tmp")
         temporary.write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -139,11 +140,25 @@ def main():
         print(json.dumps({"saved": path.name, "shortest": record["shortest"],
                           "reached": record["reached"], "failure": record["failure"],
                           "steps": len(record["trace"]), "output_tokens": record["output_tokens"]}), flush=True)
+        return record
+
+    errors = []
+    with ThreadPoolExecutor(max_workers=len(args.endpoints) * config["concurrency_per_endpoint"]) as pool:
+        futures = [pool.submit(sample, index, case, replicate)
+                   for index, (case, replicate) in enumerate(slots)]
+        for future in as_completed(futures):
+            try:
+                future.result()
+            except Exception as error:
+                errors.append(repr(error))
+                print(json.dumps({"service_error": repr(error)}), flush=True)
     records = [json.loads(p.read_text(encoding="utf-8")) for p in sorted(record_dir.glob("*.json"))]
     (args.out / "summary.json").write_text(json.dumps(summarize(records), ensure_ascii=False, indent=2) + "\n",
                                            encoding="utf-8")
     print(json.dumps({"complete": len(records) == config["pair_count"] * config["replicates"],
-                      "saved_trials": len(records)}), flush=True)
+                      "saved_trials": len(records), "service_errors": errors}), flush=True)
+    if errors:
+        raise RuntimeError(f"{len(errors)} unresolved service errors; saved trials remain resumable")
 
 
 if __name__ == "__main__":

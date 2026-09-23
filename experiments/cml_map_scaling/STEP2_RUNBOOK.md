@@ -4,7 +4,7 @@
 
 **目标：只用状态报告训练接口，再检验它能否支持一步动作选择。** 首轮比较 Linear 与 MLP；多 token、打乱编号和少量动作监督均留作后续解决方案。
 
-以下是当时的实施规格；原始想法与会议批注保留在 [STEP2_DISCUSSION.md](STEP2_DISCUSSION.md)。参数和精确 prompt 统一放在 [configs/step2.json](configs/step2.json)。图 Step 2 runner 尚未实现。
+以下是当时的首轮实施规格；原始想法与会议批注保留在 [STEP2_DISCUSSION.md](STEP2_DISCUSSION.md)。参数和精确 prompt 统一放在 [configs/step2.json](configs/step2.json)。已执行的 runner、后续诊断配置及结果保留在本实验目录，结论见[验收摘要](results/step2_acceptance.md)。
 
 ## 1. 模型与信息流
 

@@ -10,7 +10,7 @@
 - [研究简述](docs/RESEARCH_BRIEF.md)：研究定义、已确定约束与证伪标准。
 - [Step 1 结果](experiments/cml_map_scaling/results/report.md)：地图规模、表示几何与长边诊断。
 - [显式地图接口](experiments/external_map_interface/README.md)：候选距离接口、逐步规划入口与单棋盘积木 Q/V 试验。
-- [图 Step 2 旧方案](experiments/cml_map_scaling/STEP2_RUNBOOK.md)、[积木 Step 2 旧方案](experiments/state_interface_pilot/README.md)：连续 state token 路线，保留供复现。
+- [图 Step 2 旧实验](experiments/cml_map_scaling/README.md)、[积木 Step 2 旧实验](experiments/state_interface_pilot/README.md)：连续 state token 路线，代码、配置和结果保留供复现。
 - [Related Work](RELATED_WORK.md)：GCML、状态表征维护与 RAP，含摘要、首图和参考意义。
 - [Qwen 验收报告](experiments/qwen_path_blocks/results/report.md)：最终双向 path256 与 blocks 16k，含准确率、截断重分类与案例。
 - [Sol 基线](experiments/sol_dag_blocks/README.md)、[Luna / Flash 基线](experiments/gcml_counterexamples/README.md)：历史独立条件。

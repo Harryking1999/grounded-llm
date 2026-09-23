@@ -10,7 +10,7 @@
 
 ## Previous approach：连续 state token 对齐（历史实验）
 
-图 Step 2 曾计划将节点 Q 经 Linear／MLP 映射为冻结 LLM 的连续输入 token，再训练节点报告并测一步选择；[runbook](../experiments/cml_map_scaling/STEP2_RUNBOOK.md) 和 [配置](../experiments/cml_map_scaling/configs/step2.json) 保留供追溯，该图 runner 尚未实现。
+图 Step 2 曾将节点 Q 经 Linear／MLP 映射为冻结 LLM 的连续输入 token，训练节点报告并测一步选择。已执行代码、[runbook](../experiments/cml_map_scaling/STEP2_RUNBOOK.md)、[配置](../experiments/cml_map_scaling/configs/step2.json)及[验收结果](../experiments/cml_map_scaling/results/step2_acceptance.md)保留供复现。固定编号报告达到 100/100，但正确 Q 对错配 Q 的动作选择没有稳定优势；重编号接口在训练中见过的排列上为 0/32。这些结果不支持把 token 对齐继续作为当前主线。
 
 积木 Step 2 曾直接将 10×10 二值棋盘（当时 Q=I）经 MLP 映射为一个 token，训练冻结 Qwen3-4B-Instruct-2507 报告棋盘。原始协议、配置、代码和运行引用保留在[实验目录](../experiments/state_interface_pilot/README.md)；它不再是当前下一步。历史证据包括：固定八张训练棋盘累计拟合到 8/8；多样状态训练后，未见开发棋盘完整报告 0/356，逐格匹配 78.27%，结果与覆盖率捷径相容；单格查询在第 70 轮开发集为 28,338/35,600（79.60%），逐格重建整板仍为 0/356。单格读出不能证明完整状态已可靠供规划使用。此前在读出失败后启动的规划评测也不能用于判断有效 token 的规划价值。详细时间线、诊断和产物路径见[读出报告](../experiments/state_interface_pilot/results/readout.md)。
 

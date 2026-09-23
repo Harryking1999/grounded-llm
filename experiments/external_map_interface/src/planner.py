@@ -24,7 +24,7 @@ class SGLangCaller:
         self.max_new_tokens = max_new_tokens
         self.timeout_seconds = timeout_seconds
 
-    def __call__(self, prompt: str) -> str:
+    def __call__(self, prompt: str) -> dict:
         rendered = self.tokenizer.apply_chat_template(
             [{"role": "user", "content": prompt}], tokenize=False,
             add_generation_prompt=True, enable_thinking=self.enable_thinking,
@@ -39,6 +39,8 @@ class SGLangCaller:
         )
         with urllib.request.urlopen(request, timeout=self.timeout_seconds) as response:
             result = json.load(response)
-        if result["meta_info"]["finish_reason"]["type"] != "stop":
-            raise ValueError("Model output did not finish within its budget")
-        return result["text"]
+        meta = result["meta_info"]
+        return {"text": result["text"],
+                "finish_reason": meta["finish_reason"]["type"],
+                "prompt_tokens": meta.get("prompt_tokens"),
+                "completion_tokens": meta.get("completion_tokens")}

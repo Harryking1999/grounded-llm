@@ -5,7 +5,7 @@ from pathlib import Path
 
 import numpy as np
 
-from experiments.external_map_interface.src.evaluate import run_episode
+from experiments.external_map_interface.src.evaluate import run_episode, summarize
 from experiments.external_map_interface.src.interface import graph_prompt
 from experiments.external_map_interface.src.q_map import GraphQMap
 from experiments.external_map_interface.src.transitions import GraphEnvironment
@@ -42,6 +42,25 @@ class DistanceInterfaceTest(unittest.TestCase):
             env = GraphEnvironment.load(path)
             self.assertEqual(env.execute(0, 0), 1)
             self.assertFalse(hasattr(env, "graph_distances"))
+
+    def test_truncation_and_illegal_answer_remain_auditable(self):
+        adjacency = np.array([[False, True], [True, False]])
+        env = GraphEnvironment(adjacency, np.array([[0, 1], [1, 0]]))
+        truncated = run_episode(env, None, lambda _: {
+            "text": "<think>unfinished", "finish_reason": "length",
+            "completion_tokens": 256}, 0, 1, 2)
+        invalid = run_episode(env, None, lambda _: '{"action_id": 99}', 0, 1, 2)
+        for record in (truncated, invalid):
+            self.assertEqual(len(record["trace"]), 1)
+            self.assertIn("prompt", record["trace"][0])
+            self.assertIn("response", record["trace"][0])
+            record["moves"] = sum("actual_next" in step for step in record["trace"])
+            record["shortest_moves"] = 1
+        self.assertEqual(truncated["failure"], "budget_truncated")
+        self.assertEqual(invalid["failure"], "invalid_action")
+        self.assertEqual(summarize([truncated, invalid])["reach_rate"], 0)
+        self.assertEqual(summarize([truncated, invalid])["budget_truncated"], 1)
+        self.assertEqual(summarize([truncated, invalid])["invalid_action_rate"], 0.5)
 
 
 if __name__ == "__main__":

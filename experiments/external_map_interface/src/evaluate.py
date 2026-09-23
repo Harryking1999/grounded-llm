@@ -22,17 +22,44 @@ def run_episode(env: GraphEnvironment, q_map: GraphQMap | None, caller,
             break
         prompt = graph_prompt(env, current, goal, q_map)
         response = caller(prompt)
+        if isinstance(response, str):
+            response = {"text": response, "finish_reason": "stop"}
+        step = {"current": current, "prompt": prompt, "response": response}
+        if response["finish_reason"] != "stop":
+            trace.append(step)
+            return {"start": start, "goal": goal, "reached": False,
+                    "failure": "budget_truncated" if response["finish_reason"] == "length"
+                    else "model_incomplete", "trace": trace}
         try:
-            action_id = parse_action_id(response)
+            action_id = parse_action_id(response["text"])
             next_node = env.execute(current, action_id)
-        except (ValueError, json.JSONDecodeError) as error:
+        except ValueError as error:
+            step["error"] = str(error)
+            trace.append(step)
             return {"start": start, "goal": goal, "reached": False,
                     "failure": "invalid_action", "error": str(error), "trace": trace}
-        trace.append({"current": current, "action_id": action_id,
-                      "actual_next": next_node, "prompt": prompt, "response": response})
+        step.update({"action_id": action_id, "actual_next": next_node})
+        trace.append(step)
         current = next_node
     return {"start": start, "goal": goal, "reached": current == goal,
             "failure": None if current == goal else "step_limit", "trace": trace}
+
+
+def summarize(records: list[dict]) -> dict:
+    count = len(records)
+    reached = [record for record in records if record["reached"]]
+    attempts = sum(len(record["trace"]) for record in records)
+    invalid = sum(record["failure"] == "invalid_action" for record in records)
+    return {"cases": count, "reached": len(reached),
+            "reach_rate": len(reached) / count if count else None,
+            "shortest_success": sum(record["moves"] == record["shortest_moves"]
+                                    for record in reached),
+            "attempted_decisions": attempts,
+            "invalid_action": invalid,
+            "invalid_action_rate": invalid / attempts if attempts else None,
+            "budget_truncated": sum(record["failure"] == "budget_truncated" for record in records),
+            "model_incomplete": sum(record["failure"] == "model_incomplete" for record in records),
+            "step_limit": sum(record["failure"] == "step_limit" for record in records)}
 
 
 def main() -> None:
@@ -48,6 +75,8 @@ def main() -> None:
     if args.out.exists():
         raise FileExistsError(args.out)
     config = json.loads(args.config.read_text(encoding="utf-8"))
+    if args.condition == "distance" and args.inputs.parent.resolve() != args.map.parent.resolve():
+        raise ValueError("Map and inputs must come from the same Step 1 case directory")
     env = GraphEnvironment.load(args.inputs)
     q_map = GraphQMap.load(args.map, len(env.adjacency), len(env.actions)) if args.condition == "distance" else None
     caller = SGLangCaller(args.model_path, args.endpoint,
@@ -58,7 +87,7 @@ def main() -> None:
     for start, goal in config["pairs"]:
         record = run_episode(env, q_map, caller, start, goal, config["step_limit"])
         record["shortest_moves"] = int(truth[start, goal])
-        record["moves"] = len(record["trace"])
+        record["moves"] = sum("actual_next" in step for step in record["trace"])
         records.append(record)
     args.out.parent.mkdir(parents=True, exist_ok=True)
     source_commit = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
@@ -67,7 +96,7 @@ def main() -> None:
                                    "inputs": str(args.inputs.resolve()),
                                    "map": str(args.map.resolve()) if q_map is not None else None,
                                    "model_path": args.model_path,
-                                   "records": records},
+                                   "records": records, "summary": summarize(records)},
                                    ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 

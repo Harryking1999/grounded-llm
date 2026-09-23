@@ -5,6 +5,24 @@ from pathlib import Path
 
 import numpy as np
 
+from experiments.cml_map_scaling.src.core import action_catalog
+
+
+def environment_from_suite(suite):
+    """Read only topology; neither shortest paths nor reference lengths are used."""
+    first = suite["cases"][0]
+    adjacency = np.zeros((first["node_count"], first["node_count"]), dtype=bool)
+    for source, neighbors in first["neighbors"].items():
+        adjacency[int(source), neighbors] = True
+    for case in suite["cases"]:
+        if case["node_count"] != len(adjacency) or any(
+            set(case["neighbors"][str(i)]) != set(np.flatnonzero(adjacency[i]))
+            for i in range(len(adjacency))
+        ):
+            raise ValueError("All cases must use the same fixed graph")
+    actions, _ = action_catalog(adjacency)
+    return GraphEnvironment(adjacency, actions)
+
 
 @dataclass(frozen=True)
 class GraphEnvironment:

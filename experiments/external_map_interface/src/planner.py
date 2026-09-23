@@ -15,7 +15,8 @@ def parse_action_id(text: str) -> int:
 
 class SGLangCaller:
     def __init__(self, model_path: str, endpoint: str, *, enable_thinking: bool,
-                 max_new_tokens: int, timeout_seconds: int = 120):
+                 max_new_tokens: int, timeout_seconds: int = 120, sampling=None,
+                 context_length=None):
         from transformers import AutoTokenizer
 
         self.tokenizer = AutoTokenizer.from_pretrained(model_path, local_files_only=True)
@@ -23,18 +24,25 @@ class SGLangCaller:
         self.enable_thinking = enable_thinking
         self.max_new_tokens = max_new_tokens
         self.timeout_seconds = timeout_seconds
+        self.sampling = dict(sampling or {"temperature": 0, "max_new_tokens": max_new_tokens})
+        if self.sampling["max_new_tokens"] != max_new_tokens:
+            raise ValueError("Conflicting output budgets")
+        self.context_length = context_length
 
-    def __call__(self, prompt: str) -> dict:
+    def __call__(self, prompt: str, *, seed=None, endpoint=None) -> dict:
         rendered = self.tokenizer.apply_chat_template(
             [{"role": "user", "content": prompt}], tokenize=False,
             add_generation_prompt=True, enable_thinking=self.enable_thinking,
         )
         ids = self.tokenizer.encode(rendered, add_special_tokens=False)
+        if self.context_length and len(ids) + self.max_new_tokens > self.context_length:
+            raise ValueError("Context would reduce the per-step output budget")
+        sampling = dict(self.sampling)
+        if seed is not None:
+            sampling["sampling_seed"] = seed
         request = urllib.request.Request(
-            self.endpoint + "/generate",
-            data=json.dumps({"input_ids": ids, "sampling_params": {
-                "temperature": 0, "max_new_tokens": self.max_new_tokens,
-            }}).encode(),
+            (endpoint or self.endpoint).rstrip('/') + "/generate",
+            data=json.dumps({"input_ids": ids, "sampling_params": sampling}).encode(),
             headers={"Content-Type": "application/json"},
         )
         with urllib.request.urlopen(request, timeout=self.timeout_seconds) as response:
@@ -43,7 +51,8 @@ class SGLangCaller:
         return {"text": result["text"],
                 "finish_reason": meta["finish_reason"]["type"],
                 "prompt_tokens": meta.get("prompt_tokens"),
-                "completion_tokens": meta.get("completion_tokens")}
+                "completion_tokens": meta.get("completion_tokens"),
+                "sampling_params": sampling}
 
 
 class TransformersCaller:

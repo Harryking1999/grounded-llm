@@ -1,0 +1,13 @@
+{
+  "base_config": "experiments/cml_map_scaling/configs/step1.json",
+  "condition": "local1000",
+  "cases": ["random128_seed0", "random256_seed0"],
+  "resume_epoch": 20,
+  "snapshot_epochs": [20, 50, 100],
+  "selected_edges": 5,
+  "edge_selection": "longest_in_existing_epoch20_tsne_display_fixed_before_continuation",
+  "comparison": "same_maps_data_learning_rates_and_replay_order_extend_epochs_only",
+  "projection": "reuse_published_roadmap_coordinates_at_epoch20_no_tsne_refit",
+  "reference_coordinates": "experiments/cml_map_scaling/results",
+  "main": ["normalized_high_dim_edge_length", "normalized_2d_edge_length", "high_dim_distance_spearman_over_epochs", "normalized_pair_distance_drift"]
+}

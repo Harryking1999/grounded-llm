@@ -51,22 +51,6 @@ def shortest_distances(adj):
     return distances
 
 
-def structural_colors(adj):
-    """Refine neighbor colors; N singleton classes suffice to exclude automorphisms.
-
-    Repeated colors do not prove symmetry. This diagnostic is never an LLM input.
-    """
-    colors = adj.sum(axis=1).tolist()
-    for _ in range(len(adj)):
-        keys = [(colors[u], tuple(sorted(colors[v] for v in np.flatnonzero(adj[u])))) for u in range(len(adj))]
-        classes = {key: i for i, key in enumerate(sorted(set(keys)))}
-        refined = [classes[key] for key in keys]
-        if len(set(refined)) == len(set(colors)):
-            return refined
-        colors = refined
-    return colors
-
-
 def sample_walks(actions, outgoing, count, steps, seed):
     rng = np.random.default_rng(seed)
     walks = np.empty((count, steps, 3), dtype=np.int32)

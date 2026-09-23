@@ -1,0 +1,140 @@
+{
+  "purpose": "Post hoc, offline illustrations of observed Luna failures; not an additional benchmark or API condition.",
+  "summary": "experiments/gcml_counterexamples/results/summary.json",
+  "suite": "experiments/gcml_counterexamples/runs/uncapped/suite.json",
+  "output": "experiments/gcml_counterexamples/runs/luna_case_studies",
+  "report": "experiments/gcml_counterexamples/results/luna_case_studies.md",
+  "selections": [
+    {
+      "label": "B8-1", "case_id": "blocks8_row18465", "replicate": 1, "focus": "illegal",
+      "title": "稳定失败题中的初始空格重叠",
+      "observation": "第 3 步横向双格覆盖了初始就为空的 (2,5)，此前还没有进入死局。同一棋盘八次均失败，但本例只能直接证明计划与给定棋盘不一致。",
+      "interpretation": "可能涉及二进制行的坐标解析、形状落点选择或动作校验；不能把初始空格误用直接解释成忘记了先前移除。",
+      "next_probe": "在同一题上比较二进制行与带行列索引的占用坐标；另问该候选动作覆盖哪些格、是否合法。这样能区分输入解析与动作生成。"
+    },
+    {
+      "label": "B8-2", "case_id": "blocks8_row18465", "replicate": 8, "focus": "trap",
+      "alternate_first": {"shape_id": 2, "row": 2, "col": 3},
+      "title": "同一 0/8 棋盘上的合法移除陷阱",
+      "observation": "第 3 步移除 (2,4) 起的竖向三格，动作合法，却使 (2,3) 失去任何可覆盖形状。失误前存在六步完成方案。",
+      "interpretation": "B8-1 与本例是同一棋盘的两种失败，不能算两个独立难题。本例把即时合法性与保持后续可完成性明确分开。",
+      "next_probe": "给出失误前状态与两个候选动作，分别预测残余棋盘、检查未覆盖孤格，再选择动作；比较单纯合法性信息与后果信息的增益。"
+    },
+    {
+      "label": "B8-3", "case_id": "blocks8_row19239", "replicate": 2, "focus": "illegal",
+      "title": "刚移除的格子在下一步被重复使用",
+      "observation": "第 2 步 shape 2 at (4,4) 已移除 (5,5)，第 3 步 shape 5 at (5,5) 又使用该格。此时仍有五步可行后缀，错误不是先前已无解。",
+      "interpretation": "这是动作序列与更新后状态不一致的直接证据，适合作为状态维护接口的微型诊断；仅凭输出仍不能确定内部是遗忘还是动作表达失误。",
+      "next_probe": "保留原始棋盘和合法前缀，测剩余占用格预测；再提供真实残余棋盘测下一动作。两者差异有助定位状态更新与动作选择。"
+    },
+    {
+      "label": "B8-4", "case_id": "blocks8_row19456", "replicate": 1, "focus": "trap",
+      "alternate_first": {"shape_id": 6, "row": 1, "col": 4},
+      "title": "六格残局中错过两步完成方案",
+      "observation": "第 8 步前仅余六格，可用两块三格形状清空；模型合法移除 shape 1 at (2,4)，却孤立 (1,4)，最后留下一个格子。该棋盘另外六次成功。",
+      "interpretation": "这是短而易核验的末端规划错误；展示局面即可说明后果，无需用长答案或复杂棋盘解释失败。",
+      "next_probe": "优先把这个六格残局作为低成本诊断，测一步后果与终止判断，再回到完整棋盘检验效果是否保留。"
+    },
+    {
+      "label": "B8-5", "case_id": "blocks8_row19418", "replicate": 6, "focus": "stop",
+      "alternate_first": {"shape_id": 1, "row": 4, "col": 8},
+      "title": "零动作并错误声称无可行分解",
+      "observation": "模型输出空动作列表和 unsolved，并在公开答案中声称无解。实际上有八步合法分解；shape 1 at (4,8) 同时覆盖 (4,8)、(5,8)、(5,9)，反驳其把 (5,9) 与 (5,8) 配对后就必须另行处理 (4,8) 的推断。",
+      "interpretation": "unsolved 仅正确描述这份空计划没有清空棋盘，不能证明棋盘不可解。这里分析的是最终答案的公开理由，不推测隐藏思考过程。",
+      "next_probe": "把‘当前尚未完成’与‘不存在任何解’分开提问；先提供上述反例形状，测试可行性判断能否更新，再测独立新棋盘。"
+    },
+    {
+      "label": "B12-1", "case_id": "blocks12_generated031", "replicate": 2, "focus": "trap",
+      "alternate_first": {"shape_id": 4, "row": 2, "col": 9},
+      "title": "用户示例：第六步孤立右上角，十五步后仍未清空",
+      "observation": "第 6 步移除 shape 1 at (2,8)，使 (2,9) 成为孤格；此前九步即可完成。继续执行到第 15 步仍余两格，却报告 solved。选择 (2,9) 起的竖向双格可保留完整解。",
+      "interpretation": "首次不可恢复在第 6 步，最终错误终止在第 15 步，属于不同事件。全过程没有动作数上限，失败不能归因于超过 12 步。",
+      "next_probe": "在相同前缀后比较继续自由规划、给定真实残余状态、增加候选后果预测三种诊断，观察哪种信息能避免首个孤格。"
+    },
+    {
+      "label": "B12-2", "case_id": "blocks12_generated025", "replicate": 2, "focus": "trap",
+      "alternate_first": {"shape_id": 7, "row": 5, "col": 7},
+      "title": "稳定 0/8：横向双格与三格的一步分歧",
+      "observation": "第 9 步移除 (5,7) 起的横向双格，孤立同一行的 (5,9)；第 10 步才出现非法动作。把第 9 步改为同锚点横向三格，可接四步完成。",
+      "interpretation": "最终非法动作标签会掩盖更早的合法陷阱。这是同一状态、同一落点、不同形状后果的干净对照，且所属棋盘八次均失败。",
+      "next_probe": "固定锚点只比较双格与三格，测模型是否能预测并利用孤格后果；之后在未用于挑例的棋盘上验证。"
+    },
+    {
+      "label": "B12-3", "case_id": "blocks12_generated090", "replicate": 5, "focus": "trap",
+      "title": "合法陷阱后紧接重复移除",
+      "observation": "第 5 步 shape 1 at (4,8) 孤立 (3,8)，第 6 步又试图使用已移除的 (5,2)。该输出同时出现后果评估失败和计划状态不一致。",
+      "interpretation": "不能把一次样本强行归入单一内部机制；应保留最早不可恢复动作和随后非法动作的时间关系。",
+      "next_probe": "分别从第 5 步前的可解状态与第 6 步前的死局状态提问，独立测后果预测、空格识别和可完成性判断。"
+    },
+    {
+      "label": "B12-4", "case_id": "blocks12_generated064", "replicate": 1, "focus": "stop",
+      "title": "只差一个合法动作却宣称完成",
+      "observation": "十三个动作全部合法，也从未进入死局；最后只剩 (7,1)、(7,2)，加一个 shape 5 at (7,1) 就成功，模型却报告 solved。该棋盘七次成功。",
+      "interpretation": "这是可恢复的漏收尾和错误完成报告，不能用复杂搜索或步数限制解释。第十四步在现行无动作数限制裁判下完全允许。",
+      "next_probe": "优先测终止前剩余格数与清空判定，并比较一次终态自检是否足以修复；把该简单基线与状态模块同时保留。"
+    },
+    {
+      "label": "P0-1", "case_id": "path_shortest_26_1", "replicate": 1, "focus": "path",
+      "title": "原图：合法到达但九步对七步",
+      "observation": "模型九步到达目标，精确最短路为七步；同一实例还有三次八步路线。所有这些路线都合法，错误在明确要求的最短目标。",
+      "interpretation": "静态图也会有最优性损失，因此开关条件的非最短错误不能一律归因于状态更新。",
+      "next_probe": "把原图保留为静态规划对照，并用精确剩余距离定位真正损失步数的动作；不要把与任意一条参考路线不同就判为错误。"
+    },
+    {
+      "label": "P0-2", "case_id": "path_shortest_3_19", "replicate": 7, "focus": "path",
+      "title": "原图：局部三边绕路可用两边替代",
+      "observation": "路线中的 4→5→6→7 可替换为 4→8→7，节省一步且不影响后续到达 19。模型总长七步，最短六步。",
+      "interpretation": "失误可在很小的局部结构上展示，适合测试动作价值比较；当前输出没有不存在的边，也没有开关状态。",
+      "next_probe": "对照完整邻接表与只包含这一分歧的子图，判断困难是否主要来自从全图检索相关连接。"
+    },
+    {
+      "label": "P0-3", "case_id": "path_shortest_17_26", "replicate": 5, "focus": "path",
+      "title": "原图：忽略经 31 的更短连接",
+      "observation": "模型从 20 经 23、24、25 到 26；经 31、27 可少走一步。该实例八次中五次非最短，是原图里成功次数最低的起终点对。",
+      "interpretation": "这提供了重复出现的静态路线比较错误，同时该实例仍有三次成功，不能描述为 pass@8 失败。",
+      "next_probe": "固定起终点测候选后续路线的长度比较，区分找不到候选与找到后选择错误。"
+    },
+    {
+      "label": "P1-1", "case_id": "path_gates1_layout0_mask0", "replicate": 1, "focus": "path",
+      "title": "单开关：直接走关闭的 8→7",
+      "observation": "从 4 到 8 后仍报告开关为 0，却尝试通过要求开关为 1 的 8→7。必须先进入节点 10 开门，允许 4→10→4 后再走向目标。",
+      "interpretation": "显式报告当前位值并不足以保证动作服从前提。回到同一个节点 4 时，开关状态已不同，所以回访有用。",
+      "next_probe": "只改变初始开关位或提供到达 8 时的真实状态，分别问门能否通过与如何到达目标；保留当前配对初始状态结果。"
+    },
+    {
+      "label": "P1-2", "case_id": "path_gates1_layout0_mask0", "replicate": 8, "focus": "path",
+      "title": "单开关：改走另一条路仍碰到同一关闭前提",
+      "observation": "另一份输出从 4→5 后试图走关闭的 5→6；这条路线与 P1-1 不同，却同样没有先到 10 开门。",
+      "interpretation": "单开关组只有这一个实例发生失败。本例与 P1-1 展示其两种路线模式，不构成两个独立布局；即使离线改成初始开门，本路线也仍非最短。",
+      "next_probe": "在扩展独立布局前，利用这两种错路测试模型是否能识别多条边共享同一个开关前提，而不只是纠正某一条边。"
+    },
+    {
+      "label": "P2-1", "case_id": "path_gates2_layout0_mask0", "replicate": 4, "focus": "path",
+      "title": "双开关 0/8：只完成第一个开门子目标",
+      "observation": "先进入 23 打开开关 0 后，模型直接向目标走；到 8 时正确报告 [1,0]，仍尝试通过需要开关 1 的 8→4。五份输出复现同一路线。",
+      "interpretation": "这份记录支持‘已报告的状态没有约束行动、子目标协调失败’，不支持‘忘记了开关值’。最短解仅七步，失败并不依赖很长答案。",
+      "next_probe": "重点测试‘先到 23 开 0，才能到 12 开 1，最后进目标区域’的前提依赖；让候选动作评价使用状态与转移信息，而不仅附加位值文本。"
+    },
+    {
+      "label": "P2-2", "case_id": "path_gates2_layout0_mask0", "replicate": 6, "focus": "path",
+      "title": "同一 0/8 实例：顺序反转，过早进入第二个开关",
+      "observation": "模型从 21→22 后直接尝试进入开关节点 12，但 22→12 先要求开关 0 已打开。尚不能到达 12，因此输出中到达后的假想位值不能当成已执行状态。",
+      "interpretation": "与 P2-1 合起来，失败覆盖跳过第二个子目标和忽略子目标先后依赖两种行为；这是同一实例的诊断，不能重复计数。",
+      "next_probe": "要求单独判断‘当前能否进入 12’与‘若合法进入 12 会发生什么’，区分动作前提和到达后的转移。"
+    },
+    {
+      "label": "P2-3", "case_id": "path_gates2_layout2_mask0", "replicate": 2, "focus": "path",
+      "title": "双开关：状态全对，却错过有价值的回访",
+      "observation": "从 6 到 5 打开开关 0 后，模型绕 4→8→7，实际返回 6 再走 7 可少一步。六份输出复现八步路线，最短为七步，沿途位值报告全部正确。",
+      "interpretation": "同一节点、不同开关值是不同规划状态。输出显示错过有利回访，但不能据此断言模型内部使用了禁止回访的搜索规则。",
+      "next_probe": "配对比较必须回访与不必回访、且最短长度相近的布局；检验状态接口是否让模型正确比较更新后的回访价值。"
+    },
+    {
+      "label": "P2-4", "case_id": "path_gates2_layout1_mask1", "replicate": 4, "focus": "path",
+      "title": "双开关：全部开门之后仍有普通绕路",
+      "observation": "进入 0 后两位均为 1，模型随后走 4→5→6→7，而 4→8→7 更短；总长九步对八步，九次开关报告全部正确。",
+      "interpretation": "开关任务可以混入与原图相同的静态优化错误。本例提示应分别报告门合法性、状态报告与最短性，避免把一切增益解释成状态学习。",
+      "next_probe": "把完成必要开关操作后的残余问题与对应静态图对照，检验新增模块改善的是动作前提还是普通路线比较。"
+    }
+  ]
+}

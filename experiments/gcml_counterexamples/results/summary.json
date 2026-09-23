@@ -1,0 +1,581 @@
+{
+  "study": "gcml_counterexamples",
+  "config_path": "configs/pilot.json",
+  "analysis_path": "runs/uncapped/analysis.json",
+  "run_sources": [
+    {
+      "path": "experiments\\gcml_counterexamples\\runs\\pilot\\path_shortest_compatible\\run.json",
+      "status": "completed",
+      "source_commit": "627fea32e43b4209f549ec0aab34246d3a89a390",
+      "calls": 128,
+      "continued_from": null
+    },
+    {
+      "path": "experiments\\gcml_counterexamples\\runs\\uncapped\\path_gates_reconnect\\run.json",
+      "status": "completed",
+      "source_commit": "47002c26e14d7326b9748c4016ab5f44640503e5",
+      "calls": 128,
+      "continued_from": "experiments/gcml_counterexamples/runs/uncapped/path_gates/run.json"
+    },
+    {
+      "path": "experiments\\gcml_counterexamples\\runs\\uncapped\\blocks_reconnect3\\run.json",
+      "status": "completed",
+      "source_commit": "f6622583279e6afcb2d1decf10cc28357c30b3af",
+      "calls": 256,
+      "continued_from": "experiments/gcml_counterexamples/runs/uncapped/blocks_reconnect2/run.json"
+    }
+  ],
+  "completed_answers": 512,
+  "instances": 64,
+  "summary": {
+    "path_shortest": {
+      "calls_recorded": 128,
+      "completed_responses": 128,
+      "successes": 116,
+      "sample_success_rate_all_attempts": 0.90625,
+      "sample_success_rate_completed_responses": 0.90625,
+      "complete_case_groups": 16,
+      "valid_pass8_case_groups": 16,
+      "pass_at_8": 1.0,
+      "solved_case_groups": 16,
+      "failure_counts": {
+        "success": 116,
+        "non_shortest": 12
+      },
+      "per_case": {
+        "path_shortest_0_22": {
+          "n": 8,
+          "successes": 8
+        },
+        "path_shortest_12_6": {
+          "n": 8,
+          "successes": 8
+        },
+        "path_shortest_14_30": {
+          "n": 8,
+          "successes": 8
+        },
+        "path_shortest_15_7": {
+          "n": 8,
+          "successes": 8
+        },
+        "path_shortest_17_26": {
+          "n": 8,
+          "successes": 3
+        },
+        "path_shortest_19_16": {
+          "n": 8,
+          "successes": 8
+        },
+        "path_shortest_19_29": {
+          "n": 8,
+          "successes": 8
+        },
+        "path_shortest_25_29": {
+          "n": 8,
+          "successes": 8
+        },
+        "path_shortest_26_1": {
+          "n": 8,
+          "successes": 4
+        },
+        "path_shortest_28_2": {
+          "n": 8,
+          "successes": 8
+        },
+        "path_shortest_29_25": {
+          "n": 8,
+          "successes": 8
+        },
+        "path_shortest_30_13": {
+          "n": 8,
+          "successes": 7
+        },
+        "path_shortest_31_26": {
+          "n": 8,
+          "successes": 8
+        },
+        "path_shortest_3_19": {
+          "n": 8,
+          "successes": 6
+        },
+        "path_shortest_4_18": {
+          "n": 8,
+          "successes": 8
+        },
+        "path_shortest_9_17": {
+          "n": 8,
+          "successes": 8
+        }
+      },
+      "execution_successes": 128,
+      "execution_pass_at_8": 1.0,
+      "output_tokens": {
+        "sum": 28893,
+        "median": 195.0,
+        "max": 742
+      },
+      "reasoning_tokens": {
+        "sum": 22453,
+        "median": 147.0,
+        "max": 670
+      },
+      "elapsed_seconds": {
+        "sum": 914.263,
+        "median": 6.487,
+        "max": 19.431
+      },
+      "diagnostics": {},
+      "strict_json_answers": 128
+    },
+    "path_gates1": {
+      "calls_recorded": 64,
+      "completed_responses": 64,
+      "successes": 60,
+      "sample_success_rate_all_attempts": 0.9375,
+      "sample_success_rate_completed_responses": 0.9375,
+      "complete_case_groups": 8,
+      "valid_pass8_case_groups": 8,
+      "pass_at_8": 1.0,
+      "solved_case_groups": 8,
+      "failure_counts": {
+        "success": 60,
+        "illegal_move": 4
+      },
+      "per_case": {
+        "path_gates1_layout0_mask0": {
+          "n": 8,
+          "successes": 4
+        },
+        "path_gates1_layout0_mask1": {
+          "n": 8,
+          "successes": 8
+        },
+        "path_gates1_layout1_mask0": {
+          "n": 8,
+          "successes": 8
+        },
+        "path_gates1_layout1_mask1": {
+          "n": 8,
+          "successes": 8
+        },
+        "path_gates1_layout2_mask0": {
+          "n": 8,
+          "successes": 8
+        },
+        "path_gates1_layout2_mask1": {
+          "n": 8,
+          "successes": 8
+        },
+        "path_gates1_layout3_mask0": {
+          "n": 8,
+          "successes": 8
+        },
+        "path_gates1_layout3_mask1": {
+          "n": 8,
+          "successes": 8
+        }
+      },
+      "execution_successes": 60,
+      "execution_pass_at_8": 1.0,
+      "output_tokens": {
+        "sum": 31123,
+        "median": 459.5,
+        "max": 1431
+      },
+      "reasoning_tokens": {
+        "sum": 25186,
+        "median": 369.5,
+        "max": 1284
+      },
+      "elapsed_seconds": {
+        "sum": 907.494,
+        "median": 12.120000000000001,
+        "max": 41.114
+      },
+      "diagnostics": {
+        "switch_reports_correct": 296,
+        "switch_reports_on_legal_prefixes": 296
+      },
+      "strict_json_answers": 59
+    },
+    "path_gates2": {
+      "calls_recorded": 64,
+      "completed_responses": 64,
+      "successes": 40,
+      "sample_success_rate_all_attempts": 0.625,
+      "sample_success_rate_completed_responses": 0.625,
+      "complete_case_groups": 8,
+      "valid_pass8_case_groups": 8,
+      "pass_at_8": 0.875,
+      "solved_case_groups": 7,
+      "failure_counts": {
+        "success": 40,
+        "non_shortest": 15,
+        "illegal_move": 9
+      },
+      "per_case": {
+        "path_gates2_layout0_mask0": {
+          "n": 8,
+          "successes": 0
+        },
+        "path_gates2_layout0_mask1": {
+          "n": 8,
+          "successes": 7
+        },
+        "path_gates2_layout1_mask0": {
+          "n": 8,
+          "successes": 4
+        },
+        "path_gates2_layout1_mask1": {
+          "n": 8,
+          "successes": 5
+        },
+        "path_gates2_layout2_mask0": {
+          "n": 8,
+          "successes": 1
+        },
+        "path_gates2_layout2_mask1": {
+          "n": 8,
+          "successes": 8
+        },
+        "path_gates2_layout3_mask0": {
+          "n": 8,
+          "successes": 7
+        },
+        "path_gates2_layout3_mask1": {
+          "n": 8,
+          "successes": 8
+        }
+      },
+      "execution_successes": 55,
+      "execution_pass_at_8": 0.875,
+      "output_tokens": {
+        "sum": 71265,
+        "median": 967.0,
+        "max": 2694
+      },
+      "reasoning_tokens": {
+        "sum": 62175,
+        "median": 847.0,
+        "max": 2462
+      },
+      "elapsed_seconds": {
+        "sum": 1758.365,
+        "median": 26.277,
+        "max": 62.672
+      },
+      "diagnostics": {
+        "switch_reports_correct": 405,
+        "switch_reports_on_legal_prefixes": 406
+      },
+      "strict_json_answers": 48
+    },
+    "blocks8": {
+      "calls_recorded": 128,
+      "completed_responses": 128,
+      "successes": 99,
+      "sample_success_rate_all_attempts": 0.7734375,
+      "sample_success_rate_completed_responses": 0.7734375,
+      "complete_case_groups": 16,
+      "valid_pass8_case_groups": 16,
+      "pass_at_8": 0.9375,
+      "solved_case_groups": 15,
+      "failure_counts": {
+        "success": 99,
+        "illegal_action": 26,
+        "dead_end": 2,
+        "stopped_early": 1
+      },
+      "per_case": {
+        "blocks8_row18465": {
+          "n": 8,
+          "successes": 0
+        },
+        "blocks8_row18471": {
+          "n": 8,
+          "successes": 8
+        },
+        "blocks8_row18565": {
+          "n": 8,
+          "successes": 6
+        },
+        "blocks8_row18795": {
+          "n": 8,
+          "successes": 6
+        },
+        "blocks8_row19222": {
+          "n": 8,
+          "successes": 8
+        },
+        "blocks8_row19238": {
+          "n": 8,
+          "successes": 6
+        },
+        "blocks8_row19239": {
+          "n": 8,
+          "successes": 7
+        },
+        "blocks8_row19411": {
+          "n": 8,
+          "successes": 6
+        },
+        "blocks8_row19418": {
+          "n": 8,
+          "successes": 3
+        },
+        "blocks8_row19423": {
+          "n": 8,
+          "successes": 7
+        },
+        "blocks8_row19456": {
+          "n": 8,
+          "successes": 6
+        },
+        "blocks8_row19615": {
+          "n": 8,
+          "successes": 8
+        },
+        "blocks8_row19686": {
+          "n": 8,
+          "successes": 8
+        },
+        "blocks8_row19756": {
+          "n": 8,
+          "successes": 7
+        },
+        "blocks8_row19912": {
+          "n": 8,
+          "successes": 6
+        },
+        "blocks8_row19986": {
+          "n": 8,
+          "successes": 7
+        }
+      },
+      "output_tokens": {
+        "sum": 280809,
+        "median": 1956.0,
+        "max": 6361
+      },
+      "reasoning_tokens": {
+        "sum": 262644,
+        "median": 1821.0,
+        "max": 6214
+      },
+      "elapsed_seconds": {
+        "sum": 9091.641,
+        "median": 58.4735,
+        "max": 276.199
+      },
+      "diagnostics": {
+        "legal_moves_creating_dead_ends": 8,
+        "boards_with_dead_end_samples": 7,
+        "locally_supported_at_first_dead_end": 0,
+        "illegal_action_empty_cell_origin": {
+          "initially_empty": 20,
+          "previously_removed": 6
+        },
+        "successful_action_count": {
+          "min": 7,
+          "max": 11
+        }
+      },
+      "strict_json_answers": 114
+    },
+    "blocks12": {
+      "calls_recorded": 128,
+      "completed_responses": 128,
+      "successes": 72,
+      "sample_success_rate_all_attempts": 0.5625,
+      "sample_success_rate_completed_responses": 0.5625,
+      "complete_case_groups": 16,
+      "valid_pass8_case_groups": 16,
+      "pass_at_8": 0.9375,
+      "solved_case_groups": 15,
+      "failure_counts": {
+        "dead_end": 15,
+        "success": 72,
+        "illegal_action": 37,
+        "stopped_early": 4
+      },
+      "per_case": {
+        "blocks12_generated009": {
+          "n": 8,
+          "successes": 1
+        },
+        "blocks12_generated011": {
+          "n": 8,
+          "successes": 6
+        },
+        "blocks12_generated025": {
+          "n": 8,
+          "successes": 0
+        },
+        "blocks12_generated031": {
+          "n": 8,
+          "successes": 4
+        },
+        "blocks12_generated036": {
+          "n": 8,
+          "successes": 4
+        },
+        "blocks12_generated044": {
+          "n": 8,
+          "successes": 3
+        },
+        "blocks12_generated048": {
+          "n": 8,
+          "successes": 2
+        },
+        "blocks12_generated050": {
+          "n": 8,
+          "successes": 8
+        },
+        "blocks12_generated053": {
+          "n": 8,
+          "successes": 1
+        },
+        "blocks12_generated054": {
+          "n": 8,
+          "successes": 6
+        },
+        "blocks12_generated064": {
+          "n": 8,
+          "successes": 7
+        },
+        "blocks12_generated065": {
+          "n": 8,
+          "successes": 6
+        },
+        "blocks12_generated073": {
+          "n": 8,
+          "successes": 8
+        },
+        "blocks12_generated074": {
+          "n": 8,
+          "successes": 6
+        },
+        "blocks12_generated090": {
+          "n": 8,
+          "successes": 3
+        },
+        "blocks12_generated094": {
+          "n": 8,
+          "successes": 7
+        }
+      },
+      "output_tokens": {
+        "sum": 414615,
+        "median": 2846.5,
+        "max": 8965
+      },
+      "reasoning_tokens": {
+        "sum": 387623,
+        "median": 2634.5,
+        "max": 8792
+      },
+      "elapsed_seconds": {
+        "sum": 11409.388,
+        "median": 69.613,
+        "max": 305.093
+      },
+      "diagnostics": {
+        "legal_moves_creating_dead_ends": 22,
+        "boards_with_dead_end_samples": 9,
+        "locally_supported_at_first_dead_end": 0,
+        "illegal_action_empty_cell_origin": {
+          "initially_empty": 36,
+          "previously_removed": 1
+        },
+        "successful_action_count": {
+          "min": 12,
+          "max": 17
+        }
+      },
+      "strict_json_answers": 100
+    }
+  },
+  "selected_block_statistics": {
+    "blocks8": {
+      "boards": 16,
+      "successful_answers": 99,
+      "successful_answers_exceeding_construction_count": 86,
+      "occupied_cells": {
+        "min": 20,
+        "mean": 22,
+        "max": 23
+      },
+      "minimum_actions": {
+        "min": 7,
+        "mean": 7.6875,
+        "max": 8
+      },
+      "initial_legal_actions": {
+        "min": 51,
+        "mean": 65,
+        "max": 83
+      },
+      "dead_end_fraction": {
+        "min": 0.058823529411764705,
+        "mean": 0.3108514917289847,
+        "max": 0.515625
+      },
+      "locally_supported_dead_end_fraction": {
+        "min": 0.0,
+        "mean": 0.032699427681275095,
+        "max": 0.08536585365853659
+      }
+    },
+    "blocks12": {
+      "boards": 16,
+      "successful_answers": 72,
+      "successful_answers_exceeding_construction_count": 71,
+      "occupied_cells": {
+        "min": 30,
+        "mean": 33,
+        "max": 35
+      },
+      "minimum_actions": {
+        "min": 10,
+        "mean": 11.5,
+        "max": 12
+      },
+      "initial_legal_actions": {
+        "min": 84,
+        "mean": 107,
+        "max": 138
+      },
+      "dead_end_fraction": {
+        "min": 0.1015625,
+        "mean": 0.2420709095585271,
+        "max": 0.44047619047619047
+      },
+      "locally_supported_dead_end_fraction": {
+        "min": 0.0,
+        "mean": 0.009120286217421615,
+        "max": 0.08333333333333333
+      }
+    }
+  },
+  "zero_success_instances": [
+    "blocks8_row18465",
+    "blocks12_generated025",
+    "path_gates2_layout0_mask0"
+  ],
+  "prior_transport_errors": {
+    "URLError": 4
+  },
+  "prior_response_errors": {
+    "upstream_error": 1,
+    "server_error": 2
+  },
+  "returned_model_names": {
+    "gpt-5.6-luna": 512
+  },
+  "returned_output_caps": {
+    "None": 512
+  },
+  "answers_exceeding_requested_output_cap": 1,
+  "next_scale_decision": "Do not add sixteen-piece cases in this pilot: eight/twelve-piece and two-switch cases already include 0/8 instances. Prioritize matched representations and failure-localization controls."
+}

@@ -1,0 +1,28 @@
+{
+  "study": "qwen_path_blocks",
+  "baseline_config": "experiments/sol_dag_blocks/configs/sol_medium.json",
+  "suite": "experiments/sol_dag_blocks/runs/suite.json",
+  "models": ["Qwen/Qwen3-4B", "Qwen/Qwen3-8B", "Qwen/Qwen3-32B"],
+  "enable_thinking": true,
+  "seed": 20260910,
+  "replicates": 8,
+  "max_calls_per_model": 384,
+  "sampling": {
+    "max_new_tokens": 16384,
+    "temperature": 0.6,
+    "top_p": 0.95,
+    "top_k": 20,
+    "min_p": 0.0,
+    "repetition_penalty": 1.0
+  },
+  "serving": {
+    "dtype": "bfloat16",
+    "context_length": 24576,
+    "mem_fraction_static": 0.85,
+    "max_running_requests": 32
+  },
+  "concurrency_per_endpoint": 24,
+  "timeout_seconds": 7200,
+  "smoke_conditions": ["path_dag", "blocks8"],
+  "evaluation": "Exact Sol prompts and deterministic task environment; score content after </think> without requiring a strict JSON object. Unambiguous JSON arrays of actions or path moves are normalized before the same judge runs. Length truncations remain failed final trials and are never resampled; raw generation and format provenance are retained."
+}

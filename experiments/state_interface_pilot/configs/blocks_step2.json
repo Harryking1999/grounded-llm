@@ -1,0 +1,55 @@
+{
+  "base_config": "experiments/cml_map_scaling/configs/step2.json",
+  "schema_version": 1,
+  "task_family": "blocks",
+  "study": "blocks_step2_text_plus_token",
+  "mode": "run",
+  "readout_requirement": {"minimum_exact_accuracy": 0.95},
+  "output": "runs/blocks_step2",
+  "model": {
+    "directory": "models/Qwen3-4B-Instruct-2507",
+    "provenance": "models/Qwen3-4B-Instruct-2507/step2_provenance.json",
+    "device": "cuda",
+    "attention": "sdpa"
+  },
+  "assets": {"state_dim": 100},
+  "adapter": {"input_scaling": "raw_binary_pixels_no_scaling", "mlp": {"hidden_dim": 256}},
+  "conditions": [{"name": "text", "adapter": null}, {"name": "text_token", "adapter": "mlp"}],
+  "blocks": {
+    "rules_config": "experiments/sol_dag_blocks/configs/sol_medium.json",
+    "construction_counts": [2, 4, 6, 8],
+    "seed": 20260921,
+    "families_per_difficulty": {"train": 128, "validation": 16, "test": 24},
+    "reports_per_family": 2,
+    "state_tokens": 1,
+    "target": "empty",
+    "training_input": "token_only_current_board",
+    "training_target": "current_board_rows_json",
+    "evaluation_input": "same_initial_text_and_self_reports_plus_optional_current_token",
+    "state_report": "board_after",
+    "continuation": "same_assistant_sequence",
+    "stop_on": ["format_error", "illegal_action", "state_report_error", "premature_done", "budget_exhausted", "context_cap"],
+    "protocol": "Continue one removal at a time. Output exactly one JSON object per step with integer shape_id, row, col and board_after, an array of exactly ten binary strings of length ten reporting the entire board AFTER this removal. Do not wrap it in an actions array. No markdown or reasoning transcript. The evaluator stops immediately on an illegal action or an incorrect board_after. After a correct step, the same sequence continues at the next 'Step:' marker. State markers may carry an additional continuous encoding of that same board. Your own correct board_after remains the textual current state. Do not repair or retry a failed step. Stop when the board is empty. If you cannot proceed, output {\"done\":true}. No action list, legal-move oracle or solution is supplied.",
+    "report_prompt": "Read the CURRENT board encoded by the state token. Output only a JSON array of ten strings, each containing ten binary digits, in row order."
+  },
+  "training": {
+    "enabled": true,
+    "epochs": 3,
+    "report_batch_size": 32,
+    "initial_microbatch_size": 4,
+    "shuffle_seed": 18,
+    "tasks": ["report_board"],
+    "selection": "validation",
+    "learning_rate": 0.0001
+  },
+  "generation": {
+    "do_sample": false,
+    "num_beams": 1,
+    "attempts_per_item": 1,
+    "max_new_tokens": 16384,
+    "report_max_new_tokens": 256,
+    "context_limit": 32768
+  },
+  "smoke": {"enabled": false, "training_report_examples": 8, "optimizer_steps": 8},
+  "evaluation": {"report_probe_count": 32, "paired_bootstrap_samples": 2000, "report_batch_size": 8}
+}

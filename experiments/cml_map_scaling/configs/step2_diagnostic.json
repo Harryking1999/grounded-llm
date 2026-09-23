@@ -1,0 +1,27 @@
+{
+  "study": "cml_map_scaling_step2_output_diagnostic",
+  "base_run": "run_1791d00",
+  "base_source_commit": "1791d001e62254e2fa19678667a710658bc06098",
+  "purpose": "Distinguish output-format failure from node-choice failure using existing frozen weights.",
+  "training": false,
+  "checkpoint": "selected",
+  "split": "test",
+  "tasks": ["report_current", "report_goal", "action"],
+  "templates": ["canonical", "heldout"],
+  "variants": [
+    {
+      "name": "strict_system",
+      "system_suffix": " Respond with exactly one decimal node ID and nothing else. Do not explain, analyze, restate the task, or list multiple nodes. Give the answer immediately.",
+      "node_id_grammar": false
+    },
+    {
+      "name": "node_id_grammar",
+      "system_suffix": "",
+      "node_id_grammar": true
+    }
+  ],
+  "grammar": "Greedy prefix constraint over tokenizer encodings of every ID 0..31 followed by native EOS; no adjacency, distance, legal-action filtering, or answer labels enter decoding.",
+  "generation_budget": "unchanged_from_base_run",
+  "scoring": "unchanged_strict_parser_and_external_judge",
+  "interpretation": "Post-hoc diagnostic on the previously inspected test split; separate from original free-generation results, not a new confirmatory test. No model or checkpoint selection."
+}

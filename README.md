@@ -23,4 +23,4 @@ See [PROJECT_ROADMAP.md](PROJECT_ROADMAP.md) for detailed implementation plan an
 
 ## Status
 
-🚧 **Early stage** - currently in Phase 1 (task selection and baseline validation)
+The Step 2 map interface code and reviewed results are available in the [graph experiment](experiments/cml_map_scaling/README.md). The [short result report](experiments/cml_map_scaling/results/step2_acceptance.md) summarizes the current findings.

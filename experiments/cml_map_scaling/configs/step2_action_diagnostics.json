@@ -1,0 +1,24 @@
+{
+  "study": "step2_action_supervision_decision_and_relations",
+  "training": false,
+  "require_saved_items": true,
+  "checkpoint": "final",
+  "node_counts": [64, 128, 256],
+  "action_tasks": ["neighbor_direct", "neighbor_reason"],
+  "probe_tasks": ["distance_compare", "transition_compare"],
+  "conditions": ["report_correct", "report_mismatch", "action_correct", "action_mismatch"],
+  "probe_extra_conditions": ["report_latent", "action_latent"],
+  "checkpoint_groups": {
+    "report": {"adapter": "mlp", "checkpoint_source": "continuation", "checkpoint_condition": "report_continuation", "checkpoint": "final"},
+    "action": {"adapter": "mlp", "checkpoint_source": "continuation", "checkpoint_condition": "report_plus_action", "checkpoint": "final"}
+  },
+  "generation": {"reason_tokens": 512, "batch_size": 8, "do_sample": false, "attempts": 1},
+  "data": {
+    "source": "Required --items-from: each graph's original step2_decision run items.json and permutation.json, copied without regeneration.",
+    "action": "Same 100 directed test pairs, with original legal neighbor options and all successful successors accepted.",
+    "distance": "Same 200 A/B questions, including reversal.",
+    "transition": "Same legal-edge questions, without class resampling.",
+    "mismatch": "Original saved derangement, shared by both new checkpoint groups."
+  },
+  "interpretation": "New checkpoints only; do not regenerate old text or original-report baselines. Primary comparison is report-plus-action versus equal-budget report continuation within this run. Correct/mismatched vectors use identical text and choice budgets. Latent-only three-slot probes remain a separate out-of-training-format diagnostic. Old text outputs are historical context."
+}

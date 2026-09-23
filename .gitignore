@@ -1,62 +1,51 @@
-# Python
+# Python 与测试缓存
 __pycache__/
 *.py[cod]
-*$py.class
-*.so
-.Python
-env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# 环境与本地工具
+.venv/
 venv/
-ENV/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
+node_modules/
+.idea/
+.vscode/
+.codex/cache/
 
-# Jupyter Notebook
-.ipynb_checkpoints
-*.ipynb
+# 密钥与机器本地配置
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*credential*
+*password*
 
-# PyTorch
-*.pth
-*.pt
-*.ckpt
-checkpoints/
+# 临时文件与生成的运行状态
+tmp/
+.tmp_*/
 runs/
 logs/
-wandb/
-
-# Data
-data/
-datasets/
-*.csv
-*.h5
-*.hdf5
-*.pkl
-*.pickle
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Experiments
-experiments/
 outputs/
-results/
+wandb/
+ray_results/
+
+# 数据集、模型与 checkpoint 不纳入源代码版本控制
+data/raw/
+data/cache/
+models/
+checkpoints/
+durable/
+*.pt
+*.pth
+*.ckpt
+*.distcp
+*.safetensors
+*.parquet
+*.arrow
+
+# 本地文献调研工作区（初筛笔记、下载论文与临时索引）
+literature_review/

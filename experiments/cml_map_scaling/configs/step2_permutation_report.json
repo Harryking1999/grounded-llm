@@ -1,0 +1,60 @@
+{
+  "study": "cml_report_node_relabeling",
+  "base_source_commit": "aafa2a599ee4055214831b1506f5d95b0fc4787f",
+  "node_counts": [64, 128],
+  "adapter": "mlp",
+  "initialization": "fresh_random_initialization_matching_original_report_adapter",
+  "initialization_seed": 17,
+  "training_data_source": "all_report_examples_from_existing_physical_train_split",
+  "training_condition": "permuted_labels_only",
+  "fixed_control": "existing_original_mlp_report_selected_no_retraining",
+  "training": {
+    "tasks": ["report_current", "report_goal"],
+    "epochs": 10,
+    "report_batch_size": 32,
+    "learning_rate": 0.001,
+    "report_repeats": 1,
+    "shuffle_seed": 18,
+    "template": "canonical",
+    "checkpoint": "final_fixed_budget",
+    "original_reference_selected_epoch": 10,
+    "freeze_llm_and_QV": true
+  },
+  "relabeling": {
+    "direction": "labels[physical_node]=displayed_node_id",
+    "train_seed": 71017,
+    "test_seed": 91017,
+    "train_schedule": "new_unique_permutation_per_optimizer_batch",
+    "test_permutations": 4,
+    "seen_permutation_index": 0,
+    "q_rows": "unchanged_physical_node_order",
+    "graph": "relabel_all_nodes_and_edges_consistently",
+    "targets": "displayed_current_or_goal_id",
+    "explicit_vector_label_table": false,
+    "textual_current_goal_ids": false,
+    "distance_or_structural_signatures_visible": false
+  },
+  "evaluation": {
+    "template": "canonical",
+    "groups": ["identity_seen_pairs", "identity_test_pairs", "seen_permutation_seen_pairs", "unseen_permutation_seen_pairs", "unseen_permutation_test_pairs"],
+    "primary_decoding": "free",
+    "format_diagnostic": "global_node_id_grammar_on_test_pairs_only",
+    "batch_size": 8,
+    "seen_examples_per_node": 2.5,
+    "max_new_tokens": 16,
+    "pair_split": "reuse_saved_physical_split_without_resampling",
+    "equivariance": "inverse_relabel_generated_ids_and_compare_to_identity_answers; report_both_correct_separately",
+    "reference_evaluation": "reuse_existing_identity_test_reports_and_generate_only_new_unseen_permutation_test_reports",
+    "checkpoints": ["new_permuted", "existing_fixed_reference"],
+    "retry": false
+  },
+  "outputs": {
+    "root": "runs/cml_step2_permutation_report",
+    "directories": ["training", "evaluation/new_permuted", "evaluation/existing_fixed_reference"],
+    "weights": ["initial.safetensors", "final.safetensors"],
+    "records": ["train.jsonl", "predictions.jsonl", "summary.json", "runtime.json", "completed.json"],
+    "report": "experiments/cml_map_scaling/results/step2_acceptance.md",
+    "overwrite": false
+  },
+  "interpretation": "Only the repeatedly relabeled report adapter is newly trained, independently for 64 and 128 nodes. Match each original fixed-label report run's initialization, full physical training data, sample order and update budget; use its existing weights as the reference on identical new test permutations without retraining. Preserve original identity outputs rather than regenerating them. This is not action training, an exact-distance test or cross-graph generalization. Structure matching to a fixed graph can explain success, and failure does not establish that Q lacks relational information."
+}

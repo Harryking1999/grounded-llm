@@ -1,0 +1,39 @@
+{
+  "study": "cml_map_scaling_step2_text_plus_roadmap",
+  "base_source_commit": "1791d001e62254e2fa19678667a710658bc06098",
+  "base_run": "run_1791d00",
+  "training": false,
+  "conditions": [
+    {"name": "text_baseline", "adapter": null, "base_condition": null},
+    {"name": "text_plus_linear", "adapter": "linear", "base_condition": "linear_report"},
+    {"name": "text_plus_mlp", "adapter": "mlp", "base_condition": "mlp_report"}
+  ],
+  "checkpoint": "selected",
+  "split": "test",
+  "tasks": ["action"],
+  "templates": ["canonical"],
+  "state_information": "All conditions retain exactly the same text graph, current node ID and goal node ID. Only experimental conditions append two frozen roadmap vectors through their trained adapter.",
+  "roadmap_scope": "Current and goal Q rows, one continuous token each; not all graph-node embeddings.",
+  "prompts": {
+    "system": "You are solving a task on a fixed, undirected, unweighted graph.",
+    "user": "Nodes are numbered from 0 to {max_node_id}. One move follows one edge.\nAdjacency list:\n{adjacency}\nCurrent node: {u}\nGoal node: {g}{roadmap_block}\n\nChoose one next node adjacent to the current node whose shortest-path distance to the goal is strictly smaller. You may give a brief explanation. Clearly state your chosen move at the end as: Next node: <node ID>.",
+    "roadmap_block": "\n\nAdditional roadmap representation of the same current and goal states:\nCurrent node: {current_slot}\nGoal node: {goal_slot}"
+  },
+  "generation": {
+    "do_sample": false,
+    "num_beams": 1,
+    "max_new_tokens": 4096,
+    "attempts_per_item": 1,
+    "grammar_constraint": false,
+    "retry": false
+  },
+  "scoring": {
+    "decision": "Accept an unambiguous chosen action expressed as a node ID or in prose. Use explicit final decision statements; never choose an answer because it is legal or correct.",
+    "ambiguous_or_unrecognized": "Retain raw output for semantic adjudication before the final report. If no unique chosen action is stated, retain as unanswered or ambiguous in the denominator.",
+    "successful_action": "Any adjacent node with strictly smaller shortest-path distance to the goal.",
+    "budget_exhaustion": "Report separately; a clearly stated decision can still be scored. A truncated explanation without a decision is unanswered.",
+    "primary_denominator": "All 100 ordered test pairs in each condition."
+  },
+  "comparison": "Matched pairs, same frozen LM, text information, question, output policy and budget. No training, prompt selection or checkpoint selection in this run.",
+  "interpretation": "Existing checkpoints were trained to report without explicit text IDs; evaluation now augments complete text. Previously inspected fixed-graph test pairs; exploratory transfer comparison, not independent confirmation or evidence of geometry use. Multi-template training is deferred."
+}

@@ -1,0 +1,1144 @@
+{
+  "study": "Step 2 fixed-graph interfaces",
+  "scope": "Each graph is trained separately; report, full-text action, constrained diagnostics and relabeling use distinct protocols.",
+  "fixed_id_reports": {
+    "64": {
+      "linear_report": {
+        "current": {
+          "successes": 100,
+          "total": 100
+        },
+        "goal": {
+          "successes": 100,
+          "total": 100
+        },
+        "both": {
+          "successes": 100,
+          "total": 100
+        }
+      },
+      "mlp_report": {
+        "current": {
+          "successes": 100,
+          "total": 100
+        },
+        "goal": {
+          "successes": 100,
+          "total": 100
+        },
+        "both": {
+          "successes": 100,
+          "total": 100
+        }
+      }
+    },
+    "128": {
+      "linear_report": {
+        "current": {
+          "successes": 100,
+          "total": 100
+        },
+        "goal": {
+          "successes": 100,
+          "total": 100
+        },
+        "both": {
+          "successes": 100,
+          "total": 100
+        }
+      },
+      "mlp_report": {
+        "current": {
+          "successes": 100,
+          "total": 100
+        },
+        "goal": {
+          "successes": 100,
+          "total": 100
+        },
+        "both": {
+          "successes": 100,
+          "total": 100
+        }
+      }
+    },
+    "256": {
+      "linear_report": {
+        "current": {
+          "successes": 100,
+          "total": 100
+        },
+        "goal": {
+          "successes": 100,
+          "total": 100
+        },
+        "both": {
+          "successes": 100,
+          "total": 100
+        }
+      },
+      "mlp_report": {
+        "current": {
+          "successes": 100,
+          "total": 100
+        },
+        "goal": {
+          "successes": 100,
+          "total": 100
+        },
+        "both": {
+          "successes": 100,
+          "total": 100
+        }
+      }
+    }
+  },
+  "full_text_augmentation": {
+    "32": {
+      "text_baseline": {
+        "total": 100,
+        "success": 83,
+        "no_choice": 11,
+        "illegal": 0,
+        "token_limit": 12
+      },
+      "text_plus_linear": {
+        "total": 100,
+        "success": 95,
+        "no_choice": 1,
+        "illegal": 0,
+        "token_limit": 2
+      },
+      "text_plus_mlp": {
+        "total": 100,
+        "success": 90,
+        "no_choice": 8,
+        "illegal": 0,
+        "token_limit": 9
+      }
+    },
+    "64": {
+      "text_baseline": {
+        "total": 100,
+        "success": 79,
+        "no_choice": 15,
+        "illegal": 0,
+        "token_limit": 19
+      },
+      "text_plus_linear": {
+        "total": 100,
+        "success": 72,
+        "no_choice": 21,
+        "illegal": 0,
+        "token_limit": 22
+      },
+      "text_plus_mlp": {
+        "total": 100,
+        "success": 75,
+        "no_choice": 16,
+        "illegal": 0,
+        "token_limit": 19
+      }
+    },
+    "128": {
+      "text_baseline": {
+        "total": 100,
+        "success": 39,
+        "no_choice": 55,
+        "illegal": 0,
+        "token_limit": 59
+      },
+      "text_plus_linear": {
+        "total": 100,
+        "success": 43,
+        "no_choice": 49,
+        "illegal": 0,
+        "token_limit": 51
+      },
+      "text_plus_mlp": {
+        "total": 100,
+        "success": 44,
+        "no_choice": 48,
+        "illegal": 0,
+        "token_limit": 52
+      }
+    },
+    "256": {
+      "text_baseline": {
+        "total": 100,
+        "success": 22,
+        "no_choice": 73,
+        "illegal": 1,
+        "token_limit": 74
+      },
+      "text_plus_linear": {
+        "total": 100,
+        "success": 20,
+        "no_choice": 75,
+        "illegal": 0,
+        "token_limit": 77
+      },
+      "text_plus_mlp": {
+        "total": 100,
+        "success": 17,
+        "no_choice": 74,
+        "illegal": 2,
+        "token_limit": 74
+      }
+    }
+  },
+  "action_continuation": {
+    "32": {
+      "conditions": {
+        "text_baseline": {
+          "total": 100,
+          "success": 92,
+          "no_choice": 5,
+          "illegal": 0,
+          "token_limit": 6
+        },
+        "text_plus_mlp_report": {
+          "total": 100,
+          "success": 92,
+          "no_choice": 5,
+          "illegal": 0,
+          "token_limit": 5
+        },
+        "text_plus_report_continuation": {
+          "total": 100,
+          "success": 91,
+          "no_choice": 5,
+          "illegal": 0,
+          "token_limit": 8
+        },
+        "text_plus_report_plus_action": {
+          "total": 100,
+          "success": 90,
+          "no_choice": 6,
+          "illegal": 0,
+          "token_limit": 8
+        }
+      },
+      "paired_report_vs_action": {
+        "both_success": 85,
+        "report_only": 6,
+        "both_failure": 4,
+        "action_only": 5,
+        "net_success_gain": -1
+      }
+    },
+    "64": {
+      "conditions": {
+        "text_plus_report_continuation": {
+          "total": 100,
+          "success": 76,
+          "no_choice": 14,
+          "illegal": 0,
+          "token_limit": 22
+        },
+        "text_plus_report_plus_action": {
+          "total": 100,
+          "success": 83,
+          "no_choice": 12,
+          "illegal": 0,
+          "token_limit": 15
+        }
+      },
+      "paired_report_vs_action": {
+        "both_success": 67,
+        "both_failure": 8,
+        "action_only": 16,
+        "report_only": 9,
+        "net_success_gain": 7
+      }
+    },
+    "128": {
+      "conditions": {
+        "text_plus_report_continuation": {
+          "total": 100,
+          "success": 47,
+          "no_choice": 45,
+          "illegal": 2,
+          "token_limit": 50
+        },
+        "text_plus_report_plus_action": {
+          "total": 100,
+          "success": 47,
+          "no_choice": 45,
+          "illegal": 1,
+          "token_limit": 47
+        }
+      },
+      "paired_report_vs_action": {
+        "both_success": 32,
+        "action_only": 15,
+        "report_only": 15,
+        "both_failure": 38,
+        "net_success_gain": 0
+      }
+    },
+    "256": {
+      "conditions": {
+        "text_plus_report_continuation": {
+          "total": 100,
+          "success": 21,
+          "no_choice": 74,
+          "illegal": 0,
+          "token_limit": 77
+        },
+        "text_plus_report_plus_action": {
+          "total": 100,
+          "success": 24,
+          "no_choice": 68,
+          "illegal": 0,
+          "token_limit": 71
+        }
+      },
+      "paired_report_vs_action": {
+        "both_success": 11,
+        "action_only": 13,
+        "report_only": 10,
+        "both_failure": 66,
+        "net_success_gain": 3
+      }
+    }
+  },
+  "decision_and_relation_probes": {
+    "64": {
+      "distance_compare__linear_correct": {
+        "total": 200,
+        "correct": 101,
+        "invalid": 0,
+        "swap_consistency": 0.13,
+        "prediction_counts": {
+          "A": 187,
+          "B": 13
+        }
+      },
+      "distance_compare__linear_latent": {
+        "total": 200,
+        "correct": 100,
+        "invalid": 0,
+        "swap_consistency": 0.0,
+        "prediction_counts": {
+          "A": 200
+        }
+      },
+      "distance_compare__linear_mismatch": {
+        "total": 200,
+        "correct": 105,
+        "invalid": 0,
+        "swap_consistency": 0.07,
+        "prediction_counts": {
+          "A": 193,
+          "B": 7
+        }
+      },
+      "distance_compare__mlp_correct": {
+        "total": 200,
+        "correct": 99,
+        "invalid": 0,
+        "swap_consistency": 0.25,
+        "prediction_counts": {
+          "A": 175,
+          "B": 25
+        }
+      },
+      "distance_compare__mlp_latent": {
+        "total": 200,
+        "correct": 100,
+        "invalid": 0,
+        "swap_consistency": 0.0,
+        "prediction_counts": {
+          "A": 200
+        }
+      },
+      "distance_compare__mlp_mismatch": {
+        "total": 200,
+        "correct": 98,
+        "invalid": 0,
+        "swap_consistency": 0.18,
+        "prediction_counts": {
+          "A": 182,
+          "B": 18
+        }
+      },
+      "distance_compare__text": {
+        "total": 200,
+        "correct": 100,
+        "invalid": 0,
+        "swap_consistency": 0.4,
+        "prediction_counts": {
+          "A": 96,
+          "B": 104
+        }
+      },
+      "neighbor_direct__linear_correct": {
+        "total": 100,
+        "correct": 39,
+        "invalid": 0
+      },
+      "neighbor_direct__linear_mismatch": {
+        "total": 100,
+        "correct": 40,
+        "invalid": 0
+      },
+      "neighbor_direct__mlp_correct": {
+        "total": 100,
+        "correct": 44,
+        "invalid": 0
+      },
+      "neighbor_direct__mlp_mismatch": {
+        "total": 100,
+        "correct": 45,
+        "invalid": 0
+      },
+      "neighbor_direct__text": {
+        "total": 100,
+        "correct": 40,
+        "invalid": 0
+      },
+      "neighbor_reason__linear_correct": {
+        "total": 100,
+        "correct": 58,
+        "invalid": 0,
+        "analysis_budget_hits": 100
+      },
+      "neighbor_reason__linear_mismatch": {
+        "total": 100,
+        "correct": 61,
+        "invalid": 0,
+        "analysis_budget_hits": 100
+      },
+      "neighbor_reason__mlp_correct": {
+        "total": 100,
+        "correct": 57,
+        "invalid": 0,
+        "analysis_budget_hits": 100
+      },
+      "neighbor_reason__mlp_mismatch": {
+        "total": 100,
+        "correct": 62,
+        "invalid": 0,
+        "analysis_budget_hits": 100
+      },
+      "neighbor_reason__text": {
+        "total": 100,
+        "correct": 58,
+        "invalid": 0,
+        "analysis_budget_hits": 100
+      },
+      "transition_compare__linear_correct": {
+        "total": 291,
+        "correct": 121,
+        "invalid": 0,
+        "macro_accuracy": 0.3594623655913978,
+        "prediction_counts": {
+          "更近": 135,
+          "更远": 156
+        }
+      },
+      "transition_compare__linear_latent": {
+        "total": 291,
+        "correct": 124,
+        "invalid": 0,
+        "macro_accuracy": 0.3333333333333333,
+        "prediction_counts": {
+          "更近": 291
+        }
+      },
+      "transition_compare__linear_mismatch": {
+        "total": 291,
+        "correct": 114,
+        "invalid": 0,
+        "macro_accuracy": 0.33806451612903227,
+        "prediction_counts": {
+          "更近": 146,
+          "更远": 145
+        }
+      },
+      "transition_compare__mlp_correct": {
+        "total": 291,
+        "correct": 124,
+        "invalid": 0,
+        "macro_accuracy": 0.33849462365591393,
+        "prediction_counts": {
+          "更近": 272,
+          "更远": 19
+        }
+      },
+      "transition_compare__mlp_latent": {
+        "total": 291,
+        "correct": 123,
+        "invalid": 0,
+        "macro_accuracy": 0.33064516129032256,
+        "prediction_counts": {
+          "更近": 290,
+          "更远": 1
+        }
+      },
+      "transition_compare__mlp_mismatch": {
+        "total": 291,
+        "correct": 123,
+        "invalid": 0,
+        "macro_accuracy": 0.33387096774193553,
+        "prediction_counts": {
+          "更近": 274,
+          "更远": 17
+        }
+      },
+      "transition_compare__text": {
+        "total": 291,
+        "correct": 99,
+        "invalid": 0,
+        "macro_accuracy": 0.3248387096774194,
+        "prediction_counts": {
+          "更远": 272,
+          "更近": 19
+        }
+      }
+    },
+    "128": {
+      "distance_compare__linear_correct": {
+        "total": 200,
+        "correct": 98,
+        "invalid": 0,
+        "swap_consistency": 0.3,
+        "prediction_counts": {
+          "B": 164,
+          "A": 36
+        }
+      },
+      "distance_compare__linear_latent": {
+        "total": 200,
+        "correct": 96,
+        "invalid": 0,
+        "swap_consistency": 0.18,
+        "prediction_counts": {
+          "A": 182,
+          "B": 18
+        }
+      },
+      "distance_compare__linear_mismatch": {
+        "total": 200,
+        "correct": 103,
+        "invalid": 0,
+        "swap_consistency": 0.37,
+        "prediction_counts": {
+          "B": 159,
+          "A": 41
+        }
+      },
+      "distance_compare__mlp_correct": {
+        "total": 200,
+        "correct": 93,
+        "invalid": 0,
+        "swap_consistency": 0.27,
+        "prediction_counts": {
+          "B": 159,
+          "A": 41
+        }
+      },
+      "distance_compare__mlp_latent": {
+        "total": 200,
+        "correct": 98,
+        "invalid": 0,
+        "swap_consistency": 0.02,
+        "prediction_counts": {
+          "A": 198,
+          "B": 2
+        }
+      },
+      "distance_compare__mlp_mismatch": {
+        "total": 200,
+        "correct": 102,
+        "invalid": 0,
+        "swap_consistency": 0.38,
+        "prediction_counts": {
+          "A": 58,
+          "B": 142
+        }
+      },
+      "distance_compare__text": {
+        "total": 200,
+        "correct": 95,
+        "invalid": 0,
+        "swap_consistency": 0.41,
+        "prediction_counts": {
+          "A": 107,
+          "B": 93
+        }
+      },
+      "neighbor_direct__linear_correct": {
+        "total": 100,
+        "correct": 40,
+        "invalid": 0
+      },
+      "neighbor_direct__linear_mismatch": {
+        "total": 100,
+        "correct": 38,
+        "invalid": 0
+      },
+      "neighbor_direct__mlp_correct": {
+        "total": 100,
+        "correct": 34,
+        "invalid": 0
+      },
+      "neighbor_direct__mlp_mismatch": {
+        "total": 100,
+        "correct": 36,
+        "invalid": 0
+      },
+      "neighbor_direct__text": {
+        "total": 100,
+        "correct": 34,
+        "invalid": 0
+      },
+      "neighbor_reason__linear_correct": {
+        "total": 100,
+        "correct": 52,
+        "invalid": 0,
+        "analysis_budget_hits": 100
+      },
+      "neighbor_reason__linear_mismatch": {
+        "total": 100,
+        "correct": 51,
+        "invalid": 0,
+        "analysis_budget_hits": 100
+      },
+      "neighbor_reason__mlp_correct": {
+        "total": 100,
+        "correct": 51,
+        "invalid": 0,
+        "analysis_budget_hits": 100
+      },
+      "neighbor_reason__mlp_mismatch": {
+        "total": 100,
+        "correct": 54,
+        "invalid": 0,
+        "analysis_budget_hits": 100
+      },
+      "neighbor_reason__text": {
+        "total": 100,
+        "correct": 57,
+        "invalid": 0,
+        "analysis_budget_hits": 100
+      },
+      "transition_compare__linear_correct": {
+        "total": 325,
+        "correct": 151,
+        "invalid": 0,
+        "macro_accuracy": 0.3304096481610685,
+        "prediction_counts": {
+          "更近": 62,
+          "更远": 263
+        }
+      },
+      "transition_compare__linear_latent": {
+        "total": 325,
+        "correct": 127,
+        "invalid": 0,
+        "macro_accuracy": 0.3333333333333333,
+        "prediction_counts": {
+          "更近": 325
+        }
+      },
+      "transition_compare__linear_mismatch": {
+        "total": 325,
+        "correct": 154,
+        "invalid": 0,
+        "macro_accuracy": 0.3377686966344397,
+        "prediction_counts": {
+          "更远": 263,
+          "更近": 62
+        }
+      },
+      "transition_compare__mlp_correct": {
+        "total": 325,
+        "correct": 135,
+        "invalid": 0,
+        "macro_accuracy": 0.3337320176750058,
+        "prediction_counts": {
+          "更近": 243,
+          "更远": 82
+        }
+      },
+      "transition_compare__mlp_latent": {
+        "total": 325,
+        "correct": 127,
+        "invalid": 0,
+        "macro_accuracy": 0.3333333333333333,
+        "prediction_counts": {
+          "更近": 325
+        }
+      },
+      "transition_compare__mlp_mismatch": {
+        "total": 325,
+        "correct": 133,
+        "invalid": 0,
+        "macro_accuracy": 0.3295126083923054,
+        "prediction_counts": {
+          "更近": 249,
+          "更远": 76
+        }
+      },
+      "transition_compare__text": {
+        "total": 325,
+        "correct": 154,
+        "invalid": 0,
+        "macro_accuracy": 0.3254094820425928,
+        "prediction_counts": {
+          "更远": 318,
+          "更近": 7
+        }
+      }
+    },
+    "256": {
+      "distance_compare__linear_correct": {
+        "total": 200,
+        "correct": 104,
+        "invalid": 0,
+        "swap_consistency": 0.46,
+        "prediction_counts": {
+          "B": 84,
+          "A": 116
+        }
+      },
+      "distance_compare__linear_latent": {
+        "total": 200,
+        "correct": 105,
+        "invalid": 0,
+        "swap_consistency": 0.13,
+        "prediction_counts": {
+          "A": 187,
+          "B": 13
+        }
+      },
+      "distance_compare__linear_mismatch": {
+        "total": 200,
+        "correct": 91,
+        "invalid": 0,
+        "swap_consistency": 0.45,
+        "prediction_counts": {
+          "A": 117,
+          "B": 83
+        }
+      },
+      "distance_compare__mlp_correct": {
+        "total": 200,
+        "correct": 92,
+        "invalid": 0,
+        "swap_consistency": 0.5,
+        "prediction_counts": {
+          "A": 126,
+          "B": 74
+        }
+      },
+      "distance_compare__mlp_latent": {
+        "total": 200,
+        "correct": 107,
+        "invalid": 0,
+        "swap_consistency": 0.23,
+        "prediction_counts": {
+          "B": 81,
+          "A": 119
+        }
+      },
+      "distance_compare__mlp_mismatch": {
+        "total": 200,
+        "correct": 100,
+        "invalid": 0,
+        "swap_consistency": 0.5,
+        "prediction_counts": {
+          "A": 120,
+          "B": 80
+        }
+      },
+      "distance_compare__text": {
+        "total": 200,
+        "correct": 98,
+        "invalid": 0,
+        "swap_consistency": 0.44,
+        "prediction_counts": {
+          "A": 120,
+          "B": 80
+        }
+      },
+      "neighbor_direct__linear_correct": {
+        "total": 100,
+        "correct": 49,
+        "invalid": 0
+      },
+      "neighbor_direct__linear_mismatch": {
+        "total": 100,
+        "correct": 44,
+        "invalid": 0
+      },
+      "neighbor_direct__mlp_correct": {
+        "total": 100,
+        "correct": 46,
+        "invalid": 0
+      },
+      "neighbor_direct__mlp_mismatch": {
+        "total": 100,
+        "correct": 48,
+        "invalid": 0
+      },
+      "neighbor_direct__text": {
+        "total": 100,
+        "correct": 52,
+        "invalid": 0
+      },
+      "neighbor_reason__linear_correct": {
+        "total": 100,
+        "correct": 57,
+        "invalid": 0,
+        "analysis_budget_hits": 100
+      },
+      "neighbor_reason__linear_mismatch": {
+        "total": 100,
+        "correct": 52,
+        "invalid": 0,
+        "analysis_budget_hits": 100
+      },
+      "neighbor_reason__mlp_correct": {
+        "total": 100,
+        "correct": 62,
+        "invalid": 0,
+        "analysis_budget_hits": 100
+      },
+      "neighbor_reason__mlp_mismatch": {
+        "total": 100,
+        "correct": 53,
+        "invalid": 0,
+        "analysis_budget_hits": 100
+      },
+      "neighbor_reason__text": {
+        "total": 100,
+        "correct": 57,
+        "invalid": 0,
+        "analysis_budget_hits": 100
+      },
+      "transition_compare__linear_correct": {
+        "total": 287,
+        "correct": 121,
+        "invalid": 0,
+        "macro_accuracy": 0.337325489097446,
+        "prediction_counts": {
+          "更近": 138,
+          "更远": 149
+        }
+      },
+      "transition_compare__linear_latent": {
+        "total": 287,
+        "correct": 118,
+        "invalid": 0,
+        "macro_accuracy": 0.33319325769248725,
+        "prediction_counts": {
+          "更近": 283,
+          "更远": 4
+        }
+      },
+      "transition_compare__linear_mismatch": {
+        "total": 287,
+        "correct": 124,
+        "invalid": 0,
+        "macro_accuracy": 0.3458000653686324,
+        "prediction_counts": {
+          "更近": 143,
+          "更远": 144
+        }
+      },
+      "transition_compare__mlp_correct": {
+        "total": 287,
+        "correct": 127,
+        "invalid": 0,
+        "macro_accuracy": 0.35420460381939584,
+        "prediction_counts": {
+          "更近": 147,
+          "更远": 140
+        }
+      },
+      "transition_compare__mlp_latent": {
+        "total": 287,
+        "correct": 118,
+        "invalid": 0,
+        "macro_accuracy": 0.3333333333333333,
+        "prediction_counts": {
+          "更近": 287
+        }
+      },
+      "transition_compare__mlp_mismatch": {
+        "total": 287,
+        "correct": 130,
+        "invalid": 0,
+        "macro_accuracy": 0.36197880188635195,
+        "prediction_counts": {
+          "更近": 125,
+          "更远": 162
+        }
+      },
+      "transition_compare__text": {
+        "total": 287,
+        "correct": 120,
+        "invalid": 0,
+        "macro_accuracy": 0.3310687771396554,
+        "prediction_counts": {
+          "更远": 266,
+          "更近": 21
+        }
+      }
+    }
+  },
+  "relabeling": {
+    "64": {
+      "new_permuted": {
+        "original_ids": {
+          "current": {
+            "successes": 2,
+            "total": 100
+          },
+          "goal": {
+            "successes": 3,
+            "total": 100
+          },
+          "both": {
+            "successes": 0,
+            "total": 100
+          }
+        },
+        "four_unseen_permutations": {
+          "current": {
+            "successes": 9,
+            "total": 400
+          },
+          "goal": {
+            "successes": 8,
+            "total": 400
+          },
+          "both": {
+            "successes": 0,
+            "total": 400
+          }
+        },
+        "actually_supervised_batch": {
+          "current": {
+            "successes": 0,
+            "total": 18
+          },
+          "goal": {
+            "successes": 0,
+            "total": 14
+          }
+        }
+      },
+      "existing_fixed_reference": {
+        "original_ids": {
+          "current": {
+            "successes": 100,
+            "total": 100
+          },
+          "goal": {
+            "successes": 100,
+            "total": 100
+          },
+          "both": {
+            "successes": 100,
+            "total": 100
+          }
+        },
+        "four_unseen_permutations": {
+          "current": {
+            "successes": 3,
+            "total": 400
+          },
+          "goal": {
+            "successes": 4,
+            "total": 400
+          },
+          "both": {
+            "successes": 0,
+            "total": 400
+          }
+        }
+      }
+    },
+    "128": {
+      "new_permuted": {
+        "original_ids": {
+          "current": {
+            "successes": 2,
+            "total": 100
+          },
+          "goal": {
+            "successes": 1,
+            "total": 100
+          },
+          "both": {
+            "successes": 0,
+            "total": 100
+          }
+        },
+        "four_unseen_permutations": {
+          "current": {
+            "successes": 1,
+            "total": 400
+          },
+          "goal": {
+            "successes": 3,
+            "total": 400
+          },
+          "both": {
+            "successes": 0,
+            "total": 400
+          }
+        },
+        "actually_supervised_batch": {
+          "current": {
+            "successes": 0,
+            "total": 18
+          },
+          "goal": {
+            "successes": 0,
+            "total": 14
+          }
+        }
+      },
+      "existing_fixed_reference": {
+        "original_ids": {
+          "current": {
+            "successes": 100,
+            "total": 100
+          },
+          "goal": {
+            "successes": 100,
+            "total": 100
+          },
+          "both": {
+            "successes": 100,
+            "total": 100
+          }
+        },
+        "four_unseen_permutations": {
+          "current": {
+            "successes": 7,
+            "total": 400
+          },
+          "goal": {
+            "successes": 5,
+            "total": 400
+          },
+          "both": {
+            "successes": 0,
+            "total": 400
+          }
+        }
+      }
+    }
+  },
+  "action_fit": {
+    "64": {
+      "report_continuation": {
+        "seen_actions__canonical__free": {
+          "successes": 13,
+          "total": 160
+        },
+        "test_actions__canonical__free": {
+          "successes": 7,
+          "total": 100
+        },
+        "test_actions__heldout__free": {
+          "successes": 7,
+          "total": 100
+        }
+      },
+      "report_plus_action": {
+        "seen_actions__canonical__free": {
+          "successes": 74,
+          "total": 160
+        },
+        "test_actions__canonical__free": {
+          "successes": 22,
+          "total": 100
+        },
+        "test_actions__heldout__free": {
+          "successes": 16,
+          "total": 100
+        }
+      }
+    },
+    "128": {
+      "report_continuation": {
+        "seen_actions__canonical__free": {
+          "successes": 24,
+          "total": 320
+        },
+        "test_actions__canonical__free": {
+          "successes": 6,
+          "total": 100
+        },
+        "test_actions__heldout__free": {
+          "successes": 2,
+          "total": 100
+        }
+      },
+      "report_plus_action": {
+        "seen_actions__canonical__free": {
+          "successes": 206,
+          "total": 320
+        },
+        "test_actions__canonical__free": {
+          "successes": 24,
+          "total": 100
+        },
+        "test_actions__heldout__free": {
+          "successes": 8,
+          "total": 100
+        }
+      }
+    },
+    "256": {
+      "report_continuation": {
+        "seen_actions__canonical__free": {
+          "successes": 0,
+          "total": 640
+        },
+        "test_actions__canonical__free": {
+          "successes": 0,
+          "total": 100
+        },
+        "test_actions__heldout__free": {
+          "successes": 0,
+          "total": 100
+        }
+      },
+      "report_plus_action": {
+        "seen_actions__canonical__free": {
+          "successes": 355,
+          "total": 640
+        },
+        "test_actions__canonical__free": {
+          "successes": 33,
+          "total": 100
+        },
+        "test_actions__heldout__free": {
+          "successes": 8,
+          "total": 100
+        }
+      }
+    }
+  },
+  "q_geometry_readout": {
+    "method": "External program selects the true neighbor nearest to goal Q in Euclidean distance; no LLM.",
+    "64": {
+      "total": 100,
+      "learned_q_success": 85,
+      "initial_random_q_success": 46
+    },
+    "128": {
+      "total": 100,
+      "learned_q_success": 82,
+      "initial_random_q_success": 46
+    }
+  }
+}

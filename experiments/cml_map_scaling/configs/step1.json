@@ -1,0 +1,54 @@
+{
+  "study": "cml_map_scaling",
+  "scope": "fixed_graph_QV_geometry_without_LLM",
+  "sources": {
+    "gcml_revision": "ff76859b71a2bc2056b50f5e052475351c007f76",
+    "cml_revision": "e36a17771bbe758c1d6b5f0446aa4a167b154a12",
+    "update_rule": "CML_2024_equations_2_3_sequential_single_transition",
+    "graph32_config": "experiments/gcml_direct_api_path32/configs/path32_v1.json"
+  },
+  "graphs": {
+    "include_official32": true,
+    "sizes": [32, 64, 128, 256, 512],
+    "seeds": [0, 1, 2],
+    "generator": "published_random_subgraph",
+    "min_edges_argument": 2,
+    "max_edges_argument": 5,
+    "note": "Generator arguments are not strict degree bounds after symmetrization. Record observed degrees; do not reject graphs by model performance."
+  },
+  "model": {
+    "state_dim": 1000,
+    "q_init_std": 1.0,
+    "v_init_std": 0.1,
+    "dtype": "float32",
+    "train_W_or_G": false,
+    "normalize_V": false
+  },
+  "training": {
+    "walks_at_32_nodes": 200,
+    "walk_count_scales_with_nodes": true,
+    "walk_node_count": 32,
+    "transitions_per_walk": 31,
+    "epochs": 20,
+    "eta_q": 0.1,
+    "eta_v": 0.01,
+    "shuffle_walks_each_epoch": true,
+    "update": "update_destination_Q_and_action_V_from_same_pre_update_error",
+    "snapshot_epochs": [0, 1, 5, 10, 20],
+    "checkpoint_selection": "fixed_final_epoch_no_test_selection",
+    "seed_offsets": {"walks": 1000, "initialization": 2000, "replay": 3000}
+  },
+  "evaluation": {
+    "geometry": "all_unordered_distinct_node_pairs_in_original_1000D_space",
+    "main": ["spearman_graph_vs_latent_distance", "distance_buckets_mean_sd"],
+    "controls": ["same_random_initialization_before_learning"],
+    "sqrt_fit": "least_squares_c_times_sqrt_graph_distance_no_intercept_descriptive_only",
+    "secondary_planning": "cosine_V_goal_minus_current_among_true_legal_actions",
+    "planning_pairs": "all_ordered_distinct_start_goal_pairs",
+    "step_budget": "node_count",
+    "ties": "first_in_canonical_directed_action_order",
+    "state_update": "actual_successor_node_then_Q_lookup",
+    "history_search_or_retries": false,
+    "graph_changes_or_cross_graph_transfer": false
+  }
+}

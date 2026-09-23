@@ -1,0 +1,41 @@
+{
+  "base_config": "experiments/cml_map_scaling/configs/step1.json",
+  "scope": "Step1_only_explore_transition_fit_dimensions_and_update",
+  "conditions": [
+    {
+      "name": "local128",
+      "state_dim": 128,
+      "method": "local"
+    },
+    {
+      "name": "local1000",
+      "state_dim": 1000,
+      "method": "local"
+    },
+    {
+      "name": "local2048",
+      "state_dim": 2048,
+      "method": "local"
+    },
+    {
+      "name": "gradient1000",
+      "state_dim": 1000,
+      "method": "full_gradient"
+    }
+  ],
+  "matching": "same_graphs_walks_replay_order_and_epochs; same_initial_QV_for_same_dimension",
+  "main": [
+    "transition_mse_all_actions",
+    "successor_retrieval_accuracy",
+    "state_centered_rms"
+  ],
+  "diagnostics": [
+    "spearman",
+    "latent_pair_min"
+  ],
+  "reference": [
+    "cosine_reach_rate"
+  ],
+  "gradient_loss": "0.5_sum_squared_transition_error_per_transition",
+  "selection": "report_all_conditions_at_fixed_final_epoch"
+}

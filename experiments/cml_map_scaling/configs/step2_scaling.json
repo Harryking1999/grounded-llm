@@ -1,0 +1,43 @@
+{
+  "study": "cml_step2_text_plus_roadmap_scaling",
+  "base_training_config": "experiments/cml_map_scaling/configs/step2.json",
+  "augmentation_config": "experiments/cml_map_scaling/configs/step2_augmentation.json",
+  "assets": {
+    "step1_source_commit": "d813282",
+    "condition": "local1000",
+    "graph_seed": 0,
+    "cases": [
+      {"node_count": 64, "case": "random64_seed0", "train_pairs": 792},
+      {"node_count": 128, "case": "random128_seed0", "train_pairs": 1584},
+      {"node_count": 256, "case": "random256_seed0", "train_pairs": 3168}
+    ]
+  },
+  "data": {
+    "validation_pairs": 50,
+    "test_pairs": 50,
+    "split_seed": 17,
+    "sampling": "First train/validation/test counts from one deterministic permutation of unordered node pairs; both directions stay together; remaining pairs unused.",
+    "training_budget": "Report samples scale linearly with node count, preserving the 32-node average samples per node and epochs; all nodes must appear in training."
+  },
+  "training": {
+    "conditions": ["linear_report", "mlp_report"],
+    "initialization": "Independent fresh adapters for each fixed graph; no 32-node adapter reuse.",
+    "tasks": ["report_current", "report_goal"],
+    "templates": ["canonical"],
+    "action_supervision": false,
+    "freeze_llm_and_QV": true,
+    "cache_frozen_report_prefix": true,
+    "prefix_validation": "FP32 full-versus-cached loss and adapter gradients on 64 nodes. BF16 split-prefill changes numerical rounding and is not claimed bitwise equivalent to 32-node full-sequence training; formal precision remains BF16 for both adapters.",
+    "checkpoint_selection": "Same validation report accuracy, then loss, then earliest epoch as base configuration."
+  },
+  "evaluation": {
+    "conditions": ["text_baseline", "text_plus_linear", "text_plus_mlp"],
+    "state_information": "Identical full textual adjacency/current/goal in every condition; augmented conditions add current/goal Q tokens.",
+    "generation_and_scoring": "Inherit matched augmentation configuration, including 4096 new tokens and semantic decision review.",
+    "report_readout": "Selected adapters also report heldout current/goal IDs without textual IDs; no action labels used in training or selection.",
+    "begin_after": "Both adapters for a graph finish training and checkpoint selection.",
+    "templates": ["canonical"],
+    "retry": false
+  },
+  "interpretation": "One existing random seed-0 graph per size. Size also changes topology, graph distances and training compute; compare matched augmentation gains within each size. No pure node-count causal effect or cross-graph transfer claim. Multi-template training and extra controls remain deferred."
+}

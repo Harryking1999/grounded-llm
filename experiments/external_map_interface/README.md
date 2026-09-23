@@ -10,7 +10,13 @@
 
 ## 图实验入口
 
-`configs/path32_smoke.json` 只用于检查双起终点的逐步调用链。输入为 Step 1 同一 case 目录下的 `inputs.npz` 与 `map.npz`；可使用已训练的 128 维 Q/V，不需要额外 adapter。模型路径与运行 backend 是运行参数；有 SGLang 服务时传 `--endpoint`，在节点上直接加载模型时用 `--backend transformers`。产物写入 Git 忽略的 `runs/`。`plain`、`reasoning` 不读 Q/V；`distance` 在同一图和候选动作上增加 learned-map 距离。每步原始回答都会留档；非法动作、输出截断和步数上限分别计数。256 token 的初试使两个 thinking 条件都在首步截断；1024 token 仍只是诊断预算。已有正式寻路基线的任务集、图规模、采样设置和预算见 [path256 合同](../qwen_path_blocks/configs/path256_bidirectional_16k.json)。它要求整条路线一次生成；本目录按步调用，所以正式对照还需将**整条轨迹的累计输出预算**与该合同匹配，不能把旧预算简单乘以步数。path32 smoke 的结果不能与正式基线比较。
+`configs/path32_smoke.json` 只用于检查双起终点的逐步调用链。输入为 Step 1 同一 case 目录下的 `inputs.npz` 与 `map.npz`；可使用已训练的 128 维 Q/V，不需要额外 adapter。模型路径与运行 backend 是运行参数；有 SGLang 服务时传 `--endpoint`，在节点上直接加载模型时用 `--backend transformers`。产物写入 Git 忽略的 `runs/`。`plain`、`reasoning` 不读 Q/V；`distance` 在同一图和候选动作上增加 learned-map 距离。每步原始回答都会留档；非法动作、输出截断和步数上限分别计数。256 token 的初试使两个 thinking 条件都在首步截断；1024 token 仍只是诊断预算，path32 的结果不能与正式基线比较。
+
+正式逐步对照使用 [path256_distance.json](configs/path256_distance.json) 和[原 path256 合同](../qwen_path_blocks/configs/path256_bidirectional_16k.json)的同一冻结题集：同一 256 节点图、16 个起终点、每题 8 次。`src/train_graph_map.py` 在该图上复用 Step 1 的局部 Q/V 更新，固定训练末轮，不按规划成绩挑地图；原有三张随机 256 节点图的 Q/V 不适用于这张图。`src/evaluate_path256.py` 分别运行 Qwen3-4B 非 thinking、thinking、thinking 加候选地图距离。三组每步都看到同一图、已执行路径和排除已访问节点后的合法动作，每次执行后用环境实际后继更新当前状态。距离条件额外得到 `||Q当前+V动作−Q目标||₂`。程序按原始寻路裁判核验实际路线，不把真实最短距离传给模型。
+
+输出预算按用户确定的**单步**范围执行：每次动作决策最多生成配置中的 token 数，包含思考；不限制整条轨迹累计输出。采样参数与原 path256 合同一致，终止、截断和 token 用量逐步存档。由于旧基线一次生成完整路线而这里是逐步反馈，三组均重新运行，历史分数仅作背景。
+
+本图已训练的 128 维地图在原始高维 Q 空间的距离秩相关为 0.575694；一步转移 MSE 为 `7.16e-12`，后继识别为 100%。对全部 65,280 个有序起终点，只按候选 learned-map 距离取最小值，44,530 个选择落在最短路方向（68.21%）。这是地图质量诊断，不是 LLM 成绩。训练摘要与 Q/V 存在开发节点忽略路径 `runs/external_map_interface/path256_local128_dd2e5f2/`。
 
 ```bash
 python -m experiments.external_map_interface.src.evaluate \

@@ -1,0 +1,22 @@
+{
+  "scope": "one_initial_blocks_board_only",
+  "seed": 20260923,
+  "episodes": 2000,
+  "sampling": "construction_witness_plus_random_legal_removal_rollouts_including_dead_ends",
+  "state_dim": 128,
+  "q_init_std": 1.0,
+  "action_dim": 32,
+  "hidden_dim": 128,
+  "epochs": 100,
+  "batch_size": 256,
+  "learning_rate": 0.001,
+  "optimizer": "adam",
+  "objective": "transition_mse_only",
+  "update": "joint_backprop_through_both_Q_endpoints_and_MLP",
+  "heldout_fraction": 0.1,
+  "split": "holdout_edges_preserving_spanning_forest_and_action_coverage",
+  "cpu_threads": 4,
+  "report_every": 10,
+  "diagnostic_episodes": 200,
+  "diagnostic_seed": 20260924
+}

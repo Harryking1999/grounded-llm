@@ -10,7 +10,7 @@
 
 ## 图实验入口
 
-`configs/path32_smoke.json` 是一个双起终点 smoke 合同。输入为 Step 1 同一 case 目录下的 `inputs.npz` 与 `map.npz`；可使用已训练的 128 维 Q/V，不需要额外 adapter。模型路径与运行 backend 是运行参数；有 SGLang 服务时传 `--endpoint`，在节点上直接加载模型时用 `--backend transformers`。产物写入 Git 忽略的 `runs/`。`plain`、`reasoning` 不读 Q/V；`distance` 在同一图和候选动作上增加 learned-map 距离。每步原始回答都会留档；非法动作、输出截断和步数上限分别计数。三条件共用生成预算；256 token 的初试中两个 thinking 条件都在首步截断，所以当前 smoke 使用 1024 token。三方正式比较仍需选定匹配的模型版本、提示、预算与测试起终点，当前 smoke 不能替代该比较。此前 Qwen Instruct 与 Qwen thinking 的历史结果配置不同，只能作参考。
+`configs/path32_smoke.json` 只用于检查双起终点的逐步调用链。输入为 Step 1 同一 case 目录下的 `inputs.npz` 与 `map.npz`；可使用已训练的 128 维 Q/V，不需要额外 adapter。模型路径与运行 backend 是运行参数；有 SGLang 服务时传 `--endpoint`，在节点上直接加载模型时用 `--backend transformers`。产物写入 Git 忽略的 `runs/`。`plain`、`reasoning` 不读 Q/V；`distance` 在同一图和候选动作上增加 learned-map 距离。每步原始回答都会留档；非法动作、输出截断和步数上限分别计数。256 token 的初试使两个 thinking 条件都在首步截断；1024 token 仍只是诊断预算。已有正式寻路基线的任务集、图规模、采样设置和预算见 [path256 合同](../qwen_path_blocks/configs/path256_bidirectional_16k.json)。它要求整条路线一次生成；本目录按步调用，所以正式对照还需将**整条轨迹的累计输出预算**与该合同匹配，不能把旧预算简单乘以步数。path32 smoke 的结果不能与正式基线比较。
 
 ```bash
 python -m experiments.external_map_interface.src.evaluate \
@@ -23,11 +23,28 @@ python -m experiments.external_map_interface.src.evaluate \
 
 已完成的 128 维训练摘要见 [Step 1 报告](../cml_map_scaling/results/report.md)。原始 Q/V 记录在开发机的 `runs/cml_step1_explore_d813282/local128/...`；复制或重放时应在运行记录中标出来源。完整 Q 向量接口只需从同一 loader 序列化 Q，128 维接口可直接读取已训练的短地图；两者目前都不是首轮模型输入条件。不可将 1000 维 Q 直接截短并声称是训练后的 128 维地图。
 
-## 积木 Q/V 试验
+## 当前积木训练：状态条件位移
+
+`src/blocks_dynamics.py` 实现 `δ=MLP([Q(o),E(a)])` 与 `Q̂(o′)=Q(o)+δ`。Q 仍按单张初始棋盘中采样到的完整状态建表；动作 embedding 使用原有 `shape_id,row,col` 编号，一个共享 MLP 预测位移，动作空间不增加。候选距离为 `||Q(o)+δ−Q(goal)||₂`，不查真实后继 Q 来代替预测。
+
+`src/train_blocks_dynamics.py` 复用下面旧试验的环境和转移采样，使用 [blocks_dynamics_pilot.json](configs/blocks_dynamics_pilot.json) 训练。采样包括构造解和随机合法 rollout，保留通向死局的合法动作；没有完整枚举状态图，也没有按好坏过滤转移。用户已确认首轮只训练转移 MSE，**不加入死局标签、路径距离或排序监督**。Q 的两个端点与 MLP 联合反向传播；这不同于旧图 `local_update` 只更新目标 Q 与动作 V 的规则，因此两者也不是只替换 V 参数化的严格消融。
+
+训练保留连通 Q 状态的生成树和每个已出现动作，从剩余边留出一部分评测。这是已观察状态间的留出转移，不是未见棋盘泛化。`src/blocks_diagnostics.py` 分别测留出转移误差、相对不移动预测的误差、Q 尺度、从初始 Q 连续预测的逐深度偏移、候选预测距离以及死局排序。连续预测中不重置到真实 Q；缺少表内 Q 的实际后继只能统计覆盖缺口，不能声称其预测已被验证。立即死局与已有到目标路径的标签仅用于诊断。
+
+```bash
+python -m experiments.external_map_interface.src.train_blocks_dynamics \
+  --config experiments/external_map_interface/configs/blocks_dynamics_pilot.json \
+  --suite experiments/sol_dag_blocks/runs/suite.json --case-id blocks8_00 \
+  --device cuda:0 --out runs/external_map_interface/blocks8_00_dynamics
+```
+
+产物目录保存模型、采样转移和固定划分、训练进度与诊断摘要，均在 Git 之外。此阶段训练积木 Q-map，不调用 LLM。实现需要 PyTorch；测试入口为 `python -m unittest discover -s experiments/external_map_interface/tests`。
+
+## Previous baseline：积木共享动作 V
 
 `src/blocks_q_map.py` 是**单张初始棋盘绑定**的最小训练试验。它直接复用 [BlocksTask](../sol_dag_blocks/src/tasks.py) 的 10×10 棋盘、`shape_id,row,col` 动作及合法移除，使用现有 case 的构造解和随机合法 rollout 收集 `(o1,a,o2)`。状态 Q 按这张棋盘内观察到的完整 mask 建表；同一个动作三元组在多个转移中共用一个 V 行。训练直接调用图 Step 1 的 `local_update`，没有改 Q/V 目标。产物保存在 `runs/`，不保证覆盖未见棋盘或所有可达状态。
 
-`configs/blocks_q_200_rollouts_100_epochs.json` 与 `configs/blocks_q_expanded_pilot.json` 在同一 `blocks8_00` 棋盘上各训练 100 轮，分别采 200 与 2,000 次合法 rollout，用来检查更多 transition 对拟合误差与目标距离排序的影响。它们沿用上述共享 `V_a` 定义，不引入 `V(Q,a)`；仍不是跨初始棋盘泛化实验。
+`configs/blocks_q_200_rollouts_100_epochs.json` 与 `configs/blocks_q_expanded_pilot.json` 在同一 `blocks8_00` 棋盘上各训练 100 轮，分别采 200 与 2,000 次合法 rollout，用来检查更多 transition 对拟合误差与目标距离排序的影响。这些历史配置保留共享 `V_a` 定义，仍不是跨初始棋盘泛化实验。
 
 ```bash
 python -m experiments.external_map_interface.src.blocks_q_map \
@@ -36,4 +53,6 @@ python -m experiments.external_map_interface.src.blocks_q_map \
   --out runs/external_map_interface/blocks8_00_q_pilot
 ```
 
-诊断只把无合法动作且非空的状态确认为 dead，把构造解上的状态确认为可解。报告比较“更少格子的 dead”与“更多格子的可解状态”的 learned Q 到目标距离，并统计已观察状态的合法后继有多少仍在 Q 表中。训练残差小并不推出这两类状态已经分离；初始棋盘绑定也不保证随机 rollout 覆盖全部后继。执行到未见棋盘后，当前表格无法直接取得 `Q当前`；这一步需先解决，才能将积木地图接入逐步 planner。更深层死局和跨棋盘泛化需后续单独检验。本试验不调用 LLM，也不把构造解或可解性标签交给 planner。
+旧试验诊断只把无合法动作且非空的状态确认为 dead，把构造解上的状态确认为可解。报告比较“更少格子的 dead”与“更多格子的可解状态”的 learned Q 到目标距离，并统计已观察状态的合法后继有多少仍在 Q 表中。训练残差小并不推出这两类状态已经分离；初始棋盘绑定也不保证随机 rollout 覆盖全部后继。执行到未见棋盘后，表格无法直接取得 `Q当前`。更深层死局和跨棋盘泛化需后续单独检验。本试验不调用 LLM，也不把构造解或可解性标签交给 planner。
+
+已完成的训练数值与局限见 [积木 Q/V 试验结果](results/blocks_q_pilot.md)。

@@ -12,4 +12,6 @@
 
 772 个全局放置动作中，该初始棋盘可用的 44 个动作均有训练样本；这不等于后继棋盘都在 Q 表中。当前地图仍绑定这张初始棋盘，且尚未测从初始 Q 累加共享 `V_a` 到未见棋盘的误差。转移拟合好不能推出地图距离可靠，更不能据此断言跨初始棋盘共享地图可行或不可行。
 
+此前从同一初始棋盘做合法后继广度探查，在深度 4 前触及 10,000 状态上限，仍有 8,492 个状态待展开。这个受限探查没有枚举完整状态图，不能据此报告全部可达状态数量。
+
 正式合同为 [200／20](../configs/blocks_q_pilot.json)、[200／100](../configs/blocks_q_200_rollouts_100_epochs.json) 和 [2,000／100](../configs/blocks_q_expanded_pilot.json)。200／20 原始摘要在本地忽略路径 `runs/external_map_interface/blocks8_00_q_pilot_coverage/summary.json`；后两组原始地图与摘要分别保存在开发节点 `/zhanghanyue/experiment/grounded_llm/runs/external_map_interface/blocks8_00_q_200ep_100epoch_5c31aba/` 和 `/zhanghanyue/experiment/grounded_llm/runs/external_map_interface/blocks8_00_q_2000ep_100epoch_9e791ee/`，不提交 Q 数组或完整逐状态诊断。

@@ -95,19 +95,22 @@ def main():
     parser.add_argument("--map", type=Path, required=True)
     parser.add_argument("--model-path", required=True)
     parser.add_argument("--endpoints", nargs="+", required=True)
-    parser.add_argument("--condition", choices=["plain", "reasoning", "distance"], required=True)
+    parser.add_argument("--condition", required=True)
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--first-trial-only", action="store_true")
     args = parser.parse_args()
     config = json.loads(args.config.read_text(encoding="utf-8"))
+    if args.condition not in config["conditions"]:
+        parser.error(f"Unknown condition: {args.condition}")
     suite = json.loads(args.suite.read_text(encoding="utf-8"))
     validate_suite(suite)
     if (len(suite["cases"]) != config["pair_count"] or
             any(c["replicates"] != config["replicates"] for c in suite["cases"])):
         raise ValueError("Suite does not match fixed pair/replicate contract")
     env = environment_from_suite(suite)
-    q_map = GraphQMap.load(args.map, len(env.adjacency), len(env.actions)) if args.condition == "distance" else None
     condition = config["conditions"][args.condition]
+    q_map = (GraphQMap.load(args.map, len(env.adjacency), len(env.actions))
+             if condition["learned_distance"] else None)
     caller = SGLangCaller(args.model_path, args.endpoints[0],
                            enable_thinking=condition["enable_thinking"],
                            max_new_tokens=config["sampling"]["max_new_tokens"],

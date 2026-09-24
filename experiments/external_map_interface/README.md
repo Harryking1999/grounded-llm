@@ -20,6 +20,8 @@
 
 正式三组各 128 条逐步轨迹已完成并重放裁判验收。thinking 条件大量在单步输出预算处截断，地图组未观察到成绩提升。数值、局限与下一步建议见 [path256 显式距离报告](results/path256_distance.md)。
 
+补测条件 `plain_distance` 复用同一逐步入口、题集、采样参数与单动作 JSON 格式，关闭 thinking 并提供 learned-map 候选距离；它与已完成的 `plain` 只差这项距离信息。原始三组记录及其配置快照不改动。
+
 ```bash
 python -m experiments.external_map_interface.src.evaluate \
   --config experiments/external_map_interface/configs/path32_smoke.json \

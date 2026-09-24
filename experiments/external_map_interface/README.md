@@ -22,6 +22,8 @@
 
 补测条件 `plain_distance` 复用同一逐步入口、题集、采样参数与单动作 JSON 格式，关闭 thinking 并提供 learned-map 候选距离；它与已完成的 `plain` 只差这项距离信息。128 条已完成并通过裁判重放验收：到达 90/128、最短路 8/128；原始三组记录及其配置快照未改动。题目间差异与限制见 [path256 显式距离报告](results/path256_distance.md)。
 
+独立图复测由 [题集配置](configs/path256_diverse_suite.json)冻结新图与分层抽题，[评测配置](configs/path256_diverse_distance.json)沿用逐步预算和采样设置。对 Qwen3-4B 与 Qwen3-4B-Instruct-2507 分别运行非 thinking 的 `plain`、`plain_distance`；新图单独训练 128 维 Q/V，旧图地图不跨图复用。
+
 ```bash
 python -m experiments.external_map_interface.src.evaluate \
   --config experiments/external_map_interface/configs/path32_smoke.json \

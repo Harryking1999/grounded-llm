@@ -65,6 +65,18 @@ def validate_suite(suite):
         raise ValueError("Suite call count does not match formal config")
     if len({case["id"] for case in cases}) != len(cases):
         raise ValueError("Duplicate case IDs")
+    quota = {int(length): count for length, count in graph.get("length_quota", {}).items()}
+    if quota:
+        if sum(quota.values()) != len(cases) or any(count <= 0 for count in quota.values()):
+            raise ValueError("Length quota does not match case count")
+        actual = {length: sum(case["reference"]["length"] == length for case in cases)
+                  for length in quota}
+        if actual != quota:
+            raise ValueError("Length quota is not satisfied")
+    if graph.get("distinct_endpoints"):
+        endpoints = [node for case in cases for node in (case["start"], case["goal"])]
+        if len(set(endpoints)) != len(endpoints):
+            raise ValueError("Case endpoints must be distinct")
     for case in cases:
         if case["condition"] != config["conditions"][0] or case["node_count"] != node_count:
             raise ValueError("Case contract does not match config")
@@ -93,14 +105,36 @@ def prepare(config):
     neighbors = regular_connected_graph(node_count, degree, rng)
     minimum, maximum = graph["minimum_shortest_moves"], graph.get("maximum_shortest_moves")
     candidate_pairs = []
+    by_length = {int(length): [] for length in graph.get("length_quota", {})}
     for start in range(node_count):
         for goal in range(start + 1, node_count):
             route = shortest(neighbors, start, goal)
             if len(route) >= minimum and (maximum is None or len(route) <= maximum):
                 candidate_pairs.append((start, goal))
+                if len(route) in by_length:
+                    by_length[len(route)].append((start, goal))
     if len(candidate_pairs) < graph["pair_count"]:
         raise ValueError("Not enough distinct start-goal pairs at the requested path length")
-    selected = rng.sample(candidate_pairs, graph["pair_count"])
+    if by_length:
+        if sum(graph["length_quota"].values()) != graph["pair_count"]:
+            raise ValueError("Length quota does not match pair count")
+        selected, used = [], set()
+        for length in sorted(by_length, reverse=True):
+            need = graph["length_quota"][str(length)]
+            picked = 0
+            for left, right in rng.sample(by_length[length], len(by_length[length])):
+                if graph.get("distinct_endpoints") and (left in used or right in used):
+                    continue
+                selected.append((left, right))
+                used.update((left, right))
+                picked += 1
+                if picked == need:
+                    break
+            else:
+                raise ValueError(f"Cannot fill length {length} quota with distinct endpoints")
+        rng.shuffle(selected)
+    else:
+        selected = rng.sample(candidate_pairs, graph["pair_count"])
     cases = []
     for number, (left, right) in enumerate(selected):
         start, goal = (left, right) if rng.randrange(2) else (right, left)

@@ -1,4 +1,7 @@
 import unittest
+from collections import Counter
+import json
+from pathlib import Path
 
 import numpy as np
 
@@ -7,9 +10,22 @@ from experiments.external_map_interface.src.interface import graph_prompt
 from experiments.external_map_interface.src.q_map import GraphQMap
 from experiments.external_map_interface.src.planner import parse_action_id
 from experiments.external_map_interface.src.transitions import GraphEnvironment, environment_from_suite
+from experiments.qwen_path_blocks.src.prepare_path_suite import prepare
 
 
 class Path256ContractTest(unittest.TestCase):
+    def test_diverse_suite_has_independent_graph_and_balanced_lengths(self):
+        root = Path(__file__).resolve().parents[3]
+        config = json.loads((root / "experiments/external_map_interface/configs/path256_diverse_suite.json").read_text())
+        suite = prepare(config)
+        self.assertEqual(Counter(c["reference"]["length"] for c in suite["cases"]),
+                         {4: 4, 6: 4, 8: 4, 10: 4})
+        endpoints = [node for c in suite["cases"] for node in (c["start"], c["goal"])]
+        self.assertEqual(len(endpoints), len(set(endpoints)))
+        old_config = json.loads((root / "experiments/qwen_path_blocks/configs/path256_bidirectional_16k.json").read_text())
+        old_suite = prepare(old_config)
+        self.assertNotEqual(suite["cases"][0]["neighbors"], old_suite["cases"][0]["neighbors"])
+
     def test_unambiguous_fenced_json_is_recovered(self):
         self.assertEqual(parse_action_id('```json\n{"action_id": 28, "to_node": 251}\n```'), 28)
         with self.assertRaises(ValueError):

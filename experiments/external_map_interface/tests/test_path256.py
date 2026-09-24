@@ -42,6 +42,16 @@ class Path256ContractTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             parse_final_action_id('{"action_id": 26} then {"action_id":')
 
+    def test_pass_at_k_estimates_from_all_sixteen_samples(self):
+        records = [{"case_id": "a", "replicate": rep, "shortest": rep == 16,
+                    "reached": rep == 16, "failure": None, "moves": 1,
+                    "shortest_moves": 1, "output_tokens": 1, "input_tokens": 1,
+                    "elapsed_seconds": 0.1} for rep in range(1, 17)]
+        summary = summarize(records, pass_k=(1, 8, 16))
+        self.assertAlmostEqual(summary["shortest_pass_at_1"], 1 / 16)
+        self.assertAlmostEqual(summary["shortest_pass_at_8"], 0.5)
+        self.assertEqual(summary["shortest_pass_at_16"], 1)
+
     def test_suite_order_and_revisit_rule_and_learned_score(self):
         suite = {"cases": [{"node_count": 3, "neighbors": {"0": [1], "1": [2, 0], "2": [1]},
                             "node_order": [2, 0, 1]}]}

@@ -1,0 +1,46 @@
+{
+  "study": "path256_five_graphs_explicit_map",
+  "suite_config": "experiments/external_map_interface/configs/path256_five_graphs_suite.json",
+  "models": {
+    "instruct": "Qwen/Qwen3-4B-Instruct-2507",
+    "thinking": "Qwen/Qwen3-4B-Thinking-2507"
+  },
+  "seed": 20260910,
+  "node_count": 256,
+  "pair_count": 24,
+  "replicates": 16,
+  "conditions": {
+    "instruct": {"model": "instruct", "enable_thinking": false, "learned_distance": false},
+    "thinking": {"model": "thinking", "enable_thinking": true, "learned_distance": false},
+    "instruct_distance": {"model": "instruct", "enable_thinking": false, "learned_distance": true}
+  },
+  "action_parser": "final_json",
+  "pass_k": [1, 8, 16],
+  "pass_k_estimator": "per question: 1 - C(n-c,k)/C(n,k), n=16 samples, c=shortest-path successes",
+  "step_limit": 256,
+  "budget_scope": "per_decision_no_cumulative_token_cap",
+  "sampling": {
+    "max_new_tokens": 16384,
+    "temperature": 0.6,
+    "top_p": 0.95,
+    "top_k": 20,
+    "min_p": 0.0,
+    "repetition_penalty": 1.0
+  },
+  "serving": {
+    "dtype": "bfloat16",
+    "context_length": 32768,
+    "mem_fraction_static": 0.85,
+    "max_running_requests": 4
+  },
+  "concurrency_per_endpoint": 1,
+  "timeout_seconds": 7200,
+  "seed_rule": "seed + case_index * replicates + replicate_index + step_index * pair_count * replicates",
+  "map": {
+    "step1_config": "experiments/cml_map_scaling/configs/step1.json",
+    "state_dim": 128,
+    "seed": 20260910,
+    "selection": "fixed_final_epoch_without_planning_score_selection"
+  },
+  "evaluation": "Original shortest-path judge; no repeated nodes. All conditions use the same final complete action JSON parser. Truncated answers fail without resampling. Estimate pass@1, pass@8, and pass@16 from all 16 samples of each question."
+}

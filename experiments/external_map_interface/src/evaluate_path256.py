@@ -4,6 +4,7 @@ import argparse
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
+from math import comb
 from pathlib import Path
 import subprocess
 import time
@@ -70,7 +71,7 @@ def run_trial(case, replicate, env, q_map, caller, config, endpoint, action_pars
             "elapsed_seconds": sum(t["elapsed_seconds"] for t in trace), "trace": trace}
 
 
-def summarize(records):
+def summarize(records, pass_k=(8,)):
     reached = [r for r in records if r["reached"]]
     failures = Counter(r["failure"] for r in records if r["failure"])
     by_case = {}
@@ -79,13 +80,22 @@ def summarize(records):
         bucket["trials"] += 1
         bucket["shortest"] += int(record["shortest"])
         bucket["reached"] += int(record["reached"])
-    return {"trials": len(records), "shortest": sum(r["shortest"] for r in records),
-            "reached": len(reached), "shortest_pass_at_8": sum(b["shortest"] > 0 for b in by_case.values()),
+    result = {"trials": len(records), "shortest": sum(r["shortest"] for r in records),
+            "reached": len(reached),
             "failures": failures, "mean_extra_moves_when_reached":
             sum(r["moves"] - r["shortest_moves"] for r in reached) / len(reached) if reached else None,
             "total_output_tokens": sum(r["output_tokens"] for r in records),
             "total_input_tokens": sum(r["input_tokens"] for r in records),
             "total_model_seconds": sum(r["elapsed_seconds"] for r in records), "by_case": by_case}
+    for k in pass_k:
+        if k < 1:
+            raise ValueError("pass@k requires k >= 1")
+        result[f"shortest_pass_at_{k}"] = (
+            sum(1 - comb(bucket["trials"] - bucket["shortest"], k) / comb(bucket["trials"], k)
+                if bucket["trials"] - bucket["shortest"] >= k else 1.0
+                for bucket in by_case.values())
+            if all(bucket["trials"] >= k for bucket in by_case.values()) else None)
+    return result
 
 
 def main():
@@ -109,6 +119,10 @@ def main():
         raise ValueError("Suite does not match fixed pair/replicate contract")
     env = environment_from_suite(suite)
     condition = config["conditions"][args.condition]
+    model_catalog = config.get("models")
+    expected_model = model_catalog.get(condition.get("model")) if isinstance(model_catalog, dict) else None
+    if expected_model and Path(args.model_path).name != expected_model.rsplit("/", 1)[-1]:
+        raise ValueError(f"Condition {args.condition} requires {expected_model}")
     parser_name = config.get("action_parser", "strict")
     if parser_name not in ("strict", "final_json"):
         raise ValueError(f"Unknown action parser: {parser_name}")
@@ -161,7 +175,7 @@ def main():
                 errors.append(repr(error))
                 print(json.dumps({"service_error": repr(error)}), flush=True)
     records = [json.loads(p.read_text(encoding="utf-8")) for p in sorted(record_dir.glob("*.json"))]
-    (args.out / "summary.json").write_text(json.dumps(summarize(records), ensure_ascii=False, indent=2) + "\n",
+    (args.out / "summary.json").write_text(json.dumps(summarize(records, config.get("pass_k", [8])), ensure_ascii=False, indent=2) + "\n",
                                            encoding="utf-8")
     print(json.dumps({"complete": len(records) == config["pair_count"] * config["replicates"],
                       "saved_trials": len(records), "service_errors": errors}), flush=True)

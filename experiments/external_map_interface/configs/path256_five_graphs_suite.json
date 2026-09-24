@@ -1,0 +1,19 @@
+{
+  "study": "path256_five_graphs",
+  "graph_seeds": [20260925, 20260926, 20260927, 20260928, 20260929],
+  "conditions": ["path_undirected_256"],
+  "replicates": 16,
+  "max_calls_per_model": 384,
+  "graph": {
+    "orientation": "undirected",
+    "node_count": 256,
+    "regular_degree": 3,
+    "pair_count": 24,
+    "minimum_shortest_moves": 4,
+    "maximum_shortest_moves": 10,
+    "length_quota": {"4": 6, "6": 6, "8": 6, "10": 6},
+    "distinct_endpoints": true,
+    "topology": "one seeded random Hamiltonian cycle plus a non-overlapping perfect matching",
+    "presentation": "Each independent graph has shuffled node rows and neighbor order per case."
+  }
+}

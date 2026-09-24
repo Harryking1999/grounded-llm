@@ -18,6 +18,8 @@
 
 本图已训练的 128 维地图在原始高维 Q 空间的距离秩相关为 0.575694；一步转移 MSE 为 `7.16e-12`，后继识别为 100%。对全部 65,280 个有序起终点，只按候选 learned-map 距离取最小值，44,530 个选择落在最短路方向（68.21%）。这是地图质量诊断，不是 LLM 成绩。训练摘要与 Q/V 存在开发节点忽略路径 `runs/external_map_interface/path256_local128_dd2e5f2/`。
 
+正式三组各 128 条逐步轨迹已完成并重放裁判验收。thinking 条件大量在单步输出预算处截断，地图组未观察到成绩提升。数值、局限与下一步建议见 [path256 显式距离报告](results/path256_distance.md)。
+
 ```bash
 python -m experiments.external_map_interface.src.evaluate \
   --config experiments/external_map_interface/configs/path32_smoke.json \

@@ -26,6 +26,8 @@
 
 四组各 128 条已完成并重放裁判验收。Qwen3-4B 的新图到达数为 53→97，两张图合计为 122/256→187/256；新图最短路数两组同为 4/128。Instruct 两组均为 0/128，到达前主要发生格式错误或单步输出截断，不能据此判断其地图规划收益。合并结果与 prompt 示例见[讨论稿](results/path256_diverse.md)。
 
+当前五图评测使用[冻结题集合同](configs/path256_five_graphs_suite.json)与[评测合同](configs/path256_five_graphs_eval.json)。每张图各自训练 Q/V；三组为 Instruct-2507 无地图、Thinking-2507 无地图、Instruct-2507 加地图，统一用回答末尾的完整动作 JSON 继续逐步执行。最短路 pass@1／@8／@16 从每题 16 次采样估计，合法到达另报。运行尚未完成，旧严格格式结果不与新成绩混合。
+
 ```bash
 python -m experiments.external_map_interface.src.evaluate \
   --config experiments/external_map_interface/configs/path32_smoke.json \

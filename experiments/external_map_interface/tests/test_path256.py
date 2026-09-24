@@ -8,7 +8,7 @@ import numpy as np
 from experiments.external_map_interface.src.evaluate_path256 import run_trial, summarize
 from experiments.external_map_interface.src.interface import graph_prompt
 from experiments.external_map_interface.src.q_map import GraphQMap
-from experiments.external_map_interface.src.planner import parse_action_id
+from experiments.external_map_interface.src.planner import parse_action_id, parse_final_action_id
 from experiments.external_map_interface.src.transitions import GraphEnvironment, environment_from_suite
 from experiments.qwen_path_blocks.src.prepare_path_suite import prepare
 
@@ -30,6 +30,17 @@ class Path256ContractTest(unittest.TestCase):
         self.assertEqual(parse_action_id('```json\n{"action_id": 28, "to_node": 251}\n```'), 28)
         with self.assertRaises(ValueError):
             parse_action_id('```json\n{"action_id": "28"}\n```')
+
+    def test_final_action_json_recovers_verbose_instruct_answer(self):
+        answer = ('Consider {"action_id": 26} first. Final choice:\n'
+                  '```json\n{"action_id": 28}\n```\nThis is the selected move.')
+        self.assertEqual(parse_final_action_id(answer), 28)
+        with self.assertRaises(json.JSONDecodeError):
+            parse_action_id(answer)
+        with self.assertRaises(ValueError):
+            parse_final_action_id('{"action_id": 26} then {"action_id": "28"}')
+        with self.assertRaises(ValueError):
+            parse_final_action_id('{"action_id": 26} then {"action_id":')
 
     def test_suite_order_and_revisit_rule_and_learned_score(self):
         suite = {"cases": [{"node_count": 3, "neighbors": {"0": [1], "1": [2, 0], "2": [1]},

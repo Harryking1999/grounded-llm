@@ -12,12 +12,12 @@ from experiments.qwen_path_blocks.src.prepare_path_suite import validate_suite
 from experiments.sol_dag_blocks.src.tasks import TASKS
 
 from .interface import graph_prompt
-from .planner import SGLangCaller, parse_action_id
+from .planner import SGLangCaller, parse_action_id, parse_final_action_id
 from .q_map import GraphQMap
 from .transitions import environment_from_suite
 
 
-def run_trial(case, replicate, env, q_map, caller, config, endpoint):
+def run_trial(case, replicate, env, q_map, caller, config, endpoint, action_parser=parse_action_id):
     current = case["start"]
     path = [current]
     trace = []
@@ -42,7 +42,7 @@ def run_trial(case, replicate, env, q_map, caller, config, endpoint):
             failure = "budget_truncated" if response["finish_reason"] == "length" else "model_incomplete"
             break
         try:
-            action = parse_action_id(response["text"])
+            action = action_parser(response["text"])
         except (ValueError, json.JSONDecodeError) as error:
             record["error"] = repr(error)
             failure = "invalid_format"
@@ -109,6 +109,10 @@ def main():
         raise ValueError("Suite does not match fixed pair/replicate contract")
     env = environment_from_suite(suite)
     condition = config["conditions"][args.condition]
+    parser_name = config.get("action_parser", "strict")
+    if parser_name not in ("strict", "final_json"):
+        raise ValueError(f"Unknown action parser: {parser_name}")
+    action_parser = parse_final_action_id if parser_name == "final_json" else parse_action_id
     q_map = (GraphQMap.load(args.map, len(env.adjacency), len(env.actions))
              if condition["learned_distance"] else None)
     caller = SGLangCaller(args.model_path, args.endpoints[0],
@@ -136,7 +140,8 @@ def main():
         path = record_dir / f"{case['id']}__{replicate}.json"
         if path.exists():
             return None
-        record = run_trial(case, replicate, env, q_map, caller, config, args.endpoints[index % len(args.endpoints)])
+        record = run_trial(case, replicate, env, q_map, caller, config,
+                           args.endpoints[index % len(args.endpoints)], action_parser)
         temporary = path.with_suffix(".tmp")
         temporary.write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         temporary.replace(path)

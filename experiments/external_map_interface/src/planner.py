@@ -1,6 +1,7 @@
-"""Model caller and strict action parsing; no environment or map logic."""
+"""Model caller and action parsing; no environment or map logic."""
 
 import json
+import re
 import urllib.request
 
 
@@ -15,6 +16,22 @@ def parse_action_id(text: str) -> int:
     if not isinstance(value, dict) or type(value.get("action_id")) is not int:
         raise ValueError("Expected JSON with integer action_id")
     return value["action_id"]
+
+
+def parse_final_action_id(text: str) -> int:
+    """Use the last complete action JSON in a finished model response."""
+    answer = text.split("</think>", 1)[-1]
+    objects = list(re.finditer(r"\{[^{}]*\}", answer, flags=re.DOTALL))
+    for match in reversed(objects):
+        if '"action_id"' not in match.group():
+            continue
+        if re.search(r'\{\s*"action_id"', answer[match.end():]):
+            raise ValueError("Final action JSON is incomplete")
+        value = json.loads(match.group())
+        if not isinstance(value, dict) or type(value.get("action_id")) is not int:
+            raise ValueError("Expected JSON with integer action_id")
+        return value["action_id"]
+    raise ValueError("No complete action JSON in model response")
 
 
 class SGLangCaller:

@@ -37,7 +37,7 @@
 
 ### 显式地图距离：path256 逐步评测
 
-同一固定图上的 Qwen3-4B 三组各 128 条已完成并通过原裁判重放验收。非 thinking、无地图 `plain` 最短路 0、到达 69；thinking、无地图 `reasoning` 最短路 7、到达 10；thinking、地图距离 `distance` 最短路 0、到达 4。后两组分别有 117、124 条因某一步耗尽 16,384 输出 token 截断，因而本轮没有观察到地图收益，也不能将成绩差异单独归因于地图几何。固定图的 128 维地图距离秩相关 0.575694；只按地图距离贪心的只读诊断在 16 题中到达 16、最短 4。详见 [path256 显式距离报告](../experiments/external_map_interface/results/path256_distance.md)。
+同一固定图上的 Qwen3-4B 四组各 128 条已完成并通过原裁判重放验收。非 thinking、无地图 `plain` 最短路 0、到达 69；非 thinking、地图距离 `plain_distance` 最短路 8、到达 90；thinking、无地图 `reasoning` 最短路 7、到达 10；thinking、地图距离 `distance` 最短路 0、到达 4。后两组分别有 117、124 条因某一步耗尽 16,384 输出 token 截断。非 thinking 配对在这张固定图上观察到地图收益，但 8 条最短路仅来自 2/16 道题；不能宣称跨图稳定。固定图的 128 维地图距离秩相关 0.575694；只按地图距离贪心的只读诊断在 16 题中到达 16、最短 4。详见 [path256 显式距离报告](../experiments/external_map_interface/results/path256_distance.md)。
 
 ### Qwen thinking 基线：寻路随规模改善，积木仍未成功
 
@@ -64,7 +64,7 @@ Blocks 共 768 次，511 次触及预算；至少 343 条已确认非法，6 条
 
 ## 有序 TODO
 
-1. **决定是否补测非 thinking＋地图距离**：已完成三组结果中，thinking 条件在单步大面积截断。建议保持正式题集、裁判和采样合同，只增加非 thinking 模型读取 learned-map 候选距离，与已完成 `plain` 构成接口信息的匹配对照；待用户确认后运行。现有结果、验收和限制见 [path256 报告](../experiments/external_map_interface/results/path256_distance.md)。
+1. **决定是否在独立图上复测寻路接口**：本张固定图的非 thinking 配对观察到到达和最短路提升，但案例差异大；若要判断能否跨图复现，需要为新图按相同训练方式获得 Q/V，并以同一逐步协议比较无地图和地图两组。此项属新实验，待确认。现有结果、验收和限制见 [path256 报告](../experiments/external_map_interface/results/path256_distance.md)。
 2. **返回积木状态条件 Q-map 诊断**：已按用户确认采用 `δ=MLP([Q(o),E(a)])`，首轮仅用合法转移残差训练，保留通向死局的坏合法动作；此前共享 `V_a` 结果保留为对照。积木训练与诊断已在开发节点完成，待寻路结果后归纳其留出转移、连续预测、死局排序和 Q 尺度。当前不把尚未验证的积木地图接入 LLM。
 
 跨图、共享跨任务模型、在线参数学习及其他游戏任务不在本次积木实验范围内。

@@ -24,6 +24,8 @@
 
 独立图复测由 [题集配置](configs/path256_diverse_suite.json)冻结新图与分层抽题，[评测配置](configs/path256_diverse_distance.json)沿用逐步预算和采样设置。对 Qwen3-4B 与 Qwen3-4B-Instruct-2507 分别运行非 thinking 的 `plain`、`plain_distance`；新图单独训练 128 维 Q/V，旧图地图不跨图复用。
 
+四组各 128 条已完成并重放裁判验收。Qwen3-4B 的新图到达数为 53→97，两张图合计为 122/256→187/256；新图最短路数两组同为 4/128。Instruct 两组均为 0/128，到达前主要发生格式错误或单步输出截断，不能据此判断其地图规划收益。数值、逐题层次和下一步建议见[独立图复测报告](results/path256_diverse.md)。
+
 ```bash
 python -m experiments.external_map_interface.src.evaluate \
   --config experiments/external_map_interface/configs/path32_smoke.json \

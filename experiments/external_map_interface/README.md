@@ -28,6 +28,8 @@
 
 当前五图评测使用[冻结题集合同](configs/path256_five_graphs_suite.json)与[评测合同](configs/path256_five_graphs_eval.json)。每张图各自训练 Q/V；三组为 Instruct-2507 无地图、Thinking-2507 无地图、Instruct-2507 加地图，统一用回答末尾的完整动作 JSON 继续逐步执行。最短路 pass@1／@8／@16 从每题 16 次采样估计，合法到达另报。运行尚未完成，旧严格格式结果不与新成绩混合。
 
+五图汇总也报告推理成本：每条轨迹和每次决策的输出 token、输入 token、模型调用耗时与截断，以及获得一次最短路成功所消耗的全部输出 token。失败尝试计入总体成本；成功轨迹的成本另列，避免把提前失败造成的短输出当成加速。耗时包含服务等待，会受 GPU 类型与并行负载影响，因此优先比较同题、同模型的 token 成本和截断。重复反思／停滞从原始回答中检查并附案例；现有运行未保存 token 概率，不能直接判断是否存在低熵或将停滞归因于低熵。
+
 ```bash
 python -m experiments.external_map_interface.src.evaluate \
   --config experiments/external_map_interface/configs/path32_smoke.json \

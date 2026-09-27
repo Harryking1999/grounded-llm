@@ -1,0 +1,1519 @@
+{
+  "study": "path256_five_graphs_explicit_map",
+  "evaluation_source_commit": "4ac723912a061266f2e3262863090ef5efac324a",
+  "aggregation_source_commit": "49afe80",
+  "suite_config": "experiments/external_map_interface/configs/path256_five_graphs_suite.json",
+  "evaluation_config": "experiments/external_map_interface/configs/path256_five_graphs_eval.json",
+  "questions": 120,
+  "replicates": 16,
+  "conditions": {
+    "instruct": {
+      "trials": 1920,
+      "reached": 691,
+      "shortest": 518,
+      "pass_at": {
+        "1": 0.26979166666666665,
+        "8": 0.6713286713286714,
+        "16": 0.7916666666666666
+      },
+      "failures": {
+        "budget_truncated": 1215,
+        "illegal_or_repeated_action": 14
+      },
+      "inference_cost": {
+        "trials": 1920,
+        "shortest_trials": 518,
+        "decision_count": 8489,
+        "truncated_decision_count": 1215,
+        "total_output_tokens": 48138726,
+        "total_input_tokens": 39518613,
+        "total_model_seconds": 390855.5747322538,
+        "shortest_trial_output_tokens": 7014518,
+        "shortest_trial_model_seconds": 55351.98025732103,
+        "mean_output_tokens_per_trial": 25072.253125,
+        "mean_input_tokens_per_trial": 20582.6109375,
+        "mean_model_seconds_per_trial": 203.57061183971553,
+        "mean_output_tokens_per_decision": 5670.718105783956,
+        "mean_input_tokens_per_decision": 4655.273059253152,
+        "mean_model_seconds_per_decision": 46.042593324567534,
+        "truncated_decision_rate": 0.14312639886912476,
+        "mean_output_tokens_per_shortest_trial": 13541.54054054054,
+        "mean_model_seconds_per_shortest_trial": 106.85710474386299,
+        "total_output_tokens_per_shortest_success": 92931.90347490348
+      },
+      "by_graph": [
+        {
+          "reached": 134,
+          "shortest": 99,
+          "pass_at": {
+            "1": 0.2578125,
+            "8": 0.6924630924630925,
+            "16": 0.7916666666666666
+          },
+          "inference_cost": {
+            "trials": 384,
+            "shortest_trials": 99,
+            "decision_count": 1638,
+            "truncated_decision_count": 249,
+            "total_output_tokens": 9639736,
+            "total_input_tokens": 7625823,
+            "total_model_seconds": 76680.15111212106,
+            "shortest_trial_output_tokens": 1391563,
+            "shortest_trial_model_seconds": 10723.621687437873,
+            "mean_output_tokens_per_trial": 25103.479166666668,
+            "mean_input_tokens_per_trial": 19858.9140625,
+            "mean_model_seconds_per_trial": 199.6878935211486,
+            "mean_output_tokens_per_decision": 5885.064713064713,
+            "mean_input_tokens_per_decision": 4655.569597069597,
+            "mean_model_seconds_per_decision": 46.813279067228976,
+            "truncated_decision_rate": 0.152014652014652,
+            "mean_output_tokens_per_shortest_trial": 14056.191919191919,
+            "mean_model_seconds_per_shortest_trial": 108.31941098422094,
+            "total_output_tokens_per_shortest_success": 97371.07070707071
+          }
+        },
+        {
+          "reached": 121,
+          "shortest": 89,
+          "pass_at": {
+            "1": 0.23177083333333334,
+            "8": 0.6836506086506087,
+            "16": 0.8333333333333334
+          },
+          "inference_cost": {
+            "trials": 384,
+            "shortest_trials": 89,
+            "decision_count": 1712,
+            "truncated_decision_count": 258,
+            "total_output_tokens": 9941285,
+            "total_input_tokens": 7970465,
+            "total_model_seconds": 79475.74610408663,
+            "shortest_trial_output_tokens": 1225846,
+            "shortest_trial_model_seconds": 9453.03536240873,
+            "mean_output_tokens_per_trial": 25888.763020833332,
+            "mean_input_tokens_per_trial": 20756.419270833332,
+            "mean_model_seconds_per_trial": 206.9680888127256,
+            "mean_output_tokens_per_decision": 5806.825350467289,
+            "mean_input_tokens_per_decision": 4655.645443925234,
+            "mean_model_seconds_per_decision": 46.42274889257397,
+            "truncated_decision_rate": 0.15070093457943926,
+            "mean_output_tokens_per_shortest_trial": 13773.550561797752,
+            "mean_model_seconds_per_shortest_trial": 106.21388047650258,
+            "total_output_tokens_per_shortest_success": 111699.83146067416
+          }
+        },
+        {
+          "reached": 144,
+          "shortest": 116,
+          "pass_at": {
+            "1": 0.3020833333333333,
+            "8": 0.6913882413882414,
+            "16": 0.7916666666666666
+          },
+          "inference_cost": {
+            "trials": 384,
+            "shortest_trials": 116,
+            "decision_count": 1651,
+            "truncated_decision_count": 238,
+            "total_output_tokens": 9307609,
+            "total_input_tokens": 7685129,
+            "total_model_seconds": 77658.45079751126,
+            "shortest_trial_output_tokens": 1522668,
+            "shortest_trial_model_seconds": 12459.028371822555,
+            "mean_output_tokens_per_trial": 24238.565104166668,
+            "mean_input_tokens_per_trial": 20013.356770833332,
+            "mean_model_seconds_per_trial": 202.23554895185225,
+            "mean_output_tokens_per_decision": 5637.558449424591,
+            "mean_input_tokens_per_decision": 4654.832828588734,
+            "mean_model_seconds_per_decision": 47.03722034979483,
+            "truncated_decision_rate": 0.1441550575408843,
+            "mean_output_tokens_per_shortest_trial": 13126.448275862069,
+            "mean_model_seconds_per_shortest_trial": 107.4054169984703,
+            "total_output_tokens_per_shortest_success": 80238.00862068965
+          }
+        },
+        {
+          "reached": 145,
+          "shortest": 113,
+          "pass_at": {
+            "1": 0.2942708333333333,
+            "8": 0.7046296296296296,
+            "16": 0.8333333333333334
+          },
+          "inference_cost": {
+            "trials": 384,
+            "shortest_trials": 113,
+            "decision_count": 1725,
+            "truncated_decision_count": 233,
+            "total_output_tokens": 9436853,
+            "total_input_tokens": 8030200,
+            "total_model_seconds": 76325.09792709607,
+            "shortest_trial_output_tokens": 1560874,
+            "shortest_trial_model_seconds": 12252.403849488357,
+            "mean_output_tokens_per_trial": 24575.138020833332,
+            "mean_input_tokens_per_trial": 20911.979166666668,
+            "mean_model_seconds_per_trial": 198.76327585181266,
+            "mean_output_tokens_per_decision": 5470.6394202898555,
+            "mean_input_tokens_per_decision": 4655.188405797101,
+            "mean_model_seconds_per_decision": 44.246433580925256,
+            "truncated_decision_rate": 0.13507246376811594,
+            "mean_output_tokens_per_shortest_trial": 13813.044247787611,
+            "mean_model_seconds_per_shortest_trial": 108.42835265033945,
+            "total_output_tokens_per_shortest_success": 83511.97345132743
+          }
+        },
+        {
+          "reached": 147,
+          "shortest": 101,
+          "pass_at": {
+            "1": 0.2630208333333333,
+            "8": 0.5845117845117845,
+            "16": 0.7083333333333334
+          },
+          "inference_cost": {
+            "trials": 384,
+            "shortest_trials": 101,
+            "decision_count": 1763,
+            "truncated_decision_count": 237,
+            "total_output_tokens": 9813243,
+            "total_input_tokens": 8206996,
+            "total_model_seconds": 80716.12879143876,
+            "shortest_trial_output_tokens": 1313567,
+            "shortest_trial_model_seconds": 10463.890986163518,
+            "mean_output_tokens_per_trial": 25555.3203125,
+            "mean_input_tokens_per_trial": 21372.385416666668,
+            "mean_model_seconds_per_trial": 210.19825206103846,
+            "mean_output_tokens_per_decision": 5566.218377765173,
+            "mean_input_tokens_per_decision": 4655.131026659104,
+            "mean_model_seconds_per_decision": 45.783396932183074,
+            "truncated_decision_rate": 0.1344299489506523,
+            "mean_output_tokens_per_shortest_trial": 13005.613861386139,
+            "mean_model_seconds_per_shortest_trial": 103.60288105112394,
+            "total_output_tokens_per_shortest_success": 97160.82178217822
+          }
+        }
+      ]
+    },
+    "thinking": {
+      "trials": 1920,
+      "reached": 1140,
+      "shortest": 921,
+      "pass_at": {
+        "1": 0.4796875,
+        "8": 0.7950123025123026,
+        "16": 0.8666666666666667
+      },
+      "failures": {
+        "budget_truncated": 779,
+        "illegal_or_repeated_action": 1
+      },
+      "inference_cost": {
+        "trials": 1920,
+        "shortest_trials": 921,
+        "decision_count": 9200,
+        "truncated_decision_count": 779,
+        "total_output_tokens": 67997021,
+        "total_input_tokens": 42849385,
+        "total_model_seconds": 545010.3766699231,
+        "shortest_trial_output_tokens": 27860644,
+        "shortest_trial_model_seconds": 219592.1922732005,
+        "mean_output_tokens_per_trial": 35415.11510416667,
+        "mean_input_tokens_per_trial": 22317.388020833332,
+        "mean_model_seconds_per_trial": 283.8595711822516,
+        "mean_output_tokens_per_decision": 7390.980543478261,
+        "mean_input_tokens_per_decision": 4657.541847826087,
+        "mean_model_seconds_per_decision": 59.240258333687294,
+        "truncated_decision_rate": 0.08467391304347827,
+        "mean_output_tokens_per_shortest_trial": 30250.42779587405,
+        "mean_model_seconds_per_shortest_trial": 238.42800463973995,
+        "total_output_tokens_per_shortest_success": 73829.555917481
+      },
+      "by_graph": [
+        {
+          "reached": 217,
+          "shortest": 175,
+          "pass_at": {
+            "1": 0.4557291666666667,
+            "8": 0.7272435897435897,
+            "16": 0.7916666666666666
+          },
+          "inference_cost": {
+            "trials": 384,
+            "shortest_trials": 175,
+            "decision_count": 1753,
+            "truncated_decision_count": 167,
+            "total_output_tokens": 13376301,
+            "total_input_tokens": 8164819,
+            "total_model_seconds": 107125.53365643695,
+            "shortest_trial_output_tokens": 5426362,
+            "shortest_trial_model_seconds": 42838.8123065345,
+            "mean_output_tokens_per_trial": 34834.1171875,
+            "mean_input_tokens_per_trial": 21262.549479166668,
+            "mean_model_seconds_per_trial": 278.9727438969712,
+            "mean_output_tokens_per_decision": 7630.519680547633,
+            "mean_input_tokens_per_decision": 4657.626354820308,
+            "mean_model_seconds_per_decision": 61.10983095062005,
+            "truncated_decision_rate": 0.09526525955504848,
+            "mean_output_tokens_per_shortest_trial": 31007.782857142858,
+            "mean_model_seconds_per_shortest_trial": 244.79321318019714,
+            "total_output_tokens_per_shortest_success": 76436.00571428571
+          }
+        },
+        {
+          "reached": 220,
+          "shortest": 177,
+          "pass_at": {
+            "1": 0.4609375,
+            "8": 0.8215099715099715,
+            "16": 0.9166666666666666
+          },
+          "inference_cost": {
+            "trials": 384,
+            "shortest_trials": 177,
+            "decision_count": 1881,
+            "truncated_decision_count": 164,
+            "total_output_tokens": 14231256,
+            "total_input_tokens": 8762213,
+            "total_model_seconds": 114591.27131107484,
+            "shortest_trial_output_tokens": 5382930,
+            "shortest_trial_model_seconds": 42787.85234953964,
+            "mean_output_tokens_per_trial": 37060.5625,
+            "mean_input_tokens_per_trial": 22818.263020833332,
+            "mean_model_seconds_per_trial": 298.4147690392574,
+            "mean_output_tokens_per_decision": 7565.792663476874,
+            "mean_input_tokens_per_decision": 4658.273790536949,
+            "mean_model_seconds_per_decision": 60.92039942109242,
+            "truncated_decision_rate": 0.08718766613503455,
+            "mean_output_tokens_per_shortest_trial": 30412.033898305086,
+            "mean_model_seconds_per_shortest_trial": 241.7392788109584,
+            "total_output_tokens_per_shortest_success": 80402.57627118644
+          }
+        },
+        {
+          "reached": 218,
+          "shortest": 176,
+          "pass_at": {
+            "1": 0.4583333333333333,
+            "8": 0.7677803677803677,
+            "16": 0.8333333333333334
+          },
+          "inference_cost": {
+            "trials": 384,
+            "shortest_trials": 176,
+            "decision_count": 1731,
+            "truncated_decision_count": 166,
+            "total_output_tokens": 12737438,
+            "total_input_tokens": 8061540,
+            "total_model_seconds": 102261.9747278411,
+            "shortest_trial_output_tokens": 4863473,
+            "shortest_trial_model_seconds": 38036.21551936213,
+            "mean_output_tokens_per_trial": 33170.411458333336,
+            "mean_input_tokens_per_trial": 20993.59375,
+            "mean_model_seconds_per_trial": 266.30722585375287,
+            "mean_output_tokens_per_decision": 7358.427498555749,
+            "mean_input_tokens_per_decision": 4657.157712305026,
+            "mean_model_seconds_per_decision": 59.07681960013928,
+            "truncated_decision_rate": 0.09589832466782207,
+            "mean_output_tokens_per_shortest_trial": 27633.36931818182,
+            "mean_model_seconds_per_shortest_trial": 216.11486090546666,
+            "total_output_tokens_per_shortest_success": 72371.80681818182
+          }
+        },
+        {
+          "reached": 248,
+          "shortest": 202,
+          "pass_at": {
+            "1": 0.5260416666666666,
+            "8": 0.8688131313131313,
+            "16": 0.9166666666666666
+          },
+          "inference_cost": {
+            "trials": 384,
+            "shortest_trials": 202,
+            "decision_count": 1972,
+            "truncated_decision_count": 135,
+            "total_output_tokens": 14256510,
+            "total_input_tokens": 9184583,
+            "total_model_seconds": 113570.39916607982,
+            "shortest_trial_output_tokens": 6726954,
+            "shortest_trial_model_seconds": 53096.48384571483,
+            "mean_output_tokens_per_trial": 37126.328125,
+            "mean_input_tokens_per_trial": 23918.184895833332,
+            "mean_model_seconds_per_trial": 295.75624782833285,
+            "mean_output_tokens_per_decision": 7229.467545638945,
+            "mean_input_tokens_per_decision": 4657.496450304259,
+            "mean_model_seconds_per_decision": 57.59148030734271,
+            "truncated_decision_rate": 0.06845841784989858,
+            "mean_output_tokens_per_shortest_trial": 33301.75247524752,
+            "mean_model_seconds_per_shortest_trial": 262.85388042433084,
+            "total_output_tokens_per_shortest_success": 70576.78217821782
+          }
+        },
+        {
+          "reached": 237,
+          "shortest": 191,
+          "pass_at": {
+            "1": 0.4973958333333333,
+            "8": 0.7897144522144522,
+            "16": 0.875
+          },
+          "inference_cost": {
+            "trials": 384,
+            "shortest_trials": 191,
+            "decision_count": 1863,
+            "truncated_decision_count": 147,
+            "total_output_tokens": 13395516,
+            "total_input_tokens": 8676230,
+            "total_model_seconds": 107461.19780849037,
+            "shortest_trial_output_tokens": 5460925,
+            "shortest_trial_model_seconds": 42832.828252049396,
+            "mean_output_tokens_per_trial": 34884.15625,
+            "mean_input_tokens_per_trial": 22594.348958333332,
+            "mean_model_seconds_per_trial": 279.84686929294367,
+            "mean_output_tokens_per_decision": 7190.29307568438,
+            "mean_input_tokens_per_decision": 4657.1282877079975,
+            "mean_model_seconds_per_decision": 57.68180236633943,
+            "truncated_decision_rate": 0.07890499194847021,
+            "mean_output_tokens_per_shortest_trial": 28591.230366492146,
+            "mean_model_seconds_per_shortest_trial": 224.25564529868794,
+            "total_output_tokens_per_shortest_success": 70133.59162303664
+          }
+        }
+      ]
+    },
+    "instruct_distance": {
+      "trials": 1920,
+      "reached": 846,
+      "shortest": 643,
+      "pass_at": {
+        "1": 0.33489583333333334,
+        "8": 0.7033650608650608,
+        "16": 0.8
+      },
+      "failures": {
+        "budget_truncated": 1056,
+        "illegal_or_repeated_action": 18
+      },
+      "inference_cost": {
+        "trials": 1920,
+        "shortest_trials": 643,
+        "decision_count": 8869,
+        "truncated_decision_count": 1056,
+        "total_output_tokens": 44206468,
+        "total_input_tokens": 41586675,
+        "total_model_seconds": 354777.2315104968,
+        "shortest_trial_output_tokens": 8320606,
+        "shortest_trial_model_seconds": 65032.75863021077,
+        "mean_output_tokens_per_trial": 23024.202083333334,
+        "mean_input_tokens_per_trial": 21659.7265625,
+        "mean_model_seconds_per_trial": 184.77980807838375,
+        "mean_output_tokens_per_decision": 4984.3802006990645,
+        "mean_input_tokens_per_decision": 4688.992558349307,
+        "mean_model_seconds_per_decision": 40.00194289215208,
+        "truncated_decision_rate": 0.11906641109482467,
+        "mean_output_tokens_per_shortest_trial": 12940.289269051322,
+        "mean_model_seconds_per_shortest_trial": 101.13959351510228,
+        "total_output_tokens_per_shortest_success": 68750.33903576982
+      },
+      "by_graph": [
+        {
+          "reached": 165,
+          "shortest": 128,
+          "pass_at": {
+            "1": 0.3333333333333333,
+            "8": 0.7578347578347578,
+            "16": 0.875
+          },
+          "inference_cost": {
+            "trials": 384,
+            "shortest_trials": 128,
+            "decision_count": 1730,
+            "truncated_decision_count": 215,
+            "total_output_tokens": 8950867,
+            "total_input_tokens": 8112012,
+            "total_model_seconds": 71023.15655515762,
+            "shortest_trial_output_tokens": 1730064,
+            "shortest_trial_model_seconds": 13335.898743708618,
+            "mean_output_tokens_per_trial": 23309.549479166668,
+            "mean_input_tokens_per_trial": 21125.03125,
+            "mean_model_seconds_per_trial": 184.95613686238963,
+            "mean_output_tokens_per_decision": 5173.911560693642,
+            "mean_input_tokens_per_decision": 4689.024277456648,
+            "mean_model_seconds_per_decision": 41.05384771974429,
+            "truncated_decision_rate": 0.12427745664739884,
+            "mean_output_tokens_per_shortest_trial": 13516.125,
+            "mean_model_seconds_per_shortest_trial": 104.18670893522358,
+            "total_output_tokens_per_shortest_success": 69928.6484375
+          }
+        },
+        {
+          "reached": 154,
+          "shortest": 112,
+          "pass_at": {
+            "1": 0.2916666666666667,
+            "8": 0.6351042476042476,
+            "16": 0.7083333333333334
+          },
+          "inference_cost": {
+            "trials": 384,
+            "shortest_trials": 112,
+            "decision_count": 1697,
+            "truncated_decision_count": 224,
+            "total_output_tokens": 8811843,
+            "total_input_tokens": 7957710,
+            "total_model_seconds": 70350.13320827484,
+            "shortest_trial_output_tokens": 1536630,
+            "shortest_trial_model_seconds": 11885.250075970427,
+            "mean_output_tokens_per_trial": 22947.5078125,
+            "mean_input_tokens_per_trial": 20723.203125,
+            "mean_model_seconds_per_trial": 183.20347189654908,
+            "mean_output_tokens_per_decision": 5192.600471420154,
+            "mean_input_tokens_per_decision": 4689.281084266352,
+            "mean_model_seconds_per_decision": 41.45558821937233,
+            "truncated_decision_rate": 0.13199764289923394,
+            "mean_output_tokens_per_shortest_trial": 13719.910714285714,
+            "mean_model_seconds_per_shortest_trial": 106.11830424973596,
+            "total_output_tokens_per_shortest_success": 78677.16964285714
+          }
+        },
+        {
+          "reached": 173,
+          "shortest": 136,
+          "pass_at": {
+            "1": 0.3541666666666667,
+            "8": 0.7107517482517482,
+            "16": 0.8333333333333334
+          },
+          "inference_cost": {
+            "trials": 384,
+            "shortest_trials": 136,
+            "decision_count": 1713,
+            "truncated_decision_count": 209,
+            "total_output_tokens": 8463393,
+            "total_input_tokens": 8032164,
+            "total_model_seconds": 67101.86287423084,
+            "shortest_trial_output_tokens": 1629496,
+            "shortest_trial_model_seconds": 12454.12344490271,
+            "mean_output_tokens_per_trial": 22040.0859375,
+            "mean_input_tokens_per_trial": 20917.09375,
+            "mean_model_seconds_per_trial": 174.74443456830946,
+            "mean_output_tokens_per_decision": 4940.68476357268,
+            "mean_input_tokens_per_decision": 4688.945709281961,
+            "mean_model_seconds_per_decision": 39.1721324426333,
+            "truncated_decision_rate": 0.12200817279626386,
+            "mean_output_tokens_per_shortest_trial": 11981.588235294117,
+            "mean_model_seconds_per_shortest_trial": 91.57443709487288,
+            "total_output_tokens_per_shortest_success": 62230.830882352944
+          }
+        },
+        {
+          "reached": 174,
+          "shortest": 134,
+          "pass_at": {
+            "1": 0.3489583333333333,
+            "8": 0.7786292411292411,
+            "16": 0.8333333333333334
+          },
+          "inference_cost": {
+            "trials": 384,
+            "shortest_trials": 134,
+            "decision_count": 1838,
+            "truncated_decision_count": 205,
+            "total_output_tokens": 8922121,
+            "total_input_tokens": 8618334,
+            "total_model_seconds": 73891.10452306923,
+            "shortest_trial_output_tokens": 1864454,
+            "shortest_trial_model_seconds": 15214.397090784041,
+            "mean_output_tokens_per_trial": 23234.690104166668,
+            "mean_input_tokens_per_trial": 22443.578125,
+            "mean_model_seconds_per_trial": 192.42475136215944,
+            "mean_output_tokens_per_decision": 4854.255168661589,
+            "mean_input_tokens_per_decision": 4688.973884657236,
+            "mean_model_seconds_per_decision": 40.20190670460785,
+            "truncated_decision_rate": 0.11153427638737759,
+            "mean_output_tokens_per_shortest_trial": 13913.835820895523,
+            "mean_model_seconds_per_shortest_trial": 113.54027679689582,
+            "total_output_tokens_per_shortest_success": 66582.99253731343
+          }
+        },
+        {
+          "reached": 180,
+          "shortest": 133,
+          "pass_at": {
+            "1": 0.3463541666666667,
+            "8": 0.6345053095053095,
+            "16": 0.75
+          },
+          "inference_cost": {
+            "trials": 384,
+            "shortest_trials": 133,
+            "decision_count": 1891,
+            "truncated_decision_count": 203,
+            "total_output_tokens": 9058244,
+            "total_input_tokens": 8866455,
+            "total_model_seconds": 72410.97434976429,
+            "shortest_trial_output_tokens": 1559962,
+            "shortest_trial_model_seconds": 12143.08927484497,
+            "mean_output_tokens_per_trial": 23589.177083333332,
+            "mean_input_tokens_per_trial": 23089.7265625,
+            "mean_model_seconds_per_trial": 188.5702457025112,
+            "mean_output_tokens_per_decision": 4790.187202538339,
+            "mean_input_tokens_per_decision": 4688.765203595981,
+            "mean_model_seconds_per_decision": 38.292424299187886,
+            "truncated_decision_rate": 0.10735060814383923,
+            "mean_output_tokens_per_shortest_trial": 11729.037593984962,
+            "mean_model_seconds_per_shortest_trial": 91.30142311913511,
+            "total_output_tokens_per_shortest_success": 68107.0977443609
+          }
+        }
+      ]
+    }
+  },
+  "acceptance": {
+    "complete_trajectories": 5760,
+    "expected_questions_per_condition": 120,
+    "expected_samples_per_question": 16,
+    "replayed_decisions": 26558,
+    "normally_finished_decisions": 23508,
+    "normally_finished_actions_extracted": 23508,
+    "missing_or_extra_slots": 0,
+    "contract_seed_sampling_prompt_state_action_transition_judge_mismatches": 0,
+    "per_condition": {
+      "instruct": {
+        "responses": 8489,
+        "finish_stop": 7274,
+        "stop_final_json_found": 7274,
+        "stop_rescued_from_strict": 7016,
+        "stop_action_legal": 7260,
+        "finish_length": 1215,
+        "length_no_parseable_action": 1202,
+        "stop_strict_json_found": 258,
+        "length_final_json_found": 13,
+        "length_rescued_from_strict": 13,
+        "length_repeated_tail": 7,
+        "stop_action_illegal": 14,
+        "stop_repeated_tail": 1
+      },
+      "thinking": {
+        "responses": 9200,
+        "finish_stop": 8421,
+        "stop_final_json_found": 8421,
+        "stop_strict_json_found": 7283,
+        "stop_action_legal": 8420,
+        "finish_length": 779,
+        "length_no_parseable_action": 722,
+        "stop_rescued_from_strict": 1138,
+        "length_final_json_found": 57,
+        "length_rescued_from_strict": 57,
+        "stop_action_illegal": 1
+      },
+      "instruct_distance": {
+        "responses": 8869,
+        "finish_stop": 7813,
+        "stop_final_json_found": 7813,
+        "stop_rescued_from_strict": 7589,
+        "stop_action_legal": 7795,
+        "stop_strict_json_found": 224,
+        "finish_length": 1056,
+        "length_no_parseable_action": 1050,
+        "length_final_json_found": 6,
+        "length_rescued_from_strict": 6,
+        "stop_action_illegal": 18,
+        "stop_repeated_tail": 1,
+        "length_repeated_tail": 3
+      }
+    },
+    "truncated_decisions_with_parseable_json": {
+      "instruct": 13,
+      "instruct_distance": 6,
+      "thinking": 57
+    },
+    "truncated_json_policy": "Non-stop responses remain failures under the frozen contract, even if JSON is present."
+  },
+  "paired_question_bootstrap": {
+    "method": "20000 paired bootstrap draws, questions sampled within each of the five fixed graphs; seed 20260927; uncertainty conditional on these graphs",
+    "results": {
+      "1": {
+        "difference": 0.06510416666666667,
+        "ci95": [
+          0.0375,
+          0.09375
+        ],
+        "question_gains": 60,
+        "question_losses": 33,
+        "question_ties": 27
+      },
+      "8": {
+        "difference": 0.03203638953638954,
+        "ci95": [
+          -0.023619836182336172,
+          0.08791574397824396
+        ],
+        "question_gains": 47,
+        "question_losses": 25,
+        "question_ties": 48
+      },
+      "16": {
+        "difference": 0.008333333333333333,
+        "ci95": [
+          -0.06666666666666667,
+          0.08333333333333333
+        ],
+        "question_gains": 11,
+        "question_losses": 10,
+        "question_ties": 99
+      }
+    }
+  },
+  "by_shortest_length": {
+    "4": {
+      "instruct": {
+        "questions": 30,
+        "shortest": 307,
+        "reached": 330,
+        "truncated": 141,
+        "mean_output_tokens": 13572.241666666667,
+        "pass_at": {
+          "1": 0.6395833333333333,
+          "8": 0.993048433048433,
+          "16": 1
+        }
+      },
+      "instruct_distance": {
+        "questions": 30,
+        "shortest": 377,
+        "reached": 397,
+        "truncated": 79,
+        "mean_output_tokens": 10923.41875,
+        "pass_at": {
+          "1": 0.7854166666666667,
+          "8": 0.99999481999482,
+          "16": 1
+        }
+      },
+      "thinking": {
+        "questions": 30,
+        "shortest": 455,
+        "reached": 461,
+        "truncated": 18,
+        "mean_output_tokens": 18169.670833333334,
+        "pass_at": {
+          "1": 0.9479166666666666,
+          "8": 1,
+          "16": 1
+        }
+      }
+    },
+    "6": {
+      "instruct": {
+        "questions": 30,
+        "shortest": 142,
+        "reached": 202,
+        "truncated": 277,
+        "mean_output_tokens": 23739.56875,
+        "pass_at": {
+          "1": 0.29583333333333334,
+          "8": 0.8692204092204092,
+          "16": 0.9666666666666667
+        }
+      },
+      "instruct_distance": {
+        "questions": 30,
+        "shortest": 185,
+        "reached": 248,
+        "truncated": 225,
+        "mean_output_tokens": 21658.214583333334,
+        "pass_at": {
+          "1": 0.3854166666666667,
+          "8": 0.9658611758611759,
+          "16": 1
+        }
+      },
+      "thinking": {
+        "questions": 30,
+        "shortest": 291,
+        "reached": 351,
+        "truncated": 129,
+        "mean_output_tokens": 34435.67291666667,
+        "pass_at": {
+          "1": 0.60625,
+          "8": 0.9808029008029008,
+          "16": 1
+        }
+      }
+    },
+    "8": {
+      "instruct": {
+        "questions": 30,
+        "shortest": 41,
+        "reached": 100,
+        "truncated": 380,
+        "mean_output_tokens": 30199.566666666666,
+        "pass_at": {
+          "1": 0.08541666666666667,
+          "8": 0.4698834498834499,
+          "16": 0.6666666666666666
+        }
+      },
+      "instruct_distance": {
+        "questions": 30,
+        "shortest": 57,
+        "reached": 132,
+        "truncated": 345,
+        "mean_output_tokens": 28441.6375,
+        "pass_at": {
+          "1": 0.11875,
+          "8": 0.5646127946127947,
+          "16": 0.7666666666666667
+        }
+      },
+      "thinking": {
+        "questions": 30,
+        "shortest": 131,
+        "reached": 226,
+        "truncated": 254,
+        "mean_output_tokens": 46652.425,
+        "pass_at": {
+          "1": 0.27291666666666664,
+          "8": 0.7852292152292152,
+          "16": 0.9
+        }
+      }
+    },
+    "10": {
+      "instruct": {
+        "questions": 30,
+        "shortest": 28,
+        "reached": 59,
+        "truncated": 417,
+        "mean_output_tokens": 32777.635416666664,
+        "pass_at": {
+          "1": 0.058333333333333334,
+          "8": 0.3531623931623932,
+          "16": 0.5333333333333333
+        }
+      },
+      "instruct_distance": {
+        "questions": 30,
+        "shortest": 24,
+        "reached": 69,
+        "truncated": 407,
+        "mean_output_tokens": 31073.5375,
+        "pass_at": {
+          "1": 0.05,
+          "8": 0.282991452991453,
+          "16": 0.43333333333333335
+        }
+      },
+      "thinking": {
+        "questions": 30,
+        "shortest": 44,
+        "reached": 102,
+        "truncated": 378,
+        "mean_output_tokens": 42402.691666666666,
+        "pass_at": {
+          "1": 0.09166666666666666,
+          "8": 0.414017094017094,
+          "16": 0.5666666666666667
+        }
+      }
+    }
+  },
+  "paired_both_shortest": {
+    "trials": 317,
+    "conditions": {
+      "instruct": {
+        "mean_output_tokens": 10325.186119873817,
+        "mean_model_seconds": 81.14157080470162
+      },
+      "instruct_distance": {
+        "mean_output_tokens": 9895.589905362776,
+        "mean_model_seconds": 76.55363778735045
+      }
+    }
+  },
+  "paired_slot_changes": {
+    "reach_gains_only": 413,
+    "reach_losses_only": 258,
+    "shortest_gains_only": 326,
+    "shortest_losses_only": 201
+  },
+  "map_quality": [
+    {
+      "graph": 0,
+      "spearman": 0.5473117609163031,
+      "shortest_candidate_accuracy": 0.6756127450980393
+    },
+    {
+      "graph": 1,
+      "spearman": 0.5590844714387525,
+      "shortest_candidate_accuracy": 0.6824448529411765
+    },
+    {
+      "graph": 2,
+      "spearman": 0.5507190904558812,
+      "shortest_candidate_accuracy": 0.6666666666666666
+    },
+    {
+      "graph": 3,
+      "spearman": 0.5386916387699434,
+      "shortest_candidate_accuracy": 0.6637101715686274
+    },
+    {
+      "graph": 4,
+      "spearman": 0.5440336631557431,
+      "shortest_candidate_accuracy": 0.6722886029411764
+    }
+  ],
+  "repeated_tail_diagnostic": {
+    "definition": "last 4000 characters, last 80 nonempty stripped lines; three adjacent identical blocks of 1-8 lines, at least 20 characters per block",
+    "examples": {
+      "instruct": [
+        {
+          "sample": "graph_00/instruct/samples/path_undirected_256_03__6.json",
+          "step": 1,
+          "finish": "length",
+          "repeated_block": "{\"action_id\": 738}\n**Final Answer**\n{\"action_id\": 738}\n(to node 212)\nas it is a valid move and might lead to a path to 116.\nWe go with that.\n."
+        },
+        {
+          "sample": "graph_00/instruct/samples/path_undirected_256_22__5.json",
+          "step": 1,
+          "finish": "length",
+          "repeated_block": "Yes.\n**Final Answer**\n{\"action_id\": 552}"
+        }
+      ],
+      "thinking": [],
+      "instruct_distance": [
+        {
+          "sample": "graph_02/instruct_distance/samples/path_undirected_256_23__1.json",
+          "step": 5,
+          "finish": "stop",
+          "repeated_block": "No.\nWait — 145 → 145 → 145 → 145 → 145 → 145 → 145 → 145 → 145 → 145?"
+        },
+        {
+          "sample": "graph_03/instruct_distance/samples/path_undirected_256_09__10.json",
+          "step": 4,
+          "finish": "length",
+          "repeated_block": "→ 191 → 107, 191, 6\n→ 191 → 107, 191, 6"
+        }
+      ]
+    },
+    "counts": {
+      "instruct": 8,
+      "instruct_distance": 4,
+      "thinking": 0
+    },
+    "note": "Descriptive exact text repetition proxy, not an entropy measurement or a complete measure of semantic repetition."
+  },
+  "per_case_shortest_counts": {
+  "case_order": "graph_00..graph_04, then case index 00..23",
+  "conditions": {
+    "instruct": [
+      [
+        2,
+        0,
+        0,
+        2,
+        15,
+        4,
+        3,
+        2,
+        12,
+        3,
+        7,
+        7,
+        2,
+        1,
+        3,
+        0,
+        0,
+        3,
+        0,
+        13,
+        7,
+        1,
+        6,
+        6
+      ],
+      [
+        3,
+        14,
+        5,
+        3,
+        5,
+        3,
+        3,
+        1,
+        10,
+        2,
+        0,
+        1,
+        1,
+        11,
+        0,
+        2,
+        3,
+        3,
+        1,
+        8,
+        1,
+        0,
+        9,
+        0
+      ],
+      [
+        0,
+        1,
+        10,
+        2,
+        2,
+        0,
+        13,
+        2,
+        3,
+        8,
+        0,
+        0,
+        8,
+        3,
+        7,
+        0,
+        14,
+        13,
+        14,
+        2,
+        4,
+        1,
+        2,
+        7
+      ],
+      [
+        0,
+        1,
+        1,
+        11,
+        9,
+        5,
+        2,
+        0,
+        8,
+        1,
+        12,
+        12,
+        6,
+        2,
+        11,
+        2,
+        7,
+        2,
+        3,
+        0,
+        4,
+        13,
+        1,
+        0
+      ],
+      [
+        0,
+        9,
+        1,
+        1,
+        11,
+        8,
+        7,
+        0,
+        1,
+        1,
+        0,
+        13,
+        7,
+        0,
+        0,
+        14,
+        8,
+        1,
+        0,
+        2,
+        9,
+        0,
+        6,
+        2
+      ]
+    ],
+    "instruct_distance": [
+      [
+        5,
+        1,
+        3,
+        4,
+        15,
+        5,
+        4,
+        4,
+        15,
+        2,
+        6,
+        11,
+        7,
+        1,
+        2,
+        1,
+        0,
+        1,
+        0,
+        16,
+        14,
+        0,
+        8,
+        3
+      ],
+      [
+        14,
+        12,
+        4,
+        4,
+        4,
+        6,
+        3,
+        0,
+        10,
+        4,
+        0,
+        8,
+        0,
+        10,
+        0,
+        0,
+        8,
+        0,
+        1,
+        9,
+        1,
+        0,
+        13,
+        1
+      ],
+      [
+        0,
+        2,
+        14,
+        1,
+        0,
+        0,
+        16,
+        2,
+        4,
+        14,
+        0,
+        1,
+        3,
+        1,
+        10,
+        3,
+        12,
+        11,
+        13,
+        1,
+        10,
+        10,
+        2,
+        6
+      ],
+      [
+        0,
+        0,
+        3,
+        10,
+        12,
+        4,
+        0,
+        4,
+        8,
+        3,
+        11,
+        15,
+        9,
+        5,
+        13,
+        4,
+        5,
+        3,
+        3,
+        0,
+        2,
+        15,
+        4,
+        1
+      ],
+      [
+        8,
+        13,
+        0,
+        1,
+        14,
+        9,
+        9,
+        0,
+        2,
+        1,
+        1,
+        12,
+        9,
+        0,
+        0,
+        15,
+        10,
+        1,
+        0,
+        4,
+        13,
+        1,
+        10,
+        0
+      ]
+    ],
+    "thinking": [
+      [
+        2,
+        2,
+        0,
+        10,
+        16,
+        2,
+        11,
+        5,
+        16,
+        3,
+        11,
+        15,
+        13,
+        1,
+        2,
+        9,
+        0,
+        0,
+        0,
+        16,
+        16,
+        0,
+        14,
+        11
+      ],
+      [
+        15,
+        15,
+        8,
+        9,
+        6,
+        14,
+        11,
+        0,
+        16,
+        7,
+        3,
+        5,
+        2,
+        16,
+        1,
+        2,
+        13,
+        3,
+        1,
+        12,
+        0,
+        3,
+        14,
+        1
+      ],
+      [
+        1,
+        1,
+        14,
+        2,
+        0,
+        0,
+        15,
+        8,
+        7,
+        16,
+        3,
+        0,
+        9,
+        3,
+        7,
+        3,
+        16,
+        16,
+        16,
+        0,
+        14,
+        10,
+        4,
+        11
+      ],
+      [
+        11,
+        2,
+        13,
+        16,
+        13,
+        7,
+        0,
+        4,
+        12,
+        4,
+        13,
+        16,
+        12,
+        7,
+        15,
+        6,
+        9,
+        11,
+        9,
+        1,
+        2,
+        16,
+        0,
+        3
+      ],
+      [
+        9,
+        14,
+        1,
+        0,
+        16,
+        10,
+        13,
+        0,
+        5,
+        2,
+        2,
+        14,
+        15,
+        2,
+        0,
+        16,
+        14,
+        7,
+        1,
+        14,
+        16,
+        2,
+        15,
+        3
+      ]
+    ]
+  }
+},
+  "map_readout_diagnostic": {
+    "policy": "Deterministic smallest learned candidate distance, excluding visited nodes; true shortest distances used only to score paths.",
+    "questions": 120,
+    "reached": 120,
+    "shortest": 69,
+    "by_length": {
+      "4": {
+        "questions": 30,
+        "reached": 30,
+        "shortest": 29
+      },
+      "6": {
+        "questions": 30,
+        "reached": 30,
+        "shortest": 21
+      },
+      "8": {
+        "questions": 30,
+        "reached": 30,
+        "shortest": 13
+      },
+      "10": {
+        "questions": 30,
+        "reached": 30,
+        "shortest": 6
+      }
+    },
+    "by_graph": [
+      {
+        "graph": 0,
+        "reached": 24,
+        "shortest": 14,
+        "first_action_shortest_correct": 18,
+        "trajectory_first_deviation": {
+          "instruct": {
+            "first_steps_executed": 303,
+            "first_steps_follow_minimum": 153,
+            "first_steps_shortest_correct": 216,
+            "map_and_choice_both_wrong": 22,
+            "followed_wrong_minimum": 30,
+            "truncated_on_shortest_prefix": 146,
+            "shortest_success": 99,
+            "rejected_correct_minimum": 87
+          },
+          "instruct_distance": {
+            "first_steps_executed": 316,
+            "first_steps_follow_minimum": 208,
+            "first_steps_shortest_correct": 249,
+            "followed_wrong_minimum": 47,
+            "map_and_choice_both_wrong": 11,
+            "shortest_success": 128,
+            "rejected_correct_minimum": 65,
+            "truncated_on_shortest_prefix": 131,
+            "invalid_action_on_shortest_prefix": 2
+          }
+        }
+      },
+      {
+        "graph": 1,
+        "reached": 24,
+        "shortest": 14,
+        "first_action_shortest_correct": 20,
+        "trajectory_first_deviation": {
+          "instruct": {
+            "first_steps_executed": 324,
+            "first_steps_follow_minimum": 138,
+            "first_steps_shortest_correct": 221,
+            "rejected_correct_minimum": 119,
+            "truncated_on_shortest_prefix": 135,
+            "shortest_success": 89,
+            "followed_wrong_minimum": 29,
+            "invalid_action_on_shortest_prefix": 4,
+            "map_and_choice_both_wrong": 8
+          },
+          "instruct_distance": {
+            "first_steps_executed": 316,
+            "first_steps_follow_minimum": 206,
+            "first_steps_shortest_correct": 237,
+            "shortest_success": 112,
+            "truncated_on_shortest_prefix": 136,
+            "followed_wrong_minimum": 65,
+            "rejected_correct_minimum": 58,
+            "invalid_action_on_shortest_prefix": 5,
+            "map_and_choice_both_wrong": 8
+          }
+        }
+      },
+      {
+        "graph": 2,
+        "reached": 24,
+        "shortest": 13,
+        "first_action_shortest_correct": 17,
+        "trajectory_first_deviation": {
+          "instruct": {
+            "first_steps_executed": 323,
+            "first_steps_follow_minimum": 161,
+            "first_steps_shortest_correct": 240,
+            "rejected_correct_minimum": 86,
+            "truncated_on_shortest_prefix": 134,
+            "followed_wrong_minimum": 38,
+            "invalid_action_on_shortest_prefix": 2,
+            "shortest_success": 116,
+            "map_and_choice_both_wrong": 8
+          },
+          "instruct_distance": {
+            "first_steps_executed": 311,
+            "first_steps_follow_minimum": 214,
+            "first_steps_shortest_correct": 245,
+            "truncated_on_shortest_prefix": 136,
+            "rejected_correct_minimum": 48,
+            "followed_wrong_minimum": 58,
+            "shortest_success": 136,
+            "map_and_choice_both_wrong": 6
+          }
+        }
+      },
+      {
+        "graph": 3,
+        "reached": 24,
+        "shortest": 13,
+        "first_action_shortest_correct": 19,
+        "trajectory_first_deviation": {
+          "instruct": {
+            "first_steps_executed": 325,
+            "first_steps_follow_minimum": 167,
+            "first_steps_shortest_correct": 263,
+            "truncated_on_shortest_prefix": 133,
+            "followed_wrong_minimum": 36,
+            "rejected_correct_minimum": 85,
+            "map_and_choice_both_wrong": 12,
+            "shortest_success": 113,
+            "invalid_action_on_shortest_prefix": 5
+          },
+          "instruct_distance": {
+            "first_steps_executed": 327,
+            "first_steps_follow_minimum": 204,
+            "first_steps_shortest_correct": 285,
+            "followed_wrong_minimum": 71,
+            "truncated_on_shortest_prefix": 126,
+            "rejected_correct_minimum": 41,
+            "shortest_success": 134,
+            "invalid_action_on_shortest_prefix": 4,
+            "map_and_choice_both_wrong": 8
+          }
+        }
+      },
+      {
+        "graph": 4,
+        "reached": 24,
+        "shortest": 15,
+        "first_action_shortest_correct": 20,
+        "trajectory_first_deviation": {
+          "instruct": {
+            "first_steps_executed": 325,
+            "first_steps_follow_minimum": 156,
+            "first_steps_shortest_correct": 212,
+            "map_and_choice_both_wrong": 28,
+            "shortest_success": 101,
+            "rejected_correct_minimum": 115,
+            "truncated_on_shortest_prefix": 108,
+            "followed_wrong_minimum": 32
+          },
+          "instruct_distance": {
+            "first_steps_executed": 326,
+            "first_steps_follow_minimum": 222,
+            "first_steps_shortest_correct": 265,
+            "shortest_success": 133,
+            "rejected_correct_minimum": 61,
+            "truncated_on_shortest_prefix": 120,
+            "followed_wrong_minimum": 59,
+            "map_and_choice_both_wrong": 11
+          }
+        }
+      }
+    ],
+    "map_trial_first_deviation_by_length": {
+      "4": {
+        "shortest_success": 377,
+        "truncated_on_shortest_prefix": 59,
+        "rejected_correct_minimum": 38,
+        "followed_wrong_minimum": 2,
+        "invalid_action_on_shortest_prefix": 4
+      },
+      "6": {
+        "followed_wrong_minimum": 51,
+        "map_and_choice_both_wrong": 11,
+        "shortest_success": 185,
+        "rejected_correct_minimum": 83,
+        "truncated_on_shortest_prefix": 145,
+        "invalid_action_on_shortest_prefix": 5
+      },
+      "8": {
+        "rejected_correct_minimum": 86,
+        "truncated_on_shortest_prefix": 212,
+        "shortest_success": 57,
+        "followed_wrong_minimum": 101,
+        "map_and_choice_both_wrong": 23,
+        "invalid_action_on_shortest_prefix": 1
+      },
+      "10": {
+        "truncated_on_shortest_prefix": 233,
+        "shortest_success": 24,
+        "rejected_correct_minimum": 66,
+        "followed_wrong_minimum": 146,
+        "map_and_choice_both_wrong": 10,
+        "invalid_action_on_shortest_prefix": 1
+      }
+    },
+    "note": "Read-only map-quality diagnostic, not an additional sampled LLM condition."
+  }
+}

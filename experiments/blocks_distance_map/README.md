@@ -2,7 +2,26 @@
 
 本目录供执行与复核实验的 agent 使用。面向人的说明见 [BLOCKS_QMAP_PLAN.md](../../docs/BLOCKS_QMAP_PLAN.md)。当前进度只维护在 [PROJECT_STATUS_AND_TODO.md](../../docs/PROJECT_STATUS_AND_TODO.md)；本文件定义执行协议，不创建另一份当前状态页。
 
-## 假设与范围
+## 1000 棋盘共享 Q：多目标与跨棋盘检验
+
+新一轮使用 [multiboard_1000_multigoal.json](configs/multiboard_1000_multigoal.json) 作为唯一正式参数合同。`src/multiboard_data.py` 从原论文八形状数据集按固定 seed 选出互不重复的训练与 OOD 初始棋盘；参考动作逐步重放，随机合法移除形成分支状态树。地标来自不同剩余格子数量的非空中间状态，显式包括含孤立格、无法清空但可从更早状态到达的目标。`DistanceOracle.distance(当前, 目标)` 仍用精确差集覆盖给出有向有限距离或已证明不可达；无法清空只描述到空棋盘的关系，不作为状态的固定坏标签。
+
+同一共享棋盘编码器 `Q(棋盘)` 输出 128 维向量；目标进入固定有向距离 `D(Q(当前), Q(目标))`，不进入编码器。训练保留不可达距离惩罚，并联合优化距离 Huber 与按相同起点或目标组成的 listwise 排序。部分训练棋盘加入“同一父状态、两个合法后继、两个非空目标，换目标应换动作”的四关系监督；另一些训练棋盘保留同类对照仅供测试。候选后继由规则环境提供，不用 Q 搜索或选择训练标签。
+
+评测分开记录：训练棋盘内见过状态但未见过的状态对、同棋盘从未进入训练关系的状态、训练中从未作为目标的地标、其中含孤立格的目标、以及初始棋盘完全未进入 1000 张训练集的 OOD 棋盘。验证集只包含同训练棋盘中未见的状态，选 checkpoint；其余测试不参与选模型。换目标对照还分别报告两个目标的一步排序、双目标都正确的反转率，以及从同一父状态分别到两个非空目标的逐步贪心到达率。另从可达起点逐步走向含孤立格的未见目标。所有测试关系使用精确标签评测，推理分数只来自冻结 Q。状态掩码可能在不同初始棋盘的分支中重合，OOD 关系要求至少一个端点未进入训练状态池；摘要记录实际分母。
+
+运行需要 `numpy`、`torch` 和 `h5py`。先将原论文的 `tiling_order_10x10_8obj.h5` 放到配置指定的忽略路径 `data/raw/`，从仓库根目录执行：
+
+```bash
+python -m unittest discover -s experiments/blocks_distance_map/tests -v
+python -m experiments.blocks_distance_map.src.multiboard_run \
+  --config experiments/blocks_distance_map/configs/multiboard_1000_multigoal.json \
+  --out runs/blocks_distance_map/RUN_ID --source-commit COMMIT --device cuda:0
+```
+
+正式运行从已提交的 commit 复制源码到独立远端目录，脱离 SSH 会话执行。`data/data.npz` 保存各关系组、棋盘行号与换目标对照；含孤立格测试是未见目标测试的显式子集。`progress.jsonl` 保存验证轨迹；`best.pt` 是按验证目标选择的权重；`checkpoints/step_*.pt` 是含优化器的周期检查点；`summary.json` 是最终测试。生成物均在忽略的 `runs/`。下文记录此前单棋盘试点的合同与结果，不作为这次共享 Q 的测试数据。
+
+## 既有单棋盘试点：假设与范围
 
 对同一固定积木棋盘中的状态，直接监督精确有向最短步数与不可达关系，能否形成支持距离排序与好坏候选判断的紧凑 Q-map？先检验关系拟合与留出关系补全，不宣称未见状态或跨棋盘泛化。
 

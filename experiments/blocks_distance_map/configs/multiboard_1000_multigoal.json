@@ -1,0 +1,43 @@
+{
+  "study": "blocks_distance_map",
+  "scope": "shared_Q_1000_official_boards_multigoal",
+  "rules_module": "experiments.gcml_counterexamples.src.blocks",
+  "official_dataset": "data/raw/tiling_order_10x10_8obj.h5",
+  "official_source_commit": "ff76859b71a2bc2056b50f5e052475351c007f76",
+  "data": {
+    "seed": 20260928,
+    "train_boards": 1000,
+    "ood_boards": 200,
+    "train_rollouts": 8,
+    "validation_rollouts": 3,
+    "ood_rollouts": 4,
+    "landmarks_per_board": 24,
+    "heldout_landmarks_per_board": 4,
+    "landmark_pairs_per_state": 8,
+    "contrast_cases_per_board": 2,
+    "contrast_training_boards": 800,
+    "isolated_goal_rollouts": 200,
+    "oracle_cache_limit": 4000000,
+    "oracle_seconds": 14400
+  },
+  "model": {
+    "state_dim": 128,
+    "encoder_hidden_dim": 256,
+    "metric": "directed_sum"
+  },
+  "training": {
+    "seed": 20260928,
+    "learning_rate": 0.001,
+    "steps": 500000,
+    "batch_size": 512,
+    "listwise_batch_size": 256,
+    "listwise_groups_per_anchor": 4,
+    "listwise_weight": 1.0,
+    "temperature": 1.0,
+    "eval_every": 5000,
+    "checkpoint_every": 25000,
+    "patience_evaluations": 12,
+    "min_improvement": 0.0001,
+    "cpu_threads": 4
+  }
+}

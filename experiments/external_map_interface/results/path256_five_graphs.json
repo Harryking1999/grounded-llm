@@ -6,6 +6,10 @@
   "evaluation_config": "experiments/external_map_interface/configs/path256_five_graphs_eval.json",
   "questions": 120,
   "replicates": 16,
+  "metric_definitions": {
+    "pass_at": "At least one shortest valid path among k samples from the same question.",
+    "reach_pass_at": "At least one valid path reaching the goal among k samples from the same question; non-shortest paths count."
+  },
   "conditions": {
     "instruct": {
       "trials": 1920,
@@ -15,6 +19,11 @@
         "1": 0.26979166666666665,
         "8": 0.6713286713286714,
         "16": 0.7916666666666666
+      },
+      "reach_pass_at": {
+        "1": 0.35989583333333336,
+        "8": 0.8539756539756541,
+        "16": 0.9416666666666667
       },
       "failures": {
         "budget_truncated": 1215,
@@ -203,6 +212,11 @@
         "8": 0.7950123025123026,
         "16": 0.8666666666666667
       },
+      "reach_pass_at": {
+        "1": 0.59375,
+        "8": 0.9335249935249937,
+        "16": 0.975
+      },
       "failures": {
         "budget_truncated": 779,
         "illegal_or_repeated_action": 1
@@ -389,6 +403,11 @@
         "1": 0.33489583333333334,
         "8": 0.7033650608650608,
         "16": 0.8
+      },
+      "reach_pass_at": {
+        "1": 0.440625,
+        "8": 0.8997649572649576,
+        "16": 0.975
       },
       "failures": {
         "budget_truncated": 1056,
@@ -662,6 +681,25 @@
         "question_gains": 11,
         "question_losses": 10,
         "question_ties": 99
+      }
+    }
+  },
+  "paired_question_reach_bootstrap": {
+    "method": "20000 paired percentile bootstrap draws; 24 questions resampled within each of the five fixed graphs; seed 20260927; uncertainty conditional on these graphs",
+    "results": {
+      "1": {
+        "difference": 0.08072916666666667,
+        "ci95": [0.05364583333333333, 0.10989583333333333]
+      },
+      "8": {
+        "difference": 0.04578930328930328,
+        "ci95": [0.00468272468272468, 0.08888306138306136]
+      },
+      "16": {
+        "difference": 0.03333333333333333,
+        "ci95": [-0.008333333333333333, 0.075],
+        "question_gains": 6,
+        "question_losses": 2
       }
     }
   },

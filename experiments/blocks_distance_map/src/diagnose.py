@@ -32,6 +32,8 @@ def diagnose(data_path, checkpoint):
                   (outgoing[decision_states] == 0).sum()),
               "train_hard_negatives": int((rows[:, 3] == 2).sum()),
               "train_non_goal_hard_negatives": int(((rows[:, 3] == 2) & (rows[:, 1] != goal)).sum()),
+              "decision_successors_with_trained_non_goal_hard_negative": int(np.isin(
+                  decision_states, rows[(rows[:, 3] == 2) & (rows[:, 1] != goal), 0]).sum()),
               "goal_pairs": {}}
     for sid, name in enumerate(("train", "validation", "test")):
         ids = pairs[(data["split"] == sid) & (pairs[:, 1] == goal), 0]

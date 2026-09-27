@@ -96,6 +96,13 @@ def prepare(config, out):
             decisions.append((s, action, t, oracle.cover(t)))
             if t:
                 forced_goal_states.add(t)
+    # Single-tile boards are solvable nonempty landmarks. For a dead successor,
+    # reaching any contained landmark is also impossible, while a solvable
+    # successor may reach some. This gives indirect goal structure without
+    # training on the reserved successor-to-empty relation itself.
+    landmarks = sorted({tile for tile, _ in blocks.PLACEMENTS if tile & initial == tile})
+    if options.get("landmark_pairs_per_state", 0):
+        states.update(landmarks)
     states = sorted(states)
     lookup = {s: i for i, s in enumerate(states)}
     # Every state has goal supervision somewhere; evaluation successors' goal
@@ -122,6 +129,16 @@ def prepare(config, out):
     for s, _, t, _ in decisions:
         add(s, t)
         add(t, s)
+    landmark_keys = set()
+    per_state = options.get("landmark_pairs_per_state", 0)
+    if per_state:
+        for s in states:
+            choices = [t for t in landmarks if t != s and t & s == t]
+            if choices:
+                chosen = rng.choice(choices, size=min(per_state, len(choices)), replace=False)
+                for t in chosen:
+                    add(s, int(t))
+                    landmark_keys.add(tuple(sorted((lookup[s], lookup[int(t)]))))
     mandatory_count = len(labels)
     # Observed paths certify reachability; the oracle, not time difference,
     # supplies the shortest-distance label.
@@ -158,7 +175,9 @@ def prepare(config, out):
     pairs = np.asarray([(lookup[s], lookup[t], d, kind)
                         for (s, t), (d, kind) in sorted(labels.items())], dtype=np.int32)
     forced_test = {tuple(sorted((lookup[s], lookup[0]))) for s in forced_goal_states}
-    forced_train = {tuple(sorted((lookup[initial], lookup[s]))) for s in states if s != initial}
+    initial_keys = {tuple(sorted((lookup[initial], lookup[s]))) for s in states if s != initial}
+    forced_train = set(initial_keys)
+    forced_train.update(landmark_keys)
     split = pair_splits(pairs, forced_test, options["split_fractions"], options["seed"], forced_train)
     # Ensure every table row is trained via some non-held-out relation. Do not
     # repair a missing row by moving reserved evaluation labels into training.
@@ -180,7 +199,8 @@ def prepare(config, out):
                "initial_exact_distance": initial_distance, "unreachable_target": cap,
                "states": len(states), "transitions": len(edges), "pairs": len(pairs),
                "mandatory_pairs": mandatory_count, "goal_test_states": len(forced_goal_states),
-               "initial_anchor_training_groups": len(forced_train),
+               "initial_anchor_training_groups": len(initial_keys),
+               "nonempty_landmarks": len(landmarks), "landmark_training_groups": len(landmark_keys),
                "decision_parents": len(parents), "decision_candidates": len(decisions),
                "action_count": len(blocks.PLACEMENTS), "shape_rows": list(blocks.CONFIG["blocks"]["shape_rows"]),
                "oracle_cache_entries": len(oracle.cache), "unknown_labels": 0, "splits": {}}

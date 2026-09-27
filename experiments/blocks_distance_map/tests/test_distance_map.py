@@ -1,4 +1,7 @@
 from collections import deque
+import json
+from pathlib import Path
+import tempfile
 import time
 import unittest
 
@@ -6,7 +9,7 @@ import numpy as np
 import torch
 
 from experiments.gcml_counterexamples.src import blocks
-from experiments.blocks_distance_map.src.data import comparisons, pair_splits
+from experiments.blocks_distance_map.src.data import comparisons, pair_splits, prepare
 from experiments.blocks_distance_map.src.evaluate import decisions_metrics
 from experiments.blocks_distance_map.src.model import distance
 from experiments.blocks_distance_map.src.oracle import DistanceOracle, OracleBudgetExceeded, successors
@@ -86,6 +89,22 @@ class DistanceMapTests(unittest.TestCase):
         self.assertEqual(result["solvable_action_rate"], .5)
         self.assertEqual(result["optimal_action_rate"], .5)
         self.assertEqual(result["deep_dead_pairs"], 1)
+
+    def test_landmark_supervision_adds_non_goal_hard_relations_without_goal_leak(self):
+        config = json.loads((Path(__file__).parents[1] / "configs/landmark_probe.json").read_text())
+        config["data"].update(episodes=30, target_pairs=3000, random_pair_attempts=3000,
+                              subset_pair_attempts=3000, decision_parents=8)
+        with tempfile.TemporaryDirectory() as work:
+            summary = prepare(config, Path(work) / "data")
+            data = np.load(Path(work) / "data/data.npz")
+            pairs, split = data["pairs"], data["split"]
+            goal = int(data["goal_id"])
+            self.assertGreater(summary["landmark_training_groups"], 0)
+            self.assertGreater(int(((pairs[:, 3] == 2) & (pairs[:, 1] != goal) & (split == 0)).sum()), 0)
+            successors = set(data["decisions"][:, 2]) - {goal}
+            for row, sid in zip(pairs, split):
+                if row[1] == goal and row[0] in successors:
+                    self.assertEqual(int(sid), 2)
 
 
 if __name__ == "__main__":

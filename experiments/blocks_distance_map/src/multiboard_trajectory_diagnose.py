@@ -7,13 +7,15 @@ from pathlib import Path
 import numpy as np
 import torch
 
+from experiments.gcml_counterexamples.src import blocks
 from .model import BoardEncoder, board_bits, distance
 from .multiboard_post_eval import matched_supported_tasks
 from .oracle import DistanceOracle, successors
 
 
 @torch.no_grad()
-def diagnose(model, tasks, states, metric, device, oracle, preserve_goal_cells=False):
+def diagnose(model, tasks, states, metric, device, oracle, preserve_goal_cells=False,
+             require_local_support=False, score_mode="q"):
     cache = {}
 
     def encode(masks):
@@ -38,14 +40,22 @@ def diagnose(model, tasks, states, metric, device, oracle, preserve_goal_cells=F
                 outcome = "reached"
                 break
             choices = successors(state)
-            if preserve_goal_cells:
+            if preserve_goal_cells or require_local_support:
                 choices = [(action, mask) for action, mask in choices if mask & goal == goal]
+            if require_local_support:
+                choices = [(action, mask) for action, mask in choices
+                           if blocks.locally_supported(mask ^ goal)]
             if not choices:
                 outcome = "no_action"
                 break
             masks = [mask for _, mask in choices]
-            scores = distance(encode(masks), encode([goal]).expand(len(masks), -1), metric)
-            chosen = masks[int(scores.argmin())]
+            if score_mode == "q":
+                scores = distance(encode(masks), encode([goal]).expand(len(masks), -1), metric)
+                chosen = masks[int(scores.argmin())]
+            elif score_mode == "area":
+                chosen = min(masks, key=int.bit_count)
+            else:
+                raise ValueError(score_mode)
             before = oracle.distance(state, goal)
             after = oracle.distance(chosen, goal)
             if after == before - 1:
@@ -71,6 +81,15 @@ def diagnose(model, tasks, states, metric, device, oracle, preserve_goal_cells=F
     return {"tasks": len(tasks), "outcomes": dict(outcomes),
             "decisions": dict(decisions), "first_error_step": dict(first_error_step),
             "by_true_distance": {str(k): dict(v) for k, v in sorted(by_distance.items())}}
+
+
+def audit_local_support(pairs, states):
+    hard = pairs[pairs[:, 3] == 2]
+    survives = sum(blocks.locally_supported(int(states[source]) ^ int(states[goal]))
+                   for source, goal, _, _ in hard)
+    return {"hard_unreachable_pairs": len(hard),
+            "locally_supported_hard_pairs": survives,
+            "locally_rejected_hard_pairs": len(hard) - survives}
 
 
 def evaluate(run_dir, device):
@@ -99,6 +118,9 @@ def evaluate(run_dir, device):
         raise ValueError("Distance-matched goal pools are incomplete")
     oracle = DistanceOracle(cache_limit=1_000_000, seconds=3600)
     result = {"source_commit": saved["source_commit"], "best_step": saved["step"],
+              "local_support_audit": {
+                  name: audit_local_support(data[name], data["states"])
+                  for name in ("test_seen_pair", "test_unseen_goal", "test_ood_board")},
               "isolated": diagnose(model, isolated, data["states"], saved["metric"], device, oracle),
               "supported": diagnose(model, supported_tasks, data["states"],
                                     saved["metric"], device, oracle),
@@ -111,7 +133,34 @@ def evaluate(run_dir, device):
                                         device, oracle, preserve_goal_cells=True),
                   "known_goal_unseen_pair": diagnose(model, known_goal_tasks, data["states"],
                                                       saved["metric"], device, oracle,
-                                                      preserve_goal_cells=True)}}
+                                                      preserve_goal_cells=True)},
+              "local_support": {
+                  "isolated": diagnose(model, isolated, data["states"], saved["metric"],
+                                       device, oracle, require_local_support=True),
+                  "supported": diagnose(model, supported_tasks, data["states"], saved["metric"],
+                                        device, oracle, require_local_support=True),
+                  "known_goal_unseen_pair": diagnose(model, known_goal_tasks, data["states"],
+                                                      saved["metric"], device, oracle,
+                                                      require_local_support=True)},
+              "local_support_area_baseline": {
+                  "isolated": diagnose(model, isolated, data["states"], saved["metric"],
+                                       device, oracle, require_local_support=True,
+                                       score_mode="area"),
+                  "supported": diagnose(model, supported_tasks, data["states"], saved["metric"],
+                                        device, oracle, require_local_support=True,
+                                        score_mode="area"),
+                  "known_goal_unseen_pair": diagnose(model, known_goal_tasks, data["states"],
+                                                      saved["metric"], device, oracle,
+                                                      require_local_support=True,
+                                                      score_mode="area")},
+              "area_only": {
+                  "isolated": diagnose(model, isolated, data["states"], saved["metric"],
+                                       device, oracle, score_mode="area"),
+                  "supported": diagnose(model, supported_tasks, data["states"], saved["metric"],
+                                        device, oracle, score_mode="area"),
+                  "known_goal_unseen_pair": diagnose(model, known_goal_tasks, data["states"],
+                                                      saved["metric"], device, oracle,
+                                                      score_mode="area")}}
     (run_dir / "trajectory_diagnosis.json").write_text(json.dumps(result, indent=2) + "\n")
     print(json.dumps(result), flush=True)
 

@@ -10,7 +10,9 @@ from .model import BoardEncoder, QMap, board_bits, distance
 from .oracle import successors
 
 
-def rollout(data_path, checkpoint, seed):
+def rollout(data_path, checkpoint, seed, training_data_path=None):
+    # Thousands of tiny candidate batches are slower with the host's full CPU pool.
+    torch.set_num_threads(4)
     data = dict(np.load(data_path, allow_pickle=False))
     saved = torch.load(checkpoint, map_location="cpu", weights_only=True)
     encoded = saved.get("model_type") == "board_mlp"
@@ -25,6 +27,8 @@ def rollout(data_path, checkpoint, seed):
     model.eval()
     states = [int(s) for s in data["states"]]
     index = {state: i for i, state in enumerate(states)}
+    training_pool = set(states) if training_data_path is None else {
+        int(s) for s in np.load(training_data_path, allow_pickle=False)["states"]}
     encoded_cache = {}
 
     def q_values(masks):
@@ -46,6 +50,7 @@ def rollout(data_path, checkpoint, seed):
         for start_id in starts:
             rng = np.random.default_rng(seed + start_id)
             state, actions = states[start_id], []
+            chosen_unseen = 0
             result = "step_limit"
             for _ in range(max_steps):
                 if state == 0:
@@ -66,18 +71,23 @@ def rollout(data_path, checkpoint, seed):
                 choice = int(rng.choice(tied))
                 action, state = legal[choice]
                 actions.append(int(action))
+                chosen_unseen += state not in training_pool
             if state == 0:
                 result = "solved"
             records.append({"start_state_id": start_id, "start_cells": states[start_id].bit_count(),
                             "exact_start_distance": int(data["goal_labels"][start_id]),
-                            "outcome": result, "executed_steps": len(actions), "actions": actions})
+                            "outcome": result, "executed_steps": len(actions),
+                            "chosen_states_outside_training_pool": chosen_unseen,
+                            "actions": actions})
     counts = {key: sum(row["outcome"] == key for row in records)
               for key in ("solved", "dead_end", "candidate_q_missing", "step_limit")}
     solved = [row for row in records if row["outcome"] == "solved"]
     return {"metric": saved["metric"], "model_type": saved.get("model_type", "table"),
             "seed": seed, "source_commit": saved["source_commit"],
             "starts": len(records), "outcomes": counts, "solve_rate_all_starts": counts["solved"] / len(records),
-            "encoded_states_outside_training_pool": sum(mask not in index for mask in encoded_cache),
+            "encoded_states_outside_training_pool": sum(mask not in training_pool for mask in encoded_cache),
+            "trajectories_choosing_unseen_states": sum(row["chosen_states_outside_training_pool"] > 0
+                                                      for row in records),
             "mean_extra_steps_on_solved": float(np.mean([row["executed_steps"] - row["exact_start_distance"]
                                                         for row in solved])) if solved else None,
             "initial_board": records[0], "records": records}
@@ -89,8 +99,10 @@ def main():
     parser.add_argument("--checkpoint", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--seed", type=int, default=20260927)
+    parser.add_argument("--training-data", type=Path,
+                        help="Encoder training data when evaluating a different board")
     args = parser.parse_args()
-    result = rollout(args.data, args.checkpoint, args.seed)
+    result = rollout(args.data, args.checkpoint, args.seed, args.training_data)
     args.out.write_text(json.dumps(result, indent=2) + "\n")
     print(json.dumps({key: value for key, value in result.items() if key != "records"}), flush=True)
 

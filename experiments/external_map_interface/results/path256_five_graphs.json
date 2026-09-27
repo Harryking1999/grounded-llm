@@ -1515,5 +1515,299 @@
       }
     },
     "note": "Read-only map-quality diagnostic, not an additional sampled LLM condition."
+  },
+  "case_studies": {
+    "selection": "Illustrative positive, generation-failure, and local-ranking cases; not a random sample.",
+    "true_distances": "Computed from the saved prompt adjacency for post-hoc analysis only; never provided to the model.",
+    "cases": [
+      {
+        "role": "gain",
+        "graph": 4,
+        "case": 0,
+        "replicate": 1,
+        "true_current_remaining_moves_posthoc": 6,
+        "candidates": [
+          {
+            "action_id": 41,
+            "to_node": 6,
+            "learned_distance": 2.589385,
+            "true_remaining_moves_posthoc": 5
+          },
+          {
+            "action_id": 35,
+            "to_node": 5,
+            "learned_distance": 2.629245,
+            "true_remaining_moves_posthoc": 6
+          },
+          {
+            "action_id": 643,
+            "to_node": 147,
+            "learned_distance": 2.383213,
+            "true_remaining_moves_posthoc": 7
+          }
+        ],
+        "records": {
+          "instruct": {
+            "start": 202,
+            "goal": 33,
+            "path": [
+              202,
+              5,
+              106,
+              218,
+              133
+            ],
+            "shortest": false,
+            "moves": 4,
+            "failure": "budget_truncated",
+            "output_tokens": 24404,
+            "source_sample": "graph_04/instruct/samples/path_undirected_256_00__1.json",
+            "decision": {
+              "step": 0,
+              "current": 202,
+              "seed": 20260910,
+              "action_id": 35,
+              "actual_next": 5,
+              "finish_reason": "stop",
+              "completion_tokens": 9
+            }
+          },
+          "instruct_distance": {
+            "start": 202,
+            "goal": 33,
+            "path": [
+              202,
+              6,
+              28,
+              91,
+              114,
+              172,
+              33
+            ],
+            "shortest": true,
+            "moves": 6,
+            "failure": null,
+            "output_tokens": 18085,
+            "source_sample": "graph_04/instruct_distance/samples/path_undirected_256_00__1.json",
+            "decision": {
+              "step": 0,
+              "current": 202,
+              "seed": 20260910,
+              "action_id": 41,
+              "actual_next": 6,
+              "finish_reason": "stop",
+              "completion_tokens": 7433
+            }
+          }
+        },
+        "counts": {
+          "instruct": {
+            "trials": 16,
+            "shortest": 0,
+            "reached": 6
+          },
+          "instruct_distance": {
+            "trials": 16,
+            "shortest": 8,
+            "reached": 12
+          }
+        },
+        "greedy_moves": 18,
+        "greedy_shortest": false,
+        "map_first_deviation": {
+          "shortest_success": 8,
+          "rejected_correct_minimum": 3,
+          "truncated_on_shortest_prefix": 3,
+          "followed_wrong_minimum": 1,
+          "map_and_choice_both_wrong": 1
+        }
+      },
+      {
+        "role": "generation_failure",
+        "graph": 4,
+        "case": 13,
+        "replicate": 1,
+        "true_current_remaining_moves_posthoc": 8,
+        "candidates": [
+          {
+            "action_id": 760,
+            "to_node": 239,
+            "learned_distance": 2.844238,
+            "true_remaining_moves_posthoc": 8
+          },
+          {
+            "action_id": 735,
+            "to_node": 203,
+            "learned_distance": 2.612992,
+            "true_remaining_moves_posthoc": 7
+          },
+          {
+            "action_id": 547,
+            "to_node": 120,
+            "learned_distance": 2.921677,
+            "true_remaining_moves_posthoc": 8
+          }
+        ],
+        "records": {
+          "instruct": {
+            "start": 235,
+            "goal": 80,
+            "path": [
+              235
+            ],
+            "shortest": false,
+            "moves": 0,
+            "failure": "budget_truncated",
+            "output_tokens": 16384,
+            "source_sample": "graph_04/instruct/samples/path_undirected_256_13__1.json",
+            "decision": {
+              "step": 0,
+              "current": 235,
+              "seed": 20261118,
+              "finish_reason": "length",
+              "completion_tokens": 16384
+            }
+          },
+          "instruct_distance": {
+            "start": 235,
+            "goal": 80,
+            "path": [
+              235
+            ],
+            "shortest": false,
+            "moves": 0,
+            "failure": "budget_truncated",
+            "output_tokens": 16384,
+            "source_sample": "graph_04/instruct_distance/samples/path_undirected_256_13__1.json",
+            "decision": {
+              "step": 0,
+              "current": 235,
+              "seed": 20261118,
+              "finish_reason": "length",
+              "completion_tokens": 16384
+            }
+          }
+        },
+        "counts": {
+          "instruct": {
+            "trials": 16,
+            "shortest": 0,
+            "reached": 1
+          },
+          "instruct_distance": {
+            "trials": 16,
+            "shortest": 0,
+            "reached": 0
+          }
+        },
+        "greedy_moves": 8,
+        "greedy_shortest": true,
+        "map_first_deviation": {
+          "truncated_on_shortest_prefix": 11,
+          "rejected_correct_minimum": 5
+        }
+      },
+      {
+        "role": "ranking_failure",
+        "graph": 1,
+        "case": 17,
+        "replicate": 4,
+        "true_current_remaining_moves_posthoc": 7,
+        "candidates": [
+          {
+            "action_id": 561,
+            "to_node": 126,
+            "learned_distance": 2.874933,
+            "true_remaining_moves_posthoc": 6
+          },
+          {
+            "action_id": 726,
+            "to_node": 245,
+            "learned_distance": 2.75583,
+            "true_remaining_moves_posthoc": 8
+          }
+        ],
+        "records": {
+          "instruct": {
+            "start": 251,
+            "goal": 152,
+            "path": [
+              251,
+              218,
+              63,
+              196,
+              126,
+              133,
+              182,
+              74,
+              222,
+              145,
+              152
+            ],
+            "shortest": true,
+            "moves": 10,
+            "failure": null,
+            "output_tokens": 23767,
+            "source_sample": "graph_01/instruct/samples/path_undirected_256_17__4.json",
+            "decision": {
+              "step": 3,
+              "current": 196,
+              "seed": 20262337,
+              "action_id": 561,
+              "actual_next": 126,
+              "finish_reason": "stop",
+              "completion_tokens": 2757
+            }
+          },
+          "instruct_distance": {
+            "start": 251,
+            "goal": 152,
+            "path": [
+              251,
+              218,
+              63,
+              196,
+              245,
+              168,
+              109,
+              242,
+              210
+            ],
+            "shortest": false,
+            "moves": 8,
+            "failure": "budget_truncated",
+            "output_tokens": 51194,
+            "source_sample": "graph_01/instruct_distance/samples/path_undirected_256_17__4.json",
+            "decision": {
+              "step": 3,
+              "current": 196,
+              "seed": 20262337,
+              "action_id": 726,
+              "actual_next": 245,
+              "finish_reason": "stop",
+              "completion_tokens": 10745
+            }
+          }
+        },
+        "counts": {
+          "instruct": {
+            "trials": 16,
+            "shortest": 3,
+            "reached": 3
+          },
+          "instruct_distance": {
+            "trials": 16,
+            "shortest": 0,
+            "reached": 2
+          }
+        },
+        "greedy_moves": 17,
+        "greedy_shortest": false,
+        "map_first_deviation": {
+          "truncated_on_shortest_prefix": 8,
+          "followed_wrong_minimum": 8
+        }
+      }
+    ]
   }
 }

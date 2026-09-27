@@ -7,6 +7,8 @@ def distance(source, target, metric):
     difference = source - target
     if metric == "directed_max":
         return difference.amax(dim=-1).clamp_min(0)
+    if metric == "directed_sum":
+        return difference.clamp_min(0).sum(dim=-1) / source.shape[-1] ** 0.5
     if metric == "euclidean":
         return difference.norm(dim=-1)
     raise ValueError(metric)

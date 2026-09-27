@@ -61,6 +61,15 @@ class DistanceMapTests(unittest.TestCase):
         reconstructed = distance(matrix[:, None, :], matrix[None, :, :], "directed_max")
         torch.testing.assert_close(reconstructed, matrix)
 
+    def test_directed_sum_is_asymmetric_and_obeys_triangle(self):
+        points = torch.tensor([[0., 2., 1.], [2., 0., 1.], [1., 2., 2.]])
+        d = distance(points[:, None, :], points[None, :, :], "directed_sum")
+        self.assertNotEqual(d[0, 2].item(), d[2, 0].item())
+        for i in range(len(points)):
+            for j in range(len(points)):
+                for k in range(len(points)):
+                    self.assertLessEqual(d[i, k].item(), d[i, j].item() + d[j, k].item() + 1e-6)
+
     def test_split_groups_reverse_and_reserves_goal_labels(self):
         pairs = np.array([[1, 0, 1, 0], [0, 1, -1, 1], [1, 2, 1, 0],
                           [2, 1, -1, 1], [2, 0, 2, 0], [0, 2, -1, 1]])

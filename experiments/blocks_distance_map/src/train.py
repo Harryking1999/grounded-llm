@@ -107,7 +107,7 @@ def main():
     parser.add_argument("--config", required=True, type=Path)
     parser.add_argument("--data", required=True, type=Path)
     parser.add_argument("--out", required=True, type=Path)
-    parser.add_argument("--metric", required=True, choices=("directed_max", "euclidean"))
+    parser.add_argument("--metric", required=True, choices=("directed_max", "directed_sum", "euclidean"))
     parser.add_argument("--seed", required=True, type=int)
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--source-commit", required=True)

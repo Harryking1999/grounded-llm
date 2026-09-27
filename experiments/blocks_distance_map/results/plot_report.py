@@ -8,6 +8,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 from matplotlib import font_manager
+from matplotlib.patches import Rectangle
 
 
 HERE = Path(__file__).resolve().parent
@@ -18,7 +19,7 @@ if FONT.exists():
     plt.rcParams["font.family"] = font_manager.FontProperties(fname=str(FONT)).get_name()
 plt.rcParams.update({"axes.unicode_minus": False, "figure.dpi": 120,
                      "savefig.dpi": 180, "font.size": 11})
-BLUE, ORANGE, GREEN, RED = "#27617D", "#D98B28", "#278167", "#C65049"
+BLUE, ORANGE = "#27617D", "#D98B28"
 
 
 def get(run):
@@ -27,11 +28,11 @@ def get(run):
 
 def make_outcomes():
     rows = [
-        ("A 稀疏监督 · 棋盘编码器", get("sparse_encoder_a3d520a")),
-        ("A 地标监督 · 查表 Q", get("dense_direction_a43b352")),
-        ("A 地标监督 · 棋盘编码器", get("encoder_c40e5ba")),
-        ("B 独立训练 · 棋盘编码器", get("second_board_encoder_7e9e153")),
-        ("B 直接使用 A 的编码器", get("encoder_c40e5ba/zero_shot_second_board_rollout")),
+        ("A · 稀疏监督，网络算坐标", get("sparse_encoder_a3d520a")),
+        ("A · 增加地标，逐状态存坐标", get("dense_direction_a43b352")),
+        ("A · 增加地标，网络算坐标", get("encoder_c40e5ba")),
+        ("B · 在 B 上重新训练网络", get("second_board_encoder_7e9e153")),
+        ("B · 直接使用 A 的网络", get("encoder_c40e5ba/zero_shot_second_board_rollout")),
     ]
     fig, ax = plt.subplots(figsize=(10.5, 5.3), layout="constrained")
     for i, (_, row) in enumerate(rows):
@@ -39,9 +40,9 @@ def make_outcomes():
         one = row["one_step_solvable"] * 100
         rollout = row["rollout_solved"] / row["rollout_starts"] * 100
         ax.barh(y + .18, one, height=.32, color=BLUE,
-                label="单步可解率" if i == 0 else None)
+                label="单步选对" if i == 0 else None)
         ax.barh(y - .18, rollout, height=.32, color=ORANGE,
-                label="逐步清空率" if i == 0 else None)
+                label="完整清空" if i == 0 else None)
     ax.set_yticks(range(len(rows)), [label for label, _ in rows[::-1]])
     ax.set_xlim(0, 100)
     ax.set_ylim(-.6, 4.6)
@@ -56,52 +57,46 @@ def make_outcomes():
     plt.close(fig)
 
 
-def draw_board(ax, rows):
+def draw_board(ax, rows, origin, removed=()):
     matrix = [[int(ch) for ch in row] for row in rows]
-    ax.imshow(matrix, cmap=ListedColormap(["#F1F4F5", "#27617D"]), vmin=0, vmax=1)
+    ax.imshow(matrix, cmap=ListedColormap(["#F1F4F5", BLUE]), vmin=0, vmax=1)
+    for r, c in removed:
+        assert matrix[r][c] == 1, "A highlighted removal must cover an occupied cell"
+        ax.add_patch(Rectangle((c - .5, r - .5), 1, 1, facecolor=ORANGE,
+                               edgecolor="#946021", linewidth=.4, hatch="///"))
     ax.set_xticks([i - .5 for i in range(len(rows[0]) + 1)], minor=True)
     ax.set_yticks([i - .5 for i in range(len(rows) + 1)], minor=True)
     ax.grid(which="minor", color="white", lw=2)
-    ax.tick_params(which="both", bottom=False, left=False,
-                   labelbottom=False, labelleft=False)
+    ax.set_xticks(range(len(rows[0])), range(origin[1] + 1, origin[1] + len(rows[0]) + 1))
+    ax.set_yticks(range(len(rows)), range(origin[0] + 1, origin[0] + len(rows) + 1))
+    ax.tick_params(which="both", length=0, labelsize=9, colors="#65747B")
     ax.spines[:].set_visible(False)
 
 
-def make_case(filename, case, model_names, values, title):
-    fig = plt.figure(figsize=(10.8, 4.7), layout="constrained")
-    gs = fig.add_gridspec(1, 2, width_ratios=[1, 2.25])
-    left = fig.add_subplot(gs[0, 0])
-    right = fig.add_subplot(gs[0, 1])
-    draw_board(left, case["board_grid"])
-    left.set_title("当前棋盘", fontsize=12, pad=12)
-    x = [0, 1]
-    width = .32
-    good = [pair[0] for pair in values]
-    bad = [pair[1] for pair in values]
-    right.bar([i - width / 2 for i in x], good, width,
-              color=GREEN, label="可解后继")
-    right.bar([i + width / 2 for i in x], bad, width,
-              color=RED, label="死局后继")
-    right.set_xticks(x, model_names)
-    right.set_ylabel("Q 距离")
-    right.set_ylim(0, max(good + bad) * 1.20)
-    right.grid(axis="y", color="#E5EBEE")
-    right.set_axisbelow(True)
-    right.spines[["top", "right"]].set_visible(False)
-    right.legend(loc="upper center", ncol=2, frameon=False)
-    fig.suptitle(title, fontsize=16, x=.04, ha="left")
+def make_case(filename, case, right_action_name):
+    # The same crop and coordinate frame is used in all four panels.
+    rows = case["board_grid"]
+    height = len(rows) / len(rows[0]) * 7 + 1.4
+    fig, axes = plt.subplots(2, 2, figsize=(8.4, height), layout="constrained")
+    for col, (key, label) in enumerate([
+            ("good_action", "左：移除三格拐角"),
+            ("bad_action", f"右：移除{right_action_name}")]):
+        action = case[key]
+        removed = action["removed_cells_cropped"]
+        expected = [list(row) for row in rows]
+        for r, c in removed:
+            expected[r][c] = "0"
+        assert ["".join(row) for row in expected] == action["after_grid_cropped"]
+        draw_board(axes[0, col], rows, case["crop_origin"], removed)
+        draw_board(axes[1, col], action["after_grid_cropped"], case["crop_origin"])
+        axes[0, col].set_title(label, fontsize=13, pad=10)
+        axes[1, col].set_title("移除后", fontsize=12, pad=10)
+    fig.suptitle(f"棋盘 {case['board']} · 两个合法动作", fontsize=16)
     fig.savefig(HERE / filename, bbox_inches="tight", facecolor="white")
     plt.close(fig)
 
 
-make_outcomes()
-case = DATA["case_sparse_vs_landmark"]
-make_case("qmap_case_supervision.png", case, ["稀疏监督", "加入地标监督"],
-          [(case["good_sparse_score"], case["bad_sparse_score"]),
-           (case["good_landmark_score"], case["bad_landmark_score"])],
-          "棋盘 A：候选评分")
-case = DATA["case_cross_board_transfer"]
-make_case("qmap_case_transfer.png", case, ["A 模型直接迁移", "在 B 上独立训练"],
-          [(case["good_transfer_score"], case["bad_transfer_score"]),
-           (case["good_trained_score"], case["bad_trained_score"])],
-          "棋盘 B：候选评分")
+if __name__ == "__main__":
+    make_outcomes()
+    make_case("qmap_case_supervision.png", DATA["case_sparse_vs_landmark"], "三格竖条")
+    make_case("qmap_case_transfer.png", DATA["case_cross_board_transfer"], "三格横条")

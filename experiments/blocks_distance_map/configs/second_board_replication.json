@@ -1,37 +1,37 @@
 {
   "study": "blocks_distance_map",
-  "scope": "same_landmark_data_dense_directional_distance_diagnostic",
+  "scope": "independent_official_board_replication_separate_Q_map",
   "rules_module": "experiments.gcml_counterexamples.src.blocks",
   "case": {
-    "id": "official8_row18002",
+    "id": "official8_row18000",
     "source_commit": "ff76859b71a2bc2056b50f5e052475351c007f76",
     "source_file": "dataset/tiling_order_10x10_8obj.h5",
-    "row": 18002,
+    "row": 18000,
     "grid": [
-      "0000000000",
-      "0000000000",
-      "1011000000",
-      "1111100000",
-      "1110111000",
-      "0011001000",
-      "0011011000",
-      "0001000000",
+      "0000111010",
+      "0000011110",
+      "0000000011",
+      "0000000111",
+      "0000001111",
+      "0000000100",
+      "0000011100",
+      "0000110000",
       "0000000000",
       "0000000000"
     ],
     "reference_actions": [
-      524,
-      355,
-      20,
-      546,
-      444,
-      557,
-      620,
-      293
+      588,
+      301,
+      597,
+      622,
+      294,
+      448,
+      512,
+      533
     ]
   },
   "data": {
-    "seed": 20260927,
+    "seed": 20260930,
     "episodes": 2000,
     "target_pairs": 250000,
     "random_pair_attempts": 200000,
@@ -56,9 +56,7 @@
       "directed_sum"
     ],
     "seeds": [
-      20260927,
-      20260928,
-      20260929
+      20260930
     ],
     "learning_rate": 0.001,
     "steps": 5000,

@@ -92,9 +92,10 @@ def audit_local_support(pairs, states):
             "locally_rejected_hard_pairs": len(hard) - survives}
 
 
-def evaluate(run_dir, device):
+def evaluate(run_dir, device, data_run=None):
     run_dir = Path(run_dir)
-    data = dict(np.load(run_dir / "data" / "data.npz", allow_pickle=False))
+    data_dir = Path(data_run) if data_run is not None else run_dir
+    data = dict(np.load(data_dir / "data" / "data.npz", allow_pickle=False))
     saved = torch.load(run_dir / "best.pt", map_location=device, weights_only=True)
     config = saved["config"]
     model = BoardEncoder(config["model"]["state_dim"],
@@ -118,6 +119,8 @@ def evaluate(run_dir, device):
         raise ValueError("Distance-matched goal pools are incomplete")
     oracle = DistanceOracle(cache_limit=1_000_000, seconds=3600)
     result = {"source_commit": saved["source_commit"], "best_step": saved["step"],
+              "finetune_source_commit": saved.get("finetune_source_commit"),
+              "finetune_step": saved.get("finetune_step"),
               "local_support_audit": {
                   name: audit_local_support(data[name], data["states"])
                   for name in ("test_seen_pair", "test_unseen_goal", "test_ood_board")},
@@ -168,9 +171,10 @@ def evaluate(run_dir, device):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--run", type=Path, required=True)
+    parser.add_argument("--data-run", type=Path)
     parser.add_argument("--device", default="cuda:0")
     args = parser.parse_args()
-    evaluate(args.run, args.device)
+    evaluate(args.run, args.device, args.data_run)
 
 
 if __name__ == "__main__":

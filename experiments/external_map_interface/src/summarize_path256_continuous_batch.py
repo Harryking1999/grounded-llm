@@ -5,7 +5,9 @@ from collections import Counter, defaultdict
 import json
 from pathlib import Path
 
-from .evaluate_path256_continuous import detect_boundary, map_update, path_error, trial_prompt
+from .evaluate_path256_continuous import (
+    detect_boundary, map_update, parse_final, path_error, trial_prompt,
+)
 from .evaluate_path256_continuous_batch import trial_seed
 from .q_map import GraphQMap
 from .transitions import environment_from_suite
@@ -72,6 +74,19 @@ def summarize(config, source, root, allow_partial=False):
                     raise ValueError(f"Confirmed path mismatch: {file}")
             elif record["updates"] or record["actions"] or len(record["segments"]) != 1:
                 raise ValueError(f"Unexpected intervention in one-shot trial: {file}")
+            else:
+                if record["failure"] not in ("budget_truncated", "context_limit"):
+                    try:
+                        parsed = parse_final(record["segments"][0]["text"])
+                    except ValueError:
+                        if record["failure"] != "missing_final_json":
+                            raise ValueError(f"Final answer extraction mismatch: {file}")
+                    else:
+                        if (record["final_path"] != parsed or
+                                record["failure"] != path_error(case, parsed)):
+                            raise ValueError(f"Final route verdict mismatch: {file}")
+            if record["reached"] != (record["failure"] is None):
+                raise ValueError(f"Success flag mismatch: {file}")
             if record["reached"]:
                 if (path_error(case, record["final_path"]) is not None or
                         record["shortest"] != (len(record["final_path"]) - 1 == case["reference"]["length"])):

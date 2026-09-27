@@ -649,6 +649,41 @@
     },
     "truncated_json_policy": "Non-stop responses remain failures under the frozen contract, even if JSON is present."
   },
+  "output_length_diagnostic": {
+    "source": "Read-only scan of all saved five-graph per-decision responses; generated output tokens, not input tokens.",
+    "instruct": {
+      "decisions": 8489,
+      "finished": 7274,
+      "finished_median_tokens": 3347,
+      "finished_p95_tokens": 9077,
+      "first_step_mean_tokens": 6434.6,
+      "first_step_truncated": 315,
+      "later_step_truncated": 900,
+      "finished_direct_json": 258,
+      "finished_recovered_from_verbose_text": 7016,
+      "truncated_without_parseable_action_json": 1202,
+      "truncated_with_parseable_action_json": 13,
+      "decisions_with_think_tags": 0
+    },
+    "instruct_distance": {
+      "decisions": 8869,
+      "finished": 7813,
+      "finished_median_tokens": 2769,
+      "finished_p95_tokens": 8231,
+      "first_step_mean_tokens": 6895.3,
+      "first_step_truncated": 324,
+      "later_step_truncated": 732
+    },
+    "thinking": {
+      "decisions": 9200,
+      "finished": 8421,
+      "finished_median_tokens": 5736,
+      "finished_p95_tokens": 13922,
+      "first_step_mean_tokens": 10376.0,
+      "first_step_truncated": 318,
+      "later_step_truncated": 461
+    }
+  },
   "paired_question_bootstrap": {
     "method": "20000 paired bootstrap draws, questions sampled within each of the five fixed graphs; seed 20260927; uncertainty conditional on these graphs",
     "results": {

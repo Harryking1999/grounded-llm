@@ -146,6 +146,23 @@ class ContinuousPilotTest(unittest.TestCase):
             with self.assertRaises(ValueError):
                 parse_final(text)
 
+    def test_terminal_json_fence_is_only_a_format_wrapper(self):
+        for text in ('reasoning\n```json\n{"path":[0,1,2]}\n```',
+                     '```\n{"path":[0,1,2]}\n```<|im_end|>'):
+            self.assertEqual(parse_final(text), [0, 1, 2])
+        result, _ = trial([('reasoning\n```json\n{"path":[0,1,2]}\n```', 'stop')], PLAIN)
+        self.assertTrue(result['reached'])
+
+    def test_fence_compatibility_cannot_repair_bad_answers(self):
+        for text in ('```json\n{"path":[0,1,2]}\nextra text\n```',
+                     '```json\n{"path":[0,1,2]}\n```\nextra text',
+                     '```json\n{"path":[0,1,2]}\n{"path":[0,2]}\n```',
+                     '```json\n{"path":[0,true,2]}\n```'):
+            with self.assertRaises(ValueError):
+                parse_final(text)
+        result, _ = trial([('```json\n{"path":[0,2]}\n```', 'stop')], PLAIN)
+        self.assertEqual(result['failure'], 'nonexistent_edge')
+
 
 class FakeTokenizer:
     def encode(self, text, **kwargs):

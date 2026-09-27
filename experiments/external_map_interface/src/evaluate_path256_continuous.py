@@ -17,6 +17,10 @@ ENVIRONMENT_MARKER = "[Environment update]"
 OPENING = re.compile(r'<action>|\{\s*"path"\s*:\s*\[|\[Environment update\]')
 INTEGER = re.compile(r"\s*(0|[1-9][0-9]*)\s*([,\]])")
 FINAL_PATTERN = re.compile(r'(\{[^{}]*\})\s*$', re.DOTALL)
+FINAL_FENCED_PATTERN = re.compile(
+    r'(?:^|\n)```(?:json)?[ \t]*\r?\n\s*(\{[^{}]*\})\s*\r?\n```[ \t]*$',
+    re.DOTALL | re.IGNORECASE,
+)
 
 
 def common_prompt(case):
@@ -98,7 +102,9 @@ def detect_boundary(text, confirmed):
 
 def parse_final(text):
     answer = re.sub(r'(?:<\|im_end\|>|<\|endoftext\|>|<\|fim_suffix\|>)\s*$', '', text).strip()
-    match = FINAL_PATTERN.search(answer)
+    # A terminal Markdown fence is a presentation wrapper, not a different route.
+    # Only accept a complete block containing one JSON object, with no trailing prose.
+    match = FINAL_PATTERN.search(answer) or FINAL_FENCED_PATTERN.search(answer)
     if not match:
         raise ValueError("No final JSON object")
     value = json.loads(match.group(1))

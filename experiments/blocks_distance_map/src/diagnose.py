@@ -7,24 +7,35 @@ import numpy as np
 import torch
 
 from .evaluate import auc, predict_pairs
-from .model import QMap
+from .model import BoardEncoder, QMap, board_bits
+from .train_encoder import encoded_view
 
 
 def diagnose(data_path, checkpoint):
+    torch.set_num_threads(4)
     data = dict(np.load(data_path, allow_pickle=False))
     saved = torch.load(checkpoint, map_location="cpu", weights_only=True)
-    model = QMap(saved["state_count"], saved["config"]["model"]["state_dim"],
-                 saved["cap"], saved["metric"], saved["config"]["model"]["init_std"])
+    encoded = saved.get("model_type") == "board_mlp"
+    if encoded:
+        model = BoardEncoder(saved["config"]["model"]["state_dim"],
+                             saved["config"]["model"]["encoder_hidden_dim"],
+                             saved["cap"], saved["metric"])
+    else:
+        model = QMap(saved["state_count"], saved["config"]["model"]["state_dim"],
+                     saved["cap"], saved["metric"], saved["config"]["model"]["init_std"])
     model.load_state_dict(saved["model"])
+    model.eval()
+    view = encoded_view(model, board_bits(data["states"])) if encoded else model
     pairs, goal = data["pairs"], int(data["goal_id"])
-    scores = predict_pairs(model, np.column_stack((np.arange(len(data["states"])),
-                                                  np.full(len(data["states"]), goal))))
+    scores = predict_pairs(view, np.column_stack((np.arange(len(data["states"])),
+                                                 np.full(len(data["states"]), goal))))
     rows = pairs[data["split"] == 0]
     outgoing = np.bincount(rows[rows[:, 2] == 1, 0], minlength=len(scores))
     decision_states = np.unique(data["decisions"][:, 2])
     decision_states = decision_states[decision_states != goal]
     rollout_states = np.unique(data["transitions"][:, [0, 2]])
-    result = {"metric": saved["metric"], "source_commit": saved["source_commit"],
+    result = {"metric": saved["metric"], "model_type": saved.get("model_type", "table"),
+              "source_commit": saved["source_commit"],
               "decision_nonempty_successors": len(decision_states),
               "decision_successors_outside_original_rollouts": int(
                   (~np.isin(decision_states, rollout_states)).sum()),

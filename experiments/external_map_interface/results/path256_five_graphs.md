@@ -182,11 +182,12 @@ Thinking 每条轨迹平均输出 35,415 tokens，高于另外两组；其截断
 **任务与提示词。** 沿用五张图、120 道题及已有地图。提示词改为：
 
 ```text
-Find a valid path from node <start> to node <goal> in this undirected graph.
-Any valid path reaching the goal counts as success. Prefer a shorter route,
-but you do not need to prove that it is shortest.
+Find a valid path from node <start> to node <goal> in this undirected graph, as short as you can.
 Follow the listed edges. Do not revisit a node.
 Return the complete route as one final JSON object: {"path": [<start>, ..., <goal>]}.
+You may reason before the final JSON. The final object must contain only the key "path".
+Use integer node IDs and list every node in order, including the start and goal; do not use ellipses.
+Do not wrap the final JSON in Markdown fences or add text after it.
 
 Neighbors:
 <完整邻接表>
@@ -203,9 +204,26 @@ Neighbors:
 | Instruct＋地图，优先跟随 | 同上 | 相同距离，提示词明确要求优先选较小距离 | 模型是否需要更明确的地图使用指令 |
 | Thinking 无地图 | 独立完成整条路径 | 无中途插入 | 自主推理的完整路径对照 |
 
-“优先跟随”增加一句：`Prefer the legal next node with the smallest learned-map distance. Use the graph to check validity; the distances may be imperfect.` 这是偏好，不由程序替模型选择节点。第三组与第二组仅这句指令不同。Thinking 使用不同权重和无中途反馈的协议，其结果单独解释；地图的主要效果看前三组的匹配比较。
+“优先跟随”增加一句：`Prefer the legal next node with the smallest learned-map distance.` 第三组与第二组仅这句指令不同。Thinking 使用不同权重和无中途反馈的协议，其结果单独解释；地图的主要效果看前三组的匹配比较。
 
-**地图怎样插入，具体例子。** 三个 Instruct 条件约定：模型每确认一个路径前缀，就输出 `<prefix>{"path":[4]}</prefix>` 这样的标记。运行程序在标记结束处暂停生成，核验前缀合法，然后把下面的补充信息追加到已有生成文本，再让模型继续生成下一 token：
+**Instruct 的额外输出格式要求。** 三个 Instruct 条件都在共同提示词中追加：
+
+```text
+Begin your response with <prefix>{"path":[<start>]}</prefix>.
+After each </prefix>, pause for an environment update; do not generate the update yourself.
+After receiving the update, you may reason, then choose exactly one legal unvisited next node.
+Append that node to the confirmed path and output the entire updated path as:
+<prefix>{"path":[<start>, ..., <new_node>]}</prefix>
+Keep all previously confirmed nodes unchanged. Prefix tags are for confirmed moves, not tentative routes.
+Inside each prefix, use a JSON object with only "path", an array of integer node IDs; list every node.
+Do not wrap prefix markers in Markdown fences.
+Once the environment confirms that your prefix reaches the goal, output the same complete path
+as the final JSON object {"path":[<start>, ..., <goal>]} and end the response.
+```
+
+模板中的占位符要换成实际节点，不输出省略号。例如首个标记为 `<prefix>{"path":[4]}</prefix>`，选定下一步后为 `<prefix>{"path":[4,216]}</prefix>`。Thinking 组不使用前缀标记，只遵守共同的最终 JSON 格式。
+
+**地图怎样插入，具体例子。** 运行程序在前缀标记结束处暂停生成，核验前缀合法，然后把下面的补充信息追加到已有生成文本，再让模型继续生成下一 token：
 
 ```text
 [Environment update]

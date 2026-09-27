@@ -76,6 +76,23 @@ Adam 只接收 Q 的参数。验证集使用与训练同分层的距离损失加
 
 是否推进到 V，参考面向人文档的暂定工程标准；若不达标，分别定位训练拟合、留出关系或候选排序。不得把验证未通过的 Q-map 自动接入 LLM。
 
+## Q 坐标与转移图可视化
+
+面向人的[可视化图例](results/qmap_geometry.md)区分冻结 Q 的二维投影、真实合法转移和按步骤排列的棋盘示意图。`src/export_geometry.py` 从报告中的一个既有案例出发，枚举全部后续状态与动作边，使用 checkpoint 中的棋盘编码器计算 Q，不更新参数。完整状态数超过预算时失败，不静默导出截断图。原始 Q 向量写入忽略的运行目录。
+
+```bash
+python -m experiments.blocks_distance_map.src.export_geometry \
+  --checkpoint CHECKPOINT --training-data TRAINING_DATA \
+  --case-summary experiments/blocks_distance_map/results/summary.json \
+  --out runs/blocks_distance_map/GEOMETRY_RUN
+python experiments/blocks_distance_map/results/plot_geometry.py \
+  --export-dir runs/blocks_distance_map/GEOMETRY_RUN
+```
+
+绘图使用 Python、numpy、matplotlib；计算投影还需要 scipy 与 scikit-learn。PCA 输入原始 Q；t-SNE 输入两方向 Q 距离的均值，等于当前 `directed_sum` 的缩放 L1 距离。真实距离、可解性标签与边不用于拟合二维坐标。固定随机种子和参数保存于 `results/qmap_geometry.json`，该文件同时保留小图的全部节点、边、路径和二维坐标，不保存原始 128 维 Q。不带 `--export-dir` 运行绘图脚本，可直接从已保存的图数据重生成 PNG/SVG。
+
+当前图例覆盖案例 A 的 336 个状态，而非 A 初始棋盘的完整图。绿线重放原评测的同起点、同种子贪心路径；红线强制第一个坏动作后继续贪心，必须明确它不是当前模型实际失败。放大图保留原 t-SNE 坐标，仅隐藏死局节点。邻居保留数以对称化 Q 距离为参照，不能解释成原始有向规划距离的保真度。
+
 ## 执行
 
 Python 需 numpy 与 PyTorch；不需要 transformers。复用开发机现有环境，不为版本号重新安装整套依赖，实际版本写入运行摘要。

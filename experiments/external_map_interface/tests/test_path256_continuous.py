@@ -194,6 +194,12 @@ class StreamingCallerTest(unittest.TestCase):
         self.assertFalse(result["abort_sent"])
         self.assertEqual(len(requests), 1)
 
+    def test_configured_request_seed_is_sent_on_supported_server(self):
+        caller, requests = self.make_caller([('<action>1</action>', 5, {"type": "stop"})])
+        caller.seed_applied = True
+        caller.generate('prompt', max_new_tokens=20, confirmed=[0], seed=20260927)
+        self.assertEqual(requests[0][1]['sampling_params']['sampling_seed'], 20260927)
+
     def test_missing_final_usage_is_explicit(self):
         caller, _ = self.make_caller([('{"path":[0,1,', 6, None)])
         result = caller.generate('prompt', max_new_tokens=20, confirmed=[0], seed=1)

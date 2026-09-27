@@ -306,10 +306,10 @@ class SGLangContinuousCaller(TokenizerCaller):
     charge all reported tokens, and never put the excess text into context.
     """
 
-    seed_applied = False  # Installed SGLang 0.4.6 has no per-request seed.
+    seed_applied = False  # SGLang 0.4.6 needs this fallback; 0.5.10 accepts sampling_seed.
 
     def __init__(self, model_path, endpoint, *, enable_thinking, sampling, context_length,
-                 timeout_seconds=7200):
+                 timeout_seconds=7200, per_request_seed=False):
         from transformers import AutoTokenizer
 
         self.tokenizer = AutoTokenizer.from_pretrained(model_path, local_files_only=True)
@@ -318,6 +318,7 @@ class SGLangContinuousCaller(TokenizerCaller):
         self.sampling = sampling
         self.context_length = context_length
         self.timeout_seconds = timeout_seconds
+        self.seed_applied = per_request_seed
 
     def request(self, path, payload):
         request = urllib.request.Request(
@@ -331,6 +332,8 @@ class SGLangContinuousCaller(TokenizerCaller):
         if room < 1:
             return {"text": "", "finish_reason": "context", "prompt_tokens": len(ids), "completion_tokens": 0}
         sampling = dict(self.sampling, max_new_tokens=min(max_new_tokens, room))
+        if self.seed_applied:
+            sampling["sampling_seed"] = seed
         mapped = confirmed is not None
         if mapped:
             sampling.update(stop=["</action>", ENVIRONMENT_MARKER], no_stop_trim=True, stream_interval=1)
@@ -412,7 +415,9 @@ def main():
     kwargs = dict(enable_thinking=condition["model"] == "thinking",
                   sampling=config["sampling"], context_length=config["context_length"])
     if args.backend == "sglang":
-        caller = SGLangContinuousCaller(str(args.model_path), args.endpoint, **kwargs)
+        caller = SGLangContinuousCaller(
+            str(args.model_path), args.endpoint,
+            per_request_seed=config.get("sglang_per_request_seed", False), **kwargs)
     else:
         caller = TransformersContinuousCaller(str(args.model_path), device=args.device, **kwargs)
     args.out.mkdir(parents=True, exist_ok=True)

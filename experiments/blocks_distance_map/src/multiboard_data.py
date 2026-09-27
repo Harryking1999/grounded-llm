@@ -57,8 +57,8 @@ def sample_paths(board, episodes, rng):
     return paths
 
 
-def choose_landmarks(paths, count, rng):
-    """Include targets with unsupported isolated cells, then span cell levels."""
+def choose_landmarks(paths, count, rng, heldout_count=0):
+    """Reserve both isolated and supported goals, then span cell levels."""
     by_size = defaultdict(set)
     for path in paths:
         for mask in path[1:]:
@@ -66,8 +66,19 @@ def choose_landmarks(paths, count, rng):
                 by_size[mask.bit_count()].add(mask)
     isolated = sorted(mask for values in by_size.values() for mask in values
                       if not blocks.locally_supported(mask))
-    quota = min(len(isolated), max(1, count // 3))
-    chosen = [isolated[int(i)] for i in rng.choice(len(isolated), quota, replace=False)] if quota else []
+    supported = sorted(mask for values in by_size.values() for mask in values
+                       if blocks.locally_supported(mask))
+
+    def draw(pool, number):
+        return [pool[int(i)] for i in rng.choice(len(pool), min(number, len(pool)), replace=False)]
+
+    chosen = draw(isolated, heldout_count // 2) + draw(supported, heldout_count - heldout_count // 2)
+    if len(chosen) < heldout_count:
+        remaining = sorted((set(isolated) | set(supported)) - set(chosen))
+        chosen.extend(draw(remaining, heldout_count - len(chosen)))
+    remaining_isolated = sorted(set(isolated) - set(chosen))
+    chosen.extend(draw(remaining_isolated, max(0, max(1, count // 3) -
+                                               sum(mask in isolated for mask in chosen))))
     for mask in chosen:
         by_size[mask.bit_count()].remove(mask)
     sizes = sorted(by_size)
@@ -150,7 +161,8 @@ def prepare(config, out):
         train_paths = paths[:1 + options["train_rollouts"]]
         validation_paths = paths[1 + options["train_rollouts"]:]
         landmarks = choose_landmarks(train_paths, options["landmarks_per_board"] +
-                                     options["heldout_landmarks_per_board"], rng)
+                                     options["heldout_landmarks_per_board"], rng,
+                                     options["heldout_landmarks_per_board"])
         board_records.append((board, train_paths, validation_paths, landmarks))
     # A held-out landmark may still be a training source; it is never a training target.
     heldout_goals = {goal for _, _, _, landmarks in board_records
@@ -245,6 +257,9 @@ def prepare(config, out):
                "contrast_test": len(contrast_test), "splits": {}}
     summary["heldout_isolated_landmarks"] = sum(not blocks.locally_supported(goal)
                                                 for goal in heldout_goals)
+    summary["heldout_supported_landmarks"] = len(heldout_goals) - summary["heldout_isolated_landmarks"]
+    if not summary["heldout_isolated_landmarks"] or not summary["heldout_supported_landmarks"]:
+        raise ValueError("Both isolated and supported held-out goals are required")
     cap = max(board[1].bit_count() for board in train_boards) // 2 + 1
     payload["cap"] = np.asarray(cap)
     for name, values in split_sets.items():

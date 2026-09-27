@@ -23,6 +23,12 @@ class MultiboardTests(unittest.TestCase):
         self.assertEqual(choose_landmarks([[0b100011, isolated]], 1,
                                           np.random.default_rng(1)), [isolated])
 
+    def test_heldout_landmarks_include_isolated_and_supported(self):
+        isolated, supported = 0b100000, 0b111000
+        landmarks = choose_landmarks([[0b111111, supported, 0], [0b100011, isolated]],
+                                     2, np.random.default_rng(1), heldout_count=2)
+        self.assertEqual(set(landmarks), {isolated, supported})
+
     def test_contrast_reverses_with_goal(self):
         oracle = DistanceOracle()
         cases = contrast_cases([[0b11111111, 0b111111, 0]], oracle, 1, np.random.default_rng(2))

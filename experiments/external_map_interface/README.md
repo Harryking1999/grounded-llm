@@ -4,9 +4,9 @@
 
 本目录是新的独立实验入口。图任务先复用 Step 1 的 Q/V 地图，逐步向 LLM 提供**候选动作的 learned-map 距离**。没有把 Q 压成 token，也没有训练 LLM 解码 Q。图与积木旧 Step 2 的代码、配置和历史结果留在原目录。
 
-图的候选分数为 `||Q[current] + V[action] - Q[goal]||₂`。`V[action]` 是 learned-map 中动作的位移，不是动作本身。每次真实执行之后，从环境获取实际新节点，重新构造当步 prompt。图的动作目录按有向边定义，本身包含目标节点；因此当前图接口把真实候选终点作为动作语义给所有条件，learned-map 条件只额外提供距离。真实图最短路只在评测端使用，绝不进入 prompt 或 Q-map 读入模块。
+图的候选分数为 `||Q[current] + V[action] - Q[goal]||₂`。`V[action]` 是 learned-map 中动作的位移，不是动作本身。每次真实执行之后，从环境获取实际新节点；旧逐步实验重新构造当步 prompt，连续生成试点则把更新追加到已有上下文。图的动作目录按有向边定义，本身包含目标节点；因此当前图接口把真实候选终点作为动作语义给所有条件，learned-map 条件只额外提供距离。真实图最短路只在评测端使用，绝不进入 prompt 或 Q-map 读入模块。
 
-`src/q_map.py` 只加载 Q/V 与计算候选距离；`src/transitions.py` 管合法动作和实际状态更新；`src/interface.py` 构造每步上下文；`src/planner.py` 调用模型与解析选择；`src/evaluate.py` 执行逐步评测。每步重新发送当前图和当步候选，避免把历史向量追加到上下文。图接口只露出标量距离，不露出完整或短 Q 向量。
+`src/q_map.py` 只加载 Q/V 与计算候选距离；`src/transitions.py` 管合法动作和实际状态更新；`src/interface.py` 构造每步上下文；`src/planner.py` 调用模型与解析选择；`src/evaluate.py` 执行逐步评测。旧逐步入口每步重新发送当前图和当步候选。连续生成入口保留历史文本和状态更新，不追加原始 Q/V 向量。图接口只露出标量距离，不露出完整或短 Q 向量。
 
 ## 图实验入口
 
@@ -40,6 +40,22 @@ python -m experiments.external_map_interface.src.evaluate \
 ```
 
 已完成的 128 维训练摘要见 [Step 1 报告](../cml_map_scaling/results/report.md)。原始 Q/V 记录在开发机的 `runs/cml_step1_explore_d813282/local128/...`；复制或重放时应在运行记录中标出来源。完整 Q 向量接口只需从同一 loader 序列化 Q，128 维接口可直接读取已训练的短地图；两者目前都不是首轮模型输入条件。不可将 1000 维 Q 直接截短并声称是训练后的 128 维地图。
+
+## 连续生成试点：逐节点上下文干预
+
+[试点配置](configs/path256_continuous_pilot.json)与 `src/evaluate_path256_continuous.py` 实现“检测节点 → 环境执行／读取地图 → 追加上下文 → 续写”。`trial_prompt` 区分最终路径基线与地图提交协议；`detect_boundary` 识别第一个完整节点；`map_update` 构造环境文本；`run_trial` 维护执行路径和整题预算。后端负责生成与边界暂停，模型负责选择节点。
+
+地图组从程序给定的起点状态开始，可先推理，再提交 `<action>节点</action>`；若生成 JSON 路径，则在首个新节点的数字和分隔符完整时即介入，并追加地图。程序保留已生成的推理，把地图追加到同一回答的上下文后续写，到目标即按真实执行路径评分。无地图 Instruct 和 Thinking 仍一次输出完整路径。
+
+Transformers 使用节点边界停止条件；SGLang 使用流解析与当前请求取消，再以保留的文本和新地图续写。暂停是正常控制事件，与预算截断分开。完整实现说明、旧试点失败证据与新验证记录见[五图报告的连续生成部分](results/path256_five_graphs.md#新实验设置连续生成过程中提供地图)。运行时传入现有题集、同图 Q/V、模型和服务地址；产物使用新的 `runs/` 目录，保存配置与逐段原文。小型试点用于检查接口闭环。
+
+```bash
+python -m experiments.external_map_interface.src.evaluate_path256_continuous \
+  --config experiments/external_map_interface/configs/path256_continuous_pilot.json \
+  --suite /path/to/graph_00/suite.json --map /path/to/graph_00/map/map.npz \
+  --model-path /path/to/Qwen3-4B-Instruct-2507 --endpoint http://localhost:30000 \
+  --condition instruct_map --out runs/external_map_interface/node_intervention/instruct_map
+```
 
 ## 当前积木训练：状态条件位移
 

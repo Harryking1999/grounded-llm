@@ -49,3 +49,15 @@ Shibo Hao 等，*EMNLP*，2023。
 *首图对比直接生成推理链与基于 world state、reward 和搜索的 RAP。图源：Hao 等，Fig. 1；从 [EMNLP 正式论文 PDF](https://aclanthology.org/2023.emnlp-main.507.pdf) 提取，图内内容未改动，[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)。*
 
 **对我们的参考。** RAP 主要让 LLM 自身充当 world model；我们当前探索的是由显式 external cognitive map／roadmap 向 LLM 提供状态与动作后果。
+
+## 4. 生成过程中追加外部信息：ReAct、IRCoT 与 FLARE
+
+本节用于连续生成试点的实现参照。
+
+**ReAct（ICLR 2023）**交替生成推理、动作和环境观察。[论文](https://arxiv.org/abs/2210.03629)及[官方 HotpotQA 实现](https://github.com/ysymyth/ReAct/blob/master/hotpotqa.ipynb)给出了直接参照：生成请求以 Observation 标记为 stop；程序执行动作，再把 Thought、Action 和真实 Observation 追加到原 prompt，继续生成。这是保留历史的上下文扩展，工程上可以由多次 completion 请求实现。我们的触发点固定为完整的新节点，观察来自图环境和 learned Q/V，每完成一个节点提交就触发更新。
+
+**IRCoT（ACL 2023）**在 CoT 的句子之间交替检索与推理，用已有推理引导检索，再用检索结果帮助后续推理。[论文](https://arxiv.org/abs/2212.10509)展示了外部知识随推理过程逐步进入上下文的方法。
+
+**FLARE（EMNLP 2023）**预测接下来要写的句子；出现低置信 token 时，以该句构造检索查询，取得文档后重新生成该句。[论文](https://arxiv.org/abs/2305.06983)和[官方代码仓库](https://github.com/jzbjyb/FLARE)提供了以置信度触发检索和重生成的方案。当前试点则在每次动作提交后追加地图信息。
+
+对本项目的实现建议是最小的“检测节点 → 执行动作／读取地图 → 追加上下文 → 续写”循环。插入内容改变后续 token 的条件分布；已经执行的动作由环境记录。以明确的节点提交格式定位干预边界。

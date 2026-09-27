@@ -1,0 +1,21 @@
+{
+  "study": "path256_continuous_generation_pilot",
+  "protocol": "controller_node_boundary",
+  "source_suite": "path256_five_graphs_4ac7239/graph_00/suite.json",
+  "case_indices": [4, 1],
+  "seed": 20260927,
+  "conditions": {
+    "instruct": {"model": "instruct", "map_updates": false, "prefer_minimum": false},
+    "instruct_map": {"model": "instruct", "map_updates": true, "prefer_minimum": false},
+    "instruct_map_prefer": {"model": "instruct", "map_updates": true, "prefer_minimum": true},
+    "thinking": {"model": "thinking", "map_updates": false, "prefer_minimum": false}
+  },
+  "max_generated_tokens_per_question": 16384,
+  "context_length": 32768,
+  "sampling": {
+    "temperature": 0.6,
+    "top_p": 0.95,
+    "top_k": 20,
+    "repetition_penalty": 1.0
+  }
+}

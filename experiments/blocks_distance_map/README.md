@@ -21,6 +21,8 @@ python -m experiments.blocks_distance_map.src.multiboard_run \
 
 正式运行从已提交的 commit 复制源码到独立远端目录，脱离 SSH 会话执行。`data/data.npz` 保存各关系组、棋盘行号与换目标对照；含孤立格测试是未见目标测试的显式子集。`progress.jsonl` 保存验证轨迹；`best.pt` 是按验证目标选择的权重；`checkpoints/step_*.pt` 是含优化器的周期检查点；`summary.json` 是最终测试。生成物均在忽略的 `runs/`。下文记录此前单棋盘试点的合同与结果，不作为这次共享 Q 的测试数据。
 
+训练后可对冻结的 `best.pt` 追加一次不含孤立格的未见目标分析：`python -m experiments.blocks_distance_map.src.multiboard_post_eval --run runs/blocks_distance_map/RUN_ID --analysis-commit COMMIT --device cuda:0`。它从原测试集中取不含孤立格的目标，并按精确最短步数匹配含孤立格的逐步任务；只写 `post_eval.json`，不改变模型或 checkpoint 选择。
+
 ## 既有单棋盘试点：假设与范围
 
 对同一固定积木棋盘中的状态，直接监督精确有向最短步数与不可达关系，能否形成支持距离排序与好坏候选判断的紧凑 Q-map？先检验关系拟合与留出关系补全，不宣称未见状态或跨棋盘泛化。

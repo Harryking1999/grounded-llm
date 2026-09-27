@@ -1,6 +1,6 @@
 # 项目状态与有序 TODO
 
-更新时间：2026-09-27。本页是本分支唯一当前进度页；研究定义见 [RESEARCH_BRIEF.md](RESEARCH_BRIEF.md)。
+更新时间：2026-09-28。本页是本分支唯一当前进度页；研究定义见 [RESEARCH_BRIEF.md](RESEARCH_BRIEF.md)。
 
 ## 当前主线
 
@@ -84,7 +84,7 @@ Blocks 共 768 次，511 次触及预算；至少 343 条已确认非法，6 条
 
 ## 有序 TODO
 
-1. **积木 Q-map 下一轮（待讨论）**：本轮距离监督、稀疏／地标消融、查表／棋盘编码器对照、两张棋盘独立训练与逐步评测已完成；代码和[结果报告](../experiments/blocks_distance_map/results/report.md)已落地。报告已补充术语、监督与指标的通俗解释，并将案例图改为左右动作的移除前后棋盘。另补充冻结 Q 的 [PCA／t-SNE 转移图例](../experiments/blocks_distance_map/results/qmap_geometry.md)，覆盖既有 12 格案例的全部 336 个后续状态，含实际贪心路径与棋盘对照，未重新训练模型。后续可分别检验：固定单棋盘 Q，单独训练 V 预测动作位移；或按**整张棋盘**划分训练／验证／测试，训练共享 Q，并加入只监督能否清空的简化对照。首张到第二张零样本逐步仅 7/129，说明跨棋盘泛化尚未成立，但不是单棋盘 V 实验的逻辑阻碍；两项工作的优先级待讨论。本轮未训练 V 或接入 LLM，也未因报告修改启动新实验。
+1. **积木共享 Q 的 1000 棋盘多目标训练（运行中）**：用户已确定保留不可达惩罚，增加非空地标与含孤立格目标的可达监督，并直接检验换目标是否使动作排序反转。按[正式合同](../experiments/blocks_distance_map/configs/multiboard_1000_multigoal.json)从原论文八形状数据集选 1000 张训练初始棋盘、独立选未见初始棋盘测试；同棋盘未见状态用于 checkpoint 选择，未见关系、未见地标、含孤立格目标与未见初始棋盘分别报告。源码提交 `f3a46a77c7f5629d9ee58d7b0afbc674598e4b4a` 已在指定单卡机独立复制并启动，产物位于忽略路径 `runs/blocks_distance_map/multigoal_1000_f3a46a7`；完成后读取正式摘要，更新本页与[积木结果报告](../experiments/blocks_distance_map/results/report.md)。旧单棋盘结果和[图例](../experiments/blocks_distance_map/results/qmap_geometry.md)保留为历史试点，不与本轮混算。
 2. **寻路逐节点上下文干预五图测试（运行中）**：35016 节点已完成四组各两题的试点。两个地图组四条都通过逐节点插入并合法到达；无地图 Instruct 两条原始路线正确，末尾 JSON 代码块经明确兼容规则重放后均合法到达；Thinking 一条到达、一条在整题 16,384 输出 token 上限截断。22 项接口检查通过，8 条记录已逐边、逐次地图更新和 token 用量重放。正式测试现按[冻结五图配置](../experiments/external_map_interface/configs/path256_continuous_five_graphs.json)启动：五图 120 题，每题 16 次，四组共计划 7,680 条；以合法到达为主，最短路、路径长度和成本单独报告。试点原始数值见[报告末尾](../experiments/external_map_interface/results/path256_five_graphs.md#小型试点结果35016-节点)和[试点摘要](../experiments/external_map_interface/results/path256_continuous_pilot.json)。40410 节点的驱动阻塞属于历史诊断，不并入新运行成绩。正式运行完成后做全量重放和分图汇总。
 
 跨图、共享跨任务模型、在线参数学习及其他游戏任务不在本次积木实验范围内。

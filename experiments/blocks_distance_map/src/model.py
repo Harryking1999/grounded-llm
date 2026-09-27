@@ -1,4 +1,5 @@
 """A goal-independent Q table and fixed distance functions; no V or decoder."""
+import numpy as np
 import torch
 from torch import nn
 
@@ -29,6 +30,32 @@ class QMap(nn.Module):
     @torch.no_grad()
     def project(self):
         self.q.weight.clamp_(0, self.cap)
+
+
+def board_bits(masks):
+    """100 occupancy bits in the exact row-major order used by the rules."""
+    values = [int(mask) for mask in masks]
+    return torch.from_numpy(np.fromiter(((mask >> bit) & 1 for mask in values for bit in range(100)),
+                                        dtype=np.float32, count=len(values) * 100).reshape(-1, 100))
+
+
+class BoardEncoder(nn.Module):
+    def __init__(self, dimension, hidden, cap, metric):
+        super().__init__()
+        self.cap = cap
+        self.metric = metric
+        self.network = nn.Sequential(nn.Linear(100, hidden), nn.ReLU(),
+                                     nn.Linear(hidden, hidden), nn.ReLU(),
+                                     nn.Linear(hidden, dimension))
+        nn.init.normal_(self.network[-1].weight, std=.01)
+        nn.init.zeros_(self.network[-1].bias)
+
+    def encode(self, bits):
+        return self.cap * torch.sigmoid(self.network(bits))
+
+    def forward(self, bit_table, pairs):
+        return distance(self.encode(bit_table[pairs[:, 0]]),
+                        self.encode(bit_table[pairs[:, 1]]), self.metric)
 
 
 def strata(pairs):

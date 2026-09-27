@@ -11,7 +11,7 @@ import torch
 from experiments.gcml_counterexamples.src import blocks
 from experiments.blocks_distance_map.src.data import comparisons, pair_splits, prepare
 from experiments.blocks_distance_map.src.evaluate import decisions_metrics
-from experiments.blocks_distance_map.src.model import distance
+from experiments.blocks_distance_map.src.model import BoardEncoder, board_bits, distance
 from experiments.blocks_distance_map.src.oracle import DistanceOracle, OracleBudgetExceeded, successors
 
 
@@ -69,6 +69,19 @@ class DistanceMapTests(unittest.TestCase):
             for j in range(len(points)):
                 for k in range(len(points)):
                     self.assertLessEqual(d[i, k].item(), d[i, j].item() + d[j, k].item() + 1e-6)
+
+    def test_board_encoder_scores_unseen_masks_without_state_ids(self):
+        bits = board_bits([0, 1, 1 << 10, (1 << 99) | 1])
+        self.assertEqual(bits.shape, (4, 100))
+        self.assertEqual(bits[1, 0].item(), 1)
+        self.assertEqual(bits[2, 10].item(), 1)
+        self.assertEqual(bits[3, 99].item(), 1)
+        self.assertEqual(bits.sum(dim=1).tolist(), [0, 1, 1, 2])
+        encoder = BoardEncoder(8, 16, 5, "directed_sum")
+        score = encoder(bits, torch.tensor([[3, 0], [0, 3]]))
+        self.assertEqual(score.shape, (2,))
+        self.assertTrue(torch.isfinite(score).all())
+        self.assertTrue(((encoder.encode(bits) >= 0) & (encoder.encode(bits) <= 5)).all())
 
     def test_split_groups_reverse_and_reserves_goal_labels(self):
         pairs = np.array([[1, 0, 1, 0], [0, 1, -1, 1], [1, 2, 1, 0],

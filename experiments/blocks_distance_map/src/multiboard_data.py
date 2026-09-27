@@ -190,8 +190,8 @@ def prepare(config, out):
     validation_candidates = {(s, t) for s, t in validation_candidates
                              if t not in heldout_goals and
                              (s not in train_states or t not in train_states)}
-    goal_candidates = {(s, t) for s, t in goal_candidates if t not in
-                       {goal for _, goal in train_candidates}}
+    train_targets = {goal for _, goal in train_candidates}
+    goal_candidates = {(s, t) for s, t in goal_candidates if t not in train_targets}
     ood_candidates = set()
     for board in ood_boards:
         paths = sample_paths(board, options["ood_rollouts"], rng)

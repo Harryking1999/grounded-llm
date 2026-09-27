@@ -1,0 +1,85 @@
+# Blocks distance-supervised Q-map
+
+本目录供执行与复核实验的 agent 使用。面向人的说明见 [BLOCKS_QMAP_PLAN.md](../../docs/BLOCKS_QMAP_PLAN.md)。当前进度只维护在 [PROJECT_STATUS_AND_TODO.md](../../docs/PROJECT_STATUS_AND_TODO.md)；本文件定义执行协议，不创建另一份当前状态页。
+
+## 假设与范围
+
+对同一固定积木棋盘中的状态，直接监督精确有向最短步数与不可达关系，能否形成支持距离排序与好坏候选判断的紧凑 Q-map？先检验关系拟合与留出关系补全，不宣称未见状态或跨棋盘泛化。
+
+用户已授权在指定开发机训练，并明确要求原论文较简单的形状集合。环境复用 `experiments.gcml_counterexamples.src.blocks` 的官方八形状规则，共 664 个带位置动作；不得换回 `sol_dag_blocks` 的十形状变体。棋盘、原始数据来源、参考动作、采样预算、优化设置的唯一机器可读合同是 [configs/pilot.json](configs/pilot.json)。参考路径须逐步重放，但不当最短路标签。
+
+本轮只训练 Q。不训练 V、LLM、分类头、策略网络或目标条件编码器，不运行对外 API。精确 solver 只负责离线标签及 oracle 评测。
+
+## 实现接口
+
+| 文件 | 职责 |
+| --- | --- |
+| `src/oracle.py` | 复用官方动作目录；差集精确覆盖 DP；返回有限距离或 -1（已证明不可达）；预算耗尽抛出 unknown 异常 |
+| `src/data.py` | 构造解与随机合法 rollout；精确 pair 标签；状态对分组划分；固定起点／终点的排序对；留出目标候选集 |
+| `src/model.py` | 单个目标无关的 Q 查表；固定有向距离及欧氏对照；坐标投影与采样分层 |
+| `src/train.py` | 只优化 Q；距离 Huber 加排序 hinge；验证集早停；保留最优 checkpoint |
+| `src/evaluate.py` | 有限距离、排序、不可达与同父状态候选评测；面积和 oracle 基线 |
+| `src/run.py` | 一份共享数据，按合同顺序跑全部 metric 与 seed，并自动汇总 |
+| `tests/test_distance_map.py` | 标签器与穷举 BFS 比较、坏合法分支、预算语义、方向表达、划分与平局评分 |
+
+`d(s,t)=-1` 仅表示严格不可达。若 `t` 不是 `s` 的子集可直接判负；否则计算 `cover(s XOR t)`。选择一个格子枚举覆盖它的合法 tile，缓存剩余 mask 的最小分解数。只有完整失败才能缓存 -1；预算异常必须向上传播，不能转换成标签。形状可重复、无库存、无重力且移除可交换，是差集公式成立的条件。
+
+## 数据与泄漏边界
+
+1. 包含原参考解、随机合法路径上的全部状态与边；不移除通往死局的边。
+2. 从已采到的可解状态随机选决策父状态，将它们所有合法后继加入状态池。使用可解父状态是明确的条件式动作评测，不代表随机所有状态的总体分布。
+3. 每个非空状态与空棋盘的两个方向均有标签。加入全部采样边、决策边及反向对、轨迹中的多步对、困难子集负样本与随机状态对；实际可获得的分层数量以数据摘要为准，不伪造配额。`target_pairs` 是软目标，必须保留的覆盖／决策关系可使总数超过它，摘要记录实际数量。
+4. 将初始棋盘与每个其他状态的双向关系保留在 train，确保每个 Q 行都有训练约束；此集合包含初始棋盘到空棋盘的标签。其他关系按无序状态对分组划分。决策后继到空棋盘及反向关系强制进入 test，不能与初始锚点关系冲突。任何排序比较只能引用同一 split 的 pair 行。
+5. 后继到目标的留出标签不能用作训练损失、排序损失、checkpoint 选择。后继 Q 可从其他训练关系中学习；这一设置是 transductive relation completion。
+6. 验证训练约束覆盖所有 Q 行；若不足，失败并检查数据，不能把保留的目标标签挪回训练来补洞。
+7. 求解器完整结束才写出可用于训练的数据文件。标签器超时是未完成，不是训练完成或不可达。
+
+保存 `data.npz`：十进制字符串 state masks、`pairs=[source_id,target_id,distance,kind]`、split、各 split 的 outgoing/incoming 近远 pair-row 索引、合法转移、目标标签和独立候选决策表。kind=0 有限、1 非子集负样本、2 子集但无法分解。目标标签和候选表仅用于标注/评测，不能当模型输入。
+
+## 模型与目标
+
+Q 为 `Embedding(state_id)`。两组使用同维度与匹配的随机初始化，唯一距离形式分别为 `max_i relu(q_s[i]-q_t[i])` 和 L2。所有 Q 行（含空棋盘）都训练，不固定 Q(goal)=0。
+
+`H=floor(initial_occupied_cells/min_tile_cells)` 是有限合法路径的统一上界；不可达目标取 `C=H+1`。坐标每步投影到 `[0,C]`，有向距离因而有界；欧氏对照也用相同坐标边界，但其距离本身可能超过 C。
+
+距离损失是 `smooth_l1(D, d_or_C)`；排序损失为 `relu(margin+D_near-D_far)`。距离项的有限／不可达家族各占一半权重，在家族内对实际存在的距离层／负样本类型等权。排序项对 outgoing／incoming 两类等权，近远必须有严格不同标签。总目标及具体 margin、权重见配置。
+
+Adam 只接收 Q 的参数。验证集使用与训练同分层的距离损失加排序损失选择 checkpoint。测试指标只作报告，不能反复根据它挑 epoch 或修改超参数后仍声称测试未使用。初始 Q 的测试分数作为固定基线保存，不影响选择。
+
+## 指标及解释
+
+- 有限距离 MAE、四舍五入距离准确率、汇总 Spearman；汇总相关不是逐起点排序的替代。
+- 固定起点与固定终点的排序准确率、平局率、hinge loss 分开报告。
+- 不可达 AUROC，以及固定 `C-0.5` 阈值下的不可达召回、有限状态误报率、困难负样本召回。阈值指标需距离校准，不能用 AUROC 代替。
+- 决策按 `D(Q(actual_successor), Q(goal))` 评分；只有合法候选，后继来自真实环境。报告可解动作率、最优动作率、进入死局率，以及全部／同面积／深层死局的好坏配对排序。
+- 最优动作指候选后继精确目标距离最小的任意动作；平局按均匀随机选择的期望值计分。配对排序要求严格排对，平局不算成功。
+- 面积基线与精确距离 oracle 使用完全相同的候选。原十形状旧 Q/V 结果只作历史背景，不能称为本合同的匹配对照。
+- 三个 seed 报告逐项值与均值/范围。单棋盘和大量相关状态对不是独立棋盘重复；不据此给跨棋盘显著性结论。
+
+是否推进到 V，参考面向人文档的暂定工程标准；若不达标，分别定位训练拟合、留出关系或候选排序。不得把验证未通过的 Q-map 自动接入 LLM。
+
+## 执行
+
+Python 需 numpy 与 PyTorch；不需要 transformers。复用开发机现有环境，不为版本号重新安装整套依赖，实际版本写入运行摘要。
+
+从仓库根目录执行最小正确性检查：
+
+```bash
+python -m unittest discover -s experiments/blocks_distance_map/tests -v
+```
+
+完整运行入口（路径与 commit 由本次运行明确指定）：
+
+```bash
+python -m experiments.blocks_distance_map.src.run \
+  --config experiments/blocks_distance_map/configs/pilot.json \
+  --source-commit COMMIT \
+  --device cuda:0 \
+  --out runs/blocks_distance_map/RUN_ID
+```
+
+需先提交正式源码和合同，再通过 `git archive` 将该 commit 的代码复制到独立远程目录。不得用预览代码跑正式训练并虚填 commit，不覆盖旧运行。可先对预览代码运行单元测试、标注和极短训练 smoke；它们不作为正式科学结果。
+
+通过 nohup 脱离 SSH 运行并保存 PID、stdout 日志。队列自动按配置跑完并写总 `summary.json`。一次启动检查后，按实测速度决定下次检查时间，避免反复查询。机器地址、实际解释器、PID 等写入忽略的运行记录；与结果身份有关的 commit 和产物路径在结果报告中给出。
+
+产物结构：`config.json`、`source_commit.txt`、共享 `data/`、各条件 `progress.jsonl` / `q.pt` / `summary.json`，以及队列总 `summary.json`。全都写入 Git 忽略的 runs；仅提交紧凑结果摘要与报告。当前任务不包含 git push 或 PR。

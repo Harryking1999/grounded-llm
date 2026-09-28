@@ -33,7 +33,10 @@ def analyze(data_path, checkpoints, out, device):
     for name, path in checkpoints.items():
         saved, _, values = load_values(path, data, device)
         result["checkpoints"][name] = {"source_commit": saved["source_commit"],
-                                       "step": saved["step"], "path": str(path)}
+                                       "step": saved["step"],
+                                       "finetune_source_commit": saved.get("finetune_source_commit"),
+                                       "finetune_step": saved.get("finetune_step"),
+                                       "path": str(path)}
         for split in ("test_ood_board", "test_unseen_goal"):
             groups = repeated_differences(data, split)
             scores = pair_scores(values, data[split], saved["metric"])

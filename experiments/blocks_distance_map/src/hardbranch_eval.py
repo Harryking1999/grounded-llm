@@ -77,6 +77,8 @@ def evaluate_prepared(data_path, checkpoint, device, compare_checkpoint=None, ou
     data = dict(np.load(data_path, allow_pickle=False))
     saved, model, values = load_values(checkpoint, data, device)
     result = {"source_commit": saved["source_commit"], "step": saved["step"],
+              "finetune_source_commit": saved.get("finetune_source_commit"),
+              "finetune_step": saved.get("finetune_step"),
               "analysis_commit": analysis_commit,
               "hardbranch": {name: score_case_ids(values, data[f"hard_{name}_cases"],
                                                        saved["metric"])
@@ -84,6 +86,8 @@ def evaluate_prepared(data_path, checkpoint, device, compare_checkpoint=None, ou
     if compare_checkpoint is not None:
         other, other_model, other_values = load_values(compare_checkpoint, data, device)
         comparison = {"source_commit": other["source_commit"], "step": other["step"],
+                      "finetune_source_commit": other.get("finetune_source_commit"),
+                      "finetune_step": other.get("finetune_step"),
                       "hardbranch": {}, "rollouts": {}}
         for name in ("train", "validation", "ood_board", "unseen_goal"):
             cases = data[f"hard_{name}_cases"]

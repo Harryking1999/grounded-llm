@@ -111,7 +111,10 @@ def analyze(data_path, checkpoints, count, out, device):
     oracle = DistanceOracle(cache_limit=3_000_000, seconds=3600)
     result = {"checkpoints": {name: {"path": str(path),
                                   "source_commit": scorers[name].saved["source_commit"],
-                                  "step": scorers[name].saved["step"]}
+                                  "step": scorers[name].saved["step"],
+                                  "finetune_source_commit": scorers[name].saved.get(
+                                      "finetune_source_commit"),
+                                  "finetune_step": scorers[name].saved.get("finetune_step")}
                               for name, path in checkpoints.items()}, "splits": {}}
     for split in ("ood_board", "unseen_goal"):
         cases = data[f"hard_{split}_cases"][:count]

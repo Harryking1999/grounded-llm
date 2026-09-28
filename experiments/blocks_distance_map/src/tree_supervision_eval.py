@@ -14,15 +14,16 @@ from .multiboard_data import official_boards, sample_paths
 from .oracle import DistanceOracle
 
 
-def fresh_tasks(data, contract, official_path, board_count, tasks_per_board, seed):
+def fresh_tasks(data, contract, official_path, board_count, tasks_per_board, seed,
+                skip_fresh_boards=0):
     train_count = len(data["train_board_rows"])
     old_ood_count = len(data["ood_board_rows"])
     _, ood = official_boards(official_path, contract["board_seed"], train_count,
-                             old_ood_count + board_count)
+                             old_ood_count + skip_fresh_boards + board_count)
     if not np.array_equal([board[0] for board in ood[:old_ood_count]],
                           data["ood_board_rows"]):
         raise ValueError("The historical OOD board split changed")
-    fresh = ood[old_ood_count:]
+    fresh = ood[old_ood_count + skip_fresh_boards:]
     known = {int(mask) for mask in data["states"]}
     rng = np.random.default_rng(seed)
     oracle = DistanceOracle(cache_limit=2_000_000, seconds=3600)
@@ -91,17 +92,18 @@ class AreaScorer:
 
 def evaluate(data_path, contract_path, official_path, checkpoint_specs, out,
              board_count=200, tasks_per_board=5, seed=20261009, device="cuda:0",
-             analysis_commit=None):
+             analysis_commit=None, skip_fresh_boards=0):
     data = dict(np.load(data_path, allow_pickle=False))
     contract = json.loads(Path(contract_path).read_text())
     tasks, oracle = fresh_tasks(data, contract, official_path, board_count,
-                                tasks_per_board, seed)
+                                tasks_per_board, seed, skip_fresh_boards)
     scorers = {"area": AreaScorer()}
     for name, checkpoint in checkpoint_specs:
         if name in scorers:
             raise ValueError(f"Duplicate scorer: {name}")
         scorers[name] = QScorer(checkpoint, device)
     result = {"analysis_commit": analysis_commit, "boards": board_count,
+              "skip_fresh_boards": skip_fresh_boards,
               "tasks": len(tasks), "tasks_per_board": tasks_per_board,
               "seed": seed, "board_rows": [int(board) for board in dict.fromkeys(
                   task[0] for task in tasks)],
@@ -153,6 +155,7 @@ def main():
                         help="One or more NAME=PATH frozen Q checkpoints")
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--board-count", type=int, default=200)
+    parser.add_argument("--skip-fresh-boards", type=int, default=0)
     parser.add_argument("--tasks-per-board", type=int, default=5)
     parser.add_argument("--seed", type=int, default=20261009)
     parser.add_argument("--device", default="cuda:0")
@@ -163,7 +166,7 @@ def main():
         parser.error("--checkpoint must be NAME=PATH")
     evaluate(args.data, args.config, args.official, specs, args.out,
              args.board_count, args.tasks_per_board, args.seed, args.device,
-             args.analysis_commit)
+             args.analysis_commit, args.skip_fresh_boards)
 
 
 if __name__ == "__main__":

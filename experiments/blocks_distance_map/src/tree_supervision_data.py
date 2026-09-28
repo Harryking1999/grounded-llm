@@ -13,6 +13,7 @@ ANCESTOR = 1
 GOAL_SWAP = 2
 CROSS_LEAF = 4
 SIBLING_GOAL = 8
+BASE = 16
 
 
 def add_relation(relations, source, goal, tag):
@@ -124,7 +125,7 @@ def pair_key(source, goal):
 
 
 def prepare_tree(base_path, official_path, out, options, max_boards=None):
-    """Replace training rows only; preserve the original validation and OOD tasks."""
+    """Add tree relations to the original train rows without changing held-out tasks."""
     out = Path(out)
     out.mkdir(parents=True, exist_ok=False)
     base = dict(np.load(base_path, allow_pickle=False))
@@ -150,7 +151,8 @@ def prepare_tree(base_path, official_path, out, options, max_boards=None):
     heldout_keys.update(pair_key(original[int(child)], original[int(goal)])
                         for _, a, b, ga, gb in base["contrast_test"]
                         for child, goal in ((a, ga), (b, ga), (a, gb), (b, gb)))
-    relations = {}
+    relations = {(original[int(s)], original[int(g)]): BASE
+                 for s, g, _, _ in base["train"]} if max_boards is None else {}
     rng = np.random.default_rng(options["sample_seed"])
     oracle = DistanceOracle(cache_limit=options["oracle_cache_limit"],
                             seconds=options["oracle_seconds"])
@@ -190,8 +192,9 @@ def prepare_tree(base_path, official_path, out, options, max_boards=None):
         if steps < 0:
             label_counts["missing_goal_cells" if kind == 1 else
                          "contained_but_unreachable"] += 1
-        for flag, name in ((ANCESTOR, "ancestor"), (GOAL_SWAP, "goal_swap"),
-                           (CROSS_LEAF, "cross_leaf"), (SIBLING_GOAL, "sibling_goal")):
+        for flag, name in ((BASE, "base"), (ANCESTOR, "ancestor"),
+                           (GOAL_SWAP, "goal_swap"), (CROSS_LEAF, "cross_leaf"),
+                           (SIBLING_GOAL, "sibling_goal")):
             if tags & flag:
                 source_counts[name] += 1
                 source_counts[f"{name}_{'finite' if steps >= 0 else 'unreachable'}"] += 1
@@ -202,6 +205,8 @@ def prepare_tree(base_path, official_path, out, options, max_boards=None):
         if tags & CROSS_LEAF and steps >= 0:
             raise AssertionError("A certified cross-branch leaf relation is reachable")
     trained_ids = {i for row in rows for i in row[:2]}
+    if max_boards is None and source_counts["base"] != len(base["train"]):
+        raise AssertionError("An original training relation was lost")
     retained_cases = [case for case in cases
                       if all(pair in relations for pair in
                              ((case[1], case[3]), (case[2], case[4]),

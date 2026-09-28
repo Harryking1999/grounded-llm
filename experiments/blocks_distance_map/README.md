@@ -23,6 +23,26 @@ python -m experiments.blocks_distance_map.src.multiboard_run \
 
 训练后可对冻结的 `best.pt` 追加一次不含孤立格的未见目标分析：`python -m experiments.blocks_distance_map.src.multiboard_post_eval --run runs/blocks_distance_map/RUN_ID --analysis-commit COMMIT --device cuda:0`。它从原测试集中取不含孤立格的目标，并按精确最短步数匹配含孤立格的逐步任务；只写 `post_eval.json`，不改变模型或 checkpoint 选择。
 
+`src/multiboard_trajectory_diagnose.py` 在冻结模型上重放同难度的已见目标／未见目标任务，输出第一次选错、删除目标格和差集不可覆盖等失败原因；同时比较纯 Q、目标格保留、差集局部覆盖、面积基线。精确 oracle 只在**动作选定后**核验失败原因，候选过滤只用局部规则。`--data-run` 可指定基础运行的数据目录，便于分析微调模型：
+
+```bash
+python -m experiments.blocks_distance_map.src.multiboard_trajectory_diagnose \
+  --run runs/blocks_distance_map/RUN_ID --device cuda:0
+python -m experiments.blocks_distance_map.src.multiboard_trajectory_diagnose \
+  --run runs/blocks_distance_map/FINETUNE_ID \
+  --data-run runs/blocks_distance_map/RUN_ID --device cuda:0
+```
+
+探索性同局面候选微调从基础 `best.pt` 开始，正式参数在[微调合同](configs/multiboard_decision_finetune.json)。它从训练关系生成精确标注的四候选组，保留原 pair 距离和排序目标，只用同训练棋盘的未见状态逐步到达率选择 checkpoint；另将结果写入独立忽略目录，不改原训练产物：
+
+```bash
+python -m experiments.blocks_distance_map.src.multiboard_decision_finetune \
+  --base-run runs/blocks_distance_map/RUN_ID \
+  --out runs/blocks_distance_map/FINETUNE_ID \
+  --config experiments/blocks_distance_map/configs/multiboard_decision_finetune.json \
+  --source-commit COMMIT --device cuda:0
+```
+
 ## 既有单棋盘试点：假设与范围
 
 对同一固定积木棋盘中的状态，直接监督精确有向最短步数与不可达关系，能否形成支持距离排序与好坏候选判断的紧凑 Q-map？先检验关系拟合与留出关系补全，不宣称未见状态或跨棋盘泛化。

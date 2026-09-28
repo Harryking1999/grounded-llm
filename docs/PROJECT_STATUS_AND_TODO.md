@@ -85,7 +85,7 @@ Blocks 共 768 次，511 次触及预算；至少 343 条已确认非法，6 条
 ## 有序 TODO
 
 1. **积木 Q-map 下一轮（待讨论）**：本轮距离监督、稀疏／地标消融、查表／棋盘编码器对照、两张棋盘独立训练与逐步评测已完成；代码和[结果报告](../experiments/blocks_distance_map/results/report.md)已落地。报告已补充术语、监督与指标的通俗解释，并将案例图改为左右动作的移除前后棋盘。另补充冻结 Q 的 [PCA／t-SNE 转移图例](../experiments/blocks_distance_map/results/qmap_geometry.md)，覆盖既有 12 格案例的全部 336 个后续状态，含实际贪心路径与棋盘对照，未重新训练模型。后续可分别检验：固定单棋盘 Q，单独训练 V 预测动作位移；或按**整张棋盘**划分训练／验证／测试，训练共享 Q，并加入只监督能否清空的简化对照。首张到第二张零样本逐步仅 7/129，说明跨棋盘泛化尚未成立，但不是单棋盘 V 实验的逻辑阻碍；两项工作的优先级待讨论。本轮未训练 V 或接入 LLM，也未因报告修改启动新实验。
-2. **寻路逐节点上下文干预五图测试（运行中）**：35016 节点已完成四组各两题的试点。两个地图组四条都通过逐节点插入并合法到达；无地图 Instruct 两条原始路线正确，末尾 JSON 代码块经明确兼容规则重放后均合法到达；Thinking 一条到达、一条在整题 16,384 输出 token 上限截断。22 项接口检查通过，8 条记录已逐边、逐次地图更新和 token 用量重放。正式测试现按[冻结五图配置](../experiments/external_map_interface/configs/path256_continuous_five_graphs.json)启动：五图 120 题，每题 16 次，四组共计划 7,680 条；以合法到达为主，最短路、路径长度和成本单独报告。试点原始数值见[报告末尾](../experiments/external_map_interface/results/path256_five_graphs.md#小型试点结果35016-节点)和[试点摘要](../experiments/external_map_interface/results/path256_continuous_pilot.json)。40410 节点的驱动阻塞属于历史诊断，不并入新运行成绩。正式运行完成后做全量重放和分图汇总。
+2. **寻路逐节点上下文干预五图测试（运行中）**：35016 节点已完成四组各两题的试点。两个地图组四条都通过逐节点插入并合法到达；无地图 Instruct 两条原始路线正确，末尾 JSON 代码块经明确兼容规则重放后均合法到达；Thinking 一条到达、一条在整题 16,384 输出 token 上限截断。22 项接口检查通过。正式测试按[冻结五图配置](../experiments/external_map_interface/configs/path256_continuous_five_graphs.json)运行：五图 120 题，每题 16 次，四组共计划 7,680 条；以合法到达为主，最短路、路径长度和成本单独报告。节点重启前保存的 790 条均通过独立重放，四组首轮各 120 题没有答案提取类失败；已从现有记录续跑，不覆盖样本。局部数字和失败案例见[报告末尾](../experiments/external_map_interface/results/path256_five_graphs.md#正式测试的首轮提取检查运行中)，试点数值见[试点摘要](../experiments/external_map_interface/results/path256_continuous_pilot.json)。40410 节点的驱动阻塞属于历史诊断，不并入新运行成绩。正式运行完成后做全量重放和分图汇总。
 
 跨图、共享跨任务模型、在线参数学习及其他游戏任务不在本次积木实验范围内。
 

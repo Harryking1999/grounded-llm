@@ -89,4 +89,4 @@ Blocks 共 768 次，511 次触及预算；至少 343 条已确认非法，6 条
 
 ## 文档与沟通
 
-[Related Work](../RELATED_WORK.md)维护 GCML、状态表征退化与 RAP 的简要摘要、首图及参考意义。任务细节见 [GCML_TASKS.md](GCML_TASKS.md)。
+[Related Work](../RELATED_WORK.md)维护预测性地图／SR、GCML、状态表征退化与 RAP 等工作的简要摘要及参考意义。任务细节见 [GCML_TASKS.md](GCML_TASKS.md)。

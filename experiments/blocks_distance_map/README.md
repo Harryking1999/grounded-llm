@@ -58,7 +58,16 @@ python -m experiments.blocks_distance_map.src.hardbranch_run \
   --source-commit COMMIT --device cuda:0
 ```
 
-`data/summary.json` 记录采样量，`data/data.npz` 保留新旧关系与困难分叉；`progress.jsonl` 记录 checkpoint 选择，最终 `summary.json` 同时给出旧分组和困难分叉结果。`src/hardbranch_eval.py --prepared --data ... --checkpoint ...` 可在同一冻结困难分叉集上给基础模型和新模型评分。
+`data/summary.json` 记录采样量，`data/data.npz` 保留新旧关系与困难分叉；`progress.jsonl` 记录 checkpoint 选择，最终 `summary.json` 同时给出旧分组和困难分叉结果。同题比较以冻结的新旧 checkpoint 和同一份困难数据运行；`--rollout-count 1000` 从父状态分别向未见目标和未见棋盘目标完整逐步走，结果写入忽略路径：
+
+```bash
+python -m experiments.blocks_distance_map.src.hardbranch_eval \
+  --prepared --data runs/blocks_distance_map/HARDBRANCH_RUN_ID/data/data.npz \
+  --checkpoint runs/blocks_distance_map/HARDBRANCH_RUN_ID/best.pt \
+  --compare-checkpoint runs/blocks_distance_map/BASE_RUN_ID/best.pt \
+  --rollout-count 1000 --analysis-commit COMMIT \
+  --out runs/blocks_distance_map/HARDBRANCH_RUN_ID/comparison_full.json --device cuda:0
+```
 
 ## 既有单棋盘试点：假设与范围
 

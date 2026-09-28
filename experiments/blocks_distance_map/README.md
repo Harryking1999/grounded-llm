@@ -43,6 +43,23 @@ python -m experiments.blocks_distance_map.src.multiboard_decision_finetune \
   --source-commit COMMIT --device cuda:0
 ```
 
+### 局部规则仍无法区分的困难分叉
+
+[困难分叉合同](configs/multiboard_1000_hardbranch.json)复用上次运行保存的 `data.npz`、1000／200 棋盘划分和原训练参数。`src/hardbranch_data.py` 从有限距离的“当前状态—非空目标”关系出发，枚举合法一步后继，挑出两个**面积相同、均保留目标格、差集每格均有局部合法摆放**的后继；精确 oracle 证明其中一个可达、另一个不可达。训练只增加这两个后继到同一目标的原格式距离关系，按合同重复采样；共享 Q 结构、原 pointwise/listwise 损失与 Adam 保持不变。从随机初始化重新训练，不接续上次权重。
+
+困难验证分叉来自原同棋盘未见状态，独立棋盘与未见目标各有单独测试。新训练关系排除原验证／测试关系和会使原未见状态变成已见状态的掩码。checkpoint 以困难验证分叉严格选对数为主、原验证损失为平局判据；静态距离与原换目标评测照常报告。面积相同的基线在困难分叉上只能打平。精确 oracle 只离线标注；推理时单独评分冻结 Q，**不**把局部覆盖检查给 Q 使用。
+
+从已保存的基础运行产物重训：
+
+```bash
+python -m experiments.blocks_distance_map.src.hardbranch_run \
+  --config experiments/blocks_distance_map/configs/multiboard_1000_hardbranch.json \
+  --out runs/blocks_distance_map/HARDBRANCH_RUN_ID \
+  --source-commit COMMIT --device cuda:0
+```
+
+`data/summary.json` 记录采样量，`data/data.npz` 保留新旧关系与困难分叉；`progress.jsonl` 记录 checkpoint 选择，最终 `summary.json` 同时给出旧分组和困难分叉结果。`src/hardbranch_eval.py --prepared --data ... --checkpoint ...` 可在同一冻结困难分叉集上给基础模型和新模型评分。
+
 ## 既有单棋盘试点：假设与范围
 
 对同一固定积木棋盘中的状态，直接监督精确有向最短步数与不可达关系，能否形成支持距离排序与好坏候选判断的紧凑 Q-map？先检验关系拟合与留出关系补全，不宣称未见状态或跨棋盘泛化。

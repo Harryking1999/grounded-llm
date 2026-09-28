@@ -86,7 +86,7 @@ Blocks 共 768 次，511 次触及预算；至少 343 条已确认非法，6 条
 
 ## 有序 TODO
 
-1. **积木 Q 的下一道证伪题：局部可摆放但整体不可达的分叉**：1000 棋盘正式训练与探索性微调均已结束，产物分别位于忽略路径 `runs/blocks_distance_map/multigoal_1000_97bd3ec`、`runs/blocks_distance_map/decision_finetune_f0f4bc9`。当前未见目标困难不可达关系中，局部覆盖规则能排除 9,384/9,644；未见初始棋盘中能排除 10,424/10,684。因此下一步先构造局部规则仍放行、但精确 oracle 证明错误的同局面候选，并与局部规则＋面积基线同题比较；只有这些残余难例呈现 Q 的稳定增益，才继续声称表示学到了局部规则以外的地图结构。旧单棋盘结果和[图例](../experiments/blocks_distance_map/results/qmap_geometry.md)保留为历史试点，不与本轮混算。
+1. **积木 Q 的困难分叉数据补强（运行中）**：当前未见目标困难不可达关系中，局部覆盖规则能排除 9,384/9,644；未见初始棋盘中能排除 10,424/10,684。按[新合同](../experiments/blocks_distance_map/configs/multiboard_1000_hardbranch.json)保持原 1000／200 棋盘划分、Q 架构、距离与排序损失，加入 11,208 组“目标保留、局部可摆放、面积相同，但精确可达性相反”的训练分叉；从随机初始化在指定单卡机重新训练。源码提交 `55bd21f3824a0b5fa0f8613c336f499c0d9bf5c6`，独立运行目录为 `/zhanghanyue/experiment/grounded_llm_qmap_55bd21f/runs/blocks_distance_map/hardbranch_1000_55bd21f`。困难验证、未见目标与未见初始棋盘各 1000 组；旧 Q 在同题分别为 781、771、777/1000。checkpoint 只按困难验证集选择，完成后同题比较 OOD 排序和逐步到达，并与局部规则＋面积基线分列。旧单棋盘结果和[图例](../experiments/blocks_distance_map/results/qmap_geometry.md)保留为历史试点，不与本轮混算。
 2. **寻路逐节点上下文干预五图测试（运行中）**：35016 节点已完成四组各两题的试点。两个地图组四条都通过逐节点插入并合法到达；无地图 Instruct 两条原始路线正确，末尾 JSON 代码块经明确兼容规则重放后均合法到达；Thinking 一条到达、一条在整题 16,384 输出 token 上限截断。22 项接口检查通过，8 条记录已逐边、逐次地图更新和 token 用量重放。正式测试现按[冻结五图配置](../experiments/external_map_interface/configs/path256_continuous_five_graphs.json)启动：五图 120 题，每题 16 次，四组共计划 7,680 条；以合法到达为主，最短路、路径长度和成本单独报告。试点原始数值见[报告末尾](../experiments/external_map_interface/results/path256_five_graphs.md#小型试点结果35016-节点)和[试点摘要](../experiments/external_map_interface/results/path256_continuous_pilot.json)。40410 节点的驱动阻塞属于历史诊断，不并入新运行成绩。正式运行完成后做全量重放和分图汇总。
 
 跨图、共享跨任务模型、在线参数学习及其他游戏任务不在本次积木实验范围内。

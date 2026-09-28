@@ -232,15 +232,29 @@ Thinking 每条轨迹平均输出 35,415 tokens，高于另外两组；其截断
 
 若模型直接开始输出 JSON 路径，解析器也会在第一个新节点处介入。例如已确认 `[4]` 时，读到 `{"path":[4,216,` 就接收节点 216。数字后的分隔符用于确定编号已经完整。JSON 路径和 action 标签都表示行动提交；普通推理文字保持原样。
 
+**实际输入示例。** 35016 节点的 Graph 00、4 步题中，“Instruct＋地图，优先跟随”从 208 走到 241。题目开头先给模型完整的 256 节点邻接表、起点和目标；下面是随后插入的**第 1 步原文**，不是示意占位符：
+
 ```text
-任务与邻接表
-[Environment update] 起点状态、合法后继和地图距离 [/Environment update]
-模型推理……<action>216</action>
-[Environment update] 当前节点 216、已确认路径、合法后继和地图距离 [/Environment update]
-模型继续推理……<action>下一节点</action>
+[Environment update]
+Current node: 208; goal: 241; confirmed path: [208]
+Legal next nodes:
+65, learned_map_distance_to_goal=2.561626
+40, learned_map_distance_to_goal=2.843496
+187, learned_map_distance_to_goal=2.855273
+Commit the next node using <action>integer_node_id</action>.
+[/Environment update]
 ```
 
-候选距离沿用 `||Q当前 + V动作 − Q目标||₂`。环境负责真实状态，Q/V 负责地图预测，LLM 负责选择节点。
+模型实际回复 `<action>65</action>`。程序确认 208→65 是合法边后，在**同一段已生成文本之后**追加第 2 步更新。四步的完整当前状态、候选值和回复如下；已访问节点从“合法下一节点”中排除，因此第 2 步不再列出 208。
+
+| 步 | 插入时当前节点；已确认路径 | 模型看到的合法后继及地图距离 | 模型提交 |
+| --- | --- | --- | --- |
+| 1 | 208；`[208]` | 65：2.561626；40：2.843496；187：2.855273 | `<action>65</action>` |
+| 2 | 65；`[208, 65]` | 128：2.638543；193：1.945657 | `<action>193</action>` |
+| 3 | 193；`[208, 65, 193]` | 33：1.257729；147：2.265587 | `<action>33</action>` |
+| 4 | 33；`[208, 65, 193, 33]` | 241：0.000060；196：1.986655 | `<action>241</action>` |
+
+最终实际执行路径是 `208 → 65 → 193 → 33 → 241`。这条记录中模型每步都直接输出一个 action 标签，四次合计生成 34 tokens；四条环境更新另占 392 个插入 tokens。表中的距离沿用 `||Q当前 + V动作 − Q目标||₂`，表示**预测后继与目标的 Q 向量有多近**，不是精确的“还要走几步”。例如最后一步到目标的数值为 0.000060，是近似 0 而非整数 0。环境负责真实状态和合法边，Q/V 负责地图预测，LLM 负责选择节点。
 
 **实现参照。** [ReAct 官方代码](https://github.com/ysymyth/ReAct/blob/master/hotpotqa.ipynb)在动作后暂停 completion，把真实 Observation 追加到原 prompt，再继续生成。试点采用相同的上下文追加方式。IRCoT 在推理句子之间加入检索结果；FLARE 根据下一句的置信度触发检索并重生成。对应论文与方法说明见 [Related Work](../../../RELATED_WORK.md#4-生成过程中追加外部信息reactircot-与-flare)。
 

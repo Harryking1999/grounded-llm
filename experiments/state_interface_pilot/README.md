@@ -33,7 +33,7 @@
 
 ## 复用与运行
 
-功能归属见 [MODULES.md](../../MODULES.md)。模型加载、adapter、loss、优化、训练、选模和 generation 均复用公共 harness。
+这条历史路线的共享实现位于 `grounded_llm/`；模型加载、adapter、loss、优化、训练、选模和 generation 均复用公共 harness。
 基础数值设置继承已存在 Step 2 配置，运行时只保存实际使用字段，排除旧图任务参数。
 
 ```sh

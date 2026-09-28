@@ -1,92 +1,29 @@
-# 显式 cognitive map 接口
+# 寻路外部地图接口
 
-## 当前问题与边界
+本实验检验：在同一张图上学到的 Q/V 距离，能否帮助 LLM 选择合法后继并到达目标。地图给出的候选分数是 `||Q(当前节点) + V(动作) − Q(目标)||₂`，不是精确最短步数。环境提供真实当前位置和合法边；模型选择动作；精确最短路只用于离线判卷。
 
-本目录是新的独立实验入口。图任务先复用 Step 1 的 Q/V 地图，逐步向 LLM 提供**候选动作的 learned-map 距离**。没有把 Q 压成 token，也没有训练 LLM 解码 Q。图与积木旧 Step 2 的代码、配置和历史结果留在原目录。
+## 当前五图协议
 
-图的候选分数为 `||Q[current] + V[action] - Q[goal]||₂`。`V[action]` 是 learned-map 中动作的位移，不是动作本身。每次真实执行之后，从环境获取实际新节点；旧逐步实验重新构造当步 prompt，连续生成试点则把更新追加到已有上下文。图的动作目录按有向边定义，本身包含目标节点；因此当前图接口把真实候选终点作为动作语义给所有条件，learned-map 条件只额外提供距离。真实图最短路只在评测端使用，绝不进入 prompt 或 Q-map 读入模块。
+[正式合同](configs/path256_continuous_five_graphs.json)冻结五张 256 节点图、120 道题、每题 16 次重复和整题输出预算。四个条件如下：
 
-`src/q_map.py` 只加载 Q/V 与计算候选距离；`src/transitions.py` 管合法动作和实际状态更新；`src/interface.py` 构造每步上下文；`src/planner.py` 调用模型与解析选择；`src/evaluate.py` 执行逐步评测。旧逐步入口每步重新发送当前图和当步候选。连续生成入口保留历史文本和状态更新，不追加原始 Q/V 向量。图接口只露出标量距离，不露出完整或短 Q 向量。
+| 条件 | 生成与反馈 |
+| --- | --- |
+| Instruct 无地图 | 一次生成整条路线，以最终 `{"path": [...]}` 提交 |
+| Thinking 无地图 | 同样一次生成整条路线 |
+| Instruct＋地图 | 每次用 `<action>节点</action>` 提交后继；控制器核验后，向同一回复追加实际状态、已确认路径、合法后继及 learned-map 距离 |
+| Instruct＋地图，优先最小距离 | 与上一组相同，提示词另加“优先选择距离最小的合法后继” |
 
-## 图实验入口
+地图组在**第一个完整的新节点**处暂停，不等整条路线生成完。程序从起点开始维护已确认路径，拒绝不存在的边和重复节点；到达目标即结束。地图更新不包含真实最短距离。无地图组没有中途插入。四组的路径都按真实图重放；合法到达是主要指标，最短路、路径长度、非法动作、截断和 token 用量另列。因为地图组还有逐节点反馈，与无地图组的差异不能只归因于距离信息。
 
-`configs/path32_smoke.json` 只用于检查双起终点的逐步调用链。输入为 Step 1 同一 case 目录下的 `inputs.npz` 与 `map.npz`；可使用已训练的 128 维 Q/V，不需要额外 adapter。模型路径与运行 backend 是运行参数；有 SGLang 服务时传 `--endpoint`，在节点上直接加载模型时用 `--backend transformers`。产物写入 Git 忽略的 `runs/`。`plain`、`reasoning` 不读 Q/V；`distance` 在同一图和候选动作上增加 learned-map 距离。每步原始回答都会留档；非法动作、输出截断和步数上限分别计数。256 token 的初试使两个 thinking 条件都在首步截断；1024 token 仍只是诊断预算，path32 的结果不能与正式基线比较。
+| 模块 | 职责 |
+| --- | --- |
+| `src/q_map.py`、`src/transitions.py` | 读取图 Q/V、给候选评分、执行并核验真实动作 |
+| `src/evaluate_path256_continuous.py` | 提示词、动作边界、同一回复续写与答案提取 |
+| `src/evaluate_path256_continuous_batch.py` | 按正式合同运行和断点跳过已有记录 |
+| `src/summarize_path256_continuous_batch.py` | 独立重放记录并汇总成绩 |
 
-正式逐步对照使用 [path256_distance.json](configs/path256_distance.json) 和[原 path256 合同](../qwen_path_blocks/configs/path256_bidirectional_16k.json)的同一冻结题集：同一 256 节点图、16 个起终点、每题 8 次。`src/train_graph_map.py` 在该图上复用 Step 1 的局部 Q/V 更新，固定训练末轮，不按规划成绩挑地图；原有三张随机 256 节点图的 Q/V 不适用于这张图。`src/evaluate_path256.py` 分别运行 Qwen3-4B 非 thinking、thinking、thinking 加候选地图距离。三组每步都看到同一图、已执行路径和排除已访问节点后的合法动作，每次执行后用环境实际后继更新当前状态。距离条件额外得到 `||Q当前+V动作−Q目标||₂`。程序按原始寻路裁判核验实际路线，不把真实最短距离传给模型。
+运行产物保存在 Git 忽略的 `runs/`，正式参数只维护在 `configs/`。模块命令行参数可由 `python -m experiments.external_map_interface.src.evaluate_path256_continuous_batch --help` 和对应汇总模块的 `--help` 查看。当前进度见[项目状态页](../../docs/PROJECT_STATUS_AND_TODO.md)；协议案例、原始提示片段与阶段结果见[五图报告](results/path256_five_graphs.md#新实验设置连续生成过程中提供地图)。
 
-输出预算按用户确定的**单步**范围执行：每次动作决策最多生成配置中的 token 数，包含思考；不限制整条轨迹累计输出。采样参数与原 path256 合同一致，终止、截断和 token 用量逐步存档。由于旧基线一次生成完整路线而这里是逐步反馈，三组均重新运行，历史分数仅作背景。
+## 已完成的旧条件
 
-本图已训练的 128 维地图在原始高维 Q 空间的距离秩相关为 0.575694；一步转移 MSE 为 `7.16e-12`，后继识别为 100%。对全部 65,280 个有序起终点，只按候选 learned-map 距离取最小值，44,530 个选择落在最短路方向（68.21%）。这是地图质量诊断，不是 LLM 成绩。训练摘要与 Q/V 存在开发节点忽略路径 `runs/external_map_interface/path256_local128_dd2e5f2/`。
-
-原三组各 128 条逐步轨迹已完成并重放裁判验收。两个 thinking 条件大量在单步输出预算处截断，thinking＋地图组未观察到成绩提升。数值、局限与下一步建议见 [path256 显式距离报告](results/path256_distance.md)。
-
-补测条件 `plain_distance` 复用同一逐步入口、题集、采样参数与单动作 JSON 格式，关闭 thinking 并提供 learned-map 候选距离；它与已完成的 `plain` 只差这项距离信息。128 条已完成并通过裁判重放验收：到达 90/128、最短路 8/128；原始三组记录及其配置快照未改动。题目间差异与限制见 [path256 显式距离报告](results/path256_distance.md)。
-
-独立图复测由 [题集配置](configs/path256_diverse_suite.json)冻结新图与分层抽题，[评测配置](configs/path256_diverse_distance.json)沿用逐步预算和采样设置。对 Qwen3-4B 与 Qwen3-4B-Instruct-2507 分别运行非 thinking 的 `plain`、`plain_distance`；新图单独训练 128 维 Q/V，旧图地图不跨图复用。
-
-四组各 128 条已完成并重放裁判验收。Qwen3-4B 的新图到达数为 53→97，两张图合计为 122/256→187/256；新图最短路数两组同为 4/128。Instruct 两组均为 0/128，到达前主要发生格式错误或单步输出截断，不能据此判断其地图规划收益。合并结果与 prompt 示例见[讨论稿](results/path256_diverse.md)。
-
-五图评测使用[冻结题集合同](configs/path256_five_graphs_suite.json)与[评测合同](configs/path256_five_graphs_eval.json)。每张图各自训练 Q/V；三组为 Instruct-2507 无地图、Thinking-2507 无地图、Instruct-2507 加地图，统一用正常结束回答末尾的完整动作 JSON 继续逐步执行。全部 5,760 条已完成并通过全量重放。三组最短路 pass@1 分别为 26.98%、47.97%、33.49%；同权重地图组平均输出减少 8.2%，但 10 步题最短路略降，pass@16 题目覆盖几乎持平。详细成绩、推理成本与分析见[五图报告](results/path256_five_graphs.md)及[紧凑结果摘要](results/path256_five_graphs.json)。旧严格格式结果不与此次成绩混合。
-
-五图汇总也报告推理成本：每条轨迹和每次决策的输出 token、输入 token、模型调用耗时与截断，以及获得一次最短路成功所消耗的全部输出 token。失败尝试计入总体成本；成功轨迹的成本另列，避免把提前失败造成的短输出当成加速。耗时包含服务等待，会受 GPU 类型与并行负载影响，因此优先比较同题、同模型的 token 成本和截断。重复反思／停滞从原始回答中检查并附案例；现有运行未保存 token 概率，不能直接判断是否存在低熵或将停滞归因于低熵。
-
-```bash
-python -m experiments.external_map_interface.src.evaluate \
-  --config experiments/external_map_interface/configs/path32_smoke.json \
-  --inputs runs/cml_step1_exploration/local128/official32/inputs.npz \
-  --map runs/cml_step1_exploration/local128/official32/map.npz \
-  --model-path /path/to/model --endpoint http://localhost:30000 \
-  --condition distance --out runs/external_map_interface/path32_distance.json
-```
-
-已完成的 128 维训练摘要见 [Step 1 报告](../cml_map_scaling/results/report.md)。原始 Q/V 记录在开发机的 `runs/cml_step1_explore_d813282/local128/...`；复制或重放时应在运行记录中标出来源。完整 Q 向量接口只需从同一 loader 序列化 Q，128 维接口可直接读取已训练的短地图；两者目前都不是首轮模型输入条件。不可将 1000 维 Q 直接截短并声称是训练后的 128 维地图。
-
-## 连续生成试点：逐节点上下文干预
-
-[试点配置](configs/path256_continuous_pilot.json)与 `src/evaluate_path256_continuous.py` 实现“检测节点 → 环境执行／读取地图 → 追加上下文 → 续写”。`trial_prompt` 区分最终路径基线与地图提交协议；`detect_boundary` 识别第一个完整节点；`map_update` 构造环境文本；`run_trial` 维护执行路径和整题预算。后端负责生成与边界暂停，模型负责选择节点。
-
-地图组从程序给定的起点状态开始，可先推理，再提交 `<action>节点</action>`；若生成 JSON 路径，则在首个新节点的数字和分隔符完整时即介入，并追加地图。程序保留已生成的推理，把地图追加到同一回答的上下文后续写，到目标即按真实执行路径评分。无地图 Instruct 和 Thinking 仍一次输出完整路径。
-
-Transformers 使用节点边界停止条件；SGLang 使用流解析与当前请求取消，再以保留的文本和新地图续写。暂停是正常控制事件，与预算截断分开。完整实现说明、旧试点失败证据与新验证记录见[五图报告的连续生成部分](results/path256_five_graphs.md#新实验设置连续生成过程中提供地图)。运行时传入现有题集、同图 Q/V、模型和服务地址；产物使用新的 `runs/` 目录，保存配置与逐段原文。小型试点用于检查接口闭环。
-
-```bash
-python -m experiments.external_map_interface.src.evaluate_path256_continuous \
-  --config experiments/external_map_interface/configs/path256_continuous_pilot.json \
-  --suite /path/to/graph_00/suite.json --map /path/to/graph_00/map/map.npz \
-  --model-path /path/to/Qwen3-4B-Instruct-2507 --endpoint http://localhost:30000 \
-  --condition instruct_map --out runs/external_map_interface/node_intervention/instruct_map
-```
-
-## 当前积木训练：状态条件位移
-
-`src/blocks_dynamics.py` 实现 `δ=MLP([Q(o),E(a)])` 与 `Q̂(o′)=Q(o)+δ`。Q 仍按单张初始棋盘中采样到的完整状态建表；动作 embedding 使用原有 `shape_id,row,col` 编号，一个共享 MLP 预测位移，动作空间不增加。候选距离为 `||Q(o)+δ−Q(goal)||₂`，不查真实后继 Q 来代替预测。
-
-`src/train_blocks_dynamics.py` 复用下面旧试验的环境和转移采样，使用 [blocks_dynamics_pilot.json](configs/blocks_dynamics_pilot.json) 训练。采样包括构造解和随机合法 rollout，保留通向死局的合法动作；没有完整枚举状态图，也没有按好坏过滤转移。用户已确认首轮只训练转移 MSE，**不加入死局标签、路径距离或排序监督**。Q 的两个端点与 MLP 联合反向传播；这不同于旧图 `local_update` 只更新目标 Q 与动作 V 的规则，因此两者也不是只替换 V 参数化的严格消融。
-
-训练保留连通 Q 状态的生成树和每个已出现动作，从剩余边留出一部分评测。这是已观察状态间的留出转移，不是未见棋盘泛化。`src/blocks_diagnostics.py` 分别测留出转移误差、相对不移动预测的误差、Q 尺度、从初始 Q 连续预测的逐深度偏移、候选预测距离以及死局排序。连续预测中不重置到真实 Q；缺少表内 Q 的实际后继只能统计覆盖缺口，不能声称其预测已被验证。立即死局与已有到目标路径的标签仅用于诊断。
-
-```bash
-python -m experiments.external_map_interface.src.train_blocks_dynamics \
-  --config experiments/external_map_interface/configs/blocks_dynamics_pilot.json \
-  --suite experiments/sol_dag_blocks/runs/suite.json --case-id blocks8_00 \
-  --device cuda:0 --out runs/external_map_interface/blocks8_00_dynamics
-```
-
-产物目录保存模型、采样转移和固定划分、训练进度与诊断摘要，均在 Git 之外。此阶段训练积木 Q-map，不调用 LLM。实现需要 PyTorch；测试入口为 `python -m unittest discover -s experiments/external_map_interface/tests`。
-
-## Previous baseline：积木共享动作 V
-
-`src/blocks_q_map.py` 是**单张初始棋盘绑定**的最小训练试验。它直接复用 [BlocksTask](../sol_dag_blocks/src/tasks.py) 的 10×10 棋盘、`shape_id,row,col` 动作及合法移除，使用现有 case 的构造解和随机合法 rollout 收集 `(o1,a,o2)`。状态 Q 按这张棋盘内观察到的完整 mask 建表；同一个动作三元组在多个转移中共用一个 V 行。训练直接调用图 Step 1 的 `local_update`，没有改 Q/V 目标。产物保存在 `runs/`，不保证覆盖未见棋盘或所有可达状态。
-
-`configs/blocks_q_200_rollouts_100_epochs.json` 与 `configs/blocks_q_expanded_pilot.json` 在同一 `blocks8_00` 棋盘上各训练 100 轮，分别采 200 与 2,000 次合法 rollout，用来检查更多 transition 对拟合误差与目标距离排序的影响。这些历史配置保留共享 `V_a` 定义，仍不是跨初始棋盘泛化实验。
-
-```bash
-python -m experiments.external_map_interface.src.blocks_q_map \
-  --config experiments/external_map_interface/configs/blocks_q_pilot.json \
-  --suite experiments/sol_dag_blocks/runs/suite.json --case-id blocks8_00 \
-  --out runs/external_map_interface/blocks8_00_q_pilot
-```
-
-旧试验诊断只把无合法动作且非空的状态确认为 dead，把构造解上的状态确认为可解。报告比较“更少格子的 dead”与“更多格子的可解状态”的 learned Q 到目标距离，并统计已观察状态的合法后继有多少仍在 Q 表中。训练残差小并不推出这两类状态已经分离；初始棋盘绑定也不保证随机 rollout 覆盖全部后继。执行到未见棋盘后，表格无法直接取得 `Q当前`。更深层死局和跨棋盘泛化需后续单独检验。本试验不调用 LLM，也不把构造解或可解性标签交给 planner。
-
-已完成的训练数值与局限见 [积木 Q/V 试验结果](results/blocks_q_pilot.md)。
+旧版五图逐步决策共 5,760 条，要求最短路且每一步重新发送图与状态，结果见[五图报告](results/path256_five_graphs.md)和[结果摘要](results/path256_five_graphs.json)。单图和独立图复测见[path256 距离报告](results/path256_distance.md)、[独立图报告](results/path256_diverse.md)。早期单棋盘积木 Q/V 与状态条件位移是转移拟合诊断，见[积木试验结果](results/blocks_q_pilot.md)；当前跨棋盘、只训练 Q 的积木研究在[独立目录](../blocks_distance_map/README.md)。

@@ -10,6 +10,7 @@ from experiments.external_map_interface.src.evaluate_path256_continuous_batch im
 
 
 CONFIG = Path(__file__).resolve().parents[1] / "configs" / "path256_continuous_five_graphs.json"
+QWEN32B_CONFIG = CONFIG.with_name("path256_continuous_five_graphs_qwen32b.json")
 
 
 class BatchIdentityTest(unittest.TestCase):
@@ -28,6 +29,15 @@ class BatchIdentityTest(unittest.TestCase):
         self.assertEqual(len(seeds), 1920)
         self.assertEqual(len(set(seeds)), len(seeds))
         self.assertEqual(seeds[0], config["seed"])
+
+    def test_qwen32b_uses_first_replicate_seeds(self):
+        original = json.loads(CONFIG.read_text(encoding="utf-8"))
+        qwen32b = json.loads(QWEN32B_CONFIG.read_text(encoding="utf-8"))
+        self.assertEqual(qwen32b["replicates"], 1)
+        for graph in range(original["graph_count"]):
+            for case in original["case_indices"]:
+                self.assertEqual(trial_seed(qwen32b, graph, case, 0),
+                                 trial_seed(original, graph, case, 0))
 
 
 if __name__ == "__main__":

@@ -13,8 +13,9 @@ from .transitions import environment_from_suite
 
 
 def trial_seed(config, graph_index, case_index, replicate_index):
-    return (config["seed"] + graph_index * len(config["case_indices"]) * config["replicates"]
-            + case_index * config["replicates"] + replicate_index)
+    stride = config.get("seed_replicate_stride", config["replicates"])
+    return (config["seed"] + graph_index * len(config["case_indices"]) * stride
+            + case_index * stride + replicate_index)
 
 
 def shard_cases(config, shard_index, shard_count):

@@ -5,9 +5,10 @@
   "model_name": "Qwen3-32B",
   "graph_count": 5,
   "case_indices": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
-  "replicates": 16,
+  "replicates": 1,
   "seed": 20260928,
-  "seed_rule": "seed + graph_index * 384 + case_index * 16 + replicate_index; each continuation adds the zero-based segment index",
+  "seed_replicate_stride": 16,
+  "seed_rule": "Use the first replicate seed from the 16-replicate five-graph evaluation: seed + graph_index * 384 + case_index * 16; each continuation adds the zero-based segment index",
   "sglang_per_request_seed": true,
   "conditions": {
     "thinking": {"model": "thinking", "map_updates": false, "prefer_minimum": false}

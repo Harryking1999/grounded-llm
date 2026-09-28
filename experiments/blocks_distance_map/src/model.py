@@ -1,4 +1,4 @@
-"""A goal-independent Q table and fixed distance functions; no V or decoder."""
+"""Goal-independent board Q encoder and fixed directed distance."""
 import numpy as np
 import torch
 from torch import nn
@@ -13,23 +13,6 @@ def distance(source, target, metric):
     if metric == "euclidean":
         return difference.norm(dim=-1)
     raise ValueError(metric)
-
-
-class QMap(nn.Module):
-    def __init__(self, states, dimension, cap, metric, init_std):
-        super().__init__()
-        self.q = nn.Embedding(states, dimension)
-        self.cap = cap
-        self.metric = metric
-        nn.init.normal_(self.q.weight, mean=cap / 2, std=init_std)
-        self.project()
-
-    def forward(self, pairs):
-        return distance(self.q(pairs[:, 0]), self.q(pairs[:, 1]), self.metric)
-
-    @torch.no_grad()
-    def project(self):
-        self.q.weight.clamp_(0, self.cap)
 
 
 def board_bits(masks):

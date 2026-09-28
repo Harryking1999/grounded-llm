@@ -1,0 +1,31 @@
+{
+  "study": "blocks_distance_map",
+  "scope": "continue_tree_Q_with_clear_and_long_goal_relations",
+  "parent_run": "runs/blocks_distance_map/tree_1000_132f5a1",
+  "parent_checkpoint": "best.pt",
+  "official_dataset": "data/raw/tiling_order_10x10_8obj.h5",
+  "board_seed": 20260928,
+  "sample_seed": 20261011,
+  "extra_clear_parents_per_board": 4,
+  "minimum_long_distance": 4,
+  "long_goals_per_parent": 2,
+  "oracle_cache_limit": 4000000,
+  "oracle_seconds": 14400,
+  "training": {
+    "seed": 20261011,
+    "learning_rate": 0.0003,
+    "steps": 30000,
+    "batch_size": 512,
+    "listwise_batch_size": 256,
+    "clear_pair_fraction": 0.25,
+    "long_pair_fraction": 0.15,
+    "clear_group_fraction": 0.4,
+    "long_group_fraction": 0.3,
+    "listwise_weight": 1.0,
+    "temperature": 1.0,
+    "eval_every": 2500,
+    "checkpoint_every": 5000,
+    "patience_evaluations": 8,
+    "cpu_threads": 4
+  }
+}

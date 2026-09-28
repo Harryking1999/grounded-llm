@@ -83,6 +83,26 @@ python -m experiments.blocks_distance_map.src.hardbranch_decision \
   --source-commit COMMIT --device cuda:0
 ```
 
+### 同一分叉上的目标相对监督
+
+[树关系合同](configs/multiboard_1000_tree_supervision.json)保留原 1000 张训练棋盘的 454,090 条关系和原验证／测试划分。从每张棋盘的参考轨迹与随机合法轨迹提取全部祖先→后代正关系；在不同深度选同一父状态，展开多个合法后继及其后代目标。对同一组后继同时监督两个目标：走自己的后代目标可达，走另一分支的目标若经精确 oracle 证实不可达则为负关系。分支可能重新汇合，因而仅把精确证实相互不可达的叶子对标负。还标注同一父状态下其余合法后继到这些目标的关系。每条训练关系保留来源位标记，数据摘要分别统计祖先、换目标、分支叶子和同父后继的有限／不可达数量。
+
+仍从随机初始化训练原 128 维共享 Q，使用原有 pointwise／listwise 损失、Adam、验证集选择与周期 checkpoint。推理只用合法动作枚举和 `D(Q(后继), Q(目标))` 排序；oracle 只生成标签和事后判错。原测试集已在前几轮实验中查看过，因此这次还从官方数据里**原 1000 训练棋盘及原 200 OOD 棋盘之后**抽取新的 200 张初始棋盘。每张固定抽取五个两步以上、起点和非空目标都不在既有状态池中的可达任务，冻结模型后与旧 Q 在同题上完整逐步对照。
+
+```bash
+python -m experiments.blocks_distance_map.src.tree_supervision_run \
+  --config experiments/blocks_distance_map/configs/multiboard_1000_tree_supervision.json \
+  --out runs/blocks_distance_map/TREE_RUN_ID --source-commit COMMIT --device cuda:0
+python -m experiments.blocks_distance_map.src.tree_supervision_eval \
+  --data runs/blocks_distance_map/TREE_RUN_ID/data/data.npz \
+  --config experiments/blocks_distance_map/configs/multiboard_1000_tree_supervision.json \
+  --official data/raw/tiling_order_10x10_8obj.h5 \
+  --checkpoint base=runs/blocks_distance_map/BASE_RUN_ID/best.pt \
+  --checkpoint tree=runs/blocks_distance_map/TREE_RUN_ID/best.pt \
+  --out runs/blocks_distance_map/TREE_RUN_ID/fresh_ood.json \
+  --analysis-commit COMMIT --device cuda:0
+```
+
 ## 既有单棋盘试点：假设与范围
 
 对同一固定积木棋盘中的状态，直接监督精确有向最短步数与不可达关系，能否形成支持距离排序与好坏候选判断的紧凑 Q-map？先检验关系拟合与留出关系补全，不宣称未见状态或跨棋盘泛化。

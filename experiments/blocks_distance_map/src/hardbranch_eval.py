@@ -73,7 +73,7 @@ def load_values(checkpoint, data, device):
 
 
 def evaluate_prepared(data_path, checkpoint, device, compare_checkpoint=None, out=None,
-                      analysis_commit=None):
+                      analysis_commit=None, rollout_count=200):
     data = dict(np.load(data_path, allow_pickle=False))
     saved, model, values = load_values(checkpoint, data, device)
     result = {"source_commit": saved["source_commit"], "step": saved["step"],
@@ -95,7 +95,7 @@ def evaluate_prepared(data_path, checkpoint, device, compare_checkpoint=None, ou
                 "rescued": int((~baseline & current).sum()),
                 "regressed": int((baseline & ~current).sum())}
         for name in ("ood_board", "unseen_goal"):
-            tasks = data[f"hard_{name}_cases"][:200][:, [0, 3]]
+            tasks = data[f"hard_{name}_cases"][:rollout_count][:, [0, 3]]
             comparison["rollouts"][name] = {
                 "baseline": goal_rollouts(other_model, tasks, data["states"],
                                            other["metric"], device),
@@ -115,6 +115,7 @@ def main():
     parser.add_argument("--compare-checkpoint", type=Path)
     parser.add_argument("--out", type=Path)
     parser.add_argument("--analysis-commit")
+    parser.add_argument("--rollout-count", type=int, default=200)
     parser.add_argument("--max-pairs", type=int, default=10000)
     parser.add_argument("--max-cases", type=int, default=1000)
     parser.add_argument("--seed", type=int, default=20260929)
@@ -122,7 +123,8 @@ def main():
     args = parser.parse_args()
     if args.prepared:
         evaluate_prepared(args.data, args.checkpoint, args.device,
-                          args.compare_checkpoint, args.out, args.analysis_commit)
+                          args.compare_checkpoint, args.out, args.analysis_commit,
+                          args.rollout_count)
     else:
         if not args.split:
             parser.error("--split is required unless --prepared is set")

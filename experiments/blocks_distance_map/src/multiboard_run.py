@@ -9,7 +9,6 @@ import torch
 from torch.nn import functional as F
 
 from .model import BoardEncoder, board_bits, distance, strata
-from .multiboard_data import prepare
 from .multiboard_eval import (contrast_metrics, encoded_values, goal_rollouts,
                               listwise_groups, pair_scores, split_metrics)
 from .train import draw
@@ -31,11 +30,19 @@ def atomic_save(payload, path):
 
 
 def run(config, out, source_commit, device):
+    from .multiboard_data import prepare
+
     out = Path(out)
     out.mkdir(parents=True, exist_ok=False)
     (out / "config.json").write_text(json.dumps(config, indent=2) + "\n")
     (out / "source_commit.txt").write_text(source_commit + "\n")
     prepare(config, out / "data")
+    train_prepared(config, out, source_commit, device)
+
+
+def train_prepared(config, out, source_commit, device):
+    """Train the original Q/loss on an already frozen relation dataset."""
+    out = Path(out)
     data = dict(np.load(out / "data" / "data.npz", allow_pickle=False))
     options = config["training"]
     torch.manual_seed(options["seed"])
@@ -59,7 +66,9 @@ def run(config, out, source_commit, device):
     optimizer = torch.optim.Adam(model.parameters(), lr=options["learning_rate"])
     checkpoints = out / "checkpoints"
     checkpoints.mkdir()
+    hard_validation = data.get("hard_validation_cases")
     best_score, best_step, stale = float("inf"), 0, 0
+    best_hard_count = -1
     started = time.monotonic()
 
     def checkpoint(step, destination):
@@ -84,8 +93,19 @@ def run(config, out, source_commit, device):
                 val_scores = pair_scores(values, data["validation_unseen_state"], metric)
                 validation = split_metrics(data["validation_unseen_state"], val_scores, rank_val, cap)
                 objective = validation["distance_loss"] + options["listwise_weight"] * validation["listwise_loss"]
-                if objective < best_score - options["min_improvement"]:
+                hard_metrics = None
+                if hard_validation is not None:
+                    from .hardbranch_eval import score_case_ids
+                    hard_metrics = score_case_ids(values, hard_validation, metric)
+                    improved = (hard_metrics["strict_correct"] > best_hard_count or
+                                (hard_metrics["strict_correct"] == best_hard_count and
+                                 objective < best_score - options["min_improvement"]))
+                else:
+                    improved = objective < best_score - options["min_improvement"]
+                if improved:
                     best_score, best_step, stale = objective, step, 0
+                    if hard_metrics is not None:
+                        best_hard_count = hard_metrics["strict_correct"]
                     checkpoint(step, out / "best.pt")
                 else:
                     stale += 1
@@ -94,6 +114,8 @@ def run(config, out, source_commit, device):
                           "listwise_batch_loss": float(listwise.detach()),
                           "validation_objective": objective, "best_step": best_step,
                           "validation": validation}
+                if hard_metrics is not None:
+                    record["hard_validation"] = hard_metrics
                 log.write(json.dumps(record) + "\n")
                 log.flush()
                 print(json.dumps(record), flush=True)
@@ -122,6 +144,11 @@ def run(config, out, source_commit, device):
               "heldout_goal_rollout": goal_rollouts(model, contrast_tasks, data["states"], metric, device),
               "isolated_goal_rollout": goal_rollouts(model, data["isolated_goal_tasks"][:, :2],
                                                      data["states"], metric, device)}
+    if hard_validation is not None:
+        from .hardbranch_eval import score_case_ids
+        result["hardbranch"] = {
+            name: score_case_ids(values, data[f"hard_{name}_cases"], metric)
+            for name in ("train", "validation", "ood_board", "unseen_goal")}
     area = torch.as_tensor([[int(mask).bit_count()] for mask in data["states"]],
                            dtype=torch.float32, device=device)
     result["area_only_baseline"] = {"splits": {},

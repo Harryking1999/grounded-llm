@@ -44,7 +44,8 @@ def main():
     if not 0 <= args.graph_index < config["graph_count"]:
         parser.error("Graph index outside configured range")
     condition = config["conditions"][args.condition]
-    if args.model_path.name != f"Qwen3-4B-{condition['model'].capitalize()}-2507":
+    expected_model = config.get("model_name", f"Qwen3-4B-{condition['model'].capitalize()}-2507")
+    if args.model_path.name != expected_model:
         parser.error("Condition and model path disagree")
     suite = json.loads(args.suite.read_text(encoding="utf-8"))
     if len(suite["cases"]) != len(config["case_indices"]):

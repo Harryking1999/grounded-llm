@@ -14,6 +14,7 @@ GOAL_SWAP = 2
 CROSS_LEAF = 4
 SIBLING_GOAL = 8
 BASE = 16
+BRANCH_LEAF = 32
 
 
 def add_relation(relations, source, goal, tag):
@@ -87,11 +88,20 @@ def add_board_graph(relations, board, options, rng, oracle):
             branches.append((child, branch[-1]))
         if len(branches) < 2:
             continue
-        goals = set()
+        goals = {goal for _, goal in branches}
         local_cases = []
         for index, (a, ga) in enumerate(branches):
             for b, gb in branches[index + 1:]:
-                if ga == gb or oracle.distance(b, ga) >= 0 or oracle.distance(a, gb) >= 0:
+                if ga == gb:
+                    stats["merged_or_reachable_pairs"] += 1
+                    continue
+                add_relation(relations, ga, gb, BRANCH_LEAF)
+                add_relation(relations, gb, ga, BRANCH_LEAF)
+                if oracle.distance(ga, gb) < 0 and oracle.distance(gb, ga) < 0:
+                    add_relation(relations, ga, gb, CROSS_LEAF)
+                    add_relation(relations, gb, ga, CROSS_LEAF)
+                    stats["mutually_unreachable_leaf_pairs"] += 1
+                if oracle.distance(b, ga) >= 0 or oracle.distance(a, gb) >= 0:
                     stats["merged_or_reachable_pairs"] += 1
                     continue
                 if oracle.distance(a, ga) < 0 or oracle.distance(b, gb) < 0:
@@ -100,14 +110,7 @@ def add_board_graph(relations, board, options, rng, oracle):
                     add_relation(relations, source, goal, GOAL_SWAP)
                 for source, goal in ((a, gb), (b, ga)):
                     add_relation(relations, source, goal, GOAL_SWAP)
-                if oracle.distance(ga, gb) < 0 and oracle.distance(gb, ga) < 0:
-                    add_relation(relations, ga, gb, CROSS_LEAF)
-                    add_relation(relations, gb, ga, CROSS_LEAF)
-                    stats["mutually_unreachable_leaf_pairs"] += 1
                 local_cases.append((parent, a, b, ga, gb, depth))
-                goals.update((ga, gb))
-        if not local_cases:
-            continue
         stats["accepted_parents"] += 1
         stats[f"fork_depth_{depth}"] += 1
         stats["goal_swap_cases"] += len(local_cases)
@@ -115,8 +118,14 @@ def add_board_graph(relations, board, options, rng, oracle):
         selected_goals = sorted(goals)
         rng.shuffle(selected_goals)
         for goal in selected_goals[:options["goals_per_parent"]]:
+            reachable = 0
             for child in children:
                 add_relation(relations, child, goal, SIBLING_GOAL)
+                reachable += oracle.distance(child, goal) >= 0
+            unreachable = len(children) - reachable
+            stats["both_reachable_child_pairs"] += reachable * (reachable - 1) // 2
+            stats["mixed_child_pairs"] += reachable * unreachable
+            stats["both_unreachable_child_pairs"] += unreachable * (unreachable - 1) // 2
     return accepted, stats
 
 
@@ -194,7 +203,7 @@ def prepare_tree(base_path, official_path, out, options, max_boards=None):
                          "contained_but_unreachable"] += 1
         for flag, name in ((BASE, "base"), (ANCESTOR, "ancestor"),
                            (GOAL_SWAP, "goal_swap"), (CROSS_LEAF, "cross_leaf"),
-                           (SIBLING_GOAL, "sibling_goal")):
+                           (SIBLING_GOAL, "sibling_goal"), (BRANCH_LEAF, "branch_leaf")):
             if tags & flag:
                 source_counts[name] += 1
                 source_counts[f"{name}_{'finite' if steps >= 0 else 'unreachable'}"] += 1
@@ -242,6 +251,10 @@ def prepare_tree(base_path, official_path, out, options, max_boards=None):
                    "median_accepted_parents": float(np.median(
                        [item["accepted_parents"] for item in board_stats])) if board_stats else 0,
                    "total_accepted_parents": sum(item["accepted_parents"] for item in board_stats),
+                   "child_pair_labels": {name: sum(item[name] for item in board_stats)
+                                         for name in ("both_reachable_child_pairs",
+                                                      "mixed_child_pairs",
+                                                      "both_unreachable_child_pairs")},
                    "fork_depths": dict(sum((Counter({key: value for key, value in item.items()
                                                      if key.startswith("fork_depth_")})
                                        for item in board_stats), Counter()))},

@@ -69,6 +69,20 @@ python -m experiments.blocks_distance_map.src.hardbranch_eval \
   --out runs/blocks_distance_map/HARDBRANCH_RUN_ID/comparison_full.json --device cuda:0
 ```
 
+### 完整候选与差集一致性诊断
+
+`src/hardbranch_failure.py` 从困难分叉父状态完整逐步走，第一次选入不可达状态即停，事后用 oracle 将错误分成删目标格、差集局部无法覆盖、局部可行但整体不可达。它也分开测纯 Q、只保留目标格、再检查局部覆盖；后两种是规则辅助对照。`src/difference_invariance.py` 找出具有相同可移除差集、不同共同保留部分的测试关系；其真实距离必相同，因此组内 Q 距离波动是直接的一致性检查。
+
+按[全候选微调合同](configs/multiboard_hardbranch_decision.json)，`src/hardbranch_decision.py` 从困难分叉最佳 Q 开始，保留原 pair 和 listwise 损失；对每个困难分叉训练局面枚举所有合法后继，只把可证实不可达的后继加入坏候选集合，用当前评分最低的坏候选与一个可达后继比较。checkpoint 由同训练棋盘未见状态的完整到达选择。运行目录独立保存最佳与中间权重、曲线和测试摘要：
+
+```bash
+python -m experiments.blocks_distance_map.src.hardbranch_decision \
+  --base-run runs/blocks_distance_map/HARDBRANCH_RUN_ID \
+  --config experiments/blocks_distance_map/configs/multiboard_hardbranch_decision.json \
+  --out runs/blocks_distance_map/DECISION_RUN_ID \
+  --source-commit COMMIT --device cuda:0
+```
+
 ## 既有单棋盘试点：假设与范围
 
 对同一固定积木棋盘中的状态，直接监督精确有向最短步数与不可达关系，能否形成支持距离排序与好坏候选判断的紧凑 Q-map？先检验关系拟合与留出关系补全，不宣称未见状态或跨棋盘泛化。

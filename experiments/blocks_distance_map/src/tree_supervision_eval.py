@@ -124,11 +124,20 @@ def evaluate(data_path, contract_path, official_path, checkpoint_specs, out,
             "ordinary": summarize([row for row, task in zip(traces, tasks) if not task[4]])}
         print(json.dumps({"scorer": name, "all": result["results"][name]["all"]}),
               flush=True)
-    result["paired"] = {
-        f"{first}_to_{second}": {
-            "rescued": sum(not a and b for a, b in zip(outcomes[first], outcomes[second])),
-            "regressed": sum(a and not b for a, b in zip(outcomes[first], outcomes[second]))}
-        for index, first in enumerate(outcomes) for second in list(outcomes)[index + 1:]}
+    result["task_outcomes"] = outcomes
+    result["paired"] = {}
+    names = list(outcomes)
+    for index, first in enumerate(names):
+        first_boards = np.asarray(outcomes[first]).reshape(board_count, tasks_per_board).sum(1)
+        for second in names[index + 1:]:
+            second_boards = np.asarray(outcomes[second]).reshape(
+                board_count, tasks_per_board).sum(1)
+            result["paired"][f"{first}_to_{second}"] = {
+                "rescued": sum(not a and b for a, b in zip(outcomes[first], outcomes[second])),
+                "regressed": sum(a and not b for a, b in zip(outcomes[first], outcomes[second])),
+                "boards_improved": int((second_boards > first_boards).sum()),
+                "boards_regressed": int((second_boards < first_boards).sum()),
+                "boards_equal": int((second_boards == first_boards).sum())}
     out = Path(out)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(result, indent=2) + "\n")

@@ -2,7 +2,25 @@
 
 目前关注：**显式地图如何提供状态与动作后果，以及 LLM 如何据此规划。**
 
-## 1. GCML：用认知地图生成面向目标的轨迹
+## 1. 预测性地图：用未来访问结构表示当前状态
+
+**The hippocampus as a predictive map**
+
+Kimberly L. Stachenfeld、Matthew M. Botvinick、Samuel J. Gershman，*Nature Neuroscience*，20:1643–1653，2017。
+
+[论文](https://doi.org/10.1038/nn.4650) · [作者存档 PDF](https://gershmanlab.com/pubs/Stachenfeld17.pdf)
+
+**核心主张。** 作者用后继表征（successor representation，SR）解释海马体的预测性地图：给定行为策略，每个状态对应一个向量，记录从这里出发对各状态的折扣预期访问次数。因此，两状态的表征相似性可以由其未来访问模式决定，而不只由当前位置的几何距离决定。将该向量与奖励函数结合，可在奖励位置改变、策略暂时不变时快速重算状态价值。论文还以 SR 的低维特征向量解释内嗅皮层网格细胞的部分结构，并讨论其与子目标发现的联系。
+
+![Stachenfeld 等 Fig. 1：保持后继表征不变，按不同奖励函数重算状态价值](docs/figures/related_work/sr_predictive_map_fig1.png)
+
+*首图 a 是状态 s⁴ 的 SR 向量；b–d 保持该向量不变，改变各状态的奖励后，s⁴ 的价值分别为 0.1、0.4 和 0.98。图源：Stachenfeld 等，Fig. 1；图内内容未改动。*
+
+**证据与边界。** 论文主要提出计算模型，并模拟方向偏好、障碍物及非空间图社区等既有神经实验现象；这些吻合支持预测性表征的解释，但不能单独证明海马体精确实现了 SR。SR 中的“未来”依赖所用策略、转移概率和时间折扣，不等于所有合法可达状态的集合。作者也指出，换奖励后最优策略可能改变，旧 SR 算出的价值仍基于原策略，需要随新行为更新。
+
+**对我们的参考。** 积木棋盘即使当前图案不同，也可能因后续可达结构相近而值得采用相近表示；即使都能清空，中间路径及其权重不同，SR 也未必相近。这为检查地图是否捕捉多步后果提供理论线索。当前积木 Q-map 则直接学习跨目标的最短步数与不可达关系，既没有估计固定策略下的未来访问次数，也没有实现论文的 SR；两者的联系是研究假设，不能把本项目的距离成绩当作对该神经理论的验证。
+
+## 2. GCML：用认知地图生成面向目标的轨迹
 
 **Neural sampling from cognitive maps enables goal-directed imagination and planning**
 
@@ -18,7 +36,7 @@ Hui Lin、Yukun Yang、Rong Zhao、Giovanni Pezzulo、Wolfgang Maass，*Nature M
 
 **对我们的参考。** Q/V 的转移学习是 Step 1 的直接起点；图寻路和积木也提供了可计算状态、合法动作与目标的任务。当前要检验的是：显式地图提供当前状态、候选动作后果和目标关系后，LLM 能否利用这些信息规划。论文的地图规划成功不直接等于这一接口有效。
 
-## 2. 汉诺塔：已有状态表征会在生成过程中退化
+## 3. 汉诺塔：已有状态表征会在生成过程中退化
 
 **Transformers Struggle to Use Their Emergent World Models: Revisiting the Tower of Hanoi, and the Illusion of Thinking**
 
@@ -34,7 +52,7 @@ Devin Pereira、Willem Zuidema，arXiv 预印本，2026。
 
 **对我们的参考。** 可作为“让状态信息在推理中持续可用”的动机：问题可能出在已有表征的保持和使用。其外部跟踪状态的机制与我们的方向相关，也支持把状态读取、表征保持和动作选择分开评测。
 
-## 3. RAP：将推理显式视为基于世界模型的规划
+## 4. RAP：将推理显式视为基于世界模型的规划
 
 **Reasoning with Language Model is Planning with World Model**
 
@@ -50,7 +68,7 @@ Shibo Hao 等，*EMNLP*，2023。
 
 **对我们的参考。** RAP 主要让 LLM 自身充当 world model；我们当前探索的是由显式 external cognitive map／roadmap 向 LLM 提供状态与动作后果。
 
-## 4. 生成过程中追加外部信息：ReAct、IRCoT 与 FLARE
+## 5. 生成过程中追加外部信息：ReAct、IRCoT 与 FLARE
 
 本节用于连续生成试点的实现参照。
 

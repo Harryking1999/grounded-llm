@@ -26,4 +26,4 @@
 3. **分析积木 Q 的非空目标错误。**使用既有开发题定位清空、长程、普通非空及孤立格关系的取舍，再决定是否调整训练配比；封存题不用于重新选权重。
 4. **固定 Q 后再单独检验 V。**验证预测后继坐标是否保住 Q 已有的候选排序，然后才评估 LLM 读取积木地图的收益。
 
-旧连续 state token 读出属于历史路线，结果见[图 Step 2](../experiments/cml_map_scaling/README.md)和[积木 Step 2](../experiments/state_interface_pilot/README.md)。其他模型基线与研究文献分别见[实验索引](../experiments/README.md)和[Related Work](../RELATED_WORK.md)。
+旧连续 state token 读出属于历史路线，结果见[图 Step 2](../experiments/cml_map_scaling/README.md)和[积木 Step 2](../experiments/state_interface_pilot/README.md)。其他模型基线见[实验索引](../experiments/README.md)；海马体预测性地图（SR）、GCML 等研究文献见[Related Work](../RELATED_WORK.md)。

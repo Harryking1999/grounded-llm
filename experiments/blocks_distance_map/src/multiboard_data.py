@@ -35,6 +35,24 @@ def official_boards(path, seed, train_count, test_count):
     return selected[:train_count], selected[train_count:]
 
 
+def fresh_official_boards(data_path, config_path, official_path, comparison_path):
+    """Load the fresh boards named by a frozen comparison, preserving the original split."""
+    with np.load(data_path, allow_pickle=False) as data:
+        train_count = len(data["train_board_rows"])
+        historical_rows = data["ood_board_rows"].tolist()
+    config = json.loads(Path(config_path).read_text(encoding="utf-8"))
+    comparison = json.loads(Path(comparison_path).read_text(encoding="utf-8"))
+    skip = int(comparison.get("skip_fresh_boards", 0))
+    _, ood = official_boards(official_path, config["board_seed"], train_count,
+                             len(historical_rows) + skip + len(comparison["board_rows"]))
+    if [board[0] for board in ood[:len(historical_rows)]] != historical_rows:
+        raise ValueError("Historical OOD board split changed")
+    fresh = ood[len(historical_rows) + skip:]
+    if [board[0] for board in fresh] != comparison["board_rows"]:
+        raise ValueError("Fresh evaluation boards differ from the frozen comparison")
+    return fresh, comparison
+
+
 def sample_paths(board, episodes, rng):
     _, initial, reference = board
     path = [initial]

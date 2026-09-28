@@ -8,25 +8,15 @@ import numpy as np
 import torch
 
 from .model import BoardEncoder, board_bits
-from .multiboard_data import official_boards, sample_paths
+from .multiboard_data import fresh_official_boards, sample_paths
 from .multiboard_eval import encoded_values, listwise_groups, pair_scores, split_metrics
 from .oracle import DistanceOracle
 
 
 def build(data_path, config_path, official_path, comparison_path, output_path):
-    base = dict(np.load(data_path, allow_pickle=False))
-    comparison = json.loads(Path(comparison_path).read_text())
-    config = json.loads(Path(config_path).read_text())
-    old_count = len(base["ood_board_rows"])
-    skip = int(comparison.get("skip_fresh_boards", 0))
+    fresh, comparison = fresh_official_boards(
+        data_path, config_path, official_path, comparison_path)
     count = len(comparison["board_rows"])
-    _, ood = official_boards(official_path, config["board_seed"],
-                             len(base["train_board_rows"]), old_count + skip + count)
-    if [board[0] for board in ood[:old_count]] != base["ood_board_rows"].tolist():
-        raise ValueError("Historical OOD split changed")
-    fresh = ood[old_count + skip:]
-    if [board[0] for board in fresh] != comparison["board_rows"]:
-        raise ValueError("Distance evaluation boards differ from main evaluation")
     rng = np.random.default_rng(20261013)
     oracle = DistanceOracle(cache_limit=2_000_000, seconds=3600)
     masks, ids, pairs, pair_boards = [], {}, [], []

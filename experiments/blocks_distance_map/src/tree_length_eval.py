@@ -6,7 +6,7 @@ from pathlib import Path
 import numpy as np
 
 from .rollout_eval import summarize, trace
-from .multiboard_data import official_boards, sample_paths
+from .multiboard_data import fresh_official_boards, sample_paths
 from .oracle import DistanceOracle
 from .tree_step_eval import inspect_tasks
 from .tree_supervision_eval import QScorer
@@ -14,19 +14,8 @@ from .tree_supervision_eval import QScorer
 
 def evaluate(data_path, config_path, official_path, comparison_path,
              checkpoint_path, output_path, device="cuda:0"):
-    data = dict(np.load(data_path, allow_pickle=False))
-    comparison = json.loads(Path(comparison_path).read_text())
-    config = json.loads(Path(config_path).read_text())
-    old_ood = len(data["ood_board_rows"])
-    skip = int(comparison.get("skip_fresh_boards", 0))
-    count = len(comparison["board_rows"])
-    _, boards = official_boards(official_path, config["board_seed"],
-                                len(data["train_board_rows"]), old_ood + skip + count)
-    if [board[0] for board in boards[:old_ood]] != data["ood_board_rows"].tolist():
-        raise ValueError("Historical OOD split changed")
-    fresh = boards[old_ood + skip:]
-    if [board[0] for board in fresh] != comparison["board_rows"]:
-        raise ValueError("Length evaluation boards differ from main evaluation")
+    fresh, comparison = fresh_official_boards(
+        data_path, config_path, official_path, comparison_path)
     rng = np.random.default_rng(20261012)
     oracle = DistanceOracle(cache_limit=2_000_000, seconds=3600)
     scorer = QScorer(checkpoint_path, device)

@@ -1,14 +1,43 @@
 """Checks for goal-dependent labels and grouped supervision."""
+import json
+from pathlib import Path
+import tempfile
 import unittest
+from unittest.mock import patch
 
 import numpy as np
 
-from experiments.blocks_distance_map.src.multiboard_data import candidate_pairs, choose_landmarks, contrast_cases
+from experiments.blocks_distance_map.src.multiboard_data import (
+    candidate_pairs, choose_landmarks, contrast_cases, fresh_official_boards)
 from experiments.blocks_distance_map.src.multiboard_eval import listwise_groups
 from experiments.blocks_distance_map.src.oracle import DistanceOracle
 
 
 class MultiboardTests(unittest.TestCase):
+    def test_fresh_official_boards_uses_frozen_rows_after_historical_split(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            data = root / "base.npz"
+            config = root / "config.json"
+            comparison = root / "comparison.json"
+            np.savez_compressed(data, train_board_rows=[1, 2], ood_board_rows=[10, 11])
+            config.write_text(json.dumps({"board_seed": 7}), encoding="utf-8")
+            comparison.write_text(json.dumps({"skip_fresh_boards": 1,
+                                              "board_rows": [20, 21]}), encoding="utf-8")
+            ood = [(row, 0, []) for row in (10, 11, 99, 20, 21)]
+            with patch("experiments.blocks_distance_map.src.multiboard_data.official_boards",
+                       return_value=([], ood)) as source:
+                fresh, frozen = fresh_official_boards(data, config, "official.h5", comparison)
+            source.assert_called_once_with("official.h5", 7, 2, 5)
+            self.assertEqual([row for row, _, _ in fresh], [20, 21])
+            self.assertEqual(frozen["board_rows"], [20, 21])
+            comparison.write_text(json.dumps({"skip_fresh_boards": 1,
+                                              "board_rows": [20, 22]}), encoding="utf-8")
+            with patch("experiments.blocks_distance_map.src.multiboard_data.official_boards",
+                       return_value=([], ood)):
+                with self.assertRaises(ValueError):
+                    fresh_official_boards(data, config, "official.h5", comparison)
+
     def test_dead_state_can_reach_a_nonempty_dead_goal(self):
         oracle = DistanceOracle()
         source, goal = 0b100011, 0b100000

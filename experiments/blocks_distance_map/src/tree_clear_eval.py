@@ -3,31 +3,17 @@ import argparse
 import json
 from pathlib import Path
 
-import numpy as np
-
 from .rollout_eval import summarize, trace
-from .multiboard_data import official_boards
+from .multiboard_data import fresh_official_boards
 from .oracle import DistanceOracle
 from .tree_supervision_eval import QScorer
 
 
 def evaluate(data_path, config_path, official_path, comparison_path,
              checkpoint_path, output_path, device="cuda:0"):
-    with np.load(data_path, allow_pickle=False) as data:
-        train_count = len(data["train_board_rows"])
-        old_ood_count = len(data["ood_board_rows"])
-        old_rows = data["ood_board_rows"].copy()
-    contract = json.loads(Path(config_path).read_text(encoding="utf-8"))
-    comparison = json.loads(Path(comparison_path).read_text(encoding="utf-8"))
+    fresh, comparison = fresh_official_boards(
+        data_path, config_path, official_path, comparison_path)
     board_count = len(comparison["board_rows"])
-    skip_fresh_boards = int(comparison.get("skip_fresh_boards", 0))
-    _, ood = official_boards(official_path, contract["board_seed"],
-                             train_count, old_ood_count + skip_fresh_boards + board_count)
-    if [board[0] for board in ood[:old_ood_count]] != old_rows.tolist():
-        raise ValueError("Historical OOD board split changed")
-    fresh = ood[old_ood_count + skip_fresh_boards:]
-    if [board[0] for board in fresh] != comparison["board_rows"]:
-        raise ValueError("Clear and nonempty-goal evaluations use different boards")
 
     scorer = QScorer(checkpoint_path, device)
     oracle = DistanceOracle(cache_limit=2_000_000, seconds=3600)

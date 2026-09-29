@@ -24,6 +24,8 @@
 
 运行产物保存在 Git 忽略的 `runs/`，正式参数只维护在 `configs/`。模块命令行参数可由 `python -m experiments.external_map_interface.src.evaluate_path256_continuous_batch --help` 和对应汇总模块的 `--help` 查看。当前进度见[项目状态页](../../docs/PROJECT_STATUS_AND_TODO.md)；协议案例、原始提示片段与阶段结果见[五图报告](results/path256_five_graphs.md#新实验设置连续生成过程中提供地图)。
 
+同一批 120 题的无地图 Qwen3-32B Thinking 单次采样已完成验收：合法到达 92/120，最短路 61/120；与 4B Thinking 首次采样的逐题对照、失败类型和案例见[32B 验收报告](results/path256_qwen32b_thinking.md)。
+
 ## 已完成的旧条件
 
 旧版五图逐步决策共 5,760 条，要求最短路且每一步重新发送图与状态，结果见[五图报告](results/path256_five_graphs.md)和[结果摘要](results/path256_five_graphs.json)。单图和独立图复测见[path256 距离报告](results/path256_distance.md)、[独立图报告](results/path256_diverse.md)。早期单棋盘积木 Q/V 与状态条件位移是转移拟合诊断，见[积木试验结果](results/blocks_q_pilot.md)；当前跨棋盘、只训练 Q 的积木研究在[独立目录](../blocks_distance_map/README.md)。

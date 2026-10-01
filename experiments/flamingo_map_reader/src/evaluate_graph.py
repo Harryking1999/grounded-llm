@@ -114,6 +114,10 @@ def main():
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--limit", type=int)
+    parser.add_argument("--start", type=int, default=0,
+                        help="First case index in the reserved suite")
+    parser.add_argument("--stop", type=int,
+                        help="Exclusive final case index in the reserved suite")
     args = parser.parse_args()
     if args.out.exists():
         raise FileExistsError(args.out)
@@ -143,6 +147,10 @@ def main():
         cases.extend((graph_id, case) for case in suite["cases"])
     if args.limit is not None:
         cases = cases[:args.limit]
+    if args.start < 0 or args.start > len(cases) or (args.stop is not None and
+            (args.stop < args.start or args.stop > len(cases))):
+        raise ValueError("Invalid reserved-suite case range")
+    cases = cases[args.start:args.stop]
     (args.out / "logs").mkdir(parents=True)
     (args.out / "results").mkdir()
     counts = {}

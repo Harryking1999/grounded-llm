@@ -10,7 +10,7 @@ from torch.nn.utils.rnn import pad_sequence
 from experiments.external_map_interface.src.q_map import GraphQMap
 from experiments.external_map_interface.src.transitions import GraphEnvironment
 
-from .memory import CURRENT, GOAL, SUCCESSOR, MapBatch
+from .memory import CURRENT, GOAL, SUCCESSOR, MapBatch, MapTimeline
 
 
 @dataclass(frozen=True)
@@ -95,3 +95,14 @@ def batch_maps(steps: list[GraphStep]) -> MapBatch:
                                    batch_first=True),
         valid=pad_sequence([s.map_batch.valid[0] for s in steps], batch_first=True),
     )
+
+
+def timeline_maps(steps: list[GraphStep], token_map_ids: Sequence[int]) -> MapTimeline:
+    """Keep every turn's map; each text token reads only its assigned turn."""
+    timeline = MapTimeline(
+        snapshots=batch_maps(steps),
+        token_map_ids=torch.tensor([list(token_map_ids)], dtype=torch.long),
+    )
+    timeline.validate(max(len(step.candidate_actions) for step in steps),
+                      len(token_map_ids))
+    return timeline

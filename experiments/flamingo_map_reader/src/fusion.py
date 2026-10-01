@@ -7,7 +7,7 @@ import torch
 from torch import Tensor, nn
 from torch.nn import functional as F
 
-from .memory import MapBatch, MapMemoryEncoder
+from .memory import MapBatch, MapMemoryEncoder, MapTimeline
 
 
 class GatedMapCrossAttention(nn.Module):
@@ -25,14 +25,32 @@ class GatedMapCrossAttention(nn.Module):
         self.to_output = nn.Linear(inner_dim, language_dim, bias=False)
         self.gate = nn.Parameter(torch.zeros(()))
 
-    def forward(self, hidden: Tensor, memory: Tensor, valid: Tensor) -> Tensor:
-        if hidden.ndim != 3 or memory.ndim != 3 or valid.shape != memory.shape[:2]:
-            raise ValueError("expected hidden [B,T,D], memory [B,N,D], valid [B,N]")
+    def forward(self, hidden: Tensor, memory: Tensor, valid: Tensor,
+                token_map_ids: Tensor | None = None) -> Tensor:
+        if hidden.ndim != 3 or memory.ndim not in (3, 4) or valid.shape != memory.shape[:-1]:
+            raise ValueError("invalid text or map memory shapes")
         if hidden.shape[0] != memory.shape[0] or hidden.shape[-1] != memory.shape[-1]:
             raise ValueError("hidden and memory batch/feature dimensions differ")
-        if not torch.all(valid.any(dim=1)):
+        if not torch.all(valid.reshape(valid.shape[0], -1).any(dim=1)):
             raise ValueError("every sample needs at least one valid map slot")
         batch_size, text_length, _ = hidden.shape
+        if memory.ndim == 4:
+            if token_map_ids is None or token_map_ids.shape != (batch_size, text_length):
+                raise ValueError("timeline memory needs one map ID per text token")
+            snapshots, slots = memory.shape[1:3]
+            if not torch.all((token_map_ids >= 0) & (token_map_ids < snapshots)):
+                raise ValueError("text token refers to a missing map snapshot")
+            snapshot_ids = torch.arange(snapshots, device=memory.device).repeat_interleave(slots)
+            slot_mask = valid.reshape(batch_size, -1)
+            attention_mask = (
+                slot_mask[:, None, :] &
+                (token_map_ids[:, :, None] == snapshot_ids[None, None, :])
+            )[:, None, :, :]
+            memory = memory.reshape(batch_size, snapshots * slots, -1)
+        else:
+            if token_map_ids is not None:
+                raise ValueError("single-map memory must not have token map IDs")
+            attention_mask = valid[:, None, None, :]
         memory_length = memory.shape[1]
         query = self.to_query(self.query_norm(hidden))
         key, value = self.to_key_value(self.memory_norm(memory)).chunk(2, dim=-1)
@@ -40,7 +58,7 @@ class GatedMapCrossAttention(nn.Module):
         key = key.reshape(batch_size, memory_length, self.heads, self.head_dim).transpose(1, 2)
         value = value.reshape(batch_size, memory_length, self.heads, self.head_dim).transpose(1, 2)
         read = F.scaled_dot_product_attention(
-            query, key, value, attn_mask=valid[:, None, None, :], dropout_p=0.0,
+            query, key, value, attn_mask=attention_mask, dropout_p=0.0,
         )
         read = read.transpose(1, 2).reshape(batch_size, text_length, -1)
         read = self.to_output(read)
@@ -58,13 +76,32 @@ class ConditionedDecoderLayer(nn.Module):
         self.attention_type = getattr(decoder_layer, "attention_type", None)
         self._memory: Tensor | None = None
         self._valid: Tensor | None = None
+        self._token_map_ids: Tensor | None = None
+        self._generated_suffix = False
 
-    def condition(self, memory: Tensor | None, valid: Tensor | None) -> None:
+    def condition(self, memory: Tensor | None, valid: Tensor | None,
+                  token_map_ids: Tensor | None = None,
+                  generated_suffix: bool = False) -> None:
         self._memory, self._valid = memory, valid
+        self._token_map_ids = token_map_ids
+        self._generated_suffix = generated_suffix
 
     def forward(self, hidden_states: Tensor, *args, **kwargs):
         if self._memory is not None:
-            hidden_states = self.map_attention(hidden_states, self._memory, self._valid)
+            token_map_ids = self._token_map_ids
+            if token_map_ids is not None and hidden_states.shape[1] != token_map_ids.shape[1]:
+                if not self._generated_suffix:
+                    raise ValueError("text length differs from its map timeline")
+                if hidden_states.shape[1] == 1:
+                    token_map_ids = token_map_ids[:, -1:]
+                elif hidden_states.shape[1] > token_map_ids.shape[1]:
+                    suffix = token_map_ids[:, -1:].expand(-1,
+                        hidden_states.shape[1] - token_map_ids.shape[1])
+                    token_map_ids = torch.cat((token_map_ids, suffix), dim=1)
+                else:
+                    raise ValueError("generation supplied an unexpected text prefix")
+            hidden_states = self.map_attention(hidden_states, self._memory,
+                                               self._valid, token_map_ids)
         return self.decoder_layer(hidden_states, *args, **kwargs)
 
 
@@ -109,24 +146,32 @@ class MapReader(nn.Module):
         setattr(parent, parts[-1], wrapped)
 
     @contextmanager
-    def conditioned(self, batch: MapBatch) -> Iterator[None]:
+    def conditioned(self, batch: MapBatch | MapTimeline,
+                    generated_suffix: bool = False) -> Iterator[None]:
         if getattr(self.base_model, "is_gradient_checkpointing", False):
             raise RuntimeError("gradient checkpointing needs map conditioning during backward")
-        memory = self.memory_encoder(batch)
+        if isinstance(batch, MapTimeline):
+            memory = self.memory_encoder(batch.snapshots).unsqueeze(0)
+            valid = batch.snapshots.valid.unsqueeze(0)
+            token_map_ids = batch.token_map_ids
+        else:
+            memory = self.memory_encoder(batch)
+            valid = batch.valid
+            token_map_ids = None
         for layer in self.conditioned_layers:
-            layer.condition(memory, batch.valid)
+            layer.condition(memory, valid, token_map_ids, generated_suffix)
         try:
             yield
         finally:
             for layer in self.conditioned_layers:
                 layer.condition(None, None)
 
-    def forward(self, map_batch: MapBatch, **model_inputs):
+    def forward(self, map_batch: MapBatch | MapTimeline, **model_inputs):
         with self.conditioned(map_batch):
             return self.base_model(**model_inputs)
 
-    def generate(self, map_batch: MapBatch, **generation_inputs):
-        with self.conditioned(map_batch):
+    def generate(self, map_batch: MapBatch | MapTimeline, **generation_inputs):
+        with self.conditioned(map_batch, generated_suffix=True):
             return self.base_model.generate(**generation_inputs)
 
     def adapter_state_dict(self) -> dict:

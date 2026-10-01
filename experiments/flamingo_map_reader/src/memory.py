@@ -46,6 +46,24 @@ class MapBatch:
             raise ValueError("successor slots need a positive candidate ID")
 
 
+@dataclass(frozen=True)
+class MapTimeline:
+    """Map snapshots for one trajectory and the snapshot assigned to each token."""
+
+    snapshots: MapBatch  # snapshot dimension is MapBatch's batch dimension
+    token_map_ids: Tensor  # [1, text_length], zero-based snapshot indices
+
+    def validate(self, max_candidates: int, text_length: int) -> None:
+        self.snapshots.validate(max_candidates)
+        count = self.snapshots.vectors.shape[0]
+        if self.token_map_ids.shape != (1, text_length):
+            raise ValueError("token_map_ids must match the text length")
+        if self.token_map_ids.dtype != torch.long:
+            raise TypeError("token_map_ids must be int64")
+        if not torch.all((self.token_map_ids >= 0) & (self.token_map_ids < count)):
+            raise ValueError("token_map_ids refers to a missing map snapshot")
+
+
 class MapMemoryEncoder(nn.Module):
     """Shared P, role/ID embeddings, then G from section 4.1."""
 

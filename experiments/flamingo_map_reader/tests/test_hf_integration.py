@@ -5,7 +5,7 @@ import unittest
 import torch
 
 from experiments.flamingo_map_reader.src.fusion import MapReader
-from experiments.flamingo_map_reader.src.memory import MapBatch, MapMemoryEncoder
+from experiments.flamingo_map_reader.src.memory import MapBatch, MapMemoryEncoder, MapTimeline
 
 
 class QwenIntegrationTest(unittest.TestCase):
@@ -55,6 +55,37 @@ class QwenIntegrationTest(unittest.TestCase):
             head_dim=16, max_position_embeddings=64, pad_token_id=0, eos_token_id=1,
         )
         self.check_model(Qwen3ForCausalLM(config))
+
+    def test_tiny_qwen2_full_timeline_forward_and_generation(self):
+        try:
+            from transformers import Qwen2Config, Qwen2ForCausalLM
+        except ImportError:
+            self.skipTest("transformers with Qwen2 is not installed")
+        base = Qwen2ForCausalLM(Qwen2Config(
+            vocab_size=128, hidden_size=64, intermediate_size=128,
+            num_hidden_layers=2, num_attention_heads=4, num_key_value_heads=2,
+            max_position_embeddings=64, pad_token_id=0, eos_token_id=1,
+        )).eval()
+        reader = MapReader(base, MapMemoryEncoder(2, 64, 2, 16, 8),
+                           heads=2, head_dim=16).eval()
+        timeline = MapTimeline(
+            snapshots=MapBatch(
+                vectors=torch.tensor([
+                    [[0., 0.], [1., 0.], [0., 1.]],
+                    [[1., 0.], [0., 1.], [1., 1.]],
+                ]),
+                roles=torch.tensor([[0, 1, 2], [0, 1, 2]]),
+                candidate_ids=torch.tensor([[0, 0, 1], [0, 0, 1]]),
+                valid=torch.ones((2, 3), dtype=torch.bool),
+            ),
+            token_map_ids=torch.tensor([[0, 0, 1, 1]]),
+        )
+        tokens = torch.tensor([[2, 3, 4, 5]])
+        logits = reader(timeline, input_ids=tokens, use_cache=False).logits
+        self.assertEqual(tuple(logits.shape), (1, 4, 128))
+        generated = reader.generate(timeline, input_ids=tokens,
+                                    max_new_tokens=2, do_sample=False)
+        self.assertEqual(tuple(generated.shape), (1, 6))
 
 
 if __name__ == "__main__":

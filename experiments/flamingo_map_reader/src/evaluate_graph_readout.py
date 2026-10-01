@@ -43,7 +43,7 @@ def fixed_turns(config, manifest, source_root, splits=("validation", "reserved")
             yield "reserved", graph_id, case["id"], step, opening + "\n\n" + turn_prompt(step, [int(case["start"])])
 
 
-def generate_answer(reader, tokenizer, step, user_text, config, device):
+def generate_answer(reader, tokenizer, step, user_text, config, device, maximum_new_tokens):
     from transformers import StoppingCriteria, StoppingCriteriaList
 
     class ControlBoundary(StoppingCriteria):
@@ -63,7 +63,7 @@ def generate_answer(reader, tokenizer, step, user_text, config, device):
     with torch.inference_mode(), context:
         output = reader.generate(timeline, input_ids=torch.tensor([prefix], device=device),
             attention_mask=torch.ones((1, len(prefix)), dtype=torch.long, device=device),
-            max_new_tokens=min(config["evaluation"]["action_max_new_tokens"],
+            max_new_tokens=min(maximum_new_tokens, config["evaluation"]["action_max_new_tokens"],
                                config["maximum_sequence_tokens"] - len(prefix)),
             do_sample=False, use_cache=True, pad_token_id=tokenizer.eos_token_id,
             stopping_criteria=StoppingCriteriaList([ControlBoundary(len(prefix))]))
@@ -111,7 +111,8 @@ def main():
     with (args.out / "first_turns.jsonl").open("w", encoding="utf-8") as handle:
         for split, graph_id, case_id, step, user_text in fixed_turns(
                 config, manifest, args.source_root, args.splits):
-            answer = generate_answer(reader, tokenizer, step, user_text, config, device)
+            answer = generate_answer(reader, tokenizer, step, user_text, config, device,
+                                     gate["maximum_new_tokens"])
             score = score_relationships(step, answer)
             observed[split] += 1
             for group in (split, f"{split}:{graph_id}"):

@@ -1,11 +1,15 @@
 import unittest
 from types import SimpleNamespace
 
+import torch
+
+from experiments.flamingo_map_reader.src.evaluate_graph_readout import generate_answer
 from experiments.flamingo_map_reader.src.relations import parse_ranking, score_relationships
 from experiments.flamingo_map_reader.src.graph import graph_step
 from experiments.flamingo_map_reader.src.sft import decision_text
 from experiments.flamingo_map_reader.src.summarize_graph_eval import score_rollout_relationships
 from test_graph import line_graph
+from test_graph_eval import ByteTokenizer
 
 
 class RelationshipTests(unittest.TestCase):
@@ -69,6 +73,23 @@ class RelationshipTests(unittest.TestCase):
         row["trace"][0]["candidate_destinations"] = [99]
         with self.assertRaises(ValueError):
             score_rollout_relationships(row, environment, qmap, case, seed=1)
+
+    def test_fixed_turn_generation_obeys_readout_budget(self):
+        class Reader:
+            def generate(self, timeline, input_ids, **kwargs):
+                self.maximum_new_tokens = kwargs["max_new_tokens"]
+                answer = list(b"<action>1</action>")
+                return torch.cat((input_ids,
+                                  torch.tensor([answer], device=input_ids.device)), dim=1)
+
+        environment, qmap = line_graph()
+        step = graph_step(environment, qmap, 0, 1, executed_path=[0])
+        reader = Reader()
+        answer = generate_answer(reader, ByteTokenizer(), step, "hello",
+            {"maximum_sequence_tokens": 2000,
+             "evaluation": {"action_max_new_tokens": 2048}}, torch.device("cpu"), 512)
+        self.assertEqual(answer, "<action>1</action>")
+        self.assertEqual(reader.maximum_new_tokens, 512)
 
 
 if __name__ == "__main__":

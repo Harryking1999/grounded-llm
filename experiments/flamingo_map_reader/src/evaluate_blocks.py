@@ -62,6 +62,7 @@ def rollout(reader, tokenizer, qmap, record, config, device):
         context = torch.autocast("cuda", dtype=torch.bfloat16) if device.type == "cuda" else nullcontext()
         with torch.inference_mode(), context:
             output = reader.generate(timeline, input_ids=torch.tensor([prefix], device=device),
+                attention_mask=torch.ones((1, len(prefix)), dtype=torch.long, device=device),
                 max_new_tokens=limit, do_sample=False, use_cache=True,
                 pad_token_id=tokenizer.eos_token_id,
                 stopping_criteria=StoppingCriteriaList([ControlBoundary(len(prefix))]))

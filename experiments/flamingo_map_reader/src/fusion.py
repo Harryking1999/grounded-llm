@@ -2,6 +2,7 @@
 
 from collections.abc import Iterator
 from contextlib import contextmanager
+from math import atanh
 
 import torch
 from torch import Tensor, nn
@@ -117,10 +118,13 @@ class MapReader(nn.Module):
         head_dim: int = 64,
         every_n_layers: int = 1,
         decoder_path: str = "model.layers",
+        fixed_gate_tanh: float | None = None,
     ) -> None:
         super().__init__()
         if every_n_layers <= 0:
             raise ValueError("every_n_layers must be positive")
+        if fixed_gate_tanh is not None and not 0 < fixed_gate_tanh < 1:
+            raise ValueError("fixed_gate_tanh must be between zero and one")
         base_model.requires_grad_(False)
         self.base_model = base_model
         self.memory_encoder = memory_encoder
@@ -139,6 +143,9 @@ class MapReader(nn.Module):
                 adapter = GatedMapCrossAttention(
                     memory_encoder.combine.out_features, heads, head_dim,
                 )
+                if fixed_gate_tanh is not None:
+                    adapter.gate.data.fill_(atanh(fixed_gate_tanh))
+                    adapter.gate.requires_grad_(False)
                 layer = ConditionedDecoderLayer(layer, adapter)
                 self.conditioned_layers.append(layer)
             wrapped.append(layer)

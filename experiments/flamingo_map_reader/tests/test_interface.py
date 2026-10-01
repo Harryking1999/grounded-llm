@@ -69,6 +69,26 @@ class InterfaceTest(unittest.TestCase):
         self.assertTrue(all(layer.map_attention.gate.grad is not None
                             for layer in reader.conditioned_layers))
 
+    def test_fixed_gate_trains_map_reader_from_first_backward(self):
+        torch.manual_seed(7)
+        reader = MapReader(FakeLM(), MapMemoryEncoder(2, 8, 4, 5, 3),
+                           heads=2, fixed_gate_tanh=0.1)
+        hidden = torch.randn(1, 2, 8)
+        reader(map_batch=batch(), hidden_states=hidden).square().sum().backward()
+        for layer in reader.conditioned_layers:
+            gate = layer.map_attention.gate
+            self.assertFalse(gate.requires_grad)
+            self.assertAlmostEqual(float(torch.tanh(gate)), 0.1, places=6)
+            self.assertIsNone(gate.grad)
+        self.assertGreater(float(reader.memory_encoder.project.weight.grad.norm()), 0)
+        self.assertGreater(float(reader.conditioned_layers[0].map_attention.to_key_value.weight.grad.norm()), 0)
+
+    def test_fixed_gate_rejects_zero_and_saturation(self):
+        for value in (0, 1):
+            with self.subTest(value=value), self.assertRaisesRegex(ValueError, "fixed_gate_tanh"):
+                MapReader(FakeLM(), MapMemoryEncoder(2, 8, 4, 5, 3),
+                          heads=2, fixed_gate_tanh=value)
+
     def test_layer_interval_and_adapter_checkpoint(self):
         first = MapReader(FakeLM(), MapMemoryEncoder(2, 8, 4, 5, 3), 2, every_n_layers=2)
         self.assertEqual(len(first.conditioned_layers), 1)

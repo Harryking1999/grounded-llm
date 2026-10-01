@@ -25,7 +25,8 @@ def build_reader(base, config):
                               spec["maximum_candidates"], spec["projection_dim"],
                               spec["role_and_id_dim"])
     return MapReader(base, memory, spec["attention_heads"], spec["attention_head_dim"],
-                      spec["cross_attention_every_n_layers"])
+                      spec["cross_attention_every_n_layers"],
+                      fixed_gate_tanh=spec.get("fixed_gate_tanh"))
 
 
 def to_device(timeline, device):

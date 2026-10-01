@@ -51,6 +51,8 @@ python -m experiments.flamingo_map_reader.src.evaluate_graph_readout \
 
 针对原权重读出失败，另备[关系 token 加权寻路配置](configs/pilot_path256_relation_weighted.json)作受控消融。它保留原整题数据、模型结构和文本格式，只在 assistant CE 中提高排序式的可变部分及 `<action>` 编号的权重；固定句式仍按普通权重计算。该配置须单独 `prepare` manifest、从新初始化训练并通过相同读出门槛评测，不能与原 checkpoint 续接或混为一次运行。代码同时适用于积木，但现有积木训练仍按已提交的原合同执行。
 
+[固定 gate 寻路配置](configs/pilot_path256_fixed_gate.json)只将 cross-attention gate 固定为 `tanh(g)=0.1`，保持原寻路的普通整题 SFT、地图与训练超参数。它使投影和 cross-attention 从第一步就收到梯度，用于检验零 gate 初始化的优化障碍。独立准备 manifest 和训练 checkpoint，按训练、验证、保留三组的固定首步关系评测，再决定闭环评测。固定值是受控对照，不能单凭 gate 大小声称地图被使用。
+
 最小正确性检查：
 
 ```bash

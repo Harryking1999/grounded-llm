@@ -6,6 +6,7 @@ from contextlib import contextmanager
 import torch
 from torch import Tensor, nn
 from torch.nn import functional as F
+from torch.nn.utils.rnn import pad_sequence
 
 from .memory import MapBatch, MapMemoryEncoder, MapTimeline
 
@@ -151,8 +152,10 @@ class MapReader(nn.Module):
         if getattr(self.base_model, "is_gradient_checkpointing", False):
             raise RuntimeError("gradient checkpointing needs map conditioning during backward")
         if isinstance(batch, MapTimeline):
-            memory = self.memory_encoder(batch.snapshots).unsqueeze(0)
-            valid = batch.snapshots.valid.unsqueeze(0)
+            batch.validate(self.memory_encoder.max_candidates, batch.token_map_ids.shape[1])
+            counts = batch.snapshot_counts or (batch.snapshots.vectors.shape[0],)
+            memory = pad_sequence(self.memory_encoder(batch.snapshots).split(counts), batch_first=True)
+            valid = pad_sequence(batch.snapshots.valid.split(counts), batch_first=True)
             token_map_ids = batch.token_map_ids
         else:
             memory = self.memory_encoder(batch)

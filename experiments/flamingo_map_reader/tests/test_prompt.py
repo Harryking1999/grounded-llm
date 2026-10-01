@@ -17,6 +17,7 @@ class PromptTest(unittest.TestCase):
                                  neighbor_order={0: [1], 1: [2, 0], 2: [1]})
         self.assertEqual(initial,
             "Find a valid path from node 1 to node 2 in this undirected graph, as short as you can.\n"
+            "Reaching the goal is the first priority; among valid solutions, prefer fewer moves.\n"
             "Use the listed edges and visit each node at most once.\n\n"
             "Neighbors:\n2: 1\n0: 1\n1: 2, 0")
         self.assertNotIn("<action>", initial)
@@ -27,8 +28,8 @@ class PromptTest(unittest.TestCase):
             self.assertIn(f"{index}: 1 -> {destination}", turn)
         self.assertNotIn("map distance", turn.lower())
         self.assertNotIn("Goal node:", turn)
-        self.assertIn("<done/>", turn)
-        self.assertIn("<action>i</action>", turn)
+        self.assertNotIn("<done/>", turn)
+        self.assertNotIn("<action>", turn)
 
     def test_rejects_path_and_graph_mismatch(self):
         environment, qmap = line_graph()

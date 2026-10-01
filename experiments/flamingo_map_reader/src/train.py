@@ -1,0 +1,220 @@
+"""Standard HF Trainer SFT with a map-aware collator and adapter-only saves."""
+
+from argparse import ArgumentParser
+from dataclasses import replace
+import json
+from pathlib import Path
+
+import torch
+from torch.utils.data import Dataset
+from transformers import Trainer, TrainerCallback, TrainingArguments, set_seed
+
+from .blocks import FrozenBoardMap
+from .blocks_data import demonstration_from_record
+from .data import demonstration_from_record as graph_demonstration_from_record, load_graph
+from .fusion import MapReader
+from .graph import batch_maps
+from .memory import MapBatch, MapMemoryEncoder, MapTimeline
+from .transcript import encode_trajectory
+
+
+def build_reader(base, config):
+    spec = config["map"]
+    memory = MapMemoryEncoder(spec["state_dim"], base.config.hidden_size,
+                              spec["maximum_candidates"], spec["projection_dim"],
+                              spec["role_and_id_dim"])
+    return MapReader(base, memory, spec["attention_heads"], spec["attention_head_dim"],
+                      spec["cross_attention_every_n_layers"])
+
+
+def to_device(timeline, device):
+    maps = timeline.snapshots
+    return replace(timeline, snapshots=MapBatch(
+        maps.vectors.to(device), maps.roles.to(device),
+        maps.candidate_ids.to(device), maps.valid.to(device)),
+        token_map_ids=timeline.token_map_ids.to(device))
+
+
+def collate_examples(examples, pad_token_id):
+    """Pad complete SFT examples; keep each example's own map timeline."""
+    width = max(len(encoded.input_ids) for encoded, _ in examples)
+    input_ids, labels, attention_mask, map_ids, counts, steps = [], [], [], [], [], []
+    for encoded, example_steps in examples:
+        padding = width - len(encoded.input_ids)
+        input_ids.append(encoded.input_ids + [pad_token_id] * padding)
+        labels.append(encoded.labels + [-100] * padding)
+        attention_mask.append([1] * len(encoded.input_ids) + [0] * padding)
+        map_ids.append(encoded.token_map_ids + [len(example_steps) - 1] * padding)
+        counts.append(len(example_steps))
+        steps.extend(example_steps)
+    timeline = MapTimeline(batch_maps(steps), torch.tensor(map_ids), tuple(counts))
+    timeline.validate(max(len(step.candidate_actions) for step in steps), width)
+    return timeline, {"input_ids": torch.tensor(input_ids), "labels": torch.tensor(labels),
+                       "attention_mask": torch.tensor(attention_mask)}
+
+
+class SFTDataset(Dataset):
+    def __init__(self, records, qmap, tokenizer, config, source_root=None):
+        self.records, self.qmap, self.tokenizer, self.config = records, qmap, tokenizer, config
+        self.source_root = source_root
+        self.graphs = {}
+
+    def __len__(self):
+        return len(self.records)
+
+    def __getitem__(self, index):
+        record = self.records[index]
+        if self.config["task"] == "blocks":
+            demo = demonstration_from_record(self.qmap, record,
+                self.config["maximum_demonstration_actions"])
+        else:
+            graph_id = record["graph_id"]
+            if graph_id not in self.graphs:
+                self.graphs[graph_id] = load_graph(self.source_root, graph_id)[:2]
+            demo = graph_demonstration_from_record(*self.graphs[graph_id], record)
+        encoded = encode_trajectory(demo, self.tokenizer, self.config["maximum_sequence_tokens"],
+                                     chat_template_kwargs=self.config.get("chat_template_kwargs", {}))
+        return encoded, [turn.step for turn in demo.turns]
+
+
+class MapCollator:
+    def __init__(self, pad_token_id):
+        self.pad_token_id = pad_token_id
+
+    def __call__(self, examples):
+        timeline, inputs = collate_examples(examples, self.pad_token_id)
+        return dict(inputs, map_batch=timeline)
+
+
+class EpochCheckpoint(TrainerCallback):
+    """Request saves after each tenth of an epoch, at optimizer boundaries."""
+    def __init__(self, fraction):
+        self.fraction = fraction
+        self.bucket = 0
+
+    def on_train_begin(self, args, state, control, **kwargs):
+        self.bucket = int(((state.epoch or 0) + 1e-8) / self.fraction)
+
+    def on_step_end(self, args, state, control, **kwargs):
+        bucket = int(((state.epoch or 0) + 1e-8) / self.fraction)
+        if bucket > self.bucket:
+            control.should_save = True
+            self.bucket = bucket
+        return control
+
+    def on_epoch_end(self, args, state, control, **kwargs):
+        control.should_save = True
+        return control
+
+
+class JsonLog(TrainerCallback):
+    def __init__(self, path):
+        self.path = Path(path)
+
+    def on_log(self, args, state, control, logs=None, **kwargs):
+        if state.is_world_process_zero:
+            self.path.parent.mkdir(parents=True, exist_ok=True)
+            with self.path.open("a", encoding="utf-8") as handle:
+                handle.write(json.dumps(dict(logs or {}, step=state.global_step)) + "\n")
+
+
+class MapSFTTrainer(Trainer):
+    # The base LM computes its normal next-token CE from labels. Trainer owns
+    # batching, backward, optimizer/scheduler, RNG, and dataloader resumption.
+    def __init__(self, *args, contract, **kwargs):
+        self.contract = contract
+        super().__init__(*args, **kwargs)
+        self.model_accepts_loss_kwargs = False
+
+    def _prepare_input(self, data):
+        if isinstance(data, MapTimeline):
+            return to_device(data, self.args.device)
+        return super()._prepare_input(data)
+
+    def _save(self, output_dir=None, state_dict=None):
+        output = Path(output_dir or self.args.output_dir)
+        output.mkdir(parents=True, exist_ok=True)
+        torch.save({"adapter": self.model.adapter_state_dict(), "contract": self.contract},
+                   output / "adapter.pt")
+        torch.save(self.args, output / "training_args.bin")
+
+    def _load_from_checkpoint(self, resume_from_checkpoint, model=None):
+        saved = torch.load(Path(resume_from_checkpoint) / "adapter.pt",
+                           map_location="cpu", weights_only=True)
+        if saved["contract"] != self.contract:
+            raise ValueError("Checkpoint and current SFT contracts differ")
+        (model or self.model).load_adapter_state_dict(saved["adapter"])
+
+
+def main():
+    parser = ArgumentParser()
+    parser.add_argument("--config", type=Path, required=True)
+    parser.add_argument("--manifest", type=Path, required=True)
+    parser.add_argument("--q-checkpoint", type=Path)
+    parser.add_argument("--source-root", type=Path)
+    parser.add_argument("--model-path", type=Path,
+                        help="Local copy of the model named in the contract")
+    parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument("--resume", type=Path)
+    parser.add_argument("--batch-size", type=int, required=True,
+                        help="Measured actual per-device batch size; no gradient accumulation")
+    args = parser.parse_args()
+    config = json.loads(args.config.read_text(encoding="utf-8"))
+    manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
+    if manifest["config"] != config:
+        raise ValueError("Manifest and training configurations differ")
+    task = config["task"]
+    if task == "blocks":
+        if args.q_checkpoint is None or Path(manifest["q_checkpoint"]).resolve() != args.q_checkpoint.resolve():
+            raise ValueError("SFT labels require the same frozen Q checkpoint")
+    elif task == "graph":
+        if args.source_root is None or Path(manifest["source_root"]).resolve() != args.source_root.resolve():
+            raise ValueError("Graph SFT requires its frozen source graphs")
+    else:
+        raise ValueError(f"Unsupported map-reader task: {task}")
+    if args.out.exists() and args.resume is None:
+        raise FileExistsError(args.out)
+    records = [r for r in manifest["records"] if r["split"] == "train"]
+    if not records or args.batch_size <= 0:
+        raise ValueError("Training needs examples and a positive batch size")
+    contract = {"config": config, "manifest": str(args.manifest.resolve()),
+                "map_source": str((args.q_checkpoint if task == "blocks" else args.source_root).resolve()),
+                "model_source": str(args.model_path.resolve()) if args.model_path else config["model"],
+                "batch_size": args.batch_size}
+    training = config["training"]
+    set_seed(config["seed"])
+    from transformers import AutoModelForCausalLM, AutoTokenizer
+    model_source = str(args.model_path) if args.model_path else config["model"]
+    tokenizer = AutoTokenizer.from_pretrained(model_source)
+    base = AutoModelForCausalLM.from_pretrained(model_source,
+        torch_dtype=torch.bfloat16 if torch.cuda.is_available() else torch.float32)
+    base.config.use_cache = False
+    reader = build_reader(base, config)
+    qmap = FrozenBoardMap.load(args.q_checkpoint) if task == "blocks" else None
+    dataset = SFTDataset(records, qmap, tokenizer, config, args.source_root)
+    arguments = TrainingArguments(
+        output_dir=str(args.out / "models"), logging_dir=str(args.out / "logs"),
+        per_device_train_batch_size=args.batch_size, gradient_accumulation_steps=1,
+        num_train_epochs=training["epochs"], learning_rate=training["learning_rate"],
+        weight_decay=training["weight_decay"], warmup_ratio=training["warmup_fraction"],
+        lr_scheduler_type="constant_with_warmup", optim="adamw_torch",
+        max_grad_norm=training["gradient_clip_norm"], bf16=torch.cuda.is_available(),
+        remove_unused_columns=False, label_names=["labels"],
+        save_strategy="no", logging_steps=1, report_to=[],
+        dataloader_num_workers=0, seed=config["seed"], data_seed=config["seed"],
+    )
+    trainer = MapSFTTrainer(model=reader, args=arguments, train_dataset=dataset,
+        data_collator=MapCollator(tokenizer.pad_token_id if tokenizer.pad_token_id is not None
+                                  else tokenizer.eos_token_id), contract=contract,
+        callbacks=[EpochCheckpoint(config["checkpoint"]["every_epoch_fraction"]),
+                   JsonLog(args.out / "logs/train.jsonl")])
+    args.out.mkdir(parents=True, exist_ok=True)
+    (args.out / "config.json").write_text(json.dumps(contract, indent=2) + "\n")
+    result = trainer.train(resume_from_checkpoint=str(args.resume) if args.resume else None)
+    trainer.save_model(str(args.out / "models/final"))
+    (args.out / "results").mkdir(exist_ok=True)
+    (args.out / "results/summary.json").write_text(json.dumps(result.metrics, indent=2) + "\n")
+
+
+if __name__ == "__main__":
+    main()

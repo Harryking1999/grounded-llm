@@ -16,6 +16,7 @@ def main() -> None:
     with args.config.open(encoding="utf-8") as handle:
         config = json.load(handle)
     manifest = build_manifest(args.source_root, config)
+    manifest["config"] = config
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with args.output.open("w", encoding="utf-8") as handle:
         json.dump(manifest, handle, indent=2)

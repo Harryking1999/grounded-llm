@@ -48,19 +48,24 @@ class MapBatch:
 
 @dataclass(frozen=True)
 class MapTimeline:
-    """Map snapshots for one trajectory and the snapshot assigned to each token."""
+    """Concatenated snapshots, trajectory counts, and local per-token turn IDs."""
 
     snapshots: MapBatch  # snapshot dimension is MapBatch's batch dimension
-    token_map_ids: Tensor  # [1, text_length], zero-based snapshot indices
+    token_map_ids: Tensor  # [batch, text_length], local zero-based turn indices
+    snapshot_counts: tuple[int, ...] | None = None
 
     def validate(self, max_candidates: int, text_length: int) -> None:
         self.snapshots.validate(max_candidates)
         count = self.snapshots.vectors.shape[0]
-        if self.token_map_ids.shape != (1, text_length):
+        counts = self.snapshot_counts or (count,)
+        if min(counts) <= 0 or sum(counts) != count:
+            raise ValueError("snapshot counts must partition the map snapshots")
+        if self.token_map_ids.shape != (len(counts), text_length):
             raise ValueError("token_map_ids must match the text length")
         if self.token_map_ids.dtype != torch.long:
             raise TypeError("token_map_ids must be int64")
-        if not torch.all((self.token_map_ids >= 0) & (self.token_map_ids < count)):
+        limits = torch.tensor(counts, device=self.token_map_ids.device)[:, None]
+        if not torch.all((self.token_map_ids >= 0) & (self.token_map_ids < limits)):
             raise ValueError("token_map_ids refers to a missing map snapshot")
 
 

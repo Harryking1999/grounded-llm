@@ -7,7 +7,10 @@ import numpy as np
 from .graph import GraphStep
 
 
-INITIAL_TEMPLATE = """Find a valid path from node {start} to node {goal} in this undirected graph, as short as you can.
+from .text import task_opening
+
+
+INITIAL_TEMPLATE = """{opening}
 Use the listed edges and visit each node at most once.
 
 Neighbors:
@@ -20,8 +23,6 @@ Actual executed path: [{path}]
 Legal next moves:
 {candidates}
 Candidate numbers may change between turns; use only the numbers above.
-If the current node is the goal, summarize the actual executed path and end with <done/>.
-Otherwise, report the current-to-goal distance and each candidate successor's distance to the goal, rank candidates from closest to farthest, explain your choice, and end with <action>i</action>.
 [/Environment update]"""
 
 
@@ -48,7 +49,8 @@ def initial_prompt(
         if sorted(neighbors) != actual:
             raise ValueError("presented neighbors disagree with the graph")
         rows.append(f"{node}: {', '.join(map(str, neighbors))}")
-    return INITIAL_TEMPLATE.format(adjacency="\n".join(rows), start=start, goal=goal)
+    return INITIAL_TEMPLATE.format(adjacency="\n".join(rows),
+        opening=task_opening(f"Find a valid path from node {start} to node {goal} in this undirected graph, as short as you can."))
 
 
 def turn_prompt(step: GraphStep, executed_path: Sequence[int]) -> str:

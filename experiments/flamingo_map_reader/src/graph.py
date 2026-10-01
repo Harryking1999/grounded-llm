@@ -11,6 +11,7 @@ from experiments.external_map_interface.src.q_map import GraphQMap
 from experiments.external_map_interface.src.transitions import GraphEnvironment
 
 from .memory import CURRENT, GOAL, SUCCESSOR, MapBatch, MapTimeline
+from .blocks import BlocksStep
 
 
 @dataclass(frozen=True)
@@ -85,9 +86,9 @@ def graph_step(
     )
 
 
-def batch_maps(steps: list[GraphStep]) -> MapBatch:
+def batch_maps(steps: list[GraphStep | BlocksStep]) -> MapBatch:
     if not steps:
-        raise ValueError("cannot batch zero graph steps")
+        raise ValueError("cannot batch zero map steps")
     return MapBatch(
         vectors=pad_sequence([s.map_batch.vectors[0] for s in steps], batch_first=True),
         roles=pad_sequence([s.map_batch.roles[0] for s in steps], batch_first=True),
@@ -97,7 +98,7 @@ def batch_maps(steps: list[GraphStep]) -> MapBatch:
     )
 
 
-def timeline_maps(steps: list[GraphStep], token_map_ids: Sequence[int]) -> MapTimeline:
+def timeline_maps(steps: list[GraphStep | BlocksStep], token_map_ids: Sequence[int]) -> MapTimeline:
     """Keep every turn's map; each text token reads only its assigned turn."""
     timeline = MapTimeline(
         snapshots=batch_maps(steps),

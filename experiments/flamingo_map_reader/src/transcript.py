@@ -14,7 +14,7 @@ class EncodedTrajectory:
 
 
 def encode_trajectory(demonstration: Demonstration, tokenizer,
-                      max_tokens: int) -> EncodedTrajectory:
+                      max_tokens: int, *, chat_template_kwargs=None) -> EncodedTrajectory:
     """Mask environment text; every token reads the map of its own turn."""
     if not demonstration.success or not demonstration.turns:
         raise ValueError("SFT requires a complete successful trajectory")
@@ -23,16 +23,19 @@ def encode_trajectory(demonstration: Demonstration, tokenizer,
     labels: list[int] = []
     map_ids: list[int] = []
     answer_tokens = 0
+    template_kwargs = chat_template_kwargs or {}
     for turn_index, turn in enumerate(demonstration.turns):
         messages.append({"role": "user", "content": turn.user_text})
         prefix = tokenizer.apply_chat_template(
             messages, tokenize=True, add_generation_prompt=True,
+            **template_kwargs,
         )
         if prefix[:len(previous)] != previous:
             raise ValueError("chat template changed an earlier conversation prefix")
         messages.append({"role": "assistant", "content": turn.answer_text})
         complete = tokenizer.apply_chat_template(
             messages, tokenize=True, add_generation_prompt=False,
+            **template_kwargs,
         )
         if complete[:len(prefix)] != prefix:
             raise ValueError("chat template does not preserve the generation prefix")

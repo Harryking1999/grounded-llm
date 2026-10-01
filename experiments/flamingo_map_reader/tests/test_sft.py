@@ -18,10 +18,8 @@ class SFTDataTest(unittest.TestCase):
         self.assertEqual(trajectory.executed_path, (1, 2))
         self.assertEqual(len(trajectory.turns), 2)
         action_turn, final_turn = trajectory.turns
-        self.assertIn("Current-to-goal map distance: 1.0000.", action_turn.answer_text)
-        self.assertIn("Candidate successor-to-goal map distances: 1=2.0000; 2=0.0000.",
-                      action_turn.answer_text)
-        self.assertIn("Ranking from closest to farthest: 2, 1.", action_turn.answer_text)
+        self.assertNotIn("1.0000", action_turn.answer_text)
+        self.assertIn("closest to farthest: 2 < current < 1.", action_turn.answer_text)
         self.assertTrue(action_turn.answer_text.endswith("<action>2</action>"))
         self.assertTrue(final_turn.step.done)
         self.assertEqual(final_turn.step.current, 2)
@@ -37,7 +35,7 @@ class SFTDataTest(unittest.TestCase):
         self.assertEqual(len(trajectory.turns), 1)
         self.assertIsNone(trajectory.turns[0].chosen_id)
         self.assertIn("Executed actions: (none).", trajectory.turns[0].answer_text)
-        self.assertIn("Summary: Reached node 1 after no executed moves.",
+        self.assertIn("Summary: Reached the goal after 0 executed moves.",
                       trajectory.turns[0].answer_text)
 
     def test_bad_greedy_choice_can_end_at_dead_end(self):

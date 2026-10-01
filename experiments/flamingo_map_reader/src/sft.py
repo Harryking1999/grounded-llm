@@ -1,4 +1,4 @@
-"""Build map-grounded, per-turn SFT text from actual graph trajectories."""
+"""Shared ranking-only targets and graph SFT examples."""
 
 from dataclasses import dataclass
 from collections.abc import Mapping, Sequence
@@ -9,28 +9,32 @@ from experiments.external_map_interface.src.q_map import GraphQMap
 from experiments.external_map_interface.src.transitions import GraphEnvironment
 
 from .graph import GraphStep, graph_step
+from .blocks import BlocksStep
 from .prompt import initial_prompt, turn_prompt
+from .text import terminal_text as shared_terminal_text
 
 
 def _same_distance(left: float, right: float) -> bool:
     return bool(np.isclose(left, right, rtol=1e-10, atol=1e-12))
 
 
-def _ranking(step: GraphStep) -> tuple[str, tuple[int, ...]]:
-    ordered = sorted(enumerate(step.candidate_map_distances, 1),
+def _ranking(step) -> tuple[str, tuple[int, ...]]:
+    distances = (step.current_map_distance, *step.candidate_map_distances)
+    ordered = sorted(enumerate(distances),
                      key=lambda item: (item[1], item[0]))
     groups: list[list[int]] = []
     for local_id, distance in ordered:
         if groups and _same_distance(distance,
-                                     step.candidate_map_distances[groups[-1][0] - 1]):
+                                     distances[groups[-1][0]]):
             groups[-1].append(local_id)
         else:
             groups.append([local_id])
-    return ", ".join(" = ".join(map(str, group)) for group in groups), tuple(
-        local_id for group in groups for local_id in group)
+    names = lambda group: " = ".join("current" if i == 0 else str(i) for i in group)
+    return " < ".join(names(group) for group in groups), tuple(
+        local_id for group in groups for local_id in group if local_id != 0)
 
 
-def decision_text(step: GraphStep, chosen_id: int) -> str:
+def decision_text(step, chosen_id: int) -> str:
     if step.done or not step.candidate_actions:
         raise ValueError("action supervision requires a nonterminal step with candidates")
     if chosen_id not in step.map_minimal_candidates:
@@ -40,24 +44,18 @@ def decision_text(step: GraphStep, chosen_id: int) -> str:
     for position, local_id in enumerate(ordered_ids):
         distance = step.candidate_map_distances[local_id - 1]
         if _same_distance(distance, step.current_map_distance):
-            comparison = "at the same map distance as the current node" if position == 0 else "at the same map distance"
+            comparison = "at the same map distance as the current state"
         elif distance < step.current_map_distance:
-            comparison = "closer to the goal than the current node" if position == 0 else "closer"
+            comparison = "closer to the goal than the current state"
         else:
-            comparison = "farther from the goal than the current node" if position == 0 else "farther"
+            comparison = "farther from the goal than the current state"
         subject = "Candidate" if position == 0 else "candidate"
         relation.append(f"{subject} {local_id} is {comparison}")
-    displayed = "; ".join(
-        f"{local_id}={distance:.4f}"
-        for local_id, distance in enumerate(step.candidate_map_distances, 1)
-    )
     return "\n".join([
-        "The current node has not reached the goal.",
-        f"Current-to-goal map distance: {step.current_map_distance:.4f}.",
-        f"Candidate successor-to-goal map distances: {displayed}.",
-        f"Ranking from closest to farthest: {ranking}.",
+        "The current state has not reached the goal.",
+        f"Map-distance ranking to the goal, closest to farthest: {ranking}.",
         "; ".join(relation) + ".",
-        f"Choose candidate {chosen_id} because its predicted successor has the smallest map distance.",
+        f"Choose candidate {chosen_id} because its successor has the smallest map distance among the candidates.",
         f"<action>{chosen_id}</action>",
     ])
 
@@ -70,22 +68,14 @@ def terminal_text(executed_path: Sequence[int]) -> str:
         f"move({source},{destination})"
         for source, destination in zip(executed_path[:-1], executed_path[1:])
     ) or "(none)"
-    count_text = "no executed moves" if moves == 0 else (
-        "one executed move" if moves == 1 else f"{moves} executed moves"
-    )
-    return "\n".join([
-        "The current node is the goal.",
-        f"Executed actions: {actions}.",
-        f"Summary: Reached node {executed_path[-1]} after {count_text}.",
-        "<done/>",
-    ])
+    return shared_terminal_text("node", actions, moves, "moves")
 
 
 @dataclass(frozen=True)
 class SupervisedTurn:
     user_text: str
     answer_text: str
-    step: GraphStep
+    step: GraphStep | BlocksStep
     executed_path: tuple[int, ...]
     chosen_id: int | None
 

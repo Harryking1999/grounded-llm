@@ -76,8 +76,8 @@ Blocks 共 768 次，511 次触及预算；至少 343 条已确认非法，6 条
 
 ## 有序 TODO
 
-1. **双任务共用接口**：积木的共享编码器、合法后继、整题 SFT 与 Trainer 已实现；寻路原有 Q/V、题集与文本现接入同一训练入口，并补闭环评测。分别使用 [积木配置](../experiments/flamingo_map_reader/configs/pilot_blocks.json)与[寻路配置](../experiments/flamingo_map_reader/configs/pilot_path256.json)。两项正式训练尚无结果。
-2. **开发机 40072 执行**：积木已有 8,000 道训练题与三组各 200 道测试题；全量审计发现原 16k 上限有两题超限，当前两项合同将整题上限提高到可容纳这些题的范围，待复核。寻路十步合同为四图共 256 训练／64 验证，待生成 manifest 并核对计数与剔除量。随后测实际 batch、运行最小 smoke，再启动各自正式训练与闭环评测，分别报告地图贪心参照和模型结果。
+1. **双任务分开训练**：积木与寻路共用代码和训练规则，但各自训练投影与 cross-attention、保存独立权重。分别使用 [积木配置](../experiments/flamingo_map_reader/configs/pilot_blocks.json)与[寻路配置](../experiments/flamingo_map_reader/configs/pilot_path256.json)。两项正式训练已在开发机 40072 启动，尚无正式结果；下一步检查训练完成情况并做各自闭环评测。
+2. **开发机 40072 执行**：积木 manifest 含 8,000 道训练题与三组各 200 道测试题，整题最长 16,852 token；寻路十步 manifest 含四图 256 道训练／64 道验证题，最长 11,851 token，均低于 17,408 token 合同上限。相同训练代码分别在 GPU 0、1 运行，输出为 `runs/path10_sft_20261001` 与 `runs/blocks_sft_20261001`。实际双样本反向传播在 A100 80GB 上显存不足；含长样本的 batch=1 smoke 完成两轮前后向及 checkpoint 保存，正式运行据此使用 batch=1、不做梯度累积。寻路冻结地图贪心在原五图 120 题上全部到达，各图最短路数为 14、14、13、13、15；模型结果待评测。
 
 已有共享积木 Q 位于 `codex/blocks-multigoal` 分支；本接口采用 `tree_1000_132f5a1/best.pt`，当前 Q 不再是下文历史试验中的单棋盘查表。汉诺塔留待后续。
 

@@ -35,6 +35,19 @@ python -m experiments.flamingo_map_reader.src.train \
 
 续训在同一训练命令上添加 `--resume .../models/checkpoint-N`。图闭环评测入口为 `src.evaluate_graph`，积木为 `src.evaluate_blocks`；两者都读取对应 manifest、adapter checkpoint 与原始地图。结果保存逐题实际动作和模型回答及紧凑 `results/summary.json`。图评测使用保留的原五图题集，积木按三组未见状态统计。
 
+寻路另有独立的首步地图关系评测，使用[读出门槛](configs/path_readout_gate.json)。它在 64 条验证题和五图 120 条保留题的固定首状态生成一次回答，从冻结 Q/V 重新计算 `current` 与每个候选的远近，报告排序格式、逐对关系、完整排序、最近候选，以及动作是否遵循排序。验证题沿用训练示范的首轮文本和候选编号；保留题沿用闭环评测的首轮文本和编号。两个集合分别满足门槛，才称当前权重通过首步距离关系读出；这仍不代表整题规划成功。保留题闭环轨迹也可由 `src.summarize_graph_eval` 重放并按首轮／后续轮统计同样指标，用来定位后续状态的错误。
+
+```bash
+python -m experiments.flamingo_map_reader.src.evaluate_graph_readout \
+  --config experiments/flamingo_map_reader/configs/pilot_path256.json \
+  --gate-config experiments/flamingo_map_reader/configs/path_readout_gate.json \
+  --manifest runs/flamingo_map_reader/data/path_manifest.json \
+  --source-root GRAPH_SOURCE_ROOT --adapter-checkpoint PATH_ADAPTER_PT \
+  --out runs/flamingo_map_reader/path_readout
+```
+
+读出分数是对模型文字的检验；如果分数高，还需交换候选 Q 向量而保持文字不变，检查选择是否随地图变化，才能支持“使用了地图”这一因果解释。
+
 最小正确性检查：
 
 ```bash

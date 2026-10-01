@@ -47,6 +47,7 @@ python -m experiments.flamingo_map_reader.src.evaluate_graph_readout \
 ```
 
 读出分数是对模型文字的检验；如果分数高，还需交换候选 Q 向量而保持文字不变，检查选择是否随地图变化，才能支持“使用了地图”这一因果解释。
+同一入口加 `--splits train` 可对全部训练题首步作诊断；训练题只用于判断是否拟合，不参与上述验证与保留题门槛。
 
 最小正确性检查：
 

@@ -18,17 +18,18 @@ from .text import chat_ids
 from .train import build_reader, to_device
 
 
-def fixed_turns(config, manifest, source_root):
+def fixed_turns(config, manifest, source_root, splits=("validation", "reserved")):
     graphs = {}
     for graph_id in [*config["train_validation_graphs"], config["unseen_test_graph"]]:
         graphs[graph_id] = load_graph(source_root, graph_id)
     for index, record in enumerate(manifest["records"]):
-        if record["split"] != "validation" or record["start"] == record["goal"]:
+        if record["split"] not in splits or record["start"] == record["goal"]:
             continue
         environment, qmap, _ = graphs[record["graph_id"]]
         turn = demonstration_from_record(environment, qmap, record).turns[0]
-        yield "validation", record["graph_id"], f"manifest:{index}", turn.step, turn.user_text
-    for graph_id in [*config["train_validation_graphs"], config["unseen_test_graph"]]:
+        yield record["split"], record["graph_id"], f"manifest:{index}", turn.step, turn.user_text
+    for graph_id in ([*config["train_validation_graphs"], config["unseen_test_graph"]]
+                     if "reserved" in splits else []):
         environment, qmap, suite = graphs[graph_id]
         for case in suite["cases"]:
             if case["start"] == case["goal"]:
@@ -79,6 +80,8 @@ def main():
     parser.add_argument("--adapter-checkpoint", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--device", default="cuda:0")
+    parser.add_argument("--splits", nargs="+", choices=("train", "validation", "reserved"),
+                        default=("validation", "reserved"))
     args = parser.parse_args()
     if args.out.exists():
         raise FileExistsError(args.out)
@@ -106,7 +109,8 @@ def main():
     counts = defaultdict(Counter)
     observed = Counter()
     with (args.out / "first_turns.jsonl").open("w", encoding="utf-8") as handle:
-        for split, graph_id, case_id, step, user_text in fixed_turns(config, manifest, args.source_root):
+        for split, graph_id, case_id, step, user_text in fixed_turns(
+                config, manifest, args.source_root, args.splits):
             answer = generate_answer(reader, tokenizer, step, user_text, config, device)
             score = score_relationships(step, answer)
             observed[split] += 1
@@ -115,8 +119,9 @@ def main():
             handle.write(json.dumps({"split": split, "graph_id": graph_id,
                 "case_id": case_id, "answer": answer, "score": score}) + "\n")
             handle.flush()
-    if observed["validation"] != gate["validation_first_turns"] or observed["reserved"] != gate["reserved_first_turns"]:
-        raise ValueError(f"Unexpected fixed-turn coverage: {dict(observed)}")
+    for split in ("validation", "reserved"):
+        if split in args.splits and observed[split] != gate[f"{split}_first_turns"]:
+            raise ValueError(f"Unexpected {split} fixed-turn coverage: {dict(observed)}")
     summary = relation_summary(counts)
     required = {"valid_ranking_rate": gate["minimum_valid_ranking_rate"],
                 "pairwise_accuracy": gate["minimum_pairwise_accuracy"],
@@ -125,10 +130,10 @@ def main():
         split: {"passed": all(summary[split][metric] >= threshold
                               for metric, threshold in required.items()),
                 "thresholds": required}
-        for split in ("validation", "reserved")
+        for split in ("validation", "reserved") if split in args.splits
     }
     (args.out / "summary.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
-    print(json.dumps({split: summary[split] for split in ("validation", "reserved", "readout_gate")}))
+    print(json.dumps({split: summary[split] for split in (*args.splits, "readout_gate")}))
 
 
 if __name__ == "__main__":

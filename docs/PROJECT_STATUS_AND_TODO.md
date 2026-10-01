@@ -4,7 +4,7 @@
 
 ## 当前主线
 
-将 cognitive map／roadmap 作为外部状态表示。当前主线是[寻路与积木共用的地图读取接口](../experiments/flamingo_map_reader/DESIGN.md)：冻结各自 Q-map 和 Qwen2.5-1.5B-Instruct，训练同构的投影、角色／编号与门控 cross-attention，输入当前、目标及合法后继 Q，输出远近排序和动作。寻路后继取 Q+V；积木由共享编码器编码真实合法后继，位移可写为 V(o,a)=Q(T(o,a))−Q(o)。
+将 cognitive map／roadmap 作为外部状态表示。当前主线是[寻路与积木的地图读取接口](../experiments/flamingo_map_reader/DESIGN.md)：冻结各自 Q-map 和同型号的 Qwen2.5-1.5B-Instruct，**分别训练**同构的投影、角色／编号与门控 cross-attention，分别保存权重，输入当前、目标及合法后继 Q，输出远近排序和动作。寻路后继取 Q+V；积木由共享编码器编码真实合法后继，位移可写为 V(o,a)=Q(T(o,a))−Q(o)。
 
 两项都按用户在 DESIGN 中的高亮执行：寻路先取真实最短十步题子集，积木从 1,000 张八块棋盘各取八道长题。两项使用近似相同的英文文本与标准整题 SFT，只输出包含 current 的地图远近排序，不报数值距离。积木测试按全部 SFT 当前／目标／候选状态划分三组共 600 道。方案 A 保留每轮文字与对应地图。旧文字距离和单棋盘查表结果见下文。
 

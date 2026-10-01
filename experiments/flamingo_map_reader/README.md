@@ -1,6 +1,6 @@
 # 地图读取接口：寻路与积木
 
-两项任务共用冻结 Qwen2.5-1.5B-Instruct、地图记忆编码、门控 cross-attention、整题 SFT 和逐轮文字协议。地图与环境规则各自提供；两项分别训练和评测，不把跨任务权重共享当成已验证事实。设计与解释见 [DESIGN](DESIGN.md)，进度见[项目状态页](../../docs/PROJECT_STATUS_AND_TODO.md)。
+两项任务共用 Qwen2.5-1.5B-Instruct 的基座型号、地图记忆编码与门控 cross-attention 的结构和代码、整题 SFT 和逐轮文字协议。**寻路与积木分别新建并训练 P、cross-attention 等接口参数，保存到不同 checkpoint；不混合训练，也不共享训练后的接口权重。**地图与环境规则各自提供。设计与解释见 [DESIGN](DESIGN.md)，进度见[项目状态页](../../docs/PROJECT_STATUS_AND_TODO.md)。
 
 正式合同：[寻路](configs/pilot_path256.json)、[积木](configs/pilot_blocks.json)。`src/text.py`、`src/sft.py` 统一英文开头、排序和终止回答；`src/train.py` 根据合同加载图 Q/V 或共享棋盘 Q。训练使用普通 Trainer batch、assistant-only CE，保持每轮 token 到当轮地图的方案 A 绑定。两个任务的训练超参数相同；实际 batch 由各自长题的显存测量决定。
 

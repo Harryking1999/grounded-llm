@@ -49,6 +49,8 @@ python -m experiments.flamingo_map_reader.src.evaluate_graph_readout \
 读出分数是对模型文字的检验；如果分数高，还需交换候选 Q 向量而保持文字不变，检查选择是否随地图变化，才能支持“使用了地图”这一因果解释。
 同一入口加 `--splits train` 可对全部训练题首步作诊断；训练题只用于判断是否拟合，不参与上述验证与保留题门槛。
 
+针对原权重读出失败，另备[关系 token 加权寻路配置](configs/pilot_path256_relation_weighted.json)作受控消融。它保留原整题数据、模型结构和文本格式，只在 assistant CE 中提高排序式的可变部分及 `<action>` 编号的权重；固定句式仍按普通权重计算。该配置须单独 `prepare` manifest、从新初始化训练并通过相同读出门槛评测，不能与原 checkpoint 续接或混为一次运行。代码同时适用于积木，但现有积木训练仍按已提交的原合同执行。
+
 最小正确性检查：
 
 ```bash

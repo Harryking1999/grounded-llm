@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 
 import torch
+from torch.nn import functional as F
 from torch.utils.data import Dataset
 from transformers import Trainer, TrainerCallback, TrainingArguments, set_seed
 
@@ -39,18 +40,41 @@ def collate_examples(examples, pad_token_id):
     """Pad complete SFT examples; keep each example's own map timeline."""
     width = max(len(encoded.input_ids) for encoded, _ in examples)
     input_ids, labels, attention_mask, map_ids, counts, steps = [], [], [], [], [], []
+    focused = []
     for encoded, example_steps in examples:
         padding = width - len(encoded.input_ids)
         input_ids.append(encoded.input_ids + [pad_token_id] * padding)
         labels.append(encoded.labels + [-100] * padding)
         attention_mask.append([1] * len(encoded.input_ids) + [0] * padding)
         map_ids.append(encoded.token_map_ids + [len(example_steps) - 1] * padding)
+        if encoded.focus_mask is not None:
+            focused.append(encoded.focus_mask + [False] * padding)
         counts.append(len(example_steps))
         steps.extend(example_steps)
     timeline = MapTimeline(batch_maps(steps), torch.tensor(map_ids), tuple(counts))
     timeline.validate(max(len(step.candidate_actions) for step in steps), width)
-    return timeline, {"input_ids": torch.tensor(input_ids), "labels": torch.tensor(labels),
-                       "attention_mask": torch.tensor(attention_mask)}
+    if focused and len(focused) != len(examples):
+        raise ValueError("Cannot mix focused and ordinary trajectories")
+    inputs = {"input_ids": torch.tensor(input_ids), "labels": torch.tensor(labels),
+              "attention_mask": torch.tensor(attention_mask)}
+    if focused:
+        inputs["focus_mask"] = torch.tensor(focused, dtype=torch.bool)
+    return timeline, inputs
+
+
+def decision_weighted_loss(ordinary_loss, logits, labels, focus_mask, weight):
+    """Preserve normal CE while increasing ranking and action-ID contributions."""
+    if weight <= 1:
+        raise ValueError("Decision weight must exceed one")
+    selected = focus_mask[:, 1:] & (labels[:, 1:] != -100)
+    if not bool(selected.any()):
+        return ordinary_loss
+    focused_logits = logits[:, :-1][selected].float()
+    focused_labels = labels[:, 1:][selected]
+    focused_loss = F.cross_entropy(focused_logits, focused_labels, reduction="sum")
+    ordinary_count = (labels[:, 1:] != -100).sum()
+    total_weight = ordinary_count + (weight - 1) * selected.sum()
+    return (ordinary_loss * ordinary_count + (weight - 1) * focused_loss) / total_weight
 
 
 class SFTDataset(Dataset):
@@ -73,7 +97,8 @@ class SFTDataset(Dataset):
                 self.graphs[graph_id] = load_graph(self.source_root, graph_id)[:2]
             demo = graph_demonstration_from_record(*self.graphs[graph_id], record)
         encoded = encode_trajectory(demo, self.tokenizer, self.config["maximum_sequence_tokens"],
-                                     chat_template_kwargs=self.config.get("chat_template_kwargs", {}))
+                                     chat_template_kwargs=self.config.get("chat_template_kwargs", {}),
+                                     focus_decisions=self.config["training"].get("decision_focus_weight", 1) > 1)
         return encoded, [turn.step for turn in demo.turns]
 
 
@@ -119,10 +144,11 @@ class JsonLog(TrainerCallback):
 
 
 class MapSFTTrainer(Trainer):
-    # The base LM computes its normal next-token CE from labels. Trainer owns
-    # batching, backward, optimizer/scheduler, RNG, and dataloader resumption.
+    # The base LM computes normal next-token CE. An optional decision focus
+    # adds weight to selected labels; Trainer still owns optimization and resume.
     def __init__(self, *args, contract, **kwargs):
         self.contract = contract
+        self.focus_weight = contract.get("config", {}).get("training", {}).get("decision_focus_weight", 1)
         super().__init__(*args, **kwargs)
         self.model_accepts_loss_kwargs = False
 
@@ -130,6 +156,19 @@ class MapSFTTrainer(Trainer):
         if isinstance(data, MapTimeline):
             return to_device(data, self.args.device)
         return super()._prepare_input(data)
+
+    def compute_loss(self, model, inputs, return_outputs=False, num_items_in_batch=None):
+        focus_mask = inputs.pop("focus_mask", None)
+        if self.focus_weight <= 1:
+            return super().compute_loss(model, inputs, return_outputs=return_outputs,
+                                        num_items_in_batch=num_items_in_batch)
+        if focus_mask is None:
+            raise ValueError("Focused training needs token-aligned focus_mask")
+        labels = inputs["labels"]
+        outputs = model(**inputs)
+        loss = decision_weighted_loss(outputs.loss, outputs.logits, labels,
+                                      focus_mask, self.focus_weight)
+        return (loss, outputs) if return_outputs else loss
 
     def _save(self, output_dir=None, state_dict=None):
         output = Path(output_dir or self.args.output_dir)

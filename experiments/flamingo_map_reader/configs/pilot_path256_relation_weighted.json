@@ -1,0 +1,49 @@
+{
+  "study": "flamingo_map_reader_path256_relation_weighted",
+  "task": "graph",
+  "seed": 20261001,
+  "source_run": "external_map_interface/path256_five_graphs_4ac7239",
+  "train_validation_graphs": ["graph_00", "graph_01", "graph_02", "graph_03"],
+  "unseen_test_graph": "graph_04",
+  "ordinary_shortest_moves": [10],
+  "train_pairs_per_length_per_graph": 64,
+  "validation_pairs_per_length_per_graph": 16,
+  "train_start_equals_goal_per_graph": 0,
+  "validation_start_equals_goal_per_graph": 0,
+  "maximum_demonstration_actions": 32,
+  "maximum_sequence_tokens": 17408,
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "chat_template_kwargs": {},
+  "map": {
+    "state_dim": 128,
+    "projection_dim": 256,
+    "role_and_id_dim": 32,
+    "attention_heads": 4,
+    "attention_head_dim": 64,
+    "cross_attention_every_n_layers": 1,
+    "maximum_candidates": 3
+  },
+  "training": {
+    "epochs": 2,
+    "batch_size_policy": "largest_measured_fitting_actual_batch",
+    "loss": "assistant_token_cross_entropy_with_decision_focus",
+    "decision_focus_weight": 16,
+    "optimizer": "AdamW",
+    "learning_rate": 0.00002,
+    "weight_decay": 0.01,
+    "warmup_fraction": 0.05,
+    "schedule_after_warmup": "constant",
+    "gradient_clip_norm": 1.0,
+    "frozen_base_dtype": "bfloat16",
+    "adapter_parameter_dtype": "float32"
+  },
+  "checkpoint": {
+    "every_epoch_fraction": 0.1,
+    "save_at_epoch_end": true
+  },
+  "evaluation": {
+    "primary_metric": "goal_reach_rate",
+    "action_max_new_tokens": 2048,
+    "terminal_max_new_tokens": 1024
+  }
+}

@@ -76,7 +76,7 @@ Blocks 共 768 次，511 次触及预算；至少 343 条已确认非法，6 条
 
 ## 有序 TODO
 
-1. **双任务 K/V 解耦**：积木与寻路共用代码和训练规则，但各自训练投影与 cross-attention、保存独立权重。新的[积木配置](../experiments/flamingo_map_reader/configs/pilot_blocks_addressed_kv.json)和[寻路配置](../experiments/flamingo_map_reader/configs/pilot_path256_addressed_kv.json)仅改变地图槽的 key/value 构造，不加 R，保留两题原文字和普通整题 SFT。旧混合记忆配置继续作为基线；先做同预算小样本读出与反事实检查，再决定完整重训。
+1. **双任务 K/V 解耦**：积木与寻路共用代码和训练规则，但各自训练投影与 cross-attention、保存独立权重。新的[积木配置](../experiments/flamingo_map_reader/configs/pilot_blocks_addressed_kv.json)和[寻路配置](../experiments/flamingo_map_reader/configs/pilot_path256_addressed_kv.json)仅改变地图槽的 key/value 构造，不加 R，保留两题原文字和普通整题 SFT。旧混合记忆配置继续作为基线。两题各两条完整轨迹 GPU smoke 和 47 项测试已通过；[成对小样本合同](../experiments/flamingo_map_reader/configs/kv_pilot.json)在两题上生成各 16 条训练／4 条验证题的旧／新同题对照，准备检查训练内读出与反事实响应，再决定完整重训。
 2. **开发机迁移**：后续开发与新运行使用 `ssh root@172.16.78.10 -p 35016`。共享存储中已有原地图、模型及数据；新源码放独立目录，避免覆盖旧训练进程使用的代码。原节点 40072 上的积木旧训练尚未取得 final 结果。积木 manifest 含 8,000 道训练题与三组各 200 道测试题，整题最长 16,852 token；寻路十步 manifest 含四图 256 道训练／64 道验证题，最长 11,851 token，均低于 17,408 token 合同上限。旧运行输出为 `runs/path10_sft_20261001` 与 `runs/blocks_sft_20261001`。实际双样本反向传播在 A100 80GB 上显存不足；含长样本的 batch=1 smoke 完成两轮前后向及 checkpoint 保存，正式运行据此使用 batch=1、不做梯度累积。寻路冻结地图贪心在原五图 120 题上全部到达，各图最短路数为 14、14、13、13、15。
 
 寻路训练期间，对四张训练图各 16 道未参与训练的十步题计算整题 assistant-token 损失：checkpoint 26 为 0.3083、231 为 0.02965、最终 512 为 0.02061。此指标被重复的解释文字主导，不能单独代表逐步规划。最终权重在原保留题集中每图首道十步题的自由生成小试点为 0/5 到达，均走满 32 步；实际选中地图最近候选为 88/160 步，五道题的第一步全部选错。评测生成补传全有效 attention mask 后，同一道 `graph_00` 题的 32 步路径与全部回答逐字一致，排除了这一警告对该题结果的影响。此为小样本诊断，不是正式成功率。先确认地图读取，再判断是训练轮数、监督目标还是接口机制问题；不得以低 token 损失声称规划收敛。

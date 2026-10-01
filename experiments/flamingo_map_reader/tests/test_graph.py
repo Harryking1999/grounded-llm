@@ -21,6 +21,15 @@ def line_graph():
 
 
 class GraphStepTest(unittest.TestCase):
+    def test_default_local_ids_sort_neighbors_not_action_catalogue(self):
+        environment, qmap = line_graph()
+        order = np.array([2, 0, 3, 1])
+        reordered = GraphEnvironment(environment.adjacency, environment.actions[order])
+        reordered_map = GraphQMap(qmap.q, qmap.v[order])
+        step = graph_step(reordered, reordered_map, 1, 2)
+        self.assertEqual(step.candidate_destinations, (0, 2))
+        self.assertEqual(step.execute(reordered, 2)[1], 2)
+
     def test_local_ids_follow_shuffled_predicted_successors(self):
         environment, qmap = line_graph()
         step = graph_step(environment, qmap, 1, 2, rng=np.random.default_rng(7))

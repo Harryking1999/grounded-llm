@@ -44,7 +44,8 @@ def graph_step(
         raise ValueError("current and goal must be graph nodes")
     if qmap.q.shape[0] != node_count or qmap.v.shape[0] != len(environment.actions):
         raise ValueError("Q/V does not match the environment catalogue")
-    actions = environment.legal_actions(current)
+    actions = sorted(environment.legal_actions(current),
+                     key=lambda action: int(environment.actions[action, 1]))
     if rng is not None:
         actions = rng.permutation(actions).tolist()
     current_vector = qmap.q[current]

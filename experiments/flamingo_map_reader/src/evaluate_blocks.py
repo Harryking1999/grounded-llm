@@ -15,6 +15,7 @@ from .blocks_data import coverage_group
 from .blocks_prompt import initial_prompt, turn_prompt
 from .graph import timeline_maps
 from .train import build_reader, to_device
+from .text import chat_ids
 
 
 def parse_control(answer):
@@ -48,8 +49,7 @@ def rollout(reader, tokenizer, qmap, record, config, device):
         steps.append(step)
         user = turn_prompt(step, actions)
         messages.append({"role": "user", "content": initial + "\n\n" + user if turn == 0 else user})
-        prefix = tokenizer.apply_chat_template(messages, tokenize=True,
-                                               add_generation_prompt=True, **kwargs)
+        prefix = chat_ids(tokenizer, messages, add_generation_prompt=True, **kwargs)
         if prefix[:len(previous)] != previous:
             raise ValueError("Chat template changed historical tokens")
         ids = old_ids + [turn] * (len(prefix) - len(previous))
@@ -97,8 +97,7 @@ def rollout(reader, tokenizer, qmap, record, config, device):
         reached = reached or current == goal
         item.update(chosen_id=chosen, executed_action=action, after=str(current))
         messages.append({"role": "assistant", "content": answer})
-        complete = tokenizer.apply_chat_template(messages, tokenize=True,
-                                                  add_generation_prompt=False, **kwargs)
+        complete = chat_ids(tokenizer, messages, add_generation_prompt=False, **kwargs)
         if complete[:len(prefix)] != prefix:
             raise ValueError("Chat template changed generation prefix")
         old_ids = ids + [turn] * (len(complete) - len(prefix))

@@ -3,6 +3,7 @@
 from dataclasses import dataclass
 
 from .sft import Demonstration
+from .text import chat_ids
 
 
 @dataclass(frozen=True)
@@ -26,17 +27,13 @@ def encode_trajectory(demonstration: Demonstration, tokenizer,
     template_kwargs = chat_template_kwargs or {}
     for turn_index, turn in enumerate(demonstration.turns):
         messages.append({"role": "user", "content": turn.user_text})
-        prefix = tokenizer.apply_chat_template(
-            messages, tokenize=True, add_generation_prompt=True,
-            **template_kwargs,
-        )
+        prefix = chat_ids(tokenizer, messages, add_generation_prompt=True,
+                          **template_kwargs)
         if prefix[:len(previous)] != previous:
             raise ValueError("chat template changed an earlier conversation prefix")
         messages.append({"role": "assistant", "content": turn.answer_text})
-        complete = tokenizer.apply_chat_template(
-            messages, tokenize=True, add_generation_prompt=False,
-            **template_kwargs,
-        )
+        complete = chat_ids(tokenizer, messages, add_generation_prompt=False,
+                            **template_kwargs)
         if complete[:len(prefix)] != prefix:
             raise ValueError("chat template does not preserve the generation prefix")
         new_answer = len(complete) - len(prefix)

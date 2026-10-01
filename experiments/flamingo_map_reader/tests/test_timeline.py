@@ -24,7 +24,20 @@ class ByteChatTemplate:
         return list(rendered.encode("utf-8"))
 
 
+class DictByteChatTemplate(ByteChatTemplate):
+    def apply_chat_template(self, *args, **kwargs):
+        return {"input_ids": super().apply_chat_template(*args, **kwargs)}
+
+
 class TimelineTest(unittest.TestCase):
+    def test_chat_template_mapping_returns_same_full_trajectory(self):
+        environment, qmap = line_graph()
+        demonstration = greedy_demonstration(environment, qmap, 1, 2,
+                                             rng=np.random.default_rng(7))
+        plain = encode_trajectory(demonstration, ByteChatTemplate(), 16384)
+        mapped = encode_trajectory(demonstration, DictByteChatTemplate(), 16384)
+        self.assertEqual(plain, mapped)
+
     def test_complete_trajectory_labels_answers_and_binds_maps(self):
         environment, qmap = line_graph()
         demonstration = greedy_demonstration(

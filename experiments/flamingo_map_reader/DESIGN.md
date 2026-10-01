@@ -1,6 +1,6 @@
 # 地图读取接口：寻路与积木共同方案
 
-本方案以[原始飞书方案](https://zcnhpsd26tyi.feishu.cn/wiki/ZNNSwpIo0iHwMgk7mk7coBA3nzb)和用户在旧 DESIGN 中的 `==...==` 修改为依据。会议自动总结只作线索，不代替这些决定。两项任务都实现，正式参数分别见 [寻路配置](configs/pilot_path256.json)和[积木配置](configs/pilot_blocks.json)。
+本方案以[原始飞书方案](https://zcnhpsd26tyi.feishu.cn/wiki/ZNNSwpIo0iHwMgk7mk7coBA3nzb)、用户在旧 DESIGN 中的 `==...==` 修改及后续确认的 K/V 解耦决定为依据。会议自动总结只作线索，不代替这些决定。两项任务都实现，当前 K/V 对照的正式参数分别见 [寻路配置](configs/pilot_path256_addressed_kv.json)和[积木配置](configs/pilot_blocks_addressed_kv.json)；[寻路原配置](configs/pilot_path256.json)与[积木原配置](configs/pilot_blocks.json)保留为混合记忆基线。
 
 ## 一、研究目标
 
@@ -32,7 +32,9 @@
 
 ## 四、共用架构与训练
 
-每轮地图槽为 `[current, goal, successor_1, …, successor_k]`。**每个任务内部**用一个可训练投影 P 处理其 Q 向量，与角色、候选编号嵌入拼接，再映射到语言隐层维度。编号作用类似位置编码，让地图槽与本轮文字候选对应；它不表示远近。Qwen 各解码层之前加入四头、每头 64 维的 cross-attention，并以零初始化门控的残差注入。每项任务自己的 Q-map 与语言模型底座冻结；该任务的 P、组合层、嵌入、cross-attention 和门控在该任务的一次 SFT 中联合更新。候选数可变，padding 槽屏蔽；不同题和不同轮的地图不可串读。
+每轮地图槽为 `[current, goal, successor_1, …, successor_k]`。当前对照保持每个状态的完整 Q 输入，用任务内共享投影 `z_i=P(Q_i)` 表示状态；角色和候选编号只形成槽的地址。cross-attention 的 key 只从角色与编号嵌入生成，value 只从 `z_i` 生成：`K_i=K(role_i,id_i)`，`V_i=V(P(Q_i))`。编号帮助语言查询找到对应候选，不直接进入状态内容；目标与候选仍各占一个槽，由 cross-attention 和后续语言层学习比较。**本轮不增加预先配对目标与候选的关系模块 R，也不预先计算距离。**value 路径不对每个状态单独归一化，以保留投影后的幅度和均值。旧配置的混合记忆架构保留为基线；两个条件只比较接口中的 K/V 表示方式。
+
+Qwen 各解码层之前加入四头、每头 64 维的 cross-attention，并以零初始化门控的残差注入。每项任务自己的 Q-map 与语言模型底座冻结；该任务的 P、嵌入、cross-attention 和门控在该任务的一次 SFT 中联合更新。候选数可变，padding 槽屏蔽；不同题和不同轮的地图不可串读。K/V 解耦只保证标签不混入 value，不保证模型学会远近比较；训练内排序、交换 Q 与同步重编号对照用来检验这一点。
 
 两个任务使用同一 [train.py](src/train.py)、地图 collator、assistant-only next-token 交叉熵、优化器与 checkpoint 机制，**分别从新初始化的接口开始训练，分别保存 checkpoint 和评测结果**。**每道完整题是一个样本，多个完整题组成实际 batch，一次前向、反向和更新；不按行动轮次切样本，也不做“累计八条轨迹才更新”。**实际 batch 按显存测量，各任务可因文本和候选数量不同而取不同值。超长题明确报错，不能截掉终止段。正式设置只存于各自配置，运行产物存 Git 外。
 

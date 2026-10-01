@@ -10,7 +10,8 @@ from torch import nn
 
 from experiments.flamingo_map_reader.src.fusion import GatedMapCrossAttention, MapReader
 from experiments.flamingo_map_reader.src.checkpoint import load_checkpoint, save_checkpoint
-from experiments.flamingo_map_reader.src.memory import MapBatch, MapMemoryEncoder
+from experiments.flamingo_map_reader.src.memory import (AddressedMapMemoryEncoder,
+    MapBatch, MapMemoryEncoder)
 
 
 class FakeLM(nn.Module):
@@ -35,6 +36,40 @@ def batch():
 
 
 class InterfaceTest(unittest.TestCase):
+    def test_address_key_and_state_value_are_independent(self):
+        torch.manual_seed(13)
+        encoder = AddressedMapMemoryEncoder(2, 8, 4, 5, 3)
+        original = batch()
+        base = encoder(original)
+        relabeled = MapBatch(original.vectors, original.roles,
+            original.candidate_ids.clone(), original.valid)
+        relabeled.candidate_ids[0, 2] = 2
+        changed_address = encoder(relabeled)
+        torch.testing.assert_close(base.values, changed_address.values)
+        self.assertFalse(torch.equal(base.keys, changed_address.keys))
+        changed_vectors = MapBatch(original.vectors.clone(), original.roles,
+            original.candidate_ids, original.valid)
+        changed_vectors.vectors[0, 2] += 4
+        changed_content = encoder(changed_vectors)
+        torch.testing.assert_close(base.keys, changed_content.keys)
+        self.assertFalse(torch.equal(base.values, changed_content.values))
+        self.assertTrue(torch.equal(base.keys[0, 3], torch.zeros_like(base.keys[0, 3])))
+        self.assertTrue(torch.equal(base.values[0, 3], torch.zeros_like(base.values[0, 3])))
+
+    def test_addressed_attention_updates_key_and_value_paths(self):
+        torch.manual_seed(17)
+        encoder = AddressedMapMemoryEncoder(2, 8, 4, 5, 3)
+        attention = GatedMapCrossAttention(8, 2, head_dim=4,
+            key_dim=encoder.key_dim, value_dim=encoder.value_dim)
+        attention.gate.data.fill_(0.5)
+        hidden = torch.randn(1, 2, 8)
+        output = attention(hidden, encoder(batch()), batch().valid)
+        output.square().sum().backward()
+        self.assertGreater(float(encoder.project.weight.grad.norm()), 0)
+        self.assertGreater(float(encoder.id_embedding.weight.grad.norm()), 0)
+        self.assertGreater(float(attention.to_key.weight.grad.norm()), 0)
+        self.assertGreater(float(attention.to_value.weight.grad.norm()), 0)
+
     def test_slot_validation_rejects_unidentified_successor(self):
         bad = batch()
         bad.candidate_ids[0, 2] = 0

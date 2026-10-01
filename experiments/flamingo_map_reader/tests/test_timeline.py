@@ -6,6 +6,7 @@ import numpy as np
 import torch
 
 from experiments.flamingo_map_reader.src.fusion import GatedMapCrossAttention
+from experiments.flamingo_map_reader.src.memory import AddressedMemory
 from experiments.flamingo_map_reader.src.graph import timeline_maps
 from experiments.flamingo_map_reader.src.sft import greedy_demonstration
 from experiments.flamingo_map_reader.src.transcript import encode_trajectory
@@ -71,6 +72,23 @@ class TimelineTest(unittest.TestCase):
         original = attention(hidden, memory, valid, turn_ids)
         modified = attention(hidden, changed, valid, turn_ids)
         self.assertTrue(torch.equal(original[:, :2], modified[:, :2]))
+        self.assertFalse(torch.allclose(original[:, 2:], modified[:, 2:]))
+
+    def test_addressed_memory_preserves_turn_mask(self):
+        torch.manual_seed(19)
+        attention = GatedMapCrossAttention(8, 2, head_dim=4,
+                                           key_dim=6, value_dim=5)
+        attention.gate.data.fill_(1)
+        hidden = torch.randn(1, 4, 8)
+        keys = torch.randn(1, 2, 3, 6)
+        values = torch.randn(1, 2, 3, 5)
+        changed = values.clone()
+        changed[:, 1] += 7
+        valid = torch.ones((1, 2, 3), dtype=torch.bool)
+        turn_ids = torch.tensor([[0, 0, 1, 1]])
+        original = attention(hidden, AddressedMemory(keys, values), valid, turn_ids)
+        modified = attention(hidden, AddressedMemory(keys, changed), valid, turn_ids)
+        torch.testing.assert_close(original[:, :2], modified[:, :2], atol=0, rtol=0)
         self.assertFalse(torch.allclose(original[:, 2:], modified[:, 2:]))
 
 

@@ -2,7 +2,9 @@
 
 两项任务共用 Qwen2.5-1.5B-Instruct 的基座型号、地图记忆编码与门控 cross-attention 的结构和代码、整题 SFT 和逐轮文字协议。**寻路与积木分别新建并训练 P、cross-attention 等接口参数，保存到不同 checkpoint；不混合训练，也不共享训练后的接口权重。**地图与环境规则各自提供。设计与解释见 [DESIGN](DESIGN.md)，进度见[项目状态页](../../docs/PROJECT_STATUS_AND_TODO.md)。
 
-正式合同：[寻路](configs/pilot_path256.json)、[积木](configs/pilot_blocks.json)。`src/text.py`、`src/sft.py` 统一英文开头、排序和终止回答；`src/train.py` 根据合同加载图 Q/V 或共享棋盘 Q。训练使用普通 Trainer batch、assistant-only CE，保持每轮 token 到当轮地图的方案 A 绑定。两个任务的训练超参数相同；实际 batch 由各自长题的显存测量决定。
+当前 K/V 解耦合同：[寻路](configs/pilot_path256_addressed_kv.json)、[积木](configs/pilot_blocks_addressed_kv.json)。旧[寻路](configs/pilot_path256.json)、[积木](configs/pilot_blocks.json)配置保留为混合记忆基线。`src/text.py`、`src/sft.py` 统一英文开头、排序和终止回答；`src/train.py` 根据合同加载图 Q/V 或共享棋盘 Q。训练使用普通 Trainer batch、assistant-only CE，保持每轮 token 到当轮地图的方案 A 绑定。两个任务的训练超参数相同；实际 batch 由各自长题的显存测量决定。
+
+新接口将角色与编号放在 attention key 路径，将完整 Q 经任务各自的投影 P 放在 value 路径，不加入关系模块 R。两题共用实现，但必须分别准备与配置完全一致的 manifest，并从头训练独立接口。其余文字、题集及训练合同沿用相应原配置。先用相同的小样本预算检查训练内排序、交换 Q 后的关系响应，以及同步重编号的一致性，再决定是否开展完整训练。
 
 ## 数据与运行入口
 
@@ -10,24 +12,24 @@
 
 ```bash
 python -m experiments.flamingo_map_reader.src.prepare \
-  --config experiments/flamingo_map_reader/configs/pilot_path256.json \
+  --config experiments/flamingo_map_reader/configs/pilot_path256_addressed_kv.json \
   --source-root GRAPH_SOURCE_ROOT \
   --output runs/flamingo_map_reader/data/path_manifest.json
 
 python -m experiments.flamingo_map_reader.src.blocks_data \
-  --config experiments/flamingo_map_reader/configs/pilot_blocks.json \
+  --config experiments/flamingo_map_reader/configs/pilot_blocks_addressed_kv.json \
   --official-data OFFICIAL_H5 --q-checkpoint Q_BEST_PT \
   --q-training-data Q_TRAIN_DATA_NPZ \
   --output runs/flamingo_map_reader/data/blocks_manifest.json
 
 python -m experiments.flamingo_map_reader.src.train \
-  --config experiments/flamingo_map_reader/configs/pilot_path256.json \
+  --config experiments/flamingo_map_reader/configs/pilot_path256_addressed_kv.json \
   --manifest runs/flamingo_map_reader/data/path_manifest.json \
   --source-root GRAPH_SOURCE_ROOT --batch-size MEASURED_BATCH \
   --out runs/flamingo_map_reader/path_train
 
 python -m experiments.flamingo_map_reader.src.train \
-  --config experiments/flamingo_map_reader/configs/pilot_blocks.json \
+  --config experiments/flamingo_map_reader/configs/pilot_blocks_addressed_kv.json \
   --manifest runs/flamingo_map_reader/data/blocks_manifest.json \
   --q-checkpoint Q_BEST_PT --batch-size MEASURED_BATCH \
   --out runs/flamingo_map_reader/blocks_train
@@ -39,7 +41,7 @@ python -m experiments.flamingo_map_reader.src.train \
 
 ```bash
 python -m experiments.flamingo_map_reader.src.evaluate_graph_readout \
-  --config experiments/flamingo_map_reader/configs/pilot_path256.json \
+  --config experiments/flamingo_map_reader/configs/pilot_path256_addressed_kv.json \
   --gate-config experiments/flamingo_map_reader/configs/path_readout_gate.json \
   --manifest runs/flamingo_map_reader/data/path_manifest.json \
   --source-root GRAPH_SOURCE_ROOT --adapter-checkpoint PATH_ADAPTER_PT \

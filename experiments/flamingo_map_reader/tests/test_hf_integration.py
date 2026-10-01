@@ -1,12 +1,15 @@
 """Smoke the adapter against Hugging Face Qwen2 and Qwen3 layer signatures."""
 
+import json
+from pathlib import Path
 import unittest
 
 import torch
 
 from experiments.flamingo_map_reader.src.fusion import MapReader
-from experiments.flamingo_map_reader.src.memory import MapBatch, MapMemoryEncoder, MapTimeline
-from experiments.flamingo_map_reader.src.train import collate_examples
+from experiments.flamingo_map_reader.src.memory import (AddressedMapMemoryEncoder,
+    MapBatch, MapMemoryEncoder, MapTimeline)
+from experiments.flamingo_map_reader.src.train import build_reader, collate_examples
 from experiments.flamingo_map_reader.src.transcript import EncodedTrajectory
 from experiments.flamingo_map_reader.src.graph import graph_step
 from test_graph import line_graph
@@ -43,12 +46,12 @@ class QwenIntegrationTest(unittest.TestCase):
         self.assertIsNotNone(reader.memory_encoder.project.weight.grad)
         self.assertTrue(all(p.grad is None for p in reader.base_model.parameters() if not p.requires_grad))
 
-    def check_model(self, base):
+    def check_model(self, base, encoder_class=MapMemoryEncoder):
         torch.manual_seed(5)
         base = base.eval()
         tokens = torch.tensor([[2, 3, 4]])
         original = base(input_ids=tokens, use_cache=False).logits.detach().clone()
-        reader = MapReader(base, MapMemoryEncoder(2, 64, 2, 16, 8), heads=2,
+        reader = MapReader(base, encoder_class(2, 64, 2, 16, 8), heads=2,
                            head_dim=16).eval()
         map_batch = MapBatch(
             vectors=torch.tensor([[[0., 0.], [1., 0.], [1., 0.]]]),
@@ -77,6 +80,31 @@ class QwenIntegrationTest(unittest.TestCase):
             max_position_embeddings=64, pad_token_id=0, eos_token_id=1,
         )
         self.check_model(Qwen2ForCausalLM(config))
+
+    def test_tiny_qwen2_addressed_forward_and_generation(self):
+        from transformers import Qwen2Config, Qwen2ForCausalLM
+        config = Qwen2Config(
+            vocab_size=128, hidden_size=64, intermediate_size=128,
+            num_hidden_layers=2, num_attention_heads=4, num_key_value_heads=2,
+            max_position_embeddings=64, pad_token_id=0, eos_token_id=1,
+        )
+        self.check_model(Qwen2ForCausalLM(config), AddressedMapMemoryEncoder)
+
+    def test_both_task_configs_select_addressed_memory(self):
+        from transformers import Qwen2Config, Qwen2ForCausalLM
+        root = Path(__file__).resolve().parents[1] / "configs"
+        for name in ("pilot_path256_addressed_kv.json",
+                     "pilot_blocks_addressed_kv.json"):
+            with self.subTest(config=name):
+                config = json.loads((root / name).read_text(encoding="utf-8"))
+                base = Qwen2ForCausalLM(Qwen2Config(
+                    vocab_size=32, hidden_size=32, intermediate_size=64,
+                    num_hidden_layers=1, num_attention_heads=2,
+                    num_key_value_heads=1, max_position_embeddings=32,
+                    pad_token_id=0))
+                reader = build_reader(base, config)
+                self.assertIsInstance(reader.memory_encoder, AddressedMapMemoryEncoder)
+                self.assertTrue(reader.conditioned_layers[0].map_attention.addressed)
 
     def test_tiny_qwen3_forward_and_generation(self):
         try:

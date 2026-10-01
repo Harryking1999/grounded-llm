@@ -9,53 +9,78 @@ from torch import Tensor, nn
 from torch.nn import functional as F
 from torch.nn.utils.rnn import pad_sequence
 
-from .memory import MapBatch, MapMemoryEncoder, MapTimeline
+from .memory import (AddressedMapMemoryEncoder, AddressedMemory, MapBatch,
+                     MapMemoryEncoder, MapTimeline)
 
 
 class GatedMapCrossAttention(nn.Module):
-    def __init__(self, language_dim: int, heads: int, head_dim: int = 64) -> None:
+    def __init__(self, language_dim: int, heads: int, head_dim: int = 64,
+                 key_dim: int | None = None, value_dim: int | None = None) -> None:
         super().__init__()
         if min(language_dim, heads, head_dim) <= 0:
             raise ValueError("attention dimensions must be positive")
+        if (key_dim is None) != (value_dim is None):
+            raise ValueError("key and value dimensions must be specified together")
+        if key_dim is not None and min(key_dim, value_dim) <= 0:
+            raise ValueError("key and value dimensions must be positive")
         self.heads = heads
         self.head_dim = head_dim
+        self.addressed = key_dim is not None
         inner_dim = heads * head_dim
         self.query_norm = nn.LayerNorm(language_dim)
-        self.memory_norm = nn.LayerNorm(language_dim)
         self.to_query = nn.Linear(language_dim, inner_dim, bias=False)
-        self.to_key_value = nn.Linear(language_dim, 2 * inner_dim, bias=False)
+        if self.addressed:
+            self.key_norm = nn.LayerNorm(key_dim)
+            self.to_key = nn.Linear(key_dim, inner_dim, bias=False)
+            self.to_value = nn.Linear(value_dim, inner_dim, bias=False)
+        else:
+            self.memory_norm = nn.LayerNorm(language_dim)
+            self.to_key_value = nn.Linear(language_dim, 2 * inner_dim, bias=False)
         self.to_output = nn.Linear(inner_dim, language_dim, bias=False)
         self.gate = nn.Parameter(torch.zeros(()))
 
-    def forward(self, hidden: Tensor, memory: Tensor, valid: Tensor,
+    def forward(self, hidden: Tensor, memory: Tensor | AddressedMemory, valid: Tensor,
                 token_map_ids: Tensor | None = None) -> Tensor:
-        if hidden.ndim != 3 or memory.ndim not in (3, 4) or valid.shape != memory.shape[:-1]:
+        if isinstance(memory, AddressedMemory) != self.addressed:
+            raise TypeError("map memory and attention mode differ")
+        keys = memory.keys if self.addressed else memory
+        values = memory.values if self.addressed else memory
+        if (hidden.ndim != 3 or keys.ndim not in (3, 4) or
+                valid.shape != keys.shape[:-1] or
+                values.shape[:-1] != keys.shape[:-1]):
             raise ValueError("invalid text or map memory shapes")
-        if hidden.shape[0] != memory.shape[0] or hidden.shape[-1] != memory.shape[-1]:
+        if hidden.shape[0] != keys.shape[0] or (
+                not self.addressed and hidden.shape[-1] != keys.shape[-1]):
             raise ValueError("hidden and memory batch/feature dimensions differ")
         if not torch.all(valid.reshape(valid.shape[0], -1).any(dim=1)):
             raise ValueError("every sample needs at least one valid map slot")
         batch_size, text_length, _ = hidden.shape
-        if memory.ndim == 4:
+        if keys.ndim == 4:
             if token_map_ids is None or token_map_ids.shape != (batch_size, text_length):
                 raise ValueError("timeline memory needs one map ID per text token")
-            snapshots, slots = memory.shape[1:3]
+            snapshots, slots = keys.shape[1:3]
             if not torch.all((token_map_ids >= 0) & (token_map_ids < snapshots)):
                 raise ValueError("text token refers to a missing map snapshot")
-            snapshot_ids = torch.arange(snapshots, device=memory.device).repeat_interleave(slots)
+            snapshot_ids = torch.arange(snapshots, device=keys.device).repeat_interleave(slots)
             slot_mask = valid.reshape(batch_size, -1)
             attention_mask = (
                 slot_mask[:, None, :] &
                 (token_map_ids[:, :, None] == snapshot_ids[None, None, :])
             )[:, None, :, :]
-            memory = memory.reshape(batch_size, snapshots * slots, -1)
+            keys = keys.reshape(batch_size, snapshots * slots, -1)
+            values = values.reshape(batch_size, snapshots * slots, -1)
         else:
             if token_map_ids is not None:
                 raise ValueError("single-map memory must not have token map IDs")
             attention_mask = valid[:, None, None, :]
-        memory_length = memory.shape[1]
+        memory_length = keys.shape[1]
         query = self.to_query(self.query_norm(hidden))
-        key, value = self.to_key_value(self.memory_norm(memory)).chunk(2, dim=-1)
+        if self.addressed:
+            key = self.to_key(self.key_norm(keys))
+            # Per-slot normalization would discard state magnitude and mean.
+            value = self.to_value(values)
+        else:
+            key, value = self.to_key_value(self.memory_norm(keys)).chunk(2, dim=-1)
         query = query.reshape(batch_size, text_length, self.heads, self.head_dim).transpose(1, 2)
         key = key.reshape(batch_size, memory_length, self.heads, self.head_dim).transpose(1, 2)
         value = value.reshape(batch_size, memory_length, self.heads, self.head_dim).transpose(1, 2)
@@ -76,12 +101,12 @@ class ConditionedDecoderLayer(nn.Module):
         self.map_attention = adapter
         # Current Qwen3Model reads this field while preparing each layer's mask.
         self.attention_type = getattr(decoder_layer, "attention_type", None)
-        self._memory: Tensor | None = None
+        self._memory: Tensor | AddressedMemory | None = None
         self._valid: Tensor | None = None
         self._token_map_ids: Tensor | None = None
         self._generated_suffix = False
 
-    def condition(self, memory: Tensor | None, valid: Tensor | None,
+    def condition(self, memory: Tensor | AddressedMemory | None, valid: Tensor | None,
                   token_map_ids: Tensor | None = None,
                   generated_suffix: bool = False) -> None:
         self._memory, self._valid = memory, valid
@@ -113,7 +138,7 @@ class MapReader(nn.Module):
     def __init__(
         self,
         base_model: nn.Module,
-        memory_encoder: MapMemoryEncoder,
+        memory_encoder: MapMemoryEncoder | AddressedMapMemoryEncoder,
         heads: int,
         head_dim: int = 64,
         every_n_layers: int = 1,
@@ -128,6 +153,7 @@ class MapReader(nn.Module):
         base_model.requires_grad_(False)
         self.base_model = base_model
         self.memory_encoder = memory_encoder
+        addressed = isinstance(memory_encoder, AddressedMapMemoryEncoder)
         self.decoder_path = decoder_path
         parent = base_model
         parts = decoder_path.split(".")
@@ -140,9 +166,11 @@ class MapReader(nn.Module):
         self.conditioned_layers: list[ConditionedDecoderLayer] = []
         for index, layer in enumerate(original):
             if (index + 1) % every_n_layers == 0:
-                adapter = GatedMapCrossAttention(
-                    memory_encoder.combine.out_features, heads, head_dim,
-                )
+                language_dim = (memory_encoder.language_dim if addressed else
+                                memory_encoder.combine.out_features)
+                adapter = GatedMapCrossAttention(language_dim, heads, head_dim,
+                    key_dim=memory_encoder.key_dim if addressed else None,
+                    value_dim=memory_encoder.value_dim if addressed else None)
                 if fixed_gate_tanh is not None:
                     adapter.gate.data.fill_(atanh(fixed_gate_tanh))
                     adapter.gate.requires_grad_(False)
@@ -161,7 +189,13 @@ class MapReader(nn.Module):
         if isinstance(batch, MapTimeline):
             batch.validate(self.memory_encoder.max_candidates, batch.token_map_ids.shape[1])
             counts = batch.snapshot_counts or (batch.snapshots.vectors.shape[0],)
-            memory = pad_sequence(self.memory_encoder(batch.snapshots).split(counts), batch_first=True)
+            encoded = self.memory_encoder(batch.snapshots)
+            if isinstance(encoded, AddressedMemory):
+                memory = AddressedMemory(
+                    pad_sequence(encoded.keys.split(counts), batch_first=True),
+                    pad_sequence(encoded.values.split(counts), batch_first=True))
+            else:
+                memory = pad_sequence(encoded.split(counts), batch_first=True)
             valid = pad_sequence(batch.snapshots.valid.split(counts), batch_first=True)
             token_map_ids = batch.token_map_ids
         else:

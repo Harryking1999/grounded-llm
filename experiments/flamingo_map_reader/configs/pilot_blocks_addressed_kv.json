@@ -1,0 +1,59 @@
+{
+  "study": "flamingo_map_reader_blocks_addressed_kv",
+  "task": "blocks",
+  "seed": 20261001,
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "chat_template_kwargs": {"enable_thinking": false},
+  "text_template_status": "confirmed",
+  "maximum_sequence_tokens": 17408,
+  "maximum_demonstration_actions": 32,
+  "data": {
+    "board_seed": 20260928,
+    "training_boards": 1000,
+    "pairs_per_training_board": 8,
+    "sampling_rollouts": 32,
+    "fresh_board_pool": 400,
+    "test_pairs_per_group": 200,
+    "minimum_shortest_moves": 6,
+    "pair_selection": "longest_certified_pairs_first",
+    "unseen_definition": "absent_from_all_sft_current_goal_and_successor_states",
+    "demonstration_policy": "frozen_map_greedy_successful_only"
+  },
+  "map": {
+    "memory_mode": "address_key_state_value",
+    "source_run": "blocks_distance_map/tree_1000_132f5a1",
+    "checkpoint": "best.pt",
+    "successor_source": "encode_legal_environment_successor",
+    "distance_metric": "directed_sum",
+    "state_dim": 128,
+    "projection_dim": 256,
+    "role_and_id_dim": 32,
+    "attention_heads": 4,
+    "attention_head_dim": 64,
+    "cross_attention_every_n_layers": 1,
+    "maximum_candidates": 664,
+    "timeline": "per_turn"
+  },
+  "training": {
+    "epochs": 2,
+    "batch_size_policy": "largest_measured_fitting_actual_batch",
+    "loss": "assistant_token_cross_entropy",
+    "optimizer": "AdamW",
+    "learning_rate": 0.00002,
+    "weight_decay": 0.01,
+    "warmup_fraction": 0.05,
+    "schedule_after_warmup": "constant",
+    "gradient_clip_norm": 1.0,
+    "frozen_base_dtype": "bfloat16",
+    "adapter_parameter_dtype": "float32"
+  },
+  "checkpoint": {
+    "every_epoch_fraction": 0.1,
+    "save_at_epoch_end": true
+  },
+  "evaluation": {
+    "primary_metric": "goal_reach_rate_by_coverage_group",
+    "action_max_new_tokens": 2048,
+    "terminal_max_new_tokens": 1024
+  }
+}

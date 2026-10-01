@@ -69,6 +69,14 @@ class MapTimeline:
             raise ValueError("token_map_ids refers to a missing map snapshot")
 
 
+@dataclass(frozen=True)
+class AddressedMemory:
+    """Slot address and state content remain separate through attention."""
+
+    keys: Tensor
+    values: Tensor
+
+
 class MapMemoryEncoder(nn.Module):
     """Shared P, role/ID embeddings, then G from section 4.1."""
 
@@ -103,3 +111,32 @@ class MapMemoryEncoder(nn.Module):
             dim=-1,
         )
         return self.combine(features).masked_fill(~batch.valid.unsqueeze(-1), 0)
+
+
+class AddressedMapMemoryEncoder(nn.Module):
+    """Encode roles/IDs as addresses and full Q vectors as state content."""
+
+    def __init__(self, map_dim: int, language_dim: int, max_candidates: int,
+                 projection_dim: int, label_dim: int) -> None:
+        super().__init__()
+        if min(map_dim, language_dim, max_candidates, projection_dim, label_dim) <= 0:
+            raise ValueError("all dimensions and max_candidates must be positive")
+        self.map_dim = map_dim
+        self.max_candidates = max_candidates
+        self.language_dim = language_dim
+        self.key_dim = 2 * label_dim
+        self.value_dim = projection_dim
+        self.project = nn.Linear(map_dim, projection_dim)
+        self.role_embedding = nn.Embedding(3, label_dim)
+        self.id_embedding = nn.Embedding(max_candidates + 1, label_dim)
+
+    def forward(self, batch: MapBatch) -> AddressedMemory:
+        batch.validate(self.max_candidates)
+        if batch.vectors.shape[-1] != self.map_dim:
+            raise ValueError("map vector dimension differs from encoder")
+        addresses = torch.cat((self.role_embedding(batch.roles),
+                               self.id_embedding(batch.candidate_ids)), dim=-1)
+        values = self.project(batch.vectors)
+        mask = ~batch.valid.unsqueeze(-1)
+        return AddressedMemory(addresses.masked_fill(mask, 0),
+                               values.masked_fill(mask, 0))

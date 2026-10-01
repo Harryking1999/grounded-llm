@@ -15,15 +15,22 @@ from .blocks_data import demonstration_from_record
 from .data import demonstration_from_record as graph_demonstration_from_record, load_graph
 from .fusion import MapReader
 from .graph import batch_maps
-from .memory import MapBatch, MapMemoryEncoder, MapTimeline
+from .memory import AddressedMapMemoryEncoder, MapBatch, MapMemoryEncoder, MapTimeline
 from .transcript import encode_trajectory
 
 
 def build_reader(base, config):
     spec = config["map"]
-    memory = MapMemoryEncoder(spec["state_dim"], base.config.hidden_size,
-                              spec["maximum_candidates"], spec["projection_dim"],
-                              spec["role_and_id_dim"])
+    mode = spec.get("memory_mode", "joint")
+    if mode == "joint":
+        encoder = MapMemoryEncoder
+    elif mode == "address_key_state_value":
+        encoder = AddressedMapMemoryEncoder
+    else:
+        raise ValueError(f"Unknown map memory mode: {mode}")
+    memory = encoder(spec["state_dim"], base.config.hidden_size,
+                     spec["maximum_candidates"], spec["projection_dim"],
+                     spec["role_and_id_dim"])
     return MapReader(base, memory, spec["attention_heads"], spec["attention_head_dim"],
                       spec["cross_attention_every_n_layers"],
                       fixed_gate_tanh=spec.get("fixed_gate_tanh"))

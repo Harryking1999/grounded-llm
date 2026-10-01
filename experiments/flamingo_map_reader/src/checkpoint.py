@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 import random
 
+import numpy as np
 import torch
 
 from .fusion import MapReader
@@ -33,6 +34,7 @@ def save_checkpoint(
         "torch_rng": torch.get_rng_state(),
         "cuda_rng": torch.cuda.get_rng_state_all() if torch.cuda.is_available() else None,
         "python_rng": random.getstate(),
+        "numpy_rng": np.random.get_state(),
     }
     temporary = path.with_name(path.name + ".tmp")
     torch.save(state, temporary)
@@ -62,4 +64,5 @@ def load_checkpoint(
     if state["cuda_rng"] is not None and torch.cuda.is_available():
         torch.cuda.set_rng_state_all(state["cuda_rng"])
     random.setstate(state["python_rng"])
+    np.random.set_state(state["numpy_rng"])
     return int(state["step"]), state["data_state"]

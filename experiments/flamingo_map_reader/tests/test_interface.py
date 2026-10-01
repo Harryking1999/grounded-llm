@@ -4,6 +4,7 @@ import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
+import numpy as np
 import torch
 from torch import nn
 
@@ -85,8 +86,10 @@ class InterfaceTest(unittest.TestCase):
         optimizer.step()
         with TemporaryDirectory() as directory:
             path = Path(directory) / "checkpoint_000001.pt"
+            np.random.seed(123)
             save_checkpoint(path, reader, optimizer, 1, {"name": "smoke"},
                             data_state={"next_sample": 8})
+            expected_random = np.random.random()
             saved_gate = reader.conditioned_layers[0].map_attention.gate.detach().clone()
             reader.conditioned_layers[0].map_attention.gate.data.add_(3)
             step, data_state = load_checkpoint(path, reader, optimizer,
@@ -95,6 +98,7 @@ class InterfaceTest(unittest.TestCase):
             self.assertEqual(data_state, {"next_sample": 8})
             self.assertTrue(torch.equal(saved_gate,
                                         reader.conditioned_layers[0].map_attention.gate))
+            self.assertEqual(np.random.random(), expected_random)
 
 
 if __name__ == "__main__":

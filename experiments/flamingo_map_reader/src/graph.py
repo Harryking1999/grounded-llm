@@ -1,5 +1,6 @@
 """Turn an existing graph Q/V and legal-action catalogue into map slots."""
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 
 import numpy as np
@@ -37,6 +38,7 @@ def graph_step(
     current: int,
     goal: int,
     *,
+    executed_path: Sequence[int],
     rng: np.random.Generator | None = None,
 ) -> GraphStep:
     node_count = len(environment.adjacency)
@@ -44,7 +46,13 @@ def graph_step(
         raise ValueError("current and goal must be graph nodes")
     if qmap.q.shape[0] != node_count or qmap.v.shape[0] != len(environment.actions):
         raise ValueError("Q/V does not match the environment catalogue")
-    actions = sorted(environment.legal_actions(current),
+    if not executed_path or executed_path[-1] != current:
+        raise ValueError("executed path must end at the actual current node")
+    if len(set(executed_path)) != len(executed_path):
+        raise ValueError("executed path may not revisit nodes")
+    visited = set(executed_path)
+    actions = sorted((action for action in environment.legal_actions(current)
+                      if int(environment.actions[action, 1]) not in visited),
                      key=lambda action: int(environment.actions[action, 1]))
     if rng is not None:
         actions = rng.permutation(actions).tolist()

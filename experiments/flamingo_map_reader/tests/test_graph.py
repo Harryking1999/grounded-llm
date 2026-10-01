@@ -26,13 +26,14 @@ class GraphStepTest(unittest.TestCase):
         order = np.array([2, 0, 3, 1])
         reordered = GraphEnvironment(environment.adjacency, environment.actions[order])
         reordered_map = GraphQMap(qmap.q, qmap.v[order])
-        step = graph_step(reordered, reordered_map, 1, 2)
+        step = graph_step(reordered, reordered_map, 1, 2, executed_path=[1])
         self.assertEqual(step.candidate_destinations, (0, 2))
         self.assertEqual(step.execute(reordered, 2)[1], 2)
 
     def test_local_ids_follow_shuffled_predicted_successors(self):
         environment, qmap = line_graph()
-        step = graph_step(environment, qmap, 1, 2, rng=np.random.default_rng(7))
+        step = graph_step(environment, qmap, 1, 2, executed_path=[1],
+                          rng=np.random.default_rng(7))
         self.assertFalse(step.done)
         for local_id, action_id in enumerate(step.candidate_actions, 1):
             vector = step.map_batch.vectors[0, local_id + 1].numpy()
@@ -43,12 +44,21 @@ class GraphStepTest(unittest.TestCase):
 
     def test_done_uses_real_state_even_when_actions_remain(self):
         environment, qmap = line_graph()
-        terminal = graph_step(environment, qmap, 2, 2)
+        terminal = graph_step(environment, qmap, 1, 1, executed_path=[0, 1])
         self.assertTrue(terminal.done)
         self.assertEqual(len(terminal.candidate_actions), 1)
-        batched = batch_maps([graph_step(environment, qmap, 1, 2), terminal])
+        self.assertEqual(terminal.candidate_destinations, (2,))
+        batched = batch_maps([graph_step(environment, qmap, 1, 2,
+                                        executed_path=[1]), terminal])
         self.assertEqual(tuple(batched.vectors.shape), (2, 4, 2))
         self.assertFalse(batched.valid[1, 3])
+
+    def test_excludes_visited_neighbor_without_dropping_other_moves(self):
+        environment, qmap = line_graph()
+        step = graph_step(environment, qmap, 1, 2, executed_path=[0, 1])
+        self.assertEqual(step.candidate_destinations, (2,))
+        with self.assertRaisesRegex(ValueError, "may not revisit"):
+            graph_step(environment, qmap, 1, 2, executed_path=[1, 0, 1])
 
 
 if __name__ == "__main__":

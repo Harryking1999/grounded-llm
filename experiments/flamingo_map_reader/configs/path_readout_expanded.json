@@ -1,0 +1,67 @@
+{
+  "study": "flamingo_map_reader_path_readout_expanded",
+  "task": "graph",
+  "seed": 20261001,
+  "source_run": "external_map_interface/path256_five_graphs_4ac7239",
+  "train_validation_graphs": ["graph_00", "graph_01", "graph_02", "graph_03"],
+  "unseen_test_graph": "graph_04",
+  "maximum_demonstration_actions": 32,
+  "maximum_sequence_tokens": 17408,
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "chat_template_kwargs": {},
+  "map": {
+    "memory_mode": "address_key_state_value",
+    "state_dim": 128,
+    "projection_dim": 256,
+    "role_and_id_dim": 32,
+    "attention_heads": 4,
+    "attention_head_dim": 64,
+    "cross_attention_every_n_layers": 1,
+    "maximum_candidates": 3,
+    "value_scale": 14.410007800237114
+  },
+  "readout_data": {
+    "seed": 20261003,
+    "held_out_goals_per_graph": 64,
+    "train_per_length_per_graph": {"2": 64, "4": 64, "6": 64, "8": 48, "10": 16},
+    "validation_per_length_per_graph": {"2": 16, "4": 16, "6": 16, "8": 12, "10": 4},
+    "test_per_length_per_graph": {"2": 64, "4": 64, "6": 64, "8": 48, "10": 16},
+    "training_evaluation_per_length_per_graph": {"2": 8, "4": 8, "6": 8, "8": 6, "10": 2}
+  },
+  "training": {
+    "supervision_mode": "counterfactual_first_turn",
+    "readout_style": "pairwise",
+    "epochs": 16,
+    "max_steps": 16384,
+    "batch_size_policy": "fixed_actual_batch_one",
+    "loss": "assistant_token_cross_entropy",
+    "optimizer": "AdamW",
+    "learning_rate": 0.00002,
+    "weight_decay": 0.01,
+    "warmup_fraction": 0.05,
+    "warmup_steps": 13,
+    "schedule_after_warmup": "constant",
+    "gradient_clip_norm": 1.0,
+    "frozen_base_dtype": "bfloat16",
+    "adapter_parameter_dtype": "float32"
+  },
+  "checkpoint": {"every_epoch_fraction": 1.0, "save_at_epoch_end": true},
+  "convergence": {
+    "source_step": 0,
+    "max_total_steps": 16384,
+    "minimum_total_steps": 4096,
+    "evaluation_every_steps": 1024,
+    "patience_evaluations": 4,
+    "relative_improvement": 0.005,
+    "absolute_improvement": 0.0001,
+    "maximum_final_loss_regression_fraction": 0.1,
+    "maximum_final_loss_regression_absolute": 0.001,
+    "selection": "lowest_fixed_training_loss",
+    "metrics": ["training_ce", "decision_ce"]
+  },
+  "evaluation": {
+    "primary_metric": "original_and_swapped_pair_both_correct",
+    "action_max_new_tokens": 64,
+    "terminal_max_new_tokens": 64
+  }
+}

@@ -13,6 +13,27 @@ from experiments.external_map_interface.src.transitions import GraphEnvironment
 from .sft import Demonstration, greedy_demonstration
 
 
+def first_turn_from_record(environment, qmap, record):
+    """Reproduce the first turn without requiring a successful later rollout."""
+    from .graph import graph_step
+    from .prompt import initial_prompt, turn_prompt
+    from .sft import SupervisedTurn, decision_text
+
+    rng = np.random.default_rng(int(record["sample_seed"]))
+    count = len(environment.adjacency)
+    node_order = rng.permutation(count).tolist()
+    neighbor_order = {node: rng.permutation(np.flatnonzero(environment.adjacency[node])).tolist()
+                      for node in range(count)}
+    start, goal = int(record["start"]), int(record["goal"])
+    step = graph_step(environment, qmap, start, goal, executed_path=[start], rng=rng)
+    if step.done or not step.candidate_actions:
+        raise ValueError("First-turn relation supervision needs legal nonterminal candidates")
+    text = initial_prompt(environment.adjacency, start, goal, node_order=node_order,
+                          neighbor_order=neighbor_order) + "\n\n" + turn_prompt(step, [start])
+    chosen = int(rng.choice(step.map_minimal_candidates))
+    return SupervisedTurn(text, decision_text(step, chosen), step, (start,), chosen)
+
+
 def load_graph(source_root: Path, graph_id: str):
     graph_root = Path(source_root) / graph_id
     with (graph_root / "suite.json").open(encoding="utf-8") as handle:

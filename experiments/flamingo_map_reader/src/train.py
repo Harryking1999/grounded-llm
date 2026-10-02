@@ -207,7 +207,7 @@ def main():
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--resume", type=Path)
     parser.add_argument("--convergence-contract", type=Path,
-                        help="Extend an existing run with fixed-set plateau checks")
+                        help="Use fixed-set plateau checks; source_step=0 permits a fresh run")
     parser.add_argument("--batch-size", type=int, required=True,
                         help="Measured actual per-device batch size; no gradient accumulation")
     args = parser.parse_args()
@@ -236,15 +236,18 @@ def main():
     training = config["training"]
     convergence = None
     if args.convergence_contract:
-        if args.resume is None:
-            raise ValueError("Convergence extension needs a full checkpoint")
         convergence = json.loads(args.convergence_contract.read_text(encoding="utf-8"))
-        for filename in ("optimizer.pt", "scheduler.pt", "trainer_state.json", "rng_state.pth"):
-            if not (args.resume / filename).is_file():
-                raise ValueError(f"Full continuation is missing {filename}")
-        source_state = json.loads((args.resume / "trainer_state.json").read_text())
-        if source_state["global_step"] != convergence["source_step"]:
-            raise ValueError("Continuation checkpoint does not match the declared source step")
+        convergence = convergence.get("convergence", convergence)
+        if args.resume is None:
+            if convergence["source_step"] != 0:
+                raise ValueError("Nonzero source_step needs a full checkpoint")
+        else:
+            for filename in ("optimizer.pt", "scheduler.pt", "trainer_state.json", "rng_state.pth"):
+                if not (args.resume / filename).is_file():
+                    raise ValueError(f"Full continuation is missing {filename}")
+            source_state = json.loads((args.resume / "trainer_state.json").read_text())
+            if source_state["global_step"] != convergence["source_step"]:
+                raise ValueError("Continuation checkpoint does not match the declared source step")
         if args.out.exists():
             status = json.loads((args.out / "convergence_status.json").read_text())
             if (status["status"] != "budget_reached_not_converged" or
@@ -282,7 +285,7 @@ def main():
             len(dataset) / args.batch_size) * training["epochs"]
         maximum_steps = convergence["max_total_steps"]
         # Preserve the original warmup; extending the budget must not restart it.
-        extra_arguments = {"warmup_steps": math.ceil(source_steps * training["warmup_fraction"]),
+        extra_arguments = {"warmup_steps": training.get("warmup_steps", math.ceil(source_steps * training["warmup_fraction"])),
                            "save_steps": convergence["evaluation_every_steps"],
                            "save_total_limit": 2, "disable_tqdm": True}
     else:
@@ -308,7 +311,7 @@ def main():
     if convergence:
         check.trainer = trainer
         continuation = {
-            "source_checkpoint": str(args.resume.resolve()),
+            "source_checkpoint": str(args.resume.resolve()) if args.resume else None,
             "source_contract": contract, "convergence": convergence}
         if (args.out / "continuation.json").exists():
             with (args.out / "continuation_extensions.jsonl").open("a", encoding="utf-8") as handle:

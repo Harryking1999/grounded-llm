@@ -2,7 +2,7 @@
 
 两项任务共用 Qwen2.5-1.5B-Instruct 的基座型号、地图记忆编码与门控 cross-attention 的结构和代码、整题 SFT 和逐轮文字协议。**寻路与积木分别新建并训练 P、cross-attention 等接口参数，保存到不同 checkpoint；不混合训练，也不共享训练后的接口权重。**地图与环境规则各自提供。设计与解释见 [DESIGN](DESIGN.md)，进度见[项目状态页](../../docs/PROJECT_STATUS_AND_TODO.md)。
 
-讨论与汇报用的[失败分析报告](results/readout_failure_analysis.md)汇总同题小样本、K/V 解耦、尺度校准和短式 swap 监督的设置、数值、真实输出与改进建议；[紧凑证据](results/readout_failure_evidence.json)保留 loss 曲线及对应运行记录。短式模型已学会格式，但两题训练集仍均为 0/16 对原题／swap 同时正确，尚未通过地图读出。
+讨论与汇报用的[分析报告](results/readout_failure_analysis.md)汇总同题小样本、K/V 解耦、尺度校准和 swap 监督；[紧凑证据](results/readout_failure_evidence.json)保留 loss 曲线及运行记录。第 256 步的失败不能替代充分训练后的比较：寻路完整与短式 swap 已达到训练成对正确 16/16，积木短式为 1/16；其余收敛结果正在补齐。样本过少，不能据此确定泛化能力。
 
 当前 K/V 解耦合同：[寻路](configs/pilot_path256_addressed_kv.json)、[积木](configs/pilot_blocks_addressed_kv.json)。旧[寻路](configs/pilot_path256.json)、[积木](configs/pilot_blocks.json)配置保留为混合记忆基线。`src/text.py`、`src/sft.py` 统一英文开头、排序和终止回答；`src/train.py` 根据合同加载图 Q/V 或共享棋盘 Q。训练使用普通 Trainer batch、assistant-only CE，保持每轮 token 到当轮地图的方案 A 绑定。两个任务的训练超参数相同；实际 batch 由各自长题的显存测量决定。
 
@@ -13,7 +13,25 @@
 
 首轮成对试点的结果见[项目状态页](../../docs/PROJECT_STATUS_AND_TODO.md)。后续尺度检查由 `src/measure_value_channel.py` 在训练题真正预测排序变量 token 的位置测量：每层未乘 gate 的地图残差／hidden、实际残差／hidden。`src/prepare_kv_scale_followup.py` 依据[正式选择规则](configs/kv_scale_followup.json)与两题各自的测量报告，为每题固定一个全状态共享的 value 缩放常数，并生成同预算的普通整题与独立首轮反事实读出合同。反事实条件通过 `training.supervision_mode=counterfactual_first_turn` 选择，使用相同文字和编号的原 Q／交换 Q 成对样本；它是接口诊断，不是环境轨迹。
 
-`src/evaluate_kv_pilot.py` 还可报告首个排序候选及 Q 交换前后成对正确率；`--scaffold-prefix` 补一个没有答案的公共回答开头，仅用于格式诊断，输出标记为 `scaffold_diagnostic`。积木另用 `src/evaluate_short_readout.py` 测两候选远近与最近候选短回答，包括同文字 Q 交换对照；这些结果与原完整排序分列。只有训练内关系读出与交换响应改善后才扩大训练覆盖。
+`src/evaluate_kv_pilot.py` 还可报告首个排序候选及 Q 交换前后成对正确率；`--scaffold-prefix` 补一个没有答案的公共回答开头，仅用于格式诊断，输出标记为 `scaffold_diagnostic`。积木另用 `src/evaluate_short_readout.py` 测两候选远近与最近候选短回答，包括同文字 Q 交换对照；这些结果与原完整排序分列。
+
+按用户要求，[扩大寻路读出合同](configs/path_readout_expanded.json)将训练覆盖扩展到多种路径长度、更多当前状态与目标，从任意非同距候选对中抽题；每题同时监督原 Q 与交换 Q 的短回答。保持校准 K/V、可训练 gate 和冻结 LLM，不加关系模块 R。`src.prepare_path_readout` 先按目标编号划分训练／验证，再生成 swap；验证目标没有以 goal 角色进入接口训练，但可能作为其他角色出现，不能称为全新状态。第五张图独立测试，旧小样本记录及历史保留题的正反方向均排除。训练样本不再以完整贪心轨迹能否成功为筛选条件。
+
+`src.evaluate_path_readout` 在同一较大题集上比较旧小样本权重与扩大训练后的权重。输入保留全部候选，对选定题目的全部非同距候选对分别问原题和 swap；报告成对正确数及整道题所有候选对均正确数，按图和长度分列。候选对不是独立题目，分母同时保留基础题数。这次同时改变数据覆盖、候选对采样及训练预算，结果不能解释为单纯样本数量的因果效应。图的首步只有三个候选，也不能替代积木的大候选集合验收。
+
+```bash
+python -m experiments.flamingo_map_reader.src.prepare_path_readout \
+  --config experiments/flamingo_map_reader/configs/path_readout_expanded.json \
+  --source-root GRAPH_SOURCE_ROOT --prior-manifest SMALL_PAIRWISE_MANIFEST \
+  --out runs/flamingo_map_reader/data/expanded_manifest.json
+
+python -m experiments.flamingo_map_reader.src.train \
+  --config experiments/flamingo_map_reader/configs/path_readout_expanded.json \
+  --convergence-contract experiments/flamingo_map_reader/configs/path_readout_expanded.json \
+  --manifest runs/flamingo_map_reader/data/expanded_manifest.json \
+  --source-root GRAPH_SOURCE_ROOT --model-path MODEL_PATH --batch-size 1 \
+  --out runs/flamingo_map_reader/expanded_train
+```
 
 ## 数据与运行入口
 

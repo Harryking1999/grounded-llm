@@ -7,6 +7,28 @@ import numpy as np
 from .memory import MapBatch
 
 
+def swap_candidate_q(step, pair):
+    """Swap two specified non-tied candidates; leave all text and addresses fixed."""
+    left, right = pair
+    count = len(step.candidate_actions)
+    if left == right or not (1 <= left <= count and 1 <= right <= count):
+        raise ValueError("Q swap needs two distinct legal candidate IDs")
+    distances = list(step.candidate_map_distances)
+    if np.isclose(distances[left - 1], distances[right - 1], rtol=1e-10, atol=1e-12):
+        return None
+    source = step.map_batch
+    vectors = source.vectors.clone()
+    vectors[:, left + 1] = source.vectors[:, right + 1]
+    vectors[:, right + 1] = source.vectors[:, left + 1]
+    distances[left - 1], distances[right - 1] = distances[right - 1], distances[left - 1]
+    minimum = min(distances)
+    minimal = tuple(i for i, distance in enumerate(distances, 1)
+                    if np.isclose(distance, minimum, rtol=1e-10, atol=1e-12))
+    return replace(step, map_batch=MapBatch(vectors, source.roles,
+        source.candidate_ids, source.valid), candidate_map_distances=tuple(distances),
+        map_minimal_candidates=minimal)
+
+
 def swap_best_worst_q(step):
     """Keep text, physical actions, and IDs fixed while swapping two Q contents."""
     distances = list(step.candidate_map_distances)

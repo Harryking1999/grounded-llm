@@ -7,16 +7,16 @@ import numpy as np
 from torch.utils.data import Dataset
 
 from .blocks_data import demonstration_from_record as blocks_demonstration
-from .counterfactual import swap_best_worst_q
-from .data import demonstration_from_record as graph_demonstration, load_graph
+from .counterfactual import swap_best_worst_q, swap_candidate_q
+from .data import demonstration_from_record as graph_demonstration, first_turn_from_record, load_graph
 from .sft import Demonstration, decision_text
 from .short_readout import correct_ids, diagnostic_prompt
 from .transcript import encode_trajectory
 
 
-def paired_turns(turn, style="full_ranking"):
+def paired_turns(turn, style="full_ranking", pair=None):
     """Same user text and IDs, with original and swapped Q supervision."""
-    swapped = swap_best_worst_q(turn.step)
+    swapped = swap_best_worst_q(turn.step) if pair is None else swap_candidate_q(turn.step, pair)
     if swapped is None:
         return ()
     if style == "full_ranking":
@@ -26,8 +26,9 @@ def paired_turns(turn, style="full_ranking"):
                      for step in (turn.step, swapped))
     if style not in ("pairwise", "nearest"):
         raise ValueError(f"Unknown readout style: {style}")
-    pair = (turn.step.map_minimal_candidates[0],
-            int(np.argmax(turn.step.candidate_map_distances)) + 1)
+    if pair is None:
+        pair = (turn.step.map_minimal_candidates[0],
+                int(np.argmax(turn.step.candidate_map_distances)) + 1)
     user_text, tag = diagnostic_prompt(turn.user_text, style, pair)
     return tuple(replace(turn, step=step, user_text=user_text,
                          answer_text=f"<{tag}>{min(correct_ids(step, style, pair))}</{tag}>",
@@ -50,6 +51,12 @@ class CounterfactualFirstTurnDataset(Dataset):
                 graph_id = record["graph_id"]
                 if graph_id not in graphs:
                     graphs[graph_id] = load_graph(source_root, graph_id)[:2]
+                if "candidate_pair" in record:
+                    turn = first_turn_from_record(*graphs[graph_id], record)
+                    self.turns.extend(paired_turns(turn,
+                        config["training"].get("readout_style", "full_ranking"),
+                        pair=record["candidate_pair"]))
+                    continue
                 demo = graph_demonstration(*graphs[graph_id], record)
             if not demo.turns or demo.turns[0].step.done:
                 continue

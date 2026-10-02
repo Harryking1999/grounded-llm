@@ -3,8 +3,10 @@
 from pathlib import Path
 import json
 import unittest
+import tempfile
+from types import SimpleNamespace
 
-from experiments.flamingo_map_reader.src.convergence import PlateauTracker, with_decision_mask
+from experiments.flamingo_map_reader.src.convergence import ConvergenceCheck, PlateauTracker, with_decision_mask
 from experiments.flamingo_map_reader.src.transcript import EncodedTrajectory
 
 
@@ -29,6 +31,21 @@ class ConvergenceTest(unittest.TestCase):
         for step in range(1664, 2304, 128):
             stopped = tracker.update(step, {"training_ce": .1, "decision_ce": 1.2})
         self.assertTrue(stopped)
+
+    def test_budget_extension_preserves_history_and_does_not_double_count_resume(self):
+        with tempfile.TemporaryDirectory() as directory:
+            rows = [dict(step=256, training_ce=.2, decision_ce=.8),
+                    dict(step=384, training_ce=.1, decision_ce=.5),
+                    dict(step=512, training_ce=.12, decision_ce=.55)]
+            (Path(directory)/"convergence.jsonl").write_text(
+                ''.join(json.dumps(row) + '\n' for row in rows))
+            check = ConvergenceCheck(self.spec(), directory, [])
+            self.assertEqual(check.best_step, 384)
+            self.assertEqual(check.best_training, .1)
+            self.assertEqual(check.tracker.stale, dict(training_ce=1, decision_ce=1))
+            control = SimpleNamespace()
+            self.assertIs(check.check(SimpleNamespace(global_step=512), control), control)
+            self.assertEqual(check.tracker.stale, dict(training_ce=1, decision_ce=1))
 
     def test_plateau_does_not_call_loss_regression_converged(self):
         tracker = PlateauTracker(self.spec())

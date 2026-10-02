@@ -85,6 +85,15 @@ class ConvergenceCheck(TrainerCallback):
         self.best_training = math.inf
         self.best_step = None
         self.converged = False
+        self.last_step = None
+        history = self.output / "convergence.jsonl"
+        if history.exists():
+            for line in history.read_text(encoding="utf-8").splitlines():
+                row = json.loads(line)
+                self.tracker.update(row["step"], row)
+                if row["training_ce"] < self.best_training:
+                    self.best_training, self.best_step = row["training_ce"], row["step"]
+                self.last_step = row["step"]
 
     @torch.inference_mode()
     def measure(self):
@@ -111,6 +120,10 @@ class ConvergenceCheck(TrainerCallback):
                 "decision_ce": statistics.mean(decision)}
 
     def check(self, state, control):
+        # A budget extension resumes exactly at the last measured checkpoint.
+        # Do not count that point twice toward the patience window.
+        if self.last_step == state.global_step:
+            return control
         metrics = self.measure()
         self.converged = self.tracker.update(state.global_step, metrics)
         if metrics["training_ce"] < self.best_training:
@@ -127,6 +140,7 @@ class ConvergenceCheck(TrainerCallback):
         (self.output / "convergence_status.json").write_text(
             json.dumps(status, indent=2) + "\n", encoding="utf-8")
         print("CONVERGENCE " + json.dumps(row), flush=True)
+        self.last_step = state.global_step
         if self.converged:
             control.should_training_stop = True
             control.should_save = True

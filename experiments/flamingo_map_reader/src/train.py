@@ -236,8 +236,8 @@ def main():
     training = config["training"]
     convergence = None
     if args.convergence_contract:
-        if args.resume is None or args.out.exists():
-            raise ValueError("Convergence extension needs a checkpoint and a fresh output directory")
+        if args.resume is None:
+            raise ValueError("Convergence extension needs a full checkpoint")
         convergence = json.loads(args.convergence_contract.read_text(encoding="utf-8"))
         for filename in ("optimizer.pt", "scheduler.pt", "trainer_state.json", "rng_state.pth"):
             if not (args.resume / filename).is_file():
@@ -245,6 +245,13 @@ def main():
         source_state = json.loads((args.resume / "trainer_state.json").read_text())
         if source_state["global_step"] != convergence["source_step"]:
             raise ValueError("Continuation checkpoint does not match the declared source step")
+        if args.out.exists():
+            status = json.loads((args.out / "convergence_status.json").read_text())
+            if (status["status"] != "budget_reached_not_converged" or
+                    status["completed_step"] != source_state["global_step"] or
+                    args.resume.parent.resolve() != (args.out / "models").resolve() or
+                    convergence["max_total_steps"] <= source_state["global_step"]):
+                raise ValueError("Existing convergence output can only extend its exhausted budget")
     set_seed(config["seed"])
     from transformers import AutoModelForCausalLM, AutoTokenizer
     model_source = str(args.model_path) if args.model_path else config["model"]
@@ -300,9 +307,14 @@ def main():
     args.out.mkdir(parents=True, exist_ok=True)
     if convergence:
         check.trainer = trainer
-        (args.out / "continuation.json").write_text(json.dumps({
+        continuation = {
             "source_checkpoint": str(args.resume.resolve()),
-            "source_contract": contract, "convergence": convergence}, indent=2) + "\n")
+            "source_contract": contract, "convergence": convergence}
+        if (args.out / "continuation.json").exists():
+            with (args.out / "continuation_extensions.jsonl").open("a", encoding="utf-8") as handle:
+                handle.write(json.dumps(continuation) + "\n")
+        else:
+            (args.out / "continuation.json").write_text(json.dumps(continuation, indent=2) + "\n")
     (args.out / "config.json").write_text(json.dumps(contract, indent=2) + "\n")
     result = trainer.train(resume_from_checkpoint=str(args.resume) if args.resume else None)
     trainer.save_model(str(args.out / "models/final"))

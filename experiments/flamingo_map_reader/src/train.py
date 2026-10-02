@@ -3,6 +3,7 @@
 from argparse import ArgumentParser
 from dataclasses import replace
 import json
+import math
 from pathlib import Path
 
 import torch
@@ -205,6 +206,8 @@ def main():
                         help="Local copy of the model named in the contract")
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--resume", type=Path)
+    parser.add_argument("--convergence-contract", type=Path,
+                        help="Extend an existing run with fixed-set plateau checks")
     parser.add_argument("--batch-size", type=int, required=True,
                         help="Measured actual per-device batch size; no gradient accumulation")
     args = parser.parse_args()
@@ -231,6 +234,17 @@ def main():
                 "model_source": str(args.model_path.resolve()) if args.model_path else config["model"],
                 "batch_size": args.batch_size}
     training = config["training"]
+    convergence = None
+    if args.convergence_contract:
+        if args.resume is None or args.out.exists():
+            raise ValueError("Convergence extension needs a checkpoint and a fresh output directory")
+        convergence = json.loads(args.convergence_contract.read_text(encoding="utf-8"))
+        for filename in ("optimizer.pt", "scheduler.pt", "trainer_state.json", "rng_state.pth"):
+            if not (args.resume / filename).is_file():
+                raise ValueError(f"Full continuation is missing {filename}")
+        source_state = json.loads((args.resume / "trainer_state.json").read_text())
+        if source_state["global_step"] != convergence["source_step"]:
+            raise ValueError("Continuation checkpoint does not match the declared source step")
     set_seed(config["seed"])
     from transformers import AutoModelForCausalLM, AutoTokenizer
     model_source = str(args.model_path) if args.model_path else config["model"]
@@ -248,24 +262,47 @@ def main():
                                                  config, args.source_root)
     else:
         raise ValueError(f"Unknown supervision mode: {supervision_mode}")
+    callbacks = [JsonLog(args.out / "logs/train.jsonl")]
+    extra_arguments = {}
+    maximum_steps = training.get("max_steps", -1)
+    if convergence:
+        from .convergence import ConvergenceCheck, with_decision_mask
+        # Caching preserves exactly the deterministic examples used by the source run.
+        dataset = [with_decision_mask(dataset[index], tokenizer) for index in range(len(dataset))]
+        check = ConvergenceCheck(convergence, args.out, dataset)
+        callbacks.append(check)
+        source_steps = maximum_steps if maximum_steps > 0 else math.ceil(
+            len(dataset) / args.batch_size) * training["epochs"]
+        maximum_steps = convergence["max_total_steps"]
+        # Preserve the original warmup; extending the budget must not restart it.
+        extra_arguments = {"warmup_steps": math.ceil(source_steps * training["warmup_fraction"]),
+                           "save_steps": convergence["evaluation_every_steps"],
+                           "save_total_limit": 2, "disable_tqdm": True}
+    else:
+        callbacks.append(EpochCheckpoint(config["checkpoint"]["every_epoch_fraction"]))
     arguments = TrainingArguments(
         output_dir=str(args.out / "models"), logging_dir=str(args.out / "logs"),
         per_device_train_batch_size=args.batch_size, gradient_accumulation_steps=1,
-        num_train_epochs=training["epochs"], max_steps=training.get("max_steps", -1),
+        num_train_epochs=training["epochs"], max_steps=maximum_steps,
         learning_rate=training["learning_rate"],
         weight_decay=training["weight_decay"], warmup_ratio=training["warmup_fraction"],
         lr_scheduler_type="constant_with_warmup", optim="adamw_torch",
         max_grad_norm=training["gradient_clip_norm"], bf16=torch.cuda.is_available(),
         remove_unused_columns=False, label_names=["labels"],
-        save_strategy="no", logging_steps=1, report_to=[],
+        save_strategy="steps" if convergence else "no", logging_steps=1, report_to=[],
         dataloader_num_workers=0, seed=config["seed"], data_seed=config["seed"],
+        **extra_arguments,
     )
     trainer = MapSFTTrainer(model=reader, args=arguments, train_dataset=dataset,
         data_collator=MapCollator(tokenizer.pad_token_id if tokenizer.pad_token_id is not None
                                   else tokenizer.eos_token_id), contract=contract,
-        callbacks=[EpochCheckpoint(config["checkpoint"]["every_epoch_fraction"]),
-                   JsonLog(args.out / "logs/train.jsonl")])
+        callbacks=callbacks)
     args.out.mkdir(parents=True, exist_ok=True)
+    if convergence:
+        check.trainer = trainer
+        (args.out / "continuation.json").write_text(json.dumps({
+            "source_checkpoint": str(args.resume.resolve()),
+            "source_contract": contract, "convergence": convergence}, indent=2) + "\n")
     (args.out / "config.json").write_text(json.dumps(contract, indent=2) + "\n")
     result = trainer.train(resume_from_checkpoint=str(args.resume) if args.resume else None)
     trainer.save_model(str(args.out / "models/final"))

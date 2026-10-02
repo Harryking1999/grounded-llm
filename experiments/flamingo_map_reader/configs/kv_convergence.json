@@ -1,0 +1,32 @@
+{
+  "source_step": 256,
+  "max_total_steps": 8192,
+  "minimum_total_steps": 1024,
+  "evaluation_every_steps": 128,
+  "patience_evaluations": 4,
+  "relative_improvement": 0.005,
+  "absolute_improvement": 0.0001,
+  "maximum_final_loss_regression_fraction": 0.1,
+  "maximum_final_loss_regression_absolute": 0.001,
+  "selection": "lowest_fixed_training_loss",
+  "metrics": ["training_ce", "decision_ce"],
+  "evaluation": {
+    "train_cases": 16,
+    "validation_cases": 4,
+    "full_ranking_max_new_tokens": 2048,
+    "pairwise_max_new_tokens": 64,
+    "perturbation_cases": 16
+  },
+  "conditions": [
+    "kv_pilot_20261002/graph_joint",
+    "kv_pilot_20261002/graph_addressed_kv",
+    "kv_pilot_20261002/blocks_joint",
+    "kv_pilot_20261002/blocks_addressed_kv",
+    "kv_scale_followup_20261002/graph_calibrated_trajectory",
+    "kv_scale_followup_20261002/blocks_calibrated_trajectory",
+    "kv_scale_followup_20261002/graph_calibrated_counterfactual_first_turn",
+    "kv_scale_followup_20261002/blocks_calibrated_counterfactual_first_turn",
+    "kv_pairwise_20261002/graph_calibrated_pairwise_counterfactual",
+    "kv_pairwise_20261002/blocks_calibrated_pairwise_counterfactual"
+  ]
+}

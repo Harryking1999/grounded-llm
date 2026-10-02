@@ -46,6 +46,8 @@ python -m experiments.flamingo_map_reader.src.train \
 
 续训在同一训练命令上添加 `--resume .../models/checkpoint-N`。图闭环评测入口为 `src.evaluate_graph`，积木为 `src.evaluate_blocks`；两者都读取对应 manifest、adapter checkpoint 与原始地图。结果保存逐题实际动作和模型回答及紧凑 `results/summary.json`。图评测使用保留的原五图题集，积木按三组未见状态统计。
 
+为排除小样本训练预算不足，[收敛对照合同](configs/kv_convergence.json)规定了现有十组条件的续训与统一评测。添加 `--convergence-contract` 并使用新的输出目录，从原 checkpoint 恢复接口、优化器、调度器和随机状态，保留原数据与 warmup。`convergence.jsonl` 定期记录同一训练集重新前向的整体 CE 和排序／短式选择 CE；两者持续进入平台才记为收敛，预算用尽不算收敛。按训练集整体 CE 保存 `models/best_loss`，不使用验证成绩挑权重。排序 CE 不包含末尾复制的 action，但仍是给定正确前文的条件损失，须另做自由生成和 Q 交换评测。
+
 寻路另有独立的首步地图关系评测，使用[读出门槛](configs/path_readout_gate.json)。它在 64 条验证题和五图 120 条保留题的固定首状态生成一次回答，从冻结 Q/V 重新计算 `current` 与每个候选的远近，报告排序格式、逐对关系、完整排序、最近候选，以及动作是否遵循排序。验证题沿用训练示范的首轮文本和候选编号；保留题沿用闭环评测的首轮文本和编号。固定首步生成有单独的 token 上限，超过预算仍未给出关系和动作即计为失败。两个集合分别满足门槛，才称当前权重通过首步距离关系读出；这仍不代表整题规划成功。保留题闭环轨迹也可由 `src.summarize_graph_eval` 重放并按首轮／后续轮统计同样指标，用来定位后续状态的错误。
 
 ```bash

@@ -12,11 +12,12 @@ import torch
 from .blocks import FrozenBoardMap
 from .blocks_data import demonstration_from_record as blocks_demonstration
 from .blocks_prompt import turn_prompt as blocks_turn_prompt
+from .counterfactual import swap_best_worst_q
 from .data import demonstration_from_record as graph_demonstration, load_graph
 from .evaluate_graph_readout import generate_answer
 from .memory import MapBatch
 from .prompt import turn_prompt as graph_turn_prompt
-from .relations import score_relationships
+from .relations import first_ranked_candidate, score_relationships
 from .summarize_graph_eval import add_relation, relation_summary
 from .train import build_reader
 
@@ -40,26 +41,6 @@ def reorder_candidates(step, order):
         candidate_actions=tuple(step.candidate_actions[index] for index in order),
         candidate_destinations=tuple(step.candidate_destinations[index] for index in order),
         candidate_map_distances=distances, map_minimal_candidates=best)
-
-
-def swap_best_worst_q(step):
-    """Keep the prompt and IDs fixed while swapping two candidate Q contents."""
-    distances = list(step.candidate_map_distances)
-    best = step.map_minimal_candidates[0] - 1
-    worst = int(np.argmax(distances))
-    if best == worst:
-        return None
-    source = step.map_batch
-    vectors = source.vectors.clone()
-    vectors[:, best + 2] = source.vectors[:, worst + 2]
-    vectors[:, worst + 2] = source.vectors[:, best + 2]
-    distances[best], distances[worst] = distances[worst], distances[best]
-    minimum = min(distances)
-    best_ids = tuple(index for index, distance in enumerate(distances, 1)
-                     if np.isclose(distance, minimum, rtol=1e-10, atol=1e-12))
-    return replace(step, map_batch=MapBatch(vectors, source.roles,
-        source.candidate_ids, source.valid), candidate_map_distances=tuple(distances),
-        map_minimal_candidates=best_ids)
 
 
 def renumbered_prompt(task, step, original_text):
@@ -89,6 +70,10 @@ def main():
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--perturbation-limit", type=int, default=4)
+    parser.add_argument("--scaffold-prefix", action="store_true",
+                        help="Diagnostic only: supply a common answer opening")
+    parser.add_argument("--max-train-turns", type=int, default=0)
+    parser.add_argument("--max-validation-turns", type=int, default=0)
     args = parser.parse_args()
     if args.out.exists():
         raise FileExistsError(args.out)
@@ -120,10 +105,16 @@ def main():
     perturbed = Counter()
     perturb_counts = Counter()
     args.out.mkdir(parents=True)
+    assistant_prefix = ("The current state has not reached the goal.\n"
+                        "Map-distance ranking to the goal, closest to farthest: "
+                        if args.scaffold_prefix else "")
     with (args.out / "first_turns.jsonl").open("w", encoding="utf-8") as handle:
         for record in manifest["records"]:
             split = record["split"]
             if split not in ("train", "validation"):
+                continue
+            limit = args.max_train_turns if split == "train" else args.max_validation_turns
+            if limit and counts[split]["turns"] >= limit:
                 continue
             if task == "graph":
                 graph_id = record["graph_id"]
@@ -138,9 +129,13 @@ def main():
             if step.done or not step.candidate_actions:
                 continue
             answer = generate_answer(reader, tokenizer, step, user_text, config,
-                                     device, config["evaluation"]["action_max_new_tokens"])
+                                     device, config["evaluation"]["action_max_new_tokens"],
+                                     assistant_prefix=assistant_prefix)
             score = score_relationships(step, answer)
             add_relation(counts[split], score)
+            first = first_ranked_candidate(answer, len(step.candidate_actions))
+            counts[split].update(first_ranked_candidate_present=int(first is not None),
+                first_ranked_candidate_correct=int(first in step.map_minimal_candidates))
             row = {"split": split, "record": record, "answer": answer,
                    "score": score}
             if split == "train" and perturbed[split] < args.perturbation_limit and len(step.candidate_actions) > 1:
@@ -148,8 +143,12 @@ def main():
                 if swapped is not None:
                     swapped_answer = generate_answer(reader, tokenizer, swapped,
                         user_text, config, device,
-                        config["evaluation"]["action_max_new_tokens"])
+                        config["evaluation"]["action_max_new_tokens"],
+                        assistant_prefix=assistant_prefix)
                     swap_score = score_relationships(swapped, swapped_answer)
+                    swapped_first = first_ranked_candidate(swapped_answer,
+                        len(swapped.candidate_actions))
+                    base_first = first_ranked_candidate(answer, len(step.candidate_actions))
                     base_chosen = score["chosen_id"]
                     swap_chosen = swap_score["chosen_id"]
                     both_valid = (base_chosen is not None and swap_chosen is not None and
@@ -158,7 +157,17 @@ def main():
                     perturb_counts.update(q_swap_cases=1,
                         q_swap_both_valid=int(both_valid),
                         q_swap_action_changed=int(both_valid and base_chosen != swap_chosen),
+                        q_swap_valid_ranking=int(swap_score["valid_ranking"]),
+                        q_swap_exact_ranking=int(swap_score["exact_ranking"]),
+                        q_swap_paired_exact=int(score["exact_ranking"] and
+                                                swap_score["exact_ranking"]),
                         q_swap_new_minimum=int(swap_score["action_map_minimum"]),
+                        q_swap_first_correct=int(swapped_first in swapped.map_minimal_candidates),
+                        q_swap_paired_first_correct=int(base_first in step.map_minimal_candidates and
+                                                        swapped_first in swapped.map_minimal_candidates),
+                        q_swap_first_changed=int(base_first is not None and
+                                                 swapped_first is not None and
+                                                 base_first != swapped_first),
                         q_swap_pairwise_correct=swap_score["pairwise_correct"],
                         q_swap_pairwise_total=swap_score["pairwise_total"])
                     row["q_swap"] = {"answer": swapped_answer, "score": swap_score}
@@ -166,7 +175,8 @@ def main():
                     list(reversed(range(len(step.candidate_actions)))))
                 reordered_answer = generate_answer(reader, tokenizer, reordered,
                     renumbered_prompt(task, reordered, user_text), config, device,
-                    config["evaluation"]["action_max_new_tokens"])
+                    config["evaluation"]["action_max_new_tokens"],
+                    assistant_prefix=assistant_prefix)
                 reordered_score = score_relationships(reordered, reordered_answer)
                 base_actual = physical_action(step, score["chosen_id"])
                 reordered_actual = physical_action(reordered, reordered_score["chosen_id"])
@@ -183,7 +193,8 @@ def main():
             handle.flush()
     summary = {"readout": relation_summary(counts),
                "perturbations": dict(perturb_counts),
-               "requested_perturbation_limit": args.perturbation_limit}
+               "requested_perturbation_limit": args.perturbation_limit,
+               "generation_mode": "scaffold_diagnostic" if args.scaffold_prefix else "free"}
     (args.out / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
     print(json.dumps(summary))
 

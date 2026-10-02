@@ -9,6 +9,10 @@
 [成对小样本合同](configs/kv_pilot.json)从已冻结的完整 manifest 抽取寻路四图各若干题、积木互不重叠的棋盘题，分别生成旧混合记忆与 K/V 解耦的同题配置和 manifest。`src/prepare_kv_pilot.py` 是这一选择的唯一入口。小样本用于检测接口能否拟合关系和响应地图反事实，不替代正式的跨图／未见棋盘评测。
 `src/evaluate_kv_pilot.py` 对两题的固定首步给出训练／验证的排序与最近候选分数；少量训练题额外保持文字和编号不动交换最近／最远候选 Q，并同步重排文字编号、地图槽和实际动作。报告交换后的新最近候选命中及重编号后是否仍选同一实际动作；全候选等距时不定义最近／最远交换。
 
+首轮成对试点的结果见[项目状态页](../../docs/PROJECT_STATUS_AND_TODO.md)。后续尺度检查由 `src/measure_value_channel.py` 在训练题真正预测排序变量 token 的位置测量：每层未乘 gate 的地图残差／hidden、实际残差／hidden。`src/prepare_kv_scale_followup.py` 依据[正式选择规则](configs/kv_scale_followup.json)与两题各自的测量报告，为每题固定一个全状态共享的 value 缩放常数，并生成同预算的普通整题与独立首轮反事实读出合同。反事实条件通过 `training.supervision_mode=counterfactual_first_turn` 选择，使用相同文字和编号的原 Q／交换 Q 成对样本；它是接口诊断，不是环境轨迹。
+
+`src/evaluate_kv_pilot.py` 还可报告首个排序候选及 Q 交换前后成对正确率；`--scaffold-prefix` 补一个没有答案的公共回答开头，仅用于格式诊断，输出标记为 `scaffold_diagnostic`。积木另用 `src/evaluate_short_readout.py` 测两候选远近与最近候选短回答，包括同文字 Q 交换对照；这些结果与原完整排序分列。只有训练内关系读出与交换响应改善后才扩大训练覆盖。
+
 ## 数据与运行入口
 
 以下路径由部署环境提供；所有 `runs/` 产物位于 Git 外。生成正式数据前，需让命令与已提交合同一致。

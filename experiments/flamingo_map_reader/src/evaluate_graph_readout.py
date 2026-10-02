@@ -43,7 +43,8 @@ def fixed_turns(config, manifest, source_root, splits=("validation", "reserved")
             yield "reserved", graph_id, case["id"], step, opening + "\n\n" + turn_prompt(step, [int(case["start"])])
 
 
-def generate_answer(reader, tokenizer, step, user_text, config, device, maximum_new_tokens):
+def generate_answer(reader, tokenizer, step, user_text, config, device, maximum_new_tokens,
+                    assistant_prefix="", stop_markers=("</action>", "<done/>")):
     from transformers import StoppingCriteria, StoppingCriteriaList
 
     class ControlBoundary(StoppingCriteria):
@@ -52,10 +53,12 @@ def generate_answer(reader, tokenizer, step, user_text, config, device, maximum_
 
         def __call__(self, input_ids, scores, **kwargs):
             answer = tokenizer.decode(input_ids[0, self.prefix_length:], skip_special_tokens=True)
-            return "</action>" in answer or "<done/>" in answer
+            return any(marker in answer for marker in stop_markers)
 
     prefix = chat_ids(tokenizer, [{"role": "user", "content": user_text}],
                       add_generation_prompt=True, **config.get("chat_template_kwargs", {}))
+    if assistant_prefix:
+        prefix += tokenizer.encode(assistant_prefix, add_special_tokens=False)
     if len(prefix) >= config["maximum_sequence_tokens"]:
         raise ValueError("Fixed first-turn prompt exceeds context")
     timeline = to_device(timeline_maps([step], [0] * len(prefix)), device)
@@ -67,7 +70,7 @@ def generate_answer(reader, tokenizer, step, user_text, config, device, maximum_
                                config["maximum_sequence_tokens"] - len(prefix)),
             do_sample=False, use_cache=True, pad_token_id=tokenizer.eos_token_id,
             stopping_criteria=StoppingCriteriaList([ControlBoundary(len(prefix))]))
-    return tokenizer.decode(output[0, len(prefix):], skip_special_tokens=True).strip()
+    return assistant_prefix + tokenizer.decode(output[0, len(prefix):], skip_special_tokens=True).strip()
 
 
 def main():

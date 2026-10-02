@@ -13,6 +13,7 @@ from transformers import Qwen2Config, Qwen2ForCausalLM, TrainingArguments
 from experiments.flamingo_map_reader.src.fusion import MapReader
 from experiments.flamingo_map_reader.src.graph import graph_step
 from experiments.flamingo_map_reader.src.memory import MapMemoryEncoder
+from experiments.flamingo_map_reader.src.measure_value_channel import ranking_prediction_positions
 from experiments.flamingo_map_reader.src.sft import greedy_demonstration
 from experiments.flamingo_map_reader.src.train import (MapCollator, MapSFTTrainer,
     collate_examples, decision_weighted_loss)
@@ -32,6 +33,16 @@ class ByteFocusTokenizer(ByteChatTemplate):
 
 
 class FocusTest(unittest.TestCase):
+    def test_calibration_samples_actual_ranking_prediction_positions(self):
+        environment, qmap = line_graph()
+        turn = greedy_demonstration(environment, qmap, 1, 2,
+            rng=np.random.default_rng(7)).turns[0]
+        ids, positions = ranking_prediction_positions(ByteFocusTokenizer(), turn, {})
+        actual = bytes(ids[position + 1] for position in positions).decode("utf-8")
+        expected = re.search(r"Map-distance ranking to the goal, closest to farthest: (.+)\.",
+                             turn.answer_text).group(1)
+        self.assertEqual(actual, expected)
+
     def test_only_variable_decision_spans_are_focused(self):
         environment, qmap = line_graph()
         demo = greedy_demonstration(environment, qmap, 1, 2,

@@ -16,6 +16,7 @@ from .data import demonstration_from_record as graph_demonstration_from_record, 
 from .fusion import MapReader
 from .graph import batch_maps
 from .memory import AddressedMapMemoryEncoder, MapBatch, MapMemoryEncoder, MapTimeline
+from .readout_aux import CounterfactualFirstTurnDataset
 from .transcript import encode_trajectory
 
 
@@ -33,7 +34,8 @@ def build_reader(base, config):
                      spec["role_and_id_dim"])
     return MapReader(base, memory, spec["attention_heads"], spec["attention_head_dim"],
                       spec["cross_attention_every_n_layers"],
-                      fixed_gate_tanh=spec.get("fixed_gate_tanh"))
+                      fixed_gate_tanh=spec.get("fixed_gate_tanh"),
+                      value_scale=spec.get("value_scale", 1.0))
 
 
 def to_device(timeline, device):
@@ -238,11 +240,19 @@ def main():
     base.config.use_cache = False
     reader = build_reader(base, config)
     qmap = FrozenBoardMap.load(args.q_checkpoint) if task == "blocks" else None
-    dataset = SFTDataset(records, qmap, tokenizer, config, args.source_root)
+    supervision_mode = training.get("supervision_mode", "trajectory")
+    if supervision_mode == "trajectory":
+        dataset = SFTDataset(records, qmap, tokenizer, config, args.source_root)
+    elif supervision_mode == "counterfactual_first_turn":
+        dataset = CounterfactualFirstTurnDataset(records, qmap, tokenizer,
+                                                 config, args.source_root)
+    else:
+        raise ValueError(f"Unknown supervision mode: {supervision_mode}")
     arguments = TrainingArguments(
         output_dir=str(args.out / "models"), logging_dir=str(args.out / "logs"),
         per_device_train_batch_size=args.batch_size, gradient_accumulation_steps=1,
-        num_train_epochs=training["epochs"], learning_rate=training["learning_rate"],
+        num_train_epochs=training["epochs"], max_steps=training.get("max_steps", -1),
+        learning_rate=training["learning_rate"],
         weight_decay=training["weight_decay"], warmup_ratio=training["warmup_fraction"],
         lr_scheduler_type="constant_with_warmup", optim="adamw_torch",
         max_grad_norm=training["gradient_clip_norm"], bf16=torch.cuda.is_available(),

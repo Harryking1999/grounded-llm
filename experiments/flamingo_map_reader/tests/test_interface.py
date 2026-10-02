@@ -70,6 +70,27 @@ class InterfaceTest(unittest.TestCase):
         self.assertGreater(float(attention.to_key.weight.grad.norm()), 0)
         self.assertGreater(float(attention.to_value.weight.grad.norm()), 0)
 
+    def test_one_global_value_scale_multiplies_branch_without_changing_addresses(self):
+        torch.manual_seed(19)
+        encoder = AddressedMapMemoryEncoder(2, 8, 4, 5, 3)
+        one = GatedMapCrossAttention(8, 2, head_dim=4,
+            key_dim=encoder.key_dim, value_dim=encoder.value_dim)
+        scaled = GatedMapCrossAttention(8, 2, head_dim=4,
+            key_dim=encoder.key_dim, value_dim=encoder.value_dim, value_scale=3.0)
+        scaled.load_state_dict(one.state_dict())
+        one.gate.data.fill_(0.5)
+        scaled.gate.data.fill_(0.5)
+        hidden = torch.randn(1, 2, 8)
+        memory = encoder(batch())
+        ordinary = one(hidden, memory, batch().valid) - hidden
+        amplified = scaled(hidden, memory, batch().valid) - hidden
+        torch.testing.assert_close(amplified, ordinary * 3, rtol=1e-5, atol=1e-6)
+        for invalid in (0, -1, float("inf"), float("nan")):
+            with self.subTest(invalid=invalid), self.assertRaisesRegex(ValueError, "value scale"):
+                GatedMapCrossAttention(8, 2, head_dim=4,
+                    key_dim=encoder.key_dim, value_dim=encoder.value_dim,
+                    value_scale=invalid)
+
     def test_slot_validation_rejects_unidentified_successor(self):
         bad = batch()
         bad.candidate_ids[0, 2] = 0

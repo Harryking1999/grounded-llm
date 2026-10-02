@@ -9,6 +9,20 @@ import numpy as np
 RANKING_PREFIX = "Map-distance ranking to the goal, closest to farthest: "
 
 
+def first_ranked_candidate(answer: str, candidate_count: int) -> int | None:
+    """Read the first candidate in the ranking line, even if the line is incomplete."""
+    lines = [line.strip() for line in answer.splitlines()
+             if line.strip().startswith(RANKING_PREFIX)]
+    if len(lines) != 1:
+        return None
+    expression = lines[0][len(RANKING_PREFIX):]
+    match = re.search(r"(?<![0-9])([1-9][0-9]*)(?![0-9])", expression)
+    if match is None:
+        return None
+    candidate = int(match.group(1))
+    return candidate if candidate <= candidate_count else None
+
+
 def parse_ranking(answer: str, candidate_count: int) -> dict[int, int] | None:
     lines = [line.strip() for line in answer.splitlines()
              if line.strip().startswith(RANKING_PREFIX)]

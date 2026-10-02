@@ -15,7 +15,8 @@ from .memory import (AddressedMapMemoryEncoder, AddressedMemory, MapBatch,
 
 class GatedMapCrossAttention(nn.Module):
     def __init__(self, language_dim: int, heads: int, head_dim: int = 64,
-                 key_dim: int | None = None, value_dim: int | None = None) -> None:
+                 key_dim: int | None = None, value_dim: int | None = None,
+                 value_scale: float = 1.0) -> None:
         super().__init__()
         if min(language_dim, heads, head_dim) <= 0:
             raise ValueError("attention dimensions must be positive")
@@ -23,9 +24,14 @@ class GatedMapCrossAttention(nn.Module):
             raise ValueError("key and value dimensions must be specified together")
         if key_dim is not None and min(key_dim, value_dim) <= 0:
             raise ValueError("key and value dimensions must be positive")
+        if value_scale <= 0 or not float(value_scale) < float("inf"):
+            raise ValueError("value scale must be finite and positive")
+        if key_dim is None and value_scale != 1.0:
+            raise ValueError("value scale is only defined for addressed memory")
         self.heads = heads
         self.head_dim = head_dim
         self.addressed = key_dim is not None
+        self.value_scale = float(value_scale)
         inner_dim = heads * head_dim
         self.query_norm = nn.LayerNorm(language_dim)
         self.to_query = nn.Linear(language_dim, inner_dim, bias=False)
@@ -78,7 +84,7 @@ class GatedMapCrossAttention(nn.Module):
         if self.addressed:
             key = self.to_key(self.key_norm(keys))
             # Per-slot normalization would discard state magnitude and mean.
-            value = self.to_value(values)
+            value = self.to_value(values) * self.value_scale
         else:
             key, value = self.to_key_value(self.memory_norm(keys)).chunk(2, dim=-1)
         query = query.reshape(batch_size, text_length, self.heads, self.head_dim).transpose(1, 2)
@@ -144,6 +150,7 @@ class MapReader(nn.Module):
         every_n_layers: int = 1,
         decoder_path: str = "model.layers",
         fixed_gate_tanh: float | None = None,
+        value_scale: float = 1.0,
     ) -> None:
         super().__init__()
         if every_n_layers <= 0:
@@ -170,7 +177,8 @@ class MapReader(nn.Module):
                                 memory_encoder.combine.out_features)
                 adapter = GatedMapCrossAttention(language_dim, heads, head_dim,
                     key_dim=memory_encoder.key_dim if addressed else None,
-                    value_dim=memory_encoder.value_dim if addressed else None)
+                    value_dim=memory_encoder.value_dim if addressed else None,
+                    value_scale=value_scale)
                 if fixed_gate_tanh is not None:
                     adapter.gate.data.fill_(atanh(fixed_gate_tanh))
                     adapter.gate.requires_grad_(False)

@@ -4,7 +4,8 @@ from types import SimpleNamespace
 import torch
 
 from experiments.flamingo_map_reader.src.evaluate_graph_readout import generate_answer
-from experiments.flamingo_map_reader.src.relations import parse_ranking, score_relationships
+from experiments.flamingo_map_reader.src.relations import (first_ranked_candidate,
+    parse_ranking, score_relationships)
 from experiments.flamingo_map_reader.src.graph import graph_step
 from experiments.flamingo_map_reader.src.sft import decision_text
 from experiments.flamingo_map_reader.src.summarize_graph_eval import score_rollout_relationships
@@ -13,6 +14,13 @@ from test_graph_eval import ByteTokenizer
 
 
 class RelationshipTests(unittest.TestCase):
+    def test_first_candidate_can_be_read_before_full_ranking_is_valid(self):
+        answer = ("Map-distance ranking to the goal, closest to farthest: "
+                  "current < 2 < 1")
+        self.assertEqual(first_ranked_candidate(answer, 2), 2)
+        self.assertIsNone(parse_ranking(answer, 2))
+        self.assertIsNone(first_ranked_candidate("Candidate 2 is closer", 2))
+
     def test_current_and_candidates_are_scored_together(self):
         step = SimpleNamespace(current_map_distance=1.5,
             candidate_map_distances=(2.0, 1.0), candidate_actions=(4, 7),

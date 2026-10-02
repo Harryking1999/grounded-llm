@@ -7274,7 +7274,136 @@
               "record_count": 20
             }
           },
-          "converged": {}
+          "converged": {
+            "full_ranking": {
+              "summary": {
+                "readout": {
+                  "train": {
+                    "turns": 16,
+                    "valid_ranking": 13,
+                    "pairwise_correct": 25103,
+                    "pairwise_total": 34931,
+                    "exact_ranking": 13,
+                    "closest_candidate_set_exact": 13,
+                    "action_map_minimum": 13,
+                    "action_follows_ranking": 13,
+                    "first_ranked_candidate_present": 16,
+                    "first_ranked_candidate_correct": 16,
+                    "valid_ranking_rate": 0.8125,
+                    "pairwise_accuracy": 0.7186453293636025,
+                    "exact_ranking_rate": 0.8125,
+                    "closest_candidate_accuracy": 0.8125,
+                    "action_map_minimum_rate": 0.8125,
+                    "action_follows_ranking_rate": 0.8125
+                  },
+                  "validation": {
+                    "turns": 4,
+                    "valid_ranking": 0,
+                    "pairwise_correct": 0,
+                    "pairwise_total": 7452,
+                    "exact_ranking": 0,
+                    "closest_candidate_set_exact": 0,
+                    "action_map_minimum": 0,
+                    "action_follows_ranking": 0,
+                    "first_ranked_candidate_present": 3,
+                    "first_ranked_candidate_correct": 0,
+                    "valid_ranking_rate": 0.0,
+                    "pairwise_accuracy": 0.0,
+                    "exact_ranking_rate": 0.0,
+                    "closest_candidate_accuracy": 0.0,
+                    "action_map_minimum_rate": 0.0,
+                    "action_follows_ranking_rate": 0.0
+                  }
+                },
+                "perturbations": {
+                  "q_swap_cases": 16,
+                  "q_swap_both_valid": 11,
+                  "q_swap_action_changed": 0,
+                  "q_swap_valid_ranking": 11,
+                  "q_swap_exact_ranking": 0,
+                  "q_swap_paired_exact": 0,
+                  "q_swap_new_minimum": 0,
+                  "q_swap_first_correct": 0,
+                  "q_swap_paired_first_correct": 0,
+                  "q_swap_first_changed": 0,
+                  "q_swap_pairwise_correct": 19566,
+                  "q_swap_pairwise_total": 34931,
+                  "renumber_cases": 16,
+                  "renumber_both_valid": 3,
+                  "renumber_same_physical_action": 0,
+                  "renumber_new_minimum": 0
+                },
+                "requested_perturbation_limit": 16,
+                "generation_max_new_tokens": 2048,
+                "generation_mode": "free",
+                "source_parts": [
+                  "evaluation_shards/blocks_calibrated_trajectory/converged/00_02/first_turns.jsonl",
+                  "evaluation_shards/blocks_calibrated_trajectory/converged/02_04/first_turns.jsonl",
+                  "evaluation_shards/blocks_calibrated_trajectory/converged/04_06/first_turns.jsonl",
+                  "evaluation_shards/blocks_calibrated_trajectory/converged/06_08/first_turns.jsonl",
+                  "evaluation_shards/blocks_calibrated_trajectory/converged/08_10/first_turns.jsonl",
+                  "evaluation_shards/blocks_calibrated_trajectory/converged/10_12/first_turns.jsonl",
+                  "evaluation_shards/blocks_calibrated_trajectory/converged/12_14/first_turns.jsonl",
+                  "evaluation_shards/blocks_calibrated_trajectory/converged/14_16/first_turns.jsonl",
+                  "evaluation_shards/blocks_calibrated_trajectory/converged/16_18/first_turns.jsonl",
+                  "evaluation_shards/blocks_calibrated_trajectory/converged/18_20/first_turns.jsonl"
+                ],
+                "record_range": [
+                  0,
+                  null
+                ]
+              },
+              "candidate_only_pairs": {
+                "train": {
+                  "strict_correct": 24315,
+                  "strict_total": 33903,
+                  "tie_correct": 0,
+                  "tie_total": 0,
+                  "valid_rankings": 13,
+                  "cases": 16
+                },
+                "validation": {
+                  "strict_correct": 0,
+                  "strict_total": 7214,
+                  "tie_correct": 0,
+                  "tie_total": 0,
+                  "valid_rankings": 0,
+                  "cases": 4
+                }
+              },
+              "paired_action_correct": 0,
+              "paired_action_denominator": 16,
+              "record_count": 20
+            },
+            "pairwise": {
+              "summary": {
+                "task": "blocks",
+                "mode": "pairwise",
+                "generation_mode": "free",
+                "readout": {
+                  "train": {
+                    "cases": 16,
+                    "base_valid": 6,
+                    "swapped_valid": 5,
+                    "base_correct": 4,
+                    "swapped_correct": 0,
+                    "paired_correct": 0,
+                    "choice_changed": 0
+                  },
+                  "validation": {
+                    "cases": 4,
+                    "base_valid": 0,
+                    "swapped_valid": 0,
+                    "base_correct": 0,
+                    "swapped_correct": 0,
+                    "paired_correct": 0,
+                    "choice_changed": 0
+                  }
+                }
+              },
+              "record_count": 20
+            }
+          }
         },
         "evaluation_records": [
           {
@@ -10441,6 +10570,7 @@
   },
   "expanded_path_readout": {
     "source_commit": "ef75c66",
+    "warmup_fix_commit": "88c72c4",
     "coverage": {
       "train": {
         "records": 1024,
@@ -10499,7 +10629,18 @@
     },
     "output_directory": "/zhanghanyue/experiment/flamingo_map_reader/runs/path_readout_expanded_20261003",
     "status": {
-      "status": "initial_evaluation"
+      "step": 11264,
+      "epoch": 5.5,
+      "training_ce": 0.0738799526461662,
+      "decision_ce": 0.8123275250691222,
+      "stale": {
+        "training_ce": 3,
+        "decision_ce": 3
+      },
+      "best_step": 8192,
+      "plateau": false,
+      "status": "running",
+      "selected_checkpoint": "models/best_loss/adapter.pt"
     },
     "evaluations": {
       "small": {
@@ -10784,6 +10925,151 @@
         "completed_records": 0
       }
     },
-    "curve": []
+    "curve": [
+      {
+        "step": 0,
+        "epoch": 0,
+        "training_ce": 1.1629358651989605,
+        "decision_ce": 3.2853259914700175,
+        "stale": {
+          "training_ce": 0,
+          "decision_ce": 0
+        },
+        "best_step": 0,
+        "plateau": false
+      },
+      {
+        "step": 1024,
+        "epoch": 0.5,
+        "training_ce": 0.07949223408422768,
+        "decision_ce": 0.8713122883063988,
+        "stale": {
+          "training_ce": 0,
+          "decision_ce": 0
+        },
+        "best_step": 1024,
+        "plateau": false
+      },
+      {
+        "step": 2048,
+        "epoch": 1.0,
+        "training_ce": 0.1143422046492617,
+        "decision_ce": 1.2532891920343445,
+        "stale": {
+          "training_ce": 1,
+          "decision_ce": 1
+        },
+        "best_step": 1024,
+        "plateau": false
+      },
+      {
+        "step": 3072,
+        "epoch": 1.5,
+        "training_ce": 0.08723140660981699,
+        "decision_ce": 0.9570613867763313,
+        "stale": {
+          "training_ce": 2,
+          "decision_ce": 2
+        },
+        "best_step": 1024,
+        "plateau": false
+      },
+      {
+        "step": 4096,
+        "epoch": 2.0,
+        "training_ce": 0.08360407117686464,
+        "decision_ce": 0.9176151441242837,
+        "stale": {
+          "training_ce": 3,
+          "decision_ce": 3
+        },
+        "best_step": 1024,
+        "plateau": false
+      },
+      {
+        "step": 5120,
+        "epoch": 2.5,
+        "training_ce": 0.06855667227023332,
+        "decision_ce": 0.7520578529329214,
+        "stale": {
+          "training_ce": 0,
+          "decision_ce": 0
+        },
+        "best_step": 5120,
+        "plateau": false
+      },
+      {
+        "step": 6144,
+        "epoch": 3.0,
+        "training_ce": 0.06501809816018067,
+        "decision_ce": 0.7137747958477121,
+        "stale": {
+          "training_ce": 0,
+          "decision_ce": 0
+        },
+        "best_step": 6144,
+        "plateau": false
+      },
+      {
+        "step": 7168,
+        "epoch": 3.5,
+        "training_ce": 0.06518809843873896,
+        "decision_ce": 0.7161642687788117,
+        "stale": {
+          "training_ce": 1,
+          "decision_ce": 1
+        },
+        "best_step": 6144,
+        "plateau": false
+      },
+      {
+        "step": 8192,
+        "epoch": 4.0,
+        "training_ce": 0.06401187187293544,
+        "decision_ce": 0.7030750527046621,
+        "stale": {
+          "training_ce": 0,
+          "decision_ce": 0
+        },
+        "best_step": 8192,
+        "plateau": false
+      },
+      {
+        "step": 9216,
+        "epoch": 4.5,
+        "training_ce": 0.07072355824038823,
+        "decision_ce": 0.7774275389747345,
+        "stale": {
+          "training_ce": 1,
+          "decision_ce": 1
+        },
+        "best_step": 8192,
+        "plateau": false
+      },
+      {
+        "step": 10240,
+        "epoch": 5.0,
+        "training_ce": 0.06518959491222631,
+        "decision_ce": 0.7165065198350931,
+        "stale": {
+          "training_ce": 2,
+          "decision_ce": 2
+        },
+        "best_step": 8192,
+        "plateau": false
+      },
+      {
+        "step": 11264,
+        "epoch": 5.5,
+        "training_ce": 0.0738799526461662,
+        "decision_ce": 0.8123275250691222,
+        "stale": {
+          "training_ce": 3,
+          "decision_ce": 3
+        },
+        "best_step": 8192,
+        "plateau": false
+      }
+    ]
   }
 }

@@ -2,7 +2,7 @@
 
 两项任务共用 Qwen2.5-1.5B-Instruct 的基座型号、地图记忆编码与门控 cross-attention 的结构和代码、整题 SFT 和逐轮文字协议。**寻路与积木分别新建并训练 P、cross-attention 等接口参数，保存到不同 checkpoint；不混合训练，也不共享训练后的接口权重。**地图与环境规则各自提供。设计与解释见 [DESIGN](DESIGN.md)，进度见[项目状态页](../../docs/PROJECT_STATUS_AND_TODO.md)。
 
-讨论与汇报用的[分析报告](results/readout_failure_analysis.md)汇总同题小样本、K/V 解耦、尺度校准和 swap 监督；[紧凑证据](results/readout_failure_evidence.json)保留 loss 曲线及运行记录。第 256 步的失败不能替代充分训练后的比较：寻路完整与短式 swap 已达到训练成对正确 16/16，积木短式为 1/16；其余收敛结果正在补齐。样本过少，不能据此确定泛化能力。
+讨论与汇报用的[分析报告](results/readout_failure_analysis.md)汇总同题小样本、K/V 解耦、尺度校准和 swap 监督；[紧凑证据](results/readout_failure_evidence.json)保留 loss 曲线及运行记录。十组小样本训练均进入平台并完成同题评测。寻路完整与短式 swap 已达到训练成对正确 16/16，积木完整与短式分别为 3/16、1/16。原普通整题 SFT 可以拟合原题，仍未通过 Q 交换；扩大寻路的训练和泛化比较继续进行。
 
 当前 K/V 解耦合同：[寻路](configs/pilot_path256_addressed_kv.json)、[积木](configs/pilot_blocks_addressed_kv.json)。旧[寻路](configs/pilot_path256.json)、[积木](configs/pilot_blocks.json)配置保留为混合记忆基线。`src/text.py`、`src/sft.py` 统一英文开头、排序和终止回答；`src/train.py` 根据合同加载图 Q/V 或共享棋盘 Q。训练使用普通 Trainer batch、assistant-only CE，保持每轮 token 到当轮地图的方案 A 绑定。两个任务的训练超参数相同；实际 batch 由各自长题的显存测量决定。
 

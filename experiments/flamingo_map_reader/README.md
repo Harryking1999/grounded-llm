@@ -64,7 +64,9 @@ python -m experiments.flamingo_map_reader.src.train \
 
 续训在同一训练命令上添加 `--resume .../models/checkpoint-N`。图闭环评测入口为 `src.evaluate_graph`，积木为 `src.evaluate_blocks`；两者都读取对应 manifest、adapter checkpoint 与原始地图。结果保存逐题实际动作和模型回答及紧凑 `results/summary.json`。图评测使用保留的原五图题集，积木按三组未见状态统计。
 
-为排除小样本训练预算不足，[收敛对照合同](configs/kv_convergence.json)规定了现有十组条件的续训与统一评测。添加 `--convergence-contract` 并使用新的输出目录，从原 checkpoint 恢复接口、优化器、调度器和随机状态，保留原数据与 warmup。`convergence.jsonl` 定期记录同一训练集重新前向的整体 CE 和排序／短式选择 CE；两者持续进入平台才记为收敛，预算用尽不算收敛。按训练集整体 CE 保存 `models/best_loss`，不使用验证成绩挑权重。排序 CE 不包含末尾复制的 action，但仍是给定正确前文的条件损失，须另做自由生成和 Q 交换评测。
+为排除小样本训练预算不足，[收敛对照合同](configs/kv_convergence.json)规定了现有十组条件的续训与统一评测。添加 `--convergence-contract` 并使用新的输出目录，从原 checkpoint 恢复接口、优化器、调度器和随机状态，保留原数据。`convergence.jsonl` 定期记录同一训练集重新前向的整体 CE 和排序／短式选择 CE；两者持续进入平台才记为收敛，预算用尽不算收敛。按训练集整体 CE 保存 `models/best_loss`，不使用验证成绩挑权重。排序 CE 不包含末尾复制的 action，但仍是给定正确前文的条件损失，须另做自由生成和 Q 交换评测。
+
+`88c72c4` 修正了 Transformers 将 warmup_ratio 覆盖显式 warmup_steps 的行为，现在延长预算时保持原 warmup 步数。修正前的小样本续训第 258–410 步存在相同的短暂学习率偏差，随后都恢复恒定值；已在报告与证据中披露。扩大寻路中受影响的首次尝试已保留记录并中止，修正后从同 seed 重新训练。
 
 若预算用尽时仍未进入平台，可用[追加预算合同](configs/kv_convergence_extension.json)从同一输出目录的末步完整 checkpoint 继续。历史曲线、最优权重和平台计数会保留；重复恢复点不计作一次新的平台观测。追加记录写入 `continuation_extensions.jsonl`，不覆盖原始续训合同。
 

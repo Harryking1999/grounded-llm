@@ -76,7 +76,14 @@ def main():
     parser.add_argument("--max-validation-turns", type=int, default=0)
     parser.add_argument("--maximum-new-tokens", type=int,
                         help="Diagnostic cap; report separately from the formal task budget")
+    parser.add_argument("--record-start", type=int, default=0,
+                        help="First manifest record for an independent evaluation shard")
+    parser.add_argument("--record-stop", type=int,
+                        help="Exclusive last manifest record for an evaluation shard")
     args = parser.parse_args()
+    if args.record_start < 0 or (args.record_stop is not None and
+                                args.record_stop <= args.record_start):
+        raise ValueError("Evaluation shard needs a nonempty nonnegative record range")
     if args.maximum_new_tokens is not None and args.maximum_new_tokens <= 0:
         raise ValueError("maximum new tokens must be positive")
     if args.out.exists():
@@ -115,7 +122,7 @@ def main():
     maximum_new_tokens = (args.maximum_new_tokens or
                           config["evaluation"]["action_max_new_tokens"])
     with (args.out / "first_turns.jsonl").open("w", encoding="utf-8") as handle:
-        for record in manifest["records"]:
+        for record in manifest["records"][args.record_start:args.record_stop]:
             split = record["split"]
             if split not in ("train", "validation"):
                 continue
@@ -201,6 +208,7 @@ def main():
                "perturbations": dict(perturb_counts),
                "requested_perturbation_limit": args.perturbation_limit,
                "generation_max_new_tokens": maximum_new_tokens,
+               "record_range": [args.record_start, args.record_stop],
                "generation_mode": "scaffold_diagnostic" if args.scaffold_prefix else "free"}
     (args.out / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
     print(json.dumps(summary))

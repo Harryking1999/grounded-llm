@@ -8,7 +8,7 @@ from types import SimpleNamespace
 
 from experiments.flamingo_map_reader.src.convergence import ConvergenceCheck, PlateauTracker, with_decision_mask
 from experiments.flamingo_map_reader.src.transcript import EncodedTrajectory
-from experiments.flamingo_map_reader.src.train import fixed_warmup_arguments
+from experiments.flamingo_map_reader.src.train import check_resume_target, fixed_warmup_arguments
 from transformers import TrainingArguments
 
 
@@ -54,6 +54,37 @@ class ConvergenceTest(unittest.TestCase):
             control = SimpleNamespace()
             self.assertIs(check.check(SimpleNamespace(global_step=512), control), control)
             self.assertEqual(check.tracker.stale, dict(training_ce=1, decision_ce=1))
+
+    def test_resume_accepts_an_interrupted_run_only_at_its_last_measurement(self):
+        spec = json.loads((Path(__file__).parents[1]
+                           / "configs/path_readout_expanded_resume.json").read_text())
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)
+            (output / "models/checkpoint-12288").mkdir(parents=True)
+            resume = output / "models/checkpoint-12288"
+            (output / "convergence.jsonl").write_text(json.dumps(
+                dict(step=12288, training_ce=.06, decision_ce=.70)) + "\n")
+            (output / "convergence_status.json").write_text(json.dumps(
+                dict(step=12288, status="running")))
+            check_resume_target(output, resume, 12288, spec)
+            with self.assertRaises(ValueError):
+                check_resume_target(output, resume, 11264, spec)
+            (output / "convergence_status.json").write_text(json.dumps(
+                dict(status="plateau", completed_step=12288)))
+            with self.assertRaises(ValueError):
+                check_resume_target(output, resume, 12288, spec)
+
+    def test_extension_still_requires_the_exhausted_budget_step(self):
+        spec = json.loads((Path(__file__).parents[1]
+                           / "configs/kv_convergence_extension.json").read_text())
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)
+            (output / "models/checkpoint-8192").mkdir(parents=True)
+            (output / "convergence_status.json").write_text(json.dumps(
+                dict(status="budget_reached_not_converged", completed_step=8192)))
+            check_resume_target(output, output / "models/checkpoint-8192", 8192, spec)
+            with self.assertRaises(ValueError):
+                check_resume_target(output, output / "models/checkpoint-8192", 8064, spec)
 
     def test_plateau_does_not_call_loss_regression_converged(self):
         tracker = PlateauTracker(self.spec())

@@ -196,6 +196,36 @@ class MapSFTTrainer(Trainer):
         (model or self.model).load_adapter_state_dict(saved["adapter"])
 
 
+def last_measured_step(output):
+    """Last step already recorded for this output; None when nothing was measured."""
+    history = Path(output) / "convergence.jsonl"
+    if not history.is_file():
+        return None
+    rows = [json.loads(line) for line in history.read_text(encoding="utf-8").splitlines()]
+    return rows[-1]["step"] if rows else None
+
+
+def check_resume_target(output, resume, source_step, convergence):
+    """Reject anything but continuing this output's own training from its last step.
+
+    A run that ran out of budget still records where it stopped. A run killed from
+    outside leaves its status at "running", so its last recorded measurement is the
+    only evidence of where training actually reached.
+    """
+    if (resume.parent.resolve() != (Path(output) / "models").resolve() or
+            convergence["max_total_steps"] <= source_step):
+        raise ValueError("Existing convergence output must continue its own models directory")
+    status = json.loads((Path(output) / "convergence_status.json").read_text(encoding="utf-8"))
+    if status["status"] == "budget_reached_not_converged":
+        if status["completed_step"] != source_step:
+            raise ValueError("Extension does not resume from the exhausted budget's last step")
+    elif status["status"] == "running":
+        if last_measured_step(output) != source_step:
+            raise ValueError("Interrupted run's last measurement differs from the resume step")
+    else:
+        raise ValueError("Existing convergence output is not resumable")
+
+
 def fixed_warmup_arguments(training, source_steps):
     # Transformers 5 converts warmup_ratio into warmup_steps during __post_init__,
     # even when an explicit step count is also supplied. Omit the ratio entirely.
@@ -256,12 +286,7 @@ def main():
             if source_state["global_step"] != convergence["source_step"]:
                 raise ValueError("Continuation checkpoint does not match the declared source step")
         if args.out.exists():
-            status = json.loads((args.out / "convergence_status.json").read_text())
-            if (status["status"] != "budget_reached_not_converged" or
-                    status["completed_step"] != source_state["global_step"] or
-                    args.resume.parent.resolve() != (args.out / "models").resolve() or
-                    convergence["max_total_steps"] <= source_state["global_step"]):
-                raise ValueError("Existing convergence output can only extend its exhausted budget")
+            check_resume_target(args.out, args.resume, source_state["global_step"], convergence)
     set_seed(config["seed"])
     from transformers import AutoModelForCausalLM, AutoTokenizer
     model_source = str(args.model_path) if args.model_path else config["model"]

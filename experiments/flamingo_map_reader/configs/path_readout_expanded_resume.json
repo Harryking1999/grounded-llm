@@ -1,0 +1,17 @@
+{
+  "source_step": 12288,
+  "max_total_steps": 16384,
+  "minimum_total_steps": 4096,
+  "evaluation_every_steps": 1024,
+  "patience_evaluations": 4,
+  "relative_improvement": 0.005,
+  "absolute_improvement": 0.0001,
+  "maximum_final_loss_regression_fraction": 0.1,
+  "maximum_final_loss_regression_absolute": 0.001,
+  "selection": "lowest_fixed_training_loss",
+  "metrics": [
+    "training_ce",
+    "decision_ce"
+  ],
+  "resume_reason": "Node restart killed the run at step 12288 with 4096 of the declared 16384 steps unspent; this contract re-enters the same budget from the last complete checkpoint."
+}

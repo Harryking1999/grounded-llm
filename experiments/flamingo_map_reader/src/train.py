@@ -196,6 +196,13 @@ class MapSFTTrainer(Trainer):
         (model or self.model).load_adapter_state_dict(saved["adapter"])
 
 
+def fixed_warmup_arguments(training, source_steps):
+    # Transformers 5 converts warmup_ratio into warmup_steps during __post_init__,
+    # even when an explicit step count is also supplied. Omit the ratio entirely.
+    return {"warmup_ratio": None, "warmup_steps": training.get(
+        "warmup_steps", math.ceil(source_steps * training["warmup_fraction"]))}
+
+
 def main():
     parser = ArgumentParser()
     parser.add_argument("--config", type=Path, required=True)
@@ -273,7 +280,7 @@ def main():
     else:
         raise ValueError(f"Unknown supervision mode: {supervision_mode}")
     callbacks = [JsonLog(args.out / "logs/train.jsonl")]
-    extra_arguments = {}
+    extra_arguments = {"warmup_ratio": training["warmup_fraction"]}
     maximum_steps = training.get("max_steps", -1)
     if convergence:
         from .convergence import ConvergenceCheck, with_decision_mask
@@ -285,7 +292,7 @@ def main():
             len(dataset) / args.batch_size) * training["epochs"]
         maximum_steps = convergence["max_total_steps"]
         # Preserve the original warmup; extending the budget must not restart it.
-        extra_arguments = {"warmup_steps": training.get("warmup_steps", math.ceil(source_steps * training["warmup_fraction"])),
+        extra_arguments = {**fixed_warmup_arguments(training, source_steps),
                            "save_steps": convergence["evaluation_every_steps"],
                            "save_total_limit": 2, "disable_tqdm": True}
     else:
@@ -295,7 +302,7 @@ def main():
         per_device_train_batch_size=args.batch_size, gradient_accumulation_steps=1,
         num_train_epochs=training["epochs"], max_steps=maximum_steps,
         learning_rate=training["learning_rate"],
-        weight_decay=training["weight_decay"], warmup_ratio=training["warmup_fraction"],
+        weight_decay=training["weight_decay"],
         lr_scheduler_type="constant_with_warmup", optim="adamw_torch",
         max_grad_norm=training["gradient_clip_norm"], bf16=torch.cuda.is_available(),
         remove_unused_columns=False, label_names=["labels"],

@@ -8,6 +8,8 @@ from types import SimpleNamespace
 
 from experiments.flamingo_map_reader.src.convergence import ConvergenceCheck, PlateauTracker, with_decision_mask
 from experiments.flamingo_map_reader.src.transcript import EncodedTrajectory
+from experiments.flamingo_map_reader.src.train import fixed_warmup_arguments
+from transformers import TrainingArguments
 
 
 class ByteTokenizer:
@@ -22,6 +24,12 @@ class ByteTokenizer:
 class ConvergenceTest(unittest.TestCase):
     def spec(self):
         return json.loads((Path(__file__).parents[1] / "configs/kv_convergence.json").read_text())
+
+    def test_transformers_does_not_reexpand_explicit_warmup_with_new_budget(self):
+        kwargs = fixed_warmup_arguments({"warmup_fraction": .05}, 256)
+        args = TrainingArguments(output_dir="unused", report_to=[], **kwargs)
+        for budget in (256, 8192, 16384):
+            self.assertEqual(args.get_warmup_steps(budget), 13)
 
     def test_plateau_requires_decision_loss_to_stop_improving(self):
         tracker = PlateauTracker(self.spec())

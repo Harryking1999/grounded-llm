@@ -33,9 +33,15 @@ def build_followup(task, data_root, measure_root, contract):
         config["map"]["value_scale"] = scale
         config["training"]["max_steps"] = contract["max_steps_per_condition"]
         config["checkpoint"]["every_epoch_fraction"] = contract["checkpoint_every_epoch_fraction"]
-        config["training"]["supervision_mode"] = (
-            "counterfactual_first_turn" if condition == "calibrated_counterfactual_first_turn"
-            else "trajectory")
+        if condition == "calibrated_trajectory":
+            config["training"]["supervision_mode"] = "trajectory"
+        elif condition == "calibrated_counterfactual_first_turn":
+            config["training"]["supervision_mode"] = "counterfactual_first_turn"
+        elif condition == "calibrated_pairwise_counterfactual":
+            config["training"]["supervision_mode"] = "counterfactual_first_turn"
+            config["training"]["readout_style"] = "pairwise"
+        else:
+            raise ValueError(f"Unknown follow-up condition: {condition}")
         config["scale_calibration"] = {
             "rule": contract["scale_rule"],
             "joint_median_ungated": reference,

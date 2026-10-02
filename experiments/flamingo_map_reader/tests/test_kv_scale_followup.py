@@ -35,10 +35,11 @@ class ScaleFollowupTest(unittest.TestCase):
                         "max_steps_per_condition": 256,
                         "checkpoint_every_epoch_fraction": 1.0,
                         "conditions": ["calibrated_trajectory",
-                                       "calibrated_counterfactual_first_turn"]}
+                                       "calibrated_counterfactual_first_turn",
+                                       "calibrated_pairwise_counterfactual"]}
             scale, prepared = build_followup("graph", data, measures, contract)
             self.assertEqual(scale, 4.0)
-            self.assertEqual(len(prepared), 2)
+            self.assertEqual(len(prepared), 3)
             for _, config, manifest in prepared:
                 self.assertEqual(config["map"]["value_scale"], 4.0)
                 self.assertEqual(config["training"]["max_steps"], 256)
@@ -46,6 +47,7 @@ class ScaleFollowupTest(unittest.TestCase):
             self.assertEqual(prepared[0][1]["training"]["supervision_mode"], "trajectory")
             self.assertEqual(prepared[1][1]["training"]["supervision_mode"],
                              "counterfactual_first_turn")
+            self.assertEqual(prepared[2][1]["training"]["readout_style"], "pairwise")
 
 
 if __name__ == "__main__":

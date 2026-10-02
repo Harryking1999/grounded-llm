@@ -61,6 +61,10 @@ class PilotCounterfactualTest(unittest.TestCase):
                             paired[1].step.candidate_map_distances)
         self.assertTrue(all(score_relationships(item.step, item.answer_text)["exact_ranking"]
                             for item in paired))
+        short = paired_turns(turn, "pairwise")
+        self.assertEqual(short[0].user_text, short[1].user_text)
+        self.assertNotEqual(short[0].answer_text, short[1].answer_text)
+        self.assertTrue(short[0].answer_text.startswith("<closer>"))
 
     def test_graph_reindex_and_q_swap(self):
         environment, qmap = line_graph()

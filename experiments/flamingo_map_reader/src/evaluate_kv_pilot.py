@@ -74,7 +74,11 @@ def main():
                         help="Diagnostic only: supply a common answer opening")
     parser.add_argument("--max-train-turns", type=int, default=0)
     parser.add_argument("--max-validation-turns", type=int, default=0)
+    parser.add_argument("--maximum-new-tokens", type=int,
+                        help="Diagnostic cap; report separately from the formal task budget")
     args = parser.parse_args()
+    if args.maximum_new_tokens is not None and args.maximum_new_tokens <= 0:
+        raise ValueError("maximum new tokens must be positive")
     if args.out.exists():
         raise FileExistsError(args.out)
     config = json.loads(args.config.read_text(encoding="utf-8"))
@@ -108,6 +112,8 @@ def main():
     assistant_prefix = ("The current state has not reached the goal.\n"
                         "Map-distance ranking to the goal, closest to farthest: "
                         if args.scaffold_prefix else "")
+    maximum_new_tokens = (args.maximum_new_tokens or
+                          config["evaluation"]["action_max_new_tokens"])
     with (args.out / "first_turns.jsonl").open("w", encoding="utf-8") as handle:
         for record in manifest["records"]:
             split = record["split"]
@@ -129,7 +135,7 @@ def main():
             if step.done or not step.candidate_actions:
                 continue
             answer = generate_answer(reader, tokenizer, step, user_text, config,
-                                     device, config["evaluation"]["action_max_new_tokens"],
+                                     device, maximum_new_tokens,
                                      assistant_prefix=assistant_prefix)
             score = score_relationships(step, answer)
             add_relation(counts[split], score)
@@ -143,7 +149,7 @@ def main():
                 if swapped is not None:
                     swapped_answer = generate_answer(reader, tokenizer, swapped,
                         user_text, config, device,
-                        config["evaluation"]["action_max_new_tokens"],
+                        maximum_new_tokens,
                         assistant_prefix=assistant_prefix)
                     swap_score = score_relationships(swapped, swapped_answer)
                     swapped_first = first_ranked_candidate(swapped_answer,
@@ -175,7 +181,7 @@ def main():
                     list(reversed(range(len(step.candidate_actions)))))
                 reordered_answer = generate_answer(reader, tokenizer, reordered,
                     renumbered_prompt(task, reordered, user_text), config, device,
-                    config["evaluation"]["action_max_new_tokens"],
+                    maximum_new_tokens,
                     assistant_prefix=assistant_prefix)
                 reordered_score = score_relationships(reordered, reordered_answer)
                 base_actual = physical_action(step, score["chosen_id"])
@@ -194,6 +200,7 @@ def main():
     summary = {"readout": relation_summary(counts),
                "perturbations": dict(perturb_counts),
                "requested_perturbation_limit": args.perturbation_limit,
+               "generation_max_new_tokens": maximum_new_tokens,
                "generation_mode": "scaffold_diagnostic" if args.scaffold_prefix else "free"}
     (args.out / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
     print(json.dumps(summary))

@@ -2,23 +2,36 @@
 
 from dataclasses import replace
 
+import numpy as np
+
 from torch.utils.data import Dataset
 
 from .blocks_data import demonstration_from_record as blocks_demonstration
 from .counterfactual import swap_best_worst_q
 from .data import demonstration_from_record as graph_demonstration, load_graph
 from .sft import Demonstration, decision_text
+from .short_readout import correct_ids, diagnostic_prompt
 from .transcript import encode_trajectory
 
 
-def paired_turns(turn):
+def paired_turns(turn, style="full_ranking"):
     """Same user text and IDs, with original and swapped Q supervision."""
     swapped = swap_best_worst_q(turn.step)
     if swapped is None:
         return ()
-    return tuple(replace(turn, step=step,
-                         answer_text=decision_text(step, step.map_minimal_candidates[0]),
-                         chosen_id=step.map_minimal_candidates[0])
+    if style == "full_ranking":
+        return tuple(replace(turn, step=step,
+                             answer_text=decision_text(step, step.map_minimal_candidates[0]),
+                             chosen_id=step.map_minimal_candidates[0])
+                     for step in (turn.step, swapped))
+    if style not in ("pairwise", "nearest"):
+        raise ValueError(f"Unknown readout style: {style}")
+    pair = (turn.step.map_minimal_candidates[0],
+            int(np.argmax(turn.step.candidate_map_distances)) + 1)
+    user_text, tag = diagnostic_prompt(turn.user_text, style, pair)
+    return tuple(replace(turn, step=step, user_text=user_text,
+                         answer_text=f"<{tag}>{min(correct_ids(step, style, pair))}</{tag}>",
+                         chosen_id=min(correct_ids(step, style, pair)))
                  for step in (turn.step, swapped))
 
 
@@ -40,7 +53,8 @@ class CounterfactualFirstTurnDataset(Dataset):
                 demo = graph_demonstration(*graphs[graph_id], record)
             if not demo.turns or demo.turns[0].step.done:
                 continue
-            self.turns.extend(paired_turns(demo.turns[0]))
+            self.turns.extend(paired_turns(demo.turns[0],
+                config["training"].get("readout_style", "full_ranking")))
         if not self.turns or len(self.turns) % 2:
             raise ValueError("Counterfactual readout needs matched non-tie pairs")
 

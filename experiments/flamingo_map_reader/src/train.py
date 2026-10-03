@@ -101,7 +101,8 @@ class SFTDataset(Dataset):
         record = self.records[index]
         if self.config["task"] == "blocks":
             demo = demonstration_from_record(self.qmap, record,
-                self.config["maximum_demonstration_actions"])
+                self.config["maximum_demonstration_actions"],
+                self.config["data"].get("reported_candidates"))
         else:
             graph_id = record["graph_id"]
             if graph_id not in self.graphs:

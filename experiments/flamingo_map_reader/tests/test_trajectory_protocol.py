@@ -5,16 +5,17 @@ import multiprocessing
 import os
 from pathlib import Path
 import tempfile
+from types import SimpleNamespace
 import unittest
 
 import numpy as np
 import torch
 
 from experiments.flamingo_map_reader.src import prepare_trajectories
-from experiments.flamingo_map_reader.src.sft import greedy_demonstration
+from experiments.flamingo_map_reader.src.sft import decision_text, greedy_demonstration, reported_candidates
 from experiments.flamingo_map_reader.src.trajectory_protocol import numbering_plans, renumber_demonstration
 from experiments.flamingo_map_reader.src.trajectory_dataset import prepare_record, PreparedTrajectoryDataset, load_record
-from experiments.flamingo_map_reader.src.trajectory_metrics import score_turn, summarize_turns, numeric_distances
+from experiments.flamingo_map_reader.src.trajectory_metrics import score_turn, summarize_turns
 from experiments.flamingo_map_reader.src.trajectory_queue import checkpoint_jobs
 from test_graph import line_graph
 from test_timeline import ByteChatTemplate
@@ -24,7 +25,7 @@ class TrajectoryProtocolTest(unittest.TestCase):
     def setUp(self):
         self.env, self.qmap = line_graph()
         self.demo = greedy_demonstration(self.env, self.qmap, 1, 2, rng=np.random.default_rng(7))
-        self.config = dict(task="graph", distance_precision=4, maximum_sequence_tokens=16384,
+        self.config = dict(task="graph", maximum_sequence_tokens=16384,
                            data=dict(numbering_variants=6), training=dict(epochs=3))
 
     def test_numbering_keeps_physical_actions_q_and_targets_together(self):
@@ -32,7 +33,7 @@ class TrajectoryProtocolTest(unittest.TestCase):
         self.assertEqual(len(plans), 2)
         self.assertEqual({p[0] for p in plans}, {(0, 1), (1, 0)})
         for plan in plans:
-            demo = renumber_demonstration(self.demo, plan, "graph", 4)
+            demo = renumber_demonstration(self.demo, plan, "graph")
             self.assertEqual(demo.executed_path, self.demo.executed_path)
             turn = demo.turns[0]
             self.assertEqual(turn.step.execute(self.env, turn.chosen_id)[1], 2)
@@ -42,8 +43,9 @@ class TrajectoryProtocolTest(unittest.TestCase):
             scored = score_turn(turn.step, turn.answer_text)
             self.assertTrue(scored["exact_ranking"])
             self.assertTrue(scored["action_map_minimum"])
-            self.assertEqual(scored["distance_absolute_error"], 0)
             self.assertNotIn("Current map distance", turn.user_text)
+            # Only the ordering is supervised; no distance is ever written out.
+            self.assertNotIn("Current map distance to goal:", turn.answer_text)
             self.assertTrue(score_turn(demo.turns[-1].step, demo.turns[-1].answer_text,
                                        demo.turns[-1].answer_text)["summary_correct"])
 
@@ -66,15 +68,40 @@ class TrajectoryProtocolTest(unittest.TestCase):
             replay = load_record(root / "trajectories", record, self.config)
             self.assertEqual(replay.executed_path, self.demo.executed_path)
 
-    def test_missing_numbers_are_not_zero_error_and_false_done_counts(self):
+    def test_missing_ranking_is_not_zero_error_and_false_done_counts(self):
         step = self.demo.turns[0].step
         row = score_turn(step, "<done/>")
         summary = summarize_turns([row])
-        self.assertEqual(summary["distance_invalid_turn_rate"], 1.)
-        self.assertIsNone(summary["distance_mae_on_valid"])
         self.assertEqual(summary["premature_done_rate"], 1.)
         self.assertEqual(summary["exact_ranking_rate"], 0.)
-        self.assertIsNone(numeric_distances("Current map distance to goal: nan.\nCandidate map distances to goal: 1: 0; 2: 1.", 2))
+        self.assertEqual(summary["current_relation_total"], len(step.candidate_actions))
+        self.assertEqual(summary["current_relation_correct"], 0)
+
+    def test_narrowed_answer_names_only_the_nearest_candidates(self):
+        """Every legal move stays in the environment; only the answer narrows."""
+        step = SimpleNamespace(done=False, candidate_actions=tuple(range(12)),
+            current_map_distance=5., candidate_map_distances=tuple(float(10 + i) for i in range(12)),
+            map_minimal_candidates=(1,))
+        self.assertEqual(reported_candidates(step, 10), tuple(range(1, 11)))
+        answer = decision_text(step, 1, 10)
+        self.assertEqual(len(answer.splitlines()), 4)
+        scored = score_turn(step, answer, reported=10)
+        self.assertTrue(scored["exact_ranking"])
+        self.assertEqual(scored["candidates"], 12)
+        self.assertEqual(scored["current_relation_correct"], 10)
+        # The same answer no longer covers the task once every candidate must be ranked.
+        self.assertFalse(score_turn(step, answer)["valid_ranking"])
+
+    def test_tied_distances_still_respect_the_cap(self):
+        """Ties must not stretch the answer past the cap the parser enforces."""
+        step = SimpleNamespace(done=False, candidate_actions=tuple(range(12)),
+            current_map_distance=5., candidate_map_distances=(7.,) * 12,
+            map_minimal_candidates=tuple(range(1, 13)))
+        named = reported_candidates(step, 10)
+        self.assertEqual(named, tuple(range(1, 11)))
+        scored = score_turn(step, decision_text(step, 1, 10), reported=10)
+        self.assertTrue(scored["exact_ranking"])
+        self.assertTrue(scored["closest_candidate_set_exact"])
 
     @unittest.skipUnless(hasattr(os, "fork"), "forked preparation is Linux-only")
     def test_forked_pool_prepares_in_order_with_swapped_arguments_caught(self):

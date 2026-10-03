@@ -26,16 +26,6 @@ def numbered_step(step, order):
                                       if i + 1 in step.map_minimal_candidates))
 
 
-def distance_answer(step, chosen, precision):
-    answer = decision_text(step, chosen)
-    numeric = [f"Current map distance to goal: {step.current_map_distance:.{precision}f}.",
-        "Candidate map distances to goal: " + "; ".join(
-            f"{i}: {distance:.{precision}f}" for i, distance in
-            enumerate(step.candidate_map_distances, 1)) + "."]
-    first, rest = answer.split("\n", 1)
-    return "\n".join([first, *numeric, rest])
-
-
 def numbering_plans(demo, count, seed):
     """Balanced per-turn permutations and distinct whole-trajectory variants.
 
@@ -65,7 +55,7 @@ def numbering_plans(demo, count, seed):
     return plans
 
 
-def renumber_demonstration(demo, plan, task, precision):
+def renumber_demonstration(demo, plan, task, reported=None):
     from .prompt import turn_prompt as graph_prompt
     from .blocks_prompt import turn_prompt as blocks_prompt
     if len(plan) != len(demo.turns):
@@ -82,7 +72,7 @@ def renumber_demonstration(demo, plan, task, precision):
         if not step.done:
             actual = turn.step.candidate_actions[turn.chosen_id - 1]
             chosen = step.candidate_actions.index(actual) + 1
-            answer = distance_answer(step, chosen, precision)
+            answer = decision_text(step, chosen, reported)
             actions.append(actual)
         turns.append(replace(turn, step=step, chosen_id=chosen,
                              user_text=prompt, answer_text=answer))

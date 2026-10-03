@@ -56,7 +56,8 @@ def build_manifest(boards, fresh_boards, qmap, config):
             sample_seed = int(rng.integers(2**32))
             demonstration = greedy_demonstration(qmap, start, goal,
                 rng=np.random.default_rng(sample_seed),
-                max_actions=config["maximum_demonstration_actions"])
+                max_actions=config["maximum_demonstration_actions"],
+                reported=options.get("reported_candidates"))
             if not demonstration.success:
                 rejected["map_greedy_failed"] += 1
                 continue
@@ -122,10 +123,10 @@ def record_q_training_coverage(manifest, archive_path):
     manifest["q_training_seen_states"] = len(seen)
 
 
-def demonstration_from_record(qmap, record, max_actions):
+def demonstration_from_record(qmap, record, max_actions, reported=None):
     return greedy_demonstration(qmap, int(record["start"]), int(record["goal"]),
                                 rng=np.random.default_rng(record["sample_seed"]),
-                                max_actions=max_actions)
+                                max_actions=max_actions, reported=reported)
 
 
 def main():

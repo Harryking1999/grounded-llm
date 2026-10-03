@@ -131,7 +131,8 @@ def reference_turns(session, demo, environment):
     for turn_index, turn in enumerate(demo.turns):
         answer, usage = session.ask(turn.user_text, turn.step)
         row = dict(turn=turn_index, remaining_shortest=environment.remaining(turn.step.current, turn.step.goal, turn.executed_path),
-            **score_turn(turn.step, answer, turn.answer_text if turn.step.done else None), **usage,
+            **score_turn(turn.step, answer, turn.answer_text if turn.step.done else None,
+                         environment.config["data"].get("reported_candidates")), **usage,
             answer=answer, current=str(turn.step.current), goal=str(turn.step.goal))
         chosen = row.get("chosen_id")
         row["chosen_action"] = turn.step.candidate_actions[chosen - 1] if row["legal_action"] else None
@@ -154,7 +155,8 @@ def closed_loop(session, record, first, environment, config, variant):
             user = first + user
         answer, usage = session.ask(user, step)
         row = dict(turn=index, remaining_shortest=environment.remaining(step.current, goal, path),
-            **score_turn(step, answer, environment.terminal(path, actions) if step.done else None),
+            **score_turn(step, answer, environment.terminal(path, actions) if step.done else None,
+                         config["data"].get("reported_candidates")),
             **usage, answer=answer, current=str(step.current), goal=str(goal))
         rows.append(row)
         if usage["context_exhausted"]:

@@ -40,7 +40,8 @@ def prepare_record(demo, record, config, tokenizer, output):
     plans = numbering_plans(demo, config["data"]["numbering_variants"], record["sample_seed"] + 719)
     encodings, lengths = [], []
     for plan in plans:
-        numbered = renumber_demonstration(demo, plan, config["task"], config["distance_precision"])
+        numbered = renumber_demonstration(demo, plan, config["task"],
+            config["data"].get("reported_candidates"))
         if demo.success:
             encoded = encode_trajectory(numbered, tokenizer,
                 config["maximum_sequence_tokens"] if record["split"] == "train" else 10**8,
@@ -62,7 +63,7 @@ def load_record(root, record, config, variant=0):
     value = torch.load(Path(root) / record["prepared_file"], weights_only=True, map_location="cpu")
     demo = unpack_demo(value["demo"], config["task"])
     return renumber_demonstration(demo, value["plans"][variant], config["task"],
-                                 config["distance_precision"])
+                                 config["data"].get("reported_candidates"))
 
 
 class PreparedTrajectoryDataset(Dataset):
@@ -80,5 +81,6 @@ class PreparedTrajectoryDataset(Dataset):
         encoded = EncodedTrajectory(**{key: tensor.tolist() if isinstance(tensor, torch.Tensor) else tensor
                                       for key, tensor in raw.items()})
         demo = renumber_demonstration(unpack_demo(value["demo"], self.config["task"]),
-            value["plans"][variant], self.config["task"], self.config["distance_precision"])
+            value["plans"][variant], self.config["task"],
+            self.config["data"].get("reported_candidates"))
         return encoded, [turn.step for turn in demo.turns]

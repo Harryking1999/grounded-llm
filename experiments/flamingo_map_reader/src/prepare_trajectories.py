@@ -83,7 +83,8 @@ def select_blocks(config, source_manifest, official, q_checkpoint):
     # was not an initial task. Do not relabel that suffix as a new held-out pair.
     qmap = FrozenBoardMap.load(q_checkpoint)
     for index, record in enumerate(train):
-        demo = blocks_data.demonstration_from_record(qmap, record, config["maximum_demonstration_actions"])
+        demo = blocks_data.demonstration_from_record(qmap, record,
+            config["maximum_demonstration_actions"], options.get("reported_candidates"))
         if not demo.success:
             raise ValueError("Seed physical trajectory is no longer successful")
         used.update((t.step.current, t.step.goal) for t in demo.turns)
@@ -199,7 +200,9 @@ def main():
     else:
         records, metadata = select_blocks(config, args.source_manifest, args.official_data, args.q_checkpoint)
         qmap = FrozenBoardMap.load(args.q_checkpoint)
-        make_demo = lambda r: blocks_data.demonstration_from_record(qmap, r, config["maximum_demonstration_actions"])
+        make_demo = lambda r: blocks_data.demonstration_from_record(qmap, r,
+            config["maximum_demonstration_actions"],
+            config["data"].get("reported_candidates"))
     pairs = [(int(r["start"]), int(r["goal"])) for r in records]
     if len(set(pairs)) != len(pairs):
         raise ValueError("Physical start-goal pair leakage or duplicate task")

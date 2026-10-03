@@ -18,43 +18,48 @@ def _same_distance(left: float, right: float) -> bool:
     return bool(np.isclose(left, right, rtol=1e-10, atol=1e-12))
 
 
-def _ranking(step) -> tuple[str, tuple[int, ...]]:
+def reported_candidates(step, reported: int | None) -> tuple[int, ...]:
+    """Nearest candidates the answer names, nearest first.
+
+    The environment still shows every legal move; only the answer narrows, so
+    supervision stops spending tokens on moves far from the goal. The cap is
+    hard: equal distances are broken by candidate ID, which keeps the target
+    bounded when many successors tie.
+    """
     distances = (step.current_map_distance, *step.candidate_map_distances)
-    ordered = sorted(enumerate(distances),
-                     key=lambda item: (item[1], item[0]))
+    order = sorted(range(1, len(distances)), key=lambda i: (distances[i], i))
+    return tuple(order if reported is None else order[:reported])
+
+
+def _ranking(step, reported: int | None = None) -> str:
+    distances = (step.current_map_distance, *step.candidate_map_distances)
+    ordered = sorted((0, *reported_candidates(step, reported)),
+                     key=lambda local_id: (distances[local_id], local_id))
     groups: list[list[int]] = []
-    for local_id, distance in ordered:
-        if groups and _same_distance(distance,
+    for local_id in ordered:
+        if groups and _same_distance(distances[local_id],
                                      distances[groups[-1][0]]):
             groups[-1].append(local_id)
         else:
             groups.append([local_id])
     names = lambda group: " = ".join("current" if i == 0 else str(i) for i in group)
-    return " < ".join(names(group) for group in groups), tuple(
-        local_id for group in groups for local_id in group if local_id != 0)
+    return " < ".join(names(group) for group in groups)
 
 
-def decision_text(step, chosen_id: int) -> str:
+def decision_text(step, chosen_id: int, reported: int | None = None) -> str:
+    """Supervise the ordering and the choice, never the distances themselves.
+
+    Asking for numbers would require the frozen Q projection to survive the
+    attention stack; asking only for the near/far ordering keeps the target
+    short enough for a whole blocks trajectory to fit on one GPU.
+    """
     if step.done or not step.candidate_actions:
         raise ValueError("action supervision requires a nonterminal step with candidates")
     if chosen_id not in step.map_minimal_candidates:
         raise ValueError("chosen action is not a map-minimal candidate")
-    ranking, ordered_ids = _ranking(step)
-    relation = []
-    for position, local_id in enumerate(ordered_ids):
-        distance = step.candidate_map_distances[local_id - 1]
-        if _same_distance(distance, step.current_map_distance):
-            comparison = "at the same map distance as the current state"
-        elif distance < step.current_map_distance:
-            comparison = "closer to the goal than the current state"
-        else:
-            comparison = "farther from the goal than the current state"
-        subject = "Candidate" if position == 0 else "candidate"
-        relation.append(f"{subject} {local_id} is {comparison}")
     return "\n".join([
         "The current state has not reached the goal.",
-        f"Map-distance ranking to the goal, closest to farthest: {ranking}.",
-        "; ".join(relation) + ".",
+        f"Map-distance ranking to the goal, closest to farthest: {_ranking(step, reported)}.",
         f"Choose candidate {chosen_id} because its successor has the smallest map distance among the candidates.",
         f"<action>{chosen_id}</action>",
     ])

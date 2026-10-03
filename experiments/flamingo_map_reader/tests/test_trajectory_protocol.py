@@ -1,6 +1,8 @@
 """Risk checks: consistent numbering, exact cache replay and metric denominators."""
 
 import json
+import multiprocessing
+import os
 from pathlib import Path
 import tempfile
 import unittest
@@ -8,6 +10,7 @@ import unittest
 import numpy as np
 import torch
 
+from experiments.flamingo_map_reader.src import prepare_trajectories
 from experiments.flamingo_map_reader.src.sft import greedy_demonstration
 from experiments.flamingo_map_reader.src.trajectory_protocol import numbering_plans, renumber_demonstration
 from experiments.flamingo_map_reader.src.trajectory_dataset import prepare_record, PreparedTrajectoryDataset, load_record
@@ -72,6 +75,21 @@ class TrajectoryProtocolTest(unittest.TestCase):
         self.assertEqual(summary["premature_done_rate"], 1.)
         self.assertEqual(summary["exact_ranking_rate"], 0.)
         self.assertIsNone(numeric_distances("Current map distance to goal: nan.\nCandidate map distances to goal: 1: 0; 2: 1.", 2))
+
+    @unittest.skipUnless(hasattr(os, "fork"), "forked preparation is Linux-only")
+    def test_forked_pool_prepares_in_order_with_swapped_arguments_caught(self):
+        """Argument order, fork inheritance and payload pickling all fail silently."""
+        original = prepare_trajectories.prepare_one
+        prepare_trajectories.prepare_one = lambda record, index: dict(index=index, record=record)
+        try:
+            records = [dict(split="train", start=start) for start in range(12)]
+            jobs = [(record, index) for index, record in enumerate(records)]
+            with multiprocessing.get_context("fork").Pool(3) as pool:
+                payloads = list(pool.imap(prepare_trajectories.prepare_star, jobs, chunksize=1))
+        finally:
+            prepare_trajectories.prepare_one = original
+        self.assertEqual([p["index"] for p in payloads], list(range(12)))
+        self.assertEqual([p["record"]["start"] for p in payloads], list(range(12)))
 
     def test_final_queue_covers_all_test_tasks_and_no_map_controls(self):
         config = dict(self.config, evaluation=dict(train_diagnostic_tasks=256, numbering_variants=6, shard_tasks=64))

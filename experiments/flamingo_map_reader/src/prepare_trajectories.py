@@ -3,6 +3,7 @@
 from argparse import ArgumentParser
 from collections import Counter, defaultdict
 import json
+import multiprocessing
 from pathlib import Path
 
 import numpy as np
@@ -132,6 +133,41 @@ def select_blocks(config, source_manifest, official, q_checkpoint):
         rejected_training=old.get("rejected_training", {}))
 
 
+# Per-record preparation is independent, so it runs in forked workers. The parent
+# fills this in before creating the pool; children inherit it without pickling the
+# tokenizer or the map evaluator.
+_WORKER = {}
+
+
+def prepare_one(record, index):
+    """Prepare one trajectory and return everything the manifest aggregation needs."""
+    config, tokenizer, root = _WORKER["config"], _WORKER["tokenizer"], _WORKER["root"]
+    make_demo = _WORKER["make_demo"]
+    record = dict(record, trajectory_id=f"{config['task']}_{index:06d}")
+    demo = make_demo(record)
+    if record["split"] == "train" and not demo.success:
+        raise ValueError("Training pair no longer produces its certified complete trajectory")
+    row = prepare_record(demo, record, config, tokenizer, root / (record["trajectory_id"] + ".pt"))
+    payload = dict(row=row, candidate_counts=Counter(), step_counts=Counter(), state_goal_pairs=set())
+    for step_id, turn in enumerate(demo.turns):
+        payload["candidate_counts"][len(turn.step.candidate_actions)] += 1
+        payload["step_counts"][step_id] += 1
+        payload["state_goal_pairs"].add((turn.step.current, turn.step.goal))
+    if record["split"] == "train":
+        payload["visible"] = blocks_data.visible_states(demo)
+    if demo.turns and not demo.turns[0].step.done:
+        step = demo.turns[0].step
+        payload["first_best"] = {step.candidate_actions[i - 1] for i in step.map_minimal_candidates}
+        if record["split"] == "test":
+            payload["by_start"] = int(record["start"])
+    return payload
+
+
+def prepare_star(job):
+    """Module-level so the pool can reference it by name."""
+    return prepare_one(*job)
+
+
 def coverage(records, config):
     return {split: dict(physical_tasks=sum(r["split"] == split for r in records),
         length_counts=dict(Counter(r["shortest_moves"] for r in records if r["split"] == split)),
@@ -147,6 +183,7 @@ def main():
     parser = ArgumentParser()
     for arg in ("config", "model-path", "out", "source-root", "source-manifest", "official-data", "q-checkpoint", "q-training-data"):
         parser.add_argument("--" + arg, type=Path, required=arg in ("config", "model-path", "out"))
+    parser.add_argument("--workers", type=int, default=1, help="Forked processes for per-record preparation")
     args = parser.parse_args()
     torch.set_num_threads(1)
     config = json.loads(args.config.read_text())
@@ -168,31 +205,35 @@ def main():
         raise ValueError("Physical start-goal pair leakage or duplicate task")
     from transformers import AutoTokenizer
     tokenizer = AutoTokenizer.from_pretrained(args.model_path)
+    _WORKER.update(config=config, tokenizer=tokenizer, root=root, make_demo=make_demo)
     result, seen, first_best, by_start = [], set(), {}, defaultdict(list)
     turn_coverage = {split: dict(candidate_counts=Counter(), step_counts=Counter(),
                                 state_goal_pairs=set()) for split in ("train", "validation", "test")}
-    for index, record in enumerate(records):
-        record["trajectory_id"] = f"{config['task']}_{index:06d}"
-        demo = make_demo(record)
-        if record["split"] == "train" and not demo.success:
-            raise ValueError("Training pair no longer produces its certified complete trajectory")
-        row = prepare_record(demo, record, config, tokenizer, root / (record["trajectory_id"] + ".pt"))
-        for step_id, turn in enumerate(demo.turns):
+    jobs = [(record, index) for index, record in enumerate(records)]
+    pool = multiprocessing.get_context("fork").Pool(args.workers) if args.workers > 1 else None
+    stream = pool.imap(prepare_star, jobs, chunksize=1) if pool else map(prepare_star, jobs)
+    try:
+        # imap preserves job order, so records land in the manifest exactly as before.
+        for index, payload in zip(range(len(records)), stream):
+            record, row = records[index], payload["row"]
             stats = turn_coverage[record["split"]]
-            stats["candidate_counts"][len(turn.step.candidate_actions)] += 1
-            stats["step_counts"][step_id] += 1
-            stats["state_goal_pairs"].add((turn.step.current, turn.step.goal))
-        if record["split"] == "train":
-            seen.update(blocks_data.visible_states(demo))
-        if demo.turns and not demo.turns[0].step.done:
-            step = demo.turns[0].step
-            first_best[record["trajectory_id"]] = {step.candidate_actions[i - 1] for i in step.map_minimal_candidates}
-            if record["split"] == "test":
-                by_start[int(record["start"])].append(record["trajectory_id"])
-        result.append(row)
-        if (index + 1) % 100 == 0:
-            print(json.dumps(dict(phase="prepare", completed=index + 1, total=len(records),
-                                 latest_tokens=row["max_tokens"])), flush=True)
+            stats["candidate_counts"].update(payload["candidate_counts"])
+            stats["step_counts"].update(payload["step_counts"])
+            stats["state_goal_pairs"].update(payload["state_goal_pairs"])
+            if "visible" in payload:
+                seen.update(payload["visible"])
+            if "first_best" in payload:
+                first_best[row["trajectory_id"]] = payload["first_best"]
+                if "by_start" in payload:
+                    by_start[payload["by_start"]].append(row["trajectory_id"])
+            result.append(row)
+            if (index + 1) % 100 == 0:
+                print(json.dumps(dict(phase="prepare", completed=index + 1, total=len(records),
+                                     latest_tokens=row["max_tokens"])), flush=True)
+    finally:
+        if pool is not None:
+            pool.terminate()
+            pool.join()
     for row in result:
         row["sft_start_seen"] = int(row["start"]) in seen
         row["sft_goal_seen"] = int(row["goal"]) in seen

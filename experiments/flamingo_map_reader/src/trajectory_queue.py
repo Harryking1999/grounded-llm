@@ -65,6 +65,8 @@ def main():
     for arg in ("run-root", "model-path", "graph-source", "blocks-source-manifest", "blocks-official", "blocks-q", "blocks-q-data"):
         parser.add_argument("--" + arg, type=Path, required=True)
     parser.add_argument("--gpus", type=int, nargs=4, default=[0, 1, 2, 3])
+    parser.add_argument("--prepare-workers", type=int, default=1,
+                        help="Forked processes each preparation task may use; the two tasks run at once")
     args = parser.parse_args()
     root = args.run_root.resolve()
     if root.exists():
@@ -92,7 +94,7 @@ def main():
 
     for task, spec in tasks.items():
         launch(task + "/prepare", "prepare_trajectories", ["--config", str(spec["config"]), "--model-path", str(args.model_path),
-               "--out", str(root / task / "data"), *spec["prepare"]])
+               "--out", str(root / task / "data"), "--workers", str(args.prepare_workers), *spec["prepare"]])
         spec["phase"] = "prepare"
     while True:
         for key, running in list(processes.items()):

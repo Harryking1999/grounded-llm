@@ -2,55 +2,19 @@
 
 from argparse import ArgumentParser
 from collections import Counter, defaultdict
-from dataclasses import replace
 import json
 from pathlib import Path
 
-import numpy as np
 import torch
 
 from .blocks import FrozenBoardMap
 from .blocks_data import demonstration_from_record as blocks_demonstration
-from .blocks_prompt import turn_prompt as blocks_turn_prompt
-from .counterfactual import swap_best_worst_q
+from .counterfactual import swap_best_worst_q, reorder_candidates, renumbered_prompt
 from .data import demonstration_from_record as graph_demonstration, load_graph
 from .evaluate_graph_readout import generate_answer
-from .memory import MapBatch
-from .prompt import turn_prompt as graph_turn_prompt
 from .relations import first_ranked_candidate, score_relationships
 from .summarize_graph_eval import add_relation, relation_summary
 from .train import build_reader
-
-
-def reorder_candidates(step, order):
-    """Keep physical actions and Q vectors paired while assigning new local IDs."""
-    count = len(step.candidate_actions)
-    if sorted(order) != list(range(count)):
-        raise ValueError("candidate order must be a permutation")
-    slots = [0, 1, *(index + 2 for index in order)]
-    source = step.map_batch
-    ids = torch.tensor([[0, 0, *range(1, count + 1)]], dtype=torch.long,
-                       device=source.candidate_ids.device)
-    distances = tuple(step.candidate_map_distances[index] for index in order)
-    minimum = min(distances)
-    best = tuple(index for index, distance in enumerate(distances, 1)
-                 if np.isclose(distance, minimum, rtol=1e-10, atol=1e-12))
-    return replace(step,
-        map_batch=MapBatch(source.vectors[:, slots], source.roles[:, slots], ids,
-                           source.valid[:, slots]),
-        candidate_actions=tuple(step.candidate_actions[index] for index in order),
-        candidate_destinations=tuple(step.candidate_destinations[index] for index in order),
-        candidate_map_distances=distances, map_minimal_candidates=best)
-
-
-def renumbered_prompt(task, step, original_text):
-    marker = "\n\n[Environment update]"
-    if marker not in original_text:
-        raise ValueError("first-turn prompt lacks its environment update")
-    opening = original_text.rsplit(marker, 1)[0]
-    update = (graph_turn_prompt(step, [step.current]) if task == "graph" else
-              blocks_turn_prompt(step, []))
-    return opening + "\n\n" + update
 
 
 def physical_action(step, chosen_id):

@@ -7,7 +7,8 @@ import numpy as np
 from torch.utils.data import Dataset
 
 from .blocks_data import demonstration_from_record as blocks_demonstration
-from .counterfactual import swap_best_worst_q, swap_candidate_q
+from .counterfactual import (swap_best_worst_q, swap_candidate_q,
+                             reorder_candidates, renumbered_prompt)
 from .data import demonstration_from_record as graph_demonstration, first_turn_from_record, load_graph
 from .sft import Demonstration, decision_text
 from .short_readout import correct_ids, diagnostic_prompt
@@ -34,6 +35,15 @@ def paired_turns(turn, style="full_ranking", pair=None):
                          answer_text=f"<{tag}>{min(correct_ids(step, style, pair))}</{tag}>",
                          chosen_id=min(correct_ids(step, style, pair)))
                  for step in (turn.step, swapped))
+
+
+def renumber_turn(turn, task, order):
+    """Recompute the complete gold answer after moving action/Q pairs together."""
+    step = reorder_candidates(turn.step, order)
+    chosen = step.map_minimal_candidates[0]
+    return replace(turn, step=step, chosen_id=chosen,
+                   user_text=renumbered_prompt(task, step, turn.user_text),
+                   answer_text=decision_text(step, chosen))
 
 
 class CounterfactualFirstTurnDataset(Dataset):
@@ -64,6 +74,27 @@ class CounterfactualFirstTurnDataset(Dataset):
                 config["training"].get("readout_style", "full_ranking")))
         if not self.turns or len(self.turns) % 2:
             raise ValueError("Counterfactual readout needs matched non-tie pairs")
+        self.base_turns = tuple(self.turns)
+        self.order_augmentation = config["training"].get("candidate_order_augmentation", "none")
+        if self.order_augmentation not in ("none", "per_epoch"):
+            raise ValueError("Unknown candidate order augmentation")
+        if (self.order_augmentation != "none" and
+                config["training"].get("readout_style", "full_ranking") != "full_ranking"):
+            raise ValueError("Candidate augmentation currently requires full-ranking completion")
+        self.set_epoch(0)
+
+    def set_epoch(self, epoch):
+        """Both members share a deterministic permutation; resume reproduces it."""
+        if self.order_augmentation == "none":
+            return
+        self.turns = []
+        seed = self.config["training"].get("augmentation_seed", self.config["seed"])
+        for index in range(0, len(self.base_turns), 2):
+            rng = np.random.default_rng(np.random.SeedSequence([seed, int(epoch), index // 2]))
+            count = len(self.base_turns[index].step.candidate_actions)
+            order = rng.permutation(count).tolist()
+            self.turns.extend(renumber_turn(turn, self.config["task"], order)
+                              for turn in self.base_turns[index:index + 2])
 
     def __len__(self):
         return len(self.turns)
@@ -74,4 +105,7 @@ class CounterfactualFirstTurnDataset(Dataset):
         encoded = encode_trajectory(diagnostic, self.tokenizer,
             self.config["maximum_sequence_tokens"],
             chat_template_kwargs=self.config.get("chat_template_kwargs", {}))
+        if self.config["training"].get("decision_focus_weight", 1) > 1:
+            from .convergence import with_decision_mask
+            return with_decision_mask((encoded, [turn.step]), self.tokenizer)
         return encoded, [turn.step]

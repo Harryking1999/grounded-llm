@@ -1,0 +1,95 @@
+{
+  "study": "flamingo_map_reader_completion_ten_epochs_ranking5",
+  "task": "graph",
+  "seed": 20261001,
+  "source_run": "external_map_interface/path256_five_graphs_4ac7239",
+  "train_validation_graphs": [
+    "graph_00",
+    "graph_01",
+    "graph_02",
+    "graph_03"
+  ],
+  "unseen_test_graph": "graph_04",
+  "maximum_demonstration_actions": 32,
+  "maximum_sequence_tokens": 17408,
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "chat_template_kwargs": {},
+  "map": {
+    "memory_mode": "address_key_state_value",
+    "state_dim": 128,
+    "projection_dim": 256,
+    "role_and_id_dim": 32,
+    "attention_heads": 4,
+    "attention_head_dim": 64,
+    "cross_attention_every_n_layers": 1,
+    "maximum_candidates": 3,
+    "value_scale": 14.410007800237114
+  },
+  "readout_data": {
+    "seed": 20261003,
+    "held_out_goals_per_graph": 64,
+    "train_per_length_per_graph": {
+      "2": 64,
+      "4": 64,
+      "6": 64,
+      "8": 48,
+      "10": 16
+    },
+    "validation_per_length_per_graph": {
+      "2": 16,
+      "4": 16,
+      "6": 16,
+      "8": 12,
+      "10": 4
+    },
+    "test_per_length_per_graph": {
+      "2": 64,
+      "4": 64,
+      "6": 64,
+      "8": 48,
+      "10": 16
+    },
+    "training_evaluation_per_length_per_graph": {
+      "2": 8,
+      "4": 8,
+      "6": 8,
+      "8": 6,
+      "10": 2
+    }
+  },
+  "training": {
+    "supervision_mode": "counterfactual_first_turn",
+    "readout_style": "full_ranking",
+    "epochs": 10,
+    "max_steps": -1,
+    "batch_size_policy": "fixed_actual_batch_one",
+    "loss": "assistant_token_cross_entropy",
+    "optimizer": "AdamW",
+    "learning_rate": 2E-05,
+    "weight_decay": 0.01,
+    "warmup_fraction": 0.05,
+    "warmup_steps": 13,
+    "schedule_after_warmup": "constant",
+    "gradient_clip_norm": 1.0,
+    "frozen_base_dtype": "bfloat16",
+    "adapter_parameter_dtype": "float32",
+    "candidate_order_augmentation": "per_epoch",
+    "augmentation_seed": 20261003,
+    "decision_focus_weight": 5,
+    "decision_focus_scope": "ranking_contents_only"
+  },
+  "checkpoint": {
+    "every_epoch_fraction": 1.0,
+    "save_at_epoch_end": true,
+    "save_initial": true
+  },
+  "evaluation": {
+    "primary_metric": "original_and_swapped_queried_order_both_correct",
+    "action_max_new_tokens": 512,
+    "terminal_max_new_tokens": 64,
+    "diagnostic_records_per_split": 16,
+    "diagnostic_seed": 20261003,
+    "interface_records_per_split": 3,
+    "checkpoint_selection": "final_epoch_no_early_stop"
+  }
+}

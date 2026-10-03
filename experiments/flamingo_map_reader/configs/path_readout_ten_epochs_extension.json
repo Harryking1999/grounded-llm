@@ -1,0 +1,17 @@
+{
+  "source_step": 16384,
+  "max_total_steps": 20480,
+  "minimum_total_steps": 20480,
+  "evaluation_every_steps": 1024,
+  "patience_evaluations": 4,
+  "relative_improvement": 0.005,
+  "absolute_improvement": 0.0001,
+  "maximum_final_loss_regression_fraction": 0.1,
+  "maximum_final_loss_regression_absolute": 0.001,
+  "selection": "lowest_fixed_training_loss",
+  "metrics": [
+    "training_ce",
+    "decision_ce"
+  ],
+  "resume_reason": "Continue the unchanged 2048-example short readout from 8 to 10 total epochs to test the additional-training explanation."
+}

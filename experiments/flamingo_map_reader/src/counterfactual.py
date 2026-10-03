@@ -3,8 +3,44 @@
 from dataclasses import replace
 
 import numpy as np
+import torch
 
 from .memory import MapBatch
+
+
+def reorder_candidates(step, order):
+    """Keep physical actions and Q vectors paired while assigning new local IDs."""
+    count = len(step.candidate_actions)
+    if sorted(order) != list(range(count)):
+        raise ValueError("candidate order must be a permutation")
+    slots = [0, 1, *(index + 2 for index in order)]
+    source = step.map_batch
+    ids = torch.tensor([[0, 0, *range(1, count + 1)]], dtype=torch.long,
+                       device=source.candidate_ids.device)
+    distances = tuple(step.candidate_map_distances[index] for index in order)
+    minimum = min(distances)
+    best = tuple(index for index, distance in enumerate(distances, 1)
+                 if np.isclose(distance, minimum, rtol=1e-10, atol=1e-12))
+    return replace(step,
+        map_batch=MapBatch(source.vectors[:, slots], source.roles[:, slots], ids,
+                           source.valid[:, slots]),
+        candidate_actions=tuple(step.candidate_actions[index] for index in order),
+        candidate_destinations=tuple(step.candidate_destinations[index] for index in order),
+        candidate_map_distances=distances, map_minimal_candidates=best)
+
+
+def renumbered_prompt(task, step, original_text):
+    """Rebuild only the first-turn candidate listing after consistent renumbering."""
+    from .blocks_prompt import turn_prompt as blocks_turn_prompt
+    from .prompt import turn_prompt as graph_turn_prompt
+
+    marker = "\n\n[Environment update]"
+    if marker not in original_text:
+        raise ValueError("first-turn prompt lacks its environment update")
+    opening = original_text.rsplit(marker, 1)[0]
+    update = (graph_turn_prompt(step, [step.current]) if task == "graph" else
+              blocks_turn_prompt(step, []))
+    return opening + "\n\n" + update
 
 
 def swap_candidate_q(step, pair):

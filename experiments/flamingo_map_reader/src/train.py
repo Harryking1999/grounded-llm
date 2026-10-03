@@ -74,7 +74,7 @@ def collate_examples(examples, pad_token_id):
 
 
 def decision_weighted_loss(ordinary_loss, logits, labels, focus_mask, weight):
-    """Preserve normal CE while increasing ranking and action-ID contributions."""
+    """Preserve normal CE while increasing the selected token contributions."""
     if weight <= 1:
         raise ValueError("Decision weight must exceed one")
     selected = focus_mask[:, 1:] & (labels[:, 1:] != -100)
@@ -141,6 +141,26 @@ class EpochCheckpoint(TrainerCallback):
     def on_epoch_end(self, args, state, control, **kwargs):
         control.should_save = True
         return control
+
+    def on_save(self, args, state, control, **kwargs):
+        if state.is_world_process_zero:
+            checkpoint_ready(Path(args.output_dir) / f"checkpoint-{state.global_step}",
+                             state.global_step, state.epoch)
+
+
+def checkpoint_ready(path, step, epoch):
+    """Publish only after Trainer finished saving; concurrent evaluators wait here."""
+    temporary = Path(path) / "evaluation_ready.tmp"
+    temporary.write_text(json.dumps({"step": step, "epoch": epoch}) + "\n")
+    temporary.replace(Path(path) / "evaluation_ready.json")
+
+
+class DatasetEpoch(TrainerCallback):
+    def __init__(self, dataset):
+        self.dataset = dataset
+
+    def on_epoch_begin(self, args, state, control, **kwargs):
+        self.dataset.set_epoch(int(state.epoch or 0))
 
 
 class JsonLog(TrainerCallback):
@@ -305,8 +325,14 @@ def main():
     else:
         raise ValueError(f"Unknown supervision mode: {supervision_mode}")
     callbacks = [JsonLog(args.out / "logs/train.jsonl")]
-    extra_arguments = {"warmup_ratio": training["warmup_fraction"]}
+    if getattr(dataset, "order_augmentation", "none") != "none":
+        if convergence:
+            raise ValueError("Per-epoch augmentation needs fixed-epoch training, not cached plateau data")
+        callbacks.append(DatasetEpoch(dataset))
     maximum_steps = training.get("max_steps", -1)
+    source_steps = maximum_steps if maximum_steps > 0 else math.ceil(
+        len(dataset) / args.batch_size) * training["epochs"]
+    extra_arguments = fixed_warmup_arguments(training, source_steps)
     if convergence:
         from .convergence import ConvergenceCheck, with_decision_mask
         # Caching preserves exactly the deterministic examples used by the source run.
@@ -351,6 +377,10 @@ def main():
         else:
             (args.out / "continuation.json").write_text(json.dumps(continuation, indent=2) + "\n")
     (args.out / "config.json").write_text(json.dumps(contract, indent=2) + "\n")
+    if config.get("checkpoint", {}).get("save_initial", False) and args.resume is None:
+        initial = args.out / "models/checkpoint-0"
+        trainer.save_model(str(initial))
+        checkpoint_ready(initial, 0, 0)
     result = trainer.train(resume_from_checkpoint=str(args.resume) if args.resume else None)
     trainer.save_model(str(args.out / "models/final"))
     (args.out / "results").mkdir(exist_ok=True)

@@ -70,9 +70,11 @@ class BlocksReaderTest(unittest.TestCase):
         step = replace(step, current_map_distance=2.0, candidate_map_distances=(2.0, 2.0),
                        map_minimal_candidates=(1, 2))
         answer = decision_text(step, 2)
-        self.assertIn("current = 1 = 2", answer)
+        # The tie is carried by the ranking grouping, not by a prose sentence.
+        self.assertEqual(answer.splitlines()[1],
+            "Map-distance ranking to the goal, closest to farthest: current = 1 = 2.")
         self.assertNotIn("2.0", answer)
-        self.assertIn("same map distance", answer)
+        self.assertEqual(len(answer.splitlines()), 4)
 
     def test_ood_uses_candidate_states_too(self):
         seen = {0, 3, 12}

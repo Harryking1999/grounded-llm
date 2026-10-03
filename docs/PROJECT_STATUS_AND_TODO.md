@@ -14,6 +14,8 @@
 
 扩大寻路短式训练已在第 8 轮（16384 步）用完原预算，末次固定训练集 overall CE 0.06483、决策 CE 0.71298，平台条件未满足。下一轮受控实验使用[普通完整补全](../experiments/flamingo_map_reader/configs/path_completion_ten_epochs.json)及[排序 token ×5](../experiments/flamingo_map_reader/configs/path_completion_ten_epochs_ranking5.json)两组匹配的十轮训练，保留原题／Q swap，逐轮同步改编号；并按[短式续训合同](../experiments/flamingo_map_reader/configs/path_readout_ten_epochs_extension.json)把旧短式权重续到第 10 轮。评价以自由生成的交换前后候选对正确率为主，分训练、同图未见目标和新图，并记录排序 CE、重编号一致性与读入地图的内部响应。设计与指标见[实验说明](../experiments/flamingo_map_reader/README.md#十轮完整首轮补全与轮数对照)。
 
+该队列已从源码提交 `807d0f8` 启动，远端产物为 `runs/path_completion_ten_epochs_20261003`。GPU 0、1 分别训练普通 CE、排序 ×5；GPU 2 把旧短式续到第 10 轮，GPU 3 等待首轮 checkpoint 后诊断，随后 GPU 2 也加入诊断。启动检查确认三个训练进程正常运行，两组完整补全在 warmup 后的早期 loss 已低于初始两步；是否学会地图比较，以逐轮自由生成和 Q swap 的留出指标判定。
+
 旧小样本权重的大样本评测已完成：同图新目标 256 题的 768 个候选对中，原题／swap 同时正确 55 对；新图为 30/768。两组“全部三个候选对都成对正确”的基础题数均为 0/256。这次覆盖任意候选对及多种长度，比原四道最近／最远比较题更广；扩大训练后的权重仍待比较。
 
 扩大训练的已有诊断见[主报告第 4–6 节](../experiments/flamingo_map_reader/results/readout_failure_analysis.md)：

@@ -124,16 +124,17 @@ class MapCollator:
 
 class EpochCheckpoint(TrainerCallback):
     """Request saves after each tenth of an epoch, at optimizer boundaries."""
-    def __init__(self, fraction):
+    def __init__(self, fraction, early_steps=()):
         self.fraction = fraction
         self.bucket = 0
+        self.early_steps = set(early_steps)
 
     def on_train_begin(self, args, state, control, **kwargs):
         self.bucket = int(((state.epoch or 0) + 1e-8) / self.fraction)
 
     def on_step_end(self, args, state, control, **kwargs):
         bucket = int(((state.epoch or 0) + 1e-8) / self.fraction)
-        if bucket > self.bucket:
+        if bucket > self.bucket or state.global_step in self.early_steps:
             control.should_save = True
             self.bucket = bucket
         return control
@@ -319,6 +320,9 @@ def main():
     supervision_mode = training.get("supervision_mode", "trajectory")
     if supervision_mode == "trajectory":
         dataset = SFTDataset(records, qmap, tokenizer, config, args.source_root)
+    elif supervision_mode == "prepared_trajectory":
+        from .trajectory_dataset import PreparedTrajectoryDataset
+        dataset = PreparedTrajectoryDataset(args.manifest, records, config)
     elif supervision_mode == "counterfactual_first_turn":
         dataset = CounterfactualFirstTurnDataset(records, qmap, tokenizer,
                                                  config, args.source_root)
@@ -347,7 +351,8 @@ def main():
                            "save_steps": convergence["evaluation_every_steps"],
                            "save_total_limit": 2, "disable_tqdm": True}
     else:
-        callbacks.append(EpochCheckpoint(config["checkpoint"]["every_epoch_fraction"]))
+        callbacks.append(EpochCheckpoint(config["checkpoint"]["every_epoch_fraction"],
+                                        config["checkpoint"].get("early_steps", ())))
     arguments = TrainingArguments(
         output_dir=str(args.out / "models"), logging_dir=str(args.out / "logs"),
         per_device_train_batch_size=args.batch_size, gradient_accumulation_steps=1,
@@ -383,6 +388,7 @@ def main():
         checkpoint_ready(initial, 0, 0)
     result = trainer.train(resume_from_checkpoint=str(args.resume) if args.resume else None)
     trainer.save_model(str(args.out / "models/final"))
+    checkpoint_ready(args.out / "models/final", trainer.state.global_step, trainer.state.epoch)
     (args.out / "results").mkdir(exist_ok=True)
     (args.out / "results/summary.json").write_text(json.dumps(result.metrics, indent=2) + "\n")
 

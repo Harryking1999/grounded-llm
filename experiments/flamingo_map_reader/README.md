@@ -1,36 +1,53 @@
-# 地图读取：完整轨迹 SFT
+# 地图读取：长轨迹 SFT
 
-本轮按[飞书 4.2](https://zcnhpsd26tyi.feishu.cn/wiki/ZNNSwpIo0iHwMgk7mk7coBA3nzb#BJmUde2p6oN7SxxELqkcIfUEnIe)组织两项实验：寻路只用一张地图及其 Q，积木用 1000 张初始棋盘与共享 Q 编码器。冻结 Qwen2.5-1.5B-Instruct 和地图，两任务分别训练接口。
+按原飞书 4.2，寻路固定一张图及其 Q，积木使用 1000 张初始棋盘与共享冻结 Q。两任务分别从头训练读取接口，冻结 Qwen2.5-1.5B-Instruct 与地图。训练完整长轨迹的每次判断、距离、排序、动作及最终停止和总结。
 
-**训练单位是完整轨迹。**每轮学习状态判断、距离数值、排序、动作；到达后还要学习终止与真实动作总结。同一物理轨迹使用多套自洽随机编号，每套重复多次。测试自由生成每一轮及完整闭环，不设前置距离读出实验。
+- [设计与评价口径](DESIGN.md)
+- [寻路正式配置](configs/path_single_long.json)、[积木正式配置](configs/blocks1000_long.json)
+- [唯一状态页](../../docs/PROJECT_STATUS_AND_TODO.md)
+- [结果报告](results/readout_failure_analysis.md)：新成绩与归档小样本分开。
 
-- [训练与评测方案](DESIGN.md)：数据规模建议、编号覆盖、监督格式及评价口径。
-- [项目状态与 TODO](../../docs/PROJECT_STATUS_AND_TODO.md)：唯一当前进度页。
-- [结果报告](results/readout_failure_analysis.md)：新实验暂无成绩，旧结果已标为历史。
+## 模块职责
 
-## 实现基础与需要修改的位置
+| 模块 | 职责 |
+|---|---|
+| `prepare_trajectories.py` | 长任务选择、物理任务划分、训练后缀排除、覆盖与贪心基线 |
+| `trajectory_protocol.py` | 数值回答、自洽重编号；固定实际动作路径 |
+| `trajectory_dataset.py` | 地图保存一次，固定编号版本的 token 缓存和重复读取 |
+| `train.py` | 共用 HF Trainer，完整轨迹普通 SFT、冻结基座、checkpoint 发布 |
+| `transcript.py` / `memory.py` / `fusion.py` | 全 token 的逐轮地图绑定与读取接口 |
+| `trajectory_eval.py` | 两任务共用自由生成会话；参考历史下全部轮次、实际闭环、无地图 |
+| `trajectory_metrics.py` | 数值、排序、动作、停止、真实历史总结评分 |
+| `trajectory_smoke.py` | 最长真实样本的一次前向／反向；不保留更新后的权重 |
+| `trajectory_queue.py` | 四卡资源分配、成功后推进、失败记录、checkpoint 评测和汇总 |
 
-| 环节 | 现有实现 | 本轮需要完成 |
-|---|---|---|
-| 寻路采样 | `src/data.py`、`src/prepare.py` | 单图、宽长度、训练／验证／测试目标分区及终止样本 |
-| 积木采样 | `src/blocks_data.py` | 1000 张训练棋盘、长短任务、足够大的验证／测试及状态覆盖标注 |
-| 轨迹与标签 | `src/sft.py`、`src/blocks_sft.py` | 距离数值监督；固定物理轨迹后生成编号版本 |
-| 数据重复 | `src/train.py` 的完整轨迹 Dataset | 多套固定编号，每套重复；旧固定 seed 不能满足 |
-| 地图绑定 | `src/transcript.py`、`src/memory.py`、`src/fusion.py` | 保留逐轮绑定，验证完整动作标记与终止段边界 |
-| 评测 | `src/evaluate_graph.py`、`src/evaluate_blocks.py`、`src/relations.py` | 新任务集、全部轮次、数值与总结评分、目标替换和无地图消融 |
+编号版本同步改变真实动作、后继向量、文字编号和标签，每个固定版本重复完整训练遍数。没有 Q-only swap，没有二选一预训练，也没有独立距离读出前置实验。历史入口保留复现，不从新队列调用。
 
-现有代码能提供完整轨迹 SFT 的基础，但还不能直接运行新方案。新增距离输出后需检查真实长样本的长度和显存，不能截掉后续轮或终止段。正式配置在采样与 smoke 后填写实际规模和运行预算。
+## 运行
 
-## 历史配置与结果
-
-原[寻路 K/V 配置](configs/pilot_path256_addressed_kv.json)和[积木 K/V 配置](configs/pilot_blocks_addressed_kv.json)是架构及优化器的参考，**仍是旧实验合同**。不修改旧合同来冒充新运行，不直接执行旧四图／五图评测作为本轮结果。
-
-[16／4 小样本与原完整轨迹结果](results/archive/full_trajectory_history.md)已标为历史；[swap 条件](results/archive/swap_training.md)继续归档。旧自然目标、二选一、排序加权等分支不进入本轮训练。
-
-代码验证入口仍为：
+在仓库根目录，用可运行 torch / transformers 的 Python：
 
 ```bash
-python -m unittest discover -s experiments/flamingo_map_reader/tests -p 'test_*.py'
+python -m experiments.flamingo_map_reader.src.trajectory_queue \
+  --run-root /absolute/new/run \
+  --model-path /absolute/Qwen2.5-1.5B-Instruct \
+  --graph-source /absolute/path256_five_graphs_4ac7239 \
+  --blocks-source-manifest /absolute/blocks_manifest.json \
+  --blocks-official /absolute/tiling_order_10x10_8obj.h5 \
+  --blocks-q /absolute/tree_1000_132f5a1/best.pt \
+  --blocks-q-data /absolute/tree_1000_132f5a1/data/data.npz \
+  --gpus 0 1 2 3
 ```
 
-新数据、日志和权重放在 Git 外的 `runs/` 等目录。源代码、正式配置与紧凑结果分别提交；寻路与积木保存独立接口权重。
+`run-root` 必须不存在。队列进度为 `queue_status.json`，日志在 `logs/`，每任务的数据和训练独立保存。准备失败、显存不足或训练失败均明确记为失败，不自动缩短任务、改变配置或覆盖运行。
+
+每个评测分片保存逐题完整回答及分母；最后跨分片合并编号与真实目标配对。阶段诊断不替代最终全量测试，终止样本单独计数。训练集选固定物理轨迹诊断，测试集在最终 checkpoint 才解封。
+
+针对性检查：
+
+```bash
+PYTHONPATH=.:experiments/flamingo_map_reader/tests python -m unittest \
+  test_trajectory_protocol test_timeline test_trainer test_hf_integration
+```
+
+旧实验及其数值见 [完整轨迹／小样本归档](results/archive/full_trajectory_history.md) 与 [swap 归档](results/archive/swap_training.md)。

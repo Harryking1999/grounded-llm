@@ -2,12 +2,12 @@
 
 本实验检验：冻结 LLM 与地图，只训练地图读取接口，能否从完整轨迹学会远近排序、行动、停止和总结。当前主实验为单图寻路与 1000 初始棋盘积木；旧小样本仅用于历史诊断。
 
-两任务均已完成 3 个 epoch。已核对结果包括寻路完整 validation 闭环（到达 423/532，到达且最短 70/532）、积木 epoch 1／2 reference 及首个 final 闭环分片。主结果采用 rollout 到达率／到达且最短路率，以及 reference 动作可达率／最短路动作率；排序与集合另列辅助诊断。积木 reference 以作答前可解的轮次为分母；完整结果、分母及待填位置见[结果报告](results/readout_failure_analysis.md)，不以部分分片推断整体成绩。
+两任务均已完成 3 个 epoch。已核对结果包括寻路完整 validation 闭环（到达 423/532，到达且最短 70/532）、积木 epoch 1／2 reference 及首个 final 闭环分片。主结果采用 rollout 到达率／到达且最短路率，以及 reference 动作可达率／最短路动作率；排序与集合另列辅助诊断。积木 reference 以作答前可解的轮次为分母；完整结果、分母及待填位置见[结果报告](results/report.md)，不以部分分片推断整体成绩。
 
 ## 阅读顺序
 
 1. [训练与评测设置](DESIGN.md)：数据范围和数量 → 动作覆盖与编号 → 初始／更新文本 → Top-10 监督 → 训练与评测。
-2. [结果报告](results/readout_failure_analysis.md)：两任务 reference、寻路完整闭环、积木部分闭环；正在评测或尚未核实的结果留空待补。
+2. [结果报告](results/report.md)：两任务 reference、寻路完整闭环、积木部分闭环；正在评测或尚未核实的结果留空待补。
 3. [项目状态与有序 TODO](../../docs/PROJECT_STATUS_AND_TODO.md)：唯一当前进度页。
 
 正式合同为 [path_single_long.json](configs/path_single_long.json) 与 [blocks1000_long.json](configs/blocks1000_long.json)；[紧凑证据](results/long_trajectory_summary.json)保存实际数据统计、动作覆盖及结果分母，不另复制配置。

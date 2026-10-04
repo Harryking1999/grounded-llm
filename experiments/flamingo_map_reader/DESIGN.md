@@ -1,6 +1,6 @@
 # 完整轨迹 SFT：当前运行设置
 
-本页描述 `long_f73b700_20261004` 实际采用的数据、输入和监督。正式合同为[寻路配置](configs/path_single_long.json)与[积木配置](configs/blocks1000_long.json)，统计依据为[运行摘要](results/long_trajectory_summary.json)。进度见[项目状态页](../../docs/PROJECT_STATUS_AND_TODO.md)，成绩见[结果报告](results/readout_failure_analysis.md)。
+本页描述 `long_f73b700_20261004` 实际采用的数据、输入和监督。正式合同为[寻路配置](configs/path_single_long.json)与[积木配置](configs/blocks1000_long.json)，统计依据为[运行摘要](results/long_trajectory_summary.json)。进度见[项目状态页](../../docs/PROJECT_STATUS_AND_TODO.md)，成绩见[结果报告](results/report.md)。
 
 ## 1. 这轮实验检验什么
 
@@ -43,7 +43,7 @@
 
 训练任务按地图贪心成功筛选，validation／test 则保留失败任务。因此训练贪心到达率 100% 是数据构造条件，不能当泛化证据。失败参考轨迹只保留实际前缀，不伪造终止段，所以表中积木留出终止段少于物理任务数。
 
-地图贪心是参照控制器，不是所有读图策略的性能上限；并列选择或非贪心策略都可能产生不同轨迹。比较闭环时使用相同 split、group 和任务范围，并单列初始即目标。逐题到达／最短成绩集中在[结果页](results/readout_failure_analysis.md#4-地图贪心参照按相同任务范围比较)，不与逐轮动作指标混用。
+地图贪心是参照控制器，不是所有读图策略的性能上限；并列选择或非贪心策略都可能产生不同轨迹。比较闭环时使用相同 split、group 和任务范围，并单列初始即目标。逐题到达／最短成绩集中在[结果页](results/report.md#4-地图贪心参照按相同任务范围比较)，不与逐轮动作指标混用。
 
 ## 3. 动作覆盖与编号重复
 
@@ -175,4 +175,4 @@ Summary: Reached the goal after {步数} executed {moves/removals}.
 
 训练内固定 256 题以及 validation 每题使用 1 套编号；epoch 1、2 和 final 均安排 reference 与 validation rollout。final 才评测 test：map 使用非零步任务的 6 套编号，初始即目标仍仅 1 套；同权重 no_map 使用 1 套。地图开关应按同题、同编号配对比较。编号一致性只对 reference 的对应轮次比较真实动作；真实目标配对及跨分片统计须在完整案例集合上汇总。
 
-按任务类型、候选数量、轮次和剩余距离分层；积木必须区分训练棋盘新任务、新棋盘及初始即目标。置信区间不能把同一任务的轮次或编号副本当成独立任务，积木还需考虑初始棋盘这一聚类单位。最新数值及待填表格统一在[结果报告](results/readout_failure_analysis.md)。
+按任务类型、候选数量、轮次和剩余距离分层；积木必须区分训练棋盘新任务、新棋盘及初始即目标。置信区间不能把同一任务的轮次或编号副本当成独立任务，积木还需考虑初始棋盘这一聚类单位。最新数值及待填表格统一在[结果报告](results/report.md)。

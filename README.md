@@ -8,7 +8,7 @@
 - [研究简述](docs/RESEARCH_BRIEF.md)：研究问题、信息条件与证伪标准。
 - [当前实验](experiments/flamingo_map_reader/README.md)：分支、源码和文件入口。
 - [训练与评测设置](experiments/flamingo_map_reader/DESIGN.md)：实际数据数量、动作覆盖、提示文本、监督与优化设置。
-- [结果报告](experiments/flamingo_map_reader/results/readout_failure_analysis.md)：已收录 reference 与闭环结果，并为未完成评测保留填写位置。
+- [结果报告](experiments/flamingo_map_reader/results/report.md)：已收录 reference 与闭环结果，并为未完成评测保留填写位置。
 - [历史结果索引](docs/PROJECT_STATUS_AND_TODO.md#历史证据入口)：显式距离接口、旧连续 token、地图训练和独立模型基线。
 - [Related Work](RELATED_WORK.md)、[GCML 任务来源](docs/GCML_TASKS.md)。
 

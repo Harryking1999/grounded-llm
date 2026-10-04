@@ -272,12 +272,19 @@
     "deduplication": "Both hosts expose the same completed shard paths in this snapshot; physical-task and case counts and all retained overall metric counts agree. Each shard counted once."
   },
   "metric_notes": {
-    "denominators": "Control: all turns. Actions/ranking: decision turns. Stop/summary: terminal turns. Pairwise/current: their recorded pair counts. Rollout: case variants; initial-goal cases included unless grouped separately.",
+    "denominators": "Stored raw summaries use: control / all turns; actions and ranking / all decision turns; stop and summary / terminal turns; pairwise and current / recorded pair counts; rollout / case variants. Primary reference tables instead use the current-reachable subset, as defined in primary_reporting.",
     "source": "Sum integer counts from deduplicated completed shard summary.json files; audit reachability directly from the matching cases.jsonl. No model inference or environment replay was run for this update.",
     "uniform_baseline": "For each scored decision turn, r/k = reachable_candidates/candidate_slots. Average these fractions across the same turns used for the model. The existing reachable_candidate_rate is instead sum(r)/sum(k), a candidate-slot-weighted proportion.",
     "current_reachable": "remaining_shortest >= 1 on nonterminal turns. Already unreachable reference states score false independently of the model choice. Report this subset separately when judging whether the chosen action destroys reachability.",
     "missing_reachability": "Use reachability_audit.reachability_scored_turns to check field coverage; aggregate counts can contain implicit zeros for absent fields. Do not publish a full-battery rate when coverage is incomplete.",
-    "rounding": "Displayed percentages use one decimal; 100.0% may be rounded. Integer counts are authoritative."
+    "rounding": "Displayed percentages use one decimal; 100.0% may be rounded. Integer counts are authoritative.",
+    "primary_reporting": {
+      "rollout_arrival": "reached / attempts",
+      "rollout_shortest": "reached_shortest / attempts; reached_goal and moves == shortest_moves, irrespective of stop output. Read from the same saved cases as the snapshot; shortest_success retains its original, stricter correct-stop meaning.",
+      "reference_reachable": "action_keeps_goal_reachable / current_reachable_turns; primary denominator is nonterminal turns with remaining_shortest >= 1.",
+      "reference_shortest": "action_environment_shortest / current_reachable_turns; any chosen action with successor distance equal to current distance minus one qualifies. Existing scorer rejects already-unreachable turns, so the original numerator is unchanged.",
+      "secondary": "Map-minimum action agreement and matched no_map/goal interventions assess map use separately. Full rankings, candidate sets, control and summaries are auxiliary diagnostics."
+    }
   },
   "evaluation_batteries": {
     "blocks/checkpoint-0/train_reference_map": {
@@ -1346,7 +1353,8 @@
             "reached": 3,
             "success": 3,
             "shortest_success": 0,
-            "attempts": 64
+            "attempts": 64,
+            "reached_shortest": 0
           }
         }
       },
@@ -1356,7 +1364,8 @@
         "success": 3,
         "shortest_success": 0,
         "successful_moves": 27,
-        "successful_shortest_moves": 23
+        "successful_shortest_moves": 23,
+        "reached_shortest": 0
       },
       "variants": 1,
       "reachability_audit": {
@@ -2817,7 +2826,8 @@
             "reached": 391,
             "success": 386,
             "shortest_success": 37,
-            "attempts": 500
+            "attempts": 500,
+            "reached_shortest": 38
           }
         },
         "initial_goal": {
@@ -2851,7 +2861,8 @@
             "reached": 32,
             "success": 31,
             "shortest_success": 31,
-            "attempts": 32
+            "attempts": 32,
+            "reached_shortest": 32
           }
         }
       },
@@ -2861,7 +2872,8 @@
         "success": 417,
         "shortest_success": 68,
         "successful_moves": 6568,
-        "successful_shortest_moves": 3390
+        "successful_shortest_moves": 3390,
+        "reached_shortest": 70
       },
       "variants": 1,
       "reachability_audit": {

@@ -1,11 +1,11 @@
 # 地图读取：完整长轨迹 SFT
 
-本实验检验：冻结 LLM 与地图，只训练地图读取接口，能否从完整轨迹学会远近排序、行动、停止和总结。当前主实验为单图寻路与 1000 初始棋盘积木；旧小样本用于历史诊断。寻路 epoch 1 的训练内逐轮诊断已取得 100% 控制格式／合法动作、69.2% 地图最优动作，尚不构成泛化结论。
+本实验检验：冻结 LLM 与地图，只训练地图读取接口，能否从完整轨迹学会远近排序、行动、停止和总结。当前主实验为单图寻路与 1000 初始棋盘积木；旧小样本用于历史诊断。寻路已在留出目标上用上地图（reference 逐轮选中地图最优候选 76.8%，闭环到达 78.9%），积木同期只到 39.5%，且积木的地图上限本身只有 71.2%；两任务都还没饱和。
 
 ## 阅读顺序
 
 1. [训练与评测设置](DESIGN.md)：数据范围和数量 → 动作覆盖与编号 → 初始／更新文本 → Top-10 监督 → 训练与评测。
-2. [结果报告](results/readout_failure_analysis.md)：先记录寻路 epoch 1，后续在同页补充。
+2. [结果报告](results/readout_failure_analysis.md)：两任务 reference 逐 checkpoint，寻路部分闭环；未跑的电池在该页留空待补。
 3. [项目状态与有序 TODO](../../docs/PROJECT_STATUS_AND_TODO.md)：唯一当前进度页。
 
 正式合同为 [path_single_long.json](configs/path_single_long.json) 与 [blocks1000_long.json](configs/blocks1000_long.json)；[紧凑证据](results/long_trajectory_summary.json)保存实际数据统计、动作覆盖及结果分母，不另复制配置。

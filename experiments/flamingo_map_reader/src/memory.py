@@ -78,7 +78,16 @@ class AddressedMemory:
 
 
 class MapMemoryEncoder(nn.Module):
-    """Shared P, role/ID embeddings, then G from section 4.1."""
+    """Shared P, role/ID embeddings, then G from section 4.1.
+
+    Deprecated: the mixed "joint" encoder, which projects state and identity into
+    one vector and feeds it as both the attention key and the value. Every archived
+    run that used it fitted its training first turn but scored 0/4 on held-out
+    turns, and the diagnosis never localized why. Kept only so those archived
+    configs stay reproducible; `AddressedMapMemoryEncoder` is the current encoder
+    and `train.py` selects it whenever `memory_mode` is set. See
+    ../results/archive/abandoned_readout_variants.md.
+    """
 
     def __init__(
         self,

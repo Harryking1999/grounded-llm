@@ -1,4 +1,12 @@
-"""Flamingo-style gated cross-attention inserted before frozen decoder layers."""
+"""Flamingo-style gated cross-attention inserted before frozen decoder layers.
+
+Two knobs here are deprecated and are left at their defaults by both current
+configs (`path_single_long.json`, `blocks1000_long.json`, which select
+`memory_mode="address_key_state_value"`): `value_scale` (state-value scale
+calibration) and `fixed_gate_tanh` (freezing the residual gate). They survive
+only so the archived runs that used them stay reproducible; see
+../results/archive/abandoned_readout_variants.md.
+"""
 
 from collections.abc import Iterator
 from contextlib import contextmanager
@@ -16,6 +24,8 @@ from .memory import (AddressedMapMemoryEncoder, AddressedMemory, MapBatch,
 class GatedMapCrossAttention(nn.Module):
     def __init__(self, language_dim: int, heads: int, head_dim: int = 64,
                  key_dim: int | None = None, value_dim: int | None = None,
+                 # Deprecated: calibrated the state-value branch to a shared scale.
+                 # Only defined for addressed memory; current configs leave it at 1.0.
                  value_scale: float = 1.0) -> None:
         super().__init__()
         if min(language_dim, heads, head_dim) <= 0:
@@ -149,6 +159,8 @@ class MapReader(nn.Module):
         head_dim: int = 64,
         every_n_layers: int = 1,
         decoder_path: str = "model.layers",
+        # Deprecated: freezes the cross-attention gate at a constant instead of
+        # letting it train. Only the archived pilot_path256_fixed_gate run set it.
         fixed_gate_tanh: float | None = None,
         value_scale: float = 1.0,
     ) -> None:

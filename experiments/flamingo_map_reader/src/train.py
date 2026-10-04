@@ -25,6 +25,8 @@ def build_reader(base, config):
     spec = config["map"]
     mode = spec.get("memory_mode", "joint")
     if mode == "joint":
+        # Deprecated fallback, reached only by configs that predate addressed memory
+        # or by a config that omits memory_mode. Both current configs set it explicitly.
         encoder = MapMemoryEncoder
     elif mode == "address_key_state_value":
         encoder = AddressedMapMemoryEncoder
@@ -35,6 +37,8 @@ def build_reader(base, config):
                      spec["role_and_id_dim"])
     return MapReader(base, memory, spec["attention_heads"], spec["attention_head_dim"],
                       spec["cross_attention_every_n_layers"],
+                      # Both deprecated; the current configs set neither. Read through
+                      # only so the archived runs that did stay reproducible.
                       fixed_gate_tanh=spec.get("fixed_gate_tanh"),
                       value_scale=spec.get("value_scale", 1.0))
 

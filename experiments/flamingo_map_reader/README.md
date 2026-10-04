@@ -43,4 +43,4 @@
 | [backfill_reachability.py](src/backfill_reachability.py) | 重建旧分片状态并校验后回填可达性；本次文档整理仅读取已有记录 |
 | [trajectory_queue.py](src/trajectory_queue.py)、[trajectory_smoke.py](src/trajectory_smoke.py) | 已有训练／评测调度与长样本显存检查 |
 
-历史结果入口：[原完整轨迹与小样本](results/archive/full_trajectory_history.md)、[swap](results/archive/swap_training.md)。旧配置与诊断源码保留复现，不代表当前训练入口。
+历史结果入口：[原完整轨迹与小样本](results/archive/full_trajectory_history.md)、[swap](results/archive/swap_training.md)、[读取接口失败变体清单](results/archive/abandoned_readout_variants.md)（逐条列出源码里还留着哪些废弃开关、各自对应哪个旧配置）。旧配置与诊断源码保留复现，不代表当前训练入口。

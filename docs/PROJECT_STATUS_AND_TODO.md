@@ -21,7 +21,7 @@
 
 - 当前实现分支：`codex/long-trajectory-training`；本轮训练协议提交：`f73b700`。
 - 运行目录：`/zhanghanyue/experiment/flamingo_map_reader/runs/long_f73b700_20261004`。数据、合同、模型和结果文件的对应关系见[实验 README](../experiments/flamingo_map_reader/README.md#分支源码与运行对应)。
-- 较早的 `codex/full-trajectory-protocol`／`1ae0e0e` 是启动前方案，仍含已取消的数值距离监督；不能用该分支文档判断当前运行是否启动或采用何种监督。
+- 较早的 `1ae0e0e`（`codex/full-trajectory-protocol` 迁移前的尖端）是启动前方案，仍含已取消的数值距离监督；不能用该提交的文档判断当前运行是否启动或采用何种监督。
 - `3992d6d`、`57d8ff1`、`d24e345`、`4ec7e78`、`aec7166`、`9f66c2b`、`f8161fb` 属于后续队列维护（重启、子进程认领、跨机器委派、每 epoch 验证闭环与排序）；截至本次整理，训练协议未随这些提交变化。旧 `long_9234c5c_20261003` 与原四图／小样本运行分别保留。
 
 ## 有序 TODO

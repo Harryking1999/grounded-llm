@@ -27,6 +27,7 @@ def checkpoint_jobs(task, directory, manifest, root):
     if checkpoint == "final":
         schedules = [("train", "reference", 1, False, spec["train_diagnostic_tasks"]),
                      ("validation", "reference", 1, False, None),
+                     ("validation", "rollout", 1, False, None),
                      ("test", "reference", spec["numbering_variants"], False, None),
                      ("test", "rollout", spec["numbering_variants"], False, None),
                      ("test", "reference", 1, True, None),
@@ -39,7 +40,8 @@ def checkpoint_jobs(task, directory, manifest, root):
             schedules = [("train", "reference", 1, False, spec["train_diagnostic_tasks"])]
         elif abs(ready["epoch"] - round(ready["epoch"])) < 1e-6 and ready["epoch"] < manifest["config"]["training"]["epochs"]:
             schedules = [("train", "reference", 1, False, spec["train_diagnostic_tasks"]),
-                         ("validation", "reference", 1, False, None)]
+                         ("validation", "reference", 1, False, None),
+                         ("validation", "rollout", 1, False, None)]
         else:
             return []
     jobs = []
@@ -57,8 +59,30 @@ def checkpoint_jobs(task, directory, manifest, root):
                 args.append("--no-map")
             if limit:
                 args.extend(["--limit", str(limit)])
-            jobs.append(dict(key=key, args=args))
+            jobs.append(dict(key=key, args=args, split=split, mode=mode, no_map=no_map))
     return jobs
+
+
+def job_priority(job):
+    """Queue order: the reading that settles the epoch question soonest, first.
+
+    A validation rollout is a sixth of a test battery's case count, and it is
+    the only closed-loop number that exists at more than one checkpoint, so it
+    is what epochs can actually be compared on. Test follows: it is the headline
+    number, but it exists only at the final checkpoint and is six times the
+    size. The no_map control goes last -- nothing waits on it, and it only
+    matters once a map result exists for it to attribute.
+
+    The sort that applies this is stable, so the scan's own newest-checkpoint-
+    first order still decides everything within one priority.
+    """
+    if job["split"] == "validation" and job["mode"] == "rollout":
+        return 0
+    if job["no_map"]:
+        return 3
+    if job["split"] == "test":
+        return 2
+    return 1
 
 
 def checkpoint_progress(directory):
@@ -277,6 +301,7 @@ def main():
                         continue
                     known.add(job["key"])
                     pending.append(job)
+        pending.sort(key=job_priority)
         for gpu in available_gpus(args.gpus, tasks, [*processes.values(), *watched.values()]):
             if pending:
                 job = pending.pop(0)

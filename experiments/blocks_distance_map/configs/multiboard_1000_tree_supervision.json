@@ -1,0 +1,19 @@
+{
+  "study": "blocks_distance_map",
+  "scope": "goal_relative_ancestor_and_contradictory_branch_dag_supervision",
+  "base_run": "runs/blocks_distance_map/base",
+  "base_source_commit": "97bd3ecd100e2f6b4bbd9f306921ae6ba744535f",
+  "official_dataset": "data/raw/tiling_order_10x10_8obj.h5",
+  "board_seed": 20260928,
+  "sample_seed": 20261008,
+  "backbone_rollouts": 8,
+  "fork_attempts_per_board": 24,
+  "accepted_parents_per_board": 8,
+  "branch_width": 4,
+  "branch_depth": 3,
+  "goals_per_parent": 4,
+  "minimum_goal_swap_cases": 12000,
+  "minimum_train_relations": 500000,
+  "oracle_cache_limit": 4000000,
+  "oracle_seconds": 14400
+}

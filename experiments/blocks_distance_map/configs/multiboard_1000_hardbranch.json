@@ -1,0 +1,17 @@
+{
+  "study": "blocks_distance_map",
+  "scope": "same_1000_boards_plus_locally_plausible_equal_area_branches",
+  "base_source_commit": "97bd3ecd100e2f6b4bbd9f306921ae6ba744535f",
+  "base_run": "runs/blocks_distance_map/base",
+  "hard_pair_repeat": 8,
+  "oracle_cache_limit": 3000000,
+  "oracle_seconds": 3600,
+  "minimum_train_cases": 10000,
+  "minimum_test_cases": 800,
+  "sampling": {
+    "train": {"max_pairs": 150000, "max_cases": 12000, "seed": 20261001},
+    "validation": {"max_pairs": 15000, "max_cases": 1000, "seed": 20261002},
+    "ood_board": {"max_pairs": 15000, "max_cases": 1000, "seed": 20261003},
+    "unseen_goal": {"max_pairs": 10000, "max_cases": 1000, "seed": 20261004}
+  }
+}

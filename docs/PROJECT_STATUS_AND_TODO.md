@@ -28,6 +28,7 @@
 
 - 本轮训练协议为 `f73b700`，运行目录为 `/zhanghanyue/experiment/flamingo_map_reader/runs/long_f73b700_20261004`；合同、清单、源码职责见[实验 README](../experiments/flamingo_map_reader/README.md#分支源码与运行对应)。
 - `codex/long-trajectory-training` 保存训练主线；`codex/full-trajectory-protocol` 已迁移到当前实现与文档。启动前旧方案用提交 `1ae0e0e` 识别，不再用分支名区分新旧。
+- 冻结的棋盘编码器与 `official_boards`／`DistanceOracle` 来自 `codex/blocks-multigoal`（末次 `3a4c572`；checkpoint `tree_1000_132f5a1` 的源码 commit 为 `132f5a1`）。该实验的计划、configs、结果与源码已移植进本分支，见[积木 Q-map 计划](BLOCKS_QMAP_PLAN.md)与[实验目录](../experiments/blocks_distance_map/README.md)。
 - 本次从 35016 读取已有产物，确认寻路 final 为 72,576 步、积木 final 为 147,000 步；重启后的 40072 也已核对，同名已完成分片去重收录。
 - 可达性字段在 `1c516e4` 引入，`07d21f9` 提供旧分片回填；正在运行的旧版评测仍可能产生缺字段分片。此次只读取记录与更新文档，没有执行回填。
 
@@ -46,6 +47,7 @@
 
 | 历史研究 | 证据与用途 |
 |---|---|
+| 并行积木 Q-map 线 | 分支 `codex/blocks-distance-map`（`fd7f9fb` 起 18 提交）、`codex/blocks-qmap-report`（46 提交，已推 origin）：与本目录同名 config 内容不同，不作为当前主训练的来源 |
 | 地图读取旧四图与 16／4 小样本 | [完整轨迹历史](../experiments/flamingo_map_reader/results/archive/full_trajectory_history.md)：局部拟合与早期失败诊断 |
 | swap 及衍生分析 | [归档](../experiments/flamingo_map_reader/results/archive/swap_training.md)：不进入当前主证据链 |
 | 图／积木连续 state token 对齐 | [图验收](../experiments/cml_map_scaling/results/step2_acceptance.md)、[积木读出](../experiments/state_interface_pilot/results/readout.md)：previous approach |

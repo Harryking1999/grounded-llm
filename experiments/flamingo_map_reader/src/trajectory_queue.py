@@ -158,6 +158,9 @@ def main():
     parser.add_argument("--gpus", type=int, nargs=4, default=[0, 1, 2, 3])
     parser.add_argument("--prepare-workers", type=int, default=1,
                         help="Forked processes each preparation task may use; the two tasks run at once")
+    parser.add_argument("--delegate-prefix", action="append", default=[],
+                        help="Evaluation key prefix another machine owns, so this queue neither claims it "
+                             "nor aggregates its shards; the owner aggregates them itself")
     args = parser.parse_args()
     root = args.run_root.resolve()
     logs = root / "logs"
@@ -270,9 +273,10 @@ def main():
             published = list((root / task / "training/models").glob("*/evaluation_ready.json"))
             for ready in sorted(published, key=lambda path: checkpoint_progress(path.parent), reverse=True):
                 for job in checkpoint_jobs(task, ready.parent, spec["manifest"], root):
-                    if job["key"] not in known:
-                        known.add(job["key"])
-                        pending.append(job)
+                    if job["key"] in known or job["key"].startswith(tuple(args.delegate_prefix)):
+                        continue
+                    known.add(job["key"])
+                    pending.append(job)
         for gpu in available_gpus(args.gpus, tasks, [*processes.values(), *watched.values()]):
             if pending:
                 job = pending.pop(0)
@@ -293,6 +297,10 @@ def main():
             continue
         groups = defaultdict_list(root / "evaluation" / task)
         for group, shards in groups.items():
+            if group.relative_to(root / "evaluation").as_posix().startswith(tuple(args.delegate_prefix)):
+                # Delegated shards are still arriving; aggregating now would freeze a
+                # partial battery under the group's final summary.json. Its owner does it.
+                continue
             results = [json.loads(line) for shard in shards for line in (shard / "cases.jsonl").read_text().splitlines()]
             atomic_json(group / "summary.json", aggregate(results, spec["manifest"]))
     atomic_json(root / "completion.json", dict(success=not failed, failed=failed, completed_jobs=len(completed)))

@@ -119,6 +119,30 @@ class TaskEnvironment:
         destination = step.candidate_destinations[chosen - 1]
         return self.remaining(destination, step.goal, [*path, destination]) == remaining - 1
 
+    def chosen_keeps_reachable(self, step, chosen, path, remaining):
+        """The task's own criterion: the goal is still reachable after this action.
+
+        Wider than chosen_is_shortest. On blocks one figure is built from several
+        pieces, so removing any of its components is as good as removing the one
+        the map ranks first -- there is no unique shortest path among the good
+        moves. remaining() answers -1 for an unreachable state on both tasks.
+        """
+        if chosen is None or not 1 <= chosen <= len(step.candidate_actions) or remaining < 1:
+            return False
+        destination = step.candidate_destinations[chosen - 1]
+        return self.remaining(destination, step.goal, [*path, destination]) >= 0
+
+    def reachable_candidates(self, step, path, remaining):
+        """How many legal candidates leave the goal reachable: the chance floor.
+
+        A model picking uniformly among the legal moves scores this fraction on
+        action_keeps_goal_reachable, so the rate is only readable beside it.
+        """
+        if remaining < 1:
+            return 0
+        return sum(self.remaining(destination, step.goal, [*path, destination]) >= 0
+                   for destination in step.candidate_destinations)
+
     def update(self, step, path, actions):
         return prompt.turn_prompt(step, path) if self.task == "graph" else blocks_prompt.turn_prompt(step, actions)
 
@@ -137,6 +161,9 @@ def reference_turns(session, demo, environment):
         chosen = row.get("chosen_id")
         row["chosen_action"] = turn.step.candidate_actions[chosen - 1] if row["legal_action"] else None
         row["action_environment_shortest"] = environment.chosen_is_shortest(turn.step, chosen, turn.executed_path, row["remaining_shortest"])
+        row["action_keeps_goal_reachable"] = environment.chosen_keeps_reachable(turn.step, chosen, turn.executed_path, row["remaining_shortest"])
+        row["reachable_candidates"] = environment.reachable_candidates(turn.step, turn.executed_path, row["remaining_shortest"])
+        row["candidate_slots"] = 0 if turn.step.done else len(turn.step.candidate_actions)
         rows.append(row)
         # Only earlier gold turns enter the next prefix. Never prepend this
         # turn's gold distances/ranking before generating its decision.
@@ -180,6 +207,9 @@ def closed_loop(session, record, first, environment, config, variant):
             break
         action, destination = environment.execute(step, chosen)
         row["action_environment_shortest"] = environment.chosen_is_shortest(step, chosen, path, row["remaining_shortest"])
+        row["action_keeps_goal_reachable"] = environment.chosen_keeps_reachable(step, chosen, path, row["remaining_shortest"])
+        row["reachable_candidates"] = environment.reachable_candidates(step, path, row["remaining_shortest"])
+        row["candidate_slots"] = len(step.candidate_actions)
         row["chosen_action"] = action
         path.append(destination)
         actions.append(action)

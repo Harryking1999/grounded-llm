@@ -49,14 +49,20 @@ def summarize_turns(rows):
                "valid_ranking", "exact_ranking", "closest_candidate_set_exact", "action_map_minimum",
                "action_follows_ranking", "pairwise_correct", "pairwise_total",
                "generated_tokens", "seconds",
-               "current_relation_correct", "current_relation_total", "action_environment_shortest")
+               "current_relation_correct", "current_relation_total", "action_environment_shortest",
+               "action_keeps_goal_reachable", "reachable_candidates", "candidate_slots")
     for r in rows:
         for key in metrics:
             counts[key] += r.get(key, 0)
     decisions = len(rows) - counts["terminal_turns"]
     result = dict(counts, decision_turns=decisions)
-    for key in ("exact_ranking", "closest_candidate_set_exact", "action_map_minimum", "legal_action", "premature_done"):
+    for key in ("exact_ranking", "closest_candidate_set_exact", "action_map_minimum", "legal_action", "premature_done",
+                "action_keeps_goal_reachable"):
         result[key + "_rate"] = counts[key] / decisions if decisions else None
     result["failed_to_stop_rate"] = counts["failed_to_stop"] / counts["terminal_turns"] if counts["terminal_turns"] else None
     result["summary_correct_rate"] = counts["summary_correct"] / counts["terminal_turns"] if counts["terminal_turns"] else None
+    # The chance floor for action_keeps_goal_reachable: the fraction of legal
+    # candidates that leave the goal reachable, i.e. what uniform picking scores.
+    result["reachable_candidate_rate"] = (counts["reachable_candidates"] / counts["candidate_slots"]
+                                          if counts["candidate_slots"] else None)
     return result

@@ -25,6 +25,9 @@ def checkpoint_jobs(task, directory, manifest, root):
     spec = manifest["config"]["evaluation"]
     checkpoint = directory.name
     if checkpoint == "final":
+        # Sorts above every numbered checkpoint: "final" is wherever training
+        # stopped, which is later than any epoch boundary already published.
+        epoch = float("inf")
         schedules = [("train", "reference", 1, False, spec["train_diagnostic_tasks"]),
                      ("validation", "reference", 1, False, None),
                      ("validation", "rollout", 1, False, None),
@@ -34,6 +37,7 @@ def checkpoint_jobs(task, directory, manifest, root):
                      ("test", "rollout", 1, True, None)]
     else:
         ready = json.loads((directory / "evaluation_ready.json").read_text())
+        epoch = ready["epoch"]
         if ready["step"] == 0:
             schedules = [("train", "reference", 1, False, spec["initial_diagnostic_tasks"])]
         elif ready["step"] in manifest["config"]["checkpoint"]["early_steps"]:
@@ -59,30 +63,37 @@ def checkpoint_jobs(task, directory, manifest, root):
                 args.append("--no-map")
             if limit:
                 args.extend(["--limit", str(limit)])
-            jobs.append(dict(key=key, args=args, split=split, mode=mode, no_map=no_map))
+            jobs.append(dict(key=key, args=args, split=split, mode=mode, no_map=no_map, epoch=epoch))
     return jobs
 
 
 def job_priority(job):
-    """Queue order: the reading that settles the epoch question soonest, first.
+    """Queue order: later training first, and within a checkpoint the quickest reading.
 
-    A validation rollout is a sixth of a test battery's case count, and it is
-    the only closed-loop number that exists at more than one checkpoint, so it
-    is what epochs can actually be compared on. Test follows: it is the headline
-    number, but it exists only at the final checkpoint and is six times the
-    size. The no_map control goes last -- nothing waits on it, and it only
-    matters once a map result exists for it to attribute.
+    Two axes, and the checkpoint's stage is the second one rather than an
+    artifact of scan order. The scan walks one whole task before the next, so a
+    tie broken by insertion order would run every path reading ahead of every
+    blocks reading no matter how early path's checkpoint was. Epoch is what
+    compares across the two tasks -- raw steps do not share a scale -- and
+    "final" sorts above every numbered checkpoint.
 
-    The sort that applies this is stable, so the scan's own newest-checkpoint-
-    first order still decides everything within one priority.
+    Within one checkpoint: a validation rollout is a sixth of a test battery's
+    case count and is the only closed-loop number that exists at more than one
+    checkpoint, so it is what epochs can actually be compared on, and it goes
+    first. Test follows -- it is the headline number but it is six times the
+    size and exists only at the final checkpoint. The no_map control goes last:
+    nothing waits on it, and it only matters once a map result exists to
+    attribute a gap to.
     """
     if job["split"] == "validation" and job["mode"] == "rollout":
-        return 0
-    if job["no_map"]:
-        return 3
-    if job["split"] == "test":
-        return 2
-    return 1
+        rank = 0
+    elif job["no_map"]:
+        rank = 3
+    elif job["split"] == "test":
+        rank = 2
+    else:
+        rank = 1
+    return (rank, -job["epoch"])
 
 
 def checkpoint_progress(directory):

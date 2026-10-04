@@ -19,8 +19,8 @@ from experiments.flamingo_map_reader.src.trajectory_protocol import numbering_pl
 from experiments.flamingo_map_reader.src.trajectory_dataset import prepare_record, PreparedTrajectoryDataset, load_record
 from experiments.flamingo_map_reader.src.trajectory_metrics import score_turn, summarize_turns
 from experiments.flamingo_map_reader.src.trajectory_queue import (
-    MODULE, checkpoint_jobs, checkpoint_progress, clear_partial_shard, completed_shards,
-    live_children, resume_point, still_running)
+    MODULE, available_gpus, checkpoint_jobs, checkpoint_progress, clear_partial_shard,
+    completed_shards, live_children, resume_point, still_running)
 from test_graph import line_graph
 from test_timeline import ByteChatTemplate
 
@@ -188,6 +188,18 @@ class TrajectoryProtocolTest(unittest.TestCase):
                 for process in (*running, dead):
                     process.kill()
                     process.wait()
+
+    def test_an_adopted_child_keeps_its_gpu_out_of_the_pool(self):
+        """Only the queue's own process table was consulted, which double-booked
+        GPUs 2 and 3 the first time a restart adopted live evaluations."""
+        tasks = {"path": dict(gpu=0, phase="train"), "blocks": dict(gpu=1, phase="train")}
+        shard = dict(gpu=3, pid=1713)
+        self.assertEqual(available_gpus([0, 1, 2, 3], tasks, [shard]), [2])
+        # A finished trainer releases its card to evaluation.
+        trained = {"path": dict(gpu=0, phase="trained"), "blocks": dict(gpu=1, phase="train")}
+        self.assertEqual(available_gpus([0, 1, 2, 3], trained, [shard]), [0, 2])
+        # So does a job that never had one.
+        self.assertEqual(available_gpus([0, 1, 2, 3], trained, [dict(gpu=None)]), [0, 2, 3])
 
     def test_final_queue_covers_all_test_tasks_and_no_map_controls(self):
         config = dict(self.config, evaluation=dict(train_diagnostic_tasks=256, numbering_variants=6, shard_tasks=64))

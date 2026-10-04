@@ -110,6 +110,20 @@ def still_running(pid):
     return Path(f"/proc/{pid}").exists()
 
 
+def available_gpus(gpus, tasks, busy):
+    """GPUs no job holds and no training phase reserves.
+
+    A training GPU stays reserved through preparation and smoke, then joins
+    evaluation once its own trainer finishes. Adopted children count as holding
+    their GPU: they are not in the queue's own process table, so leaving them
+    out would put a second evaluation on a card that already has one.
+    """
+    occupied = {job["gpu"] for job in busy if job["gpu"] is not None}
+    return [gpu for gpu in gpus if gpu not in occupied
+            and not any(spec["gpu"] == gpu and spec["phase"] in ("prepare", "smoke", "train")
+                        for spec in tasks.values())]
+
+
 def live_children(status, root):
     """Jobs the previous queue started that this one must not start again.
 
@@ -259,12 +273,7 @@ def main():
                     if job["key"] not in known:
                         known.add(job["key"])
                         pending.append(job)
-        occupied = {p["gpu"] for p in processes.values() if p["gpu"] is not None}
-        # Training GPUs are reserved through preparation, then join evaluation
-        # when their own trainer finishes. No GPU has two simultaneous jobs.
-        available = [g for g in args.gpus if g not in occupied and not any(
-            s["gpu"] == g and s["phase"] in ("prepare", "smoke", "train") for s in tasks.values())]
-        for gpu in available:
+        for gpu in available_gpus(args.gpus, tasks, [*processes.values(), *watched.values()]):
             if pending:
                 job = pending.pop(0)
                 clear_partial_shard(root / "evaluation" / job["key"])

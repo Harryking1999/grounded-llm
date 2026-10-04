@@ -51,6 +51,7 @@
 | 地图读取旧四图与 16／4 小样本 | [完整轨迹历史](../experiments/flamingo_map_reader/results/archive/full_trajectory_history.md)：局部拟合与早期失败诊断 |
 | swap 及衍生分析 | [归档](../experiments/flamingo_map_reader/results/archive/swap_training.md)：不进入当前主证据链 |
 | 图／积木连续 state token 对齐 | [图验收](../experiments/cml_map_scaling/results/step2_acceptance.md)、[积木读出](../experiments/state_interface_pilot/results/readout.md)：previous approach |
+| 旧连续 state token 路线的文档 | [详版讨论](archive/EXPERIMENT_TODO.md)、[简版](archive/experiment_todo_simple.md)、[路线备忘](archive/PROJECT_ROADMAP.md)、[2026-09-07 汇报](archive/early_experiment_summary.md)：均为 previous approach，只存档不维护进度 |
 | 图 Q/V 转移与几何 | [Step 1 报告](../experiments/cml_map_scaling/results/report.md) |
 | 旧单棋盘积木 Q/V | [试验结果](../experiments/external_map_interface/results/blocks_q_pilot.md)：转移拟合与目标距离分离 |
 | 显式地图距离接口 | [五图报告](../experiments/external_map_interface/results/path256_five_graphs.md)、[早期单图](../experiments/external_map_interface/results/path256_distance.md)、[独立图复测](../experiments/external_map_interface/results/path256_diverse.md) |

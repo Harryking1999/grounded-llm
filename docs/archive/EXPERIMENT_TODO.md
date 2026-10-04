@@ -1,8 +1,8 @@
 # Previous approach：Grounded LLM 连续状态接口设计讨论
 
-> 来源：远端 `origin/main` 的 `3681416`（2026-09-12），结合 [飞书讨论](https://zcnhpsd26tyi.feishu.cn/wiki/X9NZw0K4zizI2vkM14OcK4tXnXd) 于 2026-09-13 校正。本文封存旧的 Q／棋盘 → adapter → 连续 state token → LLM 路线；保留原文件名和当时的设计语境。下文的“当前”“下一步”“建议”均不是现行指令；现行研究定义与有序 TODO 见 [研究简述](docs/RESEARCH_BRIEF.md) 和 [项目状态页](docs/PROJECT_STATUS_AND_TODO.md)。
+> 来源：远端 `origin/main` 的 `3681416`（2026-09-12），结合 [飞书讨论](https://zcnhpsd26tyi.feishu.cn/wiki/X9NZw0K4zizI2vkM14OcK4tXnXd) 于 2026-09-13 校正。本文封存旧的 Q／棋盘 → adapter → 连续 state token → LLM 路线；保留原文件名和当时的设计语境。下文的“当前”“下一步”“建议”均不是现行指令；现行研究定义与有序 TODO 见 [研究简述](../RESEARCH_BRIEF.md) 和 [项目状态页](../PROJECT_STATUS_AND_TODO.md)。
 
-当时的首轮提案见 [状态接口试点设计](experiments/state_interface_pilot/README.md)；后续实际积木合同与结果也保留在该目录。该段原提案不再是当前实施方案。
+当时的首轮提案见 [状态接口试点设计](../../experiments/state_interface_pilot/README.md)；后续实际积木合同与结果也保留在该目录。该段原提案不再是当前实施方案。
 
 ## 一、核心研究问题
 
@@ -73,7 +73,7 @@ s_hat_(t+1) = s_hat_t + V(a_t)
 
 ### 3.3 已有纯 LLM 观察
 
-Sol 新形状 12 块任务已核实为逐次输出成功 `69/128 = 53.91%`，`pass@8 = 13/16`；后者指每个实例八次采样中至少成功一次的实例比例。原始摘要见 [Sol 报告](experiments/sol_dag_blocks/results/report.md)，不再将统计口径标为待补全。Qwen blocks 16k 的三个规模均为零成功，但同时存在已确认非法和原因未决的截断，见 [Qwen 验收报告](experiments/qwen_path_blocks/results/report.md)。
+Sol 新形状 12 块任务已核实为逐次输出成功 `69/128 = 53.91%`，`pass@8 = 13/16`；后者指每个实例八次采样中至少成功一次的实例比例。原始摘要见 [Sol 报告](../../experiments/sol_dag_blocks/results/report.md)，不再将统计口径标为待补全。Qwen blocks 16k 的三个规模均为零成功，但同时存在已确认非法和原因未决的截断，见 [Qwen 验收报告](../../experiments/qwen_path_blocks/results/report.md)。
 
 讨论中关注的两类失败示例（非全部失败分类）：
 
@@ -125,7 +125,7 @@ Sol 新形状 12 块任务已核实为逐次输出成功 `69/128 = 53.91%`，`pa
 
 两种结构都保持 Qwen 原有参数冻结，只训练状态 adapter 以及新增的状态接口模块。它们分别比较状态作为输入序列的一部分，以及状态作为外部 memory 被读取。
 
-1. **输入层 state tokens**：将 100 维状态向量输入可训练 adapter/projector，映射为 current 和 goal 的连续输入向量，再输入冻结 Qwen。远端举例各用一个 token；用户现已指定首轮比较每个状态 1／2／4 个向量，具体分块与匹配预算见[试点设计](experiments/state_interface_pilot/README.md)。一个高维向量并非必然装不下网格，关键是冻结 LLM 的可读性，不能预设更多向量更好。一次调用的概念序列为：
+1. **输入层 state tokens**：将 100 维状态向量输入可训练 adapter/projector，映射为 current 和 goal 的连续输入向量，再输入冻结 Qwen。远端举例各用一个 token；用户现已指定首轮比较每个状态 1／2／4 个向量，具体分块与匹配预算见[试点设计](../../experiments/state_interface_pilot/README.md)。一个高维向量并非必然装不下网格，关键是冻结 LLM 的可读性，不能预设更多向量更好。一次调用的概念序列为：
 
    ```text
    <im_start>user
@@ -188,7 +188,7 @@ KV cache 保存历史 token 在各层计算出的 key/value。追加新的状态
 
 ### 3.10 积木设计的未决项
 
-新的形状集合、非空目标、动作边界、状态接口容量与训练／测试划分仍需形成正式合同；优先复用已有状态更新器和裁判，不能将已有统计和检查器记作尚未完成。现有报告任务方案是一项可检验的迁移假设，概念上尚不能保证长程规划成功。工作顺序只在 [项目状态页](docs/PROJECT_STATUS_AND_TODO.md) 维护。
+新的形状集合、非空目标、动作边界、状态接口容量与训练／测试划分仍需形成正式合同；优先复用已有状态更新器和裁判，不能将已有统计和检查器记作尚未完成。现有报告任务方案是一项可检验的迁移假设，概念上尚不能保证长程规划成功。工作顺序只在 [项目状态页](../PROJECT_STATUS_AND_TODO.md) 维护。
 
 ## 四、任务 B：抽象寻路问题
 
@@ -261,7 +261,7 @@ LLM 输出 a_t
 
 ## 六、进度与执行入口
 
-当前证据与工作顺序统一见 [项目状态页](docs/PROJECT_STATUS_AND_TODO.md)。本页只记录设计；新实验形成时，机器可读参数放入对应研究的 `configs/`，不在多份说明中复制配置或待办状态。
+当前证据与工作顺序统一见 [项目状态页](../PROJECT_STATUS_AND_TODO.md)。本页只记录设计；新实验形成时，机器可读参数放入对应研究的 `configs/`，不在多份说明中复制配置或待办状态。
 
 ## 七、当前不作为既定结论的事项
 

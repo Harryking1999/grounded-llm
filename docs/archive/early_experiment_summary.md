@@ -1,4 +1,6 @@
-> 这是 2026-09-07 的历史汇报，保留当时的观察与讨论；其中“目前”“下一步”不代表最新状态。后续 Sol、Qwen 结果与新方案统一见 [项目状态页](PROJECT_STATUS_AND_TODO.md)。
+# 实验总结与初步进展（2026-09-07 汇报）
+
+> 这是 2026-09-07 的历史汇报，保留当时的观察与讨论；其中“目前”“下一步”不代表最新状态。后续 Sol、Qwen 结果与新方案统一见 [项目状态页](../PROJECT_STATUS_AND_TODO.md)。
 
 ## 汇报结论
 
@@ -91,7 +93,7 @@ Luna 的原始 8 块、生成 12 块和双开关条件各有一个 0/8 实例，
 
 `blocks8_00` 第 6 次采样中，第 2 步已移除 `(4,6)`，模型随后报告的棋盘也将该格标为空。第 3 步仍选择横向三格 `(4,4)、(4,5)、(4,6)`，非法动作。
 
-![正确棋盘报告后仍重复移除空格](../experiments/sol_dag_blocks/results/figures/C2_repeated_removal.png)
+![正确棋盘报告后仍重复移除空格](../../experiments/sol_dag_blocks/results/figures/C2_repeated_removal.png)
 
 ### 5.2 积木：状态输出漏掉仍占用的格子
 
@@ -102,7 +104,7 @@ Luna 的原始 8 块、生成 12 块和双开关条件各有一个 0/8 实例，
 | 真实棋盘 | `0110000000` |
 | 模型报告 | `0100000000` |
 
-![状态输出错误的真实棋盘与模型报告对比](../experiments/sol_dag_blocks/results/figures/C5_state_report_error.png)
+![状态输出错误的真实棋盘与模型报告对比](../../experiments/sol_dag_blocks/results/figures/C5_state_report_error.png)
 
 这个案例直接展示了状态输出错误如何传递到后续状态和终止判断。
 
@@ -115,7 +117,7 @@ Luna 的原始 8 块、生成 12 块和双开关条件各有一个 0/8 实例，
 
 第 4 步移除 `(4,4)、(5,4)、(5,5)`。三格当时均被占用，动作和 `board_after` 都正确；但它使 `(5,3)` 变为孤立单格，后续再也没有形状可以覆盖。动作前的棋盘仍有完整解，改用另一种移除即可清空。
 
-![合法动作留下孤立格](../experiments/sol_dag_blocks/results/figures/C4_legal_trap.png)
+![合法动作留下孤立格](../../experiments/sol_dag_blocks/results/figures/C4_legal_trap.png)
 
 ### 5.5 积木：空计划，输出unsolved
 

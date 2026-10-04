@@ -1,6 +1,6 @@
 # Previous approach：状态 token 接口候选备忘
 
-本页封存早期连续状态 token／memory 接口路线，不是当前实施合同，也不维护进度、TODO 或期限。当前决策以 [研究简述](docs/RESEARCH_BRIEF.md) 和 [状态页](docs/PROJECT_STATUS_AND_TODO.md) 为准；下文的“近期”“建议从……开始”均属当时观点。
+本页封存早期连续状态 token／memory 接口路线，不是当前实施合同，也不维护进度、TODO 或期限。当前决策以 [研究简述](../RESEARCH_BRIEF.md) 和 [状态页](../PROJECT_STATUS_AND_TODO.md) 为准；下文的“近期”“建议从……开始”均属当时观点。
 
 ## 待比较的表示与接口
 

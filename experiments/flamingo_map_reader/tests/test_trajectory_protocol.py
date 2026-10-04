@@ -4,6 +4,8 @@ import json
 import multiprocessing
 import os
 from pathlib import Path
+import subprocess
+import sys
 import tempfile
 from types import SimpleNamespace
 import unittest
@@ -17,7 +19,8 @@ from experiments.flamingo_map_reader.src.trajectory_protocol import numbering_pl
 from experiments.flamingo_map_reader.src.trajectory_dataset import prepare_record, PreparedTrajectoryDataset, load_record
 from experiments.flamingo_map_reader.src.trajectory_metrics import score_turn, summarize_turns
 from experiments.flamingo_map_reader.src.trajectory_queue import (
-    checkpoint_jobs, clear_partial_shard, completed_shards, resume_point)
+    MODULE, checkpoint_jobs, checkpoint_progress, clear_partial_shard, completed_shards,
+    live_children, resume_point, still_running)
 from test_graph import line_graph
 from test_timeline import ByteChatTemplate
 
@@ -151,6 +154,40 @@ class TrajectoryProtocolTest(unittest.TestCase):
             self.assertFalse(partial.exists())
             clear_partial_shard(shard)
             self.assertTrue(shard.exists())
+
+    def test_restart_orders_the_newest_checkpoint_first_and_adopts_live_children(self):
+        """A reorder must not cost the run: newest reading first, no second start."""
+        names = ["checkpoint-0", "checkpoint-128", "checkpoint-8064", "checkpoint-49000", "final"]
+        order = sorted((Path(name) for name in names), key=checkpoint_progress, reverse=True)
+        self.assertEqual([path.name for path in order],
+                         ["final", "checkpoint-49000", "checkpoint-8064", "checkpoint-128", "checkpoint-0"])
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            shard = "blocks/checkpoint-128/train_reference_map/00000_00064"
+            running = [subprocess.Popen([sys.executable, "-c", "import time; time.sleep(60)", *arguments])
+                       for arguments in ([MODULE + "train", "--out", str(root / "path/training")],
+                                         [MODULE + "trajectory_eval", "--out", str(root / "evaluation" / shard)],
+                                         [MODULE + "trajectory_eval", "--out", "/elsewhere/evaluation"])]
+            dead = subprocess.Popen([sys.executable, "-c", "pass"])
+            dead.wait()
+            try:
+                adopted = live_children(dict(running={
+                    "path/train": dict(pid=running[0].pid, gpu=0, log="trainer"),
+                    shard: dict(pid=running[1].pid, gpu=2, log="shard"),
+                    # Wrong module for the key, and a foreign output directory.
+                    "blocks/train": dict(pid=running[2].pid, gpu=1, log="elsewhere"),
+                    "path/smoke": dict(pid=dead.pid, gpu=0, log="gone")}), root)
+                self.assertEqual(set(adopted), {"path/train", shard})
+                self.assertEqual(adopted["path/train"]["pid"], running[0].pid)
+                self.assertEqual(live_children(None, root), {})
+                # Adopted work stays adopted only while /proc still has the pid.
+                self.assertTrue(still_running(running[0].pid))
+                self.assertFalse(still_running(dead.pid))
+            finally:
+                for process in (*running, dead):
+                    process.kill()
+                    process.wait()
 
     def test_final_queue_covers_all_test_tasks_and_no_map_controls(self):
         config = dict(self.config, evaluation=dict(train_diagnostic_tasks=256, numbering_variants=6, shard_tasks=64))

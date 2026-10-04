@@ -61,6 +61,18 @@ def checkpoint_jobs(task, directory, manifest, root):
     return jobs
 
 
+def checkpoint_progress(directory):
+    """How far training had gone when this checkpoint was published.
+
+    The scan enqueues the newest checkpoints first. An early diagnostic
+    checkpoint carries almost no information yet costs as much GPU time as any
+    other shard, so it must not push the reading from a trained checkpoint
+    hours down the queue.
+    """
+    name = directory.name
+    return float("inf") if name == "final" else int(name.split("-")[-1])
+
+
 def resume_point(models):
     """Newest checkpoint Trainer finished writing, or None for a fresh run.
 
@@ -89,6 +101,42 @@ def clear_partial_shard(directory):
         shutil.rmtree(directory)
 
 
+def still_running(pid):
+    """True while that process exists; a finished one leaves no /proc entry.
+
+    /proc/<pid> is a directory, so this is a presence check on the path, not a
+    regular-file check on it.
+    """
+    return Path(f"/proc/{pid}").exists()
+
+
+def live_children(status, root):
+    """Jobs the previous queue started that this one must not start again.
+
+    A restarted queue must not put a second trainer on a GPU that already has
+    one. The predecessor's status file names each pid; /proc then confirms that
+    pid still runs the module its key implies and, for an evaluation, still
+    writes this run's own output directory, which a recycled pid would not.
+    """
+    modules = dict(prepare="prepare_trajectories", smoke="trajectory_smoke", train="train")
+    alive = {}
+    for key, running in (status or {}).get("running", {}).items():
+        command = Path(f"/proc/{running['pid']}/cmdline")
+        if not command.is_file():
+            continue
+        try:
+            actual = command.read_bytes().decode(errors="replace")
+        except OSError:
+            continue
+        module = modules.get(key.split("/")[-1], "trajectory_eval")
+        if MODULE + module not in actual:
+            continue
+        if module == "trajectory_eval" and str(root / "evaluation" / key) not in actual:
+            continue
+        alive[key] = running
+    return alive
+
+
 def main():
     parser = ArgumentParser()
     for arg in ("run-root", "model-path", "graph-source", "blocks-source-manifest", "blocks-official", "blocks-q", "blocks-q-data"):
@@ -108,6 +156,8 @@ def main():
                           "--q-checkpoint", str(args.blocks_q), "--q-training-data", str(args.blocks_q_data)],
                  train=["--q-checkpoint", str(args.blocks_q)])}
     processes, pending, known, completed, failed = {}, [], set(), [], []
+    previous = root / "queue_status.json"
+    watched = live_children(json.loads(previous.read_text()) if previous.is_file() else None, root)
 
     def launch(key, module, arguments, gpu=None):
         log = logs / (key.replace("/", "_") + ".log")
@@ -127,24 +177,37 @@ def main():
         launch(task + "/train", "train", arguments, spec["gpu"])
 
     # A restarted queue adopts what the previous process left behind instead of
-    # redoing it: prepared data, a passing smoke test, and the newest published
-    # checkpoint, which train.py continues rather than restarting from scratch.
+    # redoing it: prepared data, a passing smoke test, the newest published
+    # checkpoint, which train.py continues rather than restarting from scratch,
+    # and any child still running, which it watches instead of starting again.
     for task, spec in tasks.items():
         manifest = root / task / "data/manifest.json"
+        if task + "/prepare" in watched:
+            spec["phase"] = "prepare"
+            continue
         if not manifest.is_file():
             launch(task + "/prepare", "prepare_trajectories", ["--config", str(spec["config"]), "--model-path", str(args.model_path),
                    "--out", str(root / task / "data"), "--workers", str(args.prepare_workers), *spec["prepare"]])
             spec["phase"] = "prepare"
             continue
         spec["manifest"] = json.loads(manifest.read_text())
+        if task + "/smoke" in watched:
+            spec["phase"] = "smoke"
+            continue
         if not (root / task / "smoke.json").is_file():
             launch(task + "/smoke", "trajectory_smoke", ["--manifest", str(manifest),
                 "--model-path", str(args.model_path), "--out", str(root / task / "smoke.json")], spec["gpu"])
             spec["phase"] = "smoke"
             continue
+        if task + "/train" in watched:
+            spec["phase"] = "train"
+            continue
         launch_train(task, spec, resume_point(root / task / "training/models"))
         spec["phase"] = "train"
     known |= completed_shards(root / "evaluation")
+    # Work already in flight is accounted for; queueing it again would run a
+    # second copy of a shard whose live process is still writing that directory.
+    known |= set(watched)
     while True:
         for key, running in list(processes.items()):
             code = running["process"].poll()
@@ -170,10 +233,28 @@ def main():
                         spec["phase"] = "train"
                 elif key == task + "/train":
                     spec["phase"] = "failed" if code else "trained"
+        for key, running in list(watched.items()):
+            if still_running(running["pid"]):
+                continue
+            del watched[key]
+            print(json.dumps(dict(event="adopted_finished", key=key, pid=running["pid"])), flush=True)
+            task = key.split("/")[0]
+            if key == task + "/train":
+                # Its exit code died with the previous queue, so the published
+                # final checkpoint is what says the trainer finished cleanly.
+                final = root / task / "training/models/final/evaluation_ready.json"
+                tasks[task]["phase"] = "trained" if final.is_file() else "failed"
+                if tasks[task]["phase"] == "failed":
+                    failed.append(dict(key=key, exit_code=None, log=running["log"]))
+            elif key.count("/") > 1 and not (root / "evaluation" / key / "summary.json").is_file():
+                # A shard that stopped without its summary never finished; forget
+                # it so the scan below puts it back in the queue.
+                known.discard(key)
         for task, spec in tasks.items():
             if "manifest" not in spec:
                 continue
-            for ready in sorted((root / task / "training/models").glob("*/evaluation_ready.json")):
+            published = list((root / task / "training/models").glob("*/evaluation_ready.json"))
+            for ready in sorted(published, key=lambda path: checkpoint_progress(path.parent), reverse=True):
                 for job in checkpoint_jobs(task, ready.parent, spec["manifest"], root):
                     if job["key"] not in known:
                         known.add(job["key"])
@@ -189,10 +270,11 @@ def main():
                 clear_partial_shard(root / "evaluation" / job["key"])
                 launch(job["key"], "trajectory_eval", [*job["args"], "--model-path", str(args.model_path)], gpu)
         status = dict(pid=os.getpid(), tasks={k: dict(phase=v["phase"], gpu=v["gpu"]) for k, v in tasks.items()},
-            running={k: dict(pid=v["process"].pid, gpu=v["gpu"], log=v["log"]) for k, v in processes.items()},
+            running={**{k: dict(pid=v["process"].pid, gpu=v["gpu"], log=v["log"]) for k, v in processes.items()},
+                     **watched},
             pending_evaluations=len(pending), completed=completed, failed=failed)
         atomic_json(root / "queue_status.json", status)
-        if not processes and not pending:
+        if not processes and not pending and not watched:
             break
         time.sleep(15)
     # Aggregate across shards so paired target changes can cross shard boundaries.

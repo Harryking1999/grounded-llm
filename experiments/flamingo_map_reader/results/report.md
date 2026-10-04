@@ -6,6 +6,8 @@
 
 运行 `long_f73b700_20261004`，训练协议 `f73b700`。寻路 epoch 1／2 对应 checkpoint-24192／48384；积木对应 checkpoint-49000／98000。设置见[设计页](../DESIGN.md)，分片路径与整数计数见[紧凑证据](long_trajectory_summary.json)。
 
+**本轮读取接口只有一种结构。**角色与编号作为 attention 的 K（寻址），Q 的投影作为 V（状态内容），门控随训练更新；状态值尺度 `value_scale` 与固定门控 `fixed_gate_tanh` 都取默认值，不生效。此前的混合 K/V、固定门控、关系 token 加权与状态值尺度校准都不参与下面任何读数，逐条对照见[失败变体清单](archive/abandoned_readout_variants.md)。
+
 ## 1. 四个主指标
 
 | 模式 | 主指标 | 判定与分母 |

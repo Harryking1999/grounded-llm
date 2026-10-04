@@ -102,7 +102,7 @@ Candidate numbers may change between turns; use only the numbers above.
 
 积木对应三项分别为 `Current board:` 后的完整 10×10 棋盘、`Actual executed actions:` 后的 `remove(...)` 日志，以及 `{编号}: remove(shape_id,row,col)` 候选表。编号只在本轮有效。初始与更新文本没有另列回答模板，格式与 Top-10 要求通过下一节的 SFT 答案学习。
 
-文字以外，每轮通过 cross-attention 提供 current、goal 和全部候选后继向量。角色与编号作为 attention 的 K（寻址），Q 的投影作为 V（状态内容），两者分离。环境负责合法性及状态转移，LLM 负责输出选择。
+文字以外，每轮通过 cross-attention 提供 current、goal 和全部候选后继向量。角色与编号作为 attention 的 K（寻址），Q 的投影作为 V（状态内容），两者分离；这是配置键 `memory_mode="address_key_state_value"` 选中的结构，也是本轮唯一使用的读取结构，寻址与状态内容不再混进同一个向量。门控不冻结、随训练更新；状态值尺度 `value_scale` 与固定门控 `fixed_gate_tanh` 都保持默认值，即不生效，二者对应的失败变体见[清单](results/archive/abandoned_readout_variants.md)。环境负责合法性及状态转移，LLM 负责输出选择。
 
 ## 5. 监督什么，为什么积木只输出 Top-10
 

@@ -16,7 +16,7 @@ from .data import load_graph, shortest_move_counts
 from .evaluate_blocks import parse_control
 from .graph import graph_step, timeline_maps
 from .text import chat_ids
-from .train import build_reader, to_device
+from .train import build_reader, pinned_supervision, to_device
 from .trajectory_dataset import load_record
 from .trajectory_metrics import score_turn, summarize_turns
 
@@ -289,9 +289,14 @@ def main():
     if args.out.exists():
         raise FileExistsError(args.out)
     saved = torch.load(args.adapter_checkpoint, weights_only=True, map_location="cpu")
-    expected = dict(config=config, manifest=str(args.manifest.resolve()), model_source=str(args.model_path.resolve()),
-                    map_source=manifest["source_root" if config["task"] == "graph" else "q_checkpoint"])
-    if any(saved["contract"].get(key) != value for key, value in expected.items()):
+    # The training budget is not part of what an adapter has to agree on: a checkpoint
+    # written under a shorter budget still reads the same map into the same model, and
+    # a run extended past that budget is what evaluates it. train.py draws the same line.
+    expected = pinned_supervision(dict(config=config, manifest=str(args.manifest.resolve()),
+        model_source=str(args.model_path.resolve()),
+        map_source=manifest["source_root" if config["task"] == "graph" else "q_checkpoint"]))
+    saved_contract = pinned_supervision(saved["contract"])
+    if any(saved_contract.get(key) != value for key, value in expected.items()):
         raise ValueError("Adapter and evaluation contracts differ")
     from transformers import AutoModelForCausalLM, AutoTokenizer
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")

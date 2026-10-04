@@ -217,9 +217,24 @@ class MapSFTTrainer(Trainer):
     def _load_from_checkpoint(self, resume_from_checkpoint, model=None):
         saved = torch.load(Path(resume_from_checkpoint) / "adapter.pt",
                            map_location="cpu", weights_only=True)
-        if saved["contract"] != self.contract:
+        if pinned_supervision(saved["contract"]) != pinned_supervision(self.contract):
             raise ValueError("Checkpoint and current SFT contracts differ")
         (model or self.model).load_adapter_state_dict(saved["adapter"])
+
+
+def pinned_supervision(contract):
+    """Contract with the training budget left out.
+
+    A checkpoint has to agree on what its adapter was trained on -- map source,
+    model, data, batch and supervision settings -- but not on how long training
+    was meant to run. Extending a budget is an expected move: the convergence
+    path takes max_total_steps from outside the contract for that same reason,
+    and an extension has to resume the checkpoint the shorter budget produced.
+    """
+    config = json.loads(json.dumps(contract["config"]))
+    for key in ("epochs", "max_steps"):
+        config["training"].pop(key, None)
+    return {**contract, "config": config}
 
 
 def last_measured_step(output):

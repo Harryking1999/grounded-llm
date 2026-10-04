@@ -147,6 +147,8 @@ Summary: Reached the goal after {步数} executed {moves/removals}.
 
 积木原计划 3 个 epoch（147,000 步）已练完并留下 `final`；因闭环成绩弱，2026-10-05 延长到 5 个 epoch，故计划总步数为 245,000。延长后每个新出现的整数 epoch 都评 validation 的 rollout 与 reference，不评 test：test 只在真正的 `final` 生成，而 3-epoch 的过渡 `final` 已归档。
 
+续训从 `checkpoint-147000` 连同优化器、调度器与随机数状态一起恢复，学习率不重启 warmup。合同仍完整记录当时的配置，但判定相等时不计训练预算（`train.py` 的 `pinned_supervision`）：否则延长预算后既无法恢复自己写出的 checkpoint，也无法用新清单评测它们。数据清单里的 `training.epochs` 随预算一起更新，使清单与合同文件保持一致。
+
 上下文上限为 32,768 token，超限报错而非静默截断；单次动作／终止生成预算分别为 4,096／2,048 token。两任务各占一张训练卡，另外两张用于阶段评测，不是四卡联合训练同一模型。数据、token 缓存与权重均在 Git 外；完整运行合同、数据清单和源码对应关系见 [README](README.md)。
 
 ## 7. 评测设置与指标口径

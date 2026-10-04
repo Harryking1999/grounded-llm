@@ -12,7 +12,7 @@
 | 固定门控 `tanh(g)=0.1` | 排除"门控关死、地图通路零输入" | 同图验证首轮最近候选 23/64；训练首轮也仅 101/256 | `fusion.py` 的 `fixed_gate_tanh`（含 `MapReader` 里冻结门控的分支）；`train.py` 的透传 | `pilot_path256_fixed_gate.json` |
 | 关系 token 加权 `decision_focus_weight=16` | 加大排序与末尾 action 编号的损失权重 | 同图验证首轮最近候选 12/64 | `readout_aux.py`、`train.py`、`epoch_readout_queue.py` 里读取该键的位置 | `pilot_path256_relation_weighted.json` |
 | 状态值尺度校准 `value_scale` | 对齐状态幅值与语言 hidden | 未单独裁定；随 swap 与十轮读出一起封存 | `fusion.py` 的 `value_scale`；`train.py` 的透传 | `path_readout_expanded.json`、`path_completion_ten_epochs*.json`（=14.41） |
-| 自然 Q-only readout | 用"同状态不同目标"的物理合法 Q 对比做读出 | 未纳入本轮 | **未跟踪**：`src/prepare_natural_readout.py`、`tests/test_natural_readout.py` | **未跟踪**：`configs/path_natural_qonly_*.json` |
+| 自然 Q-only readout | 用"同状态不同目标"的物理合法 Q 对比做读出 | 未纳入本轮，已丢弃 | 2026-10-05 删除，未入库：新增文件 `src/prepare_natural_readout.py`、`tests/test_natural_readout.py`，改动曾存于 stash `b746c7e`（`readout_aux.py` 的 `NaturalFirstTurnDataset`／`q_only_prompt`、`convergence.py` 的 `ranking_ids_only` scope 等） | 2026-10-05 删除：`path_natural_qonly_ce.json`、`path_natural_qonly_rankids15.json`（后者为 `ranking_ids_only` + weight 15） |
 
 对应读数分别记在 [full_trajectory_history.md](full_trajectory_history.md)（16／4 小样本三条件与四图）、[swap_training.md](swap_training.md) 和 [readout_interface_diagnosis.md](readout_interface_diagnosis.md)（swap D/E/F、hidden-state 与探针）。
 

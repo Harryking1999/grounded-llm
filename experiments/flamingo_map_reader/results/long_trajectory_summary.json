@@ -198,98 +198,6 @@
       }
     }
   },
-  "path_train_reference": {
-    "checkpoint-0": {
-      "physical_tasks": 2,
-      "numbering_variants_per_task": 1,
-      "counts": {
-        "turns": 12,
-        "terminal_turns": 2,
-        "valid_control": 8,
-        "premature_done": 0,
-        "failed_to_stop": 2,
-        "legal_action": 7,
-        "summary_correct": 0,
-        "valid_ranking": 6,
-        "exact_ranking": 0,
-        "closest_candidate_set_exact": 2,
-        "action_map_minimum": 4,
-        "action_follows_ranking": 5,
-        "pairwise_correct": 9,
-        "pairwise_total": 33,
-        "generated_tokens": 5097,
-        "current_relation_correct": 7,
-        "current_relation_total": 21,
-        "action_environment_shortest": 4,
-        "decision_turns": 10
-      },
-      "sources": [
-        "evaluation/path/checkpoint-0/train_reference_map/00000_00002/summary.json"
-      ]
-    },
-    "checkpoint-128": {
-      "physical_tasks": 256,
-      "numbering_variants_per_task": 1,
-      "counts": {
-        "turns": 3260,
-        "terminal_turns": 256,
-        "valid_control": 2682,
-        "premature_done": 0,
-        "failed_to_stop": 256,
-        "legal_action": 2554,
-        "summary_correct": 0,
-        "valid_ranking": 2411,
-        "exact_ranking": 674,
-        "closest_candidate_set_exact": 1188,
-        "action_map_minimum": 1287,
-        "action_follows_ranking": 1970,
-        "pairwise_correct": 3650,
-        "pairwise_total": 9724,
-        "generated_tokens": 446483,
-        "current_relation_correct": 2464,
-        "current_relation_total": 6242,
-        "action_environment_shortest": 1422,
-        "decision_turns": 3004
-      },
-      "sources": [
-        "evaluation/path/checkpoint-128/train_reference_map/00000_00064/summary.json",
-        "evaluation/path/checkpoint-128/train_reference_map/00064_00128/summary.json",
-        "evaluation/path/checkpoint-128/train_reference_map/00128_00192/summary.json",
-        "evaluation/path/checkpoint-128/train_reference_map/00192_00256/summary.json"
-      ]
-    },
-    "checkpoint-24192": {
-      "physical_tasks": 256,
-      "numbering_variants_per_task": 1,
-      "counts": {
-        "turns": 3260,
-        "terminal_turns": 256,
-        "valid_control": 3260,
-        "premature_done": 0,
-        "failed_to_stop": 0,
-        "legal_action": 3004,
-        "summary_correct": 254,
-        "valid_ranking": 3004,
-        "exact_ranking": 1446,
-        "closest_candidate_set_exact": 2080,
-        "action_map_minimum": 2080,
-        "action_follows_ranking": 3004,
-        "pairwise_correct": 6561,
-        "pairwise_total": 9724,
-        "generated_tokens": 193576,
-        "current_relation_correct": 4169,
-        "current_relation_total": 6242,
-        "action_environment_shortest": 2180,
-        "decision_turns": 3004
-      },
-      "sources": [
-        "evaluation/path/checkpoint-24192/train_reference_map/00000_00064/summary.json",
-        "evaluation/path/checkpoint-24192/train_reference_map/00064_00128/summary.json",
-        "evaluation/path/checkpoint-24192/train_reference_map/00128_00192/summary.json",
-        "evaluation/path/checkpoint-24192/train_reference_map/00192_00256/summary.json"
-      ]
-    }
-  },
   "action_coverage": {
     "source": "User-supplied full scan of this run's prepared physical trajectories, provided in this conversation on 2026-10-04. Counts copied from that scan; the full tensor cache was not rescanned for this documentation update.",
     "candidate_scope": "All stored turns, including terminal turns; before numbering augmentation. Chosen counts are unique physical demonstration actions.",
@@ -324,5 +232,2738 @@
       }
     }
   },
-  "documentation_scope": "Settings and prepared-data evidence, with path train/reference results through epoch 1 only. Not a live training-status snapshot."
+  "documentation_scope": "Completed-shard snapshots from 35016 and 40072, deduplicated by shard path. Not a live monitor. Missing or incomplete results are not zero.",
+  "snapshot": {
+    "snapshot_utc": "2026-10-04T18:54:20.160925+00:00",
+    "host": "172.16.78.10:35016",
+    "run_root": "/zhanghanyue/experiment/flamingo_map_reader/runs/long_f73b700_20261004",
+    "ready": {
+      "path": {
+        "checkpoint-48384": {
+          "step": 48384,
+          "epoch": 2.0
+        },
+        "final": {
+          "step": 72576,
+          "epoch": 3.0
+        },
+        "checkpoint-24192": {
+          "step": 24192,
+          "epoch": 1.0
+        }
+      },
+      "blocks": {
+        "final": {
+          "step": 147000,
+          "epoch": 3.0
+        },
+        "checkpoint-98000": {
+          "step": 98000,
+          "epoch": 2.0
+        },
+        "checkpoint-49000": {
+          "step": 49000,
+          "epoch": 1.0
+        }
+      }
+    },
+    "second_host_snapshot_utc": "2026-10-04T19:00:35.808148+00:00",
+    "second_host": "172.16.78.10:40072",
+    "deduplication": "Both hosts expose the same completed shard paths in this snapshot; physical-task and case counts and all retained overall metric counts agree. Each shard counted once."
+  },
+  "metric_notes": {
+    "denominators": "Control: all turns. Actions/ranking: decision turns. Stop/summary: terminal turns. Pairwise/current: their recorded pair counts. Rollout: case variants; initial-goal cases included unless grouped separately.",
+    "source": "Sum integer counts from deduplicated completed shard summary.json files; audit reachability directly from the matching cases.jsonl. No model inference or environment replay was run for this update.",
+    "uniform_baseline": "For each scored decision turn, r/k = reachable_candidates/candidate_slots. Average these fractions across the same turns used for the model. The existing reachable_candidate_rate is instead sum(r)/sum(k), a candidate-slot-weighted proportion.",
+    "current_reachable": "remaining_shortest >= 1 on nonterminal turns. Already unreachable reference states score false independently of the model choice. Report this subset separately when judging whether the chosen action destroys reachability.",
+    "missing_reachability": "Use reachability_audit.reachability_scored_turns to check field coverage; aggregate counts can contain implicit zeros for absent fields. Do not publish a full-battery rate when coverage is incomplete.",
+    "rounding": "Displayed percentages use one decimal; 100.0% may be rounded. Integer counts are authoritative."
+  },
+  "evaluation_batteries": {
+    "blocks/checkpoint-0/train_reference_map": {
+      "physical_tasks": 2,
+      "case_variants": 2,
+      "counts": {
+        "turns": 10,
+        "terminal_turns": 2,
+        "valid_control": 3,
+        "premature_done": 0,
+        "failed_to_stop": 2,
+        "legal_action": 3,
+        "summary_correct": 0,
+        "valid_ranking": 0,
+        "exact_ranking": 0,
+        "closest_candidate_set_exact": 0,
+        "action_map_minimum": 1,
+        "action_follows_ranking": 0,
+        "pairwise_correct": 0,
+        "pairwise_total": 327,
+        "current_relation_correct": 0,
+        "current_relation_total": 64,
+        "action_environment_shortest": 1,
+        "action_keeps_goal_reachable": 1,
+        "reachable_candidates": 97,
+        "candidate_slots": 185,
+        "decision_turns": 8
+      },
+      "sources": [
+        "evaluation/blocks/checkpoint-0/train_reference_map/00000_00002/summary.json"
+      ],
+      "intervals": [
+        [
+          0,
+          2
+        ]
+      ],
+      "groups": {
+        "train": {
+          "counts": {
+            "turns": 9,
+            "terminal_turns": 1,
+            "valid_control": 3,
+            "premature_done": 0,
+            "failed_to_stop": 1,
+            "legal_action": 3,
+            "summary_correct": 0,
+            "valid_ranking": 0,
+            "exact_ranking": 0,
+            "closest_candidate_set_exact": 0,
+            "action_map_minimum": 1,
+            "action_follows_ranking": 0,
+            "pairwise_correct": 0,
+            "pairwise_total": 327,
+            "current_relation_correct": 0,
+            "current_relation_total": 64,
+            "action_environment_shortest": 1,
+            "action_keeps_goal_reachable": 1,
+            "reachable_candidates": 97,
+            "candidate_slots": 185,
+            "decision_turns": 8
+          },
+          "physical_tasks": 1,
+          "case_variants": 1,
+          "reachability_audit": {
+            "decision_turns": 8,
+            "reachability_scored_turns": 8,
+            "keeps_goal_reachable": 1,
+            "candidate_slots": 185,
+            "reachable_candidates": 97,
+            "uniform_expected_success_sum": 4.289645813579366,
+            "zero_candidate_turns": 0,
+            "already_unreachable_turns": 0,
+            "current_reachable_turns": 8,
+            "reachable_to_unreachable_legal_actions": 2,
+            "invalid_actions_on_reachable_states": 5,
+            "illegal_or_missing_actions": 5,
+            "uniform_expected_rate_scored_turns": 0.5362057266974207,
+            "model_rate_current_reachable": 0.125,
+            "uniform_expected_rate_current_reachable": 0.5362057266974207
+          }
+        },
+        "initial_goal": {
+          "counts": {
+            "turns": 1,
+            "terminal_turns": 1,
+            "valid_control": 0,
+            "premature_done": 0,
+            "failed_to_stop": 1,
+            "legal_action": 0,
+            "summary_correct": 0,
+            "valid_ranking": 0,
+            "exact_ranking": 0,
+            "closest_candidate_set_exact": 0,
+            "action_map_minimum": 0,
+            "action_follows_ranking": 0,
+            "pairwise_correct": 0,
+            "pairwise_total": 0,
+            "current_relation_correct": 0,
+            "current_relation_total": 0,
+            "action_environment_shortest": 0,
+            "action_keeps_goal_reachable": 0,
+            "reachable_candidates": 0,
+            "candidate_slots": 0,
+            "decision_turns": 0
+          },
+          "physical_tasks": 1,
+          "case_variants": 1,
+          "reachability_audit": {}
+        }
+      },
+      "rollout": {
+        "attempts": 0,
+        "reached": 0,
+        "success": 0,
+        "shortest_success": 0,
+        "successful_moves": 0,
+        "successful_shortest_moves": 0
+      },
+      "variants": 1,
+      "reachability_audit": {
+        "decision_turns": 8,
+        "reachability_scored_turns": 8,
+        "keeps_goal_reachable": 1,
+        "candidate_slots": 185,
+        "reachable_candidates": 97,
+        "uniform_expected_success_sum": 4.289645813579366,
+        "zero_candidate_turns": 0,
+        "already_unreachable_turns": 0,
+        "current_reachable_turns": 8,
+        "reachable_to_unreachable_legal_actions": 2,
+        "invalid_actions_on_reachable_states": 5,
+        "illegal_or_missing_actions": 5,
+        "uniform_expected_rate_scored_turns": 0.5362057266974207,
+        "model_rate_current_reachable": 0.125,
+        "uniform_expected_rate_current_reachable": 0.5362057266974207
+      },
+      "unique_case_keys": 2,
+      "expected_physical_tasks": 2,
+      "completion": "complete",
+      "observed_on": [
+        "35016",
+        "40072"
+      ]
+    },
+    "blocks/checkpoint-49000/train_reference_map": {
+      "physical_tasks": 256,
+      "case_variants": 256,
+      "counts": {
+        "turns": 2055,
+        "terminal_turns": 256,
+        "valid_control": 2055,
+        "premature_done": 1,
+        "failed_to_stop": 5,
+        "legal_action": 1798,
+        "summary_correct": 251,
+        "valid_ranking": 542,
+        "exact_ranking": 164,
+        "closest_candidate_set_exact": 308,
+        "action_map_minimum": 466,
+        "action_follows_ranking": 542,
+        "pairwise_correct": 7820,
+        "pairwise_total": 79927,
+        "current_relation_correct": 2110,
+        "current_relation_total": 15272,
+        "action_environment_shortest": 1124,
+        "action_keeps_goal_reachable": 1230,
+        "reachable_candidates": 22619,
+        "candidate_slots": 47657,
+        "decision_turns": 1799
+      },
+      "sources": [
+        "evaluation/blocks/checkpoint-49000/train_reference_map/00000_00064/summary.json",
+        "evaluation/blocks/checkpoint-49000/train_reference_map/00064_00128/summary.json",
+        "evaluation/blocks/checkpoint-49000/train_reference_map/00128_00192/summary.json",
+        "evaluation/blocks/checkpoint-49000/train_reference_map/00192_00256/summary.json"
+      ],
+      "intervals": [
+        [
+          0,
+          64
+        ],
+        [
+          64,
+          128
+        ],
+        [
+          128,
+          192
+        ],
+        [
+          192,
+          256
+        ]
+      ],
+      "groups": {
+        "train": {
+          "counts": {
+            "turns": 2026,
+            "terminal_turns": 227,
+            "valid_control": 2026,
+            "premature_done": 1,
+            "failed_to_stop": 5,
+            "legal_action": 1798,
+            "summary_correct": 222,
+            "valid_ranking": 542,
+            "exact_ranking": 164,
+            "closest_candidate_set_exact": 308,
+            "action_map_minimum": 466,
+            "action_follows_ranking": 542,
+            "pairwise_correct": 7820,
+            "pairwise_total": 79927,
+            "current_relation_correct": 2110,
+            "current_relation_total": 15272,
+            "action_environment_shortest": 1124,
+            "action_keeps_goal_reachable": 1230,
+            "reachable_candidates": 22619,
+            "candidate_slots": 47657,
+            "decision_turns": 1799
+          },
+          "physical_tasks": 227,
+          "case_variants": 227,
+          "reachability_audit": {
+            "decision_turns": 1799,
+            "reachability_scored_turns": 1799,
+            "keeps_goal_reachable": 1230,
+            "candidate_slots": 47657,
+            "reachable_candidates": 22619,
+            "uniform_expected_success_sum": 873.9334633895967,
+            "zero_candidate_turns": 0,
+            "already_unreachable_turns": 0,
+            "current_reachable_turns": 1799,
+            "reachable_to_unreachable_legal_actions": 568,
+            "invalid_actions_on_reachable_states": 1,
+            "illegal_or_missing_actions": 1,
+            "uniform_expected_rate_scored_turns": 0.48578847325714103,
+            "model_rate_current_reachable": 0.6837131739855475,
+            "uniform_expected_rate_current_reachable": 0.48578847325714103
+          }
+        },
+        "initial_goal": {
+          "counts": {
+            "turns": 29,
+            "terminal_turns": 29,
+            "valid_control": 29,
+            "premature_done": 0,
+            "failed_to_stop": 0,
+            "legal_action": 0,
+            "summary_correct": 29,
+            "valid_ranking": 0,
+            "exact_ranking": 0,
+            "closest_candidate_set_exact": 0,
+            "action_map_minimum": 0,
+            "action_follows_ranking": 0,
+            "pairwise_correct": 0,
+            "pairwise_total": 0,
+            "current_relation_correct": 0,
+            "current_relation_total": 0,
+            "action_environment_shortest": 0,
+            "action_keeps_goal_reachable": 0,
+            "reachable_candidates": 0,
+            "candidate_slots": 0,
+            "decision_turns": 0
+          },
+          "physical_tasks": 29,
+          "case_variants": 29,
+          "reachability_audit": {}
+        }
+      },
+      "rollout": {
+        "attempts": 0,
+        "reached": 0,
+        "success": 0,
+        "shortest_success": 0,
+        "successful_moves": 0,
+        "successful_shortest_moves": 0
+      },
+      "variants": 1,
+      "reachability_audit": {
+        "decision_turns": 1799,
+        "reachability_scored_turns": 1799,
+        "keeps_goal_reachable": 1230,
+        "candidate_slots": 47657,
+        "reachable_candidates": 22619,
+        "uniform_expected_success_sum": 873.9334633895967,
+        "zero_candidate_turns": 0,
+        "already_unreachable_turns": 0,
+        "current_reachable_turns": 1799,
+        "reachable_to_unreachable_legal_actions": 568,
+        "invalid_actions_on_reachable_states": 1,
+        "illegal_or_missing_actions": 1,
+        "uniform_expected_rate_scored_turns": 0.48578847325714103,
+        "model_rate_current_reachable": 0.6837131739855475,
+        "uniform_expected_rate_current_reachable": 0.48578847325714103
+      },
+      "unique_case_keys": 256,
+      "expected_physical_tasks": 256,
+      "completion": "complete",
+      "observed_on": [
+        "35016",
+        "40072"
+      ]
+    },
+    "blocks/checkpoint-49000/validation_reference_map": {
+      "physical_tasks": 1100,
+      "case_variants": 1100,
+      "counts": {
+        "turns": 9025,
+        "terminal_turns": 783,
+        "valid_control": 9019,
+        "premature_done": 23,
+        "failed_to_stop": 21,
+        "legal_action": 8219,
+        "summary_correct": 754,
+        "valid_ranking": 2627,
+        "exact_ranking": 600,
+        "closest_candidate_set_exact": 1552,
+        "action_map_minimum": 2160,
+        "action_follows_ranking": 2627,
+        "pairwise_correct": 37973,
+        "pairwise_total": 359244,
+        "current_relation_correct": 10013,
+        "current_relation_total": 68952,
+        "action_environment_shortest": 4034,
+        "action_keeps_goal_reachable": 4456,
+        "reachable_candidates": 91001,
+        "candidate_slots": 216023,
+        "decision_turns": 8242
+      },
+      "sources": [
+        "evaluation/blocks/checkpoint-49000/validation_reference_map/00000_00064/summary.json",
+        "evaluation/blocks/checkpoint-49000/validation_reference_map/00064_00128/summary.json",
+        "evaluation/blocks/checkpoint-49000/validation_reference_map/00128_00192/summary.json",
+        "evaluation/blocks/checkpoint-49000/validation_reference_map/00192_00256/summary.json",
+        "evaluation/blocks/checkpoint-49000/validation_reference_map/00256_00320/summary.json",
+        "evaluation/blocks/checkpoint-49000/validation_reference_map/00320_00384/summary.json",
+        "evaluation/blocks/checkpoint-49000/validation_reference_map/00384_00448/summary.json",
+        "evaluation/blocks/checkpoint-49000/validation_reference_map/00448_00512/summary.json",
+        "evaluation/blocks/checkpoint-49000/validation_reference_map/00512_00576/summary.json",
+        "evaluation/blocks/checkpoint-49000/validation_reference_map/00576_00640/summary.json",
+        "evaluation/blocks/checkpoint-49000/validation_reference_map/00640_00704/summary.json",
+        "evaluation/blocks/checkpoint-49000/validation_reference_map/00704_00768/summary.json",
+        "evaluation/blocks/checkpoint-49000/validation_reference_map/00768_00832/summary.json",
+        "evaluation/blocks/checkpoint-49000/validation_reference_map/00832_00896/summary.json",
+        "evaluation/blocks/checkpoint-49000/validation_reference_map/00896_00960/summary.json",
+        "evaluation/blocks/checkpoint-49000/validation_reference_map/00960_01024/summary.json",
+        "evaluation/blocks/checkpoint-49000/validation_reference_map/01024_01088/summary.json",
+        "evaluation/blocks/checkpoint-49000/validation_reference_map/01088_01100/summary.json"
+      ],
+      "intervals": [
+        [
+          0,
+          64
+        ],
+        [
+          64,
+          128
+        ],
+        [
+          128,
+          192
+        ],
+        [
+          192,
+          256
+        ],
+        [
+          256,
+          320
+        ],
+        [
+          320,
+          384
+        ],
+        [
+          384,
+          448
+        ],
+        [
+          448,
+          512
+        ],
+        [
+          512,
+          576
+        ],
+        [
+          576,
+          640
+        ],
+        [
+          640,
+          704
+        ],
+        [
+          704,
+          768
+        ],
+        [
+          768,
+          832
+        ],
+        [
+          832,
+          896
+        ],
+        [
+          896,
+          960
+        ],
+        [
+          960,
+          1024
+        ],
+        [
+          1024,
+          1088
+        ],
+        [
+          1088,
+          1100
+        ]
+      ],
+      "groups": {
+        "same_initial_board_new_pair": {
+          "counts": {
+            "turns": 4457,
+            "terminal_turns": 338,
+            "valid_control": 4457,
+            "premature_done": 8,
+            "failed_to_stop": 6,
+            "legal_action": 4111,
+            "summary_correct": 331,
+            "valid_ranking": 1327,
+            "exact_ranking": 308,
+            "closest_candidate_set_exact": 787,
+            "action_map_minimum": 1092,
+            "action_follows_ranking": 1327,
+            "pairwise_correct": 19345,
+            "pairwise_total": 179476,
+            "current_relation_correct": 5093,
+            "current_relation_total": 34452,
+            "action_environment_shortest": 2044,
+            "action_keeps_goal_reachable": 2234,
+            "reachable_candidates": 44205,
+            "candidate_slots": 106382,
+            "decision_turns": 4119
+          },
+          "physical_tasks": 500,
+          "case_variants": 500,
+          "reachability_audit": {
+            "decision_turns": 4119,
+            "reachability_scored_turns": 4119,
+            "keeps_goal_reachable": 2234,
+            "candidate_slots": 106382,
+            "reachable_candidates": 44205,
+            "uniform_expected_success_sum": 1595.8775903779758,
+            "zero_candidate_turns": 0,
+            "already_unreachable_turns": 904,
+            "current_reachable_turns": 3215,
+            "reachable_to_unreachable_legal_actions": 978,
+            "invalid_actions_on_reachable_states": 3,
+            "illegal_or_missing_actions": 8,
+            "uniform_expected_rate_scored_turns": 0.3874429692590376,
+            "model_rate_current_reachable": 0.6948678071539658,
+            "uniform_expected_rate_current_reachable": 0.4963849425747981
+          }
+        },
+        "new_initial_board": {
+          "counts": {
+            "turns": 4468,
+            "terminal_turns": 345,
+            "valid_control": 4468,
+            "premature_done": 15,
+            "failed_to_stop": 8,
+            "legal_action": 4108,
+            "summary_correct": 337,
+            "valid_ranking": 1300,
+            "exact_ranking": 292,
+            "closest_candidate_set_exact": 765,
+            "action_map_minimum": 1068,
+            "action_follows_ranking": 1300,
+            "pairwise_correct": 18628,
+            "pairwise_total": 179768,
+            "current_relation_correct": 4920,
+            "current_relation_total": 34500,
+            "action_environment_shortest": 1990,
+            "action_keeps_goal_reachable": 2222,
+            "reachable_candidates": 46796,
+            "candidate_slots": 109641,
+            "decision_turns": 4123
+          },
+          "physical_tasks": 500,
+          "case_variants": 500,
+          "reachability_audit": {
+            "decision_turns": 4123,
+            "reachability_scored_turns": 4123,
+            "keeps_goal_reachable": 2222,
+            "candidate_slots": 109641,
+            "reachable_candidates": 46796,
+            "uniform_expected_success_sum": 1624.9782075391317,
+            "zero_candidate_turns": 0,
+            "already_unreachable_turns": 929,
+            "current_reachable_turns": 3194,
+            "reachable_to_unreachable_legal_actions": 968,
+            "invalid_actions_on_reachable_states": 4,
+            "illegal_or_missing_actions": 15,
+            "uniform_expected_rate_scored_turns": 0.3941252019255716,
+            "model_rate_current_reachable": 0.6956793988728867,
+            "uniform_expected_rate_current_reachable": 0.5087596141324771
+          }
+        },
+        "initial_goal": {
+          "counts": {
+            "turns": 100,
+            "terminal_turns": 100,
+            "valid_control": 94,
+            "premature_done": 0,
+            "failed_to_stop": 7,
+            "legal_action": 0,
+            "summary_correct": 86,
+            "valid_ranking": 0,
+            "exact_ranking": 0,
+            "closest_candidate_set_exact": 0,
+            "action_map_minimum": 0,
+            "action_follows_ranking": 0,
+            "pairwise_correct": 0,
+            "pairwise_total": 0,
+            "current_relation_correct": 0,
+            "current_relation_total": 0,
+            "action_environment_shortest": 0,
+            "action_keeps_goal_reachable": 0,
+            "reachable_candidates": 0,
+            "candidate_slots": 0,
+            "decision_turns": 0
+          },
+          "physical_tasks": 100,
+          "case_variants": 100,
+          "reachability_audit": {}
+        }
+      },
+      "rollout": {
+        "attempts": 0,
+        "reached": 0,
+        "success": 0,
+        "shortest_success": 0,
+        "successful_moves": 0,
+        "successful_shortest_moves": 0
+      },
+      "variants": 1,
+      "reachability_audit": {
+        "decision_turns": 8242,
+        "reachability_scored_turns": 8242,
+        "keeps_goal_reachable": 4456,
+        "candidate_slots": 216023,
+        "reachable_candidates": 91001,
+        "uniform_expected_success_sum": 3220.855797917119,
+        "zero_candidate_turns": 0,
+        "already_unreachable_turns": 1833,
+        "current_reachable_turns": 6409,
+        "reachable_to_unreachable_legal_actions": 1946,
+        "invalid_actions_on_reachable_states": 7,
+        "illegal_or_missing_actions": 23,
+        "uniform_expected_rate_scored_turns": 0.3907857070998689,
+        "model_rate_current_reachable": 0.6952722733655796,
+        "uniform_expected_rate_current_reachable": 0.5025520046679856
+      },
+      "unique_case_keys": 1100,
+      "expected_physical_tasks": 1100,
+      "completion": "complete",
+      "observed_on": [
+        "35016",
+        "40072"
+      ]
+    },
+    "blocks/checkpoint-98000/train_reference_map": {
+      "physical_tasks": 256,
+      "case_variants": 256,
+      "counts": {
+        "turns": 2055,
+        "terminal_turns": 256,
+        "valid_control": 2055,
+        "premature_done": 0,
+        "failed_to_stop": 0,
+        "legal_action": 1799,
+        "summary_correct": 256,
+        "valid_ranking": 580,
+        "exact_ranking": 193,
+        "closest_candidate_set_exact": 404,
+        "action_map_minimum": 729,
+        "action_follows_ranking": 580,
+        "pairwise_correct": 10702,
+        "pairwise_total": 79927,
+        "current_relation_correct": 2671,
+        "current_relation_total": 15272,
+        "action_environment_shortest": 1430,
+        "action_keeps_goal_reachable": 1559,
+        "reachable_candidates": 22619,
+        "candidate_slots": 47657,
+        "decision_turns": 1799
+      },
+      "sources": [
+        "evaluation/blocks/checkpoint-98000/train_reference_map/00000_00064/summary.json",
+        "evaluation/blocks/checkpoint-98000/train_reference_map/00064_00128/summary.json",
+        "evaluation/blocks/checkpoint-98000/train_reference_map/00128_00192/summary.json",
+        "evaluation/blocks/checkpoint-98000/train_reference_map/00192_00256/summary.json"
+      ],
+      "intervals": [
+        [
+          0,
+          64
+        ],
+        [
+          64,
+          128
+        ],
+        [
+          128,
+          192
+        ],
+        [
+          192,
+          256
+        ]
+      ],
+      "groups": {
+        "train": {
+          "counts": {
+            "turns": 2026,
+            "terminal_turns": 227,
+            "valid_control": 2026,
+            "premature_done": 0,
+            "failed_to_stop": 0,
+            "legal_action": 1799,
+            "summary_correct": 227,
+            "valid_ranking": 580,
+            "exact_ranking": 193,
+            "closest_candidate_set_exact": 404,
+            "action_map_minimum": 729,
+            "action_follows_ranking": 580,
+            "pairwise_correct": 10702,
+            "pairwise_total": 79927,
+            "current_relation_correct": 2671,
+            "current_relation_total": 15272,
+            "action_environment_shortest": 1430,
+            "action_keeps_goal_reachable": 1559,
+            "reachable_candidates": 22619,
+            "candidate_slots": 47657,
+            "decision_turns": 1799
+          },
+          "physical_tasks": 227,
+          "case_variants": 227,
+          "reachability_audit": {
+            "decision_turns": 1799,
+            "reachability_scored_turns": 1799,
+            "keeps_goal_reachable": 1559,
+            "candidate_slots": 47657,
+            "reachable_candidates": 22619,
+            "uniform_expected_success_sum": 873.9334633895967,
+            "zero_candidate_turns": 0,
+            "already_unreachable_turns": 0,
+            "current_reachable_turns": 1799,
+            "reachable_to_unreachable_legal_actions": 240,
+            "invalid_actions_on_reachable_states": 0,
+            "illegal_or_missing_actions": 0,
+            "uniform_expected_rate_scored_turns": 0.48578847325714103,
+            "model_rate_current_reachable": 0.8665925514174542,
+            "uniform_expected_rate_current_reachable": 0.48578847325714103
+          }
+        },
+        "initial_goal": {
+          "counts": {
+            "turns": 29,
+            "terminal_turns": 29,
+            "valid_control": 29,
+            "premature_done": 0,
+            "failed_to_stop": 0,
+            "legal_action": 0,
+            "summary_correct": 29,
+            "valid_ranking": 0,
+            "exact_ranking": 0,
+            "closest_candidate_set_exact": 0,
+            "action_map_minimum": 0,
+            "action_follows_ranking": 0,
+            "pairwise_correct": 0,
+            "pairwise_total": 0,
+            "current_relation_correct": 0,
+            "current_relation_total": 0,
+            "action_environment_shortest": 0,
+            "action_keeps_goal_reachable": 0,
+            "reachable_candidates": 0,
+            "candidate_slots": 0,
+            "decision_turns": 0
+          },
+          "physical_tasks": 29,
+          "case_variants": 29,
+          "reachability_audit": {}
+        }
+      },
+      "rollout": {
+        "attempts": 0,
+        "reached": 0,
+        "success": 0,
+        "shortest_success": 0,
+        "successful_moves": 0,
+        "successful_shortest_moves": 0
+      },
+      "variants": 1,
+      "reachability_audit": {
+        "decision_turns": 1799,
+        "reachability_scored_turns": 1799,
+        "keeps_goal_reachable": 1559,
+        "candidate_slots": 47657,
+        "reachable_candidates": 22619,
+        "uniform_expected_success_sum": 873.9334633895967,
+        "zero_candidate_turns": 0,
+        "already_unreachable_turns": 0,
+        "current_reachable_turns": 1799,
+        "reachable_to_unreachable_legal_actions": 240,
+        "invalid_actions_on_reachable_states": 0,
+        "illegal_or_missing_actions": 0,
+        "uniform_expected_rate_scored_turns": 0.48578847325714103,
+        "model_rate_current_reachable": 0.8665925514174542,
+        "uniform_expected_rate_current_reachable": 0.48578847325714103
+      },
+      "unique_case_keys": 256,
+      "expected_physical_tasks": 256,
+      "completion": "complete",
+      "observed_on": [
+        "35016",
+        "40072"
+      ]
+    },
+    "blocks/checkpoint-98000/validation_reference_map": {
+      "physical_tasks": 1100,
+      "case_variants": 1100,
+      "counts": {
+        "turns": 9025,
+        "terminal_turns": 783,
+        "valid_control": 9020,
+        "premature_done": 39,
+        "failed_to_stop": 4,
+        "legal_action": 8201,
+        "summary_correct": 769,
+        "valid_ranking": 2697,
+        "exact_ranking": 704,
+        "closest_candidate_set_exact": 1870,
+        "action_map_minimum": 3254,
+        "action_follows_ranking": 2696,
+        "pairwise_correct": 46820,
+        "pairwise_total": 359244,
+        "current_relation_correct": 11874,
+        "current_relation_total": 68952,
+        "action_environment_shortest": 4982,
+        "action_keeps_goal_reachable": 5480,
+        "reachable_candidates": 91001,
+        "candidate_slots": 216023,
+        "decision_turns": 8242
+      },
+      "sources": [
+        "evaluation/blocks/checkpoint-98000/validation_reference_map/00000_00064/summary.json",
+        "evaluation/blocks/checkpoint-98000/validation_reference_map/00064_00128/summary.json",
+        "evaluation/blocks/checkpoint-98000/validation_reference_map/00128_00192/summary.json",
+        "evaluation/blocks/checkpoint-98000/validation_reference_map/00192_00256/summary.json",
+        "evaluation/blocks/checkpoint-98000/validation_reference_map/00256_00320/summary.json",
+        "evaluation/blocks/checkpoint-98000/validation_reference_map/00320_00384/summary.json",
+        "evaluation/blocks/checkpoint-98000/validation_reference_map/00384_00448/summary.json",
+        "evaluation/blocks/checkpoint-98000/validation_reference_map/00448_00512/summary.json",
+        "evaluation/blocks/checkpoint-98000/validation_reference_map/00512_00576/summary.json",
+        "evaluation/blocks/checkpoint-98000/validation_reference_map/00576_00640/summary.json",
+        "evaluation/blocks/checkpoint-98000/validation_reference_map/00640_00704/summary.json",
+        "evaluation/blocks/checkpoint-98000/validation_reference_map/00704_00768/summary.json",
+        "evaluation/blocks/checkpoint-98000/validation_reference_map/00768_00832/summary.json",
+        "evaluation/blocks/checkpoint-98000/validation_reference_map/00832_00896/summary.json",
+        "evaluation/blocks/checkpoint-98000/validation_reference_map/00896_00960/summary.json",
+        "evaluation/blocks/checkpoint-98000/validation_reference_map/00960_01024/summary.json",
+        "evaluation/blocks/checkpoint-98000/validation_reference_map/01024_01088/summary.json",
+        "evaluation/blocks/checkpoint-98000/validation_reference_map/01088_01100/summary.json"
+      ],
+      "intervals": [
+        [
+          0,
+          64
+        ],
+        [
+          64,
+          128
+        ],
+        [
+          128,
+          192
+        ],
+        [
+          192,
+          256
+        ],
+        [
+          256,
+          320
+        ],
+        [
+          320,
+          384
+        ],
+        [
+          384,
+          448
+        ],
+        [
+          448,
+          512
+        ],
+        [
+          512,
+          576
+        ],
+        [
+          576,
+          640
+        ],
+        [
+          640,
+          704
+        ],
+        [
+          704,
+          768
+        ],
+        [
+          768,
+          832
+        ],
+        [
+          832,
+          896
+        ],
+        [
+          896,
+          960
+        ],
+        [
+          960,
+          1024
+        ],
+        [
+          1024,
+          1088
+        ],
+        [
+          1088,
+          1100
+        ]
+      ],
+      "groups": {
+        "same_initial_board_new_pair": {
+          "counts": {
+            "turns": 4457,
+            "terminal_turns": 338,
+            "valid_control": 4455,
+            "premature_done": 15,
+            "failed_to_stop": 0,
+            "legal_action": 4102,
+            "summary_correct": 338,
+            "valid_ranking": 1357,
+            "exact_ranking": 357,
+            "closest_candidate_set_exact": 931,
+            "action_map_minimum": 1604,
+            "action_follows_ranking": 1356,
+            "pairwise_correct": 23421,
+            "pairwise_total": 179476,
+            "current_relation_correct": 5940,
+            "current_relation_total": 34452,
+            "action_environment_shortest": 2509,
+            "action_keeps_goal_reachable": 2732,
+            "reachable_candidates": 44205,
+            "candidate_slots": 106382,
+            "decision_turns": 4119
+          },
+          "physical_tasks": 500,
+          "case_variants": 500,
+          "reachability_audit": {
+            "decision_turns": 4119,
+            "reachability_scored_turns": 4119,
+            "keeps_goal_reachable": 2732,
+            "candidate_slots": 106382,
+            "reachable_candidates": 44205,
+            "uniform_expected_success_sum": 1595.8775903779758,
+            "zero_candidate_turns": 0,
+            "already_unreachable_turns": 904,
+            "current_reachable_turns": 3215,
+            "reachable_to_unreachable_legal_actions": 476,
+            "invalid_actions_on_reachable_states": 7,
+            "illegal_or_missing_actions": 17,
+            "uniform_expected_rate_scored_turns": 0.3874429692590376,
+            "model_rate_current_reachable": 0.8497667185069985,
+            "uniform_expected_rate_current_reachable": 0.4963849425747981
+          }
+        },
+        "new_initial_board": {
+          "counts": {
+            "turns": 4468,
+            "terminal_turns": 345,
+            "valid_control": 4468,
+            "premature_done": 24,
+            "failed_to_stop": 1,
+            "legal_action": 4099,
+            "summary_correct": 344,
+            "valid_ranking": 1340,
+            "exact_ranking": 347,
+            "closest_candidate_set_exact": 939,
+            "action_map_minimum": 1650,
+            "action_follows_ranking": 1340,
+            "pairwise_correct": 23399,
+            "pairwise_total": 179768,
+            "current_relation_correct": 5934,
+            "current_relation_total": 34500,
+            "action_environment_shortest": 2473,
+            "action_keeps_goal_reachable": 2748,
+            "reachable_candidates": 46796,
+            "candidate_slots": 109641,
+            "decision_turns": 4123
+          },
+          "physical_tasks": 500,
+          "case_variants": 500,
+          "reachability_audit": {
+            "decision_turns": 4123,
+            "reachability_scored_turns": 4123,
+            "keeps_goal_reachable": 2748,
+            "candidate_slots": 109641,
+            "reachable_candidates": 46796,
+            "uniform_expected_success_sum": 1624.9782075391317,
+            "zero_candidate_turns": 0,
+            "already_unreachable_turns": 929,
+            "current_reachable_turns": 3194,
+            "reachable_to_unreachable_legal_actions": 441,
+            "invalid_actions_on_reachable_states": 5,
+            "illegal_or_missing_actions": 24,
+            "uniform_expected_rate_scored_turns": 0.3941252019255716,
+            "model_rate_current_reachable": 0.8603631809643081,
+            "uniform_expected_rate_current_reachable": 0.5087596141324771
+          }
+        },
+        "initial_goal": {
+          "counts": {
+            "turns": 100,
+            "terminal_turns": 100,
+            "valid_control": 97,
+            "premature_done": 0,
+            "failed_to_stop": 3,
+            "legal_action": 0,
+            "summary_correct": 87,
+            "valid_ranking": 0,
+            "exact_ranking": 0,
+            "closest_candidate_set_exact": 0,
+            "action_map_minimum": 0,
+            "action_follows_ranking": 0,
+            "pairwise_correct": 0,
+            "pairwise_total": 0,
+            "current_relation_correct": 0,
+            "current_relation_total": 0,
+            "action_environment_shortest": 0,
+            "action_keeps_goal_reachable": 0,
+            "reachable_candidates": 0,
+            "candidate_slots": 0,
+            "decision_turns": 0
+          },
+          "physical_tasks": 100,
+          "case_variants": 100,
+          "reachability_audit": {}
+        }
+      },
+      "rollout": {
+        "attempts": 0,
+        "reached": 0,
+        "success": 0,
+        "shortest_success": 0,
+        "successful_moves": 0,
+        "successful_shortest_moves": 0
+      },
+      "variants": 1,
+      "reachability_audit": {
+        "decision_turns": 8242,
+        "reachability_scored_turns": 8242,
+        "keeps_goal_reachable": 5480,
+        "candidate_slots": 216023,
+        "reachable_candidates": 91001,
+        "uniform_expected_success_sum": 3220.855797917119,
+        "zero_candidate_turns": 0,
+        "already_unreachable_turns": 1833,
+        "current_reachable_turns": 6409,
+        "reachable_to_unreachable_legal_actions": 917,
+        "invalid_actions_on_reachable_states": 12,
+        "illegal_or_missing_actions": 41,
+        "uniform_expected_rate_scored_turns": 0.3907857070998689,
+        "model_rate_current_reachable": 0.8550475893275082,
+        "uniform_expected_rate_current_reachable": 0.5025520046679856
+      },
+      "unique_case_keys": 1100,
+      "expected_physical_tasks": 1100,
+      "completion": "complete",
+      "observed_on": [
+        "35016",
+        "40072"
+      ]
+    },
+    "blocks/final/validation_rollout_map": {
+      "physical_tasks": 64,
+      "case_variants": 64,
+      "counts": {
+        "turns": 599,
+        "terminal_turns": 3,
+        "valid_control": 598,
+        "premature_done": 53,
+        "failed_to_stop": 0,
+        "legal_action": 535,
+        "summary_correct": 3,
+        "valid_ranking": 158,
+        "exact_ranking": 15,
+        "closest_candidate_set_exact": 61,
+        "action_map_minimum": 103,
+        "action_follows_ranking": 158,
+        "pairwise_correct": 2059,
+        "pairwise_total": 23897,
+        "current_relation_correct": 577,
+        "current_relation_total": 4612,
+        "action_environment_shortest": 111,
+        "decision_turns": 596
+      },
+      "sources": [
+        "evaluation/blocks/final/validation_rollout_map/00000_00064/summary.json"
+      ],
+      "intervals": [
+        [
+          0,
+          64
+        ]
+      ],
+      "groups": {
+        "same_initial_board_new_pair": {
+          "counts": {
+            "turns": 599,
+            "terminal_turns": 3,
+            "valid_control": 598,
+            "premature_done": 53,
+            "failed_to_stop": 0,
+            "legal_action": 535,
+            "summary_correct": 3,
+            "valid_ranking": 158,
+            "exact_ranking": 15,
+            "closest_candidate_set_exact": 61,
+            "action_map_minimum": 103,
+            "action_follows_ranking": 158,
+            "pairwise_correct": 2059,
+            "pairwise_total": 23897,
+            "current_relation_correct": 577,
+            "current_relation_total": 4612,
+            "action_environment_shortest": 111,
+            "decision_turns": 596
+          },
+          "physical_tasks": 64,
+          "case_variants": 64,
+          "reachability_audit": {
+            "decision_turns": 596
+          },
+          "rollout": {
+            "reached": 3,
+            "success": 3,
+            "shortest_success": 0,
+            "attempts": 64
+          }
+        }
+      },
+      "rollout": {
+        "attempts": 64,
+        "reached": 3,
+        "success": 3,
+        "shortest_success": 0,
+        "successful_moves": 27,
+        "successful_shortest_moves": 23
+      },
+      "variants": 1,
+      "reachability_audit": {
+        "decision_turns": 596
+      },
+      "unique_case_keys": 64,
+      "expected_physical_tasks": 1100,
+      "completion": "partial",
+      "observed_on": [
+        "35016",
+        "40072"
+      ]
+    },
+    "path/checkpoint-0/train_reference_map": {
+      "physical_tasks": 2,
+      "case_variants": 2,
+      "counts": {
+        "turns": 12,
+        "terminal_turns": 2,
+        "valid_control": 8,
+        "premature_done": 0,
+        "failed_to_stop": 2,
+        "legal_action": 7,
+        "summary_correct": 0,
+        "valid_ranking": 6,
+        "exact_ranking": 0,
+        "closest_candidate_set_exact": 2,
+        "action_map_minimum": 4,
+        "action_follows_ranking": 5,
+        "pairwise_correct": 9,
+        "pairwise_total": 33,
+        "current_relation_correct": 7,
+        "current_relation_total": 21,
+        "action_environment_shortest": 4,
+        "action_keeps_goal_reachable": 7,
+        "reachable_candidates": 21,
+        "candidate_slots": 21,
+        "decision_turns": 10
+      },
+      "sources": [
+        "evaluation/path/checkpoint-0/train_reference_map/00000_00002/summary.json"
+      ],
+      "intervals": [
+        [
+          0,
+          2
+        ]
+      ],
+      "groups": {
+        "train": {
+          "counts": {
+            "turns": 11,
+            "terminal_turns": 1,
+            "valid_control": 8,
+            "premature_done": 0,
+            "failed_to_stop": 1,
+            "legal_action": 7,
+            "summary_correct": 0,
+            "valid_ranking": 6,
+            "exact_ranking": 0,
+            "closest_candidate_set_exact": 2,
+            "action_map_minimum": 4,
+            "action_follows_ranking": 5,
+            "pairwise_correct": 9,
+            "pairwise_total": 33,
+            "current_relation_correct": 7,
+            "current_relation_total": 21,
+            "action_environment_shortest": 4,
+            "action_keeps_goal_reachable": 7,
+            "reachable_candidates": 21,
+            "candidate_slots": 21,
+            "decision_turns": 10
+          },
+          "physical_tasks": 1,
+          "case_variants": 1,
+          "reachability_audit": {
+            "decision_turns": 10,
+            "reachability_scored_turns": 10,
+            "keeps_goal_reachable": 7,
+            "candidate_slots": 21,
+            "reachable_candidates": 21,
+            "uniform_expected_success_sum": 10.0,
+            "zero_candidate_turns": 0,
+            "already_unreachable_turns": 0,
+            "current_reachable_turns": 10,
+            "reachable_to_unreachable_legal_actions": 0,
+            "invalid_actions_on_reachable_states": 3,
+            "illegal_or_missing_actions": 3,
+            "uniform_expected_rate_scored_turns": 1.0,
+            "model_rate_current_reachable": 0.7,
+            "uniform_expected_rate_current_reachable": 1.0
+          }
+        },
+        "initial_goal": {
+          "counts": {
+            "turns": 1,
+            "terminal_turns": 1,
+            "valid_control": 0,
+            "premature_done": 0,
+            "failed_to_stop": 1,
+            "legal_action": 0,
+            "summary_correct": 0,
+            "valid_ranking": 0,
+            "exact_ranking": 0,
+            "closest_candidate_set_exact": 0,
+            "action_map_minimum": 0,
+            "action_follows_ranking": 0,
+            "pairwise_correct": 0,
+            "pairwise_total": 0,
+            "current_relation_correct": 0,
+            "current_relation_total": 0,
+            "action_environment_shortest": 0,
+            "action_keeps_goal_reachable": 0,
+            "reachable_candidates": 0,
+            "candidate_slots": 0,
+            "decision_turns": 0
+          },
+          "physical_tasks": 1,
+          "case_variants": 1,
+          "reachability_audit": {}
+        }
+      },
+      "rollout": {
+        "attempts": 0,
+        "reached": 0,
+        "success": 0,
+        "shortest_success": 0,
+        "successful_moves": 0,
+        "successful_shortest_moves": 0
+      },
+      "variants": 1,
+      "reachability_audit": {
+        "decision_turns": 10,
+        "reachability_scored_turns": 10,
+        "keeps_goal_reachable": 7,
+        "candidate_slots": 21,
+        "reachable_candidates": 21,
+        "uniform_expected_success_sum": 10.0,
+        "zero_candidate_turns": 0,
+        "already_unreachable_turns": 0,
+        "current_reachable_turns": 10,
+        "reachable_to_unreachable_legal_actions": 0,
+        "invalid_actions_on_reachable_states": 3,
+        "illegal_or_missing_actions": 3,
+        "uniform_expected_rate_scored_turns": 1.0,
+        "model_rate_current_reachable": 0.7,
+        "uniform_expected_rate_current_reachable": 1.0
+      },
+      "unique_case_keys": 2,
+      "expected_physical_tasks": 2,
+      "completion": "complete",
+      "observed_on": [
+        "35016",
+        "40072"
+      ]
+    },
+    "path/checkpoint-128/train_reference_map": {
+      "physical_tasks": 256,
+      "case_variants": 256,
+      "counts": {
+        "turns": 3260,
+        "terminal_turns": 256,
+        "valid_control": 2682,
+        "premature_done": 0,
+        "failed_to_stop": 256,
+        "legal_action": 2554,
+        "summary_correct": 0,
+        "valid_ranking": 2411,
+        "exact_ranking": 674,
+        "closest_candidate_set_exact": 1188,
+        "action_map_minimum": 1287,
+        "action_follows_ranking": 1970,
+        "pairwise_correct": 3650,
+        "pairwise_total": 9724,
+        "current_relation_correct": 2464,
+        "current_relation_total": 6242,
+        "action_environment_shortest": 1422,
+        "action_keeps_goal_reachable": 2554,
+        "reachable_candidates": 6242,
+        "candidate_slots": 6242,
+        "decision_turns": 3004
+      },
+      "sources": [
+        "evaluation/path/checkpoint-128/train_reference_map/00000_00064/summary.json",
+        "evaluation/path/checkpoint-128/train_reference_map/00064_00128/summary.json",
+        "evaluation/path/checkpoint-128/train_reference_map/00128_00192/summary.json",
+        "evaluation/path/checkpoint-128/train_reference_map/00192_00256/summary.json"
+      ],
+      "intervals": [
+        [
+          0,
+          64
+        ],
+        [
+          64,
+          128
+        ],
+        [
+          128,
+          192
+        ],
+        [
+          192,
+          256
+        ]
+      ],
+      "groups": {
+        "train": {
+          "counts": {
+            "turns": 3248,
+            "terminal_turns": 244,
+            "valid_control": 2682,
+            "premature_done": 0,
+            "failed_to_stop": 244,
+            "legal_action": 2554,
+            "summary_correct": 0,
+            "valid_ranking": 2411,
+            "exact_ranking": 674,
+            "closest_candidate_set_exact": 1188,
+            "action_map_minimum": 1287,
+            "action_follows_ranking": 1970,
+            "pairwise_correct": 3650,
+            "pairwise_total": 9724,
+            "current_relation_correct": 2464,
+            "current_relation_total": 6242,
+            "action_environment_shortest": 1422,
+            "action_keeps_goal_reachable": 2554,
+            "reachable_candidates": 6242,
+            "candidate_slots": 6242,
+            "decision_turns": 3004
+          },
+          "physical_tasks": 244,
+          "case_variants": 244,
+          "reachability_audit": {
+            "decision_turns": 3004,
+            "reachability_scored_turns": 3004,
+            "keeps_goal_reachable": 2554,
+            "candidate_slots": 6242,
+            "reachable_candidates": 6242,
+            "uniform_expected_success_sum": 3004.0,
+            "zero_candidate_turns": 0,
+            "already_unreachable_turns": 0,
+            "current_reachable_turns": 3004,
+            "reachable_to_unreachable_legal_actions": 0,
+            "invalid_actions_on_reachable_states": 450,
+            "illegal_or_missing_actions": 450,
+            "uniform_expected_rate_scored_turns": 1.0,
+            "model_rate_current_reachable": 0.8501997336884154,
+            "uniform_expected_rate_current_reachable": 1.0
+          }
+        },
+        "initial_goal": {
+          "counts": {
+            "turns": 12,
+            "terminal_turns": 12,
+            "valid_control": 0,
+            "premature_done": 0,
+            "failed_to_stop": 12,
+            "legal_action": 0,
+            "summary_correct": 0,
+            "valid_ranking": 0,
+            "exact_ranking": 0,
+            "closest_candidate_set_exact": 0,
+            "action_map_minimum": 0,
+            "action_follows_ranking": 0,
+            "pairwise_correct": 0,
+            "pairwise_total": 0,
+            "current_relation_correct": 0,
+            "current_relation_total": 0,
+            "action_environment_shortest": 0,
+            "action_keeps_goal_reachable": 0,
+            "reachable_candidates": 0,
+            "candidate_slots": 0,
+            "decision_turns": 0
+          },
+          "physical_tasks": 12,
+          "case_variants": 12,
+          "reachability_audit": {}
+        }
+      },
+      "rollout": {
+        "attempts": 0,
+        "reached": 0,
+        "success": 0,
+        "shortest_success": 0,
+        "successful_moves": 0,
+        "successful_shortest_moves": 0
+      },
+      "variants": 1,
+      "reachability_audit": {
+        "decision_turns": 3004,
+        "reachability_scored_turns": 3004,
+        "keeps_goal_reachable": 2554,
+        "candidate_slots": 6242,
+        "reachable_candidates": 6242,
+        "uniform_expected_success_sum": 3004.0,
+        "zero_candidate_turns": 0,
+        "already_unreachable_turns": 0,
+        "current_reachable_turns": 3004,
+        "reachable_to_unreachable_legal_actions": 0,
+        "invalid_actions_on_reachable_states": 450,
+        "illegal_or_missing_actions": 450,
+        "uniform_expected_rate_scored_turns": 1.0,
+        "model_rate_current_reachable": 0.8501997336884154,
+        "uniform_expected_rate_current_reachable": 1.0
+      },
+      "unique_case_keys": 256,
+      "expected_physical_tasks": 256,
+      "completion": "complete",
+      "observed_on": [
+        "35016",
+        "40072"
+      ]
+    },
+    "path/checkpoint-24192/train_reference_map": {
+      "physical_tasks": 256,
+      "case_variants": 256,
+      "counts": {
+        "turns": 3260,
+        "terminal_turns": 256,
+        "valid_control": 3260,
+        "premature_done": 0,
+        "failed_to_stop": 0,
+        "legal_action": 3004,
+        "summary_correct": 254,
+        "valid_ranking": 3004,
+        "exact_ranking": 1446,
+        "closest_candidate_set_exact": 2080,
+        "action_map_minimum": 2080,
+        "action_follows_ranking": 3004,
+        "pairwise_correct": 6561,
+        "pairwise_total": 9724,
+        "current_relation_correct": 4169,
+        "current_relation_total": 6242,
+        "action_environment_shortest": 2180,
+        "action_keeps_goal_reachable": 3004,
+        "reachable_candidates": 6242,
+        "candidate_slots": 6242,
+        "decision_turns": 3004
+      },
+      "sources": [
+        "evaluation/path/checkpoint-24192/train_reference_map/00000_00064/summary.json",
+        "evaluation/path/checkpoint-24192/train_reference_map/00064_00128/summary.json",
+        "evaluation/path/checkpoint-24192/train_reference_map/00128_00192/summary.json",
+        "evaluation/path/checkpoint-24192/train_reference_map/00192_00256/summary.json"
+      ],
+      "intervals": [
+        [
+          0,
+          64
+        ],
+        [
+          64,
+          128
+        ],
+        [
+          128,
+          192
+        ],
+        [
+          192,
+          256
+        ]
+      ],
+      "groups": {
+        "train": {
+          "counts": {
+            "turns": 3248,
+            "terminal_turns": 244,
+            "valid_control": 3248,
+            "premature_done": 0,
+            "failed_to_stop": 0,
+            "legal_action": 3004,
+            "summary_correct": 242,
+            "valid_ranking": 3004,
+            "exact_ranking": 1446,
+            "closest_candidate_set_exact": 2080,
+            "action_map_minimum": 2080,
+            "action_follows_ranking": 3004,
+            "pairwise_correct": 6561,
+            "pairwise_total": 9724,
+            "current_relation_correct": 4169,
+            "current_relation_total": 6242,
+            "action_environment_shortest": 2180,
+            "action_keeps_goal_reachable": 3004,
+            "reachable_candidates": 6242,
+            "candidate_slots": 6242,
+            "decision_turns": 3004
+          },
+          "physical_tasks": 244,
+          "case_variants": 244,
+          "reachability_audit": {
+            "decision_turns": 3004,
+            "reachability_scored_turns": 3004,
+            "keeps_goal_reachable": 3004,
+            "candidate_slots": 6242,
+            "reachable_candidates": 6242,
+            "uniform_expected_success_sum": 3004.0,
+            "zero_candidate_turns": 0,
+            "already_unreachable_turns": 0,
+            "current_reachable_turns": 3004,
+            "reachable_to_unreachable_legal_actions": 0,
+            "invalid_actions_on_reachable_states": 0,
+            "illegal_or_missing_actions": 0,
+            "uniform_expected_rate_scored_turns": 1.0,
+            "model_rate_current_reachable": 1.0,
+            "uniform_expected_rate_current_reachable": 1.0
+          }
+        },
+        "initial_goal": {
+          "counts": {
+            "turns": 12,
+            "terminal_turns": 12,
+            "valid_control": 12,
+            "premature_done": 0,
+            "failed_to_stop": 0,
+            "legal_action": 0,
+            "summary_correct": 12,
+            "valid_ranking": 0,
+            "exact_ranking": 0,
+            "closest_candidate_set_exact": 0,
+            "action_map_minimum": 0,
+            "action_follows_ranking": 0,
+            "pairwise_correct": 0,
+            "pairwise_total": 0,
+            "current_relation_correct": 0,
+            "current_relation_total": 0,
+            "action_environment_shortest": 0,
+            "action_keeps_goal_reachable": 0,
+            "reachable_candidates": 0,
+            "candidate_slots": 0,
+            "decision_turns": 0
+          },
+          "physical_tasks": 12,
+          "case_variants": 12,
+          "reachability_audit": {}
+        }
+      },
+      "rollout": {
+        "attempts": 0,
+        "reached": 0,
+        "success": 0,
+        "shortest_success": 0,
+        "successful_moves": 0,
+        "successful_shortest_moves": 0
+      },
+      "variants": 1,
+      "reachability_audit": {
+        "decision_turns": 3004,
+        "reachability_scored_turns": 3004,
+        "keeps_goal_reachable": 3004,
+        "candidate_slots": 6242,
+        "reachable_candidates": 6242,
+        "uniform_expected_success_sum": 3004.0,
+        "zero_candidate_turns": 0,
+        "already_unreachable_turns": 0,
+        "current_reachable_turns": 3004,
+        "reachable_to_unreachable_legal_actions": 0,
+        "invalid_actions_on_reachable_states": 0,
+        "illegal_or_missing_actions": 0,
+        "uniform_expected_rate_scored_turns": 1.0,
+        "model_rate_current_reachable": 1.0,
+        "uniform_expected_rate_current_reachable": 1.0
+      },
+      "unique_case_keys": 256,
+      "expected_physical_tasks": 256,
+      "completion": "complete",
+      "observed_on": [
+        "35016",
+        "40072"
+      ]
+    },
+    "path/checkpoint-24192/validation_reference_map": {
+      "physical_tasks": 532,
+      "case_variants": 532,
+      "counts": {
+        "turns": 6672,
+        "terminal_turns": 532,
+        "valid_control": 6672,
+        "premature_done": 1,
+        "failed_to_stop": 6,
+        "legal_action": 6139,
+        "summary_correct": 522,
+        "valid_ranking": 6139,
+        "exact_ranking": 2908,
+        "closest_candidate_set_exact": 4119,
+        "action_map_minimum": 4119,
+        "action_follows_ranking": 6139,
+        "pairwise_correct": 13218,
+        "pairwise_total": 19896,
+        "current_relation_correct": 8443,
+        "current_relation_total": 12768,
+        "action_environment_shortest": 4404,
+        "action_keeps_goal_reachable": 6139,
+        "reachable_candidates": 12768,
+        "candidate_slots": 12768,
+        "decision_turns": 6140
+      },
+      "sources": [
+        "evaluation/path/checkpoint-24192/validation_reference_map/00000_00064/summary.json",
+        "evaluation/path/checkpoint-24192/validation_reference_map/00064_00128/summary.json",
+        "evaluation/path/checkpoint-24192/validation_reference_map/00128_00192/summary.json",
+        "evaluation/path/checkpoint-24192/validation_reference_map/00192_00256/summary.json",
+        "evaluation/path/checkpoint-24192/validation_reference_map/00256_00320/summary.json",
+        "evaluation/path/checkpoint-24192/validation_reference_map/00320_00384/summary.json",
+        "evaluation/path/checkpoint-24192/validation_reference_map/00384_00448/summary.json",
+        "evaluation/path/checkpoint-24192/validation_reference_map/00448_00512/summary.json",
+        "evaluation/path/checkpoint-24192/validation_reference_map/00512_00532/summary.json"
+      ],
+      "intervals": [
+        [
+          0,
+          64
+        ],
+        [
+          64,
+          128
+        ],
+        [
+          128,
+          192
+        ],
+        [
+          192,
+          256
+        ],
+        [
+          256,
+          320
+        ],
+        [
+          320,
+          384
+        ],
+        [
+          384,
+          448
+        ],
+        [
+          448,
+          512
+        ],
+        [
+          512,
+          532
+        ]
+      ],
+      "groups": {
+        "same_map_new_goal": {
+          "counts": {
+            "turns": 6640,
+            "terminal_turns": 500,
+            "valid_control": 6640,
+            "premature_done": 1,
+            "failed_to_stop": 3,
+            "legal_action": 6139,
+            "summary_correct": 493,
+            "valid_ranking": 6139,
+            "exact_ranking": 2908,
+            "closest_candidate_set_exact": 4119,
+            "action_map_minimum": 4119,
+            "action_follows_ranking": 6139,
+            "pairwise_correct": 13218,
+            "pairwise_total": 19896,
+            "current_relation_correct": 8443,
+            "current_relation_total": 12768,
+            "action_environment_shortest": 4404,
+            "action_keeps_goal_reachable": 6139,
+            "reachable_candidates": 12768,
+            "candidate_slots": 12768,
+            "decision_turns": 6140
+          },
+          "physical_tasks": 500,
+          "case_variants": 500,
+          "reachability_audit": {
+            "decision_turns": 6140,
+            "reachability_scored_turns": 6140,
+            "keeps_goal_reachable": 6139,
+            "candidate_slots": 12768,
+            "reachable_candidates": 12768,
+            "uniform_expected_success_sum": 6140.0,
+            "zero_candidate_turns": 0,
+            "already_unreachable_turns": 0,
+            "current_reachable_turns": 6140,
+            "reachable_to_unreachable_legal_actions": 0,
+            "invalid_actions_on_reachable_states": 1,
+            "illegal_or_missing_actions": 1,
+            "uniform_expected_rate_scored_turns": 1.0,
+            "model_rate_current_reachable": 0.9998371335504886,
+            "uniform_expected_rate_current_reachable": 1.0
+          }
+        },
+        "initial_goal": {
+          "counts": {
+            "turns": 32,
+            "terminal_turns": 32,
+            "valid_control": 32,
+            "premature_done": 0,
+            "failed_to_stop": 3,
+            "legal_action": 0,
+            "summary_correct": 29,
+            "valid_ranking": 0,
+            "exact_ranking": 0,
+            "closest_candidate_set_exact": 0,
+            "action_map_minimum": 0,
+            "action_follows_ranking": 0,
+            "pairwise_correct": 0,
+            "pairwise_total": 0,
+            "current_relation_correct": 0,
+            "current_relation_total": 0,
+            "action_environment_shortest": 0,
+            "action_keeps_goal_reachable": 0,
+            "reachable_candidates": 0,
+            "candidate_slots": 0,
+            "decision_turns": 0
+          },
+          "physical_tasks": 32,
+          "case_variants": 32,
+          "reachability_audit": {}
+        }
+      },
+      "rollout": {
+        "attempts": 0,
+        "reached": 0,
+        "success": 0,
+        "shortest_success": 0,
+        "successful_moves": 0,
+        "successful_shortest_moves": 0
+      },
+      "variants": 1,
+      "reachability_audit": {
+        "decision_turns": 6140,
+        "reachability_scored_turns": 6140,
+        "keeps_goal_reachable": 6139,
+        "candidate_slots": 12768,
+        "reachable_candidates": 12768,
+        "uniform_expected_success_sum": 6140.0,
+        "zero_candidate_turns": 0,
+        "already_unreachable_turns": 0,
+        "current_reachable_turns": 6140,
+        "reachable_to_unreachable_legal_actions": 0,
+        "invalid_actions_on_reachable_states": 1,
+        "illegal_or_missing_actions": 1,
+        "uniform_expected_rate_scored_turns": 1.0,
+        "model_rate_current_reachable": 0.9998371335504886,
+        "uniform_expected_rate_current_reachable": 1.0
+      },
+      "unique_case_keys": 532,
+      "expected_physical_tasks": 532,
+      "completion": "complete",
+      "observed_on": [
+        "35016",
+        "40072"
+      ]
+    },
+    "path/checkpoint-48384/train_reference_map": {
+      "physical_tasks": 256,
+      "case_variants": 256,
+      "counts": {
+        "turns": 3260,
+        "terminal_turns": 256,
+        "valid_control": 3260,
+        "premature_done": 0,
+        "failed_to_stop": 0,
+        "legal_action": 3004,
+        "summary_correct": 256,
+        "valid_ranking": 3004,
+        "exact_ranking": 1660,
+        "closest_candidate_set_exact": 2312,
+        "action_map_minimum": 2312,
+        "action_follows_ranking": 3004,
+        "pairwise_correct": 7314,
+        "pairwise_total": 9724,
+        "current_relation_correct": 4642,
+        "current_relation_total": 6242,
+        "action_environment_shortest": 2200,
+        "action_keeps_goal_reachable": 3004,
+        "reachable_candidates": 6242,
+        "candidate_slots": 6242,
+        "decision_turns": 3004
+      },
+      "sources": [
+        "evaluation/path/checkpoint-48384/train_reference_map/00000_00064/summary.json",
+        "evaluation/path/checkpoint-48384/train_reference_map/00064_00128/summary.json",
+        "evaluation/path/checkpoint-48384/train_reference_map/00128_00192/summary.json",
+        "evaluation/path/checkpoint-48384/train_reference_map/00192_00256/summary.json"
+      ],
+      "intervals": [
+        [
+          0,
+          64
+        ],
+        [
+          64,
+          128
+        ],
+        [
+          128,
+          192
+        ],
+        [
+          192,
+          256
+        ]
+      ],
+      "groups": {
+        "train": {
+          "counts": {
+            "turns": 3248,
+            "terminal_turns": 244,
+            "valid_control": 3248,
+            "premature_done": 0,
+            "failed_to_stop": 0,
+            "legal_action": 3004,
+            "summary_correct": 244,
+            "valid_ranking": 3004,
+            "exact_ranking": 1660,
+            "closest_candidate_set_exact": 2312,
+            "action_map_minimum": 2312,
+            "action_follows_ranking": 3004,
+            "pairwise_correct": 7314,
+            "pairwise_total": 9724,
+            "current_relation_correct": 4642,
+            "current_relation_total": 6242,
+            "action_environment_shortest": 2200,
+            "action_keeps_goal_reachable": 3004,
+            "reachable_candidates": 6242,
+            "candidate_slots": 6242,
+            "decision_turns": 3004
+          },
+          "physical_tasks": 244,
+          "case_variants": 244,
+          "reachability_audit": {
+            "decision_turns": 3004,
+            "reachability_scored_turns": 3004,
+            "keeps_goal_reachable": 3004,
+            "candidate_slots": 6242,
+            "reachable_candidates": 6242,
+            "uniform_expected_success_sum": 3004.0,
+            "zero_candidate_turns": 0,
+            "already_unreachable_turns": 0,
+            "current_reachable_turns": 3004,
+            "reachable_to_unreachable_legal_actions": 0,
+            "invalid_actions_on_reachable_states": 0,
+            "illegal_or_missing_actions": 0,
+            "uniform_expected_rate_scored_turns": 1.0,
+            "model_rate_current_reachable": 1.0,
+            "uniform_expected_rate_current_reachable": 1.0
+          }
+        },
+        "initial_goal": {
+          "counts": {
+            "turns": 12,
+            "terminal_turns": 12,
+            "valid_control": 12,
+            "premature_done": 0,
+            "failed_to_stop": 0,
+            "legal_action": 0,
+            "summary_correct": 12,
+            "valid_ranking": 0,
+            "exact_ranking": 0,
+            "closest_candidate_set_exact": 0,
+            "action_map_minimum": 0,
+            "action_follows_ranking": 0,
+            "pairwise_correct": 0,
+            "pairwise_total": 0,
+            "current_relation_correct": 0,
+            "current_relation_total": 0,
+            "action_environment_shortest": 0,
+            "action_keeps_goal_reachable": 0,
+            "reachable_candidates": 0,
+            "candidate_slots": 0,
+            "decision_turns": 0
+          },
+          "physical_tasks": 12,
+          "case_variants": 12,
+          "reachability_audit": {}
+        }
+      },
+      "rollout": {
+        "attempts": 0,
+        "reached": 0,
+        "success": 0,
+        "shortest_success": 0,
+        "successful_moves": 0,
+        "successful_shortest_moves": 0
+      },
+      "variants": 1,
+      "reachability_audit": {
+        "decision_turns": 3004,
+        "reachability_scored_turns": 3004,
+        "keeps_goal_reachable": 3004,
+        "candidate_slots": 6242,
+        "reachable_candidates": 6242,
+        "uniform_expected_success_sum": 3004.0,
+        "zero_candidate_turns": 0,
+        "already_unreachable_turns": 0,
+        "current_reachable_turns": 3004,
+        "reachable_to_unreachable_legal_actions": 0,
+        "invalid_actions_on_reachable_states": 0,
+        "illegal_or_missing_actions": 0,
+        "uniform_expected_rate_scored_turns": 1.0,
+        "model_rate_current_reachable": 1.0,
+        "uniform_expected_rate_current_reachable": 1.0
+      },
+      "unique_case_keys": 256,
+      "expected_physical_tasks": 256,
+      "completion": "complete",
+      "observed_on": [
+        "35016",
+        "40072"
+      ]
+    },
+    "path/checkpoint-48384/validation_reference_map": {
+      "physical_tasks": 532,
+      "case_variants": 532,
+      "counts": {
+        "turns": 6672,
+        "terminal_turns": 532,
+        "valid_control": 6671,
+        "premature_done": 0,
+        "failed_to_stop": 3,
+        "legal_action": 6140,
+        "summary_correct": 524,
+        "valid_ranking": 6140,
+        "exact_ranking": 3269,
+        "closest_candidate_set_exact": 4582,
+        "action_map_minimum": 4582,
+        "action_follows_ranking": 6140,
+        "pairwise_correct": 14654,
+        "pairwise_total": 19896,
+        "current_relation_correct": 9304,
+        "current_relation_total": 12768,
+        "action_environment_shortest": 4535,
+        "action_keeps_goal_reachable": 6140,
+        "reachable_candidates": 12768,
+        "candidate_slots": 12768,
+        "decision_turns": 6140
+      },
+      "sources": [
+        "evaluation/path/checkpoint-48384/validation_reference_map/00000_00064/summary.json",
+        "evaluation/path/checkpoint-48384/validation_reference_map/00064_00128/summary.json",
+        "evaluation/path/checkpoint-48384/validation_reference_map/00128_00192/summary.json",
+        "evaluation/path/checkpoint-48384/validation_reference_map/00192_00256/summary.json",
+        "evaluation/path/checkpoint-48384/validation_reference_map/00256_00320/summary.json",
+        "evaluation/path/checkpoint-48384/validation_reference_map/00320_00384/summary.json",
+        "evaluation/path/checkpoint-48384/validation_reference_map/00384_00448/summary.json",
+        "evaluation/path/checkpoint-48384/validation_reference_map/00448_00512/summary.json",
+        "evaluation/path/checkpoint-48384/validation_reference_map/00512_00532/summary.json"
+      ],
+      "intervals": [
+        [
+          0,
+          64
+        ],
+        [
+          64,
+          128
+        ],
+        [
+          128,
+          192
+        ],
+        [
+          192,
+          256
+        ],
+        [
+          256,
+          320
+        ],
+        [
+          320,
+          384
+        ],
+        [
+          384,
+          448
+        ],
+        [
+          448,
+          512
+        ],
+        [
+          512,
+          532
+        ]
+      ],
+      "groups": {
+        "same_map_new_goal": {
+          "counts": {
+            "turns": 6640,
+            "terminal_turns": 500,
+            "valid_control": 6640,
+            "premature_done": 0,
+            "failed_to_stop": 1,
+            "legal_action": 6140,
+            "summary_correct": 495,
+            "valid_ranking": 6140,
+            "exact_ranking": 3269,
+            "closest_candidate_set_exact": 4582,
+            "action_map_minimum": 4582,
+            "action_follows_ranking": 6140,
+            "pairwise_correct": 14654,
+            "pairwise_total": 19896,
+            "current_relation_correct": 9304,
+            "current_relation_total": 12768,
+            "action_environment_shortest": 4535,
+            "action_keeps_goal_reachable": 6140,
+            "reachable_candidates": 12768,
+            "candidate_slots": 12768,
+            "decision_turns": 6140
+          },
+          "physical_tasks": 500,
+          "case_variants": 500,
+          "reachability_audit": {
+            "decision_turns": 6140,
+            "reachability_scored_turns": 6140,
+            "keeps_goal_reachable": 6140,
+            "candidate_slots": 12768,
+            "reachable_candidates": 12768,
+            "uniform_expected_success_sum": 6140.0,
+            "zero_candidate_turns": 0,
+            "already_unreachable_turns": 0,
+            "current_reachable_turns": 6140,
+            "reachable_to_unreachable_legal_actions": 0,
+            "invalid_actions_on_reachable_states": 0,
+            "illegal_or_missing_actions": 0,
+            "uniform_expected_rate_scored_turns": 1.0,
+            "model_rate_current_reachable": 1.0,
+            "uniform_expected_rate_current_reachable": 1.0
+          }
+        },
+        "initial_goal": {
+          "counts": {
+            "turns": 32,
+            "terminal_turns": 32,
+            "valid_control": 31,
+            "premature_done": 0,
+            "failed_to_stop": 2,
+            "legal_action": 0,
+            "summary_correct": 29,
+            "valid_ranking": 0,
+            "exact_ranking": 0,
+            "closest_candidate_set_exact": 0,
+            "action_map_minimum": 0,
+            "action_follows_ranking": 0,
+            "pairwise_correct": 0,
+            "pairwise_total": 0,
+            "current_relation_correct": 0,
+            "current_relation_total": 0,
+            "action_environment_shortest": 0,
+            "action_keeps_goal_reachable": 0,
+            "reachable_candidates": 0,
+            "candidate_slots": 0,
+            "decision_turns": 0
+          },
+          "physical_tasks": 32,
+          "case_variants": 32,
+          "reachability_audit": {}
+        }
+      },
+      "rollout": {
+        "attempts": 0,
+        "reached": 0,
+        "success": 0,
+        "shortest_success": 0,
+        "successful_moves": 0,
+        "successful_shortest_moves": 0
+      },
+      "variants": 1,
+      "reachability_audit": {
+        "decision_turns": 6140,
+        "reachability_scored_turns": 6140,
+        "keeps_goal_reachable": 6140,
+        "candidate_slots": 12768,
+        "reachable_candidates": 12768,
+        "uniform_expected_success_sum": 6140.0,
+        "zero_candidate_turns": 0,
+        "already_unreachable_turns": 0,
+        "current_reachable_turns": 6140,
+        "reachable_to_unreachable_legal_actions": 0,
+        "invalid_actions_on_reachable_states": 0,
+        "illegal_or_missing_actions": 0,
+        "uniform_expected_rate_scored_turns": 1.0,
+        "model_rate_current_reachable": 1.0,
+        "uniform_expected_rate_current_reachable": 1.0
+      },
+      "unique_case_keys": 532,
+      "expected_physical_tasks": 532,
+      "completion": "complete",
+      "observed_on": [
+        "35016",
+        "40072"
+      ]
+    },
+    "path/final/train_reference_map": {
+      "physical_tasks": 256,
+      "case_variants": 256,
+      "counts": {
+        "turns": 3260,
+        "terminal_turns": 256,
+        "valid_control": 3260,
+        "premature_done": 2,
+        "failed_to_stop": 0,
+        "legal_action": 3002,
+        "summary_correct": 255,
+        "valid_ranking": 3002,
+        "exact_ranking": 1770,
+        "closest_candidate_set_exact": 2365,
+        "action_map_minimum": 2365,
+        "action_follows_ranking": 3002,
+        "pairwise_correct": 7646,
+        "pairwise_total": 9724,
+        "current_relation_correct": 4905,
+        "current_relation_total": 6242,
+        "action_environment_shortest": 2222,
+        "action_keeps_goal_reachable": 3002,
+        "reachable_candidates": 6242,
+        "candidate_slots": 6242,
+        "decision_turns": 3004
+      },
+      "sources": [
+        "evaluation/path/final/train_reference_map/00000_00064/summary.json",
+        "evaluation/path/final/train_reference_map/00064_00128/summary.json",
+        "evaluation/path/final/train_reference_map/00128_00192/summary.json",
+        "evaluation/path/final/train_reference_map/00192_00256/summary.json"
+      ],
+      "intervals": [
+        [
+          0,
+          64
+        ],
+        [
+          64,
+          128
+        ],
+        [
+          128,
+          192
+        ],
+        [
+          192,
+          256
+        ]
+      ],
+      "groups": {
+        "train": {
+          "counts": {
+            "turns": 3248,
+            "terminal_turns": 244,
+            "valid_control": 3248,
+            "premature_done": 2,
+            "failed_to_stop": 0,
+            "legal_action": 3002,
+            "summary_correct": 243,
+            "valid_ranking": 3002,
+            "exact_ranking": 1770,
+            "closest_candidate_set_exact": 2365,
+            "action_map_minimum": 2365,
+            "action_follows_ranking": 3002,
+            "pairwise_correct": 7646,
+            "pairwise_total": 9724,
+            "current_relation_correct": 4905,
+            "current_relation_total": 6242,
+            "action_environment_shortest": 2222,
+            "action_keeps_goal_reachable": 3002,
+            "reachable_candidates": 6242,
+            "candidate_slots": 6242,
+            "decision_turns": 3004
+          },
+          "physical_tasks": 244,
+          "case_variants": 244,
+          "reachability_audit": {
+            "decision_turns": 3004,
+            "reachability_scored_turns": 3004,
+            "keeps_goal_reachable": 3002,
+            "candidate_slots": 6242,
+            "reachable_candidates": 6242,
+            "uniform_expected_success_sum": 3004.0,
+            "zero_candidate_turns": 0,
+            "already_unreachable_turns": 0,
+            "current_reachable_turns": 3004,
+            "reachable_to_unreachable_legal_actions": 0,
+            "invalid_actions_on_reachable_states": 2,
+            "illegal_or_missing_actions": 2,
+            "uniform_expected_rate_scored_turns": 1.0,
+            "model_rate_current_reachable": 0.9993342210386151,
+            "uniform_expected_rate_current_reachable": 1.0
+          }
+        },
+        "initial_goal": {
+          "counts": {
+            "turns": 12,
+            "terminal_turns": 12,
+            "valid_control": 12,
+            "premature_done": 0,
+            "failed_to_stop": 0,
+            "legal_action": 0,
+            "summary_correct": 12,
+            "valid_ranking": 0,
+            "exact_ranking": 0,
+            "closest_candidate_set_exact": 0,
+            "action_map_minimum": 0,
+            "action_follows_ranking": 0,
+            "pairwise_correct": 0,
+            "pairwise_total": 0,
+            "current_relation_correct": 0,
+            "current_relation_total": 0,
+            "action_environment_shortest": 0,
+            "action_keeps_goal_reachable": 0,
+            "reachable_candidates": 0,
+            "candidate_slots": 0,
+            "decision_turns": 0
+          },
+          "physical_tasks": 12,
+          "case_variants": 12,
+          "reachability_audit": {}
+        }
+      },
+      "rollout": {
+        "attempts": 0,
+        "reached": 0,
+        "success": 0,
+        "shortest_success": 0,
+        "successful_moves": 0,
+        "successful_shortest_moves": 0
+      },
+      "variants": 1,
+      "reachability_audit": {
+        "decision_turns": 3004,
+        "reachability_scored_turns": 3004,
+        "keeps_goal_reachable": 3002,
+        "candidate_slots": 6242,
+        "reachable_candidates": 6242,
+        "uniform_expected_success_sum": 3004.0,
+        "zero_candidate_turns": 0,
+        "already_unreachable_turns": 0,
+        "current_reachable_turns": 3004,
+        "reachable_to_unreachable_legal_actions": 0,
+        "invalid_actions_on_reachable_states": 2,
+        "illegal_or_missing_actions": 2,
+        "uniform_expected_rate_scored_turns": 1.0,
+        "model_rate_current_reachable": 0.9993342210386151,
+        "uniform_expected_rate_current_reachable": 1.0
+      },
+      "unique_case_keys": 256,
+      "expected_physical_tasks": 256,
+      "completion": "complete",
+      "observed_on": [
+        "35016",
+        "40072"
+      ]
+    },
+    "path/final/validation_reference_map": {
+      "physical_tasks": 532,
+      "case_variants": 532,
+      "counts": {
+        "turns": 6672,
+        "terminal_turns": 532,
+        "valid_control": 6672,
+        "premature_done": 0,
+        "failed_to_stop": 9,
+        "legal_action": 6140,
+        "summary_correct": 517,
+        "valid_ranking": 6139,
+        "exact_ranking": 3451,
+        "closest_candidate_set_exact": 4717,
+        "action_map_minimum": 4718,
+        "action_follows_ranking": 6139,
+        "pairwise_correct": 15324,
+        "pairwise_total": 19896,
+        "current_relation_correct": 9806,
+        "current_relation_total": 12768,
+        "action_environment_shortest": 4567,
+        "action_keeps_goal_reachable": 6140,
+        "reachable_candidates": 12768,
+        "candidate_slots": 12768,
+        "decision_turns": 6140
+      },
+      "sources": [
+        "evaluation/path/final/validation_reference_map/00000_00064/summary.json",
+        "evaluation/path/final/validation_reference_map/00064_00128/summary.json",
+        "evaluation/path/final/validation_reference_map/00128_00192/summary.json",
+        "evaluation/path/final/validation_reference_map/00192_00256/summary.json",
+        "evaluation/path/final/validation_reference_map/00256_00320/summary.json",
+        "evaluation/path/final/validation_reference_map/00320_00384/summary.json",
+        "evaluation/path/final/validation_reference_map/00384_00448/summary.json",
+        "evaluation/path/final/validation_reference_map/00448_00512/summary.json",
+        "evaluation/path/final/validation_reference_map/00512_00532/summary.json"
+      ],
+      "intervals": [
+        [
+          0,
+          64
+        ],
+        [
+          64,
+          128
+        ],
+        [
+          128,
+          192
+        ],
+        [
+          192,
+          256
+        ],
+        [
+          256,
+          320
+        ],
+        [
+          320,
+          384
+        ],
+        [
+          384,
+          448
+        ],
+        [
+          448,
+          512
+        ],
+        [
+          512,
+          532
+        ]
+      ],
+      "groups": {
+        "same_map_new_goal": {
+          "counts": {
+            "turns": 6640,
+            "terminal_turns": 500,
+            "valid_control": 6640,
+            "premature_done": 0,
+            "failed_to_stop": 8,
+            "legal_action": 6140,
+            "summary_correct": 486,
+            "valid_ranking": 6139,
+            "exact_ranking": 3451,
+            "closest_candidate_set_exact": 4717,
+            "action_map_minimum": 4718,
+            "action_follows_ranking": 6139,
+            "pairwise_correct": 15324,
+            "pairwise_total": 19896,
+            "current_relation_correct": 9806,
+            "current_relation_total": 12768,
+            "action_environment_shortest": 4567,
+            "action_keeps_goal_reachable": 6140,
+            "reachable_candidates": 12768,
+            "candidate_slots": 12768,
+            "decision_turns": 6140
+          },
+          "physical_tasks": 500,
+          "case_variants": 500,
+          "reachability_audit": {
+            "decision_turns": 6140,
+            "reachability_scored_turns": 6140,
+            "keeps_goal_reachable": 6140,
+            "candidate_slots": 12768,
+            "reachable_candidates": 12768,
+            "uniform_expected_success_sum": 6140.0,
+            "zero_candidate_turns": 0,
+            "already_unreachable_turns": 0,
+            "current_reachable_turns": 6140,
+            "reachable_to_unreachable_legal_actions": 0,
+            "invalid_actions_on_reachable_states": 0,
+            "illegal_or_missing_actions": 0,
+            "uniform_expected_rate_scored_turns": 1.0,
+            "model_rate_current_reachable": 1.0,
+            "uniform_expected_rate_current_reachable": 1.0
+          }
+        },
+        "initial_goal": {
+          "counts": {
+            "turns": 32,
+            "terminal_turns": 32,
+            "valid_control": 32,
+            "premature_done": 0,
+            "failed_to_stop": 1,
+            "legal_action": 0,
+            "summary_correct": 31,
+            "valid_ranking": 0,
+            "exact_ranking": 0,
+            "closest_candidate_set_exact": 0,
+            "action_map_minimum": 0,
+            "action_follows_ranking": 0,
+            "pairwise_correct": 0,
+            "pairwise_total": 0,
+            "current_relation_correct": 0,
+            "current_relation_total": 0,
+            "action_environment_shortest": 0,
+            "action_keeps_goal_reachable": 0,
+            "reachable_candidates": 0,
+            "candidate_slots": 0,
+            "decision_turns": 0
+          },
+          "physical_tasks": 32,
+          "case_variants": 32,
+          "reachability_audit": {}
+        }
+      },
+      "rollout": {
+        "attempts": 0,
+        "reached": 0,
+        "success": 0,
+        "shortest_success": 0,
+        "successful_moves": 0,
+        "successful_shortest_moves": 0
+      },
+      "variants": 1,
+      "reachability_audit": {
+        "decision_turns": 6140,
+        "reachability_scored_turns": 6140,
+        "keeps_goal_reachable": 6140,
+        "candidate_slots": 12768,
+        "reachable_candidates": 12768,
+        "uniform_expected_success_sum": 6140.0,
+        "zero_candidate_turns": 0,
+        "already_unreachable_turns": 0,
+        "current_reachable_turns": 6140,
+        "reachable_to_unreachable_legal_actions": 0,
+        "invalid_actions_on_reachable_states": 0,
+        "illegal_or_missing_actions": 0,
+        "uniform_expected_rate_scored_turns": 1.0,
+        "model_rate_current_reachable": 1.0,
+        "uniform_expected_rate_current_reachable": 1.0
+      },
+      "unique_case_keys": 532,
+      "expected_physical_tasks": 532,
+      "completion": "complete",
+      "observed_on": [
+        "35016",
+        "40072"
+      ]
+    },
+    "path/final/validation_rollout_map": {
+      "physical_tasks": 532,
+      "case_variants": 532,
+      "counts": {
+        "turns": 10605,
+        "terminal_turns": 423,
+        "valid_control": 10605,
+        "premature_done": 5,
+        "failed_to_stop": 6,
+        "legal_action": 10177,
+        "summary_correct": 388,
+        "valid_ranking": 10163,
+        "exact_ranking": 4682,
+        "closest_candidate_set_exact": 7195,
+        "action_map_minimum": 7208,
+        "action_follows_ranking": 10163,
+        "pairwise_correct": 22231,
+        "pairwise_total": 31746,
+        "current_relation_correct": 14369,
+        "current_relation_total": 20714,
+        "action_environment_shortest": 6937,
+        "action_keeps_goal_reachable": 8836,
+        "reachable_candidates": 17980,
+        "candidate_slots": 17983,
+        "decision_turns": 10182
+      },
+      "sources": [
+        "evaluation/path/final/validation_rollout_map/00000_00064/summary.json",
+        "evaluation/path/final/validation_rollout_map/00064_00128/summary.json",
+        "evaluation/path/final/validation_rollout_map/00128_00192/summary.json",
+        "evaluation/path/final/validation_rollout_map/00192_00256/summary.json",
+        "evaluation/path/final/validation_rollout_map/00256_00320/summary.json",
+        "evaluation/path/final/validation_rollout_map/00320_00384/summary.json",
+        "evaluation/path/final/validation_rollout_map/00384_00448/summary.json",
+        "evaluation/path/final/validation_rollout_map/00448_00512/summary.json",
+        "evaluation/path/final/validation_rollout_map/00512_00532/summary.json"
+      ],
+      "intervals": [
+        [
+          0,
+          64
+        ],
+        [
+          64,
+          128
+        ],
+        [
+          128,
+          192
+        ],
+        [
+          192,
+          256
+        ],
+        [
+          256,
+          320
+        ],
+        [
+          320,
+          384
+        ],
+        [
+          384,
+          448
+        ],
+        [
+          448,
+          512
+        ],
+        [
+          512,
+          532
+        ]
+      ],
+      "groups": {
+        "same_map_new_goal": {
+          "counts": {
+            "turns": 10573,
+            "terminal_turns": 391,
+            "valid_control": 10573,
+            "premature_done": 5,
+            "failed_to_stop": 5,
+            "legal_action": 10177,
+            "summary_correct": 357,
+            "valid_ranking": 10163,
+            "exact_ranking": 4682,
+            "closest_candidate_set_exact": 7195,
+            "action_map_minimum": 7208,
+            "action_follows_ranking": 10163,
+            "pairwise_correct": 22231,
+            "pairwise_total": 31746,
+            "current_relation_correct": 14369,
+            "current_relation_total": 20714,
+            "action_environment_shortest": 6937,
+            "action_keeps_goal_reachable": 8836,
+            "reachable_candidates": 17980,
+            "candidate_slots": 17983,
+            "decision_turns": 10182
+          },
+          "physical_tasks": 500,
+          "case_variants": 500,
+          "reachability_audit": {
+            "decision_turns": 10182,
+            "reachability_scored_turns": 8836,
+            "keeps_goal_reachable": 8836,
+            "candidate_slots": 17983,
+            "reachable_candidates": 17980,
+            "uniform_expected_success_sum": 8834.5,
+            "zero_candidate_turns": 0,
+            "already_unreachable_turns": 0,
+            "current_reachable_turns": 8836,
+            "reachable_to_unreachable_legal_actions": 0,
+            "invalid_actions_on_reachable_states": 0,
+            "illegal_or_missing_actions": 0,
+            "uniform_expected_rate_scored_turns": 0.999830239927569,
+            "model_rate_current_reachable": 1.0,
+            "uniform_expected_rate_current_reachable": 0.999830239927569
+          },
+          "rollout": {
+            "reached": 391,
+            "success": 386,
+            "shortest_success": 37,
+            "attempts": 500
+          }
+        },
+        "initial_goal": {
+          "counts": {
+            "turns": 32,
+            "terminal_turns": 32,
+            "valid_control": 32,
+            "premature_done": 0,
+            "failed_to_stop": 1,
+            "legal_action": 0,
+            "summary_correct": 31,
+            "valid_ranking": 0,
+            "exact_ranking": 0,
+            "closest_candidate_set_exact": 0,
+            "action_map_minimum": 0,
+            "action_follows_ranking": 0,
+            "pairwise_correct": 0,
+            "pairwise_total": 0,
+            "current_relation_correct": 0,
+            "current_relation_total": 0,
+            "action_environment_shortest": 0,
+            "action_keeps_goal_reachable": 0,
+            "reachable_candidates": 0,
+            "candidate_slots": 0,
+            "decision_turns": 0
+          },
+          "physical_tasks": 32,
+          "case_variants": 32,
+          "reachability_audit": {},
+          "rollout": {
+            "reached": 32,
+            "success": 31,
+            "shortest_success": 31,
+            "attempts": 32
+          }
+        }
+      },
+      "rollout": {
+        "attempts": 532,
+        "reached": 423,
+        "success": 417,
+        "shortest_success": 68,
+        "successful_moves": 6568,
+        "successful_shortest_moves": 3390
+      },
+      "variants": 1,
+      "reachability_audit": {
+        "decision_turns": 10182,
+        "reachability_scored_turns": 8836,
+        "keeps_goal_reachable": 8836,
+        "candidate_slots": 17983,
+        "reachable_candidates": 17980,
+        "uniform_expected_success_sum": 8834.5,
+        "zero_candidate_turns": 0,
+        "already_unreachable_turns": 0,
+        "current_reachable_turns": 8836,
+        "reachable_to_unreachable_legal_actions": 0,
+        "invalid_actions_on_reachable_states": 0,
+        "illegal_or_missing_actions": 0,
+        "uniform_expected_rate_scored_turns": 0.999830239927569,
+        "model_rate_current_reachable": 1.0,
+        "uniform_expected_rate_current_reachable": 0.999830239927569
+      },
+      "unique_case_keys": 532,
+      "expected_physical_tasks": 532,
+      "completion": "complete",
+      "observed_on": [
+        "35016",
+        "40072"
+      ]
+    }
+  },
+  "greedy_reference_groups": {
+    "path": {
+      "train/train": {
+        "attempts": 4000,
+        "reached": 4000,
+        "shortest": 869
+      },
+      "train/initial_goal": {
+        "attempts": 192,
+        "reached": 192,
+        "shortest": 192
+      },
+      "validation/same_map_new_goal": {
+        "attempts": 500,
+        "reached": 500,
+        "shortest": 115
+      },
+      "validation/initial_goal": {
+        "attempts": 32,
+        "reached": 32,
+        "shortest": 32
+      },
+      "test/same_map_new_goal": {
+        "attempts": 1000,
+        "reached": 1000,
+        "shortest": 200
+      },
+      "test/initial_goal": {
+        "attempts": 32,
+        "reached": 32,
+        "shortest": 32
+      }
+    },
+    "blocks": {
+      "train/train": {
+        "attempts": 8000,
+        "reached": 8000,
+        "shortest": 3538
+      },
+      "validation/same_initial_board_new_pair": {
+        "attempts": 500,
+        "reached": 338,
+        "shortest": 172
+      },
+      "test/same_initial_board_new_pair": {
+        "attempts": 1000,
+        "reached": 655,
+        "shortest": 335
+      },
+      "train/initial_goal": {
+        "attempts": 1000,
+        "reached": 1000,
+        "shortest": 1000
+      },
+      "validation/new_initial_board": {
+        "attempts": 500,
+        "reached": 345,
+        "shortest": 139
+      },
+      "validation/initial_goal": {
+        "attempts": 100,
+        "reached": 100,
+        "shortest": 100
+      },
+      "test/new_initial_board": {
+        "attempts": 1000,
+        "reached": 694,
+        "shortest": 304
+      },
+      "test/initial_goal": {
+        "attempts": 200,
+        "reached": 200,
+        "shortest": 200
+      }
+    }
+  }
 }

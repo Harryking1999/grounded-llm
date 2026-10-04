@@ -1,53 +1,41 @@
-# 地图读取：长轨迹 SFT
+# 地图读取：完整长轨迹 SFT
 
-按原飞书 4.2，寻路固定一张图及其 Q，积木使用 1000 张初始棋盘与共享冻结 Q。两任务分别从头训练读取接口，冻结 Qwen2.5-1.5B-Instruct 与地图。训练完整长轨迹的每次判断、距离、排序、动作及最终停止和总结。
+本实验检验：冻结 LLM 与地图，只训练地图读取接口，能否从完整轨迹学会远近排序、行动、停止和总结。当前主实验为单图寻路与 1000 初始棋盘积木；旧小样本用于历史诊断。寻路 epoch 1 的训练内逐轮诊断已取得 100% 控制格式／合法动作、69.2% 地图最优动作，尚不构成泛化结论。
 
-- [设计与评价口径](DESIGN.md)
-- [寻路正式配置](configs/path_single_long.json)、[积木正式配置](configs/blocks1000_long.json)
-- [唯一状态页](../../docs/PROJECT_STATUS_AND_TODO.md)
-- [结果报告](results/readout_failure_analysis.md)：新成绩与归档小样本分开。
+## 阅读顺序
 
-## 模块职责
+1. [训练与评测设置](DESIGN.md)：数据范围和数量 → 动作覆盖与编号 → 初始／更新文本 → Top-10 监督 → 训练与评测。
+2. [结果报告](results/readout_failure_analysis.md)：先记录寻路 epoch 1，后续在同页补充。
+3. [项目状态与有序 TODO](../../docs/PROJECT_STATUS_AND_TODO.md)：唯一当前进度页。
 
-| 模块 | 职责 |
+正式合同为 [path_single_long.json](configs/path_single_long.json) 与 [blocks1000_long.json](configs/blocks1000_long.json)；[紧凑证据](results/long_trajectory_summary.json)保存实际数据统计、动作覆盖及结果分母，不另复制配置。
+
+## 分支、源码与运行对应
+
+| 对象 | 本轮对应关系 |
 |---|---|
-| `prepare_trajectories.py` | 长任务选择、物理任务划分、训练后缀排除、覆盖与贪心基线 |
-| `trajectory_protocol.py` | 数值回答、自洽重编号；固定实际动作路径 |
-| `trajectory_dataset.py` | 地图保存一次，固定编号版本的 token 缓存和重复读取 |
-| `train.py` | 共用 HF Trainer，完整轨迹普通 SFT、冻结基座、checkpoint 发布 |
-| `transcript.py` / `memory.py` / `fusion.py` | 全 token 的逐轮地图绑定与读取接口 |
-| `trajectory_eval.py` | 两任务共用自由生成会话；参考历史下全部轮次、实际闭环、无地图 |
-| `trajectory_metrics.py` | 数值、排序、动作、停止、真实历史总结评分 |
-| `trajectory_smoke.py` | 最长真实样本的一次前向／反向；不保留更新后的权重 |
-| `trajectory_queue.py` | 四卡资源分配、成功后推进、失败记录、checkpoint 评测和汇总 |
+| 实现分支 | `codex/long-trajectory-training` |
+| 训练协议提交 | `f73b700`；`087e2d3` 已将监督改为排序与 Top-10，`f73b700` 对应测试断言修正 |
+| 后续分支提交 | 至 `4ec7e78` 的追加改动是队列、队列测试与状态记录，未改变本轮训练数据／监督代码 |
+| 较早方案分支 | `codex/full-trajectory-protocol` 的 `1ae0e0e` 是运行前方案，仍含数值距离监督要求，不能作为当前实际设置 |
+| 远端运行根目录 | `/zhanghanyue/experiment/flamingo_map_reader/runs/long_f73b700_20261004` |
+| 原始训练源码 | `/zhanghanyue/experiment/flamingo_map_reader/code/long_f73b700`；后续队列可使用独立的新源码目录，运行名保持不变 |
 
-编号版本同步改变真实动作、后继向量、文字编号和标签，每个固定版本重复完整训练遍数。没有 Q-only swap，没有二选一预训练，也没有独立距离读出前置实验。历史入口保留复现，不从新队列调用。
+以源码提交、运行合同和数据清单识别实验，不以当前窗口检出的分支或临时进程号判断设置。旧 `long_9234c5c_20261003`、原四图、16／4 小样本及 swap 均不并入本轮成绩。
 
-## 运行
+运行根目录内，`path/` 与 `blocks/` 各自保存 `data/manifest.json`、`data/trajectories/*.pt`、`training/config.json`、`training/models/`。`evaluation/<task>/<checkpoint>/...` 保存评测分片的完整回答和摘要。清单给出划分与样本数，训练合同绑定地图、模型、配置和实际 batch；这些大型／运行产物不提交 Git。
 
-在仓库根目录，用可运行 torch / transformers 的 Python：
+## 代码职责
 
-```bash
-python -m experiments.flamingo_map_reader.src.trajectory_queue \
-  --run-root /absolute/new/run \
-  --model-path /absolute/Qwen2.5-1.5B-Instruct \
-  --graph-source /absolute/path256_five_graphs_4ac7239 \
-  --blocks-source-manifest /absolute/blocks_manifest.json \
-  --blocks-official /absolute/tiling_order_10x10_8obj.h5 \
-  --blocks-q /absolute/tree_1000_132f5a1/best.pt \
-  --blocks-q-data /absolute/tree_1000_132f5a1/data/data.npz \
-  --gpus 0 1 2 3
-```
+| 源码 | 职责 |
+|---|---|
+| [prepare_trajectories.py](src/prepare_trajectories.py) | 物理任务选择与划分、训练后缀排除、数据覆盖及地图贪心参照 |
+| [prompt.py](src/prompt.py)、[blocks_prompt.py](src/blocks_prompt.py)、[text.py](src/text.py) | 初始规则、环境更新、终止与历史总结文本 |
+| [sft.py](src/sft.py)、[blocks_sft.py](src/blocks_sft.py) | 地图贪心示范，排序式答案与 Top-10 选择 |
+| [trajectory_protocol.py](src/trajectory_protocol.py)、[trajectory_dataset.py](src/trajectory_dataset.py) | 自洽重编号、固定版本缓存；不改变真实轨迹 |
+| [transcript.py](src/transcript.py)、[memory.py](src/memory.py)、[fusion.py](src/fusion.py) | assistant-token 标签、逐轮地图绑定、K/V 分离与门控读取 |
+| [train.py](src/train.py) | 冻结基座，完整轨迹普通交叉熵训练及接口权重保存 |
+| [trajectory_eval.py](src/trajectory_eval.py)、[trajectory_metrics.py](src/trajectory_metrics.py)、[relations.py](src/relations.py) | reference／闭环自由生成、关系与控制评分 |
+| [trajectory_queue.py](src/trajectory_queue.py)、[trajectory_smoke.py](src/trajectory_smoke.py) | 已有训练／评测调度与长样本显存检查 |
 
-`run-root` 必须不存在。队列进度为 `queue_status.json`，日志在 `logs/`，每任务的数据和训练独立保存。准备失败、显存不足或训练失败均明确记为失败，不自动缩短任务、改变配置或覆盖运行。
-
-每个评测分片保存逐题完整回答及分母；最后跨分片合并编号与真实目标配对。阶段诊断不替代最终全量测试，终止样本单独计数。训练集选固定物理轨迹诊断，测试集在最终 checkpoint 才解封。
-
-针对性检查：
-
-```bash
-PYTHONPATH=.:experiments/flamingo_map_reader/tests python -m unittest \
-  test_trajectory_protocol test_timeline test_trainer test_hf_integration
-```
-
-旧实验及其数值见 [完整轨迹／小样本归档](results/archive/full_trajectory_history.md) 与 [swap 归档](results/archive/swap_training.md)。
+历史结果入口：[原完整轨迹与小样本](results/archive/full_trajectory_history.md)、[swap](results/archive/swap_training.md)。旧配置与诊断源码保留复现，不代表当前训练入口。

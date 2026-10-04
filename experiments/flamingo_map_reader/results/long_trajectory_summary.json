@@ -1,0 +1,328 @@
+{
+  "run_root": "/zhanghanyue/experiment/flamingo_map_reader/runs/long_f73b700_20261004",
+  "training_protocol_commit": "f73b700",
+  "training_branch": "codex/long-trajectory-training",
+  "data": {
+    "path": {
+      "source": "path/data/manifest.json",
+      "splits": {
+        "train": {
+          "physical_tasks": 4192,
+          "length_counts": {
+            "10": 205,
+            "9": 2514,
+            "11": 4,
+            "8": 1277,
+            "0": 192
+          },
+          "action_turns": 50315,
+          "numbered_trajectories": 24192,
+          "max_tokens": 11451,
+          "greedy_success": 4192,
+          "repeats_per_fixed_variant": 3,
+          "terminal_turns": 4192,
+          "groups": {
+            "train": 4000,
+            "initial_goal": 192
+          },
+          "distinct_state_goal_pairs": 18601,
+          "all_turn_candidate_slots": 113062,
+          "maximum_candidates": 3
+        },
+        "validation": {
+          "physical_tasks": 532,
+          "length_counts": {
+            "10": 26,
+            "9": 340,
+            "8": 134,
+            "0": 32
+          },
+          "action_turns": 6140,
+          "numbered_trajectories": 3032,
+          "max_tokens": 10723,
+          "greedy_success": 532,
+          "repeats_per_fixed_variant": null,
+          "terminal_turns": 532,
+          "groups": {
+            "same_map_new_goal": 500,
+            "initial_goal": 32
+          },
+          "distinct_state_goal_pairs": 2621,
+          "all_turn_candidate_slots": 13864,
+          "maximum_candidates": 3
+        },
+        "test": {
+          "physical_tasks": 1032,
+          "length_counts": {
+            "10": 28,
+            "9": 482,
+            "8": 490,
+            "0": 32
+          },
+          "action_turns": 12217,
+          "numbered_trajectories": 6032,
+          "max_tokens": 11186,
+          "greedy_success": 1032,
+          "repeats_per_fixed_variant": null,
+          "terminal_turns": 1032,
+          "groups": {
+            "same_map_new_goal": 1000,
+            "initial_goal": 32
+          },
+          "distinct_state_goal_pairs": 3629,
+          "all_turn_candidate_slots": 27518,
+          "maximum_candidates": 3
+        }
+      },
+      "rejected_training": {
+        "training_greedy_failed_or_over_limit": 39
+      },
+      "greedy_baseline": {
+        "validation": {
+          "attempts": 532,
+          "reached": 532,
+          "shortest": 147
+        },
+        "test": {
+          "attempts": 1032,
+          "reached": 1032,
+          "shortest": 232
+        }
+      },
+      "smoke": {
+        "trajectory_id": "graph_001229",
+        "tokens": 11451,
+        "loss": 0.19290553033351898,
+        "peak_gpu_gib": 51.85036516189575,
+        "finite_gradients": true,
+        "frozen_parameters_without_gradients": true
+      }
+    },
+    "blocks": {
+      "source": "blocks/data/manifest.json",
+      "splits": {
+        "train": {
+          "physical_tasks": 9000,
+          "length_counts": {
+            "8": 3004,
+            "7": 4784,
+            "6": 200,
+            "9": 12,
+            "0": 1000
+          },
+          "action_turns": 64155,
+          "numbered_trajectories": 49000,
+          "max_tokens": 8964,
+          "greedy_success": 9000,
+          "repeats_per_fixed_variant": 3,
+          "terminal_turns": 9000,
+          "groups": {
+            "train": 8000,
+            "initial_goal": 1000
+          },
+          "distinct_state_goal_pairs": 68469,
+          "all_turn_candidate_slots": 1741980,
+          "maximum_candidates": 102
+        },
+        "validation": {
+          "physical_tasks": 1100,
+          "length_counts": {
+            "8": 617,
+            "6": 20,
+            "7": 355,
+            "9": 8,
+            "0": 100
+          },
+          "action_turns": 8242,
+          "numbered_trajectories": 6100,
+          "max_tokens": 9138,
+          "greedy_success": 783,
+          "repeats_per_fixed_variant": null,
+          "terminal_turns": 783,
+          "groups": {
+            "same_initial_board_new_pair": 500,
+            "new_initial_board": 500,
+            "initial_goal": 100
+          },
+          "distinct_state_goal_pairs": 8842,
+          "all_turn_candidate_slots": 222598,
+          "maximum_candidates": 102
+        },
+        "test": {
+          "physical_tasks": 2200,
+          "length_counts": {
+            "8": 1173,
+            "7": 797,
+            "6": 12,
+            "9": 18,
+            "0": 200
+          },
+          "action_turns": 16435,
+          "numbered_trajectories": 12200,
+          "max_tokens": 8228,
+          "greedy_success": 1549,
+          "repeats_per_fixed_variant": null,
+          "terminal_turns": 1549,
+          "groups": {
+            "same_initial_board_new_pair": 1000,
+            "new_initial_board": 1000,
+            "initial_goal": 200
+          },
+          "distinct_state_goal_pairs": 17516,
+          "all_turn_candidate_slots": 442560,
+          "maximum_candidates": 102
+        }
+      },
+      "rejected_training": {
+        "map_greedy_failed": 3282
+      },
+      "greedy_baseline": {
+        "validation": {
+          "attempts": 1100,
+          "reached": 783,
+          "shortest": 411
+        },
+        "test": {
+          "attempts": 2200,
+          "reached": 1549,
+          "shortest": 839
+        }
+      },
+      "smoke": {
+        "trajectory_id": "blocks_002378",
+        "tokens": 8960,
+        "loss": 0.6715582013130188,
+        "peak_gpu_gib": 41.696091651916504,
+        "finite_gradients": true,
+        "frozen_parameters_without_gradients": true
+      }
+    }
+  },
+  "path_train_reference": {
+    "checkpoint-0": {
+      "physical_tasks": 2,
+      "numbering_variants_per_task": 1,
+      "counts": {
+        "turns": 12,
+        "terminal_turns": 2,
+        "valid_control": 8,
+        "premature_done": 0,
+        "failed_to_stop": 2,
+        "legal_action": 7,
+        "summary_correct": 0,
+        "valid_ranking": 6,
+        "exact_ranking": 0,
+        "closest_candidate_set_exact": 2,
+        "action_map_minimum": 4,
+        "action_follows_ranking": 5,
+        "pairwise_correct": 9,
+        "pairwise_total": 33,
+        "generated_tokens": 5097,
+        "current_relation_correct": 7,
+        "current_relation_total": 21,
+        "action_environment_shortest": 4,
+        "decision_turns": 10
+      },
+      "sources": [
+        "evaluation/path/checkpoint-0/train_reference_map/00000_00002/summary.json"
+      ]
+    },
+    "checkpoint-128": {
+      "physical_tasks": 256,
+      "numbering_variants_per_task": 1,
+      "counts": {
+        "turns": 3260,
+        "terminal_turns": 256,
+        "valid_control": 2682,
+        "premature_done": 0,
+        "failed_to_stop": 256,
+        "legal_action": 2554,
+        "summary_correct": 0,
+        "valid_ranking": 2411,
+        "exact_ranking": 674,
+        "closest_candidate_set_exact": 1188,
+        "action_map_minimum": 1287,
+        "action_follows_ranking": 1970,
+        "pairwise_correct": 3650,
+        "pairwise_total": 9724,
+        "generated_tokens": 446483,
+        "current_relation_correct": 2464,
+        "current_relation_total": 6242,
+        "action_environment_shortest": 1422,
+        "decision_turns": 3004
+      },
+      "sources": [
+        "evaluation/path/checkpoint-128/train_reference_map/00000_00064/summary.json",
+        "evaluation/path/checkpoint-128/train_reference_map/00064_00128/summary.json",
+        "evaluation/path/checkpoint-128/train_reference_map/00128_00192/summary.json",
+        "evaluation/path/checkpoint-128/train_reference_map/00192_00256/summary.json"
+      ]
+    },
+    "checkpoint-24192": {
+      "physical_tasks": 256,
+      "numbering_variants_per_task": 1,
+      "counts": {
+        "turns": 3260,
+        "terminal_turns": 256,
+        "valid_control": 3260,
+        "premature_done": 0,
+        "failed_to_stop": 0,
+        "legal_action": 3004,
+        "summary_correct": 254,
+        "valid_ranking": 3004,
+        "exact_ranking": 1446,
+        "closest_candidate_set_exact": 2080,
+        "action_map_minimum": 2080,
+        "action_follows_ranking": 3004,
+        "pairwise_correct": 6561,
+        "pairwise_total": 9724,
+        "generated_tokens": 193576,
+        "current_relation_correct": 4169,
+        "current_relation_total": 6242,
+        "action_environment_shortest": 2180,
+        "decision_turns": 3004
+      },
+      "sources": [
+        "evaluation/path/checkpoint-24192/train_reference_map/00000_00064/summary.json",
+        "evaluation/path/checkpoint-24192/train_reference_map/00064_00128/summary.json",
+        "evaluation/path/checkpoint-24192/train_reference_map/00128_00192/summary.json",
+        "evaluation/path/checkpoint-24192/train_reference_map/00192_00256/summary.json"
+      ]
+    }
+  },
+  "action_coverage": {
+    "source": "User-supplied full scan of this run's prepared physical trajectories, provided in this conversation on 2026-10-04. Counts copied from that scan; the full tensor cache was not rescanned for this documentation update.",
+    "candidate_scope": "All stored turns, including terminal turns; before numbering augmentation. Chosen counts are unique physical demonstration actions.",
+    "path": {
+      "universe": 768,
+      "train": {
+        "candidate": 768,
+        "chosen": 767
+      },
+      "validation": {
+        "candidate": 764,
+        "chosen": 680
+      },
+      "test": {
+        "candidate": 768,
+        "chosen": 718
+      }
+    },
+    "blocks": {
+      "universe": 664,
+      "train": {
+        "candidate": 664,
+        "chosen": 664
+      },
+      "validation": {
+        "candidate": 664,
+        "chosen": 654
+      },
+      "test": {
+        "candidate": 664,
+        "chosen": 662
+      }
+    }
+  },
+  "documentation_scope": "Settings and prepared-data evidence, with path train/reference results through epoch 1 only. Not a live training-status snapshot."
+}

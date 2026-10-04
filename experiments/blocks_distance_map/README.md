@@ -1,8 +1,8 @@
 # Blocks distance-supervised Q-map
 
-本目录供执行与复核实验的 agent 使用。面向人的说明见 [BLOCKS_QMAP_PLAN.md](../../docs/BLOCKS_QMAP_PLAN.md)。当前进度只维护在 [PROJECT_STATUS_AND_TODO.md](../../docs/PROJECT_STATUS_AND_TODO.md)；本文件定义执行协议，不创建另一份当前状态页。
+本目录供执行与复核实验的 agent 使用。面向人的说明见 [BLOCKS_QMAP_PLAN.md](../../docs/BLOCKS_QMAP_PLAN.md)。当前进度只维护在 [PROJECT_STATUS_AND_TODO.md](../../docs/PROJECT_STATUS_AND_TODO.md)；本文件定义执行协议，不创建另一份当前状态页。当前结果页见 [results/report.md](results/report.md)。
 
-> **来源与归属。** 本目录连同 `docs/BLOCKS_QMAP_PLAN.md` 一并移植自 `codex/blocks-multigoal`（末次提交 `3a4c572`，2026-09-28），以便当前分支自洽。当前主训练 `experiments/flamingo_map_reader` 冻结的棋盘编码器 checkpoint 为 `blocks_distance_map/tree_1000_132f5a1/best.pt`，源码 commit `132f5a1` 属于同一分支；接口只导入 `src/model.py`、`src/oracle.py`、`src/multiboard_data.py`，三者与 `3a4c572` 逐字节相同，本目录不重训 Q。另有一条并行的 Q-map 线 `codex/blocks-distance-map`（含已推送的 `codex/blocks-qmap-report`），与本目录同名 config 的内容不同，不作为当前主训练的地基。
+> **来源与归属。** 本目录连同 `docs/BLOCKS_QMAP_PLAN.md` 一并移植自 `codex/blocks-multigoal`（末次提交 `3a4c572`，2026-09-28），以便当前分支自洽。当前主训练 `experiments/flamingo_map_reader` 冻结的棋盘编码器 checkpoint 为 `blocks_distance_map/tree_1000_132f5a1/best.pt`，源码 commit `132f5a1` 属于同一分支；接口只导入 `src/model.py`、`src/oracle.py`、`src/multiboard_data.py`，三者与 `3a4c572` 逐字节相同，本目录不重训 Q。另有一条并行的 Q-map 线 `codex/blocks-distance-map`（含已推送的 `codex/blocks-qmap-report`），与本目录同名 config 的内容不同，不作为当前主训练的地基；但本目录当前结果页 [results/report.md](results/report.md) 与其 4 张 `tree_qmap_*` 图、`plot_tree_report.py`、`tree_qmap_figure_data.json` 取自该线的 `codex/blocks-qmap-report`，只作结果记录，不改变上面这条地基结论，此前的逐级推进过程见 [results/archive/qmap_progression.md](results/archive/qmap_progression.md)。
 
 ## 1000 棋盘共享 Q：多目标与跨棋盘检验
 

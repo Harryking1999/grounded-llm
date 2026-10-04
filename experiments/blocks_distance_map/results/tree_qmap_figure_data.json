@@ -1,0 +1,189 @@
+{
+  "checkpoint_source_commit": "986cb4d",
+  "evaluation_analysis_commit": "3a4c572",
+  "fresh_boards": 200,
+  "tasks": 1000,
+  "tree_outcomes": {
+    "all": {
+      "tasks": 1000,
+      "outcomes": {
+        "reached": 860,
+        "local_coverage_failure": 61,
+        "removed_goal_cell": 76,
+        "globally_unreachable": 3
+      },
+      "first_error_steps": {
+        "1": 82,
+        "4": 6,
+        "2": 39,
+        "3": 13
+      },
+      "failures_correctable_by_local_rule": 137,
+      "failed_choice_candidates_median": 46.0,
+      "failed_choice_reachable_median": 3.5,
+      "failed_choice_best_good_rank_median": 2.0
+    },
+    "isolated": {
+      "tasks": 400,
+      "outcomes": {
+        "reached": 326,
+        "local_coverage_failure": 27,
+        "removed_goal_cell": 46,
+        "globally_unreachable": 1
+      },
+      "first_error_steps": {
+        "1": 46,
+        "4": 4,
+        "2": 18,
+        "3": 6
+      },
+      "failures_correctable_by_local_rule": 73,
+      "failed_choice_candidates_median": 42.0,
+      "failed_choice_reachable_median": 4.0,
+      "failed_choice_best_good_rank_median": 2.0
+    },
+    "ordinary": {
+      "tasks": 600,
+      "outcomes": {
+        "reached": 534,
+        "removed_goal_cell": 30,
+        "local_coverage_failure": 34,
+        "globally_unreachable": 2
+      },
+      "first_error_steps": {
+        "1": 36,
+        "2": 21,
+        "4": 2,
+        "3": 7
+      },
+      "failures_correctable_by_local_rule": 64,
+      "failed_choice_candidates_median": 49.0,
+      "failed_choice_reachable_median": 3.0,
+      "failed_choice_best_good_rank_median": 2.0
+    }
+  },
+  "distance_relation": {
+    "split": "test_ood_board",
+    "pairs": 272160,
+    "groups": [
+      {
+        "true_distance": "1",
+        "count": 7028,
+        "mean": 3.6264448165893555,
+        "ci95_low": 3.5822699401856606,
+        "ci95_high": 3.670682063985175
+      },
+      {
+        "true_distance": "2",
+        "count": 6406,
+        "mean": 4.886968612670898,
+        "ci95_low": 4.822608731820715,
+        "ci95_high": 4.951711836298623
+      },
+      {
+        "true_distance": "3",
+        "count": 6050,
+        "mean": 5.692019462585449,
+        "ci95_low": 5.611689448083154,
+        "ci95_high": 5.767880457620516
+      },
+      {
+        "true_distance": "4",
+        "count": 5954,
+        "mean": 6.138661861419678,
+        "ci95_low": 6.05677857352873,
+        "ci95_high": 6.223332484253095
+      },
+      {
+        "true_distance": "5",
+        "count": 5939,
+        "mean": 6.394463539123535,
+        "ci95_low": 6.3019860242248065,
+        "ci95_high": 6.496204411571696
+      },
+      {
+        "true_distance": "6",
+        "count": 4969,
+        "mean": 6.698207855224609,
+        "ci95_low": 6.59578759263634,
+        "ci95_high": 6.8052987190501115
+      },
+      {
+        "true_distance": "7",
+        "count": 2302,
+        "mean": 7.172913551330566,
+        "ci95_low": 7.058110461874846,
+        "ci95_high": 7.282601900348028
+      },
+      {
+        "true_distance": "8+",
+        "count": 399,
+        "mean": 7.882838249206543,
+        "ci95_low": 7.733040155720531,
+        "ci95_high": 8.038861073273441
+      },
+      {
+        "true_distance": "不可达",
+        "count": 233113,
+        "mean": 17.90152359008789,
+        "ci95_low": 17.706071135008603,
+        "ci95_high": 18.11274591167211
+      }
+    ]
+  },
+  "figures": {
+    "complete_isolated_goal": {
+      "task_index": 311,
+      "states": 296,
+      "edges": 1010,
+      "reachable": 64,
+      "path_steps": 5,
+      "pca_variance": [
+        0.16383537650108337,
+        0.15345583856105804
+      ]
+    },
+    "same_start_two_goals": {
+      "task_indices": [
+        295,
+        298
+      ],
+      "states": 818,
+      "edges": 1647,
+      "reachable": [
+        58,
+        4
+      ],
+      "label_changes": 58,
+      "path_steps": [
+        5,
+        2
+      ],
+      "pca_variance": [
+        0.12251832336187363,
+        0.09934943914413452
+      ]
+    },
+    "same_goal_two_starts": {
+      "task_indices": [
+        922,
+        923
+      ],
+      "states": 896,
+      "edges": 1863,
+      "reachable": [
+        21,
+        21
+      ],
+      "label_changes": 0,
+      "path_steps": [
+        4,
+        2
+      ],
+      "pca_variance": [
+        0.17032873630523682,
+        0.12405796349048615
+      ]
+    }
+  }
+}

@@ -2,7 +2,7 @@
 
 本实验检验：冻结 LLM 与地图，只训练地图读取接口，能否从完整轨迹学会远近排序、行动、停止和总结。当前主实验为单图寻路与 1000 初始棋盘积木；旧小样本仅用于历史诊断。
 
-两任务均已完成 3 个 epoch。已核对结果包括寻路完整 validation 闭环（到达 423/532，到达且最短 70/532）、积木 epoch 1／2 reference 及首个 final 闭环分片。主结果采用 rollout 到达率／到达且最短路率，以及 reference 动作可达率／最短路动作率；排序与集合另列辅助诊断。积木 reference 以作答前可解的轮次为分母；完整结果、分母及待填位置见[结果报告](results/report.md)，不以部分分片推断整体成绩。
+寻路已完成 3 个 epoch；积木 3 个 epoch 已练完，2026-10-05 延长到 5 个 epoch 续训中，见[设计页](DESIGN.md)第 6 节。已核对结果包括寻路完整 validation 闭环（到达 423/532，到达且最短 70/532）、积木 epoch 1／2 reference，以及积木 3-epoch `final` 的完整 validation 闭环（`evaluation/blocks/final/validation_rollout_map` 18/18 分片，但该过渡 `final` 已归档，真 `final` 待续训结束）。主结果采用 rollout 到达率／到达且最短路率，以及 reference 动作可达率／最短路动作率；排序与集合另列辅助诊断。积木 reference 以作答前可解的轮次为分母；完整结果、分母及待填位置见[结果报告](results/report.md)，不以部分分片推断整体成绩。
 
 ## 阅读顺序
 

@@ -194,8 +194,12 @@ def main():
     parser.add_argument("--prepare-workers", type=int, default=1,
                         help="Forked processes each preparation task may use; the two tasks run at once")
     parser.add_argument("--delegate-prefix", action="append", default=[],
-                        help="Evaluation key prefix another machine owns, so this queue neither claims it "
-                             "nor aggregates its shards; the owner aggregates them itself")
+                        help="Key prefix another machine owns, so this queue neither claims it nor "
+                             "aggregates its shards; the owner aggregates them itself. A prefix may "
+                             "also name a task's trainer, e.g. blocks/train, which that machine runs "
+                             "instead: its checkpoints still land in the shared run root, so this "
+                             "queue keeps evaluating them without holding a card for a trainer it "
+                             "will never start")
     args = parser.parse_args()
     root = args.run_root.resolve()
     logs = root / "logs"
@@ -250,6 +254,14 @@ def main():
             launch(task + "/smoke", "trajectory_smoke", ["--manifest", str(manifest),
                 "--model-path", str(args.model_path), "--out", str(root / task / "smoke.json")], spec["gpu"])
             spec["phase"] = "smoke"
+            continue
+        if (task + "/train").startswith(tuple(args.delegate_prefix)):
+            # Another machine owns this task's trainer. Its checkpoints arrive in the
+            # shared run root, which the scan below already picks up, so this queue
+            # keeps reading them without holding a card for a trainer it will never
+            # start; "delegated" is outside available_gpus' reserve set for exactly
+            # that reason, while the manifest is loaded so evaluation still runs.
+            spec["phase"] = "delegated"
             continue
         if task + "/train" in watched:
             spec["phase"] = "train"

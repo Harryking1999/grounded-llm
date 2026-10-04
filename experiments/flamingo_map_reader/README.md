@@ -16,7 +16,7 @@
 |---|---|
 | 实现分支 | `codex/long-trajectory-training` |
 | 训练协议提交 | `f73b700`；`087e2d3` 已将监督改为排序与 Top-10，`f73b700` 对应测试断言修正 |
-| 后续分支提交 | 至 `4ec7e78` 的追加改动是队列、队列测试与状态记录，未改变本轮训练数据／监督代码 |
+| 后续分支提交 | 至 `f8161fb`，均为评测队列改动：`3992d6d`／`57d8ff1`／`d24e345`／`4ec7e78` 为重启、子进程认领与记录，`aec7166` 增加跨机器委派，`9f66c2b` 增加每 epoch 验证闭环电池，`f8161fb` 修正队列排序；均未改变本轮训练数据／监督代码 |
 | 较早方案分支 | `codex/full-trajectory-protocol` 的 `1ae0e0e` 是运行前方案，仍含数值距离监督要求，不能作为当前实际设置 |
 | 远端运行根目录 | `/zhanghanyue/experiment/flamingo_map_reader/runs/long_f73b700_20261004` |
 | 原始训练源码 | `/zhanghanyue/experiment/flamingo_map_reader/code/long_f73b700`；后续队列可使用独立的新源码目录，运行名保持不变 |

@@ -4,6 +4,7 @@ from argparse import ArgumentParser
 import json
 import os
 from pathlib import Path
+import shutil
 import subprocess
 import sys
 import time
@@ -60,6 +61,34 @@ def checkpoint_jobs(task, directory, manifest, root):
     return jobs
 
 
+def resume_point(models):
+    """Newest checkpoint Trainer finished writing, or None for a fresh run.
+
+    Trainer publishes evaluation_ready.json only after adapter, optimizer,
+    scheduler, RNG and state are all on disk, so its presence is what separates
+    a checkpoint worth continuing from one a crash left half-written.
+    """
+    published = [ready.parent for ready in models.glob("checkpoint-*/evaluation_ready.json")]
+    return max(published, key=lambda path: int(path.name.split("-")[-1])) if published else None
+
+
+def completed_shards(evaluation):
+    """Shard keys that already wrote their own summary.json.
+
+    trajectory_eval writes summary.json only after the last case of its shard,
+    so it marks a finished shard; a shard killed mid-run leaves a partial
+    cases.jsonl and no summary, and must be redone rather than trusted.
+    """
+    return {summary.parent.relative_to(evaluation).as_posix()
+            for summary in evaluation.glob("*/*/*/*/summary.json")}
+
+
+def clear_partial_shard(directory):
+    """Drop an interrupted shard's output; trajectory_eval refuses a directory that exists."""
+    if directory.exists() and not (directory / "summary.json").is_file():
+        shutil.rmtree(directory)
+
+
 def main():
     parser = ArgumentParser()
     for arg in ("run-root", "model-path", "graph-source", "blocks-source-manifest", "blocks-official", "blocks-q", "blocks-q-data"):
@@ -69,11 +98,8 @@ def main():
                         help="Forked processes each preparation task may use; the two tasks run at once")
     args = parser.parse_args()
     root = args.run_root.resolve()
-    if root.exists():
-        raise FileExistsError(root)
-    root.mkdir(parents=True)
     logs = root / "logs"
-    logs.mkdir()
+    logs.mkdir(parents=True, exist_ok=True)
     env = dict(os.environ, OMP_NUM_THREADS="1", MKL_NUM_THREADS="1", TOKENIZERS_PARALLELISM="false")
     tasks = {"path": dict(config=CONFIGS / "path_single_long.json", gpu=args.gpus[0],
                  prepare=["--source-root", str(args.graph_source)], train=["--source-root", str(args.graph_source)]),
@@ -92,10 +118,33 @@ def main():
         processes[key] = dict(process=process, gpu=gpu, command=command, log=str(log))
         print(json.dumps(dict(event="launched", key=key, pid=process.pid, gpu=gpu, log=str(log))), flush=True)
 
+    def launch_train(task, spec, resume=None):
+        arguments = ["--config", str(spec["config"]), "--manifest", str(root / task / "data/manifest.json"),
+                     "--model-path", str(args.model_path), "--batch-size", "1",
+                     "--out", str(root / task / "training"), *spec["train"]]
+        if resume is not None:
+            arguments += ["--resume", str(resume)]
+        launch(task + "/train", "train", arguments, spec["gpu"])
+
+    # A restarted queue adopts what the previous process left behind instead of
+    # redoing it: prepared data, a passing smoke test, and the newest published
+    # checkpoint, which train.py continues rather than restarting from scratch.
     for task, spec in tasks.items():
-        launch(task + "/prepare", "prepare_trajectories", ["--config", str(spec["config"]), "--model-path", str(args.model_path),
-               "--out", str(root / task / "data"), "--workers", str(args.prepare_workers), *spec["prepare"]])
-        spec["phase"] = "prepare"
+        manifest = root / task / "data/manifest.json"
+        if not manifest.is_file():
+            launch(task + "/prepare", "prepare_trajectories", ["--config", str(spec["config"]), "--model-path", str(args.model_path),
+                   "--out", str(root / task / "data"), "--workers", str(args.prepare_workers), *spec["prepare"]])
+            spec["phase"] = "prepare"
+            continue
+        spec["manifest"] = json.loads(manifest.read_text())
+        if not (root / task / "smoke.json").is_file():
+            launch(task + "/smoke", "trajectory_smoke", ["--manifest", str(manifest),
+                "--model-path", str(args.model_path), "--out", str(root / task / "smoke.json")], spec["gpu"])
+            spec["phase"] = "smoke"
+            continue
+        launch_train(task, spec, resume_point(root / task / "training/models"))
+        spec["phase"] = "train"
+    known |= completed_shards(root / "evaluation")
     while True:
         for key, running in list(processes.items()):
             code = running["process"].poll()
@@ -117,9 +166,7 @@ def main():
                     if code:
                         spec["phase"] = "failed"
                     else:
-                        launch(task + "/train", "train", ["--config", str(spec["config"]),
-                            "--manifest", str(root / task / "data/manifest.json"), "--model-path", str(args.model_path),
-                            "--batch-size", "1", "--out", str(root / task / "training"), *spec["train"]], spec["gpu"])
+                        launch_train(task, spec)
                         spec["phase"] = "train"
                 elif key == task + "/train":
                     spec["phase"] = "failed" if code else "trained"
@@ -139,6 +186,7 @@ def main():
         for gpu in available:
             if pending:
                 job = pending.pop(0)
+                clear_partial_shard(root / "evaluation" / job["key"])
                 launch(job["key"], "trajectory_eval", [*job["args"], "--model-path", str(args.model_path)], gpu)
         status = dict(pid=os.getpid(), tasks={k: dict(phase=v["phase"], gpu=v["gpu"]) for k, v in tasks.items()},
             running={k: dict(pid=v["process"].pid, gpu=v["gpu"], log=v["log"]) for k, v in processes.items()},

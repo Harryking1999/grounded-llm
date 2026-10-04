@@ -16,7 +16,8 @@ from experiments.flamingo_map_reader.src.sft import decision_text, greedy_demons
 from experiments.flamingo_map_reader.src.trajectory_protocol import numbering_plans, renumber_demonstration
 from experiments.flamingo_map_reader.src.trajectory_dataset import prepare_record, PreparedTrajectoryDataset, load_record
 from experiments.flamingo_map_reader.src.trajectory_metrics import score_turn, summarize_turns
-from experiments.flamingo_map_reader.src.trajectory_queue import checkpoint_jobs
+from experiments.flamingo_map_reader.src.trajectory_queue import (
+    checkpoint_jobs, clear_partial_shard, completed_shards, resume_point)
 from test_graph import line_graph
 from test_timeline import ByteChatTemplate
 
@@ -117,6 +118,39 @@ class TrajectoryProtocolTest(unittest.TestCase):
             prepare_trajectories.prepare_one = original
         self.assertEqual([p["index"] for p in payloads], list(range(12)))
         self.assertEqual([p["record"]["start"] for p in payloads], list(range(12)))
+
+    def test_restart_reuses_finished_work_instead_of_redoing_it(self):
+        """A restarted queue must not re-prepare, re-smoke or re-evaluate."""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            models = root / "path/training/models"
+            for step in (0, 128, 8064):
+                (models / f"checkpoint-{step}").mkdir(parents=True)
+                (models / f"checkpoint-{step}/evaluation_ready.json").write_text("{}")
+            # A crash between saves leaves a directory Trainer never published,
+            # and the closing "final" copy is published too but is not a step.
+            (models / "checkpoint-8192").mkdir()
+            (models / "final").mkdir()
+            (models / "final/evaluation_ready.json").write_text("{}")
+            self.assertEqual(resume_point(models).name, "checkpoint-8064")
+            self.assertIsNone(resume_point(root / "absent/models"))
+
+            evaluation = root / "evaluation"
+            shard = evaluation / "path/checkpoint-0/train_reference_map/00000_00002"
+            shard.mkdir(parents=True)
+            (shard / "summary.json").write_text("{}")
+            # The aggregate the queue writes sits one level up and is not a shard.
+            (evaluation / "path/checkpoint-0/train_reference_map/summary.json").write_text("{}")
+            self.assertEqual(completed_shards(evaluation),
+                             {"path/checkpoint-0/train_reference_map/00000_00002"})
+
+            partial = evaluation / "blocks/checkpoint-128/train_reference_map/00000_00064"
+            partial.mkdir(parents=True)
+            (partial / "cases.jsonl").write_text("{}\n")
+            clear_partial_shard(partial)
+            self.assertFalse(partial.exists())
+            clear_partial_shard(shard)
+            self.assertTrue(shard.exists())
 
     def test_final_queue_covers_all_test_tasks_and_no_map_controls(self):
         config = dict(self.config, evaluation=dict(train_diagnostic_tasks=256, numbering_variants=6, shard_tasks=64))

@@ -171,10 +171,10 @@ Summary: Reached the goal after {步数} executed {moves/removals}.
 
 1. **`action_map_minimum`、`exact_ranking`、`current_relation` 是诊断，不是主证据。**它们衡量的是"能否复现地图的距离序／是否落在 `np.isclose` 最小集里"。积木每轮要排 11 项，而**训练标签本身就是从地图最小集里随机抽的**（`blocks_sft.py` 用 `rng.choice(step.map_minimal_candidates)`）——数据管线自己就不认为最小那个是唯一的。用它们当主证据等于要求模型复现一个连示范生成器都不认的精确排序。
 2. **积木必须按 group 分开报。**训练棋盘新任务与新棋盘是两类题；混在一起会得出错误结论（也解释了"地图达 100%"和"留出只有约 68%"为什么能同时为真）。实测两组几乎无差，所以"没见过棋盘"不解释积木的弱。
-3. **主证据用"动作后目标仍可解"（`action_keeps_goal_reachable`），不是"走在最短短路上"。**移除后目标仍可达的动作就是好动作，因为一个图形由多块积木组成，拆任何原组成部件都同样好，并不存在唯一最短路。`action_environment_shortest` 比它窄，会把大量等价好动作判成错。实现在 `trajectory_eval.py`，严格宽于前者（前者接受的它都接受）；可达性用环境已有的判据：两个任务的 `remaining()` 对不可达状态都返回 -1，积木在评测时本来就加载了 `DistanceOracle`。
+3. **积木的第一优先级指标是"动作后目标仍可解"（`action_keeps_goal_reachable`）。**任务原文就是"先到达、再求短"（`Reaching the goal is the first priority; among valid solutions, prefer fewer moves.`），所以逐轮的"这一步之后目标还可达吗"对应第一优先级，`action_environment_shortest` 对应第二优先级。一个图形由多块积木组成，拆任何原组成部件都同样好，并不存在唯一最短路——但**"仍可解"是可行性判据，不是"这步最优"**，两者是不同的问题，不能说前者取代后者。实现在 `trajectory_eval.py`，严格宽于后者（后者接受的它都接受）；可达性用环境已有的判据：两个任务的 `remaining()` 对不可达状态都返回 -1，积木在评测时本来就加载了 `DistanceOracle`。
 
-   **这个指标必须同列机会下限**（`reachable_candidate_rate`＝全部合法候选里能保住可达性的比例）：均匀乱选正好得到那个数。积木 validation 实测下限 34.5%（训练棋盘新任务）到 52.5%（新棋盘），比"最短路"类指标的下限高得多，所以两者百分比不可直接对比。成本 10 ms／决策轮，一个 64 题分片约 5 秒，相对生成可忽略。
+   **这个指标必须同列机会下限**（`reachable_candidate_rate`＝全部合法候选里能保住可达性的比例）：均匀乱选正好得到那个数。积木 validation 实测下限 42.1%（两组分别 41.6%／42.7%），模型 epoch 2 是 66.5%——"高于随机"成立，但同一批轮次里 **33.5% 的动作直接把目标拆没了**（均匀乱选是 57.9%）。**寻路上它退化**：留出合法候选有 99.97% 都保住可达性，下限贴着上限、没有区分度，只在积木上有信息量。成本 10 ms／决策轮，一个 64 题分片约 5 秒，相对生成可忽略。
 
-   字段自 `1c516e4` 起写入新跑的电池；**已有分片没有这个字段**，要拿它必须重跑。
+   字段自 `1c516e4` 起写入新跑的分片；**更早的分片已离线回填**：`src/backfill_reachability.py` 重放每轮状态（reference 重放示范轨迹，rollout 重放自己的路径），逐步自校验后才写回 `summary.json` 与 `cases.jsonl`，97 个分片零分歧。
 
 最终评测还包括编号重排一致性、同起点不同真实目标的配对、关闭地图残差的同权重对照，以及地图贪心控制器。无地图是依赖性消融，不是另训的纯文字 baseline。成绩集中在[结果报告](results/readout_failure_analysis.md)，已录入两任务的 reference 逐 checkpoint 结果与寻路部分闭环；未跑出的电池在那里留空待补。

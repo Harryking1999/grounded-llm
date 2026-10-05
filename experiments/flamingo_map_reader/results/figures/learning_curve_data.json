@@ -1,0 +1,277 @@
+{
+  "reference": {
+    "path": [
+      {
+        "epoch": 1,
+        "denominator": 6140,
+        "reachable": 6139,
+        "shortest": 4404
+      },
+      {
+        "epoch": 2,
+        "denominator": 6140,
+        "reachable": 6140,
+        "shortest": 4535
+      },
+      {
+        "epoch": 3,
+        "denominator": 6140,
+        "reachable": 6140,
+        "shortest": 4567
+      }
+    ],
+    "blocks": [
+      {
+        "epoch": 1,
+        "denominator": 6409,
+        "reachable": 4456,
+        "shortest": 4034
+      },
+      {
+        "epoch": 2,
+        "denominator": 6409,
+        "reachable": 5480,
+        "shortest": 4982
+      },
+      {
+        "epoch": 3,
+        "denominator": 6409,
+        "reachable": 5439,
+        "shortest": 4947
+      },
+      {
+        "epoch": 4,
+        "denominator": 6409,
+        "reachable": 5515,
+        "shortest": 5054
+      },
+      {
+        "epoch": 5,
+        "denominator": 6409,
+        "reachable": 5607,
+        "shortest": 5151
+      }
+    ]
+  },
+  "rollout": {
+    "path": [
+      {
+        "epoch": 1,
+        "denominator": 532,
+        "reached": 321,
+        "shortest": 53
+      },
+      {
+        "epoch": 2,
+        "denominator": 532,
+        "reached": 409,
+        "shortest": 70
+      },
+      {
+        "epoch": 3,
+        "denominator": 532,
+        "reached": 423,
+        "shortest": 70
+      }
+    ],
+    "blocks": [
+      {
+        "epoch": 1,
+        "denominator": 1100,
+        "reached": 151,
+        "shortest": 106
+      },
+      {
+        "epoch": 2,
+        "denominator": 1100,
+        "reached": 177,
+        "shortest": 110
+      },
+      {
+        "epoch": 3,
+        "denominator": 1100,
+        "reached": 187,
+        "shortest": 110
+      },
+      {
+        "epoch": 4,
+        "denominator": 1100,
+        "reached": 194,
+        "shortest": 117
+      },
+      {
+        "epoch": 5,
+        "denominator": 1100,
+        "reached": 256,
+        "shortest": 143
+      }
+    ]
+  },
+  "map_agreement": {
+    "path": [
+      {
+        "epoch": 1,
+        "denominator": 6140,
+        "correct": 4119
+      },
+      {
+        "epoch": 2,
+        "denominator": 6140,
+        "correct": 4582
+      },
+      {
+        "epoch": 3,
+        "denominator": 6140,
+        "correct": 4718
+      }
+    ],
+    "blocks": [
+      {
+        "epoch": 1,
+        "denominator": 8242,
+        "correct": 2160
+      },
+      {
+        "epoch": 2,
+        "denominator": 8242,
+        "correct": 3254
+      },
+      {
+        "epoch": 3,
+        "denominator": 8242,
+        "correct": 3406
+      },
+      {
+        "epoch": 4,
+        "denominator": 8242,
+        "correct": 3574
+      },
+      {
+        "epoch": 5,
+        "denominator": 8242,
+        "correct": 3633
+      }
+    ]
+  },
+  "blocks_goals": {
+    "3": {
+      "empty": {
+        "denominator": 132,
+        "reached": 76,
+        "shortest": 6
+      },
+      "nonempty": {
+        "denominator": 868,
+        "reached": 11,
+        "shortest": 4
+      }
+    },
+    "4": {
+      "empty": {
+        "denominator": 132,
+        "reached": 69,
+        "shortest": 7
+      },
+      "nonempty": {
+        "denominator": 868,
+        "reached": 25,
+        "shortest": 10
+      }
+    },
+    "5": {
+      "empty": {
+        "denominator": 132,
+        "reached": 72,
+        "shortest": 7
+      },
+      "nonempty": {
+        "denominator": 868,
+        "reached": 84,
+        "shortest": 36
+      }
+    }
+  },
+  "baselines": {
+    "run": "long_f73b700_20261004",
+    "split": "validation",
+    "variant": 0,
+    "tasks": {
+      "path": {
+        "reference_decisions": 6140,
+        "reference": {
+          "chance_reachable": 1.0,
+          "chance_shortest": 0.5720684039087948,
+          "greedy_reachable": 1.0,
+          "greedy_shortest": 0.8247557003257329
+        },
+        "map_agreement": {
+          "decisions": 6140,
+          "chance": 0.4874049945711183,
+          "greedy": 1.0
+        },
+        "rollout": {
+          "all": {
+            "tasks": 532,
+            "reached": 532,
+            "shortest": 147
+          },
+          "path": {
+            "tasks": 532,
+            "reached": 532,
+            "shortest": 147
+          }
+        }
+      },
+      "blocks": {
+        "reference_decisions": 6409,
+        "reference": {
+          "chance_reachable": 0.5025520046679839,
+          "chance_shortest": 0.43797418780771913,
+          "greedy_reachable": 0.9505383055078795,
+          "greedy_shortest": 0.8740833203307848
+        },
+        "map_agreement": {
+          "decisions": 8242,
+          "chance": 0.1495840943896326,
+          "greedy": 1.0
+        },
+        "rollout": {
+          "all": {
+            "tasks": 1100,
+            "reached": 783,
+            "shortest": 411
+          },
+          "nonempty": {
+            "tasks": 868,
+            "reached": 620,
+            "shortest": 305
+          },
+          "empty": {
+            "tasks": 132,
+            "reached": 63,
+            "shortest": 6
+          },
+          "initial_goal": {
+            "tasks": 100,
+            "reached": 100,
+            "shortest": 100
+          }
+        }
+      }
+    },
+    "definitions": {
+      "reference": "Solvable nonterminal gold-history states; same states as final reference.",
+      "random": "Mean of per-state fractions, with uniform sampling among all legal candidates.",
+      "map_greedy": "Existing physical demonstration action on each reference state; retains its fixed tie choice.",
+      "map_agreement": "All nonterminal reference states, including already-dead states, matching the report.",
+      "rollout": "Saved complete map-greedy physical episodes; never a claimed planning upper bound.",
+      "random_rollout": "Not available; never extrapolate one-step chance into episode success."
+    }
+  },
+  "sources": [
+    "long_trajectory_summary.json",
+    "blocks_rollout_turn_analysis.json",
+    "blocks_target_analysis.json",
+    "learning_curve_baselines.json"
+  ]
+}

@@ -21,6 +21,7 @@
 | 自由生成与评分 | [trajectory_eval.py](src/trajectory_eval.py)、[trajectory_metrics.py](src/trajectory_metrics.py) |
 | 训练／评测调度 | [trajectory_queue.py](src/trajectory_queue.py) |
 | 结果汇总与旧字段回填 | [collect_evidence.py](src/collect_evidence.py)、[backfill_reachability.py](src/backfill_reachability.py) |
+| 主指标学习曲线与同状态参照 | [plot_learning_curves.py](src/plot_learning_curves.py)、[collect_plot_baselines.py](src/collect_plot_baselines.py)；[图表与复现说明](results/figures/README.md) |
 
 积木地图来自 `tree_1000_132f5a1/best.pt`，源码来源为 `132f5a1`，依赖 [blocks_distance_map](../blocks_distance_map/README.md) 的编码器、棋盘读取与裁判。寻路复用 [external_map_interface](../external_map_interface/README.md) 的图环境和 Q/V。
 

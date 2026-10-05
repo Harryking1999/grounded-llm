@@ -107,12 +107,14 @@ def main():
                                          completed=len(completed), running={}))
             time.sleep(15)
         print(json.dumps(dict(event='stage_complete', stage=index + 1)), flush=True)
+        if index == 0 and args.worker_index == 0:
+            from .diagnostic_eval import paired_summary
+            for task in ('path', 'blocks'):
+                group = args.out / task / 'q_reverse_reference'
+                atomic_json(group / 'summary.json', paired_summary(read_cases(group)))
     if args.worker_index == 0:
-        from .diagnostic_eval import paired_summary, assisted_summary
+        from .diagnostic_eval import assisted_summary
         atomic_json(contract, protocol)
-        for task in ('path', 'blocks'):
-            group = args.out / task / 'q_reverse_reference'
-            atomic_json(group / 'summary.json', paired_summary(read_cases(group)))
         manifest = json.loads((args.run_root / 'blocks/data/manifest.json').read_text())
         for helper in protocol['stages'][1]['helper_steps']:
             group = args.out / 'blocks' / f'safe_prefix_{helper}_rollout'

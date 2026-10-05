@@ -138,7 +138,10 @@ def paired_summary(cases):
 
 
 def assisted_summary(cases, manifest):
+    from .collect_evidence import complete_rollout_reachability
+    restored = complete_rollout_reachability(cases, manifest)
     summary = aggregate(cases, manifest)
+    summary['restored_reachability_turns'] = restored
     summary['rollout']['reached_shortest'] = sum(c['reached_goal'] and c['moves'] == c['shortest_moves'] for c in cases)
     summary['model_only_turns'] = summarize_turns([r for c in cases for r in c['turns'] if not r['assisted']])
     summary['goal_types'] = {}

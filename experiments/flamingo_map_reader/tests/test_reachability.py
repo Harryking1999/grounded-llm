@@ -84,8 +84,8 @@ class ReachabilityTest(unittest.TestCase):
         self.assertEqual(task.reachable_candidates(step, [1], 0), 0)
 
     @staticmethod
-    def row(keeps, reachable, slots, remaining):
-        return dict(done=False, action_keeps_goal_reachable=keeps, reachable_candidates=reachable,
+    def row(keeps, reachable, slots, remaining, done=False):
+        return dict(done=done, action_keeps_goal_reachable=keeps, reachable_candidates=reachable,
                     candidate_slots=slots, remaining_shortest=remaining)
 
     def test_the_floor_is_the_share_of_legal_candidates_that_survive(self):
@@ -102,6 +102,17 @@ class ReachabilityTest(unittest.TestCase):
         summary = summarize_turns([self.row(True, 1, 2, 3), self.row(False, 1, 2, -1),
                                    self.row(False, 1, 2, None)])
         self.assertEqual(summary["decision_turns"], 3)
+        self.assertEqual(summary["solvable_decisions"], 1)
+        self.assertEqual(summary["action_keeps_goal_reachable_rate"], 1.0)
+        self.assertEqual(summary["reachable_candidate_rate"], 0.5)
+
+    def test_the_stopping_turn_is_not_a_decision_however_the_field_is_carried(self):
+        # Reference shards attach the metric to the stopping turn as well, where
+        # remaining is 0 and it is always false. Counting that row as solvable
+        # would deflate the rate while its zero slots left the floor untouched,
+        # so the two halves of one table row would be read over different rows.
+        summary = summarize_turns([self.row(True, 1, 2, 3), self.row(False, 0, 0, 0, done=True)])
+        self.assertEqual(summary["decision_turns"], 1)
         self.assertEqual(summary["solvable_decisions"], 1)
         self.assertEqual(summary["action_keeps_goal_reachable_rate"], 1.0)
         self.assertEqual(summary["reachable_candidate_rate"], 0.5)

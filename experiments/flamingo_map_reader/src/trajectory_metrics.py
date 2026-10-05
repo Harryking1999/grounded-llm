@@ -44,13 +44,16 @@ def score_turn(step, answer, expected_terminal=None, reported=None):
 
 
 def still_solvable(row):
-    """Whether the goal was still reachable when the model answered this turn.
+    """Whether this turn was a live decision the model could still have got right.
 
     A turn played on an already-dead board cannot be broken by any action, so it
-    is not evidence about the model's choice; only rows that carry the metric can
-    be scored at all.
+    is not evidence about the model's choice. A terminal turn is not a choice at
+    all. Neither belongs in the rate or in the floor it is read against, and the
+    field's mere presence cannot be the filter: reference shards attach it to the
+    stopping turn too, where it is always false, which silently deflates the rate
+    against a floor that skips those rows.
     """
-    if "action_keeps_goal_reachable" not in row:
+    if row["done"] or "action_keeps_goal_reachable" not in row:
         return False
     remaining = row.get("remaining_shortest")
     return remaining is not None and remaining >= 0

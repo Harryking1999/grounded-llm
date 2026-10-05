@@ -11,8 +11,13 @@ two values the shard already holds: `remaining_shortest` and
 `action_environment_shortest`. One disagreement leaves that shard alone, which is
 also what makes the replay trustworthy rather than merely plausible.
 
+The same tool re-derives summaries when the *aggregation* changes rather than the
+metric, which needs no replay and is expected to disagree with the recorded
+numbers:
+
 Usage:
     python -m experiments.flamingo_map_reader.src.backfill_reachability --run <run root> [--apply]
+    python -m experiments.flamingo_map_reader.src.backfill_reachability --run <run root> --resummarize [--apply]
 """
 
 from argparse import ArgumentParser
@@ -110,32 +115,40 @@ def restratify(rows):
     return groups
 
 
-def rebuild(cases, summary):
-    """Re-derive the shard's aggregates, refusing to proceed unless the old ones come back."""
+def rebuild(cases, summary, verify=True):
+    """Re-derive the shard's aggregates, refusing to proceed unless the old ones come back.
+
+    `verify` compares every recorded field against the rebuilt one, which is what
+    makes the replay behind a backfill trustworthy. It has to be turned off for
+    --resummarize, where the recorded numbers are the *old* aggregation rule's and
+    are expected to differ: there the rows are taken as already correct and only
+    the summary is re-derived.
+    """
     rows = [dict(row, group=case["group"]) for case in cases for row in case["turns"]]
     overall = summarize_turns(rows)
-    for field, recorded in summary["overall"].items():
-        if not same(recorded, overall.get(field)):
-            raise ReplayError(f"rebuilt overall[{field}]={overall.get(field)!r} against recorded {recorded!r}")
     strata = restratify(rows)
-    for dimension, recorded in summary["strata"].items():
-        for key, value in recorded.items():
-            rebuilt = strata.get(dimension, {}).get(key)
-            if rebuilt is None:
-                raise ReplayError(f"stratum {dimension}={key} disappeared")
-            for field, count in value.items():
-                if not same(count, rebuilt.get(field)):
-                    raise ReplayError(f"rebuilt strata[{dimension}][{key}][{field}]="
-                                      f"{rebuilt.get(field)!r} against recorded {count!r}")
+    if verify:
+        for field, recorded in summary["overall"].items():
+            if not same(recorded, overall.get(field)):
+                raise ReplayError(f"rebuilt overall[{field}]={overall.get(field)!r} against recorded {recorded!r}")
+        for dimension, recorded in summary["strata"].items():
+            for key, value in recorded.items():
+                rebuilt = strata.get(dimension, {}).get(key)
+                if rebuilt is None:
+                    raise ReplayError(f"stratum {dimension}={key} disappeared")
+                for field, count in value.items():
+                    if not same(count, rebuilt.get(field)):
+                        raise ReplayError(f"rebuilt strata[{dimension}][{key}][{field}]="
+                                          f"{rebuilt.get(field)!r} against recorded {count!r}")
     summary["overall"], summary["strata"] = overall, strata
     summary["backfill"] = dict(metric="action_keeps_goal_reachable", commit="1c516e4", fields=list(TURN_FIELDS))
     return summary
 
 
-def write_shard(shard, cases, summary):
-    """Replace both of a shard's files, so the per-turn record and its summary agree."""
-    for name, text in (("cases.jsonl", "".join(json.dumps(case) + "\n" for case in cases)),
-                       ("summary.json", json.dumps(summary, indent=2) + "\n")):
+def write_shard(shard, cases, summary, rewrite_cases=True):
+    """Replace a shard's files, so the per-turn record and its summary agree."""
+    for name, text in (([("cases.jsonl", "".join(json.dumps(case) + "\n" for case in cases))] if rewrite_cases else [])
+                       + [("summary.json", json.dumps(summary, indent=2) + "\n")]):
         temporary = shard / (name + ".backfill")
         temporary.write_text(text)
         os.replace(temporary, shard / name)
@@ -151,10 +164,25 @@ def main():
     parser.add_argument("--run", required=True, type=Path, help="run root holding <task>/data and evaluation/")
     parser.add_argument("--apply", action="store_true", help="rewrite the shards; without it, only report")
     parser.add_argument("--shard", action="append", type=Path, help="limit to these shard directories")
+    parser.add_argument("--resummarize", action="store_true",
+                        help="re-derive each summary from the rows already on disk instead of replaying the "
+                             "episode, and skip the check against the recorded numbers; for when the "
+                             "aggregation rule changes rather than the metric it aggregates")
     args = parser.parse_args()
     shards = args.shard or sorted(path.parent for path in args.run.glob("evaluation/*/*/*/*/summary.json"))
     context, totals = {}, dict(checked=0, skipped=0, turns=0)
     for shard in sorted(shards):
+        if args.resummarize:
+            summary = json.loads((shard / "summary.json").read_text())
+            rebuild(shard_cases(shard), summary, verify=False)
+            if args.apply:
+                write_shard(shard, None, summary, rewrite_cases=False)
+            totals["checked"] += 1
+            overall = summary["overall"]
+            print(f"{'wrote' if args.apply else 'ok  '} {shard} solvable={overall['solvable_decisions']} "
+                  f"reachable={overall['action_keeps_goal_reachable_rate']} "
+                  f"floor={overall['reachable_candidate_rate']}", flush=True)
+            continue
         task = shard.relative_to(args.run / "evaluation").parts[0]
         if task not in context:
             manifest = json.loads((args.run / task / "data" / "manifest.json").read_text())

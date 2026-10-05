@@ -1,61 +1,56 @@
 # 项目状态与有序 TODO
 
-更新时间：2026-10-05；结果核对截止 03:00（北京时间）。本页是唯一当前进度页。研究定义见[研究简述](RESEARCH_BRIEF.md)，实际设置见[实验设计](../experiments/flamingo_map_reader/DESIGN.md)。
+更新：2026-10-05。结果快照为北京时间 18:18；两节点队列交接后已检查。本页维护当前进度，设置见 [DESIGN](../experiments/flamingo_map_reader/DESIGN.md)，完整成绩见 [report](../experiments/flamingo_map_reader/results/report.md)。
 
 ## 当前主线
 
-主实验为单图寻路与 1000 初始棋盘积木的完整长轨迹 SFT。寻路已完成 3 个 epoch。积木 3 个 epoch 也已练完（`checkpoint-147000`，过渡 `final` 与它同权重，已归档），2026-10-05 把预算延长到 5 个 epoch 并在 42406 的第 4 张卡上续训，预计约 11 小时。队列相应改为：对每个新出现的整数 epoch 评 validation 的 rollout 与 reference，积木 test 暂停排期——test 只从 `final` 分支生成，过渡 `final` 归档后自然不再产生，真 `final` 落地时会自动恢复。训练卡已移交 42406，本机队列不再拉起积木训练（`--delegate-prefix blocks/train`），四张卡全部用于评测。监测由负责运行的 agent 继续处理。
+通过门控 cross-attention，让冻结 LLM 读取冻结地图并逐步行动。地址 K 与状态 V 分离；完整轨迹同时监督排序、动作、停止和总结。寻路只用一张图，积木用 1000 张训练初始棋盘；积木仅输出最近 Top-10 加 current，输入仍给全部合法候选。
 
-| 设置 | 当前采用的范围 |
+两任务训练候选均覆盖全部具体动作；这不表示覆盖全部状态与目标组合。研究主张和边界见[研究简述](RESEARCH_BRIEF.md)。
+
+## 已完成的结果
+
+| validation | reference 动作可达率 | reference 最短路动作率 | rollout 到达率 | rollout 到达且最短 |
+|---|---:|---:|---:|---:|
+| 寻路 epoch 3（final） | 100.0% | 74.4% | 423/532（79.5%） | 70/532（13.2%） |
+| 积木 epoch 3 | 84.9% | 77.2% | 187/1,100（17.0%） | 110/1,100（10.0%） |
+| 积木 epoch 4 | 86.1% | 78.9% | 194/1,100（17.6%） | 117/1,100（10.6%） |
+
+reference 两率只计作答前可解的决策轮；积木 epoch 4 为 6,409 轮。rollout 含初始即目标：非零步到达率，寻路为 78.2%，积木 epoch 4 为 9.4%。逐轮随机合法动作的可达基线分别为 100.0% 和 50.3%。
+
+已有证据支持“动作选择学到了一部分，寻路同图新目标表现改善”。积木 reference 与闭环仍有明显差距；map／no_map 等匹配对照未齐，尚不能把收益归因于地图通路，也不能由少数 epoch 判断饱和。
+
+## 训练与评测队列
+
+- 寻路 3 个 epoch 已完成；积木按已确定的 5-epoch 预算续训，交接时约 96%，训练进程正常。
+- 寻路 epoch 1–3、积木 epoch 1–4 的 validation reference／rollout 已收齐。
+- 评测主节点：4 张卡运行寻路 final test reference，之后继续其余已排定测试与 no_map。
+- 训练节点：1 张卡续训积木，另外 3 张卡运行寻路 final test rollout；积木真正的 final 发布后，由该节点的评测 worker 接续其 validation、test 与 no_map。
+- 已修正委派队列只等 `checkpoint-245000`、接不到 `final` 的衔接问题。两队列使用互斥前缀和独立状态文件，原有在跑分片未中断；交接检查未见失败。
+
+主队列状态为 `queue_status.json`，worker 为 `delegate_status.json`；日志在运行目录的 `logs/`。旧 `completion.json` 不是重启后整轮已完成的证明。积木 step-128 训练内诊断沿用此前停排决定，不补跑；epoch 对比使用完整整数 epoch 结果。
+
+## 运行与源码定位
+
+| 对象 | 标识 |
 |---|---|
-| 数据 | 寻路 4,192 个训练物理任务；积木 9,000 个，来自 1000 张初始棋盘 |
-| 动作覆盖 | 训练候选覆盖寻路 768/768、积木 664/664；示范执行分别 767/768、664/664；不等于全部状态与目标组合已覆盖 |
-| 训练 | 冻结 Qwen2.5-1.5B-Instruct 与地图，分别从头训练读取接口；固定编号语料 3 遍，实际 batch=1 |
-| 监督 | 每轮排序与动作，到达后停止并总结；不输出数值距离；积木答案仅列最近 Top-10 加 current，输入保留全部合法候选 |
+| 当前运行 | `long_f73b700_20261004`，两节点共享存储 |
+| 完整轨迹训练协议 | `f73b700`；积木预算延长与恢复兼容修订为 `d3d9cbc`、`d9ed3c2` |
+| 接管后的队列源码 | `8e62133`；不改模型、数据或训练预算 |
+| 冻结积木编码器 | `tree_1000_132f5a1/best.pt`，来源说明见[积木地图](BLOCKS_QMAP_PLAN.md) |
+| 证据与分母 | [long_trajectory_summary.json](../experiments/flamingo_map_reader/results/long_trajectory_summary.json) |
 
-## 已核对结果及边界
-
-| 证据 | 当前结果 | 能支持的判断 |
-|---|---|---|
-| 寻路 final reference | validation 6,140 个可解决策轮：动作可达率 100.0%，最短路动作率 74.4% | 同图未训练目标上的一步动作质量；随机合法动作可达率也为 100%，须结合最短路与闭环 |
-| 寻路 final validation 闭环 | 全部 532 题：到达 423（79.5%），到达且最短 70（13.2%） | 已有完整长程证据；含 32 个初始即目标任务，非零步组另报 |
-| 积木 epoch 2 reference | validation 6,409 个可解决策轮：动作可达率 85.5%，最短路动作率 77.7% | 随机动作可达基线为 50.3%；一步表现不能推算完整任务成功率 |
-| 积木 final 闭环 | 首个 64 题分片：到达 3/64（4.7%），到达且最短 0/64 | 部分负结果保留；全部 1,100 题成绩留空 |
-
-主结果只列 rollout 到达率／到达且最短路率，以及 reference 动作可达率／最短路动作率。任意同样最优的动作或路径都计对；reference 两率统一以作答前可解的决策轮为分母。排序、集合、停止和总结放入辅助表，动作与地图的一致性及消融另列地图使用证据。完整分母、结果和待填表统一见[结果报告](../experiments/flamingo_map_reader/results/report.md)。
-
-## 文件、分支与运行定位
-
-- 本轮训练协议为 `f73b700`，运行目录为 `/zhanghanyue/experiment/flamingo_map_reader/runs/long_f73b700_20261004`；合同、清单、源码职责见[实验 README](../experiments/flamingo_map_reader/README.md#分支源码与运行对应)。
-- 训练主线合并前保存在 `codex/long-trajectory-training`（该分支仍在一个独立 worktree 中检出）。再往前的 `codex/full-trajectory-protocol` 已并入当前实现，其内容用提交 `1ae0e0e` 标识——识别启动前的旧方案请用提交号，不要用分支名。
-- 冻结的棋盘编码器与 `official_boards`／`DistanceOracle` 来自 `codex/blocks-multigoal`（末次 `3a4c572`；checkpoint `tree_1000_132f5a1` 的源码 commit 为 `132f5a1`）。该实验的计划、configs、结果与源码已移植进本分支，见[积木 Q-map 计划](BLOCKS_QMAP_PLAN.md)与[实验目录](../experiments/blocks_distance_map/README.md)。
-- 本次从 35016 读取已有产物，确认寻路 final 为 72,576 步、积木 final 为 147,000 步；重启后的 40072 也已核对，同名已完成分片去重收录。
-- 可达性字段在 `1c516e4` 引入，`07d21f9` 提供旧分片回填；正在运行的旧版评测仍可能产生缺字段分片。此次只读取记录与更新文档，没有执行回填。
+连接信息、实际运行路径和接管命令保存在本地忽略文件 `runs/map_reader_handoff.json`，远端启动记录为运行目录内的 `handoff_owner.json`／`handoff_worker.json`。不把端口和进程号当作实验身份。目录与汇总命令见[实验 README](../experiments/flamingo_map_reader/README.md)。
 
 ## 有序 TODO
 
-1. 由现有运行 agent 完成其评测队列；后续跨机器结果继续按分片键去重收录。
-2. 先填积木 final reference 与完整 validation 闭环，再补两任务 epoch 1／2 闭环；积木分别报告训练棋盘新任务、新棋盘和初始即目标。
-3. 收齐 final test、同编号 no_map 对照、重编号一致性与真实目标配对；合并案例后计算跨分片配对，不平均分片百分比。
-4. 发布可达性成绩前核对字段覆盖，并同时报告全部决策轮、作答前可解子集与匹配随机基线。后续字段补齐由运行负责人处理。
-5. 利用积木地图失败状态分析可行动作的地图排序，区分地图几何、并列选择与模型读取问题；该分析仍待进行，不在本次启动。
-6. 据完整结果判断拟合、泛化和地图作用；本轮同时变动多个设置，不单独归因于数据量，也不由少量 checkpoint 判断是否饱和。
+1. 完成既有积木第 5 个 epoch 及其 validation；保留 epoch 3／4 比较，不将旧 epoch 3 的过渡 final 当作当前最终权重。
+2. 收齐两任务 final test 与同权重 no_map。按同题同编号配对，以逐例计数汇总，不平均分片百分比。
+3. 补全重编号一致性、真实目标配对；报告旧可达性字段的覆盖率，缺失不补零。两类积木留出组及零步组分开报告。
+4. 利用已有轨迹定位积木首次走入死局或非法动作的位置，区分地图排序、接口选择和自身历史影响，再决定是否调整训练。暂不启动新实验条件。
 
 ## 历史证据入口
 
-历史结果保留在各自实验报告中；下表仅作索引，不重复维护数值。
-
-| 历史研究 | 证据与用途 |
-|---|---|
-| 并行积木 Q-map 线 | 分支 `codex/blocks-distance-map`（`fd7f9fb` 起 18 提交）、`codex/blocks-qmap-report`（46 提交，已推 origin）：与本目录同名 config 内容不同，不作为当前主训练的来源 |
-| 地图读取旧四图与 16／4 小样本 | [完整轨迹历史](../experiments/flamingo_map_reader/results/archive/full_trajectory_history.md)：局部拟合与早期失败诊断 |
-| swap 及衍生分析 | [归档](../experiments/flamingo_map_reader/results/archive/swap_training.md)：不进入当前主证据链 |
-| 图／积木连续 state token 对齐 | [图验收](../experiments/cml_map_scaling/results/step2_acceptance.md)、[积木读出](../experiments/state_interface_pilot/results/readout.md)：previous approach |
-| 旧连续 state token 路线的文档 | [详版讨论](archive/EXPERIMENT_TODO.md)、[简版](archive/experiment_todo_simple.md)、[路线备忘](archive/PROJECT_ROADMAP.md)、[2026-09-07 汇报](archive/early_experiment_summary.md)：均为 previous approach，只存档不维护进度 |
-| 图 Q/V 转移与几何 | [Step 1 报告](../experiments/cml_map_scaling/results/report.md) |
-| 旧单棋盘积木 Q/V | [试验结果](../experiments/external_map_interface/results/blocks_q_pilot.md)：转移拟合与目标距离分离 |
-| 显式地图距离接口 | [五图报告](../experiments/external_map_interface/results/path256_five_graphs.md)、[早期单图](../experiments/external_map_interface/results/path256_distance.md)、[独立图复测](../experiments/external_map_interface/results/path256_diverse.md) |
-| Qwen 4B／8B／32B 基线 | [验收报告](../experiments/qwen_path_blocks/results/report.md) |
-| Sol、Luna、Flash 基线 | [Sol](../experiments/sol_dag_blocks/results/report.md)、[Luna](../experiments/gcml_counterexamples/results/summary.json)、[Flash](../experiments/gcml_counterexamples/results/deepseek_flash.json) |
-
-[Related Work](../RELATED_WORK.md)维护相关文献，任务来源见 [GCML_TASKS.md](GCML_TASKS.md)。原工作区的自然目标 Q-only 草案未纳入本轮。
+- 地图读取：[旧完整轨迹与小样本](../experiments/flamingo_map_reader/results/archive/full_trajectory_history.md)、[swap](../experiments/flamingo_map_reader/results/archive/swap_training.md)、[失败变体](../experiments/flamingo_map_reader/results/archive/abandoned_readout_variants.md)。
+- 地图与基线：[实验目录](../experiments/README.md)、[积木地图来源](BLOCKS_QMAP_PLAN.md)。
+- 旧连续 token 路线：[历史计划](archive/EXPERIMENT_TODO.md)、[路线备忘](archive/PROJECT_ROADMAP.md)。归档只作历史参考，不维护当前进度。

@@ -234,25 +234,21 @@
   },
   "documentation_scope": "Completed-shard snapshots from the two containers sharing this run root (172.16.78.10:41467 and :35016), deduplicated by shard path. Not a live monitor. Missing or incomplete results are not zero.",
   "snapshot": {
-    "snapshot_utc": "2026-10-05T07:40:37.700367+00:00",
+    "snapshot_utc": "2026-10-05T10:18:20.875738+00:00",
     "run_root": "/zhanghanyue/experiment/flamingo_map_reader/runs/long_f73b700_20261004",
-    "hosts": [
-      "172.16.78.10:41467",
-      "172.16.78.10:35016"
-    ],
     "checkpoint_epochs": {
       "path": {
         "checkpoint-0": {
           "step": 0,
-          "epoch": 0.0
+          "epoch": 0
         },
         "checkpoint-128": {
           "step": 128,
-          "epoch": 0.005
+          "epoch": 0.005291005291005291
         },
         "checkpoint-16128": {
           "step": 16128,
-          "epoch": 0.667
+          "epoch": 0.6666666666666666
         },
         "checkpoint-24192": {
           "step": 24192,
@@ -260,11 +256,11 @@
         },
         "checkpoint-32256": {
           "step": 32256,
-          "epoch": 1.333
+          "epoch": 1.3333333333333333
         },
         "checkpoint-40320": {
           "step": 40320,
-          "epoch": 1.667
+          "epoch": 1.6666666666666665
         },
         "checkpoint-48384": {
           "step": 48384,
@@ -272,11 +268,11 @@
         },
         "checkpoint-56448": {
           "step": 56448,
-          "epoch": 2.333
+          "epoch": 2.3333333333333335
         },
         "checkpoint-64512": {
           "step": 64512,
-          "epoch": 2.667
+          "epoch": 2.6666666666666665
         },
         "checkpoint-72576": {
           "step": 72576,
@@ -284,7 +280,7 @@
         },
         "checkpoint-8064": {
           "step": 8064,
-          "epoch": 0.333
+          "epoch": 0.3333333333333333
         },
         "final": {
           "step": 72576,
@@ -294,19 +290,19 @@
       "blocks": {
         "checkpoint-0": {
           "step": 0,
-          "epoch": 0.0
+          "epoch": 0
         },
         "checkpoint-114334": {
           "step": 114334,
-          "epoch": 2.333
+          "epoch": 2.3333469387755104
         },
         "checkpoint-128": {
           "step": 128,
-          "epoch": 0.003
+          "epoch": 0.0026122448979591837
         },
         "checkpoint-130667": {
           "step": 130667,
-          "epoch": 2.667
+          "epoch": 2.666673469387755
         },
         "checkpoint-147000": {
           "step": 147000,
@@ -314,23 +310,31 @@
         },
         "checkpoint-163334": {
           "step": 163334,
-          "epoch": 3.333
+          "epoch": 3.3333469387755104
         },
         "checkpoint-16334": {
           "step": 16334,
-          "epoch": 0.333
+          "epoch": 0.3333469387755102
         },
         "checkpoint-179667": {
           "step": 179667,
-          "epoch": 3.667
+          "epoch": 3.666673469387755
         },
         "checkpoint-196000": {
           "step": 196000,
           "epoch": 4.0
         },
+        "checkpoint-212334": {
+          "step": 212334,
+          "epoch": 4.33334693877551
+        },
+        "checkpoint-228667": {
+          "step": 228667,
+          "epoch": 4.666673469387755
+        },
         "checkpoint-32667": {
           "step": 32667,
-          "epoch": 0.667
+          "epoch": 0.6666734693877551
         },
         "checkpoint-49000": {
           "step": 49000,
@@ -338,11 +342,11 @@
         },
         "checkpoint-65334": {
           "step": 65334,
-          "epoch": 1.333
+          "epoch": 1.3333469387755101
         },
         "checkpoint-81667": {
           "step": 81667,
-          "epoch": 1.667
+          "epoch": 1.6666734693877552
         },
         "checkpoint-98000": {
           "step": 98000,
@@ -350,7 +354,7 @@
         }
       }
     },
-    "deduplication": "Both hosts share one run root; each completed shard path counted once."
+    "deduplication": "Each completed shard path in the shared run root counted once."
   },
   "metric_notes": {
     "denominators": "Stored raw summaries use: control / all turns; actions and ranking / all decision turns; stop and summary / terminal turns; pairwise and current / recorded pair counts; rollout / case variants. Reachability is the exception: the summary also computes action_keeps_goal_reachable_rate and reachable_candidate_rate over the current-reachable subset and records its size as solvable_decisions, so the two need no separate audit. Primary reference tables use that same subset, as defined in primary_reporting.",
@@ -359,7 +363,7 @@
     "current_reachable": "remaining_shortest >= 1 on nonterminal turns. Already unreachable reference states score false independently of the model choice. Report this subset separately when judging whether the chosen action destroys reachability.",
     "missing_reachability": "Use reachability_audit.reachability_scored_turns to check field coverage; aggregate counts can contain implicit zeros for absent fields. Do not publish a full-battery rate when coverage is incomplete.",
     "action_macro": "Emitted by trajectory_eval.aggregate as a per-unit mean with a bootstrap interval; its unit and turn set are its own, so it is not the number in the report tables, whose denominators are in primary_reporting.",
-  "rounding": "Displayed percentages use one decimal; 100.0% may be rounded. Integer counts are authoritative.",
+    "rounding": "Displayed percentages use one decimal; 100.0% may be rounded. Integer counts are authoritative.",
     "primary_reporting": {
       "rollout_arrival": "reached / attempts",
       "rollout_shortest": "reached_shortest / attempts; reached_goal and moves == shortest_moves, irrespective of stop output. Read from the same saved cases as the snapshot; shortest_success retains its original, stricter correct-stop meaning.",
@@ -4922,15 +4926,15 @@
       "completion": "complete"
     },
     "blocks/checkpoint-196000/validation_reference_map": {
-      "physical_tasks": 576,
-      "case_variants": 576,
+      "physical_tasks": 1100,
+      "case_variants": 1100,
       "action_macro": {
         "unit": "initial_board",
-        "units": 513,
-        "mean": 0.4386755609562627,
+        "units": 600,
+        "mean": 0.43680781625781623,
         "bootstrap_95": [
-          0.4229842261377349,
-          0.4537924848597363
+          0.4251505765993266,
+          0.4495700402837903
         ]
       },
       "renumbering": {
@@ -4951,44 +4955,44 @@
         "successful_shortest_moves": 0
       },
       "counts": {
-        "turns": 5051,
-        "terminal_turns": 389,
-        "valid_control": 5051,
-        "premature_done": 14,
-        "failed_to_stop": 0,
-        "legal_action": 4648,
-        "summary_correct": 389,
-        "valid_ranking": 1566,
-        "exact_ranking": 441,
-        "closest_candidate_set_exact": 1102,
-        "action_map_minimum": 2041,
-        "action_follows_ranking": 1565,
-        "pairwise_correct": 29240,
-        "pairwise_total": 203240,
-        "generated_tokens": 396749,
-        "seconds": 15062.518454119563,
-        "current_relation_correct": 7280,
-        "current_relation_total": 39007,
-        "action_environment_shortest": 2871,
-        "action_keeps_goal_reachable": 3100,
-        "reachable_candidates": 50236,
-        "candidate_slots": 121193,
-        "solvable_decisions": 3592,
-        "decision_turns": 4662,
-        "exact_ranking_rate": 0.0945945945945946,
-        "closest_candidate_set_exact_rate": 0.23637923637923638,
-        "action_map_minimum_rate": 0.4377949377949378,
-        "legal_action_rate": 0.996996996996997,
-        "premature_done_rate": 0.003003003003003003,
-        "failed_to_stop_rate": 0.0,
-        "summary_correct_rate": 1.0,
-        "action_keeps_goal_reachable_rate": 0.8630289532293987,
-        "reachable_candidate_rate": 0.48229646697388634
+        "turns": 9025,
+        "terminal_turns": 783,
+        "valid_control": 9014,
+        "premature_done": 33,
+        "failed_to_stop": 7,
+        "legal_action": 8205,
+        "summary_correct": 773,
+        "valid_ranking": 2764,
+        "exact_ranking": 791,
+        "closest_candidate_set_exact": 1951,
+        "action_map_minimum": 3574,
+        "action_follows_ranking": 2763,
+        "pairwise_correct": 51910,
+        "pairwise_total": 359244,
+        "generated_tokens": 727700,
+        "seconds": 27677.98953191191,
+        "current_relation_correct": 12892,
+        "current_relation_total": 68952,
+        "action_environment_shortest": 5054,
+        "action_keeps_goal_reachable": 5515,
+        "reachable_candidates": 91001,
+        "candidate_slots": 216023,
+        "solvable_decisions": 6409,
+        "decision_turns": 8242,
+        "exact_ranking_rate": 0.09597185149235622,
+        "closest_candidate_set_exact_rate": 0.23671438971123512,
+        "action_map_minimum_rate": 0.433632613443339,
+        "legal_action_rate": 0.9955107983499151,
+        "premature_done_rate": 0.004003882552778452,
+        "failed_to_stop_rate": 0.008939974457215836,
+        "summary_correct_rate": 0.9872286079182631,
+        "action_keeps_goal_reachable_rate": 0.8605086596973007,
+        "reachable_candidate_rate": 0.488092811705517
       },
       "groups": {
         "initial_goal": {
-          "physical_tasks": 12,
-          "case_variants": 12,
+          "physical_tasks": 100,
+          "case_variants": 100,
           "action_macro": {
             "unit": "initial_board",
             "units": 0,
@@ -5013,13 +5017,13 @@
             "successful_shortest_moves": 0
           },
           "counts": {
-            "turns": 12,
-            "terminal_turns": 12,
-            "valid_control": 12,
+            "turns": 100,
+            "terminal_turns": 100,
+            "valid_control": 93,
             "premature_done": 0,
-            "failed_to_stop": 0,
+            "failed_to_stop": 7,
             "legal_action": 0,
-            "summary_correct": 12,
+            "summary_correct": 91,
             "valid_ranking": 0,
             "exact_ranking": 0,
             "closest_candidate_set_exact": 0,
@@ -5027,8 +5031,8 @@
             "action_follows_ranking": 0,
             "pairwise_correct": 0,
             "pairwise_total": 0,
-            "generated_tokens": 348,
-            "seconds": 13.048388609662652,
+            "generated_tokens": 17033,
+            "seconds": 645.031003584154,
             "current_relation_correct": 0,
             "current_relation_total": 0,
             "action_environment_shortest": 0,
@@ -5042,8 +5046,8 @@
             "action_map_minimum_rate": null,
             "legal_action_rate": null,
             "premature_done_rate": null,
-            "failed_to_stop_rate": 0.0,
-            "summary_correct_rate": 1.0,
+            "failed_to_stop_rate": 0.07,
+            "summary_correct_rate": 0.91,
             "action_keeps_goal_reachable_rate": null,
             "reachable_candidate_rate": null
           },
@@ -5056,15 +5060,15 @@
           }
         },
         "new_initial_board": {
-          "physical_tasks": 64,
-          "case_variants": 64,
+          "physical_tasks": 500,
+          "case_variants": 500,
           "action_macro": {
             "unit": "initial_board",
-            "units": 13,
-            "mean": 0.4207081807081808,
+            "units": 100,
+            "mean": 0.4251333333333333,
             "bootstrap_95": [
-              0.3795250305250305,
-              0.46221764346764355
+              0.41065795995670995,
+              0.4388119498556999
             ]
           },
           "renumbering": {
@@ -5085,54 +5089,54 @@
             "successful_shortest_moves": 0
           },
           "counts": {
-            "turns": 582,
-            "terminal_turns": 39,
-            "valid_control": 582,
-            "premature_done": 3,
+            "turns": 4468,
+            "terminal_turns": 345,
+            "valid_control": 4464,
+            "premature_done": 22,
             "failed_to_stop": 0,
-            "legal_action": 540,
-            "summary_correct": 39,
-            "valid_ranking": 179,
-            "exact_ranking": 43,
-            "closest_candidate_set_exact": 124,
-            "action_map_minimum": 231,
-            "action_follows_ranking": 179,
-            "pairwise_correct": 3291,
-            "pairwise_total": 23764,
-            "generated_tokens": 45978,
-            "seconds": 1733.2750585610047,
-            "current_relation_correct": 809,
-            "current_relation_total": 4555,
-            "action_environment_shortest": 285,
-            "action_keeps_goal_reachable": 316,
-            "reachable_candidates": 6031,
-            "candidate_slots": 14811,
-            "solvable_decisions": 377,
-            "decision_turns": 543,
-            "exact_ranking_rate": 0.07918968692449356,
-            "closest_candidate_set_exact_rate": 0.2283609576427256,
-            "action_map_minimum_rate": 0.425414364640884,
-            "legal_action_rate": 0.994475138121547,
-            "premature_done_rate": 0.0055248618784530384,
+            "legal_action": 4097,
+            "summary_correct": 344,
+            "valid_ranking": 1377,
+            "exact_ranking": 393,
+            "closest_candidate_set_exact": 973,
+            "action_map_minimum": 1764,
+            "action_follows_ranking": 1377,
+            "pairwise_correct": 25961,
+            "pairwise_total": 179768,
+            "generated_tokens": 360244,
+            "seconds": 13716.76352137886,
+            "current_relation_correct": 6421,
+            "current_relation_total": 34500,
+            "action_environment_shortest": 2468,
+            "action_keeps_goal_reachable": 2731,
+            "reachable_candidates": 46796,
+            "candidate_slots": 109641,
+            "solvable_decisions": 3194,
+            "decision_turns": 4123,
+            "exact_ranking_rate": 0.09531894251758428,
+            "closest_candidate_set_exact_rate": 0.23599320882852293,
+            "action_map_minimum_rate": 0.42784380305602715,
+            "legal_action_rate": 0.9936939121998545,
+            "premature_done_rate": 0.0053359204462769825,
             "failed_to_stop_rate": 0.0,
-            "summary_correct_rate": 1.0,
-            "action_keeps_goal_reachable_rate": 0.8381962864721485,
-            "reachable_candidate_rate": 0.5108852181279119
+            "summary_correct_rate": 0.9971014492753624,
+            "action_keeps_goal_reachable_rate": 0.8550407013149656,
+            "reachable_candidate_rate": 0.49736945592908693
           },
           "reachability_audit": {
-            "decision_turns": 543,
-            "already_unreachable_turns": 166,
-            "current_reachable_turns": 377,
-            "reachability_scored_turns": 377,
+            "decision_turns": 4123,
+            "already_unreachable_turns": 929,
+            "current_reachable_turns": 3194,
+            "reachability_scored_turns": 3194,
             "missing_reachability_turns": 0,
-            "keeps_goal_reachable": 316,
-            "action_environment_shortest": 285,
-            "candidate_slots": 11805,
-            "reachable_candidates": 6031,
+            "keeps_goal_reachable": 2731,
+            "action_environment_shortest": 2468,
+            "candidate_slots": 94087,
+            "reachable_candidates": 46796,
             "zero_candidate_turns": 0,
-            "uniform_expected_rate_current_reachable": 0.527676182239654,
-            "uniform_expected_rate_all_decisions": 0.3663608116102201,
-            "reachable_candidate_rate": 0.5108852181279119
+            "uniform_expected_rate_current_reachable": 0.5087596141324763,
+            "uniform_expected_rate_all_decisions": 0.394125201925571,
+            "reachable_candidate_rate": 0.49736945592908693
           }
         },
         "same_initial_board_new_pair": {
@@ -5217,19 +5221,19 @@
         }
       },
       "reachability_audit": {
-        "decision_turns": 4662,
-        "already_unreachable_turns": 1070,
-        "current_reachable_turns": 3592,
-        "reachability_scored_turns": 3592,
+        "decision_turns": 8242,
+        "already_unreachable_turns": 1833,
+        "current_reachable_turns": 6409,
+        "reachability_scored_turns": 6409,
         "missing_reachability_turns": 0,
-        "keeps_goal_reachable": 3100,
-        "action_environment_shortest": 2871,
-        "candidate_slots": 104160,
-        "reachable_candidates": 50236,
+        "keeps_goal_reachable": 5515,
+        "action_environment_shortest": 5054,
+        "candidate_slots": 186442,
+        "reachable_candidates": 91001,
         "zero_candidate_turns": 0,
-        "uniform_expected_rate_current_reachable": 0.4996691289204701,
-        "uniform_expected_rate_all_decisions": 0.3849874541146136,
-        "reachable_candidate_rate": 0.48229646697388634
+        "uniform_expected_rate_current_reachable": 0.5025520046679839,
+        "uniform_expected_rate_all_decisions": 0.3907857070998676,
+        "reachable_candidate_rate": 0.488092811705517
       },
       "sources": [
         "evaluation/blocks/checkpoint-196000/validation_reference_map/00000_00064/summary.json",
@@ -5240,7 +5244,16 @@
         "evaluation/blocks/checkpoint-196000/validation_reference_map/00320_00384/summary.json",
         "evaluation/blocks/checkpoint-196000/validation_reference_map/00384_00448/summary.json",
         "evaluation/blocks/checkpoint-196000/validation_reference_map/00448_00512/summary.json",
-        "evaluation/blocks/checkpoint-196000/validation_reference_map/00512_00576/summary.json"
+        "evaluation/blocks/checkpoint-196000/validation_reference_map/00512_00576/summary.json",
+        "evaluation/blocks/checkpoint-196000/validation_reference_map/00576_00640/summary.json",
+        "evaluation/blocks/checkpoint-196000/validation_reference_map/00640_00704/summary.json",
+        "evaluation/blocks/checkpoint-196000/validation_reference_map/00704_00768/summary.json",
+        "evaluation/blocks/checkpoint-196000/validation_reference_map/00768_00832/summary.json",
+        "evaluation/blocks/checkpoint-196000/validation_reference_map/00832_00896/summary.json",
+        "evaluation/blocks/checkpoint-196000/validation_reference_map/00896_00960/summary.json",
+        "evaluation/blocks/checkpoint-196000/validation_reference_map/00960_01024/summary.json",
+        "evaluation/blocks/checkpoint-196000/validation_reference_map/01024_01088/summary.json",
+        "evaluation/blocks/checkpoint-196000/validation_reference_map/01088_01100/summary.json"
       ],
       "intervals": [
         [
@@ -5278,12 +5291,48 @@
         [
           512,
           576
+        ],
+        [
+          576,
+          640
+        ],
+        [
+          640,
+          704
+        ],
+        [
+          704,
+          768
+        ],
+        [
+          768,
+          832
+        ],
+        [
+          832,
+          896
+        ],
+        [
+          896,
+          960
+        ],
+        [
+          960,
+          1024
+        ],
+        [
+          1024,
+          1088
+        ],
+        [
+          1088,
+          1100
         ]
       ],
-      "unique_case_keys": 576,
+      "unique_case_keys": 1100,
       "variants": 1,
       "expected_physical_tasks": 1100,
-      "completion": "partial"
+      "completion": "complete"
     },
     "blocks/checkpoint-196000/validation_rollout_map": {
       "physical_tasks": 1100,

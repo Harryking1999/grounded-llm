@@ -1,45 +1,14 @@
-# 实验 harness
+# 实验目录
 
-## 阅读入口
+当前主线是通过 cross-attention 让冻结 LLM 读取并利用地图。先读[地图读取实验](flamingo_map_reader/README.md)及其 [design](flamingo_map_reader/DESIGN.md)、[report](flamingo_map_reader/results/report.md)；进度只维护在[项目状态页](../docs/PROJECT_STATUS_AND_TODO.md)。
 
-| 研究 | 内容 |
-| --- | --- |
-| [cml_map_scaling](cml_map_scaling/README.md) | 寻路 Q/V 地图结果；已运行的图 Step 2 token 接口已封存 |
-| [qwen_path_blocks](qwen_path_blocks/README.md) | Qwen thinking 寻路／积木基线与 Sol 小批参考 |
-| [sol_dag_blocks](sol_dag_blocks/README.md) | Sol 新形状积木与有向图基线 |
-| [gcml_counterexamples](gcml_counterexamples/README.md) | Luna／Flash 基线与错误案例 |
-| [state_interface_pilot](state_interface_pilot/README.md) | 已运行的积木连续 token 读出实验，现为 previous approach |
-| [external_map_interface](external_map_interface/README.md) | 当前显式候选地图距离接口与单棋盘积木 Q/V 试验 |
+| 目录 | 作用 |
+|---|---|
+| [flamingo_map_reader](flamingo_map_reader/README.md) | 当前读取接口：单图寻路与 1000 初始棋盘积木的完整轨迹 SFT |
+| [blocks_distance_map](blocks_distance_map/README.md) | 冻结积木 Q 的来源、编码器与精确裁判 |
+| [external_map_interface](external_map_interface/README.md) | 寻路 Q/V 与环境依赖；显式距离接口的历史试验 |
+| [cml_map_scaling](cml_map_scaling/README.md) | 图地图训练与几何结果；旧连续 token 接口 |
+| [qwen_path_blocks](qwen_path_blocks/README.md)、[sol_dag_blocks](sol_dag_blocks/README.md)、[gcml_counterexamples](gcml_counterexamples/README.md) | 独立模型基线 |
+| [state_interface_pilot](state_interface_pilot/README.md) | 旧积木连续 token 读出 |
 
-## 目录约定
-
-只有在具备具体假设或评测器时，才创建研究目录。默认结构为：
-
-```text
-experiments/<study>/
-  README.md          假设、baseline、指标、当前结论
-  configs/           已提交的机器可读正式运行合同
-  src/               可复用的环境或方法实现
-  tests/             针对性的正确性测试
-```
-
-生成状态应放在受跟踪源码之外：
-
-```text
-runs/<run_id>/       解析后的配置、预测、指标、日志、产物
-```
-
-Git 会忽略 `runs/`。只有紧凑且与决策有关的结果，才应提升到研究 README 或权威项目状态中。
-
-## 最小运行合同
-
-正式运行应明确：
-
-- 模型与推理设置；
-- 环境／规则版本与数据集划分；
-- 观测编码和可用工具；
-- 适用时的随机种子；
-- 主要指标；
-- 源代码 commit 与输出目录。
-
-探索性 smoke 不需要生产级 manifest。只记录足以复现那项会影响下一步决策的观察即可。
+每个研究用 `README.md` 说明目的和入口，`configs/` 保存正式合同，`src/` 保存可复用实现，`tests/` 保存针对性检查。原始数据、模型、回答和日志写入忽略的 `runs/` 等目录；Git 只收录源码、配置和与决策有关的结果摘要。历史及归档内容不维护当前进度。

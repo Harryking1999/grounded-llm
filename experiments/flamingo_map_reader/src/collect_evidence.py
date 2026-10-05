@@ -1,8 +1,8 @@
 """Compact, checkable evidence for the long-trajectory run.
 
-Reads every finished battery under the run root, reuses ``trajectory_eval.aggregate``
-so the counts are the same quantities the queue writes into a group summary, and adds
-the reachability audit the report quotes.
+Reads finished shards under the run root and reuses ``trajectory_eval.aggregate``.
+Missing rollout decision metrics are reconstructed from saved trajectories before
+aggregation; raw shards and episode outcomes remain unchanged.
 
 Scoring convention (``DESIGN.md`` section 7): ``action_keeps_goal_reachable`` and
 ``action_environment_shortest`` are read on the **solvable non-terminal decision
@@ -10,9 +10,10 @@ turns** -- turns that are not terminal and whose state was still solvable before
 model answered (``remaining_shortest >= 0``; identical to the ``>= 1`` in ``metric_notes``
 because no non-terminal turn has distance 0). The turn is excluded explicitly; a
 reference shard carries the field on its stopping turn too, where remaining is 0 and
-the action is always scored false. A turn whose reachability fields were never
-recorded stays missing rather than counting as a failure. Each rate is printed beside
-the floor of a uniformly random legal action on the same turns.
+the action is always scored false. Solvable rollout turns omitted at early exit or
+the action budget are replayed, including invalid or absent choices as failures.
+Other missing fields remain explicitly missing. Rates are printed beside the
+expected rate of a uniformly random legal action on the same turns.
 
 Usage:
     python -m experiments.flamingo_map_reader.src.collect_evidence --run-root RUN [--update EVIDENCE.json] [--table]
@@ -32,6 +33,52 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from .trajectory_eval import aggregate
+
+
+def complete_rollout_reachability(cases, manifest):
+    """Score omitted live decision turns by replay, without rewriting raw shards.
+
+    closed_loop can exit before attaching metrics (including a valid choice at
+    the action budget). These are still decisions on solvable states and belong
+    in the denominator. Reconstruct the candidate mapping from the saved run.
+    """
+    from .backfill_reachability import rollout_states
+    from .evaluate_blocks import parse_control
+    from .trajectory_eval import TaskEnvironment
+
+    environment = None
+    records = {row["trajectory_id"]: row for row in manifest["records"]}
+    restored = 0
+    for case in cases:
+        if case.get("mode") != "rollout":
+            continue
+        missing = {index for index, row in enumerate(case["turns"])
+                   if not row["done"] and row.get("remaining_shortest", -1) >= 0
+                   and "action_keeps_goal_reachable" not in row}
+        if not missing:
+            continue
+        if environment is None:
+            environment = TaskEnvironment(manifest["config"], manifest)
+        for index, step, path in rollout_states(environment, records[case["trajectory_id"]], case):
+            if index not in missing:
+                continue
+            row = case["turns"][index]
+            remaining = environment.remaining(step.current, step.goal, path)
+            if remaining != row["remaining_shortest"]:
+                raise ValueError(f"{case['trajectory_id']} turn {index}: replayed distance differs")
+            try:
+                chosen = parse_control(row["answer"])
+            except ValueError:
+                chosen = None
+            row["action_keeps_goal_reachable"] = environment.chosen_keeps_reachable(step, chosen, path, remaining)
+            row["action_environment_shortest"] = environment.chosen_is_shortest(step, chosen, path, remaining)
+            row["reachable_candidates"] = environment.reachable_candidates(step, path, remaining)
+            row["candidate_slots"] = len(step.candidate_actions)
+            missing.remove(index)
+            restored += 1
+        if missing:
+            raise ValueError(f"{case['trajectory_id']}: replay did not cover turns {sorted(missing)}")
+    return restored
 
 SHARD = 64
 # Physical tasks per split, from the manifests. The train battery is a fixed
@@ -64,10 +111,9 @@ def load(directory):
 def audit(cases):
     """Keep-reachable / environment-shortest on solvable non-terminal decision turns.
 
-    A shard evaluated before the reachability fields existed keeps them missing, so the
-    scored subset is the solvable turns that actually carry ``action_keeps_goal_reachable``.
-    Counting a missing field as a failure would publish a deflated rate; the gap is
-    reported as ``missing_reachability_turns`` instead.
+    After rollout replay, the scored subset should cover every solvable decision.
+    Any remaining missing fields are reported as ``missing_reachability_turns``;
+    they cannot silently count as failures or be dropped from a published rate.
     """
     rows = [row for case in cases for row in case["turns"]]
     decisions = [row for row in rows if not row["done"]]
@@ -119,6 +165,7 @@ def battery(root, task, name, manifest):
     cases = load(directory)
     if not cases:
         return None
+    restored = complete_rollout_reachability(cases, manifest)
     split = split_of(directory.name)
     by_group = defaultdict(list)
     for case in cases:
@@ -138,6 +185,10 @@ def battery(root, task, name, manifest):
         groups[group] = summary
     entry["groups"] = groups
     entry["reachability_audit"] = audit(cases)
+    if restored:
+        entry["rollout_reachability_replay"] = dict(
+            restored_solvable_decisions=restored,
+            method="Replayed saved states and candidate numbering; raw shards unchanged. Includes unexecuted choices at the action budget.")
     entry["rollout"] = rollout_of(cases)
     shards = shards_of(directory)
     entry["sources"] = [shard.relative_to(root).as_posix() + "/summary.json" for shard in shards]
@@ -164,8 +215,9 @@ def show(task, name, entry):
                  percent(rollout["reached_shortest"], rollout["attempts"]), rollout["reached_shortest"], rollout["attempts"]))
     if audit_.get("reachability_scored_turns"):
         scored = audit_["reachability_scored_turns"]
-        print("   reference: keep-reachable %s (%d/%d)  floor %s"
-              % (percent(audit_["keeps_goal_reachable"], scored), audit_["keeps_goal_reachable"], scored,
+        print("   %s: keep-reachable %s (%d/%d)  floor %s"
+              % ("rollout" if rollout["attempts"] else "reference",
+                 percent(audit_["keeps_goal_reachable"], scored), audit_["keeps_goal_reachable"], scored,
                  percent(audit_["uniform_expected_rate_current_reachable"], 1)))
         print("              env-shortest  %s (%d/%d)"
               % (percent(audit_["action_environment_shortest"], scored),

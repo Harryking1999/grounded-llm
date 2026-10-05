@@ -354,13 +354,14 @@
         }
       }
     },
-    "deduplication": "Each completed shard path in the shared run root counted once."
+    "deduplication": "Each completed shard path in the shared run root counted once.",
+    "rollout_reachability_recomputed_utc": "2026-10-05T11:03:39.421800+00:00"
   },
   "metric_notes": {
     "denominators": "Stored raw summaries use: control / all turns; actions and ranking / all decision turns; stop and summary / terminal turns; pairwise and current / recorded pair counts; rollout / case variants. Reachability is the exception: the summary also computes action_keeps_goal_reachable_rate and reachable_candidate_rate over the current-reachable subset and records its size as solvable_decisions, so the two need no separate audit. Primary reference tables use that same subset, as defined in primary_reporting.",
-    "source": "Counts recomputed from each completed shard cases.jsonl by src/collect_evidence.py through trajectory_eval.aggregate, the same function the queue uses to write the shard summary.json; the reachability audit is read off those same turns. No model inference or environment replay was run for this update.",
+    "source": "Counts from saved cases.jsonl via collect_evidence and trajectory_eval.aggregate. Missing solvable rollout decisions are scored by offline state/candidate replay before aggregation; raw shards and model outputs unchanged.",
     "uniform_baseline": "For each scored decision turn, r/k = reachable_candidates/candidate_slots. Average these fractions across the same turns used for the model. The stored reachable_candidate_rate is instead sum(r)/sum(k) over that same subset, a candidate-slot-weighted proportion, so it is not the per-turn average.",
-    "current_reachable": "remaining_shortest >= 1 on nonterminal turns. Already unreachable reference states score false independently of the model choice. Report this subset separately when judging whether the chosen action destroys reachability.",
+    "current_reachable": "Nonterminal decision turns with remaining_shortest >= 1, in either mode. Already-unreachable states and terminal turns are excluded; invalid, absent, or reachability-destroying choices on solvable states remain failures.",
     "missing_reachability": "Use reachability_audit.reachability_scored_turns to check field coverage; aggregate counts can contain implicit zeros for absent fields. Do not publish a full-battery rate when coverage is incomplete.",
     "action_macro": "Emitted by trajectory_eval.aggregate as a per-unit mean with a bootstrap interval; its unit and turn set are its own, so it is not the number in the report tables, whose denominators are in primary_reporting.",
     "rounding": "Displayed percentages use one decimal; 100.0% may be rounded. Integer counts are authoritative.",
@@ -369,7 +370,8 @@
       "rollout_shortest": "reached_shortest / attempts; reached_goal and moves == shortest_moves, irrespective of stop output. Read from the same saved cases as the snapshot; shortest_success retains its original, stricter correct-stop meaning.",
       "reference_reachable": "action_keeps_goal_reachable / current_reachable_turns; primary denominator is nonterminal turns with remaining_shortest >= 1.",
       "reference_shortest": "action_environment_shortest / current_reachable_turns; any chosen action with successor distance equal to current distance minus one qualifies. Existing scorer rejects already-unreachable turns, so the original numerator is unchanged.",
-      "secondary": "Map-minimum action agreement and matched no_map/goal interventions assess map use separately. Full rankings, candidate sets, control and summaries are auxiliary diagnostics."
+      "secondary": "Map-minimum action agreement and matched no_map/goal interventions assess map use separately. Full rankings, candidate sets, control and summaries are auxiliary diagnostics.",
+      "rollout_reachable_auxiliary": "keeps_goal_reachable / current_reachable_turns on model-generated histories, excluding pre-answer unreachable states. Includes choices at the action-budget boundary even if not executed; these do not change episode arrival or path length."
     }
   },
   "evaluation_batteries": {
@@ -1461,11 +1463,11 @@
         "seconds": 22682.680727421306,
         "current_relation_correct": 14036,
         "current_relation_total": 24204,
-        "action_environment_shortest": 7637,
-        "action_keeps_goal_reachable": 11826,
-        "reachable_candidates": 23800,
-        "candidate_slots": 23808,
-        "solvable_decisions": 11830,
+        "action_environment_shortest": 7774,
+        "action_keeps_goal_reachable": 12023,
+        "reachable_candidates": 24196,
+        "candidate_slots": 24204,
+        "solvable_decisions": 12037,
         "decision_turns": 12041,
         "exact_ranking_rate": 0.36807574121750686,
         "closest_candidate_set_exact_rate": 0.5976247819948509,
@@ -1474,8 +1476,8 @@
         "premature_done_rate": 0.0006643966447969437,
         "failed_to_stop_rate": 0.01557632398753894,
         "summary_correct_rate": 0.838006230529595,
-        "action_keeps_goal_reachable_rate": 0.9996618765849535,
-        "reachable_candidate_rate": 0.9996639784946236
+        "action_keeps_goal_reachable_rate": 0.9988369194982138,
+        "reachable_candidate_rate": 0.9996694761196496
       },
       "groups": {
         "initial_goal": {
@@ -1595,11 +1597,11 @@
             "seconds": 22648.419154822826,
             "current_relation_correct": 14036,
             "current_relation_total": 24204,
-            "action_environment_shortest": 7637,
-            "action_keeps_goal_reachable": 11826,
-            "reachable_candidates": 23800,
-            "candidate_slots": 23808,
-            "solvable_decisions": 11830,
+            "action_environment_shortest": 7774,
+            "action_keeps_goal_reachable": 12023,
+            "reachable_candidates": 24196,
+            "candidate_slots": 24204,
+            "solvable_decisions": 12037,
             "decision_turns": 12041,
             "exact_ranking_rate": 0.36807574121750686,
             "closest_candidate_set_exact_rate": 0.5976247819948509,
@@ -1608,23 +1610,23 @@
             "premature_done_rate": 0.0006643966447969437,
             "failed_to_stop_rate": 0.006920415224913495,
             "summary_correct_rate": 0.8304498269896193,
-            "action_keeps_goal_reachable_rate": 0.9996618765849535,
-            "reachable_candidate_rate": 0.9996639784946236
+            "action_keeps_goal_reachable_rate": 0.9988369194982138,
+            "reachable_candidate_rate": 0.9996694761196496
           },
           "reachability_audit": {
             "decision_turns": 12041,
             "already_unreachable_turns": 4,
             "current_reachable_turns": 12037,
-            "reachability_scored_turns": 11830,
-            "missing_reachability_turns": 207,
-            "keeps_goal_reachable": 11826,
-            "action_environment_shortest": 7637,
-            "candidate_slots": 23808,
-            "reachable_candidates": 23800,
+            "reachability_scored_turns": 12037,
+            "missing_reachability_turns": 0,
+            "keeps_goal_reachable": 12023,
+            "action_environment_shortest": 7774,
+            "candidate_slots": 24204,
+            "reachable_candidates": 24196,
             "zero_candidate_turns": 0,
-            "uniform_expected_rate_current_reachable": 0.9996618765849535,
-            "uniform_expected_rate_all_decisions": 0.9821443401710821,
-            "reachable_candidate_rate": 0.9996639784946236
+            "uniform_expected_rate_current_reachable": 0.9996676912852039,
+            "uniform_expected_rate_all_decisions": 0.9993356033552031,
+            "reachable_candidate_rate": 0.9996694761196496
           }
         }
       },
@@ -1632,16 +1634,20 @@
         "decision_turns": 12041,
         "already_unreachable_turns": 4,
         "current_reachable_turns": 12037,
-        "reachability_scored_turns": 11830,
-        "missing_reachability_turns": 207,
-        "keeps_goal_reachable": 11826,
-        "action_environment_shortest": 7637,
-        "candidate_slots": 23808,
-        "reachable_candidates": 23800,
+        "reachability_scored_turns": 12037,
+        "missing_reachability_turns": 0,
+        "keeps_goal_reachable": 12023,
+        "action_environment_shortest": 7774,
+        "candidate_slots": 24204,
+        "reachable_candidates": 24196,
         "zero_candidate_turns": 0,
-        "uniform_expected_rate_current_reachable": 0.9996618765849535,
-        "uniform_expected_rate_all_decisions": 0.9821443401710821,
-        "reachable_candidate_rate": 0.9996639784946236
+        "uniform_expected_rate_current_reachable": 0.9996676912852039,
+        "uniform_expected_rate_all_decisions": 0.9993356033552031,
+        "reachable_candidate_rate": 0.9996694761196496
+      },
+      "rollout_reachability_replay": {
+        "restored_solvable_decisions": 207,
+        "method": "Replayed saved states and candidate numbering; raw shards unchanged. Includes unexecuted choices at the action budget."
       },
       "sources": [
         "evaluation/path/checkpoint-24192/validation_rollout_map/00000_00064/summary.json",
@@ -2288,11 +2294,11 @@
         "seconds": 20264.817939326167,
         "current_relation_correct": 14178,
         "current_relation_total": 21130,
-        "action_environment_shortest": 7027,
-        "action_keeps_goal_reachable": 10283,
-        "reachable_candidates": 20890,
-        "candidate_slots": 20893,
-        "solvable_decisions": 10285,
+        "action_environment_shortest": 7112,
+        "action_keeps_goal_reachable": 10401,
+        "reachable_candidates": 21126,
+        "candidate_slots": 21130,
+        "solvable_decisions": 10406,
         "decision_turns": 10408,
         "exact_ranking_rate": 0.4576287471176018,
         "closest_candidate_set_exact_rate": 0.693793235972329,
@@ -2301,8 +2307,8 @@
         "premature_done_rate": 0.0003843197540353574,
         "failed_to_stop_rate": 0.0024449877750611247,
         "summary_correct_rate": 0.8997555012224939,
-        "action_keeps_goal_reachable_rate": 0.9998055420515314,
-        "reachable_candidate_rate": 0.9998564112382138
+        "action_keeps_goal_reachable_rate": 0.9995195079761676,
+        "reachable_candidate_rate": 0.999810695693327
       },
       "groups": {
         "initial_goal": {
@@ -2422,11 +2428,11 @@
             "seconds": 20231.558707406744,
             "current_relation_correct": 14178,
             "current_relation_total": 21130,
-            "action_environment_shortest": 7027,
-            "action_keeps_goal_reachable": 10283,
-            "reachable_candidates": 20890,
-            "candidate_slots": 20893,
-            "solvable_decisions": 10285,
+            "action_environment_shortest": 7112,
+            "action_keeps_goal_reachable": 10401,
+            "reachable_candidates": 21126,
+            "candidate_slots": 21130,
+            "solvable_decisions": 10406,
             "decision_turns": 10408,
             "exact_ranking_rate": 0.4576287471176018,
             "closest_candidate_set_exact_rate": 0.693793235972329,
@@ -2435,23 +2441,23 @@
             "premature_done_rate": 0.0003843197540353574,
             "failed_to_stop_rate": 0.0,
             "summary_correct_rate": 0.8938992042440318,
-            "action_keeps_goal_reachable_rate": 0.9998055420515314,
-            "reachable_candidate_rate": 0.9998564112382138
+            "action_keeps_goal_reachable_rate": 0.9995195079761676,
+            "reachable_candidate_rate": 0.999810695693327
           },
           "reachability_audit": {
             "decision_turns": 10408,
             "already_unreachable_turns": 2,
             "current_reachable_turns": 10406,
-            "reachability_scored_turns": 10285,
-            "missing_reachability_turns": 121,
-            "keeps_goal_reachable": 10283,
-            "action_environment_shortest": 7027,
-            "candidate_slots": 20893,
-            "reachable_candidates": 20890,
+            "reachability_scored_turns": 10406,
+            "missing_reachability_turns": 0,
+            "keeps_goal_reachable": 10401,
+            "action_environment_shortest": 7112,
+            "candidate_slots": 21130,
+            "reachable_candidates": 21126,
             "zero_candidate_turns": 0,
-            "uniform_expected_rate_current_reachable": 0.9998541565386485,
-            "uniform_expected_rate_all_decisions": 0.9880380476556495,
-            "reachable_candidate_rate": 0.9998564112382138
+            "uniform_expected_rate_current_reachable": 0.999807803190467,
+            "uniform_expected_rate_all_decisions": 0.9996156802459646,
+            "reachable_candidate_rate": 0.999810695693327
           }
         }
       },
@@ -2459,16 +2465,20 @@
         "decision_turns": 10408,
         "already_unreachable_turns": 2,
         "current_reachable_turns": 10406,
-        "reachability_scored_turns": 10285,
-        "missing_reachability_turns": 121,
-        "keeps_goal_reachable": 10283,
-        "action_environment_shortest": 7027,
-        "candidate_slots": 20893,
-        "reachable_candidates": 20890,
+        "reachability_scored_turns": 10406,
+        "missing_reachability_turns": 0,
+        "keeps_goal_reachable": 10401,
+        "action_environment_shortest": 7112,
+        "candidate_slots": 21130,
+        "reachable_candidates": 21126,
         "zero_candidate_turns": 0,
-        "uniform_expected_rate_current_reachable": 0.9998541565386485,
-        "uniform_expected_rate_all_decisions": 0.9880380476556495,
-        "reachable_candidate_rate": 0.9998564112382138
+        "uniform_expected_rate_current_reachable": 0.999807803190467,
+        "uniform_expected_rate_all_decisions": 0.9996156802459646,
+        "reachable_candidate_rate": 0.999810695693327
+      },
+      "rollout_reachability_replay": {
+        "restored_solvable_decisions": 121,
+        "method": "Replayed saved states and candidate numbering; raw shards unchanged. Includes unexecuted choices at the action budget."
       },
       "sources": [
         "evaluation/path/checkpoint-48384/validation_rollout_map/00000_00064/summary.json",
@@ -3115,11 +3125,11 @@
         "seconds": 20479.685678863898,
         "current_relation_correct": 14369,
         "current_relation_total": 20714,
-        "action_environment_shortest": 6937,
-        "action_keeps_goal_reachable": 10073,
-        "reachable_candidates": 20498,
-        "candidate_slots": 20501,
-        "solvable_decisions": 10073,
+        "action_environment_shortest": 7004,
+        "action_keeps_goal_reachable": 10176,
+        "reachable_candidates": 20710,
+        "candidate_slots": 20714,
+        "solvable_decisions": 10182,
         "decision_turns": 10182,
         "exact_ranking_rate": 0.4598310744450992,
         "closest_candidate_set_exact_rate": 0.7066391671577293,
@@ -3128,8 +3138,8 @@
         "premature_done_rate": 0.0004910626595953643,
         "failed_to_stop_rate": 0.014184397163120567,
         "summary_correct_rate": 0.91725768321513,
-        "action_keeps_goal_reachable_rate": 1.0,
-        "reachable_candidate_rate": 0.9998536656748451
+        "action_keeps_goal_reachable_rate": 0.9994107248084856,
+        "reachable_candidate_rate": 0.9998068938881916
       },
       "groups": {
         "initial_goal": {
@@ -3249,11 +3259,11 @@
             "seconds": 20447.61781284865,
             "current_relation_correct": 14369,
             "current_relation_total": 20714,
-            "action_environment_shortest": 6937,
-            "action_keeps_goal_reachable": 10073,
-            "reachable_candidates": 20498,
-            "candidate_slots": 20501,
-            "solvable_decisions": 10073,
+            "action_environment_shortest": 7004,
+            "action_keeps_goal_reachable": 10176,
+            "reachable_candidates": 20710,
+            "candidate_slots": 20714,
+            "solvable_decisions": 10182,
             "decision_turns": 10182,
             "exact_ranking_rate": 0.4598310744450992,
             "closest_candidate_set_exact_rate": 0.7066391671577293,
@@ -3262,23 +3272,23 @@
             "premature_done_rate": 0.0004910626595953643,
             "failed_to_stop_rate": 0.01278772378516624,
             "summary_correct_rate": 0.9130434782608695,
-            "action_keeps_goal_reachable_rate": 1.0,
-            "reachable_candidate_rate": 0.9998536656748451
+            "action_keeps_goal_reachable_rate": 0.9994107248084856,
+            "reachable_candidate_rate": 0.9998068938881916
           },
           "reachability_audit": {
             "decision_turns": 10182,
             "already_unreachable_turns": 0,
             "current_reachable_turns": 10182,
-            "reachability_scored_turns": 10073,
-            "missing_reachability_turns": 109,
-            "keeps_goal_reachable": 10073,
-            "action_environment_shortest": 6937,
-            "candidate_slots": 20501,
-            "reachable_candidates": 20498,
+            "reachability_scored_turns": 10182,
+            "missing_reachability_turns": 0,
+            "keeps_goal_reachable": 10176,
+            "action_environment_shortest": 7004,
+            "candidate_slots": 20714,
+            "reachable_candidates": 20710,
             "zero_candidate_turns": 0,
-            "uniform_expected_rate_current_reachable": 0.9998510870644297,
-            "uniform_expected_rate_all_decisions": 0.9891475152229424,
-            "reachable_candidate_rate": 0.9998536656748451
+            "uniform_expected_rate_current_reachable": 0.9998035749361619,
+            "uniform_expected_rate_all_decisions": 0.9998035749361619,
+            "reachable_candidate_rate": 0.9998068938881916
           }
         }
       },
@@ -3286,16 +3296,20 @@
         "decision_turns": 10182,
         "already_unreachable_turns": 0,
         "current_reachable_turns": 10182,
-        "reachability_scored_turns": 10073,
-        "missing_reachability_turns": 109,
-        "keeps_goal_reachable": 10073,
-        "action_environment_shortest": 6937,
-        "candidate_slots": 20501,
-        "reachable_candidates": 20498,
+        "reachability_scored_turns": 10182,
+        "missing_reachability_turns": 0,
+        "keeps_goal_reachable": 10176,
+        "action_environment_shortest": 7004,
+        "candidate_slots": 20714,
+        "reachable_candidates": 20710,
         "zero_candidate_turns": 0,
-        "uniform_expected_rate_current_reachable": 0.9998510870644297,
-        "uniform_expected_rate_all_decisions": 0.9891475152229424,
-        "reachable_candidate_rate": 0.9998536656748451
+        "uniform_expected_rate_current_reachable": 0.9998035749361619,
+        "uniform_expected_rate_all_decisions": 0.9998035749361619,
+        "reachable_candidate_rate": 0.9998068938881916
+      },
+      "rollout_reachability_replay": {
+        "restored_solvable_decisions": 109,
+        "method": "Replayed saved states and candidate numbering; raw shards unchanged. Includes unexecuted choices at the action budget."
       },
       "sources": [
         "evaluation/path/final/validation_rollout_map/00000_00064/summary.json",
@@ -4307,9 +4321,9 @@
         "current_relation_total": 71244,
         "action_environment_shortest": 1729,
         "action_keeps_goal_reachable": 1972,
-        "reachable_candidates": 60394,
-        "candidate_slots": 221995,
-        "solvable_decisions": 2879,
+        "reachable_candidates": 60681,
+        "candidate_slots": 222396,
+        "solvable_decisions": 2885,
         "decision_turns": 9185,
         "exact_ranking_rate": 0.03440391943385955,
         "closest_candidate_set_exact_rate": 0.12988568317909635,
@@ -4318,8 +4332,8 @@
         "premature_done_rate": 0.08502994011976048,
         "failed_to_stop_rate": 0.0374331550802139,
         "summary_correct_rate": 0.9197860962566845,
-        "action_keeps_goal_reachable_rate": 0.6849600555748524,
-        "reachable_candidate_rate": 0.4941417116674849
+        "action_keeps_goal_reachable_rate": 0.6835355285961872,
+        "reachable_candidate_rate": 0.4948662953327733
       },
       "groups": {
         "initial_goal": {
@@ -4441,9 +4455,9 @@
             "current_relation_total": 35434,
             "action_environment_shortest": 857,
             "action_keeps_goal_reachable": 987,
-            "reachable_candidates": 30821,
-            "candidate_slots": 111210,
-            "solvable_decisions": 1431,
+            "reachable_candidates": 31108,
+            "candidate_slots": 111611,
+            "solvable_decisions": 1437,
             "decision_turns": 4563,
             "exact_ranking_rate": 0.03528380451457375,
             "closest_candidate_set_exact_rate": 0.13521805829498137,
@@ -4452,23 +4466,23 @@
             "premature_done_rate": 0.08305939075169845,
             "failed_to_stop_rate": 0.0,
             "summary_correct_rate": 1.0,
-            "action_keeps_goal_reachable_rate": 0.689727463312369,
-            "reachable_candidate_rate": 0.5047492712325178
+            "action_keeps_goal_reachable_rate": 0.6868475991649269,
+            "reachable_candidate_rate": 0.506125636561834
           },
           "reachability_audit": {
             "decision_turns": 4563,
             "already_unreachable_turns": 3126,
             "current_reachable_turns": 1437,
-            "reachability_scored_turns": 1431,
-            "missing_reachability_turns": 6,
+            "reachability_scored_turns": 1437,
+            "missing_reachability_turns": 0,
             "keeps_goal_reachable": 987,
             "action_environment_shortest": 857,
-            "candidate_slots": 61062,
-            "reachable_candidates": 30821,
+            "candidate_slots": 61463,
+            "reachable_candidates": 31108,
             "zero_candidate_turns": 0,
-            "uniform_expected_rate_current_reachable": 0.5067942810421606,
-            "uniform_expected_rate_all_decisions": 0.15893548458718648,
-            "reachable_candidate_rate": 0.5047492712325178
+            "uniform_expected_rate_current_reachable": 0.5074783755707316,
+            "uniform_expected_rate_all_decisions": 0.15981731880235403,
+            "reachable_candidate_rate": 0.506125636561834
           }
         },
         "same_initial_board_new_pair": {
@@ -4556,16 +4570,20 @@
         "decision_turns": 9185,
         "already_unreachable_turns": 6300,
         "current_reachable_turns": 2885,
-        "reachability_scored_turns": 2879,
-        "missing_reachability_turns": 6,
+        "reachability_scored_turns": 2885,
+        "missing_reachability_turns": 0,
         "keeps_goal_reachable": 1972,
         "action_environment_shortest": 1729,
-        "candidate_slots": 122220,
-        "reachable_candidates": 60394,
+        "candidate_slots": 122621,
+        "reachable_candidates": 60681,
         "zero_candidate_turns": 0,
-        "uniform_expected_rate_current_reachable": 0.4919248840174765,
-        "uniform_expected_rate_all_decisions": 0.1541918063240408,
-        "reachable_candidate_rate": 0.4941417116674849
+        "uniform_expected_rate_current_reachable": 0.49229655133799805,
+        "uniform_expected_rate_all_decisions": 0.1546298911932634,
+        "reachable_candidate_rate": 0.4948662953327733
+      },
+      "rollout_reachability_replay": {
+        "restored_solvable_decisions": 6,
+        "method": "Replayed saved states and candidate numbering; raw shards unchanged. Includes unexecuted choices at the action budget."
       },
       "sources": [
         "evaluation/blocks/checkpoint-147000/validation_rollout_map/00000_00064/summary.json",
@@ -5384,9 +5402,9 @@
         "current_relation_total": 70705,
         "action_environment_shortest": 1951,
         "action_keeps_goal_reachable": 2212,
-        "reachable_candidates": 62111,
-        "candidate_slots": 218382,
-        "solvable_decisions": 3115,
+        "reachable_candidates": 62254,
+        "candidate_slots": 218587,
+        "solvable_decisions": 3118,
         "decision_turns": 9085,
         "exact_ranking_rate": 0.040176114474408366,
         "closest_candidate_set_exact_rate": 0.1313153549807375,
@@ -5395,8 +5413,8 @@
         "premature_done_rate": 0.08431480462300495,
         "failed_to_stop_rate": 0.03608247422680412,
         "summary_correct_rate": 0.9587628865979382,
-        "action_keeps_goal_reachable_rate": 0.7101123595505618,
-        "reachable_candidate_rate": 0.48991938664437046
+        "action_keeps_goal_reachable_rate": 0.7094291212315587,
+        "reachable_candidate_rate": 0.49025460100958396
       },
       "groups": {
         "initial_goal": {
@@ -5518,9 +5536,9 @@
             "current_relation_total": 35373,
             "action_environment_shortest": 978,
             "action_keeps_goal_reachable": 1122,
-            "reachable_candidates": 31998,
-            "candidate_slots": 110120,
-            "solvable_decisions": 1565,
+            "reachable_candidates": 32141,
+            "candidate_slots": 110325,
+            "solvable_decisions": 1568,
             "decision_turns": 4522,
             "exact_ranking_rate": 0.040468819106590004,
             "closest_candidate_set_exact_rate": 0.13445378151260504,
@@ -5529,23 +5547,23 @@
             "premature_done_rate": 0.08314904909332153,
             "failed_to_stop_rate": 0.0,
             "summary_correct_rate": 1.0,
-            "action_keeps_goal_reachable_rate": 0.7169329073482428,
-            "reachable_candidate_rate": 0.5001328560934056
+            "action_keeps_goal_reachable_rate": 0.7155612244897959,
+            "reachable_candidate_rate": 0.5007634301383522
           },
           "reachability_audit": {
             "decision_turns": 4522,
             "already_unreachable_turns": 2954,
             "current_reachable_turns": 1568,
-            "reachability_scored_turns": 1565,
-            "missing_reachability_turns": 3,
+            "reachability_scored_turns": 1568,
+            "missing_reachability_turns": 0,
             "keeps_goal_reachable": 1122,
             "action_environment_shortest": 978,
-            "candidate_slots": 63979,
-            "reachable_candidates": 31998,
+            "candidate_slots": 64184,
+            "reachable_candidates": 32141,
             "zero_candidate_turns": 0,
-            "uniform_expected_rate_current_reachable": 0.4987478027729297,
-            "uniform_expected_rate_all_decisions": 0.1726095336885526,
-            "reachable_candidate_rate": 0.5001328560934056
+            "uniform_expected_rate_current_reachable": 0.4991300198885171,
+            "uniform_expected_rate_all_decisions": 0.1730729480727985,
+            "reachable_candidate_rate": 0.5007634301383522
           }
         },
         "same_initial_board_new_pair": {
@@ -5633,16 +5651,20 @@
         "decision_turns": 9085,
         "already_unreachable_turns": 5967,
         "current_reachable_turns": 3118,
-        "reachability_scored_turns": 3115,
-        "missing_reachability_turns": 3,
+        "reachability_scored_turns": 3118,
+        "missing_reachability_turns": 0,
         "keeps_goal_reachable": 2212,
         "action_environment_shortest": 1951,
-        "candidate_slots": 126778,
-        "reachable_candidates": 62111,
+        "candidate_slots": 126983,
+        "reachable_candidates": 62254,
         "zero_candidate_turns": 0,
-        "uniform_expected_rate_current_reachable": 0.4814461416234861,
-        "uniform_expected_rate_all_decisions": 0.1650748190596763,
-        "reachable_candidate_rate": 0.48991938664437046
+        "uniform_expected_rate_current_reachable": 0.4816550003215904,
+        "uniform_expected_rate_all_decisions": 0.16530548057267133,
+        "reachable_candidate_rate": 0.49025460100958396
+      },
+      "rollout_reachability_replay": {
+        "restored_solvable_decisions": 3,
+        "method": "Replayed saved states and candidate numbering; raw shards unchanged. Includes unexecuted choices at the action budget."
       },
       "sources": [
         "evaluation/blocks/checkpoint-196000/validation_rollout_map/00000_00064/summary.json",

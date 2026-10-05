@@ -15,7 +15,7 @@ recorded stays missing rather than counting as a failure. Each rate is printed b
 the floor of a uniformly random legal action on the same turns.
 
 Usage:
-    python collect_evidence.py --run-root RUN [--update EVIDENCE.json] [--table]
+    python -m experiments.flamingo_map_reader.src.collect_evidence --run-root RUN [--update EVIDENCE.json] [--table]
 
 ``--update`` rewrites only the ``snapshot`` and ``evaluation_batteries`` sections of an
 existing evidence file and leaves the rest (``data``, ``action_coverage``,
@@ -27,15 +27,11 @@ same function the queue uses to write the shard ``summary.json``.
 import argparse
 import json
 import math
-import sys
 from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 
-CODE = "/zhanghanyue/experiment/flamingo_map_reader/code/long_aec7166"
-DEPS = "/zhanghanyue/experiment/flamingo_map_reader/deps"
-sys.path[:0] = [CODE, DEPS]
-from experiments.flamingo_map_reader.src.trajectory_eval import aggregate  # noqa: E402
+from .trajectory_eval import aggregate
 
 SHARD = 64
 # Physical tasks per split, from the manifests. The train battery is a fixed
@@ -191,29 +187,17 @@ def show(task, name, entry):
 
 
 def checkpoint_epochs(root):
-    """Map each saved checkpoint to its step and epoch, so the report's epoch names resolve.
-
-    Intermediates are saved every third of an epoch (``checkpoint.every_epoch_fraction``), so
-    three times the median gap between consecutive saved steps is one epoch. The epoch is
-    written as a fraction -- 1.0, 2.0, 3.0 are the epoch boundaries the report quotes, and
-    0.333/0.667 are the intermediate saves inside them.
-    """
+    """Read the trainer's published step/epoch, including the actual final budget."""
     out = {}
     for task in ("path", "blocks"):
         directory = root / task / "training" / "models"
         if not directory.is_dir():
             continue
-        steps = sorted(int(path.name.split("-")[1]) for path in directory.iterdir()
-                       if path.name.startswith("checkpoint-"))
-        gaps = [b - a for a, b in zip(steps, steps[1:]) if b - a > 1]
-        if not gaps:
-            continue
-        per_epoch = 3 * sorted(gaps)[len(gaps) // 2]
-        names = [path.name for path in directory.iterdir()
-                 if path.name.startswith("checkpoint-") or path.name == "final"]
-        steps = {name: steps[-1] if name == "final" else int(name.split("-")[1]) for name in names}
-        out[task] = {name: dict(step=step, epoch=round(step / per_epoch, 3))
-                     for name, step in sorted(steps.items())}
+        out[task] = {}
+        for ready in sorted(directory.glob("*/evaluation_ready.json")):
+            if ready.parent.name == "final" or ready.parent.name.startswith("checkpoint-"):
+                state = json.loads(ready.read_text())
+                out[task][ready.parent.name] = dict(step=state["step"], epoch=state["epoch"])
     return out
 
 
@@ -240,12 +224,10 @@ def main():
             if args.table:
                 show(task, directory.relative_to(root / "evaluation" / task).as_posix(), entry)
 
-    # The two containers that share this run root; a completed shard is one path, so shard
-    # paths -- not hosts -- are what the deduplication below counts.
+    # Shared storage exposes each completed shard once, independent of its worker host.
     snapshot = dict(snapshot_utc=datetime.now(timezone.utc).isoformat(), run_root=str(root),
-                    hosts=["172.16.78.10:41467", "172.16.78.10:35016"],
                     checkpoint_epochs=checkpoint_epochs(root),
-                    deduplication="Both hosts share one run root; each completed shard path counted once.")
+                    deduplication="Each completed shard path in the shared run root counted once.")
     if args.update:
         evidence = json.loads(args.update.read_text())
         evidence["snapshot"] = snapshot

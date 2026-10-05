@@ -292,6 +292,9 @@ def main():
         if task + "/train" in watched:
             spec["phase"] = "train"
             continue
+        if (root / task / "training/models/final/evaluation_ready.json").is_file():
+            spec["phase"] = "trained"
+            continue
         launch_train(task, spec, resume_point(root / task / "training/models"))
         spec["phase"] = "train"
     known |= completed_shards(root / "evaluation")

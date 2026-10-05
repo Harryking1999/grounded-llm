@@ -190,6 +190,8 @@ Summary: Reached the goal after {步数} executed {moves/removals}.
 
 最短路不要求唯一：reference 选中任意使剩余最短距离减少 1 的动作即计对；rollout 任意合法序列到达目标且步数等于环境最短距离即计对。原字段 `shortest_success` 还要求正确停止，保留为辅助指标；报告的 `reached_shortest` 从同一批案例的到达状态与步数计算，不修改评测代码。
 
+报告的闭环主要展示范围为非零步任务，模型与贪心均排除 `start=goal`；含初始即目标的完整电池计数另列，不改写原评分。最终 checkpoint 的逐步动作图按该步仍可解状态计算；累计到达／首次死局图则固定使用全部非零步任务作分母。reference 模型回答不执行，实际示范轨迹的累计结果须标为地图贪心，不能把 reference 单步正确率连乘当作自主任务成功率。
+
 积木 `valid_ranking` 要求语法可解析且列齐正确 Top-10；名单不齐时，逐对及 current 关系均计错。它是比选择一个有效动作更强的输出要求，仅作辅助诊断。
 
 可达性指标要同时报作答前是否可解。参考轨迹可能已经进入死局，`remaining_shortest < 0` 时模型任何动作都无法得分；这类轮次不能算作模型当轮破坏目标。终止轮是停止而不是动作选择，同样不进入该子集；参考分片在终止轮上也带该字段，因此不能以"字段存在"作为筛选条件。原始全部决策轮计数继续保留；汇总器的 `action_keeps_goal_reachable_rate` 与 `reachable_candidate_rate` 都在作答前可解的非终止决策轮上计算，并记录该子集大小 `solvable_decisions` 供核对。

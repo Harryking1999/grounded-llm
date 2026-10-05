@@ -1,47 +1,52 @@
-# 主指标学习曲线
+# 主指标与最终轨迹图
 
-四张图用于回答：训练读取接口后，LLM 是否更能读取地图、选择有效动作，并将这一能力用于完整任务。图内仅保留标题、坐标和共享图例；详细分母与解释放在[报告](../report.md)。
+训练进度和轨迹推进回答不同问题。三张学习曲线检查接口训练后的能力变化；两张最终 checkpoint 图直接比较参考历史与自身历史下的动作，并展示实际执行后何时到达、何时走入死局。清空／非清空只在[报告](../report.md)中保留原表格。
 
-| 图 | 同图比较 | 范围 |
+| 图 | 横轴与同图比较 | 范围 |
 |---|---|---|
-| [完整任务](rollout_learning_curves.png) | 两任务 × 到达率／到达且最短路率 | 全部 validation，含初始即目标 |
-| [reference 动作](reference_learning_curves.png) | 两任务 × 动作可达率／最短路动作率 | 作答前仍可解的非终止参考状态 |
-| [积木目标](blocks_goal_learning_curves.png) | 清空／非清空 × 两项闭环主指标 | epoch 3–5，排除初始即目标 |
-| [地图动作一致性](map_reading_learning_curves.png) | 两任务的地图最优动作选择率 | 全部非终止参考状态，含已死局状态 |
+| [闭环学习曲线](rollout_learning_curves.png) | epoch；两任务 × 到达率／到达且最短路率 | 非零步 validation：寻路 500，积木 1,000 |
+| [reference 学习曲线](reference_learning_curves.png) | epoch；两任务 × 动作可达率／最短路动作率 | 作答前仍可解的非终止参考状态 |
+| [积木最终轨迹](blocks_final_trajectory_steps.png) | 决策步的 reference／rollout 对比；执行步的累计到达与首次死局 | epoch 5；累计图固定 1,000 个非零步任务 |
+| [寻路最终轨迹](path_final_trajectory_steps.png) | 决策步的最短路动作率；执行步的累计到达 | epoch 3；累计图固定 500 个非零步任务 |
+| [地图动作一致性](map_reading_learning_curves.png) | epoch；两任务的地图最优动作选择率 | 全部非终止参考状态，含已死局状态 |
 
 ## 绘图选择
 
-版式参考 ICLR 2021 [DreamerV2 的学习曲线与消融图](https://arxiv.org/pdf/2010.02193)：将任务和指标放在对齐的子图中，使用共享图例，避免在一个坐标轴中堆叠不同指标。蓝色 `#0072B2`、橙色 `#E69F00` 和朱红色 `#D55E00` 取自 [Okabe–Ito 的 Color Universal Design 建议](https://jfly.uni-koeln.de/color/)，同时用圆点／方点及实线／虚线／点线传达区别。
+版式参考 ICLR 2021 [DreamerV2 的学习曲线与消融图](https://arxiv.org/pdf/2010.02193)：同一指标使用对齐子图与共享图例。蓝色 `#0072B2`、橙色 `#E69F00` 和朱红色 `#D55E00` 取自 [Okabe–Ito 的 Color Universal Design 建议](https://jfly.uni-koeln.de/color/)，用点形和线型补充颜色区别。图内只保留标题、坐标、图例，分母和解释放在图外。
 
-模型为蓝色圆点实线；贪心为橙色虚线；随机为灰色点线。目标分层图将颜色用于清空和非清空，线型用于模型和对应目标组的贪心。横轴只标已有整数 epoch；不加入通路检查的两题 epoch 0，不平滑、不外推。纵轴从 0 起，同图同一行的两任务采用相同范围；闭环最短路率显示 0–50%，目标分层图分别显示 0–80% 和 0–40%。当前只有一个训练运行，故不画多次运行的误差带。
+学习曲线中模型为蓝色圆点，地图贪心为橙色虚线，随机为灰色点线；最终逐步图中 reference 为蓝色圆点、rollout 为朱红色方点，地图贪心仍为橙色虚线。每步可解案例少于 30 时只画空心点，不与主曲线相连；这是低支持度提示，不是显著性检验。寻路几乎重合的动作可达率和恒为零的实际死局不再重复画图。
 
-## 数据与参照线
+学习曲线只连接已有整数 epoch，不加入通路检查的两题 epoch 0；逐步图保留原轨迹步数，不做分箱和平滑，累计曲线采用阶梯线。纵轴从 0 起；闭环学习曲线的最短路率一行显示 0–50%，其余百分比图显示 0–100%（顶部留空）。当前只有一个训练运行，不画多次运行误差带。
 
-- [原运行摘要](../long_trajectory_summary.json)：寻路 epoch 1–3、积木 epoch 1–4 的完整 validation 电池与整数计数。
-- [积木逐轮证据](../blocks_rollout_turn_analysis.json)：积木 epoch 3–5 完整主指标和地图动作一致性。与旧摘要重叠时使用此完整复核结果。
-- [目标分层证据](../blocks_target_analysis.json)：积木 epoch 3–5 清空与非清空的完整任务计数；未补造 epoch 1–2 的目标分层点。
-- [参照摘要](../learning_curve_baselines.json)：从原 validation 示范与已保存的 final reference 状态离线计算；不生成 LLM 回答。
-- [绘图计数](learning_curve_data.json)：以上证据合并后的全部分子、分母与参照值，供核对和重绘。
+## 数据与分母
 
-reference 随机参照是每个状态中合格候选数／全部合法候选数，再对状态取平均；不对候选槽位加权。动作主指标只纳入可解状态，地图一致性则匹配其全部参考决策轮的分母。最优候选有并列时，随机一致率计入所有并列项。
+- [原运行摘要](../long_trajectory_summary.json)：寻路 epoch 1–3、积木 epoch 1–4 的完整 validation 电池与整数计数。闭环曲线减去已保存的零步组分子和分母。
+- [积木逐轮证据](../blocks_rollout_turn_analysis.json)：积木 epoch 3–5 完整主指标和地图一致性；重叠时使用完整复核结果。零步组均为 100/100 到达且最短，由[目标分层证据](../blocks_target_analysis.json)核对。
+- [一步参照摘要](../learning_curve_baselines.json)：原 validation 状态上的随机与地图贪心参照，不运行 LLM。
+- [最终轨迹证据](../final_trajectory_step_analysis.json)：两任务 final 的全部逐步计数，原示范与模型轨迹的累计到达、累计首次死局；仅读取已完成原案例和物理示范。
+- [绘图计数](learning_curve_data.json)：上述证据合并后的主图分子、分母；同时保留 `rollout_all` 的含零步原读数。
 
-reference 贪心采用原物理示范在该状态选中的动作，保留原并列处理；完整任务贪心采用原示范的到达与最短路计数。贪心不是所有读图模型的严格上限，随机也不是严格下限；原实验没有完整随机 rollout，因此任务图不画随机成功率，不能把一步 chance 外推成完整任务概率。读图一致性提高也不能单独证明地图的因果收益，须结合报告中的 Q 倒序干预。
+**动作图的分母随步骤变化，累计图的分母固定。**动作图只纳入当步仍可解的非终止状态，无效输出计错；已死局状态排除。reference 与 rollout 第二步起访问不同物理状态和历史，其差值是模式差距，不是同状态的因果消融。晚步样本还受完成退出与存活筛选影响。
+
+累计到达、首次死局以全部非零步任务作分母，不因任务结束而缩小。首次死局只统计实际执行的合法动作：积木 rollout 为 832/1,000，另 12 题未到达但未执行过破坏可达性的动作；寻路没有实际死局，109/500 未完成。地图贪心累计曲线来自原物理示范；不能把 reference 模型的错误当作已经执行，也不能将各轮正确率连乘制造 reference 成功率。寻路预算末轮的第 33 次决策可评分，但最多实际执行 32 个动作。
+
+闭环贪心辅助线与主图匹配非零步范围：寻路到达 500/500、最短 115/500；积木到达 683/1,000、最短 311/1,000。一步随机参照先计算各状态的合格候选比例，再对状态取平均，地图最优并列项全部计入。贪心与随机均是参照而非严格上下界；尚无完整随机 rollout 数据，因此任务图不画随机成功率。
 
 ## 重绘与导出
 
-从仓库根目录运行（绘图仅需 matplotlib，已保存摘要足够；本次使用 matplotlib 3.10.6）：
+从仓库根目录运行（绘图只需 matplotlib；本次使用 3.10.6，已保存摘要足够）：
 
 ```bash
 python -m pip install matplotlib
 python -m experiments.flamingo_map_reader.src.plot_learning_curves
 ```
 
-如需从 Git 外原运行重算参照（使用项目环境与裁判，不运行模型推理）：
+如需从 Git 外原运行重算逐步摘要（使用项目环境，不运行模型推理）：
 
 ```bash
-python -m experiments.flamingo_map_reader.src.collect_plot_baselines \
+python -m experiments.flamingo_map_reader.src.collect_trajectory_steps \
   --run-root RUN \
-  --out experiments/flamingo_map_reader/results/learning_curve_baselines.json
+  --out experiments/flamingo_map_reader/results/final_trajectory_step_analysis.json
 ```
 
-每图同时保存 PNG（报告预览）、PDF（矢量排版）和 SVG（可编辑文字），文件同名。报告引用图像文件，保留原表格以核对细项；图与表均采用相同的成功定义。
+重算一步参照的入口为 `collect_plot_baselines`，输出 `results/learning_curve_baselines.json`。每图同时保存 PNG（预览）、PDF（矢量排版）和 SVG（可编辑文字），文件同名；不再生成目标分层折线图。

@@ -1,4 +1,4 @@
-"""Four compact report figures from completed, counted validation evidence."""
+"""Training curves and final trajectory-step comparisons from saved evidence."""
 
 from argparse import ArgumentParser
 import json
@@ -18,13 +18,14 @@ BLUE, ORANGE, GRAY, VERMILION = '#0072B2', '#E69F00', '#78828C', '#D55E00'
 def load_data(results):
     summary = json.loads((results / 'long_trajectory_summary.json').read_text())
     turns = json.loads((results / 'blocks_rollout_turn_analysis.json').read_text())
-    targets = json.loads((results / 'blocks_target_analysis.json').read_text())
     references = json.loads((results / 'learning_curve_baselines.json').read_text())
-    data = dict(reference={}, rollout={}, map_agreement={}, blocks_goals={}, baselines=references,
+    steps = json.loads((results / 'final_trajectory_step_analysis.json').read_text())
+    data = dict(reference={}, rollout={}, rollout_all={}, map_agreement={}, baselines=references,
+        final_steps=steps,
         sources=['long_trajectory_summary.json', 'blocks_rollout_turn_analysis.json',
-                 'blocks_target_analysis.json', 'learning_curve_baselines.json'])
+                 'learning_curve_baselines.json', 'final_trajectory_step_analysis.json'])
     for task in ('path', 'blocks'):
-        reading, rollout, agreement = {}, {}, {}
+        reading, rollout, agreement, all_rollout = {}, {}, {}, {}
         for key, battery in summary['evaluation_batteries'].items():
             parts = key.split('/')
             if parts[0] != task or parts[2] not in ('validation_reference_map', 'validation_rollout_map'):
@@ -44,8 +45,12 @@ def load_data(results):
                                         correct=battery['counts']['action_map_minimum'])
             else:
                 value = battery['rollout']
-                rollout[epoch] = dict(epoch=epoch, denominator=value['attempts'],
-                                      reached=value['reached'], shortest=value['reached_shortest'])
+                initial = battery['groups']['initial_goal']['rollout']
+                all_rollout[epoch] = dict(epoch=epoch, denominator=value['attempts'],
+                                         reached=value['reached'], shortest=value['reached_shortest'])
+                rollout[epoch] = dict(epoch=epoch, denominator=value['attempts'] - initial['attempts'],
+                    reached=value['reached'] - initial['reached'],
+                    shortest=value['reached_shortest'] - initial['reached_shortest'])
         if task == 'blocks':
             for checkpoint in turns['checkpoints'].values():
                 epoch = int(checkpoint['epoch'])
@@ -56,20 +61,27 @@ def load_data(results):
                 correct = round(ref['map_minimum_all_decisions_rate'] * ref['decisions'])
                 agreement[epoch] = dict(epoch=epoch, denominator=ref['decisions'], correct=correct)
                 value = checkpoint['modes']['rollout']
-                rollout[epoch] = dict(epoch=epoch, denominator=value['cases'], reached=value['reached'], shortest=value['reached_shortest'])
+                all_rollout[epoch] = dict(epoch=epoch, denominator=value['cases'],
+                    reached=value['reached'], shortest=value['reached_shortest'])
+                initial = value['cases'] - value['nonzero_cases']
+                assert value['reached'] - value['nonzero_reached'] == initial
+                rollout[epoch] = dict(epoch=epoch, denominator=value['nonzero_cases'],
+                    reached=value['nonzero_reached'], shortest=value['reached_shortest'] - initial)
         expected = list(range(1, 4 if task == 'path' else 6))
         assert sorted(reading) == sorted(rollout) == sorted(agreement) == expected
         assert all(r['denominator'] == references['tasks'][task]['reference_decisions'] for r in reading.values())
         data['reference'][task] = [reading[i] for i in expected]
         data['rollout'][task] = [rollout[i] for i in expected]
+        data['rollout_all'][task] = [all_rollout[i] for i in expected]
         data['map_agreement'][task] = [agreement[i] for i in expected]
-    for checkpoint, modes in targets['validation'].items():
-        epoch = int(turns['checkpoints'][checkpoint]['epoch'])
-        data['blocks_goals'][str(epoch)] = {}
-        for goal in ('empty', 'nonempty'):
-            value = modes['rollout'][goal]
-            data['blocks_goals'][str(epoch)][goal] = dict(denominator=value['cases'],
-                reached=value['reached'], shortest=value['reached_shortest'])
+        final = steps['tasks'][task]
+        assert final['epoch'] == expected[-1]
+        outcomes = final['nonzero_outcomes']['rollout']
+        assert rollout[expected[-1]] == dict(epoch=expected[-1], denominator=outcomes['cases'],
+            reached=outcomes['reached'], shortest=outcomes['shortest'])
+        for mode in ('reference', 'rollout'):
+            rows = final['modes'][mode]['by_step']
+            assert sum(row['solvable'] for row in rows) == final['modes'][mode]['overall']['solvable']
     return data
 
 
@@ -149,35 +161,96 @@ def rollout_figure(data, output):
     handles = None
     for col, task in enumerate(('path', 'blocks')):
         rows = data['rollout'][task]
-        baseline = data['baselines']['tasks'][task]['rollout']['all']
+        baseline = data['final_steps']['tasks'][task]['nonzero_outcomes']['greedy']
         for index, (metric, title) in enumerate((('reached', 'Goal reached'), ('shortest', 'Goal reached on a shortest path'))):
             ax = axes[index, col]
-            greedy = reference_line(ax, baseline[metric] / baseline['tasks'], 'Map greedy', ORANGE, (0, (5, 3)))
+            greedy = reference_line(ax, baseline[metric] / baseline['cases'], 'Map greedy', ORANGE, (0, (5, 3)))
             model = curve(ax, rows, metric)
             ax.set_title(f'{"Pathfinding" if task == "path" else "Blocks"} · {title}', pad=10)
             axes_style(ax, [r['epoch'] for r in rows], 'Task rate (%)',
                        ylim=(0, 105) if index == 0 else (0, 50), ystep=20 if index == 0 else 10)
             handles = [model, greedy]
-    finish(fig, 'Rollout: completing tasks with the map', handles, output, 'rollout_learning_curves')
+    finish(fig, 'Rollout: nonzero-step tasks', handles, output, 'rollout_learning_curves')
 
 
-def goal_figure(data, output):
-    fig, axes = plt.subplots(1, 2, figsize=(10.4, 4.1))
-    epochs = sorted(map(int, data['blocks_goals']))
-    for col, (metric, title) in enumerate((('reached', 'Goal reached'), ('shortest', 'Goal reached on a shortest path'))):
-        ax = axes[col]
-        for goal, color, marker in (('empty', BLUE, 'o'), ('nonempty', VERMILION, 's')):
-            rows = [dict(data['blocks_goals'][str(epoch)][goal], epoch=epoch) for epoch in epochs]
-            baseline = data['baselines']['tasks']['blocks']['rollout'][goal]
-            reference_line(ax, baseline[metric] / baseline['tasks'], goal, color, (0, (5, 3)))
-            curve(ax, rows, metric, goal, color, marker)
+def step_axes(ax, maximum, ylabel, xlabel, start=1):
+    ax.set_xlim(start - .15, maximum + .15)
+    ax.set_ylim(0, 105)
+    interval = 1 if maximum <= 12 else 5
+    ticks = list(range(start, maximum + 1)) if interval == 1 else list(range(0, maximum + 1, interval))
+    if start == 1 and interval != 1:
+        ticks = [1] + [tick for tick in ticks if tick]
+    if ticks[-1] != maximum:
+        ticks.append(maximum)
+    ax.set_xticks(ticks)
+    ax.yaxis.set_major_locator(MultipleLocator(20))
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    ax.grid(axis='y')
+    ax.tick_params(length=3, width=.6)
+
+
+def decision_curve(ax, rows, key, color, marker):
+    rows = [row for row in rows if row['solvable']]
+    x = [row['step'] for row in rows]
+    y = [100 * row[key] / row['solvable'] for row in rows]
+    # A singleton late decision should not look like a reliable continuation.
+    ax.plot(x, [value if row['solvable'] >= 30 else float('nan') for row, value in zip(rows, y)],
+            color=color, marker=marker, markeredgecolor='white', markeredgewidth=.7, zorder=4)
+    low = [(row['step'], value) for row, value in zip(rows, y) if row['solvable'] < 30]
+    if low:
+        ax.plot([at for at, _ in low], [value for _, value in low], linestyle='none',
+                marker=marker, markersize=4, color=color, markerfacecolor='white',
+                markeredgewidth=1.0, alpha=.7, zorder=4)
+
+
+def progress_curve(ax, rows, key, color, dashed=False):
+    ax.step([row['step'] for row in rows], [100 * row[key] / row['denominator'] for row in rows],
+            where='post', color=color, linestyle=(0, (5, 3)) if dashed else '-', zorder=3)
+
+
+def step_handles():
+    return [Line2D([], [], color=BLUE, marker='o', label='Reference'),
+            Line2D([], [], color=VERMILION, marker='s', label='Rollout'),
+            Line2D([], [], color=ORANGE, linestyle=(0, (5, 3)), label='Map greedy')]
+
+
+def final_blocks_figure(data, output):
+    final = data['final_steps']['tasks']['blocks']
+    fig, axes = plt.subplots(2, 2, figsize=(10.4, 6.6))
+    for ax, key, title in zip(axes[0], ('kept', 'shortest'),
+                             ('Action keeps goal reachable', 'Action on a shortest path')):
+        for mode, color, marker in (('reference', BLUE, 'o'), ('rollout', VERMILION, 's')):
+            decision_curve(ax, final['modes'][mode]['by_step'], key, color, marker)
+        maximum = max(row['step'] for mode in final['modes'].values()
+                      for row in mode['by_step'] if row['solvable'])
+        step_axes(ax, maximum, 'Action rate (%)', 'Decision step')
         ax.set_title(title, pad=10)
-        axes_style(ax, epochs, 'Task rate (%)', ylim=(0, 80) if col == 0 else (0, 40), ystep=20 if col == 0 else 10)
-    handles = [Line2D([], [], color=BLUE, marker='o', label='Empty goal'),
-               Line2D([], [], color=VERMILION, marker='s', label='Nonempty goal'),
-               Line2D([], [], color='#303943', linewidth=2.3, label='Map + LLM'),
-               Line2D([], [], color='#303943', linestyle=(0, (5, 3)), linewidth=1.7, label='Map greedy')]
-    finish(fig, 'Blocks rollout: empty vs nonempty goals', handles, output, 'blocks_goal_learning_curves')
+    for ax, key, title in zip(axes[1], ('reached', 'dead'),
+                             ('Goal reached (cumulative)', 'Dead end (cumulative)')):
+        progress_curve(ax, final['progress']['rollout'], key, VERMILION)
+        progress_curve(ax, final['progress']['greedy'], key, ORANGE, dashed=True)
+        step_axes(ax, final['progress']['rollout'][-1]['step'], 'Tasks (%)',
+                  'Executed actions', start=0)
+        ax.set_title(title, pad=10)
+    finish(fig, 'Blocks · final epoch 5', step_handles(), output, 'blocks_final_trajectory_steps')
+
+
+def final_path_figure(data, output):
+    final = data['final_steps']['tasks']['path']
+    fig, axes = plt.subplots(1, 2, figsize=(10.4, 4.1))
+    for mode, color, marker in (('reference', BLUE, 'o'), ('rollout', VERMILION, 's')):
+        decision_curve(axes[0], final['modes'][mode]['by_step'], 'shortest', color, marker)
+    maximum = max(row['step'] for mode in final['modes'].values()
+                  for row in mode['by_step'] if row['solvable'])
+    step_axes(axes[0], maximum, 'Action rate (%)', 'Decision step')
+    axes[0].set_title('Action on a shortest path', pad=10)
+    progress_curve(axes[1], final['progress']['rollout'], 'reached', VERMILION)
+    progress_curve(axes[1], final['progress']['greedy'], 'reached', ORANGE, dashed=True)
+    step_axes(axes[1], final['progress']['rollout'][-1]['step'], 'Tasks (%)',
+              'Executed actions', start=0)
+    axes[1].set_title('Goal reached (cumulative)', pad=10)
+    finish(fig, 'Pathfinding · final epoch 3', step_handles(), output, 'path_final_trajectory_steps')
 
 
 def reading_figure(data, output):
@@ -204,10 +277,10 @@ def main():
     output.mkdir(parents=True, exist_ok=True)
     data = load_data(args.results)
     style()
-    for make in (reference_figure, rollout_figure, goal_figure, reading_figure):
+    for make in (reference_figure, rollout_figure, reading_figure, final_blocks_figure, final_path_figure):
         make(data, output)
     (output / 'learning_curve_data.json').write_text(json.dumps(data, indent=2) + '\n')
-    print('Saved four figures as PNG, PDF and SVG:', output)
+    print('Saved five figures as PNG, PDF and SVG:', output)
 
 
 if __name__ == '__main__':

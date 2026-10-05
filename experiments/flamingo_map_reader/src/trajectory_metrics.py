@@ -43,6 +43,19 @@ def score_turn(step, answer, expected_terminal=None, reported=None):
     return result
 
 
+def still_solvable(row):
+    """Whether the goal was still reachable when the model answered this turn.
+
+    A turn played on an already-dead board cannot be broken by any action, so it
+    is not evidence about the model's choice; only rows that carry the metric can
+    be scored at all.
+    """
+    if "action_keeps_goal_reachable" not in row:
+        return False
+    remaining = row.get("remaining_shortest")
+    return remaining is not None and remaining >= 0
+
+
 def summarize_turns(rows):
     counts = Counter(turns=len(rows), terminal_turns=sum(r["done"] for r in rows))
     metrics = ("valid_control", "premature_done", "failed_to_stop", "legal_action", "summary_correct",
@@ -55,14 +68,21 @@ def summarize_turns(rows):
         for key in metrics:
             counts[key] += r.get(key, 0)
     decisions = len(rows) - counts["terminal_turns"]
+    # Reachability is reported over the solvable subset, not over every decision
+    # turn: on a board the model already made dead, no action could score, and
+    # counting those turns charges it for a loss that happened earlier. The
+    # all-turn counts stay in the summary unchanged.
+    solvable = [r for r in rows if still_solvable(r)]
+    counts["solvable_decisions"] = len(solvable)
     result = dict(counts, decision_turns=decisions)
-    for key in ("exact_ranking", "closest_candidate_set_exact", "action_map_minimum", "legal_action", "premature_done",
-                "action_keeps_goal_reachable"):
+    for key in ("exact_ranking", "closest_candidate_set_exact", "action_map_minimum", "legal_action", "premature_done"):
         result[key + "_rate"] = counts[key] / decisions if decisions else None
     result["failed_to_stop_rate"] = counts["failed_to_stop"] / counts["terminal_turns"] if counts["terminal_turns"] else None
     result["summary_correct_rate"] = counts["summary_correct"] / counts["terminal_turns"] if counts["terminal_turns"] else None
-    # The chance floor for action_keeps_goal_reachable: the fraction of legal
-    # candidates that leave the goal reachable, i.e. what uniform picking scores.
-    result["reachable_candidate_rate"] = (counts["reachable_candidates"] / counts["candidate_slots"]
-                                          if counts["candidate_slots"] else None)
+    result["action_keeps_goal_reachable_rate"] = (sum(1 for r in solvable if r["action_keeps_goal_reachable"]) / len(solvable)
+                                                  if solvable else None)
+    # The chance floor for that same subset: the fraction of legal candidates
+    # that leave the goal reachable, i.e. what uniform picking scores there.
+    slots = sum(r["candidate_slots"] for r in solvable)
+    result["reachable_candidate_rate"] = (sum(r["reachable_candidates"] for r in solvable) / slots if slots else None)
     return result

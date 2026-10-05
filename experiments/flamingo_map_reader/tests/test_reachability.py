@@ -1,7 +1,6 @@
 """The reachability metric must be wider than the shortest-path one, never narrower."""
 
 import unittest
-from types import SimpleNamespace
 
 import numpy as np
 
@@ -84,16 +83,27 @@ class ReachabilityTest(unittest.TestCase):
             self.assertFalse(task.chosen_keeps_reachable(step, chosen, [1], 1))
         self.assertEqual(task.reachable_candidates(step, [1], 0), 0)
 
+    @staticmethod
+    def row(keeps, reachable, slots, remaining):
+        return dict(done=False, action_keeps_goal_reachable=keeps, reachable_candidates=reachable,
+                    candidate_slots=slots, remaining_shortest=remaining)
+
     def test_the_floor_is_the_share_of_legal_candidates_that_survive(self):
-        rows = [SimpleNamespace(done=False, action_keeps_goal_reachable=True,
-                                reachable_candidates=1, candidate_slots=2),
-                SimpleNamespace(done=False, action_keeps_goal_reachable=False,
-                                reachable_candidates=1, candidate_slots=2)]
-        summary = summarize_turns([dict(done=False, action_keeps_goal_reachable=r.action_keeps_goal_reachable,
-                                        reachable_candidates=r.reachable_candidates,
-                                        candidate_slots=r.candidate_slots) for r in rows])
+        summary = summarize_turns([self.row(True, 1, 2, 3), self.row(False, 1, 2, 3)])
         self.assertEqual(summary["decision_turns"], 2)
+        self.assertEqual(summary["solvable_decisions"], 2)
         self.assertEqual(summary["action_keeps_goal_reachable_rate"], 0.5)
+        self.assertEqual(summary["reachable_candidate_rate"], 0.5)
+
+    def test_a_board_already_made_dead_is_not_charged_to_the_model(self):
+        # The first turn was still solvable and kept the goal reachable. The second
+        # is played on a board the loop already killed (remaining < 0) and the third
+        # was never scored at all, so neither belongs in the rate or in its floor.
+        summary = summarize_turns([self.row(True, 1, 2, 3), self.row(False, 1, 2, -1),
+                                   self.row(False, 1, 2, None)])
+        self.assertEqual(summary["decision_turns"], 3)
+        self.assertEqual(summary["solvable_decisions"], 1)
+        self.assertEqual(summary["action_keeps_goal_reachable_rate"], 1.0)
         self.assertEqual(summary["reachable_candidate_rate"], 0.5)
 
 

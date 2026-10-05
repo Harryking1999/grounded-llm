@@ -205,7 +205,7 @@ class TrajectoryProtocolTest(unittest.TestCase):
         config = dict(self.config, evaluation=dict(train_diagnostic_tasks=256, numbering_variants=6, shard_tasks=64))
         manifest = dict(config=config, records=[dict(split=s) for s in ("train", "validation", "test") for _ in range(129)])
         jobs = checkpoint_jobs("path", Path("/run/final"), manifest, Path("/run"))
-        self.assertEqual(len(jobs), 18)
+        self.assertEqual(len(jobs), 21)  # train reference, both validation modes, four test controls
         test = [j for j in jobs if "/test_reference_map/" in j["key"]]
         self.assertEqual(len(test), 3)
         self.assertTrue(test[-1]["key"].endswith("00128_00129"))

@@ -1,4 +1,4 @@
-"""Detached four-GPU queue: two independent trainers, shared checkpoint evaluators."""
+"""Detached training/evaluation queue, with disjoint evaluation workers."""
 
 from argparse import ArgumentParser
 import json
@@ -188,9 +188,18 @@ def live_children(status, root):
 
 def main():
     parser = ArgumentParser()
-    for arg in ("run-root", "model-path", "graph-source", "blocks-source-manifest", "blocks-official", "blocks-q", "blocks-q-data"):
+    for arg in ("run-root", "model-path"):
         parser.add_argument("--" + arg, type=Path, required=True)
-    parser.add_argument("--gpus", type=int, nargs=4, default=[0, 1, 2, 3])
+    training_inputs = ("graph-source", "blocks-source-manifest", "blocks-official", "blocks-q", "blocks-q-data")
+    for arg in training_inputs:
+        parser.add_argument("--" + arg, type=Path)
+    parser.add_argument("--gpus", type=int, nargs="+", default=[0, 1, 2, 3])
+    parser.add_argument("--evaluation-only", action="store_true",
+                        help="Read existing manifests and checkpoints; never prepare data or train")
+    parser.add_argument("--include-prefix", action="append", default=[],
+                        help="Evaluation-only worker owns these keys; the main queue must delegate them")
+    parser.add_argument("--status-file", type=Path,
+                        help="Separate status path for a worker on another host sharing this run")
     parser.add_argument("--prepare-workers", type=int, default=1,
                         help="Forked processes each preparation task may use; the two tasks run at once")
     parser.add_argument("--delegate-prefix", action="append", default=[],
@@ -201,18 +210,31 @@ def main():
                              "queue keeps evaluating them without holding a card for a trainer it "
                              "will never start")
     args = parser.parse_args()
+    if args.evaluation_only:
+        if not args.include_prefix or args.status_file is None:
+            parser.error("--evaluation-only requires --include-prefix and --status-file")
+    elif args.include_prefix or len(args.gpus) < 2 or any(getattr(args, name.replace("-", "_")) is None for name in training_inputs):
+        parser.error("training queue requires its data/map inputs and at least two GPUs; --include-prefix is evaluation-only")
     root = args.run_root.resolve()
+    previous = args.status_file.resolve() if args.status_file else root / "queue_status.json"
+    if args.evaluation_only and previous == root / "queue_status.json":
+        parser.error("evaluation worker must not overwrite the main queue's status")
+    previous.parent.mkdir(parents=True, exist_ok=True)
     logs = root / "logs"
     logs.mkdir(parents=True, exist_ok=True)
     env = dict(os.environ, OMP_NUM_THREADS="1", MKL_NUM_THREADS="1", TOKENIZERS_PARALLELISM="false")
     tasks = {"path": dict(config=CONFIGS / "path_single_long.json", gpu=args.gpus[0],
                  prepare=["--source-root", str(args.graph_source)], train=["--source-root", str(args.graph_source)]),
-             "blocks": dict(config=CONFIGS / "blocks1000_long.json", gpu=args.gpus[1],
+             "blocks": dict(config=CONFIGS / "blocks1000_long.json", gpu=args.gpus[min(1, len(args.gpus) - 1)],
                  prepare=["--source-manifest", str(args.blocks_source_manifest), "--official-data", str(args.blocks_official),
                           "--q-checkpoint", str(args.blocks_q), "--q-training-data", str(args.blocks_q_data)],
                  train=["--q-checkpoint", str(args.blocks_q)])}
     processes, pending, known, completed, failed = {}, [], set(), [], []
-    previous = root / "queue_status.json"
+    if args.evaluation_only:
+        tasks = {task: spec for task, spec in tasks.items()
+                 if any(prefix.startswith(task + "/") for prefix in args.include_prefix)}
+        if not tasks:
+            parser.error("include prefixes must start with path/ or blocks/")
     watched = live_children(json.loads(previous.read_text()) if previous.is_file() else None, root)
 
     def launch(key, module, arguments, gpu=None):
@@ -238,6 +260,10 @@ def main():
     # and any child still running, which it watches instead of starting again.
     for task, spec in tasks.items():
         manifest = root / task / "data/manifest.json"
+        if args.evaluation_only:
+            spec["manifest"] = json.loads(manifest.read_text())
+            spec["phase"] = "evaluation"
+            continue
         if task + "/prepare" in watched:
             spec["phase"] = "prepare"
             continue
@@ -320,6 +346,8 @@ def main():
             published = list((root / task / "training/models").glob("*/evaluation_ready.json"))
             for ready in sorted(published, key=lambda path: checkpoint_progress(path.parent), reverse=True):
                 for job in checkpoint_jobs(task, ready.parent, spec["manifest"], root):
+                    if args.include_prefix and not job["key"].startswith(tuple(args.include_prefix)):
+                        continue
                     if job["key"] in known or job["key"].startswith(tuple(args.delegate_prefix)):
                         continue
                     known.add(job["key"])
@@ -334,8 +362,10 @@ def main():
             running={**{k: dict(pid=v["process"].pid, gpu=v["gpu"], log=v["log"]) for k, v in processes.items()},
                      **watched},
             pending_evaluations=len(pending), completed=completed, failed=failed)
-        atomic_json(root / "queue_status.json", status)
-        if not processes and not pending and not watched:
+        atomic_json(previous, status)
+        waiting_for_final = args.evaluation_only and any(
+            not (root / task / "training/models/final/evaluation_ready.json").is_file() for task in tasks)
+        if not processes and not pending and not watched and not waiting_for_final:
             break
         time.sleep(15)
     # Aggregate across shards so paired target changes can cross shard boundaries.
@@ -345,13 +375,15 @@ def main():
             continue
         groups = defaultdict_list(root / "evaluation" / task)
         for group, shards in groups.items():
-            if group.relative_to(root / "evaluation").as_posix().startswith(tuple(args.delegate_prefix)):
+            key = group.relative_to(root / "evaluation").as_posix() + "/"
+            if (args.include_prefix and not key.startswith(tuple(args.include_prefix))) or key.startswith(tuple(args.delegate_prefix)):
                 # Delegated shards are still arriving; aggregating now would freeze a
                 # partial battery under the group's final summary.json. Its owner does it.
                 continue
             results = [json.loads(line) for shard in shards for line in (shard / "cases.jsonl").read_text().splitlines()]
             atomic_json(group / "summary.json", aggregate(results, spec["manifest"]))
-    atomic_json(root / "completion.json", dict(success=not failed, failed=failed, completed_jobs=len(completed)))
+    completion = previous.with_name(previous.stem + "_completion.json") if args.status_file else root / "completion.json"
+    atomic_json(completion, dict(success=not failed, failed=failed, completed_jobs=len(completed)))
     if failed:
         raise SystemExit(1)
 

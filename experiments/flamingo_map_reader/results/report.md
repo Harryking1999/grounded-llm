@@ -29,7 +29,7 @@ rollout 额外报告**动作可达率**：选中合法动作后目标仍可达�
 
 ## 2. 主结果：长程 rollout
 
-<img src="figures/rollout_learning_curves.png" alt="寻路与积木随训练 epoch 变化的闭环到达率和到达且最短路率" width="100%">
+![寻路与积木随训练 epoch 变化的闭环到达率和到达且最短路率](C:/Users/TH.Xie/Desktop/kyo/grounded-llm-diagnostic-audit/experiments/flamingo_map_reader/results/figures/rollout_learning_curves.png)
 
 *图 1．非零步任务的两项闭环主指标，寻路 500 题、积木 1,000 题；模型与贪心均排除初始即目标。左右为任务，上下为到达率与到达且最短路率，同一行共享纵轴范围。[矢量 PDF](figures/rollout_learning_curves.pdf)。*
 
@@ -83,7 +83,7 @@ validation 涉及 32 个未作训练目标的节点、532 个物理任务；目�
 
 ## 3. 主结果：reference 动作选择
 
-<img src="figures/reference_learning_curves.png" alt="寻路与积木随训练 epoch 变化的 reference 动作可达率和最短路动作率" width="100%">
+![寻路与积木随训练 epoch 变化的 reference 动作可达率和最短路动作率](C:/Users/TH.Xie/Desktop/kyo/grounded-llm-diagnostic-audit/experiments/flamingo_map_reader/results/figures/reference_learning_curves.png)
 
 *图 2．同一批参考状态下的两项动作主指标；左右为任务，上下为动作可达率与最短路动作率。寻路可达率接近 100%，区分度主要来自最短路动作率；积木的两项能力均随接口训练明显改善。[矢量 PDF](figures/reference_learning_curves.pdf)。*
 
@@ -172,7 +172,7 @@ epoch 4→5 的非零步成功增加 62 题，其中非清空增加 59 题、清
 
 每轮动作可达率仍按“选择后保住目标可达／作答前仍可解的非终止决策轮”计算。非法动作、格式错误或提前停止计错；作答前已有死局及终止回答不进入分母。沿用证据汇总器的状态回放，分别补齐 epoch 3、4、5 rollout 的 6、3、12 个缺失决策轮，未改写原始分片，也未重新生成回答。随机参照先计算每个可解状态的可行候选比例，再对同一轮的状态取平均，不能用候选槽位加权比例替代。
 
-<img src="figures/blocks_final_trajectory_steps.png" alt="积木 epoch 5 的 reference 与 rollout 逐步动作对比，以及累计到达和首次死局" width="100%">
+![积木 epoch 5 的 reference 与 rollout 逐步动作对比，以及累计到达和首次死局](C:/Users/TH.Xie/Desktop/kyo/grounded-llm-diagnostic-audit/experiments/flamingo_map_reader/results/figures/blocks_final_trajectory_steps.png)
 
 *图 3．积木 final：上排以决策步数对比 reference（蓝色圆点）和 rollout（朱红色方点）的动作可达率、最短路动作率；空心点表示该步可解样本少于 30，尾部不连线。下排以实际执行动作数展示累计到达、累计首次死局，固定分母为 1,000 个非零步任务；橙色虚线是实际地图贪心示范轨迹，不是执行 reference 模型回答得到的成绩。[矢量 PDF](figures/blocks_final_trajectory_steps.pdf)。*
 
@@ -245,7 +245,7 @@ python -m experiments.flamingo_map_reader.src.analyze_rollout_turns \
 
 #### 寻路 final：绕路与完成速度的逐步对比
 
-<img src="figures/path_final_trajectory_steps.png" alt="寻路 epoch 3 的逐步最短路动作率及随实际步数变化的累计到达比例" width="100%">
+![寻路 epoch 3 的逐步最短路动作率及随实际步数变化的累计到达比例](C:/Users/TH.Xie/Desktop/kyo/grounded-llm-diagnostic-audit/experiments/flamingo_map_reader/results/figures/path_final_trajectory_steps.png)
 
 *图 4．寻路 final（epoch 3）：左图为 reference／rollout 的逐步最短路动作率，空心点同图 3；右图为 500 个非零步任务随实际执行步数变化的累计到达，模型为朱红色实线、地图贪心为橙色虚线。累计曲线使用固定任务分母，动作曲线使用该轮仍可解的决策分母。[矢量 PDF](figures/path_final_trajectory_steps.pdf)。*
 
@@ -276,7 +276,7 @@ python -m experiments.flamingo_map_reader.src.analyze_rollout_turns \
 
 动作落入地图最小候选集合，说明选择与地图几何一致；接受集合中的任意动作，不要求复现某一个并列示范。它是读图的动作诊断，不替代上面的任务主指标。
 
-<img src="figures/map_reading_learning_curves.png" alt="模型选择地图最优动作的比例随训练 epoch 变化" width="100%">
+![模型选择地图最优动作的比例随训练 epoch 变化](C:/Users/TH.Xie/Desktop/kyo/grounded-llm-diagnostic-audit/experiments/flamingo_map_reader/results/figures/map_reading_learning_curves.png)
 
 *图 5．参考状态下选择地图最优动作的比例，分母为全部非终止决策轮，积木包含示范历史已死局状态。贪心的 100% 由指标定义决定；随机线计入地图最优候选的全部并列项。曲线上升说明与地图几何的动作一致性改善，地图依赖的因果证据见下方 Q 倒序实验。[矢量 PDF](figures/map_reading_learning_curves.pdf)。*
 

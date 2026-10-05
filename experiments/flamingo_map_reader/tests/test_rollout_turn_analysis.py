@@ -38,3 +38,11 @@ def test_missing_metric_cannot_silently_disappear_from_live_denominator():
     import pytest
     with pytest.raises(ValueError, match='Replay omitted'):
         summarize([dict(turn=0, done=False, remaining_shortest=2, candidates=5)])
+
+
+def test_empty_goal_is_separated_from_nonempty_and_zero_move_controls():
+    from experiments.flamingo_map_reader.src.analyze_blocks_targets import target_kind
+    assert target_kind(dict(start='31', goal='0')) == 'empty'
+    assert target_kind(dict(start='31', goal='1')) == 'nonempty'
+    assert target_kind(dict(start='31', goal='31')) == 'initial_goal'
+    assert target_kind(dict(start='0', goal='0')) == 'initial_goal'

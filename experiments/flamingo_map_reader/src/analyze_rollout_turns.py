@@ -26,6 +26,8 @@ def summarize(rows):
     counts = [r['candidates'] for r in live]
     return dict(decisions=len(decisions), solvable=n, already_dead=len(decisions)-n,
                 kept=kept, rate=kept/n if n else None,
+                shortest=sum(bool(r.get('action_environment_shortest')) for r in live),
+                map_minimum_all_decisions_rate=sum(bool(r.get('action_map_minimum')) for r in decisions)/len(decisions) if decisions else None,
                 candidates_mean=mean(counts) if n else None,
                 candidates_median=median(counts) if n else None,
                 random_rate=mean(r['reachable_candidates']/r['candidate_slots']

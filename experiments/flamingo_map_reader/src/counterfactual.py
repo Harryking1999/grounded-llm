@@ -65,6 +65,31 @@ def swap_candidate_q(step, pair):
         map_minimal_candidates=minimal)
 
 
+def reverse_candidate_q(step):
+    """Reverse distance-ranked Q contents, preserving all physical slot addresses.
+
+    Sort by (distance, local ID), then send the farthest content to the nearest
+    slot and vice versa. Ties use local ID deterministically. Current and goal
+    vectors, physical actions, destinations, and candidate IDs never move.
+    Returns the intervened step and zero-based source index for each slot.
+    """
+    count = len(step.candidate_actions)
+    ordered = sorted(range(count), key=lambda i: (step.candidate_map_distances[i], i))
+    sources = list(range(count))
+    for target, source in zip(ordered, reversed(ordered)):
+        sources[target] = source
+    batch = step.map_batch
+    vectors = batch.vectors.clone()
+    if count:
+        vectors[:, 2:count + 2] = batch.vectors[:, [i + 2 for i in sources]]
+    distances = tuple(step.candidate_map_distances[i] for i in sources)
+    minimum = min(distances, default=float('inf'))
+    minimal = tuple(i for i, distance in enumerate(distances, 1)
+                    if np.isclose(distance, minimum, rtol=1e-10, atol=1e-12))
+    return replace(step, map_batch=MapBatch(vectors, batch.roles, batch.candidate_ids, batch.valid),
+                   candidate_map_distances=distances, map_minimal_candidates=minimal), tuple(sources)
+
+
 def swap_best_worst_q(step):
     """Keep text, physical actions, and IDs fixed while swapping two Q contents."""
     distances = list(step.candidate_map_distances)

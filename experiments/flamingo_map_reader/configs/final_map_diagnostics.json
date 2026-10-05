@@ -1,0 +1,27 @@
+{
+  "study": "final_map_diagnostics",
+  "split": "validation",
+  "variant": 0,
+  "shard_tasks": 32,
+  "final_epochs": {"path": 3, "blocks": 5},
+  "stages": [
+    {
+      "name": "q_reverse_reference",
+      "tasks": ["blocks", "path"],
+      "conditions": ["normal_saved", "distance_rank_reverse"],
+      "baseline": "completed_final_validation_reference_map_variant_0",
+      "states": "all_solvable_nonterminal_reference_turns",
+      "history": "identical_gold_text_and_original_historical_maps",
+      "intervention": "current_turn_successor_Q_only",
+      "tie_break": "local_candidate_id"
+    },
+    {
+      "name": "safe_prefix_rollout",
+      "tasks": ["blocks"],
+      "helper_steps": [1, 2, 3],
+      "helper_policy": "oracle_shortest_then_lowest_physical_action_id",
+      "history": "model_own_answers_including_overridden_turns",
+      "baseline": "completed_final_validation_rollout_map_variant_0"
+    }
+  ]
+}

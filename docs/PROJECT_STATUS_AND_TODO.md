@@ -1,6 +1,6 @@
 # 项目状态与有序 TODO
 
-更新：2026-10-05。本页记录项目动机、整体进展和研究优先级；具体实验设置与成绩分别见 [design](../experiments/flamingo_map_reader/DESIGN.md) 和 [report](../experiments/flamingo_map_reader/results/report.md)。
+更新：2026-10-06。本页记录项目动机、整体进展和研究优先级；具体实验设置与成绩分别见 [design](../experiments/flamingo_map_reader/DESIGN.md) 和 [report](../experiments/flamingo_map_reader/results/report.md)。
 
 ## 1. 为什么做这个项目
 
@@ -39,6 +39,8 @@ LLM 已有较强的语言理解和推理能力，但在复杂任务中，仍可�
 旧连续 token 接口、小样本和失败变体保留为历史证据。它们用于解释路线如何演进，不与当前协议合并统计；各实验入口见[实验目录](../experiments/README.md)。
 
 ## 4. 有序 TODO
+
+2026-10-06 用户已调整当前运行优先级：停止 no_map；先用最终 checkpoint 在两任务 reference 上做候选 Q 的距离倒序，再做积木前 1、2、3 步安全前缀的 rollout 诊断。正常对照均复用已完成的 final validation，不重复生成。精确合同与解释边界见 [DESIGN 第 8 节](../experiments/flamingo_map_reader/DESIGN.md#8-最终-checkpoint-诊断先-reference-q-倒序再-rollout-早期干预)。完整 test 与任务训练等比较仍保留为后续缺口；更大模型基线不是同一训练后接口的地图消融对照。
 
 1. **收齐当前方法的完整证据。** 优先完成积木 final validation，再收齐两任务 test 与配对对照，分别判断参考状态下的动作能力和自主闭环能力。
 2. **确认地图是否被实际使用。** 优先完成同题配对的无地图对照、候选重编号和目标变化分析，区分接口学到的任务规律与地图信息带来的收益。

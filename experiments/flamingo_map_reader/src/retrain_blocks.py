@@ -17,7 +17,7 @@ def main():
         parser.add_argument('--'+name, type=Path, required=True)
     parser.add_argument('--workers', type=int, default=8)
     parser.add_argument('--prepared-manifest', type=Path,
-                        help='Reuse identical prepared data after interface or batch-size changes')
+                        help='Reuse identical prepared data after interface, batch or checkpoint changes')
     args = parser.parse_args()
     if args.out.exists():
         raise FileExistsError(args.out)
@@ -56,8 +56,8 @@ def main():
         status()
         if args.prepared_manifest:
             prepared = json.loads(args.prepared_manifest.read_text())
-            before = {k:v for k,v in prepared['config'].items() if k != 'map'}
-            after = {k:v for k,v in config.items() if k != 'map'}
+            before = {k:v for k,v in prepared['config'].items() if k not in ('map', 'checkpoint')}
+            after = {k:v for k,v in config.items() if k not in ('map', 'checkpoint')}
             for value in (before, after):
                 value['training'] = {k:v for k,v in value['training'].items()
                     if k not in ('checkpoint_layers', 'loss_chunk_tokens',

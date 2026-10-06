@@ -1,11 +1,11 @@
 # Grounded LLM with Cognitive Maps
 
-研究 LLM 能否通过 **cross-attention 读取并利用显式状态地图**，改善动作选择与长程任务完成。当前实验冻结 Qwen2.5-1.5B-Instruct 和地图，只训练读取接口；单图寻路与 1000 初始棋盘积木分别做完整轨迹 SFT。地址 K 与状态 V 分离，积木答案限 Top-10，输入保留全部候选。
+研究 LLM 能否通过 **cross-attention 读取并利用显式状态地图**，改善动作选择与长程任务完成。当前实验冻结 Qwen2.5-1.5B-Instruct 和地图，只训练读取接口。寻路沿用地址 K 与状态 V 分离的方案；积木本次加入融合 FFN 和失败上下文重新训练，答案限 Top-10，输入保留全部候选。
 
 ## 阅读入口
 
 1. [训练与评测设计](experiments/flamingo_map_reader/DESIGN.md)：数据、文本、监督与指标。
-2. [结果报告](experiments/flamingo_map_reader/results/report.md)：reference、rollout 与地图使用证据。
+2. [上一轮结果报告](experiments/flamingo_map_reader/results/report_long_trajectory.md)：原寻路与积木的 reference、rollout 及地图使用证据。
 3. [当前状态与 TODO](docs/PROJECT_STATUS_AND_TODO.md)：唯一进度页及运行定位。
 4. [研究简述](docs/RESEARCH_BRIEF.md)：问题、主张与证据边界。
 

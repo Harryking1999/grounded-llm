@@ -24,6 +24,6 @@
 
 ## 来源与结果入口
 
-当前依赖的编码器、裁判和多棋盘读取实现来自 `codex/blocks-multigoal`（移植截止 `3a4c572`）。正式合同与实现见[实验 README](../experiments/blocks_distance_map/README.md)，本轮地图贪心参照见[读取实验报告](../experiments/flamingo_map_reader/results/report.md#4-地图贪心参照按相同任务范围比较)。
+当前依赖的编码器、裁判和多棋盘读取实现来自 `codex/blocks-multigoal`（移植截止 `3a4c572`）。正式合同与实现见[实验 README](../experiments/blocks_distance_map/README.md)，本轮地图贪心参照见[读取实验报告](../experiments/flamingo_map_reader/results/report_long_trajectory.md#6-地图贪心参照按相同任务范围比较)。
 
 另一个 Q-map 分支的[跨棋盘报告](../experiments/blocks_distance_map/results/report.md)使用独立运行和任务集合，不能将其数字替换成本轮参照。单棋盘到共享编码器的旧过程见[历史结果](../experiments/blocks_distance_map/results/archive/qmap_progression.md)。当前进度统一见[状态页](PROJECT_STATUS_AND_TODO.md)。

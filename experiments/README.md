@@ -1,6 +1,6 @@
 # 实验目录
 
-当前主线是通过 cross-attention 让冻结 LLM 读取并利用地图。先读[地图读取实验](flamingo_map_reader/README.md)及其 [design](flamingo_map_reader/DESIGN.md)、[report](flamingo_map_reader/results/report.md)；进度只维护在[项目状态页](../docs/PROJECT_STATUS_AND_TODO.md)。
+当前主线是通过 cross-attention 让冻结 LLM 读取并利用地图。先读[地图读取实验](flamingo_map_reader/README.md)及其[当前 design](flamingo_map_reader/DESIGN.md)；已有成绩见[上一轮 report](flamingo_map_reader/results/report_long_trajectory.md)，进度只维护在[项目状态页](../docs/PROJECT_STATUS_AND_TODO.md)。
 
 | 目录 | 作用 |
 |---|---|

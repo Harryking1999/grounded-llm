@@ -2,7 +2,7 @@
 
 **核心问题：给已有语言能力的模型接入显式状态地图，能否改善动作判断与长程任务完成？**
 
-当前进度见[状态页](PROJECT_STATUS_AND_TODO.md)，实际协议见[实验设计](../experiments/flamingo_map_reader/DESIGN.md)，结果见[报告](../experiments/flamingo_map_reader/results/report.md)。
+当前进度见[状态页](PROJECT_STATUS_AND_TODO.md)，实际协议见[实验设计](../experiments/flamingo_map_reader/DESIGN.md)，已有结果见[上一轮报告](../experiments/flamingo_map_reader/results/report_long_trajectory.md)。
 
 ## 问题与假设
 

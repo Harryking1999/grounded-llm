@@ -1,14 +1,14 @@
 # Cross-attention 地图读取
 
-冻结 Qwen2.5-1.5B-Instruct 和地图，只训练读取接口，让 LLM 在完整轨迹中输出远近排序、动作、停止与总结。当前条件是单图寻路和 1000 初始棋盘积木；角色／编号作 K，状态内容作 V。积木答案限最近 Top-10 加 current，输入保留全部候选。
+冻结 Qwen2.5-1.5B-Instruct 和地图，只训练读取接口，让 LLM 在完整轨迹中输出远近排序、动作、停止与总结。寻路沿用角色／编号作 K、状态内容作 V 的方案；积木本次通过共享 FFN 融合地图、角色及编号，同时供 K/V 使用，并加入失败上下文。积木答案限最近 Top-10 加 current，输入保留全部候选。
 
 ## 阅读顺序
 
 1. [DESIGN.md](DESIGN.md)：数据、输入文本、监督、训练和评测口径。
-2. [results/report.md](results/report.md)：reference 与 rollout 主结果、地图对照和辅助诊断。
+2. [上一轮 DESIGN](DESIGN_long_trajectory.md) 与[上一轮 report](results/report_long_trajectory.md)：原两任务的协议、成绩和辅助诊断，均在原目录保留。
 3. [项目状态与 TODO](../../docs/PROJECT_STATUS_AND_TODO.md)：唯一当前进度页。
 
-正式配置为 [path_single_long.json](configs/path_single_long.json) 和 [blocks1000_long.json](configs/blocks1000_long.json)。[结果摘要](results/long_trajectory_summary.json)保存分片来源、计数和数据统计；模型、原始回答及运行日志留在 Git 外。
+当前正式配置为 [path_single_long.json](configs/path_single_long.json) 和 [blocks_ffn_failure.json](configs/blocks_ffn_failure.json)；上一轮积木配置为 [blocks1000_long.json](configs/blocks1000_long.json)。[上一轮结果摘要](results/long_trajectory_summary.json)保存其分片来源、计数和数据统计；模型、原始回答及运行日志留在 Git 外。
 
 ## 积木会议决策重训
 

@@ -19,7 +19,7 @@ from .text import chat_ids
 from .train import build_reader, pinned_supervision, to_device
 from .trajectory_dataset import load_record
 from .trajectory_metrics import score_turn, summarize_turns
-from .blocks_failure import declares_no_solution
+from .blocks_failure import declares_no_solution, no_solution_terminal
 
 
 class GenerationSession:
@@ -174,7 +174,7 @@ def reference_turns(session, demo, environment):
             **score_turn(turn.step, answer, turn.answer_text if turn.step.done else None,
                          environment.config["data"].get("reported_candidates")), **usage,
             answer=answer, current=str(turn.step.current), goal=str(turn.step.goal))
-        row["no_solution_expected"] = row["remaining_shortest"] < 0
+        row["no_solution_expected"] = no_solution_terminal(turn.step)
         row["no_solution_correct"] = row["no_solution_expected"] and declares_no_solution(answer)
         row["false_no_solution"] = not row["no_solution_expected"] and declares_no_solution(answer)
         chosen = row.get("chosen_id")
@@ -205,7 +205,7 @@ def closed_loop(session, record, first, environment, config, variant):
                          config["data"].get("reported_candidates")),
             **usage, answer=answer, current=str(step.current), goal=str(goal))
         rows.append(row)
-        row["no_solution_expected"] = row["remaining_shortest"] < 0
+        row["no_solution_expected"] = no_solution_terminal(step)
         row["no_solution_correct"] = row["no_solution_expected"] and declares_no_solution(answer)
         row["false_no_solution"] = not row["no_solution_expected"] and declares_no_solution(answer)
         if usage["context_exhausted"]:

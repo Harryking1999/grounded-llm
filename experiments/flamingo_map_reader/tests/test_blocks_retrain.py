@@ -4,7 +4,8 @@ import unittest
 import torch
 
 from experiments.blocks_distance_map.src.oracle import DistanceOracle
-from experiments.flamingo_map_reader.src.blocks_failure import failure_demonstration, declares_no_solution
+from experiments.flamingo_map_reader.src.blocks_failure import (
+    failure_demonstration, declares_no_solution, no_solution_terminal)
 from experiments.flamingo_map_reader.src.trajectory_dataset import pack_demo, unpack_demo
 from experiments.flamingo_map_reader.src.trajectory_protocol import numbering_plans, renumber_demonstration
 from experiments.flamingo_map_reader.src.transcript import encode_trajectory
@@ -20,14 +21,26 @@ class RetrainTest(unittest.TestCase):
         oracle = DistanceOracle()
         for seed in range(20):
             demo = failure_demonstration(CountingMap(), dict(start=3 | (3 << 90), goal=3,
-                sample_seed=seed), oracle)
+                sample_seed=seed))
             if demo is not None:
                 self.assertGreater(oracle.distance(demo.turns[0].step.current, 3), 0)
                 self.assertEqual(oracle.distance(demo.turns[-1].step.current, 3), -1)
-                self.assertTrue(all(oracle.distance(s, 3) == -1
-                    for s in demo.turns[-1].step.candidate_destinations))
+                self.assertFalse(demo.turns[-1].step.candidate_actions)
+                self.assertFalse(demo.turns[-1].step.done)
+                # A wrong move already destroys reachability, but legal moves
+                # remain: the new target must wait until those are exhausted.
+                intermediate = demo.turns[1].step
+                self.assertEqual(oracle.distance(intermediate.current, 3), -1)
+                self.assertTrue(intermediate.candidate_actions)
+                self.assertFalse(no_solution_terminal(intermediate))
                 return demo
         self.fail('Expected one deliberately bad greedy tie choice')
+
+    def test_goal_and_action_budget_are_not_no_solution(self):
+        self.assertIsNone(failure_demonstration(CountingMap(),
+            dict(start=3, goal=0, sample_seed=0)))
+        self.assertIsNone(failure_demonstration(CountingMap(),
+            dict(start=3 | (3 << 90), goal=3, sample_seed=0), max_actions=1))
 
     def test_failure_actions_masked_after_save_and_renumber(self):
         demo = unpack_demo(pack_demo(self.failure()), 'blocks')

@@ -19,12 +19,13 @@
 
 保留原 9000 条成功训练轨迹，另加 1000 条地图贪心失败轨迹。旧数据清单没有失败训练样本，
 原采样器记录剔除了 3282 条贪心失败样本但未保存具体轨迹，因此在训练棋盘上重新生成。
-新增样本截在第一次进入无解状态的位置，之前所有 assistant 回答均为上下文、loss 为零；
-仅最后无解回答参与监督。环境 oracle 只用于制作标签和评分，不进入模型输入。
-当前未到目标且所有合法候选都不能到达目标时（含无合法候选），使用用户已确认的固定答案：
+新增样本照常执行地图贪心动作，直到没有合法动作且仍未到目标；不要求中途判断不可达。
+之前所有 assistant 回答均为上下文、loss 为零，仅最后无解回答参与监督。
+无解终止仅依赖当前棋盘与合法候选列表；oracle 仍用于任务最短长度和原有评测指标。
+用户确认使用 action none 和 done；按后续修订的终止条件，固定答案为：
 
 ```text
-No solution: none of the legal next moves can reach the goal.
+No solution: no legal moves remain and the goal has not been reached.
 <action>none</action>
 <done/>
 ```

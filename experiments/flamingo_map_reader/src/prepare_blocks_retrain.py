@@ -40,7 +40,7 @@ def failure_candidates(board):
             continue
         record = dict(board_row=board[0], start=str(start), goal=str(goal),
                       shortest_moves=distance, sample_seed=int(rng.integers(2**32)))
-        demo = failure_demonstration(WORK['qmap'], record, oracle,
+        demo = failure_demonstration(WORK['qmap'], record,
             max_actions=config['maximum_demonstration_actions'],
             reported=config['data']['reported_candidates'])
         if demo is None or physical_pairs(demo) & WORK['excluded']:
@@ -131,12 +131,14 @@ def main():
         if any(quota.values()):
             raise ValueError(f'Insufficient evaluation tasks for {group}: {quota}')
     records = []
+    # One directory link avoids thousands of slow shared-filesystem metadata writes.
+    (root / 'source').symlink_to(old_root.resolve(), target_is_directory=True)
     for record in [*train, *validation, *selected]:
         if record['trajectory_id'] in new_demos:
             record = prepare_record(new_demos[record['trajectory_id']], record, config,
                 tokenizer, root / (record['trajectory_id'] + '.pt'))
         else:
-            (root / record['prepared_file']).symlink_to((old_root / record['prepared_file']).resolve())
+            record = dict(record, prepared_file='source/' + record['prepared_file'])
         records.append(record)
     print(json.dumps(dict(phase='balanced_test', counts=dict(Counter(
         f"{r['group']}:{r['shortest_moves']}" for r in records if r['split']=='test')))), flush=True)
@@ -166,7 +168,7 @@ def main():
                 if accepted == count:
                     break
         if accepted != count:
-            raise ValueError(f'Only {accepted}/{count} certified failures for {split}')
+            raise ValueError(f'Only {accepted}/{count} exhausted failures for {split}')
     with mp.get_context('fork').Pool(args.workers) as pool:
         for i, record in enumerate(pool.imap(prepare_failure, negative_jobs, chunksize=1)):
             records.append(record)
@@ -178,7 +180,8 @@ def main():
     audit = dict(source_training_tasks=len(train), source_failed_training_tasks=0,
         previously_rejected=old.get('rejected_training', {}),
         added_training_failures=options['failure_trajectories'],
-        negative_supervision='only final certified no_solution; all previous assistant turns masked',
+        negative_supervision='only final no-legal-moves, non-goal answer; all previous assistant turns masked',
+        failure_endpoint='no_legal_moves_and_not_at_goal',
         negative_source='regenerated failures on training boards; rejected source records were not saved',
         no_solution_test_tasks=options['test_no_solution_trajectories'],
         training_tasks=sum(r['split']=='train' for r in records),

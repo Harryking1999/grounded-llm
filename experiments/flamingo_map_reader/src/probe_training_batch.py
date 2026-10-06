@@ -19,6 +19,8 @@ def main():
     for name in ('config', 'manifest', 'model-path', 'out'):
         parser.add_argument('--'+name, type=Path, required=True)
     parser.add_argument('--batch-size', type=int, required=True)
+    parser.add_argument('--stress-profile', type=Path)
+    parser.add_argument('--steps', type=int, default=2)
     args = parser.parse_args()
     rank = int(os.environ['LOCAL_RANK'])
     torch.set_num_threads(1)
@@ -27,10 +29,22 @@ def main():
     config = json.loads(args.config.read_text())
     set_seed(config['seed'])
     manifest = json.loads(args.manifest.read_text())
-    records = sorted((r for r in manifest['records'] if r['split']=='train'),
-                     key=lambda r: -r['max_tokens'])[:args.batch_size]
-    dataset = PreparedTrajectoryDataset(args.manifest, records, config)
-    examples = [dataset[sum(r['variants'] for r in records[:i])] for i in range(len(records))]
+    if args.stress_profile:
+        profile = json.loads(args.stress_profile.read_text())
+        if Path(profile['manifest']).resolve() != args.manifest.resolve():
+            raise ValueError('Stress profile belongs to a different manifest')
+        by_id = {r['trajectory_id']: r for r in manifest['records'] if r['split']=='train'}
+        selected = profile['selected']
+        if args.batch_size < len(selected):
+            raise ValueError('Batch must cover every padding extremum')
+        examples = [PreparedTrajectoryDataset(args.manifest, [by_id[r['trajectory_id']]], config)[r['variant']]
+                    for r in selected]
+        examples = [examples[i % len(examples)] for i in range(args.batch_size)]
+    else:
+        records = sorted((r for r in manifest['records'] if r['split']=='train'),
+                         key=lambda r: -r['max_tokens'])[:args.batch_size]
+        dataset = PreparedTrajectoryDataset(args.manifest, records, config)
+        examples = [dataset[sum(r['variants'] for r in records[:i])] for i in range(len(records))]
     tokenizer = AutoTokenizer.from_pretrained(args.model_path)
     base = AutoModelForCausalLM.from_pretrained(args.model_path, torch_dtype=torch.bfloat16)
     base.config.use_cache = False
@@ -42,7 +56,7 @@ def main():
     inputs = {k: v.to(rank) for k,v in inputs.items()}
     losses = []
     started = time.monotonic()
-    for _ in range(2):
+    for _ in range(args.steps):
         optimizer.zero_grad(set_to_none=True)
         with torch.autocast('cuda', dtype=torch.bfloat16):
             output = model(map_batch=timeline, **inputs)
@@ -57,7 +71,12 @@ def main():
         global_batch=args.batch_size*torch.distributed.get_world_size(),
         tokens=inputs['input_ids'].shape[1], losses=losses,
         ffn_gradient_norm=reader.memory_encoder.feature_ffn[0].weight.grad.norm().item(),
-        peak_gib=torch.cuda.max_memory_allocated()/1024**3, seconds=time.monotonic()-started)
+        peak_gib=torch.cuda.max_memory_allocated()/1024**3,
+        reserved_gib=torch.cuda.max_memory_reserved()/1024**3,
+        total_gib=torch.cuda.get_device_properties(rank).total_memory/1024**3,
+        snapshots=max(timeline.snapshot_counts), slots=timeline.snapshots.valid.shape[1],
+        steps=args.steps, stress_profile=str(args.stress_profile) if args.stress_profile else None,
+        seconds=time.monotonic()-started)
     args.out.mkdir(parents=True, exist_ok=True)
     (args.out/f'rank_{rank}.json').write_text(json.dumps(result,indent=2)+'\n')
     print(json.dumps(result), flush=True)

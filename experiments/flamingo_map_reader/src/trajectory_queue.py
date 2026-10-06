@@ -108,14 +108,16 @@ def checkpoint_progress(directory):
     return float("inf") if name == "final" else int(name.split("-")[-1])
 
 
-def resume_point(models):
+def resume_point(models, world_size=1):
     """Newest checkpoint Trainer finished writing, or None for a fresh run.
 
     Trainer publishes evaluation_ready.json only after adapter, optimizer,
     scheduler, RNG and state are all on disk, so its presence is what separates
     a checkpoint worth continuing from one a crash left half-written.
     """
-    published = [ready.parent for ready in models.glob("checkpoint-*/evaluation_ready.json")]
+    from .train import full_checkpoint
+    published = [ready.parent for ready in models.glob("checkpoint-*/evaluation_ready.json")
+                 if full_checkpoint(ready.parent, world_size)]
     return max(published, key=lambda path: int(path.name.split("-")[-1])) if published else None
 
 

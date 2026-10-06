@@ -43,6 +43,36 @@ No solution: no legal moves remain and the goal has not been reached.
 并仅对有监督 token 分块计算交叉熵；目标仍是同一 assistant-token 平均交叉熵。
 单元测试比较普通计算与优化计算的 loss 和全部可训练梯度，避免因节省显存改变监督。
 
+从仓库根目录启动完整流程（路径参数由调用者指定，节点信息不写入源码）：
+
+```bash
+python -m experiments.flamingo_map_reader.src.retrain_blocks \
+  --config experiments/flamingo_map_reader/configs/blocks_ffn_failure.json \
+  --source-manifest "$SOURCE_MANIFEST" --model-path "$MODEL_PATH" --out "$RUN_DIR"
+```
+
+已有准备数据时加 `--prepared-manifest "$PREPARED_MANIFEST"`，复用轨迹和编号，
+并核对监督、采样与训练预算。保存间隔由合同的 `checkpoint.every_epoch_fraction` 控制。
+中断后，以同一配置、模型路径和输出目录调用上述命令并加 `--resume`；
+入口复用现有队列的断点选择及评测分片重试，底层仍调用 `train.py --resume CHECKPOINT`。
+只选择已发布且包含 adapter、optimizer、scheduler、trainer state 和全部进程 RNG 状态的断点；
+初始权重与未写完的目录不作为续训断点，无完整断点时明确报错。
+Trainer 恢复已完成步数、epoch 与数据顺序，继续原有总预算，不额外增加训练轮数。
+
+训练结束后复用 `trajectory_eval.py` 完成主测试 reference、主测试 rollout 和失败上下文 reference，
+由四个 GPU 分片执行，再用同一 `aggregate` 汇总；完成的评测分片在恢复时直接复用。
+也可独立调用任意已保存权重进行评测：
+
+```bash
+python -m experiments.flamingo_map_reader.src.trajectory_eval \
+  --manifest "$RUN_DIR/data/manifest.json" --model-path "$MODEL_PATH" \
+  --adapter-checkpoint "$CHECKPOINT_DIR/adapter.pt" \
+  --split test --mode reference --variants 1 --out "$EVAL_DIR"
+```
+
+`--mode rollout` 用于自主执行，`--split test_no_solution --mode reference` 用于失败上下文诊断。
+分片参数 `--start`、`--stop` 与生成预算均沿用共享评测器及合同，原始回答和摘要留在运行目录。
+
 ## 代码与目录
 
 | 功能 | 入口 |

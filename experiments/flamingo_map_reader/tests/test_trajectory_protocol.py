@@ -130,6 +130,9 @@ class TrajectoryProtocolTest(unittest.TestCase):
             for step in (0, 128, 8064):
                 (models / f"checkpoint-{step}").mkdir(parents=True)
                 (models / f"checkpoint-{step}/evaluation_ready.json").write_text("{}")
+                if step:
+                    for name in ("adapter.pt", "optimizer.pt", "scheduler.pt", "trainer_state.json", "rng_state.pth"):
+                        (models / f"checkpoint-{step}" / name).touch()
             # A crash between saves leaves a directory Trainer never published,
             # and the closing "final" copy is published too but is not a step.
             (models / "checkpoint-8192").mkdir()
@@ -137,6 +140,17 @@ class TrajectoryProtocolTest(unittest.TestCase):
             (models / "final/evaluation_ready.json").write_text("{}")
             self.assertEqual(resume_point(models).name, "checkpoint-8064")
             self.assertIsNone(resume_point(root / "absent/models"))
+
+            # A four-rank save is usable only after all four RNG files exist.
+            newest = models / "checkpoint-8192"
+            (newest / "evaluation_ready.json").write_text("{}")
+            for name in ("adapter.pt", "optimizer.pt", "scheduler.pt", "trainer_state.json"):
+                (newest / name).touch()
+            for rank in range(3):
+                (newest / f"rng_state_{rank}.pth").touch()
+            self.assertIsNone(resume_point(models, world_size=4))
+            (newest / "rng_state_3.pth").touch()
+            self.assertEqual(resume_point(models, world_size=4), newest)
 
             evaluation = root / "evaluation"
             shard = evaluation / "path/checkpoint-0/train_reference_map/00000_00002"

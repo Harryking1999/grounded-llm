@@ -49,16 +49,20 @@ class TrainerTest(unittest.TestCase):
     def test_standard_batch_save_and_resume(self):
         environment, qmap = line_graph()
         step = graph_step(environment, qmap, 1, 2, executed_path=[1])
-        examples = [(EncodedTrajectory([2, 3, 4, 5], [-100, -100, 4, 5], [0]*4, 2), [step])
-                    for _ in range(4)]
+        examples = [(EncodedTrajectory([2, 3, 4+i, 5+i], [-100, -100, 4+i, 5+i], [0]*4, 2), [step])
+                    for i in range(4)]
 
         def model():
             set_seed(7)
             base = Qwen2ForCausalLM(Qwen2Config(vocab_size=32, hidden_size=32,
                 intermediate_size=64, num_hidden_layers=1, num_attention_heads=2,
-                num_key_value_heads=1, max_position_embeddings=32, pad_token_id=0))
+                num_key_value_heads=1, max_position_embeddings=32, pad_token_id=0,
+                attention_dropout=0.1))
             base.config.use_cache = False
-            return MapReader(base, MapMemoryEncoder(2, 32, 2, 8, 4), 2, head_dim=8)
+            reader = MapReader(base, JointFeatureMapMemoryEncoder(2, 32, 2, 8, 4, 16),
+                2, head_dim=8, checkpoint_layers=True, loss_chunk_tokens=2)
+            reader.conditioned_layers[0].map_attention.gate.data.fill_(0.1)
+            return reader
 
         def trainer(reader, output):
             args = TrainingArguments(output_dir=str(output), use_cpu=True,
@@ -85,6 +89,10 @@ class TrainerTest(unittest.TestCase):
             second = trainer(restarted, Path(directory)/"second")
             second.train(resume_from_checkpoint=str(checkpoint))
             self.assertEqual(second.state.global_step, 2)
+            self.assertEqual(first.lr_scheduler.state_dict(), second.lr_scheduler.state_dict())
+            for left, right in zip(first.optimizer.state.values(), second.optimizer.state.values()):
+                for key in left:
+                    torch.testing.assert_close(left[key], right[key], atol=0, rtol=0)
             for (_, left), (_, right) in zip(initial.named_parameters(), restarted.named_parameters()):
                 torch.testing.assert_close(left, right, atol=0, rtol=0)
 

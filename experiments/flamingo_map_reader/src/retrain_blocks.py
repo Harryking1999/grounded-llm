@@ -10,6 +10,10 @@ import subprocess
 import sys
 import traceback
 
+from filelock import FileLock
+
+from .trajectory_queue import clear_partial_shard, resume_point
+
 
 def main():
     parser = ArgumentParser()
@@ -18,12 +22,22 @@ def main():
     parser.add_argument('--workers', type=int, default=8)
     parser.add_argument('--prepared-manifest', type=Path,
                         help='Reuse identical prepared data after interface, batch or checkpoint changes')
+    parser.add_argument('--resume', action='store_true',
+                        help='Continue the existing output from its newest complete checkpoint')
     args = parser.parse_args()
-    if args.out.exists():
+    if args.out.exists() and not args.resume:
         raise FileExistsError(args.out)
-    args.out.mkdir(parents=True)
+    if args.resume and not (args.out/'data/manifest.json').is_file():
+        raise ValueError('Resume requires an existing prepared manifest in the same output')
+    args.out.mkdir(parents=True, exist_ok=args.resume)
+    with FileLock(str(args.out/'.pipeline.lock'), timeout=0):
+        run(args)
+
+
+def run(args):
+    """Use the same training and evaluation modules for fresh and resumed runs."""
     logs = args.out/'logs'
-    logs.mkdir()
+    logs.mkdir(exist_ok=args.resume)
     config = json.loads(args.config.read_text())
     if config['task'] != 'blocks' or config['training']['world_size'] != 4:
         raise ValueError('This run requires blocks and four GPUs')
@@ -37,7 +51,7 @@ def main():
         print(json.dumps(state), flush=True)
 
     def execute(name, command, env=None):
-        with (logs/(name+'.log')).open('w') as log:
+        with (logs/(name+'.log')).open('a' if args.resume else 'w') as log:
             child = subprocess.Popen(command, stdout=log, stderr=subprocess.STDOUT,
                 stdin=subprocess.DEVNULL, env=env)
             code = child.wait()
@@ -54,7 +68,10 @@ def main():
 
     try:
         status()
-        if args.prepared_manifest:
+        if args.resume:
+            if json.loads((args.out/'data/manifest.json').read_text())['config'] != config:
+                raise ValueError('Resume must use the existing run configuration')
+        elif args.prepared_manifest:
             prepared = json.loads(args.prepared_manifest.read_text())
             before = {k:v for k,v in prepared['config'].items() if k not in ('map', 'checkpoint')}
             after = {k:v for k,v in config.items() if k not in ('map', 'checkpoint')}
@@ -80,7 +97,16 @@ def main():
         manifest = json.loads(manifest_path.read_text())
         status(phase='probe', audit=manifest['audit'])
         batch = None
-        for candidate in config['training']['batch_size_candidates_per_device']:
+        final = args.out/'training/models/final'
+        training_done = (final/'evaluation_ready.json').is_file() and (final/'adapter.pt').is_file()
+        resume = None
+        if args.resume and not training_done:
+            resume = resume_point(args.out/'training/models', config['training']['world_size'])
+            if resume is None:
+                raise ValueError('No complete training checkpoint exists; refusing to restart silently')
+            saved = json.loads((args.out/'training/config.json').read_text())
+            batch = saved['batch_size']
+        for candidate in (() if args.resume else config['training']['batch_size_candidates_per_device']):
             name = f'probe_batch_{candidate}'
             try:
                 execute(name, distributed('probe_training_batch') + [
@@ -93,13 +119,15 @@ def main():
                 log = (logs/(name+'.log')).read_text()
                 if 'out of memory' not in log.lower():
                     raise
-        if batch is None:
+        if batch is None and not training_done:
             raise RuntimeError('No requested batch fits; all probes failed with OOM')
-        status(phase='training', per_device_batch=batch, global_batch=4*batch)
-        execute('training', distributed('train') + ['--config', str(args.config),
-            '--manifest', str(manifest_path), '--model-path', str(args.model_path),
-            '--q-checkpoint', manifest['q_checkpoint'], '--batch-size', str(batch),
-            '--out', str(args.out/'training')])
+        if not training_done:
+            status(phase='training', per_device_batch=batch, global_batch=4*batch,
+                   resume_checkpoint=str(resume) if resume else None)
+            execute('training', distributed('train') + ['--config', str(args.config),
+                '--manifest', str(manifest_path), '--model-path', str(args.model_path),
+                '--q-checkpoint', manifest['q_checkpoint'], '--batch-size', str(batch),
+                '--out', str(args.out/'training')] + (['--resume', str(resume)] if resume else []))
         checkpoint = args.out/'training/models/final/adapter.pt'
         status(phase='evaluation', checkpoint=str(checkpoint))
         jobs = []
@@ -112,6 +140,10 @@ def main():
         def lane(gpu):
             for split, mode, start, stop in jobs[gpu::4]:
                 name = f'{split}_{mode}_{start:05d}_{stop:05d}'
+                output = args.out/'evaluation'/name
+                if args.resume and (output/'summary.json').is_file():
+                    continue
+                clear_partial_shard(output)
                 execute(name, python('trajectory_eval') + ['--manifest', str(manifest_path),
                     '--adapter-checkpoint', str(checkpoint), '--model-path', str(args.model_path),
                     '--out', str(args.out/'evaluation'/name), '--split', split, '--mode', mode,

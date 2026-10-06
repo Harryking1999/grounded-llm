@@ -156,6 +156,9 @@ class EpochCheckpoint(TrainerCallback):
         return control
 
     def on_save(self, args, state, control, **kwargs):
+        if torch.distributed.is_initialized():
+            # Publish only after every rank has finished writing its RNG state.
+            torch.distributed.barrier()
         if state.is_world_process_zero:
             checkpoint_ready(Path(args.output_dir) / f"checkpoint-{state.global_step}",
                              state.global_step, state.epoch)
@@ -244,6 +247,14 @@ def pinned_supervision(contract):
     return {**contract, "config": config}
 
 
+def full_checkpoint(path, world_size=1):
+    """A continuation needs all ranks' RNG state as well as optimizer progress."""
+    path = Path(path)
+    files = ("adapter.pt", "optimizer.pt", "scheduler.pt", "trainer_state.json")
+    rng = ["rng_state.pth"] if world_size == 1 else [f"rng_state_{i}.pth" for i in range(world_size)]
+    return all((path / name).is_file() for name in (*files, *rng))
+
+
 def last_measured_step(output):
     """Last step already recorded for this output; None when nothing was measured."""
     history = Path(output) / "convergence.jsonl"
@@ -314,6 +325,8 @@ def main():
             raise ValueError("Graph SFT requires its frozen source graphs")
     else:
         raise ValueError(f"Unsupported map-reader task: {task}")
+    if args.resume is not None and not full_checkpoint(args.resume, world_size):
+        raise ValueError("Resume requires adapter, optimizer, scheduler, trainer state and every rank's RNG state")
     if args.out.exists() and args.resume is None:
         raise FileExistsError(args.out)
     if world_size > 1:

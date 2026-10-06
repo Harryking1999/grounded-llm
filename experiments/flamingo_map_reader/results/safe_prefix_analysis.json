@@ -1,0 +1,221 @@
+{
+  "run": "long_f73b700_20261004",
+  "split": "validation",
+  "variant": 0,
+  "definitions": {
+    "nonzero": "Excludes start=goal.",
+    "fixed_longer_cohort": "Same tasks with environment shortest distance greater than 3 in every condition.",
+    "completed_by_prefix": "Goal is reached within the first k executed actions, before the model resumes.",
+    "model_handoff": "Nonzero tasks not completed by the assisted prefix; reach rates are conditional on this cohort."
+  },
+  "shortest_distance_histogram": {
+    "6": 20,
+    "7": 355,
+    "8": 617,
+    "9": 8
+  },
+  "conditions": {
+    "baseline": {
+      "helper_steps": 0,
+      "all": {
+        "cases": 1100,
+        "reached": 256,
+        "reached_shortest": 143,
+        "reached_rate": 0.23272727272727273,
+        "reached_shortest_rate": 0.13
+      },
+      "nonzero": {
+        "cases": 1000,
+        "reached": 156,
+        "reached_shortest": 43,
+        "reached_rate": 0.156,
+        "reached_shortest_rate": 0.043
+      },
+      "fixed_shortest_gt3": {
+        "cases": 1000,
+        "reached": 156,
+        "reached_shortest": 43,
+        "reached_rate": 0.156,
+        "reached_shortest_rate": 0.043
+      },
+      "goal_types": {
+        "empty": {
+          "cases": 132,
+          "reached": 72,
+          "reached_shortest": 7,
+          "reached_rate": 0.5454545454545454,
+          "reached_shortest_rate": 0.05303030303030303
+        },
+        "nonempty": {
+          "cases": 868,
+          "reached": 84,
+          "reached_shortest": 36,
+          "reached_rate": 0.0967741935483871,
+          "reached_shortest_rate": 0.041474654377880185
+        }
+      }
+    },
+    "prefix_1": {
+      "helper_steps": 1,
+      "all": {
+        "cases": 1100,
+        "reached": 306,
+        "reached_shortest": 195,
+        "reached_rate": 0.2781818181818182,
+        "reached_shortest_rate": 0.17727272727272728
+      },
+      "nonzero": {
+        "cases": 1000,
+        "reached": 206,
+        "reached_shortest": 95,
+        "reached_rate": 0.206,
+        "reached_shortest_rate": 0.095
+      },
+      "fixed_shortest_gt3": {
+        "cases": 1000,
+        "reached": 206,
+        "reached_shortest": 95,
+        "reached_rate": 0.206,
+        "reached_shortest_rate": 0.095
+      },
+      "goal_types": {
+        "empty": {
+          "cases": 132,
+          "reached": 81,
+          "reached_shortest": 21,
+          "reached_rate": 0.6136363636363636,
+          "reached_shortest_rate": 0.1590909090909091
+        },
+        "nonempty": {
+          "cases": 868,
+          "reached": 125,
+          "reached_shortest": 74,
+          "reached_rate": 0.14400921658986174,
+          "reached_shortest_rate": 0.08525345622119816
+        }
+      },
+      "completed_by_prefix": {
+        "cases": 0,
+        "reached": 0,
+        "reached_shortest": 0,
+        "reached_rate": null,
+        "reached_shortest_rate": null
+      },
+      "model_handoff": {
+        "cases": 1000,
+        "reached": 206,
+        "reached_shortest": 95,
+        "reached_rate": 0.206,
+        "reached_shortest_rate": 0.095
+      }
+    },
+    "prefix_2": {
+      "helper_steps": 2,
+      "all": {
+        "cases": 1100,
+        "reached": 357,
+        "reached_shortest": 264,
+        "reached_rate": 0.3245454545454545,
+        "reached_shortest_rate": 0.24
+      },
+      "nonzero": {
+        "cases": 1000,
+        "reached": 257,
+        "reached_shortest": 164,
+        "reached_rate": 0.257,
+        "reached_shortest_rate": 0.164
+      },
+      "fixed_shortest_gt3": {
+        "cases": 1000,
+        "reached": 257,
+        "reached_shortest": 164,
+        "reached_rate": 0.257,
+        "reached_shortest_rate": 0.164
+      },
+      "goal_types": {
+        "empty": {
+          "cases": 132,
+          "reached": 92,
+          "reached_shortest": 41,
+          "reached_rate": 0.696969696969697,
+          "reached_shortest_rate": 0.3106060606060606
+        },
+        "nonempty": {
+          "cases": 868,
+          "reached": 165,
+          "reached_shortest": 123,
+          "reached_rate": 0.19009216589861752,
+          "reached_shortest_rate": 0.14170506912442396
+        }
+      },
+      "completed_by_prefix": {
+        "cases": 0,
+        "reached": 0,
+        "reached_shortest": 0,
+        "reached_rate": null,
+        "reached_shortest_rate": null
+      },
+      "model_handoff": {
+        "cases": 1000,
+        "reached": 257,
+        "reached_shortest": 164,
+        "reached_rate": 0.257,
+        "reached_shortest_rate": 0.164
+      }
+    },
+    "prefix_3": {
+      "helper_steps": 3,
+      "all": {
+        "cases": 1100,
+        "reached": 450,
+        "reached_shortest": 398,
+        "reached_rate": 0.4090909090909091,
+        "reached_shortest_rate": 0.3618181818181818
+      },
+      "nonzero": {
+        "cases": 1000,
+        "reached": 350,
+        "reached_shortest": 298,
+        "reached_rate": 0.35,
+        "reached_shortest_rate": 0.298
+      },
+      "fixed_shortest_gt3": {
+        "cases": 1000,
+        "reached": 350,
+        "reached_shortest": 298,
+        "reached_rate": 0.35,
+        "reached_shortest_rate": 0.298
+      },
+      "goal_types": {
+        "empty": {
+          "cases": 132,
+          "reached": 106,
+          "reached_shortest": 75,
+          "reached_rate": 0.803030303030303,
+          "reached_shortest_rate": 0.5681818181818182
+        },
+        "nonempty": {
+          "cases": 868,
+          "reached": 244,
+          "reached_shortest": 223,
+          "reached_rate": 0.28110599078341014,
+          "reached_shortest_rate": 0.2569124423963134
+        }
+      },
+      "completed_by_prefix": {
+        "cases": 0,
+        "reached": 0,
+        "reached_shortest": 0,
+        "reached_rate": null,
+        "reached_shortest_rate": null
+      },
+      "model_handoff": {
+        "cases": 1000,
+        "reached": 350,
+        "reached_shortest": 298,
+        "reached_rate": 0.35,
+        "reached_shortest_rate": 0.298
+      }
+    }
+  }
+}

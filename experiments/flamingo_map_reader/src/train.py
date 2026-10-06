@@ -17,7 +17,8 @@ from .blocks_data import demonstration_from_record
 from .data import demonstration_from_record as graph_demonstration_from_record, load_graph
 from .fusion import MapReader
 from .graph import batch_maps
-from .memory import AddressedMapMemoryEncoder, MapBatch, MapMemoryEncoder, MapTimeline
+from .memory import (AddressedMapMemoryEncoder, JointFeatureMapMemoryEncoder,
+                     MapBatch, MapMemoryEncoder, MapTimeline)
 from .readout_aux import CounterfactualFirstTurnDataset
 from .transcript import encode_trajectory
 
@@ -31,18 +32,22 @@ def build_reader(base, config):
         encoder = MapMemoryEncoder
     elif mode == "address_key_state_value":
         encoder = AddressedMapMemoryEncoder
+    elif mode == "joint_feature_kv":
+        encoder = JointFeatureMapMemoryEncoder
     else:
         raise ValueError(f"Unknown map memory mode: {mode}")
     memory = encoder(spec["state_dim"], base.config.hidden_size,
                      spec["maximum_candidates"], spec["projection_dim"],
                      spec["role_and_id_dim"], **({"feature_ffn_hidden_dim":
-                         spec.get("feature_ffn_hidden_dim", 0)} if mode == "address_key_state_value" else {}))
+                         spec.get("feature_ffn_hidden_dim", 0)} if mode != "joint" else {}))
     return MapReader(base, memory, spec["attention_heads"], spec["attention_head_dim"],
                       spec["cross_attention_every_n_layers"],
                       # Both deprecated; the current configs set neither. Read through
                       # only so the archived runs that did stay reproducible.
                       fixed_gate_tanh=spec.get("fixed_gate_tanh"),
-                      value_scale=spec.get("value_scale", 1.0))
+                      value_scale=spec.get("value_scale", 1.0),
+                      checkpoint_layers=config["training"].get("checkpoint_layers", False),
+                      loss_chunk_tokens=config["training"].get("loss_chunk_tokens", 0))
 
 
 def to_device(timeline, device):

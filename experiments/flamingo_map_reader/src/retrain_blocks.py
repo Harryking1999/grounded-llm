@@ -16,6 +16,8 @@ def main():
     for name in ('config', 'source-manifest', 'model-path', 'out'):
         parser.add_argument('--'+name, type=Path, required=True)
     parser.add_argument('--workers', type=int, default=8)
+    parser.add_argument('--prepared-manifest', type=Path,
+                        help='Reuse identical prepared data after an interface-only architecture change')
     args = parser.parse_args()
     if args.out.exists():
         raise FileExistsError(args.out)
@@ -52,10 +54,27 @@ def main():
 
     try:
         status()
-        execute('prepare', python('prepare_blocks_retrain') + [
-            '--config', str(args.config), '--source-manifest', str(args.source_manifest),
-            '--model-path', str(args.model_path), '--out', str(args.out/'data'),
-            '--workers', str(args.workers)])
+        if args.prepared_manifest:
+            prepared = json.loads(args.prepared_manifest.read_text())
+            before = {k:v for k,v in prepared['config'].items() if k != 'map'}
+            after = {k:v for k,v in config.items() if k != 'map'}
+            for value in (before, after):
+                value['training'] = {k:v for k,v in value['training'].items()
+                    if k not in ('checkpoint_layers', 'loss_chunk_tokens')}
+            if before != after:
+                raise ValueError('Prepared data reuse requires identical labels, sampling and training budget')
+            prepared['config'] = config
+            prepared['prepared_data_source'] = str(args.prepared_manifest.resolve())
+            (args.out/'data').mkdir()
+            (args.out/'data/trajectories').symlink_to(
+                (args.prepared_manifest.parent/'trajectories').resolve(), target_is_directory=True)
+            (args.out/'data/manifest.json').write_text(json.dumps(prepared, indent=2)+'\n')
+            (args.out/'data/audit.json').write_text(json.dumps(prepared['audit'], indent=2)+'\n')
+        else:
+            execute('prepare', python('prepare_blocks_retrain') + [
+                '--config', str(args.config), '--source-manifest', str(args.source_manifest),
+                '--model-path', str(args.model_path), '--out', str(args.out/'data'),
+                '--workers', str(args.workers)])
         manifest_path = args.out/'data/manifest.json'
         manifest = json.loads(manifest_path.read_text())
         status(phase='probe', audit=manifest['audit'])

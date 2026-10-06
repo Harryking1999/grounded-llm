@@ -156,3 +156,32 @@ class AddressedMapMemoryEncoder(nn.Module):
         mask = ~batch.valid.unsqueeze(-1)
         return AddressedMemory(addresses.masked_fill(mask, 0),
                                values.masked_fill(mask, 0))
+
+
+class JointFeatureMapMemoryEncoder(nn.Module):
+    """One shared FFN fuses state, role and ID before separate attention K/V projections."""
+
+    def __init__(self, map_dim: int, language_dim: int, max_candidates: int,
+                 projection_dim: int, label_dim: int, feature_ffn_hidden_dim: int) -> None:
+        super().__init__()
+        if min(map_dim, language_dim, max_candidates, projection_dim, label_dim,
+               feature_ffn_hidden_dim) <= 0:
+            raise ValueError("joint feature dimensions must be positive")
+        self.map_dim = map_dim
+        self.language_dim = language_dim
+        self.max_candidates = max_candidates
+        self.key_dim = self.value_dim = projection_dim
+        self.role_embedding = nn.Embedding(3, label_dim)
+        self.id_embedding = nn.Embedding(max_candidates + 1, label_dim)
+        self.feature_ffn = nn.Sequential(
+            nn.Linear(map_dim + 2 * label_dim, feature_ffn_hidden_dim),
+            nn.GELU(), nn.Linear(feature_ffn_hidden_dim, projection_dim))
+
+    def forward(self, batch: MapBatch) -> AddressedMemory:
+        batch.validate(self.max_candidates)
+        if batch.vectors.shape[-1] != self.map_dim:
+            raise ValueError("map vector dimension differs from encoder")
+        inputs = torch.cat((batch.vectors, self.role_embedding(batch.roles),
+                            self.id_embedding(batch.candidate_ids)), dim=-1)
+        features = self.feature_ffn(inputs).masked_fill(~batch.valid.unsqueeze(-1), 0)
+        return AddressedMemory(features, features)

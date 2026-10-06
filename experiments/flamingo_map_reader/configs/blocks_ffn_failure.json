@@ -30,7 +30,7 @@
     "test_no_solution_trajectories": 100
   },
   "map": {
-    "memory_mode": "address_key_state_value",
+    "memory_mode": "joint_feature_kv",
     "state_dim": 128,
     "projection_dim": 256,
     "role_and_id_dim": 32,
@@ -44,6 +44,8 @@
   "training": {
     "supervision_mode": "prepared_trajectory",
     "epochs": 10,
+    "checkpoint_layers": true,
+    "loss_chunk_tokens": 128,
     "loss": "assistant_token_cross_entropy",
     "learning_rate": 2e-05,
     "weight_decay": 0.01,

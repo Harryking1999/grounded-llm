@@ -16,8 +16,9 @@ import torch
 from torch import Tensor, nn
 from torch.nn import functional as F
 from torch.nn.utils.rnn import pad_sequence
+from torch.utils.checkpoint import checkpoint
 
-from .memory import (AddressedMapMemoryEncoder, AddressedMemory, MapBatch,
+from .memory import (AddressedMapMemoryEncoder, AddressedMemory, JointFeatureMapMemoryEncoder, MapBatch,
                      MapMemoryEncoder, MapTimeline)
 
 
@@ -121,6 +122,7 @@ class ConditionedDecoderLayer(nn.Module):
         self._valid: Tensor | None = None
         self._token_map_ids: Tensor | None = None
         self._generated_suffix = False
+        self.checkpoint_training = False
 
     def condition(self, memory: Tensor | AddressedMemory | None, valid: Tensor | None,
                   token_map_ids: Tensor | None = None,
@@ -143,8 +145,15 @@ class ConditionedDecoderLayer(nn.Module):
                     token_map_ids = torch.cat((token_map_ids, suffix), dim=1)
                 else:
                     raise ValueError("generation supplied an unexpected text prefix")
-            hidden_states = self.map_attention(hidden_states, self._memory,
-                                               self._valid, token_map_ids)
+            memory, valid = self._memory, self._valid
+            if self.checkpoint_training and self.training and torch.is_grad_enabled():
+                # Capture this forward's map, since the conditioning context is
+                # cleared before backward recomputes the layer.
+                def conditioned_forward(hidden):
+                    hidden = self.map_attention(hidden, memory, valid, token_map_ids)
+                    return self.decoder_layer(hidden, *args, **kwargs)
+                return checkpoint(conditioned_forward, hidden_states, use_reentrant=False)
+            hidden_states = self.map_attention(hidden_states, memory, valid, token_map_ids)
         return self.decoder_layer(hidden_states, *args, **kwargs)
 
 
@@ -154,7 +163,7 @@ class MapReader(nn.Module):
     def __init__(
         self,
         base_model: nn.Module,
-        memory_encoder: MapMemoryEncoder | AddressedMapMemoryEncoder,
+        memory_encoder: MapMemoryEncoder | AddressedMapMemoryEncoder | JointFeatureMapMemoryEncoder,
         heads: int,
         head_dim: int = 64,
         every_n_layers: int = 1,
@@ -163,6 +172,8 @@ class MapReader(nn.Module):
         # letting it train. Only the archived pilot_path256_fixed_gate run set it.
         fixed_gate_tanh: float | None = None,
         value_scale: float = 1.0,
+        checkpoint_layers: bool = False,
+        loss_chunk_tokens: int = 0,
     ) -> None:
         super().__init__()
         if every_n_layers <= 0:
@@ -172,7 +183,8 @@ class MapReader(nn.Module):
         base_model.requires_grad_(False)
         self.base_model = base_model
         self.memory_encoder = memory_encoder
-        addressed = isinstance(memory_encoder, AddressedMapMemoryEncoder)
+        self.loss_chunk_tokens = loss_chunk_tokens
+        addressed = isinstance(memory_encoder, (AddressedMapMemoryEncoder, JointFeatureMapMemoryEncoder))
         self.decoder_path = decoder_path
         parent = base_model
         parts = decoder_path.split(".")
@@ -195,6 +207,7 @@ class MapReader(nn.Module):
                     adapter.gate.data.fill_(atanh(fixed_gate_tanh))
                     adapter.gate.requires_grad_(False)
                 layer = ConditionedDecoderLayer(layer, adapter)
+                layer.checkpoint_training = checkpoint_layers
                 self.conditioned_layers.append(layer)
             wrapped.append(layer)
         if not self.conditioned_layers:
@@ -232,6 +245,21 @@ class MapReader(nn.Module):
 
     def forward(self, map_batch: MapBatch | MapTimeline, **model_inputs):
         with self.conditioned(map_batch):
+            if self.loss_chunk_tokens and self.training and "labels" in model_inputs:
+                from transformers.modeling_outputs import CausalLMOutputWithPast
+                labels = model_inputs.pop("labels")[:, 1:]
+                outputs = self.base_model.model(**model_inputs)
+                selected = labels != -100
+                hidden = outputs.last_hidden_state[:, :-1][selected]
+                targets = labels[selected]
+                if not len(targets):
+                    raise ValueError("Batch has no supervised next-token targets")
+                def token_loss(features, target):
+                    return F.cross_entropy(self.base_model.lm_head(features).float(), target, reduction="sum")
+                losses = [checkpoint(token_loss, features, target, use_reentrant=False)
+                          for features, target in zip(hidden.split(self.loss_chunk_tokens),
+                                                     targets.split(self.loss_chunk_tokens))]
+                return CausalLMOutputWithPast(loss=torch.stack(losses).sum() / len(targets))
             return self.base_model(**model_inputs)
 
     def generate(self, map_batch: MapBatch | MapTimeline, **generation_inputs):

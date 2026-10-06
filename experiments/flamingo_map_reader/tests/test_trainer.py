@@ -9,13 +9,43 @@ from transformers import Qwen2Config, Qwen2ForCausalLM, TrainingArguments, set_s
 
 from experiments.flamingo_map_reader.src.fusion import MapReader
 from experiments.flamingo_map_reader.src.graph import graph_step
-from experiments.flamingo_map_reader.src.memory import MapMemoryEncoder
+from experiments.flamingo_map_reader.src.memory import MapMemoryEncoder, JointFeatureMapMemoryEncoder
 from experiments.flamingo_map_reader.src.train import MapCollator, MapSFTTrainer, EpochCheckpoint
 from experiments.flamingo_map_reader.src.transcript import EncodedTrajectory
 from test_graph import line_graph
 
 
 class TrainerTest(unittest.TestCase):
+    def test_checkpointed_chunked_loss_preserves_joint_reader_loss_and_gradients(self):
+        environment, qmap = line_graph()
+        step = graph_step(environment, qmap, 1, 2, executed_path=[1])
+        examples = [(EncodedTrajectory([2, 3, 4, 5, 6], [-100, -100, 4, 5, 6], [0]*5, 3), [step])]
+        from experiments.flamingo_map_reader.src.train import collate_examples
+        timeline, inputs = collate_examples(examples, 0)
+        def make(efficient):
+            set_seed(7)
+            base = Qwen2ForCausalLM(Qwen2Config(vocab_size=32, hidden_size=32,
+                intermediate_size=64, num_hidden_layers=2, num_attention_heads=2,
+                num_key_value_heads=1, max_position_embeddings=32, pad_token_id=0))
+            base.config.use_cache = False
+            reader = MapReader(base, JointFeatureMapMemoryEncoder(2, 32, 2, 8, 4, 16),
+                2, head_dim=8, checkpoint_layers=efficient, loss_chunk_tokens=2 if efficient else 0)
+            for layer in reader.conditioned_layers:
+                layer.map_attention.gate.data.fill_(0.3)
+            return reader.train()
+        normal, efficient = make(False), make(True)
+        left = normal(map_batch=timeline, **inputs).loss
+        right = efficient(map_batch=timeline, **inputs).loss
+        torch.testing.assert_close(left, right, atol=1e-6, rtol=1e-6)
+        left.backward()
+        right.backward()  # Map conditioning has already exited here.
+        for (name, p), (_, q) in zip(normal.named_parameters(), efficient.named_parameters()):
+            if p.requires_grad:
+                self.assertIsNotNone(p.grad, name)
+                self.assertIsNotNone(q.grad, name)
+                torch.testing.assert_close(p.grad, q.grad, atol=1e-6, rtol=1e-5, msg=name)
+        self.assertGreater(efficient.memory_encoder.feature_ffn[0].weight.grad.norm().item(), 0)
+
     def test_standard_batch_save_and_resume(self):
         environment, qmap = line_graph()
         step = graph_step(environment, qmap, 1, 2, executed_path=[1])

@@ -34,7 +34,10 @@ No solution: no legal moves remain and the goal has not been reached.
 
 主测试集按最短解长度分层，两个分组各占一半；另留独立失败上下文测试，报告无解召回率。
 主测试的 reference 和 rollout 同时报告误判无解率；走错后正确识别无解仍不算完成原任务。
-先对最长样本做真实四卡反向传播和优化器更新，按合同从大到小选择可承受的全局 batch，
+可先用 [find_training_batch.py](src/find_training_batch.py) 扫描训练集全部编号变体，
+将序列长度、地图快照数、候选槽位数和监督长度的极值样本组合，
+以真实四卡反向传播和优化器更新测量 batch 显存边界及保留余量的档位。
+正式启动再按合同从大到小验证所选全局 batch，
 随后训练并自动评测 final checkpoint。旧配置和旧结果保留用于对照，不混入这次成绩。
 最长样本的旧实现连全局 batch 8 都会显存不足，因此训练启用逐层激活重计算，
 并仅对有监督 token 分块计算交叉熵；目标仍是同一 assistant-token 平均交叉熵。

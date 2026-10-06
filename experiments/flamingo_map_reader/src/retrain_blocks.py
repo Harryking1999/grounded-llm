@@ -17,7 +17,7 @@ def main():
         parser.add_argument('--'+name, type=Path, required=True)
     parser.add_argument('--workers', type=int, default=8)
     parser.add_argument('--prepared-manifest', type=Path,
-                        help='Reuse identical prepared data after an interface-only architecture change')
+                        help='Reuse identical prepared data after interface or batch-size changes')
     args = parser.parse_args()
     if args.out.exists():
         raise FileExistsError(args.out)
@@ -60,7 +60,8 @@ def main():
             after = {k:v for k,v in config.items() if k != 'map'}
             for value in (before, after):
                 value['training'] = {k:v for k,v in value['training'].items()
-                    if k not in ('checkpoint_layers', 'loss_chunk_tokens')}
+                    if k not in ('checkpoint_layers', 'loss_chunk_tokens',
+                                 'batch_size_candidates_per_device', 'batch_size_candidates_global')}
             if before != after:
                 raise ValueError('Prepared data reuse requires identical labels, sampling and training budget')
             prepared['config'] = config

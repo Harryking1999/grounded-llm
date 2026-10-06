@@ -126,7 +126,7 @@ class AddressedMapMemoryEncoder(nn.Module):
     """Encode roles/IDs as addresses and full Q vectors as state content."""
 
     def __init__(self, map_dim: int, language_dim: int, max_candidates: int,
-                 projection_dim: int, label_dim: int) -> None:
+                 projection_dim: int, label_dim: int, feature_ffn_hidden_dim: int = 0) -> None:
         super().__init__()
         if min(map_dim, language_dim, max_candidates, projection_dim, label_dim) <= 0:
             raise ValueError("all dimensions and max_candidates must be positive")
@@ -136,6 +136,11 @@ class AddressedMapMemoryEncoder(nn.Module):
         self.key_dim = 2 * label_dim
         self.value_dim = projection_dim
         self.project = nn.Linear(map_dim, projection_dim)
+        if feature_ffn_hidden_dim < 0:
+            raise ValueError("feature FFN width must be nonnegative")
+        self.feature_ffn = (nn.Sequential(nn.Linear(projection_dim, feature_ffn_hidden_dim),
+            nn.GELU(), nn.Linear(feature_ffn_hidden_dim, projection_dim))
+            if feature_ffn_hidden_dim else None)
         self.role_embedding = nn.Embedding(3, label_dim)
         self.id_embedding = nn.Embedding(max_candidates + 1, label_dim)
 
@@ -146,6 +151,8 @@ class AddressedMapMemoryEncoder(nn.Module):
         addresses = torch.cat((self.role_embedding(batch.roles),
                                self.id_embedding(batch.candidate_ids)), dim=-1)
         values = self.project(batch.vectors)
+        if self.feature_ffn is not None:
+            values = values + self.feature_ffn(values)
         mask = ~batch.valid.unsqueeze(-1)
         return AddressedMemory(addresses.masked_fill(mask, 0),
                                values.masked_fill(mask, 0))

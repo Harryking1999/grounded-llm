@@ -19,10 +19,14 @@ from .text import chat_ids
 
 
 def parse_control(answer):
-    markers = re.findall(r"<action>\s*([0-9]+)\s*</action>|(<done/>)", answer)
+    markers = re.findall(r"<action>\s*([0-9]+|none)\s*</action>|(<done/>)", answer)
+    if markers == [("none", ""), ("", "<done/>")]:
+        return None
     if len(markers) != 1:
         raise ValueError("Expected exactly one action or done marker")
     action, done = markers[0]
+    if action == "none":
+        raise ValueError("Action none requires a following done marker")
     return None if done else int(action)
 
 

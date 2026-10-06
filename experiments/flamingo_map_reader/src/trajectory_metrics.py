@@ -7,6 +7,7 @@ import re
 from .relations import score_relationships, parse_ranking
 from .sft import reported_candidates
 from .evaluate_blocks import parse_control
+from .blocks_failure import declares_no_solution
 
 
 def summary_correct(answer, expected):
@@ -21,12 +22,15 @@ def score_turn(step, answer, expected_terminal=None, reported=None):
         valid_control = True
     except ValueError:
         chosen, valid_control = None, False
+    no_solution = declares_no_solution(answer)
     result = dict(done=step.done, candidates=len(step.candidate_actions), valid_control=valid_control,
-        premature_done=valid_control and chosen is None and not step.done,
-        failed_to_stop=step.done and not (valid_control and chosen is None),
+        premature_done=valid_control and chosen is None and not step.done and not no_solution,
+        failed_to_stop=step.done and not (valid_control and chosen is None and not no_solution),
         legal_action=not step.done and valid_control and chosen is not None and
                      1 <= chosen <= len(step.candidate_actions),
         summary_correct=step.done and expected_terminal is not None and summary_correct(answer, expected_terminal))
+    result["declared_no_solution"] = no_solution
+    result["valid_control"] = valid_control or no_solution
     if not step.done and step.candidate_actions:
         result.update(score_relationships(step, answer, reported))
         # A narrowed answer names the nearest candidates; every rate below is
@@ -66,7 +70,8 @@ def summarize_turns(rows):
                "action_follows_ranking", "pairwise_correct", "pairwise_total",
                "generated_tokens", "seconds",
                "current_relation_correct", "current_relation_total", "action_environment_shortest",
-               "action_keeps_goal_reachable", "reachable_candidates", "candidate_slots")
+               "action_keeps_goal_reachable", "reachable_candidates", "candidate_slots",
+               "declared_no_solution", "no_solution_expected", "no_solution_correct", "false_no_solution")
     for r in rows:
         for key in metrics:
             counts[key] += r.get(key, 0)
@@ -78,6 +83,9 @@ def summarize_turns(rows):
     solvable = [r for r in rows if still_solvable(r)]
     counts["solvable_decisions"] = len(solvable)
     result = dict(counts, decision_turns=decisions)
+    negatives = counts["no_solution_expected"]
+    result["no_solution_recall"] = counts["no_solution_correct"] / negatives if negatives else None
+    result["false_no_solution_rate"] = counts["false_no_solution"] / (len(rows) - negatives) if len(rows) > negatives else None
     for key in ("exact_ranking", "closest_candidate_set_exact", "action_map_minimum", "legal_action", "premature_done"):
         result[key + "_rate"] = counts[key] / decisions if decisions else None
     result["failed_to_stop_rate"] = counts["failed_to_stop"] / counts["terminal_turns"] if counts["terminal_turns"] else None

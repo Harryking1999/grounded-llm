@@ -37,7 +37,7 @@ class TrainerTest(unittest.TestCase):
                 remove_unused_columns=False, label_names=["labels"],
                 report_to=[], disable_tqdm=True, seed=11, dataloader_pin_memory=False)
             return MapSFTTrainer(model=reader, args=args, train_dataset=examples,
-                data_collator=MapCollator(0), contract={"test": "batch_resume"},
+                data_collator=MapCollator(0), contract={"test": "batch_resume", "config": {"training": {}}},
                 callbacks=[EpochCheckpoint(0.5)])
 
         with tempfile.TemporaryDirectory() as directory:

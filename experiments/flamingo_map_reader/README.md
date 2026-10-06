@@ -10,6 +10,30 @@
 
 正式配置为 [path_single_long.json](configs/path_single_long.json) 和 [blocks1000_long.json](configs/blocks1000_long.json)。[结果摘要](results/long_trajectory_summary.json)保存分片来源、计数和数据统计；模型、原始回答及运行日志留在 Git 外。
 
+## 积木会议决策重训
+
+新一轮积木合同见 [blocks_ffn_failure.json](configs/blocks_ffn_failure.json)，入口为
+[retrain_blocks.py](src/retrain_blocks.py)。冻结原语言模型和地图，从头初始化读取接口；
+地图状态投影后增加共享的残差 FFN，再送入 cross-attention 的 V 分支，角色和编号仍作为 K。
+这是本项目的地图特征提取器，并非对 Flamingo 原论文全部结构的复现。
+
+保留原 9000 条成功训练轨迹，另加 1000 条地图贪心失败轨迹。旧数据清单没有失败训练样本，
+原采样器记录剔除了 3282 条贪心失败样本但未保存具体轨迹，因此在训练棋盘上重新生成。
+新增样本截在第一次进入无解状态的位置，之前所有 assistant 回答均为上下文、loss 为零；
+仅最后无解回答参与监督。环境 oracle 只用于制作标签和评分，不进入模型输入。
+当前未到目标且所有合法候选都不能到达目标时（含无合法候选），使用用户已确认的固定答案：
+
+```text
+No solution: none of the legal next moves can reach the goal.
+<action>none</action>
+<done/>
+```
+
+主测试集按最短解长度分层，两个分组各占一半；另留独立失败上下文测试，报告无解召回率。
+主测试的 reference 和 rollout 同时报告误判无解率；走错后正确识别无解仍不算完成原任务。
+先对最长样本做真实四卡反向传播和优化器更新，按合同从大到小选择可承受的全局 batch，
+随后训练并自动评测 final checkpoint。旧配置和旧结果保留用于对照，不混入这次成绩。
+
 ## 代码与目录
 
 | 功能 | 入口 |

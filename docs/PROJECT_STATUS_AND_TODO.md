@@ -40,6 +40,13 @@ LLM 已有较强的语言理解和推理能力，但在复杂任务中，仍可�
 
 ## 4. 有序 TODO
 
+2026-10-06 会议后的新优先级：仅对积木执行 FFN＋失败上下文的从头重训和评测。
+正式合同为 [blocks_ffn_failure.json](../experiments/flamingo_map_reader/configs/blocks_ffn_failure.json)，
+实现与已确认的无解回答见 [实验 README](../experiments/flamingo_map_reader/README.md#积木会议决策重训)。
+保留原成功训练数据，新增失败历史只监督最后无解回答；无解动作为 none 并输出 done。
+四卡全局 batch 的含义及无解文本已由用户确认。当前代码已通过 44 项针对性测试，
+接下来生成数据、实测 NVLink 四卡 batch，然后按合同训练并评测 final；新成绩尚未产生。
+
 2026-10-06 用户已调整当前运行优先级：停止 no_map；先用最终 checkpoint 在两任务 reference 上做候选 Q 的距离倒序，再做积木前 1、2、3 步安全前缀的 rollout 诊断。正常对照均复用已完成的 final validation，不重复生成。精确合同与解释边界见 [DESIGN 第 8 节](../experiments/flamingo_map_reader/DESIGN.md#8-最终-checkpoint-诊断先-reference-q-倒序再-rollout-早期干预)。完整 test 与任务训练等比较仍保留为后续缺口；更大模型基线不是同一训练后接口的地图消融对照。
 
 1. **收齐当前方法的完整证据。** 优先完成积木 final validation，再收齐两任务 test 与配对对照，分别判断参考状态下的动作能力和自主闭环能力。

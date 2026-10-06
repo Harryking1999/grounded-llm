@@ -4,6 +4,7 @@ from argparse import ArgumentParser
 from dataclasses import replace
 import json
 import math
+import os
 from pathlib import Path
 
 import torch
@@ -34,7 +35,8 @@ def build_reader(base, config):
         raise ValueError(f"Unknown map memory mode: {mode}")
     memory = encoder(spec["state_dim"], base.config.hidden_size,
                      spec["maximum_candidates"], spec["projection_dim"],
-                     spec["role_and_id_dim"])
+                     spec["role_and_id_dim"], **({"feature_ffn_hidden_dim":
+                         spec.get("feature_ffn_hidden_dim", 0)} if mode == "address_key_state_value" else {}))
     return MapReader(base, memory, spec["attention_heads"], spec["attention_head_dim"],
                       spec["cross_attention_every_n_layers"],
                       # Both deprecated; the current configs set neither. Read through
@@ -289,6 +291,11 @@ def main():
     parser.add_argument("--batch-size", type=int, required=True,
                         help="Measured actual per-device batch size; no gradient accumulation")
     args = parser.parse_args()
+    world_size = int(os.environ.get("WORLD_SIZE", "1"))
+    rank = int(os.environ.get("RANK", "0"))
+    if world_size > 1:
+        torch.cuda.set_device(int(os.environ["LOCAL_RANK"]))
+        torch.distributed.init_process_group("nccl")
     config = json.loads(args.config.read_text(encoding="utf-8"))
     manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
     if manifest["config"] != config:
@@ -304,6 +311,8 @@ def main():
         raise ValueError(f"Unsupported map-reader task: {task}")
     if args.out.exists() and args.resume is None:
         raise FileExistsError(args.out)
+    if world_size > 1:
+        torch.distributed.barrier()
     records = [r for r in manifest["records"] if r["split"] == "train"]
     if not records or args.batch_size <= 0:
         raise ValueError("Training needs examples and a positive batch size")
@@ -355,7 +364,7 @@ def main():
         callbacks.append(DatasetEpoch(dataset))
     maximum_steps = training.get("max_steps", -1)
     source_steps = maximum_steps if maximum_steps > 0 else math.ceil(
-        len(dataset) / args.batch_size) * training["epochs"]
+        len(dataset) / (args.batch_size * world_size)) * training["epochs"]
     extra_arguments = fixed_warmup_arguments(training, source_steps)
     if convergence:
         from .convergence import ConvergenceCheck, with_decision_mask
@@ -364,7 +373,7 @@ def main():
         check = ConvergenceCheck(convergence, args.out, dataset)
         callbacks.append(check)
         source_steps = maximum_steps if maximum_steps > 0 else math.ceil(
-            len(dataset) / args.batch_size) * training["epochs"]
+            len(dataset) / (args.batch_size * world_size)) * training["epochs"]
         maximum_steps = convergence["max_total_steps"]
         # Preserve the original warmup; extending the budget must not restart it.
         extra_arguments = {**fixed_warmup_arguments(training, source_steps),
@@ -384,6 +393,7 @@ def main():
         remove_unused_columns=False, label_names=["labels"],
         save_strategy="steps" if convergence else "no", logging_steps=1, report_to=[],
         dataloader_num_workers=0, seed=config["seed"], data_seed=config["seed"],
+        ddp_find_unused_parameters=False,
         **extra_arguments,
     )
     trainer = MapSFTTrainer(model=reader, args=arguments, train_dataset=dataset,
@@ -401,16 +411,21 @@ def main():
                 handle.write(json.dumps(continuation) + "\n")
         else:
             (args.out / "continuation.json").write_text(json.dumps(continuation, indent=2) + "\n")
-    (args.out / "config.json").write_text(json.dumps(contract, indent=2) + "\n")
+    if rank == 0:
+        (args.out / "config.json").write_text(json.dumps(contract, indent=2) + "\n")
     if config.get("checkpoint", {}).get("save_initial", False) and args.resume is None:
         initial = args.out / "models/checkpoint-0"
         trainer.save_model(str(initial))
-        checkpoint_ready(initial, 0, 0)
+        if rank == 0:
+            checkpoint_ready(initial, 0, 0)
     result = trainer.train(resume_from_checkpoint=str(args.resume) if args.resume else None)
     trainer.save_model(str(args.out / "models/final"))
-    checkpoint_ready(args.out / "models/final", trainer.state.global_step, trainer.state.epoch)
-    (args.out / "results").mkdir(exist_ok=True)
-    (args.out / "results/summary.json").write_text(json.dumps(result.metrics, indent=2) + "\n")
+    if rank == 0:
+        checkpoint_ready(args.out / "models/final", trainer.state.global_step, trainer.state.epoch)
+        (args.out / "results").mkdir(exist_ok=True)
+        (args.out / "results/summary.json").write_text(json.dumps(result.metrics, indent=2) + "\n")
+    if world_size > 1:
+        torch.distributed.destroy_process_group()
 
 
 if __name__ == "__main__":

@@ -22,8 +22,10 @@ def pack_demo(demo):
         step["map_batch"] = {field.name: getattr(turn.step.map_batch, field.name).cpu()
                              for field in fields(turn.step.map_batch)}
         rows.append(dict(user_text=turn.user_text, answer_text=turn.answer_text,
-                         executed_path=turn.executed_path, chosen_id=turn.chosen_id, step=step))
-    return dict(turns=rows, executed_path=demo.executed_path, success=demo.success)
+                         executed_path=turn.executed_path, chosen_id=turn.chosen_id,
+                         supervise=turn.supervise, step=step))
+    return dict(turns=rows, executed_path=demo.executed_path, success=demo.success,
+                no_solution=demo.no_solution)
 
 
 def unpack_demo(value, task):
@@ -33,7 +35,8 @@ def unpack_demo(value, task):
         step = dict(row["step"])
         step["map_batch"] = MapBatch(**step["map_batch"])
         turns.append(SupervisedTurn(**dict(row, step=cls(**step))))
-    return Demonstration(tuple(turns), tuple(value["executed_path"]), value["success"])
+    return Demonstration(tuple(turns), tuple(value["executed_path"]), value["success"],
+                         value.get("no_solution", False))
 
 
 def prepare_record(demo, record, config, tokenizer, output):
@@ -42,7 +45,7 @@ def prepare_record(demo, record, config, tokenizer, output):
     for plan in plans:
         numbered = renumber_demonstration(demo, plan, config["task"],
             config["data"].get("reported_candidates"))
-        if demo.success:
+        if demo.success or demo.no_solution:
             encoded = encode_trajectory(numbered, tokenizer,
                 config["maximum_sequence_tokens"] if record["split"] == "train" else 10**8,
                 chat_template_kwargs=config.get("chat_template_kwargs", {}))

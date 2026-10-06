@@ -19,6 +19,7 @@ from .text import chat_ids
 from .train import build_reader, pinned_supervision, to_device
 from .trajectory_dataset import load_record
 from .trajectory_metrics import score_turn, summarize_turns
+from .blocks_failure import declares_no_solution
 
 
 class GenerationSession:
@@ -47,7 +48,8 @@ class GenerationSession:
         class Boundary(StoppingCriteria):
             def __call__(self, input_ids, scores, **kwargs):
                 text = tokenizer.decode(input_ids[0, len(prefix):], skip_special_tokens=True)
-                return "</action>" in text or "<done/>" in text
+                return "<done/>" in text or ("</action>" in text and
+                    "none" not in text.rsplit("<action>", 1)[-1])
 
         inputs = dict(input_ids=torch.tensor([prefix], device=self.device),
             attention_mask=torch.ones((1, len(prefix)), dtype=torch.long, device=self.device),
@@ -72,6 +74,17 @@ class GenerationSession:
             raise ValueError("Chat template changed this turn's generation prefix")
         self.old_ids = self.ids + [len(self.steps) - 1] * (len(complete) - len(self.prefix))
         self.previous = complete
+
+    def observe(self, turn):
+        """Install a supplied error history without treating it as a prediction."""
+        self.steps.append(turn.step)
+        self.messages.append(dict(role="user", content=turn.user_text))
+        self.prefix = chat_ids(self.tokenizer, self.messages, add_generation_prompt=True,
+                               **self.config.get("chat_template_kwargs", {}))
+        if self.prefix[:len(self.previous)] != self.previous:
+            raise ValueError("Chat template changed the historical prefix")
+        self.ids = self.old_ids + [len(self.steps) - 1] * (len(self.prefix) - len(self.previous))
+        self.accept(turn.answer_text)
 
 
 class TaskEnvironment:
@@ -153,11 +166,17 @@ class TaskEnvironment:
 def reference_turns(session, demo, environment):
     rows = []
     for turn_index, turn in enumerate(demo.turns):
+        if not turn.supervise:
+            session.observe(turn)
+            continue
         answer, usage = session.ask(turn.user_text, turn.step)
         row = dict(turn=turn_index, remaining_shortest=environment.remaining(turn.step.current, turn.step.goal, turn.executed_path),
             **score_turn(turn.step, answer, turn.answer_text if turn.step.done else None,
                          environment.config["data"].get("reported_candidates")), **usage,
             answer=answer, current=str(turn.step.current), goal=str(turn.step.goal))
+        row["no_solution_expected"] = row["remaining_shortest"] < 0
+        row["no_solution_correct"] = row["no_solution_expected"] and declares_no_solution(answer)
+        row["false_no_solution"] = not row["no_solution_expected"] and declares_no_solution(answer)
         chosen = row.get("chosen_id")
         row["chosen_action"] = turn.step.candidate_actions[chosen - 1] if row["legal_action"] else None
         row["action_environment_shortest"] = environment.chosen_is_shortest(turn.step, chosen, turn.executed_path, row["remaining_shortest"])
@@ -186,8 +205,14 @@ def closed_loop(session, record, first, environment, config, variant):
                          config["data"].get("reported_candidates")),
             **usage, answer=answer, current=str(step.current), goal=str(goal))
         rows.append(row)
+        row["no_solution_expected"] = row["remaining_shortest"] < 0
+        row["no_solution_correct"] = row["no_solution_expected"] and declares_no_solution(answer)
+        row["false_no_solution"] = not row["no_solution_expected"] and declares_no_solution(answer)
         if usage["context_exhausted"]:
             failure = "context_budget"
+            break
+        if declares_no_solution(answer):
+            failure = "correct_no_solution_after_error" if row["no_solution_correct"] else "false_no_solution"
             break
         try:
             chosen = parse_control(answer)
@@ -275,7 +300,7 @@ def main():
     parser = ArgumentParser()
     for arg in ("manifest", "adapter-checkpoint", "model-path", "out"):
         parser.add_argument("--" + arg, required=True, type=Path)
-    parser.add_argument("--split", choices=("train", "validation", "test"), required=True)
+    parser.add_argument("--split", choices=("train", "validation", "test", "test_no_solution"), required=True)
     parser.add_argument("--mode", choices=("reference", "rollout"), required=True)
     parser.add_argument("--variants", type=int, default=1)
     parser.add_argument("--limit", type=int)

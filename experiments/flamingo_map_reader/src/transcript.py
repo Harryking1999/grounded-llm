@@ -36,7 +36,7 @@ def encode_trajectory(demonstration: Demonstration, tokenizer,
                       max_tokens: int, *, chat_template_kwargs=None,
                       focus_decisions=False) -> EncodedTrajectory:
     """Mask environment text; every token reads the map of its own turn."""
-    if not demonstration.success or not demonstration.turns:
+    if not (demonstration.success or demonstration.no_solution) or not demonstration.turns:
         raise ValueError("SFT requires a complete successful trajectory")
     messages = []
     previous: list[int] = []
@@ -60,7 +60,7 @@ def encode_trajectory(demonstration: Demonstration, tokenizer,
         if new_answer == 0:
             raise ValueError("assistant answer produced no supervised tokens")
         labels.extend([-100] * (len(prefix) - len(previous)))
-        labels.extend(complete[len(prefix):])
+        labels.extend(complete[len(prefix):] if turn.supervise else [-100] * new_answer)
         if focus_mask is not None:
             content = tokenizer(turn.answer_text, add_special_tokens=False,
                                 return_offsets_mapping=True)
@@ -71,10 +71,10 @@ def encode_trajectory(demonstration: Demonstration, tokenizer,
                 raise ValueError("Answer offsets and tokens have different lengths")
             focused = decision_focus(turn.answer_text, content["offset_mapping"])
             focus_mask.extend([False] * (len(prefix) - len(previous)))
-            focus_mask.extend(focused)
+            focus_mask.extend(focused if turn.supervise else [False] * len(focused))
             focus_mask.extend([False] * (new_answer - len(content_ids)))
         map_ids.extend([turn_index] * (len(complete) - len(previous)))
-        answer_tokens += new_answer
+        answer_tokens += new_answer if turn.supervise else 0
         previous = complete
         if len(previous) > max_tokens:
             raise ValueError(f"trajectory has {len(previous)} tokens, exceeding {max_tokens}")

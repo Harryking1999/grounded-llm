@@ -1,0 +1,77 @@
+{
+  "study": "flamingo_map_reader_blocks_ffn_failure",
+  "task": "blocks",
+  "seed": 20261006,
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "chat_template_kwargs": {},
+  "maximum_sequence_tokens": 32768,
+  "maximum_demonstration_actions": 32,
+  "data": {
+    "reported_candidates": 10,
+    "board_seed": 20260928,
+    "training_boards": 1000,
+    "pairs_per_training_board": 8,
+    "minimum_shortest_moves": 6,
+    "sampling_rollouts": 32,
+    "pair_selection": "preserve_9000_train_add_1000_masked_failure_contexts_balanced_test",
+    "validation_same_board_pairs": 500,
+    "test_same_board_pairs": 255,
+    "validation_new_boards": 100,
+    "test_new_boards": 200,
+    "numbering_variants": 6,
+    "failure_trajectories": 1000,
+    "test_length_counts_per_group": {
+      "6": 50,
+      "7": 100,
+      "8": 100,
+      "9": 5
+    },
+    "test_no_solution_trajectories": 100
+  },
+  "map": {
+    "memory_mode": "address_key_state_value",
+    "state_dim": 128,
+    "projection_dim": 256,
+    "role_and_id_dim": 32,
+    "attention_heads": 4,
+    "attention_head_dim": 64,
+    "cross_attention_every_n_layers": 1,
+    "maximum_candidates": 664,
+    "distance_metric": "directed_sum",
+    "feature_ffn_hidden_dim": 1024
+  },
+  "training": {
+    "supervision_mode": "prepared_trajectory",
+    "epochs": 10,
+    "loss": "assistant_token_cross_entropy",
+    "learning_rate": 2e-05,
+    "weight_decay": 0.01,
+    "warmup_fraction": 0.05,
+    "gradient_clip_norm": 1.0,
+    "world_size": 4,
+    "batch_size_candidates_per_device": [
+      4,
+      3,
+      2
+    ],
+    "batch_size_candidates_global": [
+      16,
+      12,
+      8
+    ]
+  },
+  "checkpoint": {
+    "every_epoch_fraction": 1.0,
+    "early_steps": [],
+    "save_initial": true
+  },
+  "evaluation": {
+    "action_max_new_tokens": 4096,
+    "terminal_max_new_tokens": 2048,
+    "initial_diagnostic_tasks": 2,
+    "train_diagnostic_tasks": 256,
+    "numbering_variants": 1,
+    "target_pairs": 200,
+    "shard_tasks": 64
+  }
+}

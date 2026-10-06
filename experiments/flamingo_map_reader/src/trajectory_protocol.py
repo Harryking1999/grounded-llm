@@ -69,11 +69,11 @@ def renumber_demonstration(demo, plan, task, reported=None):
             prompt = turn.user_text.split("[Environment update]", 1)[0] + prompt
         chosen = None
         answer = turn.answer_text
-        if not step.done:
+        if not step.done and turn.chosen_id is not None:
             actual = turn.step.candidate_actions[turn.chosen_id - 1]
             chosen = step.candidate_actions.index(actual) + 1
             answer = decision_text(step, chosen, reported)
             actions.append(actual)
         turns.append(replace(turn, step=step, chosen_id=chosen,
                              user_text=prompt, answer_text=answer))
-    return Demonstration(tuple(turns), demo.executed_path, demo.success)
+    return Demonstration(tuple(turns), demo.executed_path, demo.success, demo.no_solution)

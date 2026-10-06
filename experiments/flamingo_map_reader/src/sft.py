@@ -83,6 +83,7 @@ class SupervisedTurn:
     step: GraphStep | BlocksStep
     executed_path: tuple[int, ...]
     chosen_id: int | None
+    supervise: bool = True
 
 
 @dataclass(frozen=True)
@@ -90,6 +91,7 @@ class Demonstration:
     turns: tuple[SupervisedTurn, ...]
     executed_path: tuple[int, ...]
     success: bool
+    no_solution: bool = False
 
 
 def greedy_demonstration(

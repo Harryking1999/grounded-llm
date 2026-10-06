@@ -1,0 +1,75 @@
+"""Failure labels, renumbering, FFN gradients and no-solution evaluation."""
+
+import unittest
+import torch
+
+from experiments.blocks_distance_map.src.oracle import DistanceOracle
+from experiments.flamingo_map_reader.src.blocks_failure import failure_demonstration, declares_no_solution
+from experiments.flamingo_map_reader.src.trajectory_dataset import pack_demo, unpack_demo
+from experiments.flamingo_map_reader.src.trajectory_protocol import numbering_plans, renumber_demonstration
+from experiments.flamingo_map_reader.src.transcript import encode_trajectory
+from experiments.flamingo_map_reader.src.memory import AddressedMapMemoryEncoder
+from experiments.flamingo_map_reader.src.trajectory_metrics import score_turn, summarize_turns
+from experiments.flamingo_map_reader.src.evaluate_blocks import parse_control
+from test_blocks import CountingMap
+from test_timeline import ByteChatTemplate
+
+
+class RetrainTest(unittest.TestCase):
+    def failure(self):
+        oracle = DistanceOracle()
+        for seed in range(20):
+            demo = failure_demonstration(CountingMap(), dict(start=3 | (3 << 90), goal=3,
+                sample_seed=seed), oracle)
+            if demo is not None:
+                self.assertGreater(oracle.distance(demo.turns[0].step.current, 3), 0)
+                self.assertEqual(oracle.distance(demo.turns[-1].step.current, 3), -1)
+                self.assertTrue(all(oracle.distance(s, 3) == -1
+                    for s in demo.turns[-1].step.candidate_destinations))
+                return demo
+        self.fail('Expected one deliberately bad greedy tie choice')
+
+    def test_failure_actions_masked_after_save_and_renumber(self):
+        demo = unpack_demo(pack_demo(self.failure()), 'blocks')
+        for plan in numbering_plans(demo, 6, 1):
+            numbered = renumber_demonstration(demo, plan, 'blocks', 10)
+            self.assertFalse(numbered.success)
+            self.assertTrue(numbered.no_solution)
+            encoded = encode_trajectory(numbered, ByteChatTemplate(), 32768)
+            for label, turn in zip(encoded.labels, encoded.token_map_ids):
+                if turn < len(numbered.turns)-1:
+                    self.assertEqual(label, -100)
+            supervised = bytes(x for x in encoded.labels if x >= 0).decode()
+            self.assertIn('<action>none</action>\n<done/>', supervised)
+            self.assertNotRegex(supervised, r'<action>[0-9]+</action>')
+            self.assertEqual(encoded.answer_tokens, sum(x >= 0 for x in encoded.labels))
+
+    def test_feature_ffn_changes_values_only_and_receives_gradients(self):
+        step = self.failure().turns[0].step
+        encoder = AddressedMapMemoryEncoder(1, 8, 10, 4, 2, feature_ffn_hidden_dim=16)
+        memory = encoder(step.map_batch)
+        old_keys = memory.keys.detach().clone()
+        memory.values.square().sum().backward()
+        self.assertGreater(encoder.feature_ffn[0].weight.grad.abs().sum().item(), 0)
+        with torch.no_grad():
+            encoder.feature_ffn[0].weight.add_(1)
+        changed = encoder(step.map_batch)
+        torch.testing.assert_close(old_keys, changed.keys)
+        self.assertFalse(torch.equal(memory.values, changed.values))
+
+    def test_no_solution_control_and_metrics(self):
+        demo = self.failure()
+        row = score_turn(demo.turns[-1].step, demo.turns[-1].answer_text)
+        self.assertTrue(row['valid_control'])
+        self.assertFalse(row['legal_action'])
+        self.assertFalse(row['premature_done'])
+        self.assertFalse(declares_no_solution('<action>1</action><done/>'))
+        self.assertIsNone(parse_control(demo.turns[-1].answer_text))
+        with self.assertRaises(ValueError):
+            parse_control('<action>none</action>')
+        row.update(no_solution_expected=True, no_solution_correct=True)
+        self.assertEqual(summarize_turns([row])['no_solution_recall'], 1)
+
+
+if __name__ == '__main__':
+    unittest.main()

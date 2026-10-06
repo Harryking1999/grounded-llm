@@ -96,6 +96,46 @@
 
 寻路输入沿用原方案：完整邻接表、起终点、禁止重复访问规则，每轮列当前节点、实际已走路径及全部合法候选。
 
+下面用一个 6 节点小图展示实际文本格式；正式任务会列出全部 256 个节点的邻接表。第一条 user 消息包含初始规则与首轮环境更新：
+
+```text
+Find a valid path from node 0 to node 5 in this undirected graph, as short as you can.
+Reaching the goal is the first priority; among valid solutions, prefer fewer moves.
+Use the listed edges and visit each node at most once.
+
+Neighbors:
+0: 1, 2
+1: 0, 3, 4
+2: 0, 4
+3: 1, 5
+4: 1, 2, 5
+5: 3, 4
+
+[Environment update]
+Current node: 0
+Actual executed path: [0]
+Legal next moves:
+1: 0 -> 2
+2: 0 -> 1
+Candidate numbers may change between turns; use only the numbers above.
+[/Environment update]
+```
+
+模型回答后，假设环境实际执行了 `0 -> 1`，下一条 user 消息只追加环境更新：
+
+```text
+[Environment update]
+Current node: 1
+Actual executed path: [0, 1]
+Legal next moves:
+1: 1 -> 3
+2: 1 -> 4
+Candidate numbers may change between turns; use only the numbers above.
+[/Environment update]
+```
+
+节点 0 已访问，因此虽然邻接表中有 `1 -> 0`，它不再出现在合法候选里。候选编号 2 在首轮表示 `0 -> 1`，在下一轮表示 `1 -> 4`；编号只在当前轮有效。初始说明和此前 assistant 回答继续保留在会话历史中。
+
 积木先给初始／目标完整棋盘、八种形状及移除规则：坐标从零起，形状占据格必须覆盖当前占据格，只使用规定朝向；形状可复用，没有重力或库存限制，必须精确保留目标中的占据格。每轮追加：
 
 ```text

@@ -1,12 +1,12 @@
 # 积木融合 FFN 与失败上下文：当前结果
 
-**大 batch 试点表现很差，小 batch 正在运行，尚无导入的评测成绩。**截至打包快照，大 batch 的 3 epoch 完整主测试仅 5/510 到达（1.0%），其中 2/510 为最短解；5 道到达题均正确结束。低训练 loss 尚未转化为完整解题能力。
+**大 batch 试点表现很差，小 batch 的部分评测也尚未形成可用的闭环解题能力。**大 batch 的 3 epoch 完整主测试仅 5/510 到达（1.0%），其中 2/510 为最短解；5 道到达题均正确结束。小 batch 在 0.5 epoch 的已保存 488 题 rollout 中仅 1 题成功；该节点尚未全量完成，不能据此比较完整趋势。
 
 本页只记录新架构这轮结果。设置见[当前设计](../DESIGN.md)，当前运行与优先级见[项目状态页](../../../docs/PROJECT_STATUS_AND_TODO.md)。原分离 K/V 的寻路与积木成绩、倒序干预及学习曲线见[上一轮报告](report_long_trajectory.md)，不与本轮合并。
 
 ## 大 batch 试点
 
-运行 `blocks_ffn_failure_8330937` 已停止；正式合同见 [blocks_ffn_failure.json](../configs/blocks_ffn_failure.json)。证据来自压缩包中 2026-10-07 16:05（北京时间）的统计快照，紧凑计数见 [blocks_batch64_summary.json](blocks_batch64_summary.json)；本机未重跑模型或查询远端。
+运行 `blocks_ffn_failure_8330937` 已停止；正式合同见 [blocks_ffn_failure.json](../configs/blocks_ffn_failure.json)。证据来自压缩包中 2026-10-07 16:05（北京时间）的统计快照，紧凑计数见 [blocks_batch64_summary.json](blocks_batch64_summary.json)；本次接续沿用该表，不重跑大 batch 节点。
 
 | epoch | reference 题数 | reference 动作可达率 | rollout 题数 | 到达 | 到达且最短解 | 到达且正确结束 |
 |---|---:|---:|---:|---:|---:|---:|
@@ -21,6 +21,21 @@
 
 ## 小 batch 对照与判断边界
 
-用户确认小 batch 实验正在运行，标识为 `blocks_ffn_failure_batch4_75cc4fd`；合同见 [blocks_ffn_failure_batch4.json](../configs/blocks_ffn_failure_batch4.json)。导入文档记录它复用数据、编号与标签，在相同初始化下从头训练，仅改变 batch。包内没有该运行的评测成绩，现阶段不报告收益或实时进度。
+当前小 batch 运行标识为 `blocks_ffn_failure_batch4_75cc4fd`；合同见 [blocks_ffn_failure_batch4.json](../configs/blocks_ffn_failure_batch4.json)。导入文档记录它复用数据、编号与标签，在相同初始化下从头训练，仅改变 batch。
+
+2026-10-07 20:04（北京时间）读取远端已有输出，0.5 epoch（step 6,875）的紧凑计数见 [blocks_batch4_summary.json](blocks_batch4_summary.json)。包含未完成分片中已完整写出的题目；两种模式各完成 6/8 个分片，缺少全量摘要，无重复题或不完整 JSON 行。20:10 已恢复同一训练并迁移半 epoch 评测，仍优先最新节点后补旧节点；未完成分片的旧输出保留归档。
+
+| 指标 | 已保存结果 | 分母 |
+|---|---:|---|
+| reference 进度 | 472/510 | 255 题同棋盘新目标，217 题新棋盘 |
+| reference 动作保持可解 | 1,597/2,916（54.8%） | 作答前可解的决策轮 |
+| reference 最短动作 | 1,360/2,916（46.6%） | 作答前可解的决策轮 |
+| reference 正确停止 | 84/319（26.3%） | 已到目标的终止轮 |
+| reference 误报无解 | 194/4,046（4.8%） | 非无解生成轮 |
+| rollout 进度 | 488/510 | 255 题同棋盘新目标，233 题新棋盘 |
+| rollout 到达、正确结束、最短解 | 各 1/488（0.2%） | 全部已保存 rollout 题目 |
+| rollout 耗尽动作后正确无解 | 300/450（66.7%） | 未到目标且无合法动作的生成轮 |
+
+唯一闭环成功来自同棋盘新目标组；新棋盘组为 0/233。正确识别走错后无解不算原任务成功。只计完整分片时，两模式各 384 题，reference 动作保持可解为 1,337/2,407（55.5%），rollout 成功为 1/384。这里尚未与大 batch 做全量或逐题匹配比较，不据部分均值宣称收益。
 
 相同 epoch 下，小 batch 约有 16 倍更新，还改变每卡监督 token 平均产生的样本权重。后续比较需同时报告 epoch、更新数、样本曝光和耗时，并使用全量或同题结果。大 batch 的负结果是这一联合设置下的事实，尚不足以确定是 batch、融合接口、失败监督还是其他因素造成。

@@ -41,7 +41,7 @@ LLM 已有较强的语言理解和推理能力，但在复杂任务中，仍可�
 ## 4. 有序 TODO
 
 **当前运行：积木融合 FFN＋失败上下文，每卡 batch 1、四卡全局 batch 4，从头训练。**
-按用户说明，小 batch 实验正在运行；本机同步以压缩包快照为依据，未查询远端实时进度。
+2026-10-07 已查询远端并在节点重启后从同一运行的完整断点恢复训练；半 epoch 评测迁移至三卡节点接续。
 2026-10-07 已停止全局 batch 64 的训练和评测，仅修改 batch，保持新架构、数据及其余训练设置。
 正式合同为 [blocks_ffn_failure_batch4.json](../experiments/flamingo_map_reader/configs/blocks_ffn_failure_batch4.json)，
 完整协议见 [DESIGN](../experiments/flamingo_map_reader/DESIGN.md)，启动与恢复见 [实验 README](../experiments/flamingo_map_reader/README.md#积木融合-ffn-重训)。
@@ -50,11 +50,14 @@ LLM 已有较强的语言理解和推理能力，但在复杂任务中，仍可�
 
 保留融合 FFN；失败历史只监督最后“未到目标且无合法动作”的 none/done 回答，不监督中途不可达判断。
 另一节点按半 epoch 评测主测试的 reference／rollout，优先最新节点后补旧节点；训练结束后自动评测 final 的主测试和独立无解诊断。
-本机包内没有小 batch 的评测成绩，不能据此判断改善。数据规模、保存周期与预算以配置及设计为准，部分结果必须标明样本量与来源。
+已保存小 batch 的 0.5 epoch 部分证据：reference 472/510 题，动作保持可解为 1,597/2,916；
+rollout 488/510 题，仅 1 题到达且正确结束。详见[本轮报告](../experiments/flamingo_map_reader/results/report.md)
+及[紧凑计数](../experiments/flamingo_map_reader/results/blocks_batch4_summary.json)。数据规模、保存周期与预算以配置及设计为准，部分结果必须标明样本量与来源。
 
 导入记录称新运行已启动，并通过最长样本的四卡反向更新检查与恢复测试。
 `--resume` 仅接回同一运行的完整训练状态及各卡 RNG，未保存部分重算；改 batch 已另开新运行，不直接续旧断点。
 保存与评测进度以运行目录为准，本页不固化实时 step 或 ETA。
+三卡迁移只改变评测并发分配，保留已完成分片；旧部分输出先归档再整片重算。训练仍沿用原四卡与全局 batch 4。
 
 **历史对照：**[全局 batch 64 配置](../experiments/flamingo_map_reader/configs/blocks_ffn_failure.json)
 对应已停止的 `blocks_ffn_failure_8330937`；导入快照中 3 epoch 全量 rollout 到达且正确结束为 5/510（1.0%），见[本轮报告](../experiments/flamingo_map_reader/results/report.md)。

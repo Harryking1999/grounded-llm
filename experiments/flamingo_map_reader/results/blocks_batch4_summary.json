@@ -1,0 +1,246 @@
+{
+  "run": "blocks_ffn_failure_batch4_75cc4fd",
+  "config": "../configs/blocks_ffn_failure_batch4.json",
+  "observed_at_utc": "2026-10-07T12:04:40.515048+00:00",
+  "checkpoint": {
+    "step": 6875,
+    "epoch": 0.5
+  },
+  "evidence": "Saved complete episodes from cases.jsonl; includes completed episodes in unfinished shards. No model rerun for these counts.",
+  "metrics_scope": "Safety and shortest-action rates use nonterminal decision turns that were still solvable before the action.",
+  "results": {
+    "reference": {
+      "partial": true,
+      "planned_tasks": 510,
+      "counts": {
+        "tasks": 472,
+        "groups": {
+          "same_initial_board_new_pair": 255,
+          "new_initial_board": 217
+        },
+        "turns": 4046,
+        "solvable_decisions": 2916,
+        "safe_actions": 1597,
+        "shortest_actions": 1360,
+        "safe_rate": 0.5476680384087792,
+        "shortest_rate": 0.4663923182441701,
+        "missing_solvable_fields": 0,
+        "terminal_turns": 319,
+        "failed_stops": 235,
+        "correct_stops": 84,
+        "negative_turns": 0,
+        "correct_no_solution": 0,
+        "no_solution_recall": null,
+        "false_no_solution": 194,
+        "nonnegative_turns": 4046,
+        "false_no_solution_rate": 0.04794859120118636
+      },
+      "by_group": {
+        "new_initial_board": {
+          "tasks": 217,
+          "groups": {
+            "new_initial_board": 217
+          },
+          "turns": 1876,
+          "solvable_decisions": 1375,
+          "safe_actions": 782,
+          "shortest_actions": 655,
+          "safe_rate": 0.5687272727272727,
+          "shortest_rate": 0.4763636363636364,
+          "missing_solvable_fields": 0,
+          "terminal_turns": 147,
+          "failed_stops": 108,
+          "correct_stops": 39,
+          "negative_turns": 0,
+          "correct_no_solution": 0,
+          "no_solution_recall": null,
+          "false_no_solution": 94,
+          "nonnegative_turns": 1876,
+          "false_no_solution_rate": 0.050106609808102345
+        },
+        "same_initial_board_new_pair": {
+          "tasks": 255,
+          "groups": {
+            "same_initial_board_new_pair": 255
+          },
+          "turns": 2170,
+          "solvable_decisions": 1541,
+          "safe_actions": 815,
+          "shortest_actions": 705,
+          "safe_rate": 0.5288773523685918,
+          "shortest_rate": 0.45749513303049966,
+          "missing_solvable_fields": 0,
+          "terminal_turns": 172,
+          "failed_stops": 127,
+          "correct_stops": 45,
+          "negative_turns": 0,
+          "correct_no_solution": 0,
+          "no_solution_recall": null,
+          "false_no_solution": 100,
+          "nonnegative_turns": 2170,
+          "false_no_solution_rate": 0.04608294930875576
+        }
+      },
+      "completed_shards": 6,
+      "planned_shards": 8,
+      "completed_shards_only": {
+        "tasks": 384,
+        "groups": {
+          "same_initial_board_new_pair": 255,
+          "new_initial_board": 129
+        },
+        "turns": 3301,
+        "solvable_decisions": 2407,
+        "safe_actions": 1337,
+        "shortest_actions": 1136,
+        "safe_rate": 0.555463232239302,
+        "shortest_rate": 0.47195679268799334,
+        "missing_solvable_fields": 0,
+        "terminal_turns": 265,
+        "failed_stops": 195,
+        "correct_stops": 70,
+        "negative_turns": 0,
+        "correct_no_solution": 0,
+        "no_solution_recall": null,
+        "false_no_solution": 162,
+        "nonnegative_turns": 3301,
+        "false_no_solution_rate": 0.04907603756437443
+      },
+      "incomplete_json_lines": 0,
+      "duplicate_cases": 0
+    },
+    "rollout": {
+      "partial": true,
+      "planned_tasks": 510,
+      "counts": {
+        "tasks": 488,
+        "groups": {
+          "same_initial_board_new_pair": 255,
+          "new_initial_board": 233
+        },
+        "turns": 4186,
+        "solvable_decisions": 927,
+        "safe_actions": 440,
+        "shortest_actions": 357,
+        "safe_rate": 0.4746494066882416,
+        "shortest_rate": 0.3851132686084142,
+        "missing_solvable_fields": 0,
+        "terminal_turns": 1,
+        "failed_stops": 0,
+        "correct_stops": 1,
+        "negative_turns": 450,
+        "correct_no_solution": 300,
+        "no_solution_recall": 0.6666666666666666,
+        "false_no_solution": 2,
+        "nonnegative_turns": 3736,
+        "false_no_solution_rate": 0.0005353319057815846,
+        "reached": 1,
+        "success": 1,
+        "shortest_success": 1,
+        "failures": {
+          "correct_no_solution_after_error": 300,
+          "premature_done": 185,
+          "null": 1,
+          "false_no_solution": 2
+        }
+      },
+      "by_group": {
+        "new_initial_board": {
+          "tasks": 233,
+          "groups": {
+            "new_initial_board": 233
+          },
+          "turns": 1992,
+          "solvable_decisions": 437,
+          "safe_actions": 204,
+          "shortest_actions": 165,
+          "safe_rate": 0.4668192219679634,
+          "shortest_rate": 0.37757437070938216,
+          "missing_solvable_fields": 0,
+          "terminal_turns": 0,
+          "failed_stops": 0,
+          "correct_stops": 0,
+          "negative_turns": 210,
+          "correct_no_solution": 136,
+          "no_solution_recall": 0.6476190476190476,
+          "false_no_solution": 2,
+          "nonnegative_turns": 1782,
+          "false_no_solution_rate": 0.001122334455667789,
+          "reached": 0,
+          "success": 0,
+          "shortest_success": 0,
+          "failures": {
+            "premature_done": 95,
+            "correct_no_solution_after_error": 136,
+            "false_no_solution": 2
+          }
+        },
+        "same_initial_board_new_pair": {
+          "tasks": 255,
+          "groups": {
+            "same_initial_board_new_pair": 255
+          },
+          "turns": 2194,
+          "solvable_decisions": 490,
+          "safe_actions": 236,
+          "shortest_actions": 192,
+          "safe_rate": 0.4816326530612245,
+          "shortest_rate": 0.39183673469387753,
+          "missing_solvable_fields": 0,
+          "terminal_turns": 1,
+          "failed_stops": 0,
+          "correct_stops": 1,
+          "negative_turns": 240,
+          "correct_no_solution": 164,
+          "no_solution_recall": 0.6833333333333333,
+          "false_no_solution": 0,
+          "nonnegative_turns": 1954,
+          "false_no_solution_rate": 0.0,
+          "reached": 1,
+          "success": 1,
+          "shortest_success": 1,
+          "failures": {
+            "correct_no_solution_after_error": 164,
+            "premature_done": 90,
+            "null": 1
+          }
+        }
+      },
+      "completed_shards": 6,
+      "planned_shards": 8,
+      "completed_shards_only": {
+        "tasks": 384,
+        "groups": {
+          "same_initial_board_new_pair": 255,
+          "new_initial_board": 129
+        },
+        "turns": 3295,
+        "solvable_decisions": 723,
+        "safe_actions": 340,
+        "shortest_actions": 275,
+        "safe_rate": 0.4702627939142462,
+        "shortest_rate": 0.38035961272475793,
+        "missing_solvable_fields": 0,
+        "terminal_turns": 1,
+        "failed_stops": 0,
+        "correct_stops": 1,
+        "negative_turns": 359,
+        "correct_no_solution": 241,
+        "no_solution_recall": 0.6713091922005571,
+        "false_no_solution": 0,
+        "nonnegative_turns": 2936,
+        "false_no_solution_rate": 0.0,
+        "reached": 1,
+        "success": 1,
+        "shortest_success": 1,
+        "failures": {
+          "correct_no_solution_after_error": 241,
+          "premature_done": 142,
+          "null": 1
+        }
+      },
+      "incomplete_json_lines": 0,
+      "duplicate_cases": 0
+    }
+  }
+}

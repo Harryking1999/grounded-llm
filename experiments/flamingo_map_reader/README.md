@@ -43,27 +43,30 @@ No solution: no legal moves remain and the goal has not been reached.
 可先用 [find_training_batch.py](src/find_training_batch.py) 扫描训练集全部编号变体，
 将序列长度、地图快照数、候选槽位数和监督长度的极值样本组合，
 以真实四卡反向传播和优化器更新测量 batch 显存边界及保留余量的档位。
-正式启动再按合同从大到小验证所选全局 batch，
+正式启动按合同验证所选 batch，当前配置只允许每卡 1、全局 4，
 随后训练并自动评测 final checkpoint。旧配置和旧结果保留用于对照，不混入这次成绩。
 最长样本的旧实现连全局 batch 8 都会显存不足，因此训练启用逐层激活重计算，
-并仅对有监督 token 分块计算交叉熵；目标仍是同一 assistant-token 平均交叉熵。
-单元测试比较普通计算与优化计算的 loss 和全部可训练梯度，避免因节省显存改变监督。
+并仅对有监督 token 分块计算交叉熵；每卡先按本卡监督 token 求平均，再平均四卡梯度。
+同一个 batch 上的普通计算与优化计算已比较 loss 和全部可训练梯度；这不意味着不同 batch 的样本权重相同。
 
 从仓库根目录启动完整流程（路径参数由调用者指定，节点信息不写入源码）：
 
 ```bash
 python -m experiments.flamingo_map_reader.src.retrain_blocks \
   --config experiments/flamingo_map_reader/configs/blocks_ffn_failure_batch4.json \
+  --prepared-manifest "$PREPARED_MANIFEST" \
   --source-manifest "$SOURCE_MANIFEST" --model-path "$MODEL_PATH" --out "$RUN_DIR"
 ```
 
-已有准备数据时加 `--prepared-manifest "$PREPARED_MANIFEST"`，复用轨迹和编号，
-并核对监督、采样与训练预算。保存间隔由合同的 `checkpoint.every_epoch_fraction` 控制。
+本轮从头对照须加 `--prepared-manifest "$PREPARED_MANIFEST"`，复用已停止大 batch 运行的轨迹和编号，
+并为 `RUN_DIR` 选择新目录。该选项只复用数据，不加载旧权重。保存间隔由合同的 `checkpoint.every_epoch_fraction` 控制：
+当前每 1,375 steps（0.1 epoch）保存，10 epochs 共 137,500 steps。
 中断后，以同一配置、模型路径和输出目录调用上述命令并加 `--resume`；
 入口复用现有队列的断点选择及评测分片重试，底层仍调用 `train.py --resume CHECKPOINT`。
 只选择已发布且包含 adapter、optimizer、scheduler、trainer state 和全部进程 RNG 状态的断点；
 初始权重与未写完的目录不作为续训断点，无完整断点时明确报错。
 Trainer 恢复已完成步数、epoch 与数据顺序，继续原有总预算，不额外增加训练轮数。
+必须沿用同一运行的 batch 和设备拓扑；未保存的更新从最近完整断点重算。不同 batch 的运行不直接互相续训。
 
 训练结束后复用 `trajectory_eval.py` 完成主测试 reference、主测试 rollout 和失败上下文 reference，
 由四个 GPU 分片执行，再用同一 `aggregate` 汇总；完成的评测分片在恢复时直接复用。
@@ -93,15 +96,27 @@ python -m experiments.flamingo_map_reader.src.trajectory_eval \
 
 积木地图来自 `tree_1000_132f5a1/best.pt`，源码来源为 `132f5a1`，依赖 [blocks_distance_map](../blocks_distance_map/README.md) 的编码器、棋盘读取与裁判。寻路复用 [external_map_interface](../external_map_interface/README.md) 的图环境和 Q/V。
 
-运行根目录内，`<task>/data/` 保存清单与轨迹，`<task>/training/` 保存训练合同和权重，`evaluation/<task>/<checkpoint>/<split>_<mode>_<map|no_map>/` 保存评测分片。以提交、合同和运行路径识别实验，不以分支名判断设置。
+当前积木独立运行在根目录的 `data/` 保存清单与轨迹、`training/` 保存合同与权重，
+`evaluation/<split>_<mode>_<start>_<stop>/` 保存 final 分片，`evaluation_half_epoch/step-N/test_<mode>/<start>_<stop>/` 保存中间评测分片。
+上一轮两任务队列则使用 `<task>/data/`、`<task>/training/` 和 `evaluation/<task>/<checkpoint>/<split>_<mode>_<map|no_map>/`。
+以提交、合同和运行路径识别实验，不以分支名判断设置。
 
 ## 两节点协作与汇总
+
+**当前积木：**训练节点运行 `retrain_blocks`；另一节点另行启动半 epoch 评测队列，读取同一共享目录中
+已发布的 checkpoint，两卡 rollout、两卡 reference，优先最新节点后补旧节点。该队列不由训练入口自动拉起；
+运行源码快照中的 `blocks_half_epoch_eval_queue.py` 和 `evaluation_half_epoch/launch.json` 保留调用，
+`contract.json` 记录分片合同，`status.json` 记录排队状态。首次评测在 0.5 epoch（step 6,875）发布后启动。
+中间队列只评主测试，独立无解诊断由 final 流程执行。重启跳过完整分片，保留未完成输出后整片重做，
+汇总排除 `.interrupted.*` 目录；同一 final 权重若被两条流程评测，也不能算作独立重复。详见 [DESIGN 第 7 节](DESIGN.md#7-评测设置与指标口径)。
+
+**上一轮两任务队列：**以下 `--delegate-prefix`、`--evaluation-only` 参数属于 `trajectory_queue`，不适用于当前 `retrain_blocks` 入口。
 
 两节点共享运行目录。主队列用 `--delegate-prefix` 排除交给另一节点的任务；另一节点运行同一模块的 `--evaluation-only --include-prefix ... --status-file ...`，使用独立状态文件。前缀必须互斥，不能将同一分片交给两个进程。
 
 评测 worker 只读取已发布 checkpoint，等待真正的 `final` 后完成最终评测。重启时接管仍在运行的子进程，跳过已有分片摘要；主队列和 worker 的完成状态分别记录。节点地址和进程号只记在忽略的运行记录中。
 
-从仓库根目录重建证据：
+从仓库根目录重建上一轮两任务证据：
 
 ```bash
 python -m experiments.flamingo_map_reader.src.collect_evidence \

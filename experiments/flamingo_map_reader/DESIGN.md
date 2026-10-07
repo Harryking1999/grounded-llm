@@ -1,8 +1,8 @@
 # 完整轨迹 SFT：寻路原方案与积木 FFN 重训
 
-本页按原寻路方案的顺序说明数据、输入、监督、训练和评测。寻路沿用原方案；积木采用 2026-10-06 会议及后续确认的设置：**融合 FFN、加入失败上下文、四卡全局 batch 64、训练 10 个 epoch，每 0.1 个 epoch 保存一次**。
+本页按原寻路方案的顺序说明数据、输入、监督、训练和评测。当前积木采用 2026-10-07 确认的设置：**融合 FFN、失败上下文、每卡 batch 1／四卡全局 batch 4，从头训练 10 个 epoch；每 0.1 epoch 保存，每 0.5 epoch 评测主测试**。寻路列为上一轮方案参照，本次不重启寻路训练。
 
-正式参数以[寻路配置](configs/path_single_long.json)和[积木重训配置](configs/blocks_ffn_failure.json)为准；本页解释其含义。进度见[项目状态页](../../docs/PROJECT_STATUS_AND_TODO.md)。上一轮两任务的[设计](DESIGN_long_trajectory.md)与[报告](results/report_long_trajectory.md)在原目录保留，已有成绩属于上一轮。
+正式参数以[积木当前配置](configs/blocks_ffn_failure_batch4.json)为准；[全局 batch 64 配置](configs/blocks_ffn_failure.json)对应已停止的对照运行，[寻路配置](configs/path_single_long.json)对应上一轮方案。进度见[项目状态页](../../docs/PROJECT_STATUS_AND_TODO.md)。上一轮两任务的[设计](DESIGN_long_trajectory.md)与[报告](results/report_long_trajectory.md)在原目录保留，其成绩不属于当前小 batch 运行。
 
 ## 1. 这轮实验检验什么
 
@@ -19,7 +19,11 @@
 | 读取接口 | 角色与编号作 K，状态投影作 V | 地图、角色、编号经共享 FFN 融合，特征同时用于 K/V |
 | 留出任务 | 同图、未作为训练目标的 goal | 训练初始棋盘上的新任务，以及新初始棋盘上的任务 |
 
-本次同时改变了接口、训练样本、batch 和训练轮数，旧成绩可作参照，但新旧差值不能单独归因于 FFN。地图贪心提供示范，不保证环境最短解。
+相对上一轮分离 K/V 的积木实验，本轮改变了接口、训练样本、batch 和训练轮数，旧成绩可作参照，但新旧差值不能单独归因于 FFN。地图贪心提供示范，不保证环境最短解。
+
+当前小 batch 对照与已停止的融合 FFN 大 batch 运行之间，只修改每卡／全局 batch：16／64 改为 1／4。复用同一份准备数据、编号、标签和测试任务，保持种子、学习率、warmup 比例及其他配置一致，在独立目录从头训练；初始 adapter 已逐 tensor 核对一致。它不是从大 batch 中间权重续训，也不是恢复旧的分离 K/V 架构。
+
+按 epoch 比较时，小 batch 对照的更新次数约为大 batch 的 16 倍；它同时改变梯度平均和不同长度样本的相对权重。因此须同时记录 epoch、更新次数、样本曝光量与耗时，不能把收益仅归因于更新次数。四卡全局 batch 4 也不等于上一轮单卡全局 batch 1。
 
 ## 2. 数据范围与实际数量
 
@@ -49,6 +53,8 @@
 | **合计** | **10,000** | — | **55,000** | — |
 
 三类放入同一个训练集，每个 epoch 随机打乱后由四卡分配，按样本采样；不按类别分阶段训练，也不强制每个 batch 各类数量相同。编号增强后的采样比例为 **48:1:6**。普通任务和失败任务各有 6 套固定编号，初始即目标只有 1 套。
+
+上述比例是样本出现次数，不是监督 token 或梯度贡献比例。失败历史只监督最后回答，不能将全部历史长度计入其监督量；batch 对损失权重的影响见第 6 节。
 
 原 8,000 条普通成功任务的最短长度分布仍为：6 步 200 条、7 步 4,784 条、8 步 3,004 条、9 步 12 条；成功训练示范为 6–11 步。原 9,000 条成功轨迹共 64,155 个决策轮、9,000 个到达终止段；这些是新增失败轨迹前的统计，不能作为新训练集总轮数。
 
@@ -227,21 +233,29 @@ No solution: no legal moves remain and the goal has not been reached.
 |---|---|---|
 | 训练样本／epoch | 24,192 | 55,000 |
 | GPU 分配 | 一张训练卡 | 四张 NVLink 互联训练卡，DDP |
-| 每卡 batch | 1 | 16 |
-| 全局 batch | 1 | 64 |
+| 每卡 batch | 1 | 1 |
+| 全局 batch | 1 | 4 |
 | 梯度累积 | 1 | 1 |
 | epoch | 3 | 10 |
-| 优化步／epoch | 24,192 | 860 |
-| 总优化步 | 72,576 | 8,600 |
-| 保存频率 | 每 1/3 epoch，另存第 128 步 | 每 0.1 epoch，即每 86 步 |
+| 优化步／epoch | 24,192 | 13,750 |
+| 总优化步 | 72,576 | 137,500 |
+| 保存频率 | 每 1/3 epoch，另存第 128 步 | 每 0.1 epoch，即每 1,375 步 |
 
 两者均采用 AdamW：学习率 `2e-5`，前 5% 优化步 warmup 后保持恒定，weight decay 为 `0.01`，梯度裁剪为 `1.0`。冻结基座使用 BF16，新增接口参数保持 FP32，并采用 BF16 autocast。
 
-积木训练启用逐层激活重计算，并仅对有监督 token 分块计算交叉熵，块大小为 128。两项用来降低显存，监督目标仍为有监督 assistant token 的平均交叉熵；重计算会增加计算时间。训练集随机混合，batch 内按最长文本与地图形状补齐。
+当前积木 warmup 为 6,875 steps，即 0.5 epoch。相对于大 batch 运行，warmup 比例和覆盖的 epoch 不变，绝对步数随总更新预算增加。
 
-55,000 条样本按四卡全局 batch 64 分配，每 epoch 向上取整为 860 步；DDP 数据分配对末尾可能补齐少量样本。因此保存点为 86、172、258……860，后续 epoch 按同一间隔继续。另存初始权重和最终 `final`；保存频率不代表每个保存点都自动评测。
+积木训练启用逐层激活重计算，并仅对有监督 token 分块计算交叉熵，块大小为 128。两项用来降低显存，不改变同一个 batch 的损失定义；重计算会增加计算时间。每张卡先对本卡 batch 内所有有监督 assistant token 求平均，再由 DDP 平均各卡梯度；不是跨四卡按全局监督 token 数重新归一化。训练集随机混合，本卡 batch 内按最长文本与地图形状补齐。
+
+每卡 batch 1 时，每条轨迹先计算自己的 token 平均损失，四条轨迹再跨卡平均；此前每卡 batch 16 时，同卡长监督轨迹对该次平均损失的权重更高。由此，缩小 batch 会同时改变短终止样本与长动作轨迹的相对权重。token 数也不等同于实际梯度贡献，需结合分类损失或对照结果判断。
+
+55,000 条样本按四卡全局 batch 4 分配，每 epoch 恰好 13,750 步，无须因整除问题补齐。保存点为 1,375、2,750、4,125……13,750，后续 epoch 按同一间隔继续。另存初始权重和最终 `final`；主测试按 0.5 epoch 评测，对应 6,875、13,750、20,625……steps。保存频率不代表每个保存点都评测。
+
+历史积木对照：分离 K/V 的单卡全局 batch 1 实验为 49,000 个样本／更新每 epoch；已停止的融合 FFN 全局 batch 64 实验为 55,000 个样本、860 次更新每 epoch、每 86 steps 保存。三者的“1 epoch”不代表相同优化更新数。
 
 中间断点保存 adapter、optimizer、scheduler、trainer state，以及各卡随机状态。通过统一入口的 `--resume` 选择最新完整断点，沿原步数、epoch、数据顺序和学习率进度继续剩余预算。初始权重目录不含完整训练状态；没有完整断点时明确报错。
+
+恢复要求同一运行、配置、batch 和设备拓扑；未保存的更新从最近完整断点重算。已通过包含随机 dropout 和激活重计算的恢复一致性测试，但不据此承诺跨硬件的逐位一致。改变 batch 的本轮使用新目录从头训练，不能按旧 Trainer 步数直接续接；`--prepared-manifest` 仅复用数据，不加载旧 adapter 或优化器。
 
 上下文上限 32,768 token，不静默截断；每次动作／终止生成预算为 4,096／2,048 token，最大执行动作数为 32。GPU 数、batch、保存间隔和生成预算的正式值均见配置。
 
@@ -257,7 +271,10 @@ No solution: no legal moves remain and the goal has not been reached.
 
 ### 本次积木自动评测
 
-训练完成后，只对最终 `final/adapter.pt` 运行以下三组评测。每题使用 1 套编号，评测按每片最多 64 个物理任务分给四张卡。
+当前运行包含两条评测流程，均使用同一 `trajectory_eval.py` 和汇总器，每题使用 1 套编号，每片最多 64 个物理任务：
+
+- **中间评测：**另一节点的独立队列读取每 0.5 epoch 已发布的 checkpoint，评测主测试 reference 和 rollout，各 510 题；两张卡负责 rollout，两张负责 reference。队列优先最新 checkpoint，再补较早节点，因此较新结果出现时，较早节点仍可能未全量。100 条独立无解诊断不在这个中间队列中。
+- **最终评测：**训练入口在训练结束后对 `final/adapter.pt` 自动运行下表三组。它与中间队列使用不同输出目录；若半 epoch 队列也评到了 final 的同一权重，汇报时只作为同一条件，不合并为独立重复。
 
 | 数据集 | 模式 | 物理任务 | 每题编号数 | 主要报告 |
 |---|---|---:|---:|---|
@@ -265,7 +282,9 @@ No solution: no legal moves remain and the goal has not been reached.
 | 主测试 `test` | rollout | 同一批 510 | 1 | 到达率、到达且最短解率、停止与失败原因 |
 | 无解诊断 `test_no_solution` | reference | 100 | 1 | 无解召回率、none/done 输出与原始回答 |
 
-合计 1,120 个评测案例，来自 610 个独立物理任务；reference 与 rollout 的同题结果不作为两批独立任务。validation、训练诊断及中间 checkpoint 可通过同一评测器单独调用，不在上述自动三组任务中。
+最终三组合计 1,120 个评测案例，来自 610 个独立物理任务；reference 与 rollout 的同题结果不作为两批独立任务。validation 与训练诊断可通过同一评测器单独调用，不在上述自动三组任务中。半 epoch 队列是本次额外启动的进程，训练入口本身不会自动启动它；运行源码快照中的 `blocks_half_epoch_eval_queue.py`、评测 `contract.json` 和 `launch.json` 记录该队列的设置与调用。
+
+评测重启跳过已有完整摘要的分片，保留未完成分片的旧输出后整片重做，不从片内某道题续接。汇总排除 `.interrupted.*` 归档目录，避免重复计数；有效题数可能在重启后暂时回落。部分结果必须注明已评数量及棋盘来源，比较趋势优先使用全量结果或对齐同一批题目。
 
 寻路沿用原有 reference／rollout、训练诊断与 validation／final test 口径：训练诊断及 validation 每题 1 套编号，final test 的普通任务可用 6 套编号、初始即目标 1 套。本次积木运行不会触发新一轮寻路训练；寻路已有的地图反序和早期干预合同见[上一轮设计第 8 节](DESIGN_long_trajectory.md#8-最终-checkpoint-诊断先-reference-q-倒序再-rollout-早期干预)。
 
@@ -286,6 +305,8 @@ No solution: no legal moves remain and the goal has not been reached.
 
 到达率与正确停止分别报告；现有 `success`、`shortest_success` 还要求正确停止，不能直接替代仅按到达状态和步数计算的到达指标。无解控制判定检查 `<action>none</action>` 和 `<done/>`，英文原因句是训练目标，完整生成文本保留以便核对。
 
+`summary_correct` 检查动作历史与总结文本，不单独代表控制标记正确；`success` 也不要求总结文本完全正确，两者须分别报告。`premature_done` 包含“尚有合法动作便结束”和“耗尽合法动作后错报成功”，应按末轮候选数拆分，不能把死局上的成功误报全部解释为模型主动提前放弃。
+
 Top-10 集合、排序、逐对关系、current 关系、地图最优动作、合法性与总结作为辅助诊断。积木排序指标只评价应报告的 Top-10 集合；动作是否地图最优仍按全部合法候选判断。主结果至少按两类棋盘来源和最短长度分层；同一任务的轮次、编号副本及同一棋盘上的题目存在关联，不能当作独立重复实验。
 
 ## 8. 配置、运行入口与产物
@@ -294,12 +315,13 @@ Top-10 集合、排序、逐对关系、current 关系、地图最优动作、�
 
 ```bash
 python -m experiments.flamingo_map_reader.src.retrain_blocks \
-  --config experiments/flamingo_map_reader/configs/blocks_ffn_failure.json \
+  --config experiments/flamingo_map_reader/configs/blocks_ffn_failure_batch4.json \
   --source-manifest "$SOURCE_MANIFEST" \
+  --prepared-manifest "$PREPARED_MANIFEST" \
   --model-path "$MODEL_PATH" --out "$RUN_DIR"
 ```
 
-已有本轮准备数据时加 `--prepared-manifest "$PREPARED_MANIFEST"` 复用轨迹。中断后，在同一配置、模型路径及输出目录下调用同一命令并加 `--resume`。恢复会复用已完成的评测分片，仅重做未完成分片。
+本轮用 `--prepared-manifest "$PREPARED_MANIFEST"` 复用已停止大 batch 运行的数据，`RUN_DIR` 必须为独立的新目录。中断后，在同一配置、模型路径及输出目录下调用同一命令并加 `--resume`。恢复会复用已完成的评测分片，仅重做未完成分片。
 
 单独评测一个保存点：
 
@@ -319,6 +341,8 @@ python -m experiments.flamingo_map_reader.src.trajectory_eval \
 | `training/models/checkpoint-N/` | 可恢复的中间训练状态 |
 | `training/models/final/adapter.pt` | 最终读取接口权重及合同 |
 | `evaluation/<split>_<mode>_<start>_<stop>/` | 原始回答 `cases.jsonl` 和分片 `summary.json` |
+| `evaluation_half_epoch/step-N/test_<mode>/<start>_<stop>/` | 中间评测的原始回答及分片摘要，模式目录另有全量汇总 |
+| `evaluation_half_epoch/contract.json`、`launch.json`、`status.json` | 独立半 epoch 队列的合同、启动记录与当前状态 |
 | 运行根目录 `summary.json`、`status.json` | 自动三组评测汇总与流程状态 |
 
 实现入口见 [README](README.md)。新运行的原始回答与成绩以其自身 manifest、权重合同和运行目录为准；上一轮报告继续保留在 [report_long_trajectory.md](results/report_long_trajectory.md)。

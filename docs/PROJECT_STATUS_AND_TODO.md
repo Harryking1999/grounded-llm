@@ -40,34 +40,33 @@ LLM 已有较强的语言理解和推理能力，但在复杂任务中，仍可�
 
 ## 4. 有序 TODO
 
-2026-10-06 会议后的新优先级：仅对积木执行 FFN＋失败上下文的从头重训和评测。
-当前正式合同为 [blocks_ffn_failure_batch4.json](../experiments/flamingo_map_reader/configs/blocks_ffn_failure_batch4.json)，全局 batch 64 对照保留在 [blocks_ffn_failure.json](../experiments/flamingo_map_reader/configs/blocks_ffn_failure.json)，
-完整训练与评测说明见 [新 DESIGN](../experiments/flamingo_map_reader/DESIGN.md)，实现与已确认的无解回答见 [实验 README](../experiments/flamingo_map_reader/README.md#积木会议决策重训)。
-保留原成功训练数据，新增失败历史只监督最后无解回答；无解动作为 none 并输出 done。
-四卡全局 batch 的含义及 none/done 输出已由用户确认。用户随后修订无解条件为：
-照常走到没有合法动作且尚未到 goal；不训练中途不可达判断。数据已生成：10000 条物理训练轨迹、
-55000 条编号增强轨迹、510 条分层主测试任务，另有 100 条失败上下文测试。用户最终指定融合版：
-单个共享 FFN 联合处理地图、角色和编号，输出同时供 K/V 投影使用。复用数据从头训练修订结构。
-旧实现的最长样本测试显存不足，现加入激活重计算与分块交叉熵；47 项针对性测试通过，
-包括普通计算与优化计算的损失和梯度等价检查。随后按用户要求扩大 batch 压测：
-同时覆盖训练数据 padding 极值的四卡三步更新中，全局 64 通过，单卡峰值分配 38.74 GiB、
-预留 43.95 GiB；已测到全局 120 能运行、128 OOM，未完成精确边界搜索。
-用户最终选择全局 64，停止继续探上限；原全局 16 的早期运行已停止，保留日志与初始权重。
-随后用户要求每 0.1 epoch 保存一次（全局 batch 64 对应每 86 steps）。当前进程无法热改，
-保留原早期运行日志后按新保存间隔重启；从头训练 10 epochs，完成后自动评测 final。
-统一入口支持 `--resume`：复用队列断点选择和分片重试，只接受完整训练状态及四卡 RNG，
-通过现有 Trainer 恢复原预算。融合 FFN、重计算和随机 dropout 的续训一致性测试通过；
-评测入口与恢复调用见实验 README。
+**当前运行：积木融合 FFN＋失败上下文，每卡 batch 1、四卡全局 batch 4，从头训练。**
+2026-10-07 用户已停止全局 batch 64 的训练和评测，仅修改 batch，保持新架构、数据及其余训练设置。
+正式合同为 [blocks_ffn_failure_batch4.json](../experiments/flamingo_map_reader/configs/blocks_ffn_failure_batch4.json)，
+完整协议见 [DESIGN](../experiments/flamingo_map_reader/DESIGN.md)，启动与恢复见 [实验 README](../experiments/flamingo_map_reader/README.md#积木会议决策重训)。
+当前运行标识为 `blocks_ffn_failure_batch4_75cc4fd`，配置来源提交 `75cc4fd`，运行源码复用 `8330937` 的持久快照。
+新旧初始 adapter 已逐 tensor 核对一致；训练记录、编号、标签与准备数据完全复用。
 
-2026-10-07 用户因当前效果不足，明确停止上述训练和评测，要求仅将 batch 改为每卡 1，
-保留新架构、新数据、学习率和其他设置，从相同种子重新运行。使用独立输出，复用原准备数据及编号，
-每 0.1 epoch 保存完整断点，并继续每 0.5 epoch 评测；每卡 batch 1 在四卡下是全局 batch 4，
-与旧实验单卡全局 batch 1 不同。新运行每 epoch 13,750 次更新，每 1,375 steps 保存，10 epochs 共 137,500 steps。
-已完成的大 batch 3 epoch 评测为 rollout 到达且正确结束 5/510；此结果不足以隔离架构、batch 与监督权重的因果贡献。
+训练集包括 10,000 条物理轨迹、55,000 条编号增强样本，三类混合采样比例为 48:1:6。
+保留融合 FFN；失败历史只监督最后“未到目标且无合法动作”的 none/done 回答，不监督中途不可达判断。
+当前每 epoch 13,750 次更新，10 epochs 共 137,500 steps；每 0.1 epoch（1,375 steps）保存完整断点，
+另一节点每 0.5 epoch 评测 510 题主测试的 reference／rollout，优先最新节点后补旧节点。
+训练结束后自动评测 final 的主测试和独立 100 条无解诊断。评测未全量时必须标明样本量与来源。
 
-2026-10-06 用户已调整当前运行优先级：停止 no_map；先用最终 checkpoint 在两任务 reference 上做候选 Q 的距离倒序，再做积木前 1、2、3 步安全前缀的 rollout 诊断。正常对照均复用已完成的 final validation，不重复生成。精确合同与解释边界见 [DESIGN 第 8 节](../experiments/flamingo_map_reader/DESIGN_long_trajectory.md#8-最终-checkpoint-诊断先-reference-q-倒序再-rollout-早期干预)。完整 test 与任务训练等比较仍保留为后续缺口；更大模型基线不是同一训练后接口的地图消融对照。
+新运行已启动，并通过最长样本的四卡反向更新检查；已有 Trainer 保存恢复与完整断点／分片恢复测试再次通过。
+`--resume` 仅接回同一运行的完整训练状态及各卡 RNG，未保存部分重算；改 batch 已另开新运行，不直接续旧断点。
+保存与评测进度以运行目录为准，本页不固化实时 step 或 ETA。
 
-1. **收齐当前方法的完整证据。** 优先完成积木 final validation，再收齐两任务 test 与配对对照，分别判断参考状态下的动作能力和自主闭环能力。
+**历史对照：**[全局 batch 64 配置](../experiments/flamingo_map_reader/configs/blocks_ffn_failure.json)
+对应已停止的 `blocks_ffn_failure_8330937`；其 3 epoch 全量 rollout 到达且正确结束为 5/510，旧权重与结果保留。
+当前小 batch 每 epoch 约增加 16 倍更新，同时改变 batch 内 token 平均造成的样本权重，不能只归因于步数。
+更早的分离 K/V 单卡实验全局 batch 为 1、每 epoch 49,000 次更新；其成绩也不能当作当前实验的同条件对照。
+
+**上一轮遗留诊断：**2026-10-06 曾安排停止 no_map，先做候选 Q 距离倒序，再做积木前 1、2、3 步安全前缀干预；
+这是上一轮权重的诊断合同，本次仅启动上述小 batch 训练及评测，不因此重启这些任务。
+合同与解释边界见 [上一轮 DESIGN 第 8 节](../experiments/flamingo_map_reader/DESIGN_long_trajectory.md#8-最终-checkpoint-诊断先-reference-q-倒序再-rollout-早期干预)。
+
+1. **收齐当前小 batch 对照。** 按统一主测试收齐各评测节点，比较全量或同题结果；同时报告 epoch、更新次数与耗时，区分动作、终止和完整解题能力。上一轮未完成的证据单独保留，不混入本轮成绩。
 2. **确认地图是否被实际使用。** 优先完成同题配对的无地图对照、候选重编号和目标变化分析，区分接口学到的任务规律与地图信息带来的收益。
 3. **解释积木的闭环差距。** 对照模型与地图贪心的轨迹，定位首次关键错误及其后果，再决定应改地图、读取接口还是训练数据。
 4. **建立项目层面的比较结论。** 在一致的信息、任务和预算下，补齐无地图任务训练、文字状态接口及更强模型等关键对照，同时考虑准确率与训练、推理成本。

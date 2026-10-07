@@ -970,5 +970,115 @@
       "map_best_distance": 6.545357704162598,
       "map_best_remaining": 5
     }
-  ]
+  ],
+  "epoch4_partial_followup": {
+    "observed_at_utc": "2026-10-07T21:12:09.165096+00:00",
+    "checkpoint_step": 55000,
+    "checkpoint_epoch": 4.0,
+    "previous_checkpoint_step": 48125,
+    "previous_checkpoint_epoch": 3.5,
+    "complete": false,
+    "method": "Only complete saved JSONL cases; within each mode compare exactly the same trajectory/variant IDs against complete epoch 3.5. All current cases are same-initial-board new targets; rollout states and histories differ.",
+    "modes": {
+      "reference": {
+        "epoch35": {
+          "cases": 210,
+          "groups": {
+            "same_initial_board_new_pair": 210
+          },
+          "safe": 1032,
+          "solvable_decisions": 1279,
+          "shortest": 962,
+          "first_safe": 98,
+          "first_decisions": 210,
+          "first_choose_1_to_3": 160,
+          "no_solution_correct": 0,
+          "no_solution_expected": 0,
+          "exhausted_false_goal": 0,
+          "goal_stop_correct": 131,
+          "goal_turns": 138
+        },
+        "epoch4": {
+          "cases": 210,
+          "groups": {
+            "same_initial_board_new_pair": 210
+          },
+          "safe": 1048,
+          "solvable_decisions": 1279,
+          "shortest": 973,
+          "first_safe": 108,
+          "first_decisions": 210,
+          "first_choose_1_to_3": 168,
+          "no_solution_correct": 0,
+          "no_solution_expected": 0,
+          "exhausted_false_goal": 0,
+          "goal_stop_correct": 129,
+          "goal_turns": 138
+        },
+        "identical_reference_state_sequences": 210
+      },
+      "rollout": {
+        "epoch35": {
+          "cases": 212,
+          "groups": {
+            "same_initial_board_new_pair": 212
+          },
+          "safe": 258,
+          "solvable_decisions": 469,
+          "shortest": 224,
+          "first_safe": 106,
+          "first_decisions": 212,
+          "first_choose_1_to_3": 161,
+          "no_solution_correct": 75,
+          "no_solution_expected": 174,
+          "exhausted_false_goal": 97,
+          "goal_stop_correct": 1,
+          "goal_turns": 1,
+          "success": 1,
+          "failure": {
+            "premature_done": 134,
+            "correct_no_solution_after_error": 75,
+            "illegal_action": 2
+          }
+        },
+        "epoch4": {
+          "cases": 212,
+          "groups": {
+            "same_initial_board_new_pair": 212
+          },
+          "safe": 230,
+          "solvable_decisions": 439,
+          "shortest": 201,
+          "first_safe": 99,
+          "first_decisions": 212,
+          "first_choose_1_to_3": 165,
+          "no_solution_correct": 87,
+          "no_solution_expected": 167,
+          "exhausted_false_goal": 80,
+          "goal_stop_correct": 3,
+          "goal_turns": 3,
+          "success": 3,
+          "failure": {
+            "premature_done": 122,
+            "correct_no_solution_after_error": 87
+          }
+        },
+        "success_transitions": {
+          "failure_failure": 209,
+          "success_success": 1,
+          "failure_success": 2
+        },
+        "success_task_ids": {
+          "previous": [
+            "blocks_008034"
+          ],
+          "current": [
+            "blocks_008034",
+            "blocks_008196",
+            "blocks_008370"
+          ]
+        }
+      }
+    }
+  }
 }

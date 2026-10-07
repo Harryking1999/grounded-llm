@@ -1,0 +1,974 @@
+{
+  "run": "blocks_ffn_failure_batch4_75cc4fd",
+  "checkpoint_step": 48125,
+  "checkpoint_epoch": 3.5,
+  "split": "test",
+  "variant": 0,
+  "cases_per_mode": 510,
+  "method": "Read saved complete outputs; CPU replay of official legal transitions and exact reachability; no new model generation or optimizer updates.",
+  "definitions": {
+    "round": "One-based generation round.",
+    "safe": "Chosen successor still reaches the goal under official removal rules, among decisions whose starting state is solvable and not already the goal.",
+    "first_irreversible_error": "First executed legal action taking a solvable state to an unreachable successor.",
+    "reference": "Generated answer is scored; the next prefix and physical state use the prepared gold answer and trajectory.",
+    "rollout": "Generated answer is accepted and its chosen action updates the physical state and subsequent history.",
+    "valid_ranking_caveat": "Existing valid_ranking also requires exactly the correct top-10 candidate set; it is not a pure syntax metric."
+  },
+  "modes": {
+    "reference": {
+      "overall": {
+        "turns": 4360,
+        "phases": {
+          "solvable": 3148,
+          "goal": 345,
+          "unreachable_with_moves": 867
+        },
+        "solvable": 3148,
+        "safe": 2574,
+        "shortest": 2356,
+        "legal_on_solvable": 3146,
+        "goal_stop_correct": 333,
+        "goal_turns": 345,
+        "exhausted_correct": 0,
+        "exhausted_turns": 0,
+        "exhausted_claim_goal": 0,
+        "parseable_ranking_all_decisions": 3991,
+        "follows_own_top_all_decisions": 3991,
+        "action_decisions": 4015
+      },
+      "by_round": {
+        "1": {
+          "turns": 510,
+          "phases": {
+            "solvable": 510
+          },
+          "solvable": 510,
+          "safe": 245,
+          "shortest": 222,
+          "legal_on_solvable": 510,
+          "goal_stop_correct": 0,
+          "goal_turns": 0,
+          "exhausted_correct": 0,
+          "exhausted_turns": 0,
+          "exhausted_claim_goal": 0,
+          "parseable_ranking_all_decisions": 510,
+          "follows_own_top_all_decisions": 510,
+          "action_decisions": 510
+        },
+        "2": {
+          "turns": 510,
+          "phases": {
+            "solvable": 465,
+            "unreachable_with_moves": 45
+          },
+          "solvable": 465,
+          "safe": 373,
+          "shortest": 334,
+          "legal_on_solvable": 465,
+          "goal_stop_correct": 0,
+          "goal_turns": 0,
+          "exhausted_correct": 0,
+          "exhausted_turns": 0,
+          "exhausted_claim_goal": 0,
+          "parseable_ranking_all_decisions": 509,
+          "follows_own_top_all_decisions": 509,
+          "action_decisions": 510
+        },
+        "3": {
+          "turns": 510,
+          "phases": {
+            "solvable": 430,
+            "unreachable_with_moves": 80
+          },
+          "solvable": 430,
+          "safe": 370,
+          "shortest": 323,
+          "legal_on_solvable": 430,
+          "goal_stop_correct": 0,
+          "goal_turns": 0,
+          "exhausted_correct": 0,
+          "exhausted_turns": 0,
+          "exhausted_claim_goal": 0,
+          "parseable_ranking_all_decisions": 510,
+          "follows_own_top_all_decisions": 510,
+          "action_decisions": 510
+        },
+        "4": {
+          "turns": 510,
+          "phases": {
+            "solvable": 401,
+            "unreachable_with_moves": 109
+          },
+          "solvable": 401,
+          "safe": 351,
+          "shortest": 320,
+          "legal_on_solvable": 401,
+          "goal_stop_correct": 0,
+          "goal_turns": 0,
+          "exhausted_correct": 0,
+          "exhausted_turns": 0,
+          "exhausted_claim_goal": 0,
+          "parseable_ranking_all_decisions": 510,
+          "follows_own_top_all_decisions": 510,
+          "action_decisions": 510
+        },
+        "5": {
+          "turns": 510,
+          "phases": {
+            "solvable": 372,
+            "unreachable_with_moves": 138
+          },
+          "solvable": 372,
+          "safe": 334,
+          "shortest": 299,
+          "legal_on_solvable": 372,
+          "goal_stop_correct": 0,
+          "goal_turns": 0,
+          "exhausted_correct": 0,
+          "exhausted_turns": 0,
+          "exhausted_claim_goal": 0,
+          "parseable_ranking_all_decisions": 510,
+          "follows_own_top_all_decisions": 510,
+          "action_decisions": 510
+        },
+        "6": {
+          "turns": 509,
+          "phases": {
+            "solvable": 358,
+            "unreachable_with_moves": 151
+          },
+          "solvable": 358,
+          "safe": 319,
+          "shortest": 296,
+          "legal_on_solvable": 357,
+          "goal_stop_correct": 0,
+          "goal_turns": 0,
+          "exhausted_correct": 0,
+          "exhausted_turns": 0,
+          "exhausted_claim_goal": 0,
+          "parseable_ranking_all_decisions": 508,
+          "follows_own_top_all_decisions": 508,
+          "action_decisions": 509
+        },
+        "7": {
+          "turns": 503,
+          "phases": {
+            "solvable": 311,
+            "unreachable_with_moves": 152,
+            "goal": 40
+          },
+          "solvable": 311,
+          "safe": 291,
+          "shortest": 273,
+          "legal_on_solvable": 311,
+          "goal_stop_correct": 34,
+          "goal_turns": 40,
+          "exhausted_correct": 0,
+          "exhausted_turns": 0,
+          "exhausted_claim_goal": 0,
+          "parseable_ranking_all_decisions": 462,
+          "follows_own_top_all_decisions": 462,
+          "action_decisions": 463
+        },
+        "8": {
+          "turns": 435,
+          "phases": {
+            "solvable": 207,
+            "goal": 102,
+            "unreachable_with_moves": 126
+          },
+          "solvable": 207,
+          "safe": 199,
+          "shortest": 197,
+          "legal_on_solvable": 206,
+          "goal_stop_correct": 99,
+          "goal_turns": 102,
+          "exhausted_correct": 0,
+          "exhausted_turns": 0,
+          "exhausted_claim_goal": 0,
+          "parseable_ranking_all_decisions": 323,
+          "follows_own_top_all_decisions": 323,
+          "action_decisions": 333
+        },
+        "9": {
+          "turns": 262,
+          "phases": {
+            "goal": 120,
+            "unreachable_with_moves": 59,
+            "solvable": 83
+          },
+          "solvable": 83,
+          "safe": 81,
+          "shortest": 81,
+          "legal_on_solvable": 83,
+          "goal_stop_correct": 118,
+          "goal_turns": 120,
+          "exhausted_correct": 0,
+          "exhausted_turns": 0,
+          "exhausted_claim_goal": 0,
+          "parseable_ranking_all_decisions": 132,
+          "follows_own_top_all_decisions": 132,
+          "action_decisions": 142
+        },
+        "10": {
+          "turns": 90,
+          "phases": {
+            "goal": 72,
+            "solvable": 11,
+            "unreachable_with_moves": 7
+          },
+          "solvable": 11,
+          "safe": 11,
+          "shortest": 11,
+          "legal_on_solvable": 11,
+          "goal_stop_correct": 71,
+          "goal_turns": 72,
+          "exhausted_correct": 0,
+          "exhausted_turns": 0,
+          "exhausted_claim_goal": 0,
+          "parseable_ranking_all_decisions": 17,
+          "follows_own_top_all_decisions": 17,
+          "action_decisions": 18
+        },
+        "11": {
+          "turns": 11,
+          "phases": {
+            "goal": 11
+          },
+          "solvable": 0,
+          "safe": 0,
+          "shortest": 0,
+          "legal_on_solvable": 0,
+          "goal_stop_correct": 11,
+          "goal_turns": 11,
+          "exhausted_correct": 0,
+          "exhausted_turns": 0,
+          "exhausted_claim_goal": 0,
+          "parseable_ranking_all_decisions": 0,
+          "follows_own_top_all_decisions": 0,
+          "action_decisions": 0
+        }
+      },
+      "groups": {
+        "new_initial_board": {
+          "turns": 2190,
+          "phases": {
+            "solvable": 1607,
+            "unreachable_with_moves": 410,
+            "goal": 173
+          },
+          "solvable": 1607,
+          "safe": 1330,
+          "shortest": 1203,
+          "legal_on_solvable": 1606,
+          "goal_stop_correct": 170,
+          "goal_turns": 173,
+          "exhausted_correct": 0,
+          "exhausted_turns": 0,
+          "exhausted_claim_goal": 0,
+          "parseable_ranking_all_decisions": 2005,
+          "follows_own_top_all_decisions": 2005,
+          "action_decisions": 2017
+        },
+        "same_initial_board_new_pair": {
+          "turns": 2170,
+          "phases": {
+            "solvable": 1541,
+            "goal": 172,
+            "unreachable_with_moves": 457
+          },
+          "solvable": 1541,
+          "safe": 1244,
+          "shortest": 1153,
+          "legal_on_solvable": 1540,
+          "goal_stop_correct": 163,
+          "goal_turns": 172,
+          "exhausted_correct": 0,
+          "exhausted_turns": 0,
+          "exhausted_claim_goal": 0,
+          "parseable_ranking_all_decisions": 1986,
+          "follows_own_top_all_decisions": 1986,
+          "action_decisions": 1998
+        }
+      },
+      "failure": {}
+    },
+    "rollout": {
+      "overall": {
+        "turns": 4519,
+        "phases": {
+          "solvable": 1142,
+          "unreachable_with_moves": 2953,
+          "exhausted_non_goal": 418,
+          "goal": 6
+        },
+        "solvable": 1142,
+        "safe": 638,
+        "shortest": 537,
+        "legal_on_solvable": 1142,
+        "goal_stop_correct": 6,
+        "goal_turns": 6,
+        "exhausted_correct": 192,
+        "exhausted_turns": 418,
+        "exhausted_claim_goal": 224,
+        "parseable_ranking_all_decisions": 3994,
+        "follows_own_top_all_decisions": 3994,
+        "action_decisions": 4095
+      },
+      "by_round": {
+        "1": {
+          "turns": 510,
+          "phases": {
+            "solvable": 510
+          },
+          "solvable": 510,
+          "safe": 256,
+          "shortest": 217,
+          "legal_on_solvable": 510,
+          "goal_stop_correct": 0,
+          "goal_turns": 0,
+          "exhausted_correct": 0,
+          "exhausted_turns": 0,
+          "exhausted_claim_goal": 0,
+          "parseable_ranking_all_decisions": 510,
+          "follows_own_top_all_decisions": 510,
+          "action_decisions": 510
+        },
+        "2": {
+          "turns": 510,
+          "phases": {
+            "solvable": 256,
+            "unreachable_with_moves": 254
+          },
+          "solvable": 256,
+          "safe": 146,
+          "shortest": 128,
+          "legal_on_solvable": 256,
+          "goal_stop_correct": 0,
+          "goal_turns": 0,
+          "exhausted_correct": 0,
+          "exhausted_turns": 0,
+          "exhausted_claim_goal": 0,
+          "parseable_ranking_all_decisions": 508,
+          "follows_own_top_all_decisions": 508,
+          "action_decisions": 510
+        },
+        "3": {
+          "turns": 510,
+          "phases": {
+            "solvable": 146,
+            "unreachable_with_moves": 364
+          },
+          "solvable": 146,
+          "safe": 90,
+          "shortest": 72,
+          "legal_on_solvable": 146,
+          "goal_stop_correct": 0,
+          "goal_turns": 0,
+          "exhausted_correct": 0,
+          "exhausted_turns": 0,
+          "exhausted_claim_goal": 0,
+          "parseable_ranking_all_decisions": 508,
+          "follows_own_top_all_decisions": 508,
+          "action_decisions": 510
+        },
+        "4": {
+          "turns": 510,
+          "phases": {
+            "solvable": 90,
+            "unreachable_with_moves": 420
+          },
+          "solvable": 90,
+          "safe": 62,
+          "shortest": 55,
+          "legal_on_solvable": 90,
+          "goal_stop_correct": 0,
+          "goal_turns": 0,
+          "exhausted_correct": 0,
+          "exhausted_turns": 0,
+          "exhausted_claim_goal": 0,
+          "parseable_ranking_all_decisions": 508,
+          "follows_own_top_all_decisions": 508,
+          "action_decisions": 510
+        },
+        "5": {
+          "turns": 510,
+          "phases": {
+            "solvable": 62,
+            "unreachable_with_moves": 448
+          },
+          "solvable": 62,
+          "safe": 42,
+          "shortest": 30,
+          "legal_on_solvable": 62,
+          "goal_stop_correct": 0,
+          "goal_turns": 0,
+          "exhausted_correct": 0,
+          "exhausted_turns": 0,
+          "exhausted_claim_goal": 0,
+          "parseable_ranking_all_decisions": 507,
+          "follows_own_top_all_decisions": 507,
+          "action_decisions": 510
+        },
+        "6": {
+          "turns": 510,
+          "phases": {
+            "unreachable_with_moves": 464,
+            "solvable": 42,
+            "exhausted_non_goal": 4
+          },
+          "solvable": 42,
+          "safe": 24,
+          "shortest": 19,
+          "legal_on_solvable": 42,
+          "goal_stop_correct": 0,
+          "goal_turns": 0,
+          "exhausted_correct": 1,
+          "exhausted_turns": 4,
+          "exhausted_claim_goal": 3,
+          "parseable_ranking_all_decisions": 504,
+          "follows_own_top_all_decisions": 504,
+          "action_decisions": 506
+        },
+        "7": {
+          "turns": 506,
+          "phases": {
+            "unreachable_with_moves": 454,
+            "exhausted_non_goal": 28,
+            "solvable": 22,
+            "goal": 2
+          },
+          "solvable": 22,
+          "safe": 12,
+          "shortest": 10,
+          "legal_on_solvable": 22,
+          "goal_stop_correct": 2,
+          "goal_turns": 2,
+          "exhausted_correct": 14,
+          "exhausted_turns": 28,
+          "exhausted_claim_goal": 14,
+          "parseable_ranking_all_decisions": 464,
+          "follows_own_top_all_decisions": 464,
+          "action_decisions": 476
+        },
+        "8": {
+          "turns": 465,
+          "phases": {
+            "unreachable_with_moves": 356,
+            "goal": 1,
+            "exhausted_non_goal": 97,
+            "solvable": 11
+          },
+          "solvable": 11,
+          "safe": 4,
+          "shortest": 4,
+          "legal_on_solvable": 11,
+          "goal_stop_correct": 1,
+          "goal_turns": 1,
+          "exhausted_correct": 45,
+          "exhausted_turns": 97,
+          "exhausted_claim_goal": 50,
+          "parseable_ranking_all_decisions": 329,
+          "follows_own_top_all_decisions": 329,
+          "action_decisions": 367
+        },
+        "9": {
+          "turns": 331,
+          "phases": {
+            "exhausted_non_goal": 163,
+            "unreachable_with_moves": 164,
+            "solvable": 3,
+            "goal": 1
+          },
+          "solvable": 3,
+          "safe": 2,
+          "shortest": 2,
+          "legal_on_solvable": 3,
+          "goal_stop_correct": 1,
+          "goal_turns": 1,
+          "exhausted_correct": 72,
+          "exhausted_turns": 163,
+          "exhausted_claim_goal": 91,
+          "parseable_ranking_all_decisions": 132,
+          "follows_own_top_all_decisions": 132,
+          "action_decisions": 167
+        },
+        "10": {
+          "turns": 133,
+          "phases": {
+            "exhausted_non_goal": 103,
+            "unreachable_with_moves": 28,
+            "goal": 2
+          },
+          "solvable": 0,
+          "safe": 0,
+          "shortest": 0,
+          "legal_on_solvable": 0,
+          "goal_stop_correct": 2,
+          "goal_turns": 2,
+          "exhausted_correct": 44,
+          "exhausted_turns": 103,
+          "exhausted_claim_goal": 59,
+          "parseable_ranking_all_decisions": 23,
+          "follows_own_top_all_decisions": 23,
+          "action_decisions": 28
+        },
+        "11": {
+          "turns": 23,
+          "phases": {
+            "exhausted_non_goal": 22,
+            "unreachable_with_moves": 1
+          },
+          "solvable": 0,
+          "safe": 0,
+          "shortest": 0,
+          "legal_on_solvable": 0,
+          "goal_stop_correct": 0,
+          "goal_turns": 0,
+          "exhausted_correct": 16,
+          "exhausted_turns": 22,
+          "exhausted_claim_goal": 6,
+          "parseable_ranking_all_decisions": 1,
+          "follows_own_top_all_decisions": 1,
+          "action_decisions": 1
+        },
+        "12": {
+          "turns": 1,
+          "phases": {
+            "exhausted_non_goal": 1
+          },
+          "solvable": 0,
+          "safe": 0,
+          "shortest": 0,
+          "legal_on_solvable": 0,
+          "goal_stop_correct": 0,
+          "goal_turns": 0,
+          "exhausted_correct": 0,
+          "exhausted_turns": 1,
+          "exhausted_claim_goal": 1,
+          "parseable_ranking_all_decisions": 0,
+          "follows_own_top_all_decisions": 0,
+          "action_decisions": 0
+        }
+      },
+      "groups": {
+        "new_initial_board": {
+          "turns": 2269,
+          "phases": {
+            "solvable": 575,
+            "unreachable_with_moves": 1476,
+            "exhausted_non_goal": 214,
+            "goal": 4
+          },
+          "solvable": 575,
+          "safe": 324,
+          "shortest": 267,
+          "legal_on_solvable": 575,
+          "goal_stop_correct": 4,
+          "goal_turns": 4,
+          "exhausted_correct": 105,
+          "exhausted_turns": 214,
+          "exhausted_claim_goal": 109,
+          "parseable_ranking_all_decisions": 2007,
+          "follows_own_top_all_decisions": 2007,
+          "action_decisions": 2051
+        },
+        "same_initial_board_new_pair": {
+          "turns": 2250,
+          "phases": {
+            "solvable": 567,
+            "unreachable_with_moves": 1477,
+            "exhausted_non_goal": 204,
+            "goal": 2
+          },
+          "solvable": 567,
+          "safe": 314,
+          "shortest": 270,
+          "legal_on_solvable": 567,
+          "goal_stop_correct": 2,
+          "goal_turns": 2,
+          "exhausted_correct": 87,
+          "exhausted_turns": 204,
+          "exhausted_claim_goal": 115,
+          "parseable_ranking_all_decisions": 1987,
+          "follows_own_top_all_decisions": 1987,
+          "action_decisions": 2044
+        }
+      },
+      "failure": {
+        "premature_done": 308,
+        "correct_no_solution_after_error": 192,
+        "illegal_action": 2,
+        "format_error": 2,
+        "success": 6
+      }
+    }
+  },
+  "reference_map_greedy_success": 345,
+  "first_irreversible_errors": {
+    "cases": 504,
+    "by_round": {
+      "5": 20,
+      "1": 254,
+      "2": 110,
+      "7": 10,
+      "4": 28,
+      "3": 56,
+      "6": 18,
+      "8": 7,
+      "9": 1
+    },
+    "by_kind": {
+      "removed_goal_cells": 239,
+      "goal_retained_but_removal_cover_impossible": 265
+    },
+    "by_group": {
+      "new_initial_board": {
+        "1": 128,
+        "2": 56,
+        "7": 3,
+        "3": 25,
+        "5": 12,
+        "4": 13,
+        "8": 4,
+        "9": 1,
+        "6": 9
+      },
+      "same_initial_board_new_pair": {
+        "5": 8,
+        "1": 126,
+        "2": 54,
+        "7": 7,
+        "4": 15,
+        "3": 31,
+        "6": 9,
+        "8": 3
+      }
+    },
+    "terminal_phases": {
+      "exhausted_non_goal": 418,
+      "unreachable_with_moves": 86
+    },
+    "by_terminal_round": {
+      "9": 197,
+      "7": 39,
+      "10": 108,
+      "11": 22,
+      "6": 4,
+      "8": 133,
+      "12": 1
+    },
+    "additional_rounds_mean": 6.688492063492063,
+    "additional_rounds_median": 7.0
+  },
+  "round_standardization": {
+    "reference_rate": 0.8176620076238882,
+    "rollout_rate": 0.5586690017513135,
+    "reference_with_rollout_round_weights": 0.6847071332923739,
+    "interpretation": "Statistical composition adjustment only; within-round physical states, histories and surviving tasks still differ. Not a causal decomposition."
+  },
+  "cpu_replay": {
+    "paired_input_checks": {
+      "same_physical_first_state_and_legal_actions": 510,
+      "different_candidate_numbering": 510,
+      "identical_aligned_float32_vectors": 510,
+      "identical_aligned_bfloat16_vectors": 510
+    },
+    "max_aligned_vector_difference": 0,
+    "first_round": {
+      "reference": {
+        "n": 510,
+        "safe": 245,
+        "chosen_map_minimum": 9,
+        "map_minimum_all_safe": 465,
+        "map_minimum_any_safe": 465,
+        "mean_map_minimum_safe_fraction": 0.9117647058823529,
+        "mean_top10_overlap": 2.5784313725490198,
+        "mean_random_top10_overlap": 1.811601650124383,
+        "exact_top10_set": 0,
+        "first_three": 400,
+        "candidate_min": 20,
+        "candidate_median": 58.5,
+        "candidate_max": 102,
+        "uniform_choice_first_three": 0.054348049503731496,
+        "chosen_id_counts": {
+          "1": 106,
+          "2": 147,
+          "3": 147,
+          "4": 37,
+          "5": 33,
+          "6": 2,
+          "7": 3,
+          "8": 2,
+          "9": 1,
+          "15": 2,
+          "16": 2,
+          "17": 1,
+          "21": 2,
+          "24": 2,
+          "25": 2,
+          "27": 1,
+          "28": 1,
+          "30": 1,
+          "31": 3,
+          "32": 1,
+          "33": 1,
+          "35": 4,
+          "36": 1,
+          "40": 1,
+          "43": 2,
+          "49": 1,
+          "50": 1,
+          "53": 1,
+          "65": 2
+        }
+      },
+      "rollout": {
+        "n": 510,
+        "safe": 256,
+        "chosen_map_minimum": 18,
+        "map_minimum_all_safe": 465,
+        "map_minimum_any_safe": 465,
+        "mean_map_minimum_safe_fraction": 0.9117647058823529,
+        "mean_top10_overlap": 2.533333333333333,
+        "mean_random_top10_overlap": 1.811601650124383,
+        "exact_top10_set": 0,
+        "first_three": 399,
+        "candidate_min": 20,
+        "candidate_median": 58.5,
+        "candidate_max": 102,
+        "uniform_choice_first_three": 0.054348049503731496,
+        "chosen_id_counts": {
+          "1": 122,
+          "2": 142,
+          "3": 135,
+          "4": 42,
+          "5": 29,
+          "6": 6,
+          "7": 2,
+          "14": 1,
+          "20": 1,
+          "21": 2,
+          "22": 3,
+          "23": 2,
+          "24": 1,
+          "26": 1,
+          "30": 3,
+          "32": 1,
+          "33": 2,
+          "34": 2,
+          "35": 1,
+          "36": 1,
+          "38": 1,
+          "40": 1,
+          "44": 2,
+          "45": 1,
+          "46": 1,
+          "48": 1,
+          "52": 1,
+          "53": 1,
+          "64": 2
+        }
+      }
+    },
+    "first_errors": {
+      "n": 504,
+      "safe": 0,
+      "chosen_map_minimum": 3,
+      "map_minimum_all_safe": 466,
+      "map_minimum_any_safe": 466,
+      "mean_map_minimum_safe_fraction": 0.9246031746031746,
+      "mean_top10_overlap": 3.255952380952381,
+      "mean_random_top10_overlap": 2.6342857755818385,
+      "exact_top10_set": 21,
+      "first_three": 244
+    }
+  },
+  "exact_transition_verification": {
+    "checked_first_irreversible_errors": 504,
+    "true_distance_before_matches": 504,
+    "all_true_distances_after_minus_one": true,
+    "all_actual_actions_replay": true,
+    "cache_entries": 5308
+  },
+  "first_round_goal_groups": {
+    "reference": {
+      "empty": {
+        "solvable": 57,
+        "safe": 41,
+        "mean_uniform_safe": 0.6671268715551485
+      },
+      "nonempty": {
+        "solvable": 453,
+        "safe": 204,
+        "mean_uniform_safe": 0.4549278645585155
+      }
+    },
+    "rollout": {
+      "empty": {
+        "solvable": 57,
+        "safe": 45,
+        "mean_uniform_safe": 0.6671268715551485
+      },
+      "nonempty": {
+        "solvable": 453,
+        "safe": 211,
+        "mean_uniform_safe": 0.4549278645585155
+      }
+    }
+  },
+  "old_first_round_unmatched": {
+    "run": "long_f73b700_20261004/blocks",
+    "split": "validation",
+    "cases_per_mode": 1000,
+    "initial_goal_cases_excluded": 100,
+    "final_step": 245000,
+    "common_physical_start_goal_pairs_with_new_test": 0,
+    "checkpoints": {
+      "final": {
+        "step": 245000,
+        "modes": {
+          "reference": {
+            "n": 1000,
+            "safe": 701,
+            "shortest": 652,
+            "chosen_map_minimum": 157,
+            "first_three": 236,
+            "valid_ranking": 1,
+            "exact_ranking": 0
+          },
+          "rollout": {
+            "n": 1000,
+            "safe": 703,
+            "shortest": 655,
+            "chosen_map_minimum": 158,
+            "first_three": 232,
+            "valid_ranking": 1,
+            "exact_ranking": 0
+          }
+        }
+      },
+      "checkpoint-196000": {
+        "step": 196000,
+        "modes": {
+          "reference": {
+            "n": 1000,
+            "safe": 606,
+            "shortest": 553,
+            "chosen_map_minimum": 108,
+            "first_three": 305,
+            "valid_ranking": 0,
+            "exact_ranking": 0
+          },
+          "rollout": {
+            "n": 1000,
+            "safe": 610,
+            "shortest": 551,
+            "chosen_map_minimum": 102,
+            "first_three": 326,
+            "valid_ranking": 1,
+            "exact_ranking": 0
+          }
+        }
+      },
+      "checkpoint-147000": {
+        "step": 147000,
+        "modes": {
+          "reference": {
+            "n": 1000,
+            "safe": 590,
+            "shortest": 530,
+            "chosen_map_minimum": 82,
+            "first_three": 499,
+            "valid_ranking": 0,
+            "exact_ranking": 0
+          },
+          "rollout": {
+            "n": 1000,
+            "safe": 590,
+            "shortest": 529,
+            "chosen_map_minimum": 99,
+            "first_three": 488,
+            "valid_ranking": 0,
+            "exact_ranking": 0
+          }
+        }
+      },
+      "checkpoint-98000": {
+        "step": 98000,
+        "modes": {
+          "reference": {
+            "n": 1000,
+            "safe": 618,
+            "shortest": 552,
+            "chosen_map_minimum": 76,
+            "first_three": 554,
+            "valid_ranking": 0,
+            "exact_ranking": 0
+          },
+          "rollout": {
+            "n": 1000,
+            "safe": 601,
+            "shortest": 546,
+            "chosen_map_minimum": 76,
+            "first_three": 562,
+            "valid_ranking": 1,
+            "exact_ranking": 0
+          }
+        }
+      },
+      "checkpoint-49000": {
+        "step": 49000,
+        "modes": {
+          "reference": {
+            "n": 1000,
+            "safe": 579,
+            "shortest": 495,
+            "chosen_map_minimum": 41,
+            "first_three": 702,
+            "valid_ranking": 0,
+            "exact_ranking": 0
+          },
+          "rollout": {
+            "n": 1000,
+            "safe": 581,
+            "shortest": 507,
+            "chosen_map_minimum": 39,
+            "first_three": 710,
+            "valid_ranking": 0,
+            "exact_ranking": 0
+          }
+        }
+      }
+    },
+    "limitations": "Old validation and new test have zero common physical tasks; global batch 1 versus 4, failure supervision and architecture differ. Old final also has about five times as many optimizer updates. No matched architecture-effect estimate."
+  },
+  "examples": [
+    {
+      "trajectory_id": "balanced_test_000000",
+      "round": 1,
+      "candidates": 53,
+      "chosen_id": 3,
+      "chosen_action": 532,
+      "chosen_map_distance": 10.359770774841309,
+      "chosen_remaining": -1,
+      "map_best_id": 30,
+      "map_best_action": 174,
+      "map_best_distance": 5.192518711090088,
+      "map_best_remaining": 5
+    },
+    {
+      "trajectory_id": "balanced_test_000001",
+      "round": 1,
+      "candidates": 52,
+      "chosen_id": 3,
+      "chosen_action": 621,
+      "chosen_map_distance": 9.962316513061523,
+      "chosen_remaining": -1,
+      "map_best_id": 32,
+      "map_best_action": 60,
+      "map_best_distance": 6.545357704162598,
+      "map_best_remaining": 5
+    }
+  ]
+}

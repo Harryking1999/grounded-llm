@@ -1,0 +1,184 @@
+{
+  "source_commit": "9465df4",
+  "config": "experiments/flamingo_map_reader/configs/blocks_gate_injection.json",
+  "old_run": "long_f73b700_20261004/blocks",
+  "new_run": "blocks_ffn_failure_batch4_75cc4fd",
+  "samples": 8,
+  "supervised_prediction_tokens": 6232,
+  "matched_inputs_verified": true,
+  "method": "Same full cached successful training trajectories and numbered variants in both architectures; identical tokens and map tensors verified. Eval mode, bf16 autocast, no gradients or optimizer. RMS ratios pool squared energies over selected positions and layers; intended measures tanh(alpha)*read before residual addition, realized measures the actual output-input difference including dtype rounding. These ratios measure local injection amplitude, not causal task benefit.",
+  "architectures": {
+    "old": {
+      "0": {
+        "epoch": 0.0,
+        "gate_absolute_median": 0.0,
+        "gate_absolute_max": 0.0,
+        "ungated_read_to_hidden_rms": 0.7899756694635406,
+        "intended_residual_to_hidden_rms": 0.0,
+        "realized_residual_to_hidden_rms": 0.0,
+        "changed_coordinate_fraction": 0.0,
+        "layer_ratio_median": 0.0,
+        "layer_ratio_max": 0.0,
+        "all_tokens_realized_residual_to_hidden_rms": 0.0
+      },
+      "16334": {
+        "epoch": 0.3333469387755102,
+        "gate_absolute_median": 0.006867693271487951,
+        "gate_absolute_max": 0.010207011364400387,
+        "ungated_read_to_hidden_rms": 6.920391644864764,
+        "intended_residual_to_hidden_rms": 0.055048506983066875,
+        "realized_residual_to_hidden_rms": 0.05501478464773869,
+        "changed_coordinate_fraction": 0.9808658385555161,
+        "layer_ratio_median": 0.07777899213169623,
+        "layer_ratio_max": 0.19813983659982373,
+        "all_tokens_realized_residual_to_hidden_rms": 0.025791221142300078
+      },
+      "32667": {
+        "epoch": 0.6666734693877551,
+        "gate_absolute_median": 0.007873129099607468,
+        "gate_absolute_max": 0.016161484643816948,
+        "ungated_read_to_hidden_rms": 7.298899191982679,
+        "intended_residual_to_hidden_rms": 0.07279218428478325,
+        "realized_residual_to_hidden_rms": 0.07276942758002317,
+        "changed_coordinate_fraction": 0.9834493504984833,
+        "layer_ratio_median": 0.09657061891347178,
+        "layer_ratio_max": 0.21021586854144236,
+        "all_tokens_realized_residual_to_hidden_rms": 0.03359776843115189
+      },
+      "49000": {
+        "epoch": 1.0,
+        "gate_absolute_median": 0.010643052402883768,
+        "gate_absolute_max": 0.03526439517736435,
+        "ungated_read_to_hidden_rms": 6.534819752266866,
+        "intended_residual_to_hidden_rms": 0.09755647139910562,
+        "realized_residual_to_hidden_rms": 0.09743612025744361,
+        "changed_coordinate_fraction": 0.9848490363556567,
+        "layer_ratio_median": 0.12225868366808725,
+        "layer_ratio_max": 0.3141126747331164,
+        "all_tokens_realized_residual_to_hidden_rms": 0.0441164534545427
+      },
+      "98000": {
+        "epoch": 2.0,
+        "gate_absolute_median": 0.016443726606667042,
+        "gate_absolute_max": 0.053684428334236145,
+        "ungated_read_to_hidden_rms": 5.86391297534211,
+        "intended_residual_to_hidden_rms": 0.13958806522878645,
+        "realized_residual_to_hidden_rms": 0.13971883039427402,
+        "changed_coordinate_fraction": 0.9890943058866679,
+        "layer_ratio_median": 0.17758294066766467,
+        "layer_ratio_max": 0.3997042891888332,
+        "all_tokens_realized_residual_to_hidden_rms": 0.06770932499893301
+      },
+      "147000": {
+        "epoch": 3.0,
+        "gate_absolute_median": 0.017987322062253952,
+        "gate_absolute_max": 0.06630239635705948,
+        "ungated_read_to_hidden_rms": 5.428903604354685,
+        "intended_residual_to_hidden_rms": 0.15792209081498687,
+        "realized_residual_to_hidden_rms": 0.1581262704332288,
+        "changed_coordinate_fraction": 0.9897103210818586,
+        "layer_ratio_median": 0.1853451355875552,
+        "layer_ratio_max": 0.46373052981763047,
+        "all_tokens_realized_residual_to_hidden_rms": 0.07648512429626626
+      },
+      "245000": {
+        "epoch": 5.0,
+        "gate_absolute_median": 0.03180845081806183,
+        "gate_absolute_max": 0.08223843574523926,
+        "ungated_read_to_hidden_rms": 4.151270277313163,
+        "intended_residual_to_hidden_rms": 0.16858022410783147,
+        "realized_residual_to_hidden_rms": 0.16850268395311319,
+        "changed_coordinate_fraction": 0.9904930515360428,
+        "layer_ratio_median": 0.20857151117440478,
+        "layer_ratio_max": 0.48735422863425515,
+        "all_tokens_realized_residual_to_hidden_rms": 0.07818034081119558
+      }
+    },
+    "new": {
+      "0": {
+        "epoch": 0.0,
+        "gate_absolute_median": 0.0,
+        "gate_absolute_max": 0.0,
+        "ungated_read_to_hidden_rms": 0.26344868345318223,
+        "intended_residual_to_hidden_rms": 0.0,
+        "realized_residual_to_hidden_rms": 0.0,
+        "changed_coordinate_fraction": 0.0,
+        "layer_ratio_median": 0.0,
+        "layer_ratio_max": 0.0,
+        "all_tokens_realized_residual_to_hidden_rms": 0.0
+      },
+      "6875": {
+        "epoch": 0.5,
+        "gate_absolute_median": 0.004727675812318921,
+        "gate_absolute_max": 0.008660015650093555,
+        "ungated_read_to_hidden_rms": 10.229795529310419,
+        "intended_residual_to_hidden_rms": 0.05949697371324198,
+        "realized_residual_to_hidden_rms": 0.05952095771616621,
+        "changed_coordinate_fraction": 0.9815008258009257,
+        "layer_ratio_median": 0.07931325950413075,
+        "layer_ratio_max": 0.2609389789541925,
+        "all_tokens_realized_residual_to_hidden_rms": 0.027543295095391853
+      },
+      "13750": {
+        "epoch": 1.0,
+        "gate_absolute_median": 0.005603654542937875,
+        "gate_absolute_max": 0.008883345872163773,
+        "ungated_read_to_hidden_rms": 12.533308375360093,
+        "intended_residual_to_hidden_rms": 0.08027850125524304,
+        "realized_residual_to_hidden_rms": 0.08030804055384089,
+        "changed_coordinate_fraction": 0.9856124141993227,
+        "layer_ratio_median": 0.11184240804581885,
+        "layer_ratio_max": 0.26631005675367186,
+        "all_tokens_realized_residual_to_hidden_rms": 0.038048383541278916
+      },
+      "20625": {
+        "epoch": 1.5,
+        "gate_absolute_median": 0.00618953607045114,
+        "gate_absolute_max": 0.009279076009988785,
+        "ungated_read_to_hidden_rms": 13.049229915906329,
+        "intended_residual_to_hidden_rms": 0.09023796996603893,
+        "realized_residual_to_hidden_rms": 0.0903025209665201,
+        "changed_coordinate_fraction": 0.9872072864492596,
+        "layer_ratio_median": 0.1313724139596225,
+        "layer_ratio_max": 0.22558922884029853,
+        "all_tokens_realized_residual_to_hidden_rms": 0.04380156043155025
+      },
+      "27500": {
+        "epoch": 2.0,
+        "gate_absolute_median": 0.006609047995880246,
+        "gate_absolute_max": 0.01025442872196436,
+        "ungated_read_to_hidden_rms": 12.47627519775661,
+        "intended_residual_to_hidden_rms": 0.09707428305940742,
+        "realized_residual_to_hidden_rms": 0.09709471405200015,
+        "changed_coordinate_fraction": 0.9877489132988722,
+        "layer_ratio_median": 0.14344137332946794,
+        "layer_ratio_max": 0.2261802494591215,
+        "all_tokens_realized_residual_to_hidden_rms": 0.04753631683003061
+      },
+      "34375": {
+        "epoch": 2.5,
+        "gate_absolute_median": 0.00850657420232892,
+        "gate_absolute_max": 0.012671009637415409,
+        "ungated_read_to_hidden_rms": 12.19612789060798,
+        "intended_residual_to_hidden_rms": 0.11386193414627772,
+        "realized_residual_to_hidden_rms": 0.11385921331452518,
+        "changed_coordinate_fraction": 0.9893644775823419,
+        "layer_ratio_median": 0.16474178536704726,
+        "layer_ratio_max": 0.2606715217797576,
+        "all_tokens_realized_residual_to_hidden_rms": 0.056018833723517014
+      },
+      "46750": {
+        "epoch": 3.4,
+        "gate_absolute_median": 0.010016975458711386,
+        "gate_absolute_max": 0.014655901119112968,
+        "ungated_read_to_hidden_rms": 10.300806020373681,
+        "intended_residual_to_hidden_rms": 0.11282868169165071,
+        "realized_residual_to_hidden_rms": 0.11281310570276268,
+        "changed_coordinate_fraction": 0.9892870634092854,
+        "layer_ratio_median": 0.16532695217206866,
+        "layer_ratio_max": 0.26795173205227896,
+        "all_tokens_realized_residual_to_hidden_rms": 0.05561955370394068
+      }
+    }
+  }
+}

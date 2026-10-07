@@ -41,7 +41,7 @@ LLM 已有较强的语言理解和推理能力，但在复杂任务中，仍可�
 ## 4. 有序 TODO
 
 **当前运行：积木融合 FFN＋失败上下文，每卡 batch 1、四卡全局 batch 4，从头训练。**
-2026-10-07 已查询远端并在节点重启后从同一运行的完整断点恢复训练；半 epoch 评测迁移至三卡节点接续。
+2026-10-07 已查询远端并在节点重启后从同一运行的完整断点恢复训练；半 epoch 评测已在替换节点恢复四卡并发。
 2026-10-07 已停止全局 batch 64 的训练和评测，仅修改 batch，保持新架构、数据及其余训练设置。
 正式合同为 [blocks_ffn_failure_batch4.json](../experiments/flamingo_map_reader/configs/blocks_ffn_failure_batch4.json)，
 完整协议见 [DESIGN](../experiments/flamingo_map_reader/DESIGN.md)，启动与恢复见 [实验 README](../experiments/flamingo_map_reader/README.md#积木融合-ffn-重训)。
@@ -57,7 +57,7 @@ rollout 488/510 题，仅 1 题到达且正确结束。详见[本轮报告](../e
 导入记录称新运行已启动，并通过最长样本的四卡反向更新检查与恢复测试。
 `--resume` 仅接回同一运行的完整训练状态及各卡 RNG，未保存部分重算；改 batch 已另开新运行，不直接续旧断点。
 保存与评测进度以运行目录为准，本页不固化实时 step 或 ETA。
-三卡迁移只改变评测并发分配，保留已完成分片；旧部分输出先归档再整片重算。训练仍沿用原四卡与全局 batch 4。
+评测节点迁移只改变并发分配，保留已完成分片；旧部分输出先归档再整片重算。训练仍沿用原四卡与全局 batch 4。
 
 **历史对照：**[全局 batch 64 配置](../experiments/flamingo_map_reader/configs/blocks_ffn_failure.json)
 对应已停止的 `blocks_ffn_failure_8330937`；导入快照中 3 epoch 全量 rollout 到达且正确结束为 5/510（1.0%），见[本轮报告](../experiments/flamingo_map_reader/results/report.md)。

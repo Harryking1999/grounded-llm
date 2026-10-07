@@ -23,7 +23,7 @@
 
 当前小 batch 运行标识为 `blocks_ffn_failure_batch4_75cc4fd`；合同见 [blocks_ffn_failure_batch4.json](../configs/blocks_ffn_failure_batch4.json)。导入文档记录它复用数据、编号与标签，在相同初始化下从头训练，仅改变 batch。
 
-2026-10-07 20:04（北京时间）读取远端已有输出，0.5 epoch（step 6,875）的紧凑计数见 [blocks_batch4_summary.json](blocks_batch4_summary.json)。包含未完成分片中已完整写出的题目；两种模式各完成 6/8 个分片，缺少全量摘要，无重复题或不完整 JSON 行。20:10 已恢复同一训练并迁移半 epoch 评测，仍优先最新节点后补旧节点；未完成分片的旧输出保留归档。
+2026-10-07 20:04（北京时间）读取远端已有输出，0.5 epoch（step 6,875）的紧凑计数见 [blocks_batch4_summary.json](blocks_batch4_summary.json)。包含未完成分片中已完整写出的题目；两种模式各完成 6/8 个分片，缺少全量摘要，无重复题或不完整 JSON 行。20:10 已恢复同一训练并迁移半 epoch 评测，20:16 更换节点后恢复为四卡并发；仍优先最新节点后补旧节点，未完成分片的旧输出保留归档。
 
 | 指标 | 已保存结果 | 分母 |
 |---|---:|---|

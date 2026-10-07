@@ -73,6 +73,10 @@ python -m experiments.flamingo_map_reader.src.blocks_checkpoint_queue \
 ```
 
 迁移评测节点只允许改变 GPU 调度；运行、测试集、模式和生成设置必须保持一致。
+评测器和半 epoch 队列支持 `--cache-map-kv`：在一次回答生成内复用固定地图的逐层 K/V 投影，
+地图有效性与编号范围只验证一次；下一轮或下一题重新计算并清除缓存。
+缓存只用于 eval 模式下的无梯度生成，不用于训练。提示、历史地图绑定、停止条件与 token 预算沿用原合同；
+切换时保留已完成分片，先等待在途 worker 结束再启动新的队列。小规模实际模型对照见[本轮报告](results/report.md)。
 只选择已发布且包含 adapter、optimizer、scheduler、trainer state 和全部进程 RNG 状态的断点；
 初始权重与未写完的目录不作为续训断点，无完整断点时明确报错。
 Trainer 恢复已完成步数、epoch 与数据顺序，继续原有总预算，不额外增加训练轮数。
@@ -141,11 +145,11 @@ python -m experiments.flamingo_map_reader.src.trajectory_eval \
 中间队列只评主测试，独立无解诊断由 final 流程执行。重启跳过完整分片，保留未完成输出后整片重做，
 汇总排除 `.interrupted.*` 目录；同一 final 权重若被两条流程评测，也不能算作独立重复。详见 [DESIGN 第 7 节](DESIGN.md#7-评测设置与指标口径)。
 
-需要在评测节点单独启动时，从仓库根目录调用以下模块；本次本机同步不启动远端进程：
+需要在评测节点单独启动时，从仓库根目录调用以下模块：
 
 ```bash
 python -m experiments.flamingo_map_reader.src.blocks_checkpoint_queue \
-  --run "$RUN_DIR" --model-path "$MODEL_PATH" --gpus 0,1,2,3
+  --run "$RUN_DIR" --model-path "$MODEL_PATH" --gpus 0,1,2,3 --cache-map-kv
 ```
 
 **上一轮两任务队列：**以下 `--delegate-prefix`、`--evaluation-only` 参数属于 `trajectory_queue`，不适用于当前 `retrain_blocks` 入口。

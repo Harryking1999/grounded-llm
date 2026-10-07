@@ -1,0 +1,175 @@
+{
+  "source_commit": "991fa8d",
+  "run": "blocks_ffn_failure_batch4_75cc4fd",
+  "checkpoint_step": 48125,
+  "checkpoint_epoch": 3.5,
+  "model": "Qwen2.5-1.5B-Instruct",
+  "dtype": "bfloat16",
+  "device": "A800-SXM4-80GB",
+  "pilot_observed_at_utc": "2026-10-07T19:26:27.131318+00:00",
+  "method": {
+    "same_resident_model": true,
+    "warmup_each_path": true,
+    "alternating_order": true,
+    "variant": 0,
+    "other_formal_worker_on_same_gpu": true,
+    "comparison_excludes_turn_seconds": true
+  },
+  "baseline": {
+    "observed_at_utc": "2026-10-07T19:06:38.961777+00:00",
+    "workers": 4,
+    "generated_tokens": 93759,
+    "generation_seconds": 3523.5806460794993,
+    "generation_fraction_of_elapsed": 0.9606775778291473,
+    "tokens_per_generation_second": 26.609012086702386
+  },
+  "conditions": [
+    {
+      "trajectory_id": "blocks_008001",
+      "group": "same_initial_board_new_pair",
+      "mode": "reference",
+      "equal_answers_and_metrics": true,
+      "uncached": {
+        "trajectory_id": "blocks_008001",
+        "group": "same_initial_board_new_pair",
+        "mode": "reference",
+        "cached": false,
+        "wall_seconds": 40.348978059133515,
+        "generation_seconds": 40.2460175123997,
+        "generated_tokens": 721,
+        "turns": 9
+      },
+      "cached": {
+        "trajectory_id": "blocks_008001",
+        "group": "same_initial_board_new_pair",
+        "mode": "reference",
+        "cached": true,
+        "wall_seconds": 22.868380844127387,
+        "generation_seconds": 22.775855041109025,
+        "generated_tokens": 721,
+        "turns": 9
+      }
+    },
+    {
+      "trajectory_id": "blocks_008001",
+      "group": "same_initial_board_new_pair",
+      "mode": "rollout",
+      "equal_answers_and_metrics": true,
+      "uncached": {
+        "trajectory_id": "blocks_008001",
+        "group": "same_initial_board_new_pair",
+        "mode": "rollout",
+        "cached": false,
+        "wall_seconds": 38.73612698400393,
+        "generation_seconds": 38.63111003488302,
+        "generated_tokens": 697,
+        "turns": 9
+      },
+      "cached": {
+        "trajectory_id": "blocks_008001",
+        "group": "same_initial_board_new_pair",
+        "mode": "rollout",
+        "cached": true,
+        "wall_seconds": 22.594802920008078,
+        "generation_seconds": 22.492194016696885,
+        "generated_tokens": 697,
+        "turns": 9
+      }
+    },
+    {
+      "trajectory_id": "blocks_011100",
+      "group": "new_initial_board",
+      "mode": "reference",
+      "equal_answers_and_metrics": true,
+      "uncached": {
+        "trajectory_id": "blocks_011100",
+        "group": "new_initial_board",
+        "mode": "reference",
+        "cached": false,
+        "wall_seconds": 34.69563144096173,
+        "generation_seconds": 34.607402220135555,
+        "generated_tokens": 625,
+        "turns": 8
+      },
+      "cached": {
+        "trajectory_id": "blocks_011100",
+        "group": "new_initial_board",
+        "mode": "reference",
+        "cached": true,
+        "wall_seconds": 19.88361152797006,
+        "generation_seconds": 19.8009335543029,
+        "generated_tokens": 625,
+        "turns": 8
+      }
+    },
+    {
+      "trajectory_id": "blocks_011100",
+      "group": "new_initial_board",
+      "mode": "rollout",
+      "equal_answers_and_metrics": true,
+      "uncached": {
+        "trajectory_id": "blocks_011100",
+        "group": "new_initial_board",
+        "mode": "rollout",
+        "cached": false,
+        "wall_seconds": 36.20344545296393,
+        "generation_seconds": 36.09485131292604,
+        "generated_tokens": 643,
+        "turns": 9
+      },
+      "cached": {
+        "trajectory_id": "blocks_011100",
+        "group": "new_initial_board",
+        "mode": "rollout",
+        "cached": true,
+        "wall_seconds": 20.68009340693243,
+        "generation_seconds": 20.56991861318238,
+        "generated_tokens": 643,
+        "turns": 9
+      }
+    },
+    {
+      "trajectory_id": "test_no_solution_failure_000000",
+      "group": "failed_greedy_context",
+      "mode": "reference",
+      "equal_answers_and_metrics": true,
+      "uncached": {
+        "trajectory_id": "test_no_solution_failure_000000",
+        "group": "failed_greedy_context",
+        "mode": "reference",
+        "cached": false,
+        "wall_seconds": 1.5969929320272058,
+        "generation_seconds": 1.4806732560973614,
+        "generated_tokens": 25,
+        "turns": 1
+      },
+      "cached": {
+        "trajectory_id": "test_no_solution_failure_000000",
+        "group": "failed_greedy_context",
+        "mode": "reference",
+        "cached": true,
+        "wall_seconds": 0.9812008820008487,
+        "generation_seconds": 0.8948800009675324,
+        "generated_tokens": 25,
+        "turns": 1
+      }
+    }
+  ],
+  "all_answers_and_metrics_equal": true,
+  "uncached": {
+    "generated_tokens": 2711,
+    "generation_seconds": 151.06005433644168,
+    "wall_seconds": 151.58117486909032,
+    "turns": 36,
+    "tokens_per_second": 17.946504864628526
+  },
+  "cached": {
+    "generated_tokens": 2711,
+    "generation_seconds": 86.53378122625872,
+    "wall_seconds": 87.0080895810388,
+    "turns": 36,
+    "tokens_per_second": 31.328805485936
+  },
+  "generation_speedup": 1.7456772626341956,
+  "wall_speedup": 1.7421503632476443
+}

@@ -1,8 +1,8 @@
 # 完整轨迹 SFT：寻路原方案与积木 FFN 重训
 
-本页按原寻路方案的顺序说明数据、输入、监督、训练和评测。当前积木采用 2026-10-07 确认的设置：**融合 FFN、失败上下文、每卡 batch 1／四卡全局 batch 4，从头训练 10 个 epoch；每 0.1 epoch 保存，每 0.5 epoch 评测主测试**。寻路列为上一轮方案参照，本次不重启寻路训练。
+本页按原寻路方案的顺序说明数据、输入、监督、训练和评测。积木采用 2026-10-07 确认的基础设置：**融合 FFN、失败上下文、全局 batch 4，从头训练 10 个 epoch；每 0.1 epoch 保存，每 0.5 epoch 评测主测试**。初始为四卡各 1 条；2026-10-08 经授权从完整断点迁移为两卡各 2 条，维持逐轨迹等权目标，另一节点继续四卡评测。寻路列为上一轮方案参照，本次不重启寻路训练。
 
-正式参数以[积木当前配置](configs/blocks_ffn_failure_batch4.json)为准；[全局 batch 64 配置](configs/blocks_ffn_failure.json)对应已停止的对照运行，[寻路配置](configs/path_single_long.json)对应上一轮方案。进度见[项目状态页](../../docs/PROJECT_STATUS_AND_TODO.md)。上一轮两任务的[设计](DESIGN_long_trajectory.md)与[报告](results/report_long_trajectory.md)在原目录保留，其成绩不属于当前小 batch 运行。
+正式参数以[积木基础配置](configs/blocks_ffn_failure_batch4.json)及[两卡接续合同](configs/blocks_batch4_two_gpu_resume.json)为准；[全局 batch 64 配置](configs/blocks_ffn_failure.json)对应已停止的对照运行，[寻路配置](configs/path_single_long.json)对应上一轮方案。进度见[项目状态页](../../docs/PROJECT_STATUS_AND_TODO.md)。上一轮两任务的[设计](DESIGN_long_trajectory.md)与[报告](results/report_long_trajectory.md)在原目录保留，其成绩不属于当前小 batch 运行。
 
 本轮大 batch 试点的负结果与小 batch 证据状态见[本轮报告](results/report.md)。
 
@@ -54,7 +54,7 @@
 | 失败上下文 | 1,000 | 6 | 6,000 | 只监督最后的无解回答，前面的 assistant 回答全部 mask |
 | **合计** | **10,000** | — | **55,000** | — |
 
-三类放入同一个训练集，每个 epoch 随机打乱后由四卡分配，按样本采样；不按类别分阶段训练，也不强制每个 batch 各类数量相同。编号增强后的采样比例为 **48:1:6**。普通任务和失败任务各有 6 套固定编号，初始即目标只有 1 套。
+三类放入同一个训练集，每个 epoch 随机打乱后由各训练进程分配，按样本采样；不按类别分阶段训练，也不强制每个 batch 各类数量相同。编号增强后的采样比例为 **48:1:6**。普通任务和失败任务各有 6 套固定编号，初始即目标只有 1 套。
 
 上述比例是样本出现次数，不是监督 token 或梯度贡献比例。失败历史只监督最后回答，不能将全部历史长度计入其监督量；batch 对损失权重的影响见第 6 节。
 
@@ -251,13 +251,15 @@ No solution: no legal moves remain and the goal has not been reached.
 
 每卡 batch 1 时，每条轨迹先计算自己的 token 平均损失，四条轨迹再跨卡平均；此前每卡 batch 16 时，同卡长监督轨迹对该次平均损失的权重更高。由此，缩小 batch 会同时改变短终止样本与长动作轨迹的相对权重。token 数也不等同于实际梯度贡献，需结合分类损失或对照结果判断。
 
-55,000 条样本按四卡全局 batch 4 分配，每 epoch 恰好 13,750 步，无须因整除问题补齐。保存点为 1,375、2,750、4,125……13,750，后续 epoch 按同一间隔继续。另存初始权重和最终 `final`；主测试按 0.5 epoch 评测，对应 6,875、13,750、20,625……steps。保存频率不代表每个保存点都评测。
+两卡接续时，每条轨迹先对自身监督 token 求平均，再对本卡轨迹等权平均，最后由 DDP 平均两卡梯度。这样维持四卡各 1 条时的样本权重，而不是把两条轨迹合并为 token 加权平均。迁移及梯度等价验证见[本轮报告](results/report.md)。
+
+55,000 条样本按全局 batch 4 分配，每 epoch 恰好 13,750 步，无须因整除问题补齐。保存点为 1,375、2,750、4,125……13,750，后续 epoch 按同一间隔继续。另存初始权重和最终 `final`；主测试按 0.5 epoch 评测，对应 6,875、13,750、20,625……steps。保存频率不代表每个保存点都评测。
 
 历史积木对照：分离 K/V 的单卡全局 batch 1 实验为 49,000 个样本／更新每 epoch；已停止的融合 FFN 全局 batch 64 实验为 55,000 个样本、860 次更新每 epoch、每 86 steps 保存。三者的“1 epoch”不代表相同优化更新数。
 
 中间断点保存 adapter、optimizer、scheduler、trainer state，以及各卡随机状态。通过统一入口的 `--resume` 选择最新完整断点，沿原步数、epoch、数据顺序和学习率进度继续剩余预算。初始权重目录不含完整训练状态；没有完整断点时明确报错。
 
-恢复要求同一运行、配置、batch 和设备拓扑；未保存的更新从最近完整断点重算。已通过包含随机 dropout 和激活重计算的恢复一致性测试，但不据此承诺跨硬件的逐位一致。改变 batch 的本轮使用新目录从头训练，不能按旧 Trainer 步数直接续接；`--prepared-manifest` 仅复用数据，不加载旧 adapter 或优化器。
+默认恢复要求同一运行、配置、batch 和设备拓扑；未保存的更新从最近完整断点重算。两卡接续使用显式迁移合同，保持全局 batch、样本权重、数据分组、更新预算与 optimizer 状态，当前 rank 只恢复自己的有效 CUDA 设备 RNG。已通过梯度、分组和恢复检查，但批量 padding、bf16 与求和顺序改变，不能承诺逐位一致。大／小 batch 对照仍使用新目录从头训练，不能按旧 Trainer 步数直接续接；`--prepared-manifest` 仅复用数据，不加载旧 adapter 或优化器。
 
 上下文上限 32,768 token，不静默截断；每次动作／终止生成预算为 4,096／2,048 token，最大执行动作数为 32。GPU 数、batch、保存间隔和生成预算的正式值均见配置。
 
@@ -323,7 +325,7 @@ python -m experiments.flamingo_map_reader.src.retrain_blocks \
   --model-path "$MODEL_PATH" --out "$RUN_DIR"
 ```
 
-本轮用 `--prepared-manifest "$PREPARED_MANIFEST"` 复用已停止大 batch 运行的数据，`RUN_DIR` 必须为独立的新目录。中断后，在同一配置、模型路径及输出目录下调用同一命令并加 `--resume`。恢复会复用已完成的评测分片，仅重做未完成分片。
+本轮用 `--prepared-manifest "$PREPARED_MANIFEST"` 复用已停止大 batch 运行的数据，`RUN_DIR` 必须为独立的新目录。中断后，在同一配置、模型路径及输出目录下调用同一命令并加 `--resume`。两卡迁移还需按 [README](README.md) 增加 `--resume-topology` 和 `--training-only`，将计划训练结束后的 final 评测交给四卡队列。恢复会复用已完成的评测分片，仅重做未完成分片。
 
 单独评测一个保存点：
 

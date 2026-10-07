@@ -40,12 +40,13 @@ LLM 已有较强的语言理解和推理能力，但在复杂任务中，仍可�
 
 ## 4. 有序 TODO
 
-**当前运行：积木融合 FFN＋失败上下文，每卡 batch 1、四卡全局 batch 4，从头训练。**
+**当前运行：积木融合 FFN＋失败上下文，从头训练后接续；现为两卡、每卡 batch 2，全局 batch 4、逐轨迹等权。**
 2026-10-07 已查询远端并在节点重启后从同一运行的完整断点恢复训练；半 epoch 评测于 2026-10-08 再次在替换节点恢复四卡并发。
 2026-10-07 已停止全局 batch 64 的训练和评测，仅修改 batch，保持新架构、数据及其余训练设置。
-正式合同为 [blocks_ffn_failure_batch4.json](../experiments/flamingo_map_reader/configs/blocks_ffn_failure_batch4.json)，
+基础训练合同为 [blocks_ffn_failure_batch4.json](../experiments/flamingo_map_reader/configs/blocks_ffn_failure_batch4.json)。
+2026-10-08 经用户授权，以[两卡迁移合同](../experiments/flamingo_map_reader/configs/blocks_batch4_two_gpu_resume.json)从同一运行 3.8 epoch 的完整断点接续；迁移实现来源为 `381ebf1`。每条轨迹先对自己的监督 token 求平均，再平均本卡两条轨迹和两卡梯度，保留四卡各一条时的样本权重。optimizer、学习率、数据分组、每 epoch 更新数与总预算继续原断点，批量计算不保证 bf16 逐位相同。评测继续使用另一个四卡节点；计划完成 10 epoch 后，最终权重才保存到 `final`，届时主测试与独立无解测试由新版评测队列执行。当前尚无 `final` 权重。
 完整协议见 [DESIGN](../experiments/flamingo_map_reader/DESIGN.md)，启动与恢复见 [实验 README](../experiments/flamingo_map_reader/README.md#积木融合-ffn-重训)。
-当前运行标识为 `blocks_ffn_failure_batch4_75cc4fd`，配置来源提交 `75cc4fd`，运行源码复用 `8330937` 的持久快照。
+当前运行标识为 `blocks_ffn_failure_batch4_75cc4fd`，基础配置来源提交 `75cc4fd`，迁移前训练源码复用 `8330937` 的持久快照；两卡接续使用上述 `381ebf1`。
 导入记录称新旧初始 adapter 已逐 tensor 核对一致；训练记录、编号、标签与准备数据完全复用。
 
 保留融合 FFN；失败历史只监督最后“未到目标且无合法动作”的 none/done 回答，不监督中途不可达判断。
@@ -60,9 +61,9 @@ rollout 488/510 题，仅 1 题到达且正确结束。详见[本轮报告](../e
 已在完全相同的 8 条成功训练轨迹上对比新旧架构的局部地图残差：新架构 0.5 至 2.5 epoch 的注入／语言隐状态 RMS 从 5.95% 增至 11.39%，3.4 epoch 为 11.28%，支持前期通道逐步增强；旧架构 final 为 16.85%。按接近的更新数比较，新架构并不更弱：约 4.8 万步时旧／新分别为 9.74%／11.28%。这是训练状态上的幅度观测，尚未识别门控对 reference 改善的独立因果作用，不能据此宣称纯架构收益。
 
 导入记录称新运行已启动，并通过最长样本的四卡反向更新检查与恢复测试。
-`--resume` 仅接回同一运行的完整训练状态及各卡 RNG，未保存部分重算；改 batch 已另开新运行，不直接续旧断点。
+默认 `--resume` 接回同一运行的完整训练状态及各卡 RNG，未保存部分重算；大／小 batch 对照另开运行。此次显式拓扑迁移维持原全局 batch 与逐轨迹等权目标，每个当前 rank 只恢复自己的有效 CUDA 设备 RNG，旧断点保留。
 保存与评测进度以运行目录为准，本页不固化实时 step 或 ETA。
-评测节点迁移只改变并发分配，保留已完成分片；旧部分输出先归档再整片重算。训练仍沿用原四卡与全局 batch 4。
+评测节点迁移只改变并发分配，保留已完成分片；旧部分输出先归档再整片重算。本次升级评测队列先让四个在途分片完成，再自动接入新版调度，保持四卡评测。
 
 **历史对照：**[全局 batch 64 配置](../experiments/flamingo_map_reader/configs/blocks_ffn_failure.json)
 对应已停止的 `blocks_ffn_failure_8330937`；导入快照中 3 epoch 全量 rollout 到达且正确结束为 5/510（1.0%），见[本轮报告](../experiments/flamingo_map_reader/results/report.md)。

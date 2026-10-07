@@ -1,0 +1,421 @@
+{
+  "run": "blocks_ffn_failure_batch4_75cc4fd",
+  "config": "../configs/blocks_ffn_failure_batch4.json",
+  "cohort_snapshot_at_utc": "2026-10-07T13:04:09.597725+00:00",
+  "checkpoints": [
+    {
+      "step": 6875,
+      "epoch": 0.5
+    },
+    {
+      "step": 13750,
+      "epoch": 1.0
+    }
+  ],
+  "method": "Frozen 259 reference and 240 rollout task/variant pairs; no model rerun.",
+  "output_conditions": {
+    "reference_epoch05": {
+      "goal_no_legal_moves": {
+        "n": 143,
+        "no_solution": 103,
+        "goal_claim": 40,
+        "other": 0
+      },
+      "goal_with_legal_moves": {
+        "n": 32,
+        "no_solution": 0,
+        "goal_claim": 5,
+        "other": 27
+      },
+      "exhausted_non_goal": {
+        "n": 0,
+        "no_solution": 0,
+        "goal_claim": 0,
+        "other": 0
+      }
+    },
+    "reference_epoch10": {
+      "goal_no_legal_moves": {
+        "n": 143,
+        "no_solution": 65,
+        "goal_claim": 78,
+        "other": 0
+      },
+      "goal_with_legal_moves": {
+        "n": 32,
+        "no_solution": 0,
+        "goal_claim": 15,
+        "other": 17
+      },
+      "exhausted_non_goal": {
+        "n": 0,
+        "no_solution": 0,
+        "goal_claim": 0,
+        "other": 0
+      }
+    },
+    "rollout_epoch05": {
+      "goal_no_legal_moves": {
+        "n": 1,
+        "no_solution": 0,
+        "goal_claim": 1,
+        "other": 0
+      },
+      "goal_with_legal_moves": {
+        "n": 0,
+        "no_solution": 0,
+        "goal_claim": 0,
+        "other": 0
+      },
+      "exhausted_non_goal": {
+        "n": 226,
+        "no_solution": 155,
+        "goal_claim": 71,
+        "other": 0
+      }
+    },
+    "rollout_epoch10": {
+      "goal_no_legal_moves": {
+        "n": 1,
+        "no_solution": 0,
+        "goal_claim": 1,
+        "other": 0
+      },
+      "goal_with_legal_moves": {
+        "n": 0,
+        "no_solution": 0,
+        "goal_claim": 0,
+        "other": 0
+      },
+      "exhausted_non_goal": {
+        "n": 226,
+        "no_solution": 56,
+        "goal_claim": 170,
+        "other": 0
+      }
+    }
+  },
+  "paired_exhausted": {
+    "tasks": 213,
+    "boards": 187,
+    "transition": [
+      {
+        "epoch05": "goal_claim",
+        "epoch10": "goal_claim",
+        "n": 53
+      },
+      {
+        "epoch05": "goal_claim",
+        "epoch10": "no_solution",
+        "n": 16
+      },
+      {
+        "epoch05": "no_solution",
+        "epoch10": "goal_claim",
+        "n": 110
+      },
+      {
+        "epoch05": "no_solution",
+        "epoch10": "no_solution",
+        "n": 34
+      }
+    ]
+  },
+  "same_terminal_state": {
+    "tasks": 6,
+    "epoch05": {
+      "n": 6,
+      "no_solution": 1,
+      "goal_claim": 5,
+      "other": 0
+    },
+    "epoch10": {
+      "n": 6,
+      "no_solution": 2,
+      "goal_claim": 4,
+      "other": 0
+    }
+  },
+  "same_executed_path": {
+    "tasks": 0,
+    "epoch05": {
+      "n": 0,
+      "no_solution": 0,
+      "goal_claim": 0,
+      "other": 0
+    },
+    "epoch10": {
+      "n": 0,
+      "no_solution": 0,
+      "goal_claim": 0,
+      "other": 0
+    }
+  },
+  "same_prior_generated_text": {
+    "tasks": 0,
+    "epoch05": {
+      "n": 0,
+      "no_solution": 0,
+      "goal_claim": 0,
+      "other": 0
+    },
+    "epoch10": {
+      "n": 0,
+      "no_solution": 0,
+      "goal_claim": 0,
+      "other": 0
+    }
+  },
+  "paired_cluster_bootstrap": {
+    "boards": 187,
+    "replicates": 5000,
+    "seed": 20261007,
+    "delta": -0.4413145539906103,
+    "percentile_95": [
+      -0.5260663507109005,
+      -0.35348837209302325
+    ],
+    "limitation": "Describes this selected cohort; does not identify the cause or establish full-test generalization."
+  },
+  "training_label_mass": {
+    "total_numbered_samples": 55000,
+    "negative_sample_fraction": 0.10909090909090909,
+    "estimated_positive_terminal_token_coefficient_share": 0.13574208821363837,
+    "negative_terminal_token_coefficient_share": 0.10909090909090909,
+    "estimated_positive_to_negative_terminal_ratio": 1.2443024752916851,
+    "estimated_nonterminal_token_coefficient_share": 0.7551670026954524,
+    "sample_physical_tasks": {
+      "successful_long": 80,
+      "initial_goal": 40,
+      "no_solution": 40
+    },
+    "sampled_supervised_tokens": {
+      "successful_long": 738.6104166666667,
+      "initial_goal": 31,
+      "no_solution": 27
+    },
+    "limitation": "Token coefficients under per-trajectory mean loss; not measured loss values or gradient magnitudes."
+  },
+  "training_goal_distribution": {
+    "no_solution": {
+      "goal_empty_physical": 57,
+      "goal_empty_numbered": 342,
+      "goal_nonempty_physical": 943,
+      "goal_nonempty_numbered": 5658,
+      "mean_goal_occupied_cells": 3.215
+    },
+    "initial_goal": {
+      "goal_empty_physical": 0,
+      "goal_empty_numbered": 0,
+      "goal_nonempty_physical": 1000,
+      "goal_nonempty_numbered": 1000,
+      "mean_goal_occupied_cells": 21.93
+    },
+    "successful_long": {
+      "goal_empty_physical": 779,
+      "goal_empty_numbered": 4674,
+      "goal_nonempty_physical": 7221,
+      "goal_nonempty_numbered": 43326,
+      "mean_goal_occupied_cells": 2.469875
+    }
+  },
+  "additional_patterns": {
+    "training_negatives": {
+      "n": 1000,
+      "goal_empty": 57,
+      "goal_cells_removed": 725,
+      "goal_cells_preserved": 275,
+      "mean_missing_goal_cells": 1.26,
+      "mean_extra_cells": 0.834,
+      "mean_terminal_turn": 8.036,
+      "by_missing": {
+        "0": 275,
+        "1": 378,
+        "2": 213,
+        "3": 87,
+        "4": 41,
+        "5": 5,
+        "6": 1
+      }
+    },
+    "reference_epoch05_empty_goal_True": {
+      "n": 5,
+      "actual_goal": 5,
+      "claimed_goal": 2,
+      "text_no_solution": 3
+    },
+    "reference_epoch05_empty_goal_False": {
+      "n": 138,
+      "actual_goal": 138,
+      "claimed_goal": 38,
+      "text_no_solution": 100
+    },
+    "reference_epoch10_empty_goal_True": {
+      "n": 5,
+      "actual_goal": 5,
+      "claimed_goal": 3,
+      "text_no_solution": 2
+    },
+    "reference_epoch10_empty_goal_False": {
+      "n": 138,
+      "actual_goal": 138,
+      "claimed_goal": 75,
+      "text_no_solution": 63
+    },
+    "rollout_epoch05_empty_goal_True": {
+      "n": 20,
+      "actual_goal": 0,
+      "claimed_goal": 9,
+      "text_no_solution": 11
+    },
+    "rollout_epoch05_empty_goal_False": {
+      "n": 207,
+      "actual_goal": 1,
+      "claimed_goal": 63,
+      "text_no_solution": 144
+    },
+    "rollout_epoch10_empty_goal_True": {
+      "n": 24,
+      "actual_goal": 0,
+      "claimed_goal": 1,
+      "text_no_solution": 23
+    },
+    "rollout_epoch10_empty_goal_False": {
+      "n": 203,
+      "actual_goal": 1,
+      "claimed_goal": 170,
+      "text_no_solution": 33
+    },
+    "paired_exhausted_empty_goal_True": {
+      "n": 20,
+      "old_correct": 11,
+      "new_correct": 19
+    },
+    "paired_exhausted_empty_goal_False": {
+      "n": 193,
+      "old_correct": 133,
+      "new_correct": 31
+    }
+  },
+  "scorer_note": "Negative-turn protocol and first-line semantics agree in every frozen rollout. One reference goal row says no solution but uses done-only and is counted as correct stopping by the control-only scorer.",
+  "negative_strata": {
+    "epoch05": {
+      "negative_turns": 226,
+      "mean_terminal_turn": 7.588495575221239,
+      "mean_missing_goal_cells": 1.9292035398230087,
+      "mean_extra_cells": 3.0486725663716814,
+      "by_turn": {
+        "0-6": {
+          "n": 33,
+          "no_solution": 26,
+          "goal_claim": 7,
+          "other": 0
+        },
+        "7-8": {
+          "n": 154,
+          "no_solution": 103,
+          "goal_claim": 51,
+          "other": 0
+        },
+        "9+": {
+          "n": 39,
+          "no_solution": 26,
+          "goal_claim": 13,
+          "other": 0
+        }
+      },
+      "by_missing_goal_cells": {
+        "0": {
+          "n": 36,
+          "no_solution": 22,
+          "goal_claim": 14,
+          "other": 0
+        },
+        "1-3": {
+          "n": 159,
+          "no_solution": 109,
+          "goal_claim": 50,
+          "other": 0
+        },
+        "4-6": {
+          "n": 28,
+          "no_solution": 22,
+          "goal_claim": 6,
+          "other": 0
+        },
+        "7+": {
+          "n": 3,
+          "no_solution": 2,
+          "goal_claim": 1,
+          "other": 0
+        }
+      },
+      "first_lines": {
+        "The current board matches the goal.": 71,
+        "No solution: no legal moves remain and the goal has not been reached.": 155
+      },
+      "protocol_text_disagreements": 0,
+      "incorrect_goal_claims_with_actual_goal": 0,
+      "context_exhausted": 0
+    },
+    "epoch10": {
+      "negative_turns": 226,
+      "mean_terminal_turn": 8.168141592920353,
+      "mean_missing_goal_cells": 1.9823008849557522,
+      "mean_extra_cells": 2.601769911504425,
+      "by_turn": {
+        "0-6": {
+          "n": 11,
+          "no_solution": 2,
+          "goal_claim": 9,
+          "other": 0
+        },
+        "7-8": {
+          "n": 133,
+          "no_solution": 33,
+          "goal_claim": 100,
+          "other": 0
+        },
+        "9+": {
+          "n": 82,
+          "no_solution": 21,
+          "goal_claim": 61,
+          "other": 0
+        }
+      },
+      "by_missing_goal_cells": {
+        "0": {
+          "n": 37,
+          "no_solution": 25,
+          "goal_claim": 12,
+          "other": 0
+        },
+        "1-3": {
+          "n": 157,
+          "no_solution": 25,
+          "goal_claim": 132,
+          "other": 0
+        },
+        "4-6": {
+          "n": 27,
+          "no_solution": 6,
+          "goal_claim": 21,
+          "other": 0
+        },
+        "7+": {
+          "n": 5,
+          "no_solution": 0,
+          "goal_claim": 5,
+          "other": 0
+        }
+      },
+      "first_lines": {
+        "The current board matches the goal.": 170,
+        "No solution: no legal moves remain and the goal has not been reached.": 56
+      },
+      "protocol_text_disagreements": 0,
+      "incorrect_goal_claims_with_actual_goal": 0,
+      "context_exhausted": 0
+    }
+  }
+}

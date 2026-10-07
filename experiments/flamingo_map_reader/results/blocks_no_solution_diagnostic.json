@@ -536,5 +536,150 @@
       }
     },
     "limitation": "Successful reference and failed rollout have different histories. The output-class shift is observed; a shortcut cue or fixed-input failure regression is not causally established."
+  },
+  "epoch2_followup": {
+    "cohort_snapshot_at_utc": "2026-10-07T16:27:19.018443+00:00",
+    "method": "Four checkpoint comparison on task/variant intersections through epoch 2.0; existing outputs only.",
+    "matched_tasks": {
+      "reference": 384,
+      "rollout": 384
+    },
+    "groups": {
+      "same_initial_board_new_pair": 255,
+      "new_initial_board": 129
+    },
+    "reference": [
+      {
+        "step": 6875,
+        "epoch": 0.5,
+        "tasks": 384,
+        "solvable_decisions": 2407,
+        "safe_actions": 1337,
+        "safe_rate": 0.555463232239302,
+        "shortest_actions": 1136,
+        "shortest_action_rate": 0.47195679268799334,
+        "goal_terminal_turns": 265,
+        "correct_protocol_stops": 70,
+        "correct_stop_rate": 0.2641509433962264
+      },
+      {
+        "step": 13750,
+        "epoch": 1.0,
+        "tasks": 384,
+        "solvable_decisions": 2407,
+        "safe_actions": 1445,
+        "safe_rate": 0.6003323639385126,
+        "shortest_actions": 1278,
+        "shortest_action_rate": 0.5309513917739925,
+        "goal_terminal_turns": 265,
+        "correct_protocol_stops": 155,
+        "correct_stop_rate": 0.5849056603773585
+      },
+      {
+        "step": 20625,
+        "epoch": 1.5,
+        "tasks": 384,
+        "solvable_decisions": 2407,
+        "safe_actions": 1507,
+        "safe_rate": 0.6260905691732447,
+        "shortest_actions": 1365,
+        "shortest_action_rate": 0.5670959700872455,
+        "goal_terminal_turns": 265,
+        "correct_protocol_stops": 227,
+        "correct_stop_rate": 0.8566037735849057
+      },
+      {
+        "step": 27500,
+        "epoch": 2.0,
+        "tasks": 384,
+        "solvable_decisions": 2407,
+        "safe_actions": 1558,
+        "safe_rate": 0.6472787702534275,
+        "shortest_actions": 1405,
+        "shortest_action_rate": 0.5837141670128791,
+        "goal_terminal_turns": 265,
+        "correct_protocol_stops": 137,
+        "correct_stop_rate": 0.5169811320754717
+      }
+    ],
+    "rollout": [
+      {
+        "step": 6875,
+        "epoch": 0.5,
+        "tasks": 384,
+        "solvable_decisions": 723,
+        "safe_actions": 340,
+        "safe_rate": 0.4702627939142462,
+        "shortest_actions": 275,
+        "shortest_action_rate": 0.38035961272475793,
+        "goal_terminal_turns": 1,
+        "correct_protocol_stops": 1,
+        "correct_stop_rate": 1.0,
+        "reached": 1,
+        "success": 1,
+        "shortest_success": 1,
+        "exhausted_non_goal_turns": 359,
+        "correct_no_solution": 241,
+        "no_solution_recall": 0.6713091922005571
+      },
+      {
+        "step": 13750,
+        "epoch": 1.0,
+        "tasks": 384,
+        "solvable_decisions": 869,
+        "safe_actions": 489,
+        "safe_rate": 0.5627157652474108,
+        "shortest_actions": 411,
+        "shortest_action_rate": 0.47295742232451093,
+        "goal_terminal_turns": 3,
+        "correct_protocol_stops": 3,
+        "correct_stop_rate": 1.0,
+        "reached": 3,
+        "success": 3,
+        "shortest_success": 1,
+        "exhausted_non_goal_turns": 361,
+        "correct_no_solution": 101,
+        "no_solution_recall": 0.27977839335180055
+      },
+      {
+        "step": 20625,
+        "epoch": 1.5,
+        "tasks": 384,
+        "solvable_decisions": 896,
+        "safe_actions": 524,
+        "safe_rate": 0.5848214285714286,
+        "shortest_actions": 442,
+        "shortest_action_rate": 0.49330357142857145,
+        "goal_terminal_turns": 8,
+        "correct_protocol_stops": 7,
+        "correct_stop_rate": 0.875,
+        "reached": 8,
+        "success": 7,
+        "shortest_success": 1,
+        "exhausted_non_goal_turns": 363,
+        "correct_no_solution": 16,
+        "no_solution_recall": 0.0440771349862259
+      },
+      {
+        "step": 27500,
+        "epoch": 2.0,
+        "tasks": 384,
+        "solvable_decisions": 785,
+        "safe_actions": 405,
+        "safe_rate": 0.5159235668789809,
+        "shortest_actions": 340,
+        "shortest_action_rate": 0.43312101910828027,
+        "goal_terminal_turns": 4,
+        "correct_protocol_stops": 4,
+        "correct_stop_rate": 1.0,
+        "reached": 4,
+        "success": 4,
+        "shortest_success": 0,
+        "exhausted_non_goal_turns": 364,
+        "correct_no_solution": 112,
+        "no_solution_recall": 0.3076923076923077
+      }
+    ],
+    "limitation": "Partial main-test cohort. Reference stopping follows control labels; rollout histories and terminal states vary across checkpoints. Fixed failure-history comparison has not been run."
   }
 }

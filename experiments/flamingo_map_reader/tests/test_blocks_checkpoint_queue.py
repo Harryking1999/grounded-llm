@@ -4,9 +4,12 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from experiments.flamingo_map_reader.src.blocks_checkpoint_queue import (
     checkpoints, gpu_modes, validate_resume_contract, evaluation_modes,
+    owns_shard, queue_file, shard_remainders, validate_auxiliary_partition,
+    main,
 )
 
 
@@ -55,6 +58,78 @@ class CheckpointSelectionTest(unittest.TestCase):
 
 
 class QueueMigrationTest(unittest.TestCase):
+    def test_main_waits_for_auxiliary_final_shards(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            run = Path(temporary)
+            data = run / 'data'
+            data.mkdir()
+            (data / 'manifest.json').write_text(json.dumps(dict(config=dict(task='blocks'),
+                records=[dict(split='test')]*510 + [dict(split='test_no_solution')]*100)))
+            final = run / 'training/models/final'
+            final.mkdir(parents=True)
+            (final / 'adapter.pt').touch()
+            (final / 'evaluation_ready.json').write_text(json.dumps(dict(step=137500, epoch=10.0)))
+            root = run / 'evaluation_half_epoch/step-137500'
+            for mode in ('rollout', 'reference'):
+                for start in range(0, 510, 64):
+                    if not owns_shard(start, 64, 3, (0, 1)):
+                        continue
+                    out = root / f'test_{mode}/{start:05d}_{min(start+64, 510):05d}'
+                    out.mkdir(parents=True)
+                    (out / 'summary.json').write_text('{}')
+            negative = root / 'test_no_solution_reference'
+            negative.mkdir()
+            (negative / 'summary.json').write_text('{}')
+            for start, stop in ((0, 64), (64, 100)):
+                out = negative / f'{start:05d}_{stop:05d}'
+                out.mkdir()
+                (out / 'summary.json').write_text('{}')
+            # All main-owned work is done. The four auxiliary test shards are missing.
+            argv = ['queue', '--run', str(run), '--model-path', 'model',
+                    '--shard-modulo', '3', '--shard-remainders', '0,1']
+            with patch('sys.argv', argv), patch(
+                    'experiments.flamingo_map_reader.src.blocks_checkpoint_queue.time.sleep',
+                    side_effect=InterruptedError), self.assertRaises(InterruptedError):
+                main()
+            status = json.loads((run / 'evaluation_half_epoch/status.json').read_text())
+            self.assertEqual(status['status'], 'running')
+            self.assertEqual(status['running'], {})
+            self.assertEqual(status['pending_shards'], 0)
+
+    def test_two_node_partitions_cover_main_and_final_no_solution_once(self):
+        primary = shard_remainders(3, '0,1')
+        auxiliary = shard_remainders(3, '2')
+        for tasks in (510, 100):
+            covered = []
+            for start in range(0, tasks, 64):
+                owners = [owns_shard(start, 64, 3, values) for values in (primary, auxiliary)]
+                self.assertEqual(sum(owners), 1)
+                covered.extend(range(start, min(start + 64, tasks)))
+            self.assertEqual(covered, list(range(tasks)))
+
+    def test_auxiliary_queue_rejects_overlapping_or_different_partition(self):
+        primary = dict(run='same', tasks=510, shard_modulo=3, shard_remainders=[0, 1])
+        auxiliary = dict(primary, shard_remainders=[2])
+        validate_auxiliary_partition(primary, auxiliary)
+        for changed in (dict(auxiliary, shard_remainders=[1, 2]),
+                        dict(auxiliary, shard_modulo=4), dict(auxiliary, tasks=100)):
+            with self.subTest(changed=changed), self.assertRaises(ValueError):
+                validate_auxiliary_partition(primary, changed)
+
+    def test_two_gpu_auxiliary_has_both_modes_and_separate_runtime_files(self):
+        self.assertEqual(gpu_modes(['2', '3']), {'2': 'rollout', '3': 'reference'})
+        root = Path('run')
+        for name in ('status.json', 'contract.json', '.queue.lock'):
+            self.assertEqual(queue_file(root, name, 'main'), root / name)
+            self.assertNotEqual(queue_file(root, name, 'main'), queue_file(root, name, 'aux'))
+        with self.assertRaises(ValueError):
+            queue_file(root, 'status.json', '../other')
+
+    def test_invalid_shard_remainders_are_rejected(self):
+        for modulo, values in ((0, '0'), (3, '0,0'), (3, '-1'), (3, '3')):
+            with self.subTest(modulo=modulo, values=values), self.assertRaises(ValueError):
+                shard_remainders(modulo, values)
+
     def test_projection_cache_changes_execution_but_keeps_generation_contract(self):
         previous = dict(run='same-run', tasks=510, modes=['rollout', 'reference'],
                         variants=1, cache_map_kv=False)

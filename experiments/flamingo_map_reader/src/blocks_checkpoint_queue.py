@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 import json
 import os
 from pathlib import Path
+import re
 import subprocess
 import sys
 import time
@@ -34,9 +35,37 @@ def checkpoints(models):
 
 
 def gpu_modes(gpus):
-    if len(gpus) not in (3, 4) or len(set(gpus)) != len(gpus) or not all(gpus):
-        raise ValueError('Three or four distinct GPUs are required: two rollout, remaining reference')
+    if len(gpus) not in (2, 3, 4) or len(set(gpus)) != len(gpus) or not all(gpus):
+        raise ValueError('Two to four distinct GPUs are required')
+    if len(gpus) == 2:
+        return dict(zip(gpus, ['rollout', 'reference']))
     return dict(zip(gpus, ['rollout', 'rollout', *(['reference'] * (len(gpus) - 2))]))
+
+
+def shard_remainders(modulo, text):
+    values = tuple(int(value) for value in text.split(','))
+    if modulo < 1 or not values or len(set(values)) != len(values) or any(
+            value < 0 or value >= modulo for value in values):
+        raise ValueError('Shard remainders must be distinct values in [0, modulo)')
+    return values
+
+
+def owns_shard(start, shard_tasks, modulo, remainders):
+    return (start // shard_tasks) % modulo in remainders
+
+
+def queue_file(root, name, queue_name):
+    if not re.fullmatch(r'[a-z0-9][a-z0-9_-]*', queue_name):
+        raise ValueError('Queue name must contain only lowercase letters, digits, _ or -')
+    path = Path(name)
+    return root / (name if queue_name == 'main' else f'{path.stem}.{queue_name}{path.suffix}')
+
+
+def validate_auxiliary_partition(primary, auxiliary):
+    validate_resume_contract(primary, auxiliary)
+    if primary.get('shard_modulo', 1) != auxiliary['shard_modulo'] or set(
+            primary.get('shard_remainders', [0])) & set(auxiliary['shard_remainders']):
+        raise ValueError('Auxiliary queue must own disjoint shards with the same modulo')
 
 
 def evaluation_modes(checkpoint, manifest):
@@ -51,7 +80,8 @@ def validate_resume_contract(previous, current):
     # Moving to a smaller node changes scheduling, not the evaluated experiment.
     def experiment(contract):
         return {key: value for key, value in contract.items()
-                if key not in ('gpus', 'gpu_modes', 'cache_map_kv')}
+                if key not in ('gpus', 'gpu_modes', 'cache_map_kv', 'queue_name',
+                               'shard_modulo', 'shard_remainders')}
     if experiment(previous) != experiment(current):
         raise ValueError('Existing queue contract differs')
 
@@ -61,6 +91,11 @@ def main():
     parser.add_argument('--run', type=Path, required=True)
     parser.add_argument('--model-path', type=Path, required=True)
     parser.add_argument('--gpus', default='0,1,2,3')
+    parser.add_argument('--queue-name', default='main',
+                        help='Separate local lock/status; main alone writes full aggregates')
+    parser.add_argument('--shard-modulo', type=int, default=1)
+    parser.add_argument('--shard-remainders', default='0',
+                        help='Owned shard indices modulo --shard-modulo, e.g. 0,1 or 2')
     parser.add_argument('--cache-map-kv', action='store_true',
                         help='Reuse unchanged map projections within each generation')
     args = parser.parse_args()
@@ -68,6 +103,7 @@ def main():
     manifest = json.loads(manifest_path.read_text())
     gpus = args.gpus.split(',')
     assignments = gpu_modes(gpus)
+    remainders = shard_remainders(args.shard_modulo, args.shard_remainders)
     count = sum(record['split'] == 'test' for record in manifest['records'])
     if manifest['config']['task'] != 'blocks' or count != 510:
         raise ValueError(f'Expected blocks main test with 510 tasks, found {count}')
@@ -75,13 +111,18 @@ def main():
     root.mkdir(exist_ok=True)
     logs = root / 'logs'
     logs.mkdir(exist_ok=True)
+    status_path = queue_file(root, 'status.json', args.queue_name)
+    contract_path = queue_file(root, 'contract.json', args.queue_name)
+    lock_path = queue_file(root, '.queue.lock', args.queue_name)
     contract = dict(run=str(args.run), manifest=str(manifest_path),
                     model_path=str(args.model_path), split='test', tasks=count,
                     modes=['rollout', 'reference'], variants=1, epoch_interval=0.5,
                     priority='newest checkpoint first, then rollout, then reference',
                     gpus=gpus, gpu_modes=assignments,
-                    shard_tasks=64, cache_map_kv=args.cache_map_kv)
-    with FileLock(str(root / '.queue.lock'), timeout=0):
+                    shard_tasks=64, cache_map_kv=args.cache_map_kv,
+                    queue_name=args.queue_name, shard_modulo=args.shard_modulo,
+                    shard_remainders=list(remainders))
+    with FileLock(str(lock_path), timeout=0):
         # A killed queue can leave evaluation workers alive. Do not move their
         # output or launch a second worker against it during a manual restart.
         for command_file in Path('/proc').glob('[0-9]*/cmdline'):
@@ -93,7 +134,9 @@ def main():
                 continue
             if 'experiments.flamingo_map_reader.src.trajectory_eval' in command_line and str(root) in command_line:
                 raise RuntimeError(f'Existing evaluation worker {command_file.parent.name} still owns this output')
-        previous = root / 'contract.json'
+        if args.queue_name != 'main':
+            validate_auxiliary_partition(json.loads((root / 'contract.json').read_text()), contract)
+        previous = contract_path
         if previous.is_file():
             validate_resume_contract(json.loads(previous.read_text()), contract)
         atomic_json(previous, contract)
@@ -112,11 +155,12 @@ def main():
                 for running in busy.values():
                     running['process'].wait()
                     running['log'].close()
-                atomic_json(root / 'status.json', dict(status='failed', failures=failures))
+                atomic_json(status_path, dict(status='failed', failures=failures))
                 raise RuntimeError(f'Evaluation failed: {failures}')
             published = checkpoints(args.run / 'training/models')
             jobs = []
             completed = 0
+            missing = 0
             for checkpoint in published:
                 for split, mode, tasks in evaluation_modes(checkpoint, manifest):
                     for start in range(0, tasks, contract['shard_tasks']):
@@ -125,8 +169,11 @@ def main():
                         output = root / key
                         if (output / 'summary.json').is_file():
                             completed += 1
-                        elif not any(value['key'] == key for value in busy.values()):
-                            jobs.append((checkpoint, split, mode, start, stop, key, output))
+                        else:
+                            missing += 1
+                            if owns_shard(start, contract['shard_tasks'], args.shard_modulo, remainders) and not any(
+                                    value['key'] == key for value in busy.values()):
+                                jobs.append((checkpoint, split, mode, start, stop, key, output))
             for gpu in contract['gpus']:
                 if gpu in busy or not jobs:
                     continue
@@ -151,7 +198,7 @@ def main():
                                            stdin=subprocess.DEVNULL)
                 busy[gpu] = dict(process=process, log=handle, output=output, key=key)
             # Use the same aggregate as the official evaluator for full checkpoint results.
-            for checkpoint in published:
+            for checkpoint in (published if args.queue_name == 'main' else []):
                 for split, mode, tasks in evaluation_modes(checkpoint, manifest):
                     directory = root / f"step-{checkpoint['step']}" / f'{split}_{mode}'
                     summaries = [directory / f'{start:05d}_{min(start + 64, tasks):05d}' / 'summary.json'
@@ -168,9 +215,12 @@ def main():
                                                step=checkpoint['step'], epoch=checkpoint['epoch'], mode=mode)
                     atomic_json(directory / 'summary.json', summary)
             final_ready = args.run / 'training/models/final/evaluation_ready.json'
-            done = final_ready.is_file() and not busy and not jobs
-            atomic_json(root / 'status.json', dict(status='completed' if done else 'running',
+            done = final_ready.is_file() and not busy and not jobs and (
+                args.queue_name != 'main' or missing == 0)
+            atomic_json(status_path, dict(status='completed' if done else 'running',
                        pid=os.getpid(), updated_at=datetime.now(timezone.utc).isoformat(),
+                       queue_name=args.queue_name, shard_modulo=args.shard_modulo,
+                       shard_remainders=list(remainders),
                        checkpoints=[dict(step=c['step'], epoch=c['epoch']) for c in published],
                        completed_shards=completed,
                        running={gpu: dict(pid=value['process'].pid, key=value['key'])

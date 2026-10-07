@@ -152,6 +152,27 @@ python -m experiments.flamingo_map_reader.src.blocks_checkpoint_queue \
   --run "$RUN_DIR" --model-path "$MODEL_PATH" --gpus 0,1,2,3 --cache-map-kv
 ```
 
+两节点共同评测同一运行时，采用互斥的分片编号余数。先在四卡评测节点启动主队列：
+
+```bash
+python -m experiments.flamingo_map_reader.src.blocks_checkpoint_queue \
+  --run "$RUN_DIR" --model-path "$MODEL_PATH" --gpus 0,1,2,3 --cache-map-kv \
+  --shard-modulo 3 --shard-remainders 0,1
+```
+
+再在训练节点的两张空闲卡启动辅助队列；此处 GPU 编号以实际训练占用为准：
+
+```bash
+python -m experiments.flamingo_map_reader.src.blocks_checkpoint_queue \
+  --run "$RUN_DIR" --model-path "$MODEL_PATH" --gpus 2,3 --cache-map-kv \
+  --queue-name aux --shard-modulo 3 --shard-remainders 2
+```
+
+分片索引是 `start // shard_tasks`，分区不改变物理题、编号或评分。两个节点分别保留锁、合同和状态文件；
+辅助队列先检查其余数与主队列互斥。只有主队列写全量汇总，并等待辅助分片完成后结束 final。
+两个队列都优先最新断点，完成分片复用，未完成分片归档后重算。运行中变更分区须先停止对应 worker，
+避免原进程继续持有已转交的分片。主状态为 `status.json`，辅助状态为 `status.aux.json`，两者须一起读取。
+
 **上一轮两任务队列：**以下 `--delegate-prefix`、`--evaluation-only` 参数属于 `trajectory_queue`，不适用于当前 `retrain_blocks` 入口。
 
 两节点共享运行目录。主队列用 `--delegate-prefix` 排除交给另一节点的任务；另一节点运行同一模块的 `--evaluation-only --include-prefix ... --status-file ...`，使用独立状态文件。前缀必须互斥，不能将同一分片交给两个进程。

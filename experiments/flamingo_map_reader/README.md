@@ -94,6 +94,12 @@ python -m experiments.flamingo_map_reader.src.trajectory_eval \
 
 ## 代码与目录
 
+单样本梯度诊断使用 [blocks_sample_gradients.json](configs/blocks_sample_gradients.json)
+和 [diagnose_sample_gradients.py](src/diagnose_sample_gradients.py)：在独立模型副本上读取完整训练样本，
+测量每条样本按监督 token 平均后的裁剪前梯度，并合成四卡平均梯度；不执行 optimizer 更新。
+运行参数为 `--spec`、`--run`、`--model-path` 和独立的 `--out`，原始输出放在 Git 忽略的 `runs/` 下。
+分层小样本用于比较梯度量级与方向，不按抽样占比推断真实训练中的贡献比例。
+
 | 功能 | 入口 |
 |---|---|
 | 物理任务、划分与示范 | [prepare_trajectories.py](src/prepare_trajectories.py)、[sft.py](src/sft.py)、[blocks_sft.py](src/blocks_sft.py) |

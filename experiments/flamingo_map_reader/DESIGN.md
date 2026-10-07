@@ -4,6 +4,8 @@
 
 正式参数以[积木当前配置](configs/blocks_ffn_failure_batch4.json)为准；[全局 batch 64 配置](configs/blocks_ffn_failure.json)对应已停止的对照运行，[寻路配置](configs/path_single_long.json)对应上一轮方案。进度见[项目状态页](../../docs/PROJECT_STATUS_AND_TODO.md)。上一轮两任务的[设计](DESIGN_long_trajectory.md)与[报告](results/report_long_trajectory.md)在原目录保留，其成绩不属于当前小 batch 运行。
 
+本轮大 batch 试点的负结果与小 batch 证据状态见[本轮报告](results/report.md)。
+
 ## 1. 这轮实验检验什么
 
 **冻结语言模型和地图后，读取接口能否学会利用地图选择动作，并区分“已经到达目标”与“没有合法动作、但还未到达目标”？**
@@ -282,9 +284,9 @@ No solution: no legal moves remain and the goal has not been reached.
 | 主测试 `test` | rollout | 同一批 510 | 1 | 到达率、到达且最短解率、停止与失败原因 |
 | 无解诊断 `test_no_solution` | reference | 100 | 1 | 无解召回率、none/done 输出与原始回答 |
 
-最终三组合计 1,120 个评测案例，来自 610 个独立物理任务；reference 与 rollout 的同题结果不作为两批独立任务。validation 与训练诊断可通过同一评测器单独调用，不在上述自动三组任务中。半 epoch 队列是本次额外启动的进程，训练入口本身不会自动启动它；运行源码快照中的 `blocks_half_epoch_eval_queue.py`、评测 `contract.json` 和 `launch.json` 记录该队列的设置与调用。
+最终三组合计 1,120 个评测案例，来自 610 个独立物理任务；reference 与 rollout 的同题结果不作为两批独立任务。validation 与训练诊断可通过同一评测器单独调用，不在上述自动三组任务中。半 epoch 队列是额外启动的进程，训练入口本身不会自动启动它；统一源码为 [blocks_checkpoint_queue.py](src/blocks_checkpoint_queue.py)，原运行快照保留旧名 `blocks_half_epoch_eval_queue.py`，评测 `contract.json` 和 `launch.json` 记录原设置与调用。
 
-评测重启跳过已有完整摘要的分片，保留未完成分片的旧输出后整片重做，不从片内某道题续接。汇总排除 `.interrupted.*` 归档目录，避免重复计数；有效题数可能在重启后暂时回落。部分结果必须注明已评数量及棋盘来源，比较趋势优先使用全量结果或对齐同一批题目。
+评测重启跳过已有完整摘要的分片，不从片内某道题续接。半 epoch 队列先归档未完成分片再重做，汇总排除 `.interrupted.*` 目录；训练入口的 final 流程则清除未完成分片再重做。有效题数可能在重启后暂时回落。部分结果必须注明已评数量及棋盘来源，比较趋势优先使用全量结果或对齐同一批题目。
 
 寻路沿用原有 reference／rollout、训练诊断与 validation／final test 口径：训练诊断及 validation 每题 1 套编号，final test 的普通任务可用 6 套编号、初始即目标 1 套。本次积木运行不会触发新一轮寻路训练；寻路已有的地图反序和早期干预合同见[上一轮设计第 8 节](DESIGN_long_trajectory.md#8-最终-checkpoint-诊断先-reference-q-倒序再-rollout-早期干预)。
 

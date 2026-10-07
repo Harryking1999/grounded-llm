@@ -1,0 +1,77 @@
+{
+  "run": "long_f73b700_20261004",
+  "split": "validation",
+  "variant": 0,
+  "tasks": {
+    "path": {
+      "reference_decisions": 6140,
+      "reference": {
+        "chance_reachable": 1.0,
+        "chance_shortest": 0.5720684039087948,
+        "greedy_reachable": 1.0,
+        "greedy_shortest": 0.8247557003257329
+      },
+      "map_agreement": {
+        "decisions": 6140,
+        "chance": 0.4874049945711183,
+        "greedy": 1.0
+      },
+      "rollout": {
+        "all": {
+          "tasks": 532,
+          "reached": 532,
+          "shortest": 147
+        },
+        "path": {
+          "tasks": 532,
+          "reached": 532,
+          "shortest": 147
+        }
+      }
+    },
+    "blocks": {
+      "reference_decisions": 6409,
+      "reference": {
+        "chance_reachable": 0.5025520046679839,
+        "chance_shortest": 0.43797418780771913,
+        "greedy_reachable": 0.9505383055078795,
+        "greedy_shortest": 0.8740833203307848
+      },
+      "map_agreement": {
+        "decisions": 8242,
+        "chance": 0.1495840943896326,
+        "greedy": 1.0
+      },
+      "rollout": {
+        "all": {
+          "tasks": 1100,
+          "reached": 783,
+          "shortest": 411
+        },
+        "nonempty": {
+          "tasks": 868,
+          "reached": 620,
+          "shortest": 305
+        },
+        "empty": {
+          "tasks": 132,
+          "reached": 63,
+          "shortest": 6
+        },
+        "initial_goal": {
+          "tasks": 100,
+          "reached": 100,
+          "shortest": 100
+        }
+      }
+    }
+  },
+  "definitions": {
+    "reference": "Solvable nonterminal gold-history states; same states as final reference.",
+    "random": "Mean of per-state fractions, with uniform sampling among all legal candidates.",
+    "map_greedy": "Existing physical demonstration action on each reference state; retains its fixed tie choice.",
+    "map_agreement": "All nonterminal reference states, including already-dead states, matching the report.",
+    "rollout": "Saved complete map-greedy physical episodes; never a claimed planning upper bound.",
+    "random_rollout": "Not available; never extrapolate one-step chance into episode success."
+  }
+}

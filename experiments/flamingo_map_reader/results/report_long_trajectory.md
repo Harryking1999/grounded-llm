@@ -31,6 +31,10 @@ rollout 另报动作可达率，评价模型自身历史下的单步选择，计
 
 ## 2. 自主执行：结果与训练进度
 
+![上一轮非零步 validation 的到达率与到达且最短路率：寻路 500 题、积木 1,000 题。图中排除初始即目标；下表同时保留含零步计数。](figures/rollout_learning_curves.png)
+
+*上一轮非零步 validation 的到达率与到达且最短路率：寻路 500 题、积木 1,000 题。图中排除初始即目标；下表同时保留含零步计数。 [矢量 PDF](figures/rollout_learning_curves.pdf)。*
+
 ### 寻路 final：validation 全部完成
 
 | 范围            |  题数 |            到达率 |       到达且最短路率 |
@@ -82,6 +86,10 @@ rollout 另报动作可达率，评价模型自身历史下的单步选择，计
 补充统计单步最短率，排序指标ndcg统计
 
 ## 3. 参考历史下的动作选择：结果与训练进度
+
+![上一轮 reference 的动作可达率与最短路动作率；只统计作答前可解的非终止决策轮。](figures/reference_learning_curves.png)
+
+*上一轮 reference 的动作可达率与最短路动作率；只统计作答前可解的非终止决策轮。 [矢量 PDF](figures/reference_learning_curves.pdf)。*
 
 ### 寻路
 
@@ -162,6 +170,10 @@ epoch 4→5 的非零步成功增加 62 题，其中非清空增加 59 题、清
 最终 test 包含清空 272、非清空 1,728、初始即目标 200 题，模型结果待收齐。
 
 ## 5. 积木逐轮分析：早期死局与风险累积
+
+![积木 epoch 5：reference 与 rollout 的逐步动作，以及累计到达和首次死局。动作分母随步骤变化，累计图固定 1,000 个非零步任务；两模式后续状态不同，差值不是同状态因果消融。](figures/blocks_final_trajectory_steps.png)
+
+*积木 epoch 5：reference 与 rollout 的逐步动作，以及累计到达和首次死局。动作分母随步骤变化，累计图固定 1,000 个非零步任务；两模式后续状态不同，差值不是同状态因果消融。 [矢量 PDF](figures/blocks_final_trajectory_steps.pdf)。*
 
 **rollout 的错误会改变后续状态，积木移除造成的死局会沿轨迹保留。**reference 由示范历史推进，每轮在参考状态上评价动作。final 首轮动作可达率接近（70.3%／70.1%），之后 rollout 持续损失可解任务。下面按轮次、首次死局、早期保护干预和候选数量展开。
 
@@ -262,6 +274,10 @@ python -m experiments.flamingo_map_reader.src.analyze_rollout_turns \
 
 ## 6. 地图贪心参照：按相同任务范围比较
 
+![寻路 final 逐步动作与累计到达](figures/path_final_trajectory_steps.png)
+
+*寻路 epoch 3，累计图固定 500 个非零步任务。逐步动作只纳入当步仍可解的状态；晚步读数受到完成退出和存活筛选影响。[矢量 PDF](figures/path_final_trajectory_steps.pdf)。*
+
 `greedy_baseline` 使用固定地图与贪心动作选择器。训练题经过贪心成功筛选，训练到达率为 100%；下表报告未经此筛选的留出任务。
 
 | 任务／留出范围               |    题数 |              地图贪心到达 |            到达且最短 |
@@ -278,6 +294,10 @@ python -m experiments.flamingo_map_reader.src.analyze_rollout_turns \
 整体成绩含初始即目标任务，分组比较使用对应的非零步任务。final validation 中，模型／贪心的到达率分别为寻路 79.5%／100.0%、积木 23.3%／71.2%。
 
 ## 7. 地图价值：反序消融与动作一致性
+
+![上一轮地图最优动作选择率。分母为全部非终止参考状态，包含已不可达状态，与动作可达率分母不同。](figures/map_reading_learning_curves.png)
+
+*上一轮地图最优动作选择率。分母为全部非终止参考状态，包含已不可达状态，与动作可达率分母不同。 [矢量 PDF](figures/map_reading_learning_curves.pdf)。*
 
 ### 7.1 地图反序 reference：候选地图信息对动作的作用
 
@@ -424,4 +444,6 @@ map 的非零步任务各 6 套编号，初始即目标各 1 套，最终 test �
 - [目标分层证据](blocks_target_analysis.json)：清空、非清空及棋盘来源分组。
 - [最终诊断验收](final_diagnostic_acceptance.json)：地图反序 reference 配对与前 1–3 步保护的完整核验。
 - [前缀分析](safe_prefix_analysis.json)：早期保护后的任务完成、最短路及目标分层计数。
+- [图表说明](figures/README.md)、[最终逐步证据](final_trajectory_step_analysis.json)和[一步参照](learning_curve_baselines.json)：学习曲线及最终轨迹图的计数、分母与重绘入口。
+- [排序评分诊断](archive/blocks_ranking_diagnostics.md)：同一轮数据的三种排序评分口径，单独归档，不替代动作或闭环指标。
 - 历史记录：[读取接口变体](archive/abandoned_readout_variants.md)、[完整轨迹历史](archive/full_trajectory_history.md)、[swap 归档](archive/swap_training.md)。

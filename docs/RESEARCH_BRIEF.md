@@ -2,7 +2,7 @@
 
 **核心问题：给已有语言能力的模型接入显式状态地图，能否改善动作判断与长程任务完成？**
 
-当前进度见[状态页](PROJECT_STATUS_AND_TODO.md)，实际协议见[实验设计](../experiments/flamingo_map_reader/DESIGN.md)，已有结果见[上一轮报告](../experiments/flamingo_map_reader/results/report_long_trajectory.md)。
+当前进度见[状态页](PROJECT_STATUS_AND_TODO.md)，实际协议见[实验设计](../experiments/flamingo_map_reader/DESIGN.md)，新架构试点见[本轮报告](../experiments/flamingo_map_reader/results/report.md)，原两任务证据见[上一轮报告](../experiments/flamingo_map_reader/results/report_long_trajectory.md)。
 
 ## 问题与假设
 
@@ -15,14 +15,16 @@
 ```text
 环境：当前状态、真实历史、全部合法动作
 地图：current、goal、各候选后继的状态向量
-  ↓ 门控 cross-attention（地址作 K，状态内容作 V）
-冻结 LLM：远近排序 → 动作；到达后停止并总结
+  ↓ 可训练读取接口：寻路地址作 K、状态作 V；积木融合 FFN 后供 K/V 使用
+冻结 LLM：远近排序 → 动作；到达后停止，或未到目标且无合法动作时报告无解
   ↓ 环境执行并更新状态，进入下一轮
 ```
 
 寻路固定一张图，用 Q(current)+V(action) 表示预测后继，检验同图未训练目标。积木使用 1000 张训练初始棋盘和共享冻结编码器 Q；环境给出真实后继，接口读取 Q(T(current, action))，目标可以非空。
 
 两任务分别从头训练读取接口，以完整轨迹做 SFT。地图距离用于生成排序和动作标签，不要求输出数值；积木只输出最近 Top-10 加 current，输入仍保留全部合法候选。这里直接研究关系读取与决策，当前状态和后继由环境提供，尚未检验自主感知、状态维护或模型内部搜索。
+
+当前积木将地图、角色及编号经共享 FFN 融合，再由各层独立投影为 K/V；普通成功轨迹直接监督动作，新增失败轨迹只监督耗尽合法动作后的最后回答。大 batch 试点表现很差，现以同数据、同架构的小 batch 从头对照。该负结果不能单独归因于 batch，也不能将旧分离 K/V 的成绩当作新架构结果。
 
 ## 证据如何对应主张
 
@@ -42,6 +44,6 @@ reference 动作可达率与最短路动作率使用作答前可解的决策轮�
 - 若匹配的无地图条件同样好，应缩小地图增益的主张。
 - 若只在训练构型有效，不支持跨构型泛化；若 reference 好而 rollout 差，应分析自身轨迹上的首次错误及其后果。
 - 地图几何不准、LLM 读取不准与动作表达错误需要分别定位；用状态或目标干预区分机制。
-- 本轮同时调整数据范围、轨迹长度、编号重复和监督格式，不能把进步单独归因于其中一项。
+- 上一轮同时调整数据范围、轨迹长度、编号重复和监督格式；新积木轮次又改变接口和失败监督，不能把新旧差值单独归因于 FFN。当前 batch 对照同时改变每 epoch 更新数与样本损失权重。
 
 后续再考虑学习状态更新、动作转移与多分支规划。旧连续 token、四图、小样本及 swap 结果保留为历史证据，不并入本轮。相关文献见 [Related Work](../RELATED_WORK.md)，任务来源见 [GCML_TASKS.md](GCML_TASKS.md)。

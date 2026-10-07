@@ -169,13 +169,16 @@ class TrajectoryProtocolTest(unittest.TestCase):
             clear_partial_shard(shard)
             self.assertTrue(shard.exists())
 
-    def test_restart_orders_the_newest_checkpoint_first_and_adopts_live_children(self):
-        """A reorder must not cost the run: newest reading first, no second start."""
+    def test_restart_orders_the_newest_checkpoint_first(self):
+        """A restart evaluates newer published weights first on every platform."""
         names = ["checkpoint-0", "checkpoint-128", "checkpoint-8064", "checkpoint-49000", "final"]
         order = sorted((Path(name) for name in names), key=checkpoint_progress, reverse=True)
         self.assertEqual([path.name for path in order],
                          ["final", "checkpoint-49000", "checkpoint-8064", "checkpoint-128", "checkpoint-0"])
 
+    @unittest.skipUnless(Path('/proc/self/cmdline').is_file(), 'Live child adoption requires Linux /proc')
+    def test_restart_adopts_live_children(self):
+        """A Linux queue restart must not launch a second copy of surviving work."""
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             shard = "blocks/checkpoint-128/train_reference_map/00000_00064"

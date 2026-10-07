@@ -1,6 +1,6 @@
 # 项目状态与有序 TODO
 
-更新：2026-10-07。本页记录项目动机、整体进展和研究优先级；当前实验设置见 [DESIGN](../experiments/flamingo_map_reader/DESIGN.md)，已有成绩见[上一轮 report](../experiments/flamingo_map_reader/results/report_long_trajectory.md)。上一轮 [DESIGN](../experiments/flamingo_map_reader/DESIGN_long_trajectory.md) 与 report 在原目录保留。
+更新：2026-10-07。本页记录项目动机、整体进展和研究优先级；当前实验设置见 [DESIGN](../experiments/flamingo_map_reader/DESIGN.md)，大 batch 试点负结果与小 batch 证据状态见[本轮报告](../experiments/flamingo_map_reader/results/report.md)。上一轮[设计](../experiments/flamingo_map_reader/DESIGN_long_trajectory.md)与[报告](../experiments/flamingo_map_reader/results/report_long_trajectory.md)单独保留。
 
 ## 1. 为什么做这个项目
 
@@ -32,7 +32,7 @@ LLM 已有较强的语言理解和推理能力，但在复杂任务中，仍可�
 | 识别语言模型的困难 | 建立寻路、积木基线，观察到状态错误、非法动作、死局与提前停止 | 哪些失败来自状态信息不足，哪些来自信息已有却未被正确使用？ |
 | 建立有用的地图 | 完成图 Q/V 与积木共享编码器实验；积木引入距离与可达性监督，已有跨初始棋盘的地图证据 | 转移拟合、目标关系与行动方向并不等价；地图在何种任务和状态上可靠？ |
 | 让 LLM 读取并行动（当前重点） | 已实现 cross-attention 接口和完整轨迹训练；寻路闭环表现明显改善，积木参考状态下的动作选择改善，但自主连续执行仍弱 | 模型是否实际依赖地图？地图误差、读取误差与自身轨迹上的错误分别贡献多少？ |
-| 验证方法优势与泛化 | 已有同图新目标、积木新任务及新初始棋盘评测；匹配地图对照尚待收齐 | 相对无地图训练、文字状态接口及更强模型，收益是否成立？能够迁移到哪些新条件？ |
+| 验证方法优势与泛化 | 已有留出任务评测，上一轮地图倒序与早期安全前缀干预已完成；no_map 已停止 | 相对无地图训练、文字状态接口及更强模型，收益是否成立？能够迁移到哪些新条件？ |
 
 上一轮寻路与积木已完成既定训练，积木 final 权重已发布，已有评测结果见上一轮报告。本次积木按会议决议重新训练与评测，设置见下节。寻路目前只训练一张地图；积木新棋盘上的表现也要区分地图训练与接口训练的曝光范围。已有进展不能直接扩展为跨图、跨动作集合或跨任务泛化。
 
@@ -41,33 +41,31 @@ LLM 已有较强的语言理解和推理能力，但在复杂任务中，仍可�
 ## 4. 有序 TODO
 
 **当前运行：积木融合 FFN＋失败上下文，每卡 batch 1、四卡全局 batch 4，从头训练。**
-2026-10-07 用户已停止全局 batch 64 的训练和评测，仅修改 batch，保持新架构、数据及其余训练设置。
+按用户说明，小 batch 实验正在运行；本机同步以压缩包快照为依据，未查询远端实时进度。
+2026-10-07 已停止全局 batch 64 的训练和评测，仅修改 batch，保持新架构、数据及其余训练设置。
 正式合同为 [blocks_ffn_failure_batch4.json](../experiments/flamingo_map_reader/configs/blocks_ffn_failure_batch4.json)，
-完整协议见 [DESIGN](../experiments/flamingo_map_reader/DESIGN.md)，启动与恢复见 [实验 README](../experiments/flamingo_map_reader/README.md#积木会议决策重训)。
+完整协议见 [DESIGN](../experiments/flamingo_map_reader/DESIGN.md)，启动与恢复见 [实验 README](../experiments/flamingo_map_reader/README.md#积木融合-ffn-重训)。
 当前运行标识为 `blocks_ffn_failure_batch4_75cc4fd`，配置来源提交 `75cc4fd`，运行源码复用 `8330937` 的持久快照。
-新旧初始 adapter 已逐 tensor 核对一致；训练记录、编号、标签与准备数据完全复用。
+导入记录称新旧初始 adapter 已逐 tensor 核对一致；训练记录、编号、标签与准备数据完全复用。
 
-训练集包括 10,000 条物理轨迹、55,000 条编号增强样本，三类混合采样比例为 48:1:6。
 保留融合 FFN；失败历史只监督最后“未到目标且无合法动作”的 none/done 回答，不监督中途不可达判断。
-当前每 epoch 13,750 次更新，10 epochs 共 137,500 steps；每 0.1 epoch（1,375 steps）保存完整断点，
-另一节点每 0.5 epoch 评测 510 题主测试的 reference／rollout，优先最新节点后补旧节点。
-训练结束后自动评测 final 的主测试和独立 100 条无解诊断。评测未全量时必须标明样本量与来源。
+另一节点按半 epoch 评测主测试的 reference／rollout，优先最新节点后补旧节点；训练结束后自动评测 final 的主测试和独立无解诊断。
+本机包内没有小 batch 的评测成绩，不能据此判断改善。数据规模、保存周期与预算以配置及设计为准，部分结果必须标明样本量与来源。
 
-新运行已启动，并通过最长样本的四卡反向更新检查；已有 Trainer 保存恢复与完整断点／分片恢复测试再次通过。
+导入记录称新运行已启动，并通过最长样本的四卡反向更新检查与恢复测试。
 `--resume` 仅接回同一运行的完整训练状态及各卡 RNG，未保存部分重算；改 batch 已另开新运行，不直接续旧断点。
 保存与评测进度以运行目录为准，本页不固化实时 step 或 ETA。
 
 **历史对照：**[全局 batch 64 配置](../experiments/flamingo_map_reader/configs/blocks_ffn_failure.json)
-对应已停止的 `blocks_ffn_failure_8330937`；其 3 epoch 全量 rollout 到达且正确结束为 5/510，旧权重与结果保留。
+对应已停止的 `blocks_ffn_failure_8330937`；导入快照中 3 epoch 全量 rollout 到达且正确结束为 5/510（1.0%），见[本轮报告](../experiments/flamingo_map_reader/results/report.md)。
 当前小 batch 每 epoch 约增加 16 倍更新，同时改变 batch 内 token 平均造成的样本权重，不能只归因于步数。
 更早的分离 K/V 单卡实验全局 batch 为 1、每 epoch 49,000 次更新；其成绩也不能当作当前实验的同条件对照。
 
-**上一轮遗留诊断：**2026-10-06 曾安排停止 no_map，先做候选 Q 距离倒序，再做积木前 1、2、3 步安全前缀干预；
-这是上一轮权重的诊断合同，本次仅启动上述小 batch 训练及评测，不因此重启这些任务。
-合同与解释边界见 [上一轮 DESIGN 第 8 节](../experiments/flamingo_map_reader/DESIGN_long_trajectory.md#8-最终-checkpoint-诊断先-reference-q-倒序再-rollout-早期干预)。
+**上一轮诊断已完成：**候选 Q 距离倒序 reference 与积木前 1、2、3 步安全前缀 rollout 均已完整验收，no_map 已停止。
+这是上一轮权重的证据，不属于新架构成绩；结果、学习曲线及最终轨迹图见[上一轮报告](../experiments/flamingo_map_reader/results/report_long_trajectory.md)。本轮不重启这些任务。
 
 1. **收齐当前小 batch 对照。** 按统一主测试收齐各评测节点，比较全量或同题结果；同时报告 epoch、更新次数与耗时，区分动作、终止和完整解题能力。上一轮未完成的证据单独保留，不混入本轮成绩。
-2. **确认地图是否被实际使用。** 优先完成同题配对的无地图对照、候选重编号和目标变化分析，区分接口学到的任务规律与地图信息带来的收益。
+2. **确认新接口如何使用地图。** 先分析本轮已产生的回答、排序与动作；上一轮倒序干预已支持地图内容依赖，但不证明新接口的净收益。后续无地图、重编号和目标干预需另定范围，不自动恢复已停止的 no_map。
 3. **解释积木的闭环差距。** 对照模型与地图贪心的轨迹，定位首次关键错误及其后果，再决定应改地图、读取接口还是训练数据。
 4. **建立项目层面的比较结论。** 在一致的信息、任务和预算下，补齐无地图任务训练、文字状态接口及更强模型等关键对照，同时考虑准确率与训练、推理成本。
 5. **据结果推进泛化问题。** 先明确现有地图内的泛化边界，再选择更换环境、动作集合或任务的检验；若要回答最初的能力迁移设想，需要单独设计不直接监督目标决策的实验。
@@ -77,7 +75,7 @@ LLM 已有较强的语言理解和推理能力，但在复杂任务中，仍可�
 飞书蓝图还提出三条相互关联的方向：分析 LLM 内部是否已有支持决策的状态关系结构；研究怎样训练兼具状态、转移与目标方向信息的地图；利用语言知识构建更可泛化的认知地图。当前读取实验为这些问题积累依据，后续是否展开以及先做哪条，由结果决定。
 
 - [研究简述](RESEARCH_BRIEF.md)：当前假设、信息条件和证据边界。
-- [当前实验设计](../experiments/flamingo_map_reader/DESIGN.md)：寻路原方案与积木本次重训协议；[上一轮结果报告](../experiments/flamingo_map_reader/results/report_long_trajectory.md)记录原两任务成绩。
+- [当前实验设计](../experiments/flamingo_map_reader/DESIGN.md)与[本轮报告](../experiments/flamingo_map_reader/results/report.md)：新架构协议、大 batch 负结果及小 batch 证据状态；[上一轮报告](../experiments/flamingo_map_reader/results/report_long_trajectory.md)记录原两任务成绩。
 - [实验 README](../experiments/flamingo_map_reader/README.md)：代码、运行和汇总入口；[积木地图说明](BLOCKS_QMAP_PLAN.md)：地图来源。
 - [相关工作](../RELATED_WORK.md)与[任务来源](GCML_TASKS.md)：文献和任务依据。
 

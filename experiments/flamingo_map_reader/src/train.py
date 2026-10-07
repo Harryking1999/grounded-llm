@@ -28,7 +28,7 @@ def build_reader(base, config):
     mode = spec.get("memory_mode", "joint")
     if mode == "joint":
         # Deprecated fallback, reached only by configs that predate addressed memory
-        # or by a config that omits memory_mode. Both current configs set it explicitly.
+        # or by a config that omits memory_mode. Current configs set it explicitly.
         encoder = MapMemoryEncoder
     elif mode == "address_key_state_value":
         encoder = AddressedMapMemoryEncoder

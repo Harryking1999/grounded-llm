@@ -1,8 +1,8 @@
 """Flamingo-style gated cross-attention inserted before frozen decoder layers.
 
 Two knobs here are deprecated and are left at their defaults by both current
-configs (`path_single_long.json`, `blocks1000_long.json`, which select
-`memory_mode="address_key_state_value"`): `value_scale` (state-value scale
+configs (path uses `address_key_state_value`, blocks retraining uses
+`joint_feature_kv`): `value_scale` (state-value scale
 calibration) and `fixed_gate_tanh` (freezing the residual gate). They survive
 only so the archived runs that used them stay reproducible; see
 ../results/archive/abandoned_readout_variants.md.

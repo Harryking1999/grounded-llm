@@ -1,0 +1,936 @@
+{
+  "run": "blocks_ffn_failure_8330937",
+  "source_commit": "8330937",
+  "config": "../configs/blocks_ffn_failure.json",
+  "observed_at": "2026-10-07T08:05:38.242161+00:00",
+  "source": "kyo.zip: kyo/tmp/blocks_metrics_snapshot.json",
+  "scope": "Imported snapshot; no live remote verification or regeneration",
+  "evaluation": {
+    "0.5": {
+      "reference": {
+        "tasks": 510,
+        "groups": {
+          "same_initial_board_new_pair": 255,
+          "new_initial_board": 255
+        },
+        "complete": true,
+        "solvable_decisions": 3148,
+        "safe_actions": 1522,
+        "shortest_actions": 1312,
+        "safe_rate": 0.4834815756035578,
+        "shortest_rate": 0.4167725540025413,
+        "reached": 0,
+        "reached_shortest": 0,
+        "correctly_finished": 0,
+        "negative_turns": 0,
+        "correct_no_solution": 0,
+        "no_solution_recall": null,
+        "failures": {},
+        "premature_done_at_exhaustion": 0,
+        "by_group": {
+          "same_initial_board_new_pair": {
+            "tasks": 255,
+            "groups": {
+              "same_initial_board_new_pair": 255
+            },
+            "solvable_decisions": 1541,
+            "safe_actions": 734,
+            "shortest_actions": 643,
+            "safe_rate": 0.4763140817650876,
+            "shortest_rate": 0.4172615184944841,
+            "reached": 0,
+            "reached_shortest": 0,
+            "correctly_finished": 0,
+            "negative_turns": 0,
+            "correct_no_solution": 0,
+            "no_solution_recall": null,
+            "failures": {},
+            "premature_done_at_exhaustion": 0
+          },
+          "new_initial_board": {
+            "tasks": 255,
+            "groups": {
+              "new_initial_board": 255
+            },
+            "solvable_decisions": 1607,
+            "safe_actions": 788,
+            "shortest_actions": 669,
+            "safe_rate": 0.4903546981953951,
+            "shortest_rate": 0.4163036714374611,
+            "reached": 0,
+            "reached_shortest": 0,
+            "correctly_finished": 0,
+            "negative_turns": 0,
+            "correct_no_solution": 0,
+            "no_solution_recall": null,
+            "failures": {},
+            "premature_done_at_exhaustion": 0
+          }
+        }
+      },
+      "rollout": {
+        "tasks": 510,
+        "groups": {
+          "same_initial_board_new_pair": 255,
+          "new_initial_board": 255
+        },
+        "complete": true,
+        "solvable_decisions": 961,
+        "safe_actions": 453,
+        "shortest_actions": 366,
+        "safe_rate": 0.4713839750260146,
+        "shortest_rate": 0.3808532778355879,
+        "reached": 2,
+        "reached_shortest": 2,
+        "correctly_finished": 0,
+        "negative_turns": 408,
+        "correct_no_solution": 280,
+        "no_solution_recall": 0.6862745098039216,
+        "failures": {
+          "premature_done": 226,
+          "correct_no_solution_after_error": 280,
+          "format_error": 2,
+          "false_no_solution": 1,
+          "failed_to_stop": 1
+        },
+        "premature_done_at_exhaustion": 126,
+        "by_group": {
+          "same_initial_board_new_pair": {
+            "tasks": 255,
+            "groups": {
+              "same_initial_board_new_pair": 255
+            },
+            "solvable_decisions": 472,
+            "safe_actions": 217,
+            "shortest_actions": 177,
+            "safe_rate": 0.4597457627118644,
+            "shortest_rate": 0.375,
+            "reached": 0,
+            "reached_shortest": 0,
+            "correctly_finished": 0,
+            "negative_turns": 195,
+            "correct_no_solution": 136,
+            "no_solution_recall": 0.6974358974358974,
+            "failures": {
+              "premature_done": 119,
+              "correct_no_solution_after_error": 136
+            },
+            "premature_done_at_exhaustion": 59
+          },
+          "new_initial_board": {
+            "tasks": 255,
+            "groups": {
+              "new_initial_board": 255
+            },
+            "solvable_decisions": 489,
+            "safe_actions": 236,
+            "shortest_actions": 189,
+            "safe_rate": 0.48261758691206547,
+            "shortest_rate": 0.38650306748466257,
+            "reached": 2,
+            "reached_shortest": 2,
+            "correctly_finished": 0,
+            "negative_turns": 213,
+            "correct_no_solution": 144,
+            "no_solution_recall": 0.676056338028169,
+            "failures": {
+              "correct_no_solution_after_error": 144,
+              "premature_done": 107,
+              "format_error": 2,
+              "false_no_solution": 1,
+              "failed_to_stop": 1
+            },
+            "premature_done_at_exhaustion": 67
+          }
+        }
+      }
+    },
+    "1.0": {
+      "reference": {
+        "tasks": 510,
+        "groups": {
+          "same_initial_board_new_pair": 255,
+          "new_initial_board": 255
+        },
+        "complete": true,
+        "solvable_decisions": 3148,
+        "safe_actions": 1625,
+        "shortest_actions": 1405,
+        "safe_rate": 0.5162007623888183,
+        "shortest_rate": 0.4463151207115629,
+        "reached": 0,
+        "reached_shortest": 0,
+        "correctly_finished": 0,
+        "negative_turns": 0,
+        "correct_no_solution": 0,
+        "no_solution_recall": null,
+        "failures": {},
+        "premature_done_at_exhaustion": 0,
+        "by_group": {
+          "same_initial_board_new_pair": {
+            "tasks": 255,
+            "groups": {
+              "same_initial_board_new_pair": 255
+            },
+            "solvable_decisions": 1541,
+            "safe_actions": 795,
+            "shortest_actions": 696,
+            "safe_rate": 0.5158987670343933,
+            "shortest_rate": 0.4516547696301103,
+            "reached": 0,
+            "reached_shortest": 0,
+            "correctly_finished": 0,
+            "negative_turns": 0,
+            "correct_no_solution": 0,
+            "no_solution_recall": null,
+            "failures": {},
+            "premature_done_at_exhaustion": 0
+          },
+          "new_initial_board": {
+            "tasks": 255,
+            "groups": {
+              "new_initial_board": 255
+            },
+            "solvable_decisions": 1607,
+            "safe_actions": 830,
+            "shortest_actions": 709,
+            "safe_rate": 0.5164903546981954,
+            "shortest_rate": 0.44119477286869946,
+            "reached": 0,
+            "reached_shortest": 0,
+            "correctly_finished": 0,
+            "negative_turns": 0,
+            "correct_no_solution": 0,
+            "no_solution_recall": null,
+            "failures": {},
+            "premature_done_at_exhaustion": 0
+          }
+        }
+      },
+      "rollout": {
+        "tasks": 510,
+        "groups": {
+          "same_initial_board_new_pair": 255,
+          "new_initial_board": 255
+        },
+        "complete": true,
+        "solvable_decisions": 966,
+        "safe_actions": 456,
+        "shortest_actions": 369,
+        "safe_rate": 0.4720496894409938,
+        "shortest_rate": 0.38198757763975155,
+        "reached": 0,
+        "reached_shortest": 0,
+        "correctly_finished": 0,
+        "negative_turns": 467,
+        "correct_no_solution": 53,
+        "no_solution_recall": 0.11349036402569593,
+        "failures": {
+          "premature_done": 457,
+          "correct_no_solution_after_error": 53
+        },
+        "premature_done_at_exhaustion": 414,
+        "by_group": {
+          "same_initial_board_new_pair": {
+            "tasks": 255,
+            "groups": {
+              "same_initial_board_new_pair": 255
+            },
+            "solvable_decisions": 476,
+            "safe_actions": 221,
+            "shortest_actions": 183,
+            "safe_rate": 0.4642857142857143,
+            "shortest_rate": 0.38445378151260506,
+            "reached": 0,
+            "reached_shortest": 0,
+            "correctly_finished": 0,
+            "negative_turns": 238,
+            "correct_no_solution": 28,
+            "no_solution_recall": 0.11764705882352941,
+            "failures": {
+              "premature_done": 227,
+              "correct_no_solution_after_error": 28
+            },
+            "premature_done_at_exhaustion": 210
+          },
+          "new_initial_board": {
+            "tasks": 255,
+            "groups": {
+              "new_initial_board": 255
+            },
+            "solvable_decisions": 490,
+            "safe_actions": 235,
+            "shortest_actions": 186,
+            "safe_rate": 0.47959183673469385,
+            "shortest_rate": 0.3795918367346939,
+            "reached": 0,
+            "reached_shortest": 0,
+            "correctly_finished": 0,
+            "negative_turns": 229,
+            "correct_no_solution": 25,
+            "no_solution_recall": 0.1091703056768559,
+            "failures": {
+              "premature_done": 230,
+              "correct_no_solution_after_error": 25
+            },
+            "premature_done_at_exhaustion": 204
+          }
+        }
+      }
+    },
+    "1.5": {
+      "reference": {
+        "tasks": 510,
+        "groups": {
+          "same_initial_board_new_pair": 255,
+          "new_initial_board": 255
+        },
+        "complete": true,
+        "solvable_decisions": 3148,
+        "safe_actions": 1766,
+        "shortest_actions": 1509,
+        "safe_rate": 0.5609911054637865,
+        "shortest_rate": 0.47935196950444725,
+        "reached": 0,
+        "reached_shortest": 0,
+        "correctly_finished": 0,
+        "negative_turns": 0,
+        "correct_no_solution": 0,
+        "no_solution_recall": null,
+        "failures": {},
+        "premature_done_at_exhaustion": 0,
+        "by_group": {
+          "same_initial_board_new_pair": {
+            "tasks": 255,
+            "groups": {
+              "same_initial_board_new_pair": 255
+            },
+            "solvable_decisions": 1541,
+            "safe_actions": 842,
+            "shortest_actions": 727,
+            "safe_rate": 0.5463984425697599,
+            "shortest_rate": 0.4717715768981181,
+            "reached": 0,
+            "reached_shortest": 0,
+            "correctly_finished": 0,
+            "negative_turns": 0,
+            "correct_no_solution": 0,
+            "no_solution_recall": null,
+            "failures": {},
+            "premature_done_at_exhaustion": 0
+          },
+          "new_initial_board": {
+            "tasks": 255,
+            "groups": {
+              "new_initial_board": 255
+            },
+            "solvable_decisions": 1607,
+            "safe_actions": 924,
+            "shortest_actions": 782,
+            "safe_rate": 0.5749844430616055,
+            "shortest_rate": 0.4866210329807094,
+            "reached": 0,
+            "reached_shortest": 0,
+            "correctly_finished": 0,
+            "negative_turns": 0,
+            "correct_no_solution": 0,
+            "no_solution_recall": null,
+            "failures": {},
+            "premature_done_at_exhaustion": 0
+          }
+        }
+      },
+      "rollout": {
+        "tasks": 510,
+        "groups": {
+          "same_initial_board_new_pair": 255,
+          "new_initial_board": 255
+        },
+        "complete": true,
+        "solvable_decisions": 1004,
+        "safe_actions": 498,
+        "shortest_actions": 400,
+        "safe_rate": 0.4960159362549801,
+        "shortest_rate": 0.398406374501992,
+        "reached": 3,
+        "reached_shortest": 2,
+        "correctly_finished": 3,
+        "negative_turns": 506,
+        "correct_no_solution": 64,
+        "no_solution_recall": 0.12648221343873517,
+        "failures": {
+          "premature_done": 442,
+          "correct_no_solution_after_error": 64,
+          "format_error": 1
+        },
+        "premature_done_at_exhaustion": 442,
+        "by_group": {
+          "same_initial_board_new_pair": {
+            "tasks": 255,
+            "groups": {
+              "same_initial_board_new_pair": 255
+            },
+            "solvable_decisions": 494,
+            "safe_actions": 241,
+            "shortest_actions": 196,
+            "safe_rate": 0.48785425101214575,
+            "shortest_rate": 0.3967611336032389,
+            "reached": 1,
+            "reached_shortest": 1,
+            "correctly_finished": 1,
+            "negative_turns": 253,
+            "correct_no_solution": 35,
+            "no_solution_recall": 0.1383399209486166,
+            "failures": {
+              "premature_done": 218,
+              "correct_no_solution_after_error": 35,
+              "format_error": 1
+            },
+            "premature_done_at_exhaustion": 218
+          },
+          "new_initial_board": {
+            "tasks": 255,
+            "groups": {
+              "new_initial_board": 255
+            },
+            "solvable_decisions": 510,
+            "safe_actions": 257,
+            "shortest_actions": 204,
+            "safe_rate": 0.503921568627451,
+            "shortest_rate": 0.4,
+            "reached": 2,
+            "reached_shortest": 1,
+            "correctly_finished": 2,
+            "negative_turns": 253,
+            "correct_no_solution": 29,
+            "no_solution_recall": 0.11462450592885376,
+            "failures": {
+              "premature_done": 224,
+              "correct_no_solution_after_error": 29
+            },
+            "premature_done_at_exhaustion": 224
+          }
+        }
+      }
+    },
+    "2.0": {
+      "reference": {
+        "tasks": 509,
+        "groups": {
+          "same_initial_board_new_pair": 255,
+          "new_initial_board": 254
+        },
+        "complete": false,
+        "solvable_decisions": 3139,
+        "safe_actions": 1872,
+        "shortest_actions": 1617,
+        "safe_rate": 0.5963682701497293,
+        "shortest_rate": 0.5151322077094617,
+        "reached": 0,
+        "reached_shortest": 0,
+        "correctly_finished": 0,
+        "negative_turns": 0,
+        "correct_no_solution": 0,
+        "no_solution_recall": null,
+        "failures": {},
+        "premature_done_at_exhaustion": 0,
+        "by_group": {
+          "same_initial_board_new_pair": {
+            "tasks": 255,
+            "groups": {
+              "same_initial_board_new_pair": 255
+            },
+            "solvable_decisions": 1541,
+            "safe_actions": 902,
+            "shortest_actions": 793,
+            "safe_rate": 0.5853341985723556,
+            "shortest_rate": 0.5146009085009734,
+            "reached": 0,
+            "reached_shortest": 0,
+            "correctly_finished": 0,
+            "negative_turns": 0,
+            "correct_no_solution": 0,
+            "no_solution_recall": null,
+            "failures": {},
+            "premature_done_at_exhaustion": 0
+          },
+          "new_initial_board": {
+            "tasks": 254,
+            "groups": {
+              "new_initial_board": 254
+            },
+            "solvable_decisions": 1598,
+            "safe_actions": 970,
+            "shortest_actions": 824,
+            "safe_rate": 0.6070087609511889,
+            "shortest_rate": 0.5156445556946183,
+            "reached": 0,
+            "reached_shortest": 0,
+            "correctly_finished": 0,
+            "negative_turns": 0,
+            "correct_no_solution": 0,
+            "no_solution_recall": null,
+            "failures": {},
+            "premature_done_at_exhaustion": 0
+          }
+        }
+      },
+      "rollout": {
+        "tasks": 480,
+        "groups": {
+          "same_initial_board_new_pair": 255,
+          "new_initial_board": 225
+        },
+        "complete": false,
+        "solvable_decisions": 948,
+        "safe_actions": 470,
+        "shortest_actions": 377,
+        "safe_rate": 0.4957805907172996,
+        "shortest_rate": 0.39767932489451474,
+        "reached": 2,
+        "reached_shortest": 1,
+        "correctly_finished": 2,
+        "negative_turns": 455,
+        "correct_no_solution": 5,
+        "no_solution_recall": 0.01098901098901099,
+        "failures": {
+          "premature_done": 473,
+          "correct_no_solution_after_error": 5
+        },
+        "premature_done_at_exhaustion": 450,
+        "by_group": {
+          "same_initial_board_new_pair": {
+            "tasks": 255,
+            "groups": {
+              "same_initial_board_new_pair": 255
+            },
+            "solvable_decisions": 504,
+            "safe_actions": 250,
+            "shortest_actions": 201,
+            "safe_rate": 0.49603174603174605,
+            "shortest_rate": 0.39880952380952384,
+            "reached": 1,
+            "reached_shortest": 0,
+            "correctly_finished": 1,
+            "negative_turns": 239,
+            "correct_no_solution": 2,
+            "no_solution_recall": 0.008368200836820083,
+            "failures": {
+              "premature_done": 252,
+              "correct_no_solution_after_error": 2
+            },
+            "premature_done_at_exhaustion": 237
+          },
+          "new_initial_board": {
+            "tasks": 225,
+            "groups": {
+              "new_initial_board": 225
+            },
+            "solvable_decisions": 444,
+            "safe_actions": 220,
+            "shortest_actions": 176,
+            "safe_rate": 0.4954954954954955,
+            "shortest_rate": 0.3963963963963964,
+            "reached": 1,
+            "reached_shortest": 1,
+            "correctly_finished": 1,
+            "negative_turns": 216,
+            "correct_no_solution": 3,
+            "no_solution_recall": 0.013888888888888888,
+            "failures": {
+              "premature_done": 221,
+              "correct_no_solution_after_error": 3
+            },
+            "premature_done_at_exhaustion": 213
+          }
+        }
+      }
+    },
+    "2.5": {
+      "reference": {
+        "tasks": 384,
+        "groups": {
+          "same_initial_board_new_pair": 255,
+          "new_initial_board": 129
+        },
+        "complete": false,
+        "solvable_decisions": 2407,
+        "safe_actions": 1491,
+        "shortest_actions": 1327,
+        "safe_rate": 0.6194432904029913,
+        "shortest_rate": 0.5513086830078936,
+        "reached": 0,
+        "reached_shortest": 0,
+        "correctly_finished": 0,
+        "negative_turns": 0,
+        "correct_no_solution": 0,
+        "no_solution_recall": null,
+        "failures": {},
+        "premature_done_at_exhaustion": 0,
+        "by_group": {
+          "same_initial_board_new_pair": {
+            "tasks": 255,
+            "groups": {
+              "same_initial_board_new_pair": 255
+            },
+            "solvable_decisions": 1541,
+            "safe_actions": 932,
+            "shortest_actions": 831,
+            "safe_rate": 0.6048020765736535,
+            "shortest_rate": 0.5392602206359507,
+            "reached": 0,
+            "reached_shortest": 0,
+            "correctly_finished": 0,
+            "negative_turns": 0,
+            "correct_no_solution": 0,
+            "no_solution_recall": null,
+            "failures": {},
+            "premature_done_at_exhaustion": 0
+          },
+          "new_initial_board": {
+            "tasks": 129,
+            "groups": {
+              "new_initial_board": 129
+            },
+            "solvable_decisions": 866,
+            "safe_actions": 559,
+            "shortest_actions": 496,
+            "safe_rate": 0.6454965357967667,
+            "shortest_rate": 0.5727482678983834,
+            "reached": 0,
+            "reached_shortest": 0,
+            "correctly_finished": 0,
+            "negative_turns": 0,
+            "correct_no_solution": 0,
+            "no_solution_recall": null,
+            "failures": {},
+            "premature_done_at_exhaustion": 0
+          }
+        }
+      },
+      "rollout": {
+        "tasks": 256,
+        "groups": {
+          "same_initial_board_new_pair": 255,
+          "new_initial_board": 1
+        },
+        "complete": false,
+        "solvable_decisions": 556,
+        "safe_actions": 304,
+        "shortest_actions": 257,
+        "safe_rate": 0.5467625899280576,
+        "shortest_rate": 0.46223021582733814,
+        "reached": 4,
+        "reached_shortest": 1,
+        "correctly_finished": 4,
+        "negative_turns": 251,
+        "correct_no_solution": 10,
+        "no_solution_recall": 0.0398406374501992,
+        "failures": {
+          "premature_done": 242,
+          "correct_no_solution_after_error": 10
+        },
+        "premature_done_at_exhaustion": 241,
+        "by_group": {
+          "same_initial_board_new_pair": {
+            "tasks": 255,
+            "groups": {
+              "same_initial_board_new_pair": 255
+            },
+            "solvable_decisions": 555,
+            "safe_actions": 304,
+            "shortest_actions": 257,
+            "safe_rate": 0.5477477477477477,
+            "shortest_rate": 0.46306306306306305,
+            "reached": 4,
+            "reached_shortest": 1,
+            "correctly_finished": 4,
+            "negative_turns": 250,
+            "correct_no_solution": 9,
+            "no_solution_recall": 0.036,
+            "failures": {
+              "premature_done": 242,
+              "correct_no_solution_after_error": 9
+            },
+            "premature_done_at_exhaustion": 241
+          },
+          "new_initial_board": {
+            "tasks": 1,
+            "groups": {
+              "new_initial_board": 1
+            },
+            "solvable_decisions": 1,
+            "safe_actions": 0,
+            "shortest_actions": 0,
+            "safe_rate": 0.0,
+            "shortest_rate": 0.0,
+            "reached": 0,
+            "reached_shortest": 0,
+            "correctly_finished": 0,
+            "negative_turns": 1,
+            "correct_no_solution": 1,
+            "no_solution_recall": 1.0,
+            "failures": {
+              "correct_no_solution_after_error": 1
+            },
+            "premature_done_at_exhaustion": 0
+          }
+        }
+      }
+    },
+    "3.0": {
+      "reference": {
+        "tasks": 510,
+        "groups": {
+          "same_initial_board_new_pair": 255,
+          "new_initial_board": 255
+        },
+        "complete": true,
+        "solvable_decisions": 3148,
+        "safe_actions": 1920,
+        "shortest_actions": 1709,
+        "safe_rate": 0.6099110546378653,
+        "shortest_rate": 0.5428843710292249,
+        "reached": 0,
+        "reached_shortest": 0,
+        "correctly_finished": 0,
+        "negative_turns": 0,
+        "correct_no_solution": 0,
+        "no_solution_recall": null,
+        "failures": {},
+        "premature_done_at_exhaustion": 0,
+        "by_group": {
+          "same_initial_board_new_pair": {
+            "tasks": 255,
+            "groups": {
+              "same_initial_board_new_pair": 255
+            },
+            "solvable_decisions": 1541,
+            "safe_actions": 931,
+            "shortest_actions": 844,
+            "safe_rate": 0.6041531473069436,
+            "shortest_rate": 0.5476963011031798,
+            "reached": 0,
+            "reached_shortest": 0,
+            "correctly_finished": 0,
+            "negative_turns": 0,
+            "correct_no_solution": 0,
+            "no_solution_recall": null,
+            "failures": {},
+            "premature_done_at_exhaustion": 0
+          },
+          "new_initial_board": {
+            "tasks": 255,
+            "groups": {
+              "new_initial_board": 255
+            },
+            "solvable_decisions": 1607,
+            "safe_actions": 989,
+            "shortest_actions": 865,
+            "safe_rate": 0.6154324828873677,
+            "shortest_rate": 0.5382700684505289,
+            "reached": 0,
+            "reached_shortest": 0,
+            "correctly_finished": 0,
+            "negative_turns": 0,
+            "correct_no_solution": 0,
+            "no_solution_recall": null,
+            "failures": {},
+            "premature_done_at_exhaustion": 0
+          }
+        }
+      },
+      "rollout": {
+        "tasks": 510,
+        "groups": {
+          "same_initial_board_new_pair": 255,
+          "new_initial_board": 255
+        },
+        "complete": true,
+        "solvable_decisions": 1060,
+        "safe_actions": 555,
+        "shortest_actions": 451,
+        "safe_rate": 0.5235849056603774,
+        "shortest_rate": 0.42547169811320756,
+        "reached": 5,
+        "reached_shortest": 2,
+        "correctly_finished": 5,
+        "negative_turns": 501,
+        "correct_no_solution": 0,
+        "no_solution_recall": 0.0,
+        "failures": {
+          "premature_done": 505
+        },
+        "premature_done_at_exhaustion": 501,
+        "by_group": {
+          "same_initial_board_new_pair": {
+            "tasks": 255,
+            "groups": {
+              "same_initial_board_new_pair": 255
+            },
+            "solvable_decisions": 548,
+            "safe_actions": 296,
+            "shortest_actions": 246,
+            "safe_rate": 0.5401459854014599,
+            "shortest_rate": 0.4489051094890511,
+            "reached": 3,
+            "reached_shortest": 2,
+            "correctly_finished": 3,
+            "negative_turns": 252,
+            "correct_no_solution": 0,
+            "no_solution_recall": 0.0,
+            "failures": {
+              "premature_done": 252
+            },
+            "premature_done_at_exhaustion": 252
+          },
+          "new_initial_board": {
+            "tasks": 255,
+            "groups": {
+              "new_initial_board": 255
+            },
+            "solvable_decisions": 512,
+            "safe_actions": 259,
+            "shortest_actions": 205,
+            "safe_rate": 0.505859375,
+            "shortest_rate": 0.400390625,
+            "reached": 2,
+            "reached_shortest": 0,
+            "correctly_finished": 2,
+            "negative_turns": 249,
+            "correct_no_solution": 0,
+            "no_solution_recall": 0.0,
+            "failures": {
+              "premature_done": 253
+            },
+            "premature_done_at_exhaustion": 249
+          }
+        }
+      }
+    },
+    "3.5": {
+      "reference": {
+        "tasks": 148,
+        "groups": {
+          "same_initial_board_new_pair": 148
+        },
+        "complete": false,
+        "solvable_decisions": 940,
+        "safe_actions": 592,
+        "shortest_actions": 540,
+        "safe_rate": 0.6297872340425532,
+        "shortest_rate": 0.574468085106383,
+        "reached": 0,
+        "reached_shortest": 0,
+        "correctly_finished": 0,
+        "negative_turns": 0,
+        "correct_no_solution": 0,
+        "no_solution_recall": null,
+        "failures": {},
+        "premature_done_at_exhaustion": 0,
+        "by_group": {
+          "same_initial_board_new_pair": {
+            "tasks": 148,
+            "groups": {
+              "same_initial_board_new_pair": 148
+            },
+            "solvable_decisions": 940,
+            "safe_actions": 592,
+            "shortest_actions": 540,
+            "safe_rate": 0.6297872340425532,
+            "shortest_rate": 0.574468085106383,
+            "reached": 0,
+            "reached_shortest": 0,
+            "correctly_finished": 0,
+            "negative_turns": 0,
+            "correct_no_solution": 0,
+            "no_solution_recall": null,
+            "failures": {},
+            "premature_done_at_exhaustion": 0
+          },
+          "new_initial_board": {
+            "tasks": 0,
+            "groups": {},
+            "solvable_decisions": 0,
+            "safe_actions": 0,
+            "shortest_actions": 0,
+            "safe_rate": null,
+            "shortest_rate": null,
+            "reached": 0,
+            "reached_shortest": 0,
+            "correctly_finished": 0,
+            "negative_turns": 0,
+            "correct_no_solution": 0,
+            "no_solution_recall": null,
+            "failures": {},
+            "premature_done_at_exhaustion": 0
+          }
+        }
+      },
+      "rollout": {
+        "tasks": 145,
+        "groups": {
+          "same_initial_board_new_pair": 145
+        },
+        "complete": false,
+        "solvable_decisions": 343,
+        "safe_actions": 199,
+        "shortest_actions": 170,
+        "safe_rate": 0.5801749271137027,
+        "shortest_rate": 0.4956268221574344,
+        "reached": 1,
+        "reached_shortest": 1,
+        "correctly_finished": 1,
+        "negative_turns": 142,
+        "correct_no_solution": 9,
+        "no_solution_recall": 0.06338028169014084,
+        "failures": {
+          "premature_done": 135,
+          "correct_no_solution_after_error": 9
+        },
+        "premature_done_at_exhaustion": 133,
+        "by_group": {
+          "same_initial_board_new_pair": {
+            "tasks": 145,
+            "groups": {
+              "same_initial_board_new_pair": 145
+            },
+            "solvable_decisions": 343,
+            "safe_actions": 199,
+            "shortest_actions": 170,
+            "safe_rate": 0.5801749271137027,
+            "shortest_rate": 0.4956268221574344,
+            "reached": 1,
+            "reached_shortest": 1,
+            "correctly_finished": 1,
+            "negative_turns": 142,
+            "correct_no_solution": 9,
+            "no_solution_recall": 0.06338028169014084,
+            "failures": {
+              "premature_done": 135,
+              "correct_no_solution_after_error": 9
+            },
+            "premature_done_at_exhaustion": 133
+          },
+          "new_initial_board": {
+            "tasks": 0,
+            "groups": {},
+            "solvable_decisions": 0,
+            "safe_actions": 0,
+            "shortest_actions": 0,
+            "safe_rate": null,
+            "shortest_rate": null,
+            "reached": 0,
+            "reached_shortest": 0,
+            "correctly_finished": 0,
+            "negative_turns": 0,
+            "correct_no_solution": 0,
+            "no_solution_recall": null,
+            "failures": {},
+            "premature_done_at_exhaustion": 0
+          }
+        }
+      }
+    }
+  }
+}

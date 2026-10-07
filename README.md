@@ -5,7 +5,7 @@
 ## 阅读入口
 
 1. [训练与评测设计](experiments/flamingo_map_reader/DESIGN.md)：数据、文本、监督与指标。
-2. [上一轮结果报告](experiments/flamingo_map_reader/results/report_long_trajectory.md)：原寻路与积木的 reference、rollout 及地图使用证据。
+2. [本轮结果](experiments/flamingo_map_reader/results/report.md)：大 batch 负结果与小 batch 证据状态；[上一轮报告](experiments/flamingo_map_reader/results/report_long_trajectory.md)保留原两任务成绩与地图使用证据。
 3. [当前状态与 TODO](docs/PROJECT_STATUS_AND_TODO.md)：唯一进度页及运行定位。
 4. [研究简述](docs/RESEARCH_BRIEF.md)：问题、主张与证据边界。
 

@@ -5,12 +5,13 @@
 ## 阅读顺序
 
 1. [DESIGN.md](DESIGN.md)：数据、输入文本、监督、训练和评测口径。
+   [本轮结果](results/report.md)：大 batch 试点负结果与小 batch 证据状态。
 2. [上一轮 DESIGN](DESIGN_long_trajectory.md) 与[上一轮 report](results/report_long_trajectory.md)：原两任务的协议、成绩和辅助诊断，均在原目录保留。
 3. [项目状态与 TODO](../../docs/PROJECT_STATUS_AND_TODO.md)：唯一当前进度页。
 
 当前正式配置为 [path_single_long.json](configs/path_single_long.json) 和 [blocks_ffn_failure_batch4.json](configs/blocks_ffn_failure_batch4.json)；全局 batch 64 对照保留在 [blocks_ffn_failure.json](configs/blocks_ffn_failure.json)，上一轮积木配置为 [blocks1000_long.json](configs/blocks1000_long.json)。[上一轮结果摘要](results/long_trajectory_summary.json)保存其分片来源、计数和数据统计；模型、原始回答及运行日志留在 Git 外。
 
-## 积木会议决策重训
+## 积木融合 FFN 重训
 
 新一轮积木合同见 [blocks_ffn_failure_batch4.json](configs/blocks_ffn_failure_batch4.json)，入口为
 [retrain_blocks.py](src/retrain_blocks.py)。冻结原语言模型和地图，从头初始化读取接口；
@@ -63,6 +64,7 @@ python -m experiments.flamingo_map_reader.src.retrain_blocks \
 当前每 1,375 steps（0.1 epoch）保存，10 epochs 共 137,500 steps。
 中断后，以同一配置、模型路径和输出目录调用上述命令并加 `--resume`；
 入口复用现有队列的断点选择及评测分片重试，底层仍调用 `train.py --resume CHECKPOINT`。
+final 流程保留已完成分片，清除未完成分片后整片重做；半 epoch 队列则先归档未完成分片，再整片重做。
 只选择已发布且包含 adapter、optimizer、scheduler、trainer state 和全部进程 RNG 状态的断点；
 初始权重与未写完的目录不作为续训断点，无完整断点时明确报错。
 Trainer 恢复已完成步数、epoch 与数据顺序，继续原有总预算，不额外增加训练轮数。
@@ -88,11 +90,13 @@ python -m experiments.flamingo_map_reader.src.trajectory_eval \
 |---|---|
 | 物理任务、划分与示范 | [prepare_trajectories.py](src/prepare_trajectories.py)、[sft.py](src/sft.py)、[blocks_sft.py](src/blocks_sft.py) |
 | 文本与逐轮地图绑定 | [prompt.py](src/prompt.py)、[blocks_prompt.py](src/blocks_prompt.py)、[transcript.py](src/transcript.py) |
-| K/V 分离与门控读取 | [memory.py](src/memory.py)、[fusion.py](src/fusion.py) |
+| 分离／融合地图特征与门控读取 | [memory.py](src/memory.py)、[fusion.py](src/fusion.py) |
 | 编号增强、缓存与训练 | [trajectory_protocol.py](src/trajectory_protocol.py)、[trajectory_dataset.py](src/trajectory_dataset.py)、[train.py](src/train.py) |
 | 自由生成与评分 | [trajectory_eval.py](src/trajectory_eval.py)、[trajectory_metrics.py](src/trajectory_metrics.py) |
-| 训练／评测调度 | [trajectory_queue.py](src/trajectory_queue.py) |
+| 训练／评测调度 | 当前积木 [retrain_blocks.py](src/retrain_blocks.py)、[blocks_checkpoint_queue.py](src/blocks_checkpoint_queue.py)；上一轮 [trajectory_queue.py](src/trajectory_queue.py) |
 | 结果汇总与旧字段回填 | [collect_evidence.py](src/collect_evidence.py)、[backfill_reachability.py](src/backfill_reachability.py) |
+| 学习曲线、最终逐步图与参照 | [plot_learning_curves.py](src/plot_learning_curves.py)、[collect_trajectory_steps.py](src/collect_trajectory_steps.py)、[collect_plot_baselines.py](src/collect_plot_baselines.py)；[图表与复现说明](results/figures/README.md) |
+| 旧轮排序评分与动作诊断 | [analyze_blocks_ranking.py](src/analyze_blocks_ranking.py)、[diagnose_blocks_ranking.py](src/diagnose_blocks_ranking.py)；[口径与归档结果](results/archive/blocks_ranking_diagnostics.md) |
 
 积木地图来自 `tree_1000_132f5a1/best.pt`，源码来源为 `132f5a1`，依赖 [blocks_distance_map](../blocks_distance_map/README.md) 的编码器、棋盘读取与裁判。寻路复用 [external_map_interface](../external_map_interface/README.md) 的图环境和 Q/V。
 
@@ -105,10 +109,17 @@ python -m experiments.flamingo_map_reader.src.trajectory_eval \
 
 **当前积木：**训练节点运行 `retrain_blocks`；另一节点另行启动半 epoch 评测队列，读取同一共享目录中
 已发布的 checkpoint，两卡 rollout、两卡 reference，优先最新节点后补旧节点。该队列不由训练入口自动拉起；
-运行源码快照中的 `blocks_half_epoch_eval_queue.py` 和 `evaluation_half_epoch/launch.json` 保留调用，
+本机统一入口为 [blocks_checkpoint_queue.py](src/blocks_checkpoint_queue.py)，原运行快照仍保留旧文件名 `blocks_half_epoch_eval_queue.py`；`evaluation_half_epoch/launch.json` 保留原调用，
 `contract.json` 记录分片合同，`status.json` 记录排队状态。首次评测在 0.5 epoch（step 6,875）发布后启动。
 中间队列只评主测试，独立无解诊断由 final 流程执行。重启跳过完整分片，保留未完成输出后整片重做，
 汇总排除 `.interrupted.*` 目录；同一 final 权重若被两条流程评测，也不能算作独立重复。详见 [DESIGN 第 7 节](DESIGN.md#7-评测设置与指标口径)。
+
+需要在评测节点单独启动时，从仓库根目录调用以下模块；本次本机同步不启动远端进程：
+
+```bash
+python -m experiments.flamingo_map_reader.src.blocks_checkpoint_queue \
+  --run "$RUN_DIR" --model-path "$MODEL_PATH" --gpus 0,1,2,3
+```
 
 **上一轮两任务队列：**以下 `--delegate-prefix`、`--evaluation-only` 参数属于 `trajectory_queue`，不适用于当前 `retrain_blocks` 入口。
 

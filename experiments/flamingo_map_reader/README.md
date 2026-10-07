@@ -8,16 +8,22 @@
 2. [上一轮 DESIGN](DESIGN_long_trajectory.md) 与[上一轮 report](results/report_long_trajectory.md)：原两任务的协议、成绩和辅助诊断，均在原目录保留。
 3. [项目状态与 TODO](../../docs/PROJECT_STATUS_AND_TODO.md)：唯一当前进度页。
 
-当前正式配置为 [path_single_long.json](configs/path_single_long.json) 和 [blocks_ffn_failure.json](configs/blocks_ffn_failure.json)；上一轮积木配置为 [blocks1000_long.json](configs/blocks1000_long.json)。[上一轮结果摘要](results/long_trajectory_summary.json)保存其分片来源、计数和数据统计；模型、原始回答及运行日志留在 Git 外。
+当前正式配置为 [path_single_long.json](configs/path_single_long.json) 和 [blocks_ffn_failure_batch4.json](configs/blocks_ffn_failure_batch4.json)；全局 batch 64 对照保留在 [blocks_ffn_failure.json](configs/blocks_ffn_failure.json)，上一轮积木配置为 [blocks1000_long.json](configs/blocks1000_long.json)。[上一轮结果摘要](results/long_trajectory_summary.json)保存其分片来源、计数和数据统计；模型、原始回答及运行日志留在 Git 外。
 
 ## 积木会议决策重训
 
-新一轮积木合同见 [blocks_ffn_failure.json](configs/blocks_ffn_failure.json)，入口为
+新一轮积木合同见 [blocks_ffn_failure_batch4.json](configs/blocks_ffn_failure_batch4.json)，入口为
 [retrain_blocks.py](src/retrain_blocks.py)。冻结原语言模型和地图，从头初始化读取接口；
 用户最终选择融合版：128 维地图状态与 32 维角色、32 维编号 embedding 拼接，
 经单个共享 FFN（192→1024→GELU→256）输出融合特征，再供各读取层独立的 K/V 投影使用。
 K 和 V 均携带地图与角色信息；FFN 在所有槽位和读取层间共享。语言 Query 仍来自当前层文本隐状态。
 这是本项目的地图特征提取器，并非对 Flamingo 原论文全部结构的复现。
+
+2026-10-07 用户停止全局 batch 64 的运行，要求仅改为每卡 batch 1、四卡全局 batch 4，
+从相同随机种子重新训练。复用同一份准备数据、编号和标签，架构及其余训练设置不变；
+每 0.1 epoch 保存完整断点，另在评测节点按 0.5 epoch 间隔评测。不同 batch 使用独立输出目录，
+不直接续接另一 batch 的 optimizer 或数据位置。此对照同时改变更新频率与 batch 内 token 平均产生的样本权重，
+不能仅凭它把效果变化归因于更新次数。
 
 保留原 9000 条成功训练轨迹，另加 1000 条地图贪心失败轨迹。旧数据清单没有失败训练样本，
 原采样器记录剔除了 3282 条贪心失败样本但未保存具体轨迹，因此在训练棋盘上重新生成。
@@ -47,7 +53,7 @@ No solution: no legal moves remain and the goal has not been reached.
 
 ```bash
 python -m experiments.flamingo_map_reader.src.retrain_blocks \
-  --config experiments/flamingo_map_reader/configs/blocks_ffn_failure.json \
+  --config experiments/flamingo_map_reader/configs/blocks_ffn_failure_batch4.json \
   --source-manifest "$SOURCE_MANIFEST" --model-path "$MODEL_PATH" --out "$RUN_DIR"
 ```
 

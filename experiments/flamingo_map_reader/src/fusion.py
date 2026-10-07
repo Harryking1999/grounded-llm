@@ -174,6 +174,7 @@ class MapReader(nn.Module):
         value_scale: float = 1.0,
         checkpoint_layers: bool = False,
         loss_chunk_tokens: int = 0,
+        sequence_mean_loss: bool = False,
     ) -> None:
         super().__init__()
         if every_n_layers <= 0:
@@ -184,6 +185,9 @@ class MapReader(nn.Module):
         self.base_model = base_model
         self.memory_encoder = memory_encoder
         self.loss_chunk_tokens = loss_chunk_tokens
+        if sequence_mean_loss and loss_chunk_tokens <= 0:
+            raise ValueError("Sequence-mean loss requires chunked supervised-token CE")
+        self.sequence_mean_loss = sequence_mean_loss
         addressed = isinstance(memory_encoder, (AddressedMapMemoryEncoder, JointFeatureMapMemoryEncoder))
         self.decoder_path = decoder_path
         parent = base_model
@@ -254,12 +258,23 @@ class MapReader(nn.Module):
                 targets = labels[selected]
                 if not len(targets):
                     raise ValueError("Batch has no supervised next-token targets")
-                def token_loss(features, target):
+                weights = None
+                if self.sequence_mean_loss:
+                    counts = selected.sum(dim=1)
+                    if bool((counts == 0).any()):
+                        raise ValueError("Sequence-mean loss requires supervision in every example")
+                    weights = (1 / (len(counts) * counts.float()))[:, None].expand_as(labels)[selected]
+                def token_loss(features, target, weight):
+                    if weight is not None:
+                        return (F.cross_entropy(self.base_model.lm_head(features).float(), target,
+                                                reduction="none") * weight).sum()
                     return F.cross_entropy(self.base_model.lm_head(features).float(), target, reduction="sum")
-                losses = [checkpoint(token_loss, features, target, use_reentrant=False)
-                          for features, target in zip(hidden.split(self.loss_chunk_tokens),
-                                                     targets.split(self.loss_chunk_tokens))]
-                return CausalLMOutputWithPast(loss=torch.stack(losses).sum() / len(targets))
+                chunks = hidden.split(self.loss_chunk_tokens)
+                weight_chunks = weights.split(self.loss_chunk_tokens) if weights is not None else [None] * len(chunks)
+                losses = [checkpoint(token_loss, features, target, weight, use_reentrant=False)
+                          for features, target, weight in zip(chunks, targets.split(self.loss_chunk_tokens), weight_chunks)]
+                loss = torch.stack(losses).sum()
+                return CausalLMOutputWithPast(loss=loss if self.sequence_mean_loss else loss / len(targets))
             return self.base_model(**model_inputs)
 
     def generate(self, map_batch: MapBatch | MapTimeline, **generation_inputs):

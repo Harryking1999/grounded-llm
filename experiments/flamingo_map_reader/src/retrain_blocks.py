@@ -24,11 +24,19 @@ def main():
                         help='Reuse identical prepared data after interface, batch or checkpoint changes')
     parser.add_argument('--resume', action='store_true',
                         help='Continue the existing output from its newest complete checkpoint')
+    parser.add_argument('--resume-topology', type=Path,
+                        help='Explicit equivalent-global-batch migration contract; requires --resume')
+    parser.add_argument('--training-only', action='store_true',
+                        help='Leave final evaluation to the separate checkpoint queue')
     args = parser.parse_args()
     if args.out.exists() and not args.resume:
         raise FileExistsError(args.out)
     if args.resume and not (args.out/'data/manifest.json').is_file():
         raise ValueError('Resume requires an existing prepared manifest in the same output')
+    if args.resume_topology and not args.resume:
+        raise ValueError('Topology migration requires --resume')
+    if args.resume_topology and not args.training_only:
+        raise ValueError('Two-GPU continuation needs --training-only and a separate final evaluation queue')
     args.out.mkdir(parents=True, exist_ok=args.resume)
     with FileLock(str(args.out/'.pipeline.lock'), timeout=0):
         run(args)
@@ -41,6 +49,12 @@ def run(args):
     config = json.loads(args.config.read_text())
     if config['task'] != 'blocks' or config['training']['world_size'] != 4:
         raise ValueError('This run requires blocks and four GPUs')
+    topology = None
+    if args.resume_topology:
+        from .train import validate_resume_topology
+        topology = json.loads(args.resume_topology.read_text())
+        validate_resume_topology(config, topology, topology['world_size'], topology['per_device_batch_size'])
+    world_size = topology['world_size'] if topology else config['training']['world_size']
     state = dict(status='running', phase='prepare', run=str(args.out.resolve()))
 
     def status(**updates):
@@ -64,7 +78,7 @@ def run(args):
 
     def distributed(name):
         return [sys.executable, '-m', 'torch.distributed.run', '--standalone',
-                '--nproc_per_node=4', '-m', module+name]
+                f'--nproc_per_node={world_size}', '-m', module+name]
 
     try:
         status()
@@ -101,11 +115,11 @@ def run(args):
         training_done = (final/'evaluation_ready.json').is_file() and (final/'adapter.pt').is_file()
         resume = None
         if args.resume and not training_done:
-            resume = resume_point(args.out/'training/models', config['training']['world_size'])
+            resume = resume_point(args.out/'training/models', world_size)
             if resume is None:
                 raise ValueError('No complete training checkpoint exists; refusing to restart silently')
             saved = json.loads((args.out/'training/config.json').read_text())
-            batch = saved['batch_size']
+            batch = topology['per_device_batch_size'] if topology else saved['batch_size']
         for candidate in (() if args.resume else config['training']['batch_size_candidates_per_device']):
             name = f'probe_batch_{candidate}'
             try:
@@ -122,12 +136,17 @@ def run(args):
         if batch is None and not training_done:
             raise RuntimeError('No requested batch fits; all probes failed with OOM')
         if not training_done:
-            status(phase='training', per_device_batch=batch, global_batch=4*batch,
+            status(phase='training', per_device_batch=batch, global_batch=world_size*batch,
+                   world_size=world_size, resume_topology=topology,
                    resume_checkpoint=str(resume) if resume else None)
             execute('training', distributed('train') + ['--config', str(args.config),
                 '--manifest', str(manifest_path), '--model-path', str(args.model_path),
                 '--q-checkpoint', manifest['q_checkpoint'], '--batch-size', str(batch),
-                '--out', str(args.out/'training')] + (['--resume', str(resume)] if resume else []))
+                '--out', str(args.out/'training')] + (['--resume', str(resume)] if resume else []) +
+                (['--resume-topology', str(args.resume_topology)] if topology else []))
+        if args.training_only:
+            status(status='training_completed', phase='final_evaluation_on_separate_queue')
+            return
         checkpoint = args.out/'training/models/final/adapter.pt'
         status(phase='evaluation', checkpoint=str(checkpoint))
         jobs = []

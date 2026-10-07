@@ -76,7 +76,15 @@ python -m experiments.flamingo_map_reader.src.blocks_checkpoint_queue \
 只选择已发布且包含 adapter、optimizer、scheduler、trainer state 和全部进程 RNG 状态的断点；
 初始权重与未写完的目录不作为续训断点，无完整断点时明确报错。
 Trainer 恢复已完成步数、epoch 与数据顺序，继续原有总预算，不额外增加训练轮数。
-必须沿用同一运行的 batch 和设备拓扑；未保存的更新从最近完整断点重算。不同 batch 的运行不直接互相续训。
+默认必须沿用同一运行的 batch 和设备拓扑；未保存的更新从最近完整断点重算。不同 batch 的运行不直接互相续训。
+
+本轮四卡各 1 条轨迹可按 [两卡迁移合同](configs/blocks_batch4_two_gpu_resume.json) 接续为两卡各 2 条。
+在上述恢复命令上增加 `--resume-topology experiments/flamingo_map_reader/configs/blocks_batch4_two_gpu_resume.json --training-only`。
+迁移后先对每条轨迹的监督 token 求平均，再对本卡两条轨迹等权平均；DDP 再平均两卡梯度，保留原四条轨迹的等权目标。
+optimizer、学习率、每 epoch 更新数与总预算继续原断点；数据分组和跳过位置保持一致。
+每个存活 rank 恢复自己的 CPU／Python／NumPy 与当前 CUDA 设备 RNG，不修改旧断点。
+批量 padding 和 bf16 求和顺序改变，不能承诺逐位相同。
+`--training-only` 将 final 主测试和独立无解测试交给另一节点的新版 `blocks_checkpoint_queue`，避免在两卡节点启动四卡评测。
 
 训练结束后复用 `trajectory_eval.py` 完成主测试 reference、主测试 rollout 和失败上下文 reference，
 由四个 GPU 分片执行，再用同一 `aggregate` 汇总；完成的评测分片在恢复时直接复用。

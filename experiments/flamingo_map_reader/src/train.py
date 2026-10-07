@@ -5,9 +5,11 @@ from dataclasses import replace
 import json
 import math
 import os
+import random
 from pathlib import Path
 
 import torch
+import numpy as np
 from torch.nn import functional as F
 from torch.utils.data import Dataset
 from transformers import Trainer, TrainerCallback, TrainingArguments, set_seed
@@ -23,7 +25,7 @@ from .readout_aux import CounterfactualFirstTurnDataset
 from .transcript import encode_trajectory
 
 
-def build_reader(base, config):
+def build_reader(base, config, *, sequence_mean_loss=False):
     spec = config["map"]
     mode = spec.get("memory_mode", "joint")
     if mode == "joint":
@@ -47,7 +49,8 @@ def build_reader(base, config):
                       fixed_gate_tanh=spec.get("fixed_gate_tanh"),
                       value_scale=spec.get("value_scale", 1.0),
                       checkpoint_layers=config["training"].get("checkpoint_layers", False),
-                      loss_chunk_tokens=config["training"].get("loss_chunk_tokens", 0))
+                      loss_chunk_tokens=config["training"].get("loss_chunk_tokens", 0),
+                      sequence_mean_loss=sequence_mean_loss)
 
 
 def to_device(timeline, device):
@@ -231,20 +234,56 @@ class MapSFTTrainer(Trainer):
             raise ValueError("Checkpoint and current SFT contracts differ")
         (model or self.model).load_adapter_state_dict(saved["adapter"])
 
+    def _load_rng_state(self, checkpoint):
+        if not self.contract.get("resume_topology") or checkpoint is None:
+            return super()._load_rng_state(checkpoint)
+        # A four-device RNG list cannot be installed wholesale on a two-device node.
+        # Each process restores its own saved rank and only its active CUDA device.
+        from transformers.trainer_pt_utils import safe_globals
+        path = Path(checkpoint) / f"rng_state_{self.args.process_index}.pth"
+        with safe_globals():
+            saved = torch.load(path, map_location="cpu", weights_only=True)
+        random.setstate(saved["python"])
+        np.random.set_state(saved["numpy"])
+        torch.random.set_rng_state(saved["cpu"])
+        if torch.cuda.is_available():
+            torch.cuda.random.set_rng_state(saved["cuda"][self.args.local_process_index], self.args.device)
+
+
+def validate_resume_topology(config, topology, world_size, batch_size):
+    """Explicitly allow the observed 4x1 -> 2x2 move without changing sample weights."""
+    expected = dict(source_world_size=4, source_per_device_batch_size=1, world_size=2,
+                    per_device_batch_size=2, loss_reduction="sequence_token_mean")
+    training = config["training"]
+    if (topology != expected or world_size != topology["world_size"] or
+            batch_size != topology["per_device_batch_size"] or training.get("world_size") != 4 or
+            training.get("batch_size_candidates_per_device") != [1] or
+            training.get("batch_size_candidates_global") != [4] or
+            training.get("decision_focus_weight", 1) != 1 or not training.get("loss_chunk_tokens")):
+        raise ValueError("Topology migration only supports this run's equivalent 4x1 -> 2x2 objective")
+    return topology
+
 
 def pinned_supervision(contract):
     """Contract with the training budget left out.
 
     A checkpoint has to agree on what its adapter was trained on -- map source,
     model, data, batch and supervision settings -- but not on how long training
-    was meant to run. Extending a budget is an expected move: the convergence
+    was meant to run. The explicit 4x1 -> 2x2 migration normalizes only its
+    equivalent per-sequence objective; other contracts retain their batch check.
+    Extending a budget is an expected move: the convergence
     path takes max_total_steps from outside the contract for that same reason,
     and an extension has to resume the checkpoint the shorter budget produced.
     """
     config = json.loads(json.dumps(contract["config"]))
     for key in ("epochs", "max_steps"):
         config["training"].pop(key, None)
-    return {**contract, "config": config}
+    normalized = {**contract, "config": config}
+    topology = normalized.pop("resume_topology", None)
+    if topology:
+        validate_resume_topology(config, topology, topology["world_size"], contract["batch_size"])
+        normalized["batch_size"] = topology["source_per_device_batch_size"]
+    return normalized
 
 
 def full_checkpoint(path, world_size=1):
@@ -302,6 +341,8 @@ def main():
                         help="Local copy of the model named in the contract")
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--resume", type=Path)
+    parser.add_argument("--resume-topology", type=Path,
+                        help="Explicit 4x1 to 2x2 continuation with equal per-sequence losses")
     parser.add_argument("--convergence-contract", type=Path,
                         help="Use fixed-set plateau checks; source_step=0 permits a fresh run")
     parser.add_argument("--batch-size", type=int, required=True,
@@ -313,6 +354,12 @@ def main():
         torch.cuda.set_device(int(os.environ["LOCAL_RANK"]))
         torch.distributed.init_process_group("nccl")
     config = json.loads(args.config.read_text(encoding="utf-8"))
+    topology = None
+    if args.resume_topology:
+        if args.resume is None:
+            raise ValueError("Topology migration requires a full continuation checkpoint")
+        topology = validate_resume_topology(config, json.loads(args.resume_topology.read_text()),
+                                            world_size, args.batch_size)
     manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
     if manifest["config"] != config:
         raise ValueError("Manifest and training configurations differ")
@@ -338,6 +385,8 @@ def main():
                 "map_source": str((args.q_checkpoint if task == "blocks" else args.source_root).resolve()),
                 "model_source": str(args.model_path.resolve()) if args.model_path else config["model"],
                 "batch_size": args.batch_size}
+    if topology:
+        contract["resume_topology"] = topology
     training = config["training"]
     convergence = None
     if args.convergence_contract:
@@ -362,7 +411,7 @@ def main():
     base = AutoModelForCausalLM.from_pretrained(model_source,
         torch_dtype=torch.bfloat16 if torch.cuda.is_available() else torch.float32)
     base.config.use_cache = False
-    reader = build_reader(base, config)
+    reader = build_reader(base, config, sequence_mean_loss=topology is not None)
     qmap = FrozenBoardMap.load(args.q_checkpoint) if task == "blocks" else None
     supervision_mode = training.get("supervision_mode", "trajectory")
     if supervision_mode == "trajectory":

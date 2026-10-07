@@ -16,6 +16,46 @@ from test_graph import line_graph
 
 
 class TrainerTest(unittest.TestCase):
+    def test_two_pairs_match_four_equal_weight_sequences_with_unequal_supervision(self):
+        from experiments.flamingo_map_reader.src.train import collate_examples
+        environment, qmap = line_graph()
+        step = graph_step(environment, qmap, 1, 2, executed_path=[1])
+        examples = [(EncodedTrajectory([2, 3, *range(4, 4+n)],
+                     [-100, -100, *range(4, 4+n)], [0]*(n+2), n), [step])
+                    for n in (1, 6, 2, 4)]
+
+        def make(sequence_mean):
+            set_seed(7)
+            base = Qwen2ForCausalLM(Qwen2Config(vocab_size=32, hidden_size=32,
+                intermediate_size=64, num_hidden_layers=2, num_attention_heads=2,
+                num_key_value_heads=1, max_position_embeddings=32, pad_token_id=0))
+            base.config.use_cache = False
+            reader = MapReader(base, JointFeatureMapMemoryEncoder(2, 32, 2, 8, 4, 16),
+                2, head_dim=8, checkpoint_layers=True, loss_chunk_tokens=2,
+                sequence_mean_loss=sequence_mean)
+            for layer in reader.conditioned_layers:
+                layer.map_attention.gate.data.fill_(0.3)
+            return reader.train()
+
+        individual, pairs = make(False), make(True)
+        old_losses, new_losses = [], []
+        for example in examples:
+            maps, inputs = collate_examples([example], 0)
+            loss = individual(map_batch=maps, **inputs).loss
+            (loss / 4).backward()
+            old_losses.append(loss.detach())
+        for batch in (examples[:2], examples[2:]):
+            maps, inputs = collate_examples(batch, 0)
+            loss = pairs(map_batch=maps, **inputs).loss
+            (loss / 2).backward()
+            new_losses.append(loss.detach())
+        torch.testing.assert_close(torch.stack(old_losses).mean(), torch.stack(new_losses).mean(),
+                                   atol=1e-6, rtol=1e-6)
+        for (name, left), (_, right) in zip(individual.named_parameters(), pairs.named_parameters()):
+            if left.requires_grad:
+                torch.testing.assert_close(left.grad, right.grad, atol=1e-6, rtol=1e-5, msg=name)
+        self.assertGreater(pairs.memory_encoder.feature_ffn[0].weight.grad.norm().item(), 0)
+
     def test_checkpointed_chunked_loss_preserves_joint_reader_loss_and_gradients(self):
         environment, qmap = line_graph()
         step = graph_step(environment, qmap, 1, 2, executed_path=[1])

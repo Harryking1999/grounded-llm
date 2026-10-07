@@ -10,6 +10,45 @@ from experiments.flamingo_map_reader.src import retrain_blocks
 
 
 class RetrainResumeTest(unittest.TestCase):
+    def test_two_gpu_continuation_reuses_newest_two_rank_checkpoint_and_leaves_evaluation_separate(self):
+        configs = Path(__file__).resolve().parents[1]/'configs'
+        config = json.loads((configs/'blocks_ffn_failure_batch4.json').read_text())
+        topology = configs/'blocks_batch4_two_gpu_resume.json'
+        with tempfile.TemporaryDirectory() as directory:
+            run = Path(directory)/'run'
+            config_path = Path(directory)/'config.json'
+            config_path.write_text(json.dumps(config))
+            (run/'data').mkdir(parents=True)
+            (run/'data/manifest.json').write_text(json.dumps(dict(config=config, audit={}, q_checkpoint='map.pt',
+                records=[dict(split='test'), dict(split='test_no_solution')])))
+            models = run/'training/models'
+            models.mkdir(parents=True)
+            (run/'training/config.json').write_text(json.dumps(dict(batch_size=2)))
+            for number, ranks in ((86, 4), (172, 2)):
+                checkpoint = models/f'checkpoint-{number}'
+                checkpoint.mkdir()
+                for filename in ('adapter.pt', 'optimizer.pt', 'scheduler.pt', 'trainer_state.json',
+                                 'evaluation_ready.json', *(f'rng_state_{i}.pth' for i in range(ranks))):
+                    (checkpoint/filename).touch()
+            commands = []
+            class Process:
+                def __init__(self, command, **kwargs):
+                    commands.append(command)
+                def wait(self):
+                    return 0
+            argv = ['retrain_blocks', '--config', str(config_path), '--source-manifest', 'unused',
+                '--model-path', 'model', '--out', str(run), '--resume', '--resume-topology', str(topology),
+                '--training-only']
+            with mock.patch('sys.argv', argv), mock.patch.object(retrain_blocks.subprocess, 'Popen', Process):
+                retrain_blocks.main()
+            self.assertEqual(len(commands), 1)
+            command = commands[0]
+            self.assertIn('--nproc_per_node=2', command)
+            self.assertEqual(command[command.index('--batch-size')+1], '2')
+            self.assertEqual(command[command.index('--resume')+1], str(models/'checkpoint-172'))
+            self.assertEqual(command[command.index('--resume-topology')+1], str(topology))
+            self.assertEqual(json.loads((run/'status.json').read_text())['status'], 'training_completed')
+
     def test_resume_passes_complete_checkpoint_and_retries_only_incomplete_shards(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

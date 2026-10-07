@@ -6,11 +6,18 @@ import tempfile
 import unittest
 
 from experiments.flamingo_map_reader.src.blocks_checkpoint_queue import (
-    checkpoints, gpu_modes, validate_resume_contract,
+    checkpoints, gpu_modes, validate_resume_contract, evaluation_modes,
 )
 
 
 class CheckpointSelectionTest(unittest.TestCase):
+    def test_independent_no_solution_tasks_are_only_scheduled_at_final(self):
+        manifest = dict(records=[dict(split='test')]*510 + [dict(split='test_no_solution')]*100)
+        ordinary = evaluation_modes(dict(path=Path('checkpoint-6875')), manifest)
+        final = evaluation_modes(dict(path=Path('final')), manifest)
+        self.assertEqual(ordinary, [('test', 'rollout', 510), ('test', 'reference', 510)])
+        self.assertEqual(final, [*ordinary, ('test_no_solution', 'reference', 100)])
+
     def publish(self, root, name, step, epoch, adapter=True):
         directory = root / name
         directory.mkdir()

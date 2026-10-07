@@ -39,6 +39,14 @@ def gpu_modes(gpus):
     return dict(zip(gpus, ['rollout', 'rollout', *(['reference'] * (len(gpus) - 2))]))
 
 
+def evaluation_modes(checkpoint, manifest):
+    modes = [('test', 'rollout'), ('test', 'reference')]
+    if checkpoint['path'].name == 'final':
+        modes.append(('test_no_solution', 'reference'))
+    return [(split, mode, sum(r['split'] == split for r in manifest['records']))
+            for split, mode in modes]
+
+
 def validate_resume_contract(previous, current):
     # Moving to a smaller node changes scheduling, not the evaluated experiment.
     def experiment(contract):
@@ -107,30 +115,30 @@ def main():
             jobs = []
             completed = 0
             for checkpoint in published:
-                for mode in contract['modes']:
-                    for start in range(0, count, contract['shard_tasks']):
-                        stop = min(start + contract['shard_tasks'], count)
-                        key = f"step-{checkpoint['step']}/test_{mode}/{start:05d}_{stop:05d}"
+                for split, mode, tasks in evaluation_modes(checkpoint, manifest):
+                    for start in range(0, tasks, contract['shard_tasks']):
+                        stop = min(start + contract['shard_tasks'], tasks)
+                        key = f"step-{checkpoint['step']}/{split}_{mode}/{start:05d}_{stop:05d}"
                         output = root / key
                         if (output / 'summary.json').is_file():
                             completed += 1
                         elif not any(value['key'] == key for value in busy.values()):
-                            jobs.append((checkpoint, mode, start, stop, key, output))
+                            jobs.append((checkpoint, split, mode, start, stop, key, output))
             for gpu in contract['gpus']:
                 if gpu in busy or not jobs:
                     continue
                 assignment = next((i for i, job in enumerate(jobs)
-                                   if job[1] == contract['gpu_modes'][gpu]), None)
+                                   if job[2] == contract['gpu_modes'][gpu]), None)
                 if assignment is None:
                     continue
-                checkpoint, mode, start, stop, key, output = jobs.pop(assignment)
+                checkpoint, split, mode, start, stop, key, output = jobs.pop(assignment)
                 if output.exists():
                     stamp = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')
                     output.rename(output.with_name(output.name + '.interrupted.' + stamp))
                 command = [sys.executable, '-m', 'experiments.flamingo_map_reader.src.trajectory_eval',
                            '--manifest', str(manifest_path), '--adapter-checkpoint',
                            str(checkpoint['path'] / 'adapter.pt'), '--model-path', str(args.model_path),
-                           '--out', str(output), '--split', 'test', '--mode', mode,
+                           '--out', str(output), '--split', split, '--mode', mode,
                            '--variants', '1', '--start', str(start), '--stop', str(stop)]
                 log_path = logs / (key.replace('/', '_') + '.log')
                 handle = log_path.open('a')
@@ -140,19 +148,19 @@ def main():
                 busy[gpu] = dict(process=process, log=handle, output=output, key=key)
             # Use the same aggregate as the official evaluator for full checkpoint results.
             for checkpoint in published:
-                for mode in contract['modes']:
-                    directory = root / f"step-{checkpoint['step']}" / f'test_{mode}'
-                    summaries = [directory / f'{start:05d}_{min(start + 64, count):05d}' / 'summary.json'
-                                 for start in range(0, count, 64)]
+                for split, mode, tasks in evaluation_modes(checkpoint, manifest):
+                    directory = root / f"step-{checkpoint['step']}" / f'{split}_{mode}'
+                    summaries = [directory / f'{start:05d}_{min(start + 64, tasks):05d}' / 'summary.json'
+                                 for start in range(0, tasks, 64)]
                     if (directory / 'summary.json').is_file() or not all(p.is_file() for p in summaries):
                         continue
                     from experiments.flamingo_map_reader.src.trajectory_eval import aggregate
                     cases = [json.loads(line) for p in summaries
                              for line in (p.parent / 'cases.jsonl').read_text().splitlines()]
-                    if len(cases) != count:
+                    if len(cases) != tasks:
                         raise ValueError(f'Incomplete checkpoint aggregate: {len(cases)}')
                     summary = aggregate(cases, manifest)
-                    summary['contract'] = dict(contract, checkpoint=str(checkpoint['path']),
+                    summary['contract'] = dict(contract, split=split, tasks=tasks, checkpoint=str(checkpoint['path']),
                                                step=checkpoint['step'], epoch=checkpoint['epoch'], mode=mode)
                     atomic_json(directory / 'summary.json', summary)
             final_ready = args.run / 'training/models/final/evaluation_ready.json'

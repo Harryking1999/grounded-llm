@@ -681,5 +681,179 @@
       }
     ],
     "limitation": "Partial main-test cohort. Reference stopping follows control labels; rollout histories and terminal states vary across checkpoints. Fixed failure-history comparison has not been run."
+  },
+  "epoch25_reference_verification": {
+    "observed_at_utc": "2026-10-07T16:39:07.928510+00:00",
+    "method": "Reproduce frozen 139-reference cohort and match exact tasks, states and turn indices across all five checkpoints; no model rerun.",
+    "same_reference_input_fields": true,
+    "matched": {
+      "6875": {
+        "epoch": 0.5,
+        "tasks": 139,
+        "solvable_decisions": 883,
+        "safe": 480,
+        "safe_rate": 0.5436013590033975,
+        "shortest": 418,
+        "shortest_rate": 0.4733861834654587,
+        "correct_protocol_stops": 25,
+        "goal_terminal_turns": 93,
+        "task_mean_safe": 0.5364365650336873,
+        "uniform_legal_action_reachability_floor": 0.496868054152354
+      },
+      "13750": {
+        "epoch": 1.0,
+        "tasks": 139,
+        "solvable_decisions": 883,
+        "safe": 533,
+        "safe_rate": 0.6036240090600227,
+        "shortest": 485,
+        "shortest_rate": 0.549263873159683,
+        "correct_protocol_stops": 54,
+        "goal_terminal_turns": 93,
+        "task_mean_safe": 0.582065775950668,
+        "uniform_legal_action_reachability_floor": 0.496868054152354
+      },
+      "20625": {
+        "epoch": 1.5,
+        "tasks": 139,
+        "solvable_decisions": 883,
+        "safe": 551,
+        "safe_rate": 0.6240090600226501,
+        "shortest": 513,
+        "shortest_rate": 0.580973952434881,
+        "correct_protocol_stops": 81,
+        "goal_terminal_turns": 93,
+        "task_mean_safe": 0.5950354002512276,
+        "uniform_legal_action_reachability_floor": 0.496868054152354
+      },
+      "27500": {
+        "epoch": 2.0,
+        "tasks": 139,
+        "solvable_decisions": 883,
+        "safe": 592,
+        "safe_rate": 0.6704416761041903,
+        "shortest": 542,
+        "shortest_rate": 0.6138165345413363,
+        "correct_protocol_stops": 44,
+        "goal_terminal_turns": 93,
+        "task_mean_safe": 0.6344552929085303,
+        "uniform_legal_action_reachability_floor": 0.496868054152354
+      },
+      "34375": {
+        "epoch": 2.5,
+        "tasks": 139,
+        "solvable_decisions": 883,
+        "safe": 711,
+        "safe_rate": 0.8052095130237825,
+        "shortest": 657,
+        "shortest_rate": 0.7440543601359003,
+        "correct_protocol_stops": 90,
+        "goal_terminal_turns": 93,
+        "task_mean_safe": 0.7556583304784743,
+        "uniform_legal_action_reachability_floor": 0.496868054152354
+      }
+    },
+    "completed_128": {
+      "27500": {
+        "tasks": 128,
+        "solvable_decisions": 820,
+        "safe": 548,
+        "safe_rate": 0.6682926829268293
+      },
+      "34375": {
+        "tasks": 128,
+        "solvable_decisions": 820,
+        "safe": 664,
+        "safe_rate": 0.8097560975609757
+      }
+    },
+    "current_epoch25_rollout": {
+      "tasks": 68,
+      "groups": {
+        "same_initial_board_new_pair": 68
+      },
+      "reached": 1,
+      "success": 1
+    },
+    "cohort_snapshot_at_utc": "2026-10-07T16:27:19.018443+00:00"
+  },
+  "epoch25_rollout_verification": {
+    "cohort_snapshot_at_utc": "2026-10-07T16:41:36.652417+00:00",
+    "verified_at_utc": "2026-10-07T16:43:24.666824+00:00",
+    "method": "Canonical still_solvable filter on already written rollout cases; no model rerun.",
+    "tasks": 78,
+    "groups": {
+      "same_initial_board_new_pair": 78
+    },
+    "shards": [
+      {
+        "shard": "00000_00064",
+        "cases": 39,
+        "completed": false
+      },
+      {
+        "shard": "00064_00128",
+        "cases": 39,
+        "completed": false
+      }
+    ],
+    "checkpoints": {
+      "6875": {
+        "epoch": 0.5,
+        "tasks": 78,
+        "solvable_decisions": 158,
+        "safe_actions": 80,
+        "safe_rate": 0.5063291139240507,
+        "shortest_actions": 68,
+        "shortest_rate": 0.43037974683544306,
+        "reached": 0,
+        "success": 0
+      },
+      "13750": {
+        "epoch": 1.0,
+        "tasks": 78,
+        "solvable_decisions": 191,
+        "safe_actions": 113,
+        "safe_rate": 0.5916230366492147,
+        "shortest_actions": 97,
+        "shortest_rate": 0.5078534031413613,
+        "reached": 0,
+        "success": 0
+      },
+      "20625": {
+        "epoch": 1.5,
+        "tasks": 78,
+        "solvable_decisions": 196,
+        "safe_actions": 120,
+        "safe_rate": 0.6122448979591837,
+        "shortest_actions": 103,
+        "shortest_rate": 0.5255102040816326,
+        "reached": 2,
+        "success": 2
+      },
+      "27500": {
+        "epoch": 2.0,
+        "tasks": 78,
+        "solvable_decisions": 173,
+        "safe_actions": 97,
+        "safe_rate": 0.5606936416184971,
+        "shortest_actions": 82,
+        "shortest_rate": 0.47398843930635837,
+        "reached": 2,
+        "success": 2
+      },
+      "34375": {
+        "epoch": 2.5,
+        "tasks": 78,
+        "solvable_decisions": 178,
+        "safe_actions": 101,
+        "safe_rate": 0.5674157303370787,
+        "shortest_actions": 86,
+        "shortest_rate": 0.48314606741573035,
+        "reached": 1,
+        "success": 1
+      }
+    },
+    "limitation": "Same tasks and variants; rollout states and histories vary. Frozen 00:41 cohort contains only same-board new-goal tasks."
   }
 }

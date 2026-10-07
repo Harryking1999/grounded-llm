@@ -100,6 +100,11 @@ python -m experiments.flamingo_map_reader.src.trajectory_eval \
 运行参数为 `--spec`、`--run`、`--model-path` 和独立的 `--out`，原始输出放在 Git 忽略的 `runs/` 下。
 分层小样本用于比较梯度量级与方向，不按抽样占比推断真实训练中的贡献比例。
 
+新旧架构的门控与残差幅度对比使用 [blocks_gate_injection.json](configs/blocks_gate_injection.json)
+和 [diagnose_gate_injection.py](src/diagnose_gate_injection.py)。两者接收完全相同的缓存轨迹，
+在前向过程中测量门控前输出、门控后预期残差和实际加法后的残差，并保留 bf16 舍入差异。
+参数为 `--spec`、`--old-run`、`--new-run`、`--model-path` 和独立的 `--out`。
+
 | 功能 | 入口 |
 |---|---|
 | 物理任务、划分与示范 | [prepare_trajectories.py](src/prepare_trajectories.py)、[sft.py](src/sft.py)、[blocks_sft.py](src/blocks_sft.py) |

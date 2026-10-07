@@ -417,5 +417,124 @@
       "incorrect_goal_claims_with_actual_goal": 0,
       "context_exhausted": 0
     }
+  },
+  "epoch15_followup": {
+    "cohort_snapshot_at_utc": "2026-10-07T14:24:46.245217+00:00",
+    "method": "Frozen shard prefixes from 22:24 snapshot; read existing outputs only.",
+    "matched_tasks": {
+      "reference": 312,
+      "rollout": 253
+    },
+    "rollout": [
+      {
+        "step": 6875,
+        "epoch": 0.5,
+        "negative_turns": 238,
+        "correct_no_solution": 163,
+        "incorrect_goal_claims": 75,
+        "empty_goal_turns": 20,
+        "empty_goal_correct_no_solution": 11,
+        "nonempty_goal_turns": 218,
+        "nonempty_goal_correct_no_solution": 152,
+        "protocol_semantic_disagreements": 0,
+        "context_exhausted": 0,
+        "mean_missing_goal_cells": 1.9747899159663866,
+        "mean_extra_cells": 3.033613445378151,
+        "mean_terminal_turn": 7.5966386554621845
+      },
+      {
+        "step": 13750,
+        "epoch": 1.0,
+        "negative_turns": 238,
+        "correct_no_solution": 58,
+        "incorrect_goal_claims": 180,
+        "empty_goal_turns": 24,
+        "empty_goal_correct_no_solution": 23,
+        "nonempty_goal_turns": 214,
+        "nonempty_goal_correct_no_solution": 35,
+        "protocol_semantic_disagreements": 0,
+        "context_exhausted": 0,
+        "mean_missing_goal_cells": 2.033613445378151,
+        "mean_extra_cells": 2.5714285714285716,
+        "mean_terminal_turn": 8.168067226890756
+      },
+      {
+        "step": 20625,
+        "epoch": 1.5,
+        "negative_turns": 237,
+        "correct_no_solution": 14,
+        "incorrect_goal_claims": 223,
+        "empty_goal_turns": 22,
+        "empty_goal_correct_no_solution": 11,
+        "nonempty_goal_turns": 215,
+        "nonempty_goal_correct_no_solution": 3,
+        "protocol_semantic_disagreements": 0,
+        "context_exhausted": 0,
+        "mean_missing_goal_cells": 2.0632911392405062,
+        "mean_extra_cells": 2.189873417721519,
+        "mean_terminal_turn": 8.29957805907173
+      }
+    ],
+    "fixed_reference_nonempty_goal_no_legal_moves": [
+      {
+        "step": 6875,
+        "turns": 167,
+        "correct_goal_claims": 46,
+        "incorrect_no_solution_claims": 121
+      },
+      {
+        "step": 13750,
+        "turns": 167,
+        "correct_goal_claims": 92,
+        "incorrect_no_solution_claims": 75
+      },
+      {
+        "step": 20625,
+        "turns": 167,
+        "correct_goal_claims": 165,
+        "incorrect_no_solution_claims": 2
+      }
+    ],
+    "paired_epoch10_epoch15": {
+      "n": 226,
+      "transitions": [
+        {
+          "old": "goal_claim",
+          "new": "goal_claim",
+          "n": 168
+        },
+        {
+          "old": "goal_claim",
+          "new": "no_solution",
+          "n": 2
+        },
+        {
+          "old": "no_solution",
+          "new": "goal_claim",
+          "n": 44
+        },
+        {
+          "old": "no_solution",
+          "new": "no_solution",
+          "n": 12
+        }
+      ],
+      "same_terminal_state": 9,
+      "same_executed_path": 2,
+      "same_prior_text": 0,
+      "by_empty": {
+        "True": {
+          "n": 22,
+          "old_correct": 21,
+          "new_correct": 11
+        },
+        "False": {
+          "n": 204,
+          "old_correct": 35,
+          "new_correct": 3
+        }
+      }
+    },
+    "limitation": "Successful reference and failed rollout have different histories. The output-class shift is observed; a shortcut cue or fixed-input failure regression is not causally established."
   }
 }

@@ -1,6 +1,6 @@
 # 项目状态与有序 TODO
 
-更新：2026-10-07。本页记录项目动机、整体进展和研究优先级；当前实验设置见 [DESIGN](../experiments/flamingo_map_reader/DESIGN.md)，大 batch 试点负结果与小 batch 证据状态见[本轮报告](../experiments/flamingo_map_reader/results/report.md)。上一轮[设计](../experiments/flamingo_map_reader/DESIGN_long_trajectory.md)与[报告](../experiments/flamingo_map_reader/results/report_long_trajectory.md)单独保留。
+更新：2026-10-08。本页记录项目动机、整体进展和研究优先级；当前实验设置见 [DESIGN](../experiments/flamingo_map_reader/DESIGN.md)，大 batch 试点负结果与小 batch 证据状态见[本轮报告](../experiments/flamingo_map_reader/results/report.md)。上一轮[设计](../experiments/flamingo_map_reader/DESIGN_long_trajectory.md)与[报告](../experiments/flamingo_map_reader/results/report_long_trajectory.md)单独保留。
 
 ## 1. 为什么做这个项目
 
@@ -41,7 +41,7 @@ LLM 已有较强的语言理解和推理能力，但在复杂任务中，仍可�
 ## 4. 有序 TODO
 
 **当前运行：积木融合 FFN＋失败上下文，每卡 batch 1、四卡全局 batch 4，从头训练。**
-2026-10-07 已查询远端并在节点重启后从同一运行的完整断点恢复训练；半 epoch 评测已在替换节点恢复四卡并发。
+2026-10-07 已查询远端并在节点重启后从同一运行的完整断点恢复训练；半 epoch 评测于 2026-10-08 再次在替换节点恢复四卡并发。
 2026-10-07 已停止全局 batch 64 的训练和评测，仅修改 batch，保持新架构、数据及其余训练设置。
 正式合同为 [blocks_ffn_failure_batch4.json](../experiments/flamingo_map_reader/configs/blocks_ffn_failure_batch4.json)，
 完整协议见 [DESIGN](../experiments/flamingo_map_reader/DESIGN.md)，启动与恢复见 [实验 README](../experiments/flamingo_map_reader/README.md#积木融合-ffn-重训)。
@@ -54,7 +54,7 @@ LLM 已有较强的语言理解和推理能力，但在复杂任务中，仍可�
 rollout 488/510 题，仅 1 题到达且正确结束。详见[本轮报告](../experiments/flamingo_map_reader/results/report.md)
 及[紧凑计数](../experiments/flamingo_map_reader/results/blocks_batch4_summary.json)。数据规模、保存周期与预算以配置及设计为准，部分结果必须标明样本量与来源。
 0.5 至 2 epoch 的同题终止诊断已补入本轮报告：共同 384 题中，1.5 至 2 epoch 的耗尽失败无解召回从 4.4% 回升至 30.8%，达标后协议正确停止从 85.7% 降至 51.7%，闭环成功为 7/384 与 4/384。终止类别选择呈波动，自身历史仍不同，固定失败输入上的判别对照尚未执行。
-2.5 epoch 的 80.5% reference 可达率已按固定 139 题复核：同题 2 epoch 为 67.0%，已完成的 128 题子集也有同向提升；00:41 的 rollout 可达为 101/178（56.7%），同题 2 epoch 为 56.1%，仅 1/78 完整成功，尚未证明完整解题或新棋盘迁移改善。
+2.5 epoch 的 reference 改善在扩展样本中仍保持：2026-10-08 01:27 的五断点共同 384 题中，可达率由 2 epoch 的 64.7% 升至 80.9%；其中 129 道新棋盘任务由 68.7% 升至 83.4%，均只反映参考轨迹上的单步选择。rollout 共同 256 题中，可达率为 51.1% 与 53.8%，完整成功均为 3/256；2.5 epoch 耗尽失败无解召回为 31/199（15.6%）。闭环样本几乎全部来自同棋盘新目标组，尚未证明完整解题或新棋盘闭环迁移改善。3 epoch 评测已开始，尚无全量断点结果。
 
 导入记录称新运行已启动，并通过最长样本的四卡反向更新检查与恢复测试。
 `--resume` 仅接回同一运行的完整训练状态及各卡 RNG，未保存部分重算；改 batch 已另开新运行，不直接续旧断点。

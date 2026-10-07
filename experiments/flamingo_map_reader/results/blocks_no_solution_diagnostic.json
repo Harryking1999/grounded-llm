@@ -855,5 +855,143 @@
       }
     },
     "limitation": "Same tasks and variants; rollout states and histories vary. Frozen 00:41 cohort contains only same-board new-goal tasks."
+  },
+  "epoch25_expanded_cohort": {
+    "cohort_snapshot_at_utc": "2026-10-07T17:27:34.178451+00:00",
+    "method": "Same trajectory/variant intersection across five checkpoints; canonical trajectory metrics; only currently active shard directories; archived interrupted outputs excluded. Action counts restricted to decisions still solvable before generation.",
+    "reference_tasks": 384,
+    "reference_groups": {
+      "same_initial_board_new_pair": 255,
+      "new_initial_board": 129
+    },
+    "rollout_tasks": 256,
+    "rollout_groups": {
+      "same_initial_board_new_pair": 255,
+      "new_initial_board": 1
+    },
+    "checkpoints": {
+      "step-6875": {
+        "epoch": 0.5,
+        "reference": {
+          "solvable_decisions": 2407,
+          "safe_actions_solvable": 1337,
+          "shortest_actions_solvable": 1136,
+          "terminal_turns": 265,
+          "correct_stops": 70
+        },
+        "rollout": {
+          "solvable_decisions": 491,
+          "safe_actions_solvable": 236,
+          "shortest_actions_solvable": 192,
+          "no_solution_expected": 241,
+          "no_solution_correct": 164
+        },
+        "rollout_reached": 1,
+        "rollout_success": 1,
+        "rollout_shortest_success": 1
+      },
+      "step-13750": {
+        "epoch": 1.0,
+        "reference": {
+          "solvable_decisions": 2407,
+          "safe_actions_solvable": 1445,
+          "shortest_actions_solvable": 1278,
+          "terminal_turns": 265,
+          "correct_stops": 155
+        },
+        "rollout": {
+          "solvable_decisions": 582,
+          "safe_actions_solvable": 328,
+          "shortest_actions_solvable": 281,
+          "no_solution_expected": 241,
+          "no_solution_correct": 60
+        },
+        "rollout_reached": 1,
+        "rollout_success": 1,
+        "rollout_shortest_success": 1
+      },
+      "step-20625": {
+        "epoch": 1.5,
+        "reference": {
+          "solvable_decisions": 2407,
+          "safe_actions_solvable": 1507,
+          "shortest_actions_solvable": 1365,
+          "terminal_turns": 265,
+          "correct_stops": 227
+        },
+        "rollout": {
+          "solvable_decisions": 594,
+          "safe_actions_solvable": 345,
+          "shortest_actions_solvable": 296,
+          "no_solution_expected": 240,
+          "no_solution_correct": 14
+        },
+        "rollout_reached": 4,
+        "rollout_success": 3,
+        "rollout_shortest_success": 1
+      },
+      "step-27500": {
+        "epoch": 2.0,
+        "reference": {
+          "solvable_decisions": 2407,
+          "safe_actions_solvable": 1558,
+          "shortest_actions_solvable": 1405,
+          "terminal_turns": 265,
+          "correct_stops": 137
+        },
+        "rollout": {
+          "solvable_decisions": 517,
+          "safe_actions_solvable": 264,
+          "shortest_actions_solvable": 225,
+          "no_solution_expected": 241,
+          "no_solution_correct": 71
+        },
+        "rollout_reached": 3,
+        "rollout_success": 3,
+        "rollout_shortest_success": 0
+      },
+      "step-34375": {
+        "epoch": 2.5,
+        "reference": {
+          "solvable_decisions": 2407,
+          "safe_actions_solvable": 1947,
+          "shortest_actions_solvable": 1768,
+          "terminal_turns": 265,
+          "correct_stops": 250
+        },
+        "rollout": {
+          "solvable_decisions": 548,
+          "safe_actions_solvable": 295,
+          "shortest_actions_solvable": 250,
+          "no_solution_expected": 199,
+          "no_solution_correct": 31
+        },
+        "rollout_reached": 3,
+        "rollout_success": 3,
+        "rollout_shortest_success": 3
+      }
+    },
+    "reference_group_followup": {
+      "step-27500": {
+        "same_initial_board_new_pair": {
+          "solvable_decisions": 1541,
+          "action_keeps_goal_reachable": 963
+        },
+        "new_initial_board": {
+          "solvable_decisions": 866,
+          "action_keeps_goal_reachable": 595
+        }
+      },
+      "step-34375": {
+        "same_initial_board_new_pair": {
+          "solvable_decisions": 1541,
+          "action_keeps_goal_reachable": 1225
+        },
+        "new_initial_board": {
+          "solvable_decisions": 866,
+          "action_keeps_goal_reachable": 722
+        }
+      }
+    }
   }
 }

@@ -56,8 +56,23 @@ class GatedMapCrossAttention(nn.Module):
         self.to_output = nn.Linear(inner_dim, language_dim, bias=False)
         self.gate = nn.Parameter(torch.zeros(()))
 
+    def project_memory(self, memory: Tensor | AddressedMemory) -> tuple[Tensor, Tensor]:
+        keys = memory.keys if self.addressed else memory
+        values = memory.values if self.addressed else memory
+        if keys.ndim == 4:
+            keys = keys.reshape(keys.shape[0], -1, keys.shape[-1])
+            values = values.reshape(values.shape[0], -1, values.shape[-1])
+        if self.addressed:
+            key = self.to_key(self.key_norm(keys))
+            value = self.to_value(values) * self.value_scale
+        else:
+            key, value = self.to_key_value(self.memory_norm(keys)).chunk(2, dim=-1)
+        shape = (keys.shape[0], keys.shape[1], self.heads, self.head_dim)
+        return key.reshape(shape).transpose(1, 2), value.reshape(shape).transpose(1, 2)
+
     def forward(self, hidden: Tensor, memory: Tensor | AddressedMemory, valid: Tensor,
-                token_map_ids: Tensor | None = None) -> Tensor:
+                token_map_ids: Tensor | None = None,
+                projected_key_value: tuple[Tensor, Tensor] | None = None) -> Tensor:
         if isinstance(memory, AddressedMemory) != self.addressed:
             raise TypeError("map memory and attention mode differ")
         keys = memory.keys if self.addressed else memory
@@ -69,14 +84,14 @@ class GatedMapCrossAttention(nn.Module):
         if hidden.shape[0] != keys.shape[0] or (
                 not self.addressed and hidden.shape[-1] != keys.shape[-1]):
             raise ValueError("hidden and memory batch/feature dimensions differ")
-        if not torch.all(valid.reshape(valid.shape[0], -1).any(dim=1)):
+        if projected_key_value is None and not torch.all(valid.reshape(valid.shape[0], -1).any(dim=1)):
             raise ValueError("every sample needs at least one valid map slot")
         batch_size, text_length, _ = hidden.shape
         if keys.ndim == 4:
             if token_map_ids is None or token_map_ids.shape != (batch_size, text_length):
                 raise ValueError("timeline memory needs one map ID per text token")
             snapshots, slots = keys.shape[1:3]
-            if not torch.all((token_map_ids >= 0) & (token_map_ids < snapshots)):
+            if projected_key_value is None and not torch.all((token_map_ids >= 0) & (token_map_ids < snapshots)):
                 raise ValueError("text token refers to a missing map snapshot")
             snapshot_ids = torch.arange(snapshots, device=keys.device).repeat_interleave(slots)
             slot_mask = valid.reshape(batch_size, -1)
@@ -84,23 +99,13 @@ class GatedMapCrossAttention(nn.Module):
                 slot_mask[:, None, :] &
                 (token_map_ids[:, :, None] == snapshot_ids[None, None, :])
             )[:, None, :, :]
-            keys = keys.reshape(batch_size, snapshots * slots, -1)
-            values = values.reshape(batch_size, snapshots * slots, -1)
         else:
             if token_map_ids is not None:
                 raise ValueError("single-map memory must not have token map IDs")
             attention_mask = valid[:, None, None, :]
-        memory_length = keys.shape[1]
         query = self.to_query(self.query_norm(hidden))
-        if self.addressed:
-            key = self.to_key(self.key_norm(keys))
-            # Per-slot normalization would discard state magnitude and mean.
-            value = self.to_value(values) * self.value_scale
-        else:
-            key, value = self.to_key_value(self.memory_norm(keys)).chunk(2, dim=-1)
+        key, value = projected_key_value if projected_key_value is not None else self.project_memory(memory)
         query = query.reshape(batch_size, text_length, self.heads, self.head_dim).transpose(1, 2)
-        key = key.reshape(batch_size, memory_length, self.heads, self.head_dim).transpose(1, 2)
-        value = value.reshape(batch_size, memory_length, self.heads, self.head_dim).transpose(1, 2)
         read = F.scaled_dot_product_attention(
             query, key, value, attn_mask=attention_mask, dropout_p=0.0,
         )
@@ -123,6 +128,8 @@ class ConditionedDecoderLayer(nn.Module):
         self._token_map_ids: Tensor | None = None
         self._generated_suffix = False
         self.checkpoint_training = False
+        self.cache_generation = False
+        self._projected_key_value = None
 
     def condition(self, memory: Tensor | AddressedMemory | None, valid: Tensor | None,
                   token_map_ids: Tensor | None = None,
@@ -130,6 +137,10 @@ class ConditionedDecoderLayer(nn.Module):
         self._memory, self._valid = memory, valid
         self._token_map_ids = token_map_ids
         self._generated_suffix = generated_suffix
+        self._projected_key_value = None
+        if (memory is not None and generated_suffix and self.cache_generation and
+                not self.training and not torch.is_grad_enabled()):
+            self._projected_key_value = self.map_attention.project_memory(memory)
 
     def forward(self, hidden_states: Tensor, *args, **kwargs):
         if self._memory is not None:
@@ -153,7 +164,8 @@ class ConditionedDecoderLayer(nn.Module):
                     hidden = self.map_attention(hidden, memory, valid, token_map_ids)
                     return self.decoder_layer(hidden, *args, **kwargs)
                 return checkpoint(conditioned_forward, hidden_states, use_reentrant=False)
-            hidden_states = self.map_attention(hidden_states, memory, valid, token_map_ids)
+            hidden_states = self.map_attention(hidden_states, memory, valid, token_map_ids,
+                                               projected_key_value=self._projected_key_value)
         return self.decoder_layer(hidden_states, *args, **kwargs)
 
 
@@ -175,6 +187,7 @@ class MapReader(nn.Module):
         checkpoint_layers: bool = False,
         loss_chunk_tokens: int = 0,
         sequence_mean_loss: bool = False,
+        cache_generation: bool = False,
     ) -> None:
         super().__init__()
         if every_n_layers <= 0:
@@ -188,6 +201,7 @@ class MapReader(nn.Module):
         if sequence_mean_loss and loss_chunk_tokens <= 0:
             raise ValueError("Sequence-mean loss requires chunked supervised-token CE")
         self.sequence_mean_loss = sequence_mean_loss
+        self.cache_generation = cache_generation
         addressed = isinstance(memory_encoder, (AddressedMapMemoryEncoder, JointFeatureMapMemoryEncoder))
         self.decoder_path = decoder_path
         parent = base_model
@@ -212,6 +226,7 @@ class MapReader(nn.Module):
                     adapter.gate.requires_grad_(False)
                 layer = ConditionedDecoderLayer(layer, adapter)
                 layer.checkpoint_training = checkpoint_layers
+                layer.cache_generation = cache_generation
                 self.conditioned_layers.append(layer)
             wrapped.append(layer)
         if not self.conditioned_layers:
@@ -239,6 +254,14 @@ class MapReader(nn.Module):
             memory = self.memory_encoder(batch)
             valid = batch.valid
             token_map_ids = None
+        if generated_suffix and self.cache_generation:
+            # This memory and timeline stay fixed for the entire generate call.
+            # Validate once rather than synchronize CUDA at every layer/token.
+            if not torch.all(valid.reshape(valid.shape[0], -1).any(dim=1)):
+                raise ValueError("every sample needs at least one valid map slot")
+            if token_map_ids is not None and not torch.all(
+                    (token_map_ids >= 0) & (token_map_ids < valid.shape[1])):
+                raise ValueError("text token refers to a missing map snapshot")
         for layer in self.conditioned_layers:
             layer.condition(memory, valid, token_map_ids, generated_suffix)
         try:

@@ -25,7 +25,7 @@ from .readout_aux import CounterfactualFirstTurnDataset
 from .transcript import encode_trajectory
 
 
-def build_reader(base, config, *, sequence_mean_loss=False):
+def build_reader(base, config, *, sequence_mean_loss=False, cache_generation=False):
     spec = config["map"]
     mode = spec.get("memory_mode", "joint")
     if mode == "joint":
@@ -50,7 +50,7 @@ def build_reader(base, config, *, sequence_mean_loss=False):
                       value_scale=spec.get("value_scale", 1.0),
                       checkpoint_layers=config["training"].get("checkpoint_layers", False),
                       loss_chunk_tokens=config["training"].get("loss_chunk_tokens", 0),
-                      sequence_mean_loss=sequence_mean_loss)
+                      sequence_mean_loss=sequence_mean_loss, cache_generation=cache_generation)
 
 
 def to_device(timeline, device):

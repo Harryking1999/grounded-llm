@@ -55,6 +55,14 @@ class CheckpointSelectionTest(unittest.TestCase):
 
 
 class QueueMigrationTest(unittest.TestCase):
+    def test_projection_cache_changes_execution_but_keeps_generation_contract(self):
+        previous = dict(run='same-run', tasks=510, modes=['rollout', 'reference'],
+                        variants=1, cache_map_kv=False)
+        current = dict(previous, cache_map_kv=True)
+        validate_resume_contract(previous, current)
+        with self.assertRaises(ValueError):
+            validate_resume_contract(previous, dict(current, variants=2))
+
     def test_three_gpu_resume_preserves_experiment(self):
         previous = dict(run='same-run', tasks=510, modes=['rollout', 'reference'],
                         gpus=['0', '1', '2', '3'], gpu_modes=gpu_modes(['0', '1', '2', '3']))

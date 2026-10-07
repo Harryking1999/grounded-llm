@@ -50,7 +50,8 @@ def evaluation_modes(checkpoint, manifest):
 def validate_resume_contract(previous, current):
     # Moving to a smaller node changes scheduling, not the evaluated experiment.
     def experiment(contract):
-        return {key: value for key, value in contract.items() if key not in ('gpus', 'gpu_modes')}
+        return {key: value for key, value in contract.items()
+                if key not in ('gpus', 'gpu_modes', 'cache_map_kv')}
     if experiment(previous) != experiment(current):
         raise ValueError('Existing queue contract differs')
 
@@ -60,6 +61,8 @@ def main():
     parser.add_argument('--run', type=Path, required=True)
     parser.add_argument('--model-path', type=Path, required=True)
     parser.add_argument('--gpus', default='0,1,2,3')
+    parser.add_argument('--cache-map-kv', action='store_true',
+                        help='Reuse unchanged map projections within each generation')
     args = parser.parse_args()
     manifest_path = args.run / 'data/manifest.json'
     manifest = json.loads(manifest_path.read_text())
@@ -77,7 +80,7 @@ def main():
                     modes=['rollout', 'reference'], variants=1, epoch_interval=0.5,
                     priority='newest checkpoint first, then rollout, then reference',
                     gpus=gpus, gpu_modes=assignments,
-                    shard_tasks=64)
+                    shard_tasks=64, cache_map_kv=args.cache_map_kv)
     with FileLock(str(root / '.queue.lock'), timeout=0):
         # A killed queue can leave evaluation workers alive. Do not move their
         # output or launch a second worker against it during a manual restart.
@@ -139,7 +142,8 @@ def main():
                            '--manifest', str(manifest_path), '--adapter-checkpoint',
                            str(checkpoint['path'] / 'adapter.pt'), '--model-path', str(args.model_path),
                            '--out', str(output), '--split', split, '--mode', mode,
-                           '--variants', '1', '--start', str(start), '--stop', str(stop)]
+                           '--variants', '1', '--start', str(start), '--stop', str(stop)] + (
+                               ['--cache-map-kv'] if args.cache_map_kv else [])
                 log_path = logs / (key.replace('/', '_') + '.log')
                 handle = log_path.open('a')
                 process = subprocess.Popen(command, env=dict(os.environ, CUDA_VISIBLE_DEVICES=gpu),

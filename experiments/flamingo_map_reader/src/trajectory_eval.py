@@ -307,6 +307,8 @@ def main():
     parser.add_argument("--start", type=int, default=0)
     parser.add_argument("--stop", type=int)
     parser.add_argument("--no-map", action="store_true")
+    parser.add_argument("--cache-map-kv", action="store_true",
+                        help="Reuse fixed map projections and validate once during each generation")
     args = parser.parse_args()
     torch.set_num_threads(1)
     manifest = json.loads(args.manifest.read_text())
@@ -328,7 +330,7 @@ def main():
     tokenizer = AutoTokenizer.from_pretrained(args.model_path)
     base = AutoModelForCausalLM.from_pretrained(args.model_path,
         torch_dtype=torch.bfloat16 if device.type == "cuda" else torch.float32)
-    reader = build_reader(base, config).to(device).eval()
+    reader = build_reader(base, config, cache_generation=args.cache_map_kv).to(device).eval()
     reader.load_adapter_state_dict(saved["adapter"])
     environment = TaskEnvironment(config, manifest)
     records = [r for r in manifest["records"] if r["split"] == args.split]
@@ -358,7 +360,8 @@ def main():
                 print(json.dumps(dict(completed=len(results), trajectory_id=record["trajectory_id"], variant=variant)), flush=True)
     summary = aggregate(results, manifest)
     summary["contract"] = dict(checkpoint=str(args.adapter_checkpoint), split=args.split, mode=args.mode, no_map=args.no_map,
-                               start=args.start, stop=args.stop, limit=args.limit, variants=args.variants)
+                               start=args.start, stop=args.stop, limit=args.limit, variants=args.variants,
+                               cache_map_kv=args.cache_map_kv)
     (args.out / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
 
 

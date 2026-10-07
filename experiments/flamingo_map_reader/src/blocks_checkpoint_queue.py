@@ -33,6 +33,20 @@ def checkpoints(models):
     return sorted(found.values(), key=lambda item: -item['step'])
 
 
+def gpu_modes(gpus):
+    if len(gpus) not in (3, 4) or len(set(gpus)) != len(gpus) or not all(gpus):
+        raise ValueError('Three or four distinct GPUs are required: two rollout, remaining reference')
+    return dict(zip(gpus, ['rollout', 'rollout', *(['reference'] * (len(gpus) - 2))]))
+
+
+def validate_resume_contract(previous, current):
+    # Moving to a smaller node changes scheduling, not the evaluated experiment.
+    def experiment(contract):
+        return {key: value for key, value in contract.items() if key not in ('gpus', 'gpu_modes')}
+    if experiment(previous) != experiment(current):
+        raise ValueError('Existing queue contract differs')
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--run', type=Path, required=True)
@@ -42,8 +56,7 @@ def main():
     manifest_path = args.run / 'data/manifest.json'
     manifest = json.loads(manifest_path.read_text())
     gpus = args.gpus.split(',')
-    if len(gpus) != 4 or len(set(gpus)) != 4:
-        raise ValueError('Exactly four distinct GPUs are required: two rollout, two reference')
+    assignments = gpu_modes(gpus)
     count = sum(record['split'] == 'test' for record in manifest['records'])
     if manifest['config']['task'] != 'blocks' or count != 510:
         raise ValueError(f'Expected blocks main test with 510 tasks, found {count}')
@@ -55,7 +68,7 @@ def main():
                     model_path=str(args.model_path), split='test', tasks=count,
                     modes=['rollout', 'reference'], variants=1, epoch_interval=0.5,
                     priority='newest checkpoint first, then rollout, then reference',
-                    gpus=gpus, gpu_modes=dict(zip(gpus, ['rollout', 'rollout', 'reference', 'reference'])),
+                    gpus=gpus, gpu_modes=assignments,
                     shard_tasks=64)
     with FileLock(str(root / '.queue.lock'), timeout=0):
         # A killed queue can leave evaluation workers alive. Do not move their
@@ -70,8 +83,8 @@ def main():
             if 'experiments.flamingo_map_reader.src.trajectory_eval' in command_line and str(root) in command_line:
                 raise RuntimeError(f'Existing evaluation worker {command_file.parent.name} still owns this output')
         previous = root / 'contract.json'
-        if previous.is_file() and json.loads(previous.read_text()) != contract:
-            raise ValueError('Existing queue contract differs')
+        if previous.is_file():
+            validate_resume_contract(json.loads(previous.read_text()), contract)
         atomic_json(previous, contract)
         busy, failures = {}, []
         while True:

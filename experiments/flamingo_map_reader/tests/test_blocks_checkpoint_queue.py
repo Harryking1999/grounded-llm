@@ -5,7 +5,9 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from experiments.flamingo_map_reader.src.blocks_checkpoint_queue import checkpoints
+from experiments.flamingo_map_reader.src.blocks_checkpoint_queue import (
+    checkpoints, gpu_modes, validate_resume_contract,
+)
 
 
 class CheckpointSelectionTest(unittest.TestCase):
@@ -43,6 +45,24 @@ class CheckpointSelectionTest(unittest.TestCase):
             selected = checkpoints(root)
             self.assertEqual(len(selected), 1)
             self.assertEqual(selected[0]['path'], final)
+
+
+class QueueMigrationTest(unittest.TestCase):
+    def test_three_gpu_resume_preserves_experiment(self):
+        previous = dict(run='same-run', tasks=510, modes=['rollout', 'reference'],
+                        gpus=['0', '1', '2', '3'], gpu_modes=gpu_modes(['0', '1', '2', '3']))
+        current = dict(previous, gpus=['0', '1', '2'], gpu_modes=gpu_modes(['0', '1', '2']))
+        validate_resume_contract(previous, current)
+        self.assertEqual(list(current['gpu_modes'].values()).count('rollout'), 2)
+        self.assertEqual(list(current['gpu_modes'].values()).count('reference'), 1)
+        for changed in (dict(current, run='other-run'), dict(current, tasks=100),
+                        dict(current, modes=['reference'])):
+            with self.subTest(changed=changed), self.assertRaises(ValueError):
+                validate_resume_contract(previous, changed)
+
+    def test_duplicate_gpu_cannot_own_two_workers(self):
+        with self.assertRaises(ValueError):
+            gpu_modes(['0', '1', '2', '2'])
 
 
 if __name__ == '__main__':

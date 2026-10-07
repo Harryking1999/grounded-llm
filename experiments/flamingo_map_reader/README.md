@@ -65,6 +65,14 @@ python -m experiments.flamingo_map_reader.src.retrain_blocks \
 中断后，以同一配置、模型路径和输出目录调用上述命令并加 `--resume`；
 入口复用现有队列的断点选择及评测分片重试，底层仍调用 `train.py --resume CHECKPOINT`。
 final 流程保留已完成分片，清除未完成分片后整片重做；半 epoch 队列则先归档未完成分片，再整片重做。
+半 epoch 队列可在三卡或四卡节点接续，前两卡执行 rollout，其余卡执行 reference：
+
+```bash
+python -m experiments.flamingo_map_reader.src.blocks_checkpoint_queue \
+  --run "$RUN_DIR" --model-path "$MODEL_PATH" --gpus "$EVAL_GPUS"
+```
+
+迁移评测节点只允许改变 GPU 调度；运行、测试集、模式和生成设置必须保持一致。
 只选择已发布且包含 adapter、optimizer、scheduler、trainer state 和全部进程 RNG 状态的断点；
 初始权重与未写完的目录不作为续训断点，无完整断点时明确报错。
 Trainer 恢复已完成步数、epoch 与数据顺序，继续原有总预算，不额外增加训练轮数。

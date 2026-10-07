@@ -993,5 +993,220 @@
         }
       }
     }
+  },
+  "epoch3_matched_cohort": {
+    "observed_at_utc": "2026-10-07T18:41:52.225772+00:00",
+    "method": "Existing completed shards only; intersection of task/variant pairs at 2, 2.5 and 3 epochs; canonical scoring functions, no model rerun.",
+    "epoch3_progress": {
+      "reference": {
+        "cases": 256,
+        "completed_shards": 4,
+        "full_summary_exists": false
+      },
+      "rollout": {
+        "cases": 256,
+        "completed_shards": 4,
+        "full_summary_exists": false
+      }
+    },
+    "checkpoints": [
+      {
+        "step": 27500,
+        "epoch": 2.0
+      },
+      {
+        "step": 34375,
+        "epoch": 2.5
+      },
+      {
+        "step": 41250,
+        "epoch": 3.0
+      }
+    ],
+    "matched": {
+      "reference": {
+        "tasks": 256,
+        "groups": {
+          "same_initial_board_new_pair": 255,
+          "new_initial_board": 1
+        },
+        "reference_state_identity": true,
+        "checkpoints": {
+          "27500": {
+            "tasks": 256,
+            "counts": {
+              "turns": 2178,
+              "terminal_turns": 172,
+              "solvable_decisions": 1543,
+              "safe_count": 964,
+              "shortest_count": 880,
+              "correct_stop": 79,
+              "no_solution_expected": 0,
+              "no_solution_correct": 0,
+              "false_no_solution": 67,
+              "all_live_decisions": 1543
+            },
+            "rollout": {
+              "attempts": 0,
+              "reached": 0,
+              "success": 0,
+              "shortest_success": 0,
+              "successful_moves": 0,
+              "successful_shortest_moves": 0
+            },
+            "failures": {}
+          },
+          "34375": {
+            "tasks": 256,
+            "counts": {
+              "turns": 2178,
+              "terminal_turns": 172,
+              "solvable_decisions": 1543,
+              "safe_count": 1227,
+              "shortest_count": 1122,
+              "correct_stop": 160,
+              "no_solution_expected": 0,
+              "no_solution_correct": 0,
+              "false_no_solution": 5,
+              "all_live_decisions": 1543
+            },
+            "rollout": {
+              "attempts": 0,
+              "reached": 0,
+              "success": 0,
+              "shortest_success": 0,
+              "successful_moves": 0,
+              "successful_shortest_moves": 0
+            },
+            "failures": {}
+          },
+          "41250": {
+            "tasks": 256,
+            "counts": {
+              "turns": 2178,
+              "terminal_turns": 172,
+              "solvable_decisions": 1543,
+              "safe_count": 1242,
+              "shortest_count": 1148,
+              "correct_stop": 154,
+              "no_solution_expected": 0,
+              "no_solution_correct": 0,
+              "false_no_solution": 10,
+              "all_live_decisions": 1543
+            },
+            "rollout": {
+              "attempts": 0,
+              "reached": 0,
+              "success": 0,
+              "shortest_success": 0,
+              "successful_moves": 0,
+              "successful_shortest_moves": 0
+            },
+            "failures": {}
+          }
+        }
+      },
+      "rollout": {
+        "tasks": 256,
+        "groups": {
+          "same_initial_board_new_pair": 255,
+          "new_initial_board": 1
+        },
+        "reference_state_identity": null,
+        "checkpoints": {
+          "27500": {
+            "tasks": 256,
+            "counts": {
+              "turns": 2383,
+              "terminal_turns": 3,
+              "solvable_decisions": 517,
+              "safe_count": 264,
+              "shortest_count": 225,
+              "correct_stop": 3,
+              "no_solution_expected": 241,
+              "no_solution_correct": 71,
+              "false_no_solution": 0,
+              "all_live_decisions": 517
+            },
+            "rollout": {
+              "attempts": 256,
+              "reached": 3,
+              "success": 3,
+              "shortest_success": 0,
+              "successful_moves": 28,
+              "successful_shortest_moves": 22
+            },
+            "failures": {
+              "premature_done": 182,
+              "correct_no_solution_after_error": 71
+            }
+          },
+          "34375": {
+            "tasks": 256,
+            "counts": {
+              "turns": 2213,
+              "terminal_turns": 3,
+              "solvable_decisions": 548,
+              "safe_count": 295,
+              "shortest_count": 250,
+              "correct_stop": 3,
+              "no_solution_expected": 199,
+              "no_solution_correct": 31,
+              "false_no_solution": 0,
+              "all_live_decisions": 548
+            },
+            "rollout": {
+              "attempts": 256,
+              "reached": 3,
+              "success": 3,
+              "shortest_success": 3,
+              "successful_moves": 21,
+              "successful_shortest_moves": 21
+            },
+            "failures": {
+              "premature_done": 220,
+              "correct_no_solution_after_error": 31,
+              "illegal_action": 2
+            }
+          },
+          "41250": {
+            "tasks": 256,
+            "counts": {
+              "turns": 2240,
+              "terminal_turns": 2,
+              "solvable_decisions": 533,
+              "safe_count": 279,
+              "shortest_count": 239,
+              "correct_stop": 2,
+              "no_solution_expected": 214,
+              "no_solution_correct": 94,
+              "false_no_solution": 0,
+              "all_live_decisions": 533
+            },
+            "rollout": {
+              "attempts": 256,
+              "reached": 2,
+              "success": 2,
+              "shortest_success": 2,
+              "successful_moves": 13,
+              "successful_shortest_moves": 13
+            },
+            "failures": {
+              "premature_done": 160,
+              "correct_no_solution_after_error": 94
+            }
+          }
+        },
+        "failure_transitions_25_to_3": {
+          "premature_done -> correct_no_solution_after_error": 62,
+          "premature_done -> premature_done": 158,
+          "correct_no_solution_after_error -> premature_done": 1,
+          "correct_no_solution_after_error -> correct_no_solution_after_error": 30,
+          "success -> success": 2,
+          "success -> premature_done": 1,
+          "illegal_action -> correct_no_solution_after_error": 2
+        }
+      }
+    }
   }
 }

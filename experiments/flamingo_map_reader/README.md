@@ -39,8 +39,7 @@ No solution: no legal moves remain and the goal has not been reached.
 <done/>
 ```
 
-主测试集按最短解长度分层，两个分组各占一半；另留独立失败上下文测试，报告无解召回率。
-主测试的 reference 和 rollout 同时报告误判无解率；走错后正确识别无解仍不算完成原任务。
+主测试集按最短解长度分层，两个分组各占一半。半 epoch 队列以 `--terminal-tasks` 同时覆盖普通任务、初始即目标和固定失败上下文，正式口径见 [三任务评测合同](configs/blocks_three_task_evaluation.json)。主要报告 Top-10 候选集合、NDCG@10、地图最优动作与遵循自身排序；环境可达率作为诊断，走错后正确识别无解不算普通任务完成。三任务总体按训练配比加权，缺组时不发布总体值。
 可先用 [find_training_batch.py](src/find_training_batch.py) 扫描训练集全部编号变体，
 将序列长度、地图快照数、候选槽位数和监督长度的极值样本组合，
 以真实四卡反向传播和优化器更新测量 batch 显存边界及保留余量的档位。
@@ -149,14 +148,14 @@ python -m experiments.flamingo_map_reader.src.trajectory_eval \
 
 ```bash
 python -m experiments.flamingo_map_reader.src.blocks_checkpoint_queue \
-  --run "$RUN_DIR" --model-path "$MODEL_PATH" --gpus 0,1,2,3 --cache-map-kv
+  --run "$RUN_DIR" --model-path "$MODEL_PATH" --gpus 0,1,2,3 --cache-map-kv --terminal-tasks
 ```
 
 两节点共同评测同一运行时，采用互斥的分片编号余数。先在四卡评测节点启动主队列：
 
 ```bash
 python -m experiments.flamingo_map_reader.src.blocks_checkpoint_queue \
-  --run "$RUN_DIR" --model-path "$MODEL_PATH" --gpus 0,1,2,3 --cache-map-kv \
+  --run "$RUN_DIR" --model-path "$MODEL_PATH" --gpus 0,1,2,3 --cache-map-kv --terminal-tasks \
   --shard-modulo 3 --shard-remainders 0,1
 ```
 
@@ -164,7 +163,7 @@ python -m experiments.flamingo_map_reader.src.blocks_checkpoint_queue \
 
 ```bash
 python -m experiments.flamingo_map_reader.src.blocks_checkpoint_queue \
-  --run "$RUN_DIR" --model-path "$MODEL_PATH" --gpus 2,3 --cache-map-kv \
+  --run "$RUN_DIR" --model-path "$MODEL_PATH" --gpus 2,3 --cache-map-kv --terminal-tasks \
   --queue-name aux --shard-modulo 3 --shard-remainders 2
 ```
 
@@ -188,6 +187,14 @@ python -m experiments.flamingo_map_reader.src.blocks_checkpoint_queue \
 ```bash
 python -m experiments.flamingo_map_reader.src.collect_evidence \
   --run-root RUN --update experiments/flamingo_map_reader/results/long_trajectory_summary.json --table
+```
+
+当前积木三任务报告从原始回答重建（`--ranking-cache` 可选，放在忽略目录；普通任务无需再次生成）：
+
+```bash
+python -m experiments.flamingo_map_reader.src.summarize_blocks_results \
+  --run "$RUN_DIR" --out experiments/flamingo_map_reader/results/blocks_results_summary.json \
+  --ranking-cache "$RUN_DIR/diagnostics/ranking_cache.json"
 ```
 
 只汇总已完成分片，同一共享路径计一次；未完成条件不能当作全量成绩。回填工具只在确有旧字段缺失时使用，不重跑模型生成。

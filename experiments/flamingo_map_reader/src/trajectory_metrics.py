@@ -107,7 +107,7 @@ def summarize_turns(rows):
     solvable = [r for r in rows if still_solvable(r)]
     counts["solvable_decisions"] = len(solvable)
     result = dict(counts, decision_turns=decisions)
-    ranked = [r for r in solvable if r.get('ranking_ndcg_at_10') is not None]
+    ranked = [r for r in rows if not r['done'] and r.get('candidates') and r.get('ranking_ndcg_at_10') is not None]
     result['ranking_ndcg_turns'] = len(ranked)
     result['ranking_ndcg_at_10'] = (sum(r['ranking_ndcg_at_10'] for r in ranked) / len(ranked)
                                      if ranked else None)

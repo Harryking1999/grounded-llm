@@ -976,5 +976,593 @@
         }
       }
     }
+  },
+  "matched_ffn_comparison": {
+    "observed_at_utc": "2026-10-08T11:26:13.901526+00:00",
+    "method": "Stored answers only; same trajectory IDs, numbering variants, starts/goals/seeds and frozen map. New gain formulas recomputed for both architectures. Completed shards only. Per-epoch 48000 ordinary exposures match, but terminal training weights and total updates differ.",
+    "checkpoints": {
+      "0.5": {
+        "reference": {
+          "kv": {
+            "step": 6250,
+            "cases": 192,
+            "groups": {
+              "same_initial_board_new_pair": 192
+            },
+            "reached": 0,
+            "success": 0,
+            "all_decisions": {
+              "decisions": 1548,
+              "map_minimum": 261,
+              "legal": 1545,
+              "follows_ranking": 484,
+              "ndcg_inverse_rank_at_10": 0.5263159617388072,
+              "ndcg_inverse_distance_at_10": 0.8400110613854134,
+              "ndcg_inverse_rank_at_1": 0.3116912689132424,
+              "ndcg_inverse_distance_at_1": 0.7333245897735666
+            },
+            "first_round": {
+              "decisions": 192,
+              "map_minimum": 3,
+              "legal": 192,
+              "follows_ranking": 0,
+              "ndcg_inverse_rank_at_10": 0.19345527047142297,
+              "ndcg_inverse_distance_at_10": 0.7961742932605621,
+              "ndcg_inverse_rank_at_1": 0.0875830154703392,
+              "ndcg_inverse_distance_at_1": 0.7371837984880547
+            },
+            "safe": 706,
+            "solvable_decisions": 1199,
+            "termination": {
+              "done_outputs": 121,
+              "done_at_goal": 118,
+              "goal_claims": 112,
+              "correct_goal_claims": 109,
+              "goal_states": 126,
+              "no_solution_states": 0,
+              "correct_no_solution": 0
+            },
+            "failures": {
+              "null": 192
+            },
+            "source_shards": [
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-6250/test_reference/00000_00064",
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-6250/test_reference/00064_00128",
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-6250/test_reference/00128_00192"
+            ]
+          },
+          "ffn": {
+            "step": 6875,
+            "cases": 192,
+            "groups": {
+              "same_initial_board_new_pair": 192
+            },
+            "reached": 0,
+            "success": 0,
+            "all_decisions": {
+              "decisions": 1548,
+              "map_minimum": 250,
+              "legal": 1543,
+              "follows_ranking": 480,
+              "ndcg_inverse_rank_at_10": 0.5200415231386497,
+              "ndcg_inverse_distance_at_10": 0.8346060820926168,
+              "ndcg_inverse_rank_at_1": 0.2926720763578688,
+              "ndcg_inverse_distance_at_1": 0.7140952565624774
+            },
+            "first_round": {
+              "decisions": 192,
+              "map_minimum": 1,
+              "legal": 192,
+              "follows_ranking": 0,
+              "ndcg_inverse_rank_at_10": 0.20765298976575583,
+              "ndcg_inverse_distance_at_10": 0.7964573582925425,
+              "ndcg_inverse_rank_at_1": 0.07535228115679175,
+              "ndcg_inverse_distance_at_1": 0.7352453219152925
+            },
+            "safe": 658,
+            "solvable_decisions": 1199,
+            "termination": {
+              "done_outputs": 119,
+              "done_at_goal": 114,
+              "goal_claims": 41,
+              "correct_goal_claims": 36,
+              "goal_states": 126,
+              "no_solution_states": 0,
+              "correct_no_solution": 0
+            },
+            "failures": {
+              "null": 192
+            },
+            "source_shards": [
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_ffn_failure_batch4_75cc4fd/evaluation_half_epoch/step-6875/test_reference/00000_00064",
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_ffn_failure_batch4_75cc4fd/evaluation_half_epoch/step-6875/test_reference/00064_00128",
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_ffn_failure_batch4_75cc4fd/evaluation_half_epoch/step-6875/test_reference/00128_00192"
+            ]
+          }
+        },
+        "rollout": {
+          "kv": {
+            "step": 6250,
+            "cases": 192,
+            "groups": {
+              "same_initial_board_new_pair": 192
+            },
+            "reached": 0,
+            "success": 0,
+            "all_decisions": {
+              "decisions": 1518,
+              "map_minimum": 252,
+              "legal": 1504,
+              "follows_ranking": 525,
+              "ndcg_inverse_rank_at_10": 0.5233487861597987,
+              "ndcg_inverse_distance_at_10": 0.8777100397889612,
+              "ndcg_inverse_rank_at_1": 0.3018214057151097,
+              "ndcg_inverse_distance_at_1": 0.8014073282382005
+            },
+            "first_round": {
+              "decisions": 192,
+              "map_minimum": 6,
+              "legal": 192,
+              "follows_ranking": 0,
+              "ndcg_inverse_rank_at_10": 0.20721418409420256,
+              "ndcg_inverse_distance_at_10": 0.7967003124993686,
+              "ndcg_inverse_rank_at_1": 0.09636841334407548,
+              "ndcg_inverse_distance_at_1": 0.7375968149227333
+            },
+            "safe": 177,
+            "solvable_decisions": 369,
+            "termination": {
+              "done_outputs": 192,
+              "done_at_goal": 0,
+              "goal_claims": 172,
+              "correct_goal_claims": 0,
+              "goal_states": 0,
+              "no_solution_states": 178,
+              "correct_no_solution": 20
+            },
+            "failures": {
+              "premature_done": 172,
+              "correct_no_solution_after_error": 20
+            },
+            "source_shards": [
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-6250/test_rollout/00000_00064",
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-6250/test_rollout/00064_00128",
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-6250/test_rollout/00128_00192"
+            ]
+          },
+          "ffn": {
+            "step": 6875,
+            "cases": 192,
+            "groups": {
+              "same_initial_board_new_pair": 192
+            },
+            "reached": 1,
+            "success": 1,
+            "all_decisions": {
+              "decisions": 1486,
+              "map_minimum": 262,
+              "legal": 1475,
+              "follows_ranking": 554,
+              "ndcg_inverse_rank_at_10": 0.5311271258058894,
+              "ndcg_inverse_distance_at_10": 0.8804393220040242,
+              "ndcg_inverse_rank_at_1": 0.31064272557059164,
+              "ndcg_inverse_distance_at_1": 0.8039778487412849
+            },
+            "first_round": {
+              "decisions": 192,
+              "map_minimum": 8,
+              "legal": 192,
+              "follows_ranking": 0,
+              "ndcg_inverse_rank_at_10": 0.2214271915167105,
+              "ndcg_inverse_distance_at_10": 0.794982171662959,
+              "ndcg_inverse_rank_at_1": 0.11157582604921835,
+              "ndcg_inverse_distance_at_1": 0.7379594580153945
+            },
+            "safe": 188,
+            "solvable_decisions": 379,
+            "termination": {
+              "done_outputs": 192,
+              "done_at_goal": 1,
+              "goal_claims": 69,
+              "correct_goal_claims": 1,
+              "goal_states": 1,
+              "no_solution_states": 180,
+              "correct_no_solution": 123
+            },
+            "failures": {
+              "correct_no_solution_after_error": 123,
+              "premature_done": 68,
+              "null": 1
+            },
+            "source_shards": [
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_ffn_failure_batch4_75cc4fd/evaluation_half_epoch/step-6875/test_rollout/00000_00064",
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_ffn_failure_batch4_75cc4fd/evaluation_half_epoch/step-6875/test_rollout/00064_00128",
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_ffn_failure_batch4_75cc4fd/evaluation_half_epoch/step-6875/test_rollout/00128_00192"
+            ]
+          }
+        }
+      },
+      "1.0": {
+        "reference": {
+          "kv": {
+            "step": 12500,
+            "cases": 192,
+            "groups": {
+              "same_initial_board_new_pair": 192
+            },
+            "reached": 0,
+            "success": 0,
+            "all_decisions": {
+              "decisions": 1548,
+              "map_minimum": 294,
+              "legal": 1547,
+              "follows_ranking": 490,
+              "ndcg_inverse_rank_at_10": 0.5604237000107443,
+              "ndcg_inverse_distance_at_10": 0.856659541046355,
+              "ndcg_inverse_rank_at_1": 0.34130976536804086,
+              "ndcg_inverse_distance_at_1": 0.7577786739297081
+            },
+            "first_round": {
+              "decisions": 192,
+              "map_minimum": 3,
+              "legal": 192,
+              "follows_ranking": 0,
+              "ndcg_inverse_rank_at_10": 0.2470631425171057,
+              "ndcg_inverse_distance_at_10": 0.8189657795127562,
+              "ndcg_inverse_rank_at_1": 0.08492001395573058,
+              "ndcg_inverse_distance_at_1": 0.7379593198902868
+            },
+            "safe": 769,
+            "solvable_decisions": 1199,
+            "termination": {
+              "done_outputs": 121,
+              "done_at_goal": 120,
+              "goal_claims": 121,
+              "correct_goal_claims": 120,
+              "goal_states": 126,
+              "no_solution_states": 0,
+              "correct_no_solution": 0
+            },
+            "failures": {
+              "null": 192
+            },
+            "source_shards": [
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-12500/test_reference/00000_00064",
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-12500/test_reference/00064_00128",
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-12500/test_reference/00128_00192"
+            ]
+          },
+          "ffn": {
+            "step": 13750,
+            "cases": 192,
+            "groups": {
+              "same_initial_board_new_pair": 192
+            },
+            "reached": 0,
+            "success": 0,
+            "all_decisions": {
+              "decisions": 1548,
+              "map_minimum": 298,
+              "legal": 1537,
+              "follows_ranking": 476,
+              "ndcg_inverse_rank_at_10": 0.5524712242054958,
+              "ndcg_inverse_distance_at_10": 0.8497141607840477,
+              "ndcg_inverse_rank_at_1": 0.3361019985599976,
+              "ndcg_inverse_distance_at_1": 0.7482291256567127
+            },
+            "first_round": {
+              "decisions": 192,
+              "map_minimum": 3,
+              "legal": 192,
+              "follows_ranking": 0,
+              "ndcg_inverse_rank_at_10": 0.23155757684732803,
+              "ndcg_inverse_distance_at_10": 0.8130593809558743,
+              "ndcg_inverse_rank_at_1": 0.0878523613612394,
+              "ndcg_inverse_distance_at_1": 0.7371831833655174
+            },
+            "safe": 719,
+            "solvable_decisions": 1199,
+            "termination": {
+              "done_outputs": 134,
+              "done_at_goal": 123,
+              "goal_claims": 83,
+              "correct_goal_claims": 72,
+              "goal_states": 126,
+              "no_solution_states": 0,
+              "correct_no_solution": 0
+            },
+            "failures": {
+              "null": 192
+            },
+            "source_shards": [
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_ffn_failure_batch4_75cc4fd/evaluation_half_epoch/step-13750/test_reference/00000_00064",
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_ffn_failure_batch4_75cc4fd/evaluation_half_epoch/step-13750/test_reference/00064_00128",
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_ffn_failure_batch4_75cc4fd/evaluation_half_epoch/step-13750/test_reference/00128_00192"
+            ]
+          }
+        },
+        "rollout": {
+          "kv": {
+            "step": 12500,
+            "cases": 192,
+            "groups": {
+              "same_initial_board_new_pair": 192
+            },
+            "reached": 1,
+            "success": 1,
+            "all_decisions": {
+              "decisions": 1604,
+              "map_minimum": 239,
+              "legal": 1597,
+              "follows_ranking": 407,
+              "ndcg_inverse_rank_at_10": 0.4967676236474953,
+              "ndcg_inverse_distance_at_10": 0.8788759915393423,
+              "ndcg_inverse_rank_at_1": 0.28783056107665295,
+              "ndcg_inverse_distance_at_1": 0.8062878539581888
+            },
+            "first_round": {
+              "decisions": 192,
+              "map_minimum": 9,
+              "legal": 192,
+              "follows_ranking": 0,
+              "ndcg_inverse_rank_at_10": 0.24634780726617952,
+              "ndcg_inverse_distance_at_10": 0.8146615228393773,
+              "ndcg_inverse_rank_at_1": 0.10438449412786117,
+              "ndcg_inverse_distance_at_1": 0.7383385123527907
+            },
+            "safe": 241,
+            "solvable_decisions": 432,
+            "termination": {
+              "done_outputs": 188,
+              "done_at_goal": 1,
+              "goal_claims": 173,
+              "correct_goal_claims": 1,
+              "goal_states": 1,
+              "no_solution_states": 184,
+              "correct_no_solution": 15
+            },
+            "failures": {
+              "premature_done": 172,
+              "correct_no_solution_after_error": 15,
+              "illegal_action": 4,
+              "null": 1
+            },
+            "source_shards": [
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-12500/test_rollout/00000_00064",
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-12500/test_rollout/00064_00128",
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-12500/test_rollout/00128_00192"
+            ]
+          },
+          "ffn": {
+            "step": 13750,
+            "cases": 192,
+            "groups": {
+              "same_initial_board_new_pair": 192
+            },
+            "reached": 1,
+            "success": 1,
+            "all_decisions": {
+              "decisions": 1596,
+              "map_minimum": 217,
+              "legal": 1586,
+              "follows_ranking": 431,
+              "ndcg_inverse_rank_at_10": 0.49682701432953,
+              "ndcg_inverse_distance_at_10": 0.8784336711774664,
+              "ndcg_inverse_rank_at_1": 0.28179726836076924,
+              "ndcg_inverse_distance_at_1": 0.7994547976176816
+            },
+            "first_round": {
+              "decisions": 192,
+              "map_minimum": 10,
+              "legal": 192,
+              "follows_ranking": 0,
+              "ndcg_inverse_rank_at_10": 0.23838930790058835,
+              "ndcg_inverse_distance_at_10": 0.8171994735405259,
+              "ndcg_inverse_rank_at_1": 0.11203930588850038,
+              "ndcg_inverse_distance_at_1": 0.7477703902906746
+            },
+            "safe": 267,
+            "solvable_decisions": 458,
+            "termination": {
+              "done_outputs": 192,
+              "done_at_goal": 1,
+              "goal_claims": 142,
+              "correct_goal_claims": 1,
+              "goal_states": 1,
+              "no_solution_states": 181,
+              "correct_no_solution": 50
+            },
+            "failures": {
+              "premature_done": 141,
+              "correct_no_solution_after_error": 50,
+              "null": 1
+            },
+            "source_shards": [
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_ffn_failure_batch4_75cc4fd/evaluation_half_epoch/step-13750/test_rollout/00000_00064",
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_ffn_failure_batch4_75cc4fd/evaluation_half_epoch/step-13750/test_rollout/00064_00128",
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_ffn_failure_batch4_75cc4fd/evaluation_half_epoch/step-13750/test_rollout/00128_00192"
+            ]
+          }
+        }
+      },
+      "1.5": {
+        "reference": {
+          "kv": {
+            "step": 18750,
+            "cases": 64,
+            "groups": {
+              "same_initial_board_new_pair": 64
+            },
+            "reached": 0,
+            "success": 0,
+            "all_decisions": {
+              "decisions": 527,
+              "map_minimum": 105,
+              "legal": 525,
+              "follows_ranking": 172,
+              "ndcg_inverse_rank_at_10": 0.5677686019556312,
+              "ndcg_inverse_distance_at_10": 0.8629238615586058,
+              "ndcg_inverse_rank_at_1": 0.3546514679292715,
+              "ndcg_inverse_distance_at_1": 0.7727496769064146
+            },
+            "first_round": {
+              "decisions": 64,
+              "map_minimum": 1,
+              "legal": 64,
+              "follows_ranking": 0,
+              "ndcg_inverse_rank_at_10": 0.22999811332281303,
+              "ndcg_inverse_distance_at_10": 0.8248905363722508,
+              "ndcg_inverse_rank_at_1": 0.07643153511698715,
+              "ndcg_inverse_distance_at_1": 0.7430729291142113
+            },
+            "safe": 288,
+            "solvable_decisions": 423,
+            "termination": {
+              "done_outputs": 46,
+              "done_at_goal": 44,
+              "goal_claims": 46,
+              "correct_goal_claims": 44,
+              "goal_states": 45,
+              "no_solution_states": 0,
+              "correct_no_solution": 0
+            },
+            "failures": {
+              "null": 64
+            },
+            "source_shards": [
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-18750/test_reference/00000_00064"
+            ]
+          },
+          "ffn": {
+            "step": 20625,
+            "cases": 64,
+            "groups": {
+              "same_initial_board_new_pair": 64
+            },
+            "reached": 0,
+            "success": 0,
+            "all_decisions": {
+              "decisions": 527,
+              "map_minimum": 112,
+              "legal": 527,
+              "follows_ranking": 172,
+              "ndcg_inverse_rank_at_10": 0.5736598925109573,
+              "ndcg_inverse_distance_at_10": 0.8660299298675576,
+              "ndcg_inverse_rank_at_1": 0.3659360023739972,
+              "ndcg_inverse_distance_at_1": 0.7749474175102231
+            },
+            "first_round": {
+              "decisions": 64,
+              "map_minimum": 1,
+              "legal": 64,
+              "follows_ranking": 0,
+              "ndcg_inverse_rank_at_10": 0.22199596391408422,
+              "ndcg_inverse_distance_at_10": 0.817828586771205,
+              "ndcg_inverse_rank_at_1": 0.06962568139757339,
+              "ndcg_inverse_distance_at_1": 0.7269903499704473
+            },
+            "safe": 277,
+            "solvable_decisions": 423,
+            "termination": {
+              "done_outputs": 42,
+              "done_at_goal": 42,
+              "goal_claims": 41,
+              "correct_goal_claims": 41,
+              "goal_states": 45,
+              "no_solution_states": 0,
+              "correct_no_solution": 0
+            },
+            "failures": {
+              "null": 64
+            },
+            "source_shards": [
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_ffn_failure_batch4_75cc4fd/evaluation_half_epoch/step-20625/test_reference/00000_00064"
+            ]
+          }
+        }
+      }
+    },
+    "training_windows": [
+      {
+        "run": "blocks_ffn_failure_batch4_75cc4fd",
+        "last": {
+          "loss": 0.2503388822078705,
+          "grad_norm": 5.391512870788574,
+          "learning_rate": 2E-05,
+          "epoch": 5.363272727272728,
+          "step": 73745
+        },
+        "windows": {
+          "6875": {
+            "updates": 500,
+            "epoch": 0.5,
+            "mean_loss": 0.2500759649127722,
+            "mean_raw_grad_norm": 6.577930701434612,
+            "raw_grad_over_clip_fraction": 0.816,
+            "learning_rate": 1.999709090909091E-05
+          },
+          "12500": {
+            "updates": 500,
+            "epoch": 0.9090909090909091,
+            "mean_loss": 0.24820137733221054,
+            "mean_raw_grad_norm": 13.163011427223683,
+            "raw_grad_over_clip_fraction": 0.846,
+            "learning_rate": 2E-05
+          },
+          "13750": {
+            "updates": 500,
+            "epoch": 1.0,
+            "mean_loss": 0.24273767191171647,
+            "mean_raw_grad_norm": 7.939745884954929,
+            "raw_grad_over_clip_fraction": 0.846,
+            "learning_rate": 2E-05
+          },
+          "20625": {
+            "updates": 500,
+            "epoch": 1.5,
+            "mean_loss": 0.23928303995031092,
+            "mean_raw_grad_norm": 12.875666998818517,
+            "raw_grad_over_clip_fraction": 0.866,
+            "learning_rate": 2E-05
+          }
+        }
+      },
+      {
+        "run": "blocks_kv_restart_36c213c",
+        "last": {
+          "loss": 0.2832501530647278,
+          "grad_norm": 1.1066431999206543,
+          "learning_rate": 2E-05,
+          "epoch": 2.01032,
+          "step": 25129
+        },
+        "windows": {
+          "6250": {
+            "updates": 500,
+            "epoch": 0.5,
+            "mean_loss": 0.27064002300798895,
+            "mean_raw_grad_norm": 3.578241803467274,
+            "raw_grad_over_clip_fraction": 0.662,
+            "learning_rate": 1.99968E-05
+          },
+          "12500": {
+            "updates": 500,
+            "epoch": 1.0,
+            "mean_loss": 0.26490735468268395,
+            "mean_raw_grad_norm": 2.2158898504972457,
+            "raw_grad_over_clip_fraction": 0.756,
+            "learning_rate": 2E-05
+          },
+          "18750": {
+            "updates": 500,
+            "epoch": 1.5,
+            "mean_loss": 0.2641037230789661,
+            "mean_raw_grad_norm": 2.6369750757217405,
+            "raw_grad_over_clip_fraction": 0.842,
+            "learning_rate": 2E-05
+          }
+        }
+      }
+    ]
   }
 }

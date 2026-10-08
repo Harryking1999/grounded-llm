@@ -4100,31 +4100,32 @@
   "startup_verified_step": 75,
   "observed_at_utc": "2026-10-08T17:11:25.582682+00:00",
   "training_resume": {
-    "checkpoint_step": 32500,
-    "checkpoint_epoch": 2.6,
-    "pre_interrupt_step": 33601,
-    "recompute_updates": 1101,
-    "verified_resumed_step": 32527,
-    "verified_loss": 0.26878297328948975,
-    "verified_grad_norm": 2.3071441650390625,
-    "observed_at_utc": "2026-10-08T13:27:35.409293+00:00",
+    "checkpoint_step": 55000,
+    "checkpoint_epoch": 4.4,
+    "pre_interrupt_step": 55906,
+    "recompute_updates": 906,
+    "verified_resumed_step": 55035,
+    "verified_loss": 0.24448983371257782,
+    "verified_grad_norm": 0.6886478662490845,
+    "observed_at_utc": "2026-10-08T17:27:37.239345+00:00",
     "full_state_restored": true,
     "global_batch": 4,
     "world_size": 4,
-    "interruption_recomputation_complete": true
+    "interruption_recomputation_complete": false
   },
   "training_progress": {
-    "step": 54412,
-    "epoch": 4.35296,
-    "loss": 0.2594909369945526,
-    "grad_norm": 1.5723295211791992,
+    "step": 55035,
+    "epoch": 4.4028,
+    "loss": 0.24448983371257782,
+    "grad_norm": 0.6886478662490845,
     "recent_steps": 500,
-    "recent_mean_loss": 0.23496838089823724,
+    "recent_mean_loss": 0.23259620425105096,
     "recent_nonfinite": 0,
-    "latest_saved_step": 53750.0,
-    "observed_at_utc": "2026-10-08T17:10:39.725640+00:00",
+    "latest_saved_step": 55000,
+    "observed_at_utc": "2026-10-08T17:27:37.239345+00:00",
     "liveness": "running;four training ranks and GPUs active",
-    "recovery": "Recomputed all1101 interrupted updates after resume from32500."
+    "recovery": "Resumed from55000 after interruption at55906;906 updates require recomputation,current35 recomputed.Previous1101 and889 update recoveries already complete.",
+    "recent_window_note": "Last500 log records include the previous attempt and35 resumed updates;not an independent post-resume loss window."
   },
   "evaluation_progress": {
     "gpus": 4,
@@ -9163,6 +9164,20 @@
       "global_batch": 4,
       "world_size": 4,
       "interruption_recomputation_complete": true
+    },
+    {
+      "checkpoint_step": 55000,
+      "checkpoint_epoch": 4.4,
+      "pre_interrupt_step": 55906,
+      "recompute_updates": 906,
+      "verified_resumed_step": 55035,
+      "verified_loss": 0.24448983371257782,
+      "verified_grad_norm": 0.6886478662490845,
+      "observed_at_utc": "2026-10-08T17:27:37.239345+00:00",
+      "full_state_restored": true,
+      "global_batch": 4,
+      "world_size": 4,
+      "interruption_recomputation_complete": false
     }
   ],
   "original_kv_update_and_stage_comparison": {

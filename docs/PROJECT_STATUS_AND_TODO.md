@@ -46,7 +46,7 @@ LLM 已有较强的语言理解和推理能力，但在复杂任务中，仍可�
 
 旧运行 `blocks_ffn_failure_batch4_75cc4fd` 已停止，停机时约 5.36 epoch；原运行目录、权重、原始回答、缓存与日志完整保留并作归档标记。已全量评齐的 0.5–5 epoch [报告](../experiments/flamingo_map_reader/results/report_ffn_failure.md)、[计数摘要](../experiments/flamingo_map_reader/results/blocks_ffn_failure_summary.json)和[历史设计](../experiments/flamingo_map_reader/DESIGN_ffn_failure.md)供参考。epoch 5 普通完成 4/510，初始目标 99/100，固定失败无解 97/100；旧三任务加权与旧 NDCG 只保留在该归档中。不能由这些结果断定 FFN 是失败原因。
 
-1. **训练重启恢复，收齐当前评测。** 2026-10-08 16:53，`blocks_kv_restart_36c213c` 从完整 0.9 epoch / step 11,250 断点恢复四卡训练，已验证更新到 11,281；中断前未保存的 889 步重算。源码与合同仍为 `36c213c`，全局 batch 4。另一节点评测持续运行：0.5 epoch 普通 reference/rollout 各完成 192/510，均为同棋盘新目标，rollout 到达 0/192。单步可达 R/F 为 58.9%/48.0%，地图最优为 16.9%/16.6%；两个终止类别尚未完成。部分结果、全部分母及新 NDCG 见[当前报告](../experiments/flamingo_map_reader/results/report.md)，不能代替全量测试。
+1. **训练重启恢复，收齐当前评测。** 2026-10-08 16:53，`blocks_kv_restart_36c213c` 从完整 0.9 epoch / step 11,250 断点恢复四卡训练，已验证更新到 11,281；中断前未保存的 889 步重算。源码与合同仍为 `36c213c`，全局 batch 4。另一节点评测持续运行：0.5 epoch 普通 reference/rollout 各完成 192/510，均为同棋盘新目标，rollout 到达 0/192。单步可达 R/F 为 58.9%/48.0%，地图最优为 16.9%/16.6%；两个终止类别尚未完成。同状态随机基线已补齐：reference 单步可达 58.9% 对随机 50.8%；rollout 48.0% 对随机 48.0%，两种 NDCG@10 略低于随机。部分结果、全部分母及新 NDCG 见[当前报告](../experiments/flamingo_map_reader/results/report.md)，不能代替全量测试。
 2. **分别收齐三类任务。** 普通任务报告完整路径到达率及到达且停止率；单步可达、地图最优、排序位置倒数与距离倒数两种 NDCG@10，以及对应 NDCG@1。已达标判断、固定失败无解判断单独报告，不跨任务混算。
 3. **解释连续执行差距。** 逐轮区分地图读取、动作使用和终止，保持 reference 与自身 rollout 的历史差异；新旧数据权重及更新预算不同，不作纯架构因果结论。
 4. **建立匹配比较与泛化证据。** 后续无地图、文字状态接口、更强模型及地图干预另定范围；不自动恢复已停止 no_map，不增加未经授权的研究分叉。

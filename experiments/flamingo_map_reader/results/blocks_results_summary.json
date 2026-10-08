@@ -174,6 +174,151 @@
         "ordinary": 510,
         "initial_goal": 100,
         "failure_context": 100
+      },
+      "random_baseline": {
+        "epoch": 0.5,
+        "step": 6250,
+        "source_commit": "36c213c",
+        "observed_at_utc": "2026-10-08T09:06:35.976249+00:00",
+        "cases_per_mode": 192,
+        "cohort": "same completed three shards as 16:53 report; same_initial_board_new_pair only",
+        "baseline": "Exact uniform random legal action / uniform random permutation, evaluated on the same model or reference states; no random rollout experiment",
+        "modes": {
+          "reference": {
+            "all_decisions": {
+              "decisions": 1548,
+              "solvable_decisions": 1199,
+              "map_minimum": {
+                "model": 0.1686046511627907,
+                "random": 0.15279871037444254
+              },
+              "keeps_reachable": {
+                "model": 0.5888240200166805,
+                "random": 0.5078160192508582
+              },
+              "metrics": {
+                "ndcg_inverse_rank_at_10": {
+                  "model": 0.5263159617388072,
+                  "random": 0.5050834054864694
+                },
+                "ndcg_inverse_distance_at_10": {
+                  "model": 0.8400110613854134,
+                  "random": 0.8298944022634972
+                },
+                "ndcg_inverse_rank_at_1": {
+                  "model": 0.3116912689132424,
+                  "random": 0.28271515093846544
+                },
+                "ndcg_inverse_distance_at_1": {
+                  "model": 0.7333245897735666,
+                  "random": 0.7070682355693849
+                }
+              }
+            },
+            "first_round": {
+              "decisions": 192,
+              "solvable_decisions": 192,
+              "map_minimum": {
+                "model": 0.015625,
+                "random": 0.018036210713795464
+              },
+              "keeps_reachable": {
+                "model": 0.5572916666666666,
+                "random": 0.5070382893519413
+              },
+              "metrics": {
+                "ndcg_inverse_rank_at_10": {
+                  "model": 0.19345527047142297,
+                  "random": 0.19924145635621163
+                },
+                "ndcg_inverse_distance_at_10": {
+                  "model": 0.7961742932605621,
+                  "random": 0.7952002712210372
+                },
+                "ndcg_inverse_rank_at_1": {
+                  "model": 0.0875830154703392,
+                  "random": 0.08226284523853002
+                },
+                "ndcg_inverse_distance_at_1": {
+                  "model": 0.7371837984880547,
+                  "random": 0.732643852250152
+                }
+              }
+            },
+            "source_shards": [
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-6250/test_reference/00000_00064",
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-6250/test_reference/00064_00128",
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-6250/test_reference/00128_00192"
+            ]
+          },
+          "rollout": {
+            "all_decisions": {
+              "decisions": 1518,
+              "solvable_decisions": 369,
+              "map_minimum": {
+                "model": 0.16600790513833993,
+                "random": 0.162105255679784
+              },
+              "keeps_reachable": {
+                "model": 0.4796747967479675,
+                "random": 0.4800124941191963
+              },
+              "metrics": {
+                "ndcg_inverse_rank_at_10": {
+                  "model": 0.5233487861597987,
+                  "random": 0.5273493690408636
+                },
+                "ndcg_inverse_distance_at_10": {
+                  "model": 0.8777100397889612,
+                  "random": 0.8870012438501265
+                },
+                "ndcg_inverse_rank_at_1": {
+                  "model": 0.3018214057151097,
+                  "random": 0.2992337276116338
+                },
+                "ndcg_inverse_distance_at_1": {
+                  "model": 0.8014073282382005,
+                  "random": 0.8066904473551957
+                }
+              }
+            },
+            "first_round": {
+              "decisions": 192,
+              "solvable_decisions": 192,
+              "map_minimum": {
+                "model": 0.03125,
+                "random": 0.018036210713795464
+              },
+              "keeps_reachable": {
+                "model": 0.4947916666666667,
+                "random": 0.5070382893519413
+              },
+              "metrics": {
+                "ndcg_inverse_rank_at_10": {
+                  "model": 0.20721418409420256,
+                  "random": 0.19924145635621163
+                },
+                "ndcg_inverse_distance_at_10": {
+                  "model": 0.7967003124993686,
+                  "random": 0.7952002712210372
+                },
+                "ndcg_inverse_rank_at_1": {
+                  "model": 0.09636841334407548,
+                  "random": 0.08226284523853002
+                },
+                "ndcg_inverse_distance_at_1": {
+                  "model": 0.7375968149227333,
+                  "random": 0.732643852250152
+                }
+              }
+            },
+            "source_shards": [
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-6250/test_rollout/00000_00064",
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-6250/test_rollout/00064_00128",
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-6250/test_rollout/00128_00192"
+            ]
+          }
+        }
       }
     }
   },

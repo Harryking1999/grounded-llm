@@ -1,8 +1,193 @@
 {
-  "status": "training_started_no_evaluation_yet",
+  "status": "training_resumed_partial_evaluation",
   "evaluation_contract": "experiments/flamingo_map_reader/configs/blocks_kv_evaluation.json",
-  "checkpoints": {},
+  "checkpoints": {
+    "6250": {
+      "epoch": 0.5,
+      "step": 6250,
+      "observed_at_utc": "2026-10-08T08:52:42.985277+00:00",
+      "only_completed_shards": true,
+      "modes": {
+        "test_rollout": {
+          "cases": 192,
+          "source_shards": [
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-6250/test_rollout/00000_00064",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-6250/test_rollout/00064_00128",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-6250/test_rollout/00128_00192"
+          ],
+          "groups": {
+            "same_initial_board_new_pair": 192
+          },
+          "reached": 0,
+          "success": 0,
+          "all_decisions": {
+            "decisions": 1518,
+            "map_minimum": 252,
+            "legal": 1504,
+            "ndcg_inverse_rank_at_10": 0.5233487861597987,
+            "ndcg_inverse_distance_at_10": 0.8777100397889612,
+            "ndcg_inverse_rank_at_1": 0.3018214057151097,
+            "ndcg_inverse_distance_at_1": 0.8014073282382005
+          },
+          "first_round": {
+            "decisions": 192,
+            "map_minimum": 6,
+            "legal": 192,
+            "ndcg_inverse_rank_at_10": 0.20721418409420256,
+            "ndcg_inverse_distance_at_10": 0.7967003124993686,
+            "ndcg_inverse_rank_at_1": 0.09636841334407548,
+            "ndcg_inverse_distance_at_1": 0.7375968149227333
+          },
+          "safe": 177,
+          "solvable_decisions": 369,
+          "termination": {
+            "done_outputs": 192,
+            "done_at_goal": 0,
+            "goal_claims": 172,
+            "correct_goal_claims": 0,
+            "goal_states": 0,
+            "no_solution_states": 178,
+            "correct_no_solution": 20
+          },
+          "inference_seconds": 4030.7344852248207
+        },
+        "test_reference": {
+          "cases": 192,
+          "source_shards": [
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-6250/test_reference/00000_00064",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-6250/test_reference/00064_00128",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-6250/test_reference/00128_00192"
+          ],
+          "groups": {
+            "same_initial_board_new_pair": 192
+          },
+          "reached": 0,
+          "success": 0,
+          "all_decisions": {
+            "decisions": 1548,
+            "map_minimum": 261,
+            "legal": 1545,
+            "ndcg_inverse_rank_at_10": 0.5263159617388072,
+            "ndcg_inverse_distance_at_10": 0.8400110613854134,
+            "ndcg_inverse_rank_at_1": 0.3116912689132424,
+            "ndcg_inverse_distance_at_1": 0.7333245897735666
+          },
+          "first_round": {
+            "decisions": 192,
+            "map_minimum": 3,
+            "legal": 192,
+            "ndcg_inverse_rank_at_10": 0.19345527047142297,
+            "ndcg_inverse_distance_at_10": 0.7961742932605621,
+            "ndcg_inverse_rank_at_1": 0.0875830154703392,
+            "ndcg_inverse_distance_at_1": 0.7371837984880547
+          },
+          "safe": 706,
+          "solvable_decisions": 1199,
+          "termination": {
+            "done_outputs": 121,
+            "done_at_goal": 118,
+            "goal_claims": 112,
+            "correct_goal_claims": 109,
+            "goal_states": 126,
+            "no_solution_states": 0,
+            "correct_no_solution": 0
+          },
+          "inference_seconds": 4021.5476858811453
+        },
+        "initial_goal_reference": {
+          "cases": 0,
+          "source_shards": [],
+          "groups": {},
+          "reached": 0,
+          "success": 0,
+          "all_decisions": {
+            "decisions": 0,
+            "map_minimum": 0,
+            "legal": 0,
+            "ndcg_inverse_rank_at_10": null,
+            "ndcg_inverse_distance_at_10": null,
+            "ndcg_inverse_rank_at_1": null,
+            "ndcg_inverse_distance_at_1": null
+          },
+          "first_round": {
+            "decisions": 0,
+            "map_minimum": 0,
+            "legal": 0,
+            "ndcg_inverse_rank_at_10": null,
+            "ndcg_inverse_distance_at_10": null,
+            "ndcg_inverse_rank_at_1": null,
+            "ndcg_inverse_distance_at_1": null
+          },
+          "safe": 0,
+          "solvable_decisions": 0,
+          "termination": {
+            "done_outputs": 0,
+            "done_at_goal": 0,
+            "goal_claims": 0,
+            "correct_goal_claims": 0,
+            "goal_states": 0,
+            "no_solution_states": 0,
+            "correct_no_solution": 0
+          },
+          "inference_seconds": 0
+        },
+        "test_no_solution_reference": {
+          "cases": 0,
+          "source_shards": [],
+          "groups": {},
+          "reached": 0,
+          "success": 0,
+          "all_decisions": {
+            "decisions": 0,
+            "map_minimum": 0,
+            "legal": 0,
+            "ndcg_inverse_rank_at_10": null,
+            "ndcg_inverse_distance_at_10": null,
+            "ndcg_inverse_rank_at_1": null,
+            "ndcg_inverse_distance_at_1": null
+          },
+          "first_round": {
+            "decisions": 0,
+            "map_minimum": 0,
+            "legal": 0,
+            "ndcg_inverse_rank_at_10": null,
+            "ndcg_inverse_distance_at_10": null,
+            "ndcg_inverse_rank_at_1": null,
+            "ndcg_inverse_distance_at_1": null
+          },
+          "safe": 0,
+          "solvable_decisions": 0,
+          "termination": {
+            "done_outputs": 0,
+            "done_at_goal": 0,
+            "goal_claims": 0,
+            "correct_goal_claims": 0,
+            "goal_states": 0,
+            "no_solution_states": 0,
+            "correct_no_solution": 0
+          },
+          "inference_seconds": 0
+        }
+      },
+      "coverage": "partial_same_initial_board_new_pair_only",
+      "expected_tasks": {
+        "ordinary": 510,
+        "initial_goal": 100,
+        "failure_context": 100
+      }
+    }
+  },
   "run": "blocks_kv_restart_36c213c",
   "source_commit": "36c213c",
-  "startup_verified_step": 75
+  "startup_verified_step": 75,
+  "observed_at_utc": "2026-10-08T08:52:42.985277+00:00",
+  "training_resume": {
+    "checkpoint_step": 11250,
+    "checkpoint_epoch": 0.9,
+    "pre_interrupt_step": 12139,
+    "recomputed_updates": 889,
+    "verified_resumed_step": 11281,
+    "verified_loss": 0.2636162042617798,
+    "verified_grad_norm": 2.1199498176574707
+  }
 }

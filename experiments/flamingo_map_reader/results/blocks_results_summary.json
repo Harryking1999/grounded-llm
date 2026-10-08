@@ -5016,25 +5016,28 @@
     "interruption_recomputation_complete": true
   },
   "training_progress": {
-    "step": 62247,
-    "epoch": 4.97976,
-    "loss": 0.2488332986831665,
-    "grad_norm": 2.8266522884368896,
+    "step": 62535,
+    "epoch": 5.0028,
+    "loss": 0.22544245421886444,
+    "grad_norm": 1.949842095375061,
     "recent_steps": 500,
-    "recent_mean_loss": 0.22257133802771567,
+    "recent_mean_loss": 0.21983753895759583,
     "recent_nonfinite": 0,
-    "latest_saved_step": 61250.0,
-    "observed_at_utc": "2026-10-08T18:40:43.342808+00:00",
+    "latest_saved_step": 62500,
+    "observed_at_utc": "2026-10-08T18:56:17.463839+00:00",
     "liveness": "running;four training ranks and GPUs active",
-    "recovery": "All906 interrupted updates after resume from55000 recomputed;all earlier recoveries complete."
+    "recovery": "Resumed from62500 after interruption at63580;1080 updates require recomputation,35 verified.Previous recoveries complete.",
+    "recent_window_note": "Last500 log records mix previous attempt with35 resumed updates;not an independent post-resume loss trend."
   },
   "evaluation_progress": {
     "gpus": 4,
-    "completed_shards": 94,
+    "completed_shards": 97,
     "resumed": true,
-    "archived_incomplete_shards": 2,
+    "archived_incomplete_shards": 4,
     "active_workers": 4,
-    "observed_at_utc": "2026-10-08T18:40:43.188498+00:00"
+    "observed_at_utc": "2026-10-08T18:56:18.388257+00:00",
+    "metrics_snapshot_completed_shards": 94,
+    "metrics_snapshot_note": "97 complete shards retained on restart;reported metrics remain frozen to earlier94-shard snapshot pending CPU update.Three added shards expand epoch4.5 reference128->256 and rollout192 noncontiguous->256 contiguous."
   },
   "matched_epoch05_epoch1": {
     "test_reference": {
@@ -11639,6 +11642,21 @@
       "global_batch": 4,
       "world_size": 4,
       "interruption_recomputation_complete": true
+    },
+    {
+      "checkpoint_step": 62500,
+      "checkpoint_epoch": 5.0,
+      "pre_interrupt_step": 63580,
+      "recompute_updates": 1080,
+      "verified_resumed_step": 62535,
+      "verified_loss": 0.22544245421886444,
+      "verified_grad_norm": 1.949842095375061,
+      "observed_at_utc": "2026-10-08T18:56:17.463839+00:00",
+      "full_state_restored": true,
+      "global_batch": 4,
+      "world_size": 4,
+      "interruption_recomputation_complete": false,
+      "numerical_equivalence_note": "Same configuration and full checkpoint state;different GPU hardware may change floating-point numerics."
     }
   ],
   "original_kv_update_and_stage_comparison": {

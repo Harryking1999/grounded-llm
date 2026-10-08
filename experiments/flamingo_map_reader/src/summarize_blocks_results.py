@@ -9,7 +9,8 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from experiments.flamingo_map_reader.src.analyze_blocks_ranking import ndcg
+from experiments.flamingo_map_reader.src.analyze_blocks_ranking import (
+    ndcg, meeting_ranking_scores, MEETING_METRICS)
 from experiments.flamingo_map_reader.src.blocks import FrozenBoardMap, blocks_step
 from experiments.flamingo_map_reader.src.blocks_checkpoint_queue import checkpoints
 from experiments.flamingo_map_reader.src.relations import parse_ranking
@@ -41,7 +42,11 @@ def summarize(rows):
     live = [r for r in rows if still_solvable(r)]
     decisions = [r for r in rows if not r['done'] and r.get('candidates', 0) > 0]
     ranked = [r for r in decisions if r.get('ranking_ndcg_at_10') is not None]
-    return dict(turns=len(rows), solvable=len(live),
+    extra = {}
+    for key in MEETING_METRICS:
+        scored = [r[key] for r in decisions if r.get(key) is not None]
+        extra[key] = sum(scored)/len(scored) if scored else None
+    return dict(**extra, turns=len(rows), solvable=len(live),
                 safe=sum(bool(r.get('action_keeps_goal_reachable')) for r in live),
                 random_safe_mean=sum(r.get('reachable_candidates', 0)/r['candidates'] for r in live)/len(live) if live else None,
                 shortest=sum(bool(r.get('action_environment_shortest')) for r in live),
@@ -76,7 +81,8 @@ def add_readout_scores(row, distances, ranking_contract):
                random_map_minimum=sum(np.isclose(d, min(distances), rtol=1e-10, atol=1e-12) for d in distances)/len(distances),
                selected_in_ranking=chosen in candidates,
                follows_own_top=chosen in candidates and candidates[chosen] == min(candidates.values()))
-    return {k:row[k] for k in ('ranking_ndcg_at_10', 'random_ndcg_at_10',
+    row.update(meeting_ranking_scores(distances, ranks))
+    return {k:row[k] for k in (*MEETING_METRICS, 'ranking_ndcg_at_10', 'random_ndcg_at_10',
                                'ranking_parseable', 'selected_in_ranking', 'follows_own_top', 'random_map_minimum', 'topk_recall')}
 
 
@@ -149,7 +155,8 @@ def main():
     qmap = FrozenBoardMap.load(Path(manifest['q_checkpoint']))
     demos = {}
     cache = json.loads(args.ranking_cache.read_text()) if args.ranking_cache and args.ranking_cache.exists() else {}
-    cache = {k:v for k,v in cache.items() if isinstance(v, dict) and 'topk_recall' in v}
+    cache = {k:v for k,v in cache.items() if isinstance(v, dict) and
+             'topk_recall' in v and all(name in v for name in MEETING_METRICS)}
     result = dict(run=args.run.name, observed_at_utc=datetime.now(timezone.utc).isoformat(),
                   evaluation_contract=contract, checkpoints={})
     expected = {k:v['tasks'] for k,v in contract['tasks'].items()}
@@ -193,12 +200,13 @@ def main():
                 assert len(c['turns']) == 1
                 assert bool(c['turns'][0]['done']) == (task == 'initial_goal')
             values[task] = summarize_cases(cases)
-        pooled_rows = []
-        for directory in ('test_rollout', 'initial_goal_reference', 'test_no_solution_reference'):
-            pooled_rows.extend(r for c in read_cases(root/directory) for r in c['turns'])
-        values['overall_termination'] = termination_counts(pooled_rows)
-        values['overall_completion'] = overall_completion(values['rollout'],values['initial_goal'],
-            values['failure_context'],contract['task_weights'],expected)
+        if contract.get('overall_completion') != 'disabled_report_tasks_separately':
+            pooled_rows = []
+            for directory in ('test_rollout', 'initial_goal_reference', 'test_no_solution_reference'):
+                pooled_rows.extend(r for c in read_cases(root/directory) for r in c['turns'])
+            values['overall_termination'] = termination_counts(pooled_rows)
+            values['overall_completion'] = overall_completion(values['rollout'],values['initial_goal'],
+                values['failure_context'],contract['task_weights'],expected)
         result['checkpoints'][str(step)] = dict(epoch=checkpoint['epoch'], **values)
         print(json.dumps(dict(step=step, ordinary=values['rollout']['cases'],
                              initial_goal=values['initial_goal']['cases'], failure=values['failure_context']['cases'])), flush=True)

@@ -26,11 +26,35 @@ def rank_grade_gains(distances, k=10):
     return gains
 
 
+def inverse_rank_gains(distances):
+    """Reciprocal true positions; equal distances share mean occupied gain."""
+    ordered = sorted(range(len(distances)), key=lambda i: distances[i])
+    gains = [0.0] * len(distances)
+    offset = 0
+    while offset < len(ordered):
+        stop = offset + 1
+        while stop < len(ordered) and math.isclose(distances[ordered[offset]],
+                distances[ordered[stop]], rel_tol=1e-10, abs_tol=1e-12):
+            stop += 1
+        value = sum(1.0 / (i + 1) for i in range(offset, stop)) / (stop - offset)
+        for i in ordered[offset:stop]:
+            gains[i] = value
+        offset = stop
+    return gains
+
+
 def ndcg(distances, ranks, k=10, gain='inverse_distance', discount='log2'):
     """Linear gains, average predicted ties, and zero gain for missing slots."""
     assert all(math.isfinite(d) and d >= 0 for d in distances)
-    assert gain in ('inverse_distance', 'rank_grade')
-    gains = rank_grade_gains(distances, k) if gain == 'rank_grade' else [1.0 / (1.0 + d) for d in distances]
+    assert gain in ('inverse_distance', 'rank_grade', 'inverse_rank', 'reciprocal_distance')
+    if gain == 'rank_grade':
+        gains = rank_grade_gains(distances, k)
+    elif gain == 'inverse_rank':
+        gains = inverse_rank_gains(distances)
+    elif gain == 'reciprocal_distance':
+        gains = [1.0 / max(d, 1e-12) for d in distances]
+    else:
+        gains = [1.0 / (1.0 + d) for d in distances]
     k = min(k, len(gains))
     if not k:
         return None, None
@@ -55,6 +79,17 @@ def ndcg(distances, ranks, k=10, gain='inverse_distance', discount='log2'):
     value = dcg / ideal
     assert -1e-12 <= value <= 1+1e-12
     return min(1.0, max(0.0, value)), chance
+
+
+MEETING_METRICS = ('ndcg_inverse_rank_at_10', 'ndcg_inverse_distance_at_10',
+                   'ndcg_inverse_rank_at_1', 'ndcg_inverse_distance_at_1')
+
+
+def meeting_ranking_scores(distances, ranks):
+    """Meeting contract: two gains, log discount, and the same gain ratio at 1."""
+    return {name: ndcg(distances, ranks, k=k, gain=gain)[0]
+            for name, k, gain in zip(MEETING_METRICS, (10, 10, 1, 1),
+                ('inverse_rank', 'reciprocal_distance', 'inverse_rank', 'reciprocal_distance'))}
 
 
 def check_metric():

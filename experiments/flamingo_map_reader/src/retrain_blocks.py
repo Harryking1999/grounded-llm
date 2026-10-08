@@ -89,6 +89,12 @@ def run(args):
             prepared = json.loads(args.prepared_manifest.read_text())
             before = {k:v for k,v in prepared['config'].items() if k not in ('map', 'checkpoint')}
             after = {k:v for k,v in config.items() if k not in ('map', 'checkpoint')}
+            # Failure histories have cached copies too; retaining their first
+            # copy changes sampling only, without rebuilding labels or maps.
+            failure_variants = config['data'].get('failure_numbering_variants')
+            for value in (before, after):
+                value['data'] = {k:v for k,v in value['data'].items()
+                                 if k != 'failure_numbering_variants'}
             for value in (before, after):
                 value['training'] = {k:v for k,v in value['training'].items()
                     if k not in ('checkpoint_layers', 'loss_chunk_tokens',
@@ -97,6 +103,15 @@ def run(args):
                 raise ValueError('Prepared data reuse requires identical labels, sampling and training budget')
             prepared['config'] = config
             prepared['prepared_data_source'] = str(args.prepared_manifest.resolve())
+            if failure_variants is not None:
+                for record in prepared['records']:
+                    if record['split'] == 'train' and record.get('no_solution'):
+                        if not 1 <= failure_variants <= record['variants']:
+                            raise ValueError('Requested failure numbering copies are not cached')
+                        record['variants'] = failure_variants
+                prepared['audit']['training_numbered_trajectories'] = sum(
+                    r['variants'] for r in prepared['records'] if r['split'] == 'train')
+                prepared['audit']['failure_numbering_variants'] = failure_variants
             (args.out/'data').mkdir()
             (args.out/'data/trajectories').symlink_to(
                 (args.prepared_manifest.parent/'trajectories').resolve(), target_is_directory=True)

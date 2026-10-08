@@ -70,7 +70,8 @@ def main():
     result = dict(rank=rank, per_device_batch=args.batch_size,
         global_batch=args.batch_size*torch.distributed.get_world_size(),
         tokens=inputs['input_ids'].shape[1], losses=losses,
-        ffn_gradient_norm=reader.memory_encoder.feature_ffn[0].weight.grad.norm().item(),
+        ffn_gradient_norm=(reader.memory_encoder.feature_ffn[0].weight.grad.norm().item()
+            if reader.memory_encoder.feature_ffn is not None else None),
         peak_gib=torch.cuda.max_memory_allocated()/1024**3,
         reserved_gib=torch.cuda.max_memory_reserved()/1024**3,
         total_gib=torch.cuda.get_device_properties(rank).total_memory/1024**3,

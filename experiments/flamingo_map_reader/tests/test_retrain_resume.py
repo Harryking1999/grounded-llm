@@ -10,6 +10,37 @@ from experiments.flamingo_map_reader.src import retrain_blocks
 
 
 class RetrainResumeTest(unittest.TestCase):
+    def test_fresh_kv_run_reuses_only_one_failure_copy_without_resuming_weights(self):
+        configs = Path(__file__).resolve().parents[1]/'configs'
+        original = json.loads((configs/'blocks_ffn_failure_batch4.json').read_text())
+        config = json.loads((configs/'blocks_kv_restart.json').read_text())
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root/'source.json'
+            source.write_text(json.dumps(dict(config=original, audit={}, q_checkpoint='map.pt', records=[
+                dict(split='train', variants=6),
+                dict(split='train', variants=1, start='1', goal='1'),
+                dict(split='train', variants=6, no_solution=True)])))
+            config_path = root/'config.json'
+            config_path.write_text(json.dumps(config))
+            commands = []
+            class Process:
+                def __init__(self, command, **kwargs):
+                    commands.append(command)
+                def wait(self):
+                    return 0
+            argv = ['retrain_blocks', '--config', str(config_path), '--prepared-manifest', str(source),
+                    '--source-manifest', 'unused', '--model-path', 'model', '--out', str(root/'run'),
+                    '--training-only']
+            with mock.patch('sys.argv', argv), mock.patch.object(retrain_blocks.subprocess, 'Popen', Process), \
+                    mock.patch.object(Path, 'symlink_to'):
+                retrain_blocks.main()
+            manifest = json.loads((root/'run/data/manifest.json').read_text())
+            self.assertEqual([r['variants'] for r in manifest['records']], [6, 1, 1])
+            self.assertEqual(manifest['audit']['training_numbered_trajectories'], 8)
+            self.assertEqual(manifest['config']['map']['memory_mode'], 'address_key_state_value')
+            self.assertTrue(all('--resume' not in c for c in commands))
+
     def test_two_gpu_continuation_reuses_newest_two_rank_checkpoint_and_leaves_evaluation_separate(self):
         configs = Path(__file__).resolve().parents[1]/'configs'
         config = json.loads((configs/'blocks_ffn_failure_batch4.json').read_text())

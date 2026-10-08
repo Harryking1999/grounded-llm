@@ -4,12 +4,27 @@ from pathlib import Path
 from experiments.flamingo_map_reader.src.trajectory_metrics import termination_counts, summarize_turns
 from experiments.flamingo_map_reader.src.blocks_checkpoint_queue import (
     evaluation_modes, evaluation_selection, validate_resume_contract)
-from experiments.flamingo_map_reader.src.analyze_blocks_ranking import check_metric
+from experiments.flamingo_map_reader.src.analyze_blocks_ranking import (
+    check_metric, meeting_ranking_scores, inverse_rank_gains)
 from experiments.flamingo_map_reader.src.summarize_blocks_results import (
     add_readout_scores, summarize_cases, overall_completion)
 
 
 class ThreeTaskMetricsTest(unittest.TestCase):
+    def test_meeting_metrics_use_true_rank_and_distance_gains(self):
+        values = meeting_ranking_scores([2., 4., 8.], {0:0, 2:1, 1:2, 3:3})
+        self.assertAlmostEqual(values['ndcg_inverse_rank_at_1'], .5)
+        self.assertAlmostEqual(values['ndcg_inverse_distance_at_1'], .5)
+        ideal = meeting_ranking_scores([2., 4., 8.], {0:0, 1:1, 2:2, 3:3})
+        self.assertTrue(all(v == 1 for v in ideal.values()))
+        bad = meeting_ranking_scores([0., 2.], None)
+        self.assertTrue(all(v == 0 for v in bad.values()))
+        tied = meeting_ranking_scores([2., 4.], {0:0, 1:1, 2:1})
+        self.assertAlmostEqual(tied['ndcg_inverse_distance_at_1'], .75)
+        self.assertEqual(inverse_rank_gains([2., 2., 4.]), [.75, .75, 1/3])
+        zeros = meeting_ranking_scores([0., 0., 2.], {0:0, 2:1})
+        self.assertEqual(zeros['ndcg_inverse_distance_at_1'], 1)
+
     def test_done_precision_recall_and_correct_failure_have_distinct_denominators(self):
         rows = [dict(done=True, candidates=0, answer='<done/>'),
                 dict(done=False, candidates=0, answer='<action>none</action><done/>'),

@@ -53,7 +53,11 @@ def failure_candidates(board):
 
 def prepare_failure(job):
     record, demo = job
-    return prepare_record(demo, record, WORK['config'], WORK['tokenizer'],
+    config = WORK['config']
+    if record['split'] == 'train' and 'failure_numbering_variants' in config['data']:
+        config = dict(config, data=dict(config['data'],
+            numbering_variants=config['data']['failure_numbering_variants']))
+    return prepare_record(demo, record, config, WORK['tokenizer'],
                            WORK['root'] / (record['trajectory_id'] + '.pt'))
 
 

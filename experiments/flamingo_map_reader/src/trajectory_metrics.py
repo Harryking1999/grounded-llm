@@ -8,7 +8,7 @@ from .relations import score_relationships, parse_ranking
 from .sft import reported_candidates
 from .evaluate_blocks import parse_control
 from .blocks_failure import declares_no_solution
-from .analyze_blocks_ranking import ndcg
+from .analyze_blocks_ranking import ndcg, meeting_ranking_scores, MEETING_METRICS
 
 
 def summary_correct(answer, expected):
@@ -40,6 +40,7 @@ def score_turn(step, answer, expected_terminal=None, reported=None):
         ranks = parse_ranking(answer, len(step.candidate_actions), reported)
         value, chance = ndcg(step.candidate_map_distances, ranks, gain='rank_grade')
         result.update(ranking_ndcg_at_10=value, random_ndcg_at_10=chance)
+        result.update(meeting_ranking_scores(step.candidate_map_distances, ranks))
         direction_correct = 0
         if ranks is not None and set(ranks) == {0, *named}:
             for i in named:
@@ -111,6 +112,9 @@ def summarize_turns(rows):
     result['ranking_ndcg_turns'] = len(ranked)
     result['ranking_ndcg_at_10'] = (sum(r['ranking_ndcg_at_10'] for r in ranked) / len(ranked)
                                      if ranked else None)
+    for key in MEETING_METRICS:
+        scored = [r[key] for r in ranked if r.get(key) is not None]
+        result[key] = sum(scored)/len(scored) if scored else None
     result.update(termination_counts(rows))
     for name, numerator, denominator in (
             ('done_goal_precision', 'done_at_goal', 'done_outputs'),

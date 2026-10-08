@@ -1,6 +1,6 @@
 # 完整轨迹 SFT：寻路原方案与积木 FFN 重训
 
-本页按原寻路方案的顺序说明数据、输入、监督、训练和评测。积木采用 2026-10-07 确认的基础设置：**融合 FFN、失败上下文、全局 batch 4，从头训练 10 个 epoch；每 0.1 epoch 保存，每 0.5 epoch 评测主测试**。初始为四卡各 1 条；2026-10-08 经授权从完整断点迁移为两卡各 2 条，维持逐轨迹等权目标。评测初始四卡，同日再次重启后经授权扩至两节点六卡，使用互斥分片，启动见 README。寻路列为上一轮方案参照，本次不重启寻路训练。
+本页按原寻路方案的顺序说明数据、输入、监督、训练和评测。积木采用 2026-10-07 确认的基础设置：**融合 FFN、失败上下文、全局 batch 4，从头训练 10 个 epoch；每 0.1 epoch 保存，每 0.5 epoch 评测主测试**。初始为四卡各 1 条；2026-10-08 经授权从完整断点迁移为两卡各 2 条，维持逐轨迹等权目标。评测支持单节点四卡或两节点六卡；后者使用互斥分片，启动见 README，当前资源分配见项目状态页。寻路列为上一轮方案参照，本次不重启寻路训练。
 
 正式参数以[积木基础配置](configs/blocks_ffn_failure_batch4.json)及[两卡接续合同](configs/blocks_batch4_two_gpu_resume.json)为准；[全局 batch 64 配置](configs/blocks_ffn_failure.json)对应已停止的对照运行，[寻路配置](configs/path_single_long.json)对应上一轮方案。进度见[项目状态页](../../docs/PROJECT_STATUS_AND_TODO.md)。上一轮两任务的[设计](DESIGN_long_trajectory.md)与[报告](results/report_long_trajectory.md)在原目录保留，其成绩不属于当前小 batch 运行。
 

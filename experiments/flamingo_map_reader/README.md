@@ -173,6 +173,10 @@ python -m experiments.flamingo_map_reader.src.blocks_checkpoint_queue \
 两个队列都优先最新断点，完成分片复用，未完成分片归档后重算。运行中变更分区须先停止对应 worker，
 避免原进程继续持有已转交的分片。主状态为 `status.json`，辅助状态为 `status.aux.json`，两者须一起读取。
 
+若重启后训练节点仅剩两卡，全部用于训练，则不启动辅助队列。确认两节点均无旧评测 worker 后，
+用上面的单节点四卡命令恢复主队列，采用默认的全部分片分区；不能沿用只拥有 `0,1` 余数的六卡调用，
+否则原辅助分片会一直无人执行。恢复记录应将辅助状态标为 inactive，完整分片继续复用。
+
 **上一轮两任务队列：**以下 `--delegate-prefix`、`--evaluation-only` 参数属于 `trajectory_queue`，不适用于当前 `retrain_blocks` 入口。
 
 两节点共享运行目录。主队列用 `--delegate-prefix` 排除交给另一节点的任务；另一节点运行同一模块的 `--evaluation-only --include-prefix ... --status-file ...`，使用独立状态文件。前缀必须互斥，不能将同一分片交给两个进程。

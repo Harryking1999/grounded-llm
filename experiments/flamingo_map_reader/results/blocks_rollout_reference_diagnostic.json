@@ -1200,8 +1200,49 @@
     }
   },
   "latest_completed_checkpoints": {
-    "observed_at_utc": "2026-10-08T00:14:13.479725+00:00",
+    "observed_at_utc": "2026-10-08T04:32:28.813929+00:00",
+    "method": "All complete canonical shards; denominator includes solvable turns even if the chosen-action field is absent. Such turns are verified to have no legal chosen action and count as errors.",
     "checkpoints": {
+      "6875": {
+        "cases_per_mode": 510,
+        "reference_safe": [
+          1726,
+          3148
+        ],
+        "rollout_safe": [
+          468,
+          976
+        ],
+        "rollout_success": [
+          1,
+          510
+        ],
+        "rollout_exhausted_no_solution": [
+          318,
+          473
+        ],
+        "rollout_missing_action_score_on_solvable": 0
+      },
+      "13750": {
+        "cases_per_mode": 510,
+        "reference_safe": [
+          1877,
+          3148
+        ],
+        "rollout_safe": [
+          616,
+          1120
+        ],
+        "rollout_success": [
+          6,
+          510
+        ],
+        "rollout_exhausted_no_solution": [
+          133,
+          477
+        ],
+        "rollout_missing_action_score_on_solvable": 1
+      },
       "20625": {
         "cases_per_mode": 510,
         "reference_safe": [
@@ -1219,7 +1260,8 @@
         "rollout_exhausted_no_solution": [
           19,
           485
-        ]
+        ],
+        "rollout_missing_action_score_on_solvable": 5
       },
       "27500": {
         "cases_per_mode": 510,
@@ -1238,7 +1280,8 @@
         "rollout_exhausted_no_solution": [
           141,
           484
-        ]
+        ],
+        "rollout_missing_action_score_on_solvable": 0
       },
       "34375": {
         "cases_per_mode": 510,
@@ -1257,7 +1300,8 @@
         "rollout_exhausted_no_solution": [
           71,
           398
-        ]
+        ],
+        "rollout_missing_action_score_on_solvable": 0
       },
       "41250": {
         "cases_per_mode": 510,
@@ -1276,7 +1320,8 @@
         "rollout_exhausted_no_solution": [
           186,
           426
-        ]
+        ],
+        "rollout_missing_action_score_on_solvable": 0
       },
       "48125": {
         "cases_per_mode": 510,
@@ -1295,7 +1340,8 @@
         "rollout_exhausted_no_solution": [
           192,
           418
-        ]
+        ],
+        "rollout_missing_action_score_on_solvable": 0
       },
       "55000": {
         "cases_per_mode": 510,
@@ -1314,7 +1360,186 @@
         "rollout_exhausted_no_solution": [
           209,
           404
-        ]
+        ],
+        "rollout_missing_action_score_on_solvable": 0
+      },
+      "61875": {
+        "cases_per_mode": 510,
+        "reference_safe": [
+          2580,
+          3148
+        ],
+        "rollout_safe": [
+          569,
+          1069
+        ],
+        "rollout_success": [
+          10,
+          510
+        ],
+        "rollout_exhausted_no_solution": [
+          188,
+          391
+        ],
+        "rollout_missing_action_score_on_solvable": 1
+      }
+    }
+  },
+  "epoch45_full_followup": {
+    "observed_at_utc": "2026-10-08T04:32:28.813929+00:00",
+    "checkpoint_step": 61875,
+    "checkpoint_epoch": 4.5,
+    "method": "All eight complete canonical shards per mode; exclude interrupted archives; unique trajectory/variant. Include every pre-response solvable decision with candidates, including premature stops. One rollout solvable row has no action score and is an error; official denominator excludes it (1068 rather than 1069). No model rerun or scoring-code mutation.",
+    "modes": {
+      "reference": {
+        "cases": 510,
+        "groups": {
+          "same_initial_board_new_pair": 255,
+          "new_initial_board": 255
+        },
+        "safe": 2580,
+        "solvable": 3148,
+        "solvable_missing_action_score": 0,
+        "shortest": 2370,
+        "first_safe": 238,
+        "first_decisions": 510,
+        "first_choose_1_to_3": 328,
+        "goal_stop_correct": 325,
+        "goal_turns": 345
+      },
+      "rollout": {
+        "cases": 510,
+        "groups": {
+          "same_initial_board_new_pair": 255,
+          "new_initial_board": 255
+        },
+        "safe": 569,
+        "solvable": 1069,
+        "solvable_missing_action_score": 1,
+        "shortest": 493,
+        "first_safe": 245,
+        "first_decisions": 510,
+        "first_choose_1_to_3": 333,
+        "goal_stop_correct": 10,
+        "goal_turns": 10,
+        "success": 10,
+        "reached": 10,
+        "no_solution_correct": 188,
+        "no_solution_expected": 391,
+        "success_by_group": {
+          "new_initial_board": 8,
+          "same_initial_board_new_pair": 2
+        }
+      }
+    },
+    "official": {
+      "reference": {
+        "action_keeps_goal_reachable": 2580,
+        "solvable_decisions": 3148,
+        "no_solution_correct": 0,
+        "no_solution_expected": 0
+      },
+      "rollout": {
+        "action_keeps_goal_reachable": 569,
+        "solvable_decisions": 1068,
+        "no_solution_correct": 188,
+        "no_solution_expected": 391
+      }
+    }
+  },
+  "epoch5_partial_followup": {
+    "observed_at_utc": "2026-10-08T04:32:28.813929+00:00",
+    "checkpoint_step": 68750,
+    "checkpoint_epoch": 5.0,
+    "method": "Fully written canonical cases only; exclude interrupted copies and incomplete final JSON lines. Match each mode to epoch 4.5 by trajectory/variant; reference physical rounds agree. Rollout states differ; this sample contains unequal numbers from the two board groups and is not the full test.",
+    "matched_epoch45_and_epoch5": {
+      "reference": {
+        "older_step": 61875,
+        "newer_step": 68750,
+        "older": {
+          "cases": 326,
+          "groups": {
+            "same_initial_board_new_pair": 255,
+            "new_initial_board": 71
+          },
+          "safe": 1606,
+          "solvable": 1965,
+          "solvable_missing_action_score": 0,
+          "shortest": 1485,
+          "first_safe": 152,
+          "first_decisions": 326,
+          "first_choose_1_to_3": 208,
+          "goal_stop_correct": 201,
+          "goal_turns": 215
+        },
+        "newer": {
+          "cases": 326,
+          "groups": {
+            "same_initial_board_new_pair": 255,
+            "new_initial_board": 71
+          },
+          "safe": 1601,
+          "solvable": 1965,
+          "solvable_missing_action_score": 0,
+          "shortest": 1480,
+          "first_safe": 146,
+          "first_decisions": 326,
+          "first_choose_1_to_3": 200,
+          "goal_stop_correct": 214,
+          "goal_turns": 215
+        }
+      },
+      "rollout": {
+        "older_step": 61875,
+        "newer_step": 68750,
+        "older": {
+          "cases": 263,
+          "groups": {
+            "same_initial_board_new_pair": 195,
+            "new_initial_board": 68
+          },
+          "safe": 287,
+          "solvable": 547,
+          "solvable_missing_action_score": 0,
+          "shortest": 257,
+          "first_safe": 126,
+          "first_decisions": 263,
+          "first_choose_1_to_3": 168,
+          "goal_stop_correct": 3,
+          "goal_turns": 3,
+          "success": 3,
+          "reached": 3,
+          "no_solution_correct": 109,
+          "no_solution_expected": 221,
+          "success_by_group": {
+            "new_initial_board": 1,
+            "same_initial_board_new_pair": 2
+          }
+        },
+        "newer": {
+          "cases": 263,
+          "groups": {
+            "same_initial_board_new_pair": 195,
+            "new_initial_board": 68
+          },
+          "safe": 356,
+          "solvable": 617,
+          "solvable_missing_action_score": 0,
+          "shortest": 294,
+          "first_safe": 140,
+          "first_decisions": 263,
+          "first_choose_1_to_3": 162,
+          "goal_stop_correct": 2,
+          "goal_turns": 2,
+          "success": 2,
+          "reached": 2,
+          "no_solution_correct": 103,
+          "no_solution_expected": 212,
+          "success_by_group": {
+            "new_initial_board": 0,
+            "same_initial_board_new_pair": 2
+          }
+        }
       }
     }
   }

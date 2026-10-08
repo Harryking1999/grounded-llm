@@ -2283,5 +2283,132 @@
         }
       }
     }
+  },
+  "original_kv_historical_reference": {
+    "run": "long_f73b700_20261004/blocks",
+    "split": "validation",
+    "cases_per_mode": 1000,
+    "initial_goal_cases_excluded": 100,
+    "final_step": 245000,
+    "common_physical_start_goal_pairs_with_new_test": 0,
+    "checkpoints": {
+      "final": {
+        "step": 245000,
+        "modes": {
+          "reference": {
+            "n": 1000,
+            "safe": 701,
+            "shortest": 652,
+            "chosen_map_minimum": 157,
+            "first_three": 236,
+            "valid_ranking": 1,
+            "exact_ranking": 0
+          },
+          "rollout": {
+            "n": 1000,
+            "safe": 703,
+            "shortest": 655,
+            "chosen_map_minimum": 158,
+            "first_three": 232,
+            "valid_ranking": 1,
+            "exact_ranking": 0
+          }
+        }
+      },
+      "checkpoint-196000": {
+        "step": 196000,
+        "modes": {
+          "reference": {
+            "n": 1000,
+            "safe": 606,
+            "shortest": 553,
+            "chosen_map_minimum": 108,
+            "first_three": 305,
+            "valid_ranking": 0,
+            "exact_ranking": 0
+          },
+          "rollout": {
+            "n": 1000,
+            "safe": 610,
+            "shortest": 551,
+            "chosen_map_minimum": 102,
+            "first_three": 326,
+            "valid_ranking": 1,
+            "exact_ranking": 0
+          }
+        }
+      },
+      "checkpoint-147000": {
+        "step": 147000,
+        "modes": {
+          "reference": {
+            "n": 1000,
+            "safe": 590,
+            "shortest": 530,
+            "chosen_map_minimum": 82,
+            "first_three": 499,
+            "valid_ranking": 0,
+            "exact_ranking": 0
+          },
+          "rollout": {
+            "n": 1000,
+            "safe": 590,
+            "shortest": 529,
+            "chosen_map_minimum": 99,
+            "first_three": 488,
+            "valid_ranking": 0,
+            "exact_ranking": 0
+          }
+        }
+      },
+      "checkpoint-98000": {
+        "step": 98000,
+        "modes": {
+          "reference": {
+            "n": 1000,
+            "safe": 618,
+            "shortest": 552,
+            "chosen_map_minimum": 76,
+            "first_three": 554,
+            "valid_ranking": 0,
+            "exact_ranking": 0
+          },
+          "rollout": {
+            "n": 1000,
+            "safe": 601,
+            "shortest": 546,
+            "chosen_map_minimum": 76,
+            "first_three": 562,
+            "valid_ranking": 1,
+            "exact_ranking": 0
+          }
+        }
+      },
+      "checkpoint-49000": {
+        "step": 49000,
+        "modes": {
+          "reference": {
+            "n": 1000,
+            "safe": 579,
+            "shortest": 495,
+            "chosen_map_minimum": 41,
+            "first_three": 702,
+            "valid_ranking": 0,
+            "exact_ranking": 0
+          },
+          "rollout": {
+            "n": 1000,
+            "safe": 581,
+            "shortest": 507,
+            "chosen_map_minimum": 39,
+            "first_three": 710,
+            "valid_ranking": 0,
+            "exact_ranking": 0
+          }
+        }
+      }
+    },
+    "limitations": "Unmatched historical reference: old validation and current test have zero common physical start/goal tasks. Old global batch 1 versus current 4; old has no dedicated failure contexts. Old/current KV have the same address-key/state-value architecture. Old 49000 versus current 12500 updates per epoch (3.92x), both 48000 ordinary trajectory exposures per epoch. Compare by updates and training stage separately; no causal architecture estimate. Old strict valid_ranking is not the syntax-only parsing rate.",
+    "source_evidence": "experiments/flamingo_map_reader/results/blocks_rollout_reference_diagnostic.json#old_first_round_unmatched"
   }
 }

@@ -1080,5 +1080,242 @@
         }
       }
     }
+  },
+  "epoch4_full_followup": {
+    "observed_at_utc": "2026-10-08T00:14:13.479725+00:00",
+    "checkpoint_step": 55000,
+    "checkpoint_epoch": 4.0,
+    "method": "All eight canonical shards per mode; exclude interrupted archives; assert unique trajectory/variant; raw counters agree with official complete summaries. Same 510 physical tasks as epoch 3.5. Rollout states depend on model actions.",
+    "modes": {
+      "reference": {
+        "cases": 510,
+        "groups": {
+          "same_initial_board_new_pair": 255,
+          "new_initial_board": 255
+        },
+        "safe": 2584,
+        "solvable": 3148,
+        "shortest": 2360,
+        "first_safe": 253,
+        "first_decisions": 510,
+        "first_choose_1_to_3": 408,
+        "goal_stop_correct": 328,
+        "goal_turns": 345
+      },
+      "rollout": {
+        "cases": 510,
+        "groups": {
+          "same_initial_board_new_pair": 255,
+          "new_initial_board": 255
+        },
+        "safe": 533,
+        "solvable": 1037,
+        "shortest": 458,
+        "first_safe": 238,
+        "first_decisions": 510,
+        "first_choose_1_to_3": 405,
+        "success": 6,
+        "reached": 6,
+        "no_solution_correct": 209,
+        "no_solution_expected": 404,
+        "goal_stop_correct": 6,
+        "goal_turns": 6
+      }
+    }
+  },
+  "epoch45_partial_followup": {
+    "observed_at_utc": "2026-10-08T00:14:13.479725+00:00",
+    "checkpoint_step": 61875,
+    "checkpoint_epoch": 4.5,
+    "method": "Only fully written canonical cases; exclude interrupted archives and incomplete final JSON lines. Match each mode against epoch 4 by trajectory/variant; reference physical rounds agree. All cases are same-initial-board new-target group; no population or new-board claim.",
+    "matched_epoch4_and_epoch45": {
+      "reference": {
+        "epoch4": {
+          "cases": 42,
+          "groups": {
+            "same_initial_board_new_pair": 42
+          },
+          "safe": 199,
+          "solvable": 244,
+          "shortest": 186,
+          "first_safe": 19,
+          "first_decisions": 42,
+          "first_choose_1_to_3": 36,
+          "goal_stop_correct": 22,
+          "goal_turns": 24
+        },
+        "epoch45": {
+          "cases": 42,
+          "groups": {
+            "same_initial_board_new_pair": 42
+          },
+          "safe": 192,
+          "solvable": 244,
+          "shortest": 178,
+          "first_safe": 17,
+          "first_decisions": 42,
+          "first_choose_1_to_3": 29,
+          "goal_stop_correct": 21,
+          "goal_turns": 24
+        }
+      },
+      "rollout": {
+        "epoch4": {
+          "cases": 37,
+          "groups": {
+            "same_initial_board_new_pair": 37
+          },
+          "safe": 31,
+          "solvable": 68,
+          "shortest": 29,
+          "first_safe": 16,
+          "first_decisions": 37,
+          "first_choose_1_to_3": 34,
+          "success": 0,
+          "reached": 0,
+          "no_solution_correct": 16,
+          "no_solution_expected": 31,
+          "goal_stop_correct": 0,
+          "goal_turns": 0
+        },
+        "epoch45": {
+          "cases": 37,
+          "groups": {
+            "same_initial_board_new_pair": 37
+          },
+          "safe": 32,
+          "solvable": 69,
+          "shortest": 31,
+          "first_safe": 16,
+          "first_decisions": 37,
+          "first_choose_1_to_3": 24,
+          "success": 0,
+          "reached": 0,
+          "no_solution_correct": 10,
+          "no_solution_expected": 32,
+          "goal_stop_correct": 0,
+          "goal_turns": 0
+        }
+      }
+    }
+  },
+  "latest_completed_checkpoints": {
+    "observed_at_utc": "2026-10-08T00:14:13.479725+00:00",
+    "checkpoints": {
+      "20625": {
+        "cases_per_mode": 510,
+        "reference_safe": [
+          1954,
+          3148
+        ],
+        "rollout_safe": [
+          672,
+          1174
+        ],
+        "rollout_success": [
+          7,
+          510
+        ],
+        "rollout_exhausted_no_solution": [
+          19,
+          485
+        ]
+      },
+      "27500": {
+        "cases_per_mode": 510,
+        "reference_safe": [
+          2012,
+          3148
+        ],
+        "rollout_safe": [
+          517,
+          1023
+        ],
+        "rollout_success": [
+          4,
+          510
+        ],
+        "rollout_exhausted_no_solution": [
+          141,
+          484
+        ]
+      },
+      "34375": {
+        "cases_per_mode": 510,
+        "reference_safe": [
+          2536,
+          3148
+        ],
+        "rollout_safe": [
+          608,
+          1111
+        ],
+        "rollout_success": [
+          7,
+          510
+        ],
+        "rollout_exhausted_no_solution": [
+          71,
+          398
+        ]
+      },
+      "41250": {
+        "cases_per_mode": 510,
+        "reference_safe": [
+          2572,
+          3148
+        ],
+        "rollout_safe": [
+          550,
+          1057
+        ],
+        "rollout_success": [
+          3,
+          510
+        ],
+        "rollout_exhausted_no_solution": [
+          186,
+          426
+        ]
+      },
+      "48125": {
+        "cases_per_mode": 510,
+        "reference_safe": [
+          2574,
+          3148
+        ],
+        "rollout_safe": [
+          638,
+          1142
+        ],
+        "rollout_success": [
+          6,
+          510
+        ],
+        "rollout_exhausted_no_solution": [
+          192,
+          418
+        ]
+      },
+      "55000": {
+        "cases_per_mode": 510,
+        "reference_safe": [
+          2584,
+          3148
+        ],
+        "rollout_safe": [
+          533,
+          1037
+        ],
+        "rollout_success": [
+          6,
+          510
+        ],
+        "rollout_exhausted_no_solution": [
+          209,
+          404
+        ]
+      }
+    }
   }
 }

@@ -1542,5 +1542,140 @@
         }
       }
     }
+  },
+  "no_solution_success_relationship": {
+    "observed_at_utc": "2026-10-08T05:14:19.464841+00:00",
+    "old_source_commit": "f73b700",
+    "method": "Read complete canonical cases for epochs 3.5/4/4.5, no generation; classify no-solution replies by physical state and first lost solvable decision by selected action. Old evaluator also rejects done before the goal. Distinguishes direct termination failures from possible indirect effects of training changes.",
+    "checkpoints": {
+      "48125": {
+        "rollout": {
+          "cases": 510,
+          "reach": 6,
+          "success": 6,
+          "no_solution_by_phase": {
+            "dead_exhausted": 192
+          },
+          "false_no_solution_by_phase": {},
+          "solvable_decisions": 1142,
+          "safe_actions": 638,
+          "solvable_no_solution": 0,
+          "solvable_other_nonaction": 0,
+          "first_no_solution": 0,
+          "failure": {
+            "premature_done": 308,
+            "correct_no_solution_after_error": 192,
+            "null": 6,
+            "illegal_action": 2,
+            "format_error": 2
+          },
+          "first_loss_kind": {
+            "legal_action_breaks_reachability": 504
+          }
+        },
+        "reference": {
+          "cases": 510,
+          "no_solution_by_phase": {
+            "goal": 6
+          },
+          "false_no_solution_by_phase": {
+            "goal": 6
+          },
+          "solvable_decisions": 3148,
+          "safe_actions": 2574,
+          "solvable_no_solution": 0,
+          "solvable_other_nonaction": 2,
+          "first_no_solution": 0,
+          "failure": {}
+        }
+      },
+      "55000": {
+        "rollout": {
+          "cases": 510,
+          "reach": 6,
+          "success": 6,
+          "no_solution_by_phase": {
+            "dead_exhausted": 209
+          },
+          "false_no_solution_by_phase": {},
+          "solvable_decisions": 1037,
+          "safe_actions": 533,
+          "solvable_no_solution": 0,
+          "solvable_other_nonaction": 0,
+          "first_no_solution": 0,
+          "failure": {
+            "premature_done": 294,
+            "correct_no_solution_after_error": 209,
+            "null": 6,
+            "format_error": 1
+          },
+          "first_loss_kind": {
+            "legal_action_breaks_reachability": 504
+          }
+        },
+        "reference": {
+          "cases": 510,
+          "no_solution_by_phase": {
+            "goal": 11
+          },
+          "false_no_solution_by_phase": {
+            "goal": 11
+          },
+          "solvable_decisions": 3148,
+          "safe_actions": 2584,
+          "solvable_no_solution": 0,
+          "solvable_other_nonaction": 3,
+          "first_no_solution": 0,
+          "failure": {}
+        }
+      },
+      "61875": {
+        "rollout": {
+          "cases": 510,
+          "reach": 10,
+          "success": 10,
+          "no_solution_by_phase": {
+            "dead_exhausted": 188
+          },
+          "false_no_solution_by_phase": {},
+          "solvable_decisions": 1069,
+          "safe_actions": 569,
+          "solvable_no_solution": 0,
+          "solvable_other_nonaction": 1,
+          "first_no_solution": 0,
+          "failure": {
+            "correct_no_solution_after_error": 188,
+            "premature_done": 306,
+            "null": 10,
+            "format_error": 6
+          },
+          "first_loss_kind": {
+            "legal_action_breaks_reachability": 499,
+            "other_nonaction_or_format": 1
+          }
+        },
+        "reference": {
+          "cases": 510,
+          "no_solution_by_phase": {
+            "goal": 13
+          },
+          "false_no_solution_by_phase": {
+            "goal": 13
+          },
+          "solvable_decisions": 3148,
+          "safe_actions": 2580,
+          "solvable_no_solution": 0,
+          "solvable_other_nonaction": 2,
+          "first_no_solution": 0,
+          "failure": {}
+        }
+      }
+    },
+    "epoch45_first_nonaction_error": {
+      "trajectory_id": "balanced_test_000064",
+      "round_one_based": 2,
+      "failure": "format_error",
+      "description": "Emitted a ranking string inside the action tag while the board was still solvable; not a no-solution declaration."
+    }
   }
 }

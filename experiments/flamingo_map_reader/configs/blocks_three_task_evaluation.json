@@ -1,0 +1,14 @@
+{
+  "task_weights": {"ordinary": 0.8, "initial_goal": 0.1, "failure_context": 0.1},
+  "tasks": {
+    "ordinary": {"split": "test", "tasks": 510, "modes": ["reference", "rollout"]},
+    "initial_goal": {"split": "validation", "filter": "start_equals_goal", "tasks": 100, "mode": "reference"},
+    "failure_context": {"split": "test_no_solution", "tasks": 100, "mode": "reference", "history": "fixed_masked_greedy"}
+  },
+  "variants": 1,
+  "checkpoint_interval_epochs": 0.5,
+  "ranking": {"k": 10, "gain": "rank_grade", "discount": "log2", "malformed": 0, "cohort": "pre_response_solvable"},
+  "done_precision": "actual_goal_among_all_answers_containing_done_including_no_solution",
+  "goal_stop_recall": "valid_success_stop_among_actual_goal_states",
+  "overall_completion": "weighted_mean_of_ordinary_rollout_success_initial_goal_stop_and_failure_context_no_solution"
+}

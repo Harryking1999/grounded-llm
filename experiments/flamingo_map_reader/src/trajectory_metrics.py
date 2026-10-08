@@ -8,6 +8,7 @@ from .relations import score_relationships, parse_ranking
 from .sft import reported_candidates
 from .evaluate_blocks import parse_control
 from .blocks_failure import declares_no_solution
+from .analyze_blocks_ranking import ndcg
 
 
 def summary_correct(answer, expected):
@@ -37,6 +38,8 @@ def score_turn(step, answer, expected_terminal=None, reported=None):
         # measured over that named set, not over every legal move.
         named = reported_candidates(step, reported)
         ranks = parse_ranking(answer, len(step.candidate_actions), reported)
+        value, chance = ndcg(step.candidate_map_distances, ranks, gain='rank_grade')
+        result.update(ranking_ndcg_at_10=value, random_ndcg_at_10=chance)
         direction_correct = 0
         if ranks is not None and set(ranks) == {0, *named}:
             for i in named:
@@ -57,10 +60,31 @@ def still_solvable(row):
     stopping turn too, where it is always false, which silently deflates the rate
     against a floor that skips those rows.
     """
-    if row["done"] or "action_keeps_goal_reachable" not in row:
+    if row["done"] or not row.get("candidates"):
         return False
     remaining = row.get("remaining_shortest")
     return remaining is not None and remaining >= 0
+
+
+def termination_counts(rows):
+    """Additive counts; all done outputs include the none+done failure reply."""
+    counts = Counter(done_outputs=0, done_at_goal=0, goal_claims=0,
+                     correct_goal_claims=0, goal_states=0, no_solution_states=0,
+                     correct_no_solution=0)
+    for row in rows:
+        answer = row.get('answer', '')
+        emitted = '<done/>' in answer
+        try:
+            claim = parse_control(answer) is None and not declares_no_solution(answer)
+        except ValueError:
+            claim = False
+        goal = bool(row['done'])
+        negative = not goal and row.get('candidates') == 0
+        counts.update(done_outputs=int(emitted), done_at_goal=int(emitted and goal),
+                      goal_claims=int(claim), correct_goal_claims=int(claim and goal),
+                      goal_states=int(goal), no_solution_states=int(negative),
+                      correct_no_solution=int(negative and declares_no_solution(answer)))
+    return dict(counts)
 
 
 def summarize_turns(rows):
@@ -83,6 +107,16 @@ def summarize_turns(rows):
     solvable = [r for r in rows if still_solvable(r)]
     counts["solvable_decisions"] = len(solvable)
     result = dict(counts, decision_turns=decisions)
+    ranked = [r for r in solvable if r.get('ranking_ndcg_at_10') is not None]
+    result['ranking_ndcg_turns'] = len(ranked)
+    result['ranking_ndcg_at_10'] = (sum(r['ranking_ndcg_at_10'] for r in ranked) / len(ranked)
+                                     if ranked else None)
+    result.update(termination_counts(rows))
+    for name, numerator, denominator in (
+            ('done_goal_precision', 'done_at_goal', 'done_outputs'),
+            ('goal_claim_precision', 'correct_goal_claims', 'goal_claims'),
+            ('goal_stop_recall', 'correct_goal_claims', 'goal_states')):
+        result[name] = result[numerator] / result[denominator] if result[denominator] else None
     negatives = counts["no_solution_expected"]
     result["no_solution_recall"] = counts["no_solution_correct"] / negatives if negatives else None
     result["false_no_solution_rate"] = counts["false_no_solution"] / (len(rows) - negatives) if len(rows) > negatives else None
@@ -90,10 +124,10 @@ def summarize_turns(rows):
         result[key + "_rate"] = counts[key] / decisions if decisions else None
     result["failed_to_stop_rate"] = counts["failed_to_stop"] / counts["terminal_turns"] if counts["terminal_turns"] else None
     result["summary_correct_rate"] = counts["summary_correct"] / counts["terminal_turns"] if counts["terminal_turns"] else None
-    result["action_keeps_goal_reachable_rate"] = (sum(1 for r in solvable if r["action_keeps_goal_reachable"]) / len(solvable)
+    result["action_keeps_goal_reachable_rate"] = (sum(1 for r in solvable if r.get("action_keeps_goal_reachable", False)) / len(solvable)
                                                   if solvable else None)
     # The chance floor for that same subset: the fraction of legal candidates
     # that leave the goal reachable, i.e. what uniform picking scores there.
-    slots = sum(r["candidate_slots"] for r in solvable)
-    result["reachable_candidate_rate"] = (sum(r["reachable_candidates"] for r in solvable) / slots if slots else None)
+    slots = sum(r.get("candidate_slots", 0) for r in solvable)
+    result["reachable_candidate_rate"] = (sum(r.get("reachable_candidates", 0) for r in solvable) / slots if slots else None)
     return result

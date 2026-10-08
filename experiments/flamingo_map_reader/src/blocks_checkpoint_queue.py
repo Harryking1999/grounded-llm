@@ -68,12 +68,21 @@ def validate_auxiliary_partition(primary, auxiliary):
         raise ValueError('Auxiliary queue must own disjoint shards with the same modulo')
 
 
-def evaluation_modes(checkpoint, manifest):
+def evaluation_modes(checkpoint, manifest, terminal_tasks=False):
     modes = [('test', 'rollout'), ('test', 'reference')]
-    if checkpoint['path'].name == 'final':
+    if terminal_tasks or checkpoint['path'].name == 'final':
         modes.append(('test_no_solution', 'reference'))
-    return [(split, mode, sum(r['split'] == split for r in manifest['records']))
-            for split, mode in modes]
+    result = [(split, mode, sum(r['split'] == split for r in manifest['records']))
+              for split, mode in modes]
+    if terminal_tasks:
+        result.append(('initial_goal', 'reference', sum(r['split'] == 'validation' and
+                      int(r['start']) == int(r['goal']) for r in manifest['records'])))
+    return result
+
+
+def evaluation_selection(split):
+    return (['--split', 'validation', '--task-type', 'initial_goal'] if split == 'initial_goal'
+            else ['--split', split])
 
 
 def validate_resume_contract(previous, current):
@@ -81,7 +90,7 @@ def validate_resume_contract(previous, current):
     def experiment(contract):
         return {key: value for key, value in contract.items()
                 if key not in ('gpus', 'gpu_modes', 'cache_map_kv', 'queue_name',
-                               'shard_modulo', 'shard_remainders')}
+                               'shard_modulo', 'shard_remainders', 'terminal_tasks')}
     if experiment(previous) != experiment(current):
         raise ValueError('Existing queue contract differs')
 
@@ -98,6 +107,8 @@ def main():
                         help='Owned shard indices modulo --shard-modulo, e.g. 0,1 or 2')
     parser.add_argument('--cache-map-kv', action='store_true',
                         help='Reuse unchanged map projections within each generation')
+    parser.add_argument('--terminal-tasks', action='store_true',
+                        help='Evaluate zero-step and fixed failure-context tasks at every half epoch')
     args = parser.parse_args()
     manifest_path = args.run / 'data/manifest.json'
     manifest = json.loads(manifest_path.read_text())
@@ -120,6 +131,7 @@ def main():
                     priority='newest checkpoint first, then rollout, then reference',
                     gpus=gpus, gpu_modes=assignments,
                     shard_tasks=64, cache_map_kv=args.cache_map_kv,
+                    terminal_tasks=args.terminal_tasks,
                     queue_name=args.queue_name, shard_modulo=args.shard_modulo,
                     shard_remainders=list(remainders))
     with FileLock(str(lock_path), timeout=0):
@@ -162,7 +174,7 @@ def main():
             completed = 0
             missing = 0
             for checkpoint in published:
-                for split, mode, tasks in evaluation_modes(checkpoint, manifest):
+                for split, mode, tasks in evaluation_modes(checkpoint, manifest, args.terminal_tasks):
                     for start in range(0, tasks, contract['shard_tasks']):
                         stop = min(start + contract['shard_tasks'], tasks)
                         key = f"step-{checkpoint['step']}/{split}_{mode}/{start:05d}_{stop:05d}"
@@ -179,6 +191,8 @@ def main():
                     continue
                 assignment = next((i for i, job in enumerate(jobs)
                                    if job[2] == contract['gpu_modes'][gpu]), None)
+                if assignment is None and args.terminal_tasks:
+                    assignment = next((i for i, job in enumerate(jobs) if job[1] != 'test'), None)
                 if assignment is None:
                     continue
                 checkpoint, split, mode, start, stop, key, output = jobs.pop(assignment)
@@ -188,7 +202,7 @@ def main():
                 command = [sys.executable, '-m', 'experiments.flamingo_map_reader.src.trajectory_eval',
                            '--manifest', str(manifest_path), '--adapter-checkpoint',
                            str(checkpoint['path'] / 'adapter.pt'), '--model-path', str(args.model_path),
-                           '--out', str(output), '--split', split, '--mode', mode,
+                           '--out', str(output), *evaluation_selection(split), '--mode', mode,
                            '--variants', '1', '--start', str(start), '--stop', str(stop)] + (
                                ['--cache-map-kv'] if args.cache_map_kv else [])
                 log_path = logs / (key.replace('/', '_') + '.log')
@@ -199,7 +213,7 @@ def main():
                 busy[gpu] = dict(process=process, log=handle, output=output, key=key)
             # Use the same aggregate as the official evaluator for full checkpoint results.
             for checkpoint in (published if args.queue_name == 'main' else []):
-                for split, mode, tasks in evaluation_modes(checkpoint, manifest):
+                for split, mode, tasks in evaluation_modes(checkpoint, manifest, args.terminal_tasks):
                     directory = root / f"step-{checkpoint['step']}" / f'{split}_{mode}'
                     summaries = [directory / f'{start:05d}_{min(start + 64, tasks):05d}' / 'summary.json'
                                  for start in range(0, tasks, 64)]

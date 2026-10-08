@@ -303,6 +303,8 @@ def main():
     parser.add_argument("--split", choices=("train", "validation", "test", "test_no_solution"), required=True)
     parser.add_argument("--mode", choices=("reference", "rollout"), required=True)
     parser.add_argument("--variants", type=int, default=1)
+    parser.add_argument("--task-type", choices=("all", "initial_goal"), default="all",
+                        help="Select zero-step held-out tasks without changing the training manifest")
     parser.add_argument("--limit", type=int)
     parser.add_argument("--start", type=int, default=0)
     parser.add_argument("--stop", type=int)
@@ -334,6 +336,8 @@ def main():
     reader.load_adapter_state_dict(saved["adapter"])
     environment = TaskEnvironment(config, manifest)
     records = [r for r in manifest["records"] if r["split"] == args.split]
+    if args.task_type == 'initial_goal':
+        records = [r for r in records if int(r['start']) == int(r['goal'])]
     if args.limit:
         # Deterministic spread across all physical records, including terminal-only examples.
         records = [records[i] for i in np.linspace(0, len(records) - 1, min(args.limit, len(records)), dtype=int)]
@@ -360,6 +364,7 @@ def main():
                 print(json.dumps(dict(completed=len(results), trajectory_id=record["trajectory_id"], variant=variant)), flush=True)
     summary = aggregate(results, manifest)
     summary["contract"] = dict(checkpoint=str(args.adapter_checkpoint), split=args.split, mode=args.mode, no_map=args.no_map,
+                               task_type=args.task_type,
                                start=args.start, stop=args.stop, limit=args.limit, variants=args.variants,
                                cache_map_kv=args.cache_map_kv)
     (args.out / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")

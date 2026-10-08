@@ -1563,6 +1563,725 @@
           }
         }
       }
-    ]
+    ],
+    "first_round_bias": {
+      "observed_at_utc": "2026-10-08T11:34:16.586232+00:00",
+      "cohort": "Same fixed 192 same-initial-board/new-goal tasks at epochs 0.5 and 1; completed shards only; reference and rollout have different numbering.",
+      "method": "CPU reconstruction of saved first-turn answers only. Uniform random baseline is exact conditional on each candidate set. No causal numbering intervention, no GPU inference.",
+      "checkpoints": {
+        "0.5": {
+          "reference": {
+            "kv": {
+              "step": 6250,
+              "cases": 192,
+              "candidate_counts": {
+                "min": 20,
+                "median": 60.0,
+                "max": 102
+              },
+              "legal": 192,
+              "safe": 107,
+              "safe_random": 0.5070382893519413,
+              "map_minimum": 3,
+              "map_random": 0.018036210713795475,
+              "chosen_id_histogram": {
+                "2": 22,
+                "3": 44,
+                "1": 109,
+                "6": 5,
+                "4": 4,
+                "5": 3,
+                "13": 1,
+                "54": 1,
+                "64": 2,
+                "33": 1
+              },
+              "ranking_first_id_histogram": {
+                "2": 22,
+                "3": 44,
+                "1": 109,
+                "6": 5,
+                "4": 4,
+                "5": 3,
+                "13": 1,
+                "54": 1,
+                "64": 2,
+                "33": 1
+              },
+              "low_id_counts": {
+                "1": 109,
+                "3": 175,
+                "10": 187
+              },
+              "ranking_first_low_id_counts": {
+                "1": 109,
+                "3": 175,
+                "10": 187
+              },
+              "uniform_low_id_expectation": {
+                "1": 0.018036210713795475,
+                "3": 0.05410863214138642,
+                "10": 0.18036210713795475
+              },
+              "follows_first": 192,
+              "parseable_ranking": 192,
+              "top10_intersection": 1.796875,
+              "random_top10_intersection": 1.8036210713795473,
+              "metrics": {
+                "ndcg_inverse_rank_at_10": {
+                  "model": 0.19345527047142297,
+                  "uniform_random": 0.19924145635621163
+                },
+                "ndcg_inverse_distance_at_10": {
+                  "model": 0.7961742932605621,
+                  "uniform_random": 0.7952002712210372
+                },
+                "ndcg_inverse_rank_at_1": {
+                  "model": 0.0875830154703392,
+                  "uniform_random": 0.08226284523853002
+                },
+                "ndcg_inverse_distance_at_1": {
+                  "model": 0.7371837984880547,
+                  "uniform_random": 0.732643852250152
+                }
+              },
+              "source_shards": [
+                "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-6250/test_reference/00000_00064",
+                "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-6250/test_reference/00064_00128",
+                "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-6250/test_reference/00128_00192"
+              ]
+            },
+            "ffn": {
+              "step": 6875,
+              "cases": 192,
+              "candidate_counts": {
+                "min": 20,
+                "median": 60.0,
+                "max": 102
+              },
+              "legal": 192,
+              "safe": 105,
+              "safe_random": 0.5070382893519413,
+              "map_minimum": 1,
+              "map_random": 0.018036210713795475,
+              "chosen_id_histogram": {
+                "2": 67,
+                "65": 2,
+                "6": 23,
+                "1": 47,
+                "3": 30,
+                "4": 6,
+                "5": 15,
+                "96": 1,
+                "75": 1
+              },
+              "ranking_first_id_histogram": {
+                "2": 67,
+                "65": 2,
+                "6": 23,
+                "1": 47,
+                "3": 30,
+                "4": 6,
+                "5": 15,
+                "96": 1,
+                "75": 1
+              },
+              "low_id_counts": {
+                "1": 47,
+                "3": 144,
+                "10": 188
+              },
+              "ranking_first_low_id_counts": {
+                "1": 47,
+                "3": 144,
+                "10": 188
+              },
+              "uniform_low_id_expectation": {
+                "1": 0.018036210713795475,
+                "3": 0.05410863214138642,
+                "10": 0.18036210713795475
+              },
+              "follows_first": 192,
+              "parseable_ranking": 192,
+              "top10_intersection": 1.9114583333333333,
+              "random_top10_intersection": 1.8036210713795473,
+              "metrics": {
+                "ndcg_inverse_rank_at_10": {
+                  "model": 0.20765298976575583,
+                  "uniform_random": 0.19924145635621163
+                },
+                "ndcg_inverse_distance_at_10": {
+                  "model": 0.7964573582925425,
+                  "uniform_random": 0.7952002712210372
+                },
+                "ndcg_inverse_rank_at_1": {
+                  "model": 0.07535228115679175,
+                  "uniform_random": 0.08226284523853002
+                },
+                "ndcg_inverse_distance_at_1": {
+                  "model": 0.7352453219152925,
+                  "uniform_random": 0.732643852250152
+                }
+              },
+              "source_shards": [
+                "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_ffn_failure_batch4_75cc4fd/evaluation_half_epoch/step-6875/test_reference/00000_00064",
+                "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_ffn_failure_batch4_75cc4fd/evaluation_half_epoch/step-6875/test_reference/00064_00128",
+                "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_ffn_failure_batch4_75cc4fd/evaluation_half_epoch/step-6875/test_reference/00128_00192"
+              ]
+            }
+          },
+          "rollout": {
+            "kv": {
+              "step": 6250,
+              "cases": 192,
+              "candidate_counts": {
+                "min": 20,
+                "median": 60.0,
+                "max": 102
+              },
+              "legal": 192,
+              "safe": 95,
+              "safe_random": 0.5070382893519413,
+              "map_minimum": 6,
+              "map_random": 0.018036210713795475,
+              "chosen_id_histogram": {
+                "3": 39,
+                "1": 100,
+                "6": 7,
+                "2": 29,
+                "4": 9,
+                "5": 4,
+                "53": 1,
+                "68": 1,
+                "73": 1,
+                "43": 1
+              },
+              "ranking_first_id_histogram": {
+                "3": 39,
+                "1": 100,
+                "6": 7,
+                "2": 29,
+                "4": 9,
+                "5": 4,
+                "53": 1,
+                "68": 1,
+                "73": 1,
+                "43": 1
+              },
+              "low_id_counts": {
+                "1": 100,
+                "3": 168,
+                "10": 188
+              },
+              "ranking_first_low_id_counts": {
+                "1": 100,
+                "3": 168,
+                "10": 188
+              },
+              "uniform_low_id_expectation": {
+                "1": 0.018036210713795475,
+                "3": 0.05410863214138642,
+                "10": 0.18036210713795475
+              },
+              "follows_first": 192,
+              "parseable_ranking": 192,
+              "top10_intersection": 1.796875,
+              "random_top10_intersection": 1.8036210713795473,
+              "metrics": {
+                "ndcg_inverse_rank_at_10": {
+                  "model": 0.20721418409420256,
+                  "uniform_random": 0.19924145635621163
+                },
+                "ndcg_inverse_distance_at_10": {
+                  "model": 0.7967003124993686,
+                  "uniform_random": 0.7952002712210372
+                },
+                "ndcg_inverse_rank_at_1": {
+                  "model": 0.09636841334407548,
+                  "uniform_random": 0.08226284523853002
+                },
+                "ndcg_inverse_distance_at_1": {
+                  "model": 0.7375968149227333,
+                  "uniform_random": 0.732643852250152
+                }
+              },
+              "source_shards": [
+                "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-6250/test_rollout/00000_00064",
+                "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-6250/test_rollout/00064_00128",
+                "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-6250/test_rollout/00128_00192"
+              ]
+            },
+            "ffn": {
+              "step": 6875,
+              "cases": 192,
+              "candidate_counts": {
+                "min": 20,
+                "median": 60.0,
+                "max": 102
+              },
+              "legal": 192,
+              "safe": 107,
+              "safe_random": 0.5070382893519413,
+              "map_minimum": 8,
+              "map_random": 0.018036210713795475,
+              "chosen_id_histogram": {
+                "2": 84,
+                "64": 1,
+                "6": 21,
+                "1": 39,
+                "5": 14,
+                "3": 24,
+                "4": 7,
+                "65": 1,
+                "75": 1
+              },
+              "ranking_first_id_histogram": {
+                "2": 84,
+                "64": 1,
+                "6": 21,
+                "1": 39,
+                "5": 14,
+                "3": 24,
+                "4": 7,
+                "65": 1,
+                "75": 1
+              },
+              "low_id_counts": {
+                "1": 39,
+                "3": 147,
+                "10": 189
+              },
+              "ranking_first_low_id_counts": {
+                "1": 39,
+                "3": 147,
+                "10": 189
+              },
+              "uniform_low_id_expectation": {
+                "1": 0.018036210713795475,
+                "3": 0.05410863214138642,
+                "10": 0.18036210713795475
+              },
+              "follows_first": 192,
+              "parseable_ranking": 191,
+              "top10_intersection": 1.9270833333333333,
+              "random_top10_intersection": 1.7985148622292204,
+              "metrics": {
+                "ndcg_inverse_rank_at_10": {
+                  "model": 0.2214271915167105,
+                  "uniform_random": 0.19924145635621163
+                },
+                "ndcg_inverse_distance_at_10": {
+                  "model": 0.794982171662959,
+                  "uniform_random": 0.7952002712210372
+                },
+                "ndcg_inverse_rank_at_1": {
+                  "model": 0.11157582604921835,
+                  "uniform_random": 0.08226284523853002
+                },
+                "ndcg_inverse_distance_at_1": {
+                  "model": 0.7379594580153945,
+                  "uniform_random": 0.732643852250152
+                }
+              },
+              "source_shards": [
+                "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_ffn_failure_batch4_75cc4fd/evaluation_half_epoch/step-6875/test_rollout/00000_00064",
+                "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_ffn_failure_batch4_75cc4fd/evaluation_half_epoch/step-6875/test_rollout/00064_00128",
+                "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_ffn_failure_batch4_75cc4fd/evaluation_half_epoch/step-6875/test_rollout/00128_00192"
+              ]
+            }
+          }
+        },
+        "1.0": {
+          "reference": {
+            "kv": {
+              "step": 12500,
+              "cases": 192,
+              "candidate_counts": {
+                "min": 20,
+                "median": 60.0,
+                "max": 102
+              },
+              "legal": 192,
+              "safe": 104,
+              "safe_random": 0.5070382893519413,
+              "map_minimum": 3,
+              "map_random": 0.018036210713795475,
+              "chosen_id_histogram": {
+                "2": 69,
+                "68": 1,
+                "3": 32,
+                "30": 2,
+                "1": 34,
+                "4": 18,
+                "45": 1,
+                "7": 4,
+                "6": 12,
+                "12": 1,
+                "24": 1,
+                "9": 1,
+                "5": 6,
+                "17": 1,
+                "40": 1,
+                "14": 1,
+                "66": 2,
+                "58": 1,
+                "41": 1,
+                "72": 1,
+                "28": 1,
+                "57": 1
+              },
+              "ranking_first_id_histogram": {
+                "2": 69,
+                "68": 1,
+                "3": 32,
+                "30": 2,
+                "1": 34,
+                "4": 18,
+                "45": 1,
+                "7": 4,
+                "6": 12,
+                "12": 1,
+                "24": 1,
+                "9": 1,
+                "5": 6,
+                "17": 1,
+                "40": 1,
+                "14": 1,
+                "66": 2,
+                "58": 1,
+                "41": 1,
+                "72": 1,
+                "28": 1,
+                "57": 1
+              },
+              "low_id_counts": {
+                "1": 34,
+                "3": 135,
+                "10": 176
+              },
+              "ranking_first_low_id_counts": {
+                "1": 34,
+                "3": 135,
+                "10": 176
+              },
+              "uniform_low_id_expectation": {
+                "1": 0.018036210713795475,
+                "3": 0.05410863214138642,
+                "10": 0.18036210713795475
+              },
+              "follows_first": 192,
+              "parseable_ranking": 192,
+              "top10_intersection": 2.4010416666666665,
+              "random_top10_intersection": 1.8036210713795473,
+              "metrics": {
+                "ndcg_inverse_rank_at_10": {
+                  "model": 0.2470631425171057,
+                  "uniform_random": 0.19924145635621163
+                },
+                "ndcg_inverse_distance_at_10": {
+                  "model": 0.8189657795127562,
+                  "uniform_random": 0.7952002712210372
+                },
+                "ndcg_inverse_rank_at_1": {
+                  "model": 0.08492001395573058,
+                  "uniform_random": 0.08226284523853002
+                },
+                "ndcg_inverse_distance_at_1": {
+                  "model": 0.7379593198902868,
+                  "uniform_random": 0.732643852250152
+                }
+              },
+              "source_shards": [
+                "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-12500/test_reference/00000_00064",
+                "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-12500/test_reference/00064_00128",
+                "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-12500/test_reference/00128_00192"
+              ]
+            },
+            "ffn": {
+              "step": 13750,
+              "cases": 192,
+              "candidate_counts": {
+                "min": 20,
+                "median": 60.0,
+                "max": 102
+              },
+              "legal": 192,
+              "safe": 95,
+              "safe_random": 0.5070382893519413,
+              "map_minimum": 3,
+              "map_random": 0.018036210713795475,
+              "chosen_id_histogram": {
+                "2": 72,
+                "66": 1,
+                "3": 55,
+                "37": 1,
+                "40": 2,
+                "4": 26,
+                "1": 13,
+                "6": 13,
+                "5": 2,
+                "35": 1,
+                "43": 1,
+                "53": 1,
+                "25": 1,
+                "41": 1,
+                "65": 1,
+                "62": 1
+              },
+              "ranking_first_id_histogram": {
+                "2": 72,
+                "66": 1,
+                "3": 55,
+                "37": 1,
+                "40": 2,
+                "4": 26,
+                "1": 13,
+                "6": 13,
+                "5": 2,
+                "35": 1,
+                "43": 1,
+                "53": 1,
+                "25": 1,
+                "41": 1,
+                "65": 1,
+                "62": 1
+              },
+              "low_id_counts": {
+                "1": 13,
+                "3": 140,
+                "10": 181
+              },
+              "ranking_first_low_id_counts": {
+                "1": 13,
+                "3": 140,
+                "10": 181
+              },
+              "uniform_low_id_expectation": {
+                "1": 0.018036210713795475,
+                "3": 0.05410863214138642,
+                "10": 0.18036210713795475
+              },
+              "follows_first": 192,
+              "parseable_ranking": 192,
+              "top10_intersection": 2.1979166666666665,
+              "random_top10_intersection": 1.8036210713795473,
+              "metrics": {
+                "ndcg_inverse_rank_at_10": {
+                  "model": 0.23155757684732803,
+                  "uniform_random": 0.19924145635621163
+                },
+                "ndcg_inverse_distance_at_10": {
+                  "model": 0.8130593809558743,
+                  "uniform_random": 0.7952002712210372
+                },
+                "ndcg_inverse_rank_at_1": {
+                  "model": 0.0878523613612394,
+                  "uniform_random": 0.08226284523853002
+                },
+                "ndcg_inverse_distance_at_1": {
+                  "model": 0.7371831833655174,
+                  "uniform_random": 0.732643852250152
+                }
+              },
+              "source_shards": [
+                "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_ffn_failure_batch4_75cc4fd/evaluation_half_epoch/step-13750/test_reference/00000_00064",
+                "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_ffn_failure_batch4_75cc4fd/evaluation_half_epoch/step-13750/test_reference/00064_00128",
+                "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_ffn_failure_batch4_75cc4fd/evaluation_half_epoch/step-13750/test_reference/00128_00192"
+              ]
+            }
+          },
+          "rollout": {
+            "kv": {
+              "step": 12500,
+              "cases": 192,
+              "candidate_counts": {
+                "min": 20,
+                "median": 60.0,
+                "max": 102
+              },
+              "legal": 192,
+              "safe": 105,
+              "safe_random": 0.5070382893519413,
+              "map_minimum": 9,
+              "map_random": 0.018036210713795475,
+              "chosen_id_histogram": {
+                "2": 72,
+                "61": 1,
+                "4": 21,
+                "44": 2,
+                "3": 33,
+                "22": 2,
+                "7": 3,
+                "6": 16,
+                "1": 28,
+                "5": 5,
+                "19": 1,
+                "26": 2,
+                "42": 1,
+                "16": 1,
+                "32": 1,
+                "79": 1,
+                "65": 1,
+                "41": 1
+              },
+              "ranking_first_id_histogram": {
+                "2": 72,
+                "61": 1,
+                "4": 21,
+                "44": 2,
+                "3": 33,
+                "22": 2,
+                "7": 3,
+                "6": 16,
+                "1": 28,
+                "5": 5,
+                "19": 1,
+                "26": 2,
+                "42": 1,
+                "16": 1,
+                "32": 1,
+                "79": 1,
+                "65": 1,
+                "41": 1
+              },
+              "low_id_counts": {
+                "1": 28,
+                "3": 133,
+                "10": 178
+              },
+              "ranking_first_low_id_counts": {
+                "1": 28,
+                "3": 133,
+                "10": 178
+              },
+              "uniform_low_id_expectation": {
+                "1": 0.018036210713795475,
+                "3": 0.05410863214138642,
+                "10": 0.18036210713795475
+              },
+              "follows_first": 192,
+              "parseable_ranking": 192,
+              "top10_intersection": 2.2135416666666665,
+              "random_top10_intersection": 1.8036210713795473,
+              "metrics": {
+                "ndcg_inverse_rank_at_10": {
+                  "model": 0.24634780726617952,
+                  "uniform_random": 0.19924145635621163
+                },
+                "ndcg_inverse_distance_at_10": {
+                  "model": 0.8146615228393773,
+                  "uniform_random": 0.7952002712210372
+                },
+                "ndcg_inverse_rank_at_1": {
+                  "model": 0.10438449412786117,
+                  "uniform_random": 0.08226284523853002
+                },
+                "ndcg_inverse_distance_at_1": {
+                  "model": 0.7383385123527907,
+                  "uniform_random": 0.732643852250152
+                }
+              },
+              "source_shards": [
+                "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-12500/test_rollout/00000_00064",
+                "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-12500/test_rollout/00064_00128",
+                "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-12500/test_rollout/00128_00192"
+              ]
+            },
+            "ffn": {
+              "step": 13750,
+              "cases": 192,
+              "candidate_counts": {
+                "min": 20,
+                "median": 60.0,
+                "max": 102
+              },
+              "legal": 192,
+              "safe": 113,
+              "safe_random": 0.5070382893519413,
+              "map_minimum": 10,
+              "map_random": 0.018036210713795475,
+              "chosen_id_histogram": {
+                "2": 74,
+                "61": 1,
+                "4": 25,
+                "3": 47,
+                "6": 19,
+                "1": 14,
+                "44": 1,
+                "57": 1,
+                "5": 1,
+                "22": 1,
+                "26": 1,
+                "42": 1,
+                "67": 2,
+                "32": 2,
+                "62": 1,
+                "41": 1
+              },
+              "ranking_first_id_histogram": {
+                "2": 74,
+                "61": 1,
+                "4": 25,
+                "3": 47,
+                "6": 19,
+                "1": 14,
+                "44": 1,
+                "57": 1,
+                "5": 1,
+                "22": 1,
+                "26": 1,
+                "42": 1,
+                "67": 2,
+                "32": 2,
+                "62": 1,
+                "41": 1
+              },
+              "low_id_counts": {
+                "1": 14,
+                "3": 135,
+                "10": 180
+              },
+              "ranking_first_low_id_counts": {
+                "1": 14,
+                "3": 135,
+                "10": 180
+              },
+              "uniform_low_id_expectation": {
+                "1": 0.018036210713795475,
+                "3": 0.05410863214138642,
+                "10": 0.18036210713795475
+              },
+              "follows_first": 192,
+              "parseable_ranking": 192,
+              "top10_intersection": 2.2135416666666665,
+              "random_top10_intersection": 1.8036210713795473,
+              "metrics": {
+                "ndcg_inverse_rank_at_10": {
+                  "model": 0.23838930790058835,
+                  "uniform_random": 0.19924145635621163
+                },
+                "ndcg_inverse_distance_at_10": {
+                  "model": 0.8171994735405259,
+                  "uniform_random": 0.7952002712210372
+                },
+                "ndcg_inverse_rank_at_1": {
+                  "model": 0.11203930588850038,
+                  "uniform_random": 0.08226284523853002
+                },
+                "ndcg_inverse_distance_at_1": {
+                  "model": 0.7477703902906746,
+                  "uniform_random": 0.732643852250152
+                }
+              },
+              "source_shards": [
+                "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_ffn_failure_batch4_75cc4fd/evaluation_half_epoch/step-13750/test_rollout/00000_00064",
+                "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_ffn_failure_batch4_75cc4fd/evaluation_half_epoch/step-13750/test_rollout/00064_00128",
+                "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_ffn_failure_batch4_75cc4fd/evaluation_half_epoch/step-13750/test_rollout/00128_00192"
+              ]
+            }
+          }
+        }
+      }
+    }
   }
 }

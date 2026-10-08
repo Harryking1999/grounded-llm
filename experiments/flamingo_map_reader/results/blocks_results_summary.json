@@ -1,102 +1,102 @@
 {
-  "status": "training_resumed_partial_evaluation",
+  "status": "training_running_evaluation_resumed_four_gpus",
   "evaluation_contract": "experiments/flamingo_map_reader/configs/blocks_kv_evaluation.json",
   "checkpoints": {
     "6250": {
       "epoch": 0.5,
-      "step": 6250,
-      "observed_at_utc": "2026-10-08T08:52:42.985277+00:00",
-      "only_completed_shards": true,
       "modes": {
-        "test_rollout": {
-          "cases": 192,
-          "source_shards": [
-            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-6250/test_rollout/00000_00064",
-            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-6250/test_rollout/00064_00128",
-            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-6250/test_rollout/00128_00192"
-          ],
+        "test_reference": {
+          "cases": 320,
           "groups": {
-            "same_initial_board_new_pair": 192
+            "same_initial_board_new_pair": 255,
+            "new_initial_board": 65
           },
           "reached": 0,
           "success": 0,
           "all_decisions": {
-            "decisions": 1518,
-            "map_minimum": 252,
-            "legal": 1504,
-            "ndcg_inverse_rank_at_10": 0.5233487861597987,
-            "ndcg_inverse_distance_at_10": 0.8777100397889612,
-            "ndcg_inverse_rank_at_1": 0.3018214057151097,
-            "ndcg_inverse_distance_at_1": 0.8014073282382005
+            "decisions": 2528,
+            "map_minimum": 423,
+            "legal": 2524,
+            "ndcg_inverse_rank_at_10": 0.524739430434962,
+            "ndcg_inverse_distance_at_10": 0.832111971530095,
+            "ndcg_inverse_rank_at_1": 0.30959518514691536,
+            "ndcg_inverse_distance_at_1": 0.7198221929823625
           },
           "first_round": {
-            "decisions": 192,
-            "map_minimum": 6,
-            "legal": 192,
-            "ndcg_inverse_rank_at_10": 0.20721418409420256,
-            "ndcg_inverse_distance_at_10": 0.7967003124993686,
-            "ndcg_inverse_rank_at_1": 0.09636841334407548,
-            "ndcg_inverse_distance_at_1": 0.7375968149227333
+            "decisions": 320,
+            "map_minimum": 4,
+            "legal": 320,
+            "ndcg_inverse_rank_at_10": 0.19433259624350918,
+            "ndcg_inverse_distance_at_10": 0.7884326081038122,
+            "ndcg_inverse_rank_at_1": 0.08483949178337376,
+            "ndcg_inverse_distance_at_1": 0.7293113680672875
           },
-          "safe": 177,
-          "solvable_decisions": 369,
+          "safe": 1151,
+          "solvable_decisions": 2027,
           "termination": {
-            "done_outputs": 192,
-            "done_at_goal": 0,
-            "goal_claims": 172,
-            "correct_goal_claims": 0,
-            "goal_states": 0,
-            "no_solution_states": 178,
-            "correct_no_solution": 20
+            "done_outputs": 204,
+            "done_at_goal": 200,
+            "goal_claims": 185,
+            "correct_goal_claims": 181,
+            "goal_states": 227,
+            "no_solution_states": 0,
+            "correct_no_solution": 0
           },
-          "inference_seconds": 4030.7344852248207
-        },
-        "test_reference": {
-          "cases": 192,
           "source_shards": [
             "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-6250/test_reference/00000_00064",
             "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-6250/test_reference/00064_00128",
-            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-6250/test_reference/00128_00192"
-          ],
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-6250/test_reference/00128_00192",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-6250/test_reference/00192_00256",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-6250/test_reference/00256_00320"
+          ]
+        },
+        "test_rollout": {
+          "cases": 320,
           "groups": {
-            "same_initial_board_new_pair": 192
+            "same_initial_board_new_pair": 255,
+            "new_initial_board": 65
           },
           "reached": 0,
           "success": 0,
           "all_decisions": {
-            "decisions": 1548,
-            "map_minimum": 261,
-            "legal": 1545,
-            "ndcg_inverse_rank_at_10": 0.5263159617388072,
-            "ndcg_inverse_distance_at_10": 0.8400110613854134,
-            "ndcg_inverse_rank_at_1": 0.3116912689132424,
-            "ndcg_inverse_distance_at_1": 0.7333245897735666
+            "decisions": 2501,
+            "map_minimum": 406,
+            "legal": 2478,
+            "ndcg_inverse_rank_at_10": 0.5260813209062638,
+            "ndcg_inverse_distance_at_10": 0.8774423125090589,
+            "ndcg_inverse_rank_at_1": 0.30180533162537976,
+            "ndcg_inverse_distance_at_1": 0.7996488744731177
           },
           "first_round": {
-            "decisions": 192,
-            "map_minimum": 3,
-            "legal": 192,
-            "ndcg_inverse_rank_at_10": 0.19345527047142297,
-            "ndcg_inverse_distance_at_10": 0.7961742932605621,
-            "ndcg_inverse_rank_at_1": 0.0875830154703392,
-            "ndcg_inverse_distance_at_1": 0.7371837984880547
+            "decisions": 320,
+            "map_minimum": 9,
+            "legal": 320,
+            "ndcg_inverse_rank_at_10": 0.20331915882629445,
+            "ndcg_inverse_distance_at_10": 0.7883567943534942,
+            "ndcg_inverse_rank_at_1": 0.09057271657495226,
+            "ndcg_inverse_distance_at_1": 0.7228990942496841
           },
-          "safe": 706,
-          "solvable_decisions": 1199,
+          "safe": 283,
+          "solvable_decisions": 603,
           "termination": {
-            "done_outputs": 121,
-            "done_at_goal": 118,
-            "goal_claims": 112,
-            "correct_goal_claims": 109,
-            "goal_states": 126,
-            "no_solution_states": 0,
-            "correct_no_solution": 0
+            "done_outputs": 320,
+            "done_at_goal": 0,
+            "goal_claims": 283,
+            "correct_goal_claims": 0,
+            "goal_states": 0,
+            "no_solution_states": 297,
+            "correct_no_solution": 37
           },
-          "inference_seconds": 4021.5476858811453
+          "source_shards": [
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-6250/test_rollout/00000_00064",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-6250/test_rollout/00064_00128",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-6250/test_rollout/00128_00192",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-6250/test_rollout/00192_00256",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-6250/test_rollout/00256_00320"
+          ]
         },
         "initial_goal_reference": {
           "cases": 0,
-          "source_shards": [],
           "groups": {},
           "reached": 0,
           "success": 0,
@@ -129,11 +129,10 @@
             "no_solution_states": 0,
             "correct_no_solution": 0
           },
-          "inference_seconds": 0
+          "source_shards": []
         },
         "test_no_solution_reference": {
           "cases": 0,
-          "source_shards": [],
           "groups": {},
           "reached": 0,
           "success": 0,
@@ -166,16 +165,17 @@
             "no_solution_states": 0,
             "correct_no_solution": 0
           },
-          "inference_seconds": 0
+          "source_shards": []
         }
       },
-      "coverage": "partial_same_initial_board_new_pair_only",
+      "coverage": "partial",
+      "only_completed_shards": true,
       "expected_tasks": {
         "ordinary": 510,
         "initial_goal": 100,
         "failure_context": 100
       },
-      "random_baseline": {
+      "random_baseline_192_task_subset": {
         "epoch": 0.5,
         "step": 6250,
         "source_commit": "36c213c",
@@ -320,12 +320,485 @@
           }
         }
       }
+    },
+    "12500": {
+      "epoch": 1.0,
+      "modes": {
+        "test_reference": {
+          "cases": 192,
+          "groups": {
+            "same_initial_board_new_pair": 192
+          },
+          "reached": 0,
+          "success": 0,
+          "all_decisions": {
+            "decisions": 1548,
+            "map_minimum": 294,
+            "legal": 1547,
+            "ndcg_inverse_rank_at_10": 0.5604237000107443,
+            "ndcg_inverse_distance_at_10": 0.856659541046355,
+            "ndcg_inverse_rank_at_1": 0.34130976536804086,
+            "ndcg_inverse_distance_at_1": 0.7577786739297081
+          },
+          "first_round": {
+            "decisions": 192,
+            "map_minimum": 3,
+            "legal": 192,
+            "ndcg_inverse_rank_at_10": 0.2470631425171057,
+            "ndcg_inverse_distance_at_10": 0.8189657795127562,
+            "ndcg_inverse_rank_at_1": 0.08492001395573058,
+            "ndcg_inverse_distance_at_1": 0.7379593198902868
+          },
+          "safe": 769,
+          "solvable_decisions": 1199,
+          "termination": {
+            "done_outputs": 121,
+            "done_at_goal": 120,
+            "goal_claims": 121,
+            "correct_goal_claims": 120,
+            "goal_states": 126,
+            "no_solution_states": 0,
+            "correct_no_solution": 0
+          },
+          "source_shards": [
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-12500/test_reference/00000_00064",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-12500/test_reference/00064_00128",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-12500/test_reference/00128_00192"
+          ]
+        },
+        "test_rollout": {
+          "cases": 192,
+          "groups": {
+            "same_initial_board_new_pair": 192
+          },
+          "reached": 1,
+          "success": 1,
+          "all_decisions": {
+            "decisions": 1604,
+            "map_minimum": 239,
+            "legal": 1597,
+            "ndcg_inverse_rank_at_10": 0.4967676236474953,
+            "ndcg_inverse_distance_at_10": 0.8788759915393423,
+            "ndcg_inverse_rank_at_1": 0.28783056107665295,
+            "ndcg_inverse_distance_at_1": 0.8062878539581888
+          },
+          "first_round": {
+            "decisions": 192,
+            "map_minimum": 9,
+            "legal": 192,
+            "ndcg_inverse_rank_at_10": 0.24634780726617952,
+            "ndcg_inverse_distance_at_10": 0.8146615228393773,
+            "ndcg_inverse_rank_at_1": 0.10438449412786117,
+            "ndcg_inverse_distance_at_1": 0.7383385123527907
+          },
+          "safe": 241,
+          "solvable_decisions": 432,
+          "termination": {
+            "done_outputs": 188,
+            "done_at_goal": 1,
+            "goal_claims": 173,
+            "correct_goal_claims": 1,
+            "goal_states": 1,
+            "no_solution_states": 184,
+            "correct_no_solution": 15
+          },
+          "source_shards": [
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-12500/test_rollout/00000_00064",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-12500/test_rollout/00064_00128",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-12500/test_rollout/00128_00192"
+          ]
+        },
+        "initial_goal_reference": {
+          "cases": 0,
+          "groups": {},
+          "reached": 0,
+          "success": 0,
+          "all_decisions": {
+            "decisions": 0,
+            "map_minimum": 0,
+            "legal": 0,
+            "ndcg_inverse_rank_at_10": null,
+            "ndcg_inverse_distance_at_10": null,
+            "ndcg_inverse_rank_at_1": null,
+            "ndcg_inverse_distance_at_1": null
+          },
+          "first_round": {
+            "decisions": 0,
+            "map_minimum": 0,
+            "legal": 0,
+            "ndcg_inverse_rank_at_10": null,
+            "ndcg_inverse_distance_at_10": null,
+            "ndcg_inverse_rank_at_1": null,
+            "ndcg_inverse_distance_at_1": null
+          },
+          "safe": 0,
+          "solvable_decisions": 0,
+          "termination": {
+            "done_outputs": 0,
+            "done_at_goal": 0,
+            "goal_claims": 0,
+            "correct_goal_claims": 0,
+            "goal_states": 0,
+            "no_solution_states": 0,
+            "correct_no_solution": 0
+          },
+          "source_shards": []
+        },
+        "test_no_solution_reference": {
+          "cases": 0,
+          "groups": {},
+          "reached": 0,
+          "success": 0,
+          "all_decisions": {
+            "decisions": 0,
+            "map_minimum": 0,
+            "legal": 0,
+            "ndcg_inverse_rank_at_10": null,
+            "ndcg_inverse_distance_at_10": null,
+            "ndcg_inverse_rank_at_1": null,
+            "ndcg_inverse_distance_at_1": null
+          },
+          "first_round": {
+            "decisions": 0,
+            "map_minimum": 0,
+            "legal": 0,
+            "ndcg_inverse_rank_at_10": null,
+            "ndcg_inverse_distance_at_10": null,
+            "ndcg_inverse_rank_at_1": null,
+            "ndcg_inverse_distance_at_1": null
+          },
+          "safe": 0,
+          "solvable_decisions": 0,
+          "termination": {
+            "done_outputs": 0,
+            "done_at_goal": 0,
+            "goal_claims": 0,
+            "correct_goal_claims": 0,
+            "goal_states": 0,
+            "no_solution_states": 0,
+            "correct_no_solution": 0
+          },
+          "source_shards": []
+        }
+      },
+      "coverage": "partial",
+      "only_completed_shards": true,
+      "expected_tasks": {
+        "ordinary": 510,
+        "initial_goal": 100,
+        "failure_context": 100
+      },
+      "random_baseline_192_task_subset": {
+        "epoch": 1.0,
+        "step": 12500,
+        "source_commit": "36c213c",
+        "observed_at_utc": "2026-10-08T11:01:33.316986+00:00",
+        "cases_per_mode": 192,
+        "cohort": "matched first 192 tasks at epoch 1; same_initial_board_new_pair only",
+        "baseline": "Exact uniform random legal action / uniform random permutation, evaluated on the same model or reference states; no random rollout experiment",
+        "modes": {
+          "reference": {
+            "all_decisions": {
+              "decisions": 1548,
+              "solvable_decisions": 1199,
+              "map_minimum": {
+                "model": 0.18992248062015504,
+                "random": 0.15279871037444254
+              },
+              "keeps_reachable": {
+                "model": 0.6413678065054211,
+                "random": 0.5078160192508582
+              },
+              "metrics": {
+                "ndcg_inverse_rank_at_10": {
+                  "model": 0.5604237000107443,
+                  "random": 0.5050834054864694
+                },
+                "ndcg_inverse_distance_at_10": {
+                  "model": 0.856659541046355,
+                  "random": 0.8298944022634972
+                },
+                "ndcg_inverse_rank_at_1": {
+                  "model": 0.34130976536804086,
+                  "random": 0.28271515093846544
+                },
+                "ndcg_inverse_distance_at_1": {
+                  "model": 0.7577786739297081,
+                  "random": 0.7070682355693849
+                }
+              }
+            },
+            "first_round": {
+              "decisions": 192,
+              "solvable_decisions": 192,
+              "map_minimum": {
+                "model": 0.015625,
+                "random": 0.018036210713795464
+              },
+              "keeps_reachable": {
+                "model": 0.5416666666666666,
+                "random": 0.5070382893519413
+              },
+              "metrics": {
+                "ndcg_inverse_rank_at_10": {
+                  "model": 0.2470631425171057,
+                  "random": 0.19924145635621163
+                },
+                "ndcg_inverse_distance_at_10": {
+                  "model": 0.8189657795127562,
+                  "random": 0.7952002712210372
+                },
+                "ndcg_inverse_rank_at_1": {
+                  "model": 0.08492001395573058,
+                  "random": 0.08226284523853002
+                },
+                "ndcg_inverse_distance_at_1": {
+                  "model": 0.7379593198902868,
+                  "random": 0.732643852250152
+                }
+              }
+            },
+            "source_shards": [
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-12500/test_reference/00000_00064",
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-12500/test_reference/00064_00128",
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-12500/test_reference/00128_00192"
+            ]
+          },
+          "rollout": {
+            "all_decisions": {
+              "decisions": 1604,
+              "solvable_decisions": 432,
+              "map_minimum": {
+                "model": 0.14900249376558602,
+                "random": 0.1293064261298154
+              },
+              "keeps_reachable": {
+                "model": 0.5578703703703703,
+                "random": 0.46727643979696215
+              },
+              "metrics": {
+                "ndcg_inverse_rank_at_10": {
+                  "model": 0.4967676236474953,
+                  "random": 0.4739112235135052
+                },
+                "ndcg_inverse_distance_at_10": {
+                  "model": 0.8788759915393423,
+                  "random": 0.8701534766414609
+                },
+                "ndcg_inverse_rank_at_1": {
+                  "model": 0.28783056107665295,
+                  "random": 0.25492574670398577
+                },
+                "ndcg_inverse_distance_at_1": {
+                  "model": 0.8062878539581888,
+                  "random": 0.7843836099390159
+                }
+              }
+            },
+            "first_round": {
+              "decisions": 192,
+              "solvable_decisions": 192,
+              "map_minimum": {
+                "model": 0.046875,
+                "random": 0.018036210713795464
+              },
+              "keeps_reachable": {
+                "model": 0.546875,
+                "random": 0.5070382893519413
+              },
+              "metrics": {
+                "ndcg_inverse_rank_at_10": {
+                  "model": 0.24634780726617952,
+                  "random": 0.19924145635621163
+                },
+                "ndcg_inverse_distance_at_10": {
+                  "model": 0.8146615228393773,
+                  "random": 0.7952002712210372
+                },
+                "ndcg_inverse_rank_at_1": {
+                  "model": 0.10438449412786117,
+                  "random": 0.08226284523853002
+                },
+                "ndcg_inverse_distance_at_1": {
+                  "model": 0.7383385123527907,
+                  "random": 0.732643852250152
+                }
+              }
+            },
+            "source_shards": [
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-12500/test_rollout/00000_00064",
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-12500/test_rollout/00064_00128",
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-12500/test_rollout/00128_00192"
+            ]
+          }
+        }
+      }
+    },
+    "18750": {
+      "epoch": 1.5,
+      "modes": {
+        "test_reference": {
+          "cases": 64,
+          "groups": {
+            "same_initial_board_new_pair": 64
+          },
+          "reached": 0,
+          "success": 0,
+          "all_decisions": {
+            "decisions": 527,
+            "map_minimum": 105,
+            "legal": 525,
+            "ndcg_inverse_rank_at_10": 0.5677686019556312,
+            "ndcg_inverse_distance_at_10": 0.8629238615586058,
+            "ndcg_inverse_rank_at_1": 0.3546514679292715,
+            "ndcg_inverse_distance_at_1": 0.7727496769064146
+          },
+          "first_round": {
+            "decisions": 64,
+            "map_minimum": 1,
+            "legal": 64,
+            "ndcg_inverse_rank_at_10": 0.22999811332281303,
+            "ndcg_inverse_distance_at_10": 0.8248905363722508,
+            "ndcg_inverse_rank_at_1": 0.07643153511698715,
+            "ndcg_inverse_distance_at_1": 0.7430729291142113
+          },
+          "safe": 288,
+          "solvable_decisions": 423,
+          "termination": {
+            "done_outputs": 46,
+            "done_at_goal": 44,
+            "goal_claims": 46,
+            "correct_goal_claims": 44,
+            "goal_states": 45,
+            "no_solution_states": 0,
+            "correct_no_solution": 0
+          },
+          "source_shards": [
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-18750/test_reference/00000_00064"
+          ]
+        },
+        "test_rollout": {
+          "cases": 0,
+          "groups": {},
+          "reached": 0,
+          "success": 0,
+          "all_decisions": {
+            "decisions": 0,
+            "map_minimum": 0,
+            "legal": 0,
+            "ndcg_inverse_rank_at_10": null,
+            "ndcg_inverse_distance_at_10": null,
+            "ndcg_inverse_rank_at_1": null,
+            "ndcg_inverse_distance_at_1": null
+          },
+          "first_round": {
+            "decisions": 0,
+            "map_minimum": 0,
+            "legal": 0,
+            "ndcg_inverse_rank_at_10": null,
+            "ndcg_inverse_distance_at_10": null,
+            "ndcg_inverse_rank_at_1": null,
+            "ndcg_inverse_distance_at_1": null
+          },
+          "safe": 0,
+          "solvable_decisions": 0,
+          "termination": {
+            "done_outputs": 0,
+            "done_at_goal": 0,
+            "goal_claims": 0,
+            "correct_goal_claims": 0,
+            "goal_states": 0,
+            "no_solution_states": 0,
+            "correct_no_solution": 0
+          },
+          "source_shards": []
+        },
+        "initial_goal_reference": {
+          "cases": 0,
+          "groups": {},
+          "reached": 0,
+          "success": 0,
+          "all_decisions": {
+            "decisions": 0,
+            "map_minimum": 0,
+            "legal": 0,
+            "ndcg_inverse_rank_at_10": null,
+            "ndcg_inverse_distance_at_10": null,
+            "ndcg_inverse_rank_at_1": null,
+            "ndcg_inverse_distance_at_1": null
+          },
+          "first_round": {
+            "decisions": 0,
+            "map_minimum": 0,
+            "legal": 0,
+            "ndcg_inverse_rank_at_10": null,
+            "ndcg_inverse_distance_at_10": null,
+            "ndcg_inverse_rank_at_1": null,
+            "ndcg_inverse_distance_at_1": null
+          },
+          "safe": 0,
+          "solvable_decisions": 0,
+          "termination": {
+            "done_outputs": 0,
+            "done_at_goal": 0,
+            "goal_claims": 0,
+            "correct_goal_claims": 0,
+            "goal_states": 0,
+            "no_solution_states": 0,
+            "correct_no_solution": 0
+          },
+          "source_shards": []
+        },
+        "test_no_solution_reference": {
+          "cases": 0,
+          "groups": {},
+          "reached": 0,
+          "success": 0,
+          "all_decisions": {
+            "decisions": 0,
+            "map_minimum": 0,
+            "legal": 0,
+            "ndcg_inverse_rank_at_10": null,
+            "ndcg_inverse_distance_at_10": null,
+            "ndcg_inverse_rank_at_1": null,
+            "ndcg_inverse_distance_at_1": null
+          },
+          "first_round": {
+            "decisions": 0,
+            "map_minimum": 0,
+            "legal": 0,
+            "ndcg_inverse_rank_at_10": null,
+            "ndcg_inverse_distance_at_10": null,
+            "ndcg_inverse_rank_at_1": null,
+            "ndcg_inverse_distance_at_1": null
+          },
+          "safe": 0,
+          "solvable_decisions": 0,
+          "termination": {
+            "done_outputs": 0,
+            "done_at_goal": 0,
+            "goal_claims": 0,
+            "correct_goal_claims": 0,
+            "goal_states": 0,
+            "no_solution_states": 0,
+            "correct_no_solution": 0
+          },
+          "source_shards": []
+        }
+      },
+      "coverage": "partial",
+      "only_completed_shards": true,
+      "expected_tasks": {
+        "ordinary": 510,
+        "initial_goal": 100,
+        "failure_context": 100
+      }
     }
   },
   "run": "blocks_kv_restart_36c213c",
   "source_commit": "36c213c",
   "startup_verified_step": 75,
-  "observed_at_utc": "2026-10-08T08:52:42.985277+00:00",
+  "observed_at_utc": "2026-10-08T11:02:12+00:00",
   "training_resume": {
     "checkpoint_step": 11250,
     "checkpoint_epoch": 0.9,
@@ -334,5 +807,174 @@
     "verified_resumed_step": 11281,
     "verified_loss": 0.2636162042617798,
     "verified_grad_norm": 2.1199498176574707
+  },
+  "training_progress": {
+    "step": 23169,
+    "epoch": 1.85352,
+    "loss": 0.2805561423301697,
+    "grad_norm": 0.8138713836669922
+  },
+  "evaluation_progress": {
+    "gpus": 4,
+    "completed_shards": 17,
+    "resumed": true,
+    "archived_incomplete_shards": 2,
+    "active_workers": 4
+  },
+  "matched_epoch05_epoch1": {
+    "test_reference": {
+      "cases": 192,
+      "epoch05": {
+        "cases": 192,
+        "groups": {
+          "same_initial_board_new_pair": 192
+        },
+        "reached": 0,
+        "success": 0,
+        "all_decisions": {
+          "decisions": 1548,
+          "map_minimum": 261,
+          "legal": 1545,
+          "ndcg_inverse_rank_at_10": 0.5263159617388072,
+          "ndcg_inverse_distance_at_10": 0.8400110613854134,
+          "ndcg_inverse_rank_at_1": 0.3116912689132424,
+          "ndcg_inverse_distance_at_1": 0.7333245897735666
+        },
+        "first_round": {
+          "decisions": 192,
+          "map_minimum": 3,
+          "legal": 192,
+          "ndcg_inverse_rank_at_10": 0.19345527047142297,
+          "ndcg_inverse_distance_at_10": 0.7961742932605621,
+          "ndcg_inverse_rank_at_1": 0.0875830154703392,
+          "ndcg_inverse_distance_at_1": 0.7371837984880547
+        },
+        "safe": 706,
+        "solvable_decisions": 1199,
+        "termination": {
+          "done_outputs": 121,
+          "done_at_goal": 118,
+          "goal_claims": 112,
+          "correct_goal_claims": 109,
+          "goal_states": 126,
+          "no_solution_states": 0,
+          "correct_no_solution": 0
+        }
+      },
+      "epoch1": {
+        "cases": 192,
+        "groups": {
+          "same_initial_board_new_pair": 192
+        },
+        "reached": 0,
+        "success": 0,
+        "all_decisions": {
+          "decisions": 1548,
+          "map_minimum": 294,
+          "legal": 1547,
+          "ndcg_inverse_rank_at_10": 0.5604237000107443,
+          "ndcg_inverse_distance_at_10": 0.856659541046355,
+          "ndcg_inverse_rank_at_1": 0.34130976536804086,
+          "ndcg_inverse_distance_at_1": 0.7577786739297081
+        },
+        "first_round": {
+          "decisions": 192,
+          "map_minimum": 3,
+          "legal": 192,
+          "ndcg_inverse_rank_at_10": 0.2470631425171057,
+          "ndcg_inverse_distance_at_10": 0.8189657795127562,
+          "ndcg_inverse_rank_at_1": 0.08492001395573058,
+          "ndcg_inverse_distance_at_1": 0.7379593198902868
+        },
+        "safe": 769,
+        "solvable_decisions": 1199,
+        "termination": {
+          "done_outputs": 121,
+          "done_at_goal": 120,
+          "goal_claims": 121,
+          "correct_goal_claims": 120,
+          "goal_states": 126,
+          "no_solution_states": 0,
+          "correct_no_solution": 0
+        }
+      }
+    },
+    "test_rollout": {
+      "cases": 192,
+      "epoch05": {
+        "cases": 192,
+        "groups": {
+          "same_initial_board_new_pair": 192
+        },
+        "reached": 0,
+        "success": 0,
+        "all_decisions": {
+          "decisions": 1518,
+          "map_minimum": 252,
+          "legal": 1504,
+          "ndcg_inverse_rank_at_10": 0.5233487861597987,
+          "ndcg_inverse_distance_at_10": 0.8777100397889612,
+          "ndcg_inverse_rank_at_1": 0.3018214057151097,
+          "ndcg_inverse_distance_at_1": 0.8014073282382005
+        },
+        "first_round": {
+          "decisions": 192,
+          "map_minimum": 6,
+          "legal": 192,
+          "ndcg_inverse_rank_at_10": 0.20721418409420256,
+          "ndcg_inverse_distance_at_10": 0.7967003124993686,
+          "ndcg_inverse_rank_at_1": 0.09636841334407548,
+          "ndcg_inverse_distance_at_1": 0.7375968149227333
+        },
+        "safe": 177,
+        "solvable_decisions": 369,
+        "termination": {
+          "done_outputs": 192,
+          "done_at_goal": 0,
+          "goal_claims": 172,
+          "correct_goal_claims": 0,
+          "goal_states": 0,
+          "no_solution_states": 178,
+          "correct_no_solution": 20
+        }
+      },
+      "epoch1": {
+        "cases": 192,
+        "groups": {
+          "same_initial_board_new_pair": 192
+        },
+        "reached": 1,
+        "success": 1,
+        "all_decisions": {
+          "decisions": 1604,
+          "map_minimum": 239,
+          "legal": 1597,
+          "ndcg_inverse_rank_at_10": 0.4967676236474953,
+          "ndcg_inverse_distance_at_10": 0.8788759915393423,
+          "ndcg_inverse_rank_at_1": 0.28783056107665295,
+          "ndcg_inverse_distance_at_1": 0.8062878539581888
+        },
+        "first_round": {
+          "decisions": 192,
+          "map_minimum": 9,
+          "legal": 192,
+          "ndcg_inverse_rank_at_10": 0.24634780726617952,
+          "ndcg_inverse_distance_at_10": 0.8146615228393773,
+          "ndcg_inverse_rank_at_1": 0.10438449412786117,
+          "ndcg_inverse_distance_at_1": 0.7383385123527907
+        },
+        "safe": 241,
+        "solvable_decisions": 432,
+        "termination": {
+          "done_outputs": 188,
+          "done_at_goal": 1,
+          "goal_claims": 173,
+          "correct_goal_claims": 1,
+          "goal_states": 1,
+          "no_solution_states": 184,
+          "correct_no_solution": 15
+        }
+      }
+    }
   }
 }

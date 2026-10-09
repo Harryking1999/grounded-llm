@@ -29,7 +29,9 @@ python -m experiments.flamingo_map_reader.src.blocks_checkpoint_queue \
 
 每半 epoch 评测普通 reference/rollout、初始目标及失败上下文。原始回答和分片摘要保存在 `evaluation_half_epoch/step-N/`；未完成分片先归档再重做，完整分片复用。运行中不得同时启动重叠分片。
 
-完成原预算后的续训使用 `train --resume --resume-topology --epoch-extension`，继续原 optimizer、scheduler 与样本进度，新增权重写入 `training_extension_20epoch/models/`。评测队列通过 `--continuation-models` 同时扫描新增权重并等待新 final；原数据 manifest 与原 `training/models/final` 保留。机器、命令参数和运行目录见两节点合同与开发机手册。
+完成原预算后的续训使用 `train --resume --epoch-extension`，继续原 optimizer、scheduler 与样本进度，新增权重写入 `training_extension_20epoch/models/`；仅在明确的四卡每卡一条迁移到两卡每卡两条时使用 `--resume-topology`。当前按确认的原四卡每卡一条续训。评测队列通过 `--continuation-models` 同时扫描新增权重并等待新 final；原数据 manifest 与原 `training/models/final` 保留。机器、命令参数和运行目录见平台两节点合同与开发机手册。
+
+单卡辅助队列串行处理 reference 和 rollout；与平台主队列使用同一分片合同并持有互斥的余数。跨机器复制的权重通过 `--source-path-map` 显式映射 manifest、基座与地图位置，配置和任务记录仍严格匹配；逐题输出回传到平台后由主队列统一汇总。
 
 ```bash
 python -m experiments.flamingo_map_reader.src.summarize_blocks_results \

@@ -1,6 +1,6 @@
 # 开发机使用手册
 
-更新：2026-10-09。平台、028 和 4090 的 SSH 登录已验证；028、4090 已配置本机公钥。文件传输示例未执行。
+更新：2026-10-09。平台、028 和 4090 的 SSH 登录已验证；028、4090 已配置本机公钥。本轮已按平台 → login02 → 4090 完成模型、地图、评测数据与 adapter 中转。
 
 ## 1. 机器概览
 
@@ -20,10 +20,10 @@
 **原平台**：本机已配置 SSH 密钥。
 
 ```powershell
-# 当前续训环境：2 张 A100
-ssh -p 35016 root@172.16.78.10
-# 当前评测环境：2 张 A800
+# 当前续训环境：4 张 A800，每卡 batch=1
 ssh -p 41511 root@172.16.78.10
+# 当前主评测环境：2 张 A100
+ssh -p 35016 root@172.16.78.10
 ```
 
 训练环境另有本机别名 `grounded-dev`。密钥和连接配置位于 `%USERPROFILE%\.ssh\`。
@@ -57,17 +57,25 @@ Agent 使用相同连接方式，登录后通过 `hostname` 确认主机、`nvid
 | 当前积木地图 | `/zhanghanyue/experiment/grounded_llm_qmap_tree_132f5a1/runs/blocks_distance_map/tree_1000_132f5a1/best.pt` |
 | 已完成同题对照、尚未接入 LLM 的续训地图 | `/zhanghanyue/experiment/grounded_llm_qmap_tree_132f5a1/runs/blocks_distance_map/tree_continue_986cb4d/checkpoints/step_015000.pt` |
 | 028 基座候选 | `/ssdwork/fuzhizhang/model_base/Qwen2.5-1.5B-Instruct`；复用权限待确认 |
-| 4090 公共模型 | `/opt/models`；上次未发现 Qwen2.5-1.5B-Instruct，本轮非交互会话尚未完成跳板密码登录，未重新核对 |
+| 4090 公共模型 | `/opt/models`；2026-10-09 重查未发现 Qwen2.5-1.5B-Instruct，项目基座由平台经 login02 复制到项目目录 |
+| 4090 项目目录 | `/home/gongruochen/grounded_llm/`，含 `code/`、`models/`、`runs/` 与 `incoming/` |
+| login02 项目中转 | `/home/zhangyue/transfer/grounded_llm/`，已创建并完成 adapter 中转验证 |
 
 原平台目录支持跨开发环境复用。**028、login02、4090 与平台之间无已确认的共享目录**；028 的 `/ssdwork` 为节点本地磁盘。
 
-2026-10-09 最初在 35016、40327 合用八卡评测；随后用户重启为两台各两卡，评测端口由 40327 改为 41511。旧主、辅助进程均已退出。现按 `experiments/flamingo_map_reader/configs/blocks_kv_two_node_continuation.json` 安排：35016 续训，41511 的 `main` 队列扫描原权重与新增权重，继续写同一 `evaluation_half_epoch/`。原八卡调度配置和日志作为历史保留；不再把旧 `status.training_aux.json` 当作活跃队列。
+2026-10-09 最初在 35016、40327 合用八卡评测；随后端口改为 41511，并先尝试两卡续训。用户最终将 41511 扩为四张 A800，确认每卡 batch=1，从本轮 10 epoch 完整断点续训到 20 epoch；35016 两张 A100 改为主评测，4090 的 4 号卡辅助评测。正式安排仍见 `experiments/flamingo_map_reader/configs/blocks_kv_two_node_continuation.json`：主、辅助分别持有分片索引模 3 的余数 0/1、2，结果回到同一平台 `evaluation_half_epoch/`。旧八卡队列与两卡尝试作为历史保留。
 
-本轮续训源码为 `343506c`，部署于上述平台工作区 `code/blocks_kv_twenty_343506c/`；评测源码为 `7227c45`，位于 `code/blocks_kv_twenty_7227c45/`。续训日志为运行目录下 `logs/training_twenty_343506c.log`，续训状态、实际合同及来源分别记录于 `training_extension_20epoch/{status,config,continuation}.json`；评测队列日志为 `evaluation_half_epoch/logs/queue_main_two_gpu_twenty_7227c45_retry.log`。两卡 batch=2 探测两步通过，峰值约 7.7 GiB/卡；实际续训已越过来源步数，启动验收为 125,026 步。
+当前训练、评测源码为 `ce8b3b7`，平台部署于 `code/blocks_kv_three_node_ce8b3b7/`，4090 位于项目目录 `code/ce8b3b7/`。续训日志为平台运行目录下 `logs/training_twenty_four_gpu_ce8b3b7.log`，状态、实际合同与来源仍在 `training_extension_20epoch/{status,config,continuation}.json`。主队列日志为 `evaluation_half_epoch/logs/queue_main_35016_three_node_ce8b3b7.log`。两卡尝试的目录整体保留为 `training_extension_20epoch_two_gpu_retired_343506c/`，最后未发布的更新未带入四卡续训；原 10 epoch final 与所有权重保留。
 
-4090 复用评测只需 adapter，不需 optimizer 和 RNG。平台当前 adapter 约 98 MB，完整续训断点约 314 MB；基座约 3.10 GB，需一次性准备。两边没有共享目录，仍需中转。login02 按既有设置每次需要密码，这不是公钥登录故障；2026-10-09 本轮非交互会话未完成该密码步骤，尚未重新检查模型或执行复制。用户决定先完成平台两节点，4090 稍后再处理。
+4090 复用评测只需 adapter，不需 optimizer 和 RNG：adapter 约 98 MB，完整续训断点约 314 MB，基座约 3.10 GB，710 道评测任务的缓存约 93 MB。4090 的 0–3 号卡供现有 vLLM 服务使用，本轮辅助评测仅用 4 号卡，显存约 48 GB。基座、冻结地图、评测缓存及所需 adapter 已转入项目目录；使用独立环境 `/home/gongruochen/grounded_llm/.venv/bin/python`，不修改公共 Conda 环境。
 
-新机器的建议项目目录如下，**尚未创建**：
+独立环境已对齐平台的 PyTorch `2.7.1+cu128`、Transformers `4.57.6` 和 h5py `3.16.0`，Python 为 3.13，平台为 3.11。以原 10 epoch adapter 和相同题目验证 reference、rollout 各 2 题，生成时间分别约 18.4、16.5 秒/题，正式辅助分片也已连续产出回答。两条 reference 的动作序列与平台缓存一致；两条 rollout 中一条路径一致、另一条从第三个动作起分歧，两边这两题均未到达。运行库对齐后仍有跨机器的生成差异，原因未单独定位，不声称逐 token 复现；辅助输出保留独立来源及日志。
+
+按用户确认，文件先存入 login02，再复制至目标机。已验证跳板分别可达 `nv-h100-028` 和 4090 的 `ubuntu`，并完成 adapter 的跳板至 4090 中转，数据段约 98 MB/s。028 本轮只核对连接，仍遵守 10 月 12 日之后使用的约定。login02 需要密码，目标 4090 从跳板复制也使用其账号认证；密码仅在运行进程中使用，未写入仓库或脚本。
+
+模型与数据经平台直接上传到 login02，再复制到 4090，避免本机上传瓶颈。平台运行目录 `transfer/` 存放中转包、后台传输脚本、`4090_bridge.log` 和 `4090_bridge_status.json`；独立传输环境为平台工作区 `.transfer-venv/`。该后台程序每 10 分钟检查新权重、同步平台已完成分片的摘要标记并回传辅助分片，发布 adapter 后才发布可评测标记，分片返回时最后写摘要。摘要标记用于跨目录复用和全队列结束判断，完整逐题结果统一在平台汇总。它负责实验文件传输，不会创建 Codex 定时唤醒；30 分钟检查仍关闭。4090 的辅助日志位于其运行目录 `evaluation_half_epoch/logs/queue_4090_aux_ce8b3b7.log`，绝对路径仅通过显式 `source_path_map.json` 对应，监督配置保持一致。
+
+项目目录如下，028 目录尚未创建，4090 与 login02 目录已创建：
 
 | 机器 | 项目目录 |
 |---|---|
@@ -97,11 +105,13 @@ scp -r root@nv-h100-028:/ssdwork/zhanghanyue/grounded_llm/models/run-id /home/zh
 scp -r /home/zhangyue/transfer/grounded_llm/run-id gongruochen@10.28.0.80:/home/gongruochen/grounded_llm/models/
 ```
 
-**平台 → 4090**：通过本地中转。在本地 PowerShell 执行，预先创建 `./models/`：
+**平台 → login02 → 4090**：平台可直接访问 login02 的 SSH 端口。在平台与 login02 分别执行，预先创建中转与接收目录：
 
 ```powershell
-scp -P 35016 -r root@172.16.78.10:/path/to/model ./models/
-scp -o ConnectTimeout=60 -J zhangyue@172.16.78.36:10022 -r ./models/model gongruochen@10.28.0.80:/home/gongruochen/grounded_llm/models/
+# 平台上
+scp -P 10022 -r /path/to/model zhangyue@172.16.78.36:/home/zhangyue/transfer/grounded_llm/
+# login02 上
+scp -r /home/zhangyue/transfer/grounded_llm/model gongruochen@10.28.0.80:/home/gongruochen/grounded_llm/models/
 ```
 
 大文件可在 login02 使用 `rsync -a --partial --info=progress2` 传输，支持中断后续传。

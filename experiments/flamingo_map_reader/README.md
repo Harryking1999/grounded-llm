@@ -20,13 +20,7 @@ python -m experiments.flamingo_map_reader.src.retrain_blocks \
   --model-path "$MODEL_PATH" --out "$RUN_DIR" --training-only
 ```
 
-新目录从零初始化接口，复用缓存而不加载旧权重。仅限制失败样本清单的编号版本数量，原缓存不改动。训练节点使用配置指定的四卡，另一节点四卡评测：
-
-```bash
-python -m experiments.flamingo_map_reader.src.blocks_checkpoint_queue \
-  --run "$RUN_DIR" --model-path "$MODEL_PATH" --gpus 0,1 \
-  --terminal-tasks --cache-map-kv
-```
+新目录从零初始化接口，复用缓存而不加载旧权重。仅限制失败样本清单的编号版本数量，原缓存不改动。续训与协同评测的 GPU、分片分工由安排合同指定，使用下文的 `experiment_runner` 统一启动。
 
 每半 epoch 评测普通 reference/rollout、初始目标及失败上下文。原始回答和分片摘要保存在 `evaluation_half_epoch/step-N/`；未完成分片先归档再重做，完整分片复用。运行中不得同时启动重叠分片。
 
@@ -34,7 +28,7 @@ python -m experiments.flamingo_map_reader.src.blocks_checkpoint_queue \
 
 单卡辅助队列串行处理 reference 和 rollout；与平台主队列使用同一分片合同并持有互斥的余数。跨机器复制的权重通过 `--source-path-map` 显式映射 manifest、基座与地图位置，配置和任务记录仍严格匹配；逐题输出回传到平台后由主队列统一汇总。
 
-续训和协同评测的日常启动使用 `experiment_runner`，直接读取同一份安排合同，不再复制每轮启动脚本。在执行节点准备 Git 外的 runtime profile，仅包含 `workspace_root`、`code_root`、`python`、`model_path`；训练增加 `q_checkpoint`，迁移后的评测增加 `source_path_map`，可选 `log`。路径必须是该节点上的绝对路径，profile 保存在 `runs/<run>/transfer/` 或 `tmp/`，不保存密码。
+续训和协同评测的日常启动使用 `experiment_runner`，直接读取同一份安排合同，不再复制每轮启动脚本。在执行节点准备 Git 外的 runtime profile，仅包含 `workspace_root`、`code_root`、`python`、`model_path`；训练增加 `q_checkpoint`，迁移后的评测增加 `source_path_map`，可选 `log`。路径必须是该节点上的绝对路径，profile 保存在 `runs/<run>/runtime/` 或 `tmp/`，不保存密码。
 
 ```bash
 python -m experiments.flamingo_map_reader.src.experiment_runner plan \

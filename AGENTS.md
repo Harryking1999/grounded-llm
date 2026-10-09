@@ -9,6 +9,7 @@
 - 当前状态与有序 TODO：`docs/PROJECT_STATUS_AND_TODO.md`
 - 当前研究主张、定义与证伪标准：`docs/RESEARCH_BRIEF.md`
 - 实验专属合同：形成具体研究后放在 `experiments/<study>/configs/`
+- 开发机连接、存储与迁移手册：根目录 `DEVELOPMENT_MACHINES.md`；远端操作前读取，机器或产物位置变化时原位更新；研究进度仍只维护当前状态页。
 
 只保留一个当前状态页。应更新权威文件，而不是创建带日期或版本后缀的替代文件。正式配置存在后，不要在说明文字里复制一套机器可读参数。
 

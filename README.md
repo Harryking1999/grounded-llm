@@ -8,7 +8,8 @@
 2. [本轮结果](experiments/flamingo_map_reader/results/report.md)：大 batch 负结果与小 batch 证据状态；[上一轮报告](experiments/flamingo_map_reader/results/report_long_trajectory.md)保留原两任务成绩与地图使用证据。
 3. [当前状态与 TODO](docs/PROJECT_STATUS_AND_TODO.md)：唯一进度页及运行定位。
 4. [研究简述](docs/RESEARCH_BRIEF.md)：问题、主张与证据边界。
+5. [开发机使用手册](DEVELOPMENT_MACHINES.md)：平台、028 与 4090 的连接、目录、使用约定、文件迁移和更新规则。
 
 实现和运行入口见[当前实验 README](experiments/flamingo_map_reader/README.md)。地图依赖及独立基线见[实验目录](experiments/README.md)；文献与任务来源见 [Related Work](RELATED_WORK.md)、[GCML_TASKS](docs/GCML_TASKS.md)。旧变体见[历史索引](docs/PROJECT_STATUS_AND_TODO.md#历史证据入口)。
 
-源码、正式配置与结果摘要纳入 Git；原始数据、模型、日志及机器连接信息留在忽略路径。协作约定见 [AGENTS.md](AGENTS.md)。
+源码、正式配置、结果摘要与不含秘密的开发机手册纳入 Git；原始数据、模型、日志、密码、密钥及本机连接配置留在 Git 外。协作约定见 [AGENTS.md](AGENTS.md)。

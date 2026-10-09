@@ -19,7 +19,7 @@
 | 作答方式 | 每轮选择一步，环境执行后更新 | 一次输出全部剩余动作，无中间反馈 | 一次输出完整动作序列 | 一次输出完整动作序列，无中间反馈 | 一次输出完整动作序列，无中间反馈 |
 | 状态由谁维护 | 环境每轮提供真实当前棋盘 | 模型自行推演，裁判提交后回放 | 同 Astra | 同 Astra | 模型自行推演，并输出每步预测棋盘 |
 | 输出格式 | 排序文字、候选编号、`<action>`／`<done/>` | 动作 JSON、`solved/no_solution/unsolved`；不要求逐步棋盘 | 动作 JSON，可选短理由 | 动作 JSON，可选短理由 | 动作 JSON，每步必须含 `board_after` |
-| 动作预算 | 评测器最多执行 32 步；当前输入文本没有写出这个上限 | 明确剩余动作预算，普通题为 32 步 | 最多 8 步 | 正式 pilot 不限动作数；生成器支持有上限条件 | 不限动作数 |
+| 动作预算 | 评测器最多执行 32 步；当前输入文本没有写出这个上限 | prompt 不写动作预算 | 最多 8 步 | 正式 pilot 不限动作数；生成器支持有上限条件 | 不限动作数 |
 | 评测重点 | rollout 到达与停止；reference 单步可达、地图排序；两类终止判断 | 拟报告完整到达、动作合法性与两类终止判断 | 合法执行并清空 | 合法执行并清空、失败类型 | 合法执行并清空；预测状态与格式另作诊断 |
 
 ### 形状编号不能混用
@@ -122,7 +122,7 @@ No solution: no legal moves remain and the goal has not been reached.
 
 这是本文整理的待确认版本：复用当前题集和 8 种形状；不提供首步候选、不输入地图、不要求 `board_after`。只提供一个当前起点棋盘和目标棋盘，删去重复的原始棋盘；规则沿用当前 1.5B 的措辞，输出约定压缩为动作 JSON 与终止状态。**它尚不是已执行的正式配置，也不表示用户已经确认。**
 
-普通题从初始棋盘出发；初始已达目标题应直接停止；失败题从固定历史后的真实末态继续判断。失败题输入仅整理实际棋盘与动作历史，不添加示范排序、地图距离、答案标签或“这题无解”的类别提示。剩余动作预算由原评测上限减去已执行动作数，不重新赠送一轮预算。
+普通题从初始棋盘出发；初始已达目标题应直接停止；失败题从固定历史后的真实末态继续判断。失败题输入仅整理实际棋盘与动作历史，不添加示范排序、地图距离、答案标签或“这题无解”的类别提示。prompt 不写动作预算。
 
 ### 拟发送的完整 prompt
 
@@ -145,12 +145,11 @@ Goal board:
 {GOAL_BOARD_ROWS}
 
 Actual executed actions: {EXECUTED_ACTIONS_OR_NONE}
-Use at most {REMAINING_ACTION_BUDGET} additional removals.
 
 Plan the complete remaining sequence from the current board and output it once. There is no intermediate feedback; the judge stops at the first illegal action.
 
 Return JSON with "actions" (an array of objects with integer shape_id, row, col) and "final_status" ("solved", "no_solution", or "unsolved").
-Use "solved" when your sequence reaches the goal; if already at the goal, output an empty actions array. Use "no_solution" only when the goal is unreachable, not merely because you could not find a plan within the budget; otherwise use "unsolved".
+Use "solved" when your sequence reaches the goal; if already at the goal, output an empty actions array. Use "no_solution" only when the goal is unreachable, not merely because you could not find a plan; otherwise use "unsolved".
 ```
 
 ### 相对当前 1.5B，改变了什么
@@ -158,7 +157,7 @@ Use "solved" when your sequence reaches the goal; if already at the goal, output
 | 项目 | 保持一致 | 草案的改变及含义 |
 |---|---|---|
 | 物理任务 | 同一批普通题与终止题、同样的目标、形状和规则 | 历史清空题不会被混入这 710 题 |
-| 动作上限 | 沿用当前评测器上限 | 在 prompt 明确写出剩余预算；当前 1.5B 文本没有这句 |
+| 动作上限 | 沿用当前评测器上限 | 两者 prompt 均不写动作预算 |
 | 棋盘与历史 | 提供真实当前起点、目标及已执行动作 | 不重复原始棋盘；失败历史压成事实文本，不带示范 assistant 答案 |
 | 合法动作 | 仍由同一规则裁判验证 | 不列候选，模型自己判断首步及后续合法性 |
 | 地图 | — | 不输入 Q-map，测纯文本规划 |

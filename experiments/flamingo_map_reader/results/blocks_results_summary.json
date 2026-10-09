@@ -7629,6 +7629,397 @@
           },
           "source_shards": []
         }
+      },
+      "distance_gain_diagnostic_completed_snapshot": {
+        "epoch": 8,
+        "step": 100000,
+        "source_commit": "36c213c",
+        "map_metric": "directed_sum",
+        "map_cap": 13,
+        "weighting": "Candidate occurrences pooled across completed cases;reference and rollout separate;not unique state pairs.",
+        "baseline": "Exact uniform random permutation on the same states,not a random trajectory.",
+        "modes": {
+          "reference": {
+            "cases": 384,
+            "decisions": 3036,
+            "candidates": {
+              "unreachable": {
+                "distance": {
+                  "n": 45014,
+                  "mean": 8.007172769287699,
+                  "min": 1.5810341835021973,
+                  "p10": 4.951669549942016,
+                  "median": 7.800737142562866,
+                  "p90": 11.365277194976807,
+                  "p99": 13.605472488403324,
+                  "max": 30.43920135498047
+                },
+                "reciprocal_gain": {
+                  "n": 45014,
+                  "mean": 0.13859292645551716,
+                  "min": 0.03285237310723265,
+                  "p10": 0.08798729524065647,
+                  "median": 0.12819301327213356,
+                  "p90": 0.20195208706551765,
+                  "p99": 0.3048908430993131,
+                  "max": 0.6324973934370409
+                },
+                "zero_distance": 0
+              },
+              "unreachable_in_live_state": {
+                "distance": {
+                  "n": 35771,
+                  "mean": 8.12194356608806,
+                  "min": 1.7321397066116333,
+                  "p10": 5.1973185539245605,
+                  "median": 7.943704605102539,
+                  "p90": 11.339655876159668,
+                  "p99": 13.687395572662354,
+                  "max": 29.51546859741211
+                },
+                "reciprocal_gain": {
+                  "n": 35771,
+                  "mean": 0.13504470317103973,
+                  "min": 0.033880539510989814,
+                  "p10": 0.08818609761363093,
+                  "median": 0.12588584919908308,
+                  "p90": 0.1924069093753908,
+                  "p99": 0.2864864183038441,
+                  "max": 0.5773206376962364
+                },
+                "zero_distance": 0
+              },
+              "reachable": {
+                "distance": {
+                  "n": 32465,
+                  "mean": 6.624497311030443,
+                  "min": 0.0,
+                  "p10": 3.6309333324432376,
+                  "median": 6.40859317779541,
+                  "p90": 10.078404617309573,
+                  "p99": 12.056592483520507,
+                  "max": 14.824305534362793
+                },
+                "reciprocal_gain": {
+                  "n": 32465,
+                  "mean": 8162636685.834013,
+                  "min": 0.06745678559322704,
+                  "p10": 0.09922205351762485,
+                  "median": 0.1560404869300824,
+                  "p90": 0.2754112900042046,
+                  "p99": 0.6353914477375454,
+                  "max": 1000000000000.0
+                },
+                "zero_distance": 265
+              },
+              "reachable_in_live_state": {
+                "distance": {
+                  "n": 32465,
+                  "mean": 6.624497311030443,
+                  "min": 0.0,
+                  "p10": 3.6309333324432376,
+                  "median": 6.40859317779541,
+                  "p90": 10.078404617309573,
+                  "p99": 12.056592483520507,
+                  "max": 14.824305534362793
+                },
+                "reciprocal_gain": {
+                  "n": 32465,
+                  "mean": 8162636685.834013,
+                  "min": 0.06745678559322704,
+                  "p10": 0.09922205351762485,
+                  "median": 0.1560404869300824,
+                  "p90": 0.2754112900042046,
+                  "p99": 0.6353914477375454,
+                  "max": 1000000000000.0
+                },
+                "zero_distance": 265
+              },
+              "reachable_non_goal": {
+                "distance": {
+                  "n": 32200,
+                  "mean": 6.679015689521843,
+                  "min": 0.7345093488693237,
+                  "p10": 3.7081417322158816,
+                  "median": 6.434142827987671,
+                  "p90": 10.092951393127443,
+                  "p99": 12.059677486419679,
+                  "max": 14.824305534362793
+                },
+                "reciprocal_gain": {
+                  "n": 32200,
+                  "mean": 0.17395005523632875,
+                  "min": 0.06745678559322704,
+                  "p10": 0.09907904650567832,
+                  "median": 0.155420858475968,
+                  "p90": 0.26967685561567845,
+                  "p99": 0.46100892487169687,
+                  "max": 1.361453059160326
+                },
+                "zero_distance": 0
+              }
+            },
+            "unreachable_causes": {
+              "unreachable_untilable_remainder": 23495,
+              "unreachable_removed_goal_cells": 21519,
+              "goal_candidates": 265
+            },
+            "map_minimum_reachability": {
+              "live_states": 2407,
+              "live_states_any_unreachable_map_minimum": 119,
+              "live_states_all_map_minima_unreachable": 119
+            },
+            "best_unsafe_to_best_safe_gain_ratio": {
+              "n": 2214,
+              "mean": 0.7188100453523745,
+              "min": 8.957803304314205E-14,
+              "p10": 0.4211298656646146,
+              "median": 0.7744467230598773,
+              "p90": 0.9578701010243752,
+              "p99": 1.0826760573370275,
+              "max": 1.3719872283785
+            },
+            "mixed_live_states": 2214,
+            "mixed_live_states_unsafe_within10pct_distance": 443,
+            "metrics": {
+              "all_decisions": {
+                "ndcg_inverse_rank_at_10": {
+                  "model": 0.7648344538904899,
+                  "random": 0.5029666758638994
+                },
+                "ndcg_inverse_distance_at_10": {
+                  "model": 0.9350129655047362,
+                  "random": 0.8233096904404912
+                },
+                "ndcg_inverse_rank_at_1": {
+                  "model": 0.5833903813976958,
+                  "random": 0.27998838516522684
+                },
+                "ndcg_inverse_distance_at_1": {
+                  "model": 0.8924244799448936,
+                  "random": 0.6960392167568423
+                }
+              },
+              "first_round": {
+                "ndcg_inverse_rank_at_10": {
+                  "model": 0.48880338334928286,
+                  "random": 0.19915125569616107
+                },
+                "ndcg_inverse_distance_at_10": {
+                  "model": 0.9008961077616999,
+                  "random": 0.7909296653628086
+                },
+                "ndcg_inverse_rank_at_1": {
+                  "model": 0.2789862165788806,
+                  "random": 0.0822256031751871
+                },
+                "ndcg_inverse_distance_at_1": {
+                  "model": 0.8426616109996702,
+                  "random": 0.7263117561246394
+                }
+              }
+            },
+            "source_shards": [
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-100000/test_reference/00000_00064",
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-100000/test_reference/00064_00128",
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-100000/test_reference/00128_00192",
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-100000/test_reference/00192_00256",
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-100000/test_reference/00256_00320",
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-100000/test_reference/00320_00384"
+            ]
+          },
+          "rollout": {
+            "cases": 384,
+            "decisions": 3135,
+            "candidates": {
+              "reachable": {
+                "distance": {
+                  "n": 24614,
+                  "mean": 7.488439707923809,
+                  "min": 0.0,
+                  "p10": 4.929180669784546,
+                  "median": 7.253068208694458,
+                  "p90": 10.492360877990723,
+                  "p99": 12.284595108032226,
+                  "max": 14.824305534362793
+                },
+                "reciprocal_gain": {
+                  "n": 24614,
+                  "mean": 2843909970.0810747,
+                  "min": 0.06745678559322704,
+                  "p10": 0.09530743497878842,
+                  "median": 0.1378726866840898,
+                  "p90": 0.20287347458025404,
+                  "p99": 0.3412668463765394,
+                  "max": 1000000000000.0
+                },
+                "zero_distance": 70
+              },
+              "reachable_in_live_state": {
+                "distance": {
+                  "n": 24614,
+                  "mean": 7.488439707923809,
+                  "min": 0.0,
+                  "p10": 4.929180669784546,
+                  "median": 7.253068208694458,
+                  "p90": 10.492360877990723,
+                  "p99": 12.284595108032226,
+                  "max": 14.824305534362793
+                },
+                "reciprocal_gain": {
+                  "n": 24614,
+                  "mean": 2843909970.0810747,
+                  "min": 0.06745678559322704,
+                  "p10": 0.09530743497878842,
+                  "median": 0.1378726866840898,
+                  "p90": 0.20287347458025404,
+                  "p99": 0.3412668463765394,
+                  "max": 1000000000000.0
+                },
+                "zero_distance": 70
+              },
+              "reachable_non_goal": {
+                "distance": {
+                  "n": 24544,
+                  "mean": 7.509796894183371,
+                  "min": 1.2090044021606445,
+                  "p10": 4.957014560699463,
+                  "median": 7.259033441543579,
+                  "p90": 10.495048427581787,
+                  "p99": 12.286776037216185,
+                  "max": 14.824305534362793
+                },
+                "reciprocal_gain": {
+                  "n": 24544,
+                  "mean": 0.14568048108126103,
+                  "min": 0.06745678559322704,
+                  "p10": 0.09528302865229946,
+                  "median": 0.1377593873968136,
+                  "p90": 0.2017343291699727,
+                  "p99": 0.3199917324781191,
+                  "max": 0.8271268476879595
+                },
+                "zero_distance": 0
+              },
+              "unreachable": {
+                "distance": {
+                  "n": 54308,
+                  "mean": 9.275973868388055,
+                  "min": 1.5810338258743286,
+                  "p10": 6.263397073745728,
+                  "median": 9.13266897201538,
+                  "p90": 12.317752933502197,
+                  "p99": 15.478318586349488,
+                  "max": 30.881990432739258
+                },
+                "reciprocal_gain": {
+                  "n": 54308,
+                  "mean": 0.11601787541121308,
+                  "min": 0.03238133248496377,
+                  "p10": 0.08118363839678759,
+                  "median": 0.10949701594443004,
+                  "p90": 0.15965776899433995,
+                  "p99": 0.2250444992179521,
+                  "max": 0.6324975365071581
+                },
+                "zero_distance": 0
+              },
+              "unreachable_in_live_state": {
+                "distance": {
+                  "n": 28310,
+                  "mean": 9.066240203283735,
+                  "min": 2.122835874557495,
+                  "p10": 6.308677339553833,
+                  "median": 8.933786392211914,
+                  "p90": 11.949171924591065,
+                  "p99": 14.269437828063964,
+                  "max": 24.911869049072266
+                },
+                "reciprocal_gain": {
+                  "n": 28310,
+                  "mean": 0.11743566431701054,
+                  "min": 0.04014150837218056,
+                  "p10": 0.08368780751700082,
+                  "median": 0.11193462175485552,
+                  "p90": 0.15851183174183778,
+                  "p99": 0.21634885911937615,
+                  "max": 0.47106797656151816
+                },
+                "zero_distance": 0
+              }
+            },
+            "unreachable_causes": {
+              "unreachable_removed_goal_cells": 30794,
+              "unreachable_untilable_remainder": 23514,
+              "goal_candidates": 70
+            },
+            "map_minimum_reachability": {
+              "live_states": 1443,
+              "live_states_any_unreachable_map_minimum": 78,
+              "live_states_all_map_minima_unreachable": 78
+            },
+            "best_unsafe_to_best_safe_gain_ratio": {
+              "n": 1400,
+              "mean": 0.7786014501384291,
+              "min": 8.685599929758179E-14,
+              "p10": 0.5505794603259273,
+              "median": 0.8196325935840374,
+              "p90": 0.9688537912259559,
+              "p99": 1.0809558725074508,
+              "max": 1.3719872283785
+            },
+            "mixed_live_states": 1400,
+            "mixed_live_states_unsafe_within10pct_distance": 314,
+            "metrics": {
+              "all_decisions": {
+                "ndcg_inverse_rank_at_10": {
+                  "model": 0.6700722248571882,
+                  "random": 0.5078798469334485
+                },
+                "ndcg_inverse_distance_at_10": {
+                  "model": 0.8865784657028263,
+                  "random": 0.8512595758830678
+                },
+                "ndcg_inverse_rank_at_1": {
+                  "model": 0.45908811171942204,
+                  "random": 0.2853232832581251
+                },
+                "ndcg_inverse_distance_at_1": {
+                  "model": 0.822031135117532,
+                  "random": 0.7434426440167886
+                }
+              },
+              "first_round": {
+                "ndcg_inverse_rank_at_10": {
+                  "model": 0.4732677061938578,
+                  "random": 0.19915125569616107
+                },
+                "ndcg_inverse_distance_at_10": {
+                  "model": 0.8966713206872652,
+                  "random": 0.7909296653628086
+                },
+                "ndcg_inverse_rank_at_1": {
+                  "model": 0.2522700833592701,
+                  "random": 0.0822256031751871
+                },
+                "ndcg_inverse_distance_at_1": {
+                  "model": 0.8302080790579655,
+                  "random": 0.7263117561246394
+                }
+              }
+            },
+            "source_shards": [
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-100000/test_rollout/00000_00064",
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-100000/test_rollout/00064_00128",
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-100000/test_rollout/00128_00192",
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-100000/test_rollout/00192_00256",
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-100000/test_rollout/00256_00320",
+              "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-100000/test_rollout/00320_00384"
+            ]
+          }
+        },
+        "observed_at_utc": "2026-10-09T03:23:36.108064+00:00",
+        "interpretation": "Exact directed reachability classified by DistanceOracle,not by Q-map. Encoder learned finite unreachable target cap13;reciprocal map distance is not zero for certified-unreachable candidates. Same-root/legal successor membership does not imply a directed path to this goal. Zero Q-map distances in this cohort occurred only at actual goal candidates. Reachable-non-goal comparison excludes those 1e12-gain terminal candidates."
       }
     },
     "106250": {

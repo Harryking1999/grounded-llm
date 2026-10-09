@@ -37,4 +37,6 @@ python -m experiments.flamingo_map_reader.src.summarize_blocks_results \
 
 普通任务报告完整到达、单步可达、地图最优及位置倒数／状态内距离归一化两种 gain 的 NDCG；距离归一化已替代距离倒数，随机与反序基线使用同一组状态。两个终止任务分别报告。分片原始汇总仍保留旧兼容字段，CPU 重评分后正式报告使用本轮合同，不跨任务混算。
 
+纯地图同题对照使用 `evaluate_blocks_map_baselines` 和[合同](configs/blocks_map_baseline_comparison.json)，直接复用当前 manifest 的 510 道 test 任务、规则、动作预算和随机种子；CPU 重跑原图并逐题核对缓存后，与新图直接贪心比较。现用图 345/510，新图 397/510，逐题回退与分组结果保存在[结果摘要](results/blocks_results_summary.json)的 `map_greedy_comparison`；此次地图对照没有更换 LLM 的地图输入或训练数据。
+
 模型、地图、数据、日志和运行状态留在 Git 外；以代码提交、配置与运行目录识别产物。停止的融合 FFN 目录保留原位并标记 archived，避免破坏缓存链接。历史诊断及旧入口说明见归档设计和报告。

@@ -21393,5 +21393,223 @@
       10,
       1
     ]
+  },
+  "map_greedy_comparison": {
+    "analysis_commit": "4dde742",
+    "contract": {
+      "split": "test",
+      "expected_tasks": 510,
+      "expected_group_counts": {
+        "same_initial_board_new_pair": 255,
+        "new_initial_board": 255
+      },
+      "expected_shortest_length_counts": {
+        "6": 100,
+        "7": 200,
+        "8": 200,
+        "9": 10
+      },
+      "new_map_source_commit": "986cb4d",
+      "new_map_continuation_step": 15000,
+      "device": "cpu",
+      "cpu_threads": 1,
+      "policy": "all_legal_successors_pure_qmap_greedy",
+      "numbering_and_ties": "existing_greedy_demonstration_with_each_record_sample_seed",
+      "oracle": "first_step_scoring_only_never_action_selection"
+    },
+    "manifest": "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/data/manifest.json",
+    "checkpoints": {
+      "current": {
+        "path": "/zhanghanyue/experiment/grounded_llm_qmap_tree_132f5a1/runs/blocks_distance_map/tree_1000_132f5a1/best.pt",
+        "source_commit": "132f5a1",
+        "step": 65000,
+        "metric": "directed_sum"
+      },
+      "continued": {
+        "path": "/zhanghanyue/experiment/grounded_llm_qmap_tree_132f5a1/runs/blocks_distance_map/tree_continue_986cb4d/checkpoints/step_015000.pt",
+        "source_commit": "986cb4d",
+        "step": 80000,
+        "metric": "directed_sum",
+        "continuation_step": 15000
+      }
+    },
+    "results": {
+      "current": {
+        "all": {
+          "tasks": 510,
+          "reached": 345,
+          "first_step_reachable": 465,
+          "first_step_shortest": 442,
+          "rates": {
+            "reached": 0.6764705882352942,
+            "first_step_reachable": 0.9117647058823529,
+            "first_step_shortest": 0.8666666666666667
+          }
+        },
+        "by_group": {
+          "same_initial_board_new_pair": {
+            "tasks": 255,
+            "reached": 172,
+            "first_step_reachable": 234,
+            "first_step_shortest": 221,
+            "rates": {
+              "reached": 0.6745098039215687,
+              "first_step_reachable": 0.9176470588235294,
+              "first_step_shortest": 0.8666666666666667
+            }
+          },
+          "new_initial_board": {
+            "tasks": 255,
+            "reached": 173,
+            "first_step_reachable": 231,
+            "first_step_shortest": 221,
+            "rates": {
+              "reached": 0.6784313725490196,
+              "first_step_reachable": 0.9058823529411765,
+              "first_step_shortest": 0.8666666666666667
+            }
+          }
+        },
+        "by_shortest_length": {
+          "6": {
+            "tasks": 100,
+            "reached": 70,
+            "first_step_reachable": 92,
+            "first_step_shortest": 86,
+            "rates": {
+              "reached": 0.7,
+              "first_step_reachable": 0.92,
+              "first_step_shortest": 0.86
+            }
+          },
+          "7": {
+            "tasks": 200,
+            "reached": 147,
+            "first_step_reachable": 181,
+            "first_step_shortest": 172,
+            "rates": {
+              "reached": 0.735,
+              "first_step_reachable": 0.905,
+              "first_step_shortest": 0.86
+            }
+          },
+          "8": {
+            "tasks": 200,
+            "reached": 122,
+            "first_step_reachable": 184,
+            "first_step_shortest": 176,
+            "rates": {
+              "reached": 0.61,
+              "first_step_reachable": 0.92,
+              "first_step_shortest": 0.88
+            }
+          },
+          "9": {
+            "tasks": 10,
+            "reached": 6,
+            "first_step_reachable": 8,
+            "first_step_shortest": 8,
+            "rates": {
+              "reached": 0.6,
+              "first_step_reachable": 0.8,
+              "first_step_shortest": 0.8
+            }
+          }
+        }
+      },
+      "continued": {
+        "all": {
+          "tasks": 510,
+          "reached": 397,
+          "first_step_reachable": 473,
+          "first_step_shortest": 444,
+          "rates": {
+            "reached": 0.7784313725490196,
+            "first_step_reachable": 0.9274509803921569,
+            "first_step_shortest": 0.8705882352941177
+          }
+        },
+        "by_group": {
+          "same_initial_board_new_pair": {
+            "tasks": 255,
+            "reached": 197,
+            "first_step_reachable": 237,
+            "first_step_shortest": 224,
+            "rates": {
+              "reached": 0.7725490196078432,
+              "first_step_reachable": 0.9294117647058824,
+              "first_step_shortest": 0.8784313725490196
+            }
+          },
+          "new_initial_board": {
+            "tasks": 255,
+            "reached": 200,
+            "first_step_reachable": 236,
+            "first_step_shortest": 220,
+            "rates": {
+              "reached": 0.7843137254901961,
+              "first_step_reachable": 0.9254901960784314,
+              "first_step_shortest": 0.8627450980392157
+            }
+          }
+        },
+        "by_shortest_length": {
+          "6": {
+            "tasks": 100,
+            "reached": 67,
+            "first_step_reachable": 89,
+            "first_step_shortest": 80,
+            "rates": {
+              "reached": 0.67,
+              "first_step_reachable": 0.89,
+              "first_step_shortest": 0.8
+            }
+          },
+          "7": {
+            "tasks": 200,
+            "reached": 159,
+            "first_step_reachable": 185,
+            "first_step_shortest": 172,
+            "rates": {
+              "reached": 0.795,
+              "first_step_reachable": 0.925,
+              "first_step_shortest": 0.86
+            }
+          },
+          "8": {
+            "tasks": 200,
+            "reached": 165,
+            "first_step_reachable": 189,
+            "first_step_shortest": 182,
+            "rates": {
+              "reached": 0.825,
+              "first_step_reachable": 0.945,
+              "first_step_shortest": 0.91
+            }
+          },
+          "9": {
+            "tasks": 10,
+            "reached": 6,
+            "first_step_reachable": 10,
+            "first_step_shortest": 10,
+            "rates": {
+              "reached": 0.6,
+              "first_step_reachable": 1.0,
+              "first_step_shortest": 1.0
+            }
+          }
+        }
+      }
+    },
+    "paired": {
+      "1->1": 292,
+      "0->1": 105,
+      "0->0": 60,
+      "1->0": 53
+    },
+    "interpretation": "Same fixed510 tasks, rules, action budget and greedy policy;oracle only scores, never filters successors;current map reproduces every cached outcome.The existing LLM and its prepared memories remain on the current map.Test-task novelty relative to the continued-map additional supervision has not been audited.",
+    "observed_at_utc": "2026-10-09T04:46:11.013136+00:00",
+    "raw_results_path": "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_map_comparison_510_986cb4d_c8/results.json",
+    "contract_file": "experiments/flamingo_map_reader/configs/blocks_map_baseline_comparison.json"
   }
 }

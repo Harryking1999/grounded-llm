@@ -37,9 +37,14 @@
     "cohort": "all_nonterminal_states_with_candidates",
     "gains": [
       "inverse_rank",
-      "reciprocal_distance"
+      "minmax_distance"
     ],
-    "distance_floor": 1e-12,
+    "distance_normalization": "per_state_all_candidates_minmax",
+    "equal_distance_gain": 1,
+    "baselines": [
+      "exact_uniform_random_permutation_same_state",
+      "all_candidates_farthest_first"
+    ],
     "ndcg_at": [
       10,
       1

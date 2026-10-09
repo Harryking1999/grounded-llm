@@ -1,4 +1,6 @@
 import unittest
+import json
+import tempfile
 from pathlib import Path
 
 from experiments.flamingo_map_reader.src.trajectory_metrics import termination_counts, summarize_turns
@@ -7,23 +9,36 @@ from experiments.flamingo_map_reader.src.blocks_checkpoint_queue import (
 from experiments.flamingo_map_reader.src.analyze_blocks_ranking import (
     check_metric, meeting_ranking_scores, inverse_rank_gains)
 from experiments.flamingo_map_reader.src.summarize_blocks_results import (
-    add_readout_scores, summarize_cases, overall_completion)
+    add_readout_scores, summarize_cases, overall_completion, read_cases)
 
 
 class ThreeTaskMetricsTest(unittest.TestCase):
+    def test_rescoring_reads_only_complete_uninterrupted_shards(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for name, complete in [('complete', True), ('partial', False),
+                                   ('complete.interrupted', True)]:
+                shard = root/name
+                shard.mkdir()
+                (shard/'cases.jsonl').write_text(json.dumps(dict(trajectory_id=name, variant=0))+'\n')
+                if complete:
+                    (shard/'summary.json').write_text('{}')
+            self.assertEqual([c['trajectory_id'] for c in read_cases(root)], ['complete'])
+
     def test_meeting_metrics_use_true_rank_and_distance_gains(self):
         values = meeting_ranking_scores([2., 4., 8.], {0:0, 2:1, 1:2, 3:3})
         self.assertAlmostEqual(values['ndcg_inverse_rank_at_1'], .5)
-        self.assertAlmostEqual(values['ndcg_inverse_distance_at_1'], .5)
+        self.assertAlmostEqual(values['ndcg_minmax_distance_at_1'], 2/3)
+        self.assertNotIn('ndcg_inverse_distance_at_1', values)
         ideal = meeting_ranking_scores([2., 4., 8.], {0:0, 1:1, 2:2, 3:3})
         self.assertTrue(all(v == 1 for v in ideal.values()))
         bad = meeting_ranking_scores([0., 2.], None)
         self.assertTrue(all(v == 0 for v in bad.values()))
         tied = meeting_ranking_scores([2., 4.], {0:0, 1:1, 2:1})
-        self.assertAlmostEqual(tied['ndcg_inverse_distance_at_1'], .75)
+        self.assertAlmostEqual(tied['ndcg_minmax_distance_at_1'], .5)
         self.assertEqual(inverse_rank_gains([2., 2., 4.]), [.75, .75, 1/3])
         zeros = meeting_ranking_scores([0., 0., 2.], {0:0, 2:1})
-        self.assertEqual(zeros['ndcg_inverse_distance_at_1'], 1)
+        self.assertEqual(zeros['ndcg_minmax_distance_at_1'], 1)
 
     def test_done_precision_recall_and_correct_failure_have_distinct_denominators(self):
         rows = [dict(done=True, candidates=0, answer='<done/>'),
@@ -80,6 +95,10 @@ class ThreeTaskMetricsTest(unittest.TestCase):
         self.assertEqual(values['overall']['solvable'], 0)
         self.assertEqual(values['overall']['ndcg_n'], 1)
         self.assertEqual(values['overall']['ndcg_mean'], row['ranking_ndcg_at_10'])
+        self.assertEqual(values['overall']['ndcg_minmax_distance_at_1'], .5)
+        self.assertEqual(values['overall']['ndcg_minmax_distance_at_10'],
+                         row['ndcg_minmax_distance_at_10'])
+        self.assertNotIn('ndcg_inverse_distance_at_10', values['overall'])
 
     def test_prefix_survival_charges_first_error_once(self):
         good = dict(turn=0, done=False, candidates=2, remaining_shortest=2,

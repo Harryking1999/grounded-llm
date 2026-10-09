@@ -35,6 +35,6 @@ python -m experiments.flamingo_map_reader.src.summarize_blocks_results \
   --ranking-cache "$RUN_DIR/diagnostics/ranking_cache.json"
 ```
 
-普通任务报告完整到达、单步可达、地图最优及两种 gain 的 NDCG；两个终止任务分别报告。分片原始汇总仍保留旧兼容字段，正式报告使用本轮合同，不跨任务混算。
+普通任务报告完整到达、单步可达、地图最优及位置倒数／状态内距离归一化两种 gain 的 NDCG；距离归一化已替代距离倒数，随机与反序基线使用同一组状态。两个终止任务分别报告。分片原始汇总仍保留旧兼容字段，CPU 重评分后正式报告使用本轮合同，不跨任务混算。
 
 模型、地图、数据、日志和运行状态留在 Git 外；以代码提交、配置与运行目录识别产物。停止的融合 FFN 目录保留原位并标记 archived，避免破坏缓存链接。历史诊断及旧入口说明见归档设计和报告。

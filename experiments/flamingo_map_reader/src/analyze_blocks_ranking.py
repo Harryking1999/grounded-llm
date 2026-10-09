@@ -91,15 +91,15 @@ def ndcg(distances, ranks, k=10, gain='inverse_distance', discount='log2'):
     return min(1.0, max(0.0, value)), chance
 
 
-MEETING_METRICS = ('ndcg_inverse_rank_at_10', 'ndcg_inverse_distance_at_10',
-                   'ndcg_inverse_rank_at_1', 'ndcg_inverse_distance_at_1')
+MEETING_METRICS = ('ndcg_inverse_rank_at_10', 'ndcg_minmax_distance_at_10',
+                   'ndcg_inverse_rank_at_1', 'ndcg_minmax_distance_at_1')
 
 
 def meeting_ranking_scores(distances, ranks):
-    """Meeting contract: two gains, log discount, and the same gain ratio at 1."""
+    """Official gains: reciprocal true position and per-state normalized distance."""
     return {name: ndcg(distances, ranks, k=k, gain=gain)[0]
             for name, k, gain in zip(MEETING_METRICS, (10, 10, 1, 1),
-                ('inverse_rank', 'reciprocal_distance', 'inverse_rank', 'reciprocal_distance'))}
+                ('inverse_rank', 'minmax_distance', 'inverse_rank', 'minmax_distance'))}
 
 
 def check_metric():

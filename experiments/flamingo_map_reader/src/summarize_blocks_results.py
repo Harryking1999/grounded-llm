@@ -22,7 +22,7 @@ from experiments.flamingo_map_reader.src.trajectory_metrics import still_solvabl
 def read_cases(directory):
     cases = []
     for path in sorted(directory.glob('*/cases.jsonl')):
-        if '.interrupted.' in path.parent.name:
+        if '.interrupted' in str(path.parent) or not (path.parent/'summary.json').exists():
             continue
         text = path.read_text()
         lines = text.splitlines()

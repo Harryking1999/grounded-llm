@@ -1,5 +1,4 @@
 {
-  "status": "training_running_evaluation_running",
   "evaluation_contract": "experiments/flamingo_map_reader/configs/blocks_kv_evaluation.json",
   "checkpoints": {
     "6250": {
@@ -7503,6 +7502,80 @@
       "epoch": 8.0,
       "modes": {
         "test_reference": {
+          "cases": 384,
+          "groups": {
+            "same_initial_board_new_pair": 255,
+            "new_initial_board": 129
+          },
+          "reached": 0,
+          "success": 0,
+          "safe": 2107,
+          "solvable_decisions": 2407,
+          "all_decisions": {
+            "decisions": 3036,
+            "map_minimum": 1294,
+            "legal": 3015,
+            "ndcg_inverse_rank_at_10": 0.7648344538904899,
+            "ndcg_inverse_distance_at_10": 0.9350129655047374,
+            "ndcg_inverse_rank_at_1": 0.5833903813976958,
+            "ndcg_inverse_distance_at_1": 0.8924244799448924
+          },
+          "termination": {
+            "done_outputs": 278,
+            "done_at_goal": 260,
+            "goal_claims": 275,
+            "correct_goal_claims": 257,
+            "goal_states": 265,
+            "no_solution_states": 0,
+            "correct_no_solution": 0
+          },
+          "source_shards": [
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-100000/test_reference/00000_00064",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-100000/test_reference/00064_00128",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-100000/test_reference/00128_00192",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-100000/test_reference/00192_00256",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-100000/test_reference/00256_00320",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-100000/test_reference/00320_00384"
+          ]
+        },
+        "test_rollout": {
+          "cases": 384,
+          "groups": {
+            "same_initial_board_new_pair": 255,
+            "new_initial_board": 129
+          },
+          "reached": 56,
+          "success": 56,
+          "safe": 1115,
+          "solvable_decisions": 1443,
+          "all_decisions": {
+            "decisions": 3135,
+            "map_minimum": 955,
+            "legal": 3022,
+            "ndcg_inverse_rank_at_10": 0.6700722248571882,
+            "ndcg_inverse_distance_at_10": 0.8865784657028272,
+            "ndcg_inverse_rank_at_1": 0.45908811171942204,
+            "ndcg_inverse_distance_at_1": 0.8220311351175325
+          },
+          "termination": {
+            "done_outputs": 372,
+            "done_at_goal": 56,
+            "goal_claims": 322,
+            "correct_goal_claims": 56,
+            "goal_states": 56,
+            "no_solution_states": 215,
+            "correct_no_solution": 50
+          },
+          "source_shards": [
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-100000/test_rollout/00000_00064",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-100000/test_rollout/00064_00128",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-100000/test_rollout/00128_00192",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-100000/test_rollout/00192_00256",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-100000/test_rollout/00256_00320",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-100000/test_rollout/00320_00384"
+          ]
+        },
+        "initial_goal_reference": {
           "cases": 0,
           "groups": {},
           "reached": 0,
@@ -7528,6 +7601,70 @@
             "correct_no_solution": 0
           },
           "source_shards": []
+        },
+        "test_no_solution_reference": {
+          "cases": 0,
+          "groups": {},
+          "reached": 0,
+          "success": 0,
+          "safe": 0,
+          "solvable_decisions": 0,
+          "all_decisions": {
+            "decisions": 0,
+            "map_minimum": 0,
+            "legal": 0,
+            "ndcg_inverse_rank_at_10": null,
+            "ndcg_inverse_distance_at_10": null,
+            "ndcg_inverse_rank_at_1": null,
+            "ndcg_inverse_distance_at_1": null
+          },
+          "termination": {
+            "done_outputs": 0,
+            "done_at_goal": 0,
+            "goal_claims": 0,
+            "correct_goal_claims": 0,
+            "goal_states": 0,
+            "no_solution_states": 0,
+            "correct_no_solution": 0
+          },
+          "source_shards": []
+        }
+      }
+    },
+    "106250": {
+      "epoch": 8.5,
+      "modes": {
+        "test_reference": {
+          "cases": 128,
+          "groups": {
+            "same_initial_board_new_pair": 128
+          },
+          "reached": 0,
+          "success": 0,
+          "safe": 729,
+          "solvable_decisions": 820,
+          "all_decisions": {
+            "decisions": 1045,
+            "map_minimum": 470,
+            "legal": 1040,
+            "ndcg_inverse_rank_at_10": 0.7852719029122508,
+            "ndcg_inverse_distance_at_10": 0.945597666885411,
+            "ndcg_inverse_rank_at_1": 0.5996486293772779,
+            "ndcg_inverse_distance_at_1": 0.9054912182734938
+          },
+          "termination": {
+            "done_outputs": 91,
+            "done_at_goal": 86,
+            "goal_claims": 84,
+            "correct_goal_claims": 79,
+            "goal_states": 86,
+            "no_solution_states": 0,
+            "correct_no_solution": 0
+          },
+          "source_shards": [
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-106250/test_reference/00000_00064",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-106250/test_reference/00064_00128"
+          ]
         },
         "test_rollout": {
           "cases": 0,
@@ -7616,7 +7753,7 @@
   "run": "blocks_kv_restart_36c213c",
   "source_commit": "36c213c",
   "startup_verified_step": 75,
-  "observed_at_utc": "2026-10-09T01:27:21.920300+00:00",
+  "observed_at_utc": "2026-10-09T02:53:44.892502+00:00",
   "training_resume": {
     "checkpoint_step": 55000,
     "checkpoint_epoch": 4.4,
@@ -7632,27 +7769,28 @@
     "interruption_recomputation_complete": true
   },
   "training_progress": {
-    "step": 100999,
-    "epoch": 8.07992,
-    "loss": 0.14486852288246155,
-    "grad_norm": 0.6260074973106384,
+    "step": 108818,
+    "epoch": 8.70544,
+    "loss": 0.21563981473445892,
+    "grad_norm": 0.960318386554718,
     "recent_steps": 500,
-    "recent_mean_loss": 0.1942245172560215,
+    "recent_mean_loss": 0.1885067003518343,
     "recent_nonfinite": 0,
-    "latest_saved_step": 100000.0,
-    "observed_at_utc": "2026-10-09T01:27:22.249146+00:00",
+    "latest_saved_step": 108750.0,
+    "observed_at_utc": "2026-10-09T02:55:35.996008+00:00",
     "liveness": "running;four training ranks and GPUs active",
-    "recovery": "All interruption recomputation completed;last resume from62500 after interruption at63580."
+    "recovery": "Resumed from108750 after interruption at109404;654 updates require recomputation,68 verified.Previous recoveries complete.",
+    "recent_window_note": "Last500 log records mix previous attempt with68 resumed updates;not an independent post-resume trend."
   },
   "evaluation_progress": {
     "gpus": 4,
-    "completed_shards": 155,
+    "completed_shards": 169,
     "resumed": true,
     "archived_incomplete_shards": 4,
     "active_workers": 4,
-    "observed_at_utc": "2026-10-09T01:27:21.920300+00:00",
-    "metrics_snapshot_completed_shards": 155,
-    "metrics_snapshot_note": "Frozen complete-shard selection;ordinary saved-turn metrics through7.5epoch.8epoch partial excluded. Previous first-round/random/FFN cohorts retained at their original epochs;no new GPU inference for aggregation."
+    "observed_at_utc": "2026-10-09T02:54:47.002906+00:00",
+    "metrics_snapshot_completed_shards": 169,
+    "metrics_snapshot_note": "Frozen complete-shard selection;ordinary saved-turn metrics through8epoch;8.5epoch reference-only subset. Partial shards excluded. Previous first-round/random/FFN cohorts retained at their original epochs;no new GPU inference for aggregation."
   },
   "matched_epoch05_epoch1": {
     "test_reference": {
@@ -16577,6 +16715,20 @@
       "numerical_equivalence_note": "Same configuration and full checkpoint state;different GPU hardware may change floating-point numerics.",
       "recomputation_completion_verified_at_step": 89364,
       "recomputation_completion_observed_at_utc": "2026-10-08T23:30:21.527630+00:00"
+    },
+    {
+      "checkpoint_step": 108750,
+      "checkpoint_epoch": 8.7,
+      "pre_interrupt_step": 109404,
+      "recompute_updates": 654,
+      "verified_resumed_step": 108818,
+      "verified_loss": 0.21563981473445892,
+      "verified_grad_norm": 0.960318386554718,
+      "observed_at_utc": "2026-10-09T02:55:35.996008+00:00",
+      "full_state_restored": true,
+      "global_batch": 4,
+      "world_size": 4,
+      "interruption_recomputation_complete": false
     }
   ],
   "original_kv_update_and_stage_comparison": {
@@ -16789,5 +16941,6 @@
         }
       }
     ]
-  }
+  },
+  "status": "training_running_evaluation_running"
 }

@@ -77,6 +77,18 @@ class ResumeTopologyTest(unittest.TestCase):
         self.assertEqual(old, new)
         self.assertEqual(old[7:], new[7:])
 
+    def test_source_batch_is_overridden_only_for_explicit_topology_migration(self):
+        from transformers import Trainer
+        trainer = object.__new__(MapSFTTrainer)
+        trainer.contract = dict(resume_topology=self.topology, batch_size=2)
+        with mock.patch.object(Trainer, '_inner_training_loop') as loop:
+            trainer._inner_training_loop(batch_size=1, resume_from_checkpoint='source')
+            self.assertEqual(loop.call_args.kwargs['batch_size'], 2)
+            self.assertEqual(trainer._train_batch_size, 2)
+            trainer.contract = dict(batch_size=2)
+            trainer._inner_training_loop(batch_size=1, resume_from_checkpoint='source')
+            self.assertEqual(loop.call_args.kwargs['batch_size'], 1)
+
     def test_rng_restores_active_device_without_modifying_source_checkpoint(self):
         saved = dict(python=random.getstate(), numpy=np.random.get_state(), cpu=torch.random.get_rng_state(),
                      cuda=[torch.tensor([rank], dtype=torch.uint8) for rank in range(4)])

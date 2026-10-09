@@ -207,6 +207,17 @@ class MapSFTTrainer(Trainer):
             return to_device(data, self.args.device)
         return super()._prepare_input(data)
 
+    def _inner_training_loop(self, batch_size=None, args=None, resume_from_checkpoint=None,
+                             trial=None, ignore_keys_for_eval=None):
+        if self.contract.get('resume_topology'):
+            # Transformers 4 restores the source rank's batch before entering here.
+            # The explicit migration keeps global groups but changes each rank to 2.
+            batch_size = self.contract['batch_size']
+            self._train_batch_size = batch_size
+        return super()._inner_training_loop(batch_size=batch_size, args=args,
+            resume_from_checkpoint=resume_from_checkpoint, trial=trial,
+            ignore_keys_for_eval=ignore_keys_for_eval)
+
     def compute_loss(self, model, inputs, return_outputs=False, num_items_in_batch=None):
         focus_mask = inputs.pop("focus_mask", None)
         if self.focus_weight <= 1:
@@ -239,9 +250,12 @@ class MapSFTTrainer(Trainer):
             return super()._load_rng_state(checkpoint)
         # A four-device RNG list cannot be installed wholesale on a two-device node.
         # Each process restores its own saved rank and only its active CUDA device.
-        from transformers.trainer_pt_utils import safe_globals
+        np_core = getattr(np, '_core', None)
+        if np_core is None:
+            from numpy import core as np_core
         path = Path(checkpoint) / f"rng_state_{self.args.process_index}.pth"
-        with safe_globals():
+        with torch.serialization.safe_globals([np_core.multiarray._reconstruct,
+                np.ndarray, np.dtype, type(np.dtype(np.uint32))]):
             saved = torch.load(path, map_location="cpu", weights_only=True)
         random.setstate(saved["python"])
         np.random.set_state(saved["numpy"])

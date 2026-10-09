@@ -1,0 +1,15 @@
+{
+  "evaluation_contract": "blocks_kv_evaluation.json",
+  "run": "blocks_kv_restart_36c213c",
+  "queue_module": "experiments.flamingo_map_reader.src.blocks_checkpoint_queue",
+  "gpus_per_node": "0,1,2,3",
+  "shard_tasks": 64,
+  "shard_modulo": 2,
+  "queues": {
+    "main": {"ssh_port": 40327, "shard_remainders": [0], "writes_full_aggregates": true},
+    "training_aux": {"ssh_port": 35016, "shard_remainders": [1], "writes_full_aggregates": false}
+  },
+  "cache_map_kv": true,
+  "terminal_tasks": true,
+  "resume": "reuse complete shards; preserve interrupted shards before rerunning"
+}

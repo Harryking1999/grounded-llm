@@ -54,6 +54,7 @@ Agent 使用相同连接方式，登录后通过 `hostname` 确认主机、`nvid
 | 上一轮寻路、积木产物 | 上述工作区 `runs/long_f73b700_20261004/{path,blocks}/` |
 | 当前基座模型 | `/zhanghanyue/experiment/flamingo_map_reader/models/Qwen2.5-1.5B-Instruct` |
 | 当前积木地图 | `/zhanghanyue/experiment/grounded_llm_qmap_tree_132f5a1/runs/blocks_distance_map/tree_1000_132f5a1/best.pt` |
+| 已完成同题对照、尚未接入 LLM 的续训地图 | `/zhanghanyue/experiment/grounded_llm_qmap_tree_132f5a1/runs/blocks_distance_map/tree_continue_986cb4d/checkpoints/step_015000.pt` |
 | 028 基座候选 | `/ssdwork/fuzhizhang/model_base/Qwen2.5-1.5B-Instruct`；复用权限待确认 |
 | 4090 公共模型 | `/opt/models`；本次未发现 Qwen2.5-1.5B-Instruct |
 

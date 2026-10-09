@@ -27,3 +27,11 @@
 当前依赖的编码器、裁判和多棋盘读取实现来自 `codex/blocks-multigoal`（移植截止 `3a4c572`）。正式合同与实现见[实验 README](../experiments/blocks_distance_map/README.md)，本轮地图贪心参照见[读取实验报告](../experiments/flamingo_map_reader/results/report_long_trajectory.md#6-地图贪心参照按相同任务范围比较)。
 
 另一个 Q-map 分支的[跨棋盘报告](../experiments/blocks_distance_map/results/report.md)使用独立运行和任务集合，不能将其数字替换成本轮参照。单棋盘到共享编码器的旧过程见[历史结果](../experiments/blocks_distance_map/results/archive/qmap_progression.md)。当前进度统一见[状态页](PROJECT_STATUS_AND_TODO.md)。
+
+## 2026-10-09 补充：更好的续训权重尚未接入 LLM
+
+用户核对后发现，当前 LLM 使用的是原树关系模型 `tree_1000_132f5a1/best.pt`（65,000 步），而跨棋盘报告的 90.2% 使用 `tree_continue_986cb4d/checkpoints/step_015000.pt`：在前者基础上补充清空和长程关系，再续训 15,000 步。`best.pt` 只表示原运行选出的权重，不能据文件名判断它优于后续运行的 checkpoint。权重完整位置见[开发机手册](../DEVELOPMENT_MACHINES.md)。
+
+已有同题 CPU 对照在当前 510 道积木测试题上，保持规则、动作预算和纯地图贪心策略一致：原地图到达 345/510（67.6%），续训地图到达 397/510（77.8%）；新救回 105 题、退步 53 题，净增 52 题。该结果支持续训地图在这批任务上更好，不能把另一题集的 90.2% 直接作为当前测试基线，也不能据此断言 LLM 换图后会同比例提升。合同见[地图对照配置](../experiments/flamingo_map_reader/configs/blocks_map_baseline_comparison.json)，原始计数保留在现有结果摘要的 `map_greedy_comparison`。
+
+当前 10,000 条物理训练任务、缓存地图向量、地图排序和动作标签仍来自原地图；本次仅保存并合入已有地图研究成果，没有换权重、重建缓存或启动新实验。下一轮若使用续训地图，需要明确重新编码与监督标签的来源，并分别记录地图训练和接口训练的任务曝光。补充关系与当前测试题的重合尚未审计。对话提出的 Astra／其他模型测试集基线及进一步扩大关系覆盖，仍是后续候选，不是已完成结果。

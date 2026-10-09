@@ -29,7 +29,7 @@ def build(data_path, config_path, official_path, comparison_path, output_path):
         raise ValueError("Distance evaluation boards differ from main evaluation")
     rng = np.random.default_rng(20261013)
     oracle = DistanceOracle(cache_limit=2_000_000, seconds=3600)
-    masks, ids, pairs = [], {}, []
+    masks, ids, pairs, pair_boards = [], {}, [], []
 
     def state_id(mask):
         if mask not in ids:
@@ -37,7 +37,7 @@ def build(data_path, config_path, official_path, comparison_path, output_path):
             masks.append(mask)
         return ids[mask]
 
-    for board in fresh:
+    for board_index, board in enumerate(fresh):
         paths = sample_paths(board, 4, rng)
         by_size = defaultdict(list)
         for mask in {mask for path in paths for mask in path}:
@@ -53,11 +53,13 @@ def build(data_path, config_path, official_path, comparison_path, output_path):
                 steps = oracle.distance(source, goal)
                 kind = 0 if steps >= 0 else 1 if goal & source != goal else 2
                 pairs.append((state_id(source), state_id(goal), steps, kind))
+                pair_boards.append(board_index)
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     rows = np.asarray(pairs, dtype=np.int32)
     np.savez_compressed(output_path, states=np.asarray([str(mask) for mask in masks]),
-                        test_ood_board=rows)
+                        test_ood_board=rows,
+                        pair_board=np.asarray(pair_boards, dtype=np.int16))
     counts = Counter(str(step) if step >= 0 else "unreachable" for step in rows[:, 2])
     summary = {"boards": count, "states": len(masks), "pairs": len(rows),
                "true_distances": dict(counts)}

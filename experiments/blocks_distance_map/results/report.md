@@ -91,3 +91,11 @@
 ---
 
 本页取代此前的过程记录；早期单棋盘 A／B 实验与逐级推进的完整过程见[归档](archive/qmap_progression.md)，本页图与统计的机器可读来源见 [tree_qmap_figure_data.json](tree_qmap_figure_data.json)。
+
+## 与当前 LLM 读取实验的关系（2026-10-09）
+
+本页 3,928/4,355（90.2%）使用补充清空和长程关系后的 `tree_continue_986cb4d/checkpoints/step_015000.pt`。当前 cross-attention 实验仍使用较早的 `tree_1000_132f5a1/best.pt`；两者并非同一权重。当前 10,000 条物理训练任务及其缓存监督也是由旧地图生成，续训地图尚未接入 LLM。
+
+在 LLM 的同一批 510 道测试题上，已完成纯地图、同规则和同预算的 CPU 贪心对照：旧图到达 345/510（67.6%），续训图到达 397/510（77.8%）；第一步后仍可达分别为 465/510（91.2%）与 473/510（92.7%）。续训图救回 105 题，也退步 53 题，不能把总提升理解为每题都改善。正式合同见[配置](../../flamingo_map_reader/configs/blocks_map_baseline_comparison.json)，详细计数见[现有摘要](../../flamingo_map_reader/results/blocks_results_summary.json)的 `map_greedy_comparison`。
+
+本页题集包含 1–8 步任务，当前 LLM 普通测试为 6–9 步，90.2% 与 77.8% 的分母不同。第一步可达率也不是后续每一步的条件正确率，不能直接用其幂次推出完整路径到达率。续训补充关系与 510 题的重合尚未审计；换图后的 LLM 表现、Astra 等模型的匹配基线仍待另行验证。本次没有启动这些实验。

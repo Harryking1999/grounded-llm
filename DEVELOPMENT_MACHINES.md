@@ -20,7 +20,7 @@
 **原平台**：本机已配置 SSH 密钥。
 
 ```powershell
-# 当前训练环境：4 张 A100
+# 原训练环境：4 张 A100，训练完成后参与评测
 ssh -p 35016 root@172.16.78.10
 # 当前评测环境：4 张 A800
 ssh -p 40327 root@172.16.78.10
@@ -59,6 +59,8 @@ Agent 使用相同连接方式，登录后通过 `hostname` 确认主机、`nvid
 | 4090 公共模型 | `/opt/models`；本次未发现 Qwen2.5-1.5B-Instruct |
 
 原平台目录支持跨开发环境复用。**028、login02、4090 与平台之间无已确认的共享目录**；028 的 `/ssdwork` 为节点本地磁盘。
+
+2026-10-09 训练完成后，35016 与重启后的 40327 合用八卡评测同一批 half-epoch 权重。40327 运行 `main`，35016 运行 `training_aux`；互斥分片调度见 `experiments/flamingo_map_reader/configs/blocks_kv_eight_gpu_evaluation.json`。两队列共享上述 `evaluation_half_epoch/`，分别写 `status.json` 与 `status.training_aux.json`，只有主队列写完整结果汇总。启动日志分别为 `logs/queue_main_eight_gpu_20261009.log` 与 `logs/queue_training_aux_eight_gpu_20261009.log`；模型、题目和指标合同沿用本轮设置。
 
 新机器的建议项目目录如下，**尚未创建**：
 

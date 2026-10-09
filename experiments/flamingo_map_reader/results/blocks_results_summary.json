@@ -9602,128 +9602,136 @@
           }
         },
         "test_rollout": {
-          "cases": 256,
+          "cases": 384,
           "groups": {
             "same_initial_board_new_pair": 255,
-            "new_initial_board": 1
+            "new_initial_board": 129
           },
-          "reached": 58,
-          "success": 57,
-          "safe": 950,
-          "solvable_decisions": 1148,
+          "reached": 85,
+          "success": 84,
+          "safe": 1409,
+          "solvable_decisions": 1708,
           "all_decisions": {
-            "decisions": 2070,
-            "map_minimum": 708,
-            "legal": 2003,
-            "ndcg_inverse_rank_at_10": 0.7035791620127968,
-            "ndcg_minmax_distance_at_10": 0.8677540777962897,
-            "ndcg_inverse_rank_at_1": 0.5009915288648527,
-            "ndcg_minmax_distance_at_1": 0.8140115965272889,
-            "ndcg_inverse_distance_at_10": 0.8961834068783865,
-            "ndcg_inverse_distance_at_1": 0.8357514141374849,
-            "equal_distance_states": 135,
-            "single_candidate_states": 135,
+            "decisions": 3132,
+            "map_minimum": 1093,
+            "legal": 3040,
+            "ndcg_inverse_rank_at_10": 0.7071075356161421,
+            "ndcg_minmax_distance_at_10": 0.8718494229078978,
+            "ndcg_inverse_rank_at_1": 0.5058431936204735,
+            "ndcg_minmax_distance_at_1": 0.8166482117566756,
+            "ndcg_inverse_distance_at_10": 0.9012155540429397,
+            "ndcg_inverse_distance_at_1": 0.8426932665483811,
+            "equal_distance_states": 205,
+            "single_candidate_states": 205,
             "normalized_distance_baselines": {
               "ndcg_minmax_distance_at_10": {
-                "random": 0.7235749255888952,
-                "reverse": 0.41381083005804836
+                "random": 0.7238928522093386,
+                "reverse": 0.41398190641068483
               },
               "ndcg_minmax_distance_at_1": {
-                "random": 0.5779771060076305,
-                "reverse": 0.06521739130434782
+                "random": 0.5791815681025023,
+                "reverse": 0.06545338441890167
               }
             }
           },
           "termination": {
-            "done_outputs": 251,
-            "done_at_goal": 58,
-            "goal_claims": 231,
-            "correct_goal_claims": 57,
-            "goal_states": 58,
-            "no_solution_states": 131,
-            "correct_no_solution": 19
+            "done_outputs": 377,
+            "done_at_goal": 85,
+            "goal_claims": 345,
+            "correct_goal_claims": 84,
+            "goal_states": 85,
+            "no_solution_states": 207,
+            "correct_no_solution": 31
           },
           "source_shards": [
             "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-118750/test_rollout/00000_00064",
             "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-118750/test_rollout/00064_00128",
             "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-118750/test_rollout/00128_00192",
-            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-118750/test_rollout/00192_00256"
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-118750/test_rollout/00192_00256",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-118750/test_rollout/00256_00320",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-118750/test_rollout/00320_00384"
           ],
           "first_round": {
-            "cases": 256,
-            "safe": 200,
-            "map_minimum": 38,
+            "cases": 384,
+            "safe": 293,
+            "map_minimum": 64,
             "chosen_id_histogram": {
-              "2": 24,
-              "1": 26,
-              "69": 1,
-              "23": 5,
-              "48": 3,
+              "2": 38,
+              "1": 41,
+              "69": 2,
+              "23": 7,
+              "48": 4,
               "65": 1,
-              "3": 14,
-              "12": 4,
+              "3": 17,
+              "12": 7,
               "34": 8,
-              "16": 5,
-              "18": 6,
-              "14": 3,
-              "5": 7,
-              "26": 3,
-              "10": 4,
+              "16": 7,
+              "18": 7,
+              "14": 4,
+              "5": 9,
+              "26": 4,
+              "10": 6,
               "61": 2,
-              "47": 3,
-              "44": 3,
-              "21": 5,
+              "47": 4,
+              "44": 5,
+              "21": 9,
               "59": 4,
-              "43": 6,
-              "13": 8,
-              "38": 2,
-              "4": 16,
-              "30": 3,
+              "43": 9,
+              "13": 11,
+              "38": 3,
+              "4": 29,
+              "30": 5,
               "81": 1,
-              "17": 7,
-              "11": 8,
+              "17": 9,
+              "11": 12,
               "6": 5,
               "9": 2,
-              "53": 3,
-              "7": 5,
-              "19": 5,
+              "53": 5,
+              "7": 8,
+              "19": 8,
               "33": 3,
-              "42": 3,
-              "24": 5,
+              "42": 7,
+              "24": 8,
               "79": 1,
-              "36": 5,
-              "20": 2,
-              "22": 2,
+              "36": 6,
+              "20": 3,
+              "22": 3,
               "51": 1,
-              "39": 2,
+              "39": 4,
               "62": 2,
-              "55": 1,
-              "25": 3,
-              "8": 1,
+              "55": 2,
+              "25": 4,
+              "8": 3,
               "32": 3,
               "37": 3,
               "46": 3,
-              "31": 1,
+              "31": 2,
               "74": 1,
-              "52": 1,
-              "28": 2,
-              "27": 1,
-              "41": 2,
-              "15": 3,
+              "52": 2,
+              "28": 4,
+              "27": 2,
+              "41": 3,
+              "15": 6,
               "64": 1,
               "60": 1,
-              "35": 1
+              "35": 2,
+              "67": 1,
+              "40": 6,
+              "70": 1,
+              "73": 1,
+              "58": 1,
+              "49": 1
             },
-            "normalized_distance_decisions": 256,
+            "normalized_distance_decisions": 384,
             "metrics": {
               "ndcg_minmax_distance_at_10": {
-                "model": 0.8786410189584698,
-                "random": 0.6506435232271914,
-                "reverse": 0.2001407098439381
+                "model": 0.880993403888875,
+                "random": 0.6526478049285142,
+                "reverse": 0.20288054753315488
               },
               "ndcg_minmax_distance_at_1": {
-                "model": 0.8170029169507458,
-                "random": 0.5911941651633261,
+                "model": 0.8230241487314198,
+                "random": 0.5932625121520879,
                 "reverse": 0.0
               }
             }
@@ -9735,7 +9743,7 @@
   "run": "blocks_kv_restart_36c213c",
   "source_commit": "36c213c",
   "startup_verified_step": 75,
-  "observed_at_utc": "2026-10-09T06:01:15.620883+00:00",
+  "observed_at_utc": "2026-10-09T06:18:06.348158+00:00",
   "training_resume": {
     "checkpoint_step": 55000,
     "checkpoint_epoch": 4.4,
@@ -9759,33 +9767,50 @@
     "status": "training_completed",
     "completed_at_utc": "2026-10-09T05:47:41.618339+00:00",
     "final_adapter": "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/training/models/final/adapter.pt",
-    "observed_at_utc": "2026-10-09T06:01:15.620883+00:00"
+    "observed_at_utc": "2026-10-09T06:18:06.348158+00:00"
   },
   "evaluation_progress": {
-    "gpus": 4,
-    "completed_shards": 199,
+    "gpus": 8,
+    "completed_shards": 201,
     "resumed": true,
-    "archived_incomplete_shards": 4,
-    "active_workers": 4,
-    "observed_at_utc": "2026-10-09T06:01:15.620883+00:00",
-    "metrics_snapshot_completed_shards": 199,
-    "metrics_snapshot_note": "Only complete shards, excluding .interrupted; 9 epoch reference/rollout 384/384, 9.5 epoch 384/256. Final checkpoint discovered; 10 epoch has no complete shards in this snapshot.",
-    "running": {
-      "1": {
-        "pid": 1222,
-        "key": "step-118750/test_rollout/00256_00320"
+    "archived_incomplete_shards": 12,
+    "active_workers": 8,
+    "observed_at_utc": "2026-10-09T06:18:06.348158+00:00",
+    "metrics_snapshot_completed_shards": 201,
+    "metrics_snapshot_note": "Only complete shards, excluding .interrupted; 9 and 9.5 epoch reference/rollout each 384/384. Eight GPUs now evaluate the final checkpoint before filling older checkpoints.",
+    "scheduling_contract": "experiments/flamingo_map_reader/configs/blocks_kv_eight_gpu_evaluation.json",
+    "queues": {
+      "main": {
+        "ssh_port": 40327,
+        "status": "running",
+        "shard_modulo": 2,
+        "shard_remainders": [
+          0
+        ],
+        "pending_shards": 92
       },
-      "0": {
-        "pid": 1232,
-        "key": "step-118750/test_rollout/00320_00384"
+      "training_aux": {
+        "ssh_port": 35016,
+        "status": "running",
+        "shard_modulo": 2,
+        "shard_remainders": [
+          1
+        ],
+        "pending_shards": 99
+      }
+    },
+    "assigned_shards": {
+      "main": {
+        "0": "step-125000/test_rollout/00000_00064",
+        "1": "step-125000/test_rollout/00128_00192",
+        "2": "step-125000/test_reference/00000_00064",
+        "3": "step-125000/test_reference/00128_00192"
       },
-      "2": {
-        "pid": 1403,
-        "key": "step-125000/test_reference/00000_00064"
-      },
-      "3": {
-        "pid": 1413,
-        "key": "step-125000/test_reference/00064_00128"
+      "training_aux": {
+        "0": "step-125000/test_rollout/00064_00128",
+        "1": "step-125000/test_rollout/00192_00256",
+        "2": "step-125000/test_reference/00064_00128",
+        "3": "step-125000/test_reference/00192_00256"
       }
     }
   },

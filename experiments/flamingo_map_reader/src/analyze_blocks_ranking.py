@@ -46,13 +46,23 @@ def inverse_rank_gains(distances):
 def ndcg(distances, ranks, k=10, gain='inverse_distance', discount='log2'):
     """Linear gains, average predicted ties, and zero gain for missing slots."""
     assert all(math.isfinite(d) and d >= 0 for d in distances)
-    assert gain in ('inverse_distance', 'rank_grade', 'inverse_rank', 'reciprocal_distance')
+    assert gain in ('inverse_distance', 'rank_grade', 'inverse_rank', 'reciprocal_distance',
+                    'minmax_distance')
     if gain == 'rank_grade':
         gains = rank_grade_gains(distances, k)
     elif gain == 'inverse_rank':
         gains = inverse_rank_gains(distances)
     elif gain == 'reciprocal_distance':
         gains = [1.0 / max(d, 1e-12) for d in distances]
+    elif gain == 'minmax_distance':
+        if not distances:
+            return None, None
+        nearest, farthest = min(distances), max(distances)
+        # Equal distances carry no ordering information; count these states
+        # separately when reporting and give every candidate equal gain.
+        gains = ([1.0] * len(distances) if math.isclose(nearest, farthest,
+                 rel_tol=1e-10, abs_tol=1e-12) else
+                 [(farthest - d) / (farthest - nearest) for d in distances])
     else:
         gains = [1.0 / (1.0 + d) for d in distances]
     k = min(k, len(gains))

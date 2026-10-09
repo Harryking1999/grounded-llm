@@ -8019,7 +8019,47 @@
           }
         },
         "observed_at_utc": "2026-10-09T03:23:36.108064+00:00",
-        "interpretation": "Exact directed reachability classified by DistanceOracle,not by Q-map. Encoder learned finite unreachable target cap13;reciprocal map distance is not zero for certified-unreachable candidates. Same-root/legal successor membership does not imply a directed path to this goal. Zero Q-map distances in this cohort occurred only at actual goal candidates. Reachable-non-goal comparison excludes those 1e12-gain terminal candidates."
+        "interpretation": "Exact directed reachability classified by DistanceOracle,not by Q-map. Encoder learned finite unreachable target cap13;reciprocal map distance is not zero for certified-unreachable candidates. Same-root/legal successor membership does not imply a directed path to this goal. Zero Q-map distances in this cohort occurred only at actual goal candidates. Reachable-non-goal comparison excludes those 1e12-gain terminal candidates.",
+        "nearest_candidate_distance": {
+          "reference": {
+            "all_decisions": {
+              "states": 3036,
+              "median": 3.905802369117737,
+              "p10": 1.4753147959709167,
+              "p90": 8.534680843353271,
+              "mean": 4.34398045317222,
+              "zero_distance": 265
+            },
+            "first_round": {
+              "states": 384,
+              "median": 5.838050603866577,
+              "p10": 4.680299949645996,
+              "p90": 7.933896589279175,
+              "mean": 6.089266370981932,
+              "zero_distance": 0
+            },
+            "definition": "One minimum candidate Q-map distance per nonterminal state with candidates;not minimum among only oracle-reachable candidates."
+          },
+          "rollout": {
+            "all_decisions": {
+              "states": 3135,
+              "median": 6.099156379699707,
+              "p10": 3.416687822341919,
+              "p90": 10.23482666015625,
+              "mean": 6.656229708905806,
+              "zero_distance": 70
+            },
+            "first_round": {
+              "states": 384,
+              "median": 5.838050603866577,
+              "p10": 4.680299949645996,
+              "p90": 7.933896589279175,
+              "mean": 6.089266370981932,
+              "zero_distance": 0
+            },
+            "definition": "One minimum candidate Q-map distance per nonterminal state with candidates;not minimum among only oracle-reachable candidates."
+          }
+        }
       }
     },
     "106250": {

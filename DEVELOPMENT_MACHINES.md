@@ -20,10 +20,10 @@
 **原平台**：本机已配置 SSH 密钥。
 
 ```powershell
-# 原训练环境：4 张 A100，训练完成后参与评测
+# 当前续训环境：2 张 A100
 ssh -p 35016 root@172.16.78.10
-# 当前评测环境：4 张 A800
-ssh -p 40327 root@172.16.78.10
+# 当前评测环境：2 张 A800
+ssh -p 41511 root@172.16.78.10
 ```
 
 训练环境另有本机别名 `grounded-dev`。密钥和连接配置位于 `%USERPROFILE%\.ssh\`。
@@ -51,16 +51,19 @@ Agent 使用相同连接方式，登录后通过 `hostname` 确认主机、`nvid
 | 平台早期实验 | `/zhanghanyue/experiment/grounded_llm` |
 | 平台当前地图读取工作区 | `/zhanghanyue/experiment/flamingo_map_reader`；包含 `code/`、`runs/`、`models/`、`logs/`、`.venv/` |
 | 当前 K/V 重训产物 | 上述工作区 `runs/blocks_kv_restart_36c213c/`；权重位于 `training/models/`，评测位于 `evaluation_half_epoch/` |
+| 20 epoch 续训产物 | 同一运行的 `training_extension_20epoch/`；新增权重位于 `models/`，与原 10 epoch final 分开 |
 | 上一轮寻路、积木产物 | 上述工作区 `runs/long_f73b700_20261004/{path,blocks}/` |
 | 当前基座模型 | `/zhanghanyue/experiment/flamingo_map_reader/models/Qwen2.5-1.5B-Instruct` |
 | 当前积木地图 | `/zhanghanyue/experiment/grounded_llm_qmap_tree_132f5a1/runs/blocks_distance_map/tree_1000_132f5a1/best.pt` |
 | 已完成同题对照、尚未接入 LLM 的续训地图 | `/zhanghanyue/experiment/grounded_llm_qmap_tree_132f5a1/runs/blocks_distance_map/tree_continue_986cb4d/checkpoints/step_015000.pt` |
 | 028 基座候选 | `/ssdwork/fuzhizhang/model_base/Qwen2.5-1.5B-Instruct`；复用权限待确认 |
-| 4090 公共模型 | `/opt/models`；本次未发现 Qwen2.5-1.5B-Instruct |
+| 4090 公共模型 | `/opt/models`；上次未发现 Qwen2.5-1.5B-Instruct，本轮因跳板拒绝公钥认证尚未重新核对 |
 
 原平台目录支持跨开发环境复用。**028、login02、4090 与平台之间无已确认的共享目录**；028 的 `/ssdwork` 为节点本地磁盘。
 
-2026-10-09 训练完成后，35016 与重启后的 40327 合用八卡评测同一批 half-epoch 权重。40327 运行 `main`，35016 运行 `training_aux`；互斥分片调度见 `experiments/flamingo_map_reader/configs/blocks_kv_eight_gpu_evaluation.json`。两队列共享上述 `evaluation_half_epoch/`，分别写 `status.json` 与 `status.training_aux.json`，只有主队列写完整结果汇总。启动日志分别为 `logs/queue_main_eight_gpu_20261009.log` 与 `logs/queue_training_aux_eight_gpu_20261009.log`；模型、题目和指标合同沿用本轮设置。
+2026-10-09 最初在 35016、40327 合用八卡评测；随后用户重启为两台各两卡，评测端口由 40327 改为 41511。旧主、辅助进程均已退出。现按 `experiments/flamingo_map_reader/configs/blocks_kv_two_node_continuation.json` 安排：35016 续训，41511 的 `main` 队列扫描原权重与新增权重，继续写同一 `evaluation_half_epoch/`。原八卡调度配置和日志作为历史保留；不再把旧 `status.training_aux.json` 当作活跃队列。
+
+4090 复用评测只需 adapter，不需 optimizer 和 RNG。平台当前 adapter 约 98 MB，完整续训断点约 314 MB；基座约 3.10 GB，需一次性准备。两边没有共享目录，仍需中转；2026-10-09 再次连接 login02 返回 password 认证要求，非交互公钥登录被拒绝，尚未执行复制。
 
 新机器的建议项目目录如下，**尚未创建**：
 

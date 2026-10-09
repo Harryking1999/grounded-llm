@@ -26,6 +26,8 @@ No solution: no legal moves remain and the goal has not been reached.
 
 训练从零开始，四卡 DDP，每卡一条轨迹；每条轨迹按监督 token 平均，再跨卡等权平均。沿用逐层重计算和分块交叉熵以控制显存。学习率、warmup、训练预算、保存及生成预算以正式配置为准，不在说明中复制机器参数。完整断点可在同一运行目录恢复；新运行不能续接融合 FFN 权重。
 
+2026-10-09 用户授权将已完成的本轮训练继续到总计 20 epoch。[续训预算](configs/blocks_kv_twenty_epoch_extension.json)与[两节点安排](configs/blocks_kv_two_node_continuation.json)是新增合同；数据、现用 Q-map、监督和学习率沿用原合同。恢复分离 K/V 的完整断点，通过已有拓扑迁移保持每条轨迹等权和 global batch；保留原 warmup，不改写准备好的 manifest。续训写入独立的 `training_extension_20epoch/`，原 `training/models/final` 与 10 epoch 评测保持原身份。评测队列同时扫描两个权重目录，沿用每半个 epoch、最新优先、普通两模式与两类终止任务的规则，并等到续训 final 发布后才可结束。
+
 ## 评测与指标
 
 正式口径：[blocks_kv_evaluation.json](configs/blocks_kv_evaluation.json)。普通任务按最短长度分层，两类棋盘来源均衡；分别运行 reference（示范历史）和 rollout（自身历史）。已达标与固定失败上下文另行评测，三类任务分别给分子和分母，不做跨任务加权或混池指标。

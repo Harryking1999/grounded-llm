@@ -1,0 +1,13 @@
+{
+  "source_training_contract": "blocks_kv_restart.json",
+  "epoch_extension": "blocks_kv_twenty_epoch_extension.json",
+  "resume_topology": "blocks_batch4_two_gpu_resume.json",
+  "evaluation_contract": "blocks_kv_evaluation.json",
+  "run": "blocks_kv_restart_36c213c",
+  "source_checkpoint": "training/models/checkpoint-125000",
+  "continuation_output": "training_extension_20epoch",
+  "training": {"ssh_port": 35016, "gpus": "0,1", "per_device_batch_size": 2, "global_batch_size": 4},
+  "evaluation": {"ssh_port": 41511, "gpus": "0,1", "queue_name": "main", "shard_modulo": 1, "shard_remainders": [0], "cache_map_kv": true, "terminal_tasks": true},
+  "checkpoint_priority": "newest first; rollout and reference each have one GPU",
+  "preserve_source_final": true
+}

@@ -15,10 +15,12 @@ from filelock import FileLock
 from .trajectory_queue import atomic_json
 
 
-def checkpoints(models):
+def checkpoints(models, continuation_models=None):
     found = {}
     # Prefer final when it duplicates the last numbered checkpoint.
-    for directory in [models / 'final', *models.glob('checkpoint-*')]:
+    roots = ([continuation_models] if continuation_models else []) + [models]
+    for directory in [directory for root in roots
+                      for directory in [root / 'final', *root.glob('checkpoint-*')]]:
         ready = directory / 'evaluation_ready.json'
         if not ready.is_file() or not (directory / 'adapter.pt').is_file():
             continue
@@ -90,7 +92,8 @@ def validate_resume_contract(previous, current):
     def experiment(contract):
         return {key: value for key, value in contract.items()
                 if key not in ('gpus', 'gpu_modes', 'cache_map_kv', 'queue_name',
-                               'shard_modulo', 'shard_remainders', 'terminal_tasks')}
+                               'shard_modulo', 'shard_remainders', 'terminal_tasks',
+                               'continuation_models')}
     if experiment(previous) != experiment(current):
         raise ValueError('Existing queue contract differs')
 
@@ -99,6 +102,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--run', type=Path, required=True)
     parser.add_argument('--model-path', type=Path, required=True)
+    parser.add_argument('--continuation-models', type=Path,
+                        help='Also watch continuation checkpoints; wait for its final before completing')
     parser.add_argument('--gpus', default='0,1,2,3')
     parser.add_argument('--queue-name', default='main',
                         help='Separate local lock/status; main alone writes full aggregates')
@@ -134,6 +139,8 @@ def main():
                     terminal_tasks=args.terminal_tasks,
                     queue_name=args.queue_name, shard_modulo=args.shard_modulo,
                     shard_remainders=list(remainders))
+    if args.continuation_models:
+        contract['continuation_models'] = str(args.continuation_models)
     with FileLock(str(lock_path), timeout=0):
         # A killed queue can leave evaluation workers alive. Do not move their
         # output or launch a second worker against it during a manual restart.
@@ -169,7 +176,7 @@ def main():
                     running['log'].close()
                 atomic_json(status_path, dict(status='failed', failures=failures))
                 raise RuntimeError(f'Evaluation failed: {failures}')
-            published = checkpoints(args.run / 'training/models')
+            published = checkpoints(args.run / 'training/models', args.continuation_models)
             jobs = []
             completed = 0
             missing = 0
@@ -228,7 +235,7 @@ def main():
                     summary['contract'] = dict(contract, split=split, tasks=tasks, checkpoint=str(checkpoint['path']),
                                                step=checkpoint['step'], epoch=checkpoint['epoch'], mode=mode)
                     atomic_json(directory / 'summary.json', summary)
-            final_ready = args.run / 'training/models/final/evaluation_ready.json'
+            final_ready = (args.continuation_models or args.run / 'training/models') / 'final/evaluation_ready.json'
             done = final_ready.is_file() and not busy and not jobs and (
                 args.queue_name != 'main' or missing == 0)
             atomic_json(status_path, dict(status='completed' if done else 'running',

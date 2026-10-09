@@ -56,8 +56,50 @@ class CheckpointSelectionTest(unittest.TestCase):
             self.assertEqual(len(selected), 1)
             self.assertEqual(selected[0]['path'], final)
 
+    def test_continuation_keeps_source_final_and_prioritizes_newer_weights(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source, continuation = root/'source', root/'continuation'
+            source.mkdir()
+            old_final = self.publish(source, 'final', 125000, 10.0)
+            self.publish(source, 'checkpoint-125000', 125000, 10.0)
+            self.assertEqual(checkpoints(source, continuation)[0]['path'], old_final)
+            continuation.mkdir()
+            newer = self.publish(continuation, 'checkpoint-131250', 131250, 10.5)
+            selected = checkpoints(source, continuation)
+            self.assertEqual([c['path'] for c in selected], [newer, old_final])
+            self.assertTrue((old_final/'adapter.pt').is_file())
+
 
 class QueueMigrationTest(unittest.TestCase):
+    def test_source_final_does_not_complete_queue_before_continuation_final(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            run = Path(temporary)
+            (run/'data').mkdir()
+            (run/'data/manifest.json').write_text(json.dumps(dict(config=dict(task='blocks'),
+                records=[dict(split='test')]*510 + [dict(split='test_no_solution')]*100)))
+            final=run/'training/models/final'
+            final.mkdir(parents=True)
+            (final/'adapter.pt').touch()
+            (final/'evaluation_ready.json').write_text(json.dumps(dict(step=125000,epoch=10.0)))
+            for split_mode,tasks in [('test_reference',510),('test_rollout',510),('test_no_solution_reference',100)]:
+                mode=run/'evaluation_half_epoch/step-125000'/split_mode
+                mode.mkdir(parents=True)
+                (mode/'summary.json').write_text('{}')
+                for start in range(0,tasks,64):
+                    shard=mode/f'{start:05d}_{min(start+64,tasks):05d}'
+                    shard.mkdir()
+                    (shard/'summary.json').write_text('{}')
+            argv=['queue','--run',str(run),'--model-path','model','--gpus','0,1',
+                  '--continuation-models',str(run/'training_extension_20epoch/models')]
+            with patch('sys.argv',argv), patch(
+                    'experiments.flamingo_map_reader.src.blocks_checkpoint_queue.time.sleep',
+                    side_effect=InterruptedError), self.assertRaises(InterruptedError):
+                main()
+            status=json.loads((run/'evaluation_half_epoch/status.json').read_text())
+            self.assertEqual(status['status'],'running')
+            self.assertEqual(status['pending_shards'],0)
+
     def test_main_waits_for_auxiliary_final_shards(self):
         with tempfile.TemporaryDirectory() as temporary:
             run = Path(temporary)

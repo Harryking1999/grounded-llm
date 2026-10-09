@@ -14,7 +14,10 @@ import torch
 from torch.utils.data import BatchSampler, RandomSampler
 from accelerate.data_loader import BatchSamplerShard
 
-from experiments.flamingo_map_reader.src.train import MapSFTTrainer, pinned_supervision, validate_resume_topology
+from experiments.flamingo_map_reader.src.train import (
+    MapSFTTrainer, pinned_supervision, validate_resume_topology,
+    extend_epoch_budget, fixed_warmup_arguments,
+)
 
 
 class ResumeTopologyTest(unittest.TestCase):
@@ -22,6 +25,23 @@ class ResumeTopologyTest(unittest.TestCase):
         configs = Path(__file__).resolve().parents[1] / 'configs'
         self.config = json.loads((configs/'blocks_ffn_failure_batch4.json').read_text())
         self.topology = json.loads((configs/'blocks_batch4_two_gpu_resume.json').read_text())
+
+    def test_epoch_extension_keeps_supervision_manifest_and_original_warmup(self):
+        configs = Path(__file__).resolve().parents[1] / 'configs'
+        source = json.loads((configs/'blocks_kv_restart.json').read_text())
+        extension = json.loads((configs/'blocks_kv_twenty_epoch_extension.json').read_text())
+        state = dict(global_step=125000, epoch=10.0)
+        extended = extend_epoch_budget(source, extension, state, 50000, 4)
+        original = dict(config=source, batch_size=1, manifest='unchanged', model_source='same', map_source='same')
+        migrated = dict(original, config=extended, batch_size=2, resume_topology=self.topology)
+        self.assertEqual(pinned_supervision(original), pinned_supervision(migrated))
+        self.assertEqual(source['training']['epochs'], 10)
+        self.assertEqual(extended['training']['epochs'], 20)
+        self.assertEqual(fixed_warmup_arguments(extended['training'], extension['source_step'])['warmup_steps'], 6250)
+        for examples, batch, changed_state in ((50001, 4, state), (50000, 8, state),
+                                               (50000, 4, dict(global_step=124000, epoch=9.92))):
+            with self.subTest(examples=examples, batch=batch), self.assertRaises(ValueError):
+                extend_epoch_budget(source, extension, changed_state, examples, batch)
 
     def test_objective_matches_source_but_other_changes_are_not_normalized(self):
         original = dict(config=self.config, batch_size=1, manifest='same', model_source='same', map_source='same')

@@ -331,6 +331,24 @@ def fixed_warmup_arguments(training, source_steps):
         "warmup_steps", math.ceil(source_steps * training["warmup_fraction"]))}
 
 
+def extend_epoch_budget(config, extension, source_state, examples, global_batch):
+    """Extend epochs while keeping the prepared manifest and source supervision intact."""
+    training = config['training']
+    steps_per_epoch = math.ceil(examples / global_batch)
+    if (training.get('supervision_mode') != 'prepared_trajectory' or
+            training.get('max_steps', -1) > 0 or
+            extension['source_epochs'] != training['epochs'] or
+            extension['total_epochs'] <= extension['source_epochs'] or
+            extension['source_step'] != steps_per_epoch * extension['source_epochs'] or
+            source_state['global_step'] != extension['source_step'] or
+            not math.isclose(source_state['epoch'], extension['source_epochs']) or
+            extension['max_total_steps'] != steps_per_epoch * extension['total_epochs']):
+        raise ValueError('Epoch extension must continue the declared completed budget and sample groups')
+    extended = json.loads(json.dumps(config))
+    extended['training']['epochs'] = extension['total_epochs']
+    return extended
+
+
 def main():
     parser = ArgumentParser()
     parser.add_argument("--config", type=Path, required=True)
@@ -343,11 +361,15 @@ def main():
     parser.add_argument("--resume", type=Path)
     parser.add_argument("--resume-topology", type=Path,
                         help="Explicit 4x1 to 2x2 continuation with equal per-sequence losses")
+    parser.add_argument("--epoch-extension", type=Path,
+                        help="Continue a completed epoch budget without rewriting the prepared manifest")
     parser.add_argument("--convergence-contract", type=Path,
                         help="Use fixed-set plateau checks; source_step=0 permits a fresh run")
     parser.add_argument("--batch-size", type=int, required=True,
                         help="Measured actual per-device batch size; no gradient accumulation")
     args = parser.parse_args()
+    if args.epoch_extension and (args.resume is None or args.convergence_contract):
+        parser.error('--epoch-extension needs --resume and cannot use convergence stopping')
     world_size = int(os.environ.get("WORLD_SIZE", "1"))
     rank = int(os.environ.get("RANK", "0"))
     if world_size > 1:
@@ -381,6 +403,12 @@ def main():
     records = [r for r in manifest["records"] if r["split"] == "train"]
     if not records or args.batch_size <= 0:
         raise ValueError("Training needs examples and a positive batch size")
+    extension = None
+    if args.epoch_extension:
+        extension = json.loads(args.epoch_extension.read_text(encoding='utf-8'))
+        source_state = json.loads((args.resume / 'trainer_state.json').read_text())
+        config = extend_epoch_budget(config, extension, source_state,
+                                     sum(r['variants'] for r in records), args.batch_size * world_size)
     contract = {"config": config, "manifest": str(args.manifest.resolve()),
                 "map_source": str((args.q_checkpoint if task == "blocks" else args.source_root).resolve()),
                 "model_source": str(args.model_path.resolve()) if args.model_path else config["model"],
@@ -432,7 +460,7 @@ def main():
     maximum_steps = training.get("max_steps", -1)
     source_steps = maximum_steps if maximum_steps > 0 else math.ceil(
         len(dataset) / (args.batch_size * world_size)) * training["epochs"]
-    extra_arguments = fixed_warmup_arguments(training, source_steps)
+    extra_arguments = fixed_warmup_arguments(training, extension['source_step'] if extension else source_steps)
     if convergence:
         from .convergence import ConvergenceCheck, with_decision_mask
         # Caching preserves exactly the deterministic examples used by the source run.
@@ -480,6 +508,10 @@ def main():
             (args.out / "continuation.json").write_text(json.dumps(continuation, indent=2) + "\n")
     if rank == 0:
         (args.out / "config.json").write_text(json.dumps(contract, indent=2) + "\n")
+        if extension:
+            (args.out / 'continuation.json').write_text(json.dumps(dict(
+                source_checkpoint=str(args.resume.resolve()), epoch_extension=extension,
+                resume_topology=topology, warmup=extra_arguments), indent=2) + '\n')
     if config.get("checkpoint", {}).get("save_initial", False) and args.resume is None:
         initial = args.out / "models/checkpoint-0"
         trainer.save_model(str(initial))

@@ -33,6 +33,26 @@ python -m experiments.flamingo_map_reader.src.blocks_checkpoint_queue \
 
 单卡辅助队列串行处理 reference 和 rollout；与平台主队列使用同一分片合同并持有互斥的余数。跨机器复制的权重通过 `--source-path-map` 显式映射 manifest、基座与地图位置，配置和任务记录仍严格匹配；逐题输出回传到平台后由主队列统一汇总。
 
+续训和协同评测的日常启动使用 `experiment_runner`，直接读取同一份安排合同，不再复制每轮启动脚本。在执行节点准备 Git 外的 runtime profile，仅包含 `workspace_root`、`code_root`、`python`、`model_path`；训练增加 `q_checkpoint`，迁移后的评测增加 `source_path_map`，可选 `log`。路径必须是该节点上的绝对路径，profile 保存在 `runs/<run>/transfer/` 或 `tmp/`，不保存密码。
+
+```bash
+python -m experiments.flamingo_map_reader.src.experiment_runner plan \
+  --contract "$CONTRACT" --profile "$RUNTIME_PROFILE" --role training
+# 同一入口：start 后台启动，status 查看状态；role 也可取 evaluation / auxiliary_evaluation。
+```
+
+`plan` 不启动任务；`start` 在 Linux 节点后台调用现有 `train` / `blocks_checkpoint_queue`，记录退出状态，检测现有同目录进程并拒绝重复启动。训练 batch 与 GPU 数必须满足合同；改变拓扑仍需独立的正式迁移合同。已运行的旧入口任务可以用 `status` 读取原状态，无需重启。
+
+不共享目录时，传输工具 `artifact_bridge` 独立运行于产物所在的源节点。其 runtime profile 包含 `source_workspace`、`target_workspace`、`jump` / `target`（各有 `host`、`port`、`user`）、`stage_dir`、`known_hosts`、`status` 和可选 `interval_seconds`。正式分片数量和归属仍读取同一个安排合同。基座、地图、数据缓存和显式路径映射须先准备好；工具不安装环境、不启动或重启 GPU 队列。
+
+```bash
+python -m experiments.flamingo_map_reader.src.artifact_bridge \
+  --contract "$CONTRACT" --profile "$TRANSFER_PROFILE" --detach
+# --once 只同步一轮；默认每 600 秒同步，完成后退出，失败写状态并退出。
+```
+
+密码通过交互提示读入，仅留在内存；后台子进程通过 stdin 接收，不放在命令行、配置或日志里。SSH 主机密钥必须预先核对。新半 epoch adapter 经跳板中转，最后发布可评测标记；同步主节点完成摘要以支持远端队列结束判断，返回完整逐题输出后才发布摘要。结果汇总仍复用下述现有入口。两种工具的日志、状态、锁、中转包和机器 profile 均留在 Git 外。
+
 ```bash
 python -m experiments.flamingo_map_reader.src.summarize_blocks_results \
   --run "$RUN_DIR" --config experiments/flamingo_map_reader/configs/blocks_kv_evaluation.json \

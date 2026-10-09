@@ -9147,44 +9147,44 @@
       "epoch": 9.0,
       "modes": {
         "test_reference": {
-          "cases": 256,
+          "cases": 384,
           "groups": {
             "same_initial_board_new_pair": 255,
-            "new_initial_board": 1
+            "new_initial_board": 129
           },
           "reached": 0,
           "success": 0,
-          "safe": 1349,
-          "solvable_decisions": 1543,
+          "safe": 2105,
+          "solvable_decisions": 2407,
           "all_decisions": {
-            "decisions": 2006,
-            "map_minimum": 868,
-            "legal": 1990,
-            "ndcg_inverse_rank_at_10": 0.770004456993046,
-            "ndcg_inverse_distance_at_10": 0.935076031007989,
-            "ndcg_inverse_rank_at_1": 0.5886355997515789,
-            "ndcg_inverse_distance_at_1": 0.8901068206508351,
-            "ndcg_minmax_distance_at_10": 0.9176149719340252,
-            "ndcg_minmax_distance_at_1": 0.8835891969711901,
+            "decisions": 3036,
+            "map_minimum": 1333,
+            "legal": 3016,
+            "ndcg_inverse_rank_at_10": 0.7732517828673555,
+            "ndcg_minmax_distance_at_10": 0.9205618626645193,
+            "ndcg_inverse_rank_at_1": 0.5952623769970276,
+            "ndcg_minmax_distance_at_1": 0.8892263383399123,
+            "ndcg_inverse_distance_at_10": 0.9376522329626519,
+            "ndcg_inverse_distance_at_1": 0.8953020859333127,
+            "equal_distance_states": 212,
+            "single_candidate_states": 212,
             "normalized_distance_baselines": {
               "ndcg_minmax_distance_at_10": {
-                "random": 0.7243754890614208,
-                "reverse": 0.41074190948920675
+                "random": 0.725014959467668,
+                "reverse": 0.4112228927781433
               },
               "ndcg_minmax_distance_at_1": {
-                "random": 0.5855769718203766,
-                "reverse": 0.07028913260219342
+                "random": 0.5875175236238739,
+                "reverse": 0.06982872200263504
               }
-            },
-            "equal_distance_states": 141,
-            "single_candidate_states": 141
+            }
           },
           "termination": {
-            "done_outputs": 181,
-            "done_at_goal": 165,
-            "goal_claims": 179,
-            "correct_goal_claims": 163,
-            "goal_states": 172,
+            "done_outputs": 276,
+            "done_at_goal": 257,
+            "goal_claims": 273,
+            "correct_goal_claims": 254,
+            "goal_states": 265,
             "no_solution_states": 0,
             "correct_no_solution": 0
           },
@@ -9192,83 +9192,216 @@
             "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-112500/test_reference/00000_00064",
             "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-112500/test_reference/00064_00128",
             "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-112500/test_reference/00128_00192",
-            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-112500/test_reference/00192_00256"
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-112500/test_reference/00192_00256",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-112500/test_reference/00256_00320",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-112500/test_reference/00320_00384"
           ],
           "first_round": {
+            "cases": 384,
+            "safe": 270,
+            "map_minimum": 60,
+            "chosen_id_histogram": {
+              "36": 5,
+              "33": 4,
+              "17": 6,
+              "5": 21,
+              "18": 3,
+              "3": 39,
+              "52": 2,
+              "9": 5,
+              "26": 8,
+              "2": 52,
+              "4": 28,
+              "22": 5,
+              "25": 8,
+              "20": 6,
+              "1": 67,
+              "13": 8,
+              "30": 1,
+              "41": 4,
+              "11": 8,
+              "14": 3,
+              "34": 5,
+              "60": 1,
+              "28": 2,
+              "32": 4,
+              "47": 4,
+              "31": 3,
+              "16": 8,
+              "46": 2,
+              "12": 7,
+              "6": 12,
+              "21": 6,
+              "45": 2,
+              "40": 1,
+              "19": 2,
+              "43": 3,
+              "7": 5,
+              "15": 7,
+              "61": 1,
+              "39": 2,
+              "35": 2,
+              "38": 3,
+              "71": 2,
+              "53": 2,
+              "10": 1,
+              "42": 1,
+              "29": 1,
+              "58": 1,
+              "48": 1,
+              "23": 2,
+              "64": 1,
+              "27": 1,
+              "56": 1,
+              "37": 2,
+              "93": 1,
+              "49": 1,
+              "8": 1
+            },
+            "normalized_distance_decisions": 384,
             "metrics": {
               "ndcg_minmax_distance_at_10": {
-                "model": 0.8649784378491379,
-                "random": 0.6506435232271917,
-                "reverse": 0.20014070984393814
+                "model": 0.8685822151723136,
+                "random": 0.6526478049285142,
+                "reverse": 0.20288054753315488
               },
               "ndcg_minmax_distance_at_1": {
-                "model": 0.7771445943514339,
-                "random": 0.5911941651633259,
+                "model": 0.7891202792940756,
+                "random": 0.5932625121520879,
                 "reverse": 0.0
               }
-            },
-            "normalized_distance_decisions": 256
+            }
           }
         },
         "test_rollout": {
-          "cases": 128,
+          "cases": 384,
           "groups": {
-            "same_initial_board_new_pair": 128
+            "same_initial_board_new_pair": 255,
+            "new_initial_board": 129
           },
-          "reached": 30,
-          "success": 30,
-          "safe": 484,
-          "solvable_decisions": 582,
+          "reached": 82,
+          "success": 81,
+          "safe": 1279,
+          "solvable_decisions": 1581,
           "all_decisions": {
-            "decisions": 1068,
-            "map_minimum": 398,
-            "legal": 1041,
-            "ndcg_inverse_rank_at_10": 0.7220086198528199,
-            "ndcg_inverse_distance_at_10": 0.9127210226095456,
-            "ndcg_inverse_rank_at_1": 0.5287454715634549,
-            "ndcg_inverse_distance_at_1": 0.855023518277822,
-            "ndcg_minmax_distance_at_10": 0.8813231393187144,
-            "ndcg_minmax_distance_at_1": 0.8217946430969458,
+            "decisions": 3140,
+            "map_minimum": 1046,
+            "legal": 3050,
+            "ndcg_inverse_rank_at_10": 0.6964024304325422,
+            "ndcg_minmax_distance_at_10": 0.8692284443362218,
+            "ndcg_inverse_rank_at_1": 0.48947033028003734,
+            "ndcg_minmax_distance_at_1": 0.8040893525139968,
+            "ndcg_inverse_distance_at_10": 0.9044161704992789,
+            "ndcg_inverse_distance_at_1": 0.8419309034747268,
+            "equal_distance_states": 216,
+            "single_candidate_states": 216,
             "normalized_distance_baselines": {
               "ndcg_minmax_distance_at_10": {
-                "random": 0.7278387160531122,
-                "reverse": 0.42144473129687327
+                "random": 0.7226225618345614,
+                "reverse": 0.4135100940514112
               },
               "ndcg_minmax_distance_at_1": {
-                "random": 0.5864657474085523,
-                "reverse": 0.07958801498127341
+                "random": 0.5763800907508481,
+                "reverse": 0.06878980891719745
               }
-            },
-            "equal_distance_states": 85,
-            "single_candidate_states": 85
+            }
           },
           "termination": {
-            "done_outputs": 125,
-            "done_at_goal": 30,
-            "goal_claims": 114,
-            "correct_goal_claims": 30,
-            "goal_states": 30,
-            "no_solution_states": 71,
-            "correct_no_solution": 11
+            "done_outputs": 364,
+            "done_at_goal": 81,
+            "goal_claims": 336,
+            "correct_goal_claims": 81,
+            "goal_states": 82,
+            "no_solution_states": 212,
+            "correct_no_solution": 28
           },
           "source_shards": [
             "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-112500/test_rollout/00000_00064",
-            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-112500/test_rollout/00064_00128"
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-112500/test_rollout/00064_00128",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-112500/test_rollout/00128_00192",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-112500/test_rollout/00192_00256",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-112500/test_rollout/00256_00320",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-112500/test_rollout/00320_00384"
           ],
           "first_round": {
+            "cases": 384,
+            "safe": 282,
+            "map_minimum": 57,
+            "chosen_id_histogram": {
+              "2": 57,
+              "1": 54,
+              "21": 7,
+              "48": 2,
+              "6": 9,
+              "3": 37,
+              "12": 3,
+              "16": 6,
+              "18": 7,
+              "14": 4,
+              "5": 15,
+              "26": 3,
+              "10": 7,
+              "61": 3,
+              "38": 3,
+              "55": 1,
+              "43": 3,
+              "13": 7,
+              "23": 6,
+              "34": 3,
+              "4": 38,
+              "30": 2,
+              "31": 4,
+              "81": 1,
+              "11": 8,
+              "57": 1,
+              "7": 9,
+              "24": 5,
+              "33": 4,
+              "60": 2,
+              "59": 1,
+              "19": 5,
+              "36": 2,
+              "20": 4,
+              "22": 3,
+              "51": 3,
+              "9": 4,
+              "29": 1,
+              "62": 1,
+              "53": 1,
+              "25": 4,
+              "8": 4,
+              "39": 4,
+              "15": 6,
+              "45": 1,
+              "17": 3,
+              "28": 4,
+              "27": 3,
+              "52": 1,
+              "47": 1,
+              "64": 1,
+              "44": 3,
+              "41": 2,
+              "67": 1,
+              "40": 4,
+              "46": 1,
+              "54": 2,
+              "73": 1,
+              "42": 1,
+              "49": 1
+            },
+            "normalized_distance_decisions": 384,
             "metrics": {
               "ndcg_minmax_distance_at_10": {
-                "model": 0.8890879629081754,
-                "random": 0.6564486860021972,
-                "reverse": 0.20662364747646783
+                "model": 0.8724680120370759,
+                "random": 0.6526478049285142,
+                "reverse": 0.20288054753315488
               },
               "ndcg_minmax_distance_at_1": {
-                "model": 0.8366543862862202,
-                "random": 0.5982311297220639,
+                "model": 0.8010365810747172,
+                "random": 0.5932625121520879,
                 "reverse": 0.0
               }
-            },
-            "normalized_distance_decisions": 128
+            }
           }
         },
         "initial_goal_reference": {
@@ -9330,12 +9463,279 @@
           "source_shards": []
         }
       }
+    },
+    "118750": {
+      "epoch": 9.5,
+      "modes": {
+        "test_reference": {
+          "cases": 384,
+          "groups": {
+            "same_initial_board_new_pair": 255,
+            "new_initial_board": 129
+          },
+          "reached": 0,
+          "success": 0,
+          "safe": 2136,
+          "solvable_decisions": 2407,
+          "all_decisions": {
+            "decisions": 3036,
+            "map_minimum": 1348,
+            "legal": 3012,
+            "ndcg_inverse_rank_at_10": 0.7818490946304637,
+            "ndcg_minmax_distance_at_10": 0.9240649505939862,
+            "ndcg_inverse_rank_at_1": 0.6014288387883423,
+            "ndcg_minmax_distance_at_1": 0.8956072678225006,
+            "ndcg_inverse_distance_at_10": 0.9390831638817456,
+            "ndcg_inverse_distance_at_1": 0.8986792615445575,
+            "equal_distance_states": 212,
+            "single_candidate_states": 212,
+            "normalized_distance_baselines": {
+              "ndcg_minmax_distance_at_10": {
+                "random": 0.725014959467668,
+                "reverse": 0.4112228927781433
+              },
+              "ndcg_minmax_distance_at_1": {
+                "random": 0.5875175236238739,
+                "reverse": 0.06982872200263504
+              }
+            }
+          },
+          "termination": {
+            "done_outputs": 284,
+            "done_at_goal": 260,
+            "goal_claims": 283,
+            "correct_goal_claims": 259,
+            "goal_states": 265,
+            "no_solution_states": 0,
+            "correct_no_solution": 0
+          },
+          "source_shards": [
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-118750/test_reference/00000_00064",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-118750/test_reference/00064_00128",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-118750/test_reference/00128_00192",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-118750/test_reference/00192_00256",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-118750/test_reference/00256_00320",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-118750/test_reference/00320_00384"
+          ],
+          "first_round": {
+            "cases": 384,
+            "safe": 301,
+            "map_minimum": 69,
+            "chosen_id_histogram": {
+              "36": 6,
+              "32": 6,
+              "17": 11,
+              "5": 8,
+              "18": 5,
+              "49": 5,
+              "40": 2,
+              "11": 10,
+              "26": 8,
+              "19": 9,
+              "4": 23,
+              "22": 11,
+              "38": 9,
+              "42": 5,
+              "20": 3,
+              "39": 5,
+              "45": 2,
+              "34": 8,
+              "2": 24,
+              "63": 2,
+              "13": 4,
+              "14": 5,
+              "28": 2,
+              "3": 27,
+              "1": 40,
+              "47": 4,
+              "43": 9,
+              "31": 7,
+              "16": 8,
+              "46": 4,
+              "6": 5,
+              "48": 3,
+              "30": 5,
+              "55": 1,
+              "21": 6,
+              "69": 2,
+              "15": 4,
+              "12": 12,
+              "44": 5,
+              "9": 5,
+              "25": 3,
+              "10": 5,
+              "33": 7,
+              "37": 3,
+              "64": 1,
+              "54": 2,
+              "50": 1,
+              "35": 6,
+              "41": 3,
+              "24": 6,
+              "56": 3,
+              "29": 3,
+              "23": 6,
+              "71": 2,
+              "7": 4,
+              "58": 1,
+              "27": 2,
+              "93": 1,
+              "53": 1,
+              "65": 1,
+              "8": 1,
+              "68": 1,
+              "57": 1
+            },
+            "normalized_distance_decisions": 384,
+            "metrics": {
+              "ndcg_minmax_distance_at_10": {
+                "model": 0.882866892331528,
+                "random": 0.6526478049285142,
+                "reverse": 0.20288054753315488
+              },
+              "ndcg_minmax_distance_at_1": {
+                "model": 0.8323117777199026,
+                "random": 0.5932625121520879,
+                "reverse": 0.0
+              }
+            }
+          }
+        },
+        "test_rollout": {
+          "cases": 256,
+          "groups": {
+            "same_initial_board_new_pair": 255,
+            "new_initial_board": 1
+          },
+          "reached": 58,
+          "success": 57,
+          "safe": 950,
+          "solvable_decisions": 1148,
+          "all_decisions": {
+            "decisions": 2070,
+            "map_minimum": 708,
+            "legal": 2003,
+            "ndcg_inverse_rank_at_10": 0.7035791620127968,
+            "ndcg_minmax_distance_at_10": 0.8677540777962897,
+            "ndcg_inverse_rank_at_1": 0.5009915288648527,
+            "ndcg_minmax_distance_at_1": 0.8140115965272889,
+            "ndcg_inverse_distance_at_10": 0.8961834068783865,
+            "ndcg_inverse_distance_at_1": 0.8357514141374849,
+            "equal_distance_states": 135,
+            "single_candidate_states": 135,
+            "normalized_distance_baselines": {
+              "ndcg_minmax_distance_at_10": {
+                "random": 0.7235749255888952,
+                "reverse": 0.41381083005804836
+              },
+              "ndcg_minmax_distance_at_1": {
+                "random": 0.5779771060076305,
+                "reverse": 0.06521739130434782
+              }
+            }
+          },
+          "termination": {
+            "done_outputs": 251,
+            "done_at_goal": 58,
+            "goal_claims": 231,
+            "correct_goal_claims": 57,
+            "goal_states": 58,
+            "no_solution_states": 131,
+            "correct_no_solution": 19
+          },
+          "source_shards": [
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-118750/test_rollout/00000_00064",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-118750/test_rollout/00064_00128",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-118750/test_rollout/00128_00192",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-118750/test_rollout/00192_00256"
+          ],
+          "first_round": {
+            "cases": 256,
+            "safe": 200,
+            "map_minimum": 38,
+            "chosen_id_histogram": {
+              "2": 24,
+              "1": 26,
+              "69": 1,
+              "23": 5,
+              "48": 3,
+              "65": 1,
+              "3": 14,
+              "12": 4,
+              "34": 8,
+              "16": 5,
+              "18": 6,
+              "14": 3,
+              "5": 7,
+              "26": 3,
+              "10": 4,
+              "61": 2,
+              "47": 3,
+              "44": 3,
+              "21": 5,
+              "59": 4,
+              "43": 6,
+              "13": 8,
+              "38": 2,
+              "4": 16,
+              "30": 3,
+              "81": 1,
+              "17": 7,
+              "11": 8,
+              "6": 5,
+              "9": 2,
+              "53": 3,
+              "7": 5,
+              "19": 5,
+              "33": 3,
+              "42": 3,
+              "24": 5,
+              "79": 1,
+              "36": 5,
+              "20": 2,
+              "22": 2,
+              "51": 1,
+              "39": 2,
+              "62": 2,
+              "55": 1,
+              "25": 3,
+              "8": 1,
+              "32": 3,
+              "37": 3,
+              "46": 3,
+              "31": 1,
+              "74": 1,
+              "52": 1,
+              "28": 2,
+              "27": 1,
+              "41": 2,
+              "15": 3,
+              "64": 1,
+              "60": 1,
+              "35": 1
+            },
+            "normalized_distance_decisions": 256,
+            "metrics": {
+              "ndcg_minmax_distance_at_10": {
+                "model": 0.8786410189584698,
+                "random": 0.6506435232271914,
+                "reverse": 0.2001407098439381
+              },
+              "ndcg_minmax_distance_at_1": {
+                "model": 0.8170029169507458,
+                "random": 0.5911941651633261,
+                "reverse": 0.0
+              }
+            }
+          }
+        }
+      }
     }
   },
   "run": "blocks_kv_restart_36c213c",
   "source_commit": "36c213c",
   "startup_verified_step": 75,
-  "observed_at_utc": "2026-10-09T04:24:18.438436+00:00",
+  "observed_at_utc": "2026-10-09T06:01:15.620883+00:00",
   "training_resume": {
     "checkpoint_step": 55000,
     "checkpoint_epoch": 4.4,
@@ -9351,25 +9751,43 @@
     "interruption_recomputation_complete": true
   },
   "training_progress": {
-    "loss": 0.20080536603927612,
-    "grad_norm": 3.443291664123535,
-    "learning_rate": 2e-05,
-    "epoch": 9.3728,
-    "step": 117160,
-    "latest_saved_step": 116250,
-    "observed_at_utc": "2026-10-09T04:27:06.680272+00:00",
-    "liveness": "Training advances with four ranks;GPU telemetry unavailable because nvidia-smi blocked.",
-    "recovery": "Interruption recomputation complete;current step exceeds109404."
+    "step": 125000,
+    "epoch": 10.0,
+    "loss": 0.1725,
+    "loss_scope": "last_logged_training_update_not_full_run_mean",
+    "latest_saved_step": 125000,
+    "status": "training_completed",
+    "completed_at_utc": "2026-10-09T05:47:41.618339+00:00",
+    "final_adapter": "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/training/models/final/adapter.pt",
+    "observed_at_utc": "2026-10-09T06:01:15.620883+00:00"
   },
   "evaluation_progress": {
     "gpus": 4,
-    "completed_shards": 183,
+    "completed_shards": 199,
     "resumed": true,
     "archived_incomplete_shards": 4,
     "active_workers": 4,
-    "observed_at_utc": "2026-10-09T04:24:18.438436+00:00",
-    "metrics_snapshot_completed_shards": 183,
-    "metrics_snapshot_note": "Frozen183 complete shards,excluding.interrupted;ordinary saved-answer CPU scores through9epoch;9epoch reference256/rollout128,8.5epoch reference384/rollout256;coverage incomplete."
+    "observed_at_utc": "2026-10-09T06:01:15.620883+00:00",
+    "metrics_snapshot_completed_shards": 199,
+    "metrics_snapshot_note": "Only complete shards, excluding .interrupted; 9 epoch reference/rollout 384/384, 9.5 epoch 384/256. Final checkpoint discovered; 10 epoch has no complete shards in this snapshot.",
+    "running": {
+      "1": {
+        "pid": 1222,
+        "key": "step-118750/test_rollout/00256_00320"
+      },
+      "0": {
+        "pid": 1232,
+        "key": "step-118750/test_rollout/00320_00384"
+      },
+      "2": {
+        "pid": 1403,
+        "key": "step-125000/test_reference/00000_00064"
+      },
+      "3": {
+        "pid": 1413,
+        "key": "step-125000/test_reference/00064_00128"
+      }
+    }
   },
   "matched_epoch05_epoch1": {
     "test_reference": {
@@ -18521,7 +18939,7 @@
       }
     ]
   },
-  "status": "training_advancing_evaluation_running_gpu_telemetry_unavailable",
+  "status": "training_completed_evaluation_running",
   "minmax_distance_diagnostic": {
     "gain": "(d_max-d)/(d_max-d_min)",
     "discount": "log2",

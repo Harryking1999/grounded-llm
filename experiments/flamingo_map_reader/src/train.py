@@ -347,7 +347,7 @@ def fixed_warmup_arguments(training, source_steps):
 
 
 def extend_epoch_budget(config, extension, source_state, examples, global_batch):
-    """Extend epochs while keeping the prepared manifest and source supervision intact."""
+    """Extend the source budget, or resume an interrupted checkpoint inside it."""
     training = config['training']
     steps_per_epoch = math.ceil(examples / global_batch)
     if (training.get('supervision_mode') != 'prepared_trajectory' or
@@ -355,10 +355,17 @@ def extend_epoch_budget(config, extension, source_state, examples, global_batch)
             extension['source_epochs'] != training['epochs'] or
             extension['total_epochs'] <= extension['source_epochs'] or
             extension['source_step'] != steps_per_epoch * extension['source_epochs'] or
-            source_state['global_step'] != extension['source_step'] or
-            not math.isclose(source_state['epoch'], extension['source_epochs']) or
             extension['max_total_steps'] != steps_per_epoch * extension['total_epochs']):
         raise ValueError('Epoch extension must continue the declared completed budget and sample groups')
+    step = source_state['global_step']
+    original_endpoint = step == extension['source_step']
+    interrupted_extension = (
+        extension['source_step'] < step < extension['max_total_steps'] and
+        source_state.get('max_steps') == extension['max_total_steps'] and
+        source_state.get('num_train_epochs') == extension['total_epochs'])
+    if (not (original_endpoint or interrupted_extension) or
+            not math.isclose(source_state['epoch'], step / steps_per_epoch)):
+        raise ValueError('Checkpoint must match the original endpoint or interrupted extended budget')
     extended = json.loads(json.dumps(config))
     extended['training']['epochs'] = extension['total_epochs']
     return extended

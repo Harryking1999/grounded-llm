@@ -5,9 +5,9 @@
   "run": "blocks_kv_restart_36c213c",
   "source_checkpoint": "training/models/checkpoint-125000",
   "continuation_output": "training_extension_20epoch",
-  "training": {"ssh_port": 41511, "gpus": "0,1,2,3", "per_device_batch_size": 1, "global_batch_size": 4},
-  "evaluation": {"ssh_port": 35016, "gpus": "0,1", "queue_name": "main", "shard_modulo": 3, "shard_remainders": [0, 1], "cache_map_kv": true, "terminal_tasks": true},
+  "training": {"ssh_port": 35016, "gpus": "0,1,2,3", "per_device_batch_size": 1, "global_batch_size": 4},
+  "evaluation": {"ssh_port": 41511, "gpus": "0,1,2,3", "queue_name": "main", "shard_modulo": 3, "shard_remainders": [0, 1], "cache_map_kv": true, "terminal_tasks": true},
   "auxiliary_evaluation": {"ssh_alias": "grounded-4090", "gpus": "4", "queue_name": "4090_aux", "shard_modulo": 3, "shard_remainders": [2], "cache_map_kv": true, "terminal_tasks": true},
-  "checkpoint_priority": "newest first; rollout and reference each have one GPU",
+  "checkpoint_priority": "newest first; rollout and reference each have two GPUs",
   "preserve_source_final": true
 }

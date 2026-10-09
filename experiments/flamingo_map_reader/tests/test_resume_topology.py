@@ -65,6 +65,20 @@ class ResumeTopologyTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate_resume_topology(changed, self.topology, 2, 2)
 
+    def test_interrupted_epoch_extension_preserves_original_warmup_and_rejects_other_budgets(self):
+        configs = Path(__file__).resolve().parents[1] / 'configs'
+        source = json.loads((configs/'blocks_kv_restart.json').read_text())
+        extension = json.loads((configs/'blocks_kv_twenty_epoch_extension.json').read_text())
+        state = dict(global_step=145000, epoch=11.6, max_steps=250000, num_train_epochs=20)
+        extended = extend_epoch_budget(source, extension, state, 50000, 4)
+        self.assertEqual(extended['training']['epochs'], 20)
+        self.assertEqual(fixed_warmup_arguments(extended['training'], extension['source_step']),
+                         {'warmup_steps': 6250})
+        for change in (dict(max_steps=300000), dict(num_train_epochs=24), dict(epoch=11.5),
+                       dict(global_step=250000, epoch=20), dict(max_steps=None)):
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                extend_epoch_budget(source, extension, dict(state, **change), 50000, 4)
+
     def test_global_groups_and_resume_offset_are_identical(self):
         def groups(world, batch):
             ranks = []

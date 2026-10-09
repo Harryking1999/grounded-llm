@@ -40,6 +40,16 @@ class LaunchPlanTest(unittest.TestCase):
             self.assertIn('--terminal-tasks', command)
             self.assertIn('/runtime/relocation.json', command)
 
+    def test_runtime_resume_checkpoint_keeps_budget_and_output(self):
+        profile = self.profile(Path('/runtime'))
+        checkpoint = '/runtime/workspace/runs/blocks_kv_restart_36c213c/training_extension_20epoch/models/checkpoint-145000'
+        profile['resume_checkpoint'] = checkpoint
+        plan = build_plan(CONTRACT, profile, 'training')
+        command = plan['command']
+        self.assertEqual(command[command.index('--resume')+1], checkpoint)
+        self.assertTrue(command[command.index('--out')+1].replace('\\', '/').endswith('training_extension_20epoch'))
+        self.assertIn('--epoch-extension', command)
+
     def test_wrong_global_batch_is_rejected_before_launch(self):
         with tempfile.TemporaryDirectory() as directory:
             contract = json.loads(CONTRACT.read_text())

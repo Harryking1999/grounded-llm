@@ -38,7 +38,7 @@ def build_plan(contract_path, profile, role):
                     '--manifest', str(run / 'data/manifest.json'),
                     '--q-checkpoint', profile['q_checkpoint'],
                     '--out', str(run / contract['continuation_output']),
-                    '--resume', str(run / contract['source_checkpoint']),
+                    '--resume', profile.get('resume_checkpoint', str(run / contract['source_checkpoint'])),
                     '--epoch-extension', str(configs / contract['epoch_extension']),
                     '--batch-size', str(spec['per_device_batch_size'])]
         environment['CUDA_VISIBLE_DEVICES'] = spec['gpus']
@@ -108,7 +108,7 @@ def main():
     parser.add_argument('action', choices=('plan', 'start', 'status'))
     parser.add_argument('--contract', required=True, type=Path)
     parser.add_argument('--profile', required=True, type=Path,
-                        help='Ignored runtime JSON: paths only, never credentials')
+                        help='Ignored runtime JSON: paths, optional resume_checkpoint, never credentials')
     parser.add_argument('--role', required=True, choices=ROLES)
     parser.add_argument('--supervise', action='store_true', help=argparse.SUPPRESS)
     args = parser.parse_args()

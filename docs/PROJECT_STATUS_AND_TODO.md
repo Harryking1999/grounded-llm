@@ -47,7 +47,7 @@ LLM 已有较强的语言理解和推理能力，但在复杂任务中，仍可�
 旧运行 `blocks_ffn_failure_batch4_75cc4fd` 已停止，停机时约 5.36 epoch；原运行目录、权重、原始回答、缓存与日志完整保留并作归档标记。已全量评齐的 0.5–5 epoch [报告](../experiments/flamingo_map_reader/results/report_ffn_failure.md)、[计数摘要](../experiments/flamingo_map_reader/results/blocks_ffn_failure_summary.json)和[历史设计](../experiments/flamingo_map_reader/DESIGN_ffn_failure.md)供参考。epoch 5 普通完成 4/510，初始目标 99/100，固定失败无解 97/100；旧三任务加权与旧 NDCG 只保留在该归档中。不能由这些结果断定 FFN 是失败原因。
 
 1. **报告固定为一张 0.5–10 epoch 总表。** 按用户 2026-10-09 指令，[本轮报告](../experiments/flamingo_map_reader/results/report.md)只维护顶部总表与一行当前状态，不再逐次追加汇报。列出 rollout 完整路径到达率；普通 8000 类的单步可达率、地图最优率、位置倒数与 Q-map 距离倒数 NDCG@10 及各自 @1；两个 1000 类的到达判断与无解判断。R/F 与评测题数明确标注，缺失填 —。首轮、编号、随机、FFN 与最初 K/V 对照留在现有 JSON 摘要，需要时单独查询。
-2. **继续既定训练与评测，定时检查保持关闭。** 最新快照 2026-10-09 07:30（北京时间，远端日志时间）：35016 四卡训练到 89,364 步（7.15 epoch），近 500 步 loss 均值 0.2009，最新完整断点 88,750；中断重算已完成。40327 四卡评 7 epoch；完整分片 135 个，普通指标到 6.5 epoch，两类独立终止测试到 2.5 epoch。只统计有 summary.json 的完整分片，排除 .interrupted；优先复用回答与 CPU 重评分，不自动恢复 30 分钟监测、不追加实验或恢复 no_map。
+2. **继续既定训练与评测，定时检查保持关闭。** 最新快照 2026-10-09 09:27（北京时间，远端日志时间）：35016 四卡训练到 100,999 步（8.08 epoch），近 500 步 loss 均值 0.1942，最新完整断点 100,000；中断重算已完成。40327 四卡正在评 8 epoch；完整分片 155 个，普通指标到 7.5 epoch，两类独立终止测试到 2.5 epoch。只统计有 summary.json 的完整分片，排除 .interrupted；优先复用回答与 CPU 重评分，不自动恢复 30 分钟监测、不追加实验或恢复 no_map。
 3. **保留比较边界。** FFN 同题同期对照最新至 5 epoch；最初 K/V 的 validation 与本轮 test 无物理交集，batch、数据与预算不同。旧 NDCG 未按新公式重评时保持缺失，不拿总体 reference 当首轮，不由不匹配均值推断架构因果收益。原始产物与此前冻结计数保留在摘要及 Git 历史。
 
 ## 5. 长期研究空间与文档入口

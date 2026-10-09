@@ -86,7 +86,7 @@ class ReachabilityTest(unittest.TestCase):
     @staticmethod
     def row(keeps, reachable, slots, remaining, done=False):
         return dict(done=done, action_keeps_goal_reachable=keeps, reachable_candidates=reachable,
-                    candidate_slots=slots, remaining_shortest=remaining)
+                    candidates=slots, candidate_slots=slots, remaining_shortest=remaining)
 
     def test_the_floor_is_the_share_of_legal_candidates_that_survive(self):
         summary = summarize_turns([self.row(True, 1, 2, 3), self.row(False, 1, 2, 3)])

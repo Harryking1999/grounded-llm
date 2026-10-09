@@ -10859,7 +10859,7 @@
   "run": "blocks_kv_restart_36c213c",
   "source_commit": "36c213c",
   "startup_verified_step": 75,
-  "observed_at_utc": "2026-10-09T09:34:42.574038+00:00",
+  "observed_at_utc": "2026-10-09T10:18:55.111567+00:00",
   "training_resume": {
     "checkpoint_step": 55000,
     "checkpoint_epoch": 4.4,
@@ -10875,58 +10875,51 @@
     "interruption_recomputation_complete": true
   },
   "training_progress": {
-    "step": 125000,
-    "epoch": 10.0,
-    "loss": 0.1725,
+    "step": 125026,
+    "epoch": 10.00208,
+    "loss": 0.1913,
     "loss_scope": "last_logged_training_update_not_full_run_mean",
-    "latest_saved_step": 125000,
-    "status": "training_completed",
-    "completed_at_utc": "2026-10-09T05:47:41.618339+00:00",
-    "final_adapter": "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/training/models/final/adapter.pt",
-    "observed_at_utc": "2026-10-09T09:34:42.574038+00:00"
+    "status": "training_running",
+    "source_step": 125000,
+    "source_epochs": 10,
+    "target_step": 250000,
+    "target_epochs": 20,
+    "source_checkpoint": "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/training/models/checkpoint-125000",
+    "output": "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/training_extension_20epoch",
+    "world_size": 2,
+    "per_device_batch_size": 2,
+    "global_batch": 4,
+    "warmup_steps": 6250,
+    "ssh_port": 35016,
+    "source_commit": "343506c",
+    "learning_rate": 2e-05,
+    "observed_at_utc": "2026-10-09T10:18:55.111567+00:00"
   },
   "evaluation_progress": {
-    "gpus": 8,
-    "completed_shards": 289,
+    "gpus": 2,
+    "completed_shards": 292,
     "resumed": true,
     "archived_incomplete_shards": 16,
-    "active_workers": 8,
-    "observed_at_utc": "2026-10-09T09:34:42.574038+00:00",
+    "active_workers": 2,
+    "observed_at_utc": "2026-10-09T10:18:55.111567+00:00",
     "metrics_snapshot_completed_shards": 289,
-    "metrics_snapshot_note": "Only complete shards, excluding .interrupted. Final checkpoint ordinary reference/rollout each 510, initial-goal/failure-context each 100. Earlier checkpoints continue on eight GPUs.",
-    "scheduling_contract": "experiments/flamingo_map_reader/configs/blocks_kv_eight_gpu_evaluation.json",
+    "metrics_snapshot_note": "Metrics remain the 289 complete-shard snapshot from 17:34 Beijing; live scheduling and completion counts are separate. Future 10.5-20epoch metrics remain unavailable until evaluated.",
+    "scheduling_contract": "experiments/flamingo_map_reader/configs/blocks_kv_two_node_continuation.json",
     "queues": {
       "main": {
-        "ssh_port": 40327,
+        "ssh_port": 41511,
         "status": "running",
-        "shard_modulo": 2,
+        "shard_modulo": 1,
         "shard_remainders": [
           0
         ],
-        "pending_shards": 52
-      },
-      "training_aux": {
-        "ssh_port": 35016,
-        "status": "running",
-        "shard_modulo": 2,
-        "shard_remainders": [
-          1
-        ],
-        "pending_shards": 51
+        "pending_shards": 106
       }
     },
     "assigned_shards": {
       "main": {
-        "0": "step-75000/test_rollout/00384_00448",
-        "1": "step-75000/test_rollout/00256_00320",
-        "2": "step-81250/test_reference/00256_00320",
-        "3": "step-81250/test_reference/00384_00448"
-      },
-      "training_aux": {
-        "0": "step-81250/test_rollout/00448_00510",
-        "1": "step-75000/test_rollout/00320_00384",
-        "2": "step-68750/test_reference/00448_00510",
-        "3": "step-68750/test_no_solution_reference/00064_00100"
+        "0": "step-75000/test_rollout/00256_00320",
+        "1": "step-81250/test_reference/00256_00320"
       }
     },
     "completed_three_task_epochs": [
@@ -10939,7 +10932,9 @@
       9.5,
       10.0
     ],
-    "total_expected_shards": 400
+    "total_expected_shards": 800,
+    "metrics_snapshot_observed_at_utc": "2026-10-09T09:34:42.574038+00:00",
+    "continuation_models": "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/training_extension_20epoch/models"
   },
   "matched_epoch05_epoch1": {
     "test_reference": {
@@ -20091,7 +20086,7 @@
       }
     ]
   },
-  "status": "training_completed_evaluation_running",
+  "status": "training_and_evaluation_running",
   "minmax_distance_diagnostic": {
     "gain": "(d_max-d)/(d_max-d_min)",
     "discount": "log2",
@@ -23181,5 +23176,16 @@
     "observed_at_utc": "2026-10-09T04:46:11.013136+00:00",
     "raw_results_path": "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_map_comparison_510_986cb4d_c8/results.json",
     "contract_file": "experiments/flamingo_map_reader/configs/blocks_map_baseline_comparison.json"
+  },
+  "training_completion_10epoch": {
+    "step": 125000,
+    "epoch": 10.0,
+    "loss": 0.1725,
+    "loss_scope": "last_logged_training_update_not_full_run_mean",
+    "latest_saved_step": 125000,
+    "status": "training_completed",
+    "completed_at_utc": "2026-10-09T05:47:41.618339+00:00",
+    "final_adapter": "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/training/models/final/adapter.pt",
+    "observed_at_utc": "2026-10-09T09:34:42.574038+00:00"
   }
 }

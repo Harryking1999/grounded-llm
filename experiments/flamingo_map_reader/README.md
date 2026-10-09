@@ -3,6 +3,7 @@
 冻结语言模型和地图，训练读取接口，让 LLM 输出地图排序、动作与终止判断。当前积木按 2026-10-08 会议重新训练：恢复分离 K/V，取消 FFN，仅普通任务保留编号增强，两个终止类别不增强。
 
 - [当前设计](DESIGN.md)、[训练合同](configs/blocks_kv_restart.json)、[评测合同](configs/blocks_kv_evaluation.json)、[当前结果](results/report.md)。
+- 已完成本轮 10 epoch，继续训练至 20 epoch 的[预算](configs/blocks_kv_twenty_epoch_extension.json)与[两节点安排](configs/blocks_kv_two_node_continuation.json)单独保存，原训练与数据合同保留。
 - [项目状态与 TODO](../../docs/PROJECT_STATUS_AND_TODO.md)为唯一当前状态页。
 - 已停止融合 FFN 的[设计](DESIGN_ffn_failure.md)、[epoch 5 报告](results/report_ffn_failure.md)及[结果摘要](results/blocks_ffn_failure_summary.json)。
 - 原分离 K/V 两任务[设计](DESIGN_long_trajectory.md)与[报告](results/report_long_trajectory.md)。
@@ -27,6 +28,8 @@ python -m experiments.flamingo_map_reader.src.blocks_checkpoint_queue \
 ```
 
 每半 epoch 评测普通 reference/rollout、初始目标及失败上下文。原始回答和分片摘要保存在 `evaluation_half_epoch/step-N/`；未完成分片先归档再重做，完整分片复用。运行中不得同时启动重叠分片。
+
+完成原预算后的续训使用 `train --resume --resume-topology --epoch-extension`，继续原 optimizer、scheduler 与样本进度，新增权重写入 `training_extension_20epoch/models/`。评测队列通过 `--continuation-models` 同时扫描新增权重并等待新 final；原数据 manifest 与原 `training/models/final` 保留。机器、命令参数和运行目录见两节点合同与开发机手册。
 
 ```bash
 python -m experiments.flamingo_map_reader.src.summarize_blocks_results \

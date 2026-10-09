@@ -57,13 +57,15 @@ Agent 使用相同连接方式，登录后通过 `hostname` 确认主机、`nvid
 | 当前积木地图 | `/zhanghanyue/experiment/grounded_llm_qmap_tree_132f5a1/runs/blocks_distance_map/tree_1000_132f5a1/best.pt` |
 | 已完成同题对照、尚未接入 LLM 的续训地图 | `/zhanghanyue/experiment/grounded_llm_qmap_tree_132f5a1/runs/blocks_distance_map/tree_continue_986cb4d/checkpoints/step_015000.pt` |
 | 028 基座候选 | `/ssdwork/fuzhizhang/model_base/Qwen2.5-1.5B-Instruct`；复用权限待确认 |
-| 4090 公共模型 | `/opt/models`；上次未发现 Qwen2.5-1.5B-Instruct，本轮因跳板拒绝公钥认证尚未重新核对 |
+| 4090 公共模型 | `/opt/models`；上次未发现 Qwen2.5-1.5B-Instruct，本轮非交互会话尚未完成跳板密码登录，未重新核对 |
 
 原平台目录支持跨开发环境复用。**028、login02、4090 与平台之间无已确认的共享目录**；028 的 `/ssdwork` 为节点本地磁盘。
 
 2026-10-09 最初在 35016、40327 合用八卡评测；随后用户重启为两台各两卡，评测端口由 40327 改为 41511。旧主、辅助进程均已退出。现按 `experiments/flamingo_map_reader/configs/blocks_kv_two_node_continuation.json` 安排：35016 续训，41511 的 `main` 队列扫描原权重与新增权重，继续写同一 `evaluation_half_epoch/`。原八卡调度配置和日志作为历史保留；不再把旧 `status.training_aux.json` 当作活跃队列。
 
-4090 复用评测只需 adapter，不需 optimizer 和 RNG。平台当前 adapter 约 98 MB，完整续训断点约 314 MB；基座约 3.10 GB，需一次性准备。两边没有共享目录，仍需中转；2026-10-09 再次连接 login02 返回 password 认证要求，非交互公钥登录被拒绝，尚未执行复制。
+本轮续训源码为 `343506c`，部署于上述平台工作区 `code/blocks_kv_twenty_343506c/`；评测源码为 `7227c45`，位于 `code/blocks_kv_twenty_7227c45/`。续训日志为运行目录下 `logs/training_twenty_343506c.log`，续训状态、实际合同及来源分别记录于 `training_extension_20epoch/{status,config,continuation}.json`；评测队列日志为 `evaluation_half_epoch/logs/queue_main_two_gpu_twenty_7227c45_retry.log`。两卡 batch=2 探测两步通过，峰值约 7.7 GiB/卡；实际续训已越过来源步数，启动验收为 125,026 步。
+
+4090 复用评测只需 adapter，不需 optimizer 和 RNG。平台当前 adapter 约 98 MB，完整续训断点约 314 MB；基座约 3.10 GB，需一次性准备。两边没有共享目录，仍需中转。login02 按既有设置每次需要密码，这不是公钥登录故障；2026-10-09 本轮非交互会话未完成该密码步骤，尚未重新检查模型或执行复制。用户决定先完成平台两节点，4090 稍后再处理。
 
 新机器的建议项目目录如下，**尚未创建**：
 

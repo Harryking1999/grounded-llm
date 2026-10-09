@@ -20,13 +20,13 @@
 **原平台**：本机已配置 SSH 密钥。
 
 ```powershell
-# 当前续训环境：4 张 A800，每卡 batch=1
-ssh -p 41511 root@172.16.78.10
-# 当前主评测环境：2 张 A100
+# 当前续训环境：4 张 A100，每卡 batch=1
 ssh -p 35016 root@172.16.78.10
+# 当前主评测环境：4 张 A800
+ssh -p 41511 root@172.16.78.10
 ```
 
-训练环境另有本机别名 `grounded-dev`。密钥和连接配置位于 `%USERPROFILE%\.ssh\`。
+训练环境另有本机别名 `grounded-dev`（当前指向 35016）。密钥和连接配置位于 `%USERPROFILE%\.ssh\`。
 
 **028、4090**：本机已配置连接别名及公钥，私钥保留在本机。
 
@@ -65,7 +65,13 @@ Agent 使用相同连接方式，登录后通过 `hostname` 确认主机、`nvid
 
 2026-10-09 最初在 35016、40327 合用八卡评测；随后端口改为 41511，并先尝试两卡续训。用户最终将 41511 扩为四张 A800，确认每卡 batch=1，从本轮 10 epoch 完整断点续训到 20 epoch；35016 两张 A100 改为主评测，4090 的 4 号卡辅助评测。正式安排仍见 `experiments/flamingo_map_reader/configs/blocks_kv_two_node_continuation.json`：主、辅助分别持有分片索引模 3 的余数 0/1、2，结果回到同一平台 `evaluation_half_epoch/`。旧八卡队列与两卡尝试作为历史保留。
 
-当前训练、评测源码为 `ce8b3b7`，平台部署于 `code/blocks_kv_three_node_ce8b3b7/`，4090 位于项目目录 `code/ce8b3b7/`。续训日志为平台运行目录下 `logs/training_twenty_four_gpu_ce8b3b7.log`，状态、实际合同与来源仍在 `training_extension_20epoch/{status,config,continuation}.json`。主队列日志为 `evaluation_half_epoch/logs/queue_main_35016_three_node_ce8b3b7.log`。两卡尝试的目录整体保留为 `training_extension_20epoch_two_gpu_retired_343506c/`，最后未发布的更新未带入四卡续训；原 10 epoch final 与所有权重保留。
+2026-10-09 两节点重启后，按用户确认交换分工：35016 四张 A100 续训，41511 四张 A800 主评测（两路 rollout、两路 reference）；每卡 batch=1、全局 batch=4，继续到原定 20 epoch。最新完整断点为 `training_extension_20epoch/models/checkpoint-145000/`（11.6 epoch），含 optimizer、scheduler、trainer state 和四份 RNG。重启前日志到 146221 步，最后未保存的约 1221 步从断点重跑；原 10 epoch final、所有完整 checkpoint 和已完成评测分片保留。平台与 4090 的分片余数仍为 0/1、2。
+
+平台恢复源码为已提交的 `fb923f8`，部署于 `code/blocks_restart_fb923f8/`；训练与评测通过可复用 `experiment_runner` 启动。该提交增加延长训练中途断点的恢复校验，原 warmup 保持 6250 步；数据、地图、监督目标和评测实现沿用原条件。4090 保留 `code/ce8b3b7/` 的辅助评测进程。
+
+平台运行目录的 `runtime/{training,evaluation,bridge}_profile.json` 保存路径和显式恢复断点，不含密码；实际进程状态分别在 `runner.training.json`、`runner.evaluation.json`，训练进展仍读 `training_extension_20epoch/logs/train.jsonl`。本次训练、主评测日志为 `logs/training_35016_resume_fb923f8.log`、`logs/evaluation_41511_resume_fb923f8.log`。恢复前的 continuation/status 副本保存在 `runtime/`，两卡尝试仍保留于 `training_extension_20epoch_two_gpu_retired_343506c/`。重启中断且没有完成摘要的评测分片由原队列保留为 `.interrupted.*` 后重做，完整分片直接复用。
+
+4090 文件同步已改用可复用 `artifact_bridge`，运行于 41511；每 600 秒经 login02 中转新 adapter 与完成标记，再导入完整辅助分片。日志与状态分别为运行目录 `transfer/artifact_bridge_status.log`、`transfer/artifact_bridge_status.json`。独立 `.transfer-venv` 需要 Paramiko 和 filelock；本次从已安装的 ML 环境复制 filelock 3.18.0 到传输环境，未修改 ML 环境。跳板和目标密码通过交互提示进入内存及后台 stdin，不写入 profile、argv、文件或日志。
 
 4090 复用评测只需 adapter，不需 optimizer 和 RNG：adapter 约 98 MB，完整续训断点约 314 MB，基座约 3.10 GB，710 道评测任务的缓存约 93 MB。4090 的 0–3 号卡供现有 vLLM 服务使用，本轮辅助评测仅用 4 号卡，显存约 48 GB。基座、冻结地图、评测缓存及所需 adapter 已转入项目目录；使用独立环境 `/home/gongruochen/grounded_llm/.venv/bin/python`，不修改公共 Conda 环境。
 
@@ -73,7 +79,7 @@ Agent 使用相同连接方式，登录后通过 `hostname` 确认主机、`nvid
 
 按用户确认，文件先存入 login02，再复制至目标机。已验证跳板分别可达 `nv-h100-028` 和 4090 的 `ubuntu`，并完成 adapter 的跳板至 4090 中转，数据段约 98 MB/s。028 本轮只核对连接，仍遵守 10 月 12 日之后使用的约定。login02 需要密码，目标 4090 从跳板复制也使用其账号认证；密码仅在运行进程中使用，未写入仓库或脚本。
 
-模型与数据经平台直接上传到 login02，再复制到 4090，避免本机上传瓶颈。平台运行目录 `transfer/` 存放中转包、后台传输脚本、`4090_bridge.log` 和 `4090_bridge_status.json`；独立传输环境为平台工作区 `.transfer-venv/`。该后台程序每 10 分钟检查新权重、同步平台已完成分片的摘要标记并回传辅助分片，发布 adapter 后才发布可评测标记，分片返回时最后写摘要。摘要标记用于跨目录复用和全队列结束判断，完整逐题结果统一在平台汇总。它负责实验文件传输，不会创建 Codex 定时唤醒；30 分钟检查仍关闭。4090 的辅助日志位于其运行目录 `evaluation_half_epoch/logs/queue_4090_aux_ce8b3b7.log`，绝对路径仅通过显式 `source_path_map.json` 对应，监督配置保持一致。
+模型与数据经平台直接上传到 login02，再复制到 4090，避免本机上传瓶颈。平台运行目录 `transfer/` 存放中转包与旧 `4090_bridge.*` 记录；当前后台同步入口、状态和日志见上文 `artifact_bridge`。独立传输环境为平台工作区 `.transfer-venv/`。同步每 10 分钟检查新权重、同步平台已完成分片的摘要标记并回传辅助分片，发布 adapter 后才发布可评测标记，分片返回时最后写摘要。摘要标记用于跨目录复用和全队列结束判断，完整逐题结果统一在平台汇总。它负责实验文件传输，不会创建 Codex 定时唤醒；30 分钟检查仍关闭。4090 的辅助日志位于其运行目录 `evaluation_half_epoch/logs/queue_4090_aux_ce8b3b7.log`，绝对路径仅通过显式 `source_path_map.json` 对应，监督配置保持一致。
 
 项目目录如下，028 目录尚未创建，4090 与 login02 目录已创建：
 

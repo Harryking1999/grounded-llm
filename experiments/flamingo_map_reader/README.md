@@ -20,7 +20,7 @@ python -m experiments.flamingo_map_reader.src.retrain_blocks \
   --model-path "$MODEL_PATH" --out "$RUN_DIR" --training-only
 ```
 
-新目录从零初始化接口，复用缓存而不加载旧权重。仅限制失败样本清单的编号版本数量，原缓存不改动。训练节点使用配置指定的四卡，另一节点两卡评测：
+新目录从零初始化接口，复用缓存而不加载旧权重。仅限制失败样本清单的编号版本数量，原缓存不改动。训练节点使用配置指定的四卡，另一节点四卡评测：
 
 ```bash
 python -m experiments.flamingo_map_reader.src.blocks_checkpoint_queue \
@@ -51,6 +51,8 @@ python -m experiments.flamingo_map_reader.src.artifact_bridge \
   --contract "$CONTRACT" --profile "$TRANSFER_PROFILE" --detach
 # --once 只同步一轮；默认每 600 秒同步，完成后退出，失败写状态并退出。
 ```
+
+传输环境需要 `paramiko` 和 `filelock`。运行中途重启时，可在忽略的训练 profile 中指定 `resume_checkpoint`，从延长预算内的完整断点恢复，仍使用原 epoch 扩展合同与 warmup。
 
 密码通过交互提示读入，仅留在内存；后台子进程通过 stdin 接收，不放在命令行、配置或日志里。SSH 主机密钥必须预先核对。新半 epoch adapter 经跳板中转，最后发布可评测标记；同步主节点完成摘要以支持远端队列结束判断，返回完整逐题输出后才发布摘要。结果汇总仍复用下述现有入口。两种工具的日志、状态、锁、中转包和机器 profile 均留在 Git 外。
 

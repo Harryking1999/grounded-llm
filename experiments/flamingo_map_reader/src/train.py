@@ -326,8 +326,9 @@ def check_resume_target(output, resume, source_step, convergence):
 
 def fixed_warmup_arguments(training, source_steps):
     # Transformers 5 converts warmup_ratio into warmup_steps during __post_init__,
-    # even when an explicit step count is also supplied. Omit the ratio entirely.
-    return {"warmup_ratio": None, "warmup_steps": training.get(
+    # even when an explicit step count is also supplied. Omit the ratio entirely;
+    # Transformers 4 requires its default numeric ratio rather than explicit None.
+    return {"warmup_steps": training.get(
         "warmup_steps", math.ceil(source_steps * training["warmup_fraction"]))}
 
 

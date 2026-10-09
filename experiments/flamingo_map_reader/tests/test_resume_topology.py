@@ -37,7 +37,12 @@ class ResumeTopologyTest(unittest.TestCase):
         self.assertEqual(pinned_supervision(original), pinned_supervision(migrated))
         self.assertEqual(source['training']['epochs'], 10)
         self.assertEqual(extended['training']['epochs'], 20)
-        self.assertEqual(fixed_warmup_arguments(extended['training'], extension['source_step'])['warmup_steps'], 6250)
+        warmup = fixed_warmup_arguments(extended['training'], extension['source_step'])
+        self.assertNotIn('warmup_ratio', warmup)
+        from transformers import TrainingArguments
+        with tempfile.TemporaryDirectory() as directory:
+            arguments = TrainingArguments(output_dir=directory, use_cpu=True, report_to=[], **warmup)
+            self.assertEqual(arguments.get_warmup_steps(250000), 6250)
         for examples, batch, changed_state in ((50001, 4, state), (50000, 8, state),
                                                (50000, 4, dict(global_step=124000, epoch=9.92))):
             with self.subTest(examples=examples, batch=batch), self.assertRaises(ValueError):

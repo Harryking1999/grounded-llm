@@ -12427,204 +12427,284 @@
       "epoch": 12.0,
       "modes": {
         "test_reference": {
-          "cases": 64,
+          "cases": 384,
           "groups": {
-            "same_initial_board_new_pair": 64
+            "new_initial_board": 129,
+            "same_initial_board_new_pair": 255
           },
           "reached": 0,
           "success": 0,
-          "safe": 384,
-          "solvable_decisions": 423,
+          "safe": 2199,
+          "solvable_decisions": 2430,
           "all_decisions": {
-            "decisions": 527,
-            "map_minimum": 255,
-            "legal": 524,
-            "ndcg_inverse_rank_at_10": 0.8074355838182896,
-            "ndcg_minmax_distance_at_10": 0.9391917016269695,
-            "ndcg_inverse_rank_at_1": 0.6287770794843056,
-            "ndcg_minmax_distance_at_1": 0.9190571280589737,
-            "ndcg_inverse_distance_at_10": 0.9560320981071078,
-            "ndcg_inverse_distance_at_1": 0.9301578409975874,
-            "equal_distance_states": 37,
-            "single_candidate_states": 37,
+            "ndcg_inverse_distance_at_10": 0.9509566371311466,
+            "ndcg_inverse_rank_at_10": 0.7964882649991784,
+            "ndcg_minmax_distance_at_10": 0.9308747911920842,
+            "ndcg_minmax_distance_at_1": 0.9037236786518179,
+            "ndcg_inverse_distance_at_1": 0.9194559871032671,
+            "single_candidate_states": 211,
             "normalized_distance_baselines": {
               "ndcg_minmax_distance_at_10": {
-                "random": 0.731716284281463,
-                "reverse": 0.42181985227560165
+                "reverse": 0.4083899465353478,
+                "random": 0.7239367686160327
               },
               "ndcg_minmax_distance_at_1": {
-                "random": 0.5936720318063813,
-                "reverse": 0.07020872865275142
+                "reverse": 0.06902191691200524,
+                "random": 0.5870594398344577
               }
-            }
+            },
+            "map_minimum": 1408,
+            "ndcg_inverse_rank_at_1": 0.6161127370913123,
+            "decisions": 3057,
+            "legal": 3033,
+            "equal_distance_states": 211
           },
           "termination": {
-            "done_outputs": 48,
-            "done_at_goal": 45,
-            "goal_claims": 45,
-            "correct_goal_claims": 42,
-            "goal_states": 45,
             "no_solution_states": 0,
-            "correct_no_solution": 0
+            "goal_states": 267,
+            "done_outputs": 283,
+            "goal_claims": 277,
+            "correct_goal_claims": 255,
+            "correct_no_solution": 0,
+            "done_at_goal": 261
           },
           "source_shards": [
-            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-150000/test_reference/00000_00064"
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-150000/test_reference/00000_00064",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-150000/test_reference/00064_00128",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-150000/test_reference/00128_00192",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-150000/test_reference/00192_00256",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-150000/test_reference/00256_00320",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-150000/test_reference/00384_00448"
           ],
           "first_round": {
-            "cases": 64,
-            "safe": 56,
-            "map_minimum": 18,
+            "cases": 384,
+            "safe": 325,
+            "map_minimum": 86,
             "chosen_id_histogram": {
-              "36": 4,
-              "18": 2,
-              "20": 2,
-              "53": 1,
-              "49": 1,
-              "56": 1,
+              "38": 10,
+              "11": 2,
+              "65": 3,
+              "28": 10,
+              "56": 2,
+              "78": 1,
+              "31": 9,
+              "26": 11,
+              "55": 3,
+              "13": 9,
               "54": 1,
-              "26": 3,
-              "12": 1,
-              "41": 1,
-              "22": 1,
-              "44": 1,
-              "14": 1,
-              "15": 2,
-              "17": 1,
-              "39": 2,
-              "19": 1,
-              "11": 1,
-              "45": 1,
-              "4": 4,
-              "34": 2,
-              "31": 2,
-              "2": 5,
-              "6": 1,
-              "13": 1,
-              "28": 3,
-              "3": 6,
-              "1": 1,
-              "32": 1,
-              "43": 2,
+              "60": 2,
+              "45": 5,
+              "None": 1,
+              "62": 1,
+              "32": 5,
+              "41": 8,
+              "50": 1,
+              "53": 3,
+              "46": 6,
+              "34": 11,
+              "81": 1,
+              "22": 5,
+              "58": 1,
+              "4": 22,
+              "18": 9,
+              "44": 7,
+              "16": 8,
+              "21": 8,
+              "47": 4,
+              "90": 1,
+              "69": 1,
+              "43": 6,
+              "25": 10,
+              "39": 6,
+              "9": 5,
+              "6": 7,
+              "14": 2,
+              "30": 2,
+              "67": 1,
+              "73": 1,
+              "20": 8,
+              "5": 14,
+              "33": 3,
+              "40": 2,
+              "15": 5,
+              "7": 7,
+              "37": 3,
+              "3": 25,
+              "23": 4,
+              "64": 1,
+              "27": 3,
+              "17": 8,
+              "29": 3,
+              "49": 6,
+              "19": 2,
+              "2": 18,
+              "42": 6,
+              "1": 14,
+              "63": 1,
+              "10": 3,
+              "12": 5,
+              "35": 11,
+              "8": 7,
+              "36": 10,
               "48": 1,
-              "46": 2,
-              "5": 1,
-              "42": 1,
-              "55": 2,
-              "21": 1
+              "24": 3
             },
-            "normalized_distance_decisions": 64,
+            "normalized_distance_decisions": 384,
             "metrics": {
               "ndcg_minmax_distance_at_10": {
-                "model": 0.9218114705850154,
-                "random": 0.6609984281288693,
-                "reverse": 0.2085978085555302
+                "model": 0.9026955232379739,
+                "reverse": 0.20143378181729862,
+                "random": 0.6525318625234006
               },
               "ndcg_minmax_distance_at_1": {
-                "model": 0.9063257812779756,
-                "random": 0.6054680300409115,
-                "reverse": 0.0
+                "model": 0.8671253021578135,
+                "reverse": 0.0,
+                "random": 0.5934260185459064
               }
             }
           }
         },
         "test_rollout": {
-          "cases": 64,
+          "cases": 448,
           "groups": {
-            "same_initial_board_new_pair": 64
+            "new_initial_board": 193,
+            "same_initial_board_new_pair": 255
           },
-          "reached": 23,
-          "success": 23,
-          "safe": 280,
-          "solvable_decisions": 321,
+          "reached": 135,
+          "success": 134,
+          "safe": 1820,
+          "solvable_decisions": 2133,
           "all_decisions": {
-            "decisions": 532,
-            "map_minimum": 217,
-            "legal": 523,
-            "ndcg_inverse_rank_at_10": 0.7622080634461063,
-            "ndcg_minmax_distance_at_10": 0.9119656878337151,
-            "ndcg_inverse_rank_at_1": 0.5671783394665304,
-            "ndcg_minmax_distance_at_1": 0.8662022599805134,
-            "ndcg_inverse_distance_at_10": 0.9401733940833323,
-            "ndcg_inverse_distance_at_1": 0.8985841684732364,
-            "equal_distance_states": 37,
-            "single_candidate_states": 37,
+            "ndcg_inverse_distance_at_10": 0.9245716130977432,
+            "ndcg_inverse_rank_at_10": 0.7382875532099481,
+            "ndcg_minmax_distance_at_10": 0.8932185053094618,
+            "ndcg_minmax_distance_at_1": 0.8429138788456308,
+            "ndcg_inverse_distance_at_1": 0.8785170038144302,
+            "single_candidate_states": 228,
             "normalized_distance_baselines": {
               "ndcg_minmax_distance_at_10": {
-                "random": 0.734746313722364,
-                "reverse": 0.4298783908002574
+                "reverse": 0.40916575096652896,
+                "random": 0.7222197763670668
               },
               "ndcg_minmax_distance_at_1": {
-                "random": 0.5920136354570313,
-                "reverse": 0.06954887218045112
+                "reverse": 0.06300082895827577,
+                "random": 0.5788454160652714
               }
-            }
+            },
+            "map_minimum": 1393,
+            "ndcg_inverse_rank_at_1": 0.5408499340164046,
+            "decisions": 3619,
+            "legal": 3530,
+            "equal_distance_states": 228
           },
           "termination": {
-            "done_outputs": 64,
-            "done_at_goal": 23,
-            "goal_claims": 56,
-            "correct_goal_claims": 23,
-            "goal_states": 23,
-            "no_solution_states": 32,
-            "correct_no_solution": 8
+            "no_solution_states": 224,
+            "goal_states": 135,
+            "done_outputs": 440,
+            "goal_claims": 386,
+            "correct_goal_claims": 134,
+            "correct_no_solution": 53,
+            "done_at_goal": 135
           },
           "source_shards": [
-            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-150000/test_rollout/00000_00064"
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-150000/test_rollout/00000_00064",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-150000/test_rollout/00064_00128",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-150000/test_rollout/00128_00192",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-150000/test_rollout/00192_00256",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-150000/test_rollout/00256_00320",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-150000/test_rollout/00320_00384",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-150000/test_rollout/00384_00448"
           ],
           "first_round": {
-            "cases": 64,
-            "safe": 50,
-            "map_minimum": 15,
+            "cases": 448,
+            "safe": 357,
+            "map_minimum": 104,
             "chosen_id_histogram": {
-              "2": 11,
-              "3": 3,
-              "51": 1,
-              "23": 2,
-              "44": 1,
-              "65": 1,
-              "12": 2,
-              "48": 2,
-              "36": 1,
-              "28": 1,
-              "18": 1,
-              "34": 1,
-              "35": 2,
-              "30": 2,
-              "26": 1,
-              "10": 2,
-              "6": 2,
-              "20": 2,
-              "8": 2,
-              "57": 2,
-              "43": 1,
-              "29": 2,
-              "22": 1,
-              "38": 2,
+              "38": 5,
+              "65": 2,
+              "11": 6,
+              "68": 1,
+              "28": 6,
+              "78": 1,
+              "31": 6,
+              "26": 9,
+              "55": 4,
+              "13": 8,
+              "54": 1,
+              "60": 1,
+              "45": 4,
+              "None": 1,
+              "62": 3,
+              "32": 3,
+              "74": 2,
+              "41": 3,
+              "57": 4,
+              "66": 1,
+              "58": 1,
+              "53": 3,
+              "50": 1,
+              "34": 9,
               "81": 1,
-              "4": 2,
-              "13": 1,
-              "74": 1,
-              "1": 2,
+              "22": 5,
+              "46": 2,
+              "4": 24,
+              "18": 3,
+              "44": 5,
+              "16": 9,
+              "21": 9,
+              "59": 1,
+              "47": 6,
+              "61": 2,
+              "69": 1,
+              "72": 1,
+              "43": 8,
+              "25": 6,
+              "39": 3,
+              "9": 3,
+              "6": 10,
+              "14": 8,
+              "30": 10,
+              "67": 1,
+              "40": 4,
+              "20": 12,
+              "5": 13,
+              "51": 4,
+              "33": 4,
+              "15": 6,
+              "7": 6,
+              "75": 1,
               "37": 1,
-              "11": 1,
-              "9": 1,
-              "14": 1,
-              "7": 2,
-              "5": 1,
-              "16": 1,
-              "24": 1
+              "3": 31,
+              "23": 5,
+              "64": 1,
+              "84": 1,
+              "27": 6,
+              "29": 5,
+              "17": 7,
+              "42": 8,
+              "2": 41,
+              "35": 9,
+              "10": 7,
+              "1": 28,
+              "19": 3,
+              "49": 1,
+              "12": 5,
+              "8": 11,
+              "36": 9,
+              "48": 7,
+              "24": 9
             },
-            "normalized_distance_decisions": 64,
+            "normalized_distance_decisions": 448,
             "metrics": {
               "ndcg_minmax_distance_at_10": {
-                "model": 0.9103505622671925,
-                "random": 0.6609984281288693,
-                "reverse": 0.2085978085555302
+                "model": 0.893109924104193,
+                "reverse": 0.20306573550622842,
+                "random": 0.6533695486559636
               },
               "ndcg_minmax_distance_at_1": {
-                "model": 0.8628289297568816,
-                "random": 0.6054680300409117,
-                "reverse": 0.0
+                "model": 0.853053918146646,
+                "reverse": 0.0,
+                "random": 0.594032099800457
               }
             }
           }
@@ -12635,7 +12715,7 @@
   "run": "blocks_kv_restart_36c213c",
   "source_commit": "36c213c",
   "startup_verified_step": 75,
-  "observed_at_utc": "2026-10-09T16:25:35.408276+00:00",
+  "observed_at_utc": "2026-10-09T17:07:50.472496+00:00",
   "training_resume": {
     "checkpoint_step": 55000,
     "checkpoint_epoch": 4.4,
@@ -12651,9 +12731,9 @@
     "interruption_recomputation_complete": true
   },
   "training_progress": {
-    "step": 154078,
-    "epoch": 12.32624,
-    "loss": 0.1371,
+    "step": 158140,
+    "epoch": 12.6512,
+    "loss": 0.1337,
     "loss_scope": "last_logged_training_update_not_full_run_mean",
     "status": "training_running",
     "source_step": 145000,
@@ -12669,18 +12749,18 @@
     "ssh_port": 35016,
     "source_commit": "fb923f8",
     "learning_rate": 2e-05,
-    "observed_at_utc": "2026-10-09T16:25:35.408276+00:00",
-    "grad_norm": 3.7433247566223145,
-    "latest_saved_step": 153750
+    "observed_at_utc": "2026-10-09T17:07:50.472496+00:00",
+    "grad_norm": 3.9413204193115234,
+    "latest_saved_step": 157500
   },
   "evaluation_progress": {
     "gpus": 5,
-    "completed_shards": 337,
+    "completed_shards": 348,
     "resumed": true,
     "archived_incomplete_shards": 24,
     "active_workers": 5,
-    "observed_at_utc": "2026-10-09T16:24:28.355951+00:00",
-    "metrics_snapshot_completed_shards": 337,
+    "observed_at_utc": "2026-10-09T17:07:59.699807+00:00",
+    "metrics_snapshot_completed_shards": 348,
     "metrics_snapshot_note": "Complete shards only, excluding .interrupted. Epoch 11.5 ordinary reference/rollout each 510; both terminal categories still unavailable. Epoch 11 ordinary each 256 and epoch 12 each 64 remain partial.",
     "scheduling_contract": "experiments/flamingo_map_reader/configs/blocks_kv_two_node_continuation.json",
     "queues": {
@@ -12692,8 +12772,8 @@
           0,
           1
         ],
-        "pending_shards": 125,
-        "observed_at_utc": "2026-10-09T16:24:40.054819+00:00"
+        "pending_shards": 133,
+        "observed_at_utc": "2026-10-09T17:08:05.633235+00:00"
       },
       "4090_aux": {
         "host": "10.28.0.80",
@@ -12718,15 +12798,15 @@
           "note": "Cross-machine generation is not token-identical even with aligned Torch/Transformers; the cause of the remaining rollout divergence was not isolated.",
           "transfer_interval_seconds": 600
         },
-        "observed_at_utc": "2026-10-09T16:24:46Z"
+        "observed_at_utc": "2026-10-09T17:05:01Z"
       }
     },
     "assigned_shards": {
       "main": {
-        "3": "step-150000/test_reference/00064_00128",
-        "1": "step-150000/test_rollout/00064_00128",
-        "2": "step-150000/test_reference/00192_00256",
-        "0": "step-150000/test_rollout/00192_00256"
+        "3": "step-156250/test_reference/00000_00064",
+        "2": "step-156250/test_reference/00064_00128",
+        "1": "step-156250/test_rollout/00000_00064",
+        "0": "step-156250/test_rollout/00064_00128"
       }
     },
     "completed_three_task_epochs": [
@@ -12741,9 +12821,9 @@
       10.0
     ],
     "total_expected_shards": 800,
-    "metrics_snapshot_observed_at_utc": "2026-10-09T16:24:28.355951+00:00",
+    "metrics_snapshot_observed_at_utc": "2026-10-09T17:07:59.699807+00:00",
     "continuation_models": "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/training_extension_20epoch/models",
-    "auxiliary_status_observed_at_utc": "2026-10-09T16:24:46Z",
+    "auxiliary_status_observed_at_utc": "2026-10-09T17:05:01Z",
     "auxiliary_status_source": "transfer/artifact_bridge_status.json; direct auxiliary worker assignment not sampled"
   },
   "matched_epoch05_epoch1": {
@@ -24999,36 +25079,43 @@
     "observed_at_utc": "2026-10-09T09:34:42.574038+00:00"
   },
   "eta": {
-    "observed_at_utc": "2026-10-09T16:25:35.408276+00:00",
-    "method": "Training: post-reboot 145621-to-154078 interval. Evaluation: two active rollout GPUs and two active reference GPUs, completed cases by modulo-3 ownership at 16:24:46 UTC, and prior complete auxiliary-shard timings.",
-    "seconds_per_training_update": 0.6299064213077923,
-    "remaining_training_hours": 16.783856595746126,
+    "observed_at_utc": "2026-10-09T17:07:50.472496+00:00",
+    "method": "Training: 154078-to-158140 interval. Evaluation: two active rollout GPUs and two active reference GPUs; complete case ownership and auxiliary generation times sampled in this acceptance.",
+    "seconds_per_training_update": 0.6240926193993107,
+    "remaining_training_hours": 15.92476333833908,
     "training_20epoch_window_beijing": "2026-10-10 16:00-20:00",
     "latest_20epoch_evaluation": "About 2-4 hours after adapter publication with newest-first queue; task lengths can change this.",
-    "remaining_full_table_hours_estimate": 27.800482969751766,
-    "full_05_to_20epoch_table_window_beijing": "2026-10-11 06:00-16:00",
+    "remaining_full_table_hours_estimate": 28.544111389615793,
+    "full_05_to_20epoch_table_window_beijing": "2026-10-11 07:00-17:00",
     "main_seconds_per_case": {
-      "reference": 22.707912818526207,
-      "rollout": 23.40765961795114
+      "reference": 22.947618328689714,
+      "rollout": 24.31652066099238
     },
     "auxiliary_seconds_per_case": {
-      "reference": 18.432138014875818,
-      "rollout": 19.425115906691644
+      "reference": 20.630076243988253,
+      "rollout": 22.16561696416639
     },
-    "auxiliary_timing_observed_at_utc": "2026-10-09T13:51:59.383858+00:00",
+    "auxiliary_timing_observed_at_utc": "2026-10-09T17:07:50.472496+00:00",
     "remaining_hours_by_owner": {
-      "main_rollout": 27.69256175357053,
-      "main_reference_and_terminal": 27.800482969751766,
-      "auxiliary": 25.920013598688982
+      "main_rollout": 27.903207458488758,
+      "main_reference_and_terminal": 27.26182702482081,
+      "auxiliary": 28.544111389615793
     },
     "excludes_4090": false,
     "limitations": "Generation-only estimates omit reload/transfer overhead; windows allow overhead and workload drift. In-progress cases are conservatively counted as remaining. Future adapters must first finish training. Full-table completion differs from latest-checkpoint completion."
   },
   "matched_continuation_epoch10": {
-    "observed_at_utc": "2026-10-09T16:24:28.355951+00:00",
+    "observed_at_utc": "2026-10-09T17:07:59.699807+00:00",
     "method": "Same completed rollout task IDs and numbering variants as each checkpoint mode; intersect with the complete epoch-10 cohort. No new model generation.",
     "reference_step": 125000,
     "checkpoints": {
+      "131250": {
+        "cases": 320,
+        "baseline_reached": 66,
+        "reached": 70,
+        "rescued": 34,
+        "regressed": 30
+      },
       "137500": {
         "cases": 256,
         "baseline_reached": 55,
@@ -25044,11 +25131,164 @@
         "regressed": 42
       },
       "150000": {
-        "cases": 64,
-        "baseline_reached": 18,
-        "reached": 23,
-        "rescued": 12,
-        "regressed": 7
+        "cases": 448,
+        "baseline_reached": 99,
+        "reached": 135,
+        "rescued": 75,
+        "regressed": 39
+      }
+    }
+  },
+  "matched_continuation_epoch115": {
+    "observed_at_utc": "2026-10-09T17:07:59.699807+00:00",
+    "method": "Same complete rollout task IDs and numbering variants; epoch 12 intersected with complete epoch 11.5.",
+    "checkpoint": {
+      "cases": 448,
+      "baseline_step": 143750,
+      "baseline_reached": 125,
+      "reached": 135,
+      "rescued": 52,
+      "regressed": 42
+    }
+  },
+  "stopping_diagnostic": {
+    "observed_at_utc": "2026-10-09T17:08:49.316438+00:00",
+    "definitions": {
+      "initial_goal": "100 independent zero-action tasks with start=current=goal, no preceding execution history.",
+      "conditional_goal_stop_recall": "Valid success control at actual goal / actual reached goal states, in own-history rollout.",
+      "conditional_stop_and_summary_accuracy": "Valid success control and exact Executed actions/Summary lines / actual reached goal states. Does not require whole answer string equality.",
+      "goal_claim_precision": "Actual reached goal among valid success-stop claims; excludes none+done failure control.",
+      "false_success_claim": "Valid success-stop control at a non-goal state; distinguish still reachable from already unreachable."
+    },
+    "checkpoints": {
+      "125000": {
+        "cases": 510,
+        "false_success_claims": 327,
+        "reachable_false_success_claims": 1,
+        "unreachable_false_success_claims": 326,
+        "no_legal_moves_false_success_claims": 200,
+        "goal_states": 109,
+        "valid_goal_stop": 107,
+        "valid_goal_stop_and_summary": 107,
+        "conditional_goal_stop_recall": 0.981651376146789,
+        "conditional_stop_and_summary_accuracy": 0.981651376146789,
+        "goal_claim_precision": 0.2465437788018433
+      },
+      "131250": {
+        "cases": 320,
+        "goal_states": 70,
+        "valid_goal_stop": 69,
+        "valid_goal_stop_and_summary": 69,
+        "false_success_claims": 200,
+        "reachable_false_success_claims": 1,
+        "unreachable_false_success_claims": 199,
+        "no_legal_moves_false_success_claims": 122,
+        "conditional_goal_stop_recall": 0.9857142857142858,
+        "conditional_stop_and_summary_accuracy": 0.9857142857142858,
+        "goal_claim_precision": 0.25650557620817843
+      },
+      "137500": {
+        "cases": 256,
+        "goal_states": 67,
+        "valid_goal_stop": 66,
+        "valid_goal_stop_and_summary": 64,
+        "false_success_claims": 149,
+        "reachable_false_success_claims": 1,
+        "unreachable_false_success_claims": 148,
+        "no_legal_moves_false_success_claims": 99,
+        "conditional_goal_stop_recall": 0.9850746268656716,
+        "conditional_stop_and_summary_accuracy": 0.9552238805970149,
+        "goal_claim_precision": 0.30697674418604654
+      },
+      "143750": {
+        "cases": 510,
+        "false_success_claims": 284,
+        "reachable_false_success_claims": 0,
+        "unreachable_false_success_claims": 284,
+        "no_legal_moves_false_success_claims": 176,
+        "goal_states": 135,
+        "valid_goal_stop": 131,
+        "valid_goal_stop_and_summary": 128,
+        "conditional_goal_stop_recall": 0.9703703703703703,
+        "conditional_stop_and_summary_accuracy": 0.9481481481481482,
+        "goal_claim_precision": 0.3156626506024096
+      },
+      "150000": {
+        "cases": 448,
+        "false_success_claims": 252,
+        "reachable_false_success_claims": 2,
+        "unreachable_false_success_claims": 250,
+        "no_legal_moves_false_success_claims": 166,
+        "goal_states": 135,
+        "valid_goal_stop": 134,
+        "valid_goal_stop_and_summary": 134,
+        "conditional_goal_stop_recall": 0.9925925925925926,
+        "conditional_stop_and_summary_accuracy": 0.9925925925925926,
+        "goal_claim_precision": 0.3471502590673575
+      }
+    },
+    "false_stop_qmap_audit": {
+      "observed_at_utc": "2026-10-09T17:00:06.245602+00:00",
+      "map_checkpoint": "/zhanghanyue/experiment/grounded_llm_qmap_tree_132f5a1/runs/blocks_distance_map/tree_1000_132f5a1/best.pt",
+      "metric": "directed_sum",
+      "method": "Complete saved ordinary rollout answers only; saved exact remaining_shortest labels and CPU-recomputed frozen-map directed distance. No new generation.",
+      "checkpoints": {
+        "125000": {
+          "cases": 510,
+          "false_success_claims": 327,
+          "reachable": 1,
+          "unreachable": 326,
+          "no_legal_moves": 200,
+          "unreachable_with_legal_moves": 126,
+          "qmap_distance": {
+            "count": 327,
+            "minimum": 2.980881452560425,
+            "q25": 6.073431015014648,
+            "median": 8.117825508117676,
+            "q75": 10.27693796157837,
+            "maximum": 18.247682571411133,
+            "mean": 8.360787592167519
+          },
+          "qmap_zero": 0,
+          "differing_cells": {
+            "count": 327,
+            "minimum": 1.0,
+            "q25": 2.0,
+            "median": 3.0,
+            "q75": 4.0,
+            "maximum": 11.0,
+            "mean": 3.146788990825688
+          },
+          "deleted_required_cell": 278
+        },
+        "143750": {
+          "cases": 510,
+          "false_success_claims": 284,
+          "reachable": 0,
+          "unreachable": 284,
+          "no_legal_moves": 176,
+          "unreachable_with_legal_moves": 108,
+          "qmap_distance": {
+            "count": 284,
+            "minimum": 2.6353962421417236,
+            "q25": 5.989356756210327,
+            "median": 7.845367431640625,
+            "q75": 9.789729118347168,
+            "maximum": 15.700215339660645,
+            "mean": 8.106793467427643
+          },
+          "qmap_zero": 0,
+          "differing_cells": {
+            "count": 284,
+            "minimum": 1.0,
+            "q25": 1.75,
+            "median": 3.0,
+            "q75": 4.0,
+            "maximum": 10.0,
+            "mean": 3.0316901408450705
+          },
+          "deleted_required_cell": 238
+        }
       }
     }
   }

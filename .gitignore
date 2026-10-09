@@ -33,9 +33,13 @@ outputs/
 wandb/
 ray_results/
 
+# 归档的失败实现与本地历史备份
+archive/
+
 # 数据集、模型与 checkpoint 不纳入源代码版本控制
 data/raw/
 data/cache/
+data/processed/
 models/
 checkpoints/
 durable/
@@ -46,6 +50,16 @@ durable/
 *.safetensors
 *.parquet
 *.arrow
+*.feather
+*.npy
+*.npz
+*.h5
+*.hdf5
+
+# 原始逐题回答与结果缓存；正式配置、紧凑摘要和报告图仍跟踪
+/experiments/**/results/raw/
+/experiments/**/results/cache/
+/experiments/**/results/cases.jsonl
 
 # 本地文献调研工作区（初筛笔记、下载论文与临时索引）
 literature_review/

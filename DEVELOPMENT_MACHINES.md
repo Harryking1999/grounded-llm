@@ -109,3 +109,15 @@ Reader 模型迁移包含基座、adapter、配置和对应地图；续训需完
 - 实验参数与结果：更新对应实验的 `configs/` 和报告。
 
 Agent 在远端操作前读取本手册，完成后更新新增产物的位置。
+
+## 6. 本地旧工作树归档
+
+2026-10-09 按用户确认，将以下工作树整体移入 Git 忽略的 `D:\Grounded_llm\tmp\archived-worktrees\`，并将分支改为 `codex/archive-*`。提交、源文件、`runs/`、`tmp/` 和已有本地环境均保留，没有删除运行产物。
+
+| 原位置 | 归档目录（上述路径下） | 归档分支 |
+|---|---|---|
+| `D:\Grounded_llm_global_context` | `step2-global-context` | `codex/archive-step2-global-context` |
+| `D:\Grounded_llm_harness` | `experiment-harness` | `codex/archive-experiment-harness` |
+| `D:\Grounded_llm_step2` | `step2-path` | `codex/archive-step2-path` |
+
+这些仍是可恢复的 Git 工作树，不计入当前研究工作区。若需恢复，可用 `git worktree move` 移回原路径；原路径恢复前，不假定旧虚拟环境或记录的绝对路径仍可直接运行。文献报告和 Qwen 基线工作树本轮只核对差异，尚未删除。

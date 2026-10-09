@@ -300,6 +300,8 @@ def main():
     parser = ArgumentParser()
     for arg in ("manifest", "adapter-checkpoint", "model-path", "out"):
         parser.add_argument("--" + arg, required=True, type=Path)
+    parser.add_argument('--source-path-map', type=Path,
+                        help='Explicit source/destination locations for copied artifacts')
     parser.add_argument("--split", choices=("train", "validation", "test", "test_no_solution"), required=True)
     parser.add_argument("--mode", choices=("reference", "rollout"), required=True)
     parser.add_argument("--variants", type=int, default=1)
@@ -325,6 +327,10 @@ def main():
         model_source=str(args.model_path.resolve()),
         map_source=manifest["source_root" if config["task"] == "graph" else "q_checkpoint"]))
     saved_contract = pinned_supervision(saved["contract"])
+    if args.source_path_map:
+        from .artifact_paths import relocate_supervision_paths
+        saved_contract = relocate_supervision_paths(saved_contract,
+            json.loads(args.source_path_map.read_text()))
     if any(saved_contract.get(key) != value for key, value in expected.items()):
         raise ValueError("Adapter and evaluation contracts differ")
     from transformers import AutoModelForCausalLM, AutoTokenizer

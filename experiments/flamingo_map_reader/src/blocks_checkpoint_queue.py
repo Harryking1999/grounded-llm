@@ -37,8 +37,10 @@ def checkpoints(models, continuation_models=None):
 
 
 def gpu_modes(gpus):
-    if len(gpus) not in (2, 3, 4) or len(set(gpus)) != len(gpus) or not all(gpus):
-        raise ValueError('Two to four distinct GPUs are required')
+    if len(gpus) not in (1, 2, 3, 4) or len(set(gpus)) != len(gpus) or not all(gpus):
+        raise ValueError('One to four distinct GPUs are required')
+    if len(gpus) == 1:
+        return {gpus[0]: 'both'}
     if len(gpus) == 2:
         return dict(zip(gpus, ['rollout', 'reference']))
     return dict(zip(gpus, ['rollout', 'rollout', *(['reference'] * (len(gpus) - 2))]))
@@ -50,6 +52,14 @@ def shard_remainders(modulo, text):
             value < 0 or value >= modulo for value in values):
         raise ValueError('Shard remainders must be distinct values in [0, modulo)')
     return values
+
+
+def next_assignment(jobs, gpu_mode, terminal_tasks):
+    assignment = next((i for i, job in enumerate(jobs)
+                       if gpu_mode == 'both' or job[2] == gpu_mode), None)
+    if assignment is None and terminal_tasks:
+        assignment = next((i for i, job in enumerate(jobs) if job[1] != 'test'), None)
+    return assignment
 
 
 def owns_shard(start, shard_tasks, modulo, remainders):
@@ -93,7 +103,7 @@ def validate_resume_contract(previous, current):
         return {key: value for key, value in contract.items()
                 if key not in ('gpus', 'gpu_modes', 'cache_map_kv', 'queue_name',
                                'shard_modulo', 'shard_remainders', 'terminal_tasks',
-                               'continuation_models')}
+                               'continuation_models', 'source_path_map')}
     if experiment(previous) != experiment(current):
         raise ValueError('Existing queue contract differs')
 
@@ -102,6 +112,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--run', type=Path, required=True)
     parser.add_argument('--model-path', type=Path, required=True)
+    parser.add_argument('--source-path-map', type=Path,
+                        help='Explicit artifact relocation passed to each evaluator')
     parser.add_argument('--continuation-models', type=Path,
                         help='Also watch continuation checkpoints; wait for its final before completing')
     parser.add_argument('--gpus', default='0,1,2,3')
@@ -141,6 +153,8 @@ def main():
                     shard_remainders=list(remainders))
     if args.continuation_models:
         contract['continuation_models'] = str(args.continuation_models)
+    if args.source_path_map:
+        contract['source_path_map'] = str(args.source_path_map)
     with FileLock(str(lock_path), timeout=0):
         # A killed queue can leave evaluation workers alive. Do not move their
         # output or launch a second worker against it during a manual restart.
@@ -196,10 +210,7 @@ def main():
             for gpu in contract['gpus']:
                 if gpu in busy or not jobs:
                     continue
-                assignment = next((i for i, job in enumerate(jobs)
-                                   if job[2] == contract['gpu_modes'][gpu]), None)
-                if assignment is None and args.terminal_tasks:
-                    assignment = next((i for i, job in enumerate(jobs) if job[1] != 'test'), None)
+                assignment = next_assignment(jobs, contract['gpu_modes'][gpu], args.terminal_tasks)
                 if assignment is None:
                     continue
                 checkpoint, split, mode, start, stop, key, output = jobs.pop(assignment)
@@ -211,7 +222,8 @@ def main():
                            str(checkpoint['path'] / 'adapter.pt'), '--model-path', str(args.model_path),
                            '--out', str(output), *evaluation_selection(split), '--mode', mode,
                            '--variants', '1', '--start', str(start), '--stop', str(stop)] + (
-                               ['--cache-map-kv'] if args.cache_map_kv else [])
+                               ['--cache-map-kv'] if args.cache_map_kv else []) + (
+                               ['--source-path-map', str(args.source_path_map)] if args.source_path_map else [])
                 log_path = logs / (key.replace('/', '_') + '.log')
                 handle = log_path.open('a')
                 process = subprocess.Popen(command, env=dict(os.environ, CUDA_VISIBLE_DEVICES=gpu),

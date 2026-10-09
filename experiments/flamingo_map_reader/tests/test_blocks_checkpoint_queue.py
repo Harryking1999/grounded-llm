@@ -9,7 +9,7 @@ from unittest.mock import patch
 from experiments.flamingo_map_reader.src.blocks_checkpoint_queue import (
     checkpoints, gpu_modes, validate_resume_contract, evaluation_modes,
     owns_shard, queue_file, shard_remainders, validate_auxiliary_partition,
-    main,
+    main, next_assignment,
 )
 
 
@@ -72,6 +72,17 @@ class CheckpointSelectionTest(unittest.TestCase):
 
 
 class QueueMigrationTest(unittest.TestCase):
+    def test_single_gpu_keeps_newest_first_across_both_modes(self):
+        assignments = gpu_modes(['4'])
+        self.assertEqual(assignments, {'4': 'both'})
+        reference = (None, 'test', 'reference')
+        rollout = (None, 'test', 'rollout')
+        jobs = [reference, rollout]
+        self.assertEqual(next_assignment(jobs, assignments['4'], True), 0)
+        jobs.pop(0)
+        self.assertEqual(next_assignment(jobs, assignments['4'], True), 0)
+        self.assertIsNone(next_assignment([], assignments['4'], True))
+
     def test_source_final_does_not_complete_queue_before_continuation_final(self):
         with tempfile.TemporaryDirectory() as temporary:
             run = Path(temporary)

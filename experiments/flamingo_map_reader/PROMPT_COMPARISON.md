@@ -13,7 +13,7 @@
 | 形状 | 8 种，含二格条 | 同当前 8 种 | 同一套 8 种 | 同一套 8 种 | 10 种：去掉二格条，增加四种 S/Z 形状；编号也改变 |
 | 普通题 | 510 题，最短距离 6–9 步 | 复用同一批 510 题 | 8 块构造的清空题 | 8／12 块构造的清空题 | 8／12 块构造的清空题 |
 | 终止题 | 已达目标 100 题；固定失败上下文 100 题 | 复用这两类各 100 题 | 未设置对应独立类别 | 未设置对应独立类别 | 未设置对应独立类别 |
-| 文本输入 | 初始／目标棋盘；每轮当前棋盘、实际动作历史和全部合法动作 | 初始／当前／目标棋盘、实际动作历史 | 初始棋盘、规则 | 初始棋盘、规则 | 初始棋盘、规则 |
+| 文本输入 | 初始／目标棋盘；每轮当前棋盘、实际动作历史和全部合法动作 | 当前起点／目标棋盘、实际动作历史 | 初始棋盘、规则 | 初始棋盘、规则 | 初始棋盘、规则 |
 | 合法动作候选 | 每轮提供全部候选及临时编号 | 不提供，首步也不提供 | 不提供 | 不提供 | 不提供 |
 | 地图信息 | 当前、目标与各合法后继的 Q 向量，经额外模型接口输入 | 不提供 | 无 | 无 | 无 |
 | 作答方式 | 每轮选择一步，环境执行后更新 | 一次输出全部剩余动作，无中间反馈 | 一次输出完整动作序列 | 一次输出完整动作序列，无中间反馈 | 一次输出完整动作序列，无中间反馈 |
@@ -120,54 +120,37 @@ No solution: no legal moves remain and the goal has not been reached.
 
 ## 3. Astra：一次性输出完整草案，待确认
 
-这是本文整理的待确认版本：复用当前题集和 8 种形状；不提供首步候选、不输入地图、不要求 `board_after`。相对之前给过首步候选的草案，本版取消该信息。**它尚不是已执行的正式配置，也不表示用户已经确认。**
+这是本文整理的待确认版本：复用当前题集和 8 种形状；不提供首步候选、不输入地图、不要求 `board_after`。只提供一个当前起点棋盘和目标棋盘，删去重复的原始棋盘；规则沿用当前 1.5B 的措辞，输出约定压缩为动作 JSON 与终止状态。**它尚不是已执行的正式配置，也不表示用户已经确认。**
 
 普通题从初始棋盘出发；初始已达目标题应直接停止；失败题从固定历史后的真实末态继续判断。失败题输入仅整理实际棋盘与动作历史，不添加示范排序、地图距离、答案标签或“这题无解”的类别提示。剩余动作预算由原评测上限减去已执行动作数，不重新赠送一轮预算。
 
 ### 拟发送的完整 prompt
 
 ```text
-Task: Find a valid sequence of removals from the CURRENT board to the GOAL board.
+Find a valid sequence of removals from the current board to the goal board, as short as you can.
 Reaching the goal is the first priority; among valid solutions, prefer fewer moves.
 
-Rules: The board is a 10x10 binary grid. Each row contains exactly ten binary characters.
-1 means occupied and 0 means empty. Rows and columns are numbered 0 through 9.
-An action is (shape_id, row, col), using the shape's zero-based top-left bounding-box anchor.
-The shape's bounding box must lie inside the board. Every 1-cell of the shape must overlap a CURRENT 1-cell; a legal action changes only those cells to 0.
-The shape's 0-cells are holes: they do not remove or constrain board cells.
-Use only the fixed orientations listed below. Shapes may be reused; there is no gravity or inventory limit.
-Reach the goal board EXACTLY, including all occupied cells that must remain.
-In the shape notation, / separates rows.
-Shapes: 0=11/10, 1=10/11, 2=11/01, 3=01/11, 4=1/1, 5=11, 6=1/1/1, 7=111.
+Rules: The board is a 10x10 binary grid. 1 means occupied and 0 means empty.
+An action remove(shape_id,row,col) removes one listed shape at its zero-based top-left anchor.
+Every occupied shape cell must overlap a currently occupied board cell and lie inside the board.
+Only those cells are removed. Empty shape cells impose no constraint.
+Use only the listed orientations. Shapes may be reused; there is no gravity or inventory limit.
+Reach the goal board exactly, including any occupied cells that must remain.
+Shapes (/ separates rows): 0=11/10; 1=10/11; 2=11/01; 3=01/11; 4=1/1; 5=11; 6=1/1/1; 7=111
 
-Original initial board, rows 0 through 9:
-{INITIAL_BOARD_ROWS}
-
-Current board, rows 0 through 9:
+Current board:
 {CURRENT_BOARD_ROWS}
 
-Goal board, rows 0 through 9:
+Goal board:
 {GOAL_BOARD_ROWS}
 
-Actual already executed actions, in order:
-{EXECUTED_ACTIONS_OR_NONE}
+Actual executed actions: {EXECUTED_ACTIONS_OR_NONE}
+Use at most {REMAINING_ACTION_BUDGET} additional removals.
 
-Remaining action budget: {REMAINING_ACTION_BUDGET} additional removals.
-Begin from the CURRENT board. Do not repeat the already executed actions in your answer.
+Plan the complete remaining sequence from the current board and output it once. There is no intermediate feedback; the judge stops at the first illegal action.
 
-Plan and check the COMPLETE remaining sequence before answering.
-Submit your answer ONCE. There is NO intermediate environment feedback and no opportunity to revise the sequence after execution starts.
-The judge executes your submitted sequence from the current board and stops at the first illegal action.
-Stop your sequence when the goal is reached; do not remove anything after reaching it.
-
-Output only one valid JSON object with exactly two fields: "actions" and "final_status".
-"actions" must be an array in execution order. Each element must contain integer "shape_id", "row", and "col" fields.
-Do not include board_after, a rationale, markdown, or a reasoning transcript.
-
-Use "final_status": "solved" if your submitted sequence reaches the goal exactly within the remaining action budget.
-If the current board already equals the goal, return {"actions":[],"final_status":"solved"}.
-Use "final_status": "no_solution" only if you establish that no legal removal sequence from the current board can reach the goal; return an empty actions array in that case.
-Failure to find a plan, or failure to fit a plan within the remaining budget, is not by itself proof of no solution. In such cases use "final_status": "unsolved"; you may submit a legal partial sequence within the remaining budget.
+Return JSON with "actions" (an array of objects with integer shape_id, row, col) and "final_status" ("solved", "no_solution", or "unsolved").
+Use "solved" when your sequence reaches the goal; if already at the goal, output an empty actions array. Use "no_solution" only when the goal is unreachable, not merely because you could not find a plan within the budget; otherwise use "unsolved".
 ```
 
 ### 相对当前 1.5B，改变了什么
@@ -176,7 +159,7 @@ Failure to find a plan, or failure to fit a plan within the remaining budget, is
 |---|---|---|
 | 物理任务 | 同一批普通题与终止题、同样的目标、形状和规则 | 历史清空题不会被混入这 710 题 |
 | 动作上限 | 沿用当前评测器上限 | 在 prompt 明确写出剩余预算；当前 1.5B 文本没有这句 |
-| 棋盘与历史 | 提供真实起点／当前／目标及已执行动作 | 失败历史压成事实文本，不带示范 assistant 答案 |
+| 棋盘与历史 | 提供真实当前起点、目标及已执行动作 | 不重复原始棋盘；失败历史压成事实文本，不带示范 assistant 答案 |
 | 合法动作 | 仍由同一规则裁判验证 | 不列候选，模型自己判断首步及后续合法性 |
 | 地图 | — | 不输入 Q-map，测纯文本规划 |
 | 交互 | — | 整条序列一次提交，无逐步更新 |

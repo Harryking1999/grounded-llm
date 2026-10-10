@@ -57,7 +57,7 @@ LLM 已有较强的语言理解和推理能力，但在复杂任务中，仍可�
 
 - [研究简述](RESEARCH_BRIEF.md)：当前假设、信息条件和证据边界。
 - [当前实验设计](../experiments/flamingo_map_reader/DESIGN.md)与[本轮报告](../experiments/flamingo_map_reader/results/report.md)：当前分离 K/V 重训协议和结果；[上一轮报告](../experiments/flamingo_map_reader/results/report_long_trajectory.md)记录原两任务成绩。
-- [实验 README](../experiments/flamingo_map_reader/README.md)：代码、运行和汇总入口；[积木地图说明](BLOCKS_QMAP_PLAN.md)：地图来源。
+- [实验 README](../experiments/flamingo_map_reader/README.md)：代码、运行和汇总入口；[积木地图说明](BLOCKS_QMAP_PLAN.md)：地图来源；[终止判断诊断](../experiments/flamingo_map_reader/results/termination_diagnostic.md)：固定终止题与自身执行的差别、指标分母及真实失败例子。
 - [相关工作](../RELATED_WORK.md)与[任务来源](GCML_TASKS.md)：文献和任务依据。
 
 ### 历史证据入口

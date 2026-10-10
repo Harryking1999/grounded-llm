@@ -48,9 +48,13 @@ def build_plan(contract_path, profile, role):
                     '--shard-modulo', str(spec['shard_modulo']),
                     '--shard-remainders', ','.join(map(str, spec['shard_remainders'])),
                     '--continuation-models', str(run / contract['continuation_output'] / 'models')]
-        for flag in ('cache_map_kv', 'terminal_tasks'):
+        for flag in ('cache_map_kv', 'terminal_tasks', 'flexible_modes', 'shared_shard_pool'):
             if spec.get(flag):
                 command.append('--'+flag.replace('_', '-'))
+        if profile.get('resume_running'):
+            command.append('--resume-running')
+        if contract.get('shard_overrides'):
+            command += ['--shard-overrides', json.dumps(contract['shard_overrides'])]
         if profile.get('source_path_map'):
             command += ['--source-path-map', profile['source_path_map']]
     command += ['--model-path', profile['model_path']]

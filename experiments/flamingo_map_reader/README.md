@@ -26,7 +26,7 @@ python -m experiments.flamingo_map_reader.src.retrain_blocks \
 
 完成原预算后的续训使用 `train --resume --epoch-extension`，继续原 optimizer、scheduler 与样本进度，新增权重写入 `training_extension_20epoch/models/`；仅在明确的四卡每卡一条迁移到两卡每卡两条时使用 `--resume-topology`。当前按确认的原四卡每卡一条续训。评测队列通过 `--continuation-models` 同时扫描新增权重并等待新 final；原数据 manifest 与原 `training/models/final` 保留。机器、命令参数和运行目录见平台两节点合同与开发机手册。
 
-单卡辅助队列串行处理 reference 和 rollout；与平台主队列使用同一分片合同并持有互斥的余数。跨机器复制的权重通过 `--source-path-map` 显式映射 manifest、基座与地图位置，配置和任务记录仍严格匹配；逐题输出回传到平台后由主队列统一汇总。
+评测合同的 `flexible_modes` 允许空闲卡领取 reference 或 rollout。共享目录上的平台队列启用 `shared_shard_pool`，通过原子创建 `.worker.claim/` 占位，worker 结束后释放；不依赖跨节点可能失效的 advisory 文件锁。独立目录的辅助队列仍持有独立分片；`shard_overrides` 可将指定步数区间与分片编号转给指定队列。更改归属前先切换让出任务的队列，已完成结果继续复用。跨机器复制的权重通过 `--source-path-map` 显式映射 manifest、基座与地图位置，配置和任务记录仍严格匹配；逐题输出回传到平台后由主队列统一汇总。
 
 续训和协同评测的日常启动使用 `experiment_runner`，直接读取同一份安排合同，不再复制每轮启动脚本。在执行节点准备 Git 外的 runtime profile，仅包含 `workspace_root`、`code_root`、`python`、`model_path`；训练增加 `q_checkpoint`，迁移后的评测增加 `source_path_map`，可选 `log`。路径必须是该节点上的绝对路径，profile 保存在 `runs/<run>/runtime/` 或 `tmp/`，不保存密码。
 
@@ -37,6 +37,8 @@ python -m experiments.flamingo_map_reader.src.experiment_runner plan \
 ```
 
 `plan` 不启动任务；`start` 在 Linux 节点后台调用现有 `train` / `blocks_checkpoint_queue`，记录退出状态，检测现有同目录进程并拒绝重复启动。训练 batch 与 GPU 数必须满足合同；改变拓扑仍需独立的正式迁移合同。已运行的旧入口任务可以用 `status` 读取原状态，无需重启。
+
+调整评测调度时，可在忽略的 runtime profile 中设置 `resume_running: true`。先停止本项目的队列进程、保留评测 worker，再用同一 `start` 入口接续；队列核对原 status 中 PID 的评测模块与输出路径，接管原进程及分片占位，不重跑它们。共享目录上的重启只清理该队列原记录的占位，若另一队列也记录同一分片则拒绝接管。机器重启后的已退出 worker 仍按原规则归档未完成分片再评测。
 
 不共享目录时，传输工具 `artifact_bridge` 独立运行于产物所在的源节点。其 runtime profile 包含 `source_workspace`、`target_workspace`、`jump` / `target`（各有 `host`、`port`、`user`）、`stage_dir`、`known_hosts`、`status` 和可选 `interval_seconds`。正式分片数量和归属仍读取同一个安排合同。基座、地图、数据缓存和显式路径映射须先准备好；工具不安装环境、不启动或重启 GPU 队列。
 

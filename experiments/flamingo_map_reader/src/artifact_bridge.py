@@ -12,7 +12,7 @@ import sys
 import tarfile
 import time
 
-from .blocks_checkpoint_queue import checkpoints, owns_shard
+from .blocks_checkpoint_queue import checkpoints, owns_job
 from .trajectory_queue import atomic_json
 
 
@@ -49,7 +49,8 @@ def missing_owned_shards(source_run, step, contract, training, evaluation):
         split = 'initial_goal' if task.get('filter') else task['split']
         for mode in task.get('modes', [task.get('mode')]):
             for start in range(0, task['tasks'], shard_tasks):
-                if not owns_shard(start, shard_tasks, spec['shard_modulo'], spec['shard_remainders']):
+                if not owns_job(step, start, shard_tasks, spec['shard_modulo'], spec['shard_remainders'],
+                                spec['queue_name'], contract.get('shard_overrides', [])):
                     continue
                 stop = min(start+shard_tasks, task['tasks'])
                 summary = source_run / f'evaluation_half_epoch/step-{step}/{split}_{mode}/{start:05d}_{stop:05d}/summary.json'

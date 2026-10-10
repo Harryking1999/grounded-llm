@@ -74,7 +74,9 @@ Agent 使用相同连接方式，登录后通过 `hostname` 确认主机、`nvid
 
 2026-10-10 用户新增41941用于评测，SSH主机身份为`2ibgniuee46br-0`，三张A800，启动前无实验进程；原训练节点41511已由用户关闭。当前评测总计九卡：35016两卡、41941三卡、4090四卡（预留其0号卡）。正式合同原位加入`additional_evaluation`，三路模9互斥分片：main余数0/1、platform_extra余数2/3/4、4090_aux余数5/6/7/8；普通510题仅有分片索引0–7，余数8用于保持分区完整。新节点共享平台模型、数据、权重与输出目录；其忽略运行配置为`runtime/additional_evaluation_profile.json`，日志`logs/evaluation_41941.log`，状态`runner.additional_evaluation.json`与`evaluation_half_epoch/status.platform_extra.json`。可复用runner新增第三评测角色，源码与合同提交b072a2c，部署于既有code目录；4090相同runner接口同步更新，评测实现保持原条件。切换前仅停止本项目评测队列与未完成worker，完整结果复用，先同步完成标记后启动。artifact_bridge仍在35016每600秒运行；不启动原训练节点。此前mod3的分片分工均作为历史。
 
-平台恢复源码为已提交的 `fb923f8`，部署于 `code/blocks_restart_fb923f8/`；训练与评测通过可复用 `experiment_runner` 启动。该提交增加延长训练中途断点的恢复校验，原 warmup 保持 6250 步；数据、地图、监督目标和评测实现沿用原条件。4090 保留 `code/ce8b3b7/` 的辅助评测进程。
+2026-10-10 按用户“平衡、尽快完成”要求，九张评测卡均改为按空闲情况领取reference或rollout。35016与41941的五张卡共享平台待评池，原子创建分片占位目录保证互斥；已验证41941无法重复领取35016正在评测的分片，未采用在该共享目录上失效的跨节点advisory锁。正式合同的shard_overrides将早期权重的部分辅助分片转给平台；具体区间、编号与队列读取合同，不在本手册复制参数。4090其余任务仍独立、0号卡继续预留。切换使用experiment_runner及runtime profile中的resume_running，核对后接续原九个worker，无需重跑；新增源码已部署到既有平台与4090代码目录。评测条件与文件同步入口保持原条件。
+
+平台恢复源码基于已提交的 `fb923f8`，部署于 `code/blocks_restart_fb923f8/`，随后原位部署本仓库可复用调度修改；训练与评测通过 `experiment_runner` 启动。原 warmup 保持 6250 步；数据、地图、监督目标和评测实现沿用原条件。4090 保留 `code/ce8b3b7/` 路径，并原位部署相同调度接口。
 
 平台运行目录的 `runtime/{training,evaluation,bridge}_profile.json` 保存路径和显式恢复断点，不含密码；实际进程状态分别在 `runner.training.json`、`runner.evaluation.json`，训练进展仍读 `training_extension_20epoch/logs/train.jsonl`。本次训练、主评测日志为 `logs/training_35016_resume_fb923f8.log`、`logs/evaluation_41511_resume_fb923f8.log`。恢复前的 continuation/status 副本保存在 `runtime/`，两卡尝试仍保留于 `training_extension_20epoch_two_gpu_retired_343506c/`。重启中断且没有完成摘要的评测分片由原队列保留为 `.interrupted.*` 后重做，完整分片直接复用。
 

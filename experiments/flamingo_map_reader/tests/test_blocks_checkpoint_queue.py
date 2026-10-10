@@ -9,7 +9,7 @@ from unittest.mock import patch
 from experiments.flamingo_map_reader.src.blocks_checkpoint_queue import (
     checkpoints, gpu_modes, validate_resume_contract, evaluation_modes,
     owns_shard, queue_file, shard_remainders, validate_auxiliary_partition,
-    main, next_assignment,
+    main, next_assignment, claim_shard, ExistingProcess, owns_job,
 )
 
 
@@ -72,6 +72,51 @@ class CheckpointSelectionTest(unittest.TestCase):
 
 
 class QueueMigrationTest(unittest.TestCase):
+    def test_override_transfers_early_backlog_without_changing_recent_or_other_shards(self):
+        rules=[dict(steps=[6250,62500], indices=[5], queues=['main','extra'])]
+        for step, index, platform, auxiliary in [(6250,5,True,False), (62500,5,True,False),
+                (68750,5,False,True), (6250,6,False,True), (6250,0,True,False)]:
+            self.assertEqual(owns_job(step,index*64,64,9,[0,1,2,3,4],'main',rules),platform)
+            self.assertEqual(owns_job(step,index*64,64,9,[5,6,7,8],'aux',rules),auxiliary)
+
+    def test_shared_claim_excludes_second_worker_and_preserves_completed_output(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = Path(temporary)/'step-1/test_rollout/00000_00064'
+            lock = claim_shard(output)
+            self.assertIsNotNone(lock)
+            self.assertIsNone(claim_shard(output))
+            lock.release()
+            second = claim_shard(output)
+            self.assertIsNotNone(second)
+            second.release()
+            output.mkdir()
+            (output/'summary.json').write_text('{}')
+            self.assertIsNone(claim_shard(output))
+
+    def test_overlapping_pool_requires_explicit_shared_locking_on_both_queues(self):
+        primary = dict(run='same', shard_modulo=9, shard_remainders=[0,1,2,3,4],
+                       shared_shard_pool=True, flexible_modes=True)
+        validate_auxiliary_partition(primary, dict(primary, queue_name='extra'))
+        with self.assertRaises(ValueError):
+            validate_auxiliary_partition(primary, dict(primary, shared_shard_pool=False))
+
+    def test_adopted_worker_identity_and_completion_are_verified(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            output = Path(temporary)
+            argv = ['python', '-m', 'experiments.flamingo_map_reader.src.trajectory_eval',
+                    '--out', str(output)]
+            identity = ('\0'.join(argv)+'\0').encode()
+            with patch('pathlib.Path.read_bytes', return_value=identity):
+                worker = ExistingProcess(123, output)
+                self.assertIsNone(worker.poll())
+            with patch('pathlib.Path.read_bytes', side_effect=FileNotFoundError):
+                self.assertEqual(worker.poll(), 1)
+                (output/'summary.json').write_text('{}')
+                self.assertEqual(worker.poll(), 0)
+            with patch('pathlib.Path.read_bytes', return_value=b'other\0process\0'):
+                with self.assertRaises(ValueError):
+                    ExistingProcess(123, output)
+
     def test_single_gpu_keeps_newest_first_across_both_modes(self):
         assignments = gpu_modes(['4'])
         self.assertEqual(assignments, {'4': 'both'})

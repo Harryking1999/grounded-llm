@@ -66,6 +66,13 @@ def owns_shard(start, shard_tasks, modulo, remainders):
     return (start // shard_tasks) % modulo in remainders
 
 
+def owns_job(step, start, shard_tasks, modulo, remainders, queue_name, overrides):
+    for rule in overrides:
+        if rule['steps'][0] <= step <= rule['steps'][1] and start // shard_tasks in rule['indices']:
+            return queue_name in rule['queues']
+    return owns_shard(start, shard_tasks, modulo, remainders)
+
+
 def queue_file(root, name, queue_name):
     if not re.fullmatch(r'[a-z0-9][a-z0-9_-]*', queue_name):
         raise ValueError('Queue name must contain only lowercase letters, digits, _ or -')
@@ -75,9 +82,61 @@ def queue_file(root, name, queue_name):
 
 def validate_auxiliary_partition(primary, auxiliary):
     validate_resume_contract(primary, auxiliary)
-    if primary.get('shard_modulo', 1) != auxiliary['shard_modulo'] or set(
-            primary.get('shard_remainders', [0])) & set(auxiliary['shard_remainders']):
+    overlap = set(primary.get('shard_remainders', [0])) & set(auxiliary['shard_remainders'])
+    shared = primary.get('shared_shard_pool') and auxiliary.get('shared_shard_pool')
+    if primary.get('shard_modulo', 1) != auxiliary['shard_modulo'] or (overlap and not shared):
         raise ValueError('Auxiliary queue must own disjoint shards with the same modulo')
+
+
+class ShardClaim:
+    """Atomic directory creation works across hosts where advisory locks do not."""
+
+    def __init__(self, path):
+        self.path = path
+
+    def release(self):
+        self.path.rmdir()
+
+
+def claim_shard(output):
+    """Claim an output until its worker finishes, including across NFS clients."""
+    output.parent.mkdir(parents=True, exist_ok=True)
+    path = output.with_name(output.name + '.worker.claim')
+    try:
+        path.mkdir()
+    except FileExistsError:
+        return None
+    lock = ShardClaim(path)
+    if (output / 'summary.json').is_file():
+        lock.release()
+        return None
+    return lock
+
+
+class ExistingProcess:
+    """Observe a verified worker across a queue restart without restarting it."""
+
+    def __init__(self, pid, output):
+        self.pid, self.output = pid, output
+        self.command_file = Path(f'/proc/{pid}/cmdline')
+        self.identity = self.command_file.read_bytes()
+        argv = self.identity.decode().split('\0')
+        if ('experiments.flamingo_map_reader.src.trajectory_eval' not in argv or
+                '--out' not in argv or argv[argv.index('--out') + 1] != str(output)):
+            raise ValueError(f'Worker {pid} does not own {output}')
+
+    def poll(self):
+        try:
+            if self.command_file.read_bytes() == self.identity:
+                return None
+        except FileNotFoundError:
+            pass
+        return 0 if (self.output / 'summary.json').is_file() else 1
+
+    def wait(self):
+        while self.poll() is None:
+            time.sleep(1)
+        return self.poll()
 
 
 def evaluation_modes(checkpoint, manifest, terminal_tasks=False):
@@ -103,7 +162,8 @@ def validate_resume_contract(previous, current):
         return {key: value for key, value in contract.items()
                 if key not in ('gpus', 'gpu_modes', 'cache_map_kv', 'queue_name',
                                'shard_modulo', 'shard_remainders', 'terminal_tasks',
-                               'continuation_models', 'source_path_map')}
+                               'continuation_models', 'source_path_map', 'flexible_modes',
+                               'shared_shard_pool', 'resume_running', 'shard_overrides')}
     if experiment(previous) != experiment(current):
         raise ValueError('Existing queue contract differs')
 
@@ -126,12 +186,26 @@ def main():
                         help='Reuse unchanged map projections within each generation')
     parser.add_argument('--terminal-tasks', action='store_true',
                         help='Evaluate zero-step and fixed failure-context tasks at every half epoch')
+    parser.add_argument('--flexible-modes', action='store_true',
+                        help='All GPUs can take either evaluation mode')
+    parser.add_argument('--shared-shard-pool', action='store_true',
+                        help='Coordinate overlapping ownership through shared-filesystem shard locks')
+    parser.add_argument('--resume-running', action='store_true',
+                        help='Adopt verified workers recorded by this queue instead of rerunning them')
+    parser.add_argument('--shard-overrides', default='[]',
+                        help='JSON routing rules: steps [min,max], indices, and allowed queue names')
     args = parser.parse_args()
     manifest_path = args.run / 'data/manifest.json'
     manifest = json.loads(manifest_path.read_text())
     gpus = args.gpus.split(',')
     assignments = gpu_modes(gpus)
+    if args.flexible_modes:
+        assignments = {gpu: 'both' for gpu in gpus}
     remainders = shard_remainders(args.shard_modulo, args.shard_remainders)
+    overrides = json.loads(args.shard_overrides)
+    for rule in overrides:
+        if len(rule['steps']) != 2 or rule['steps'][0] > rule['steps'][1] or not rule['queues'] or not rule['indices']:
+            raise ValueError('Invalid shard routing override')
     count = sum(record['split'] == 'test' for record in manifest['records'])
     if manifest['config']['task'] != 'blocks' or count != 510:
         raise ValueError(f'Expected blocks main test with 510 tasks, found {count}')
@@ -151,15 +225,47 @@ def main():
                     terminal_tasks=args.terminal_tasks,
                     queue_name=args.queue_name, shard_modulo=args.shard_modulo,
                     shard_remainders=list(remainders))
+    contract.update(flexible_modes=args.flexible_modes, shared_shard_pool=args.shared_shard_pool,
+                    shard_overrides=overrides)
     if args.continuation_models:
         contract['continuation_models'] = str(args.continuation_models)
     if args.source_path_map:
         contract['source_path_map'] = str(args.source_path_map)
     with FileLock(str(lock_path), timeout=0):
+        busy, failures = {}, []
+        if args.resume_running and status_path.exists():
+            for gpu, worker in json.loads(status_path.read_text()).get('running', {}).items():
+                output = root / worker['key']
+                # The preceding queue has exited. Release only its recorded
+                # claim, and never a key now recorded by another queue.
+                if args.shared_shard_pool:
+                    other_keys = {w['key'] for p in root.glob('status*.json') if p != status_path
+                                  for w in json.loads(p.read_text()).get('running', {}).values()}
+                    if worker['key'] in other_keys:
+                        raise RuntimeError(f'Another queue owns recorded worker: {worker["key"]}')
+                    old_claim = output.with_name(output.name + '.worker.claim')
+                    if old_claim.is_dir():
+                        old_claim.rmdir()
+                if (output / 'summary.json').is_file():
+                    continue
+                if gpu not in gpus:
+                    raise ValueError(f'Cannot adopt worker on removed GPU {gpu}')
+                if not Path(f"/proc/{worker['pid']}/cmdline").exists():
+                    continue
+                process = ExistingProcess(worker['pid'], output)
+                lock = claim_shard(output) if args.shared_shard_pool else None
+                if args.shared_shard_pool and lock is None:
+                    if (output / 'summary.json').is_file():
+                        continue
+                    raise RuntimeError(f'Worker output already claimed: {output}')
+                busy[gpu] = dict(process=process, log=open(os.devnull, 'w'),
+                                 output=output, key=worker['key'], shard_lock=lock)
         # A killed queue can leave evaluation workers alive. Do not move their
         # output or launch a second worker against it during a manual restart.
         for command_file in Path('/proc').glob('[0-9]*/cmdline'):
             if command_file.parent.name == str(os.getpid()):
+                continue
+            if int(command_file.parent.name) in {w['process'].pid for w in busy.values()}:
                 continue
             try:
                 command_line = command_file.read_bytes().replace(b'\0', b' ').decode(errors='replace')
@@ -173,13 +279,14 @@ def main():
         if previous.is_file():
             validate_resume_contract(json.loads(previous.read_text()), contract)
         atomic_json(previous, contract)
-        busy, failures = {}, []
         while True:
             for gpu, running in list(busy.items()):
                 code = running['process'].poll()
                 if code is None:
                     continue
                 running['log'].close()
+                if running.get('shard_lock'):
+                    running['shard_lock'].release()
                 if code or not (running['output'] / 'summary.json').is_file():
                     failures.append(dict(key=running['key'], exit_code=code))
                 del busy[gpu]
@@ -188,10 +295,20 @@ def main():
                 for running in busy.values():
                     running['process'].wait()
                     running['log'].close()
+                    if running.get('shard_lock'):
+                        running['shard_lock'].release()
                 atomic_json(status_path, dict(status='failed', failures=failures))
                 raise RuntimeError(f'Evaluation failed: {failures}')
             published = checkpoints(args.run / 'training/models', args.continuation_models)
             jobs = []
+            reserved = set()
+            if args.shared_shard_pool:
+                # Protect old workers during a rolling queue migration too.
+                for other_status in root.glob('status*.json'):
+                    if other_status == status_path:
+                        continue
+                    state = json.loads(other_status.read_text())
+                    reserved.update(w['key'] for w in state.get('running', {}).values())
             completed = 0
             missing = 0
             for checkpoint in published:
@@ -204,8 +321,9 @@ def main():
                             completed += 1
                         else:
                             missing += 1
-                            if owns_shard(start, contract['shard_tasks'], args.shard_modulo, remainders) and not any(
-                                    value['key'] == key for value in busy.values()):
+                            if owns_job(checkpoint['step'], start, contract['shard_tasks'], args.shard_modulo,
+                                        remainders, args.queue_name, overrides) and not any(
+                                    value['key'] == key for value in busy.values()) and key not in reserved:
                                 jobs.append((checkpoint, split, mode, start, stop, key, output))
             for gpu in contract['gpus']:
                 if gpu in busy or not jobs:
@@ -213,6 +331,19 @@ def main():
                 assignment = next_assignment(jobs, contract['gpu_modes'][gpu], args.terminal_tasks)
                 if assignment is None:
                     continue
+                shard_lock = None
+                if args.shared_shard_pool:
+                    candidates = list(range(len(jobs))) if contract['gpu_modes'][gpu] == 'both' else [
+                        i for i, job in enumerate(jobs)
+                        if job[2] == contract['gpu_modes'][gpu] or (args.terminal_tasks and job[1] != 'test')]
+                    assignment = None
+                    for i in candidates:
+                        shard_lock = claim_shard(jobs[i][-1])
+                        if shard_lock is not None:
+                            assignment = i
+                            break
+                    if assignment is None:
+                        continue
                 checkpoint, split, mode, start, stop, key, output = jobs.pop(assignment)
                 if output.exists():
                     stamp = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')
@@ -229,7 +360,8 @@ def main():
                 process = subprocess.Popen(command, env=dict(os.environ, CUDA_VISIBLE_DEVICES=gpu),
                                            stdout=handle, stderr=subprocess.STDOUT,
                                            stdin=subprocess.DEVNULL)
-                busy[gpu] = dict(process=process, log=handle, output=output, key=key)
+                busy[gpu] = dict(process=process, log=handle, output=output, key=key,
+                                 shard_lock=shard_lock)
             # Use the same aggregate as the official evaluator for full checkpoint results.
             for checkpoint in (published if args.queue_name == 'main' else []):
                 for split, mode, tasks in evaluation_modes(checkpoint, manifest, args.terminal_tasks):

@@ -30191,31 +30191,98 @@
     "observed_at_utc": "2026-10-09T09:34:42.574038+00:00"
   },
   "eta": {
-    "observed_at_utc": "2026-10-10T07:31:46.578381+00:00",
-    "method": "Training: measured post-restart step interval. Primary evaluation: one rollout GPU and one reference GPU; auxiliary: one GPU. Complete-case timing and ownership, not old four-GPU throughput.",
-    "seconds_per_training_update": 0.6020846979865773,
-    "remaining_training_hours": 1.4356375131991053,
-    "main_seconds_per_case": {
-      "rollout": 23.884143885919855,
-      "reference": 23.696631352032817
+    "observed_at_utc": "2026-10-10T11:16:37.557303+00:00",
+    "status": "nine_gpu_estimate",
+    "method": "Current mod9 ownership, unfinished task counts minus active saved cases; current platform worker generation timing and recent imported auxiliary timing. No extrapolation from historical mod3 ownership.",
+    "remaining_training_hours": 0,
+    "raw_complete_shards": 526,
+    "expected_shards": 800,
+    "pending_cases_by_owner": {
+      "aux": {
+        "test_rollout": 3404,
+        "test_reference": 3282
+      },
+      "main": {
+        "initial_goal_reference": 2728,
+        "test_no_solution_reference": 2728,
+        "test_rollout": 345,
+        "test_reference": 266
+      },
+      "extra": {
+        "test_rollout": 1437,
+        "test_reference": 1551
+      }
     },
-    "auxiliary_seconds_per_case": {
-      "rollout": 21.085194910129985,
-      "reference": 19.94202263244306
+    "current_platform_timing": {
+      "step-231250/test_reference/00064_00128": {
+        "node": "main",
+        "gpu": "1",
+        "cases": 54,
+        "seconds": 1262.2495647463948,
+        "seconds_per_case": 23.37499193974805
+      },
+      "step-225000/test_rollout/00000_00064": {
+        "node": "main",
+        "gpu": "0",
+        "cases": 39,
+        "seconds": 939.3821541965008,
+        "seconds_per_case": 24.08672190247438
+      },
+      "step-231250/test_rollout/00192_00256": {
+        "node": "extra",
+        "gpu": "0",
+        "cases": 60,
+        "seconds": 1234.9918140317313,
+        "seconds_per_case": 20.583196900528854
+      },
+      "step-237500/test_reference/00256_00320": {
+        "node": "extra",
+        "gpu": "2",
+        "cases": 49,
+        "seconds": 1211.4027267482597,
+        "seconds_per_case": 24.722504627515505
+      },
+      "step-231250/test_rollout/00256_00320": {
+        "node": "extra",
+        "gpu": "1",
+        "cases": 39,
+        "seconds": 948.145957673667,
+        "seconds_per_case": 24.311434812145308
+      }
     },
-    "remaining_hours_by_owner": {
-      "main_rollout": 38.267706092773814,
-      "main_reference_and_terminal": 38.12784389179257,
-      "auxiliary": 12.024488947797543
+    "recent_auxiliary_and_terminal_timing": {
+      "initial_goal_reference": {
+        "cases": 300,
+        "seconds": 567.836554992944,
+        "seconds_per_case": 1.8927885166431466
+      },
+      "test_rollout": {
+        "cases": 892,
+        "seconds": 17354.500508651137,
+        "seconds_per_case": 19.455718059025937
+      },
+      "test_no_solution_reference": {
+        "cases": 300,
+        "seconds": 306.7505899751559,
+        "seconds_per_case": 1.022501966583853
+      },
+      "test_reference": {
+        "cases": 700,
+        "seconds": 13406.772898368537,
+        "seconds_per_case": 19.152532711955054
+      }
     },
-    "remaining_full_table_hours_estimate": 38.267706092773814,
+    "ideal_generation_hours": {
+      "platform_extra_reference": 10.651279077021263,
+      "auxiliary_longest_mode": 9.198231149017262
+    },
     "full_table_hours_window": [
-      45,
-      57
+      12,
+      16
     ],
-    "full_05_to_20epoch_table_window_beijing": "10-12 12:37 to 10-13 00:37",
-    "limitations": "Previous numeric estimates describe the historical 2+1 GPU topology. Training is complete and original node closed; re-estimate after observing all three current queues (2+3+4 GPUs).",
-    "status": "historical_only_pending_nine_gpu_estimate"
+    "full_05_to_20epoch_table_window_beijing": "2026-10-11 07:20 to 11:20",
+    "latest_20epoch_missing_shards": [],
+    "limitations": "Assumes existing nodes stay available. Includes reload/transfer and timing variation allowance. Direct local jump-host SSH timed out; auxiliary running status comes from the bridge 2026-10-10T11:09:34Z, rates from imported completed cases. Auxiliary outstanding counts conservatively omit current unimported completions. Raw completed shards are newer than accepted metric snapshot; do not mix sample sizes."
   },
   "matched_continuation_epoch10": {
     "observed_at_utc": "2026-10-10T10:57:56.983165+00:00",

@@ -11,7 +11,7 @@ import sys
 from .trajectory_queue import atomic_json
 
 MODULE = 'experiments.flamingo_map_reader.src.'
-ROLES = ('training', 'evaluation', 'auxiliary_evaluation')
+ROLES = ('training', 'evaluation', 'additional_evaluation', 'auxiliary_evaluation')
 
 
 def build_plan(contract_path, profile, role):

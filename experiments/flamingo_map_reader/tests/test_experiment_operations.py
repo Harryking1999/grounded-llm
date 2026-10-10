@@ -32,13 +32,25 @@ class LaunchPlanTest(unittest.TestCase):
     def test_queues_keep_disjoint_shards_and_auxiliary_relocation(self):
         profile = self.profile(Path('/runtime'))
         profile['source_path_map'] = '/runtime/relocation.json'
-        for role, expected in [('evaluation', '0,1'), ('auxiliary_evaluation', '2')]:
-            command = build_plan(CONTRACT, profile, role)['command']
-            self.assertEqual(command[command.index('--shard-modulo')+1], '3')
+        ownership = set()
+        status_paths = set()
+        for role, expected in [('evaluation', '0,1'), ('additional_evaluation', '2,3,4'),
+                               ('auxiliary_evaluation', '5,6,7,8')]:
+            plan = build_plan(CONTRACT, profile, role)
+            command = plan['command']
+            self.assertEqual(command[command.index('--shard-modulo')+1], '9')
             self.assertEqual(command[command.index('--shard-remainders')+1], expected)
+            owned = set(map(int, expected.split(',')))
+            self.assertFalse(ownership & owned)
+            ownership.update(owned)
+            self.assertNotIn(plan['status_path'], status_paths)
+            status_paths.add(plan['status_path'])
             self.assertIn('--cache-map-kv', command)
             self.assertIn('--terminal-tasks', command)
             self.assertIn('/runtime/relocation.json', command)
+        self.assertEqual(ownership, set(range(9)))
+        extra = build_plan(CONTRACT, profile, 'additional_evaluation')
+        self.assertTrue(extra['native_status'].endswith('status.platform_extra.json'))
 
     def test_runtime_resume_checkpoint_keeps_budget_and_output(self):
         profile = self.profile(Path('/runtime'))
@@ -125,10 +137,10 @@ class TransferPublicationTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             run = Path(directory)
             self.assertTrue(missing_owned_shards(run, 125000, contract, training, evaluation))
-            # Auxiliary owns ordinary shards 2 and 5; each terminal task has only two shards.
+            # Auxiliary owns ordinary shards 5, 6 and 7; terminal shards belong to primary.
             for mode in ('reference', 'rollout'):
-                for start in (128, 320):
-                    shard = run/f'evaluation_half_epoch/step-125000/test_{mode}/{start:05d}_{start+64:05d}'
+                for start in (320, 384, 448):
+                    shard = run/f'evaluation_half_epoch/step-125000/test_{mode}/{start:05d}_{min(start+64,510):05d}'
                     shard.mkdir(parents=True)
                     (shard/'summary.json').write_text('{}')
             self.assertFalse(missing_owned_shards(run, 125000, contract, training, evaluation))

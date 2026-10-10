@@ -1,12 +1,12 @@
 # 开发机使用手册
 
-更新：2026-10-09。平台、028 和 4090 的 SSH 登录已验证；028、4090 已配置本机公钥。本轮已按平台 → login02 → 4090 完成模型、地图、评测数据与 adapter 中转。
+更新：2026-10-10。平台、028 和 4090 的 SSH 登录已验证；028、4090 已配置本机公钥。本轮已按平台 → login02 → 4090 完成模型、地图、评测数据与 adapter 中转。
 
 ## 1. 机器概览
 
 | 机器 | 用途 | 使用约定 |
 |---|---|---|
-| 原人工智能平台 | 当前训练、评测；开发环境共享 `/zhanghanyue` | 环境变更后，从平台页面确认 SSH 端口 |
+| 原人工智能平台 | 当前评测；开发环境共享 `/zhanghanyue` | 环境变更后，从平台页面确认 SSH 端口 |
 | 028：8 张 H100 80GB | 后续训练 | 10 月 12 日以后使用；崔涵需要 6–8 卡训练时协调释放资源 |
 | 4090：本次识别到 5 张卡 | 推理、评测 | 按用户最新指令预留 0 号卡，本轮使用 1–4 号卡评测 |
 | login02 登录节点 | 028 连接入口及文件中转 | 仅用于登录和传输 |
@@ -20,10 +20,11 @@
 **原平台**：本机已配置 SSH 密钥。
 
 ```powershell
-# 当前续训环境：4 张 A800，每卡 batch=1
-ssh -p 41511 root@172.16.78.10
-# 当前主评测环境：2 张 A100
+# 主评测环境：2 张 A100
 ssh -p 35016 root@172.16.78.10
+# 新增评测环境：3 张 A800
+ssh -p 41941 root@172.16.78.10
+# 原训练环境41511已完成20 epoch并由用户关闭，不再恢复
 ```
 
 本机别名 `grounded-dev` 当前仍指向 35016（现为主评测环境）。密钥和连接配置位于 `%USERPROFILE%\.ssh\`。
@@ -70,6 +71,8 @@ Agent 使用相同连接方式，登录后通过 `hostname` 确认主机、`nvid
 2026-10-10 用户再次重启两节点后，按“四卡节点继续训练”调整：41511 的四张 A800 从最新完整 `checkpoint-236250`（18.9 epoch）续训，35016 的两张 A100 主评测，一路 rollout、一路 reference。35016 当前环境名为 `20261010143741`，旧环境 `20261009224734` 不再作为恢复目标；41511 环境仍为 `20261009175224`。端口均不变。停机前日志 236281 步，未保存的 31 步重跑；optimizer、scheduler、trainer state 和四份 RNG 全部恢复。artifact_bridge 随主评测迁至 35016，仍每 600 秒经 login02 同步。当前日志为 `logs/training_41511_resume_fb923f8.log`、`logs/evaluation_35016_resume_fb923f8.log`，runtime profile 原位更新。以下旧机器分工和日志名称仅作为历史。
 
 2026-10-10 按用户授权检查扩卡时，原四卡 vLLM 服务已自行退出，0–3 号卡显存均为0，无需杀进程或删除部署。预留0号卡，4090评测改用1–4号卡（两路rollout、两路reference）。主节点35016保持两卡，分片改为模3余数0；4090持有余数1/2。切换时仅停止本项目旧队列和未完成worker，完整summary保留；先同步全部完成标记与缺少的adapter，再通过现有experiment_runner启动四卡辅助队列。4090仍使用ce8b3b7评测实现，仅部署仓库现有experiment_runner与正式两节点合同；运行路径保存于忽略的runtime/auxiliary_evaluation_profile.json。artifact_bridge在35016恢复，仍每600秒同步。41511已正常退出训练（runner returncode=0），20 epoch final adapter与evaluation_ready.json均已生成；不会再恢复此轮训练。以下单卡4090规则仅作为历史。
+
+2026-10-10 用户新增41941用于评测，SSH主机身份为`2ibgniuee46br-0`，三张A800，启动前无实验进程；原训练节点41511已由用户关闭。当前评测总计九卡：35016两卡、41941三卡、4090四卡（预留其0号卡）。正式合同原位加入`additional_evaluation`，三路模9互斥分片：main余数0/1、platform_extra余数2/3/4、4090_aux余数5/6/7/8；普通510题仅有分片索引0–7，余数8用于保持分区完整。新节点共享平台模型、数据、权重与输出目录；其忽略运行配置为`runtime/additional_evaluation_profile.json`，日志`logs/evaluation_41941.log`，状态`runner.additional_evaluation.json`与`evaluation_half_epoch/status.platform_extra.json`。可复用runner新增第三评测角色，源码与合同提交b072a2c，部署于既有code目录；4090相同runner接口同步更新，评测实现保持原条件。切换前仅停止本项目评测队列与未完成worker，完整结果复用，先同步完成标记后启动。artifact_bridge仍在35016每600秒运行；不启动原训练节点。此前mod3的分片分工均作为历史。
 
 平台恢复源码为已提交的 `fb923f8`，部署于 `code/blocks_restart_fb923f8/`；训练与评测通过可复用 `experiment_runner` 启动。该提交增加延长训练中途断点的恢复校验，原 warmup 保持 6250 步；数据、地图、监督目标和评测实现沿用原条件。4090 保留 `code/ce8b3b7/` 的辅助评测进程。
 

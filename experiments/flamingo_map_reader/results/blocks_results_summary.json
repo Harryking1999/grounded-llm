@@ -16460,11 +16460,11 @@
     "completion_evidence": "runner.training.json returncode=0 and final adapter.pt/evaluation_ready.json; native status.json remains stale running"
   },
   "evaluation_progress": {
-    "gpus": 6,
+    "gpus": 9,
     "completed_shards": 472,
     "resumed": true,
     "archived_incomplete_shards": 27,
-    "active_workers": 6,
+    "active_workers": 9,
     "observed_at_utc": "2026-10-10T07:30:17.637848+00:00",
     "metrics_snapshot_completed_shards": 472,
     "metrics_snapshot_note": "Complete shards only, excluding .interrupted. All per-mode sample sizes are retained; incomplete epochs must not be compared as full cohorts.",
@@ -16473,20 +16473,23 @@
       "main": {
         "ssh_port": 35016,
         "status": "running",
-        "shard_modulo": 3,
+        "shard_modulo": 9,
         "shard_remainders": [
-          0
+          0,
+          1
         ],
-        "pending_shards": 135,
+        "pending_shards": 128,
         "observed_at_utc": "2026-10-10T07:30:27.166615+00:00"
       },
       "4090_aux": {
         "host": "10.28.0.80",
         "status": "running",
-        "shard_modulo": 3,
+        "shard_modulo": 9,
         "shard_remainders": [
-          1,
-          2
+          5,
+          6,
+          7,
+          8
         ],
         "source_commit": "ce8b3b7",
         "runtime": {
@@ -16510,18 +16513,40 @@
           3,
           4
         ]
+      },
+      "platform_extra": {
+        "ssh_port": 41941,
+        "gpus": [
+          0,
+          1,
+          2
+        ],
+        "status": "running",
+        "queue_name": "platform_extra",
+        "shard_modulo": 9,
+        "shard_remainders": [
+          2,
+          3,
+          4
+        ],
+        "pending_shards": 49
       }
     },
     "assigned_shards": {
       "main": {
-        "0": "step-243750/test_rollout/00192_00256",
-        "1": "step-243750/test_reference/00192_00256"
+        "0": "step-231250/test_rollout/00064_00128",
+        "1": "step-250000/test_no_solution_reference/00000_00064"
+      },
+      "platform_extra": {
+        "0": "step-237500/test_rollout/00192_00256",
+        "1": "step-237500/test_rollout/00256_00320",
+        "2": "step-237500/test_reference/00192_00256"
       },
       "4090_aux": {
-        "1": "step-243750/test_rollout/00256_00320",
-        "2": "step-243750/test_rollout/00448_00510",
-        "3": "step-243750/test_reference/00128_00192",
-        "4": "step-243750/test_reference/00256_00320"
+        "1": "step-250000/test_rollout/00384_00448",
+        "2": "step-243750/test_rollout/00384_00448",
+        "3": "step-250000/test_reference/00384_00448",
+        "4": "step-243750/test_reference/00320_00384"
       }
     },
     "completed_three_task_epochs": [
@@ -16540,8 +16565,9 @@
     "continuation_models": "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/training_extension_20epoch/models",
     "auxiliary_status_observed_at_utc": "2026-10-10T07:28:46Z",
     "auxiliary_status_source": "Direct auxiliary SSH verified in preceding check; current running status from artifact_bridge synchronization snapshot.",
-    "scheduling_observed_at_utc": "2026-10-10T09:05:10Z",
-    "scheduling_note": "Primary GPUs0/1 own modulo3 remainder0; auxiliary GPUs1/2/3/4 own remainder1/2. GPU0 on auxiliary host reserved. Complete metrics snapshot remains 472 shards, not refreshed during topology change."
+    "scheduling_observed_at_utc": "2026-10-10T10:29:24Z",
+    "scheduling_note": "Nine GPUs on three disjoint modulo9 queues; original training node41511 completed and closed by user. Metrics snapshot remains 472 accepted shards; live queue completeness is not a new metrics acceptance.",
+    "scheduling_source_commit": "b072a2c"
   },
   "matched_epoch05_epoch1": {
     "test_reference": {
@@ -28819,8 +28845,8 @@
       57
     ],
     "full_05_to_20epoch_table_window_beijing": "10-12 12:37 to 10-13 00:37",
-    "limitations": "Previous numeric estimates describe the old 2+1 GPU topology and are historical only; training is now complete. Re-estimate evaluation after observing the 2+4 GPU queues.",
-    "status": "superseded_by_auxiliary_four_gpu_expansion"
+    "limitations": "Previous numeric estimates describe the historical 2+1 GPU topology. Training is complete and original node closed; re-estimate after observing all three current queues (2+3+4 GPUs).",
+    "status": "superseded_by_nine_gpu_three_queue_expansion"
   },
   "matched_continuation_epoch10": {
     "observed_at_utc": "2026-10-10T07:30:17.637848+00:00",

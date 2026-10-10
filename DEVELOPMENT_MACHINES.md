@@ -20,13 +20,13 @@
 **原平台**：本机已配置 SSH 密钥。
 
 ```powershell
-# 当前续训环境：4 张 A100，每卡 batch=1
-ssh -p 35016 root@172.16.78.10
-# 当前主评测环境：4 张 A800
+# 当前续训环境：4 张 A800，每卡 batch=1
 ssh -p 41511 root@172.16.78.10
+# 当前主评测环境：2 张 A100
+ssh -p 35016 root@172.16.78.10
 ```
 
-训练环境另有本机别名 `grounded-dev`（当前指向 35016）。密钥和连接配置位于 `%USERPROFILE%\.ssh\`。
+本机别名 `grounded-dev` 当前仍指向 35016（现为主评测环境）。密钥和连接配置位于 `%USERPROFILE%\.ssh\`。
 
 **028、4090**：本机已配置连接别名及公钥，私钥保留在本机。
 
@@ -66,6 +66,8 @@ Agent 使用相同连接方式，登录后通过 `hostname` 确认主机、`nvid
 2026-10-09 最初在 35016、40327 合用八卡评测；随后端口改为 41511，并先尝试两卡续训。用户最终将 41511 扩为四张 A800，确认每卡 batch=1，从本轮 10 epoch 完整断点续训到 20 epoch；35016 两张 A100 改为主评测，4090 的 4 号卡辅助评测。正式安排仍见 `experiments/flamingo_map_reader/configs/blocks_kv_two_node_continuation.json`：主、辅助分别持有分片索引模 3 的余数 0/1、2，结果回到同一平台 `evaluation_half_epoch/`。旧八卡队列与两卡尝试作为历史保留。
 
 2026-10-09 两节点重启后，按用户确认交换分工：35016 四张 A100 续训，41511 四张 A800 主评测（两路 rollout、两路 reference）；每卡 batch=1、全局 batch=4，继续到原定 20 epoch。最新完整断点为 `training_extension_20epoch/models/checkpoint-145000/`（11.6 epoch），含 optimizer、scheduler、trainer state 和四份 RNG。重启前日志到 146221 步，最后未保存的约 1221 步从断点重跑；原 10 epoch final、所有完整 checkpoint 和已完成评测分片保留。平台与 4090 的分片余数仍为 0/1、2。
+
+2026-10-10 用户再次重启两节点后，按“四卡节点继续训练”调整：41511 的四张 A800 从最新完整 `checkpoint-236250`（18.9 epoch）续训，35016 的两张 A100 主评测，一路 rollout、一路 reference。35016 当前环境名为 `20261010143741`，旧环境 `20261009224734` 不再作为恢复目标；41511 环境仍为 `20261009175224`。端口均不变。停机前日志 236281 步，未保存的 31 步重跑；optimizer、scheduler、trainer state 和四份 RNG 全部恢复。artifact_bridge 随主评测迁至 35016，仍每 600 秒经 login02 同步。当前日志为 `logs/training_41511_resume_fb923f8.log`、`logs/evaluation_35016_resume_fb923f8.log`，runtime profile 原位更新。以下旧机器分工和日志名称仅作为历史。
 
 平台恢复源码为已提交的 `fb923f8`，部署于 `code/blocks_restart_fb923f8/`；训练与评测通过可复用 `experiment_runner` 启动。该提交增加延长训练中途断点的恢复校验，原 warmup 保持 6250 步；数据、地图、监督目标和评测实现沿用原条件。4090 保留 `code/ce8b3b7/` 的辅助评测进程。
 

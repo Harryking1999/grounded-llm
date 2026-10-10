@@ -8,7 +8,7 @@
 |---|---|---|
 | 原人工智能平台 | 当前训练、评测；开发环境共享 `/zhanghanyue` | 环境变更后，从平台页面确认 SSH 端口 |
 | 028：8 张 H100 80GB | 后续训练 | 10 月 12 日以后使用；崔涵需要 6–8 卡训练时协调释放资源 |
-| 4090：本次识别到 5 张卡 | 推理、评测 | 预留 1–2 张卡供其他使用者使用，其余空闲卡可用 |
+| 4090：本次识别到 5 张卡 | 推理、评测 | 按用户最新指令预留 0 号卡，本轮使用 1–4 号卡评测 |
 | login02 登录节点 | 028 连接入口及文件中转 | 仅用于登录和传输 |
 
 [平台入口](https://172.16.78.10:32206/index.html?#/developEnv)：业务管理 → 开发环境 → SSH 查看。
@@ -68,6 +68,8 @@ Agent 使用相同连接方式，登录后通过 `hostname` 确认主机、`nvid
 2026-10-09 两节点重启后，按用户确认交换分工：35016 四张 A100 续训，41511 四张 A800 主评测（两路 rollout、两路 reference）；每卡 batch=1、全局 batch=4，继续到原定 20 epoch。最新完整断点为 `training_extension_20epoch/models/checkpoint-145000/`（11.6 epoch），含 optimizer、scheduler、trainer state 和四份 RNG。重启前日志到 146221 步，最后未保存的约 1221 步从断点重跑；原 10 epoch final、所有完整 checkpoint 和已完成评测分片保留。平台与 4090 的分片余数仍为 0/1、2。
 
 2026-10-10 用户再次重启两节点后，按“四卡节点继续训练”调整：41511 的四张 A800 从最新完整 `checkpoint-236250`（18.9 epoch）续训，35016 的两张 A100 主评测，一路 rollout、一路 reference。35016 当前环境名为 `20261010143741`，旧环境 `20261009224734` 不再作为恢复目标；41511 环境仍为 `20261009175224`。端口均不变。停机前日志 236281 步，未保存的 31 步重跑；optimizer、scheduler、trainer state 和四份 RNG 全部恢复。artifact_bridge 随主评测迁至 35016，仍每 600 秒经 login02 同步。当前日志为 `logs/training_41511_resume_fb923f8.log`、`logs/evaluation_35016_resume_fb923f8.log`，runtime profile 原位更新。以下旧机器分工和日志名称仅作为历史。
+
+2026-10-10 按用户授权检查扩卡时，原四卡 vLLM 服务已自行退出，0–3 号卡显存均为0，无需杀进程或删除部署。预留0号卡，4090评测改用1–4号卡（两路rollout、两路reference）。主节点35016保持两卡，分片改为模3余数0；4090持有余数1/2。切换时仅停止本项目旧队列和未完成worker，完整summary保留；先同步全部完成标记与缺少的adapter，再通过现有experiment_runner启动四卡辅助队列。4090仍使用ce8b3b7评测实现，仅部署仓库现有experiment_runner与正式两节点合同；运行路径保存于忽略的runtime/auxiliary_evaluation_profile.json。artifact_bridge在35016恢复，仍每600秒同步。41511已正常退出训练（runner returncode=0），20 epoch final adapter与evaluation_ready.json均已生成；不会再恢复此轮训练。以下单卡4090规则仅作为历史。
 
 平台恢复源码为已提交的 `fb923f8`，部署于 `code/blocks_restart_fb923f8/`；训练与评测通过可复用 `experiment_runner` 启动。该提交增加延长训练中途断点的恢复校验，原 warmup 保持 6250 步；数据、地图、监督目标和评测实现沿用原条件。4090 保留 `code/ce8b3b7/` 的辅助评测进程。
 

@@ -16434,11 +16434,11 @@
     "interruption_recomputation_complete": true
   },
   "training_progress": {
-    "step": 241416,
-    "epoch": 19.31328,
+    "step": 250000,
+    "epoch": 20.0,
     "loss": 0.1277,
     "loss_scope": "last_logged_training_update_not_full_run_mean",
-    "status": "training_running",
+    "status": "completed",
     "source_step": 236250,
     "source_epochs": 18.9,
     "target_step": 250000,
@@ -16454,14 +16454,17 @@
     "learning_rate": 2e-05,
     "observed_at_utc": "2026-10-10T07:31:46.578381+00:00",
     "grad_norm": 8.563067436218262,
-    "latest_saved_step": 241250
+    "latest_saved_step": 250000,
+    "completed_at_utc": "2026-10-10T09:03:39.932610+00:00",
+    "final_adapter_exists": true,
+    "completion_evidence": "runner.training.json returncode=0 and final adapter.pt/evaluation_ready.json; native status.json remains stale running"
   },
   "evaluation_progress": {
-    "gpus": 3,
+    "gpus": 6,
     "completed_shards": 472,
     "resumed": true,
     "archived_incomplete_shards": 27,
-    "active_workers": 3,
+    "active_workers": 6,
     "observed_at_utc": "2026-10-10T07:30:17.637848+00:00",
     "metrics_snapshot_completed_shards": 472,
     "metrics_snapshot_note": "Complete shards only, excluding .interrupted. All per-mode sample sizes are retained; incomplete epochs must not be compared as full cohorts.",
@@ -16472,18 +16475,17 @@
         "status": "running",
         "shard_modulo": 3,
         "shard_remainders": [
-          0,
-          1
+          0
         ],
-        "pending_shards": 261,
+        "pending_shards": 135,
         "observed_at_utc": "2026-10-10T07:30:27.166615+00:00"
       },
       "4090_aux": {
         "host": "10.28.0.80",
-        "gpu": 4,
         "status": "running",
         "shard_modulo": 3,
         "shard_remainders": [
+          1,
           2
         ],
         "source_commit": "ce8b3b7",
@@ -16501,13 +16503,25 @@
           "note": "Cross-machine generation is not token-identical even with aligned Torch/Transformers; the cause of the remaining rollout divergence was not isolated.",
           "transfer_interval_seconds": 600
         },
-        "observed_at_utc": "2026-10-10T07:28:46Z"
+        "observed_at_utc": "2026-10-10T07:28:46Z",
+        "gpus": [
+          1,
+          2,
+          3,
+          4
+        ]
       }
     },
     "assigned_shards": {
       "main": {
-        "1": "step-237500/test_reference/00000_00064",
-        "0": "step-237500/test_rollout/00000_00064"
+        "0": "step-243750/test_rollout/00192_00256",
+        "1": "step-243750/test_reference/00192_00256"
+      },
+      "4090_aux": {
+        "1": "step-243750/test_rollout/00256_00320",
+        "2": "step-243750/test_rollout/00448_00510",
+        "3": "step-243750/test_reference/00128_00192",
+        "4": "step-243750/test_reference/00256_00320"
       }
     },
     "completed_three_task_epochs": [
@@ -16525,7 +16539,9 @@
     "metrics_snapshot_observed_at_utc": "2026-10-10T07:30:17.637848+00:00",
     "continuation_models": "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/training_extension_20epoch/models",
     "auxiliary_status_observed_at_utc": "2026-10-10T07:28:46Z",
-    "auxiliary_status_source": "Direct auxiliary SSH verified in preceding check; current running status from artifact_bridge synchronization snapshot."
+    "auxiliary_status_source": "Direct auxiliary SSH verified in preceding check; current running status from artifact_bridge synchronization snapshot.",
+    "scheduling_observed_at_utc": "2026-10-10T09:05:10Z",
+    "scheduling_note": "Primary GPUs0/1 own modulo3 remainder0; auxiliary GPUs1/2/3/4 own remainder1/2. GPU0 on auxiliary host reserved. Complete metrics snapshot remains 472 shards, not refreshed during topology change."
   },
   "matched_epoch05_epoch1": {
     "test_reference": {
@@ -28803,7 +28819,8 @@
       57
     ],
     "full_05_to_20epoch_table_window_beijing": "10-12 12:37 to 10-13 00:37",
-    "limitations": "Assumes uninterrupted nodes and current task timing; reload, synchronization, future checkpoint publication and task drift can delay completion. Latest checkpoint completion differs from full-table completion."
+    "limitations": "Previous numeric estimates describe the old 2+1 GPU topology and are historical only; training is now complete. Re-estimate evaluation after observing the 2+4 GPU queues.",
+    "status": "superseded_by_auxiliary_four_gpu_expansion"
   },
   "matched_continuation_epoch10": {
     "observed_at_utc": "2026-10-10T07:30:17.637848+00:00",

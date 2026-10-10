@@ -18485,11 +18485,11 @@
     "completion_evidence": "runner.training.json returncode=0 and final adapter.pt/evaluation_ready.json; native status.json remains stale running"
   },
   "evaluation_progress": {
-    "gpus": 9,
+    "gpus": 8,
     "completed_shards": 565,
     "resumed": true,
     "archived_incomplete_shards": 32,
-    "active_workers": 9,
+    "active_workers": 8,
     "observed_at_utc": "2026-10-10T12:27:13.225568+00:00",
     "metrics_snapshot_completed_shards": 565,
     "metrics_snapshot_note": "Complete shards only, excluding .interrupted. All per-mode sample sizes are retained; incomplete epochs must not be compared as full cohorts.",
@@ -18498,26 +18498,24 @@
       "main": {
         "ssh_port": 35016,
         "status": "running",
-        "shard_modulo": 9,
+        "shard_modulo": 2,
         "shard_remainders": [
+          0
+        ],
+        "observed_at_utc": "2026-10-10T18:43:54Z",
+        "gpus": [
           0,
           1,
           2,
-          3,
-          4
-        ],
-        "pending_shards": 163,
-        "observed_at_utc": "2026-10-10T12:27:18.249490+00:00"
+          3
+        ]
       },
       "4090_aux": {
         "host": "10.28.0.80",
         "status": "running",
-        "shard_modulo": 9,
+        "shard_modulo": 2,
         "shard_remainders": [
-          5,
-          6,
-          7,
-          8
+          1
         ],
         "source_commit": "ce8b3b7",
         "runtime": {
@@ -18534,7 +18532,7 @@
           "note": "Cross-machine generation is not token-identical even with aligned Torch/Transformers; the cause of the remaining rollout divergence was not isolated.",
           "transfer_interval_seconds": 600
         },
-        "observed_at_utc": "2026-10-10T12:19:53Z",
+        "observed_at_utc": "2026-10-10T18:43:54Z",
         "gpus": [
           1,
           2,
@@ -18549,29 +18547,21 @@
           1,
           2
         ],
-        "status": "running",
+        "status": "retired",
         "queue_name": "platform_extra",
-        "shard_modulo": 9,
+        "shard_modulo": 2,
         "shard_remainders": [
-          0,
-          1,
-          2,
-          3,
-          4
+          0
         ],
-        "pending_shards": 163,
-        "observed_at_utc": "2026-10-10T12:27:24.736902+00:00"
+        "observed_at_utc": "2026-10-10T18:43:54Z"
       }
     },
     "assigned_shards": {
       "main": {
-        "1": "step-218750/test_rollout/00064_00128",
-        "0": "step-218750/test_rollout/00192_00256"
-      },
-      "platform_extra": {
-        "2": "step-225000/test_reference/00256_00320",
-        "1": "step-218750/test_rollout/00256_00320",
-        "0": "step-218750/test_reference/00192_00256"
+        "2": "step-162500/test_rollout/00256_00320",
+        "3": "step-162500/test_reference/00256_00320",
+        "0": "step-162500/initial_goal_reference/00000_00064",
+        "1": "step-156250/test_no_solution_reference/00000_00064"
       }
     },
     "completed_three_task_epochs": [
@@ -18592,11 +18582,11 @@
     "total_expected_shards": 800,
     "metrics_snapshot_observed_at_utc": "2026-10-10T12:27:13.225568+00:00",
     "continuation_models": "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/training_extension_20epoch/models",
-    "auxiliary_status_observed_at_utc": "2026-10-10T12:19:53Z",
-    "auxiliary_status_source": "Latest artifact_bridge synchronization snapshot; no direct auxiliary SSH check in this acceptance.",
-    "scheduling_observed_at_utc": "2026-10-10T10:29:24Z",
-    "scheduling_note": "Nine GPUs on three disjoint modulo9 queues; original training node41511 completed and closed by user. Metrics snapshot remains 472 accepted shards; live queue completeness is not a new metrics acceptance.",
-    "scheduling_source_commit": "b072a2c"
+    "auxiliary_status_observed_at_utc": "2026-10-10T18:43:54Z",
+    "auxiliary_status_source": "Direct SSH launch verification; all four workers generating cases. Frozen metric acceptance timestamp remains separate.",
+    "scheduling_observed_at_utc": "2026-10-10T18:43:54Z",
+    "scheduling_note": "35016 four GPUs and4090 GPUs1-4 restored;41941 disabled. Scheduling follows the current formal contract;695 generated/imported complete shards are not a new metrics acceptance. Accepted metrics remain565 shards.",
+    "generated_complete_shards": 695
   },
   "matched_epoch05_epoch1": {
     "test_reference": {
@@ -30851,32 +30841,34 @@
     "observed_at_utc": "2026-10-09T09:34:42.574038+00:00"
   },
   "eta": {
-    "observed_at_utc": "2026-10-10T11:37:04.602197+00:00",
-    "status": "balanced_nine_gpu_estimate",
+    "observed_at_utc": "2026-10-10T18:43:54Z",
+    "status": "restored_eight_gpu_rough_estimate",
     "remaining_training_hours": 0,
-    "raw_complete_shards": 538,
+    "raw_complete_shards": 695,
     "expected_shards": 800,
     "pending_cases_by_pool": {
-      "platform/test_rollout": 2471,
-      "aux/test_rollout": 2446,
-      "platform/test_reference": 2444,
-      "aux/test_reference": 2514,
-      "platform/initial_goal_reference": 2628,
-      "platform/test_no_solution_reference": 2628
+      "aux/test_rollout": 960,
+      "platform/test_rollout": 704,
+      "aux/test_reference": 768,
+      "platform/test_reference": 576,
+      "platform/initial_goal_reference": 1088,
+      "aux/initial_goal_reference": 468,
+      "platform/test_no_solution_reference": 960,
+      "aux/test_no_solution_reference": 468
     },
     "ideal_generation_hours": {
-      "platform_five_gpus": 6.978965743884475,
-      "auxiliary_four_gpus": 6.648482889599475
+      "platform_four_gpus": 2.417777777777778,
+      "auxiliary_four_gpus": 2.41
     },
-    "method": "Current routing including early shard5/6 reassignment. Platform ordinary cases approximately24s; auxiliary recent completed cases approximately19s; terminal timing retained. All GPUs accept either mode; platform shares atomically claimed shards.",
+    "method": "Current formal routing; historical ordinary case times24s platform and19s auxiliary, terminal allowance2s. Estimate includes outstanding full shards, conservatively ignoring partial progress.",
     "full_table_hours_window": [
-      8,
-      10
+      3,
+      4
     ],
-    "full_05_to_20epoch_table_window_beijing": "2026-10-11 03:40 to 05:40",
-    "transferred_pending_shards": 24,
-    "transferred_pending_cases": 1536,
-    "limitations": "Estimate made at the earlier 538-shard scheduling snapshot; the current metric acceptance is separately timestamped. Assumes nodes remain available. Auxiliary unfinished counts conservatively include saved but unimported cases; allowance includes loading and synchronization."
+    "full_05_to_20epoch_table_window_beijing": "2026-10-11 05:44 to 06:44",
+    "transferred_pending_shards": 11,
+    "transferred_pending_cases": 704,
+    "limitations": "Rough estimate after restoring eight GPUs; assumes both nodes remain online. Includes allowance for model loading and600s artifact synchronization. Raw generated/imported completeness is distinct from the frozen565-shard metric acceptance."
   },
   "matched_continuation_epoch10": {
     "observed_at_utc": "2026-10-10T12:27:13.225568+00:00",

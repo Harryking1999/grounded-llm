@@ -6,10 +6,10 @@
   "source_checkpoint": "training/models/checkpoint-125000",
   "continuation_output": "training_extension_20epoch",
   "training": {"ssh_port": 41511, "gpus": "0,1,2,3", "per_device_batch_size": 1, "global_batch_size": 4},
-  "evaluation": {"ssh_port": 35016, "gpus": "0,1", "queue_name": "main", "shard_modulo": 9, "shard_remainders": [0, 1, 2, 3, 4], "cache_map_kv": true, "terminal_tasks": true, "flexible_modes": true, "shared_shard_pool": true},
-  "additional_evaluation": {"ssh_port": 41941, "gpus": "0,1,2", "queue_name": "platform_extra", "shard_modulo": 9, "shard_remainders": [0, 1, 2, 3, 4], "cache_map_kv": true, "terminal_tasks": true, "flexible_modes": true, "shared_shard_pool": true},
-  "auxiliary_evaluation": {"ssh_alias": "grounded-4090", "gpus": "1,2,3,4", "queue_name": "4090_aux", "shard_modulo": 9, "shard_remainders": [5, 6, 7, 8], "cache_map_kv": true, "terminal_tasks": true, "flexible_modes": true},
-  "shard_overrides": [{"steps": [6250, 62500], "indices": [5, 6], "queues": ["main", "platform_extra"]}],
-  "checkpoint_priority": "newest first; all nine GPUs accept either mode; platform shares locked shards and takes early shard-5/6 backlog from auxiliary",
+  "evaluation": {"ssh_port": 35016, "gpus": "0,1,2,3", "queue_name": "main", "shard_modulo": 2, "shard_remainders": [0], "cache_map_kv": true, "terminal_tasks": true, "flexible_modes": true, "shared_shard_pool": true},
+  "additional_evaluation": {"enabled": false, "ssh_port": 41941, "gpus": "0,1,2", "queue_name": "platform_extra", "shard_modulo": 2, "shard_remainders": [0], "cache_map_kv": true, "terminal_tasks": true, "flexible_modes": true, "shared_shard_pool": true},
+  "auxiliary_evaluation": {"ssh_alias": "grounded-4090", "gpus": "1,2,3,4", "queue_name": "4090_aux", "shard_modulo": 2, "shard_remainders": [1], "cache_map_kv": true, "terminal_tasks": true, "flexible_modes": true},
+  "shard_overrides": [{"steps": [6250, 156250], "indices": [4], "queues": ["4090_aux"]}],
+  "checkpoint_priority": "newest first; two four-GPU queues use disjoint even/odd shards, with early shard4 backlog transferred to auxiliary for balance",
   "preserve_source_final": true
 }

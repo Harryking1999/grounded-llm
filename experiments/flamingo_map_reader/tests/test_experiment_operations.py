@@ -34,11 +34,10 @@ class LaunchPlanTest(unittest.TestCase):
         profile['source_path_map'] = '/runtime/relocation.json'
         ownership = set()
         status_paths = set()
-        for role, expected in [('evaluation', '0,1,2,3,4'), ('additional_evaluation', '0,1,2,3,4'),
-                               ('auxiliary_evaluation', '5,6,7,8')]:
+        for role, expected in [('evaluation', '0'), ('auxiliary_evaluation', '1')]:
             plan = build_plan(CONTRACT, profile, role)
             command = plan['command']
-            self.assertEqual(command[command.index('--shard-modulo')+1], '9')
+            self.assertEqual(command[command.index('--shard-modulo')+1], '2')
             self.assertEqual(command[command.index('--shard-remainders')+1], expected)
             owned = set(map(int, expected.split(',')))
             if role == 'auxiliary_evaluation':
@@ -52,11 +51,12 @@ class LaunchPlanTest(unittest.TestCase):
             self.assertIn('--cache-map-kv', command)
             self.assertIn('--terminal-tasks', command)
             self.assertIn('--flexible-modes', command)
-            self.assertIn('--shard-overrides', command)
             self.assertIn('/runtime/relocation.json', command)
-        self.assertEqual(ownership, set(range(9)))
-        extra = build_plan(CONTRACT, profile, 'additional_evaluation')
-        self.assertTrue(extra['native_status'].endswith('status.platform_extra.json'))
+        self.assertEqual(ownership, {0,1})
+        self.assertEqual(build_plan(CONTRACT,profile,'evaluation')['command'][
+            build_plan(CONTRACT,profile,'evaluation')['command'].index('--gpus')+1], '0,1,2,3')
+        with self.assertRaisesRegex(ValueError, 'disabled'):
+            build_plan(CONTRACT, profile, 'additional_evaluation')
 
     def test_runtime_resume_checkpoint_keeps_budget_and_output(self):
         profile = self.profile(Path('/runtime'))
@@ -120,6 +120,8 @@ class LocalSFTP:
 class TransferPublicationTest(unittest.TestCase):
     def test_transferred_early_shards_do_not_block_auxiliary_completion(self):
         contract = json.loads(CONTRACT.read_text())
+        contract['auxiliary_evaluation'].update(shard_modulo=9,shard_remainders=[5,6,7,8])
+        contract['shard_overrides']=[dict(steps=[6250,62500],indices=[5,6],queues=['main','platform_extra'])]
         training = json.loads((CONFIGS/contract['source_training_contract']).read_text())
         evaluation = json.loads((CONFIGS/contract['evaluation_contract']).read_text())
         with tempfile.TemporaryDirectory() as directory:
@@ -156,12 +158,16 @@ class TransferPublicationTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             run = Path(directory)
             self.assertTrue(missing_owned_shards(run, 125000, contract, training, evaluation))
-            # Auxiliary owns ordinary shards 5, 6 and 7; terminal shards belong to primary.
+            # Auxiliary owns odd indices plus the transferred early ordinary shard.
             for mode in ('reference', 'rollout'):
-                for start in (320, 384, 448):
+                for start in (64, 192, 256, 320, 448):
                     shard = run/f'evaluation_half_epoch/step-125000/test_{mode}/{start:05d}_{min(start+64,510):05d}'
                     shard.mkdir(parents=True)
                     (shard/'summary.json').write_text('{}')
+            for mode in ('initial_goal_reference','test_no_solution_reference'):
+                shard=run/f'evaluation_half_epoch/step-125000/{mode}/00064_00100'
+                shard.mkdir(parents=True)
+                (shard/'summary.json').write_text('{}')
             self.assertFalse(missing_owned_shards(run, 125000, contract, training, evaluation))
 
 

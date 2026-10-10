@@ -17,6 +17,8 @@ ROLES = ('training', 'evaluation', 'additional_evaluation', 'auxiliary_evaluatio
 def build_plan(contract_path, profile, role):
     contract = json.loads(contract_path.read_text(encoding='utf-8'))
     spec = contract[role]
+    if spec.get('enabled') is False:
+        raise ValueError(f'{role} is disabled in the current execution contract')
     code = Path(profile['code_root'])
     run = Path(profile['workspace_root']) / 'runs' / contract['run']
     configs = code / 'experiments/flamingo_map_reader/configs'

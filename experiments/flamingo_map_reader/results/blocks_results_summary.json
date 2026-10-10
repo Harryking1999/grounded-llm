@@ -15094,306 +15094,689 @@
       "epoch": 16.5,
       "modes": {
         "test_reference": {
-          "cases": 128,
+          "cases": 448,
           "groups": {
-            "same_initial_board_new_pair": 128
+            "same_initial_board_new_pair": 255,
+            "new_initial_board": 193
           },
           "reached": 0,
           "success": 0,
-          "safe": 744,
-          "solvable_decisions": 820,
+          "safe": 2503,
+          "solvable_decisions": 2810,
           "all_decisions": {
-            "decisions": 1045,
-            "map_minimum": 532,
-            "legal": 1041,
-            "ndcg_inverse_rank_at_10": 0.8134429299491512,
-            "ndcg_minmax_distance_at_10": 0.9397174848990474,
-            "ndcg_inverse_rank_at_1": 0.6493100598245609,
-            "ndcg_minmax_distance_at_1": 0.9171729196254195,
-            "ndcg_inverse_distance_at_10": 0.9576867031437908,
-            "ndcg_inverse_distance_at_1": 0.9319338876654576,
-            "equal_distance_states": 75,
-            "single_candidate_states": 75,
+            "single_candidate_states": 248,
+            "ndcg_inverse_distance_at_10": 0.9475611673107559,
             "normalized_distance_baselines": {
               "ndcg_minmax_distance_at_10": {
-                "random": 0.7269165592559935,
-                "reverse": 0.4150087522299375
+                "reverse": 0.41083577218536116,
+                "random": 0.7252514021571639
               },
               "ndcg_minmax_distance_at_1": {
-                "random": 0.5890289486132408,
-                "reverse": 0.07177033492822966
+                "reverse": 0.06956521739130436,
+                "random": 0.5885525372984554
               }
-            }
+            },
+            "ndcg_minmax_distance_at_1": 0.9012486377033191,
+            "ndcg_minmax_distance_at_10": 0.9280937400282847,
+            "legal": 3530,
+            "decisions": 3565,
+            "equal_distance_states": 248,
+            "map_minimum": 1656,
+            "ndcg_inverse_distance_at_1": 0.9162852522894797,
+            "ndcg_inverse_rank_at_1": 0.6206850914496003,
+            "ndcg_inverse_rank_at_10": 0.7947884614328415
           },
           "termination": {
-            "done_outputs": 89,
-            "done_at_goal": 86,
-            "goal_claims": 88,
-            "correct_goal_claims": 85,
-            "goal_states": 86,
+            "done_at_goal": 301,
             "no_solution_states": 0,
-            "correct_no_solution": 0
+            "done_outputs": 332,
+            "correct_no_solution": 0,
+            "correct_goal_claims": 297,
+            "goal_states": 305,
+            "goal_claims": 328
           },
           "source_shards": [
             "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-206250/test_reference/00000_00064",
-            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-206250/test_reference/00064_00128"
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-206250/test_reference/00064_00128",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-206250/test_reference/00128_00192",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-206250/test_reference/00192_00256",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-206250/test_reference/00256_00320",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-206250/test_reference/00320_00384",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-206250/test_reference/00384_00448"
           ],
           "first_round": {
-            "cases": 128,
-            "safe": 120,
-            "map_minimum": 41,
+            "cases": 448,
+            "safe": 374,
+            "map_minimum": 118,
             "chosen_id_histogram": {
-              "36": 2,
-              "30": 4,
-              "17": 2,
-              "57": 2,
-              "25": 3,
-              "49": 2,
-              "56": 1,
-              "11": 2,
-              "26": 3,
-              "19": 3,
-              "41": 3,
-              "22": 3,
-              "44": 3,
-              "38": 5,
-              "43": 3,
-              "15": 4,
-              "13": 5,
-              "39": 1,
-              "14": 2,
-              "35": 6,
-              "31": 3,
-              "2": 5,
-              "63": 2,
-              "23": 1,
-              "42": 2,
-              "3": 7,
+              "36": 7,
+              "30": 6,
+              "17": 17,
+              "57": 5,
+              "25": 9,
+              "49": 5,
+              "56": 2,
+              "11": 7,
+              "26": 11,
+              "19": 6,
+              "41": 12,
+              "22": 13,
+              "44": 4,
+              "38": 14,
+              "43": 8,
+              "15": 8,
+              "13": 10,
+              "39": 5,
+              "14": 4,
+              "35": 13,
+              "31": 8,
+              "2": 14,
+              "63": 6,
+              "23": 4,
+              "42": 6,
+              "3": 24,
               "77": 1,
-              "28": 1,
-              "1": 2,
-              "34": 2,
-              "12": 2,
-              "6": 3,
-              "46": 2,
-              "4": 6,
-              "33": 2,
+              "28": 4,
+              "1": 23,
+              "34": 9,
+              "12": 9,
+              "6": 8,
+              "46": 9,
+              "4": 17,
+              "33": 10,
               "55": 2,
-              "37": 2,
-              "53": 1,
-              "16": 2,
+              "37": 5,
+              "53": 4,
+              "16": 6,
               "66": 2,
-              "18": 2,
-              "5": 1,
-              "32": 4,
-              "21": 3,
+              "18": 6,
+              "5": 6,
+              "32": 7,
+              "21": 10,
               "76": 1,
-              "40": 1,
+              "40": 4,
               "9": 1,
               "45": 1,
-              "24": 1,
-              "7": 1,
-              "20": 1,
-              "50": 1,
-              "47": 1
+              "24": 8,
+              "7": 4,
+              "20": 8,
+              "50": 3,
+              "47": 4,
+              "48": 6,
+              "51": 4,
+              "61": 1,
+              "10": 8,
+              "8": 4,
+              "90": 1,
+              "54": 4,
+              "60": 1,
+              "62": 3,
+              "64": 2,
+              "None": 1,
+              "81": 1,
+              "65": 1,
+              "58": 1,
+              "93": 1,
+              "72": 1,
+              "52": 2,
+              "79": 1,
+              "27": 2,
+              "71": 1,
+              "29": 1,
+              "70": 1
             },
-            "choose_1_to_3": 14,
-            "choose_1_to_10": 26,
-            "parseable": 128,
-            "follows_first": 128,
-            "normalized_distance_decisions": 128,
+            "choose_1_to_3": 61,
+            "choose_1_to_10": 109,
+            "parseable": 447,
+            "follows_first": 446,
+            "normalized_distance_decisions": 448,
             "metrics": {
               "ndcg_inverse_rank_at_10": {
-                "model": 0.6254327514548662,
-                "random": 0.19975761179168433
+                "model": 0.6038304210123292,
+                "random": 0.1974788637138616
               },
               "ndcg_inverse_rank_at_1": {
-                "model": 0.4530122755927107,
-                "random": 0.08247595557953956
+                "model": 0.4169975523967224,
+                "random": 0.08153510569873747
               },
               "ndcg_inverse_distance_at_10": {
-                "model": 0.9510737226895793,
-                "random": 0.8218878377049641
+                "model": 0.9411100344333375,
+                "random": 0.813808812371535
               },
               "ndcg_inverse_distance_at_1": {
-                "model": 0.9265172076615399,
-                "random": 0.7683949707860562
+                "model": 0.9146379090300776,
+                "random": 0.7565482150668127
               },
               "ndcg_minmax_distance_at_10": {
-                "model": 0.9228281823508302,
-                "random": 0.6564486860021969,
-                "reverse": 0.20662364747646794
+                "model": 0.9096419291359316,
+                "random": 0.6533695486559633,
+                "reverse": 0.20306573550622845
               },
               "ndcg_minmax_distance_at_1": {
-                "model": 0.9012129447679258,
-                "random": 0.5982311297220639,
+                "model": 0.8864893689076565,
+                "random": 0.5940320998004572,
                 "reverse": 0.0
               }
             },
-            "safe_random": 0.5203580146553096,
-            "map_random": 0.01806952628136256,
-            "random_1_to_3": 0.054208578844087654,
-            "random_1_to_10": 0.18069526281362566,
-            "top10_intersection": 5.7421875,
-            "random_top10_intersection": 1.8069526281362558
+            "safe_random": 0.48898583285337455,
+            "map_random": 0.01783727466701181,
+            "random_1_to_3": 0.05351182400103551,
+            "random_1_to_10": 0.1783727466701183,
+            "top10_intersection": 5.5,
+            "random_top10_intersection": 1.7837274667011835
           }
         },
         "test_rollout": {
-          "cases": 192,
+          "cases": 448,
           "groups": {
-            "same_initial_board_new_pair": 192
+            "same_initial_board_new_pair": 255,
+            "new_initial_board": 193
           },
-          "reached": 68,
-          "success": 66,
-          "safe": 910,
-          "solvable_decisions": 1034,
+          "reached": 152,
+          "success": 148,
+          "safe": 1996,
+          "solvable_decisions": 2292,
           "all_decisions": {
-            "decisions": 1583,
-            "map_minimum": 646,
-            "legal": 1548,
-            "ndcg_inverse_rank_at_10": 0.7527516025467081,
-            "ndcg_minmax_distance_at_10": 0.8955165590657894,
-            "ndcg_inverse_rank_at_1": 0.5639569212582818,
-            "ndcg_minmax_distance_at_1": 0.8514825768264142,
-            "ndcg_inverse_distance_at_10": 0.9221149713783232,
-            "ndcg_inverse_distance_at_1": 0.8797848600123402,
-            "equal_distance_states": 107,
-            "single_candidate_states": 107,
+            "single_candidate_states": 240,
+            "ndcg_inverse_distance_at_10": 0.9212715496123333,
             "normalized_distance_baselines": {
               "ndcg_minmax_distance_at_10": {
-                "random": 0.7237058523925747,
-                "reverse": 0.4131274594973244
+                "reverse": 0.41203409266429536,
+                "random": 0.7235347294623018
               },
               "ndcg_minmax_distance_at_1": {
-                "random": 0.5803615657460721,
-                "reverse": 0.06759317751105495
+                "reverse": 0.06646358349487677,
+                "random": 0.5811407716602967
               }
-            }
+            },
+            "ndcg_minmax_distance_at_1": 0.8451639615684783,
+            "ndcg_minmax_distance_at_10": 0.8924106164066385,
+            "legal": 3525,
+            "decisions": 3611,
+            "equal_distance_states": 240,
+            "map_minimum": 1456,
+            "ndcg_inverse_distance_at_1": 0.8770396491139436,
+            "ndcg_inverse_rank_at_1": 0.5566531103881415,
+            "ndcg_inverse_rank_at_10": 0.7453512615572527
           },
           "termination": {
-            "done_outputs": 185,
-            "done_at_goal": 67,
-            "goal_claims": 158,
-            "correct_goal_claims": 66,
-            "goal_states": 68,
-            "no_solution_states": 89,
-            "correct_no_solution": 26
+            "done_at_goal": 151,
+            "no_solution_states": 210,
+            "done_outputs": 432,
+            "correct_no_solution": 56,
+            "correct_goal_claims": 148,
+            "goal_states": 152,
+            "goal_claims": 373
           },
           "source_shards": [
             "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-206250/test_rollout/00000_00064",
             "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-206250/test_rollout/00064_00128",
-            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-206250/test_rollout/00128_00192"
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-206250/test_rollout/00128_00192",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-206250/test_rollout/00192_00256",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-206250/test_rollout/00256_00320",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-206250/test_rollout/00320_00384",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-206250/test_rollout/00384_00448"
           ],
           "first_round": {
-            "cases": 192,
-            "safe": 163,
-            "map_minimum": 53,
+            "cases": 448,
+            "safe": 375,
+            "map_minimum": 114,
             "chosen_id_histogram": {
-              "2": 10,
-              "32": 4,
-              "51": 3,
-              "20": 3,
-              "18": 4,
-              "65": 2,
-              "3": 6,
-              "12": 4,
-              "37": 6,
-              "16": 6,
-              "36": 3,
-              "35": 3,
-              "15": 1,
-              "30": 4,
-              "1": 17,
-              "10": 4,
-              "69": 1,
-              "6": 4,
-              "4": 7,
-              "57": 2,
-              "43": 4,
-              "38": 7,
-              "23": 2,
-              "22": 2,
+              "2": 24,
+              "32": 8,
+              "51": 4,
+              "20": 7,
+              "18": 8,
+              "65": 3,
+              "3": 21,
+              "12": 9,
+              "37": 8,
+              "16": 11,
+              "36": 6,
+              "35": 6,
+              "15": 6,
+              "30": 5,
+              "1": 32,
+              "10": 7,
+              "69": 2,
+              "6": 9,
+              "4": 19,
+              "57": 5,
+              "43": 7,
+              "38": 8,
+              "23": 6,
+              "22": 5,
               "9": 3,
               "77": 1,
-              "48": 1,
-              "13": 5,
-              "44": 1,
-              "74": 1,
-              "60": 3,
-              "21": 5,
-              "53": 2,
-              "11": 4,
-              "72": 1,
-              "14": 2,
-              "62": 1,
-              "24": 4,
-              "29": 2,
-              "40": 3,
-              "7": 2,
+              "48": 4,
+              "13": 11,
+              "44": 5,
+              "74": 2,
+              "60": 4,
+              "21": 11,
+              "53": 3,
+              "11": 9,
+              "72": 2,
+              "14": 7,
+              "62": 2,
+              "24": 7,
+              "29": 3,
+              "40": 6,
+              "7": 7,
               "78": 1,
-              "25": 3,
-              "5": 4,
-              "31": 3,
-              "26": 2,
-              "33": 2,
-              "34": 2,
-              "39": 1,
-              "52": 2,
-              "59": 2,
+              "25": 11,
+              "5": 8,
+              "31": 9,
+              "26": 6,
+              "33": 6,
+              "34": 7,
+              "39": 5,
+              "52": 4,
+              "59": 5,
               "8": 2,
               "45": 1,
-              "27": 1,
-              "55": 1,
-              "46": 1,
-              "42": 3,
-              "50": 1,
-              "61": 1,
+              "27": 7,
+              "55": 2,
+              "46": 3,
+              "42": 5,
+              "50": 5,
+              "61": 3,
               "58": 3,
-              "17": 1,
-              "28": 2,
-              "54": 1,
+              "17": 5,
+              "28": 7,
+              "54": 5,
               "86": 1,
-              "19": 1
+              "19": 2,
+              "56": 2,
+              "41": 7,
+              "None": 1,
+              "67": 1,
+              "82": 1,
+              "75": 1,
+              "66": 3,
+              "73": 2,
+              "80": 1,
+              "49": 1,
+              "63": 1,
+              "47": 1
             },
-            "choose_1_to_3": 33,
-            "choose_1_to_10": 59,
-            "parseable": 191,
-            "follows_first": 191,
-            "normalized_distance_decisions": 192,
+            "choose_1_to_3": 77,
+            "choose_1_to_10": 132,
+            "parseable": 446,
+            "follows_first": 445,
+            "normalized_distance_decisions": 448,
             "metrics": {
               "ndcg_inverse_rank_at_10": {
-                "model": 0.6220543880493962,
-                "random": 0.19924145635621152
+                "model": 0.595322546232514,
+                "random": 0.1974788637138616
               },
               "ndcg_inverse_rank_at_1": {
-                "model": 0.4257410255210509,
-                "random": 0.08226284523852999
+                "model": 0.3950911970370149,
+                "random": 0.08153510569873747
               },
               "ndcg_inverse_distance_at_10": {
-                "model": 0.9436209583386045,
-                "random": 0.8157548019171226
+                "model": 0.9383398458136207,
+                "random": 0.8138088123715351
               },
               "ndcg_inverse_distance_at_1": {
-                "model": 0.9160987318991732,
-                "random": 0.759652546893215
+                "model": 0.9070427203154744,
+                "random": 0.7565482150668127
               },
               "ndcg_minmax_distance_at_10": {
-                "model": 0.9125664757488231,
-                "random": 0.6505571783823005,
-                "reverse": 0.1983998149566568
+                "model": 0.906370893038771,
+                "random": 0.6533695486559633,
+                "reverse": 0.20306573550622845
               },
               "ndcg_minmax_distance_at_1": {
-                "model": 0.8833617640055182,
-                "random": 0.591321967465858,
+                "model": 0.8750442615993632,
+                "random": 0.5940320998004572,
                 "reverse": 0.0
               }
             },
-            "safe_random": 0.5070382893519412,
-            "map_random": 0.018036210713795464,
-            "random_1_to_3": 0.05410863214138639,
-            "random_1_to_10": 0.18036210713795478,
-            "top10_intersection": 5.822916666666667,
-            "random_top10_intersection": 1.8036210713795475
+            "safe_random": 0.48898583285337455,
+            "map_random": 0.01783727466701181,
+            "random_1_to_3": 0.05351182400103551,
+            "random_1_to_10": 0.1783727466701183,
+            "top10_intersection": 5.555803571428571,
+            "random_top10_intersection": 1.7837274667011835
+          }
+        }
+      }
+    },
+    "212500": {
+      "epoch": 17.0,
+      "modes": {
+        "test_reference": {
+          "cases": 256,
+          "groups": {
+            "same_initial_board_new_pair": 191,
+            "new_initial_board": 65
+          },
+          "reached": 0,
+          "success": 0,
+          "safe": 1456,
+          "solvable_decisions": 1648,
+          "all_decisions": {
+            "decisions": 2025,
+            "map_minimum": 980,
+            "legal": 2008,
+            "ndcg_inverse_rank_at_10": 0.8050682479626083,
+            "ndcg_minmax_distance_at_10": 0.9310717278566181,
+            "ndcg_inverse_rank_at_1": 0.6331726074765972,
+            "ndcg_minmax_distance_at_1": 0.9020852883639445,
+            "ndcg_inverse_distance_at_10": 0.9485382768135469,
+            "ndcg_inverse_distance_at_1": 0.9142723636694349,
+            "equal_distance_states": 136,
+            "single_candidate_states": 136,
+            "normalized_distance_baselines": {
+              "ndcg_minmax_distance_at_10": {
+                "random": 0.7241457125158481,
+                "reverse": 0.40993998094879497
+              },
+              "ndcg_minmax_distance_at_1": {
+                "random": 0.5851796220322849,
+                "reverse": 0.0671604938271605
+              }
+            }
+          },
+          "termination": {
+            "done_outputs": 195,
+            "done_at_goal": 181,
+            "goal_claims": 193,
+            "correct_goal_claims": 179,
+            "goal_states": 187,
+            "no_solution_states": 0,
+            "correct_no_solution": 0
+          },
+          "source_shards": [
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-212500/test_reference/00000_00064",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-212500/test_reference/00064_00128",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-212500/test_reference/00192_00256",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-212500/test_reference/00256_00320"
+          ],
+          "first_round": {
+            "cases": 256,
+            "safe": 214,
+            "map_minimum": 74,
+            "chosen_id_histogram": {
+              "36": 6,
+              "18": 4,
+              "17": 6,
+              "53": 3,
+              "25": 5,
+              "49": 4,
+              "56": 2,
+              "54": 3,
+              "26": 3,
+              "19": 6,
+              "41": 3,
+              "22": 4,
+              "44": 4,
+              "38": 5,
+              "43": 2,
+              "15": 5,
+              "13": 8,
+              "39": 4,
+              "59": 1,
+              "14": 1,
+              "4": 10,
+              "34": 4,
+              "63": 2,
+              "23": 5,
+              "42": 6,
+              "3": 10,
+              "82": 1,
+              "28": 3,
+              "1": 6,
+              "12": 6,
+              "58": 1,
+              "16": 5,
+              "6": 1,
+              "46": 5,
+              "35": 8,
+              "2": 6,
+              "7": 8,
+              "31": 5,
+              "30": 1,
+              "55": 4,
+              "37": 6,
+              "50": 3,
+              "66": 2,
+              "21": 7,
+              "27": 5,
+              "60": 1,
+              "62": 1,
+              "40": 2,
+              "9": 2,
+              "29": 2,
+              "57": 2,
+              "47": 2,
+              "24": 6,
+              "5": 5,
+              "33": 4,
+              "10": 3,
+              "20": 2,
+              "48": 4,
+              "52": 1,
+              "11": 3,
+              "8": 1,
+              "None": 1,
+              "45": 2,
+              "73": 1,
+              "64": 2,
+              "70": 1,
+              "76": 2,
+              "51": 3,
+              "81": 1,
+              "61": 1,
+              "32": 1,
+              "83": 1
+            },
+            "choose_1_to_3": 22,
+            "choose_1_to_10": 52,
+            "parseable": 253,
+            "follows_first": 253,
+            "normalized_distance_decisions": 256,
+            "metrics": {
+              "ndcg_inverse_rank_at_10": {
+                "model": 0.6250741567827927,
+                "random": 0.2015162448565097
+              },
+              "ndcg_inverse_rank_at_1": {
+                "model": 0.4397979920215174,
+                "random": 0.08320206028831277
+              },
+              "ndcg_inverse_distance_at_10": {
+                "model": 0.9361250341873172,
+                "random": 0.8105894155891563
+              },
+              "ndcg_inverse_distance_at_1": {
+                "model": 0.9126302296989448,
+                "random": 0.7531726248178118
+              },
+              "ndcg_minmax_distance_at_10": {
+                "model": 0.9108407418100213,
+                "random": 0.6546792502443088,
+                "reverse": 0.20561841941052186
+              },
+              "ndcg_minmax_distance_at_1": {
+                "model": 0.8924290635842953,
+                "random": 0.5961007106578302,
+                "reverse": 0.0
+              }
+            },
+            "safe_random": 0.48597728426926845,
+            "map_random": 0.01832038713867283,
+            "random_1_to_3": 0.0549611614160185,
+            "random_1_to_10": 0.18320387138672825,
+            "top10_intersection": 5.74609375,
+            "random_top10_intersection": 1.8320387138672836
+          }
+        },
+        "test_rollout": {
+          "cases": 320,
+          "groups": {
+            "same_initial_board_new_pair": 255,
+            "new_initial_board": 65
+          },
+          "reached": 100,
+          "success": 96,
+          "safe": 1381,
+          "solvable_decisions": 1601,
+          "all_decisions": {
+            "decisions": 2563,
+            "map_minimum": 1019,
+            "legal": 2497,
+            "ndcg_inverse_rank_at_10": 0.7462068602357158,
+            "ndcg_minmax_distance_at_10": 0.8890053190986593,
+            "ndcg_inverse_rank_at_1": 0.5543438879795302,
+            "ndcg_minmax_distance_at_1": 0.8417699302367655,
+            "ndcg_inverse_distance_at_10": 0.9182358889916014,
+            "ndcg_inverse_distance_at_1": 0.8735880730990057,
+            "equal_distance_states": 171,
+            "single_candidate_states": 171,
+            "normalized_distance_baselines": {
+              "ndcg_minmax_distance_at_10": {
+                "random": 0.7232788707886113,
+                "reverse": 0.41185565021838993
+              },
+              "ndcg_minmax_distance_at_1": {
+                "random": 0.5813593039530611,
+                "reverse": 0.0667186890362856
+              }
+            }
+          },
+          "termination": {
+            "done_outputs": 297,
+            "done_at_goal": 99,
+            "goal_claims": 266,
+            "correct_goal_claims": 96,
+            "goal_states": 100,
+            "no_solution_states": 154,
+            "correct_no_solution": 28
+          },
+          "source_shards": [
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-212500/test_rollout/00000_00064",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-212500/test_rollout/00064_00128",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-212500/test_rollout/00128_00192",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-212500/test_rollout/00192_00256",
+            "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/evaluation_half_epoch/step-212500/test_rollout/00320_00384"
+          ],
+          "first_round": {
+            "cases": 320,
+            "safe": 272,
+            "map_minimum": 88,
+            "chosen_id_histogram": {
+              "2": 23,
+              "4": 14,
+              "51": 1,
+              "20": 5,
+              "18": 8,
+              "65": 2,
+              "3": 10,
+              "12": 4,
+              "37": 6,
+              "16": 12,
+              "34": 6,
+              "45": 5,
+              "15": 7,
+              "7": 3,
+              "30": 6,
+              "1": 21,
+              "10": 5,
+              "6": 2,
+              "28": 9,
+              "43": 6,
+              "23": 5,
+              "22": 3,
+              "9": 6,
+              "81": 1,
+              "48": 3,
+              "13": 5,
+              "71": 1,
+              "26": 7,
+              "56": 3,
+              "17": 6,
+              "11": 6,
+              "14": 6,
+              "57": 4,
+              "35": 3,
+              "5": 9,
+              "24": 3,
+              "60": 1,
+              "40": 5,
+              "78": 1,
+              "29": 5,
+              "58": 3,
+              "19": 3,
+              "33": 3,
+              "46": 4,
+              "25": 6,
+              "36": 7,
+              "27": 4,
+              "38": 5,
+              "39": 3,
+              "59": 3,
+              "8": 2,
+              "55": 2,
+              "63": 2,
+              "42": 4,
+              "21": 4,
+              "50": 1,
+              "32": 3,
+              "31": 2,
+              "53": 2,
+              "61": 2,
+              "54": 3,
+              "86": 1,
+              "68": 1,
+              "62": 2,
+              "52": 2,
+              "41": 4,
+              "44": 1,
+              "47": 1,
+              "80": 1,
+              "49": 1
+            },
+            "choose_1_to_3": 54,
+            "choose_1_to_10": 95,
+            "parseable": 318,
+            "follows_first": 318,
+            "normalized_distance_decisions": 320,
+            "metrics": {
+              "ndcg_inverse_rank_at_10": {
+                "model": 0.6077842686618288,
+                "random": 0.2009420255459884
+              },
+              "ndcg_inverse_rank_at_1": {
+                "model": 0.41974947542503127,
+                "random": 0.08296497652503261
+              },
+              "ndcg_inverse_distance_at_10": {
+                "model": 0.9374955102719419,
+                "random": 0.8118499524400814
+              },
+              "ndcg_inverse_distance_at_1": {
+                "model": 0.9104101535058788,
+                "random": 0.7533873247772351
+              },
+              "ndcg_minmax_distance_at_10": {
+                "model": 0.906483183391581,
+                "random": 0.6521939516720214,
+                "reverse": 0.2026840594031119
+              },
+              "ndcg_minmax_distance_at_1": {
+                "model": 0.8825109393671016,
+                "random": 0.5924890495962131,
+                "reverse": 0.0
+              }
+            },
+            "safe_random": 0.4810444165041991,
+            "map_random": 0.01825265287587697,
+            "random_1_to_3": 0.05475795862763081,
+            "random_1_to_10": 0.18252652875876937,
+            "top10_intersection": 5.60625,
+            "random_top10_intersection": 1.8252652875876965
           }
         }
       }
@@ -15402,7 +15785,7 @@
   "run": "blocks_kv_restart_36c213c",
   "source_commit": "36c213c",
   "startup_verified_step": 75,
-  "observed_at_utc": "2026-10-10T02:22:52.403930+00:00",
+  "observed_at_utc": "2026-10-10T03:49:46.140811+00:00",
   "training_resume": {
     "checkpoint_step": 55000,
     "checkpoint_epoch": 4.4,
@@ -15418,9 +15801,9 @@
     "interruption_recomputation_complete": true
   },
   "training_progress": {
-    "step": 211339,
-    "epoch": 16.90712,
-    "loss": 0.1657,
+    "step": 220007,
+    "epoch": 17.60056,
+    "loss": 0.12,
     "loss_scope": "last_logged_training_update_not_full_run_mean",
     "status": "training_running",
     "source_step": 190000,
@@ -15436,18 +15819,18 @@
     "ssh_port": 35016,
     "source_commit": "fb923f8",
     "learning_rate": 2e-05,
-    "observed_at_utc": "2026-10-10T02:22:52.403930+00:00",
-    "grad_norm": 2.5341174602508545,
-    "latest_saved_step": 211250
+    "observed_at_utc": "2026-10-10T03:49:46.140811+00:00",
+    "grad_norm": 1.5527445077896118,
+    "latest_saved_step": 220000
   },
   "evaluation_progress": {
     "gpus": 5,
-    "completed_shards": 435,
+    "completed_shards": 453,
     "resumed": true,
     "archived_incomplete_shards": 27,
     "active_workers": 5,
-    "observed_at_utc": "2026-10-10T02:22:53.128219+00:00",
-    "metrics_snapshot_completed_shards": 435,
+    "observed_at_utc": "2026-10-10T03:49:47.077193+00:00",
+    "metrics_snapshot_completed_shards": 453,
     "metrics_snapshot_note": "Complete shards only, excluding .interrupted. All per-mode sample sizes are retained; incomplete epochs must not be compared as full cohorts.",
     "scheduling_contract": "experiments/flamingo_map_reader/configs/blocks_kv_two_node_continuation.json",
     "queues": {
@@ -15459,8 +15842,8 @@
           0,
           1
         ],
-        "pending_shards": 200,
-        "observed_at_utc": "2026-10-10T02:23:03.206725+00:00"
+        "pending_shards": 219,
+        "observed_at_utc": "2026-10-10T03:50:02.553419+00:00"
       },
       "4090_aux": {
         "host": "10.28.0.80",
@@ -15485,15 +15868,15 @@
           "note": "Cross-machine generation is not token-identical even with aligned Torch/Transformers; the cause of the remaining rollout divergence was not isolated.",
           "transfer_interval_seconds": 600
         },
-        "observed_at_utc": "2026-10-10T02:22:53Z"
+        "observed_at_utc": "2026-10-10T03:43:24Z"
       }
     },
     "assigned_shards": {
       "main": {
-        "2": "step-206250/test_reference/00192_00256",
-        "0": "step-206250/test_rollout/00192_00256",
-        "3": "step-206250/test_reference/00256_00320",
-        "1": "step-206250/test_rollout/00256_00320"
+        "0": "step-212500/test_rollout/00256_00320",
+        "3": "step-212500/test_reference/00384_00448",
+        "1": "step-212500/test_rollout/00384_00448",
+        "2": "step-218750/test_reference/00000_00064"
       }
     },
     "completed_three_task_epochs": [
@@ -15508,10 +15891,10 @@
       10.0
     ],
     "total_expected_shards": 800,
-    "metrics_snapshot_observed_at_utc": "2026-10-10T02:22:53.128219+00:00",
+    "metrics_snapshot_observed_at_utc": "2026-10-10T03:49:47.077193+00:00",
     "continuation_models": "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/training_extension_20epoch/models",
-    "auxiliary_status_observed_at_utc": "2026-10-10T02:22:53Z",
-    "auxiliary_status_source": "transfer/artifact_bridge_status.json; auxiliary process was checked directly in the previous readout, not in this snapshot"
+    "auxiliary_status_observed_at_utc": "2026-10-10T03:43:24Z",
+    "auxiliary_status_source": "Latest artifact_bridge synchronization snapshot; no direct SSH check of the auxiliary machine in this readout."
   },
   "matched_epoch05_epoch1": {
     "test_reference": {
@@ -27766,27 +28149,27 @@
     "observed_at_utc": "2026-10-09T09:34:42.574038+00:00"
   },
   "eta": {
-    "observed_at_utc": "2026-10-10T02:22:52.403930+00:00",
-    "method": "Training: short post-restart live interval, excluding downtime and replay. Evaluation: two active rollout GPUs and two active reference GPUs; complete case ownership and auxiliary generation times sampled in this acceptance.",
-    "seconds_per_training_update": 0.6015423093523298,
-    "remaining_training_hours": 6.460063117186228,
+    "observed_at_utc": "2026-10-10T03:49:46.140811+00:00",
+    "method": "Training: short live interval including one checkpoint save, excluding downtime and replay. Evaluation: actual completed-case ownership and current per-case generation times, two main rollout and two reference GPUs plus the auxiliary GPU.",
+    "seconds_per_training_update": 0.696078730792534,
+    "remaining_training_hours": 5.799302603516797,
     "training_20epoch_window_beijing": "2026-10-10 16:00-20:00",
     "latest_20epoch_evaluation": "About 2-4 hours after adapter publication with newest-first queue; task lengths can change this.",
-    "remaining_full_table_hours_estimate": 20.38460227867612,
-    "full_05_to_20epoch_table_window_beijing": "10-11 11:22 至 10-11 18:22，节点持续可用时",
+    "remaining_full_table_hours_estimate": 20.58741402766037,
+    "full_05_to_20epoch_table_window_beijing": "10-11 12:49 至 10-11 19:49，节点持续可用时",
     "main_seconds_per_case": {
-      "reference": 22.506991206789653,
-      "rollout": 22.313661719540445
+      "reference": 23.600874013665955,
+      "rollout": 24.60647094939486
     },
     "auxiliary_seconds_per_case": {
-      "reference": 20.211335846988867,
-      "rollout": 21.321687114951132
+      "reference": 20.154666375934863,
+      "rollout": 21.2383187471416
     },
-    "auxiliary_timing_observed_at_utc": "2026-10-10T02:22:52.403930+00:00",
+    "auxiliary_timing_observed_at_utc": "2026-10-10T03:49:46.140811+00:00",
     "remaining_hours_by_owner": {
-      "main_rollout": 19.859158930390993,
-      "main_reference_and_terminal": 20.38460227867612,
-      "auxiliary": 17.68127730756685
+      "main_rollout": 20.58741402766037,
+      "main_reference_and_terminal": 19.83223030191803,
+      "auxiliary": 16.150726541604776
     },
     "excludes_4090": false,
     "limitations": "Generation-only estimates omit reload/transfer overhead; windows allow overhead and workload drift. In-progress cases are conservatively counted as remaining. Future adapters must first finish training. Full-table completion differs from latest-checkpoint completion.",
@@ -27796,7 +28179,7 @@
     ]
   },
   "matched_continuation_epoch10": {
-    "observed_at_utc": "2026-10-10T02:22:53.128219+00:00",
+    "observed_at_utc": "2026-10-10T03:49:47.077193+00:00",
     "method": "Same completed rollout task IDs and numbering variants as each checkpoint mode; intersect with the complete epoch-10 cohort. No new model generation.",
     "reference_step": 125000,
     "checkpoints": {
@@ -27878,16 +28261,23 @@
         "regressed": 36
       },
       "206250": {
-        "cases": 192,
-        "baseline_reached": 47,
-        "reached": 68,
-        "rescued": 40,
-        "regressed": 19
+        "cases": 448,
+        "baseline_reached": 99,
+        "reached": 152,
+        "rescued": 86,
+        "regressed": 33
+      },
+      "212500": {
+        "cases": 320,
+        "baseline_reached": 66,
+        "reached": 100,
+        "rescued": 62,
+        "regressed": 28
       }
     }
   },
   "matched_continuation_epoch115": {
-    "observed_at_utc": "2026-10-10T02:22:53.128219+00:00",
+    "observed_at_utc": "2026-10-10T03:49:47.077193+00:00",
     "method": "Same complete rollout task IDs and numbering variants, intersected with complete epoch 11.5.",
     "checkpoints": {
       "150000": {
@@ -27947,16 +28337,23 @@
         "regressed": 40
       },
       "206250": {
-        "cases": 192,
-        "baseline_reached": 61,
-        "reached": 68,
-        "rescued": 34,
-        "regressed": 27
+        "cases": 448,
+        "baseline_reached": 125,
+        "reached": 152,
+        "rescued": 77,
+        "regressed": 50
+      },
+      "212500": {
+        "cases": 320,
+        "baseline_reached": 80,
+        "reached": 100,
+        "rescued": 54,
+        "regressed": 34
       }
     }
   },
   "stopping_diagnostic": {
-    "observed_at_utc": "2026-10-10T02:22:52.403930+00:00",
+    "observed_at_utc": "2026-10-10T03:49:46.140811+00:00",
     "definitions": {
       "initial_goal": "100 independent zero-action tasks with start=current=goal, no preceding execution history.",
       "conditional_goal_stop_recall": "Valid success control at actual goal / actual reached goal states, in own-history rollout.",
@@ -28122,17 +28519,30 @@
         "goal_claim_precision": 0.3554006968641115
       },
       "206250": {
-        "cases": 192,
-        "goal_states": 68,
-        "valid_goal_stop": 66,
-        "valid_goal_stop_and_summary": 66,
-        "false_success_claims": 92,
-        "reachable_false_success_claims": 1,
-        "unreachable_false_success_claims": 91,
-        "no_legal_moves_false_success_claims": 59,
-        "conditional_goal_stop_recall": 0.9705882352941176,
-        "conditional_stop_and_summary_accuracy": 0.9705882352941176,
-        "goal_claim_precision": 0.4177215189873418
+        "cases": 448,
+        "goal_states": 152,
+        "valid_goal_stop": 148,
+        "valid_goal_stop_and_summary": 148,
+        "false_success_claims": 225,
+        "reachable_false_success_claims": 2,
+        "unreachable_false_success_claims": 223,
+        "no_legal_moves_false_success_claims": 145,
+        "conditional_goal_stop_recall": 0.9736842105263158,
+        "conditional_stop_and_summary_accuracy": 0.9736842105263158,
+        "goal_claim_precision": 0.3967828418230563
+      },
+      "212500": {
+        "cases": 320,
+        "goal_states": 100,
+        "valid_goal_stop": 96,
+        "valid_goal_stop_and_summary": 96,
+        "false_success_claims": 170,
+        "reachable_false_success_claims": 2,
+        "unreachable_false_success_claims": 168,
+        "no_legal_moves_false_success_claims": 110,
+        "conditional_goal_stop_recall": 0.96,
+        "conditional_stop_and_summary_accuracy": 0.96,
+        "goal_claim_precision": 0.3609022556390977
       }
     },
     "false_stop_qmap_audit": {
@@ -28335,21 +28745,32 @@
           "correct_no_solution_episodes": 66
         },
         "206250": {
-          "cases": 192,
-          "claims": 27,
-          "correct_claims": 26,
-          "at_goal_claims": 1,
+          "cases": 448,
+          "claims": 59,
+          "correct_claims": 56,
+          "at_goal_claims": 3,
           "reachable_claims": 0,
-          "empty_states": 89,
-          "correct_empty": 26,
-          "unreachable_episodes": 123,
-          "correct_no_solution_episodes": 26
+          "empty_states": 210,
+          "correct_empty": 56,
+          "unreachable_episodes": 293,
+          "correct_no_solution_episodes": 56
+        },
+        "212500": {
+          "cases": 320,
+          "claims": 31,
+          "correct_claims": 28,
+          "at_goal_claims": 3,
+          "reachable_claims": 0,
+          "empty_states": 154,
+          "correct_empty": 28,
+          "unreachable_episodes": 218,
+          "correct_no_solution_episodes": 28
         }
       }
     }
   },
   "matched_continuation_epoch145": {
-    "observed_at_utc": "2026-10-10T02:22:52.403930+00:00",
+    "observed_at_utc": "2026-10-10T03:49:46.140811+00:00",
     "reference_step": 181250,
     "method": "Frozen complete rollout task IDs and numbering variants, intersected with full epoch14.5.",
     "checkpoints": {
@@ -28379,11 +28800,18 @@
         "success": 102
       },
       "206250": {
-        "cases": 192,
-        "baseline_reached": 58,
-        "reached": 68,
-        "rescued": 32,
-        "regressed": 22
+        "cases": 448,
+        "baseline_reached": 147,
+        "reached": 152,
+        "rescued": 62,
+        "regressed": 57
+      },
+      "212500": {
+        "cases": 320,
+        "baseline_reached": 90,
+        "reached": 100,
+        "rescued": 47,
+        "regressed": 37
       }
     }
   }

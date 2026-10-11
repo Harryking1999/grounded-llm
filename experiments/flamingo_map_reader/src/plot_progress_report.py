@@ -57,11 +57,14 @@ def completion_comparison(rows, blocks, out, vector):
     experiments = RESULTS.parents[1]
     sol = json.loads((experiments / 'sol_dag_blocks/results/summary.json').read_text(encoding='utf-8'))
     qwen = json.loads((experiments / 'qwen_path_blocks/results/acceptance_audit.json').read_text(encoding='utf-8'))
-    fig, axs = plt.subplots(1, 2, figsize=(11.8, 4.8), width_ratios=[1.25, 1], layout='constrained')
+    # Each evidence source gets a full-width figure in the report.
+    fig, ax = plt.subplots(figsize=(8, 4.8), layout='constrained')
+    axs = [ax]
     xx = [r['epoch'] for r in rows]
     axs[0].plot(xx, [r['reached'] for r in rows], color=BLUE, label='1.5B＋cross-attention SFT')
     axs[0].plot(xx, [r['stopped'] for r in rows], color=ORANGE, linestyle=':', label='其中：到达且正确停止')
-    source = [dict(panel='current', method='reader', epoch=r['epoch'], successes=round(r['reached']*510), trials=510) for r in rows]
+    source = [dict(panel='current', method=method, epoch=r['epoch'], successes=round(r[metric]*510), trials=510)
+              for r in rows for method, metric in [('reader_reached', 'reached'), ('reader_stopped', 'stopped')]]
     for key, label, color, style in [('current', '现用地图贪心', GRAY, '--'), ('continued', '续训地图贪心（尚未接入）', '#8C9B75', '-.')]:
         result = blocks['map_greedy_comparison']['results'][key]['all']
         rate = result['rates']['reached']
@@ -72,10 +75,15 @@ def completion_comparison(rows, blocks, out, vector):
     axs[0].plot(best['epoch'],best['reached'],'o',color=BLUE)
     axs[0].annotate(f"19.5 epoch：{best['reached']:.1%}",(best['epoch'],best['reached']),
                     xytext=(-5,16),textcoords='offset points',ha='right',fontsize=10)
-    axs[0].set_title('a  当前同题：逐步反馈，510 题',loc='left',pad=12)
+    axs[0].set_title('积木：当前训练进展（同题逐步反馈，510 题）',loc='left',pad=12)
     axs[0].set_ylim(0,1);axs[0].set_xlim(.5,20.5);axs[0].set_xticks([.5,5,10,15,20])
     axs[0].legend(loc='upper left',bbox_to_anchor=(.01,.65),fontsize=9)
     tidy(axs[0],'接口训练 epoch',True);axs[0].set_ylabel('完整任务到达率')
+    save(fig,'progress_completion_training',source,out,vector)
+
+    fig, ax = plt.subplots(figsize=(8, 4.8), layout='constrained')
+    axs.append(ax)
+    source = []
     labels=['Qwen3-4B','Qwen3-8B','Qwen3-32B','Sol / medium']
     for j,(condition,offset,color) in enumerate([('blocks8',-.17,BLUE),('blocks12',.17,ORANGE)]):
         values=[]
@@ -92,11 +100,10 @@ def completion_comparison(rows, blocks, out, vector):
             axs[1].text(value+.018,ypos,f'{value:.1%}',va='center',fontsize=9)
     axs[1].set_yticks(range(4),labels);axs[1].invert_yaxis();axs[1].set_xlim(0,1)
     axs[1].xaxis.set_major_formatter(PercentFormatter(1));axs[1].grid(axis='x',color='#E8ECEF');axs[1].set_axisbelow(True)
-    axs[1].set_title('b  历史参考：一次输出完整计划',loc='left',pad=12)
+    axs[1].set_title('积木：历史模型基线（一次输出完整计划）',loc='left',pad=12)
     axs[1].set_xlabel('清空成功率（每模型、每条件 128 次）');axs[1].legend(loc='lower right',fontsize=9)
-    fig.suptitle('积木任务完成：当前训练进展与已有基线',fontsize=14,fontweight='bold')
-    fig.text(.5,-.025,'两栏题集、规则与交互条件不同；纯 SFT 同题基线尚无完成结果，不画作 0%。',ha='center',fontsize=10,color='#555F67')
-    save(fig,'progress_completion_comparison',source,out,vector)
+    fig.text(.5,-.025,'与当前训练评测的题集、规则及交互条件不同；纯 SFT 基线仍待补。',ha='center',fontsize=10,color='#555F67')
+    save(fig,'progress_historical_baselines',source,out,vector)
 
 
 def main():

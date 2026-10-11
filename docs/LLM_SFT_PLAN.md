@@ -163,9 +163,9 @@ P 含 assistant 起始标记，R 含结束 token；S 限完整训练序列，G �
 
 ## 附录 A：教师输入与监督输出
 
-下面是按真实规则构造的完整消息样例，拟用于教师试样，尚未实测。**每条计划单独调用教师：system 使用 A.1，user 使用 A.2 或 A.3。** 同题换一条路线时保持题面不变，替换计划，并重新回放生成相应证据；不把多条路线混入一次调用。教师的响应经验收后成为学生的 assistant 监督。
+下面是按真实规则构造的完整消息样例，拟用于教师试样，尚未实测。**每条计划单独调用教师：A.1 通用文本与该任务的追加指令以空行拼成一条 system 消息，user 使用 A.2 或 A.3 的完整文本。** 同题换一条路线时保持题面不变，替换计划，并重新回放生成相应证据；不把多条路线混入一次调用。教师的响应经验收后成为学生的 assistant 监督。
 
-### A.1 共用教师 system 消息
+### A.1 教师 system 的通用部分
 
 ```text
 You write an explanatory solution for a student that sees only the problem.
@@ -180,10 +180,6 @@ In <reasoning>:
    deductions supported by the problem or the checked facts.
 3. Describe every action's effect and check the resulting state.
 4. Check that the final state equals the goal.
-For pathfinding, write the initial visited path and the visited path
-after every move. For blocks, list all occupied cells initially and
-after every removal; unlisted cells are empty.
-Use zero-based coordinates and list cells in row-then-column order.
 
 In <final>, return the supplied plan's JSON exactly.
 Do not choose another plan or add actions.
@@ -199,6 +195,13 @@ Do not add text outside the two output blocks.
 `transition_facts` 是规则回放的结果，`checked_deductions` 是程序或人工核对过的推导，可为空；没有证明时不填写局部排除或最短理由。这些段落不是求解器的完整搜索日志。下面两条短样例用于说明消息格式，不代表正式输出长度。
 
 ### A.2 寻路
+
+**教师 system 的寻路追加指令：**
+
+```text
+For this pathfinding task, write the initial visited path and the
+visited path after every move.
+```
 
 **教师 user 消息（完整文本）：**
 
@@ -276,6 +279,14 @@ It matches the 2-move lower bound, so it is shortest.
 另一条路线 `[0,3,5]` 需生成相应状态；允许的次优路线 `[0,1,4,5]` 可以说三步合法，不能声称匹配两步下界。正式图为原 256 节点图，不保证一般长题都有这样短的构造证明。
 
 ### A.3 积木
+
+**教师 system 的积木追加指令：**
+
+```text
+For this blocks task, list all occupied cells initially and after
+every removal; unlisted cells are empty.
+Use zero-based coordinates and list cells in row-then-column order.
+```
 
 **教师 user 消息（完整文本）：**
 

@@ -56,6 +56,7 @@ def main():
     parser.add_argument('--longest-smoke', action='store_true')
     args = parser.parse_args()
     config = json.loads(args.config.read_text())
+    os.environ.update(config['execution'].get('nccl_environment',{}))
     spec = config['training']
     rank, world, local_rank = int(os.environ['RANK']), int(os.environ['WORLD_SIZE']), int(os.environ['LOCAL_RANK'])
     if world != spec['world_size'] or world * spec['per_device_batch_size'] * spec['gradient_accumulation_steps'] != spec['global_batch_size']:

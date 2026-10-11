@@ -52,6 +52,12 @@
     "reserved_gpu": 0,
     "evaluation_ssh_port": 35016,
     "evaluation_gpus": [0, 1, 2, 3],
-    "sync_every_seconds": 60
+    "sync_every_seconds": 60,
+    "nccl_environment": {
+      "NCCL_P2P_DISABLE": "1",
+      "NCCL_IB_DISABLE": "1",
+      "NCCL_CUMEM_ENABLE": "0",
+      "NCCL_CUMEM_HOST_ENABLE": "0"
+    }
   }
 }

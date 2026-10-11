@@ -105,7 +105,7 @@ def summarize(cases):
     for exposed in (False, True):
         selected = [c for c in ordinary if c['initial_pair_exposed'] == exposed]
         groups['initial_pair_exposed' if exposed else 'initial_pair_unexposed'] = rate(sum(c['arrived'] for c in selected), len(selected))
-    return dict(tasks=len(cases), ordinary_tasks=len(ordinary), initial_goal_tasks=len(zero),
+    return dict(tasks=len(cases), ordinary_tasks=len(ordinary), initial_goal_tasks=len(zero),decision_turns=len(turns),
         # Reference paths are supplied by the evaluator; their arrival is not model success.
         arrival=rate(sum(c['arrived'] for c in ordinary),len(ordinary)) if cases and cases[0]['mode']=='rollout' else None,
         arrival_and_stop=rate(sum(c['arrived_and_stopped'] for c in ordinary),len(ordinary)) if cases and cases[0]['mode']=='rollout' else None,
@@ -113,6 +113,9 @@ def summarize(cases):
         step_reachability=rate(sum(t['reachability'] for t in eligible),len(eligible)),
         shortest_progress=rate(sum(t['shortest_progress'] for t in eligible),len(eligible)),
         control_errors=dict(Counter(t['control_error'] for t in turns if t['control_error'])),
+        control_format_error=rate(sum(t['control_error']=='control_format' for t in turns),len(turns)),
+        illegal_action=rate(sum(t['control_error']=='illegal_action' for t in turns),len(turns)),
+        dead_state_turns=sum(t.get('before_distance',0)<0 for t in turns),
         reason_errors=dict(Counter(t['reason_error'] for t in turns if t['reason_error'])),
         reason_checked_turns=sum(t['reason_error'] is not None or t['control_error'] in (None,'premature_stop') for t in turns),
         generated_limit_hits=sum(t.get('generation_limit_hit',False) for t in turns),

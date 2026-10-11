@@ -156,7 +156,7 @@ def encode_messages(messages, tokenizer):
 def parse_control(text, candidate_count):
     tags = re.findall(r'<action>[^<]*</action>|<done\s*/>', text)
     line = text.strip().splitlines()[-1] if text.strip() else ''
-    if len(tags) != 1 or tags[0] != line:
+    if len(tags) != 1 or len(re.findall(r'<(?:action\b|done\b)',text)) != 1 or tags[0] != line:
         return None, 'control_format'
     if line == '<done/>':
         return None, None

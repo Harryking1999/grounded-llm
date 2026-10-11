@@ -39,7 +39,8 @@ def test_reason_failure_does_not_replace_control_and_wrong_stop_keeps_arrival():
     text = 'Reason: incorrect\n<action>1</action>'
     judged = score_turn(text,start,goal,oracle)
     assert judged['reason_error']=='format' and judged['control_error'] is None and judged['shortest_progress']
-    for text in ('<action>1</action>\n<action>1</action>','Reason: x\n<action>1</action> trailing','Reason: x\n<action>0</action>'):
+    for text in ('<action>1</action>\n<action>1</action>','Reason: x\n<action>1</action> trailing','Reason: x\n<action>0</action>',
+                 '<action>broken\n<action>1</action>'):
         assert parse_control(text,5)[1] == 'control_format'
     route = [(5,0,0),(5,0,2)]
     record=dict(start=str(start),goal=str(goal),reference_actions=route,trajectory_id='tiny',split='validation',

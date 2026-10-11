@@ -1,410 +1,136 @@
-# 1.5B 整题 CoT SFT 基线方案
+# 积木 1.5B 无地图动作 SFT 基线方案
 
-寻路、积木分别训练，学生仅凭题面一次输出解释与完整计划。下图概括监督生成与学生训练；当前进度见[项目状态页](PROJECT_STATUS_AND_TODO.md)。
+**首轮只做积木：沿用现有 cross-attention 实验的逐步环境交互，保留当前棋盘、目标、历史和全部合法候选；移除认知地图，全参数微调 1.5B，每轮直接选择一个动作。** 监督来自每题一条合法最短轨迹，答案只保留动作控制，不包含排序或 CoT。1.5B 是试点，7B、寻路和教师解释监督留待后续。
+
+## 1. 实验条件与信息流
+
+| 条件 | 模型更新 | 每轮输入 | 输出 |
+|---|---|---|---|
+| 无地图动作 SFT | 原始 Qwen2.5-1.5B-Instruct 全参数 | 规则、目标、当前棋盘、已执行动作、全部合法候选 | 一个候选编号或停止标记 |
+| 未微调同基座 | 不训练 | 与 SFT 相同 | 相同动作格式 |
+| 现有地图接口系统 | 冻结 LLM／地图，训练接口 | 上述环境信息＋地图 | 现有接口答案，比较时提取动作结果 |
 
 ```mermaid
 flowchart LR
-    S["求解器"] -->|"计划＋证据"| T["原始1.5B教师"]
-    T -->|"CoT＋计划"| V["验收"]
-    V --> F["1.5B全参数SFT"]
-    F --> M["学生模型"]
+    O["离线最短轨迹"] --> S["全参数SFT"] --> L["1.5B LLM"]
+    E["环境：当前状态＋合法候选"] --> L
+    L -->|"动作"| E
 ```
 
-教师与学生从同一原始基座出发。计划与证据只用于教师解释和离线验收，不放入学生输入；评测裁判在整题答案提交后执行。
+环境负责执行、更新状态和枚举合法动作；动作由模型选择。求解器只用于离线标签和评测裁判，不给运行中的模型最短距离、推荐动作、后继可达性或地图信息。“没有搜索”指模型运行时直接作答且不调用规划工具；离线保证最短仍需精确求解。
 
-## 1. 实验要回答什么
+无地图 SFT 与未微调同基座衡量任务微调收益；与现有地图接口相比，LLM 更新范围和监督也不同，因此属于系统比较，不能把全部差异单独归因于地图。
 
-检验带依据的整题监督能否提高 1.5B 的任务完成率。首轮设置如下：
+## 2. 输入与输出合同
 
-| 条件 | 参数更新 | 模型收到什么、怎样作答 |
-|---|---|---|
-| 整题 CoT SFT | Qwen2.5-1.5B-Instruct 全参数 | 规则＋完整题目；一次输出解释与完整计划 |
-| 未微调同基座 | 无 | 与 SFT 相同的题面、格式和生成预算 |
-| 已有地图接口系统 | 只训练接口，LLM／地图冻结 | 地图、逐步真实状态与合法候选；作为已有系统参照 |
+### 2.1 保留什么输入
 
-前两项衡量 SFT 收益；第三项同时改变信息和交互条件，只作系统级比较。首轮结果不能单独证明地图的因果收益，也不能分离 CoT 与计划监督的贡献。
+复用[积木题面与环境更新格式](../experiments/flamingo_map_reader/src/blocks_prompt.py)：首轮给真实规则、八种形状、初始棋盘和目标；每轮给完整 10×10 当前棋盘、实际执行历史及全部合法候选。保留多轮对话上下文，状态由环境回报，不要求模型自行维护棋盘。
 
-**监督选择已确认：**使用未做本项目微调的原始 1.5B 作为解释教师；程序负责找路线，教师负责解释路线。保留有依据的局部比较与排除，不要求完整搜索日志。这能监督约束判断、状态推演和计划验证；能否改善自主找解由整题评测回答。
+- 合法候选按真实 `remove(shape_id,row,col)` 动作编号，沿用现有编号策略，每轮编号可以变化。
+- 合法只表示几何上可执行，仍可能损害目标或进入死局；不能用求解器过滤这些候选。
+- 不加载地图向量、K/V、距离、排序或最优标记。题面的物理信息与现有接口一致，输出指令改成直接动作格式。
 
-## 2. 怎样制作训练数据
+### 2.2 每轮只输出什么
 
-### 2.1 固定题目与划分
+```text
+Choose one legal candidate using its number in the current update.
+Output only <action>ID</action>.
+If the current board exactly matches the goal, output only <done/>.
+```
 
-复用现有实验保存的物理题，保留来源、task ID、状态、目标、split 和组别；重新生成监督，不重新筛题。
+非终止轮的监督为 `<action>候选编号</action>`；到达轮为 `<done/>`，不输出排名、理由或轨迹总结。初始已到目标的零步题直接监督 `<done/>`，即使目标非空且仍有可移除形状，也应停止。
 
-| 任务 | 来源合同 | 训练题／留出题边界 |
-|---|---|---|
-| 寻路 | [path_single_long.json](../experiments/flamingo_map_reader/configs/path_single_long.json) | 4,000 普通＋192 零步训练题；同一 256 节点图，目标按 192／32／32 划分；普通 validation／test 为 500／1,000 题 |
-| 积木 | [blocks_kv_restart.json](../experiments/flamingo_map_reader/configs/blocks_kv_restart.json) | 8,000 普通＋1,000 零步训练题；排除 1,000 条固定失败历史 |
-| 积木评测 | [blocks_kv_evaluation.json](../experiments/flamingo_map_reader/configs/blocks_kv_evaluation.json) | 普通 test 510 题；分别报告原初始棋盘新任务与新初始棋盘 |
+**“动作序列”是整条多轮轨迹的动作选择序列，不是首轮一次输出剩余全部动作。** 每轮执行一个动作，再根据新棋盘和新候选选择下一步；这与现有接口的交互方式对应。
 
-上述是合同预期，**实施第一步要找到并核对实际保存清单**。本地旧 `path10_manifest.json` 与 `blocks_long_manifest_preview.json` 不能替代当前来源。原训练题按地图贪心成功筛选的偏差保留并披露；失败历史不等于原整题无解。旧积木 100 道已达标题属于 validation，独立零步 test 的来源需另行确认。
+### 2.3 最小两步例子
 
-学生题面包含真实规则及完整物理输入：寻路给完整邻接表、起点和目标；积木给八种形状、10×10 初始／目标棋盘及移除规则。一条计划配一份题面，不复制旧候选编号增强；输入呈现按保存种子固定。
+此处用占据格集合缩写棋盘以便阅读；正式 user 消息仍使用完整 10×10 棋盘。目标仅保留 `(9,9)`：
 
-### 2.2 答案怎样采样
+| 轮次 | 当前占据格 | 全部合法候选 | assistant 监督 |
+|---|---|---|---|
+| 0 | `(0,0),(0,1),(0,2),(0,3),(9,9)` | 1=`remove(5,0,0)`；2=`remove(5,0,1)`；3=`remove(5,0,2)`；4=`remove(7,0,0)`；5=`remove(7,0,1)` | `<action>1</action>` |
+| 1 | `(0,2),(0,3),(9,9)` | 1=`remove(5,0,2)` | `<action>1</action>` |
+| 2 | `(9,9)` | 无 | `<done/>` |
 
-**采样单位是一条合法计划。** 每题最多保留 4 条计划，每条独立交给教师生成一份解释，组成一个“题目 → CoT＋计划”监督样本。教师贪心生成；解释不通过时最多反馈修订一次，不以文字改写增加解数。
+两轮编号都为 1，但对应不同物理动作。完整标签轨迹为两次水平二格移除，再停止；其余候选依然显示，模型需学会选择。
 
-| 规则 | 具体处理 |
+## 3. 数据：每题一条合法最短轨迹
+
+### 3.1 来源与范围
+
+复用[当前积木合同](../experiments/flamingo_map_reader/configs/blocks_kv_restart.json)对应的保存物理题和 split，重新制作动作标签：
+
+| 数据 | 本轮处理 |
 |---|---|
-| 候选范围 | 设认证最短步数为 d；候选必须逐步合法、精确到达，步数在 d 至 d＋2 之间 |
-| 必保答案 | 先保留求解器认证的一条 d 步计划 |
-| 去重单位 | 寻路按完整节点序列；积木按有序的 `(shape_id,row,col)` 动作序列；候选编号或文本不同不算新计划 |
-| 数量不足 | 保留实际取得的 1–3 条，不复制补足；零步只留一条：寻路 `path=[start], steps=0`，积木 `actions=[], steps=0` |
-| 随机性 | 固定种子随机化同层候选访问顺序，保存实际选中计划；这是有界枚举采样，不宣称对所有合法解均匀抽样 |
-| 停止条件 | 取得 4 条即停止补充；补充预算耗尽时保留已验证计划并记录原因；最短认证超时记 unknown，先解决，不记无解或静默删题 |
+| 8,000 普通训练题 | 每题一条求解器认证的合法最短轨迹 |
+| 1,000 初始即目标题 | 保留，每题一个停止轮 |
+| 1,000 固定失败历史 | 不加入本轮；它们不是原题的最短解 |
+| 普通留出题 | 沿用固定 validation／test，普通 test 510 题；区分原初始棋盘新任务与新初始棋盘 |
+| 已达标 100 题 | 源合同将其标为 validation；单列评测，不改称独立 test |
 
-**执行建议：最短长度优先，积木优先不同覆盖。**
+数量按实际清单核对，先确认当前正式源路径，不能把历史 preview 当当前数据。原题曾按地图贪心成功筛选，该选题偏差保留并披露；重新生成标签不等于重新选题。
 
-1. **寻路：**BFS 得到 d 和一条最短路线，再按 d、d＋1、d＋2 三层枚举不重复节点的路径，依次补足到 4 条；同层随机化顺序。不强制每个长度都取一条。visited 只限制当前路径，用到目标的图距离作剩余步数下界剪枝。
-2. **积木：**确认目标是初始占据格的子集，对待移除格求最小精确覆盖。先保留一条最短计划；再按上述长度顺序补充不同覆盖，每组覆盖只先取一个动作顺序。若覆盖不足且枚举结束／预算用尽，再从已有覆盖取不同动作顺序补足。覆盖由“各动作移除格集合的无序集合”区分；换序属于同覆盖下的不同计划，单列统计。
-3. **积木枚举：**每轮选候选最少的剩余格，遍历覆盖它的放置并递归余格，用 `ceil(剩余格数/3)` 作动作数下界。当前规则无重力／库存限制，覆盖互不重叠，动作顺序可交换；随机换序后仍需独立回放验收。
+### 3.2 怎样取得最短标签
 
-**例子：**附录寻路题 d＝2。假设同层随机遍历得到以下顺序：
+1. 确认目标格属于初始占据格；对“初始减目标”的格集合，用[精确覆盖求解器](../experiments/gcml_counterexamples/src/blocks.py)求最少移除次数和一条见证轨迹。多个最短解按固定动作遍历顺序取一条，保存实际轨迹，不做多解采样、次优路线或教师生成。
+2. 独立按真实规则回放，检查全部动作合法、目标格始终保留、终局精确等于目标，且动作数等于认证最短值。
+3. 每步由规则重新枚举全部合法动作，将见证中的物理动作映射到本轮候选编号；生成当前棋盘、历史、`<action>ID</action>`，最后追加停止轮。
+4. 复用[精确距离裁判](../experiments/blocks_distance_map/src/oracle.py)检查最优动作令剩余距离减少 1。地图贪心成功仅能证明可行，未经认证不能称最短；求解超时记 unknown，先解决，不标无解或静默删题。
 
-| 计划 | 步数 | 处理 |
-|---|---|---|
-| `[0,2,5]` | 2 | 必保最短解 |
-| `[0,3,5]` | 2 | 补充另一条最短解 |
-| `[0,1,4,5]` | 3 | 最短解不足 4 条，继续补充 |
-| `[0,1,2,5]` | 3 | 取得第 4 条，停止 |
-| `[0,1,4,3,5]` | 4 | 在允许范围内，但已取够，不再纳入 |
+候选编号增强沿用现有策略：普通题最多 6 个编号版本，零步题 1 个；它只改变呈现，不增加物理解。同题版本全部在同一 split，标签随编号同步变换。保存题目来源、物理动作、状态、候选映射、最短认证及种子即可，数据和缓存放 Git 外。
 
-附录积木题只有一组两动作覆盖，正序／反序共两条不同计划，因此保留两份监督；零步题只保留一份。
+检查新最短轨迹的非终止 `(状态,目标)` 与留出输入重合，固定测试题并重算实际曝光分组；共有终局不等于整题泄漏，零步完全同题重合需单列。
 
-复用[图距离实现](../experiments/flamingo_map_reader/src/data.py)与[积木覆盖求解器](../experiments/gcml_counterexamples/src/blocks.py)，只读取真实图／规则，不调用地图评分。最短认证和补充枚举分别设时间／展开预算，按试样耗时固定到正式配置。
+## 4. 训练设置与实现
 
-同题多解始终属于同一 split。检查新监督中的非终止 `(状态,目标)` 是否撞到留出输入；优先重采训练路线，无法消除则记录。测试题保持固定，按新增状态重算曝光分组；共有终局不等于整题泄漏，零步同题重合需单列。
-
-### 2.3 让原模型为每条计划写解释
-
-| 输入／输出 | 内容 |
-|---|---|
-| 教师输入 | 学生题面＋一条指定计划＋独立回放的动作效果、后继状态和目标保持证据 |
-| 教师输出 | `<reasoning>` 中写目标约束、方案依据、逐步状态和终局检查；`<final>` 中写指定计划的 JSON |
-| 学生输入 | 只有题面和输出格式要求 |
-| 学生监督 | 验收后的完整解释＋计划；不含教师的路线提示或事实包 |
-
-解释必须独立可读。多解均可行时不编造排他理由；没有失败分支证据时不编造探索／回溯；声称最短时给出可检查的下界或证明。教师 system／user 完整文本及对应监督输出见附录 A；每条计划独立生成一次解释。零步用规则短文本即可。
-
-**建议试样协议：**每任务固定 32 道训练题，覆盖距离、棋盘来源、非空目标与候选较多的题，每条所选计划生成一次解释。教师贪心生成；按原生上下文减实际输入长度确定可用生成额度，记录触顶。失败最多按具体错误反馈修订一次。小批全部人工审阅，记录首次／修订后验收率、错误类型、最长文本、token 和耗时。教师与学生初始权重相同，新增信息来自离线计划与事实；解释质量尚未实测。
-
-### 2.4 什么样的监督可以入库
-
-| 检查项 | 验收办法 |
-|---|---|
-| 计划与格式 | 唯一 final、有效 JSON、与指定计划一致、步数一致；逐步合法且精确到达 |
-| 中间状态 | 使用附录的固定状态行，提取路径／占据格列表，与独立规则回放逐步比对 |
-| 理由与最短声明 | 对照边、覆盖格、不可逆移除和显式下界；正确终局不能抵销错误理由 |
-| 自然语言 | 小批全审；全量检查可提取事实并抽查理由，记录审阅覆盖，不能宣称自由文本逻辑全部自动认证 |
-
-原始输出、修订及失败原因均保存。修订仍不过时，先决定规则模板兜底或升级解释教师，再做全量；不能静默丢题或把不可靠解释当监督。每条样本至少保留题目来源／split、计划与最短认证、回放状态／证据、教师版本与生成设置、监督文本及验收结果。大数据与生成日志放 Git 外。
-
-## 3. 怎样训练
-
-### 3.1 固定起点
+### 4.1 1.5B 试点起点
 
 | 项目 | 设置 |
 |---|---|
-| 基座与更新 | 两任务各自从原始 Qwen2.5-1.5B-Instruct 全参数训练，不使用 LoRA |
-| 学习率／有效 batch | 2e-5／32 条完整样本 |
-| 训练预算 | 3 epoch，每 epoch 打乱并遍历所有扩展样本 |
-| 调度 | 前 5% 更新 warmup，之后 cosine 降至峰值的 1/10 |
-| 监督范围 | 解释、最终计划和 assistant 结束 token；输入／padding 标签为 -100 |
+| 基座 | 原始 Qwen2.5-1.5B-Instruct，全参数更新，不使用地图接口或 LoRA |
+| 学习率／有效 batch | 2e-5／32 条完整多轮轨迹 |
+| 预算 | 3 epoch；每 epoch 遍历全部编号版本 |
+| 调度 | 前 5% 更新 warmup，之后 cosine 至峰值 1/10 |
+| 监督 | 各轮动作／停止响应及 assistant 结束 token；user、padding 为 -100 |
 
-工程预设建议为 AdamW（weight decay 0.01、beta 0.9／0.999、epsilon 1e-8）、梯度裁剪 1.0；设备支持时用 BF16 与梯度检查点，不跨题 packing。首轮一个训练种子；设备、单卡 batch 和累积步数由显存试样确定并写入合同。
+保留此前已选的训练起点，先建立基线，不因改协议自动扩预算。工程预设为 AdamW、weight decay 0.01、梯度裁剪 1.0；设备支持时 BF16 与梯度检查点，不跨题 packing。单卡 batch 与累积步数按最长样本实测，首轮固定一个训练种子。
 
-### 3.2 多解怎样计权
+每条完整轨迹先对监督 token 的损失平均，再对同题编号版本平均，最后对物理题平均，避免增强版本多的普通题压低零步题权重。若 N 题扩展为 M 条、题 i 有 n_i 个版本，使用固定权重 `M/(N*n_i)` 乘轨迹平均损失，对 batch 平均，不按 batch 内权重和再次归一化。
 
-目标是**先对回答 token 平均，再对同题不同解平均，最后对物理题平均**；解更多、解释更长不提高该题权重。
+### 4.2 长度和代码复用
 
-实现：共 N 道题、M 条扩展样本，题 i 有 n_i 条监督；每条先算回答 token 平均交叉熵，再乘固定权重 `M/(N*n_i)`，对 batch 平均。不要按每个 batch 的权重和再次归一化；梯度累积／分布式与末 batch 也要保持这一目标。零步题按同样的物理题权重进入训练。
+- **训练上限 S：**用真实 tokenizer／chat template 统计完整多轮对话，按最大训练长度确定，不静默裁掉后续动作或停止轮。
+- **每轮生成上限 G：**统计合法动作编号响应和停止响应的实际 token 长度，包括结束 token；用 validation 检查触顶后固定。未微调与 SFT 同 G，不用 test 调预算。
+- **交互预算：**沿用最多 32 个执行动作，另允许到达后的停止轮；训练 S 和每次生成的累计上下文＋G 均须在原生上下文内。超限在实施前处理，不静默截断／删题，原始失败保留。
 
-### 3.3 长度由真实文本确定
+可复用环境规则、候选编号、多轮拼接及 user mask 思路；需要移除地图加载与 token-map 分配，使用普通 causal LM。旧 `MapReader` 会冻结基座，旧 trainer 只存 `adapter.pt`，旧答案解析／评分包含排序和自然语言总结，因此必须改为全参数更新、完整模型保存重载和纯动作／停止评分。不能只删提示中的地图字样后继续原训练入口。
 
-1. 用实际 tokenizer 和正式 chat template，统计**学生输入 P、完整回答 R、整条训练序列 T**，保存分位数、最大值和最长原文；按最终拼接计数。
-2. 全量验收文本的最大 T 决定训练上限 **S**；不按 P99 截掉长题。实际 R 提供新生成上限 **G** 的起点，再用小训练的 validation 检查学生重复／触顶，正式评测前固定。
-3. 每任务分别定 S／G；核对最长输入＋G 和 S 都在原生上下文与设备能力内。超限先修改表达粒度并重验，不能静默截断。未微调与 SFT 同 G，不用 test 答案调预算。
+## 5. 评测：轨迹到达率＋单步可达率
 
-P 含 assistant 起始标记，R 含结束 token；S 限完整训练序列，G 限新生成 token。附录的短例子不能决定正式长度，教师长度也不是学生长度上界。
-
-### 3.4 实现边界与资源
-
-旧接口代码会冻结 base_model、保存 `adapter.pt`，并使用逐轮地图输入与 constant warmup；**不能只改参数范围就复用**。需要普通 causal LM 的整题入口、上述加权损失和完整模型保存／重载；复用环境规则、基础日志与 token 对齐思路。
-
-在不复制题面的前提下，寻路约 4,192–16,192 条、积木约 9,000–33,000 条训练样本；普通题最多 48,000 次首轮教师生成，修订另计。全参数的优化器状态和长序列开销需用最长样本实测，不能按冻结接口估算。
-
-## 4. 怎样评测与选模
-
-每题一次贪心输出，无工具、无中间反馈、无重采。只解析唯一 final 中的 JSON，不从解释修补动作，不跳过非法步骤。
-
-| 结果 | 统计口径 |
+| 指标 | 定义与输入 |
 |---|---|
-| 主指标：普通合法完整到达率 | 所有普通题为分母；全部动作合法并精确到达才成功，解析／格式错误和截断均计失败 |
-| 效率与预算 | 合法且最短率、成功步数；另报 32 动作内成功率，便于对应旧系统预算 |
-| 目标判断 | 零步空计划正确率单列，不混入普通成功率 |
-| 诊断与成本 | 首个非法动作、逐步状态错误／缺失、解释抽查、生成 token、触顶与延迟；按距离、棋盘来源、目标非空和曝光分组 |
+| 轨迹到达率（主指标） | rollout 从固定初始状态出发，每轮执行模型动作并回报真实状态；32 动作内曾精确到达目标的普通题数／全部普通题数 |
+| 到达且正确停止率 | 到达后正确输出停止标记的普通题数／全部普通题数；与“曾到达”分开 |
+| 单步可达率 | reference 给固定最短参考历史与当前状态；在作答前仍可解的非终止轮中，合法选择且后继仍可达目标的轮数／全部该类轮数 |
+| 辅助诊断 | 单步最优率（剩余最短距离减 1）、非法／格式错误、提前停止、触顶、生成 token；零步停止正确率单列 |
 
-每 epoch 末评完整固定 validation，以普通到达率选 checkpoint；平分看合法最短率，再选较早权重。test 只评未微调基座与选定 checkpoint，不用于选教师、改格式或调长度。最终计划成功而理由错误时，任务记成功、解释诊断记错，分别报告。
+单步可达率不是合法率：几何合法仍可能破坏可解性。提前停止、编号越界和格式错误在原本可解的决策轮计失败；rollout 的同指标另列，并记录已死局轮数。多个动作可能同样最优，按规则距离评价，不以是否等于那条唯一训练标签判错。
 
-## 5. 按什么顺序落地
+每轮一次贪心生成，无重采、动作修复或求解器建议。rollout 保留模型自身回答；reference 在下一轮只接入正确参考动作，不将本轮标签提前放入输入。未到目标且无合法候选时结束并记失败；到达后仍给一个停止轮。非法动作不执行，失败及其分母保留；若已到达却未正确停止，到达与停止分别计分。
 
-| 阶段 | 输入与工作 | 产物及完成条件 |
+每 epoch 末评固定 validation，以普通轨迹到达率选模，平分看到达且停止率，再选较早 checkpoint。test 只评未微调基座与选定 SFT checkpoint。与现有接口比较时保持题目、候选编号策略、动作预算一致；reference 还需相同状态／历史，不能直接拿不同参考轨迹的旧均值作对照。排序、地图最优率和 NDCG 不属于本基线指标。
+
+## 6. 落地顺序与后续
+
+| 顺序 | 工作 | 完成条件 |
 |---|---|---|
-| 1. 固定源题 | 当前保存清单与源合同 | 确定实际路径、ID／split／数量及零步评测来源；区分历史预览与正式数据 |
-| 2. 验证监督流程 | 每任务 32 题；生成多解、回放证据、原模型解释 | 所有计划／状态核验，小批文本全审；记录解数、unknown、错误、最长文本和成本，定求解预算及失败处理 |
-| 3. 制作全量语料 | 固定源题与通过试样的流程 | 每题有认证最短解，全部入库监督通过检查；未解决题、重复与曝光冲突逐项记账并处理 |
-| 4. 验证训练入口 | 验收语料、最长样本和少量训练题 | 得到 token 统计／S、显存吞吐与累积设置；核对 mask、损失、参数确实更新及完整模型重载，少量过拟合能复现监督 |
-| 5. 固定正式合同 | validation 生成试点 | 固定 G、设备／种子／输出目录及选模规则；提交两任务 configs，试样权重不计正式结果 |
-| 6. 正式训练评测 | 原始基座、固定合同和语料 | 各训练 3 epoch，保存 validation 选模依据、两组 test 原始输出与逐题回放 |
+| 1 | 核对积木源清单及分组 | 固定题目、split、来源和编号策略 |
+| 2 | 固定 32 道积木训练题制作试样 | 单条最短认证、状态回放、候选编号和停止标签一致；记录求解 unknown 与成本 |
+| 3 | 实现纯动作多轮训练／评测入口 | mask、轨迹权重、参数更新、完整模型重载正确；小量题能过拟合，评分不依赖排序文本 |
+| 4 | 制作全量标签并测长度／资源 | S／G、显存、吞吐、batch／累积设置确定；未解决题和曝光冲突明确处理 |
+| 5 | 提交正式合同后训练与评测 | 3 epoch、validation 选模、固定 test 原始回答和逐步执行结果 |
 
-阶段 1–5 补齐实际路径、解释可用性、长度和资源，之后才具备正式开跑条件。若原模型不能写出可靠解释或最短认证无法完成，先解决该失败，不靠删难题维持流程。实施时在 `experiments/llm_task_sft/` 建立 README、configs、src 和针对性 tests；正式参数以配置为权威。本轮只修订文档，尚未实施新生成或训练。
+实施时在 `experiments/llm_task_sft/` 建立正式配置与必要实现；配置形成后以其为参数权威。本轮只更新本方案，不启动数据制作、代码实现或训练。
 
-## 附录 A：教师输入与监督输出
-
-下面是按真实规则构造的完整消息样例，拟用于教师试样，尚未实测。**每条计划单独调用教师：A.1 通用文本与该任务的追加指令以空行拼成一条 system 消息，user 使用 A.2 或 A.3 的完整文本。** 同题换一条路线时保持题面不变，替换计划，并重新回放生成相应证据；不把多条路线混入一次调用。教师的响应经验收后成为学生的 assistant 监督。
-
-### A.1 教师 system 的通用部分
-
-```text
-You write an explanatory solution for a student that sees only the problem.
-The user message contains <problem>, one <verified_plan>,
-<transition_facts>, and any <checked_deductions>. The plan and facts
-are teacher-only context from an offline solver and rule replay.
-
-Return exactly one <reasoning> block followed by one <final> block.
-In <reasoning>:
-1. Identify the goal constraints.
-2. Explain how the proposed plan meets those constraints. Use useful
-   deductions supported by the problem or the checked facts.
-3. Describe every action's effect and check the resulting state.
-4. Check that the final state equals the goal.
-
-In <final>, return the supplied plan's JSON exactly.
-Do not choose another plan or add actions.
-Write a self-contained solution without referring to the supplied
-plan, the solver, or the fact records.
-Do not invent search attempts, backtracking, or unsupported claims
-that another choice fails. Multiple choices may be equally valid.
-Claim shortestness only with an explicit valid proof in your text.
-If the supplied facts do not support a comparison, omit it.
-Do not add text outside the two output blocks.
-```
-
-`transition_facts` 是规则回放的结果，`checked_deductions` 是程序或人工核对过的推导，可为空；没有证明时不填写局部排除或最短理由。这些段落不是求解器的完整搜索日志。下面两条短样例用于说明消息格式，不代表正式输出长度。
-
-### A.2 寻路
-
-**教师 system 的寻路追加指令：**
-
-```text
-For this pathfinding task, write the initial visited path and the
-visited path after every move.
-```
-
-**教师 user 消息（完整文本）：**
-
-```text
-<problem>
-Find a valid path from node 0 to node 5 in this undirected graph.
-Reaching the goal is the first priority; prefer fewer moves.
-Use only listed edges. Visit each node at most once.
-In <reasoning>, explain the constraints, plan, and checks.
-In <final>, return JSON with path and steps.
-
-Neighbors:
-0: [1, 2, 3]
-1: [0, 2, 4]
-2: [0, 1, 5]
-3: [0, 4, 5]
-4: [1, 3, 5]
-5: [2, 3, 4]
-</problem>
-
-<verified_plan>
-{"path": [0, 2, 5], "steps": 2}
-</verified_plan>
-
-<transition_facts>
-Initial: current_node=0; visited_path=[0].
-Step 1:
-  action=0->2; listed_edge=true; destination_unvisited=true.
-  current_node_after=2; visited_path_after=[0, 2].
-Step 2:
-  action=2->5; listed_edge=true; destination_unvisited=true.
-  current_node_after=5; visited_path_after=[0, 2, 5].
-End: goal_reached=true; repeated_nodes=false; moves_executed=2.
-</transition_facts>
-
-<checked_deductions>
-There is no edge between 0 and 5, so a route needs at least 2 moves.
-Neighbors(0)=[1, 2, 3]; neighbors(5)=[2, 3, 4].
-Their intersection is [2, 3]. Each common neighbor gives a
-2-move route from 0 to 5; choosing 2 does not make 3 invalid.
-</checked_deductions>
-```
-
-**学生输入：**只取上面 `<problem>` 内的文本，去掉外层标签；不附加教师 system 消息或其他三个证据段。
-
-**监督输出：**
-
-```text
-<reasoning>
-Goal constraints:
-Connect 0 to 5 using listed edges without repeating a node.
-There is no edge 0 -> 5, so at least 2 moves are needed.
-
-Plan construction:
-For a 2-move route, the middle node must neighbor both 0 and 5.
-Their neighbor sets intersect at {2, 3}; either gives a 2-move route.
-Use node 2. This does not mean node 3 is worse.
-
-State checks:
-Start at 0 with visited path [0].
-Take 0 -> 2: the edge exists and 2 is unvisited.
-Now at 2 with visited path [0, 2].
-Take 2 -> 5: the edge exists and 5 is unvisited.
-Now at 5 with visited path [0, 2, 5].
-
-Verification:
-Both edges exist, no node repeats, and the path ends at 5.
-It matches the 2-move lower bound, so it is shortest.
-</reasoning>
-<final>
-{"path": [0, 2, 5], "steps": 2}
-</final>
-```
-
-另一条路线 `[0,3,5]` 需生成相应状态；允许的次优路线 `[0,1,4,5]` 可以说三步合法，不能声称匹配两步下界。正式图为原 256 节点图，不保证一般长题都有这样短的构造证明。
-
-### A.3 积木
-
-**教师 system 的积木追加指令：**
-
-```text
-For this blocks task, list all occupied cells initially and after
-every removal; unlisted cells are empty.
-Use zero-based coordinates and list cells in row-then-column order.
-```
-
-**教师 user 消息（完整文本）：**
-
-```text
-<problem>
-Find a valid removal sequence from the initial board to the goal board.
-Reaching the goal is the first priority; prefer fewer removals.
-The board is a 10x10 binary grid: 1 is occupied and 0 is empty.
-remove(shape_id,row,col) uses the shape's zero-based top-left anchor.
-Every occupied shape cell must overlap an occupied board cell and lie
-inside the board. Only those cells are removed. Empty shape cells
-impose no constraint. Use only listed orientations. Shapes may be reused.
-There is no gravity or inventory limit. Reach the goal exactly.
-Shapes (/ separates rows):
-0=11/10; 1=10/11; 2=11/01; 3=01/11; 4=1/1; 5=11; 6=1/1/1; 7=111.
-
-Initial board:
-1111000000
-0000000000
-0000000000
-0000000000
-0000000000
-0000000000
-0000000000
-0000000000
-0000000000
-0000000001
-
-Goal board:
-0000000000
-0000000000
-0000000000
-0000000000
-0000000000
-0000000000
-0000000000
-0000000000
-0000000000
-0000000001
-
-In <reasoning>, explain the constraints, plan, and checks.
-List all occupied cells after each removal; unlisted cells are empty.
-In <final>, return JSON with actions and steps.
-</problem>
-
-<verified_plan>
-{"actions": [{"shape_id": 5, "row": 0, "col": 0}, {"shape_id": 5, "row": 0, "col": 2}], "steps": 2}
-</verified_plan>
-
-<transition_facts>
-Initially occupied: [(0,0), (0,1), (0,2), (0,3), (9,9)].
-Goal occupied: [(9,9)].
-Cells to remove: [(0,0), (0,1), (0,2), (0,3)].
-Step 1:
-  action=remove(5,0,0); covered_cells=[(0,0), (0,1)].
-  all_covered_cells_occupied=true; within_board=true.
-  goal_cells_removed=[].
-  occupied_after=[(0,2), (0,3), (9,9)].
-Step 2:
-  action=remove(5,0,2); covered_cells=[(0,2), (0,3)].
-  all_covered_cells_occupied=true; within_board=true.
-  goal_cells_removed=[].
-  occupied_after=[(9,9)].
-End: exact_goal_reached=true; removals_executed=2.
-</transition_facts>
-
-<checked_deductions>
-Removals are irreversible, so a successful plan must preserve (9,9).
-Allowed shape areas are 2 or 3. Four cells must be removed.
-The action-count lower bound is ceil(4/3)=2.
-Any goal-preserving 3-cell removal here leaves exactly one cell
-still to remove. No allowed shape fits in that one-cell remainder.
-The two supplied placements are disjoint and cover all four cells
-to remove; their order can be exchanged because there is no
-gravity, inventory limit, or constraint on empty shape cells.
-</checked_deductions>
-```
-
-**学生输入：**只取上面 `<problem>` 内的文本，去掉外层标签；不附加教师 system 消息或其他三个证据段。
-
-**监督输出：**
-
-```text
-<reasoning>
-Goal constraints:
-The goal keeps (9,9). Preserve it because removals cannot be undone.
-Remove exactly [(0,0), (0,1), (0,2), (0,3)] using disjoint shapes.
-
-Plan construction:
-Every allowed shape removes two or three cells.
-A three-cell removal here leaves one cell to remove.
-No allowed shape fits inside a one-cell remainder, so that choice fails.
-Two horizontal two-cell shapes cover the four cells without touching (9,9).
-Use remove(5,0,0) and remove(5,0,2).
-These placements are disjoint; their order can be exchanged under these rules.
-
-State checks:
-Initially occupied: [(0,0), (0,1), (0,2), (0,3), (9,9)].
-remove(5,0,0) covers [(0,0), (0,1)], both occupied and outside the goal.
-Occupied after removal: [(0,2), (0,3), (9,9)].
-remove(5,0,2) covers [(0,2), (0,3)], both still occupied and outside the goal.
-Occupied after removal: [(9,9)].
-
-Verification:
-Both removals are legal, preserve (9,9), and leave exactly the goal.
-Four cells must be removed and one action removes at most three,
-so at least two actions are needed. This two-action plan is shortest.
-</reasoning>
-<final>
-{"actions": [{"shape_id": 5, "row": 0, "col": 0}, {"shape_id": 5, "row": 0, "col": 2}], "steps": 2}
-</final>
-```
-
-排除三格方案是规则推导，不声称先真实探索再回溯。一般题中，每格都有覆盖候选不保证整体可解；奇数格也不证明无解，因为允许二格和三格形状。
-
-## 附录 B：参考依据
-
-- [STaR，§3](https://arxiv.org/html/2203.14465)：给答案提示补写理由，训练时移除提示，支持本方案的答案条件自生成形式；答案正确不保证理由正确。
-- [SCoTD，§2–3](https://arxiv.org/html/2306.14050)：每题多条理由监督；OPT-1.3B 使用 2e-5、batch 32，作为本方案保守起点。其教师与任务不同，不能直接搬用效果。
-- [DeepSeek-R1，B.3.3／B.4.3](https://arxiv.org/html/2501.12948v2)：参考多采样筛选与 cosine 衰减至 1/10；原文 1.5B 蒸馏采用 1e-4、batch 64、约 80 万样本，本方案不照搬其规模和长度。
-- [Searchformer，§3／5.1](https://arxiv.org/html/2402.14083v2)：真实程序搜索轨迹是另一种监督，成本随轨迹增长。本轮选择路线解释，若后续定位到找解能力不足，再讨论搜索监督。
+后续再讨论 7B、寻路，以及强教师／教师解释的 CoT SFT；均不纳入当前 1.5B 积木动作基线。

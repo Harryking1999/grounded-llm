@@ -74,12 +74,36 @@ def extract_model(archive,directory):
         raise ValueError('Model archive lacks complete HF weights')
 
 
+def stage_data(profile,credentials):
+    """One initial transfer; subsequent bridge work only sends epoch model weights."""
+    data=Path(profile['data'])
+    if not (data/'ready.json').exists(): raise ValueError('Training data is not ready')
+    archive=Path(profile['run'])/'incoming'/'data_50k.tar'
+    with tarfile.open(archive,'w') as stream:
+        stream.add(data,arcname=data.name)
+    jump,target=connect(profile,credentials)
+    try:
+        stage=profile['jump_stage']+'/data_50k.tar'
+        files=paramiko.SFTPClient.from_transport(jump.get_transport(),window_size=64*1024*1024,max_packet_size=1024*1024)
+        try: files.put(str(archive),stage)
+        finally: files.close()
+        remote_archive=profile['target_run']+'/incoming/data_50k.tar'
+        scp(target,f"{profile['jump_user']}@{profile['jump_host']}:{stage}",remote_archive,profile,credentials['jump_password'])
+        execute(target,shlex.join(['tar','xf',remote_archive,'-C',profile['target_run']]))
+        atomic_json(Path(profile['run'])/'data_transfer_complete.json',dict(target_data=profile['target_run']+'/'+data.name))
+    finally: target.close(); jump.close()
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--profile',type=Path,required=True)
+    parser.add_argument('--stage-data',action='store_true')
     args=parser.parse_args(); profile=json.loads(args.profile.read_text())
     credentials=json.load(sys.stdin)  # supplied by a detached launcher through a pipe
     run=Path(profile['run']); (run/'incoming').mkdir(exist_ok=True); (run/'models').mkdir(exist_ok=True)
+    if args.stage_data:
+        stage_data(profile,credentials)
+        return
     epochs=profile['epochs']; completed=[]
     while len(completed)<epochs:
         jump,target=connect(profile,credentials)

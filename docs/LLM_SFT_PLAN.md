@@ -3,16 +3,16 @@
 首轮用 **Qwen2.5-1.5B-Instruct 做全参数 SFT**，检验任务微调能否提升积木求解表现。
 
 - **模型输入：**规则、目标棋盘、当前棋盘、已执行动作、全部合法候选；不提供认知地图。
-- **模型输出：**每轮选一个动作，环境执行后给出新状态；到达目标时输出停止标记。
-- **监督来源：**每题一条经求解器认证的合法最短轨迹，拆成多轮动作标签；不生成排序或 CoT。
+- **模型输出：**每轮先写一句动作依据，再选一个动作，环境执行后给出新状态；到达目标时说明已达标并停止。
+- **监督来源：**每题一条经求解器认证的合法最短轨迹，拆成“简短依据＋动作”的多轮标签；依据由规则和求解结果直接生成。
 
 ## 1. 实验怎样运行
 
 ```mermaid
 flowchart LR
-    O["离线最短轨迹"] --> S["全参数 SFT"] --> L["1.5B LLM"]
+    O["最短轨迹＋简短依据"] --> S["全参数 SFT"] --> L["1.5B LLM"]
     E["环境：当前棋盘＋合法候选"] --> L
-    L -->|"一个动作／停止"| E
+    L -->|"末行：动作／停止"| E
 ```
 
 **一次选一个动作，整题通过多轮交互完成。** 环境负责执行、更新棋盘和列出合法候选；模型根据新状态选择下一步。这里的“动作序列”指各轮输出连成的序列。
@@ -37,11 +37,17 @@ SFT 与未微调同基座的差异用于衡量任务微调收益。与地图接�
 
 1. **首轮：**任务规则、八种形状、初始棋盘、目标棋盘、输出格式，以及当前环境状态。
 2. **后续轮：**完整 10×10 当前棋盘、实际执行历史、全部合法候选；保留前面各轮的对话。
-3. **assistant：**只输出 `<action>ID</action>` 或 `<done/>`，这些响应就是训练标签。
+3. **assistant：**固定两行：第一行 `Reason: ...`，写一句依据；第二行 `<action>ID</action>` 或 `<done/>`。两行都作为训练标签。
+
+**依据写在动作前面，**让自回归生成动作时能利用已生成的说明。每句写清所选动作移除的具体格子、是否保留目标格，以及剩余棋盘能否继续完成。这里“离目标更近”指剩余最短移除次数减少 1；单纯少了几个格子不能证明选择正确。
+
+短句由真实状态转移和精确求解结果生成，采用下文示例中的三种固定句式：仍需继续、此次到达、已经到达。具体格子按行列顺序填写，两格或三格用 ` and ` 连接。是否提升解题表现由任务指标判断，解释流畅本身不构成证据。
+
+环境只解析末行唯一的动作／停止标记，不依据说明选择、补全或修复动作。说明缺失或事实错误单列记录；动作结果仍按真实执行评测。
 
 候选编号只在当前轮有效；它对应真实的 `remove(shape_id,row,col)` 动作。合法候选只表示几何上能执行，仍可能进入死局，因此必须全部呈现，不能用求解器预先过滤。输入不包含地图向量、K/V、距离、排名或最优标记。
 
-**停止条件是当前棋盘精确等于目标。** 初始已达目标的题直接输出 `<done/>`；即使目标非空且还有合法移除动作，也应停止。
+**停止条件是当前棋盘精确等于目标。** 初始已达目标的题输出一句达标说明和 `<done/>`；即使目标非空且还有合法移除动作，也应停止。
 
 ### 2.2 完整三轮示例
 
@@ -90,8 +96,14 @@ Goal board:
 0000000001
 
 Response format:
-If the current board exactly matches the goal, output only <done/>.
-Otherwise, choose one legal candidate from the current update and output only <action>ID</action>.
+Output exactly two lines: a short reason, then one control tag.
+If the current board exactly matches the goal, explain this in one sentence beginning with "Reason:", then output <done/> on the second line.
+Otherwise, choose one legal candidate from the current update. On the first line, beginning with "Reason:", state which cells it removes, whether goal cells are preserved, and how it advances a valid completion. On the second line, output <action>ID</action>.
+Use one of these reason sentences. Replace CELLS with the removed occupied cells as (row,col), ordered by row then column and joined by " and ".
+If the removal leaves a board that still needs solving: Reason: Clearing CELLS is legal, preserves all goal cells, and leaves a solvable board with one fewer removal needed.
+If the removal reaches the goal: Reason: Clearing CELLS is legal and leaves exactly the goal board.
+If already at the goal: Reason: The current board exactly matches the goal; no further removal is needed.
+Do not output candidate rankings or a multi-step plan.
 
 [Environment update]
 Current board:
@@ -119,12 +131,13 @@ Candidate numbers may change between turns; use only the numbers above.
 **assistant 监督答案**
 
 ```text
+Reason: Clearing (0,0) and (0,1) is legal, preserves all goal cells, and leaves a solvable board with one fewer removal needed.
 <action>1</action>
 ```
 
 环境执行 `remove(5,0,0)`，移除 `(0,0)`、`(0,1)`，再发送更新后的棋盘。
 
-示例说明：首轮候选 1 和 3 都能在两步内完成；候选 2、4、5 虽然合法，却会留下无法继续移除的孤立格。本例固定选候选 1。这段说明用于读者理解，不写入模型输入或监督答案。
+示例说明：首轮候选 1 和 3 都能在两步内完成；候选 2、4、5 虽然合法，却会留下无法继续移除的孤立格。本例固定选候选 1。上述候选比较用于读者理解，不写入模型输入或监督答案。
 
 #### 第 2 轮：根据新棋盘选择第二次移除
 
@@ -153,6 +166,7 @@ Candidate numbers may change between turns; use only the numbers above.
 **assistant 监督答案**
 
 ```text
+Reason: Clearing (0,2) and (0,3) is legal and leaves exactly the goal board.
 <action>1</action>
 ```
 
@@ -185,10 +199,11 @@ Candidate numbers may change between turns; use only the numbers above.
 **assistant 监督答案**
 
 ```text
+Reason: The current board exactly matches the goal; no further removal is needed.
 <done/>
 ```
 
-本题的完整训练样本包含上述三轮对话。只对两次动作响应、停止响应及各自的 assistant 结束 token 计算损失；题面、棋盘、候选和 padding 不计算损失。
+本题的完整训练样本包含上述三轮对话。各轮依据、动作／停止标记及 assistant 结束 token 都计算损失；题面、棋盘、候选和 padding 不计算损失。
 
 ## 3. 监督数据怎样制作
 
@@ -199,7 +214,7 @@ Candidate numbers may change between turns; use only the numbers above.
 | 来源 | 本轮处理 |
 |---|---|
 | 8,000 普通训练题 | 每题一条合法最短轨迹 |
-| 1,000 初始已达目标题 | 每题一轮 `<done/>` |
+| 1,000 初始已达目标题 | 每题一轮达标说明＋`<done/>` |
 | 1,000 固定失败历史 | 不加入本轮最短解监督 |
 | 普通 validation／test | 保持原划分；普通 test 为 510 题，保留原初始棋盘新任务／新初始棋盘分组 |
 | 已达标 100 题 | 源合同属于 validation，单列停止评测 |
@@ -210,10 +225,10 @@ Candidate numbers may change between turns; use only the numbers above.
 
 1. **求最短解。**确认目标格均属于初始占据格，对“初始减目标”调用[精确覆盖求解器](../experiments/gcml_counterexamples/src/blocks.py)，得到最少移除次数和一条解。多个最短解按固定动作遍历顺序取一条，不采样多条路线。
 2. **回放验证。**按真实规则执行这条解：每步合法、目标格始终保留、终局精确等于目标，动作数等于认证最短值。
-3. **生成对话。**每步重新枚举全部合法候选，将解中的物理动作映射为本轮编号，填写棋盘和实际历史，生成 `<action>ID</action>`；终局追加 `<done/>`。
-4. **核对距离。**用[精确距离裁判](../experiments/blocks_distance_map/src/oracle.py)检查每个动作让剩余最短距离减少 1。求解超时记为 unknown，查明后再制作正式数据，不能当无解或静默删题。
+3. **生成对话。**每步重新枚举全部合法候选，将解中的物理动作映射为本轮编号，填写棋盘和实际历史；根据动作实际移除的格子填写一行依据，下一行写 `<action>ID</action>`。终局追加达标说明和 `<done/>`。
+4. **验证依据。**按真实转移检查移除格、合法性和目标保留；用[精确距离裁判](../experiments/blocks_distance_map/src/oracle.py)确认后继仍可解、剩余最短距离减少 1，若后继等于目标则使用“此次到达”的短句。依据不写具体距离数值，不把求解结果加进 user 输入。求解超时记为 unknown，查明后再制作正式数据，不能当无解或静默删题。
 
-最短性来自精确求解和验证，不来自地图贪心成功。直接动作监督不需要教师生成解释。
+最短性来自精确求解和验证，不来自地图贪心成功。说明按规则填入具体格子和经验证的结论，不需要教师生成长解释或搜索过程。
 
 ### 3.3 编号增强和数据隔离
 
@@ -245,7 +260,7 @@ Candidate numbers may change between turns; use only the numbers above.
 | 上限 | 如何确定 |
 |---|---|
 | 训练序列长度 S | 用真实 tokenizer／chat template 统计完整多轮训练样本，以最大长度确定 |
-| 每轮生成长度 G | 统计动作编号响应和停止响应的实际 token 长度，包含结束 token；用 validation 检查触顶后固定 |
+| 每轮生成长度 G | 统计完整两行响应（依据＋动作／停止）的实际 token 长度，包含结束 token；用 validation 检查触顶后固定 |
 | 执行动作数 | 最多 32 个动作，另允许到达后的停止轮 |
 
 S 不能裁掉后续动作或停止标签；推理时累计上下文＋G 也须在原生上下文内。若超限，实施前处理并记录，不能静默截断或删题。未微调与 SFT 使用相同 G，不用 test 调预算。
@@ -253,7 +268,7 @@ S 不能裁掉后续动作或停止标签；推理时累计上下文＋G 也须�
 ### 4.3 现有实现怎样复用
 
 - **可复用：**环境规则、候选编号、多轮消息拼接，以及将 user token 设为 -100 的思路。
-- **需要改：**普通 causal LM 入口、全参数更新、完整模型保存与重载、纯动作／停止解析和评分；移除地图加载与 token-map 分配。
+- **需要改：**普通 causal LM 入口、全参数更新、完整模型保存与重载、两行响应的控制标记解析和执行评分；移除地图加载与 token-map 分配。
 
 旧 `MapReader` 冻结基座，旧 trainer 只保存 `adapter.pt`，旧评分依赖排序和自然语言总结。因此，正式实施时需要调整训练和评测入口，不能只改提示词。
 
@@ -263,7 +278,7 @@ S 不能裁掉后续动作或停止标签；推理时累计上下文＋G 也须�
 
 **整题交互（rollout）：**从固定初始棋盘出发，执行模型自己选的动作，回报真实棋盘，直到停止、失败或用完 32 个动作。保留模型自身回答，衡量实际解题能力。
 
-**固定状态单步评测（reference）：**给模型固定最短参考轨迹中的历史和当前棋盘，让它选择一次动作。下一轮接入正确参考动作，避免本轮错误改变后续输入；当前答案不能提前放进输入。
+**固定状态单步评测（reference）：**给模型固定最短参考轨迹中的历史和当前棋盘，让它选择一次动作。下一轮接入正确参考动作及对应说明，避免本轮错误改变后续输入；当前答案不能提前放进输入。
 
 两种方式都每轮只做一次贪心生成，不重采、不修复动作、不提供求解器建议。
 
@@ -274,16 +289,18 @@ S 不能裁掉后续动作或停止标签；推理时累计上下文＋G 也须�
 | 轨迹到达率（主指标） | 32 动作内曾精确到达目标的普通题数 ÷ 全部普通题数 |
 | 到达且正确停止率 | 到达后正确输出 `<done/>` 的普通题数 ÷ 全部普通题数 |
 | 单步可达率 | 固定状态评测中，合法选择且后继仍可解的轮数 ÷ 作答前可解的非终止轮数 |
-| 辅助指标 | 单步最优率、非法／格式错误、提前停止、生成触顶及 token 数；零步停止正确率单列 |
+| 辅助指标 | 单步最优率、非法／控制格式错误、提前停止、生成触顶及 token 数；零步停止正确率、说明格式和事实错误单列 |
 
 单步最优指动作令剩余最短距离减少 1。多个动作可能同样最优，按真实状态和精确距离评分，不要求与唯一训练标签编号一致。
 
-单步可达与合法不同：几何合法仍可能破坏可解性。提前停止、编号越界和格式错误在原本可解的决策轮计失败。整题交互中的单步可达率另列，并记录已死局轮数。
+单步可达与合法不同：几何合法仍可能破坏可解性。提前停止、编号越界和控制格式错误在原本可解的决策轮计失败。整题交互中的单步可达率另列，并记录已死局轮数。
+
+说明评测按固定句式提取移除格和“仍可解／已达标”主张，再用实际动作与精确裁判核验。未匹配句式记说明格式错误，不猜测自由文本含义；不以“模型说合法、说更近”判成功。说明错误不替代实际动作指标。
 
 失败处理明确如下：
 
 - 未到目标且无合法候选：结束并记失败。
-- 非法动作或格式错误：不执行，结束并保留失败计数。
+- 非法动作或控制标记缺失、重复、格式错误：不执行，结束并保留失败计数；有效控制标记对应的动作可执行，说明问题单列。
 - 到达目标：再给一个停止轮；即使未正确停止，也分别记录“已到达”和“停止失败”。
 
 ### 5.3 选模和对照
@@ -295,11 +312,11 @@ S 不能裁掉后续动作或停止标签；推理时累计上下文＋G 也须�
 ## 6. 实施顺序与完成条件
 
 1. **核对源数据。**固定题目清单、split、来源和编号策略。
-2. **制作 32 题试样。**固定 32 道训练题，完成最短认证、状态回放、编号映射和停止标签；记录 unknown 与求解成本。
+2. **制作 32 题试样。**固定 32 道训练题，完成最短认证、状态回放、编号映射、短句依据和停止标签；记录 unknown 与求解成本。
 3. **实现训练和评测入口。**确认 mask、轨迹权重、参数更新和完整模型重载正确；小量题能过拟合，评分不依赖排序文本。
 4. **制作全量标签，测长度和资源。**确定 S、G、显存、吞吐及 batch／累积设置；明确处理未解决题和曝光冲突。
 5. **提交正式配置后运行。**训练 3 epoch，validation 选模，固定 test 保存原始回答与逐步执行结果。
 
 正式实施时在 `experiments/llm_task_sft/` 建立配置和必要实现；配置形成后以其为参数权威。本次仅更新方案。
 
-7B、寻路、教师解释和 CoT SFT 留待后续讨论。
+7B、寻路、强教师生成长解释和完整 CoT SFT 留待后续讨论。

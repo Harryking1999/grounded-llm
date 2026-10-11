@@ -1,6 +1,16 @@
 # 1.5B 整题 CoT SFT 基线方案
 
-**主流程：固定物理题 → 求解器生成多条合法计划 → 原始 1.5B 根据计划和状态证据写解释 → 验收 → 全参数 SFT → 无工具整题评测。** 寻路、积木分别训练。本文件是实施方案，当前进度见[项目状态页](PROJECT_STATUS_AND_TODO.md)。
+寻路、积木分别训练，学生仅凭题面一次输出解释与完整计划。下图概括监督生成与学生训练；当前进度见[项目状态页](PROJECT_STATUS_AND_TODO.md)。
+
+```mermaid
+flowchart LR
+    S["求解器"] -->|"计划＋证据"| T["原始1.5B教师"]
+    T -->|"CoT＋计划"| V["验收"]
+    V --> F["1.5B全参数SFT"]
+    F --> M["学生模型"]
+```
+
+教师与学生从同一原始基座出发。计划与证据只用于教师解释和离线验收，不放入学生输入；评测裁判在整题答案提交后执行。
 
 ## 1. 实验要回答什么
 
@@ -32,14 +42,38 @@
 
 学生题面包含真实规则及完整物理输入：寻路给完整邻接表、起点和目标；积木给八种形状、10×10 初始／目标棋盘及移除规则。一条计划配一份题面，不复制旧候选编号增强；输入呈现按保存种子固定。
 
-### 2.2 每题取得哪些计划
+### 2.2 答案怎样采样
 
-- 普通题最多 **4 条不同计划**：至少一条最短，其余不超过最短＋2步。不足 4 条保留实际数量，不复制补足或删题。
-- 寻路用 BFS 认证最短距离，再在该距离至＋2步内枚举不重复节点的路径，用到目标的距离下界剪枝。visited 只限制当前路径，不能用全局 visited 丢掉其他路线。
-- 积木先确认目标是初始占据格的子集，对待移除格求最小精确覆盖，再有界枚举补充覆盖：选候选最少的剩余格，遍历覆盖它的放置并递归余格，用 `ceil(剩余格数/3)` 作动作数下界剪枝。当前规则无重力／库存限制，合法覆盖互不重叠，动作顺序可交换；优先不同覆盖，不足时可用换序，并分别统计两种多样性。
-- 零步只有一份短监督：寻路 `path=[start], steps=0`；积木 `actions=[], steps=0`，解释初始已等于目标。
+**采样单位是一条合法计划。** 每题最多保留 4 条计划，每条独立交给教师生成一份解释，组成一个“题目 → CoT＋计划”监督样本。教师贪心生成；解释不通过时最多反馈修订一次，不以文字改写增加解数。
 
-复用[图距离实现](../experiments/flamingo_map_reader/src/data.py)与[积木覆盖求解器](../experiments/gcml_counterexamples/src/blocks.py)，只读取真实图／规则，不调用地图评分。最短认证和补充枚举分别设预算，取够即停；预算由试样耗时确定。超时记 unknown，不能记无解；最短未认证的题保留在问题清单中，先解决再进入正式语料。
+| 规则 | 具体处理 |
+|---|---|
+| 候选范围 | 设认证最短步数为 d；候选必须逐步合法、精确到达，步数在 d 至 d＋2 之间 |
+| 必保答案 | 先保留求解器认证的一条 d 步计划 |
+| 去重单位 | 寻路按完整节点序列；积木按有序的 `(shape_id,row,col)` 动作序列；候选编号或文本不同不算新计划 |
+| 数量不足 | 保留实际取得的 1–3 条，不复制补足；零步只留一条：寻路 `path=[start], steps=0`，积木 `actions=[], steps=0` |
+| 随机性 | 固定种子随机化同层候选访问顺序，保存实际选中计划；这是有界枚举采样，不宣称对所有合法解均匀抽样 |
+| 停止条件 | 取得 4 条即停止补充；补充预算耗尽时保留已验证计划并记录原因；最短认证超时记 unknown，先解决，不记无解或静默删题 |
+
+**执行建议：最短长度优先，积木优先不同覆盖。**
+
+1. **寻路：**BFS 得到 d 和一条最短路线，再按 d、d＋1、d＋2 三层枚举不重复节点的路径，依次补足到 4 条；同层随机化顺序。不强制每个长度都取一条。visited 只限制当前路径，用到目标的图距离作剩余步数下界剪枝。
+2. **积木：**确认目标是初始占据格的子集，对待移除格求最小精确覆盖。先保留一条最短计划；再按上述长度顺序补充不同覆盖，每组覆盖只先取一个动作顺序。若覆盖不足且枚举结束／预算用尽，再从已有覆盖取不同动作顺序补足。覆盖由“各动作移除格集合的无序集合”区分；换序属于同覆盖下的不同计划，单列统计。
+3. **积木枚举：**每轮选候选最少的剩余格，遍历覆盖它的放置并递归余格，用 `ceil(剩余格数/3)` 作动作数下界。当前规则无重力／库存限制，覆盖互不重叠，动作顺序可交换；随机换序后仍需独立回放验收。
+
+**例子：**附录寻路题 d＝2。假设同层随机遍历得到以下顺序：
+
+| 计划 | 步数 | 处理 |
+|---|---|---|
+| `[0,2,5]` | 2 | 必保最短解 |
+| `[0,3,5]` | 2 | 补充另一条最短解 |
+| `[0,1,4,5]` | 3 | 最短解不足 4 条，继续补充 |
+| `[0,1,2,5]` | 3 | 取得第 4 条，停止 |
+| `[0,1,4,3,5]` | 4 | 在允许范围内，但已取够，不再纳入 |
+
+附录积木题只有一组两动作覆盖，正序／反序共两条不同计划，因此保留两份监督；零步题只保留一份。
+
+复用[图距离实现](../experiments/flamingo_map_reader/src/data.py)与[积木覆盖求解器](../experiments/gcml_counterexamples/src/blocks.py)，只读取真实图／规则，不调用地图评分。最短认证和补充枚举分别设时间／展开预算，按试样耗时固定到正式配置。
 
 同题多解始终属于同一 split。检查新监督中的非终止 `(状态,目标)` 是否撞到留出输入；优先重采训练路线，无法消除则记录。测试题保持固定，按新增状态重算曝光分组；共有终局不等于整题泄漏，零步同题重合需单列。
 
@@ -52,7 +86,7 @@
 | 学生输入 | 只有题面和输出格式要求 |
 | 学生监督 | 验收后的完整解释＋计划；不含教师的路线提示或事实包 |
 
-解释必须独立可读。多解均可行时不编造排他理由；没有失败分支证据时不编造探索／回溯；声称最短时给出可检查的下界或证明。两个具体输入与监督输出见附录 A。零步用规则短文本即可。
+解释必须独立可读。多解均可行时不编造排他理由；没有失败分支证据时不编造探索／回溯；声称最短时给出可检查的下界或证明。教师 system／user 完整文本及对应监督输出见附录 A；每条计划独立生成一次解释。零步用规则短文本即可。
 
 **建议试样协议：**每任务固定 32 道训练题，覆盖距离、棋盘来源、非空目标与候选较多的题，每条所选计划生成一次解释。教师贪心生成；按原生上下文减实际输入长度确定可用生成额度，记录触顶。失败最多按具体错误反馈修订一次。小批全部人工审阅，记录首次／修订后验收率、错误类型、最长文本、token 和耗时。教师与学生初始权重相同，新增信息来自离线计划与事实；解释质量尚未实测。
 
@@ -127,15 +161,49 @@ P 含 assistant 起始标记，R 含结束 token；S 限完整训练序列，G �
 
 阶段 1–5 补齐实际路径、解释可用性、长度和资源，之后才具备正式开跑条件。若原模型不能写出可靠解释或最短认证无法完成，先解决该失败，不靠删难题维持流程。实施时在 `experiments/llm_task_sft/` 建立 README、configs、src 和针对性 tests；正式参数以配置为权威。本轮只修订文档，尚未实施新生成或训练。
 
-## 附录 A：完整 CoT 样例
+## 附录 A：教师输入与监督输出
 
-下面是人工说明样例，采用真实规则，展示格式与推理内容。它们不是生产教师输出，也不能代表正式文本长度。
+下面是按真实规则构造的完整消息样例，拟用于教师试样，尚未实测。**每条计划单独调用教师：system 使用 A.1，user 使用 A.2 或 A.3。** 同题换一条路线时保持题面不变，替换计划，并重新回放生成相应证据；不把多条路线混入一次调用。教师的响应经验收后成为学生的 assistant 监督。
 
-### A.1 寻路
-
-**学生输入：**
+### A.1 共用教师 system 消息
 
 ```text
+You write an explanatory solution for a student that sees only the problem.
+The user message contains <problem>, one <verified_plan>,
+<transition_facts>, and any <checked_deductions>. The plan and facts
+are teacher-only context from an offline solver and rule replay.
+
+Return exactly one <reasoning> block followed by one <final> block.
+In <reasoning>:
+1. Identify the goal constraints.
+2. Explain how the proposed plan meets those constraints. Use useful
+   deductions supported by the problem or the checked facts.
+3. Describe every action's effect and check the resulting state.
+4. Check that the final state equals the goal.
+For pathfinding, write the initial visited path and the visited path
+after every move. For blocks, list all occupied cells initially and
+after every removal; unlisted cells are empty.
+Use zero-based coordinates and list cells in row-then-column order.
+
+In <final>, return the supplied plan's JSON exactly.
+Do not choose another plan or add actions.
+Write a self-contained solution without referring to the supplied
+plan, the solver, or the fact records.
+Do not invent search attempts, backtracking, or unsupported claims
+that another choice fails. Multiple choices may be equally valid.
+Claim shortestness only with an explicit valid proof in your text.
+If the supplied facts do not support a comparison, omit it.
+Do not add text outside the two output blocks.
+```
+
+`transition_facts` 是规则回放的结果，`checked_deductions` 是程序或人工核对过的推导，可为空；没有证明时不填写局部排除或最短理由。这些段落不是求解器的完整搜索日志。下面两条短样例用于说明消息格式，不代表正式输出长度。
+
+### A.2 寻路
+
+**教师 user 消息（完整文本）：**
+
+```text
+<problem>
 Find a valid path from node 0 to node 5 in this undirected graph.
 Reaching the goal is the first priority; prefer fewer moves.
 Use only listed edges. Visit each node at most once.
@@ -149,9 +217,32 @@ Neighbors:
 3: [0, 4, 5]
 4: [1, 3, 5]
 5: [2, 3, 4]
+</problem>
+
+<verified_plan>
+{"path": [0, 2, 5], "steps": 2}
+</verified_plan>
+
+<transition_facts>
+Initial: current_node=0; visited_path=[0].
+Step 1:
+  action=0->2; listed_edge=true; destination_unvisited=true.
+  current_node_after=2; visited_path_after=[0, 2].
+Step 2:
+  action=2->5; listed_edge=true; destination_unvisited=true.
+  current_node_after=5; visited_path_after=[0, 2, 5].
+End: goal_reached=true; repeated_nodes=false; moves_executed=2.
+</transition_facts>
+
+<checked_deductions>
+There is no edge between 0 and 5, so a route needs at least 2 moves.
+Neighbors(0)=[1, 2, 3]; neighbors(5)=[2, 3, 4].
+Their intersection is [2, 3]. Each common neighbor gives a
+2-move route from 0 to 5; choosing 2 does not make 3 invalid.
+</checked_deductions>
 ```
 
-教师额外收到计划 `[0,2,5]` 及真实边／状态，学生不收到。
+**学生输入：**只取上面 `<problem>` 内的文本，去掉外层标签；不附加教师 system 消息或其他三个证据段。
 
 **监督输出：**
 
@@ -184,11 +275,12 @@ It matches the 2-move lower bound, so it is shortest.
 
 另一条路线 `[0,3,5]` 需生成相应状态；允许的次优路线 `[0,1,4,5]` 可以说三步合法，不能声称匹配两步下界。正式图为原 256 节点图，不保证一般长题都有这样短的构造证明。
 
-### A.2 积木
+### A.3 积木
 
-**学生输入：**
+**教师 user 消息（完整文本）：**
 
 ```text
+<problem>
 Find a valid removal sequence from the initial board to the goal board.
 Reaching the goal is the first priority; prefer fewer removals.
 The board is a 10x10 binary grid: 1 is occupied and 0 is empty.
@@ -227,9 +319,42 @@ Goal board:
 In <reasoning>, explain the constraints, plan, and checks.
 List all occupied cells after each removal; unlisted cells are empty.
 In <final>, return JSON with actions and steps.
+</problem>
+
+<verified_plan>
+{"actions": [{"shape_id": 5, "row": 0, "col": 0}, {"shape_id": 5, "row": 0, "col": 2}], "steps": 2}
+</verified_plan>
+
+<transition_facts>
+Initially occupied: [(0,0), (0,1), (0,2), (0,3), (9,9)].
+Goal occupied: [(9,9)].
+Cells to remove: [(0,0), (0,1), (0,2), (0,3)].
+Step 1:
+  action=remove(5,0,0); covered_cells=[(0,0), (0,1)].
+  all_covered_cells_occupied=true; within_board=true.
+  goal_cells_removed=[].
+  occupied_after=[(0,2), (0,3), (9,9)].
+Step 2:
+  action=remove(5,0,2); covered_cells=[(0,2), (0,3)].
+  all_covered_cells_occupied=true; within_board=true.
+  goal_cells_removed=[].
+  occupied_after=[(9,9)].
+End: exact_goal_reached=true; removals_executed=2.
+</transition_facts>
+
+<checked_deductions>
+Removals are irreversible, so a successful plan must preserve (9,9).
+Allowed shape areas are 2 or 3. Four cells must be removed.
+The action-count lower bound is ceil(4/3)=2.
+Any goal-preserving 3-cell removal here leaves exactly one cell
+still to remove. No allowed shape fits in that one-cell remainder.
+The two supplied placements are disjoint and cover all four cells
+to remove; their order can be exchanged because there is no
+gravity, inventory limit, or constraint on empty shape cells.
+</checked_deductions>
 ```
 
-教师额外收到两个水平二格移除及逐步状态；单格无法覆盖的理由来自形状规则。
+**学生输入：**只取上面 `<problem>` 内的文本，去掉外层标签；不附加教师 system 消息或其他三个证据段。
 
 **监督输出：**
 

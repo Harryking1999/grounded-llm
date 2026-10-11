@@ -92,7 +92,209 @@
 
 无论选择哪种格式，推理时中间内容都由 LLM 自行生成。若记录状态、转移或分支判断，应由相应的真实环境或搜索记录支持；不能把仅核对终局视为已验证全部 CoT。
 
-### 4.2 样本结构与损失
+### 4.2 寻路：同一道题的两种具体输出
+
+以下是用于讨论格式的完整小例子，不是正式训练集样本。正式寻路仍使用已有图和任务划分。示例采用英文，与已有实验语言一致；标签名称、标点及状态表示是待确认的模板提案，不表示 CoT 方案已选定。
+
+**共同输入正文：**
+
+```text
+Find a valid path from node 0 to node 3 in this undirected graph.
+Reaching the goal is the first priority; among valid paths, prefer fewer moves.
+Use only the listed edges. Visit each node at most once.
+
+Neighbors:
+0: [1, 2]
+1: [0]
+2: [0, 3]
+3: [2]
+```
+
+共同正文之后，根据条件追加 A 或 B 的格式指令。相同条件下，未微调模型与 SFT 模型收到完全相同的指令。
+
+**A．状态—动作轨迹：只展示成功路径上的推演。**
+
+输入追加：
+
+```text
+In <reasoning>, write the current node, each chosen edge, and the updated
+visited path. In <final>, return JSON with path and steps.
+```
+
+监督输出：
+
+```text
+<reasoning>
+Current node: 0. Visited path: [0].
+Take edge 0 -> 2. This edge exists, and node 2 has not been visited.
+Current node: 2. Visited path: [0, 2].
+Take edge 2 -> 3. This edge exists, and node 3 has not been visited.
+Current node: 3. Visited path: [0, 2, 3].
+The current node equals the goal. Stop after 2 moves.
+</reasoning>
+<final>
+{"path": [0, 2, 3], "steps": 2}
+</final>
+```
+
+这个答案说明路径如何执行，没有说明为什么一开始不选节点 1。
+
+**B．完整搜索过程：展示 BFS 找到同一条路径的过程。**
+
+此例的具体算法是 BFS：按邻接表顺序扩展，用队列保存待探索路径，跳过当前路径中已出现的节点，在取出目标路径时停止。算法仅用于说明 B 的文本内容，正式求解器尚未选定。
+
+输入追加：
+
+```text
+In <reasoning>, perform breadth-first search over paths. Show the queue,
+each expansion, and skipped revisits. Stop when a goal path is popped.
+In <final>, return JSON with path and steps.
+```
+
+监督输出：
+
+```text
+<reasoning>
+Queue: [[0]].
+Pop [0]. Node 0 is not the goal.
+Append [0, 1] and [0, 2]. Queue: [[0, 1], [0, 2]].
+Pop [0, 1]. Node 1 is not the goal.
+Skip neighbor 0: it already occurs in this path.
+No extension remains for [0, 1]. Queue: [[0, 2]].
+Pop [0, 2]. Node 2 is not the goal.
+Skip neighbor 0: it already occurs in this path.
+Append [0, 2, 3]. Queue: [[0, 2, 3]].
+Pop [0, 2, 3]. Node 3 is the goal.
+Return [0, 2, 3], with 2 moves.
+</reasoning>
+<final>
+{"path": [0, 2, 3], "steps": 2}
+</final>
+```
+
+B 多监督了队列维护和无效分支处理。这里的“完整”指从初始化到找到该解的完整搜索记录，不要求找到解后继续穷举所有其他解。
+
+### 4.3 积木：同一道题的两种具体输出
+
+这个小例子遵守项目真实的 10×10 棋盘、八种形状和零起始坐标规则。初始棋盘第一行有四格，右下角有一格；目标仅保留右下角。下面的推理用 `Occupied cells` 列出所有占据坐标，未列坐标全为空。这是完整状态的稀疏表达，不是省略中间棋盘；是否采用这种表示仍属于模板讨论。
+
+**共同输入正文：**
+
+```text
+Find a valid sequence of removals from the initial board to the goal board.
+Reaching the goal is the first priority; among valid solutions, prefer fewer moves.
+The board is a 10x10 binary grid: 1 means occupied and 0 means empty.
+remove(shape_id,row,col) places the shape's top-left anchor at (row,col).
+Coordinates are zero-based. Every occupied shape cell must overlap an occupied
+board cell and lie inside the board. Remove only those cells.
+Empty shape cells impose no constraint. Use only the listed orientations.
+Shapes may be reused. There is no gravity or inventory limit.
+Reach the goal board exactly, preserving its occupied cells.
+Shapes (/ separates rows):
+0=11/10; 1=10/11; 2=11/01; 3=01/11; 4=1/1; 5=11; 6=1/1/1; 7=111.
+
+Initial board:
+1111000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000001
+
+Goal board:
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000001
+```
+
+**A．状态—动作轨迹：直接推演两次正确移除。**
+
+输入追加：
+
+```text
+In <reasoning>, list all occupied cells, then each chosen removal and the
+resulting occupied cells. Unlisted cells are empty.
+In <final>, return JSON with actions and steps.
+```
+
+监督输出：
+
+```text
+<reasoning>
+Occupied cells: [(0,0), (0,1), (0,2), (0,3), (9,9)].
+Goal occupied cells: [(9,9)].
+Choose remove(5,0,0). It removes [(0,0), (0,1)], both occupied.
+It does not remove the goal cell.
+Occupied cells: [(0,2), (0,3), (9,9)].
+Choose remove(5,0,2). It removes [(0,2), (0,3)], both occupied.
+It does not remove the goal cell.
+Occupied cells: [(9,9)].
+The board equals the goal. Stop after 2 removals.
+</reasoning>
+<final>
+{"actions": [{"shape_id": 5, "row": 0, "col": 0}, {"shape_id": 5, "row": 0, "col": 2}], "steps": 2}
+</final>
+```
+
+这条答案只包含成功解上的状态与动作，并不声称模型比较过其他移除方式。
+
+**B．完整搜索过程：先遇到死局，再回溯找到解。**
+
+为明确示例中的次序，此例采用深度优先搜索，候选按 shape_id 从大到小、再按 row 和 col 从小到大排列；跳过会移除目标格的动作，首次到达目标就停止。它与寻路示例采用不同算法，说明 B 可以有不同的求解器来源，不预设两个任务必须共用算法。
+
+输入追加：
+
+```text
+In <reasoning>, perform depth-first search. Try legal removals in descending
+shape_id, then ascending row and col order. Skip removals of goal cells.
+List all occupied cells after each trial. Backtrack when no continuation
+can reach the goal, and stop at the first solution.
+In <final>, return JSON with actions and steps for the successful branch only.
+```
+
+监督输出：
+
+```text
+<reasoning>
+Occupied cells: [(0,0), (0,1), (0,2), (0,3), (9,9)].
+Goal occupied cells: [(9,9)].
+Ordered legal removals: [remove(7,0,0), remove(7,0,1), remove(5,0,0), remove(5,0,1), remove(5,0,2)].
+Try remove(7,0,0).
+Occupied cells: [(0,3), (9,9)].
+The goal has not been reached, and no legal removal remains. Backtrack.
+Restore occupied cells: [(0,0), (0,1), (0,2), (0,3), (9,9)].
+Try remove(7,0,1).
+Occupied cells: [(0,0), (9,9)].
+The goal has not been reached, and no legal removal remains. Backtrack.
+Restore occupied cells: [(0,0), (0,1), (0,2), (0,3), (9,9)].
+Try remove(5,0,0).
+Occupied cells: [(0,2), (0,3), (9,9)].
+Ordered legal removals: [remove(5,0,2)].
+Try remove(5,0,2).
+Occupied cells: [(9,9)].
+The board equals the goal. Return the successful branch with 2 removals.
+</reasoning>
+<final>
+{"actions": [{"shape_id": 5, "row": 0, "col": 0}, {"shape_id": 5, "row": 0, "col": 2}], "steps": 2}
+</final>
+```
+
+该例的动作、状态、候选和死局可由仓库现有积木规则核对，成功计划最短为 2 步。深度优先“首次找到解”一般不保证最短，本例的最短性由独立精确求解确认。
+
+**两种格式共同的边界：**整段文本都是一次 assistant 输出。B 中失败尝试和回溯是离线思考，不是真实环境执行，也不进入 `<final>` 计划。示例展示的顺序是具体算法顺序，不代表正式多路径采样策略已确定；正式 B 标签必须取自实际搜索日志，不能给现成成功路径编造探索经过。
+
+### 4.4 样本结构与损失
 
 ```text
 输入：任务规则＋完整题目
@@ -106,7 +308,7 @@
 
 若完整搜索过程很长，应单独观察最终计划部分的学习情况；只有出现明确问题后，再讨论调整其损失权重。
 
-### 4.3 零步与无解样本
+### 4.5 零步与无解样本
 
 - **保留零步题：**初始状态已经等于目标时，监督空计划和简短完成判断，不强制长 CoT。
 - **暂不加入整题无解题：**首轮聚焦生成可达计划，无解证明可作为后续独立扩展。
@@ -134,11 +336,44 @@
 | 训练预算 | 首轮 3 epoch | 参考短程 SFT 预算，不继承接口训练的 20 epoch；是否延长依据验证集另行讨论 |
 | 调度 | warmup 后余弦衰减至峰值的 1/10 | 衰减方式参考 R1 |
 | warmup | 总更新步数的前 5% | 本项目采用的起始设置，不冒称 R1 或 SCoTD 的已公开参数 |
-| 最大序列长度 | 待完整样本长度统计后确定 | CoT 格式未定，不预先锁定 8K／16K／32K，也不截掉最终答案来凑上限 |
+| 最大序列长度 | 用实际求解文本确定，步骤见 §5.3 | 每个任务在格式选定后固定一个数值，不凭短示例或参考论文直接填写 |
 
 优化器细项、数值精度、梯度裁剪、单卡 batch、随机种子等尚未确定；在实施前写入正式合同，不由框架默认值暗中决定。超出长度预算的样本需要报告并讨论处理方法，不能静默过滤后改变难度分布。
 
-### 5.3 预算如何计数
+### 5.3 如何从求解文本确定长度上限
+
+**用户已明确：长度上限根据具体求解文本确定。** 当前四个小示例用于比较格式，不代表正式任务难度，不能据此直接填 8K、16K 或 32K。完整搜索文本的长度取决于实际展开的分支数量，也不能只按最终动作数估算。
+
+**第一步：先拿到可检查的文本。**
+
+1. CoT 选择前，用正式训练任务中覆盖不同步数和棋盘来源的小批题，分别生成 A、B 两种实际求解文本，展示典型样本和最长样本。此时不运行模型训练。
+2. 检查状态表达是否完整、搜索日志是否冗长、最终计划是否正确，再确定采用的格式与记录粒度。
+3. 格式选定后，按该格式统计完整训练语料；小批数据用于估计成本，不能代替最终全量长度检查。校准长度使用训练数据，不能根据测试答案调预算。
+
+**第二步：用实际 tokenizer 计数。**
+
+使用 Qwen2.5-1.5B-Instruct 的 tokenizer 与正式 chat template，保留角色标记、格式指令、最终计划及结束 token，分别计数：
+
+| 记号 | 具体计算什么 | 对应限制 |
+|---|---|---|
+| P | 推理时的完整输入前缀，包含 assistant 生成起始标记 | 输入占用 |
+| R | 完整监督回答，包含 CoT、最终计划及结束标记 | 回答长度 |
+| T | 套用 chat template 后的整条训练样本 | 训练序列长度 |
+
+P、R、T 按实际模板拼接后的 token 边界计数，不能用字符数或独立分词片段的简单相加替代。每任务、每格式报告中位数、P95、P99、最大值及最长样本原文；另记最终动作数和搜索展开数，解释长文本来自哪里。
+
+**第三步：按观测值提出一个固定上限。**
+
+以下是便于定稿的计算提案，25% 余量和 256-token 取整属于工程建议，不是已有实测结论：
+
+- **训练上限 S：**将全量训练样本的最大 T 向上取整到 256 的整数倍。完整保留所有已纳入样本，不按 P99 静默截掉尾部。
+- **生成上限 G：**将最大 R 的 1.25 倍向上取整到 256 的整数倍，给模型生成留少量余量。生成限制只计新 token，不能与 S 混为一个参数。
+- **上下文约束：**核对最长合法输入前缀加 G 不超过模型与运行时支持的上下文，并验证 S 可训练。若超限或成本不可接受，回到记录粒度或格式选择讨论，不能无声截断答案、删难题或自动扩大上下文。
+- **固定方式：**寻路和积木分别确定 S、G，未微调与 SFT 条件使用相同 G。固定后不随单个测试题的已知答案长度调整，实际触顶仍计入失败诊断。
+
+定稿时在正式配置写入实测数值及对应语料路径，本节只保留确定方法。目前尚未生成正式求解语料，也未进行实际 tokenizer 长度测量，因此没有可声称已经验证的数值上限。
+
+### 5.4 预算如何计数
 
 - 一个 epoch 指遍历扩展后的多解训练数据一次；例如每题 4 条解，训练 3 epoch，相当于每题约出现 12 次。
 - 同时报告物理题数、不同解数量、呈现增强数量、训练 token 和参数更新步数。
@@ -169,16 +404,16 @@
 
 ### 6.3 尚需定稿的评测细节
 
-精确题集、每任务生成 token 上限、验证频率、平分时的 checkpoint 选择规则和训练种子数量待定。序列预算应在 CoT 格式及样本长度明确后制定，不能先照搬旧“每轮”输出上限当作整题预算。
+精确题集、验证频率、平分时的 checkpoint 选择规则和训练种子数量待定。训练与生成长度上限按 §5.3 的实际求解文本统计确定，不能照搬旧“每轮”输出上限当作整题预算。
 
 ## 7. 剩余决策与实施顺序
 
 | 顺序 | 需要确定的内容 | 为什么此时确定 |
 |---|---|---|
-| 1 | 两任务各自的 CoT 格式与记录粒度 | 决定监督语义及主要长度开销 |
-| 2 | 求解器算法、采样方式与预算；精确数据清单 | 保证多路径可生成、可认证且划分一致 |
-| 3 | 小批样本的格式、解多样性、长度与生成成本 | 用实际样本判断是否需要调整起始方案 |
-| 4 | 长度上限、类别权重、训练细项和完整评测合同 | 将已确认设计转成可执行设置 |
+| 1 | 对照 §4.2–4.3 的具体文本讨论 A／B，明确小批求解算法及训练题来源 | 先看清模型要学习输出什么 |
+| 2 | 两种格式的小批实际求解文本及 token 统计 | 比较实际长度和生成成本，再选 CoT 格式与记录粒度 |
+| 3 | 选定格式的完整语料、解多样性及最大 token 长度 | 按 §5.3 确定每任务固定的训练与生成上限 |
+| 4 | 类别权重、训练细项和完整评测合同 | 将已确认设计转成可执行设置 |
 | 5 | 实现、正确性检查及正式运行安排 | 实施前固定合同和独立产物目录 |
 
 上述是后续顺序，不代表已授权启动生成或训练。当前用户确认的是将推荐设计写入方案，CoT 选择仍保持开放。

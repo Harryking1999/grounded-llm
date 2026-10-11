@@ -15,7 +15,7 @@ from matplotlib.patches import Circle, FancyBboxPatch, Polygon
 
 
 OUT = Path(__file__).resolve().parents[1] / "results" / "figures"
-WIDTH, HEIGHT = 1120, 700
+WIDTH, HEIGHT = 1320, 860
 INK = "#222222"
 BLUE, BLUE_LIGHT = "#9EBBDC", "#E7EFF8"
 PEACH, CREAM = "#EAC4A7", "#FBF5E9"
@@ -27,14 +27,14 @@ class Drawing:
     """Mirror the simple editable SVG primitives in the Python raster preview."""
 
     def __init__(self):
-        self.fig = plt.figure(figsize=(11.2, 7), facecolor="white")
+        self.fig = plt.figure(figsize=(WIDTH/100, HEIGHT/100), facecolor="white")
         self.ax = self.fig.add_axes([0, 0, 1, 1])
         self.ax.set(xlim=(0, WIDTH), ylim=(HEIGHT, 0))
         self.ax.axis("off")
         self.svg = [
             f'<svg xmlns="http://www.w3.org/2000/svg" width="{WIDTH}" '
             f'height="{HEIGHT}" viewBox="0 0 {WIDTH} {HEIGHT}">',
-            '<rect width="1120" height="700" fill="white"/>',
+            f'<rect width="{WIDTH}" height="{HEIGHT}" fill="white"/>',
         ]
 
     def rect(self, x, y, w, h, fill="white", stroke=INK, radius=3, width=1.2):
@@ -53,13 +53,13 @@ class Drawing:
             f'font-family="Arial, sans-serif" font-size="{size}" '
             f'font-weight="{weight}"{style} fill="{INK}">{escape(text)}</text>')
 
-    def arrow(self, points, width=1.2, head=True, dashed=False):
+    def arrow(self, points, width=1.2, head=True, dashed=False, color=INK):
         xx, yy = zip(*points)
-        self.ax.plot(xx, yy, color=INK, lw=width*.72,
+        self.ax.plot(xx, yy, color=color, lw=width*.72,
             linestyle=(0, (4, 4)) if dashed else "-", solid_capstyle="round")
         dash = ' stroke-dasharray="4 4"' if dashed else ''
         coords = " ".join(f"{x},{y}" for x, y in points)
-        self.svg.append(f'<polyline points="{coords}" fill="none" stroke="{INK}" '
+        self.svg.append(f'<polyline points="{coords}" fill="none" stroke="{color}" '
             f'stroke-width="{width}" stroke-linejoin="round"{dash}/>')
         if head:
             x, y = points[-1]; px, py = points[-2]
@@ -103,87 +103,102 @@ class Drawing:
 
 def main():
     d = Drawing()
-    # The cream field expands one interface; a second layer's adapter is shown.
-    d.rect(35, 165, 205, 450, width=1.7)
-    d.rect(822, 63, 244, 594, width=1.7)
-    d.rect(282, 157, 518, 363, CREAM, "none", radius=8)
-    d.text(137, 137, "Frozen Q-map", 23)
-    d.text(944, 37, "Frozen Qwen2.5-1.5B", 23)
-    d.text(542, 183, "Trainable interface ℓ", 23, weight="bold")
+    # The right stack contains complete augmented layers. The expanded middle
+    # view is the selected orange component, not an additional processing path.
+    d.rect(1015, 63, 270, 753, width=1.6)
+    d.text(1150, 37, "Qwen2.5-1.5B", 24)
+    d.block(1050, 78, 200, 32, "LM head", BLUE_LIGHT)
 
-    # One frozen map, supplying shared content memory.
-    d.text(137, 668, "States", 20)
-    d.arrow([(137, 649), (137, 572)])
-    d.block(64, 550, 146, 22, "", BLUE_LIGHT)
-    d.arrow([(137, 550), (137, 536)])
-    d.dots(137, 519)
-    d.arrow([(137, 503), (137, 497)])
-    d.block(64, 475, 146, 22, "", BLUE_LIGHT)
-    d.arrow([(137, 475), (137, 373)])
-    d.matrix(77, 277, BLUE, cols=6, rows=5, cell=20)
-    d.text(137, 246, "State tokens", 19)
+    def layer(y, label, selected=False):
+        d.rect(1030, y, 240, 164, "#FFFCF8" if selected else "white",
+            "#B88B66" if selected else "#A7A7A7", radius=5,
+            width=1.8 if selected else 1.1)
+        d.text(1043, y+23, label, 20, weight="bold" if selected else "normal", anchor="start")
+        d.block(1050, y+52, 200, 34, "Frozen Decoder", BLUE_LIGHT, size=18)
+        d.block(1050, y+110, 200, 34, "Gated Cross-Attn", PEACH, size=18)
+        d.arrow([(1150, y+110), (1150, y+86)])
 
-    # Content (V) and address (K) stay separate; matrix cells are schematic.
-    d.arrow([(197, 327), (260, 327), (260, 555), (328, 555)])
-    d.block(328, 538, 108, 34, "P", PEACH, size=23, italic=True)
-    d.arrow([(382, 538), (382, 499)])
-    d.matrix(345, 439, BLUE)
-    d.arrow([(382, 439), (382, 406)])
-    d.block(329, 374, 106, 32, "Wv", size=21, italic=True)
-    d.arrow([(382, 374), (382, 333)])
-    d.text(398, 352, "V", 18, italic=True)
+    layer(130, "Layer L")
+    layer(335, "Layer ℓ", selected=True)
+    layer(550, "Layer 1")
+    d.arrow([(1150, 182), (1150, 110)])
+    d.arrow([(1150, 387), (1150, 327)])
+    d.dots(1150, 313)
+    d.arrow([(1150, 300), (1150, 274)])
+    d.arrow([(1150, 602), (1150, 542)])
+    d.dots(1150, 528)
+    d.arrow([(1150, 515), (1150, 479)])
+    d.block(1050, 760, 200, 34, "Embedding", BLUE_LIGHT)
+    d.arrow([(1150, 760), (1150, 694)])
+    d.text(1150, 841, "Text tokens", 20)
+    d.arrow([(1150, 825), (1150, 794)])
 
-    d.text(542, 668, "Role / ID", 20)
-    d.arrow([(542, 649), (542, 572)])
-    d.block(473, 538, 138, 34, "Embedding", PEACH, size=18)
-    d.text(428, 600, "Shared memory", 17)
-    d.arrow([(542, 538), (542, 499)])
-    d.matrix(505, 439, PEACH)
-    d.arrow([(542, 439), (542, 406)])
-    d.block(483, 374, 118, 32, "LN → Wk", size=19)
-    d.arrow([(542, 374), (542, 333)])
-    d.text(558, 352, "K", 18, italic=True)
+    # Dashed, arrowless magnification links carry no computation.
+    d.arrow([(1050, 445), (949, 166)], head=False, dashed=True, color="#A3A3A3")
+    d.arrow([(1050, 479), (949, 656)], head=False, dashed=True, color="#A3A3A3")
+    d.rect(292, 166, 657, 490, CREAM, "#C6AF91", radius=7, width=1.3)
+    d.text(595, 193, "Gated Cross-Attn ℓ", 23, weight="bold")
+    d.text(595, 218, "Expanded view", 16)
 
-    # h supplies Q and the unchanged residual path.
-    d.matrix(680, 439, GRAY)
-    d.arrow([(717, 439), (717, 406)])
-    d.block(657, 374, 120, 32, "LN → Wq", size=19)
-    d.arrow([(717, 374), (717, 333)])
-    d.text(733, 352, "Q", 18, italic=True)
-    d.arrow([(944, 492), (944, 249)])
-    d.arrow([(944, 469), (755, 469)])
-    d.text(900, 452, "hℓ", 20, italic=True)
+    # One frozen state map, shared by the layer-specific interfaces.
+    d.rect(35, 295, 195, 350, width=1.6)
+    d.text(132, 268, "Frozen Q-map", 23)
+    d.text(132, 696, "States", 20)
+    d.arrow([(132, 678), (132, 605)])
+    d.block(64, 583, 137, 22, "", BLUE_LIGHT)
+    d.arrow([(132, 583), (132, 573)])
+    d.dots(132, 560)
+    d.arrow([(132, 546), (132, 540)])
+    d.block(64, 518, 137, 22, "", BLUE_LIGHT)
+    d.arrow([(132, 518), (132, 445)])
+    d.matrix(72, 365, BLUE, cols=6, rows=4, cell=20)
+    d.text(132, 341, "State tokens", 19)
 
-    # No interface FFN: attention -> Wo -> scalar gate -> residual.
-    d.block(317, 293, 456, 40, "Cross-attention", size=22)
-    d.arrow([(542, 293), (542, 254)])
-    d.block(482, 220, 120, 34, "Wo", size=21, italic=True)
-    d.arrow([(602, 237), (651, 237)])
-    d.block(651, 220, 122, 34, "× tanh(αℓ)", size=19)
-    d.arrow([(773, 237), (932, 237)])
-    d.circle(944, 237)
-    d.text(944, 237, "+", 23)
-    d.arrow([(944, 225), (944, 198)])
+    # Shared P and role/ID embeddings lie outside the per-layer expanded box.
+    d.arrow([(192, 405), (260, 405), (260, 697), (330, 697)])
+    d.block(330, 680, 100, 34, "P", PEACH, size=23, italic=True)
+    d.arrow([(380, 680), (380, 552)])
+    d.matrix(342.5, 492, BLUE)
+    d.arrow([(380, 492), (380, 459)])
+    d.block(327, 427, 106, 32, "Wv", size=21, italic=True)
+    d.arrow([(380, 427), (380, 380)])
+    d.text(396, 403, "V", 18, italic=True)
 
-    # Two distinct adapter layers are depicted in the frozen LM stack.
-    d.text(944, 689, "Text tokens", 20)
-    d.arrow([(944, 674), (944, 651)])
-    d.block(850, 617, 188, 34, "Embedding", BLUE_LIGHT)
-    d.dots(944, 601)
-    d.arrow([(944, 589), (944, 588)])
-    d.block(850, 554, 188, 34, "Adapter ℓ−1", PEACH, size=19)
-    d.arrow([(944, 554), (944, 530)])
-    d.block(850, 492, 188, 38, "Decoder ℓ−1", BLUE_LIGHT, size=19)
-    d.block(850, 155, 188, 43, "Decoder ℓ", BLUE_LIGHT, size=20)
-    d.arrow([(944, 155), (944, 148)])
-    d.dots(944, 134)
-    d.arrow([(944, 120), (944, 112)])
-    d.block(850, 78, 188, 34, "LM head", BLUE_LIGHT, size=19)
+    d.text(550, 788, "Role / ID", 20)
+    d.arrow([(550, 771), (550, 714)])
+    d.block(480, 680, 140, 34, "Embedding", PEACH, size=18)
+    d.text(425, 739, "Shared memory", 17)
+    d.arrow([(550, 680), (550, 552)])
+    d.matrix(512.5, 492, PEACH)
+    d.arrow([(550, 492), (550, 459)])
+    d.block(491, 427, 118, 32, "LN → Wk", size=19)
+    d.arrow([(550, 427), (550, 380)])
+    d.text(566, 403, "K", 18, italic=True)
 
-    d.rect(318, 633, 14, 14, BLUE_LIGHT, width=.8)
-    d.text(342, 641, "Frozen", 16, anchor="start")
-    d.rect(669, 633, 14, 14, PEACH, width=.8)
-    d.text(693, 641, "Trainable", 16, anchor="start")
+    # Q, attention output, gate and residual are all inside this same adapter.
+    d.text(752, 621, "hℓ", 20, italic=True)
+    d.arrow([(752, 605), (752, 552)])
+    d.matrix(714.5, 492, GRAY)
+    d.arrow([(752, 492), (752, 459)])
+    d.block(692, 427, 120, 32, "LN → Wq", size=19)
+    d.arrow([(752, 427), (752, 380)])
+    d.text(768, 403, "Q", 18, italic=True)
+    d.arrow([(752, 583), (865, 583), (865, 287)])
+    d.block(327, 340, 485, 40, "Cross-attention", size=22)
+    d.arrow([(567, 340), (567, 292)])
+    d.block(517, 258, 100, 34, "Wo", size=21, italic=True)
+    d.arrow([(617, 275), (672, 275)])
+    d.block(672, 258, 135, 34, "× tanh(αℓ)", size=19)
+    d.arrow([(807, 275), (853, 275)])
+    d.circle(865, 275)
+    d.text(865, 275, "+", 23)
+    d.arrow([(865, 263), (865, 234)])
+    d.text(895, 237, "h′ℓ", 20, italic=True)
+
+    d.rect(315, 817, 14, 14, BLUE_LIGHT, width=.8)
+    d.text(339, 825, "Frozen", 16, anchor="start")
+    d.rect(702, 817, 14, 14, PEACH, width=.8)
+    d.text(726, 825, "Trainable", 16, anchor="start")
     d.save()
     print("Saved progress_model_architecture.svg and progress_model_architecture.png")
 

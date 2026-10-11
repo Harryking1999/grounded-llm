@@ -31,7 +31,7 @@
 
 ![Gated cross-attention map reader](figures/progress_model_architecture.png)
 
-**Figure 1a | Gated cross-attention map reader.** A trainable interface connects the frozen Q-map to the frozen LLM.
+**Figure 1a | Gated cross-attention map reader.** Each layer combines a trainable map-reading interface with a frozen decoder. The interface in layer ℓ is shown expanded.
 
 ### 2. 一轮决策如何运行
 

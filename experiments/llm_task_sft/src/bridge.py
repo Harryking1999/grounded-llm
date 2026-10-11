@@ -10,7 +10,7 @@ import time
 
 import paramiko
 
-from .protocol import atomic_json
+from .files import atomic_json
 
 
 def connect(profile, credentials):

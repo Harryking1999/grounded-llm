@@ -1,7 +1,5 @@
 """Factual prompts, certified shortest routes, and two-line control responses."""
 
-import json
-from pathlib import Path
 import random
 import re
 from types import SimpleNamespace
@@ -9,6 +7,7 @@ from types import SimpleNamespace
 from experiments.gcml_counterexamples.src import blocks as rules
 from experiments.blocks_distance_map.src.oracle import DistanceOracle
 from experiments.flamingo_map_reader.src.blocks_prompt import initial_prompt, turn_prompt
+from .files import atomic_json
 
 
 RESPONSE_INSTRUCTION = '''Response format:
@@ -23,14 +22,6 @@ Do not output candidate rankings or a multi-step plan.'''
 STOP_REASON = 'Reason: The current board exactly matches the goal; no further removal is needed.'
 CONTINUE_SUFFIX = ' is legal, preserves all goal cells, and leaves a solvable board with one fewer removal needed.'
 ARRIVAL_SUFFIX = ' is legal and leaves exactly the goal board.'
-
-
-def atomic_json(path, value):
-    path = Path(path)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = path.with_name(path.name + '.tmp')
-    temporary.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
-    temporary.replace(path)
 
 
 def legal_actions(state):

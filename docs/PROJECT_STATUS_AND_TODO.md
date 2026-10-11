@@ -1,6 +1,6 @@
 # 项目状态与有序 TODO
 
-更新：2026-10-10。本页记录项目动机、整体进展和研究优先级；当前实验设置见 [DESIGN](../experiments/flamingo_map_reader/DESIGN.md)，新运行结果见[本轮报告](../experiments/flamingo_map_reader/results/report.md)。上一轮[设计](../experiments/flamingo_map_reader/DESIGN_long_trajectory.md)与[报告](../experiments/flamingo_map_reader/results/report_long_trajectory.md)单独保留。
+更新：2026-10-11。本页记录项目动机、整体进展和研究优先级；当前实验设置见 [DESIGN](../experiments/flamingo_map_reader/DESIGN.md)，新运行结果见[本轮报告](../experiments/flamingo_map_reader/results/report.md)。上一轮[设计](../experiments/flamingo_map_reader/DESIGN_long_trajectory.md)与[报告](../experiments/flamingo_map_reader/results/report_long_trajectory.md)单独保留。
 
 ## 1. 为什么做这个项目
 
@@ -51,7 +51,11 @@ LLM 已有较强的语言理解和推理能力，但在复杂任务中，仍可�
 
 3. **保留比较边界。** FFN 同题同期对照最新至 5 epoch；最初 K/V 的 validation 与本轮 test 无物理交集，batch、数据与预算不同。旧 NDCG 未按新公式重评时保持缺失，不拿总体 reference 当首轮，不由不匹配均值推断架构因果收益。2026-10-09 用户授权的纯地图同题 CPU 对照完成：现用树关系 Q 到达 345/510（67.6%），补清空与长程关系的续训 15,000 步 Q 到达 397/510（77.8%）；新救回 105 题、退步 53 题，8 步改善最大，6 步略退步。新权重仍未接入 LLM；原地图生成的 10,000 条物理训练任务与缓存监督继续保留。已保存并合入地图分支的评测工具，权重差异见[地图文档末尾](BLOCKS_QMAP_PLAN.md#2026-10-09-补充更好的续训权重尚未接入-llm)。新地图补充监督与这些任务的重合尚未审计，不能把这次对照当作纯跨棋盘泛化证明。合同见 `blocks_map_baseline_comparison.json`，汇总与分组结果在现有 JSON 的 `map_greedy_comparison`。原始产物与此前冻结计数保留在摘要及 Git 历史。
 
-4. **积木 1.5B 无地图 SFT 已进入实施。** 用户最终选择逐步状态输入、一行可验证依据与动作标记监督，求解器只离线采样多条合法最短轨迹；取消教师 CoT 和候选排序。源清单已核对，32 题试样生成 196 条不同最短轨迹，最长完整对话 6,077 token；本地四项正确性检查通过。全量固定数据正在 35016 生成，4090 的 1–4 号卡正在做最长样本 DDP 试跑，0 号卡预留。正式合同见 [SFT 配置](../experiments/llm_task_sft/configs/blocks_reason_bs4.json)，实现与运行接口见 [README](../experiments/llm_task_sft/README.md)，设计边界见 [方案](LLM_SFT_PLAN.md)。本轮运行名 `blocks_reason_sft_bs4_50k`；完成显存与完整保存验证后正式启动，逐 epoch 同步模型到 35016 做 validation，自动选模后评固定 test。目前无 SFT 结果。
+4. **积木 1.5B 无地图 SFT 已正式启动。** 用户选择逐步状态输入、一行可验证依据与动作标记监督，求解器只离线采样多条合法最短轨迹；取消教师 CoT 和候选排序。正式合同见 [SFT 配置](../experiments/llm_task_sft/configs/blocks_reason_bs4.json)，运行接口见 [README](../experiments/llm_task_sft/README.md)，设计边界见 [方案](LLM_SFT_PLAN.md)。两节点运行名均为 `blocks_reason_sft_bs4_50k`。
+
+   - **数据与验证：**固定训练集已生成，含 9,000 个物理任务、50,000 条不同最短轨迹，没有重复补足；最长完整对话 7,350 token，生成预算由实际监督文本定为 80 token。本地四项正确性检查、最长样本四卡训练、完整模型保存与平台重载均通过；全参数模型没有缺失或多余权重。
+   - **训练：**2026-10-11 约 20:50（北京时间）从原始基座启动，训练源码 `80541e2`。21:26 核验已到 1,080/37,500 步，4090 的 1–4 号卡持续工作，0 号卡空闲；近期约 1.93 秒/步。按此速度，首个 epoch 预计 10 月 12 日 03:30 左右，三轮训练预计当日 17:00 左右结束；这是训练 ETA，未含后续模型传输及最终评测。
+   - **同步与评测：**35016 的四卡评测队列已运行，源码 `58905d0`；每 epoch 自动同步完整模型并做 validation，最后按合同选模，再评固定 test。约 6.2 GB 的完整模型传输及平台加载已实测通过，传输约 10 分钟；目前仍在评原始基座，等待首轮模型。原始基座普通 validation rollout 已完成 1,000 题，到达率 0/1,000，观察到动作标记不符合编号格式的失败；其 reference 评测尚未全部完成，不能据此把失败全部归因于规划。当前尚无 SFT checkpoint 的评测结果。
 
 ## 5. 长期研究空间与文档入口
 

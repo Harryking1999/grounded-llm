@@ -15,7 +15,7 @@
 
 ## 2. SSH 连接
 
-本地命令使用 PowerShell；登录节点命令使用 Bash。凭据不存入仓库。用户已授权保存跳板和 4090 口令，已用 Windows DPAPI 加密保存到本机 `%USERPROFILE%\.codex\credentials\grounded-machines.json`；后续直接读取并在进程内解密使用，不重复询问。当前本机辅助入口为忽略的 `tmp/sft_remote.py`，通过 Paramiko 连接并核验现有 known_hosts。
+本地命令使用 PowerShell；登录节点命令使用 Bash。凭据不存入仓库。用户已授权保存跳板和 4090 口令，已用 Windows DPAPI 加密保存到本机 `%USERPROFILE%\.codex\credentials\grounded-machines.json`；后续直接读取并在进程内解密使用，不重复询问。持久连接辅助入口为同目录的 `grounded-ssh.py`，使用本项目 `.venv` 的 Python，通过 Paramiko 连接并核验现有 known_hosts；stdin 接收公开的命令／文件传输 JSON，不接收明文口令。`tmp/sft_remote.py` 只是本次运行的临时副本。
 
 **原平台**：本机已配置 SSH 密钥。
 

@@ -268,13 +268,13 @@ Reason: The current board exactly matches the goal; no further removal is needed
 | 项目 | 设置 |
 |---|---|
 | 基座／更新范围 | 原始 Qwen2.5-1.5B-Instruct，全参数，不使用地图接口或 LoRA |
-| 学习率／有效 batch | 2e-5／32 条完整多轮轨迹 |
+| 学习率／有效 batch | 2e-5／4 条完整多轮轨迹（用户确认：4090 的 1–4 号卡，每卡 1 条，无梯度累积） |
 | 训练预算 | 3 epoch；每 epoch 50,000 条完整多轮样本，固定训练种子 |
 | 学习率调度 | 前 5% 更新 warmup，之后 cosine 至峰值 1/10 |
 | 优化器 | AdamW，weight decay 0.01，梯度裁剪 1.0 |
 | 工程设置 | 设备支持时 BF16、梯度检查点；不跨题 packing |
 
-单卡 batch 和梯度累积按最长样本实测。沿用已选的超参，先完成 1.5B 基线。
+正式运行参数以 [SFT 合同](../experiments/llm_task_sft/configs/blocks_reason_bs4.json) 为准。先用最长样本检查显存；每 epoch 保存完整模型并同步到 35016 评 validation，训练继续下一轮。训练入口与输出说明见 [实验 README](../experiments/llm_task_sft/README.md)。
 
 **每个物理题保持相同训练权重：**先平均一条轨迹内的监督 token 损失，再平均同题采样轨迹，最后平均物理题。这样，轨迹更多的普通题不会挤低零步题权重。
 

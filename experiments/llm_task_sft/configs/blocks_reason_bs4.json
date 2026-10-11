@@ -1,0 +1,57 @@
+{
+  "study": "llm_task_sft_blocks_reason",
+  "run": "blocks_reason_sft_bs4_50k",
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "seed": 20261011,
+  "data": {
+    "ordinary_tasks": 8000,
+    "initial_goal_tasks": 1000,
+    "ordinary_base_routes": 6,
+    "extra_route_tasks": 1000,
+    "samples_per_epoch": 50000,
+    "sampling_attempt_factor": 20,
+    "oracle_seconds_per_task": 300,
+    "oracle_cache_limit": 2000000,
+    "numbering": "shape_id_row_col_sorted",
+    "workers": 8
+  },
+  "training": {
+    "epochs": 3,
+    "world_size": 4,
+    "per_device_batch_size": 1,
+    "gradient_accumulation_steps": 1,
+    "global_batch_size": 4,
+    "learning_rate": 0.00002,
+    "weight_decay": 0.01,
+    "warmup_fraction": 0.05,
+    "cosine_minimum_ratio": 0.1,
+    "gradient_clip_norm": 1.0,
+    "bf16": true,
+    "gradient_checkpointing": true,
+    "loss_chunk_tokens": 128,
+    "logging_steps": 10,
+    "save_every_epochs": 1,
+    "attention": "sdpa",
+    "loss": "physical_task_mean_of_trajectory_token_mean"
+  },
+  "evaluation": {
+    "action_budget": 32,
+    "generation_margin_tokens": 16,
+    "generation_round_to": 16,
+    "shard_tasks": 25,
+    "epoch_split": "validation",
+    "epoch_modes": ["rollout", "reference"],
+    "test_models": ["original_base", "validation_selected_epoch"],
+    "selection": ["arrival_rate", "arrival_and_stop_rate", "earlier_epoch"],
+    "sampling": "greedy",
+    "allow_action_repair": false
+  },
+  "execution": {
+    "training_ssh_alias": "grounded-4090",
+    "training_gpus": [1, 2, 3, 4],
+    "reserved_gpu": 0,
+    "evaluation_ssh_port": 35016,
+    "evaluation_gpus": [0, 1, 2, 3],
+    "sync_every_seconds": 60
+  }
+}

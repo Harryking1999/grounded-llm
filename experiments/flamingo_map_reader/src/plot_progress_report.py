@@ -52,6 +52,53 @@ def save(fig, name, rows, out, vector):
     plt.close(fig)
 
 
+def completion_comparison(rows, blocks, out, vector):
+    """Separate current same-task evidence from historical whole-plan results."""
+    experiments = RESULTS.parents[1]
+    sol = json.loads((experiments / 'sol_dag_blocks/results/summary.json').read_text(encoding='utf-8'))
+    qwen = json.loads((experiments / 'qwen_path_blocks/results/acceptance_audit.json').read_text(encoding='utf-8'))
+    fig, axs = plt.subplots(1, 2, figsize=(11.8, 4.8), width_ratios=[1.25, 1], layout='constrained')
+    xx = [r['epoch'] for r in rows]
+    axs[0].plot(xx, [r['reached'] for r in rows], color=BLUE, label='1.5B＋cross-attention SFT')
+    axs[0].plot(xx, [r['stopped'] for r in rows], color=ORANGE, linestyle=':', label='其中：到达且正确停止')
+    source = [dict(panel='current', method='reader', epoch=r['epoch'], successes=round(r['reached']*510), trials=510) for r in rows]
+    for key, label, color, style in [('current', '现用地图贪心', GRAY, '--'), ('continued', '续训地图贪心（尚未接入）', '#8C9B75', '-.')]:
+        result = blocks['map_greedy_comparison']['results'][key]['all']
+        rate = result['rates']['reached']
+        axs[0].axhline(rate, color=color, linestyle=style, linewidth=1.4)
+        axs[0].text(1, rate+.015, f'{label}  {rate:.1%}', fontsize=9, color=color)
+        source.append(dict(panel='current', method=key+'_map_greedy', epoch='', successes=round(rate*510), trials=510))
+    best=max(rows,key=lambda x:x['reached'])
+    axs[0].plot(best['epoch'],best['reached'],'o',color=BLUE)
+    axs[0].annotate(f"19.5 epoch：{best['reached']:.1%}",(best['epoch'],best['reached']),
+                    xytext=(-5,16),textcoords='offset points',ha='right',fontsize=10)
+    axs[0].set_title('a  当前同题：逐步反馈，510 题',loc='left',pad=12)
+    axs[0].set_ylim(0,1);axs[0].set_xlim(.5,20.5);axs[0].set_xticks([.5,5,10,15,20])
+    axs[0].legend(loc='upper left',bbox_to_anchor=(.01,.65),fontsize=9)
+    tidy(axs[0],'接口训练 epoch',True);axs[0].set_ylabel('完整任务到达率')
+    labels=['Qwen3-4B','Qwen3-8B','Qwen3-32B','Sol / medium']
+    for j,(condition,offset,color) in enumerate([('blocks8',-.17,BLUE),('blocks12',.17,ORANGE)]):
+        values=[]
+        for size in ['4b','8b','32b']:
+            m=qwen['blocks_'+size]['metrics'][condition]
+            values.append(m['successes']/m['final_samples'])
+            source.append(dict(panel='historical_'+condition,method='Qwen3-'+size,epoch='',successes=m['successes'],trials=m['final_samples']))
+        m=sol['conditions'][condition];values.append(m['successes']/m['final_samples'])
+        source.append(dict(panel='historical_'+condition,method='Sol medium',epoch='',successes=m['successes'],trials=m['final_samples']))
+        y=[i+offset for i in range(4)]
+        axs[1].barh(y,values,height=.27,color=color,label='8 块' if j==0 else '12 块')
+        for ypos,value in zip(y,values):
+            axs[1].plot(value,ypos,'|',color=color,markersize=9)
+            axs[1].text(value+.018,ypos,f'{value:.1%}',va='center',fontsize=9)
+    axs[1].set_yticks(range(4),labels);axs[1].invert_yaxis();axs[1].set_xlim(0,1)
+    axs[1].xaxis.set_major_formatter(PercentFormatter(1));axs[1].grid(axis='x',color='#E8ECEF');axs[1].set_axisbelow(True)
+    axs[1].set_title('b  历史参考：一次输出完整计划',loc='left',pad=12)
+    axs[1].set_xlabel('清空成功率（每模型、每条件 128 次）');axs[1].legend(loc='lower right',fontsize=9)
+    fig.suptitle('积木任务完成：当前训练进展与已有基线',fontsize=14,fontweight='bold')
+    fig.text(.5,-.025,'两栏题集、规则与交互条件不同；纯 SFT 同题基线尚无完成结果，不画作 0%。',ha='center',fontsize=10,color='#555F67')
+    save(fig,'progress_completion_comparison',source,out,vector)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", type=Path, default=RESULTS / "figures")
@@ -82,7 +129,7 @@ def main():
         axs[0].annotate(f"{yy[-1]:.1%}", (3, yy[-1]), xytext=(-8, 8), textcoords="offset points", ha="right")
     axs[0].set_title("a  寻路：自主执行（500 个非零步任务）", loc="left")
     axs[0].set_ylim(0, 1.02); axs[0].legend(loc="center left")
-    axs[1].plot(xx, [r["reference_shortest"] for r in path], "o-", color=BLUE, label="模型：reference")
+    axs[1].plot(xx, [r["reference_shortest"] for r in path], "o-", color=BLUE, label="模型：teacher forcing")
     axs[1].axhline(baseline["chance_shortest"], color=GRAY, linestyle=":", label="同状态均匀随机")
     axs[1].axhline(baseline["greedy_shortest"], color=ORANGE, linestyle="--", label="同状态地图贪心")
     axs[1].set_ylim(.45, .95); axs[1].set_title("b  单步最短路动作率", loc="left")
@@ -107,6 +154,7 @@ def main():
             row[f"distance_random_{tag}"] = a["normalized_distance_baselines"]["ndcg_minmax_distance_at_10"]["random"]
         rows.append(row)
     assert len(rows) == 40
+    completion_comparison(rows, blocks, args.output, args.vector_output)
     xx = [r["epoch"] for r in rows]
     fig, axs = plt.subplots(1, 2, figsize=(10.4, 3.9), layout="constrained")
     for key, label, color in [("reached", "实际到达", BLUE), ("stopped", "到达且正确停止", ORANGE)]:
@@ -119,7 +167,7 @@ def main():
                     xytext=(-12, 18), textcoords="offset points", ha="right", fontsize=10)
     axs[0].set_ylim(0,.78); axs[0].set_title("a  积木：完整任务（同一批 510 题）", loc="left")
     axs[0].legend(loc="upper left", bbox_to_anchor=(.01, .80), fontsize=9)
-    for tag, label, color in [("R", "示范历史 R", BLUE), ("F", "自身历史 F", ORANGE)]:
+    for tag, label, color in [("R", "示范历史 TF", BLUE), ("F", "自主执行 RO", ORANGE)]:
         axs[1].plot(xx, [r[f"safe_{tag}"] for r in rows], color=color, label=f"可达率 · {label}")
         axs[1].plot(xx, [r[f"map_{tag}"] for r in rows], color=color, linestyle="--", label=f"地图最优率 · {label}")
     axs[1].set_ylim(0,1); axs[1].set_title("b  单步动作：保住可达与选中地图最优", loc="left")
@@ -129,10 +177,10 @@ def main():
 
     fig, axs = plt.subplots(1,2,figsize=(10.4,3.8),layout="constrained")
     for ax, metric, title in zip(axs,["inverse_rank","minmax_distance"],["a  NDCG@10：位置倒数", "b  NDCG@10：Q-map 距离归一化"]):
-        for tag,label,color in [("R","示范历史 R",BLUE),("F","自身历史 F",ORANGE)]:
+        for tag,label,color in [("R","示范历史 TF",BLUE),("F","自主执行 RO",ORANGE)]:
             ax.plot(xx,[r[f"ndcg_{metric}_at_10_{tag}"] for r in rows],color=color,label=label)
         if metric == "minmax_distance":
-            ax.plot(xx,[r["distance_random_F"] for r in rows],color=GRAY,linestyle=":",label="F 同状态随机排序")
+            ax.plot(xx,[r["distance_random_F"] for r in rows],color=GRAY,linestyle=":",label="RO 同状态随机排序")
         ax.set_title(title,loc="left"); ax.set_ylim(0,1); ax.set_xlim(.5,20); ax.set_xticks([.5,5,10,15,20])
         tidy(ax,"训练 epoch"); ax.legend(loc="lower right",fontsize=9)
     save(fig,"progress_blocks_ranking",rows,args.output,args.vector_output)
@@ -140,7 +188,7 @@ def main():
     steps = load("final_trajectory_step_analysis.json")["tasks"]["path"]
     fig, axs = plt.subplots(1,2,figsize=(10.4,3.8),layout="constrained")
     source=[]
-    for mode,label,color in [("reference","示范历史 R",BLUE),("rollout","自身历史 F",ORANGE)]:
+    for mode,label,color in [("reference","示范历史 TF",BLUE),("rollout","自主执行 RO",ORANGE)]:
         rr=steps["modes"][mode]["by_step"]
         axs[0].plot([x["step"] for x in rr],[x["shortest"]/x["solvable"] if x["solvable"] else float("nan") for x in rr],color=color,label=label)
         for x in rr: source.append(dict(series=mode,step=x["step"],numerator=x["shortest"],denominator=x["solvable"]))
@@ -154,7 +202,7 @@ def main():
     axs[0].set_title("a  寻路：各轮最短路动作率",loc="left")
     axs[1].set_title("b  累计到达（固定分母 500 题）",loc="left")
     save(fig,"progress_path_steps",source,args.output,args.vector_output)
-    print("Created four report figures from complete saved summaries.")
+    print("Created report figures from complete saved summaries.")
 
 
 if __name__ == "__main__":

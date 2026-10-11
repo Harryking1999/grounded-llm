@@ -50,6 +50,10 @@ def test_reason_failure_does_not_replace_control_and_wrong_stop_keeps_arrival():
     assert case['arrived'] and not case['arrived_and_stopped'] and case['failure']=='control_format'
     metrics=summarize([case]); assert metrics['arrival']['rate']==1 and metrics['arrival_and_stop']['rate']==0
     ref=summarize([dict(case,mode='reference')]); assert ref['arrival'] is None
+    zero=dict(record,start=str(start),goal=str(start),reference_actions=[])
+    result=evaluate_task(zero,'rollout',lambda _:dict(text='Reason: incorrect\n<action>1</action>'),oracle_config())
+    assert result['arrived'] and not result['arrived_and_stopped']
+    assert len(result['turns'])==1 and result['executed_actions']==[] and result['failure']=='goal_stop_error'
 
 
 def test_chunked_weighted_loss_and_gradients_match_full_vocabulary():

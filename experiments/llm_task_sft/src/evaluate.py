@@ -74,6 +74,10 @@ def evaluate_task(record, mode, generate, config):
             arrived |= state == goal
             continue
         messages.append(dict(role='assistant', content=text))
+        if state == goal:
+            stopped = judgement['correct_stop']
+            failure = None if stopped else judgement['control_error'] or 'goal_stop_error'
+            break
         if judgement['control_error']:
             failure = judgement['control_error']
             break

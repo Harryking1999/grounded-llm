@@ -1,6 +1,6 @@
 # 开发机使用手册
 
-更新：2026-10-11。平台、028 和 4090 的 SSH 登录已验证；028、4090 已配置本机公钥。本轮已按平台 → login02 → 4090 完成模型、地图、评测数据与 adapter 中转。
+更新：2026-10-11。平台 35016 与 4090 登录已重新验证；SFT 使用 4090 的 1–4 号卡训练，35016 四张 A100 逐 epoch 评测。既有地图实验已完成。
 
 ## 1. 机器概览
 
@@ -8,14 +8,14 @@
 |---|---|---|
 | 原人工智能平台 | 当前评测；开发环境共享 `/zhanghanyue` | 环境变更后，从平台页面确认 SSH 端口 |
 | 028：8 张 H100 80GB | 后续训练 | 10 月 12 日以后使用；崔涵需要 6–8 卡训练时协调释放资源 |
-| 4090：本次识别到 5 张卡 | 推理、评测 | 按用户最新指令预留 0 号卡，本轮使用 1–4 号卡评测 |
+| 4090：5 张 48GB 卡 | 当前 SFT 训练 | 按用户最新指令预留 0 号卡，本轮使用 1–4 号卡训练 |
 | login02 登录节点 | 028 连接入口及文件中转 | 仅用于登录和传输 |
 
 [平台入口](https://172.16.78.10:32206/index.html?#/developEnv)：业务管理 → 开发环境 → SSH 查看。
 
 ## 2. SSH 连接
 
-本地命令使用 PowerShell；登录节点命令使用 Bash。密码通过 SSH 提示输入，不存入仓库。
+本地命令使用 PowerShell；登录节点命令使用 Bash。凭据不存入仓库。用户已授权保存跳板和 4090 口令，已用 Windows DPAPI 加密保存到本机 `%USERPROFILE%\.codex\credentials\grounded-machines.json`；后续直接读取并在进程内解密使用，不重复询问。当前本机辅助入口为忽略的 `tmp/sft_remote.py`，通过 Paramiko 连接并核验现有 known_hosts。
 
 **原平台**：本机已配置 SSH 密钥。
 
@@ -37,7 +37,7 @@ ssh grounded-028
 ssh grounded-4090
 ```
 
-两个别名均经过 `zhangyue@172.16.78.36:10022`（login02）。目标机器已通过仅公钥认证的连接验证；login02 未开放公钥认证，每次连接仍需输入一次跳板密码。
+两个别名均经过 `zhangyue@172.16.78.36:10022`（login02）。目标机器已通过仅公钥认证的连接验证；login02 未开放公钥认证。交互式 SSH 会提示跳板密码；代理应使用上述已保存的本机凭据，不再向用户询问。
 
 单独登录跳板可使用 `ssh grounded-login02`。本机项目密钥为 `%USERPROFILE%\.ssh\id_ed25519_grounded_dev`，公钥已登记到两台目标机器及跳板；跳板公钥暂不生效。
 
@@ -60,8 +60,11 @@ Agent 使用相同连接方式，登录后通过 `hostname` 确认主机、`nvid
 | 4090 公共模型 | `/opt/models`；2026-10-09 重查未发现 Qwen2.5-1.5B-Instruct，项目基座由平台经 login02 复制到项目目录 |
 | 4090 项目目录 | `/home/gongruochen/grounded_llm/`，含 `code/`、`models/`、`runs/` 与 `incoming/` |
 | login02 项目中转 | `/home/zhangyue/transfer/grounded_llm/`，已创建并完成 adapter 中转验证 |
+| 当前无地图 SFT | 两机既有项目工作区下 `runs/blocks_reason_sft_bs4_50k/`；4090 保存训练完整断点，35016 保存数据、同步模型与评测。公共中转使用 login02 的 `transfer/grounded_llm/llm_task_sft/` |
 
 原平台目录支持跨开发环境复用。**028、login02、4090 与平台之间无已确认的共享目录**；028 的 `/ssdwork` 为节点本地磁盘。
+
+SFT 启动前实查：35016 主机身份为 `56ldennbmqmq3-0`，四张 A100-SXM4-80GB 空闲；4090 主机身份为 `ubuntu`，五张卡各 49,140 MiB、全部空闲，项目磁盘余量约 557GB。源代码按 Git commit 部署到各自 `code/llm_sft_<commit>/`；运行时路径与 PID 放在本次运行的 `runtime/`，不入 Git。新实验合同见 `experiments/llm_task_sft/configs/blocks_reason_bs4.json`；以下地图实验机器分工均为历史。
 
 2026-10-09 最初在 35016、40327 合用八卡评测；随后端口改为 41511，并先尝试两卡续训。用户最终将 41511 扩为四张 A800，确认每卡 batch=1，从本轮 10 epoch 完整断点续训到 20 epoch；35016 两张 A100 改为主评测，4090 的 4 号卡辅助评测。正式安排仍见 `experiments/flamingo_map_reader/configs/blocks_kv_two_node_continuation.json`：主、辅助分别持有分片索引模 3 的余数 0/1、2，结果回到同一平台 `evaluation_half_epoch/`。旧八卡队列与两卡尝试作为历史保留。
 

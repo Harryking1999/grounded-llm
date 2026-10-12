@@ -11,9 +11,13 @@ def test_uniform_probabilities_include_losing_actions_and_budget():
     empty=exact_probabilities(0b1111,0,32,tiles)
     assert empty['all_legal']==pytest.approx(2/3)
     assert empty['goal_preserving']==pytest.approx(2/3)
+    assert empty['first_turn']['reachable_all_legal']==pytest.approx(2/3)
+    assert empty['first_turn']['shortest_all_legal']==pytest.approx(2/3)
     goal=exact_probabilities(0b1111,0b0011,32,tiles)
     assert goal['all_legal']==pytest.approx(1/3)
     assert goal['goal_preserving']==1
+    assert goal['first_turn']['reachable_all_legal']==pytest.approx(1/3)
+    assert goal['first_turn']['reachable_goal_preserving']==1
     assert exact_probabilities(0b1111,0,1,tiles)['all_legal']==0
     assert exact_probabilities(0b0011,0b0011,0,tiles)['all_legal']==1
 

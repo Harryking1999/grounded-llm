@@ -46,6 +46,8 @@ CUDA_VISIBLE_DEVICES=0 python -m experiments.llm_task_sft.src.evaluate --config 
 全部几何合法候选，以及额外排除破坏目标格的候选。两者均假定正确识别目标、没有格式错误或提前停止；
 不筛选可达动作，不搜索后选路，不进行多次尝试择优。初始已达标题单独统计。
 动作只会移除格子，因此可通过动态规划累加全部成功路线的概率；失败分支仍保留在选择分母中。
+同时报告每题首轮，以及固定参考轨迹上全部非终止状态的随机可达动作率和最短进展率；
+每个状态先计算候选比例，再对状态取平均，不能把单步概率直接当成整题到达率。
 
 ```bash
 python -m experiments.llm_task_sft.src.random_legal --config experiments/llm_task_sft/configs/blocks_random_legal.json --data DATA --out DIAGNOSTIC

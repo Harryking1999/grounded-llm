@@ -43,8 +43,8 @@ CUDA_VISIBLE_DEVICES=0 python -m experiments.llm_task_sft.src.evaluate --config 
 
 ## 合法候选随机对照
 
-`random_legal.py` 在相同 validation 题目上精确计算两种均匀随机策略的到达概率：
-全部几何合法候选，以及额外排除破坏目标格的候选。两者均假定正确识别目标、没有格式错误或提前停止；
+`random_legal.py` 在固定题目上精确计算三种随机策略的到达概率：
+全部几何合法候选、额外排除破坏目标格的候选、保护目标且优先大块后随机。三者均假定正确识别目标、没有格式错误或提前停止；
 不筛选可达动作，不搜索后选路，不进行多次尝试择优。初始已达标题单独统计。
 动作只会移除格子，因此可通过动态规划累加全部成功路线的概率；失败分支仍保留在选择分母中。
 同时报告每题首轮，以及固定参考轨迹上全部非终止状态的随机可达动作率和最短进展率；
@@ -55,3 +55,4 @@ python -m experiments.llm_task_sft.src.random_legal --config experiments/llm_tas
 ```
 
 同题首轮、单步与整题对照结果见[合法候选分析](results/legal_candidate_baselines.md)。
+510 test 使用 `blocks_random_legal_test.json`；loss 下降速度、监督与参数差异见[优化诊断](results/optimization_diagnostics.md)。

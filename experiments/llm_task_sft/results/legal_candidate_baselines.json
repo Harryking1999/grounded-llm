@@ -1,0 +1,499 @@
+{
+  "split": "validation",
+  "ordinary_tasks": 1000,
+  "initial_goal_tasks_reported_separately": 100,
+  "reference_decisions": 7613,
+  "provenance": {
+    "source_commit": "8d1f467",
+    "evaluation_commit": "98e2df9",
+    "run": "blocks_reason_sft_bs4_50k",
+    "random_output": "diagnostics/random_largest_validation",
+    "evaluation_output": "evaluation/{base,epoch_1,epoch_2}/validation",
+    "contract": "experiments/llm_task_sft/configs/blocks_random_legal.json"
+  },
+  "random": {
+    "ordinary": {
+      "tasks": 1000,
+      "expected_arrivals_all_legal": 3.708310867530233,
+      "arrival_rate_all_legal": 0.003708310867530233,
+      "expected_arrivals_goal_preserving": 23.69359505032105,
+      "arrival_rate_goal_preserving": 0.02369359505032105,
+      "expected_arrivals_largest_goal_preserving": 35.05012076728047,
+      "arrival_rate_largest_goal_preserving": 0.035050120767280465,
+      "mean_initial_candidates": 62.11,
+      "mean_initial_goal_preserving": 48.538
+    },
+    "first_turn": {
+      "decisions": 1000,
+      "reachable_all_legal": 0.49329231988764155,
+      "shortest_all_legal": 0.41858756819522663,
+      "reachable_goal_preserving": 0.6232229610703816,
+      "shortest_goal_preserving": 0.5345029736062326,
+      "reachable_largest_goal_preserving": 0.5537048832728306,
+      "shortest_largest_goal_preserving": 0.5069589876142049
+    },
+    "reference_single_step": {
+      "decisions": 7613,
+      "reachable_all_legal": 0.39444767127818176,
+      "shortest_all_legal": 0.32834304487927746,
+      "reachable_goal_preserving": 0.5513059531481437,
+      "shortest_goal_preserving": 0.4721973250556971,
+      "reachable_largest_goal_preserving": 0.6477997974109488,
+      "shortest_largest_goal_preserving": 0.617596857204337
+    },
+    "by_shortest_moves": {
+      "6": {
+        "tasks": 20,
+        "expected_arrivals_all_legal": 0.22373812592544073,
+        "arrival_rate_all_legal": 0.011186906296272036,
+        "expected_arrivals_goal_preserving": 1.2838838189688684,
+        "arrival_rate_goal_preserving": 0.06419419094844342,
+        "expected_arrivals_largest_goal_preserving": 2.4568586616136434,
+        "arrival_rate_largest_goal_preserving": 0.12284293308068217,
+        "mean_initial_candidates": 54.1,
+        "mean_initial_goal_preserving": 39.55
+      },
+      "7": {
+        "tasks": 355,
+        "expected_arrivals_all_legal": 1.620588078289343,
+        "arrival_rate_all_legal": 0.00456503684025167,
+        "expected_arrivals_goal_preserving": 10.794419901551805,
+        "arrival_rate_goal_preserving": 0.030406816624089592,
+        "expected_arrivals_largest_goal_preserving": 16.657127847508704,
+        "arrival_rate_largest_goal_preserving": 0.04692148689439071,
+        "mean_initial_candidates": 61.03380281690141,
+        "mean_initial_goal_preserving": 45.540845070422534
+      },
+      "8": {
+        "tasks": 617,
+        "expected_arrivals_all_legal": 1.8551084212181677,
+        "arrival_rate_all_legal": 0.0030066587053779056,
+        "expected_arrivals_goal_preserving": 11.517340573851504,
+        "arrival_rate_goal_preserving": 0.01866667840170422,
+        "expected_arrivals_largest_goal_preserving": 15.936134258158159,
+        "arrival_rate_largest_goal_preserving": 0.025828418570758765,
+        "mean_initial_candidates": 63.12479740680713,
+        "mean_initial_goal_preserving": 50.65964343598055
+      },
+      "9": {
+        "tasks": 8,
+        "expected_arrivals_all_legal": 0.008876242097280853,
+        "arrival_rate_all_legal": 0.0011095302621601066,
+        "expected_arrivals_goal_preserving": 0.0979507559488974,
+        "arrival_rate_goal_preserving": 0.012243844493612176,
+        "expected_arrivals_largest_goal_preserving": 0.0,
+        "arrival_rate_largest_goal_preserving": 0.0,
+        "mean_initial_candidates": 51.625,
+        "mean_initial_goal_preserving": 40.375
+      }
+    },
+    "by_goal_type": {
+      "empty": {
+        "tasks": 132,
+        "expected_arrivals_all_legal": 1.5901783949230353,
+        "arrival_rate_all_legal": 0.012046806022144207,
+        "expected_arrivals_goal_preserving": 1.5901783949230353,
+        "arrival_rate_goal_preserving": 0.012046806022144207,
+        "expected_arrivals_largest_goal_preserving": 4.106233913669507,
+        "arrival_rate_largest_goal_preserving": 0.031107832679314443,
+        "mean_initial_candidates": 62.81818181818182,
+        "mean_initial_goal_preserving": 62.81818181818182
+      },
+      "nonempty": {
+        "tasks": 868,
+        "expected_arrivals_all_legal": 2.1181324726071966,
+        "arrival_rate_all_legal": 0.0024402447841096737,
+        "expected_arrivals_goal_preserving": 22.103416655398025,
+        "arrival_rate_goal_preserving": 0.025464765732025375,
+        "expected_arrivals_largest_goal_preserving": 30.943886853610987,
+        "arrival_rate_largest_goal_preserving": 0.03564963923227072,
+        "mean_initial_candidates": 62.00230414746544,
+        "mean_initial_goal_preserving": 46.366359447004605
+      }
+    },
+    "initial_training_exposure": {
+      "start_seen": 452,
+      "goal_seen": 437,
+      "pair_seen": 0
+    },
+    "source_groups": {
+      "same_initial_board_new_pair": 500,
+      "new_initial_board": 500
+    }
+  },
+  "sft": {
+    "base": {
+      "reference": {
+        "first_turn": {
+          "reachability": {
+            "numerator": 2,
+            "denominator": 1000,
+            "rate": 0.002
+          },
+          "shortest_progress": {
+            "numerator": 2,
+            "denominator": 1000,
+            "rate": 0.002
+          }
+        },
+        "single_step": {
+          "reachability": {
+            "numerator": 2224,
+            "denominator": 7613,
+            "rate": 0.2921318796794956
+          },
+          "shortest_progress": {
+            "numerator": 1909,
+            "denominator": 7613,
+            "rate": 0.25075528700906347
+          }
+        }
+      },
+      "rollout": {
+        "first_turn": {
+          "reachability": {
+            "numerator": 2,
+            "denominator": 1000,
+            "rate": 0.002
+          },
+          "shortest_progress": {
+            "numerator": 2,
+            "denominator": 1000,
+            "rate": 0.002
+          }
+        },
+        "single_step": {
+          "reachability": {
+            "numerator": 2,
+            "denominator": 1002,
+            "rate": 0.001996007984031936
+          },
+          "shortest_progress": {
+            "numerator": 2,
+            "denominator": 1002,
+            "rate": 0.001996007984031936
+          }
+        }
+      },
+      "first_reference_rollout_text_differences": 0
+    },
+    "epoch_1": {
+      "reference": {
+        "first_turn": {
+          "reachability": {
+            "numerator": 529,
+            "denominator": 1000,
+            "rate": 0.529
+          },
+          "shortest_progress": {
+            "numerator": 489,
+            "denominator": 1000,
+            "rate": 0.489
+          }
+        },
+        "single_step": {
+          "reachability": {
+            "numerator": 4460,
+            "denominator": 7613,
+            "rate": 0.585840010508341
+          },
+          "shortest_progress": {
+            "numerator": 4275,
+            "denominator": 7613,
+            "rate": 0.561539471955865
+          }
+        }
+      },
+      "rollout": {
+        "first_turn": {
+          "reachability": {
+            "numerator": 529,
+            "denominator": 1000,
+            "rate": 0.529
+          },
+          "shortest_progress": {
+            "numerator": 489,
+            "denominator": 1000,
+            "rate": 0.489
+          }
+        },
+        "single_step": {
+          "reachability": {
+            "numerator": 1334,
+            "denominator": 2302,
+            "rate": 0.579496090356212
+          },
+          "shortest_progress": {
+            "numerator": 1270,
+            "denominator": 2302,
+            "rate": 0.5516941789748045
+          }
+        }
+      },
+      "first_reference_rollout_text_differences": 0
+    },
+    "epoch_2": {
+      "reference": {
+        "first_turn": {
+          "reachability": {
+            "numerator": 648,
+            "denominator": 1000,
+            "rate": 0.648
+          },
+          "shortest_progress": {
+            "numerator": 601,
+            "denominator": 1000,
+            "rate": 0.601
+          }
+        },
+        "single_step": {
+          "reachability": {
+            "numerator": 5501,
+            "denominator": 7613,
+            "rate": 0.7225797977144358
+          },
+          "shortest_progress": {
+            "numerator": 5287,
+            "denominator": 7613,
+            "rate": 0.6944699855510311
+          }
+        }
+      },
+      "rollout": {
+        "first_turn": {
+          "reachability": {
+            "numerator": 648,
+            "denominator": 1000,
+            "rate": 0.648
+          },
+          "shortest_progress": {
+            "numerator": 601,
+            "denominator": 1000,
+            "rate": 0.601
+          }
+        },
+        "single_step": {
+          "reachability": {
+            "numerator": 2050,
+            "denominator": 2934,
+            "rate": 0.6987048398091343
+          },
+          "shortest_progress": {
+            "numerator": 1963,
+            "denominator": 2934,
+            "rate": 0.669052488070893
+          }
+        }
+      },
+      "first_reference_rollout_text_differences": 0
+    }
+  },
+  "subgroups": {
+    "epoch_1": {
+      "first_goal_preserved": 760,
+      "groups": {
+        "same_initial_board_new_pair": {
+          "tasks": 500,
+          "arrived": 8,
+          "first_reachable": 275,
+          "random_expected_arrivals": 1.5800161399617798,
+          "preserving_random_expected_arrivals": 11.119916644674316
+        },
+        "new_initial_board": {
+          "tasks": 500,
+          "arrived": 24,
+          "first_reachable": 254,
+          "random_expected_arrivals": 2.128294727568453,
+          "preserving_random_expected_arrivals": 12.573678405646739
+        }
+      }
+    },
+    "epoch_2": {
+      "first_goal_preserved": 796,
+      "groups": {
+        "same_initial_board_new_pair": {
+          "tasks": 500,
+          "arrived": 56,
+          "first_reachable": 342,
+          "random_expected_arrivals": 1.5800161399617798,
+          "preserving_random_expected_arrivals": 11.119916644674316
+        },
+        "new_initial_board": {
+          "tasks": 500,
+          "arrived": 60,
+          "first_reachable": 306,
+          "random_expected_arrivals": 2.128294727568453,
+          "preserving_random_expected_arrivals": 12.573678405646739
+        }
+      }
+    }
+  },
+  "random_repeat_count_ranges": {
+    "arrival_all_legal": {
+      "expected": 3.708310867530231,
+      "central95_counts": [
+        1,
+        8
+      ]
+    },
+    "arrival_goal_preserving": {
+      "expected": 23.693595050321058,
+      "central95_counts": [
+        15,
+        33
+      ]
+    },
+    "first_reachable_all_legal": {
+      "expected": 493.2923198876423,
+      "central95_counts": [
+        464,
+        523
+      ]
+    },
+    "first_reachable_goal_preserving": {
+      "expected": 623.2229610703808,
+      "central95_counts": [
+        594,
+        652
+      ]
+    },
+    "reference_reachable_all_legal": {
+      "expected": 3002.930121440777,
+      "central95_counts": [
+        2926,
+        3080
+      ]
+    },
+    "reference_reachable_goal_preserving": {
+      "expected": 4197.092221316789,
+      "central95_counts": [
+        4119,
+        4275
+      ]
+    }
+  },
+  "definitions": {
+    "episode": "One uniformly chosen legal action per state; exact expected arrival probability, no retries or format/stop errors.",
+    "preserving": "Rejects actions touching occupied goal cells; does not reject dead-end or nonoptimal actions.",
+    "single_step": "Matched nonterminal states on the fixed gold reference trajectories; average the candidate fraction per decision.",
+    "first_turn": "Initial nonterminal state of each ordinary task; reference and rollout generations agree exactly.",
+    "shortest_progress": "Remaining exact minimum action count decreases by one.",
+    "count_ranges": "Central 95% predictive range from the Poisson-binomial count distribution when independently repeating random choices on these fixed states; not a population confidence interval.",
+    "largest_preserving": "Choose uniformly among the largest currently legal goal-preserving shapes; no reachability filtering."
+  },
+  "test_510": {
+    "physical_tasks_identical_to_map": true,
+    "random": {
+      "ordinary": {
+        "tasks": 510,
+        "expected_arrivals_all_legal": 2.2784425727086073,
+        "arrival_rate_all_legal": 0.004467534456291387,
+        "expected_arrivals_goal_preserving": 15.79516516438723,
+        "arrival_rate_goal_preserving": 0.030970912087033783,
+        "expected_arrivals_largest_goal_preserving": 26.079852313204952,
+        "arrival_rate_largest_goal_preserving": 0.05113696532000971,
+        "mean_initial_candidates": 59.6843137254902,
+        "mean_initial_goal_preserving": 45.1
+      },
+      "first_turn": {
+        "decisions": 510,
+        "reachable_all_legal": 0.4786442241640217,
+        "shortest_all_legal": 0.39865277163142376,
+        "reachable_goal_preserving": 0.6246443072734248,
+        "shortest_goal_preserving": 0.5234571396888787,
+        "reachable_largest_goal_preserving": 0.5562909967561296,
+        "shortest_largest_goal_preserving": 0.50263924339363
+      },
+      "reference_single_step": {
+        "decisions": 3690,
+        "reachable_all_legal": 0.3802984236085492,
+        "shortest_all_legal": 0.3159758773800341,
+        "reachable_goal_preserving": 0.5510608476305795,
+        "shortest_goal_preserving": 0.47120389883607394,
+        "reachable_largest_goal_preserving": 0.6539372637791898,
+        "shortest_largest_goal_preserving": 0.6239536820967202
+      },
+      "by_shortest_moves": {
+        "6": {
+          "tasks": 100,
+          "expected_arrivals_all_legal": 0.5228389920377864,
+          "arrival_rate_all_legal": 0.005228389920377864,
+          "expected_arrivals_goal_preserving": 5.692678454104118,
+          "arrival_rate_goal_preserving": 0.05692678454104118,
+          "expected_arrivals_largest_goal_preserving": 11.209236868849313,
+          "arrival_rate_largest_goal_preserving": 0.11209236868849314,
+          "mean_initial_candidates": 52.91,
+          "mean_initial_goal_preserving": 32.44
+        },
+        "7": {
+          "tasks": 200,
+          "expected_arrivals_all_legal": 1.0153560177960346,
+          "arrival_rate_all_legal": 0.0050767800889801725,
+          "expected_arrivals_goal_preserving": 6.388871325678331,
+          "arrival_rate_goal_preserving": 0.03194435662839166,
+          "expected_arrivals_largest_goal_preserving": 10.003285708792587,
+          "arrival_rate_largest_goal_preserving": 0.05001642854396294,
+          "mean_initial_candidates": 59.88,
+          "mean_initial_goal_preserving": 45.315
+        },
+        "8": {
+          "tasks": 200,
+          "expected_arrivals_all_legal": 0.7366026544565788,
+          "arrival_rate_all_legal": 0.003683013272282894,
+          "expected_arrivals_goal_preserving": 3.588138673093215,
+          "arrival_rate_goal_preserving": 0.017940693365466075,
+          "expected_arrivals_largest_goal_preserving": 4.867329735563078,
+          "arrival_rate_largest_goal_preserving": 0.02433664867781539,
+          "mean_initial_candidates": 63.17,
+          "mean_initial_goal_preserving": 51.61
+        },
+        "9": {
+          "tasks": 10,
+          "expected_arrivals_all_legal": 0.003644908418205151,
+          "arrival_rate_all_legal": 0.0003644908418205151,
+          "expected_arrivals_goal_preserving": 0.1254767115115596,
+          "arrival_rate_goal_preserving": 0.012547671151155959,
+          "expected_arrivals_largest_goal_preserving": 0.0,
+          "arrival_rate_largest_goal_preserving": 0.0,
+          "mean_initial_candidates": 53.8,
+          "mean_initial_goal_preserving": 37.2
+        }
+      },
+      "by_goal_type": {
+        "empty": {
+          "tasks": 57,
+          "expected_arrivals_all_legal": 0.7075379049415349,
+          "arrival_rate_all_legal": 0.012412945700728683,
+          "expected_arrivals_goal_preserving": 0.7075379049415349,
+          "arrival_rate_goal_preserving": 0.012412945700728683,
+          "expected_arrivals_largest_goal_preserving": 2.2679484285549543,
+          "arrival_rate_largest_goal_preserving": 0.039788568922016744,
+          "mean_initial_candidates": 62.85964912280702,
+          "mean_initial_goal_preserving": 62.85964912280702
+        },
+        "nonempty": {
+          "tasks": 453,
+          "expected_arrivals_all_legal": 1.570904667767069,
+          "arrival_rate_all_legal": 0.003467780723547614,
+          "expected_arrivals_goal_preserving": 15.087627259445698,
+          "arrival_rate_goal_preserving": 0.03330602044027748,
+          "expected_arrivals_largest_goal_preserving": 23.811903884650015,
+          "arrival_rate_largest_goal_preserving": 0.052564909237638,
+          "mean_initial_candidates": 59.28476821192053,
+          "mean_initial_goal_preserving": 42.86534216335541
+        }
+      },
+      "initial_training_exposure": {
+        "start_seen": 206,
+        "goal_seen": 174,
+        "pair_seen": 0
+      },
+      "source_groups": {
+        "same_initial_board_new_pair": 255,
+        "new_initial_board": 255
+      }
+    },
+    "sft_per_epoch": "pending",
+    "output": "diagnostics/random_largest_test510"
+  }
+}

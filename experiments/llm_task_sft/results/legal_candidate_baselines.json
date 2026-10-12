@@ -493,15 +493,15 @@
         "new_initial_board": 255
       }
     },
-    "sft_per_epoch": "pending",
+    "sft_per_epoch": "Initial epochs 1, 2, 3 complete; continuation monitors only these 510 tasks every half epoch.",
     "output": "diagnostics/random_largest_test510"
   },
   "sft_test_completed_conditions": {
     "source_commit": "d2d9a54",
     "run": "/home/gongruochen/grounded_llm/runs/blocks_reason_sft_bs4_50k",
     "host": "ubuntu",
-    "recorded_beijing": "2026-10-12 20:48",
-    "scope": "Only fully completed 510-task conditions; epoch_3 test still pending.",
+    "recorded_beijing": "2026-10-12 21:20",
+    "scope": "Initial three epochs: all 510-task rollout and reference conditions complete. Subsequent continuation uses the same tasks only as a training monitor.",
     "results": {
       "epoch_1": {
         "rollout": {
@@ -747,6 +747,130 @@
             "tasks": 510,
             "reachable": 334,
             "shortest_progress": 307,
+            "correct_control": 510
+          },
+          "shards": 21
+        }
+      },
+      "epoch_3": {
+        "rollout": {
+          "metrics": {
+            "tasks": 510,
+            "ordinary_tasks": 510,
+            "initial_goal_tasks": 0,
+            "decision_turns": 3936,
+            "arrival": {
+              "numerator": 139,
+              "denominator": 510,
+              "rate": 0.2725490196078431
+            },
+            "arrival_and_stop": {
+              "numerator": 139,
+              "denominator": 510,
+              "rate": 0.2725490196078431
+            },
+            "initial_goal_stop": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null
+            },
+            "step_reachability": {
+              "numerator": 1548,
+              "denominator": 1919,
+              "rate": 0.8066701406982804
+            },
+            "shortest_progress": {
+              "numerator": 1483,
+              "denominator": 1919,
+              "rate": 0.7727983324648254
+            },
+            "control_errors": {
+              "premature_stop": 86,
+              "illegal_action": 2
+            },
+            "control_format_error": {
+              "numerator": 0,
+              "denominator": 3936,
+              "rate": 0
+            },
+            "illegal_action": {
+              "numerator": 2,
+              "denominator": 3936,
+              "rate": 0.0005081300813008131
+            },
+            "dead_state_turns": 1878,
+            "reason_errors": {
+              "fact": 2312
+            },
+            "reason_checked_turns": 3934,
+            "generated_limit_hits": 0,
+            "exposure_groups": {
+              "initial_pair_unexposed": {
+                "numerator": 138,
+                "denominator": 509,
+                "rate": 0.27111984282907664
+              },
+              "initial_pair_exposed": {
+                "numerator": 1,
+                "denominator": 1,
+                "rate": 1
+              }
+            }
+          },
+          "first_turn": {
+            "tasks": 510,
+            "reachable": 370,
+            "shortest_progress": 337,
+            "correct_control": 510
+          },
+          "shards": 21
+        },
+        "reference": {
+          "metrics": {
+            "tasks": 510,
+            "ordinary_tasks": 510,
+            "initial_goal_tasks": 0,
+            "decision_turns": 4200,
+            "arrival": null,
+            "arrival_and_stop": null,
+            "initial_goal_stop": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null
+            },
+            "step_reachability": {
+              "numerator": 2935,
+              "denominator": 3690,
+              "rate": 0.7953929539295393
+            },
+            "shortest_progress": {
+              "numerator": 2789,
+              "denominator": 3690,
+              "rate": 0.7558265582655826
+            },
+            "control_errors": {},
+            "control_format_error": {
+              "numerator": 0,
+              "denominator": 4200,
+              "rate": 0
+            },
+            "illegal_action": {
+              "numerator": 0,
+              "denominator": 4200,
+              "rate": 0
+            },
+            "dead_state_turns": 0,
+            "reason_errors": {
+              "fact": 904
+            },
+            "reason_checked_turns": 4200,
+            "generated_limit_hits": 0,
+            "exposure_groups": null
+          },
+          "first_turn": {
+            "tasks": 510,
+            "reachable": 370,
+            "shortest_progress": 337,
             "correct_control": 510
           },
           "shards": 21

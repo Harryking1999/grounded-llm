@@ -1,6 +1,6 @@
 # 开发机使用手册
 
-更新：2026-10-12。平台 35016 已重新开启并登记为可用评测机；用户最终决定本轮只评已有 1、2、3 epoch，不补训半整数权重。44491 仍关闭。SFT 同题 510 test 继续在 4090 评测，预留 0 号卡；35016 当前不启动新任务。既有地图实验已完成。
+更新：2026-10-12。SFT 前三轮与同题 510 评测已完成；用户随后授权继续训练，每 0.5 epoch 只评这 510 题，再继续。当前训练与评测均只用 4090 的 1–4 号卡，0 号卡预留，不设 epoch 上限。35016 保留为已登记可用机器，不启动任务；44491 仍关闭。
 
 ## 1. 机器概览
 
@@ -8,7 +8,7 @@
 |---|---|---|
 | 原人工智能平台 | 35016 已恢复并登记为可用评测机；共享 `/zhanghanyue` | 本轮没有分配新任务；44491 不再使用 |
 | 028：8 张 H100 80GB | 后续训练 | 10 月 12 日以后使用；崔涵需要 6–8 卡训练时协调释放资源 |
-| 4090：5 张 48GB 卡 | SFT 同题评测与权重留存 | 训练已完成；评测使用合同中的卡号，0 号卡预留 |
+| 4090：5 张 48GB 卡 | SFT 半轮续训与 510 题串行评测 | 按续训合同使用 1–4 号卡，0 号卡预留 |
 | login02 登录节点 | 028 连接入口及文件中转 | 仅用于登录和传输 |
 
 [平台入口](https://172.16.78.10:32206/index.html?#/developEnv)：业务管理 → 开发环境 → SSH 查看。
@@ -27,7 +27,7 @@ ssh -p 35016 root@172.16.78.10
 # 原训练环境41511已完成20 epoch并关闭，不再恢复
 ```
 
-本机别名 `grounded-dev` 已改为重新开启的 35016；4090 整数轮次队列仍通过 `grounded-4090` 与已保存的连接辅助入口管理。密钥和连接配置位于 `%USERPROFILE%\.ssh\`。
+本机别名 `grounded-dev` 已改为重新开启的 35016；当前 4090 续训通过 `grounded-4090` 与已保存的连接辅助入口管理。密钥和连接配置位于 `%USERPROFILE%\.ssh\`。
 
 **028、4090**：本机已配置连接别名及公钥，私钥保留在本机。
 
@@ -67,9 +67,13 @@ Agent 使用相同连接方式，登录后通过 `hostname` 确认主机、`nvid
 
 SFT 启动前实查：原 35016 主机身份为 `56ldennbmqmq3-0`；2026-10-12 替换平台 44491 的主机身份为 `7pkc1o9ovj34v-0`，四张 A100-SXM4-80GB，原共享路径、虚拟环境及已完成基座评测均保留。两平台后由用户关闭。4090 主机身份为 `ubuntu`，五张卡各 49,140 MiB；SFT 三轮权重留存于 `training/checkpoint-{12500,25000,37500}/`，当前 `models/epoch_{1,2,3}/` 为对应断点的符号链接。平台三轮模型和原始评测仍在共享盘，不删除或覆盖。
 
-2026-10-12 18:31（北京时间）按用户授权启动 4090 评测，源码 `d2d9a54`。本地已验收的基座 validation/test、前两轮 validation 完整汇总已迁入 4090；来源记录在 `runtime/migration_44491_audited_summaries.json`，明确标注历史逐题分片未迁回。队列只生成缺少的三轮 test 与第三轮 validation，共 214 个分片，不混用平台未完成的 test。运行 profile、PID 与日志路径在 `runtime/{evaluation_profile,evaluation_processes}.json`，自动按 validation 选模并汇总全部 test。当前日志为 `evaluation_queue_4090_d2d9a54.log`。
+2026-10-12 18:31（北京时间）按用户授权启动 4090 评测，源码 `d2d9a54`。本地已验收的基座 validation/test、前两轮 validation 完整汇总已迁入 4090；来源记录在 `runtime/migration_44491_audited_summaries.json`，明确标注历史逐题分片未迁回。队列只生成缺少的三轮 test 与第三轮 validation，共 214 个分片，不混用平台未完成的 test。该阶段现已完成，profile、PID 与日志路径保留在 `runtime/{evaluation_profile,evaluation_processes}.json`，原日志为 `evaluation_queue_4090_d2d9a54.log`。
 
 随后用户重新提供 35016。实查主机为 `2q9cq8lsupefi-0`，四张 A100-SXM4-80GB 均空闲，没有本项目活动进程；共享路径、三轮整数模型、数据与环境完整保留。查明两机均无本轮半整数权重后，用户明确选择“先登记 35016；本轮只评已有整数权重”。因此不补训或评测 0.5、1.5、2.5 epoch，不在 35016 启动额外任务，4090 队列继续。
+
+用户随后授权从第三轮继续训练，并明确“只用 4090”、只评固定 510 题。2026-10-12 21:18（北京时间）启动源码 `9834539` 的续训协调器，原前三轮 test 已完整完成。新的运行输出为原运行目录下 `continuation/`，profile 与进程信息为 `runtime/continuation_{profile,process}.json`；日志为 `continuation/logs/coordinator_9834539.log` 和逐段 `train_to_<step>.log`。协调器从原完整 `training/checkpoint-37500/` 恢复，每段训练后保存 `continuation/training/checkpoint-<step>/`，再用同机四卡完成该点的 510 题两种评测，输出于 `continuation/evaluation/epoch_<epoch>/test/`；完整成绩汇总到 `continuation/curve.json`。不启动 35016，不再生成 validation 评测。原模型、恢复状态与历史评测均保留。
+
+续训正式合同为 `experiments/llm_task_sft/configs/blocks_reason_continuation.json`，延续原 cosine 末尾学习率 2e-6，完整恢复 optimizer、scheduler、RNG 与半轮样本位置。当前 `continuation/status.json` 和 `continuation/training/progress.json` 为运行状态；没有总 epoch 上限，失败或空间不足时停止并记录原因，不自动清理产物。需要在周期结束后停止时，可在 `continuation/` 创建 `stop_after_cycle`。
 
 同题 510 的身份核对保留在原平台 `runtime/test510_alignment.json`，4090 复用已向平台提供的同一数据目录。概率对照源码 `8d1f467`，原输出位于平台 `diagnostics/random_largest_{validation,test510}/`，紧凑摘要已保存在仓库结果目录。源代码按 Git commit 部署到 `code/llm_sft_<commit>/`；运行时路径与 PID 放在本次运行的 `runtime/`，不入 Git。实验合同见 `experiments/llm_task_sft/configs/blocks_reason_bs4.json`；以下地图实验机器分工均为历史。
 

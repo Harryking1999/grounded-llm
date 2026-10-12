@@ -29,7 +29,8 @@ CUDA_VISIBLE_DEVICES=0 python -m experiments.llm_task_sft.src.evaluate --config 
 - `prepare.py`：固定轨迹配额、token 数据、真实长度与输入曝光审计。
 - `training.py` / `train.py`：全参数更新；FP32 主参数与 Adam 状态、BF16 运算；只在监督位置计算分块词表损失。
 - `evaluate.py`：真实状态执行、停止判断与独立说明诊断；保留原始生成。
-- `bridge.py` / `epoch_queue.py`：经 login02 转移每轮完整模型，平台空闲 GPU 领取各轮 validation 与固定 test 分片；全部验证完成后自动选模，最终摘要等待所有轮次 test 评齐。当前平台端口见正式合同。
+- `bridge.py` / `epoch_queue.py`：转移每轮完整模型、按空闲 GPU 领取各轮 validation 与固定 test 分片；全部验证完成后自动选模，最终摘要等待所有轮次 test 评齐。当前评测机器与卡号见正式合同。平台关闭后改在训练用的 4090 直接读取三轮断点，不再转移模型。
+- 迁移可复用已验收的完整 split 汇总，跳过该 split 的生成；来源记录在运行目录中。平台逐题回答仍留在原共享盘，未取回前不能在 4090 查询这些历史回答。
 - 每个 epoch 保存完整 HF 模型、优化器、调度器及四份 RNG，全部写完后发布 `evaluation_ready.json`。
 - `progress.json` / `train.jsonl` 记录实测步时、显存和 ETA；完成标记写入 `complete.json`。
 

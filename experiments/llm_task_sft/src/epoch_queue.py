@@ -34,6 +34,9 @@ def pending_jobs(root,models,counts,modes,size):
     result=[]
     for label,model in models:
         for split in ['validation','test']:
+            # A complete split can survive a host migration without its large raw shards.
+            if (root/label/split/'summary.json').exists():
+                continue
             for mode in modes:
                 for shard in range((counts[split]+size-1)//size):
                     out=root/label/split/mode/f'shard_{shard:03d}'

@@ -30,10 +30,10 @@ def collect_model(root, label, split, modes, counts, size):
     return result
 
 
-def pending_jobs(root,models,counts,modes,size):
+def pending_jobs(root,models,counts,modes,size,splits=('validation','test')):
     result=[]
     for label,model in models:
-        for split in ['validation','test']:
+        for split in splits:
             # A complete split can survive a host migration without its large raw shards.
             if (root/label/split/'summary.json').exists():
                 continue

@@ -28,6 +28,18 @@ def scheduler_factor(step, total, warmup, floor):
     return floor + (1 - floor) * (1 + math.cos(math.pi * progress)) / 2
 
 
+def resume_position(step, steps_epoch):
+    return divmod(step, steps_epoch)
+
+
+def validate_resume(saved, config, steps_epoch):
+    # Host and evaluation scheduling can change without changing the training recipe.
+    if saved['steps_per_epoch'] != steps_epoch or any(
+        saved['config'][key] != config[key] for key in ('model','seed','data','training')
+    ):
+        raise ValueError('Resume training recipe differs from saved checkpoint')
+
+
 def save_epoch(base, tokenizer, optimizer, scheduler, out, state, rank):
     directory = out/f"checkpoint-{state['step']}"
     directory.mkdir(parents=True, exist_ok=True)
@@ -54,6 +66,7 @@ def main():
     parser.add_argument('--resume', type=Path)
     parser.add_argument('--smoke-steps', type=int)
     parser.add_argument('--longest-smoke', action='store_true')
+    parser.add_argument('--stop-step', type=int, help='Save and exit at this global update, including beyond the original horizon')
     args = parser.parse_args()
     config = json.loads(args.config.read_text())
     os.environ.update(config['execution'].get('nccl_environment',{}))
@@ -92,28 +105,35 @@ def main():
     total = steps_epoch * spec['epochs']
     warmup = round(total * spec['warmup_fraction'])
     scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lambda s: scheduler_factor(s, total, warmup, spec['cosine_minimum_ratio']))
-    step, epoch_start = 0, 0
+    step = 0
     if args.resume:
         saved = json.loads((args.resume/'training_state.json').read_text())
-        if saved['config'] != config or saved['steps_per_epoch'] != steps_epoch:
-            raise ValueError('Resume contract differs from saved checkpoint')
+        validate_resume(saved,config,steps_epoch)
         optimizer.load_state_dict(torch.load(args.resume/'optimizer.pt', map_location=f'cuda:{local_rank}', weights_only=False))
         scheduler.load_state_dict(torch.load(args.resume/'scheduler.pt', weights_only=False))
         rng = torch.load(args.resume/f'rng_state_{rank}.pt', weights_only=False)
         random.setstate(rng['python']); np.random.set_state(rng['numpy']); torch.set_rng_state(rng['torch']); torch.cuda.set_rng_state(rng['cuda'])
-        step, epoch_start = saved['step'], saved['epoch']
+        step = saved['step']
+    epoch_start, resume_offset = resume_position(step,steps_epoch)
+    if args.stop_step is not None and args.stop_step <= step:
+        raise ValueError('stop-step must follow the restored update')
+    end_step = args.stop_step if args.stop_step is not None else total
+    epoch_end = math.ceil(end_step/steps_epoch)
     args.out.mkdir(parents=True, exist_ok=True)
     sampler = DistributedSampler(data, num_replicas=world, rank=rank, shuffle=True, seed=config['seed'])
     loader = DataLoader(data, batch_size=spec['per_device_batch_size'], sampler=sampler,
-                        collate_fn=Collator(tokenizer.pad_token_id), pin_memory=True, num_workers=0)
+                        collate_fn=Collator(tokenizer.pad_token_id), pin_memory=True, num_workers=0,
+                        generator=torch.Generator().manual_seed(config['seed']+rank))
     durations, start_time = deque(maxlen=100), time.monotonic()
     longest = max(range(len(data)), key=lambda i: data.rows[i]['length'])
     log = (args.out/'train.jsonl').open('a') if rank == 0 else None
     try:
-        for epoch in range(epoch_start, spec['epochs']):
+        for epoch in range(epoch_start, epoch_end):
             sampler.set_epoch(epoch)
             model.train()
-            for batch in loader:
+            for batch_index,batch in enumerate(loader):
+                if epoch == epoch_start and batch_index < resume_offset:
+                    continue
                 if args.longest_smoke:
                     batch = Collator(tokenizer.pad_token_id)([data[longest]])
                 begin = time.monotonic()
@@ -122,7 +142,7 @@ def main():
                 with torch.autocast('cuda', dtype=torch.bfloat16, enabled=spec['bf16']):
                     loss = model(**batch)
                 loss.backward()
-                norm = torch.nn.utils.clip_grad_norm_(base.parameters(), spec['gradient_clip_norm'])
+                norm = torch.nn.utils.clip_grad_norm_(base.parameters(), spec['gradient_clip_norm'],error_if_nonfinite=True)
                 optimizer.step(); scheduler.step()
                 torch.cuda.synchronize()
                 step += 1
@@ -132,9 +152,10 @@ def main():
                     dist.all_reduce(diagnostic); diagnostic /= world
                     if rank == 0:
                         seconds_step = sum(durations)/len(durations)
-                        state = dict(step=step, epoch=step/steps_epoch, total_steps=total, steps_per_epoch=steps_epoch,
+                        state = dict(step=step, epoch=step/steps_epoch, total_steps=end_step,
+                            lr_schedule_steps=total, steps_per_epoch=steps_epoch,
                             loss=diagnostic[0].item(), gradient_norm=diagnostic[1].item(), lr=scheduler.get_last_lr()[0],
-                            seconds_per_step=seconds_step, eta_seconds=(total-step)*seconds_step,
+                            seconds_per_step=seconds_step, eta_seconds=max(0,end_step-step)*seconds_step,
                             next_epoch_eta_seconds=(steps_epoch-step%steps_epoch)*seconds_step,
                             elapsed_seconds=time.monotonic()-start_time, utc=datetime.now(timezone.utc).isoformat(),
                             peak_memory_gib=torch.cuda.max_memory_allocated()/2**30)
@@ -143,9 +164,15 @@ def main():
                         print(json.dumps(state), flush=True)
                 if args.smoke_steps and step >= args.smoke_steps:
                     save_epoch(base, tokenizer, optimizer, scheduler, args.out,
-                        dict(step=step, epoch=epoch, config=config, steps_per_epoch=steps_epoch, smoke=True), rank)
+                        dict(step=step, epoch=step/steps_epoch, config=config, steps_per_epoch=steps_epoch, smoke=True), rank)
                     if rank == 0:
                         atomic_json(args.out/'complete.json', dict(smoke=True, steps=step))
+                    return
+                if args.stop_step is not None and step == args.stop_step:
+                    save_epoch(base,tokenizer,optimizer,scheduler,args.out,
+                        dict(step=step,epoch=step/steps_epoch,config=config,steps_per_epoch=steps_epoch,smoke=False),rank)
+                    if rank == 0:
+                        atomic_json(args.out/'complete.json',dict(segment=True,step=step,epoch=step/steps_epoch))
                     return
             save_epoch(base, tokenizer, optimizer, scheduler, args.out,
                        dict(step=step, epoch=epoch+1, config=config, steps_per_epoch=steps_epoch, smoke=False), rank)

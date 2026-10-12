@@ -1,0 +1,22 @@
+{
+  "base_config": "blocks_reason_bs4.json",
+  "resume_step": 37500,
+  "save_and_evaluate_every_epochs": 0.5,
+  "epoch_limit": null,
+  "learning_rate_policy": "hold_original_cosine_terminal_rate",
+  "evaluation": {
+    "splits": ["test"],
+    "physical_tasks": 510,
+    "modes": ["rollout", "reference"],
+    "use": "training_monitor_only",
+    "automatic_early_stopping": false
+  },
+  "execution": {
+    "ssh_alias": "grounded-4090",
+    "training_gpus": [1, 2, 3, 4],
+    "evaluation_gpus": [1, 2, 3, 4],
+    "reserved_gpu": 0,
+    "minimum_free_disk_gib": 25,
+    "checkpoint_retention": "keep_all_without_automatic_deletion"
+  }
+}

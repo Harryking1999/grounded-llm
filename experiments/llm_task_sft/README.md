@@ -19,9 +19,27 @@ CUDA_VISIBLE_DEVICES=0 python -m experiments.llm_task_sft.src.evaluate --config 
 
 先用 `prepare --smoke-tasks 32` 检查真实标签，再用 `train --smoke-steps 20 --longest-smoke`
 在最长样本上完成四卡前后向、优化器更新和完整保存；正式训练不使用 smoke 数据。
-原始基座与 SFT 使用相同提示、候选编号和生成上限。每轮评 validation，按到达率选模，
-每个 epoch 同时补齐与地图线完全相同的 510 道普通 test 题，reference 与自身历史 rollout 分开汇总。
-最终选模仍只使用 validation；选定模型复用该轮已完成的 test，不再次生成同题回答。
+原始基座与 SFT 使用相同提示、候选编号和生成上限。前三轮原方案评 validation 并补齐与地图线相同的 510 题，
+历史回答与选模记录保留。用户随后授权继续训练，并指定后续仅评这 510 题，详见下节。
+
+## 半轮续训与监测
+
+正式续训合同为 [blocks_reason_continuation.json](configs/blocks_reason_continuation.json)。
+从第三轮完整断点恢复模型、Adam、调度器与各卡 RNG；沿用固定 50,000 条数据和 global batch 4。
+原三轮 cosine 已到末尾，后续保持其终值学习率 2e-6，不重新 warmup 或改变原三轮权重。
+
+```bash
+python -u -m experiments.llm_task_sft.src.continuation --profile PROFILE
+```
+
+同一台 4090 的四卡依次执行：训练 6,250 步 → 保存完整断点 → 完成 510 题的 rollout 与 reference → 再训练。
+因此新评测点为 3.5、4、4.5…… epoch，不补训已过去的半整数点。半轮恢复接续同一 epoch 的剩余样本，
+完整模型和所有训练状态均恢复；执行信息记录在运行目录，不使用 1,000 题 validation。
+
+不设 epoch 上限，也不因连续几次分数不涨自动停止。每个半轮保留模型、恢复状态、逐题回答与曲线；
+`curve.json` 的峰值仅是固定 510 题监测集上的最佳观察值，不能当作独立 test 泛化成绩。
+进程失败或磁盘不足时停止并记录原因，不自动更改配方或删除旧产物。
+运行目录的 `stop_after_cycle` 可要求完成当前训练与评测周期后停止。
 
 ## 实现与验证
 
@@ -29,7 +47,7 @@ CUDA_VISIBLE_DEVICES=0 python -m experiments.llm_task_sft.src.evaluate --config 
 - `prepare.py`：固定轨迹配额、token 数据、真实长度与输入曝光审计。
 - `training.py` / `train.py`：全参数更新；FP32 主参数与 Adam 状态、BF16 运算；只在监督位置计算分块词表损失。
 - `evaluate.py`：真实状态执行、停止判断与独立说明诊断；保留原始生成。
-- `bridge.py` / `epoch_queue.py`：转移每轮完整模型、按空闲 GPU 领取各轮 validation 与固定 test 分片；全部验证完成后自动选模，最终摘要等待所有轮次 test 评齐。当前评测机器与卡号见正式合同。平台关闭后改在训练用的 4090 直接读取三轮断点，不再转移模型。
+- `bridge.py` / `epoch_queue.py`：前三轮的模型转移与分片评测；续训由 `continuation.py` 串行协调训练、510 题评测和曲线汇总。当前机器与卡号见续训合同。
 - 迁移可复用已验收的完整 split 汇总，跳过该 split 的生成；来源记录在运行目录中。平台逐题回答仍留在原共享盘，未取回前不能在 4090 查询这些历史回答。
 - 每个 epoch 保存完整 HF 模型、优化器、调度器及四份 RNG，全部写完后发布 `evaluation_ready.json`。
 - `progress.json` / `train.jsonl` 记录实测步时、显存和 ETA；完成标记写入 `complete.json`。
@@ -41,7 +59,7 @@ CUDA_VISIBLE_DEVICES=0 python -m experiments.llm_task_sft.src.evaluate --config 
 三轮 validation 普通到达率为 3.2%、11.6%、25.7%，初始已达标题均正确停止 100/100；
 多数普通题仍最终无合法动作，依据模板的事实正确性也未稳定。
 前两轮同题 510 test 已完整完成，到达率为 3.53%、11.76%；第三轮 test 仍在评测。
-本轮仅评已有整数权重，不补训半整数权重；35016 已登记为可用机器，当前无新任务。
+用户随后授权从第三轮继续训练并逐半轮评测；35016 已登记，当前串行续训与评测均在 4090。
 进度与精确计数见[项目状态页](../../docs/PROJECT_STATUS_AND_TODO.md)。
 
 ## 合法候选随机对照

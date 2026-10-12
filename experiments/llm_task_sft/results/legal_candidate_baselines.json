@@ -495,5 +495,213 @@
     },
     "sft_per_epoch": "pending",
     "output": "diagnostics/random_largest_test510"
+  },
+  "sft_test_completed_conditions": {
+    "source_commit": "d2d9a54",
+    "run": "/home/gongruochen/grounded_llm/runs/blocks_reason_sft_bs4_50k",
+    "host": "ubuntu",
+    "recorded_beijing": "2026-10-12 19:36",
+    "scope": "Only fully completed 510-task conditions; epoch_2 reference and epoch_3 still pending.",
+    "results": {
+      "epoch_1": {
+        "rollout": {
+          "metrics": {
+            "tasks": 510,
+            "ordinary_tasks": 510,
+            "initial_goal_tasks": 0,
+            "decision_turns": 3697,
+            "arrival": {
+              "numerator": 18,
+              "denominator": 510,
+              "rate": 0.03529411764705882
+            },
+            "arrival_and_stop": {
+              "numerator": 18,
+              "denominator": 510,
+              "rate": 0.03529411764705882
+            },
+            "initial_goal_stop": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null
+            },
+            "step_reachability": {
+              "numerator": 645,
+              "denominator": 1137,
+              "rate": 0.5672823218997362
+            },
+            "shortest_progress": {
+              "numerator": 613,
+              "denominator": 1137,
+              "rate": 0.5391380826737028
+            },
+            "control_errors": {
+              "premature_stop": 73
+            },
+            "control_format_error": {
+              "numerator": 0,
+              "denominator": 3697,
+              "rate": 0
+            },
+            "illegal_action": {
+              "numerator": 0,
+              "denominator": 3697,
+              "rate": 0
+            },
+            "dead_state_turns": 2542,
+            "reason_errors": {
+              "fact": 3066
+            },
+            "reason_checked_turns": 3697,
+            "generated_limit_hits": 0,
+            "exposure_groups": {
+              "initial_pair_unexposed": {
+                "numerator": 18,
+                "denominator": 509,
+                "rate": 0.03536345776031434
+              },
+              "initial_pair_exposed": {
+                "numerator": 0,
+                "denominator": 1,
+                "rate": 0
+              }
+            }
+          },
+          "first_turn": {
+            "tasks": 510,
+            "reachable": 260,
+            "shortest_progress": 239,
+            "correct_control": 509
+          },
+          "shards": 21
+        },
+        "reference": {
+          "metrics": {
+            "tasks": 510,
+            "ordinary_tasks": 510,
+            "initial_goal_tasks": 0,
+            "decision_turns": 4200,
+            "arrival": null,
+            "arrival_and_stop": null,
+            "initial_goal_stop": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null
+            },
+            "step_reachability": {
+              "numerator": 2024,
+              "denominator": 3690,
+              "rate": 0.548509485094851
+            },
+            "shortest_progress": {
+              "numerator": 1916,
+              "denominator": 3690,
+              "rate": 0.5192411924119241
+            },
+            "control_errors": {
+              "premature_stop": 1
+            },
+            "control_format_error": {
+              "numerator": 0,
+              "denominator": 4200,
+              "rate": 0
+            },
+            "illegal_action": {
+              "numerator": 0,
+              "denominator": 4200,
+              "rate": 0
+            },
+            "dead_state_turns": 0,
+            "reason_errors": {
+              "fact": 1780
+            },
+            "reason_checked_turns": 4200,
+            "generated_limit_hits": 0,
+            "exposure_groups": null
+          },
+          "first_turn": {
+            "tasks": 510,
+            "reachable": 260,
+            "shortest_progress": 239,
+            "correct_control": 509
+          },
+          "shards": 21
+        }
+      },
+      "epoch_2": {
+        "rollout": {
+          "metrics": {
+            "tasks": 510,
+            "ordinary_tasks": 510,
+            "initial_goal_tasks": 0,
+            "decision_turns": 3770,
+            "arrival": {
+              "numerator": 60,
+              "denominator": 510,
+              "rate": 0.11764705882352941
+            },
+            "arrival_and_stop": {
+              "numerator": 60,
+              "denominator": 510,
+              "rate": 0.11764705882352941
+            },
+            "initial_goal_stop": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null
+            },
+            "step_reachability": {
+              "numerator": 1048,
+              "denominator": 1498,
+              "rate": 0.6995994659546061
+            },
+            "shortest_progress": {
+              "numerator": 995,
+              "denominator": 1498,
+              "rate": 0.664218958611482
+            },
+            "control_errors": {
+              "premature_stop": 74,
+              "illegal_action": 2
+            },
+            "control_format_error": {
+              "numerator": 0,
+              "denominator": 3770,
+              "rate": 0
+            },
+            "illegal_action": {
+              "numerator": 2,
+              "denominator": 3770,
+              "rate": 0.0005305039787798408
+            },
+            "dead_state_turns": 2212,
+            "reason_errors": {
+              "fact": 2713
+            },
+            "reason_checked_turns": 3768,
+            "generated_limit_hits": 0,
+            "exposure_groups": {
+              "initial_pair_unexposed": {
+                "numerator": 59,
+                "denominator": 509,
+                "rate": 0.11591355599214145
+              },
+              "initial_pair_exposed": {
+                "numerator": 1,
+                "denominator": 1,
+                "rate": 1
+              }
+            }
+          },
+          "first_turn": {
+            "tasks": 510,
+            "reachable": 334,
+            "shortest_progress": 307,
+            "correct_control": 510
+          },
+          "shards": 21
+        }
+      }
+    }
   }
 }

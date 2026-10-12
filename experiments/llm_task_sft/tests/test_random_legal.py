@@ -35,3 +35,11 @@ def test_bitset_dynamic_program_matches_literal_candidate_enumeration():
                     return sum(literal(state ^ tile,left-1) for tile in candidates)/len(candidates) if candidates else 0.
                 computed=exact_probabilities(15,goal,budget,tiles)
                 assert computed['goal_preserving' if preserve else 'all_legal']==pytest.approx(literal(15,budget))
+
+
+def test_largest_shape_heuristic_does_not_filter_dead_ends():
+    # Three-cell removals leave one isolated cell. A heuristic must lose their mass.
+    result=exact_probabilities(15,0,32,[3,6,12,7,14])
+    assert result['all_legal']==pytest.approx(.4)
+    assert result['largest_goal_preserving']==0
+    assert result['first_turn']['reachable_largest_goal_preserving']==0

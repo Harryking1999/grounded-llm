@@ -15,13 +15,14 @@ def exact_probabilities(start, goal, budget, placements=None, max_states=2000000
     """Evaluate the removal DAG; losing branches keep their probability mass.
 
     Policy A chooses uniformly among every geometrically legal placement.
-    Policy B also rejects placements touching the goal. Both stop at the goal.
+    Policy B also rejects placements touching the goal. Policy C additionally
+    samples only the largest available goal-preserving shapes. All stop at the goal.
     Local support prunes only provably zero-probability subtrees; it never
     changes either policy's candidate denominator or selects a safe action.
     """
     started=time.monotonic()
     if goal & start != goal:
-        return dict(all_legal=0.,goal_preserving=0.,states=0,seconds=0.,initial_candidates=0,
+        return dict(all_legal=0.,goal_preserving=0.,largest_goal_preserving=0.,states=0,seconds=0.,initial_candidates=0,
                     initial_goal_preserving=0,minimum_moves=-1,first_turn=None,reference_steps=[])
     tiles=[tile for tile in (placements if placements is not None else [p[0] for p in rules.PLACEMENTS])
            if tile & start == tile]
@@ -30,6 +31,8 @@ def exact_probabilities(start, goal, budget, placements=None, max_states=2000000
     extra=start ^ goal
     active_initial=(1<<len(tiles))-1
     safe_initial=sum(1<<i for i,tile in enumerate(tiles) if not tile & goal)
+    largest_area=max((tile.bit_count() for tile in tiles),default=1)
+    largest_initial=sum(1<<i for i,tile in enumerate(tiles) if tile.bit_count()==largest_area)
     touches=defaultdict(int)
     for i,tile in enumerate(tiles):
         for cell in rules.cells(tile & extra):
@@ -45,8 +48,8 @@ def exact_probabilities(start, goal, budget, placements=None, max_states=2000000
     visits=0
     def probability(remaining,active,left):
         nonlocal visits
-        if not remaining: return 1.,1.,0
-        if left<=0: return 0.,0.,-1
+        if not remaining: return 1.,1.,0,1.
+        if left<=0: return 0.,0.,-1,0.
         key=remaining if nonbinding else (remaining,left)
         if key in cache: return cache[key]
         visits+=1
@@ -54,33 +57,42 @@ def exact_probabilities(start, goal, budget, placements=None, max_states=2000000
             raise RuntimeError('Exact probability budget exhausted; result is unknown, not zero')
         safe=active & safe_initial
         if not safe or any(not (touches[cell] & safe) for cell in rules.cells(remaining)):
-            cache[key]=(0.,0.,-1);return cache[key]
+            cache[key]=(0.,0.,-1,0.);return cache[key]
         count_all,count_safe=active.bit_count(),safe.bit_count()
-        total_all,total_safe=0.,0.;minimum_moves=-1
+        largest_pool=(safe & largest_initial) or safe
+        total_all,total_safe,total_largest=0.,0.,0.;minimum_moves=-1
         while safe:
             bit=safe & -safe;safe ^= bit;i=bit.bit_length()-1
-            child_all,child_safe,child_minimum=probability(remaining ^ tiles[i],active & ~disables[i],left-1)
+            child_all,child_safe,child_minimum,child_largest=probability(remaining ^ tiles[i],active & ~disables[i],left-1)
             total_all+=child_all;total_safe+=child_safe
+            if bit & largest_pool: total_largest+=child_largest
             if child_minimum>=0 and (minimum_moves<0 or child_minimum+1<minimum_moves): minimum_moves=child_minimum+1
-        result=total_all/count_all,total_safe/count_safe,minimum_moves
+        result=total_all/count_all,total_safe/count_safe,minimum_moves,total_largest/largest_pool.bit_count()
         cache[key]=result
         return result
     def step_chance(remaining,active,left):
         minimum_moves=probability(remaining,active,left)[2]
         legal_count,safe_count=active.bit_count(),(active & safe_initial).bit_count()
+        largest_pool=((active & safe_initial) & largest_initial) or (active & safe_initial)
+        largest_count=largest_pool.bit_count();reachable_largest,shortest_largest=0,0
         reachable,shortest=0,0;options=active & safe_initial
         while options and left>0:
             bit=options & -options;options ^= bit;i=bit.bit_length()-1
             child=probability(remaining ^ tiles[i],active & ~disables[i],left-1)
             reachable+=child[2]>=0
             shortest+=minimum_moves>0 and child[2]==minimum_moves-1
+            if bit & largest_pool:
+                reachable_largest+=child[2]>=0
+                shortest_largest+=minimum_moves>0 and child[2]==minimum_moves-1
         return dict(candidates=legal_count,goal_preserving_candidates=safe_count,
                     reachable_candidates=reachable,shortest_candidates=shortest,
                     reachable_all_legal=reachable/legal_count if legal_count else 0.,
                     shortest_all_legal=shortest/legal_count if legal_count else 0.,
                     reachable_goal_preserving=reachable/safe_count if safe_count else 0.,
-                    shortest_goal_preserving=shortest/safe_count if safe_count else 0.)
-    all_legal,goal_preserving,minimum_moves=probability(extra,active_initial,budget)
+                    shortest_goal_preserving=shortest/safe_count if safe_count else 0.,
+                    reachable_largest_goal_preserving=reachable_largest/largest_count if largest_count else 0.,
+                    shortest_largest_goal_preserving=shortest_largest/largest_count if largest_count else 0.)
+    all_legal,goal_preserving,minimum_moves,largest_goal_preserving=probability(extra,active_initial,budget)
     first=step_chance(extra,active_initial,budget) if extra else None
     reference=[];remaining,active=extra,active_initial
     for index,tile in enumerate(reference_tiles):
@@ -88,7 +100,7 @@ def exact_probabilities(start, goal, budget, placements=None, max_states=2000000
         reference.append(step_chance(remaining,active,budget-index))
         i=tiles.index(tile);remaining ^= tile;active &= ~disables[i]
     if reference_tiles and remaining: raise ValueError('Reference path does not reach the goal')
-    return dict(all_legal=all_legal,goal_preserving=goal_preserving,states=len(cache),
+    return dict(all_legal=all_legal,goal_preserving=goal_preserving,largest_goal_preserving=largest_goal_preserving,states=len(cache),
                 seconds=time.monotonic()-started,initial_candidates=len(tiles),
                 initial_goal_preserving=safe_initial.bit_count(),minimum_moves=minimum_moves,
                 first_turn=first,reference_steps=reference)
@@ -111,12 +123,15 @@ def aggregate(rows):
         arrival_rate_all_legal=sum(row['all_legal'] for row in rows)/count if count else None,
         expected_arrivals_goal_preserving=sum(row['goal_preserving'] for row in rows),
         arrival_rate_goal_preserving=sum(row['goal_preserving'] for row in rows)/count if count else None,
+        expected_arrivals_largest_goal_preserving=sum(row['largest_goal_preserving'] for row in rows),
+        arrival_rate_largest_goal_preserving=sum(row['largest_goal_preserving'] for row in rows)/count if count else None,
         mean_initial_candidates=sum(row['initial_candidates'] for row in rows)/count if count else None,
         mean_initial_goal_preserving=sum(row['initial_goal_preserving'] for row in rows)/count if count else None)
 
 
 def aggregate_steps(steps):
-    keys=['reachable_all_legal','shortest_all_legal','reachable_goal_preserving','shortest_goal_preserving']
+    keys=['reachable_all_legal','shortest_all_legal','reachable_goal_preserving','shortest_goal_preserving',
+          'reachable_largest_goal_preserving','shortest_largest_goal_preserving']
     return dict(decisions=len(steps),**{key:sum(step[key] for step in steps)/len(steps) if steps else None for key in keys})
 
 
@@ -158,6 +173,7 @@ def main():
         elapsed_seconds=time.monotonic()-started,total_evaluated_states=sum(row['states'] for row in rows),
         definitions=dict(all_legal='Uniform choice over all geometric candidates, no premature stop or format error.',
             goal_preserving='Uniform choice after rejecting goal-touching removals; no reachability or optimality filter.',
+            largest_goal_preserving='Prefer the largest goal-preserving shape, then sample uniformly; no learned weights or reachability filter.',
             terminal='Perfect recognition and stopping at the exact goal; initially solved tasks are reported separately.',
             probability='Dynamic programming sums all successful routes; no Monte Carlo sampling or retry selection.'))
     atomic_json(args.out/'summary.json',result)

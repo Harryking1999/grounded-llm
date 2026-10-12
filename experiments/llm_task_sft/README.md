@@ -20,7 +20,8 @@ CUDA_VISIBLE_DEVICES=0 python -m experiments.llm_task_sft.src.evaluate --config 
 先用 `prepare --smoke-tasks 32` 检查真实标签，再用 `train --smoke-steps 20 --longest-smoke`
 在最长样本上完成四卡前后向、优化器更新和完整保存；正式训练不使用 smoke 数据。
 原始基座与 SFT 使用相同提示、候选编号和生成上限。每轮评 validation，按到达率选模，
-并只对基座与选定模型评 test。reference 与自身历史 rollout 分开汇总。
+每个 epoch 同时补齐与地图线完全相同的 510 道普通 test 题，reference 与自身历史 rollout 分开汇总。
+最终选模仍只使用 validation；选定模型复用该轮已完成的 test，不再次生成同题回答。
 
 ## 实现与验证
 
@@ -28,7 +29,7 @@ CUDA_VISIBLE_DEVICES=0 python -m experiments.llm_task_sft.src.evaluate --config 
 - `prepare.py`：固定轨迹配额、token 数据、真实长度与输入曝光审计。
 - `training.py` / `train.py`：全参数更新；FP32 主参数与 Adam 状态、BF16 运算；只在监督位置计算分块词表损失。
 - `evaluate.py`：真实状态执行、停止判断与独立说明诊断；保留原始生成。
-- `bridge.py` / `epoch_queue.py`：经 login02 转移每轮完整模型，平台空闲 GPU 领取验证分片；全部轮次完成后自动选模并评 test。当前平台端口见正式合同。
+- `bridge.py` / `epoch_queue.py`：经 login02 转移每轮完整模型，平台空闲 GPU 领取各轮 validation 与固定 test 分片；全部验证完成后自动选模，最终摘要等待所有轮次 test 评齐。当前平台端口见正式合同。
 - 每个 epoch 保存完整 HF 模型、优化器、调度器及四份 RNG，全部写完后发布 `evaluation_ready.json`。
 - `progress.json` / `train.jsonl` 记录实测步时、显存和 ETA；完成标记写入 `complete.json`。
 
@@ -38,7 +39,7 @@ CUDA_VISIBLE_DEVICES=0 python -m experiments.llm_task_sft.src.evaluate --config 
 阶段验收已核对训练数据配额、前两轮完整断点及全部已完成评测分片。
 前两轮 validation 普通到达率为 3.2%、11.6%，初始已达标题均正确停止 100/100；
 多数普通题仍最终无合法动作，依据模板的事实正确性也未稳定。
-当前未完成第三轮验证及最终选模 test，进度与精确计数见[项目状态页](../../docs/PROJECT_STATUS_AND_TODO.md)。
+当前正在补齐每轮同题 510 test，第三轮验证及最终选模也尚未完成，进度与精确计数见[项目状态页](../../docs/PROJECT_STATUS_AND_TODO.md)。
 
 ## 合法候选随机对照
 
@@ -52,3 +53,5 @@ CUDA_VISIBLE_DEVICES=0 python -m experiments.llm_task_sft.src.evaluate --config 
 ```bash
 python -m experiments.llm_task_sft.src.random_legal --config experiments/llm_task_sft/configs/blocks_random_legal.json --data DATA --out DIAGNOSTIC
 ```
+
+同题首轮、单步与整题对照结果见[合法候选分析](results/legal_candidate_baselines.md)。

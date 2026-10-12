@@ -41,7 +41,8 @@
     "shard_tasks": 25,
     "epoch_split": "validation",
     "epoch_modes": ["rollout", "reference"],
-    "test_models": ["original_base", "validation_selected_epoch"],
+    "test_models": ["original_base", "each_epoch"],
+    "selection_split": "validation",
     "selection": ["arrival_rate", "arrival_and_stop_rate", "earlier_epoch"],
     "sampling": "greedy",
     "allow_action_repair": false

@@ -323,7 +323,7 @@ S 不能裁掉后续动作或停止标签；推理时累计上下文＋G 也须�
 
 ### 5.3 选模和对照
 
-每 epoch 末评固定 validation。按普通轨迹到达率选 checkpoint；平分时看到达且正确停止率，再平分选较早 checkpoint。test 只评未微调基座与选定的 SFT checkpoint。
+每 epoch 末评固定 validation，并评与地图线相同的 510 道普通 test 题，每轮均保存 reference 和 rollout。按 validation 的普通轨迹到达率选 checkpoint；平分时看到达且正确停止率，再平分选较早 checkpoint。选模不使用 test，最终报告复用选定轮次已完成的 test。
 
 训练和留出集都使用第 2.1 节的固定候选编号规则。与地图接口比较时，题目、候选编号和动作预算一致；固定状态评测还须使用相同状态及历史，必要时重评接口，不能直接拿不同编号或参考轨迹的旧均值作对照。本基线不评价排序、地图最优率或 NDCG。
 

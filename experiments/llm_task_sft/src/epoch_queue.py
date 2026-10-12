@@ -1,4 +1,4 @@
-"""Evaluate arriving epoch models on idle platform GPUs, then select and test."""
+"""Evaluate validation and the fixed test set for every arriving epoch model."""
 
 import argparse
 from collections import Counter
@@ -30,6 +30,17 @@ def collect_model(root, label, split, modes, counts, size):
     return result
 
 
+def pending_jobs(root,models,counts,modes,size):
+    result=[]
+    for label,model in models:
+        for split in ['validation','test']:
+            for mode in modes:
+                for shard in range((counts[split]+size-1)//size):
+                    out=root/label/split/mode/f'shard_{shard:03d}'
+                    if not (out/'summary.json').exists(): result.append((label,model,split,mode,shard,out))
+    return result
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--profile',type=Path,required=True)
@@ -46,17 +57,7 @@ def main():
         models=[('base',Path(profile['base_model']))]
         models.extend((f'epoch_{i}',run/'models'/f'epoch_{i}') for i in range(1,config['training']['epochs']+1)
                       if (run/'models'/f'epoch_{i}'/'evaluation_ready.json').exists())
-        if selected:
-            models.append(('selected_test',run/'models'/selected))
-        result=[]
-        for label,model in models:
-            splits=['test'] if label=='selected_test' else ['validation','test'] if label=='base' else ['validation']
-            for split in splits:
-                for mode in modes:
-                    for shard in range((counts[split]+size-1)//size):
-                        out=root/label/split/mode/f'shard_{shard:03d}'
-                        if not (out/'summary.json').exists(): result.append((label,model,split,mode,shard,out))
-        return result
+        return pending_jobs(root,models,counts,modes,size)
     while True:
         for gpu,(process,job,log) in list(active.items()):
             code=process.poll()
@@ -69,10 +70,12 @@ def main():
             # Other independent shards may finish; no automatic change of protocol or retries.
             if not active: raise RuntimeError('A worker failed; inspect evaluation_failure.json and its worker.log')
             time.sleep(10); continue
-        completed={}
+        completed={};completed_test={}
         for label in ['base']+[f'epoch_{i}' for i in range(1,config['training']['epochs']+1)]:
             summary=collect_model(root,label,'validation',modes,counts,size)
             if summary: completed[label]=summary
+            test_summary=collect_model(root,label,'test',modes,counts,size)
+            if test_summary: completed_test[label]=test_summary
         if selected is None and all(f'epoch_{i}' in completed for i in range(1,config['training']['epochs']+1)):
             epoch=max(range(1,config['training']['epochs']+1),key=lambda i:(
                 completed[f'epoch_{i}']['metrics']['rollout']['arrival']['rate'],
@@ -91,13 +94,16 @@ def main():
             env=dict(os.environ,CUDA_VISIBLE_DEVICES=str(gpu),OMP_NUM_THREADS='1',TOKENIZERS_PARALLELISM='false')
             process=subprocess.Popen(command,cwd=profile['code'],env=env,stdout=log,stderr=subprocess.STDOUT)
             active[gpu]=(process,job,log)
-        base_test=collect_model(root,'base','test',modes,counts,size)
-        selected_test=collect_model(root,'selected_test','test',modes,counts,size) if selected else None
+        base_test=completed_test.get('base')
+        selected_test=completed_test.get(selected) if selected else None
         state=dict(active=[dict(gpu=gpu,pid=p.pid,job=str(job[-1])) for gpu,(p,job,_) in active.items()],
-                   completed_validation=list(completed),selected=selected,pending_shards=len(pending),utc_epoch=time.time())
+                   completed_validation=list(completed),completed_test=list(completed_test),
+                   selected=selected,pending_shards=len(pending),utc_epoch=time.time())
         atomic_json(run/'evaluation_status.json',state)
-        if selected_test and base_test and 'base' in completed and not active:
-            atomic_json(run/'summary.json',dict(validation=completed,base_test=base_test,selected_test=selected_test,selected=selected))
+        all_test=len(completed_test)==config['training']['epochs']+1
+        if selected_test and base_test and 'base' in completed and all_test and not active:
+            atomic_json(run/'summary.json',dict(validation=completed,test=completed_test,
+                base_test=base_test,selected_test=selected_test,selected=selected))
             return
         time.sleep(10)
 

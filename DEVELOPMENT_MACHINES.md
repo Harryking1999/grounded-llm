@@ -1,14 +1,14 @@
 # 开发机使用手册
 
-更新：2026-10-12。用户已关闭平台 35016，平台曾改为 44491；SFT 已在 4090 的 1–4 号卡完成三轮训练，三轮完整模型均同步至平台。44491 四卡已启动各轮同题 510 test 补评，但 17:42 起 SSH 连接被拒绝，新连接状态待确认。既有地图实验已完成。
+更新：2026-10-12。用户已关闭平台 35016 和 44491，授权先在 4090 评测。SFT 三轮训练已完成；同题 510 test 补评迁至 4090，直接读取本机完整断点，预留 0 号卡。平台历史产物仍留在共享盘；既有地图实验已完成。
 
 ## 1. 机器概览
 
 | 机器 | 用途 | 使用约定 |
 |---|---|---|
-| 原人工智能平台 | 当前评测；开发环境共享 `/zhanghanyue` | 环境变更后，从平台页面确认 SSH 端口 |
+| 原人工智能平台 | 已关机；历史产物保存在共享 `/zhanghanyue` | 不再连接 35016、44491；重启后从平台页面确认 SSH 端口 |
 | 028：8 张 H100 80GB | 后续训练 | 10 月 12 日以后使用；崔涵需要 6–8 卡训练时协调释放资源 |
-| 4090：5 张 48GB 卡 | SFT 权重留存；本轮训练已完成 | 本轮使用 1–4 号卡，0 号卡预留；完成核验时五卡均空闲 |
+| 4090：5 张 48GB 卡 | SFT 同题评测与权重留存 | 训练已完成；评测使用合同中的卡号，0 号卡预留 |
 | login02 登录节点 | 028 连接入口及文件中转 | 仅用于登录和传输 |
 
 [平台入口](https://172.16.78.10:32206/index.html?#/developEnv)：业务管理 → 开发环境 → SSH 查看。
@@ -20,14 +20,14 @@
 **原平台**：本机已配置 SSH 密钥。
 
 ```powershell
-# 唯一平台评测环境：4 张 A100
+# 已关闭的历史评测环境，不作为当前运行目标
 ssh -p 44491 root@172.16.78.10
 # 35016 已由用户关闭，不再作为评测目标
 # 41941已关闭并从当前运行合同禁用，不再恢复
 # 原训练环境41511已完成20 epoch并关闭，不再恢复
 ```
 
-本机别名 `grounded-dev` 当前指向 44491（主评测环境）；17:42 起连接被拒绝，尚未擅自更换端口。密钥和连接配置位于 `%USERPROFILE%\.ssh\`。
+本机别名 `grounded-dev` 仍指向已关闭的 44491，当前不使用；评测通过 `grounded-4090` 与已保存的连接辅助入口进行。密钥和连接配置位于 `%USERPROFILE%\.ssh\`。
 
 **028、4090**：本机已配置连接别名及公钥，私钥保留在本机。
 
@@ -61,11 +61,15 @@ Agent 使用相同连接方式，登录后通过 `hostname` 确认主机、`nvid
 | 4090 公共模型 | `/opt/models`；2026-10-09 重查未发现 Qwen2.5-1.5B-Instruct，项目基座由平台经 login02 复制到项目目录 |
 | 4090 项目目录 | `/home/gongruochen/grounded_llm/`，含 `code/`、`models/`、`runs/` 与 `incoming/` |
 | login02 项目中转 | `/home/zhangyue/transfer/grounded_llm/`，已创建并完成 adapter 中转验证 |
-| 当前无地图 SFT | 两机既有项目工作区下 `runs/blocks_reason_sft_bs4_50k/`；4090 保存训练完整断点，平台 44491 复用 `/zhanghanyue` 中的数据、同步模型与评测。公共中转使用 login02 的 `transfer/grounded_llm/llm_task_sft/` |
+| 当前无地图 SFT | 4090 的 `runs/blocks_reason_sft_bs4_50k/` 保存训练断点、新评测与迁移来源；原平台同名运行保留历史模型、逐题回答与评测。公共中转为 login02 的 `transfer/grounded_llm/llm_task_sft/` |
 
 原平台目录支持跨开发环境复用。**028、login02、4090 与平台之间无已确认的共享目录**；028 的 `/ssdwork` 为节点本地磁盘。
 
-SFT 启动前实查：原 35016 主机身份为 `56ldennbmqmq3-0`；2026-10-12 替换平台 44491 的主机身份为 `7pkc1o9ovj34v-0`，四张 A100-SXM4-80GB，原共享路径、虚拟环境及已完成基座评测均保留。4090 主机身份为 `ubuntu`，五张卡各 49,140 MiB；SFT 三轮训练现已完成，权重留存其 `training/checkpoint-{12500,25000,37500}/`。平台三轮模型位于同运行的 `models/epoch_{1,2,3}/`，同步完成标记已写入。新评测队列源码 `d86e334`，同题 510 身份核对存于忽略的 `runtime/test510_alignment.json`；概率对照源码 `8d1f467`，输出在 `diagnostics/random_largest_{validation,test510}/`。源代码按 Git commit 部署到各自 `code/llm_sft_<commit>/`；运行时路径与 PID 放在本次运行的 `runtime/`，不入 Git。新实验合同见 `experiments/llm_task_sft/configs/blocks_reason_bs4.json`；以下地图实验机器分工均为历史。
+SFT 启动前实查：原 35016 主机身份为 `56ldennbmqmq3-0`；2026-10-12 替换平台 44491 的主机身份为 `7pkc1o9ovj34v-0`，四张 A100-SXM4-80GB，原共享路径、虚拟环境及已完成基座评测均保留。两平台后由用户关闭。4090 主机身份为 `ubuntu`，五张卡各 49,140 MiB；SFT 三轮权重留存于 `training/checkpoint-{12500,25000,37500}/`，当前 `models/epoch_{1,2,3}/` 为对应断点的符号链接。平台三轮模型和原始评测仍在共享盘，不删除或覆盖。
+
+2026-10-12 18:31（北京时间）按用户授权启动 4090 评测，源码 `d2d9a54`。本地已验收的基座 validation/test、前两轮 validation 完整汇总已迁入 4090；来源记录在 `runtime/migration_44491_audited_summaries.json`，明确标注历史逐题分片未迁回。队列只生成缺少的三轮 test 与第三轮 validation，共 214 个分片，不混用平台未完成的 test。运行 profile、PID 与日志路径在 `runtime/{evaluation_profile,evaluation_processes}.json`，自动按 validation 选模并汇总全部 test。当前日志为 `evaluation_queue_4090_d2d9a54.log`。
+
+同题 510 的身份核对保留在原平台 `runtime/test510_alignment.json`，4090 复用已向平台提供的同一数据目录。概率对照源码 `8d1f467`，原输出位于平台 `diagnostics/random_largest_{validation,test510}/`，紧凑摘要已保存在仓库结果目录。源代码按 Git commit 部署到 `code/llm_sft_<commit>/`；运行时路径与 PID 放在本次运行的 `runtime/`，不入 Git。实验合同见 `experiments/llm_task_sft/configs/blocks_reason_bs4.json`；以下地图实验机器分工均为历史。
 
 2026-10-09 最初在 35016、40327 合用八卡评测；随后端口改为 41511，并先尝试两卡续训。用户最终将 41511 扩为四张 A800，确认每卡 batch=1，从本轮 10 epoch 完整断点续训到 20 epoch；35016 两张 A100 改为主评测，4090 的 4 号卡辅助评测。正式安排仍见 `experiments/flamingo_map_reader/configs/blocks_kv_two_node_continuation.json`：主、辅助分别持有分片索引模 3 的余数 0/1、2，结果回到同一平台 `evaluation_half_epoch/`。旧八卡队列与两卡尝试作为历史保留。
 

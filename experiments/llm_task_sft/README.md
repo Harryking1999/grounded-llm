@@ -39,3 +39,14 @@ CUDA_VISIBLE_DEVICES=0 python -m experiments.llm_task_sft.src.evaluate --config 
 前两轮 validation 普通到达率为 3.2%、11.6%，初始已达标题均正确停止 100/100；
 多数普通题仍最终无合法动作，依据模板的事实正确性也未稳定。
 当前未完成第三轮验证及最终选模 test，进度与精确计数见[项目状态页](../../docs/PROJECT_STATUS_AND_TODO.md)。
+
+## 合法候选随机对照
+
+`random_legal.py` 在相同 validation 题目上精确计算两种均匀随机策略的到达概率：
+全部几何合法候选，以及额外排除破坏目标格的候选。两者均假定正确识别目标、没有格式错误或提前停止；
+不筛选可达动作，不搜索后选路，不进行多次尝试择优。初始已达标题单独统计。
+动作只会移除格子，因此可通过动态规划累加全部成功路线的概率；失败分支仍保留在选择分母中。
+
+```bash
+python -m experiments.llm_task_sft.src.random_legal --config experiments/llm_task_sft/configs/blocks_random_legal.json --data DATA --out DIAGNOSTIC
+```

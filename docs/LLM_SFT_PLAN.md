@@ -267,7 +267,7 @@ Reason: The current board exactly matches the goal; no further removal is needed
 
 从原始 Qwen2.5-1.5B-Instruct 做全参数微调，不使用地图接口或 LoRA，不跨题 packing。用户确认使用 4090 的 1–4 号卡，每卡一条完整轨迹，global batch=4，无梯度累积。
 
-学习率、调度、精度与训练预算以 [SFT 合同](../experiments/llm_task_sft/configs/blocks_reason_bs4.json) 为准。先用最长样本检查显存；每 epoch 保存完整模型并同步到 35016 评 validation，训练继续下一轮。训练入口与输出说明见 [实验 README](../experiments/llm_task_sft/README.md)。
+学习率、调度、精度与训练预算以 [SFT 合同](../experiments/llm_task_sft/configs/blocks_reason_bs4.json) 为准。先用最长样本检查显存；每 epoch 保存完整模型并同步到评测平台做 validation，训练继续下一轮。当前平台连接见 [开发机手册](../DEVELOPMENT_MACHINES.md)，训练入口与输出说明见 [实验 README](../experiments/llm_task_sft/README.md)。
 
 **每个物理题保持相同训练权重：**先平均一条轨迹内的监督 token 损失，再平均同题采样轨迹，最后平均物理题。这样，轨迹更多的普通题不会挤低零步题权重。
 

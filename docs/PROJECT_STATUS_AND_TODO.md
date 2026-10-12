@@ -1,6 +1,6 @@
 # 项目状态与有序 TODO
 
-更新：2026-10-11。本页记录项目动机、整体进展和研究优先级；当前实验设置见 [DESIGN](../experiments/flamingo_map_reader/DESIGN.md)，新运行结果见[本轮报告](../experiments/flamingo_map_reader/results/report.md)。上一轮[设计](../experiments/flamingo_map_reader/DESIGN_long_trajectory.md)与[报告](../experiments/flamingo_map_reader/results/report_long_trajectory.md)单独保留。
+更新：2026-10-12。本页记录项目动机、整体进展和研究优先级；当前实验设置见 [DESIGN](../experiments/flamingo_map_reader/DESIGN.md)，新运行结果见[本轮报告](../experiments/flamingo_map_reader/results/report.md)。上一轮[设计](../experiments/flamingo_map_reader/DESIGN_long_trajectory.md)与[报告](../experiments/flamingo_map_reader/results/report_long_trajectory.md)单独保留。
 
 ## 1. 为什么做这个项目
 
@@ -54,8 +54,8 @@ LLM 已有较强的语言理解和推理能力，但在复杂任务中，仍可�
 4. **积木 1.5B 无地图 SFT 已正式启动。** 用户选择逐步状态输入、一行可验证依据与动作标记监督，求解器只离线采样多条合法最短轨迹；取消教师 CoT 和候选排序。正式合同见 [SFT 配置](../experiments/llm_task_sft/configs/blocks_reason_bs4.json)，运行接口见 [README](../experiments/llm_task_sft/README.md)，设计边界见 [方案](LLM_SFT_PLAN.md)。两节点运行名均为 `blocks_reason_sft_bs4_50k`。
 
    - **数据与验证：**固定训练集已生成，含 9,000 个物理任务、50,000 条不同最短轨迹，没有重复补足；最长完整对话 7,350 token，生成预算由实际监督文本定为 80 token。本地四项正确性检查、最长样本四卡训练、完整模型保存与平台重载均通过；全参数模型没有缺失或多余权重。
-   - **训练：**2026-10-11 约 20:50（北京时间）从原始基座启动，训练源码 `80541e2`。21:26 核验已到 1,080/37,500 步，4090 的 1–4 号卡持续工作，0 号卡空闲；近期约 1.93 秒/步。按此速度，首个 epoch 预计 10 月 12 日 03:30 左右，三轮训练预计当日 17:00 左右结束；这是训练 ETA，未含后续模型传输及最终评测。
-   - **同步与评测：**35016 的四卡评测队列已运行，源码 `58905d0`；每 epoch 自动同步完整模型并做 validation，最后按合同选模，再评固定 test。约 6.2 GB 的完整模型传输及平台加载已实测通过，传输约 10 分钟；目前仍在评原始基座，等待首轮模型。原始基座普通 validation rollout 已完成 1,000 题，到达率 0/1,000，观察到动作标记不符合编号格式的失败；其 reference 评测尚未全部完成，不能据此把失败全部归因于规划。当前尚无 SFT checkpoint 的评测结果。
+   - **训练：**2026-10-11 约 20:50（北京时间）从原始基座启动，训练源码 `80541e2`。10 月 12 日 09:54 核验已到 24,380/37,500 步（1.95 epoch），首轮完整断点 `checkpoint-12500` 已保存；4090 的 1–4 号卡持续工作，0 号卡空闲，global batch 保持 4。近期约 1.93 秒/步，第二轮预计当日 10:15 左右完成，三轮训练预计 17:00 左右结束；这是训练 ETA，未含模型传输及最终评测。平台关机没有中断训练。
+   - **同步与评测：**用户关闭 35016 后，10 月 12 日迁至平台 44491（四张 A100），同步与评测源码 `98e2df9`，评测方法保持 `58905d0` 的条件。新节点复用共享目录中的全部 130 个已完成基座分片，已恢复逐 epoch 完整模型同步及 validation 队列；最后仍按合同选模，再评固定 test。首轮约 6.2 GB 的权重已完成同步，耗时约 706 秒；09:54 核验四卡 worker 均已加载模型并产出逐题回答，暂无启动错误，尚无完整 SFT 汇总。基座 validation 和 test 均已评齐，普通 rollout 到达分别为 0/1,000、0/510；其自身历史下控制格式错误率分别约 96.7%、95.3%。这些结果同时受到格式失败影响，不能把到达率直接解释成纯规划能力。
 
 ## 5. 长期研究空间与文档入口
 

@@ -1,6 +1,6 @@
 # 开发机使用手册
 
-更新：2026-10-11。平台 35016 与 4090 登录已重新验证；SFT 使用 4090 的 1–4 号卡训练，35016 四张 A100 逐 epoch 评测。既有地图实验已完成。
+更新：2026-10-12。用户已关闭平台 35016，当前平台改为 44491；SFT 使用 4090 的 1–4 号卡训练，44491 四张 A100 逐 epoch 评测。既有地图实验已完成。
 
 ## 1. 机器概览
 
@@ -21,12 +21,13 @@
 
 ```powershell
 # 唯一平台评测环境：4 张 A100
-ssh -p 35016 root@172.16.78.10
+ssh -p 44491 root@172.16.78.10
+# 35016 已由用户关闭，不再作为评测目标
 # 41941已关闭并从当前运行合同禁用，不再恢复
 # 原训练环境41511已完成20 epoch并关闭，不再恢复
 ```
 
-本机别名 `grounded-dev` 当前仍指向 35016（现为主评测环境）。密钥和连接配置位于 `%USERPROFILE%\.ssh\`。
+本机别名 `grounded-dev` 当前指向 44491（主评测环境）。密钥和连接配置位于 `%USERPROFILE%\.ssh\`。
 
 **028、4090**：本机已配置连接别名及公钥，私钥保留在本机。
 
@@ -60,11 +61,11 @@ Agent 使用相同连接方式，登录后通过 `hostname` 确认主机、`nvid
 | 4090 公共模型 | `/opt/models`；2026-10-09 重查未发现 Qwen2.5-1.5B-Instruct，项目基座由平台经 login02 复制到项目目录 |
 | 4090 项目目录 | `/home/gongruochen/grounded_llm/`，含 `code/`、`models/`、`runs/` 与 `incoming/` |
 | login02 项目中转 | `/home/zhangyue/transfer/grounded_llm/`，已创建并完成 adapter 中转验证 |
-| 当前无地图 SFT | 两机既有项目工作区下 `runs/blocks_reason_sft_bs4_50k/`；4090 保存训练完整断点，35016 保存数据、同步模型与评测。公共中转使用 login02 的 `transfer/grounded_llm/llm_task_sft/` |
+| 当前无地图 SFT | 两机既有项目工作区下 `runs/blocks_reason_sft_bs4_50k/`；4090 保存训练完整断点，平台 44491 复用 `/zhanghanyue` 中的数据、同步模型与评测。公共中转使用 login02 的 `transfer/grounded_llm/llm_task_sft/` |
 
 原平台目录支持跨开发环境复用。**028、login02、4090 与平台之间无已确认的共享目录**；028 的 `/ssdwork` 为节点本地磁盘。
 
-SFT 启动前实查：35016 主机身份为 `56ldennbmqmq3-0`，四张 A100-SXM4-80GB 空闲；4090 主机身份为 `ubuntu`，五张卡各 49,140 MiB、全部空闲，项目磁盘余量约 557GB。源代码按 Git commit 部署到各自 `code/llm_sft_<commit>/`；运行时路径与 PID 放在本次运行的 `runtime/`，不入 Git。新实验合同见 `experiments/llm_task_sft/configs/blocks_reason_bs4.json`；以下地图实验机器分工均为历史。
+SFT 启动前实查：原 35016 主机身份为 `56ldennbmqmq3-0`；2026-10-12 替换平台 44491 的主机身份为 `7pkc1o9ovj34v-0`，四张 A100-SXM4-80GB 空闲，原共享路径、虚拟环境及 130 个已完成基座评测分片均保留。4090 主机身份为 `ubuntu`，五张卡各 49,140 MiB；训练独立持续，无需恢复断点。源代码按 Git commit 部署到各自 `code/llm_sft_<commit>/`；运行时路径与 PID 放在本次运行的 `runtime/`，不入 Git。新实验合同见 `experiments/llm_task_sft/configs/blocks_reason_bs4.json`；以下地图实验机器分工均为历史。
 
 2026-10-09 最初在 35016、40327 合用八卡评测；随后端口改为 41511，并先尝试两卡续训。用户最终将 41511 扩为四张 A800，确认每卡 batch=1，从本轮 10 epoch 完整断点续训到 20 epoch；35016 两张 A100 改为主评测，4090 的 4 号卡辅助评测。正式安排仍见 `experiments/flamingo_map_reader/configs/blocks_kv_two_node_continuation.json`：主、辅助分别持有分片索引模 3 的余数 0/1、2，结果回到同一平台 `evaluation_half_epoch/`。旧八卡队列与两卡尝试作为历史保留。
 

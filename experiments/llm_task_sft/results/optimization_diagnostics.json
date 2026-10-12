@@ -360,5 +360,70 @@
     "map_loss": "Per-trajectory supervised-token cross-entropy on map ranking and action responses; logged every step.",
     "windows": "Arithmetic mean of saved per-step loss rows inside each stated interval; excludes HF terminal train_loss.",
     "numeric_fraction": "Digit-only token labels; a positional weight fraction, not a measured fraction of total loss."
+  },
+  "continuation_training_acceptance": {
+    "source_commit": "9834539",
+    "recorded_beijing": "2026-10-13 03:45",
+    "artifact": "acceptance.json",
+    "checks": {
+      "finite_loss_gradient_lr_time": true,
+      "strictly_increasing_logged_steps": true,
+      "expected_logging_spacing": true,
+      "continuation_lr": true,
+      "only_510_continuation": true
+    },
+    "windows": {
+      "1": {
+        "first_step": 11501,
+        "last_step": 12500,
+        "logged_rows": 100,
+        "loss_mean": 0.048388252891600134,
+        "loss_median": 0.04853017441928387
+      },
+      "2": {
+        "first_step": 24001,
+        "last_step": 25000,
+        "logged_rows": 100,
+        "loss_mean": 0.04242318645119667,
+        "loss_median": 0.04339334927499294
+      },
+      "3": {
+        "first_step": 36501,
+        "last_step": 37500,
+        "logged_rows": 100,
+        "loss_mean": 0.0375488387979567,
+        "loss_median": 0.03753617778420448
+      },
+      "3.5": {
+        "first_step": 42751,
+        "last_step": 43750,
+        "logged_rows": 100,
+        "loss_mean": 0.03573407055810094,
+        "loss_median": 0.036217041313648224
+      },
+      "current_last_1000_steps": {
+        "first_step": 47531,
+        "last_step": 48530,
+        "logged_rows": 100,
+        "loss_mean": 0.03570120735093951,
+        "loss_median": 0.035595886409282684
+      }
+    },
+    "last_logged": {
+      "step": 48530,
+      "epoch": 3.8824,
+      "total_steps": 50000,
+      "lr_schedule_steps": 37500,
+      "steps_per_epoch": 12500,
+      "loss": 0.03575122356414795,
+      "gradient_norm": 0.2801174819469452,
+      "lr": 2.0000000000000003e-06,
+      "seconds_per_step": 1.9170757004246115,
+      "eta_seconds": 2818.101279624179,
+      "next_epoch_eta_seconds": 2818.101279624179,
+      "elapsed_seconds": 9176.192714709789,
+      "utc": "2026-10-12T19:44:30.596068+00:00",
+      "peak_memory_gib": 27.27240562438965
+    }
   }
 }

@@ -1000,5 +1000,129 @@
       },
       "shards": 44
     }
+  },
+  "continuation_monitor_acceptance": {
+    "source_commit": "9834539",
+    "recorded_beijing": "2026-10-13 03:45",
+    "artifact": "acceptance.json",
+    "epoch": 3.5,
+    "metrics": {
+      "epoch": 3.5,
+      "tasks": 510,
+      "complete_shards": 42,
+      "checks": {
+        "rollout": {
+          "complete_shards": true,
+          "tasks": true,
+          "unique_ids": true,
+          "exact_ids": true,
+          "correct_condition": true,
+          "action_budget": true,
+          "physical_state_and_action_replay": true,
+          "control_and_stop_labels": true,
+          "independently_replayed_arrival": true,
+          "stored_distance_arithmetic": true,
+          "reference_trajectory": true,
+          "independent_oracle_sample": true,
+          "published_metrics": true,
+          "curve_metrics": true,
+          "per_shard_metrics": true,
+          "fixed_generation_limit": true,
+          "reference_decisions": true
+        },
+        "reference": {
+          "complete_shards": true,
+          "tasks": true,
+          "unique_ids": true,
+          "exact_ids": true,
+          "correct_condition": true,
+          "action_budget": true,
+          "physical_state_and_action_replay": true,
+          "control_and_stop_labels": true,
+          "independently_replayed_arrival": true,
+          "stored_distance_arithmetic": true,
+          "reference_trajectory": true,
+          "independent_oracle_sample": true,
+          "published_metrics": true,
+          "curve_metrics": true,
+          "per_shard_metrics": true,
+          "fixed_generation_limit": true,
+          "reference_decisions": true
+        }
+      },
+      "oracle_sampled_turns": 64,
+      "arrival": {
+        "numerator": 162,
+        "denominator": 510,
+        "rate": 0.3176470588235294
+      },
+      "arrival_and_stop": {
+        "numerator": 162,
+        "denominator": 510,
+        "rate": 0.3176470588235294
+      },
+      "first_turn": {
+        "tasks": 510,
+        "reachable": 401,
+        "shortest_progress": 368,
+        "correct_control": 510
+      },
+      "reference_reachability": {
+        "numerator": 3028,
+        "denominator": 3690,
+        "rate": 0.8205962059620596
+      },
+      "reference_shortest_progress": {
+        "numerator": 2884,
+        "denominator": 3690,
+        "rate": 0.7815718157181571
+      },
+      "rollout_reachability": {
+        "numerator": 1699,
+        "denominator": 2047,
+        "rate": 0.8299951148021495
+      },
+      "failures": {
+        "no_legal_actions": 260,
+        "premature_stop": 87,
+        "illegal_action": 1
+      },
+      "control_format_error": {
+        "numerator": 0,
+        "denominator": 3942,
+        "rate": 0
+      },
+      "illegal_action": {
+        "numerator": 1,
+        "denominator": 3942,
+        "rate": 0.0002536783358701167
+      },
+      "reason_errors": {
+        "fact": 2144,
+        "format": 1
+      },
+      "reason_checked_turns": 3941,
+      "reference_reason_errors": {
+        "fact": 810
+      },
+      "reference_reason_checked_turns": 4200,
+      "unexposed_state_goal_pairs": {
+        "numerator": 161,
+        "denominator": 509,
+        "rate": 0.3163064833005894
+      }
+    },
+    "paired_vs_epoch_3": {
+      "recovered": 66,
+      "regressed": 43,
+      "both_success": 96,
+      "both_failure": 305,
+      "first_text_equal_of_510": {
+        "1": 510,
+        "2": 510,
+        "3": 510,
+        "3.5": 510
+      }
+    }
   }
 }

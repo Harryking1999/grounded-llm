@@ -1,6 +1,6 @@
 # 开发机使用手册
 
-更新：2026-10-12。SFT 前三轮与同题 510 评测已完成；用户随后授权继续训练，每 0.5 epoch 只评这 510 题，再继续。当前训练与评测均只用 4090 的 1–4 号卡，0 号卡预留，不设 epoch 上限。35016 保留为已登记可用机器，不启动任务；44491 仍关闭。
+更新：2026-10-13。SFT 已完成到 3.5 epoch 的同题 510 评测，当前正训练至 4 epoch。训练与评测均只用 4090 的 1–4 号卡，0 号卡预留，不设 epoch 上限。35016 保留为已登记可用机器，不启动任务；44491 仍关闭。
 
 ## 1. 机器概览
 
@@ -74,6 +74,8 @@ SFT 启动前实查：原 35016 主机身份为 `56ldennbmqmq3-0`；2026-10-12 �
 用户随后授权从第三轮继续训练，并明确“只用 4090”、只评固定 510 题。2026-10-12 21:18（北京时间）启动源码 `9834539` 的续训协调器，原前三轮 test 已完整完成。新的运行输出为原运行目录下 `continuation/`，profile 与进程信息为 `runtime/continuation_{profile,process}.json`；日志为 `continuation/logs/coordinator_9834539.log` 和逐段 `train_to_<step>.log`。协调器从原完整 `training/checkpoint-37500/` 恢复，每段训练后保存 `continuation/training/checkpoint-<step>/`，再用同机四卡完成该点的 510 题两种评测，输出于 `continuation/evaluation/epoch_<epoch>/test/`；完整成绩汇总到 `continuation/curve.json`。不启动 35016，不再生成 validation 评测。原模型、恢复状态与历史评测均保留。
 
 续训正式合同为 `experiments/llm_task_sft/configs/blocks_reason_continuation.json`，延续原 cosine 末尾学习率 2e-6，完整恢复 optimizer、scheduler、RNG 与半轮样本位置。当前 `continuation/status.json` 和 `continuation/training/progress.json` 为运行状态；没有总 epoch 上限，失败或空间不足时停止并记录原因，不自动清理产物。需要在周期结束后停止时，可在 `continuation/` 创建 `stop_after_cycle`。
+
+2026-10-13 03:45（北京时间）验收：3.5 点已完成全部 42 分片与完整恢复断点，协调器已自动切到 `train_to_50000.log`，从 `continuation/training/checkpoint-43750/` 接续。动作回放、汇总与训练窗口的完整诊断保存在 `runtime/acceptance_current.json`，逐题涨跌与首轮一致性为 `runtime/acceptance_paired.json`；紧凑摘要见仓库 `experiments/llm_task_sft/results/acceptance.{md,json}`。全部操作仅在 4090，未启动新评测或修改训练配方。
 
 同题 510 的身份核对保留在原平台 `runtime/test510_alignment.json`，4090 复用已向平台提供的同一数据目录。概率对照源码 `8d1f467`，原输出位于平台 `diagnostics/random_largest_{validation,test510}/`，紧凑摘要已保存在仓库结果目录。源代码按 Git commit 部署到 `code/llm_sft_<commit>/`；运行时路径与 PID 放在本次运行的 `runtime/`，不入 Git。实验合同见 `experiments/llm_task_sft/configs/blocks_reason_bs4.json`；以下地图实验机器分工均为历史。
 

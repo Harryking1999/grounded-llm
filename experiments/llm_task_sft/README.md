@@ -33,4 +33,9 @@ CUDA_VISIBLE_DEVICES=0 python -m experiments.llm_task_sft.src.evaluate --config 
 - `progress.json` / `train.jsonl` 记录实测步时、显存和 ETA；完成标记写入 `complete.json`。
 
 本地 `python -m pytest experiments/llm_task_sft/tests -q` 验证轨迹认证、控制计分、
-分块加权损失与全词表损失／梯度等价、真实 Qwen 对话标签。尚无研究结论。
+分块加权损失与全词表损失／梯度等价、真实 Qwen 对话标签。
+
+阶段验收已核对训练数据配额、前两轮完整断点及全部已完成评测分片。
+前两轮 validation 普通到达率为 3.2%、11.6%，初始已达标题均正确停止 100/100；
+多数普通题仍最终无合法动作，依据模板的事实正确性也未稳定。
+当前未完成第三轮验证及最终选模 test，进度与精确计数见[项目状态页](../../docs/PROJECT_STATUS_AND_TODO.md)。

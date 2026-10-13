@@ -8,6 +8,8 @@
 |---|---|
 | `src/prepare.py` | 全来源采样、长度优先选样、最短认证、两种输出缓存与覆盖验收 |
 | `src/common.py` | 共同状态、固定编号、R＋A／R＋排序＋A 与伪地图 |
+| `src/contract.py` | 统一解释样本数、batch、保存间隔、评测规模与平台期规则 |
+| `src/metrics.py` | 不依赖模型/GPU 的已保存回答汇总 |
 | `src/modeling.py` | 复用既有 reader，配置主干训练范围，标准 token CE |
 | `src/train.py` | 两卡 DDP、梯度累积、全局 token 归一化及半轮断点 |
 | `src/evaluate.py` | 共同参考状态 TF、自主 RO、既有地图 NDCG 与内容探针 |
@@ -26,6 +28,8 @@ python -m experiments.map_sft_baselines.src.bridge --profile PRIVATE_RUNTIME_PRO
 ```
 
 桥接凭据仅通过 stdin 进入进程内存，运行 profile、路径映射、PID、日志、缓存与权重全部在 Git 忽略的运行目录。训练端保留完整恢复状态，评测端只接收推理导出。失败记录后停止相应队列，不静默重试。所有卡须空闲才领取任务，4090 的 0 号卡始终预留。
+
+bridge 的 runtime profile 须包含 `config`（正式研究配置的绝对路径），以及源运行、目标运行、跳板/目标连接与 known_hosts 路径。停训策略从 runtime profile 读取；样本、评测规模和保存间隔从正式配置读取，不在队列中另写一套数值。
 
 ## 验证与结果
 

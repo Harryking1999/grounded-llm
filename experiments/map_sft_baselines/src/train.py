@@ -49,17 +49,20 @@ def main():
     p.add_argument('--baseline',required=True);p.add_argument('--smoke-steps',type=int);p.add_argument('--resume',type=Path)
     a=p.parse_args();cfg=json.loads(a.config.read_text());spec=cfg['baselines'][a.baseline];t=cfg['training']
     rank,local,world=int(os.environ['RANK']),int(os.environ['LOCAL_RANK']),int(os.environ['WORLD_SIZE'])
-    if world!=2 or world*t['micro_batch']*t['gradient_accumulation_steps']!=4:raise ValueError('Expected two GPUs and global batch four')
+    accumulation=t['gradient_accumulation_steps']
+    if world!=t['world_size'] or world*t['micro_batch']*accumulation!=t['global_batch']:
+        raise ValueError('DDP topology differs from the configured global batch')
     torch.cuda.set_device(local);dist.init_process_group('nccl');device=torch.device('cuda',local)
     random.seed(cfg['seed']);np.random.seed(cfg['seed']);torch.manual_seed(cfg['seed']);torch.set_num_threads(2)
     data=Routes(a.data,spec['real_map'])
     ready=json.loads((a.data/'ready.json').read_text())
-    if not a.smoke_steps and (len(data)!=50000 or ready['smoke']):raise ValueError('Formal training requires accepted complete common data')
+    if not a.smoke_steps and (len(data)!=cfg['data']['samples_per_epoch'] or ready['smoke']):raise ValueError('Formal training requires accepted complete common data')
     tokenizer=AutoTokenizer.from_pretrained(a.model_path,local_files_only=True)
     model=build(cfg,a.baseline,a.model_path).to(device);wrapped=DDP(model,device_ids=[local],gradient_as_bucket_view=True)
     params=[p for p in model.parameters() if p.requires_grad]
     optimizer=torch.optim.AdamW(params,lr=t['learning_rate'],weight_decay=t['weight_decay'],fused=True)
-    steps_epoch=len(data)//4;total=steps_epoch*t['epochs'];warmup=round(total*t['warmup_fraction'])
+    if len(data)%t['global_batch']:raise ValueError('Dataset must divide into complete global batches')
+    steps_epoch=len(data)//t['global_batch'];total=steps_epoch*t['epochs'];warmup=round(total*t['warmup_fraction'])
     scheduler=torch.optim.lr_scheduler.LambdaLR(optimizer,lambda s:scheduler_factor(s,total,warmup,t['cosine_minimum_ratio']))
     step=0
     if a.resume:
@@ -74,20 +77,20 @@ def main():
         timeline,inputs=collate_examples(rows,tokenizer.pad_token_id or tokenizer.eos_token_id)
         if spec['interface'] and not spec['real_map']:timeline=pseudo_timeline(timeline)
         return timeline,inputs
-    loader=DataLoader(data,batch_size=1,sampler=sampler,num_workers=2,collate_fn=collate)
+    loader=DataLoader(data,batch_size=t['micro_batch'],sampler=sampler,num_workers=2,collate_fn=collate)
     windows=deque(maxlen=50);start=time.monotonic();limit=a.smoke_steps or total
     for epoch in range(step//max(1,steps_epoch),t['epochs']):
-        sampler.set_epoch(epoch);it=iter(loader);skip=(step%max(1,steps_epoch))*2
+        sampler.set_epoch(epoch);it=iter(loader);skip=(step%max(1,steps_epoch))*accumulation
         for _ in range(skip):next(it)
         while step<(epoch+1)*steps_epoch and step<limit:
-            micro=[next(it),next(it)]
+            micro=[next(it) for _ in range(accumulation)]
             count=torch.tensor(sum(int(inputs['labels'][:,1:].ne(-100).sum()) for _,inputs in micro),device=device,dtype=torch.float64);dist.all_reduce(count)
             optimizer.zero_grad(set_to_none=True);loss_sum=torch.zeros((),device=device);began=time.monotonic()
             for index,(timeline,inputs) in enumerate(micro):
                 inputs={k:v.to(device) for k,v in inputs.items()};n=inputs['labels'][:,1:].ne(-100).sum()
                 kwargs=dict(inputs)
                 if spec['interface']:kwargs['map_batch']=to_device(timeline,device)
-                with wrapped.no_sync() if index==0 else nullcontext():
+                with wrapped.no_sync() if index<accumulation-1 else nullcontext():
                     with torch.autocast('cuda',dtype=torch.bfloat16):
                         output=wrapped(**kwargs);loss=output.loss if hasattr(output,'loss') else output
                         scaled=loss*n*world/count

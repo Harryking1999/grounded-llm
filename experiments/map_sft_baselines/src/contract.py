@@ -1,0 +1,46 @@
+"""Shared interpretation of training and evaluation budgets."""
+
+def steps_per_epoch(config):
+    samples = config['data']['samples_per_epoch']
+    batch = config['training']['global_batch']
+    if samples <= 0 or batch <= 0 or samples % batch:
+        raise ValueError('Samples must divide into complete positive global batches')
+    return samples // batch
+
+
+def checkpoint_steps(config):
+    interval = config['training']['save_steps']
+    total = steps_per_epoch(config) * config['training']['epochs']
+    if interval <= 0 or total % interval:
+        raise ValueError('Checkpoint interval must divide the training horizon')
+    return range(interval, total + 1, interval)
+
+
+def cohort_size(config, mode):
+    key = 'probe_tasks' if mode == 'probe' else 'tasks'
+    return config['evaluation'][key]
+
+
+def evaluation_modes(config, baseline):
+    modes = list(config['evaluation']['modes'])
+    if config['baselines'][baseline]['real_map']:
+        modes.append('probe')
+    return modes
+
+
+def plateau_status(curve, policy, interval):
+    """Only contiguous complete checkpoints count toward the patience window."""
+    complete = []
+    for row in sorted(curve, key=lambda item: item['step']):
+        if row['step'] != (len(complete) + 1) * interval:
+            break
+        complete.append(row)
+    patience = policy['patience_points']
+    if len(complete) <= patience or complete[-1]['epoch'] < policy['minimum_epochs']:
+        return None
+    previous, recent = complete[:-patience], complete[-patience:]
+    best = max(row['metrics']['RO']['arrival'] for row in previous)
+    if max(row['metrics']['RO']['arrival'] for row in recent) >= best + policy['minimum_gain_tasks']:
+        return None
+    return dict(status='plateau_flag', through_epoch=complete[-1]['epoch'],
+                previous_best=best, mode=policy['mode'])

@@ -1,9 +1,10 @@
 """Inference-only checkpoint publication and metric return over SSH jump host."""
-import argparse,json,os,sys,time
+import argparse,json,os,shlex,sys,time
 from pathlib import Path
 import paramiko
 from experiments.llm_task_sft.src.bridge import connect,execute
-from .common import atomic_json
+from experiments.llm_task_sft.src.files import atomic_json
+from .contract import plateau_status
 
 def publish(files,source,destination):
     temporary=destination+'.part'
@@ -23,7 +24,7 @@ def main():
                 key=str(ready.relative_to(root));meta=json.loads(ready.read_text());dest=profile['target_run']+'/models/'+ready.parent.parent.name+'/'+ready.parent.name
                 try:files.stat(dest+'/evaluation_ready.json');completed.add(key);continue
                 except FileNotFoundError:pass
-                execute(target,'mkdir -p '+dest)
+                execute(target,'mkdir -p '+shlex.quote(dest))
                 # Publish marker last; never copy optimizer or FP32 resume weights.
                 publish(files,ready.parent/'weights.pt',dest+'/weights.pt')
                 publish(files,ready.parent/'state.json',dest+'/state.json')
@@ -41,19 +42,12 @@ def main():
                 # Operational stop policy can be confirmed without changing the
                 # optimizer/data contract already held by active training ranks.
                 stop=json.loads(a.profile.read_text())['early_stop']
-                ordinary=sorted(curve,key=lambda r:r['step'])
-                # A missing half-epoch point cannot count toward patience.
-                contiguous=[]
-                for row in ordinary:
-                    if row['step']!=(len(contiguous)+1)*6250:break
-                    contiguous.append(row)
-                if len(contiguous)>stop['patience_points'] and contiguous[-1]['epoch']>=stop['minimum_epochs']:
-                    before=contiguous[:-stop['patience_points']];recent=contiguous[-stop['patience_points']:]
-                    best=max(r['metrics']['RO']['arrival'] for r in before)
-                    plateau=max(r['metrics']['RO']['arrival'] for r in recent)<best+stop['minimum_gain_tasks']
-                    if plateau:
-                        atomic_json(root/'results'/base/'plateau.json',dict(status='plateau_flag',through_epoch=contiguous[-1]['epoch'],previous_best=best,mode=stop['mode']))
-                        if stop['mode']=='automatic':(root/'training'/base/'stop_after_checkpoint').touch()
+                config=json.loads(Path(profile['config']).read_text())
+                flag=plateau_status(curve,stop,config['training']['save_steps'])
+                if flag:
+                    atomic_json(root/'results'/base/'plateau.json',flag)
+                    if stop['mode']=='automatic':(root/'training'/base/'stop_after_checkpoint').touch()
+                else:(root/'results'/base/'plateau.json').unlink(missing_ok=True)
             files.close()
             atomic_json(root/'bridge_status.json',dict(status='running',published=len(completed),updated=time.time()))
         finally:target.close();jump.close()

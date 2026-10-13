@@ -105,7 +105,8 @@ def main():
     a=p.parse_args();cfg=json.loads(a.config.read_text());src=a.sources
     boards=json.loads((src/'boards.json').read_text());source=json.loads((src/'source_manifest.json').read_text())
     refs=json.loads((src/'evaluation.json').read_text());test=[r for r in refs if r['split']=='test' and int(r['start'])!=int(r['goal'])]
-    if len(test)!=510:raise ValueError('Expected the existing fixed 510 tasks')
+    if len(test)!=cfg['evaluation']['tasks']:raise ValueError('Evaluation cohort differs from configuration')
+    if len(boards)!=cfg['data']['training_boards']:raise ValueError('Source board count differs from configuration')
     excluded={(int(r['start']),int(r['goal'])) for r in source['records'] if r['split']!='train'}
     from experiments.llm_task_sft.src.protocol import action_from_key
     from experiments.gcml_counterexamples.src import blocks as rules
@@ -116,7 +117,7 @@ def main():
     if a.smoke_boards:boards=boards[:a.smoke_boards]
     a.out.mkdir(parents=True,exist_ok=True);(a.out/'trajectories').mkdir(exist_ok=True)
     atomic_json(a.out/'evaluation.json',test)
-    rng=np.random.default_rng(cfg['seed']);indices=sorted(map(int,rng.choice(510,100,replace=False)))
+    rng=np.random.default_rng(cfg['seed']);indices=sorted(map(int,rng.choice(len(test),cfg['evaluation']['probe_tasks'],replace=False)))
     atomic_json(a.out/'probe_indices.json',indices)
     rows=[];audit=[];all_pairs=set();began=time.monotonic()
     with ProcessPoolExecutor(max_workers=a.workers,mp_context=mp.get_context('spawn'),initializer=init_worker,
@@ -128,7 +129,7 @@ def main():
             print(json.dumps(dict(boards=len(audit),samples=len(rows),unique_pairs=len(all_pairs),last=stats)),flush=True)
     result=dict(config=cfg,rows=rows,boards=audit,unique_pairs=len(all_pairs),smoke=bool(a.smoke_boards))
     atomic_json(a.out/'dataset.json',result)
-    if not a.smoke_boards and (len(rows)!=50000 or len(audit)!=1000 or len(all_pairs)<cfg['data']['coverage_target']):
+    if not a.smoke_boards and (len(rows)!=cfg['data']['samples_per_epoch'] or len(audit)!=cfg['data']['training_boards'] or len(all_pairs)<cfg['data']['coverage_target']):
         raise ValueError(f'Data coverage target not met: boards={len(audit)},rows={len(rows)},pairs={len(all_pairs)}')
     atomic_json(a.out/'ready.json',dict(samples=len(rows),unique_pairs=len(all_pairs),smoke=bool(a.smoke_boards)))
 

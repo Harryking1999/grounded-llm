@@ -1,16 +1,17 @@
 """Independent training lanes and latest-first four-GPU evaluation workers."""
 import argparse,json,os,subprocess,sys,time
 from pathlib import Path
-from .common import atomic_json
-from .evaluate import summarize
+from experiments.llm_task_sft.src.files import atomic_json
+from .metrics import summarize
+from .contract import steps_per_epoch,checkpoint_steps,cohort_size,evaluation_modes
 
 def evaluation_jobs(root,config):
     jobs=[]
     for marker in Path(root).glob('models/B*/checkpoint-*/evaluation_ready.json'):
         meta=json.loads(marker.read_text());base=meta['baseline'];step=meta['step']
-        modes=['RO','TF']+(['probe'] if config['baselines'][base]['real_map'] else [])
+        modes=evaluation_modes(config,base)
         for mode in modes:
-            total=100 if mode=='probe' else 510
+            total=cohort_size(config,mode)
             for start in range(0,total,config['evaluation']['shard_tasks']):
                 stop=min(start+config['evaluation']['shard_tasks'],total);out=Path(root)/'evaluation'/base/f'checkpoint-{step}'/f'{mode}_{start:04d}_{stop:04d}'
                 if not (out/'summary.json').exists():jobs.append((step,meta['epoch'],base,mode,start,stop,marker.parent,out))
@@ -20,10 +21,10 @@ def collect(root,config):
     for base in config['baselines']:
         curve=[]
         for checkpoint in sorted((Path(root)/'evaluation'/base).glob('checkpoint-*'),key=lambda p:int(p.name.split('-')[-1])):
-            modes=['TF','RO']+(['probe'] if config['baselines'][base]['real_map'] else [])
+            modes=evaluation_modes(config,base)
             all_metrics={};valid=True
             for mode in modes:
-                cases=[];total=100 if mode=='probe' else 510
+                cases=[];total=cohort_size(config,mode)
                 for start in range(0,total,config['evaluation']['shard_tasks']):
                     stop=min(start+config['evaluation']['shard_tasks'],total);path=checkpoint/f'{mode}_{start:04d}_{stop:04d}'
                     if not (path/'summary.json').exists():valid=False;break
@@ -32,7 +33,7 @@ def collect(root,config):
                 if len(cases)!=total or len({c['trajectory_id'] for c in cases})!=total:raise ValueError('Evaluation missing/duplicate IDs')
                 all_metrics[mode]=summarize(cases)
             if valid:
-                step=int(checkpoint.name.split('-')[-1]);row=dict(step=step,epoch=step/12500,metrics=all_metrics)
+                step=int(checkpoint.name.split('-')[-1]);row=dict(step=step,epoch=step/steps_per_epoch(config),metrics=all_metrics)
                 atomic_json(checkpoint/'summary.json',row);curve.append(row)
         if curve:
             destination=Path(root)/'results'/base
@@ -46,13 +47,14 @@ def collect(root,config):
             lines=[f'# {base} 半轮评测','', '| epoch | '+' | '.join(columns)+' |','|---|'+'---|'*len(columns)]
             lookup={r['step']:r for r in curve}
             def percent(x):return '—' if x is None else f'{100*x:.2f}%'
-            for step in range(6250,250001,6250):
+            tasks=cohort_size(config,'RO')
+            for step in checkpoint_steps(config):
                 row=lookup.get(step)
                 if row:
-                    metrics=row['metrics'];cells=[f"{metrics['RO']['arrival']}/510（{percent(metrics['RO']['arrival']/510)}）"]
+                    metrics=row['metrics'];cells=[f"{metrics['RO']['arrival']}/{tasks}（{percent(metrics['RO']['arrival']/tasks)}）"]
                     for name in names:cells.append('／'.join(percent(metrics[mode][name]['value']) for mode in ['TF','RO']))
                 else:cells=['—']*len(columns)
-                lines.append(f'| {step/12500:g} | '+' | '.join(cells)+' |')
+                lines.append(f'| {step/steps_per_epoch(config):g} | '+' | '.join(cells)+' |')
             (destination/'report.md').write_text('\n'.join(lines)+'\n')
 
 def main():
@@ -79,7 +81,8 @@ def main():
                 if lane in active or not pending or not all(free_gpu(gpu) for gpu in pair):continue
                 base=pending.pop(0);out=a.root/'training'/base;out.mkdir(parents=True,exist_ok=True)
                 log=(out/'launcher.log').open('a')
-                command=[sys.executable,'-u','-m','torch.distributed.run','--standalone','--nproc-per-node=2','-m','experiments.map_sft_baselines.src.train','--config',str(a.config),'--data',str(a.data),'--model-path',str(a.model_path),'--out',str(out),'--baseline',base]
+                if len(pair)!=cfg['training']['world_size']:raise ValueError('GPU lane size differs from world size')
+                command=[sys.executable,'-u','-m','torch.distributed.run','--standalone',f"--nproc-per-node={cfg['training']['world_size']}",'-m','experiments.map_sft_baselines.src.train','--config',str(a.config),'--data',str(a.data),'--model-path',str(a.model_path),'--out',str(out),'--baseline',base]
                 proc=subprocess.Popen(command,env=dict(os.environ,CUDA_VISIBLE_DEVICES=','.join(map(str,pair))),stdout=log,stderr=subprocess.STDOUT)
                 active[lane]=(proc,base,log)
             atomic_json(a.root/'training_queue.json',dict(status='running' if active else 'finished',active={str(k):dict(pid=v[0].pid,baseline=v[1],gpus=cfg['execution']['gpu_pairs'][k]) for k,v in active.items()},pending=pending,failed=failed))

@@ -15,6 +15,7 @@ from experiments.gcml_counterexamples.src import blocks as rules
 from .common import prompt,sorted_step,pseudo_timeline,atomic_json
 from .prepare import CachedMap
 from .modeling import build
+from .metrics import summarize
 
 class Boundary(StoppingCriteria):
     def __init__(self,tokenizer,prefix):self.tokenizer,self.prefix=tokenizer,prefix
@@ -32,21 +33,14 @@ def score(text,step,oracle,with_map):
         row.update(meeting_ranking_scores(step.candidate_map_distances,parse_ranking(text,len(step.candidate_actions),10)))
     return row
 
-def summarize(cases):
-    turns=[r for c in cases for r in c['turns']];live=[r for r in turns if r['live']];ranked=[r for r in turns if r['rank_eligible']]
-    def rate(key,rows):return dict(numerator=sum(int(r.get(key,False)) for r in rows),denominator=len(rows),value=sum(int(r.get(key,False)) for r in rows)/len(rows) if rows else None)
-    result=dict(tasks=len(cases),arrival=sum(c['arrived'] for c in cases),arrival_and_stop=sum(c['arrived_and_stopped'] for c in cases),safe=rate('safe',live),optimal=rate('optimal',live),map_optimal=rate('map_optimal',ranked))
-    for key in ('ndcg_inverse_rank_at_1','ndcg_inverse_rank_at_10','ndcg_minmax_distance_at_1','ndcg_minmax_distance_at_10'):
-        rows=[r for r in ranked if key in r];result[key]=dict(denominator=len(rows),value=sum(r[key] for r in rows)/len(rows) if rows else None)
-    return result
-
 def main():
     p=argparse.ArgumentParser()
     for name in ('config','data','model-path','q-checkpoint','checkpoint','out'):p.add_argument('--'+name,type=Path,required=True)
     p.add_argument('--baseline',required=True);p.add_argument('--mode',choices=['TF','RO','probe'],required=True)
-    p.add_argument('--start',type=int,default=0);p.add_argument('--stop',type=int,default=510)
+    p.add_argument('--start',type=int,default=0);p.add_argument('--stop',type=int)
     a=p.parse_args();cfg=json.loads(a.config.read_text());spec=cfg['baselines'][a.baseline];torch.set_num_threads(1)
     records=json.loads((a.data/'evaluation.json').read_text())
+    if len(records)!=cfg['evaluation']['tasks']:raise ValueError('Evaluation cohort differs from configuration')
     if a.mode=='probe':records=[records[i] for i in json.loads((a.data/'probe_indices.json').read_text())]
     records=records[a.start:a.stop];tokenizer=AutoTokenizer.from_pretrained(a.model_path,local_files_only=True)
     reader=build(cfg,a.baseline,a.model_path,False,a.checkpoint).cuda();qmap=CachedMap(FrozenBoardMap.load(a.q_checkpoint))

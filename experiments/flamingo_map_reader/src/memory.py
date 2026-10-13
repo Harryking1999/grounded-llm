@@ -84,8 +84,8 @@ class MapMemoryEncoder(nn.Module):
     one vector and feeds it as both the attention key and the value. Every archived
     run that used it fitted its training first turn but scored 0/4 on held-out
     turns, and the diagnosis never localized why. Kept only so those archived
-    configs stay reproducible. Current path configs use `AddressedMapMemoryEncoder`;
-    blocks retraining uses `JointFeatureMapMemoryEncoder`. See
+    configs stay reproducible. Current separated K/V path and blocks configs use
+    `AddressedMapMemoryEncoder`. See
     ../results/archive/abandoned_readout_variants.md.
     """
 

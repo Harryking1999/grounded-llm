@@ -1,10 +1,14 @@
 # 实验目录
 
-当前主线是通过 cross-attention 让冻结 LLM 读取并利用地图。先读[地图读取实验](flamingo_map_reader/README.md)及其[当前 design](flamingo_map_reader/DESIGN.md)；新架构试点见[本轮结果](flamingo_map_reader/results/report.md)，原两任务成绩见[上一轮报告](flamingo_map_reader/results/report_long_trajectory.md)，进度只维护在[项目状态页](../docs/PROJECT_STATUS_AND_TODO.md)。
+当前主实验：[同数据地图与 SFT 多基线](map_sft_baselines/README.md)。其余目录分别保存独立协议或历史证据，目录内的“当前”以该实验语境为准。
+
+项目进度只维护在[状态页](../docs/PROJECT_STATUS_AND_TODO.md)。各实验有独立的参数、数据和比较边界；已完成的历史实验不作为新运行的默认启动指令。
 
 | 目录 | 作用 |
 |---|---|
-| [flamingo_map_reader](flamingo_map_reader/README.md) | 当前读取接口：单图寻路与 1000 初始棋盘积木的完整轨迹 SFT |
+| [map_sft_baselines](map_sft_baselines/README.md) | 当前同数据对照：地图、主干训练范围与接口容量 |
+| [llm_task_sft](llm_task_sft/README.md) | 独立无地图任务 SFT 的历史协议与结果 |
+| [flamingo_map_reader](flamingo_map_reader/README.md) | 已完成的冻结读取接口、两任务证据和 FFN 负结果 |
 | [blocks_distance_map](blocks_distance_map/README.md) | 冻结积木 Q 的来源、编码器与精确裁判 |
 | [external_map_interface](external_map_interface/README.md) | 寻路 Q/V 与环境依赖；显式距离接口的历史试验 |
 | [cml_map_scaling](cml_map_scaling/README.md) | 图地图训练与几何结果；旧连续 token 接口 |

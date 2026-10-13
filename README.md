@@ -1,15 +1,17 @@
 # Grounded LLM with Cognitive Maps
 
-研究 LLM 能否通过 **cross-attention 读取并利用显式状态地图**，改善动作选择与长程任务完成。当前实验冻结 Qwen2.5-1.5B-Instruct 和地图，只训练读取接口。寻路沿用地址 K 与状态 V 分离的方案；积木本次加入融合 FFN 和失败上下文重新训练，答案限 Top-10，输入保留全部候选。
+研究显式状态地图能否提升 LLM 的动作判断和连续任务完成。环境提供当前状态、合法候选与执行反馈；地图经 cross-attention 接入 LLM。
+
+当前重点是积木的**同数据多基线对照**：统一示范和损失，比较有无地图、仅训接口与全参训练。先前冻结接口、融合 FFN 和无地图 SFT 均作为独立历史实验保留。
 
 ## 阅读入口
 
-1. [训练与评测设计](experiments/flamingo_map_reader/DESIGN.md)：数据、文本、监督与指标。
-2. [本轮结果](experiments/flamingo_map_reader/results/report.md)：大 batch 负结果与小 batch 证据状态；[上一轮报告](experiments/flamingo_map_reader/results/report_long_trajectory.md)保留原两任务成绩与地图使用证据。
-3. [当前状态与 TODO](docs/PROJECT_STATUS_AND_TODO.md)：唯一进度页及运行定位。
-4. [研究简述](docs/RESEARCH_BRIEF.md)：问题、主张与证据边界。
-5. [开发机使用手册](DEVELOPMENT_MACHINES.md)：平台、028 与 4090 的连接、目录、使用约定、文件迁移和更新规则。
+1. [项目状态与有序 TODO](docs/PROJECT_STATUS_AND_TODO.md)：唯一项目进度页。
+2. [研究简述](docs/RESEARCH_BRIEF.md)：假设、定义与证伪边界。
+3. [同数据多基线](experiments/map_sft_baselines/README.md)：设计、配置、代码和结果入口。
+4. [实验目录](experiments/README.md)：既有实验及历史证据。
+5. [开发机手册](DEVELOPMENT_MACHINES.md)：连接、存储与迁移方法。
 
-实现和运行入口见[当前实验 README](experiments/flamingo_map_reader/README.md)。地图依赖及独立基线见[实验目录](experiments/README.md)；文献与任务来源见 [Related Work](RELATED_WORK.md)、[GCML_TASKS](docs/GCML_TASKS.md)。旧变体见[历史索引](docs/PROJECT_STATUS_AND_TODO.md#历史证据入口)。
+文献和任务来源见 [Related Work](RELATED_WORK.md)、[GCML Tasks](docs/GCML_TASKS.md)。协作约定见 [AGENTS.md](AGENTS.md)。
 
-源码、正式配置、结果摘要与不含秘密的开发机手册纳入 Git；原始数据、模型、日志、密码、密钥及本机连接配置留在 Git 外。协作约定见 [AGENTS.md](AGENTS.md)。
+全局文档不维护局部运行时间线。实验参数放在对应 `configs/`，结果在实验报告，原始数据、模型、日志、PID 和本机凭据留在 Git 外。

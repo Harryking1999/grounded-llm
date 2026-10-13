@@ -13,7 +13,7 @@
 | 4 | 164/510（32.16%） | 0.03534 |
 | 4.5 | 161/510（31.57%） | 0.03306 |
 
-这是截至既有验收记录的完整结果，不冒充最新运行状态。当前运行状态仅维护在 [项目状态页](../../../docs/PROJECT_STATUS_AND_TODO.md)，原始动态曲线保留远端 `continuation/curve.json`。
+表中为早期六个已验收点；后续第 5 轮结果与配对诊断见 [policy_comparison.md](policy_comparison.md)，完整曲线保留远端 `continuation/curve.json`。旧训练已按用户要求在 75,000 步保存完整模型、Adam、scheduler 与四卡 RNG 后退出；第 6 轮未评测，不补写其成绩。
 
 ## 2. 验收结论
 

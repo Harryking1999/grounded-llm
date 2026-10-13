@@ -1,10 +1,11 @@
 # Cross-attention 地图读取
 
-冻结语言模型和地图，训练读取接口，让 LLM 输出地图排序、动作与终止判断。当前积木按 2026-10-08 会议重新训练：恢复分离 K/V，取消 FFN，仅普通任务保留编号增强，两个终止类别不增强。
+本目录保存已完成的地图读取接口实验；以下训练与恢复流程属于该实验协议。当前同数据多基线见 [map_sft_baselines](../map_sft_baselines/README.md)，不复用本目录的旧监督作为新配置。
+该实验冻结语言模型和地图，训练接口输出排序、动作与终止判断。积木按会议决议恢复分离 K/V、取消 FFN，保留普通任务编号增强和独立终止类别；这些是旧实验条件。
 
 - [当前设计](DESIGN.md)、[训练合同](configs/blocks_kv_restart.json)、[评测合同](configs/blocks_kv_evaluation.json)、[当前结果](results/report.md)。
 - [积木提示词对比](PROMPT_COMPARISON.md)：当前 1.5B 原始输入与监督答案、待确认 Astra 一次性草案，以及历史 API／Qwen 模板和差异表。
-- 已完成本轮 10 epoch，继续训练至 20 epoch 的[预算](configs/blocks_kv_twenty_epoch_extension.json)与[两节点安排](configs/blocks_kv_two_node_continuation.json)单独保存，原训练与数据合同保留。
+- 该轮既定训练与评测已完成；原扩展[预算](configs/blocks_kv_twenty_epoch_extension.json)与[两节点安排](configs/blocks_kv_two_node_continuation.json)保留用于复核。
 - [项目状态与 TODO](../../docs/PROJECT_STATUS_AND_TODO.md)为唯一当前状态页。
 - 已停止融合 FFN 的[设计](DESIGN_ffn_failure.md)、[epoch 5 报告](results/report_ffn_failure.md)及[结果摘要](results/blocks_ffn_failure_summary.json)。
 - 原分离 K/V 两任务[设计](DESIGN_long_trajectory.md)与[报告](results/report_long_trajectory.md)。

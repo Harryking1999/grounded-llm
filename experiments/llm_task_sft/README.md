@@ -1,4 +1,6 @@
-# 无地图积木全参数 SFT
+# 独立无地图积木 SFT（历史对照）
+
+本目录保存旧独立 SFT 的协议与实现；新运行使用 [同数据多基线](../map_sft_baselines/README.md)。
 
 检验在相同棋盘、规则与工具更新下，任务 SFT 能否改善原始 1.5B 的解题能力。
 模型每轮读取当前状态、历史和全部合法候选，生成一行可验证依据和一个动作／停止标记。
@@ -20,9 +22,9 @@ CUDA_VISIBLE_DEVICES=0 python -m experiments.llm_task_sft.src.evaluate --config 
 先用 `prepare --smoke-tasks 32` 检查真实标签，再用 `train --smoke-steps 20 --longest-smoke`
 在最长样本上完成四卡前后向、优化器更新和完整保存；正式训练不使用 smoke 数据。
 原始基座与 SFT 使用相同提示、候选编号和生成上限。前三轮原方案评 validation 并补齐与地图线相同的 510 题，
-历史回答与选模记录保留。用户随后授权继续训练，并指定后续仅评这 510 题，详见下节。
+历史回答与选模记录保留。用户随后授权继续训练，并指定后续仅评这 510 题，旧流程见下节。
 
-## 半轮续训与监测
+## 历史半轮续训协议
 
 正式续训合同为 [blocks_reason_continuation.json](configs/blocks_reason_continuation.json)。
 从第三轮完整断点恢复模型、Adam、调度器与各卡 RNG；沿用固定 50,000 条数据和 global batch 4。
@@ -55,14 +57,7 @@ python -u -m experiments.llm_task_sft.src.continuation --profile PROFILE
 本地 `python -m pytest experiments/llm_task_sft/tests -q` 验证轨迹认证、控制计分、
 分块加权损失与全词表损失／梯度等价、真实 Qwen 对话标签。
 
-阶段验收已核对训练数据配额、前两轮完整断点及全部已完成评测分片。
-三轮 validation 普通到达率为 3.2%、11.6%、25.7%，初始已达标题均正确停止 100/100；
-多数普通题仍最终无合法动作，依据模板的事实正确性也未稳定。
-三轮同题 510 评测已全部完成，到达率为 3.53%、11.76%、27.25%。
-续训 3.5、4、4.5 点为 31.76%、32.16%、31.57%，出现短期平台迹象；loss 仍下降，尚未确认上限。
-已验收六个完整断点、累计 252 个分片的动作回放与汇总，当前自动接续至第 5 轮，见[验收报告](results/report.md)。
-用户随后授权从第三轮继续训练并逐半轮评测；35016 已登记，当前串行续训与评测均在 4090。
-进度与精确计数见[项目状态页](../../docs/PROJECT_STATUS_AND_TODO.md)。
+已完成的阶段成绩、验收范围与 loss 诊断集中在 [结果总报告](results/report.md)，逐题分析在 [策略比较](results/policy_comparison.md)。本 README 不维护实时运行状态。
 
 ## 合法候选随机对照
 

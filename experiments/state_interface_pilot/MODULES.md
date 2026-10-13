@@ -1,6 +1,6 @@
 # Previous approach：连续 token 实验的功能归属
 
-本页记录图／积木连续 state token 实验的现有代码归属，供复现和维护旧结果使用；不规定新显式 roadmap 接口的模块设计。当前方向见[研究简述](docs/RESEARCH_BRIEF.md)。
+本页记录图／积木连续 state token 实验的现有代码归属，供复现和维护旧结果使用；不规定新显式 roadmap 接口的模块设计。当前方向见[研究简述](../../docs/RESEARCH_BRIEF.md)。
 
 前期连续 token 实验复用 `codex/experiment-harness` 的已提交实现（`cdd9e58`），通过
 `python -m grounded_llm.harness --config ...` 运行；不另写 Blocks 训练器。
@@ -27,4 +27,4 @@
 模型不接触构造见证、合法动作列表或裁判搜索。配置引用旧规则，不复制形状表。
 正式参数见 `experiments/state_interface_pilot/configs/blocks_step2.json`；smoke 只继承覆盖样本量。
 
-公共模块的图任务兼容接口保留，用于复现旧实验。当前 cross-attention 地图读取与积木融合 FFN 的实现入口见[实验 README](experiments/flamingo_map_reader/README.md)，不受本页旧模块划分约束。
+公共模块的图任务兼容接口保留，用于复现旧实验。后续地图读取接口的实现与历史 FFN 条件见[实验 README](../flamingo_map_reader/README.md)，不受本页旧模块划分约束。

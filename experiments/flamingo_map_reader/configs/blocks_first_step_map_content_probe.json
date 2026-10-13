@@ -1,0 +1,18 @@
+{
+  "study": "blocks_first_step_map_content_probe",
+  "split": "test",
+  "cohort_tasks": 510,
+  "checkpoint_steps": [243750, 250000],
+  "seed": 20261013,
+  "tasks_per_origin_by_shortest_length": {"6": 13, "7": 25, "8": 25, "9": 1},
+  "sample_tasks": 128,
+  "stages": ["first"],
+  "maximum_pairs_per_checkpoint": 128,
+  "conditions": ["normal_regenerated", "candidate_Q_distance_rank_reverse"],
+  "history": "identical_initial_prompt; no_prior_assistant_answers",
+  "intervention": "current_turn_successor_Q_contents_only",
+  "unchanged": ["current_Q", "goal_V", "physical_actions", "candidate_ids", "user_text", "history", "generation_budget"],
+  "grading": "actual_physical_action; exact_reachability; shortest_action; legality; map_following",
+  "normal_saved_agreement": "diagnostic_only; regenerated_normal_is_the_paired_baseline",
+  "inference": "map_content_contribution_to_first_step_navigation; not_full_rollout_or_matched_no_map_benefit"
+}

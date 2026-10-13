@@ -1,4 +1,5 @@
-from experiments.flamingo_map_reader.src.probe_map_content import aggregate_pairs, select_records
+from experiments.flamingo_map_reader.src.probe_map_content import aggregate_pairs, select_records, probe_turns
+from types import SimpleNamespace
 
 
 def test_selection_is_fixed_and_independent_of_model_outcomes():
@@ -22,3 +23,12 @@ def test_paired_actions_and_presented_map_minimum_are_separate():
     assert result['paired_safe_counts']=={'safe/unsafe':1}
     assert result['reverse_original_map_minimum']==0
     assert result['reverse_presented_map_minimum']==1
+
+
+def test_first_step_contract_does_not_generate_later_decisions():
+    demo = SimpleNamespace(turns=[SimpleNamespace(supervise=True,
+        step=SimpleNamespace(done=False,current=i,goal=10),executed_path=[])
+        for i in range(6)])
+    environment = SimpleNamespace(remaining=lambda *args: 1)
+    assert probe_turns(demo,environment,['first']) == {0:'first'}
+    assert probe_turns(demo,environment)[3] == 'later_solvable_nearest_decision_4'

@@ -32,14 +32,17 @@ def select_records(records, config):
     return selected
 
 
-def probe_turns(demo, environment):
+def probe_turns(demo, environment, stages=None):
+    stages = stages or ('first', 'later_solvable_nearest_decision_4')
+    if not set(stages) <= {'first', 'later_solvable_nearest_decision_4'}:
+        raise ValueError('Unknown probe stage')
     eligible = [i for i,t in enumerate(demo.turns) if t.supervise and not t.step.done and
                 environment.remaining(t.step.current,t.step.goal,t.executed_path)>0]
     if not eligible or eligible[0]!=0:
         raise ValueError('Ordinary task lacks a live first decision')
-    selected = {0:'first'}
+    selected = {0:'first'} if 'first' in stages else {}
     later = [i for i in eligible if i>0]
-    if later:
+    if later and 'later_solvable_nearest_decision_4' in stages:
         selected[min(later,key=lambda i:(abs(i-3),i))]='later_solvable_nearest_decision_4'
     return selected
 
@@ -57,6 +60,8 @@ def aggregate_pairs(cases):
         paired = Counter(('safe' if r['normal']['action_keeps_goal_reachable'] else 'unsafe')+'/'+
                          ('safe' if r['reverse']['action_keeps_goal_reachable'] else 'unsafe') for r in rows)
         result[group] = dict(pairs=len(rows),normal_safe=normal_safe,reverse_safe=reverse_safe,
+            normal_legal=sum(r['normal'].get('legal_action',False) for r in rows),
+            reverse_legal=sum(r['reverse'].get('legal_action',False) for r in rows),
             normal_shortest=sum(r['normal']['action_environment_shortest'] for r in rows),
             reverse_shortest=sum(r['reverse']['action_environment_shortest'] for r in rows),
             changed_physical_action=sum(r['changed_physical_action'] for r in rows),
@@ -101,11 +106,13 @@ def main():
     with (args.out/'cases.jsonl').open('w') as handle:
         for record in selected:
             demo=load_record(args.manifest.parent/'trajectories',record,config,0)
-            turns=probe_turns(demo,environment)
+            turns=probe_turns(demo,environment,protocol['stages'])
             normal=GenerationSession(reader,tokenizer,config,device)
             reverse=GenerationSession(reader,tokenizer,config,device)
             rows=[]
             for i,turn in enumerate(demo.turns):
+                if i > max(turns):
+                    break
                 if i not in turns:
                     append_history(normal,turn.user_text,turn.step,turn.answer_text)
                     append_history(reverse,turn.user_text,turn.step,turn.answer_text)

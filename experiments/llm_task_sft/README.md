@@ -5,7 +5,7 @@
 离线求解器只制作最短轨迹标签和评分，不进入模型推理。
 
 正式参数以 [blocks_reason_bs4.json](configs/blocks_reason_bs4.json) 为准；
-数据组成与比较边界见 [方案](../../docs/LLM_SFT_PLAN.md)。数据、训练输出与逐题回答放在忽略的运行目录。
+历史数据组成和评测边界见 [结果总报告](results/report.md)；新的同数据基线见 [map_sft_baselines](../map_sft_baselines/README.md)。数据、训练输出与逐题回答放在忽略的运行目录。
 
 ## 运行接口
 
@@ -60,7 +60,7 @@ python -u -m experiments.llm_task_sft.src.continuation --profile PROFILE
 多数普通题仍最终无合法动作，依据模板的事实正确性也未稳定。
 三轮同题 510 评测已全部完成，到达率为 3.53%、11.76%、27.25%。
 续训 3.5、4、4.5 点为 31.76%、32.16%、31.57%，出现短期平台迹象；loss 仍下降，尚未确认上限。
-已验收六个完整断点、累计 252 个分片的动作回放与汇总，当前自动接续至第 5 轮，见[验收报告](results/acceptance.md)。
+已验收六个完整断点、累计 252 个分片的动作回放与汇总，当前自动接续至第 5 轮，见[验收报告](results/report.md)。
 用户随后授权从第三轮继续训练并逐半轮评测；35016 已登记，当前串行续训与评测均在 4090。
 进度与精确计数见[项目状态页](../../docs/PROJECT_STATUS_AND_TODO.md)。
 
@@ -77,8 +77,8 @@ python -u -m experiments.llm_task_sft.src.continuation --profile PROFILE
 python -m experiments.llm_task_sft.src.random_legal --config experiments/llm_task_sft/configs/blocks_random_legal.json --data DATA --out DIAGNOSTIC
 ```
 
-同题首轮、单步与整题对照结果见[合法候选分析](results/legal_candidate_baselines.md)。
-510 test 使用 `blocks_random_legal_test.json`；loss 下降速度、监督与参数差异见[优化诊断](results/optimization_diagnostics.md)。
+同题首轮、单步与整题对照结果见[合法候选分析](results/report.md)。
+510 test 使用 `blocks_random_legal_test.json`；loss 下降速度、监督与参数差异见[优化诊断](results/report.md)。
 
 ## 保存回答的策略比较
 

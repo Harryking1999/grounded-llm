@@ -125,6 +125,12 @@ SFT 启动前实查：原 35016 主机身份为 `56ldennbmqmq3-0`；2026-10-12 �
 
 平台 Python：`/zhanghanyue/experiment/flamingo_map_reader/.venv/bin/python`。4090 Conda：`/opt/miniconda3`。新机器使用独立环境，依赖安装在项目环境中。
 
+## 新多基线部署（2026-10-13）
+
+028 已实查为 `nv-h100-028`，八张 H100 80GB；独立项目目录为 `/ssdwork/zhanghanyue/grounded_llm/`，Python 为其中 `.venv/bin/python`（复用系统 PyTorch 2.7.1+cu126，独立安装 Transformers 4.57.6）。经确认可读取的基座目录为 `/ssdwork/fuzhizhang/model_base/Qwen2.5-1.5B-Instruct`，不修改该共享模型。
+
+共同来源文件位于 `data/map_sft_sources/`，增强缓存为 `data/map_sft_50k/`，新训练及桥接输出为 `runs/map_sft_baselines/`；4090 同名新运行目录用于评测，1–4 号卡工作、0 号卡备用。源码与任务协议见 [实验 README](experiments/map_sft_baselines/README.md)，机器路径和 PID 只保存在各运行的 runtime 文件中，不复制为正式配置。旧 SFT 保留原运行目录，不与新队列混写。
+
 ## 4. 文件传输
 
 源码通过 Git 同步，或将已提交版本打包传输。执行前创建本地 `tmp/` 和远端接收目录：

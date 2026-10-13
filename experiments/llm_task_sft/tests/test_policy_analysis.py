@@ -51,3 +51,5 @@ def test_compare_uses_physical_actions_and_separates_success_sets():
     assert (result['both_arrive'],result['left_only'],result['right_only'],result['neither'])==(1,1,1,0)
     assert result['identical_first_physical_action']['numerator']==3
     assert result['success_set_jaccard']==1/3
+    assert result['common_success_path_lengths']['tasks']==1
+    assert result['common_success_path_lengths']['left_mean_moves']==1

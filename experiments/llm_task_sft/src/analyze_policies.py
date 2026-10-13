@@ -196,6 +196,12 @@ def compare(left, right, failures_left, failures_right):
             left_only=len(selected&(a-b)),right_only=len(selected&(b-a)),neither=len(selected-(a|b)))
     return dict(tasks=len(ids), both_arrive=len(both), left_only=len(a-b), right_only=len(b-a),
         neither=len(ids-(a|b)), success_set_jaccard=len(both)/len(a|b) if a|b else None,
+        common_success_path_lengths=dict(tasks=len(both),
+            left_mean_moves=sum(len(left[k]['moves']) for k in both)/len(both) if both else None,
+            right_mean_moves=sum(len(right[k]['moves']) for k in both)/len(both) if both else None,
+            mean_shortest_moves=sum(left[k]['length'] for k in both)/len(both) if both else None,
+            left_shortest_count=sum(len(left[k]['moves'])==left[k]['length'] for k in both),
+            right_shortest_count=sum(len(right[k]['moves'])==right[k]['length'] for k in both)),
         identical_first_physical_action=rate(same_first,len(first_eligible)),
         identical_removal_partition_among_both_arrived=rate(sum(set(left[k]['moves'])==set(right[k]['moves']) for k in both),len(both)),
         mean_identical_action_prefix=prefix/len(ids), failure_type_pairs=dict(detail), by_length=strata)

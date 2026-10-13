@@ -64,7 +64,7 @@ def main():
                 step=sorted_step(qmap,state,goal)
                 if state!=goal and not step.candidate_actions:break
                 if a.mode!='RO':messages=[];steps=[];previous_ids=[]
-                update=prompt(state,goal,executed,first=not messages,start=int(record['start']),with_map=spec['real_map'])
+                update=prompt(state,goal,executed,first=not messages,start=int(record['start']),with_map=spec['real_map'],response_order=spec.get('response_order','reason_first'))
                 messages.append(dict(role='user',content=update));steps.append(step)
                 ids=tokenizer.apply_chat_template(messages,tokenize=True,add_generation_prompt=True)
                 map_ids=previous_ids+[len(steps)-1]*(len(ids)-len(previous_ids))

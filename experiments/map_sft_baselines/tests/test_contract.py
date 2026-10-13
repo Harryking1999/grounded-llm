@@ -13,6 +13,25 @@ from experiments.map_sft_baselines.src.train import validate_resume_contract
 from experiments.map_sft_baselines.src.contract import steps_per_epoch,checkpoint_steps,plateau_status
 
 class ContractTests(unittest.TestCase):
+    def test_ranking_first_preserves_reason_action_and_terminal(self):
+        from experiments.map_sft_baselines.src.common import answer,prompt
+        from experiments.gcml_counterexamples.src import blocks as rules
+        from experiments.llm_task_sft.src.protocol import legal_actions
+        state=rules.PLACEMENTS[0][0]
+        step=SimpleNamespace(current=state,goal=0,current_map_distance=2.,
+            candidate_map_distances=tuple(float(i) for i in range(len(legal_actions(state)))))
+        old=answer(step,1,True).splitlines();new=answer(step,1,True,'ranking_first').splitlines()
+        self.assertEqual(new,[old[1],old[0],old[2]])
+        self.assertIn('First output the map-distance ranking.',prompt(state,0,[],True,state,True,'ranking_first'))
+        terminal=SimpleNamespace(current=0,goal=0)
+        self.assertEqual(answer(terminal,None,True),answer(terminal,None,True,'ranking_first'))
+
+    def test_retired_runs_are_not_dispatched_but_replacements_are(self):
+        cfg=json.loads((Path(__file__).parents[1]/'configs/study.json').read_text())
+        records=[dict(step=6250,epoch=.5,baseline=b) for b in ['B1','B2','B1_sortfirst','B2_sortfirst']]
+        with tempfile.TemporaryDirectory() as folder:
+            jobs=evaluation_jobs(folder,cfg,records)
+        self.assertEqual({j[2] for j in jobs},{'B1_sortfirst','B2_sortfirst'})
     def test_longest_before_coverage_then_diversity(self):
         rows=[dict(start='1',goal='0',shortest_moves=9,pairs=[(1,0)]),
               dict(start='2',goal='0',shortest_moves=8,pairs=[(2,0),(3,0)]),

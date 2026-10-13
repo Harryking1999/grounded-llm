@@ -11,6 +11,7 @@ def evaluation_jobs(root,config,records=None):
         records=[json.loads(marker.read_text()) for marker in Path(root).glob('models/B*/checkpoint-*/evaluation_ready.json')]
     for meta in records:
         base=meta['baseline'];step=meta['step']
+        if base in config.get('execution',{}).get('retired_baselines',[]):continue
         checkpoint=Path(root)/'models'/base/f'checkpoint-{step}'
         modes=evaluation_modes(config,base)
         for mode in modes:
@@ -77,12 +78,27 @@ def main():
         used=subprocess.check_output(['nvidia-smi',f'--id={gpu}','--query-gpu=memory.used','--format=csv,noheader,nounits'],text=True)
         return int(used.strip())<1000
     if a.role=='train':pending=list(cfg['execution']['initial_baselines'])+list(cfg['execution']['pending_baselines'])
+    if a.role=='train' and a.resume_workers:
+        from .evaluation_queue import ExistingWorker
+        status=a.root/'training_queue.json'
+        previous=json.loads(status.read_text()) if status.exists() else {}
+        pending=[base for base in pending if not (a.root/'training'/base/'finished.json').exists()]
+        for lane,record in previous.get('active',{}).items():
+            base=record['baseline'];pid=record['pid'];out=a.root/'training'/base
+            path=Path(f'/proc/{pid}/cmdline')
+            argv=path.read_bytes().decode().split('\0') if path.exists() else []
+            if 'torch.distributed.run' not in argv or '--out' not in argv or argv[argv.index('--out')+1]!=str(out):continue
+            if base not in pending:raise RuntimeError('Unexpected live training lane; wait for requested stop')
+            if record['gpus']!=cfg['execution']['gpu_pairs'][int(lane)]:raise RuntimeError('Live training GPU assignment changed')
+            active[int(lane)]=(ExistingWorker(pid,out,completion_marker='finished.json'),base,None)
+            pending.remove(base)
     while True:
         for lane,item in list(active.items()):
             process,job,handle=item
             code=process.poll()
             if code is None:continue
-            handle.close();del active[lane]
+            if handle:handle.close()
+            del active[lane]
             if code:failed.append(dict(job=str(job),code=code))
         if a.role=='train':
             if not (a.data/'ready.json').exists():

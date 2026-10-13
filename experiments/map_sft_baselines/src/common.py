@@ -20,7 +20,7 @@ At the goal, output: Reason: The current board exactly matches the goal; no furt
 The final line is <action>ID</action> or, at the goal, <done/>.
 ORDERING'''
 
-def prompt(state, goal, executed, first=False, start=None, with_map=False):
+def prompt(state, goal, executed, first=False, start=None, with_map=False, response_order='reason_first'):
     action_ids = [rules.BY_ACTION[action_key(a)] for a in legal_actions(state)]
     step = SimpleNamespace(current=state, candidate_actions=action_ids)
     update = turn_prompt(step, [rules.BY_ACTION[action_key(a)] for a in executed])
@@ -29,15 +29,22 @@ def prompt(state, goal, executed, first=False, start=None, with_map=False):
     ordering = ('Before the action line, output "Map-distance ranking to the goal, closest to farthest: RANKING." '
                 'Rank the nearest 10 candidates plus current using < and =; input contains every legal candidate.'
                 if with_map else 'Do not output candidate rankings.')
-    return initial_prompt(state if start is None else start, goal)+'\n\n'+FORMAT.replace('CONTROL','the requested lines').replace('ORDERING',ordering)+'\n\n'+update
+    formatting=FORMAT.replace('CONTROL','the requested lines').replace('ORDERING',ordering)
+    if with_map and response_order=='ranking_first':
+        formatting=formatting.replace('Output a short factual line beginning with "Reason:", then the requested lines.',
+            'First output the map-distance ranking. Next output a short factual line beginning with "Reason:". Finally output the action line.')
+    elif response_order!='reason_first':
+        raise ValueError('Unsupported response order')
+    return initial_prompt(state if start is None else start, goal)+'\n\n'+formatting+'\n\n'+update
 
-def answer(step, candidate=None, with_map=False):
+def answer(step, candidate=None, with_map=False, response_order='reason_first'):
     if candidate is None:
         return STOP_REASON+'\n<done/>'
     action = legal_actions(step.current)[candidate-1]
     text = reason(step.current, step.goal, action)
     if with_map:
-        text += '\nMap-distance ranking to the goal, closest to farthest: '+_ranking(step,10)+'.'
+        ranking='Map-distance ranking to the goal, closest to farthest: '+_ranking(step,10)+'.'
+        text = ranking+'\n'+text if response_order=='ranking_first' else text+'\n'+ranking
     return text+f'\n<action>{candidate}</action>'
 
 def sorted_step(qmap, state, goal):
@@ -48,13 +55,14 @@ def sorted_step(qmap, state, goal):
         raise ValueError('Physical candidate order differs from sorted protocol')
     return step
 
-def demonstration(record, qmap, with_map):
+def demonstration(record, qmap, with_map, response_order='reason_first', cached_steps=None):
     state, goal = int(record['start']),int(record['goal'])
     executed, path, turns = [],[state],[]
     for candidate in [*record['route_ids'],None]:
-        step=sorted_step(qmap,state,goal)
-        user=prompt(state,goal,executed,not turns,int(record['start']),with_map)
-        turns.append(SupervisedTurn(user,answer(step,candidate,with_map),step,tuple(path),candidate))
+        step=sorted_step(qmap,state,goal) if cached_steps is None else cached_steps[len(turns)]
+        if step.current!=state or step.goal!=goal:raise ValueError('Cached map differs from physical trajectory')
+        user=prompt(state,goal,executed,not turns,int(record['start']),with_map,response_order)
+        turns.append(SupervisedTurn(user,answer(step,candidate,with_map,response_order),step,tuple(path),candidate))
         if candidate is not None:
             action, state=step.execute(candidate)
             executed.append(dict(rules.PLACEMENTS[action][1]));path.append(state)

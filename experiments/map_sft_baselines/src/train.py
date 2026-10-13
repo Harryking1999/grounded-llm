@@ -55,6 +55,8 @@ def main():
     torch.cuda.set_device(local);dist.init_process_group('nccl');device=torch.device('cuda',local)
     random.seed(cfg['seed']);np.random.seed(cfg['seed']);torch.manual_seed(cfg['seed']);torch.set_num_threads(2)
     data=Routes(a.data,spec['real_map'])
+    if spec['real_map'] and data.meta.get('response_order','reason_first')!=spec.get('response_order','reason_first'):
+        raise ValueError('Prepared assistant order differs from baseline configuration')
     ready=json.loads((a.data/'ready.json').read_text())
     if not a.smoke_steps and (len(data)!=cfg['data']['samples_per_epoch'] or ready['smoke']):raise ValueError('Formal training requires accepted complete common data')
     tokenizer=AutoTokenizer.from_pretrained(a.model_path,local_files_only=True)

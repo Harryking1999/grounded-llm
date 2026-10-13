@@ -13,8 +13,9 @@ MODULE = 'experiments.map_sft_baselines.src.evaluate'
 
 
 class ExistingWorker:
-    def __init__(self, pid, output):
+    def __init__(self, pid, output, completion_marker='summary.json'):
         self.pid, self.output = pid, output
+        self.completion_marker = completion_marker
         self.path = Path(f'/proc/{pid}/cmdline')
         self.identity = self.path.read_bytes()
 
@@ -24,7 +25,7 @@ class ExistingWorker:
                 return None
         except FileNotFoundError:
             pass
-        return 0 if (self.output / 'summary.json').exists() else 1
+        return 0 if (self.output / self.completion_marker).exists() else 1
 
 
 def existing_jobs(args, config):

@@ -2,11 +2,14 @@
 
 本实验在全部 1,000 张来源棋盘上增强地图贪心成功且最短的示范，统一数据与 token CE，对照地图信息、可训练主干与接口。研究假设和监督示例见 [DESIGN.md](DESIGN.md)，正式参数只维护在 [configs/study.json](configs/study.json)。
 
+地图组按用户决策重新从基座训练：`B1_sortfirst`、`B2_sortfirst` 替代原 B1/B2，输出改为“排序 → reason → action”。物理任务、地图向量、动作与 reason 内容不变，只调整输出顺序及对应提示。原 B1/B2 保留为停止的 reason-first 对照，不再领取新评测；B0/B3 继续原训练。新旧运行使用不同目录和曲线，不能拼接 epoch。
+
 ## 代码入口
 
 | 模块 | 职责 |
 |---|---|
 | `src/prepare.py` | 全来源采样、长度优先选样、最短认证、两种输出缓存与覆盖验收 |
+| `src/reorder_supervision.py` | 复用已验收路线与地图缓存，仅重排地图监督并重新编码 |
 | `src/common.py` | 共同状态、固定编号、R＋A／R＋排序＋A 与伪地图 |
 | `src/contract.py` | 统一解释样本数、batch、保存间隔、评测规模与平台期规则 |
 | `src/metrics.py` | 不依赖模型/GPU 的已保存回答汇总 |

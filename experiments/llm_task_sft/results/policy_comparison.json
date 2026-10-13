@@ -1914,5 +1914,155 @@
     "Common-success path lengths are conditional on both policies succeeding.",
     "The content probe is a stratified 32-task exploratory sample with correlated within-task states.",
     "Reverse Q-content dependence is not matched-training evidence of incremental benefit over no map."
-  ]
+  ],
+  "training_route_audit": {
+    "checked_at": "2026-10-13T14:41:40.963965+08:00",
+    "source_manifest": "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/data/manifest.json",
+    "source_map": "/zhanghanyue/experiment/grounded_llm_qmap_tree_132f5a1/runs/blocks_distance_map/tree_1000_132f5a1/best.pt",
+    "sft_dataset": "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_reason_sft_bs4_50k/data_50k/dataset.json",
+    "oracle_code": "/zhanghanyue/experiment/flamingo_map_reader/code/policy_diagnostics_93d1e70",
+    "scope": "8000 ordinary successful map training demonstrations; excludes initial-goal and masked failure contexts",
+    "ordinary": {
+      "tasks": 8000,
+      "shortest_tasks": 3538,
+      "nonshortest_tasks": 4462,
+      "nonshortest_fraction": 0.55775,
+      "excess_steps_histogram": {
+        "0": 3538,
+        "1": 3644,
+        "2": 771,
+        "3": 47
+      },
+      "total_demonstration_actions": 64155,
+      "total_shortest_actions": 58828,
+      "mean_demonstration_actions": 8.019375,
+      "mean_shortest_actions": 7.3535,
+      "mean_excess_all": 0.665875,
+      "mean_excess_nonshortest": 1.1938592559390409,
+      "relative_extra_actions": 0.09055211803902896,
+      "numbered_trajectories": 48000,
+      "shortest_numbered_trajectories": 21228
+    },
+    "by_shortest_length": {
+      "6": {
+        "tasks": 200,
+        "shortest_tasks": 90,
+        "nonshortest_tasks": 110,
+        "nonshortest_fraction": 0.55,
+        "excess_steps_histogram": {
+          "0": 90,
+          "1": 91,
+          "2": 19
+        },
+        "total_demonstration_actions": 1329,
+        "total_shortest_actions": 1200,
+        "mean_demonstration_actions": 6.645,
+        "mean_shortest_actions": 6.0,
+        "mean_excess_all": 0.645,
+        "mean_excess_nonshortest": 1.1727272727272726,
+        "relative_extra_actions": 0.10749999999999993,
+        "numbered_trajectories": 1200,
+        "shortest_numbered_trajectories": 540
+      },
+      "7": {
+        "tasks": 4784,
+        "shortest_tasks": 2054,
+        "nonshortest_tasks": 2730,
+        "nonshortest_fraction": 0.5706521739130435,
+        "excess_steps_histogram": {
+          "0": 2054,
+          "1": 2293,
+          "2": 423,
+          "3": 14
+        },
+        "total_demonstration_actions": 36669,
+        "total_shortest_actions": 33488,
+        "mean_demonstration_actions": 7.6649247491638794,
+        "mean_shortest_actions": 7.0,
+        "mean_excess_all": 0.6649247491638796,
+        "mean_excess_nonshortest": 1.1652014652014653,
+        "relative_extra_actions": 0.09498924988055424,
+        "numbered_trajectories": 28704,
+        "shortest_numbered_trajectories": 12324
+      },
+      "8": {
+        "tasks": 3004,
+        "shortest_tasks": 1383,
+        "nonshortest_tasks": 1621,
+        "nonshortest_fraction": 0.5396138482023968,
+        "excess_steps_histogram": {
+          "0": 1383,
+          "1": 1259,
+          "2": 329,
+          "3": 33
+        },
+        "total_demonstration_actions": 26048,
+        "total_shortest_actions": 24032,
+        "mean_demonstration_actions": 8.671105193075899,
+        "mean_shortest_actions": 8.0,
+        "mean_excess_all": 0.6711051930758988,
+        "mean_excess_nonshortest": 1.243676742751388,
+        "relative_extra_actions": 0.08388814913448739,
+        "numbered_trajectories": 18024,
+        "shortest_numbered_trajectories": 8298
+      },
+      "9": {
+        "tasks": 12,
+        "shortest_tasks": 11,
+        "nonshortest_tasks": 1,
+        "nonshortest_fraction": 0.08333333333333333,
+        "excess_steps_histogram": {
+          "0": 11,
+          "1": 1
+        },
+        "total_demonstration_actions": 109,
+        "total_shortest_actions": 108,
+        "mean_demonstration_actions": 9.083333333333334,
+        "mean_shortest_actions": 9.0,
+        "mean_excess_all": 0.08333333333333333,
+        "mean_excess_nonshortest": 1.0,
+        "relative_extra_actions": 0.0092592592592593,
+        "numbered_trajectories": 72,
+        "shortest_numbered_trajectories": 66
+      }
+    },
+    "training_groups": {
+      "failed_greedy_context": {
+        "tasks": 1000,
+        "numbered_trajectories": 1000
+      },
+      "initial_goal": {
+        "tasks": 1000,
+        "numbered_trajectories": 1000
+      },
+      "train": {
+        "tasks": 8000,
+        "numbered_trajectories": 48000
+      }
+    },
+    "all_training_numbered_trajectories": 50000,
+    "strict_filter_coverage": {
+      "original_tasks": 8000,
+      "remaining_tasks": 3538,
+      "original_boards": 1000,
+      "remaining_boards": 978,
+      "boards_lost": 22
+    },
+    "checks": {
+      "all_8000_manifest_action_fields_agree": true,
+      "all_8000_start_goal_and_shortest_match_sft_certificates": true,
+      "cached_trajectories_replayed": 64,
+      "cached_actions_replayed": 573,
+      "sampled_exact_distances_recomputed": 64,
+      "sampled_routes_successful_and_map_minimal": true,
+      "sample_seed": 20261013,
+      "sample_per_excess_steps": 16
+    },
+    "limitations": [
+      "Manifest census covers all 8000 trajectories; cached replay and fresh exact solving cover a stratified sample of 64.",
+      "Filtering existing shortest demonstrations is not new physical-route augmentation.",
+      "Data length differences alone do not identify their causal effect on task success."
+    ],
+    "raw_artifacts": "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/diagnostics/training_route_lengths/{summary.json,audit.py}"
+  }
 }

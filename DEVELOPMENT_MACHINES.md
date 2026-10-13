@@ -79,6 +79,8 @@ SFT 启动前实查：原 35016 主机身份为 `56ldennbmqmq3-0`；2026-10-12 �
 
 当前 44491 的主机身份为 `4b5glpbtq0bnc-0`，一张 A100-SXM4-80GB；共享目录与原虚拟环境保留，工作区仍为 `/zhanghanyue/experiment/flamingo_map_reader/`。
 
+2026-10-13 在该平台完成旧地图训练示范长度的 CPU 核查，原始摘要与一次性检查脚本位于当前 K/V 运行 `runs/blocks_kv_restart_36c213c/diagnostics/training_route_lengths/{summary.json,audit.py}`；未修改训练数据或占用 GPU。结论与紧凑计数归入仓库 `experiments/llm_task_sft/results/policy_comparison.{md,json}`。
+
 同题 510 的身份核对保留在原平台 `runtime/test510_alignment.json`，4090 复用已向平台提供的同一数据目录。概率对照源码 `8d1f467`，原输出位于平台 `diagnostics/random_largest_{validation,test510}/`，紧凑摘要已保存在仓库结果目录。源代码按 Git commit 部署到 `code/llm_sft_<commit>/`；运行时路径与 PID 放在本次运行的 `runtime/`，不入 Git。实验合同见 `experiments/llm_task_sft/configs/blocks_reason_bs4.json`；以下地图实验机器分工均为历史。
 
 2026-10-09 最初在 35016、40327 合用八卡评测；随后端口改为 41511，并先尝试两卡续训。用户最终将 41511 扩为四张 A800，确认每卡 batch=1，从本轮 10 epoch 完整断点续训到 20 epoch；35016 两张 A100 改为主评测，4090 的 4 号卡辅助评测。正式安排仍见 `experiments/flamingo_map_reader/configs/blocks_kv_two_node_continuation.json`：主、辅助分别持有分片索引模 3 的余数 0/1、2，结果回到同一平台 `evaluation_half_epoch/`。旧八卡队列与两卡尝试作为历史保留。

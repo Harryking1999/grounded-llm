@@ -13,7 +13,9 @@
 | `src/modeling.py` | 复用既有 reader，配置主干训练范围，标准 token CE |
 | `src/train.py` | 两卡 DDP、梯度累积、全局 token 归一化及半轮断点 |
 | `src/evaluate.py` | 共同参考状态 TF、自主 RO、既有地图 NDCG 与内容探针 |
-| `src/queue.py` | 四训练通道、空闲卡接后续基线、最新检查点优先评测与整点汇总 |
+| `src/queue.py` | 训练通道和统一评测入口、最新检查点优先及整点汇总 |
+| `src/evaluation_queue.py` | 多节点评测 worker 启动、在途 worker 接管、统一结果发布 |
+| `src/shard_pool.py` | 主节点原子占位、所有权核验、按需权重传输与完成标记 |
 | `src/bridge.py` | 只传推理权重、完整发布后入队、紧凑指标回传及平台期标记 |
 
 复用 `blocks_distance_map` 的规则与求解器、`flamingo_map_reader` 的接口/排序计分、`llm_task_sft` 的事实依据和控制解析；不复制旧模型或改写旧运行。
@@ -31,10 +33,28 @@ python -m experiments.map_sft_baselines.src.bridge --profile PRIVATE_RUNTIME_PRO
 
 bridge 的 runtime profile 须包含 `config`（正式研究配置的绝对路径），以及源运行、目标运行、跳板/目标连接与 known_hosts 路径。停训策略从 runtime profile 读取；样本、评测规模和保存间隔从正式配置读取，不在队列中另写一套数值。
 
+## 多节点评测
+
+4090 保存统一 `models/`、`evaluation/` 和结果总表；辅助节点只保存自己的模型缓存和回答。节点不共享磁盘时，辅助队列通过 SFTP 访问同一主节点目录，不能各自在本地加锁后当作跨节点互斥。
+
+1. 分片唯一键为基线、checkpoint、模式及题目区间。所有队列在主节点原子创建对应 `.worker.claim/`，成功后才启动 worker；`owner.json` 保存节点、PID 与随机所有权 token。
+2. 辅助节点按需下载推理权重，先回传完整 `cases.jsonl`，最后发布 `summary.json`；发布后释放自己的占位。完成标记存在即跳过，只有主节点写完整汇总。
+3. 锁不按时间自动过期。队列异常时保留占位，防止慢 worker 被重复领取；显式 `--resume-workers` 会核对本节点实际进程，接管活 worker，或回传已完成的退出 worker。确认本节点 worker 已退出且没有完整结果后才释放其旧占位。
+4. 每台机器另有队列锁，防止重复启动调度器。启用新节点前先接管现有 worker 的占位，不能让无锁的旧调度器继续领取任务。
+
+```bash
+# 主节点：与现有在途 worker 接续，不重跑已完成回答
+python -m experiments.map_sft_baselines.src.queue evaluate --config CONFIG --data DATA --model-path MODEL --q-checkpoint Q --root RUN --node-id 4090 --resume-workers
+# 辅助节点：SSH 凭据仅经 stdin 送入内存
+python -m experiments.map_sft_baselines.src.queue evaluate --config CONFIG --data DATA --model-path MODEL --q-checkpoint Q --root LOCAL_RUN --node-id platform-35016 --gpus 0,1 --coordination-profile RUNTIME_PROFILE --resume-workers
+```
+
+辅助 runtime profile 复用桥接的公开 SSH 字段与 `target_run`（统一主节点目录），不保存凭据。未来节点采用相同入口、不同 `node-id` 和本机 GPU 配置。各节点动态队列状态、占位、PID 与日志留在远端运行目录。
+
 ## 验证与结果
 
 ```bash
-python -m unittest experiments.map_sft_baselines.tests.test_contract -v
+python -m unittest experiments.map_sft_baselines.tests.test_contract experiments.map_sft_baselines.tests.test_shard_pool -v
 ```
 
 [results/report.md](results/report.md)记录准备、启动和验收；每条基线的半轮结果表独立维护。原始逐题回答和动态队列状态留在远端 `runs/map_sft_baselines/`，全局 [项目状态页](../../docs/PROJECT_STATUS_AND_TODO.md)只保留决策和入口。

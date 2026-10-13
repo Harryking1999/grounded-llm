@@ -6,7 +6,7 @@
 
 | 机器 | 连接入口 | 资源约定 |
 |---|---|---|
-| 人工智能平台 | `root@172.16.78.10`，最近登记 SSH 端口 `44491` | GPU 与端口随开发环境配置变化，以平台页面为准 |
+| 人工智能平台 | `root@172.16.78.10`，已登记 SSH 端口 `35016`、`40621` | GPU 与端口随开发环境配置变化，以平台页面为准 |
 | 028 | `root@nv-h100-028`，经 login02 | 八张 H100 80GB；崔涵需要 6–8 卡时协调资源 |
 | 4090 | `gongruochen@10.28.0.80`，经 login02 | 五张扩容 48GB 卡；本项目使用 1–4 号卡，0 号卡预留 |
 | login02 | `zhangyue@172.16.78.36:10022` | 仅用于登录和文件中转 |
@@ -18,13 +18,14 @@
 本地使用 PowerShell，远端使用 Bash。
 
 ```powershell
-ssh -p 44491 root@172.16.78.10
+ssh -p 35016 root@172.16.78.10
+ssh -p 40621 root@172.16.78.10
 ssh grounded-login02
 ssh grounded-028
 ssh grounded-4090
 ```
 
-- `grounded-028`、`grounded-4090` 均经 login02；`grounded-dev` 仍指向旧端口 35016，访问平台应使用已登记的显式端口。
+- `grounded-028`、`grounded-4090` 均经 login02；`grounded-dev` 指向 35016；访问平台前仍应核对已登记端口。
 - 本机 SSH 配置与 known_hosts 位于 `%USERPROFILE%\.ssh\`；项目私钥为 `id_ed25519_grounded_dev`。
 - 跳板和 4090 的已授权凭据通过 Windows DPAPI 加密存于 `%USERPROFILE%\.codex\credentials\grounded-machines.json`，后续直接读取，不重复询问。
 - 连接辅助入口为同目录 `grounded-ssh.py`，使用本项目 `.venv` 的 Python。通过 stdin 传入公开命令或文件传输请求，凭据仅在进程内解密，不写入仓库、命令行或日志。

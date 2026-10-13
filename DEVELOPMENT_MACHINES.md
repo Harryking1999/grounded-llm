@@ -1,6 +1,6 @@
 # 开发机使用手册
 
-更新：2026-10-13。44491 已恢复，当前为一张 A100 80GB；35016 当前拒绝连接。4090 按现有约定使用 1–4 号卡，0 号卡预留。
+更新：2026-10-13。44491 已恢复，当前为一张 A100 80GB；35016 当前拒绝连接。新多基线在 028 八卡训练，4090 按现有约定使用 1–4 号卡评测、0 号卡预留；旧 SFT 已请求在当前周期结束后停训并释放卡。
 
 ## 1. 机器概览
 
@@ -129,7 +129,7 @@ SFT 启动前实查：原 35016 主机身份为 `56ldennbmqmq3-0`；2026-10-12 �
 
 028 已实查为 `nv-h100-028`，八张 H100 80GB；独立项目目录为 `/ssdwork/zhanghanyue/grounded_llm/`，Python 为其中 `.venv/bin/python`（复用系统 PyTorch 2.7.1+cu126，独立安装 Transformers 4.57.6）。经确认可读取的基座目录为 `/ssdwork/fuzhizhang/model_base/Qwen2.5-1.5B-Instruct`，不修改该共享模型。
 
-共同来源文件位于 `data/map_sft_sources/`，增强缓存为 `data/map_sft_50k/`，新训练及桥接输出为 `runs/map_sft_baselines/`；4090 同名新运行目录用于评测，1–4 号卡工作、0 号卡备用。源码与任务协议见 [实验 README](experiments/map_sft_baselines/README.md)，机器路径和 PID 只保存在各运行的 runtime 文件中，不复制为正式配置。旧 SFT 保留原运行目录，不与新队列混写。
+共同来源文件位于 `data/map_sft_sources/`，增强缓存为 `data/map_sft_50k/`，新训练及桥接输出为 `runs/map_sft_baselines/`；028 访问跳板必须使用内网 `192.168.181.253:10022`，外部 `172.16.78.36` 无路由，内网 22 端口未监听；已按外部 SSH 连接的可信主机公钥核验内网入口。4090 同名新运行目录用于评测，1–4 号卡工作、0 号卡备用。源码与任务协议见 [实验 README](experiments/map_sft_baselines/README.md)，机器路径和 PID 只保存在各运行的 runtime 文件中，不复制为正式配置。旧 SFT 保留原运行目录，不与新队列混写。
 
 ## 4. 文件传输
 

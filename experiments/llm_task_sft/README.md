@@ -79,3 +79,19 @@ python -m experiments.llm_task_sft.src.random_legal --config experiments/llm_tas
 
 同题首轮、单步与整题对照结果见[合法候选分析](results/legal_candidate_baselines.md)。
 510 test 使用 `blocks_random_legal_test.json`；loss 下降速度、监督与参数差异见[优化诊断](results/optimization_diagnostics.md)。
+
+## 保存回答的策略比较
+
+`analyze_policies` 在同一 510 题上比较已保存的 SFT 与地图回答，不生成新回答。
+先按真实动作回放棋盘，再定位首次不可逆失败：误删目标格、保住目标却留下不可拼除的残余，
+以及可解状态上的提前停止、非法动作或格式错误。死局之后的回答不重复计为首次失败。
+按决策轮报告仍可解题数、首次失败、累计到达，并比较成功题集合和物理动作；候选局部编号不作为动作身份。
+
+```bash
+python -m experiments.llm_task_sft.src.analyze_policies --config CONFIG --sft-run SFT_RUN --map-run MAP_RUN --map-cases SAVED_MAP_ROOT --out OUTPUT
+```
+
+正式范围见 [blocks_policy_comparison.json](configs/blocks_policy_comparison.json)。
+当前地图的内容依赖另用 [配对探针合同](../flamingo_map_reader/configs/blocks_current_map_content_probe.json)：
+同一状态重新生成正常与反序地图两种回答，历史、文字、候选动作和生成预算保持一致，
+实际动作与可达性评分和排序评分分开；不将这项小样本探针当作完整 rollout 成绩。

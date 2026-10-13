@@ -1,0 +1,16 @@
+{
+  "study": "blocks_sft_map_policy_comparison",
+  "split": "test",
+  "tasks": 510,
+  "map_steps": [243750, 250000],
+  "sft_epochs": [4, 4.5, 5],
+  "primary_pair": {"map_step": 243750, "sft_epoch": 4.5},
+  "secondary_pairs": "all_saved_conditions_on_the_same_tasks",
+  "outcome": "physical_goal_arrival; correct_stop_reported_separately",
+  "first_failure": "first_irreversible_loss_of_reachability_or_control_failure_while_solvable",
+  "step_index": "one_based_model_decision; stopping_attempts_count_as_decisions",
+  "physical_action_identity": ["shape_id", "row", "col"],
+  "oracle_cache_limit": 2000000,
+  "oracle_seconds": 600,
+  "inference": "descriptive_saved_output_analysis; no_new_generation"
+}

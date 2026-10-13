@@ -1,0 +1,18 @@
+{
+  "study": "blocks_current_map_content_probe",
+  "split": "test",
+  "cohort_tasks": 510,
+  "checkpoint_steps": [243750, 250000],
+  "seed": 20261013,
+  "tasks_per_origin_by_shortest_length": {"6": 3, "7": 6, "8": 6, "9": 1},
+  "sample_tasks": 32,
+  "stages": ["first", "later_solvable_nearest_decision_4"],
+  "maximum_pairs_per_checkpoint": 64,
+  "conditions": ["normal_regenerated", "candidate_Q_distance_rank_reverse"],
+  "history": "identical_original_gold_text_and_historical_maps",
+  "intervention": "current_turn_successor_Q_contents_only",
+  "unchanged": ["current_Q", "goal_V", "physical_actions", "candidate_ids", "user_text", "history", "generation_budget"],
+  "grading": "actual_physical_action_and_exact_reachability; ranking_reported_separately",
+  "normal_saved_agreement": "diagnostic_only; regenerated_normal_is_the_paired_baseline",
+  "inference": "exploratory_content_dependency_probe; does_not_measure_full_rollout_or_matched_no_map_benefit"
+}

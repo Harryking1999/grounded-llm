@@ -154,18 +154,24 @@ def assisted_summary(cases, manifest):
     return summary
 
 
-def load_evaluation(manifest_path, checkpoint, model_path):
+def load_evaluation(manifest_path, checkpoint, model_path, *, source_path_map=None, device=None):
     manifest = json.loads(manifest_path.read_text())
     config = manifest['config']
     saved = torch.load(checkpoint, weights_only=True, map_location='cpu')
+    actual = pinned_supervision(saved['contract'])
+    if source_path_map:
+        from .artifact_paths import relocate_supervision_paths
+        locations = json.loads(source_path_map.read_text())
+        actual = relocate_supervision_paths(actual, locations)
+        manifest = dict(manifest)
+        manifest['source_root' if config['task'] == 'graph' else 'q_checkpoint'] = locations['map_source']['destination']
     expected = pinned_supervision(dict(config=config, manifest=str(manifest_path.resolve()),
         model_source=str(model_path.resolve()),
         map_source=manifest['source_root' if config['task'] == 'graph' else 'q_checkpoint']))
-    actual = pinned_supervision(saved['contract'])
     if any(actual.get(key) != value for key, value in expected.items()):
         raise ValueError('Adapter and evaluation contracts differ')
     from transformers import AutoModelForCausalLM, AutoTokenizer
-    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    device = torch.device(device or ('cuda:0' if torch.cuda.is_available() else 'cpu'))
     tokenizer = AutoTokenizer.from_pretrained(model_path)
     base = AutoModelForCausalLM.from_pretrained(model_path,
         torch_dtype=torch.bfloat16 if device.type == 'cuda' else torch.float32)

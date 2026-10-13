@@ -150,12 +150,9 @@ def run(args, config):
                     used = subprocess.check_output(['nvidia-smi',f'--id={gpu}','--query-gpu=memory.used','--format=csv,noheader,nounits'],text=True)
                     if int(used.strip()) >= 1000:
                         continue
-                    for job in jobs:
-                        if str(job[-1]) in busy:
-                            continue
-                        owner = pool.acquire(job, args.node_id)
-                        if not owner:
-                            continue
+                    selected = pool.acquire_next([job for job in jobs if str(job[-1]) not in busy], args.node_id)
+                    if selected:
+                        job, owner = selected
                         preparing = dict(job=[str(x) if isinstance(x,Path) else x for x in job],owner=owner)
                         snapshot('preparing_checkpoint',len(jobs))
                         pool.pull_checkpoint(job)
@@ -171,7 +168,6 @@ def run(args, config):
                         active[gpu] = (process,job,log,owner)
                         preparing = None
                         busy.add(str(out));snapshot(pending=len(jobs))
-                        break
                 if not files:
                     collect(root, config)
                 snapshot('running' if active else 'waiting_for_checkpoints',len(jobs))

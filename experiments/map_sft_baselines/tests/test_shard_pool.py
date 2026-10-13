@@ -25,6 +25,22 @@ class LocalSFTP:
 
 
 class PoolTests(unittest.TestCase):
+    def test_shared_round_robin_preserves_latest_within_each_baseline(self):
+        with tempfile.TemporaryDirectory() as folder:
+            pools = [ShardPool(folder), ShardPool(folder, LocalSFTP())]
+            jobs = [(step, step / 10, base, 'RO', start, start + 2,
+                     Path(folder) / f'models/{base}/checkpoint-{step}',
+                     Path(folder) / f'evaluation/{base}/checkpoint-{step}/RO_{start:04d}_{start+2:04d}')
+                    for step, base in [(40, 'B0'), (30, 'B3'), (20, 'B1'), (10, 'B2'), (5, 'B1')]
+                    for start in (0, 2)]
+            selected = [pools[i % 2].acquire_next(jobs, f'node-{i % 2}')[0] for i in range(8)]
+            self.assertEqual([job[2] for job in selected], ['B0','B1','B2','B3'] * 2)
+            self.assertEqual([job[0] for job in selected if job[2]=='B1'], [20,20])
+            self.assertEqual(pools[0].acquire_next(jobs,'a')[0][0],5)
+            self.assertEqual(pools[1].acquire_next(jobs,'b')[0][0],5)
+            self.assertIsNone(pools[0].acquire_next(jobs,'a'))
+            self.assertFalse((Path(folder)/'evaluation_dispatch.lock').exists())
+
     def job(self, root):
         return (8,0.5,'B0','RO',0,2,Path(root)/'models/B0/checkpoint-8',
                 Path(root)/'evaluation/B0/checkpoint-8/RO_0000_0002')

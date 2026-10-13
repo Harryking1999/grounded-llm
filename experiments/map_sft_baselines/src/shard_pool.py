@@ -59,6 +59,45 @@ class ShardPool:
         output = self.output(job)
         return output.with_name(output.name + '.worker.claim')
 
+    def acquire_next(self, jobs, node):
+        """Round-robin baselines across nodes; preserve priority within each baseline.
+
+        Only claim selection holds this short shared lock, never checkpoint transfer
+        or evaluation. A crashed dispatcher requires explicit lock recovery.
+        """
+        self.mkdirs(self.root)
+        lock = self.root / 'evaluation_dispatch.lock'
+        try:
+            if self.files:
+                self.files.mkdir(str(lock))
+            else:
+                lock.mkdir()
+        except OSError:
+            if self.exists(lock):
+                return None
+            raise
+        try:
+            cursor = self.root / 'evaluation_dispatch.json'
+            previous = self.read(cursor).get('baseline') if self.exists(cursor) else None
+            baselines = sorted({job[2] for job in jobs})
+            if previous in baselines:
+                index = baselines.index(previous) + 1
+                baselines = baselines[index:] + baselines[:index]
+            for baseline in baselines:
+                for job in jobs:
+                    if job[2] != baseline:
+                        continue
+                    owner = self.acquire(job, node)
+                    if owner:
+                        self.write(cursor, dict(baseline=baseline, node=node))
+                        return job, owner
+            return None
+        finally:
+            if self.files:
+                self.files.rmdir(str(lock))
+            else:
+                lock.rmdir()
+
     def acquire(self, job, node, pid=None):
         output, path = self.output(job), self.claim_path(job)
         self.mkdirs(output.parent)

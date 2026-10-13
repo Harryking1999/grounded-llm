@@ -9,6 +9,7 @@ from experiments.map_sft_baselines.src.prepare import choose
 from experiments.map_sft_baselines.src.modeling import TokenLM
 from experiments.map_sft_baselines.src.queue import evaluation_jobs
 from experiments.map_sft_baselines.src.evaluate import summarize
+from experiments.map_sft_baselines.src.train import validate_resume_contract
 
 class ContractTests(unittest.TestCase):
     def test_longest_before_coverage_then_diversity(self):
@@ -43,5 +44,11 @@ class ContractTests(unittest.TestCase):
         result=summarize(cases)
         self.assertEqual(result['safe']['denominator'],1)
         self.assertEqual(result['map_optimal']['denominator'],2)
+    def test_stop_confirmation_does_not_change_training_recipe(self):
+        cfg=json.loads((Path(__file__).parents[1]/'configs/study.json').read_text())
+        saved=json.loads(json.dumps(cfg));saved['early_stop']['mode']='flag_only_pending_user_choice'
+        validate_resume_contract(dict(config=saved,baseline='B0'),cfg,'B0')
+        changed=json.loads(json.dumps(cfg));changed['training']['learning_rate']*=2
+        with self.assertRaises(ValueError):validate_resume_contract(dict(config=saved,baseline='B0'),changed,'B0')
 
 if __name__=='__main__':unittest.main()

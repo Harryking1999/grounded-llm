@@ -23,6 +23,11 @@ class Routes(Dataset):
         item=torch.load(self.path/'trajectories'/self.rows[index]['prepared_file'],map_location='cpu',weights_only=False)[self.key]
         return item['encoded'],item['steps']
 
+def validate_resume_contract(saved,config,baseline):
+    recipe=('model','seed','data','map','training','baselines','maximum_sequence_tokens')
+    if saved['baseline']!=baseline or any(saved['config'][key]!=config[key] for key in recipe):
+        raise ValueError('Resume training recipe mismatch')
+
 def save(model,optimizer,scheduler,out,config,baseline,step,steps_epoch,rank):
     path=out/f'checkpoint-{step}';path.mkdir(parents=True,exist_ok=True)
     torch.save(dict(torch=torch.get_rng_state(),cuda=torch.cuda.get_rng_state(),python=random.getstate(),numpy=np.random.get_state()),path/f'rng_{rank}.pt')
@@ -59,7 +64,7 @@ def main():
     step=0
     if a.resume:
         state=json.loads((a.resume/'state.json').read_text())
-        if state['config']!=cfg or state['baseline']!=a.baseline:raise ValueError('Resume contract mismatch')
+        validate_resume_contract(state,cfg,a.baseline)
         saved=torch.load(a.resume/'resume.pt',map_location=device,weights_only=False)
         model.load_state_dict(saved['model'],strict=False);optimizer.load_state_dict(saved['optimizer']);scheduler.load_state_dict(saved['scheduler']);step=state['step']
         rng=torch.load(a.resume/f'rng_{rank}.pt',weights_only=False,map_location='cpu');torch.set_rng_state(rng['torch']);torch.cuda.set_rng_state(rng['cuda']);random.setstate(rng['python']);np.random.set_state(rng['numpy'])

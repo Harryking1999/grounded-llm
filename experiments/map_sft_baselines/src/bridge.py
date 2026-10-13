@@ -38,7 +38,10 @@ def main():
                 atomic_json(root/'results'/base/'curve.json',curve)
                 try:files.get(profile['target_run']+'/results/'+base+'/report.md',str(root/'results'/base/'report.md'))
                 except FileNotFoundError:pass
-                stop=profile['early_stop'];ordinary=sorted(curve,key=lambda r:r['step'])
+                # Operational stop policy can be confirmed without changing the
+                # optimizer/data contract already held by active training ranks.
+                stop=json.loads(a.profile.read_text())['early_stop']
+                ordinary=sorted(curve,key=lambda r:r['step'])
                 # A missing half-epoch point cannot count toward patience.
                 contiguous=[]
                 for row in ordinary:

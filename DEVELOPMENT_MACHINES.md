@@ -1,12 +1,12 @@
 # 开发机使用手册
 
-更新：2026-10-13。SFT 已完成到 4.5 epoch 的同题 510 评测，当前正训练至 5 epoch。训练与评测均只用 4090 的 1–4 号卡，0 号卡预留，不设 epoch 上限。35016 保留为已登记可用机器，不启动任务；44491 仍关闭。
+更新：2026-10-13。44491 已恢复，当前为一张 A100 80GB；35016 当前拒绝连接。4090 按现有约定使用 1–4 号卡，0 号卡预留。
 
 ## 1. 机器概览
 
 | 机器 | 用途 | 使用约定 |
 |---|---|---|
-| 原人工智能平台 | 35016 已恢复并登记为可用评测机；共享 `/zhanghanyue` | 本轮没有分配新任务；44491 不再使用 |
+| 原人工智能平台 | 44491 已恢复，当前为一张 A100 80GB；共享 `/zhanghanyue` | 35016 当前拒绝连接；使用显式 SSH 端口 44491 |
 | 028：8 张 H100 80GB | 后续训练 | 10 月 12 日以后使用；崔涵需要 6–8 卡训练时协调释放资源 |
 | 4090：5 张 48GB 卡 | SFT 半轮续训与 510 题串行评测 | 按续训合同使用 1–4 号卡，0 号卡预留 |
 | login02 登录节点 | 028 连接入口及文件中转 | 仅用于登录和传输 |
@@ -20,14 +20,14 @@
 **原平台**：本机已配置 SSH 密钥。
 
 ```powershell
-# 已登记的四卡 A100 可用评测环境，本轮暂不启动新任务
-ssh -p 35016 root@172.16.78.10
-# 44491 已关闭，不再作为当前运行目标
+# 当前可用的一卡 A100 环境
+ssh -p 44491 root@172.16.78.10
+# 35016 当前拒绝连接，不再作为本次读取目标
 # 41941已关闭并从当前运行合同禁用，不再恢复
 # 原训练环境41511已完成20 epoch并关闭，不再恢复
 ```
 
-本机别名 `grounded-dev` 已改为重新开启的 35016；当前 4090 续训通过 `grounded-4090` 与已保存的连接辅助入口管理。密钥和连接配置位于 `%USERPROFILE%\.ssh\`。
+本机别名 `grounded-dev` 仍记录此前的 35016，本次 44491 使用显式端口；当前 4090 续训通过 `grounded-4090` 与已保存的连接辅助入口管理。密钥和连接配置位于 `%USERPROFILE%\.ssh\`。
 
 **028、4090**：本机已配置连接别名及公钥，私钥保留在本机。
 
@@ -76,6 +76,8 @@ SFT 启动前实查：原 35016 主机身份为 `56ldennbmqmq3-0`；2026-10-12 �
 续训正式合同为 `experiments/llm_task_sft/configs/blocks_reason_continuation.json`，延续原 cosine 末尾学习率 2e-6，完整恢复 optimizer、scheduler、RNG 与半轮样本位置。当前 `continuation/status.json` 和 `continuation/training/progress.json` 为运行状态；没有总 epoch 上限，失败或空间不足时停止并记录原因，不自动清理产物。需要在周期结束后停止时，可在 `continuation/` 创建 `stop_after_cycle`。
 
 2026-10-13 11:03（北京时间）验收：4、4.5 点各已完成全部 42 分片与完整恢复断点，协调器已自动切到 `train_to_62500.log`，从 `continuation/training/checkpoint-56250/` 接续。累计六个评测点验收通过，动作回放、汇总与训练窗口的完整诊断保存在 `runtime/acceptance_current.json`，逐题涨跌与首轮一致性为 `runtime/acceptance_paired.json`；紧凑摘要见仓库 `experiments/llm_task_sft/results/acceptance.{md,json}`。本次复用前四点，新增审计两点，没有重新生成回答；全部操作仅在 4090，未修改训练配方。
+
+当前 44491 的主机身份为 `4b5glpbtq0bnc-0`，一张 A100-SXM4-80GB；共享目录与原虚拟环境保留，工作区仍为 `/zhanghanyue/experiment/flamingo_map_reader/`。
 
 同题 510 的身份核对保留在原平台 `runtime/test510_alignment.json`，4090 复用已向平台提供的同一数据目录。概率对照源码 `8d1f467`，原输出位于平台 `diagnostics/random_largest_{validation,test510}/`，紧凑摘要已保存在仓库结果目录。源代码按 Git commit 部署到 `code/llm_sft_<commit>/`；运行时路径与 PID 放在本次运行的 `runtime/`，不入 Git。实验合同见 `experiments/llm_task_sft/configs/blocks_reason_bs4.json`；以下地图实验机器分工均为历史。
 

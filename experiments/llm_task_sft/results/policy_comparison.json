@@ -1,0 +1,1918 @@
+{
+  "contract": {
+    "study": "blocks_sft_map_policy_comparison",
+    "split": "test",
+    "tasks": 510,
+    "map_steps": [
+      243750,
+      250000
+    ],
+    "sft_epochs": [
+      4,
+      4.5,
+      5
+    ],
+    "primary_pair": {
+      "map_step": 243750,
+      "sft_epoch": 4.5
+    },
+    "secondary_pairs": "all_saved_conditions_on_the_same_tasks",
+    "outcome": "physical_goal_arrival; correct_stop_reported_separately",
+    "first_failure": "first_irreversible_loss_of_reachability_or_control_failure_while_solvable",
+    "step_index": "one_based_model_decision; stopping_attempts_count_as_decisions",
+    "physical_action_identity": [
+      "shape_id",
+      "row",
+      "col"
+    ],
+    "oracle_cache_limit": 2000000,
+    "oracle_seconds": 600,
+    "inference": "descriptive_saved_output_analysis; no_new_generation"
+  },
+  "recorded_utc": "2026-10-13T05:44:38.532669+00:00",
+  "conditions": {
+    "map_243750": {
+      "tasks": 510,
+      "arrival": {
+        "numerator": 175,
+        "denominator": 510,
+        "rate": 0.3431372549019608
+      },
+      "arrival_and_stop": {
+        "numerator": 172,
+        "denominator": 510,
+        "rate": 0.33725490196078434
+      },
+      "first_safe": {
+        "numerator": 419,
+        "denominator": 510,
+        "rate": 0.8215686274509804
+      },
+      "live_safe": {
+        "numerator": 2239,
+        "denominator": 2574,
+        "rate": 0.8698523698523698
+      },
+      "live_shortest": {
+        "numerator": 2013,
+        "denominator": 2574,
+        "rate": 0.782051282051282
+      },
+      "root_errors": {
+        "remove_goal_cells": 156,
+        "untileable_residue": 175,
+        "premature_stop": 3,
+        "control_format": 1
+      },
+      "residue_errors": {
+        "unsupported_cell": 168,
+        "global_tiling_conflict": 7
+      },
+      "ending_labels": {
+        "premature_done": 262,
+        "success": 172,
+        "correct_no_solution_after_error": 56,
+        "illegal_action": 16,
+        "false_no_solution": 3,
+        "format_error": 1
+      },
+      "by_step": {
+        "1": {
+          "live": 510,
+          "safe": 419,
+          "shortest": 387,
+          "first_fatal": 91,
+          "fatal_types": {
+            "untileable_residue": 47,
+            "remove_goal_cells": 43,
+            "control_format": 1
+          },
+          "cumulative_fatal": 91,
+          "cumulative_arrived": 0,
+          "active_after": 419,
+          "already_dead_turns": 0,
+          "reason_fact_errors_live": 0
+        },
+        "2": {
+          "live": 419,
+          "safe": 364,
+          "shortest": 310,
+          "first_fatal": 55,
+          "fatal_types": {
+            "remove_goal_cells": 33,
+            "untileable_residue": 22
+          },
+          "cumulative_fatal": 146,
+          "cumulative_arrived": 0,
+          "active_after": 364,
+          "already_dead_turns": 90,
+          "reason_fact_errors_live": 0
+        },
+        "3": {
+          "live": 364,
+          "safe": 324,
+          "shortest": 284,
+          "first_fatal": 40,
+          "fatal_types": {
+            "remove_goal_cells": 20,
+            "untileable_residue": 20
+          },
+          "cumulative_fatal": 186,
+          "cumulative_arrived": 0,
+          "active_after": 324,
+          "already_dead_turns": 145,
+          "reason_fact_errors_live": 0
+        },
+        "4": {
+          "live": 324,
+          "safe": 278,
+          "shortest": 238,
+          "first_fatal": 46,
+          "fatal_types": {
+            "untileable_residue": 24,
+            "remove_goal_cells": 22
+          },
+          "cumulative_fatal": 232,
+          "cumulative_arrived": 0,
+          "active_after": 278,
+          "already_dead_turns": 185,
+          "reason_fact_errors_live": 0
+        },
+        "5": {
+          "live": 278,
+          "safe": 244,
+          "shortest": 214,
+          "first_fatal": 34,
+          "fatal_types": {
+            "untileable_residue": 24,
+            "remove_goal_cells": 10
+          },
+          "cumulative_fatal": 266,
+          "cumulative_arrived": 0,
+          "active_after": 244,
+          "already_dead_turns": 231,
+          "reason_fact_errors_live": 0
+        },
+        "6": {
+          "live": 244,
+          "safe": 214,
+          "shortest": 195,
+          "first_fatal": 30,
+          "fatal_types": {
+            "untileable_residue": 19,
+            "remove_goal_cells": 11
+          },
+          "cumulative_fatal": 296,
+          "cumulative_arrived": 11,
+          "active_after": 203,
+          "already_dead_turns": 265,
+          "reason_fact_errors_live": 0
+        },
+        "7": {
+          "live": 203,
+          "safe": 180,
+          "shortest": 173,
+          "first_fatal": 23,
+          "fatal_types": {
+            "untileable_residue": 14,
+            "remove_goal_cells": 8,
+            "premature_stop": 1
+          },
+          "cumulative_fatal": 319,
+          "cumulative_arrived": 46,
+          "active_after": 145,
+          "already_dead_turns": 293,
+          "reason_fact_errors_live": 0
+        },
+        "8": {
+          "live": 145,
+          "safe": 133,
+          "shortest": 130,
+          "first_fatal": 12,
+          "fatal_types": {
+            "remove_goal_cells": 7,
+            "untileable_residue": 4,
+            "premature_stop": 1
+          },
+          "cumulative_fatal": 331,
+          "cumulative_arrived": 104,
+          "active_after": 75,
+          "already_dead_turns": 290,
+          "reason_fact_errors_live": 0
+        },
+        "9": {
+          "live": 75,
+          "safe": 72,
+          "shortest": 71,
+          "first_fatal": 3,
+          "fatal_types": {
+            "remove_goal_cells": 2,
+            "untileable_residue": 1
+          },
+          "cumulative_fatal": 334,
+          "cumulative_arrived": 166,
+          "active_after": 10,
+          "already_dead_turns": 196,
+          "reason_fact_errors_live": 0
+        },
+        "10": {
+          "live": 10,
+          "safe": 9,
+          "shortest": 9,
+          "first_fatal": 1,
+          "fatal_types": {
+            "premature_stop": 1
+          },
+          "cumulative_fatal": 335,
+          "cumulative_arrived": 173,
+          "active_after": 2,
+          "already_dead_turns": 64,
+          "reason_fact_errors_live": 0
+        },
+        "11": {
+          "live": 2,
+          "safe": 2,
+          "shortest": 2,
+          "first_fatal": 0,
+          "fatal_types": {},
+          "cumulative_fatal": 335,
+          "cumulative_arrived": 175,
+          "active_after": 0,
+          "already_dead_turns": 15,
+          "reason_fact_errors_live": 0
+        },
+        "12": {
+          "live": 0,
+          "safe": 0,
+          "shortest": 0,
+          "first_fatal": 0,
+          "fatal_types": {},
+          "cumulative_fatal": 335,
+          "cumulative_arrived": 175,
+          "active_after": 0,
+          "already_dead_turns": 0,
+          "reason_fact_errors_live": 0
+        }
+      },
+      "reason_errors_by_context": {
+        "live": {
+          "turns": 2574
+        },
+        "already_dead": {
+          "turns": 1774
+        },
+        "goal": {
+          "turns": 175
+        }
+      },
+      "mean_live_decisions": 5.047058823529412,
+      "mean_actions_arrived": 8.142857142857142,
+      "by_length": {
+        "6": {
+          "tasks": 100,
+          "arrived": 24,
+          "root_errors": {
+            "untileable_residue": 25,
+            "control_format": 1,
+            "remove_goal_cells": 50
+          }
+        },
+        "7": {
+          "tasks": 200,
+          "arrived": 69,
+          "root_errors": {
+            "remove_goal_cells": 59,
+            "untileable_residue": 70,
+            "premature_stop": 2
+          }
+        },
+        "8": {
+          "tasks": 200,
+          "arrived": 79,
+          "root_errors": {
+            "remove_goal_cells": 44,
+            "untileable_residue": 76,
+            "premature_stop": 1
+          }
+        },
+        "9": {
+          "tasks": 10,
+          "arrived": 3,
+          "root_errors": {
+            "remove_goal_cells": 3,
+            "untileable_residue": 4
+          }
+        }
+      },
+      "by_group": {
+        "new_initial_board": {
+          "tasks": 255,
+          "arrived": 86,
+          "root_errors": {
+            "untileable_residue": 86,
+            "remove_goal_cells": 82,
+            "premature_stop": 1
+          }
+        },
+        "same_initial_board_new_pair": {
+          "tasks": 255,
+          "arrived": 89,
+          "root_errors": {
+            "remove_goal_cells": 74,
+            "untileable_residue": 89,
+            "premature_stop": 2,
+            "control_format": 1
+          }
+        }
+      },
+      "reference": {
+        "tasks": 510,
+        "live_safe": {
+          "numerator": 2774,
+          "denominator": 3148,
+          "rate": 0.8811944091486659
+        },
+        "first_safe": {
+          "numerator": 432,
+          "denominator": 510,
+          "rate": 0.8470588235294118
+        },
+        "errors_per_task": {
+          "0": 276,
+          "1": 148,
+          "2": 53,
+          "3": 20,
+          "4": 6,
+          "5": 6,
+          "6": 1
+        },
+        "tasks_with_no_live_decision_errors": 276
+      }
+    },
+    "map_250000": {
+      "tasks": 510,
+      "arrival": {
+        "numerator": 172,
+        "denominator": 510,
+        "rate": 0.33725490196078434
+      },
+      "arrival_and_stop": {
+        "numerator": 147,
+        "denominator": 510,
+        "rate": 0.28823529411764703
+      },
+      "first_safe": {
+        "numerator": 417,
+        "denominator": 510,
+        "rate": 0.8176470588235294
+      },
+      "live_safe": {
+        "numerator": 2157,
+        "denominator": 2495,
+        "rate": 0.8645290581162325
+      },
+      "live_shortest": {
+        "numerator": 1940,
+        "denominator": 2495,
+        "rate": 0.7775551102204409
+      },
+      "root_errors": {
+        "untileable_residue": 203,
+        "premature_stop": 3,
+        "remove_goal_cells": 132
+      },
+      "residue_errors": {
+        "unsupported_cell": 195,
+        "global_tiling_conflict": 8
+      },
+      "ending_labels": {
+        "correct_no_solution_after_error": 111,
+        "premature_done": 209,
+        "success": 147,
+        "false_no_solution": 25,
+        "illegal_action": 17,
+        "format_error": 1
+      },
+      "by_step": {
+        "1": {
+          "live": 510,
+          "safe": 417,
+          "shortest": 381,
+          "first_fatal": 93,
+          "fatal_types": {
+            "remove_goal_cells": 46,
+            "untileable_residue": 47
+          },
+          "cumulative_fatal": 93,
+          "cumulative_arrived": 0,
+          "active_after": 417,
+          "already_dead_turns": 0,
+          "reason_fact_errors_live": 0
+        },
+        "2": {
+          "live": 417,
+          "safe": 356,
+          "shortest": 308,
+          "first_fatal": 61,
+          "fatal_types": {
+            "remove_goal_cells": 24,
+            "untileable_residue": 37
+          },
+          "cumulative_fatal": 154,
+          "cumulative_arrived": 0,
+          "active_after": 356,
+          "already_dead_turns": 93,
+          "reason_fact_errors_live": 0
+        },
+        "3": {
+          "live": 356,
+          "safe": 304,
+          "shortest": 269,
+          "first_fatal": 52,
+          "fatal_types": {
+            "untileable_residue": 34,
+            "remove_goal_cells": 18
+          },
+          "cumulative_fatal": 206,
+          "cumulative_arrived": 0,
+          "active_after": 304,
+          "already_dead_turns": 154,
+          "reason_fact_errors_live": 0
+        },
+        "4": {
+          "live": 304,
+          "safe": 263,
+          "shortest": 231,
+          "first_fatal": 41,
+          "fatal_types": {
+            "untileable_residue": 28,
+            "remove_goal_cells": 13
+          },
+          "cumulative_fatal": 247,
+          "cumulative_arrived": 0,
+          "active_after": 263,
+          "already_dead_turns": 206,
+          "reason_fact_errors_live": 0
+        },
+        "5": {
+          "live": 263,
+          "safe": 230,
+          "shortest": 194,
+          "first_fatal": 33,
+          "fatal_types": {
+            "untileable_residue": 21,
+            "remove_goal_cells": 12
+          },
+          "cumulative_fatal": 280,
+          "cumulative_arrived": 0,
+          "active_after": 230,
+          "already_dead_turns": 247,
+          "reason_fact_errors_live": 0
+        },
+        "6": {
+          "live": 230,
+          "safe": 205,
+          "shortest": 184,
+          "first_fatal": 25,
+          "fatal_types": {
+            "untileable_residue": 17,
+            "remove_goal_cells": 8
+          },
+          "cumulative_fatal": 305,
+          "cumulative_arrived": 11,
+          "active_after": 194,
+          "already_dead_turns": 280,
+          "reason_fact_errors_live": 0
+        },
+        "7": {
+          "live": 194,
+          "safe": 173,
+          "shortest": 165,
+          "first_fatal": 21,
+          "fatal_types": {
+            "untileable_residue": 13,
+            "remove_goal_cells": 8
+          },
+          "cumulative_fatal": 326,
+          "cumulative_arrived": 43,
+          "active_after": 141,
+          "already_dead_turns": 304,
+          "reason_fact_errors_live": 0
+        },
+        "8": {
+          "live": 141,
+          "safe": 132,
+          "shortest": 131,
+          "first_fatal": 9,
+          "fatal_types": {
+            "premature_stop": 3,
+            "untileable_residue": 5,
+            "remove_goal_cells": 1
+          },
+          "cumulative_fatal": 335,
+          "cumulative_arrived": 105,
+          "active_after": 70,
+          "already_dead_turns": 291,
+          "reason_fact_errors_live": 0
+        },
+        "9": {
+          "live": 70,
+          "safe": 67,
+          "shortest": 67,
+          "first_fatal": 3,
+          "fatal_types": {
+            "remove_goal_cells": 2,
+            "untileable_residue": 1
+          },
+          "cumulative_fatal": 338,
+          "cumulative_arrived": 164,
+          "active_after": 8,
+          "already_dead_turns": 192,
+          "reason_fact_errors_live": 0
+        },
+        "10": {
+          "live": 8,
+          "safe": 8,
+          "shortest": 8,
+          "first_fatal": 0,
+          "fatal_types": {},
+          "cumulative_fatal": 338,
+          "cumulative_arrived": 170,
+          "active_after": 2,
+          "already_dead_turns": 65,
+          "reason_fact_errors_live": 0
+        },
+        "11": {
+          "live": 2,
+          "safe": 2,
+          "shortest": 2,
+          "first_fatal": 0,
+          "fatal_types": {},
+          "cumulative_fatal": 338,
+          "cumulative_arrived": 172,
+          "active_after": 0,
+          "already_dead_turns": 9,
+          "reason_fact_errors_live": 0
+        },
+        "12": {
+          "live": 0,
+          "safe": 0,
+          "shortest": 0,
+          "first_fatal": 0,
+          "fatal_types": {},
+          "cumulative_fatal": 338,
+          "cumulative_arrived": 172,
+          "active_after": 0,
+          "already_dead_turns": 0,
+          "reason_fact_errors_live": 0
+        }
+      },
+      "reason_errors_by_context": {
+        "live": {
+          "turns": 2495
+        },
+        "already_dead": {
+          "turns": 1841
+        },
+        "goal": {
+          "turns": 172
+        }
+      },
+      "mean_live_decisions": 4.892156862745098,
+      "mean_actions_arrived": 8.133720930232558,
+      "by_length": {
+        "6": {
+          "tasks": 100,
+          "arrived": 19,
+          "root_errors": {
+            "untileable_residue": 33,
+            "remove_goal_cells": 48
+          }
+        },
+        "7": {
+          "tasks": 200,
+          "arrived": 76,
+          "root_errors": {
+            "premature_stop": 3,
+            "remove_goal_cells": 42,
+            "untileable_residue": 79
+          }
+        },
+        "8": {
+          "tasks": 200,
+          "arrived": 71,
+          "root_errors": {
+            "untileable_residue": 88,
+            "remove_goal_cells": 41
+          }
+        },
+        "9": {
+          "tasks": 10,
+          "arrived": 6,
+          "root_errors": {
+            "remove_goal_cells": 1,
+            "untileable_residue": 3
+          }
+        }
+      },
+      "by_group": {
+        "new_initial_board": {
+          "tasks": 255,
+          "arrived": 87,
+          "root_errors": {
+            "untileable_residue": 96,
+            "remove_goal_cells": 71,
+            "premature_stop": 1
+          }
+        },
+        "same_initial_board_new_pair": {
+          "tasks": 255,
+          "arrived": 85,
+          "root_errors": {
+            "untileable_residue": 107,
+            "premature_stop": 2,
+            "remove_goal_cells": 61
+          }
+        }
+      },
+      "reference": {
+        "tasks": 510,
+        "live_safe": {
+          "numerator": 2787,
+          "denominator": 3148,
+          "rate": 0.8853240152477764
+        },
+        "first_safe": {
+          "numerator": 429,
+          "denominator": 510,
+          "rate": 0.8411764705882353
+        },
+        "errors_per_task": {
+          "0": 282,
+          "1": 149,
+          "2": 46,
+          "3": 17,
+          "4": 13,
+          "5": 1,
+          "6": 2
+        },
+        "tasks_with_no_live_decision_errors": 282
+      }
+    },
+    "sft_4": {
+      "tasks": 510,
+      "arrival": {
+        "numerator": 164,
+        "denominator": 510,
+        "rate": 0.3215686274509804
+      },
+      "arrival_and_stop": {
+        "numerator": 164,
+        "denominator": 510,
+        "rate": 0.3215686274509804
+      },
+      "first_safe": {
+        "numerator": 397,
+        "denominator": 510,
+        "rate": 0.7784313725490196
+      },
+      "live_safe": {
+        "numerator": 1695,
+        "denominator": 2041,
+        "rate": 0.8304752572268496
+      },
+      "live_shortest": {
+        "numerator": 1629,
+        "denominator": 2041,
+        "rate": 0.7981381675649192
+      },
+      "root_errors": {
+        "untileable_residue": 191,
+        "remove_goal_cells": 155
+      },
+      "residue_errors": {
+        "unsupported_cell": 163,
+        "global_tiling_conflict": 28
+      },
+      "ending_labels": {
+        "no_legal_actions": 264,
+        "success": 164,
+        "premature_stop": 78,
+        "illegal_action": 4
+      },
+      "by_step": {
+        "1": {
+          "live": 510,
+          "safe": 397,
+          "shortest": 361,
+          "first_fatal": 113,
+          "fatal_types": {
+            "untileable_residue": 64,
+            "remove_goal_cells": 49
+          },
+          "cumulative_fatal": 113,
+          "cumulative_arrived": 0,
+          "active_after": 397,
+          "already_dead_turns": 0,
+          "reason_fact_errors_live": 149
+        },
+        "2": {
+          "live": 397,
+          "safe": 297,
+          "shortest": 277,
+          "first_fatal": 100,
+          "fatal_types": {
+            "remove_goal_cells": 50,
+            "untileable_residue": 50
+          },
+          "cumulative_fatal": 213,
+          "cumulative_arrived": 0,
+          "active_after": 297,
+          "already_dead_turns": 113,
+          "reason_fact_errors_live": 120
+        },
+        "3": {
+          "live": 297,
+          "safe": 229,
+          "shortest": 223,
+          "first_fatal": 68,
+          "fatal_types": {
+            "untileable_residue": 45,
+            "remove_goal_cells": 23
+          },
+          "cumulative_fatal": 281,
+          "cumulative_arrived": 0,
+          "active_after": 229,
+          "already_dead_turns": 213,
+          "reason_fact_errors_live": 74
+        },
+        "4": {
+          "live": 229,
+          "safe": 197,
+          "shortest": 193,
+          "first_fatal": 32,
+          "fatal_types": {
+            "untileable_residue": 14,
+            "remove_goal_cells": 18
+          },
+          "cumulative_fatal": 313,
+          "cumulative_arrived": 0,
+          "active_after": 197,
+          "already_dead_turns": 281,
+          "reason_fact_errors_live": 36
+        },
+        "5": {
+          "live": 197,
+          "safe": 177,
+          "shortest": 177,
+          "first_fatal": 20,
+          "fatal_types": {
+            "untileable_residue": 11,
+            "remove_goal_cells": 9
+          },
+          "cumulative_fatal": 333,
+          "cumulative_arrived": 0,
+          "active_after": 177,
+          "already_dead_turns": 313,
+          "reason_fact_errors_live": 20
+        },
+        "6": {
+          "live": 177,
+          "safe": 165,
+          "shortest": 165,
+          "first_fatal": 12,
+          "fatal_types": {
+            "untileable_residue": 7,
+            "remove_goal_cells": 5
+          },
+          "cumulative_fatal": 345,
+          "cumulative_arrived": 19,
+          "active_after": 146,
+          "already_dead_turns": 333,
+          "reason_fact_errors_live": 12
+        },
+        "7": {
+          "live": 146,
+          "safe": 145,
+          "shortest": 145,
+          "first_fatal": 1,
+          "fatal_types": {
+            "remove_goal_cells": 1
+          },
+          "cumulative_fatal": 346,
+          "cumulative_arrived": 86,
+          "active_after": 78,
+          "already_dead_turns": 321,
+          "reason_fact_errors_live": 1
+        },
+        "8": {
+          "live": 78,
+          "safe": 78,
+          "shortest": 78,
+          "first_fatal": 0,
+          "fatal_types": {},
+          "cumulative_fatal": 346,
+          "cumulative_arrived": 155,
+          "active_after": 9,
+          "already_dead_turns": 177,
+          "reason_fact_errors_live": 0
+        },
+        "9": {
+          "live": 9,
+          "safe": 9,
+          "shortest": 9,
+          "first_fatal": 0,
+          "fatal_types": {},
+          "cumulative_fatal": 346,
+          "cumulative_arrived": 163,
+          "active_after": 1,
+          "already_dead_turns": 20,
+          "reason_fact_errors_live": 0
+        },
+        "10": {
+          "live": 1,
+          "safe": 1,
+          "shortest": 1,
+          "first_fatal": 0,
+          "fatal_types": {},
+          "cumulative_fatal": 346,
+          "cumulative_arrived": 164,
+          "active_after": 0,
+          "already_dead_turns": 1,
+          "reason_fact_errors_live": 0
+        },
+        "11": {
+          "live": 0,
+          "safe": 0,
+          "shortest": 0,
+          "first_fatal": 0,
+          "fatal_types": {},
+          "cumulative_fatal": 346,
+          "cumulative_arrived": 164,
+          "active_after": 0,
+          "already_dead_turns": 0,
+          "reason_fact_errors_live": 0
+        }
+      },
+      "reason_errors_by_context": {
+        "live": {
+          "turns": 2041,
+          "fact": 412
+        },
+        "already_dead": {
+          "turns": 1772,
+          "fact": 1768
+        },
+        "goal": {
+          "turns": 164
+        }
+      },
+      "mean_live_decisions": 4.0019607843137255,
+      "mean_actions_arrived": 7.420731707317073,
+      "by_length": {
+        "6": {
+          "tasks": 100,
+          "arrived": 27,
+          "root_errors": {
+            "untileable_residue": 36,
+            "remove_goal_cells": 37
+          }
+        },
+        "7": {
+          "tasks": 200,
+          "arrived": 65,
+          "root_errors": {
+            "untileable_residue": 73,
+            "remove_goal_cells": 62
+          }
+        },
+        "8": {
+          "tasks": 200,
+          "arrived": 72,
+          "root_errors": {
+            "untileable_residue": 76,
+            "remove_goal_cells": 52
+          }
+        },
+        "9": {
+          "tasks": 10,
+          "arrived": 0,
+          "root_errors": {
+            "remove_goal_cells": 4,
+            "untileable_residue": 6
+          }
+        }
+      },
+      "by_group": {
+        "new_initial_board": {
+          "tasks": 255,
+          "arrived": 77,
+          "root_errors": {
+            "remove_goal_cells": 81,
+            "untileable_residue": 97
+          }
+        },
+        "same_initial_board_new_pair": {
+          "tasks": 255,
+          "arrived": 87,
+          "root_errors": {
+            "untileable_residue": 94,
+            "remove_goal_cells": 74
+          }
+        }
+      },
+      "reference": {
+        "tasks": 510,
+        "live_safe": {
+          "numerator": 3023,
+          "denominator": 3690,
+          "rate": 0.8192411924119242
+        },
+        "first_safe": {
+          "numerator": 397,
+          "denominator": 510,
+          "rate": 0.7784313725490196
+        },
+        "errors_per_task": {
+          "0": 215,
+          "1": 111,
+          "2": 77,
+          "3": 52,
+          "4": 35,
+          "5": 15,
+          "6": 4,
+          "7": 1
+        },
+        "tasks_with_no_live_decision_errors": 215
+      }
+    },
+    "sft_4.5": {
+      "tasks": 510,
+      "arrival": {
+        "numerator": 161,
+        "denominator": 510,
+        "rate": 0.3156862745098039
+      },
+      "arrival_and_stop": {
+        "numerator": 161,
+        "denominator": 510,
+        "rate": 0.3156862745098039
+      },
+      "first_safe": {
+        "numerator": 393,
+        "denominator": 510,
+        "rate": 0.7705882352941177
+      },
+      "live_safe": {
+        "numerator": 1677,
+        "denominator": 2026,
+        "rate": 0.8277393879565647
+      },
+      "live_shortest": {
+        "numerator": 1615,
+        "denominator": 2026,
+        "rate": 0.797137216189536
+      },
+      "root_errors": {
+        "untileable_residue": 205,
+        "remove_goal_cells": 142,
+        "premature_stop": 2
+      },
+      "residue_errors": {
+        "unsupported_cell": 180,
+        "global_tiling_conflict": 25
+      },
+      "ending_labels": {
+        "no_legal_actions": 271,
+        "success": 161,
+        "premature_stop": 74,
+        "illegal_action": 4
+      },
+      "by_step": {
+        "1": {
+          "live": 510,
+          "safe": 393,
+          "shortest": 357,
+          "first_fatal": 117,
+          "fatal_types": {
+            "untileable_residue": 67,
+            "remove_goal_cells": 48,
+            "premature_stop": 2
+          },
+          "cumulative_fatal": 117,
+          "cumulative_arrived": 0,
+          "active_after": 393,
+          "already_dead_turns": 0,
+          "reason_fact_errors_live": 153
+        },
+        "2": {
+          "live": 393,
+          "safe": 295,
+          "shortest": 283,
+          "first_fatal": 98,
+          "fatal_types": {
+            "untileable_residue": 50,
+            "remove_goal_cells": 48
+          },
+          "cumulative_fatal": 215,
+          "cumulative_arrived": 0,
+          "active_after": 295,
+          "already_dead_turns": 115,
+          "reason_fact_errors_live": 110
+        },
+        "3": {
+          "live": 295,
+          "safe": 233,
+          "shortest": 223,
+          "first_fatal": 62,
+          "fatal_types": {
+            "untileable_residue": 39,
+            "remove_goal_cells": 23
+          },
+          "cumulative_fatal": 277,
+          "cumulative_arrived": 0,
+          "active_after": 233,
+          "already_dead_turns": 213,
+          "reason_fact_errors_live": 72
+        },
+        "4": {
+          "live": 233,
+          "safe": 194,
+          "shortest": 191,
+          "first_fatal": 39,
+          "fatal_types": {
+            "untileable_residue": 23,
+            "remove_goal_cells": 16
+          },
+          "cumulative_fatal": 316,
+          "cumulative_arrived": 0,
+          "active_after": 194,
+          "already_dead_turns": 275,
+          "reason_fact_errors_live": 42
+        },
+        "5": {
+          "live": 194,
+          "safe": 167,
+          "shortest": 166,
+          "first_fatal": 27,
+          "fatal_types": {
+            "untileable_residue": 21,
+            "remove_goal_cells": 6
+          },
+          "cumulative_fatal": 343,
+          "cumulative_arrived": 0,
+          "active_after": 167,
+          "already_dead_turns": 314,
+          "reason_fact_errors_live": 28
+        },
+        "6": {
+          "live": 167,
+          "safe": 162,
+          "shortest": 162,
+          "first_fatal": 5,
+          "fatal_types": {
+            "untileable_residue": 4,
+            "remove_goal_cells": 1
+          },
+          "cumulative_fatal": 348,
+          "cumulative_arrived": 18,
+          "active_after": 144,
+          "already_dead_turns": 340,
+          "reason_fact_errors_live": 5
+        },
+        "7": {
+          "live": 144,
+          "safe": 143,
+          "shortest": 143,
+          "first_fatal": 1,
+          "fatal_types": {
+            "untileable_residue": 1
+          },
+          "cumulative_fatal": 349,
+          "cumulative_arrived": 79,
+          "active_after": 82,
+          "already_dead_turns": 316,
+          "reason_fact_errors_live": 1
+        },
+        "8": {
+          "live": 82,
+          "safe": 82,
+          "shortest": 82,
+          "first_fatal": 0,
+          "fatal_types": {},
+          "cumulative_fatal": 349,
+          "cumulative_arrived": 153,
+          "active_after": 8,
+          "already_dead_turns": 163,
+          "reason_fact_errors_live": 0
+        },
+        "9": {
+          "live": 8,
+          "safe": 8,
+          "shortest": 8,
+          "first_fatal": 0,
+          "fatal_types": {},
+          "cumulative_fatal": 349,
+          "cumulative_arrived": 161,
+          "active_after": 0,
+          "already_dead_turns": 19,
+          "reason_fact_errors_live": 0
+        },
+        "10": {
+          "live": 0,
+          "safe": 0,
+          "shortest": 0,
+          "first_fatal": 0,
+          "fatal_types": {},
+          "cumulative_fatal": 349,
+          "cumulative_arrived": 161,
+          "active_after": 0,
+          "already_dead_turns": 0,
+          "reason_fact_errors_live": 0
+        }
+      },
+      "reason_errors_by_context": {
+        "live": {
+          "turns": 2026,
+          "fact": 411
+        },
+        "already_dead": {
+          "turns": 1755,
+          "fact": 1748,
+          "format": 3
+        },
+        "goal": {
+          "turns": 161
+        }
+      },
+      "mean_live_decisions": 3.9725490196078432,
+      "mean_actions_arrived": 7.447204968944099,
+      "by_length": {
+        "6": {
+          "tasks": 100,
+          "arrived": 23,
+          "root_errors": {
+            "untileable_residue": 34,
+            "remove_goal_cells": 41,
+            "premature_stop": 2
+          }
+        },
+        "7": {
+          "tasks": 200,
+          "arrived": 63,
+          "root_errors": {
+            "untileable_residue": 90,
+            "remove_goal_cells": 47
+          }
+        },
+        "8": {
+          "tasks": 200,
+          "arrived": 75,
+          "root_errors": {
+            "untileable_residue": 75,
+            "remove_goal_cells": 50
+          }
+        },
+        "9": {
+          "tasks": 10,
+          "arrived": 0,
+          "root_errors": {
+            "remove_goal_cells": 4,
+            "untileable_residue": 6
+          }
+        }
+      },
+      "by_group": {
+        "new_initial_board": {
+          "tasks": 255,
+          "arrived": 82,
+          "root_errors": {
+            "untileable_residue": 100,
+            "remove_goal_cells": 73
+          }
+        },
+        "same_initial_board_new_pair": {
+          "tasks": 255,
+          "arrived": 79,
+          "root_errors": {
+            "untileable_residue": 105,
+            "remove_goal_cells": 69,
+            "premature_stop": 2
+          }
+        }
+      },
+      "reference": {
+        "tasks": 510,
+        "live_safe": {
+          "numerator": 3031,
+          "denominator": 3690,
+          "rate": 0.821409214092141
+        },
+        "first_safe": {
+          "numerator": 393,
+          "denominator": 510,
+          "rate": 0.7705882352941177
+        },
+        "errors_per_task": {
+          "0": 216,
+          "1": 111,
+          "2": 76,
+          "3": 54,
+          "4": 36,
+          "5": 13,
+          "6": 3,
+          "7": 1
+        },
+        "tasks_with_no_live_decision_errors": 216
+      }
+    },
+    "sft_5": {
+      "tasks": 510,
+      "arrival": {
+        "numerator": 171,
+        "denominator": 510,
+        "rate": 0.3352941176470588
+      },
+      "arrival_and_stop": {
+        "numerator": 171,
+        "denominator": 510,
+        "rate": 0.3352941176470588
+      },
+      "first_safe": {
+        "numerator": 399,
+        "denominator": 510,
+        "rate": 0.7823529411764706
+      },
+      "live_safe": {
+        "numerator": 1771,
+        "denominator": 2110,
+        "rate": 0.8393364928909952
+      },
+      "live_shortest": {
+        "numerator": 1702,
+        "denominator": 2110,
+        "rate": 0.8066350710900474
+      },
+      "root_errors": {
+        "untileable_residue": 191,
+        "remove_goal_cells": 147,
+        "premature_stop": 1
+      },
+      "residue_errors": {
+        "unsupported_cell": 167,
+        "global_tiling_conflict": 24
+      },
+      "ending_labels": {
+        "no_legal_actions": 258,
+        "success": 171,
+        "premature_stop": 78,
+        "illegal_action": 3
+      },
+      "by_step": {
+        "1": {
+          "live": 510,
+          "safe": 399,
+          "shortest": 361,
+          "first_fatal": 111,
+          "fatal_types": {
+            "untileable_residue": 62,
+            "remove_goal_cells": 48,
+            "premature_stop": 1
+          },
+          "cumulative_fatal": 111,
+          "cumulative_arrived": 0,
+          "active_after": 399,
+          "already_dead_turns": 0,
+          "reason_fact_errors_live": 149
+        },
+        "2": {
+          "live": 399,
+          "safe": 310,
+          "shortest": 290,
+          "first_fatal": 89,
+          "fatal_types": {
+            "remove_goal_cells": 43,
+            "untileable_residue": 46
+          },
+          "cumulative_fatal": 200,
+          "cumulative_arrived": 0,
+          "active_after": 310,
+          "already_dead_turns": 110,
+          "reason_fact_errors_live": 109
+        },
+        "3": {
+          "live": 310,
+          "safe": 247,
+          "shortest": 239,
+          "first_fatal": 63,
+          "fatal_types": {
+            "untileable_residue": 33,
+            "remove_goal_cells": 30
+          },
+          "cumulative_fatal": 263,
+          "cumulative_arrived": 0,
+          "active_after": 247,
+          "already_dead_turns": 199,
+          "reason_fact_errors_live": 71
+        },
+        "4": {
+          "live": 247,
+          "safe": 212,
+          "shortest": 209,
+          "first_fatal": 35,
+          "fatal_types": {
+            "untileable_residue": 24,
+            "remove_goal_cells": 11
+          },
+          "cumulative_fatal": 298,
+          "cumulative_arrived": 0,
+          "active_after": 212,
+          "already_dead_turns": 262,
+          "reason_fact_errors_live": 38
+        },
+        "5": {
+          "live": 212,
+          "safe": 190,
+          "shortest": 190,
+          "first_fatal": 22,
+          "fatal_types": {
+            "remove_goal_cells": 5,
+            "untileable_residue": 17
+          },
+          "cumulative_fatal": 320,
+          "cumulative_arrived": 0,
+          "active_after": 190,
+          "already_dead_turns": 297,
+          "reason_fact_errors_live": 22
+        },
+        "6": {
+          "live": 190,
+          "safe": 174,
+          "shortest": 174,
+          "first_fatal": 16,
+          "fatal_types": {
+            "untileable_residue": 8,
+            "remove_goal_cells": 8
+          },
+          "cumulative_fatal": 336,
+          "cumulative_arrived": 22,
+          "active_after": 152,
+          "already_dead_turns": 317,
+          "reason_fact_errors_live": 16
+        },
+        "7": {
+          "live": 152,
+          "safe": 149,
+          "shortest": 149,
+          "first_fatal": 3,
+          "fatal_types": {
+            "remove_goal_cells": 2,
+            "untileable_residue": 1
+          },
+          "cumulative_fatal": 339,
+          "cumulative_arrived": 92,
+          "active_after": 79,
+          "already_dead_turns": 302,
+          "reason_fact_errors_live": 3
+        },
+        "8": {
+          "live": 79,
+          "safe": 79,
+          "shortest": 79,
+          "first_fatal": 0,
+          "fatal_types": {},
+          "cumulative_fatal": 339,
+          "cumulative_arrived": 160,
+          "active_after": 11,
+          "already_dead_turns": 151,
+          "reason_fact_errors_live": 0
+        },
+        "9": {
+          "live": 11,
+          "safe": 11,
+          "shortest": 11,
+          "first_fatal": 0,
+          "fatal_types": {},
+          "cumulative_fatal": 339,
+          "cumulative_arrived": 171,
+          "active_after": 0,
+          "already_dead_turns": 20,
+          "reason_fact_errors_live": 0
+        },
+        "10": {
+          "live": 0,
+          "safe": 0,
+          "shortest": 0,
+          "first_fatal": 0,
+          "fatal_types": {},
+          "cumulative_fatal": 339,
+          "cumulative_arrived": 171,
+          "active_after": 0,
+          "already_dead_turns": 0,
+          "reason_fact_errors_live": 0
+        }
+      },
+      "reason_errors_by_context": {
+        "live": {
+          "turns": 2110,
+          "fact": 408
+        },
+        "already_dead": {
+          "turns": 1658,
+          "fact": 1654,
+          "format": 1
+        },
+        "goal": {
+          "turns": 171
+        }
+      },
+      "mean_live_decisions": 4.137254901960785,
+      "mean_actions_arrived": 7.39766081871345,
+      "by_length": {
+        "6": {
+          "tasks": 100,
+          "arrived": 29,
+          "root_errors": {
+            "untileable_residue": 38,
+            "remove_goal_cells": 32,
+            "premature_stop": 1
+          }
+        },
+        "7": {
+          "tasks": 200,
+          "arrived": 70,
+          "root_errors": {
+            "untileable_residue": 72,
+            "remove_goal_cells": 58
+          }
+        },
+        "8": {
+          "tasks": 200,
+          "arrived": 71,
+          "root_errors": {
+            "untileable_residue": 76,
+            "remove_goal_cells": 53
+          }
+        },
+        "9": {
+          "tasks": 10,
+          "arrived": 1,
+          "root_errors": {
+            "remove_goal_cells": 4,
+            "untileable_residue": 5
+          }
+        }
+      },
+      "by_group": {
+        "new_initial_board": {
+          "tasks": 255,
+          "arrived": 84,
+          "root_errors": {
+            "remove_goal_cells": 78,
+            "untileable_residue": 93
+          }
+        },
+        "same_initial_board_new_pair": {
+          "tasks": 255,
+          "arrived": 87,
+          "root_errors": {
+            "untileable_residue": 98,
+            "remove_goal_cells": 69,
+            "premature_stop": 1
+          }
+        }
+      },
+      "reference": {
+        "tasks": 510,
+        "live_safe": {
+          "numerator": 3052,
+          "denominator": 3690,
+          "rate": 0.82710027100271
+        },
+        "first_safe": {
+          "numerator": 399,
+          "denominator": 510,
+          "rate": 0.7823529411764706
+        },
+        "errors_per_task": {
+          "0": 228,
+          "1": 95,
+          "2": 87,
+          "3": 58,
+          "4": 24,
+          "5": 12,
+          "6": 3,
+          "7": 3
+        },
+        "tasks_with_no_live_decision_errors": 228
+      }
+    }
+  },
+  "comparisons": {
+    "map_243750/sft_4": {
+      "tasks": 510,
+      "both_arrive": 89,
+      "left_only": 86,
+      "right_only": 75,
+      "neither": 260,
+      "success_set_jaccard": 0.356,
+      "common_success_path_lengths": {
+        "tasks": 89,
+        "left_mean_moves": 8.213483146067416,
+        "right_mean_moves": 7.449438202247191,
+        "mean_shortest_moves": 7.314606741573034,
+        "left_shortest_count": 25,
+        "right_shortest_count": 77
+      },
+      "identical_first_physical_action": {
+        "numerator": 16,
+        "denominator": 509,
+        "rate": 0.03143418467583497
+      },
+      "identical_removal_partition_among_both_arrived": {
+        "numerator": 6,
+        "denominator": 89,
+        "rate": 0.06741573033707865
+      },
+      "mean_identical_action_prefix": 0.03333333333333333,
+      "failure_type_pairs": {
+        "untileable_residue / remove_goal_cells": 57,
+        "untileable_residue / untileable_residue": 70,
+        "remove_goal_cells / remove_goal_cells": 65,
+        "remove_goal_cells / untileable_residue": 66,
+        "premature_stop / untileable_residue": 1,
+        "premature_stop / remove_goal_cells": 1
+      },
+      "by_length": {
+        "6": {
+          "tasks": 100,
+          "both_arrive": 12,
+          "left_only": 12,
+          "right_only": 15,
+          "neither": 61
+        },
+        "7": {
+          "tasks": 200,
+          "both_arrive": 37,
+          "left_only": 32,
+          "right_only": 28,
+          "neither": 103
+        },
+        "8": {
+          "tasks": 200,
+          "both_arrive": 40,
+          "left_only": 39,
+          "right_only": 32,
+          "neither": 89
+        },
+        "9": {
+          "tasks": 10,
+          "both_arrive": 0,
+          "left_only": 3,
+          "right_only": 0,
+          "neither": 7
+        }
+      }
+    },
+    "map_243750/sft_4.5": {
+      "tasks": 510,
+      "both_arrive": 82,
+      "left_only": 93,
+      "right_only": 79,
+      "neither": 256,
+      "success_set_jaccard": 0.3228346456692913,
+      "common_success_path_lengths": {
+        "tasks": 82,
+        "left_mean_moves": 8.182926829268293,
+        "right_mean_moves": 7.426829268292683,
+        "mean_shortest_moves": 7.304878048780488,
+        "left_shortest_count": 25,
+        "right_shortest_count": 72
+      },
+      "identical_first_physical_action": {
+        "numerator": 15,
+        "denominator": 507,
+        "rate": 0.029585798816568046
+      },
+      "identical_removal_partition_among_both_arrived": {
+        "numerator": 5,
+        "denominator": 82,
+        "rate": 0.06097560975609756
+      },
+      "mean_identical_action_prefix": 0.029411764705882353,
+      "failure_type_pairs": {
+        "untileable_residue / remove_goal_cells": 49,
+        "untileable_residue / untileable_residue": 71,
+        "remove_goal_cells / remove_goal_cells": 68,
+        "remove_goal_cells / untileable_residue": 64,
+        "premature_stop / untileable_residue": 2,
+        "remove_goal_cells / premature_stop": 2
+      },
+      "by_length": {
+        "6": {
+          "tasks": 100,
+          "both_arrive": 12,
+          "left_only": 12,
+          "right_only": 11,
+          "neither": 65
+        },
+        "7": {
+          "tasks": 200,
+          "both_arrive": 33,
+          "left_only": 36,
+          "right_only": 30,
+          "neither": 101
+        },
+        "8": {
+          "tasks": 200,
+          "both_arrive": 37,
+          "left_only": 42,
+          "right_only": 38,
+          "neither": 83
+        },
+        "9": {
+          "tasks": 10,
+          "both_arrive": 0,
+          "left_only": 3,
+          "right_only": 0,
+          "neither": 7
+        }
+      }
+    },
+    "map_243750/sft_5": {
+      "tasks": 510,
+      "both_arrive": 85,
+      "left_only": 90,
+      "right_only": 86,
+      "neither": 249,
+      "success_set_jaccard": 0.32567049808429116,
+      "common_success_path_lengths": {
+        "tasks": 85,
+        "left_mean_moves": 8.235294117647058,
+        "right_mean_moves": 7.458823529411765,
+        "mean_shortest_moves": 7.294117647058823,
+        "left_shortest_count": 23,
+        "right_shortest_count": 72
+      },
+      "identical_first_physical_action": {
+        "numerator": 13,
+        "denominator": 508,
+        "rate": 0.025590551181102362
+      },
+      "identical_removal_partition_among_both_arrived": {
+        "numerator": 7,
+        "denominator": 85,
+        "rate": 0.08235294117647059
+      },
+      "mean_identical_action_prefix": 0.029411764705882353,
+      "failure_type_pairs": {
+        "untileable_residue / remove_goal_cells": 58,
+        "remove_goal_cells / untileable_residue": 64,
+        "remove_goal_cells / remove_goal_cells": 59,
+        "untileable_residue / untileable_residue": 66,
+        "premature_stop / untileable_residue": 1,
+        "remove_goal_cells / premature_stop": 1
+      },
+      "by_length": {
+        "6": {
+          "tasks": 100,
+          "both_arrive": 12,
+          "left_only": 12,
+          "right_only": 17,
+          "neither": 59
+        },
+        "7": {
+          "tasks": 200,
+          "both_arrive": 36,
+          "left_only": 33,
+          "right_only": 34,
+          "neither": 97
+        },
+        "8": {
+          "tasks": 200,
+          "both_arrive": 37,
+          "left_only": 42,
+          "right_only": 34,
+          "neither": 87
+        },
+        "9": {
+          "tasks": 10,
+          "both_arrive": 0,
+          "left_only": 3,
+          "right_only": 1,
+          "neither": 6
+        }
+      }
+    },
+    "map_250000/sft_4": {
+      "tasks": 510,
+      "both_arrive": 81,
+      "left_only": 91,
+      "right_only": 83,
+      "neither": 255,
+      "success_set_jaccard": 0.3176470588235294,
+      "common_success_path_lengths": {
+        "tasks": 81,
+        "left_mean_moves": 8.11111111111111,
+        "right_mean_moves": 7.395061728395062,
+        "mean_shortest_moves": 7.234567901234568,
+        "left_shortest_count": 26,
+        "right_shortest_count": 68
+      },
+      "identical_first_physical_action": {
+        "numerator": 12,
+        "denominator": 510,
+        "rate": 0.023529411764705882
+      },
+      "identical_removal_partition_among_both_arrived": {
+        "numerator": 7,
+        "denominator": 81,
+        "rate": 0.08641975308641975
+      },
+      "mean_identical_action_prefix": 0.023529411764705882,
+      "failure_type_pairs": {
+        "untileable_residue / untileable_residue": 89,
+        "remove_goal_cells / untileable_residue": 49,
+        "untileable_residue / remove_goal_cells": 57,
+        "remove_goal_cells / remove_goal_cells": 59,
+        "premature_stop / remove_goal_cells": 1
+      },
+      "by_length": {
+        "6": {
+          "tasks": 100,
+          "both_arrive": 12,
+          "left_only": 7,
+          "right_only": 15,
+          "neither": 66
+        },
+        "7": {
+          "tasks": 200,
+          "both_arrive": 38,
+          "left_only": 38,
+          "right_only": 27,
+          "neither": 97
+        },
+        "8": {
+          "tasks": 200,
+          "both_arrive": 31,
+          "left_only": 40,
+          "right_only": 41,
+          "neither": 88
+        },
+        "9": {
+          "tasks": 10,
+          "both_arrive": 0,
+          "left_only": 6,
+          "right_only": 0,
+          "neither": 4
+        }
+      }
+    },
+    "map_250000/sft_4.5": {
+      "tasks": 510,
+      "both_arrive": 78,
+      "left_only": 94,
+      "right_only": 83,
+      "neither": 255,
+      "success_set_jaccard": 0.3058823529411765,
+      "common_success_path_lengths": {
+        "tasks": 78,
+        "left_mean_moves": 8.08974358974359,
+        "right_mean_moves": 7.410256410256411,
+        "mean_shortest_moves": 7.269230769230769,
+        "left_shortest_count": 27,
+        "right_shortest_count": 67
+      },
+      "identical_first_physical_action": {
+        "numerator": 18,
+        "denominator": 508,
+        "rate": 0.03543307086614173
+      },
+      "identical_removal_partition_among_both_arrived": {
+        "numerator": 6,
+        "denominator": 78,
+        "rate": 0.07692307692307693
+      },
+      "mean_identical_action_prefix": 0.0392156862745098,
+      "failure_type_pairs": {
+        "untileable_residue / untileable_residue": 86,
+        "remove_goal_cells / untileable_residue": 56,
+        "untileable_residue / remove_goal_cells": 52,
+        "remove_goal_cells / remove_goal_cells": 56,
+        "premature_stop / untileable_residue": 3,
+        "remove_goal_cells / premature_stop": 2
+      },
+      "by_length": {
+        "6": {
+          "tasks": 100,
+          "both_arrive": 11,
+          "left_only": 8,
+          "right_only": 12,
+          "neither": 69
+        },
+        "7": {
+          "tasks": 200,
+          "both_arrive": 35,
+          "left_only": 41,
+          "right_only": 28,
+          "neither": 96
+        },
+        "8": {
+          "tasks": 200,
+          "both_arrive": 32,
+          "left_only": 39,
+          "right_only": 43,
+          "neither": 86
+        },
+        "9": {
+          "tasks": 10,
+          "both_arrive": 0,
+          "left_only": 6,
+          "right_only": 0,
+          "neither": 4
+        }
+      }
+    },
+    "map_250000/sft_5": {
+      "tasks": 510,
+      "both_arrive": 91,
+      "left_only": 81,
+      "right_only": 80,
+      "neither": 258,
+      "success_set_jaccard": 0.3611111111111111,
+      "common_success_path_lengths": {
+        "tasks": 91,
+        "left_mean_moves": 8.142857142857142,
+        "right_mean_moves": 7.43956043956044,
+        "mean_shortest_moves": 7.274725274725275,
+        "left_shortest_count": 29,
+        "right_shortest_count": 77
+      },
+      "identical_first_physical_action": {
+        "numerator": 16,
+        "denominator": 509,
+        "rate": 0.03143418467583497
+      },
+      "identical_removal_partition_among_both_arrived": {
+        "numerator": 9,
+        "denominator": 91,
+        "rate": 0.0989010989010989
+      },
+      "mean_identical_action_prefix": 0.03725490196078431,
+      "failure_type_pairs": {
+        "untileable_residue / remove_goal_cells": 60,
+        "remove_goal_cells / untileable_residue": 59,
+        "remove_goal_cells / remove_goal_cells": 50,
+        "untileable_residue / untileable_residue": 87,
+        "remove_goal_cells / premature_stop": 1,
+        "premature_stop / remove_goal_cells": 1
+      },
+      "by_length": {
+        "6": {
+          "tasks": 100,
+          "both_arrive": 13,
+          "left_only": 6,
+          "right_only": 16,
+          "neither": 65
+        },
+        "7": {
+          "tasks": 200,
+          "both_arrive": 40,
+          "left_only": 36,
+          "right_only": 30,
+          "neither": 94
+        },
+        "8": {
+          "tasks": 200,
+          "both_arrive": 38,
+          "left_only": 33,
+          "right_only": 33,
+          "neither": 96
+        },
+        "9": {
+          "tasks": 10,
+          "both_arrive": 0,
+          "left_only": 6,
+          "right_only": 1,
+          "neither": 3
+        }
+      }
+    }
+  },
+  "checks": {
+    "same_510_ids_and_boards": true,
+    "physical_action_replay": true,
+    "exact_first_failure": true
+  },
+  "analysis_source_commit": "a2e5cd0",
+  "content_probe_source_commit": "93d1e70",
+  "map_content_probe_artifact": "../../flamingo_map_reader/results/current_map_content_probe.json",
+  "limitations": [
+    "Repeated fixed 510-task monitoring is not independent held-out model selection.",
+    "Map and SFT reference histories, numbering, supervision and updated parameters differ.",
+    "Different physical actions and success sets do not identify internal mechanisms.",
+    "Common-success path lengths are conditional on both policies succeeding.",
+    "The content probe is a stratified 32-task exploratory sample with correlated within-task states.",
+    "Reverse Q-content dependence is not matched-training evidence of incremental benefit over no map."
+  ]
+}

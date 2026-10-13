@@ -95,3 +95,5 @@ python -m experiments.llm_task_sft.src.analyze_policies --config CONFIG --sft-ru
 当前地图的内容依赖另用 [配对探针合同](../flamingo_map_reader/configs/blocks_current_map_content_probe.json)：
 同一状态重新生成正常与反序地图两种回答，历史、文字、候选动作和生成预算保持一致，
 实际动作与可达性评分和排序评分分开；不将这项小样本探针当作完整 rollout 成绩。
+
+同题成功集合、首次失败类型与分步分布，以及当前权重的配对内容探针结果见[策略诊断](results/policy_comparison.md)。

@@ -6,16 +6,18 @@
     "1": "d2d9a54",
     "2": "d2d9a54",
     "3": "d2d9a54",
-    "3.5": "9834539"
+    "3.5": "9834539",
+    "4": "9834539",
+    "4.5": "9834539"
   },
   "scope": "Saved complete 510-task rollout/reference generations; no new generation and no new 1000-task validation.",
-  "recorded_beijing": "2026-10-13 03:45",
+  "recorded_beijing": "2026-10-13 11:03",
   "raw_output": "/home/gongruochen/grounded_llm/runs/blocks_reason_sft_bs4_50k/runtime/acceptance_current.json",
-  "complete_shards": 168,
-  "oracle_sampled_turns": 256,
+  "complete_shards": 252,
+  "oracle_sampled_turns": 384,
   "conditions": [
     {
-      "epoch": 1,
+      "epoch": 1.0,
       "tasks": 510,
       "complete_shards": 42,
       "checks": {
@@ -97,12 +99,12 @@
       "control_format_error": {
         "numerator": 0,
         "denominator": 3697,
-        "rate": 0
+        "rate": 0.0
       },
       "illegal_action": {
         "numerator": 0,
         "denominator": 3697,
-        "rate": 0
+        "rate": 0.0
       },
       "reason_errors": {
         "fact": 3066
@@ -119,7 +121,7 @@
       }
     },
     {
-      "epoch": 2,
+      "epoch": 2.0,
       "tasks": 510,
       "complete_shards": 42,
       "checks": {
@@ -202,7 +204,7 @@
       "control_format_error": {
         "numerator": 0,
         "denominator": 3770,
-        "rate": 0
+        "rate": 0.0
       },
       "illegal_action": {
         "numerator": 2,
@@ -224,7 +226,7 @@
       }
     },
     {
-      "epoch": 3,
+      "epoch": 3.0,
       "tasks": 510,
       "complete_shards": 42,
       "checks": {
@@ -307,7 +309,7 @@
       "control_format_error": {
         "numerator": 0,
         "denominator": 3936,
-        "rate": 0
+        "rate": 0.0
       },
       "illegal_action": {
         "numerator": 2,
@@ -412,7 +414,7 @@
       "control_format_error": {
         "numerator": 0,
         "denominator": 3942,
-        "rate": 0
+        "rate": 0.0
       },
       "illegal_action": {
         "numerator": 1,
@@ -432,6 +434,217 @@
         "numerator": 161,
         "denominator": 509,
         "rate": 0.3163064833005894
+      }
+    },
+    {
+      "epoch": 4,
+      "tasks": 510,
+      "complete_shards": 42,
+      "checks": {
+        "rollout": {
+          "complete_shards": true,
+          "tasks": true,
+          "unique_ids": true,
+          "exact_ids": true,
+          "correct_condition": true,
+          "action_budget": true,
+          "physical_state_and_action_replay": true,
+          "control_and_stop_labels": true,
+          "independently_replayed_arrival": true,
+          "stored_distance_arithmetic": true,
+          "reference_trajectory": true,
+          "independent_oracle_sample": true,
+          "published_metrics": true,
+          "curve_metrics": true,
+          "per_shard_metrics": true,
+          "fixed_generation_limit": true,
+          "reference_decisions": true
+        },
+        "reference": {
+          "complete_shards": true,
+          "tasks": true,
+          "unique_ids": true,
+          "exact_ids": true,
+          "correct_condition": true,
+          "action_budget": true,
+          "physical_state_and_action_replay": true,
+          "control_and_stop_labels": true,
+          "independently_replayed_arrival": true,
+          "stored_distance_arithmetic": true,
+          "reference_trajectory": true,
+          "independent_oracle_sample": true,
+          "published_metrics": true,
+          "curve_metrics": true,
+          "per_shard_metrics": true,
+          "fixed_generation_limit": true,
+          "reference_decisions": true
+        }
+      },
+      "oracle_sampled_turns": 64,
+      "arrival": {
+        "numerator": 164,
+        "denominator": 510,
+        "rate": 0.3215686274509804
+      },
+      "arrival_and_stop": {
+        "numerator": 164,
+        "denominator": 510,
+        "rate": 0.3215686274509804
+      },
+      "first_turn": {
+        "tasks": 510,
+        "reachable": 397,
+        "shortest_progress": 361,
+        "correct_control": 510
+      },
+      "reference_reachability": {
+        "numerator": 3023,
+        "denominator": 3690,
+        "rate": 0.8192411924119242
+      },
+      "reference_shortest_progress": {
+        "numerator": 2873,
+        "denominator": 3690,
+        "rate": 0.7785907859078591
+      },
+      "rollout_reachability": {
+        "numerator": 1695,
+        "denominator": 2041,
+        "rate": 0.8304752572268496
+      },
+      "failures": {
+        "no_legal_actions": 264,
+        "premature_stop": 78,
+        "illegal_action": 4
+      },
+      "control_format_error": {
+        "numerator": 0,
+        "denominator": 3977,
+        "rate": 0.0
+      },
+      "illegal_action": {
+        "numerator": 4,
+        "denominator": 3977,
+        "rate": 0.0010057832537088258
+      },
+      "reason_errors": {
+        "fact": 2180
+      },
+      "reason_checked_turns": 3973,
+      "reference_reason_errors": {
+        "fact": 821
+      },
+      "reference_reason_checked_turns": 4200,
+      "unexposed_state_goal_pairs": {
+        "numerator": 163,
+        "denominator": 509,
+        "rate": 0.32023575638506874
+      }
+    },
+    {
+      "epoch": 4.5,
+      "tasks": 510,
+      "complete_shards": 42,
+      "checks": {
+        "rollout": {
+          "complete_shards": true,
+          "tasks": true,
+          "unique_ids": true,
+          "exact_ids": true,
+          "correct_condition": true,
+          "action_budget": true,
+          "physical_state_and_action_replay": true,
+          "control_and_stop_labels": true,
+          "independently_replayed_arrival": true,
+          "stored_distance_arithmetic": true,
+          "reference_trajectory": true,
+          "independent_oracle_sample": true,
+          "published_metrics": true,
+          "curve_metrics": true,
+          "per_shard_metrics": true,
+          "fixed_generation_limit": true,
+          "reference_decisions": true
+        },
+        "reference": {
+          "complete_shards": true,
+          "tasks": true,
+          "unique_ids": true,
+          "exact_ids": true,
+          "correct_condition": true,
+          "action_budget": true,
+          "physical_state_and_action_replay": true,
+          "control_and_stop_labels": true,
+          "independently_replayed_arrival": true,
+          "stored_distance_arithmetic": true,
+          "reference_trajectory": true,
+          "independent_oracle_sample": true,
+          "published_metrics": true,
+          "curve_metrics": true,
+          "per_shard_metrics": true,
+          "fixed_generation_limit": true,
+          "reference_decisions": true
+        }
+      },
+      "oracle_sampled_turns": 64,
+      "arrival": {
+        "numerator": 161,
+        "denominator": 510,
+        "rate": 0.3156862745098039
+      },
+      "arrival_and_stop": {
+        "numerator": 161,
+        "denominator": 510,
+        "rate": 0.3156862745098039
+      },
+      "first_turn": {
+        "tasks": 510,
+        "reachable": 393,
+        "shortest_progress": 357,
+        "correct_control": 508
+      },
+      "reference_reachability": {
+        "numerator": 3031,
+        "denominator": 3690,
+        "rate": 0.821409214092141
+      },
+      "reference_shortest_progress": {
+        "numerator": 2888,
+        "denominator": 3690,
+        "rate": 0.7826558265582656
+      },
+      "rollout_reachability": {
+        "numerator": 1677,
+        "denominator": 2026,
+        "rate": 0.8277393879565647
+      },
+      "failures": {
+        "no_legal_actions": 271,
+        "premature_stop": 74,
+        "illegal_action": 4
+      },
+      "control_format_error": {
+        "numerator": 0,
+        "denominator": 3942,
+        "rate": 0.0
+      },
+      "illegal_action": {
+        "numerator": 4,
+        "denominator": 3942,
+        "rate": 0.0010147133434804667
+      },
+      "reason_errors": {
+        "fact": 2159,
+        "format": 3
+      },
+      "reason_checked_turns": 3938,
+      "reference_reason_errors": {
+        "fact": 808
+      },
+      "reference_reason_checked_turns": 4200,
+      "unexposed_state_goal_pairs": {
+        "numerator": 160,
+        "denominator": 509,
+        "rate": 0.3143418467583497
       }
     }
   ],
@@ -472,29 +685,43 @@
         "loss_mean": 0.03573407055810094,
         "loss_median": 0.036217041313648224
       },
-      "current_last_1000_steps": {
-        "first_step": 47531,
-        "last_step": 48530,
+      "4": {
+        "first_step": 49001,
+        "last_step": 50000,
         "logged_rows": 100,
-        "loss_mean": 0.03570120735093951,
-        "loss_median": 0.035595886409282684
+        "loss_mean": 0.03534326903522014,
+        "loss_median": 0.03589919954538345
+      },
+      "4.5": {
+        "first_step": 55251,
+        "last_step": 56250,
+        "logged_rows": 100,
+        "loss_mean": 0.03305680314078927,
+        "loss_median": 0.033462490886449814
+      },
+      "current_last_1000_steps": {
+        "first_step": 59121,
+        "last_step": 60120,
+        "logged_rows": 100,
+        "loss_mean": 0.03312759984284639,
+        "loss_median": 0.03387794643640518
       }
     },
     "last_logged": {
-      "step": 48530,
-      "epoch": 3.8824,
-      "total_steps": 50000,
+      "step": 60120,
+      "epoch": 4.8096,
+      "total_steps": 62500,
       "lr_schedule_steps": 37500,
       "steps_per_epoch": 12500,
-      "loss": 0.03575122356414795,
-      "gradient_norm": 0.2801174819469452,
+      "loss": 0.02957882359623909,
+      "gradient_norm": 0.3030368983745575,
       "lr": 2.0000000000000003e-06,
-      "seconds_per_step": 1.9170757004246115,
-      "eta_seconds": 2818.101279624179,
-      "next_epoch_eta_seconds": 2818.101279624179,
-      "elapsed_seconds": 9176.192714709789,
-      "utc": "2026-10-12T19:44:30.596068+00:00",
-      "peak_memory_gib": 27.27240562438965
+      "seconds_per_step": 1.9700446053594352,
+      "eta_seconds": 4688.706160755456,
+      "next_epoch_eta_seconds": 4688.706160755456,
+      "elapsed_seconds": 7620.196832802147,
+      "utc": "2026-10-13T03:03:39.274433+00:00",
+      "peak_memory_gib": 27.308494091033936
     },
     "checkpoints": [
       {
@@ -572,12 +799,50 @@
           "rng_state_2.pt": 14725,
           "rng_state_3.pt": 14725
         }
+      },
+      {
+        "epoch": 4.0,
+        "step": 50000,
+        "checks": {
+          "full_model_optimizer_scheduler_rng": true,
+          "step_epoch": true,
+          "scheduler_step": true,
+          "recipe": true,
+          "terminal_lr": true
+        },
+        "file_bytes": {
+          "optimizer.pt": 12350013737,
+          "scheduler.pt": 1465,
+          "rng_state_0.pt": 14661,
+          "rng_state_1.pt": 14725,
+          "rng_state_2.pt": 14725,
+          "rng_state_3.pt": 14725
+        }
+      },
+      {
+        "epoch": 4.5,
+        "step": 56250,
+        "checks": {
+          "full_model_optimizer_scheduler_rng": true,
+          "step_epoch": true,
+          "scheduler_step": true,
+          "recipe": true,
+          "terminal_lr": true
+        },
+        "file_bytes": {
+          "optimizer.pt": 12350013737,
+          "scheduler.pt": 1465,
+          "rng_state_0.pt": 14661,
+          "rng_state_1.pt": 14725,
+          "rng_state_2.pt": 14725,
+          "rng_state_3.pt": 14725
+        }
       }
     ],
-    "logged_rows": 4854,
+    "logged_rows": 6013,
     "sampled_steps": [
       1,
-      48530
+      60120
     ]
   },
   "paired_3_to_3_5": {
@@ -592,5 +857,42 @@
       "3.5": 510
     }
   },
-  "monitoring_note": "Repeated 510-task monitoring is not an independent held-out test. One initial state-goal pair occurred among training decision pairs."
+  "monitoring_note": "Repeated 510-task monitoring is not an independent held-out test. One initial state-goal pair occurred among training decision pairs.",
+  "cached_audit_epochs": [
+    1.0,
+    2.0,
+    3.0,
+    3.5
+  ],
+  "fresh_audit_epochs": [
+    4.0,
+    4.5
+  ],
+  "fresh_complete_shards": 84,
+  "fresh_oracle_sampled_turns": 128,
+  "paired_4_to_4_5": {
+    "from_epoch": 4,
+    "to_epoch": 4.5,
+    "tasks": 510,
+    "both_success": 112,
+    "recovered": 49,
+    "regressed": 52,
+    "both_failure": 297
+  },
+  "first_text_equal_of_510": {
+    "1": 510,
+    "2": 510,
+    "3": 510,
+    "3.5": 510,
+    "4": 510,
+    "4.5": 510
+  },
+  "best_observed": {
+    "epoch": 4,
+    "arrival_and_stop": {
+      "numerator": 164,
+      "denominator": 510,
+      "rate": 0.3215686274509804
+    }
+  }
 }

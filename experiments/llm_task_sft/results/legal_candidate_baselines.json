@@ -1003,11 +1003,11 @@
   },
   "continuation_monitor_acceptance": {
     "source_commit": "9834539",
-    "recorded_beijing": "2026-10-13 03:45",
+    "recorded_beijing": "2026-10-13 11:03",
     "artifact": "acceptance.json",
-    "epoch": 3.5,
+    "epoch": 4.5,
     "metrics": {
-      "epoch": 3.5,
+      "epoch": 4.5,
       "tasks": 510,
       "complete_shards": 42,
       "checks": {
@@ -1052,76 +1052,81 @@
       },
       "oracle_sampled_turns": 64,
       "arrival": {
-        "numerator": 162,
+        "numerator": 161,
         "denominator": 510,
-        "rate": 0.3176470588235294
+        "rate": 0.3156862745098039
       },
       "arrival_and_stop": {
-        "numerator": 162,
+        "numerator": 161,
         "denominator": 510,
-        "rate": 0.3176470588235294
+        "rate": 0.3156862745098039
       },
       "first_turn": {
         "tasks": 510,
-        "reachable": 401,
-        "shortest_progress": 368,
-        "correct_control": 510
+        "reachable": 393,
+        "shortest_progress": 357,
+        "correct_control": 508
       },
       "reference_reachability": {
-        "numerator": 3028,
+        "numerator": 3031,
         "denominator": 3690,
-        "rate": 0.8205962059620596
+        "rate": 0.821409214092141
       },
       "reference_shortest_progress": {
-        "numerator": 2884,
+        "numerator": 2888,
         "denominator": 3690,
-        "rate": 0.7815718157181571
+        "rate": 0.7826558265582656
       },
       "rollout_reachability": {
-        "numerator": 1699,
-        "denominator": 2047,
-        "rate": 0.8299951148021495
+        "numerator": 1677,
+        "denominator": 2026,
+        "rate": 0.8277393879565647
       },
       "failures": {
-        "no_legal_actions": 260,
-        "premature_stop": 87,
-        "illegal_action": 1
+        "no_legal_actions": 271,
+        "premature_stop": 74,
+        "illegal_action": 4
       },
       "control_format_error": {
         "numerator": 0,
         "denominator": 3942,
-        "rate": 0
+        "rate": 0.0
       },
       "illegal_action": {
-        "numerator": 1,
+        "numerator": 4,
         "denominator": 3942,
-        "rate": 0.0002536783358701167
+        "rate": 0.0010147133434804667
       },
       "reason_errors": {
-        "fact": 2144,
-        "format": 1
+        "fact": 2159,
+        "format": 3
       },
-      "reason_checked_turns": 3941,
+      "reason_checked_turns": 3938,
       "reference_reason_errors": {
-        "fact": 810
+        "fact": 808
       },
       "reference_reason_checked_turns": 4200,
       "unexposed_state_goal_pairs": {
-        "numerator": 161,
+        "numerator": 160,
         "denominator": 509,
-        "rate": 0.3163064833005894
+        "rate": 0.3143418467583497
       }
     },
-    "paired_vs_epoch_3": {
-      "recovered": 66,
-      "regressed": 43,
-      "both_success": 96,
-      "both_failure": 305,
-      "first_text_equal_of_510": {
-        "1": 510,
-        "2": 510,
-        "3": 510,
-        "3.5": 510
+    "paired_vs_epoch_4": {
+      "from_epoch": 4,
+      "to_epoch": 4.5,
+      "tasks": 510,
+      "both_success": 112,
+      "recovered": 49,
+      "regressed": 52,
+      "both_failure": 297
+    },
+    "best_observed": {
+      "epoch": 4,
+      "arrival_and_stop": {
+        "numerator": 164,
+        "denominator": 510,
+        "rate": 0.3215686274509804
       }
     }
   }

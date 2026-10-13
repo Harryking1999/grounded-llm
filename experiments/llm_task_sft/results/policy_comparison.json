@@ -2064,5 +2064,143 @@
       "Data length differences alone do not identify their causal effect on task success."
     ],
     "raw_artifacts": "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/diagnostics/training_route_lengths/{summary.json,audit.py}"
+  },
+  "training_coverage_audit": {
+    "source_manifest": "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/data/manifest.json",
+    "ordinary_tasks": 8000,
+    "board_count": 1000,
+    "tasks_per_board": 8,
+    "unique_start_boards": 2400,
+    "unique_goal_boards": 5239,
+    "starts_per_parent_board": {
+      "n": 1000,
+      "min": 1,
+      "median": 2.0,
+      "mean": 2.4,
+      "max": 6
+    },
+    "one_start_parent_boards": 208,
+    "shortest_length_histogram": {
+      "6": 200,
+      "7": 4784,
+      "8": 3004,
+      "9": 12
+    },
+    "goal_occupied_cells_histogram": {
+      "0": 779,
+      "1": 1275,
+      "2": 2102,
+      "3": 1988,
+      "4": 1180,
+      "5": 495,
+      "6": 148,
+      "7": 31,
+      "8": 2
+    },
+    "original_rejected": {
+      "map_greedy_failed": 3282
+    },
+    "map": {
+      "decision_occurrences": 64155,
+      "unique_state_goal_pairs": 62230,
+      "unique_state_goal_action_triples": 62230,
+      "pairs_with_multiple_supervised_actions": 0,
+      "distinct_physical_actions": 664,
+      "shape_counts": {
+        "0": 3527,
+        "1": 3634,
+        "2": 3585,
+        "3": 3615,
+        "4": 20467,
+        "5": 20091,
+        "6": 4693,
+        "7": 4543
+      },
+      "physical_action_frequency": {
+        "n": 664,
+        "min": 10,
+        "median": 55.0,
+        "mean": 96.61897590361446,
+        "max": 427
+      }
+    },
+    "sft": {
+      "decision_occurrences": 360336,
+      "unique_state_goal_pairs": 292758,
+      "unique_state_goal_action_triples": 337299,
+      "pairs_with_multiple_supervised_actions": 16932,
+      "distinct_physical_actions": 664,
+      "shape_counts": {
+        "0": 33582,
+        "1": 33503,
+        "2": 34179,
+        "3": 33733,
+        "4": 74789,
+        "5": 75705,
+        "6": 37670,
+        "7": 37175
+      },
+      "physical_action_frequency": {
+        "n": 664,
+        "min": 142,
+        "median": 485.0,
+        "mean": 542.6746987951807,
+        "max": 1409
+      }
+    },
+    "map_legal_action_union": 664,
+    "map_selected_action_fraction_of_exposed_union": 1.0,
+    "map_exact_minimum_ties": {
+      "tied_decision_turns": 0,
+      "total_turns": 64155,
+      "all_steps_unique_minimum_routes": 8000,
+      "total_routes": 8000
+    },
+    "sft_route_diversity": {
+      "routes": 49000,
+      "first_action_choices": {
+        "n": 8000,
+        "min": 2,
+        "median": 6.0,
+        "mean": 5.39875,
+        "max": 7
+      },
+      "unordered_removal_sets": {
+        "n": 8000,
+        "min": 1,
+        "median": 5.0,
+        "mean": 4.845625,
+        "max": 7
+      },
+      "tasks_with_one_removal_set": 236,
+      "tasks_with_multiple_removal_sets": 7764
+    },
+    "root_optimal_action_coverage_sample": {
+      "tasks": 128,
+      "seed": 20261013,
+      "optimal_action_count": {
+        "n": 128,
+        "min": 7,
+        "median": 23.5,
+        "mean": 25.125,
+        "max": 57
+      },
+      "total_optimal_actions": 3216,
+      "map_covered": 117,
+      "sft_covered": 693,
+      "map_fraction": 0.036380597014925374,
+      "sft_fraction": 0.21548507462686567,
+      "map_macro_fraction": 0.044172443165100855,
+      "sft_macro_fraction": 0.2665757680550245
+    },
+    "limitations": [
+      "Physical-action ID coverage ignores state and goal; it is not policy coverage.",
+      "Optimal-action coverage is a reproducible 128-task initial-state sample, not the full state space.",
+      "Exact-minimum tie counts describe cached map routes, not all alternative map-compatible routes.",
+      "Uneven sampling does not alone establish the cause of evaluation failures."
+    ],
+    "checked_date": "2026-10-13",
+    "map_checkpoint_version": "original tree_1000_132f5a1/best.pt; not the newly selected continuation map",
+    "raw_artifacts": "/zhanghanyue/experiment/flamingo_map_reader/runs/blocks_kv_restart_36c213c/diagnostics/training_coverage/{summary.json,root_sample.json,audit.py}"
   }
 }

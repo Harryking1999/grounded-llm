@@ -68,6 +68,10 @@ class ContractTests(unittest.TestCase):
         cfg=json.loads((Path(__file__).parents[1]/'configs/study.json').read_text())
         saved=json.loads(json.dumps(cfg));saved['early_stop']['mode']='flag_only_pending_user_choice'
         validate_resume_contract(dict(config=saved,baseline='B0'),cfg,'B0')
+        additional=json.loads(json.dumps(cfg));additional['baselines']['new_experiment']={'real_map':True}
+        validate_resume_contract(dict(config=saved,baseline='B0'),additional,'B0')
+        changed_scope=json.loads(json.dumps(cfg));changed_scope['baselines']['B0']['full_llm']=False
+        with self.assertRaises(ValueError):validate_resume_contract(dict(config=saved,baseline='B0'),changed_scope,'B0')
         changed=json.loads(json.dumps(cfg));changed['training']['learning_rate']*=2
         with self.assertRaises(ValueError):validate_resume_contract(dict(config=saved,baseline='B0'),changed,'B0')
     def test_configured_budgets(self):

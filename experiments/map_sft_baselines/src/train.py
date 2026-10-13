@@ -24,8 +24,9 @@ class Routes(Dataset):
         return item['encoded'],item['steps']
 
 def validate_resume_contract(saved,config,baseline):
-    recipe=('model','seed','data','map','training','baselines','maximum_sequence_tokens')
-    if saved['baseline']!=baseline or any(saved['config'][key]!=config[key] for key in recipe):
+    recipe=('model','seed','data','map','training','maximum_sequence_tokens')
+    if (saved['baseline']!=baseline or saved['config']['baselines'][baseline]!=config['baselines'][baseline]
+            or any(saved['config'][key]!=config[key] for key in recipe)):
         raise ValueError('Resume training recipe mismatch')
 
 def save(model,optimizer,scheduler,out,config,baseline,step,steps_epoch,rank):

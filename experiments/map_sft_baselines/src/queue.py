@@ -102,7 +102,9 @@ def main():
             if code:failed.append(dict(job=str(job),code=code))
         if a.role=='train':
             if not (a.data/'ready.json').exists():
-                atomic_json(a.root/'training_queue.json',dict(status='waiting_for_common_data',failed=failed));time.sleep(30);continue
+                atomic_json(a.root/'training_queue.json',dict(status='waiting_for_common_data',
+                    active={str(k):dict(pid=v[0].pid,baseline=v[1],gpus=cfg['execution']['gpu_pairs'][k]) for k,v in active.items()},
+                    pending=pending,failed=failed));time.sleep(30);continue
             for lane,pair in enumerate(cfg['execution']['gpu_pairs']):
                 if lane in active or not pending or not all(free_gpu(gpu) for gpu in pair):continue
                 base=pending.pop(0);out=a.root/'training'/base;out.mkdir(parents=True,exist_ok=True)

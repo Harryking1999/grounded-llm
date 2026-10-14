@@ -13,6 +13,7 @@
 | `src/common.py` | 共同状态、固定编号、R＋A／R＋排序＋A 与伪地图 |
 | `src/contract.py` | 统一解释样本数、batch、保存间隔、评测规模与平台期规则 |
 | `src/metrics.py` | 不依赖模型/GPU 的已保存回答汇总 |
+| `src/map_policy_reference.py` | 在固定 510 题上比较地图 Top-1 与 Top-3 均匀随机，多种子并与完整 B2 结果配对 |
 | `src/modeling.py` | 复用既有 reader，配置主干训练范围，标准 token CE |
 | `src/train.py` | 两卡 DDP、梯度累积、全局 token 归一化及半轮断点 |
 | `src/evaluate.py` | 共同参考状态 TF、自主 RO、既有地图 NDCG 与内容探针 |

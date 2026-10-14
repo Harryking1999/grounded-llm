@@ -1,0 +1,15 @@
+{
+  "tasks": 510,
+  "action_budget": 32,
+  "policies": [
+    {"name": "top1_greedy", "top_k": 1, "seeds": [20261014]},
+    {"name": "top3_uniform", "top_k": 3, "seed_start": 20261014, "repeats": 50}
+  ],
+  "sampling": "uniform_from_distance_sorted_top_k_at_every_state",
+  "ties": "distance_then_local_candidate_id",
+  "candidate_filter": "all_legal_actions_without_oracle_or_goal_preservation_filter",
+  "device": "cpu",
+  "cpu_threads": 1,
+  "expected_top1_arrivals": 397,
+  "comparison": {"baseline": "B2_sortfirst", "step": 50000}
+}

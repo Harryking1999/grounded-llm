@@ -12,6 +12,17 @@ from .shard_pool import ShardPool
 MODULE = 'experiments.map_sft_baselines.src.evaluate'
 
 
+def released_training_gpus(path, gpus):
+    """Fail closed until the training scheduler has assigned pending work."""
+    if not path.exists():
+        return []
+    state = json.loads(path.read_text())
+    if state.get('pending') or state.get('status') not in ('running', 'finished'):
+        return []
+    occupied = {gpu for item in state.get('active', {}).values() for gpu in item['gpus']}
+    return [gpu for gpu in gpus if gpu not in occupied]
+
+
 class ExistingWorker:
     def __init__(self, pid, output, completion_marker='summary.json'):
         self.pid, self.output = pid, output
@@ -54,6 +65,10 @@ def existing_jobs(args, config):
 def run(args, config):
     from .queue import evaluation_jobs, collect
     gpus = [int(gpu) for gpu in args.gpus.split(',')] if args.gpus else config['execution']['evaluation_gpus']
+    training_queue = getattr(args, 'training_queue', None)
+    released_config = config['execution'].get('after_training_evaluation', {})
+    if training_queue and not args.gpus:
+        gpus = released_config['gpus']
     if len(set(gpus)) != len(gpus):
         raise ValueError('Evaluation GPUs must be distinct')
     root = args.root.resolve()
@@ -144,8 +159,11 @@ def run(args, config):
                     pool.publish(job, owner)
                     del active[gpu]
                 jobs = evaluation_jobs(root, config, pool.checkpoints())
+                if training_queue:
+                    jobs = [job for job in jobs if job[3] in released_config['modes']]
                 busy = {str(item[1][-1]) for item in active.values()}
-                for gpu in gpus:
+                available = released_training_gpus(training_queue, gpus) if training_queue else gpus
+                for gpu in available:
                     if gpu in active:
                         continue
                     used = subprocess.check_output(['nvidia-smi',f'--id={gpu}','--query-gpu=memory.used','--format=csv,noheader,nounits'],text=True)

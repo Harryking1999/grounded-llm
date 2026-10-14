@@ -69,6 +69,7 @@ def main():
     p.add_argument('--gpus',help='Node-specific evaluation GPUs; does not alter the study config')
     p.add_argument('--coordination-profile',type=Path,help='Ignored runtime SSH profile for the common shard authority')
     p.add_argument('--resume-workers',action='store_true')
+    p.add_argument('--training-queue',type=Path,help='Use only released training GPUs, after pending training jobs are assigned')
     a=p.parse_args();cfg=json.loads(a.config.read_text());a.root.mkdir(parents=True,exist_ok=True)
     if a.role=='evaluate':
         from .evaluation_queue import run

@@ -61,10 +61,11 @@
     "reserved_evaluation_gpu": 0,
     "evaluation_coordination": "atomic_shard_claim_on_primary",
     "auxiliary_evaluation_nodes": [
-      {"node_id": "platform-35016", "gpus": [0, 1]},
+      {"node_id": "platform-35016", "gpus": [0, 1, 2, 3]},
       {"node_id": "platform-40621", "gpus": [0, 1]},
       {"node_id": "platform-43848", "gpus": [0, 1, 2, 3]}
     ],
+    "after_training_evaluation": {"node_id": "028", "gpus": [0, 1, 2, 3, 4, 5, 6, 7], "modes": ["TF", "probe"]},
     "queue_priority": "round_robin_baselines_newest_checkpoint_within_baseline",
     "poll_seconds": 60
   },

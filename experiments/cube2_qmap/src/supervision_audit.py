@@ -9,6 +9,7 @@ from torch.nn import functional as F
 
 from experiments.puzzle_qmap.src.model import MapReader, soft_rank_loss
 from .environment import Cube2
+from .local_graph import LocalGraphSampler
 from .structure_study import dense_upper_loss, load_contract, relation_values
 
 
@@ -56,6 +57,40 @@ def audit(model, features, data, temperature, rank_weight):
     return result
 
 
+def audit_sampling(env, data, config, milestones):
+    """Cumulative node/goal exposure; ranking cooccurrence is not calibration."""
+    sampler = LocalGraphSampler(env, data, config, np.random.default_rng(config["seed"] + 1))
+    relations, absolute, overlap, records = [], [], [], []
+    seen = np.zeros(env.size, dtype=bool)
+    for step in range(1, max(milestones) + 1):
+        batch = sampler.draw()
+        states = batch["states"]
+        seen[states] = True
+        packed = states.reshape(-1, len(sampler.words) + 1).astype(np.int64)
+        relations.append((packed[:, 1:] * env.size + packed[:, :1]).ravel())
+        pairs = states[batch["pairs"]].astype(np.int64)
+        absolute.append(pairs.min(-1) * env.size + pairs.max(-1))
+        # Use the same shared Q slots as the actual two losses.
+        pair_idx = batch["pairs"]
+        keys = pair_idx.min(-1) * len(states) + pair_idx.max(-1)
+        child, goal = batch["children"], batch["goals"][:, None]
+        rank_keys = np.minimum(child, goal) * len(states) + np.maximum(child, goal)
+        overlap.append(float(np.isin(rank_keys, keys).mean()))
+        if step in milestones:
+            unique = np.unique(np.concatenate(relations))
+            _, counts = np.unique(unique // env.size, return_counts=True)
+            records.append({"draws": step, "graph_groups": sampler.groups_drawn,
+                            "unique_input_states": int(seen.sum()),
+                            "unique_node_goal_relations": len(unique), "node_states": len(counts),
+                            "node_states_with_multiple_goals": int((counts > 1).sum()),
+                            "fraction_node_states_with_multiple_goals": float((counts > 1).mean()),
+                            "maximum_goals_per_node_state": int(counts.max()),
+                            "unique_absolute_distance_pairs": len(np.unique(np.concatenate(absolute))),
+                            "same_batch_rank_relations_in_absolute_loss_mean": float(np.mean(overlap))})
+    return {"seed": config["seed"] + 1, "records": records,
+            "scope": "Sampled prefix, not full-run coverage. Node-goal cooccurrence includes ranking labels, not only calibrated distances. All groups share encoder parameters; sparse early overlap alone does not demonstrate a causal deficiency."}
+
+
 def main():
     parser = argparse.ArgumentParser(__doc__)
     parser.add_argument("--study", type=Path, required=True)
@@ -63,6 +98,7 @@ def main():
     parser.add_argument("--contract", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--source-commit", required=True)
+    parser.add_argument("--sampling-batches", type=int, nargs="+", help="Optional cumulative sampler audit milestones")
     args = parser.parse_args()
     torch.set_num_threads(2)
     config = load_contract(args.contract)
@@ -76,6 +112,10 @@ def main():
               "states": len(data["states"]), "supervised_pairs": len(data["pairs"]),
               "minimum_pair_degree": int(np.bincount(data["pairs"].ravel(), minlength=len(data["states"])).min()),
               "audit": audit(model, features, data, config["training"]["temperature"], config["training"]["rank_weight"])}
+    if args.sampling_batches:
+        prepared = dict(np.load(args.prepared_run / "data.npz", allow_pickle=False))
+        original_config = json.loads((args.prepared_run / "config.json").read_text())
+        result["sampling_linkage"] = audit_sampling(env, prepared, original_config, args.sampling_batches)
     args.out.parent.mkdir(parents=True, exist_ok=True)
     with args.out.open("x") as handle:
         handle.write(json.dumps(result, indent=2) + "\n")

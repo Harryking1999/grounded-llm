@@ -14,7 +14,7 @@
 | 冻结地图读取接口 | 既定训练与评测已完成，保留历史对照，不与新组直接混算 | [实验 README](../experiments/flamingo_map_reader/README.md)、[报告](../experiments/flamingo_map_reader/results/report.md) |
 | 独立无地图任务 SFT | 历史强基线；已保存完整断点并退出，为新评测释放资源 | [协议](../experiments/llm_task_sft/README.md)、[总报告](../experiments/llm_task_sft/results/report.md) |
 | 棋盘状态地图 | 提供冻结 Q 和独立地图贪心参照 | [协议与来源](../experiments/blocks_distance_map/README.md) |
-| 汉诺塔／二阶魔方地图 | 四、五盘汉诺塔表现较好，六盘仍有循环；魔方补全距离标签与错题重放未改善留出求解，失败分支已归档。新增四点转面环＋远目标的 L1 精确拟合反例；该限制不证明正确排序不可能。当前保留纯 Q 基线，下一项候选是只改变固定度量的对照；分训／合并尚未实施 | [统一说明与代码入口](../experiments/puzzle_qmap/README.md) |
+| 汉诺塔／二阶魔方地图 | 四、五盘汉诺塔表现较好，六盘仍有循环；魔方既有修复负结果已归档。L1 精确表示存在反例，但不证明正确排序不可能。匹配 L1／L∞ 对照已启动，按验证结果决定是否运行 L2；精确固定锚点诊断仍未解决长程贪心到达。DeepCubeAI 实现调研已记录，转移学习尚未接入；分训／合并尚未实施 | [统一入口](../experiments/puzzle_qmap/README.md)、[结果](../experiments/cube2_qmap/results/report.md)、[结构调研](../experiments/cube2_qmap/results/structure_notes.md) |
 | 寻路接口与早期方案 | 作为机制和任务边界的历史证据 | [实验目录](../experiments/README.md) |
 
 ## 3. 已确定的比较原则

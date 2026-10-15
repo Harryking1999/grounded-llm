@@ -16,6 +16,7 @@ from experiments.puzzle_qmap.src.model import MapReader
 from experiments.puzzle_qmap.src.run import train
 from experiments.puzzle_qmap.src.model import QMap, distance
 from experiments.cube2_qmap.src.structure_study import build_template, objective, relation_values
+from experiments.cube2_qmap.src.linf_dimension import construct
 
 
 class QuarterTurnTest(unittest.TestCase):
@@ -65,6 +66,23 @@ class QuarterTurnTest(unittest.TestCase):
         x = torch.tensor([[1., 2., 0., 0.]], requires_grad=True)
         distance(x, torch.zeros_like(x), "max_l1", 2).sum().backward()
         torch.testing.assert_close(x.grad, torch.tensor([[1., 1., 0., 0.]]))
+
+    def test_129_incompatible_antipodes_require_more_than_128_linf_coordinates(self):
+        config = json.loads((Path(__file__).parents[1] / "configs/linf_dimension_witness.json").read_text())
+        result = construct(self.env, config, [0, 1, 12345])
+        pairs = np.asarray(result["pairs"])
+        self.assertFalse(np.isin(pairs, [0, 1, 12345]).any())
+        self.assertEqual(len(np.unique(pairs)), 258)
+        self.assertTrue((self.env.distance(pairs[:, 0], pairs[:, 1]) == 14).all())
+        a, b = pairs.T
+        # Both signs of a shared-coordinate witness would imply 28 <= one
+        # of these cross sums. Each cross sum is <=26 for distinct pairs.
+        same_sign = self.env.distance(a[:, None], b[None]) + self.env.distance(b[:, None], a[None])
+        opposite_sign = self.env.distance(a[:, None], a[None]) + self.env.distance(b[:, None], b[None])
+        off_diagonal = ~np.eye(len(pairs), dtype=bool)
+        self.assertLessEqual(same_sign[off_diagonal].max(), 26)
+        self.assertLessEqual(opposite_sign[off_diagonal].max(), 26)
+        self.assertEqual(result["uniform_error_lower_bound_below_this_dimension"], .5)
 
     def test_full_qtm_graph_and_same_face_composition(self):
         env = self.env

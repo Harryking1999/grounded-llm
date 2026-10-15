@@ -7,7 +7,7 @@ import numpy as np
 import torch
 
 from .evaluate import decisions, encode, evaluate, pair_metrics, rollout, task_indices
-from .model import MapReader, distance
+from .model import MapReader
 from .tasks import make_environment
 
 
@@ -21,7 +21,7 @@ def first_error(model, env, tasks, device):
         if not len(ids):
             break
         children = env.successors(current[ids])
-        scores = distance(encode(model, env, np.maximum(children, 0), device),
+        scores = model.distance(encode(model, env, np.maximum(children, 0), device),
                           encode(model, env, goals[ids], device)[:, None]).cpu().numpy()
         scores[children < 0] = np.inf
         chosen = children[np.arange(len(ids)), scores.argmin(axis=1)]

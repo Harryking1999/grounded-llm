@@ -1,4 +1,4 @@
-"""Only Q: reuse the blocks encoder and symmetrize its directed_sum metric."""
+"""Goal-independent Q encoder with a checkpoint-defined symmetric distance."""
 import torch
 
 from experiments.blocks_distance_map.src.model import BoardEncoder, distance as blocks_distance
@@ -7,17 +7,29 @@ from experiments.blocks_distance_map.src.model import BoardEncoder, distance as 
 MODEL_TYPE = "pure_q_symmetric_blocks"
 
 
-def distance(source, goal):
-    return (blocks_distance(source, goal, "directed_sum") +
-            blocks_distance(goal, source, "directed_sum")) / 2
+def distance(source, goal, metric="l1"):
+    if metric == "l1":
+        return (blocks_distance(source, goal, "directed_sum") +
+                blocks_distance(goal, source, "directed_sum")) / 2
+    if metric == "linf":
+        return (source - goal).abs().amax(dim=-1)
+    if metric == "l2":
+        return (source - goal).norm(p=2, dim=-1)
+    raise ValueError(f"Unknown Q distance: {metric}")
 
 
 class QMap(BoardEncoder):
-    def __init__(self, feature_dim, dimension, hidden, cap):
+    def __init__(self, feature_dim, dimension, hidden, cap, metric="l1"):
+        if metric not in ("l1", "linf", "l2"):
+            raise ValueError(f"Unknown Q distance: {metric}")
         super().__init__(dimension, hidden, cap, "symmetric_directed_sum", input_dim=feature_dim)
+        self.metric = metric
+
+    def distance(self, source, goal):
+        return distance(source, goal, self.metric)
 
     def forward(self, features, pairs):
-        return distance(self.encode(features[pairs[:, 0]]), self.encode(features[pairs[:, 1]]))
+        return self.distance(self.encode(features[pairs[:, 0]]), self.encode(features[pairs[:, 1]]))
 
 
 def soft_rank_loss(scores, truth, valid, temperature):
@@ -46,7 +58,7 @@ class MapReader:
 
     @torch.no_grad()
     def scores(self, source, goal):
-        return distance(self.encode(source), self.encode(goal)).cpu().numpy()
+        return self.model.distance(self.encode(source), self.encode(goal)).cpu().numpy()
 
     def choose(self, state, goal):
         children = self.env.successors([state])[0]

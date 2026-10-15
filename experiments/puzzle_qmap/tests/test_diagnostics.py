@@ -6,16 +6,17 @@ import torch
 
 from experiments.hanoi_qmap.src.environment import Hanoi
 from experiments.puzzle_qmap.src.post_eval import first_error
+from experiments.puzzle_qmap.src.model import distance
 
 
 class DiagnosticTest(unittest.TestCase):
     def test_first_error_counts_goal_and_same_layer_mistakes(self):
         env = Hanoi(1)
         tasks = np.array([[0, 1], [0, 2], [1, 2]])
-        exact_on_this_graph = SimpleNamespace(encode=lambda features: features)
+        exact_on_this_graph = SimpleNamespace(encode=lambda features: features, distance=distance)
         result = first_error(exact_on_this_graph, env, tasks, "cpu")
         self.assertEqual(result["all_steps_shortest"], 3)
-        collapsed = SimpleNamespace(encode=lambda features: torch.zeros_like(features))
+        collapsed = SimpleNamespace(encode=lambda features: torch.zeros_like(features), distance=distance)
         result = first_error(collapsed, env, tasks, "cpu")
         self.assertEqual(result["all_steps_shortest"], 1)
         self.assertEqual(result["first_error_type"], {"same_layer": 2, "away": 0})

@@ -20,7 +20,7 @@
 
 ## 配置与运行
 
-只保留一个基线配置：[quarter_turn_local.json](configs/quarter_turn_local.json)。清理后的默认配置可独立生成划分，无需旧运行目录；它不是已报告历史运行的原样复现，旧配置和数据在归档中。可选 reference_data 仅用于需要保持历史同题比较的情况。
+基线配置为 [quarter_turn_local.json](configs/quarter_turn_local.json)。清理后的默认配置可独立生成划分，无需旧运行目录；它不是已报告历史运行的原样复现，旧配置和数据在归档中。可选 reference_data 仅用于需要保持历史同题比较的情况。
 
 ```bash
 python -m experiments.puzzle_qmap.src.run --config experiments/cube2_qmap/configs/quarter_turn_local.json --out runs/cube2_qmap/RUN_ID --source-commit COMMIT --device cuda:0
@@ -29,3 +29,15 @@ python -m unittest discover -s experiments/cube2_qmap/tests -v
 ```
 
 运行目录必须不存在。纯 Q 求解不加载 oracle；精确求解是独立裁判条件。
+
+## 固定度量对照
+
+[metric_comparison.json](configs/metric_comparison.json) 定义 L1 与 L∞ 的同题、同初始权重对照；若 L∞ 未达到预先写定的验证到达条件，顺序运行 L2。复用归档基线的数据与 oracle，不续接其权重。编码器、输出范围、两项损失、在线采样流、步数和学习率计划相同。距离尺度沿用原 L1，L∞ 与 L2 使用原始范数；因此这是完整读出规则的比较，不能单独归因于范数形状。各自的初始化损失会不同。
+
+```bash
+python -u -m experiments.cube2_qmap.src.metric_study --contract experiments/cube2_qmap/configs/metric_comparison.json --prepared-run /PATH/TO/cube2_quarter_turn_8eed676 --out /PATH/TO/metric_study --source-commit COMMIT --devices cuda:0 cuda:1
+```
+
+程序只依据验证集决定是否运行 L2；测试结果不参与条件选择。最终同时报告验证选定与末步模型的距离误差、排序和完整到达，不把 loss 降低当作成功。运行、日志和完整结果集中在同一个 Git 外目录；启动与结论记录于结果报告。
+
+L2 也不能精确表示四条边为 1、两条对角线为 2 的图四环：欧氏空间中距离 1+1=2 的等号迫使中间点位于两端中点，两条路径的中点因此重合。这不否定近似动作排序；对应检查见共享测试。结构调研与后续建议见[研究记录](results/structure_notes.md)。

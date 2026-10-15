@@ -1,0 +1,27 @@
+{
+  "hypothesis": "Changing only the fixed Q distance can improve middle-distance decisions and long-range greedy solving.",
+  "prepared_source_commit": "8eed6763204bd4c5b5fb468263b936186be13b68",
+  "seed": 20261016,
+  "initial_conditions": ["l1", "linf"],
+  "fallback": "l2",
+  "model": {"dimension": 128, "hidden": 256},
+  "training": {
+    "steps": 200000,
+    "batch_size": 1024,
+    "graph_batch_size": 128,
+    "learning_rate": 0.001,
+    "minimum_learning_rate": 0.00001,
+    "eval_every": 5000,
+    "patience": null,
+    "rank_weight": 1.0,
+    "rank_temperature": 1.0
+  },
+  "sampling": {"minimum_full_passes": 1.0},
+  "validation_gate": {
+    "minimum_success_rate": 0.90,
+    "long_distance_minimum": 7,
+    "minimum_long_success_rate": 0.80,
+    "require_not_worse_than_l1": true
+  },
+  "comparison": "All conditions start from identical random encoder weights, not an L1 checkpoint. Reuse exact data/rules/protected states and the identical online random stream. Only the checkpoint-defined distance changes: legacy scaled L1, raw max absolute difference, or raw Euclidean L2. Keep cap, both losses, their weights and temperature, update budget and cosine schedule fixed. Select best by validation Huber plus full soft ranking CE; report last separately. Run L2 only if the validation-selected Linf fails the predeclared validation reliability gate. Never use test results for the fallback decision."
+}

@@ -2,7 +2,7 @@
 import numpy as np
 import torch
 
-from .model import distance, soft_rank_loss
+from .model import soft_rank_loss
 from .sampling import task_indices
 
 
@@ -30,7 +30,7 @@ def pair_metrics(model, env, rows, device):
     predictions = []
     for chunk in np.array_split(rows, max(1, (len(rows) + 4095) // 4096)):
         a, b = encode(model, env, chunk[:, 0], device), encode(model, env, chunk[:, 1], device)
-        predictions.extend(distance(a, b).cpu().tolist())
+        predictions.extend(model.distance(a, b).cpu().tolist())
     predictions, truth = np.asarray(predictions), rows[:, 2]
     error = np.abs(predictions - truth)
     return {"count": len(rows), "huber": float(np.where(error < 1, .5 * error**2, error - .5).mean()),
@@ -46,7 +46,7 @@ def decisions(model, env, tasks, device):
     valid = children >= 0
     child_q = encode(model, env, np.maximum(children, 0), device)
     goal_q = encode(model, env, tasks[:, 1], device)
-    q_scores = distance(child_q, goal_q[:, None]).cpu().numpy()
+    q_scores = model.distance(child_q, goal_q[:, None]).cpu().numpy()
     baseline = env.baseline(np.maximum(children, 0), tasks[:, 1, None]).astype(float)
     truth = env.distance(np.maximum(children, 0), tasks[:, 1, None])
     parent_distance = env.distance(tasks[:, 0], tasks[:, 1])
@@ -72,7 +72,7 @@ def ranking_loss(model, env, tasks, truth, device, temperature):
     for begin in range(0, len(tasks), 1024):
         chunk = tasks[begin:begin + 1024]
         children = env.successors(chunk[:, 0])
-        scores.append(distance(encode(model, env, np.maximum(children, 0), device),
+        scores.append(model.distance(encode(model, env, np.maximum(children, 0), device),
                                encode(model, env, chunk[:, 1], device)[:, None]))
         targets.append(torch.as_tensor(truth[begin:begin + len(chunk)], device=device))
         masks.append(torch.as_tensor(children >= 0, device=device))
@@ -99,7 +99,7 @@ def rollout(model, env, tasks, device, budget_multiplier, horizon=None, return_t
             valid = children >= 0
             safe = np.maximum(children, 0)
             if policy == "q":
-                scores = distance(encode(model, env, safe, device), encode(model, env, goal[ids], device)[:, None]).cpu().numpy()
+                scores = model.distance(encode(model, env, safe, device), encode(model, env, goal[ids], device)[:, None]).cpu().numpy()
             elif policy == "hamming":
                 scores = env.baseline(safe, goal[ids, None]).astype(float)
             else:

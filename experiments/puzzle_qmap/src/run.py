@@ -11,7 +11,7 @@ from torch.nn import functional as F
 
 from .data import build
 from .evaluate import decisions, encode, evaluate, pair_metrics, ranking_loss, task_indices
-from .model import MODEL_TYPE, QMap, distance, soft_rank_loss
+from .model import MODEL_TYPE, QMap, soft_rank_loss
 from .sampling import CoverageSampler, StratifiedEpochSampler
 from .tasks import make_environment
 
@@ -29,7 +29,8 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
     if checkpoint is not None:
         saved = torch.load(checkpoint, map_location=device, weights_only=False)
         if (saved.get("model_type") != MODEL_TYPE or saved["task"] != env.name or
-                saved["actions"] != list(env.actions) or saved["model_config"] != config["model"]):
+                saved["actions"] != list(env.actions) or
+                {"metric": "l1", **saved["model_config"]} != {"metric": "l1", **config["model"]}):
             raise ValueError("Continuation requires a matching pure-Q checkpoint")
         model.load_state_dict(saved["model"])
         optimizer.load_state_dict(saved["optimizer"])
@@ -156,19 +157,19 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
                 batch = online.draw()
                 vectors = online_encode(batch["states"])
                 pair_indices = torch.as_tensor(batch["pairs"], device=device)
-                pair_prediction = distance(vectors[pair_indices[:, 0]], vectors[pair_indices[:, 1]])
+                pair_prediction = model.distance(vectors[pair_indices[:, 0]], vectors[pair_indices[:, 1]])
                 pair_target = torch.as_tensor(batch["pair_distances"], dtype=torch.float32, device=device)
                 pair_loss = F.smooth_l1_loss(pair_prediction, pair_target)
                 candidate_q = vectors[torch.as_tensor(batch["children"], device=device)]
                 goal_q = vectors[torch.as_tensor(batch["goals"], device=device)]
-                scores = distance(candidate_q, goal_q[:, None])
+                scores = model.distance(candidate_q, goal_q[:, None])
                 truth = torch.as_tensor(batch["child_distances"], device=device)
                 valid = torch.ones_like(truth, dtype=torch.bool)
             else:
                 sampled_ids = (pair_sampler.draw(options["batch_size"]) if pair_sampler is not None
                                else rng.integers(len(pairs), size=options["batch_size"]))
                 sampled = pairs[sampled_ids]
-                pair_loss = F.smooth_l1_loss(distance(q(sampled[:, 0]), q(sampled[:, 1])),
+                pair_loss = F.smooth_l1_loss(model.distance(q(sampled[:, 0]), q(sampled[:, 1])),
                                              torch.as_tensor(sampled[:, 2], dtype=torch.float32, device=device))
                 idx = (rank_sampler.draw(options["decision_batch_size"]) if rank_sampler is not None
                        else rng.integers(len(tasks), size=options["decision_batch_size"]))
@@ -178,7 +179,7 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
                 safe = np.where(candidate >= 0, candidate, tasks[idx, 0, None])
                 candidate_q = q(safe)
                 goal_q = q(tasks[idx, 1])
-                scores = distance(candidate_q, goal_q[:, None])
+                scores = model.distance(candidate_q, goal_q[:, None])
                 truth = torch.as_tensor(data["child_distances_train"][idx], device=device)
             rank_loss = soft_rank_loss(scores, truth, valid, options["rank_temperature"])
             loss = pair_loss + options["rank_weight"] * rank_loss
@@ -255,7 +256,7 @@ def main():
     if args.prepared_run is not None:
         source = args.prepared_run.resolve()
         prepared_config = json.loads((source / "config.json").read_text())
-        if any(config[key] != prepared_config[key] for key in ("task", "rules", "data", "augmentation", "model")):
+        if any(config[key] != prepared_config[key] for key in ("task", "rules", "data", "augmentation")):
             raise ValueError("Prepared data does not match this contract")
         for name in ("data.npz", "oracle_depth.npy"):
             if (source / name).exists():

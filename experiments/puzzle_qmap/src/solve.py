@@ -8,7 +8,7 @@ from .tasks import make_environment
 
 def main():
     parser = argparse.ArgumentParser(__doc__)
-    parser.add_argument("--task", choices=("hanoi3", "cube2"), required=True)
+    parser.add_argument("--task", choices=("hanoi3", "hanoi4", "hanoi5", "hanoi6", "cube2"), required=True)
     parser.add_argument("--start", type=int)
     parser.add_argument("--goal", type=int)
     parser.add_argument("--scramble", default="", help="Cube U/R/F notation, space separated")
@@ -18,7 +18,7 @@ def main():
     args = parser.parse_args()
     env = make_environment(args.task, args.oracle)
     source = 0 if args.start is None else args.start
-    goal = (26 if args.task == "hanoi3" else 0) if args.goal is None else args.goal
+    goal = (env.size - 1 if args.task.startswith("hanoi") else 0) if args.goal is None else args.goal
     env.validate(source)
     env.validate(goal)
     for action in args.scramble.split():

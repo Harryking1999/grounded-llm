@@ -45,17 +45,25 @@ def cube_pairs(env, rng, count, split, buckets):
 
 
 def build(env, config, out):
+    if config["data"].get("builder") == "breadth_depth":
+        from experiments.cube2_qmap.src.data import build_breadth_depth
+        return build_breadth_depth(env, config, out)
     options, augmentation = config["data"], config["augmentation"]
     if augmentation["kind"] != env.symmetry_kind:
         raise ValueError("Augmentation does not match this task's symmetry convention")
     rng = np.random.default_rng(config["seed"])
     data, membership = {}, None
-    if env.name == "hanoi3":
+    if env.name.startswith("hanoi"):
         source, goal = np.triu_indices(env.size, k=1)
         pairs = np.column_stack((source, goal, env.distance(source, goal)))
         orbit = hanoi_orbit_keys(env, pairs)
         keys = np.unique(orbit)
         rng.shuffle(keys)
+        if options.get("require_all_legal_edges", False):
+            required = np.unique(orbit[pairs[:, 2] == 1])
+            keys = np.concatenate((required, keys[~np.isin(keys, required)]))
+            if len(required) > int(len(keys) * .7):
+                raise ValueError("Required edge orbits exceed the training allocation")
         boundaries = (0, int(len(keys) * .7), int(len(keys) * .85), len(keys))
         membership = np.full(env.size**2, -1, dtype=np.int8)
         for i, name in enumerate(SPLITS):
@@ -89,14 +97,14 @@ def build(env, config, out):
     augmented, indices, pair_stats = augment(env, base[:, :2], allowed, rng, copies, augmentation["max_attempts"])
     if not np.array_equal(env.distance(augmented[:, 0], augmented[:, 1]), base[indices, 2]):
         raise ValueError("Symmetry changed a true pair distance")
-    if env.name == "hanoi3":
+    if env.name.startswith("hanoi"):
         augmented.sort(axis=1)  # unordered pairs, not separate state normalization
     extra = np.column_stack((augmented, base[indices, 2]))
     data["pairs_train"] = np.unique(np.concatenate((base, extra)), axis=0)
 
     for i, name in enumerate(SPLITS):
         pairs = base if i == 0 else data[f"pairs_{name}"]
-        if env.name == "hanoi3":
+        if env.name.startswith("hanoi"):
             tasks = pairs[pairs[:, 2] > 0, :2]
             tasks = np.concatenate((tasks, tasks[:, ::-1]))
         else:
@@ -128,8 +136,13 @@ def build(env, config, out):
     if not allowed(data["pairs_train"][:, :2]).all():
         raise ValueError("Heldout labels entered pair supervision")
     np.savez_compressed(out / "data.npz", **data)
+    edge_coverage = None
+    if membership is not None:
+        edge_rows = np.column_stack(np.where(np.triu(env.distances == 1, k=1)))
+        edge_coverage = float(np.isin(pair_keys(edge_rows, env.size), train_keys).mean())
     summary = {"split_unit": "unordered_pair_peg_symmetry_orbit_seen_states" if membership is not None else "state_endpoints_unseen_in_all_losses",
                "states_in_environment": env.size, "action_count": len(env.actions), "diameter": env.diameter,
+               "legal_edge_relation_coverage": edge_coverage,
                "augmentation": {"kind": env.symmetry_kind, "pairs": pair_stats, "decisions": task_stats,
                                 "base_pairs": len(base), "base_decisions": len(data["tasks_train_base"])},
                "splits": {name: {"pairs": len(data[f"pairs_{name}"]),

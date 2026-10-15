@@ -71,6 +71,26 @@ class HanoiTest(unittest.TestCase):
                     expected = -1 if child < 0 else env.symmetry(child, transform)
                     self.assertEqual(env.next[renamed[state], renamed_action], expected)
 
+    def test_four_five_six_disks_exact_graph_and_long_solutions(self):
+        rng = np.random.default_rng(16)
+        for disks in (4, 5, 6):
+            env = Hanoi(disks)
+            self.assertEqual(env.size, 3**disks)
+            self.assertEqual(int(env.distances.max()), 2**disks - 1)
+            self.assertEqual(len(env.solve(0)), 2**disks - 1)
+            self.assertEqual(env.features([0]).shape, (1, 3 * disks))
+            self.assertTrue((env.distances >= 0).all())
+            for source, goal in rng.integers(env.size, size=(30, 2)):
+                current = int(source)
+                actions = env.solve(current, int(goal))
+                self.assertEqual(len(actions), env.distance(source, goal))
+                for action in actions:
+                    current = env.step(current, action)
+                self.assertEqual(current, goal)
+            states = np.arange(env.size)
+            renamed = env.symmetry(states, 4)
+            np.testing.assert_array_equal(env.distances, env.distances[renamed[:, None], renamed[None, :]])
+
 
 if __name__ == "__main__":
     unittest.main()

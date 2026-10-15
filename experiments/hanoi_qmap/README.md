@@ -1,6 +1,8 @@
-# 三层汉诺塔 Qmap
+# 三至六盘汉诺塔 Qmap
 
 研究问题：在全部合法状态上，用部分精确关系训练目标无关 Q，能否补全剩余最短步数，并通过真实合法候选的 Q 距离完成任意起终点任务？模型与评测分工见 [共享核心](../puzzle_qmap/README.md)，正式参数只维护在 [configs/study.json](configs/study.json)。首轮结果记录在 [results/report.md](results/report.md)。
+
+扩展实验分别见 [四盘](configs/hanoi4.json)、[五盘](configs/hanoi5.json)、[六盘](configs/hanoi6.json)。使用同一环境实现与共享编码器范式，各盘数从随机初始化独立训练；不把结果称为三盘模型的跨盘数泛化。
 
 ## 状态、动作、合法性与求解
 
@@ -21,3 +23,16 @@ python -m experiments.puzzle_qmap.src.solve --task hanoi3 --start 0 --goal 26 --
 ```
 
 测试穷举全部起终点的最短解重放、全部合法／非法动作、反向边和训练监督划分。精确求解不需要 torch；纯 Q 不需要加载距离表。
+
+## 四至六盘的结构与覆盖
+
+固定最大盘所在柱时，状态图是少一盘状态图的一份副本；三个副本由移动最大盘的桥连接。过桥要求较小盘先堆到第三根柱上，所以“某盘看起来更接近目标柱”不能代替当前状态到目标的全局最短距离。任意起终点可能有不同绕行方式，标签由完整 BFS 给出，不把单一递归解当作最短标签。
+
+各盘数完整枚举 `3^n` 个合法状态和全部动作；四／五／六盘分别有 81／243／729 状态，最大最短距离为 15／31／63。距离表使用 int16。状态特征随盘数变成 `3*n` 维，其余 Q 结构不变。
+
+新配置把所有合法一步关系对应的柱置换轨道放入训练，覆盖每一级盘移动和桥；其余关系按轨道留出。它是已知完整一步拓扑下的长程关系补全，不检验未知一步规则。训练混合完整遍历和按真实距离均衡采样，验证／测试任务按距离分层选择，报告长程到达而不只看总体平均。
+
+```bash
+python -m experiments.puzzle_qmap.src.run --config experiments/hanoi_qmap/configs/hanoi4.json --out runs/hanoi_qmap/HANOI4_RUN --source-commit COMMIT --device cuda:0
+python -m experiments.puzzle_qmap.src.solve --task hanoi6 --start 0 --goal 728
+```

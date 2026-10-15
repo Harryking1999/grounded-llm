@@ -2,6 +2,8 @@
 
 研究问题：在完整 2×2×2 魔方群上离线生成精确关系后，共享状态编码器能否在未参与任何训练损失的状态上表达远近、正确排序真实合法后继并支持纯 Q 贪心到达？正式参数见 [configs/study.json](configs/study.json)，共同模型与指标定义见 [共享核心](../puzzle_qmap/README.md)，结果见 [results/report.md](results/report.md)。
 
+针对旧数据的覆盖缺口，新一轮使用 [breadth_depth.json](configs/breadth_depth.json)，第一性原理推导、覆盖审计、深路径与完整分叉、评测边界见 [DATA_DESIGN.md](DATA_DESIGN.md)。旧 `study.json` 保留为已有纯 Q 结果的合同，不覆盖旧产物。
+
 ## 状态与动作约定
 
 采用 [Kociemba 的角块顺序与朝向定义](https://www.kociemba.org/math/cubielevel.htm)：URF/UFL/ULB/UBR/DFR/DLF/DBL/DRB。状态是八角块排列 `cp` 和八个朝向 `co`；朝向取 0/1/2，总和必须模 3 为零。二阶魔方没有棱块，**不施加三阶角块／棱块奇偶耦合限制**。

@@ -25,6 +25,7 @@
 | `src/tasks.py` | 延迟加载任务；不依赖 torch |
 | 每个任务的 `src/environment.py` | 状态编号／验证、文字说明、动作执行、合法后继、特征、Hamming 基线、精确距离和最短解 |
 | `src/data.py`、`src/symmetry.py` | 固定划分、精确标注、整组对称增强与去重；不导入 torch |
+| `src/sampling.py` | 广度无放回遍历、真实距离均衡和同目标上下文采样；记录实际覆盖轮次 |
 | `src/model.py` | 复用积木编码器、对称距离、完整软排序；`MapReader` 冻结读取接口 |
 | `src/run.py` | 构建数据、训练、验证选模型、冻结评测与向量导出 |
 | `src/evaluate.py` | 距离、完整软排序、候选与连续到达；oracle 仅为标签或独立基线 |
@@ -53,3 +54,5 @@ action, successor = reader.choose(0, 26)
 从仓库根目录运行各任务 README 的命令。运行目录必须不存在；所有生成物写入 Git 外的 `runs/`。每次保存实际 `config.json`、`data.npz`（包含增强前的训练关系与任务）、增强／划分摘要、验证曲线、最佳 checkpoint、初始与最终评测 `summary.json`、示例 `q_vectors.npz`；魔方还保存完整精确距离表。模型只按验证 Huber 加完整软排序损失选择，测试不参与选择。单 seed 首轮只证明该条件的表现；未运行无增强消融时，不能单独归因于对称增强。读取接口只接受纯 Q checkpoint。
 
 依赖：环境与数据只需 NumPy；学习和冻结 Q 推理另需 PyTorch。不修改仓库通用依赖或公共环境。
+
+新一轮覆盖实验的任务专属构建器位于 `cube2_qmap/src/data.py`，不把魔方群结构塞进通用训练器。模型和两项损失保持不变。只有在实际完成合同要求的广度遍历后，checkpoint 才能参与验证选择。汉诺塔四至六盘和魔方新数据使用距离分层的评测任务；旧参考测试保留原顺序单独对照。详细划分以各实验合同和数据设计为准。

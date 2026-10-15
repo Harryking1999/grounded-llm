@@ -15,6 +15,28 @@ def correlation(x, y):
     return float(np.corrcoef(x, y)[0, 1]) if np.std(x) and np.std(y) else 0.0
 
 
+def task_indices(env, data, split, count, config):
+    tasks = data[f"tasks_{split}"]
+    count = min(count, len(tasks))
+    if not config["evaluation"].get("stratified_tasks", False) or split == "reference_test":
+        return np.arange(count)
+    labels = data.get(f"parent_distances_{split}")
+    if labels is None:
+        labels = env.distance(tasks[:, 0], tasks[:, 1])
+    rng = np.random.default_rng(config["seed"] + (101 if split == "validation" else 102) + count)
+    levels = np.unique(labels)
+    selected = []
+    for level in levels:
+        pool = np.flatnonzero(labels == level)
+        selected.extend(rng.choice(pool, min(len(pool), count // len(levels)), replace=False).tolist())
+    remaining = np.setdiff1d(np.arange(len(tasks)), selected)
+    if len(selected) < count:
+        selected.extend(rng.choice(remaining, count - len(selected), replace=False).tolist())
+    result = np.asarray(selected)
+    rng.shuffle(result)
+    return result
+
+
 @torch.no_grad()
 def encode(model, env, ids, device):
     shape = np.asarray(ids).shape
@@ -127,12 +149,15 @@ def rollout(model, env, tasks, device, budget_multiplier):
 def evaluate(model, env, data, config, device):
     model.eval()
     metrics = {}
-    for split in ("validation", "test"):
-        tasks = data[f"tasks_{split}"][:config["evaluation"]["decision_count"]]
+    splits = ["validation", "test"] + (["reference_test"] if "tasks_reference_test" in data else [])
+    for split in splits:
+        idx = task_indices(env, data, split, config["evaluation"]["decision_count"], config)
+        tasks = data[f"tasks_{split}"][idx]
+        roll_idx = task_indices(env, data, split, config["evaluation"]["rollout_count"], config)
         metrics[split] = {"pairs": pair_metrics(model, env, data[f"pairs_{split}"], device),
                           "decisions": decisions(model, env, tasks, device),
-                          "soft_rank_loss": ranking_loss(model, env, tasks, data[f"child_distances_{split}"][:len(tasks)],
+                          "soft_rank_loss": ranking_loss(model, env, tasks, data[f"child_distances_{split}"][idx],
                                                          device, config["training"]["rank_temperature"]),
-                          "rollout": rollout(model, env, tasks[:config["evaluation"]["rollout_count"]], device,
+                          "rollout": rollout(model, env, data[f"tasks_{split}"][roll_idx], device,
                                              config["evaluation"]["budget_multiplier"])}
     return metrics

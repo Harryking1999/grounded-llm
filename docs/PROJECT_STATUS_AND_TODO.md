@@ -14,7 +14,7 @@
 | 冻结地图读取接口 | 既定训练与评测已完成，保留历史对照，不与新组直接混算 | [实验 README](../experiments/flamingo_map_reader/README.md)、[报告](../experiments/flamingo_map_reader/results/report.md) |
 | 独立无地图任务 SFT | 历史强基线；已保存完整断点并退出，为新评测释放资源 | [协议](../experiments/llm_task_sft/README.md)、[总报告](../experiments/llm_task_sft/results/report.md) |
 | 棋盘状态地图 | 提供冻结 Q 和独立地图贪心参照 | [协议与来源](../experiments/blocks_distance_map/README.md) |
-| 汉诺塔／二阶魔方地图 | 现有纯 Q：汉诺塔关系轨道留出 108/108，魔方未见状态 138/512、长程仍弱。下一步分析魔方决策覆盖、重构广度／深度监督并重训，扩展汉诺塔至 4、5、6 盘；旧非纯 Q 实现及产物退出工作区 | [汉诺塔结果](../experiments/hanoi_qmap/results/report.md)、[魔方结果](../experiments/cube2_qmap/results/report.md)、[共享核心](../experiments/puzzle_qmap/README.md) |
+| 汉诺塔／二阶魔方地图 | 已定位旧魔方相对决策覆盖不足，完整相对广度、同目标深路径／分叉构建器及实际遍历采样已实现；四至六盘汉诺塔完整环境与合同已验证，待指定机训练。保持纯 Q；旧非纯 Q 实现及产物退出工作区 | [魔方数据设计](../experiments/cube2_qmap/DATA_DESIGN.md)、[汉诺塔](../experiments/hanoi_qmap/README.md)、[既有结果](../experiments/cube2_qmap/results/report.md) |
 | 寻路接口与早期方案 | 作为机制和任务边界的历史证据 | [实验目录](../experiments/README.md) |
 
 ## 3. 已确定的比较原则

@@ -12,7 +12,7 @@ def augment(env, states, allowed, rng, copies, max_attempts):
         raise ValueError("copies must be nonnegative; max_attempts must be positive")
     indices = np.tile(np.arange(len(states)), copies)
     result = states[indices].copy()
-    if env.name == "hanoi3" and copies:
+    if env.name.startswith("hanoi") and copies:
         if copies != env.symmetry_count:
             raise ValueError("Hanoi augmentation enumerates all six peg permutations")
         transform = np.repeat(np.arange(env.symmetry_count), len(states))

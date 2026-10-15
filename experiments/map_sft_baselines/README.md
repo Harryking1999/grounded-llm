@@ -39,7 +39,7 @@ python -m experiments.map_sft_baselines.src.bridge --profile PRIVATE_RUNTIME_PRO
 
 bridge 的 runtime profile 须包含 `config`（正式研究配置的绝对路径），以及源运行、目标运行、跳板/目标连接与 known_hosts 路径。停训策略从 runtime profile 读取；样本、评测规模和保存间隔从正式配置读取，不在队列中另写一套数值。
 
-桥接每轮先下载汇总曲线和报告，再清理权重，最后发布新权重。重建评测端时按 step 合并训练端已有曲线，避免较短的新曲线覆盖历史数字。`baselines` 指定回传范围，`publish_baselines` 可单独指定发送权重的条件，避免与 028 独立评测重复。逐题记录不自动复制到训练端。
+桥接每轮先下载汇总曲线和报告，再清理权重，最后发布新权重。重建评测端时按 step 合并训练端已有曲线，避免较短的新曲线覆盖历史数字。`baselines` 指定回传范围，`publish_baselines` 可单独指定发送权重的条件，避免与 028 独立评测重复。逐题记录不自动复制到训练端。`bridge_status.json` 实时记录连接、回传、清理、上传阶段；`bridge_failures.jsonl` 保留历次 I/O 失败记录，即使之后重连成功也不覆盖。
 
 权重缓存策略由 [bridge_retention.json](configs/bridge_retention.json) 统一维护，profile 可用 `retention_config` 指定其绝对路径。默认只发布各条件最新 checkpoint，限制缓存总字节、各条件在途 checkpoint 数和每轮传输数；到达上限时保持回传结果并等待空间，不删除未完成评测来腾位置。用户账号配额与整盘剩余空间须分别检查。
 

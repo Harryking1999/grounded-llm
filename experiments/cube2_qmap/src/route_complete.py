@@ -272,8 +272,9 @@ def main():
         initial = encoder.encode(features)
     free = FreeCoordinates(initial, env.diameter).to(args.device)
     gap = float((free().detach() - initial).abs().max())
-    if gap > 1e-6:
-        raise ValueError("Free coordinates do not match initial encoder Q")
+    # GPU sigmoid/logit round trips differ by a few float32 ulps.
+    if gap > config["initial_q_tolerance"]:
+        raise ValueError(f"Free coordinates do not match initial encoder Q: {gap}")
     summary = {"source_commit": args.source_commit, "seed": args.seed,
                "states": len(data["states"]), "decisions": len(data["tasks"]),
                "initial_routes": len(data["initial"]), "pairs": len(data["pairs"]),

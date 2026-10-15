@@ -66,7 +66,7 @@ python -u -m experiments.cube2_qmap.src.structure_study --contract experiments/c
 
 [route_complete.json](configs/route_complete.json) 与 [route_complete.py](src/route_complete.py) 实现下一项小型诊断：从八步起点和路径中间目标构造多目标关系，递归加入每个最优后继，直到目标；每个父节点保留全部六个动作候选。所有最优分支都闭合在受监督决策内，而非只监督一条选定路径。距离仍是完整状态集合的真实距离，网络自行组织坐标。
 
-自由坐标组以共享编码器的随机初始输出初始化，并保留同一 sigmoid 输出范围；两组使用同样的距离与排序标签、Adam、步数及学习率计划。参数化不同意味着相同学习率不保证相同的 Q 步长，因此记录实际 Adam 更新后的两项损失、Q 移动、距离关系与动作决策退化。验收同时检查距离平均／分位误差、所有受监督动作和完整起点路线；最大误差作为诊断，不再要求所有距离都低于同一个极小阈值。
+自由坐标组以共享编码器的随机初始输出初始化，并保留同一 sigmoid 输出范围；初始 Q 在合同浮点容差内匹配，实际最大差写入结果。两组使用同样的距离与排序标签、Adam、步数及学习率计划。参数化不同意味着相同学习率不保证相同的 Q 步长，因此记录实际 Adam 更新后的两项损失、Q 移动、距离关系与动作决策退化。验收同时检查距离平均／分位误差、所有受监督动作和完整起点路线；最大误差作为诊断，不再要求所有距离都低于同一个极小阈值。
 
 ```bash
 python -u -m experiments.cube2_qmap.src.route_complete --contract experiments/cube2_qmap/configs/route_complete.json --prepared-run /PATH/TO/cube2_quarter_turn_8eed676 --out /NEW/RUN/seed_20261016 --source-commit COMMIT --seed 20261016 --device cuda:0

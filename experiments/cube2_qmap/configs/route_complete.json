@@ -3,6 +3,7 @@
   "data": {"seed": 20261016, "root_depth": 8, "subgoal_path_index": 4, "minimum_branching_decisions": 2, "maximum_states": 128, "maximum_attempts": 64, "validation_poses": 4, "test_poses": 8},
   "model": {"dimension": 128, "hidden": 256, "metric": "linf"},
   "seeds": [20261016, 20261017, 20261018],
+  "initial_q_tolerance": 0.00001,
   "training": {"steps": 5000, "learning_rate": 0.001, "minimum_learning_rate": 0.00001, "eval_every": 500, "rank_weight": 1.0, "temperature": 1.0, "clip_norm": 5.0},
   "selection": "Minimum complete training Huber plus rank_weight * full soft ranking CE; no heldout selection; report best and last. Same fixed labels, initial Q, optimizer family and update budget. Equal learning rates do not guarantee equal functional step sizes across parameterizations, so record actual Q movement.",
   "criterion": {"maximum_mae": 0.25, "maximum_p95_error": 1.0, "all_decisions_optimal": true, "all_initial_routes_solved": true},

@@ -14,7 +14,7 @@
 | 冻结地图读取接口 | 既定训练与评测已完成，保留历史对照，不与新组直接混算 | [实验 README](../experiments/flamingo_map_reader/README.md)、[报告](../experiments/flamingo_map_reader/results/report.md) |
 | 独立无地图任务 SFT | 历史强基线；已保存完整断点并退出，为新评测释放资源 | [协议](../experiments/llm_task_sft/README.md)、[总报告](../experiments/llm_task_sft/results/report.md) |
 | 棋盘状态地图 | 提供冻结 Q 和独立地图贪心参照 | [协议与来源](../experiments/blocks_distance_map/README.md) |
-| 汉诺塔／二阶魔方地图 | 新任务环境、完整精确求解器与数据／Q 训练管线已实现；在指定平台开发机验证首轮地图，不包含联合 LLM 训练 | [汉诺塔](../experiments/hanoi_qmap/README.md)、[魔方](../experiments/cube2_qmap/README.md)、[共享核心](../experiments/puzzle_qmap/README.md) |
+| 汉诺塔／二阶魔方地图 | 指定开发机首轮训练已完成：汉诺塔留出关系 Q 贪心 106/106；魔方未见状态 123/512，长程仍弱；两任务的辅助转移头均未通过留出验证，不包含联合 LLM 训练 | [汉诺塔结果](../experiments/hanoi_qmap/results/report.md)、[魔方结果](../experiments/cube2_qmap/results/report.md)、[共享核心](../experiments/puzzle_qmap/README.md) |
 | 寻路接口与早期方案 | 作为机制和任务边界的历史证据 | [实验目录](../experiments/README.md) |
 
 ## 3. 已确定的比较原则

@@ -1,0 +1,601 @@
+{
+  "task": "cube2",
+  "source_commit": "fc87cce8ff6114f66824639cf336cad38fdc1973",
+  "best_step": 2000,
+  "last_step": 6000,
+  "training_seconds": 54.21,
+  "device": "cuda:1",
+  "torch_version": "2.7.1+cu128",
+  "numpy_version": "2.2.6",
+  "selection": "validation MAE + rank_weight * (1 - validation shortest-action rate)",
+  "remote_run": "/zhanghanyue/experiment/grounded_llm_puzzle_qmaps/runs/cube2_fc87cce",
+  "local_artifacts": "runs\\cube2_qmap\\first",
+  "data": {
+    "split_unit": "state_endpoints_unseen_in_all_losses",
+    "states_in_environment": 3674160,
+    "action_count": 9,
+    "diameter": 11,
+    "splits": {
+      "train": {
+        "pairs": 120000,
+        "unique_unordered_pairs": 119995,
+        "distance_histogram": [
+          0,
+          11078,
+          10916,
+          10833,
+          10827,
+          10873,
+          11114,
+          10922,
+          10816,
+          11036,
+          10826,
+          10759
+        ],
+        "decisions": 16717,
+        "transitions": 30000
+      },
+      "validation": {
+        "pairs": 6000,
+        "unique_unordered_pairs": 5999,
+        "distance_histogram": [
+          0,
+          565,
+          555,
+          507,
+          522,
+          531,
+          542,
+          572,
+          580,
+          554,
+          549,
+          523
+        ],
+        "decisions": 1200,
+        "transitions": 2000
+      },
+      "test": {
+        "pairs": 6000,
+        "unique_unordered_pairs": 5999,
+        "distance_histogram": [
+          0,
+          577,
+          508,
+          537,
+          503,
+          574,
+          562,
+          536,
+          574,
+          501,
+          579,
+          549
+        ],
+        "decisions": 1200,
+        "transitions": 2000
+      }
+    }
+  },
+  "test": {
+    "pairs": {
+      "count": 6000,
+      "mae": 2.0932313362161317,
+      "spearman": 0.6023782010446183,
+      "by_distance": {
+        "1": {
+          "count": 577,
+          "predicted_mean": 2.942977695159317,
+          "mae": 1.9429776951593172
+        },
+        "2": {
+          "count": 508,
+          "predicted_mean": 4.421859548786494,
+          "mae": 2.4218595487864936
+        },
+        "3": {
+          "count": 537,
+          "predicted_mean": 5.32082744639235,
+          "mae": 2.3208274463923506
+        },
+        "4": {
+          "count": 503,
+          "predicted_mean": 5.90182218115562,
+          "mae": 1.9137482311332201
+        },
+        "5": {
+          "count": 574,
+          "predicted_mean": 6.258362579844139,
+          "mae": 1.3380906664951338
+        },
+        "6": {
+          "count": 562,
+          "predicted_mean": 6.51265870846039,
+          "mae": 0.9475503438732378
+        },
+        "7": {
+          "count": 536,
+          "predicted_mean": 6.57143028725439,
+          "mae": 0.8261427959399437
+        },
+        "8": {
+          "count": 574,
+          "predicted_mean": 6.777785493937103,
+          "mae": 1.3160165195265714
+        },
+        "9": {
+          "count": 501,
+          "predicted_mean": 6.901835125601458,
+          "mae": 2.1042220007159753
+        },
+        "10": {
+          "count": 579,
+          "predicted_mean": 6.8177127426358295,
+          "mae": 3.182287257364171
+        },
+        "11": {
+          "count": 549,
+          "predicted_mean": 6.257681900903393,
+          "mae": 4.742318099096607
+        }
+      }
+    },
+    "decisions": {
+      "q": {
+        "count": 1000,
+        "shortest_action_rate": 0.489,
+        "uniform_tie_shortest_rate": 0.489,
+        "strict_candidate_order_accuracy": 0.6587149302494425
+      },
+      "hamming": {
+        "count": 1000,
+        "shortest_action_rate": 0.367,
+        "uniform_tie_shortest_rate": 0.3745626984126984,
+        "strict_candidate_order_accuracy": 0.3484934916766063
+      },
+      "oracle": {
+        "count": 1000,
+        "shortest_action_rate": 1.0,
+        "uniform_tie_shortest_rate": 1.0,
+        "strict_candidate_order_accuracy": 1.0
+      }
+    },
+    "transitions": {
+      "count": 2000,
+      "next_q_mse": 13.911662101745605,
+      "successor_retrieval_accuracy": 0.1245,
+      "identity_retrieval_accuracy": 0.121
+    },
+    "rollout": {
+      "q": {
+        "count": 512,
+        "solved": 123,
+        "success_rate": 0.240234375,
+        "cycle_rate": 0.759765625,
+        "budget_exhausted": 0,
+        "horizon": 22,
+        "mean_extra_steps_on_solved": 0.04065040650406504,
+        "illegal_action_rate": 0.0,
+        "by_start_distance": {
+          "1": {
+            "count": 45,
+            "success_rate": 1.0
+          },
+          "2": {
+            "count": 38,
+            "success_rate": 0.9736842105263158
+          },
+          "3": {
+            "count": 43,
+            "success_rate": 0.627906976744186
+          },
+          "4": {
+            "count": 42,
+            "success_rate": 0.19047619047619047
+          },
+          "5": {
+            "count": 51,
+            "success_rate": 0.09803921568627451
+          },
+          "6": {
+            "count": 45,
+            "success_rate": 0.0
+          },
+          "7": {
+            "count": 40,
+            "success_rate": 0.025
+          },
+          "8": {
+            "count": 61,
+            "success_rate": 0.0
+          },
+          "9": {
+            "count": 51,
+            "success_rate": 0.0
+          },
+          "10": {
+            "count": 55,
+            "success_rate": 0.0
+          },
+          "11": {
+            "count": 41,
+            "success_rate": 0.0
+          }
+        }
+      },
+      "hamming": {
+        "count": 512,
+        "solved": 61,
+        "success_rate": 0.119140625,
+        "cycle_rate": 0.880859375,
+        "budget_exhausted": 0,
+        "horizon": 22,
+        "mean_extra_steps_on_solved": 0.0,
+        "illegal_action_rate": 0.0,
+        "by_start_distance": {
+          "1": {
+            "count": 45,
+            "success_rate": 1.0
+          },
+          "2": {
+            "count": 38,
+            "success_rate": 0.39473684210526316
+          },
+          "3": {
+            "count": 43,
+            "success_rate": 0.023255813953488372
+          },
+          "4": {
+            "count": 42,
+            "success_rate": 0.0
+          },
+          "5": {
+            "count": 51,
+            "success_rate": 0.0
+          },
+          "6": {
+            "count": 45,
+            "success_rate": 0.0
+          },
+          "7": {
+            "count": 40,
+            "success_rate": 0.0
+          },
+          "8": {
+            "count": 61,
+            "success_rate": 0.0
+          },
+          "9": {
+            "count": 51,
+            "success_rate": 0.0
+          },
+          "10": {
+            "count": 55,
+            "success_rate": 0.0
+          },
+          "11": {
+            "count": 41,
+            "success_rate": 0.0
+          }
+        }
+      },
+      "oracle": {
+        "count": 512,
+        "solved": 512,
+        "success_rate": 1.0,
+        "cycle_rate": 0.0,
+        "budget_exhausted": 0,
+        "horizon": 22,
+        "mean_extra_steps_on_solved": 0.0,
+        "illegal_action_rate": 0.0,
+        "by_start_distance": {
+          "1": {
+            "count": 45,
+            "success_rate": 1.0
+          },
+          "2": {
+            "count": 38,
+            "success_rate": 1.0
+          },
+          "3": {
+            "count": 43,
+            "success_rate": 1.0
+          },
+          "4": {
+            "count": 42,
+            "success_rate": 1.0
+          },
+          "5": {
+            "count": 51,
+            "success_rate": 1.0
+          },
+          "6": {
+            "count": 45,
+            "success_rate": 1.0
+          },
+          "7": {
+            "count": 40,
+            "success_rate": 1.0
+          },
+          "8": {
+            "count": 61,
+            "success_rate": 1.0
+          },
+          "9": {
+            "count": 51,
+            "success_rate": 1.0
+          },
+          "10": {
+            "count": 55,
+            "success_rate": 1.0
+          },
+          "11": {
+            "count": 41,
+            "success_rate": 1.0
+          }
+        }
+      }
+    }
+  },
+  "initial_test": {
+    "pairs": {
+      "count": 6000,
+      "mae": 5.860147545752426,
+      "spearman": 0.26768093644256047,
+      "by_distance": {
+        "1": {
+          "count": 577,
+          "predicted_mean": 0.13987643390480733,
+          "mae": 0.8601235660951927
+        },
+        "2": {
+          "count": 508,
+          "predicted_mean": 0.16235873268873202,
+          "mae": 1.8376412673112679
+        },
+        "3": {
+          "count": 537,
+          "predicted_mean": 0.16246410699308028,
+          "mae": 2.83753589300692
+        },
+        "4": {
+          "count": 503,
+          "predicted_mean": 0.1648620088875412,
+          "mae": 3.835137991112459
+        },
+        "5": {
+          "count": 574,
+          "predicted_mean": 0.16547291437715603,
+          "mae": 4.834527085622844
+        },
+        "6": {
+          "count": 562,
+          "predicted_mean": 0.16669068387394698,
+          "mae": 5.833309316126053
+        },
+        "7": {
+          "count": 536,
+          "predicted_mean": 0.1669576253686378,
+          "mae": 6.833042374631362
+        },
+        "8": {
+          "count": 574,
+          "predicted_mean": 0.1685842662945857,
+          "mae": 7.831415733705414
+        },
+        "9": {
+          "count": 501,
+          "predicted_mean": 0.1681833178875689,
+          "mae": 8.83181668211243
+        },
+        "10": {
+          "count": 579,
+          "predicted_mean": 0.16742831059379282,
+          "mae": 9.832571689406207
+        },
+        "11": {
+          "count": 549,
+          "predicted_mean": 0.1632784401729893,
+          "mae": 10.83672155982701
+        }
+      }
+    },
+    "decisions": {
+      "q": {
+        "count": 1000,
+        "shortest_action_rate": 0.367,
+        "uniform_tie_shortest_rate": 0.367,
+        "strict_candidate_order_accuracy": 0.5643831354042421
+      },
+      "hamming": {
+        "count": 1000,
+        "shortest_action_rate": 0.367,
+        "uniform_tie_shortest_rate": 0.3745626984126984,
+        "strict_candidate_order_accuracy": 0.3484934916766063
+      },
+      "oracle": {
+        "count": 1000,
+        "shortest_action_rate": 1.0,
+        "uniform_tie_shortest_rate": 1.0,
+        "strict_candidate_order_accuracy": 1.0
+      }
+    },
+    "transitions": {
+      "count": 2000,
+      "next_q_mse": 0.03730659931898117,
+      "successor_retrieval_accuracy": 0.1135,
+      "identity_retrieval_accuracy": 0.115
+    },
+    "rollout": {
+      "q": {
+        "count": 512,
+        "solved": 62,
+        "success_rate": 0.12109375,
+        "cycle_rate": 0.87890625,
+        "budget_exhausted": 0,
+        "horizon": 22,
+        "mean_extra_steps_on_solved": 0.016129032258064516,
+        "illegal_action_rate": 0.0,
+        "by_start_distance": {
+          "1": {
+            "count": 45,
+            "success_rate": 1.0
+          },
+          "2": {
+            "count": 38,
+            "success_rate": 0.42105263157894735
+          },
+          "3": {
+            "count": 43,
+            "success_rate": 0.023255813953488372
+          },
+          "4": {
+            "count": 42,
+            "success_rate": 0.0
+          },
+          "5": {
+            "count": 51,
+            "success_rate": 0.0
+          },
+          "6": {
+            "count": 45,
+            "success_rate": 0.0
+          },
+          "7": {
+            "count": 40,
+            "success_rate": 0.0
+          },
+          "8": {
+            "count": 61,
+            "success_rate": 0.0
+          },
+          "9": {
+            "count": 51,
+            "success_rate": 0.0
+          },
+          "10": {
+            "count": 55,
+            "success_rate": 0.0
+          },
+          "11": {
+            "count": 41,
+            "success_rate": 0.0
+          }
+        }
+      },
+      "hamming": {
+        "count": 512,
+        "solved": 61,
+        "success_rate": 0.119140625,
+        "cycle_rate": 0.880859375,
+        "budget_exhausted": 0,
+        "horizon": 22,
+        "mean_extra_steps_on_solved": 0.0,
+        "illegal_action_rate": 0.0,
+        "by_start_distance": {
+          "1": {
+            "count": 45,
+            "success_rate": 1.0
+          },
+          "2": {
+            "count": 38,
+            "success_rate": 0.39473684210526316
+          },
+          "3": {
+            "count": 43,
+            "success_rate": 0.023255813953488372
+          },
+          "4": {
+            "count": 42,
+            "success_rate": 0.0
+          },
+          "5": {
+            "count": 51,
+            "success_rate": 0.0
+          },
+          "6": {
+            "count": 45,
+            "success_rate": 0.0
+          },
+          "7": {
+            "count": 40,
+            "success_rate": 0.0
+          },
+          "8": {
+            "count": 61,
+            "success_rate": 0.0
+          },
+          "9": {
+            "count": 51,
+            "success_rate": 0.0
+          },
+          "10": {
+            "count": 55,
+            "success_rate": 0.0
+          },
+          "11": {
+            "count": 41,
+            "success_rate": 0.0
+          }
+        }
+      },
+      "oracle": {
+        "count": 512,
+        "solved": 512,
+        "success_rate": 1.0,
+        "cycle_rate": 0.0,
+        "budget_exhausted": 0,
+        "horizon": 22,
+        "mean_extra_steps_on_solved": 0.0,
+        "illegal_action_rate": 0.0,
+        "by_start_distance": {
+          "1": {
+            "count": 45,
+            "success_rate": 1.0
+          },
+          "2": {
+            "count": 38,
+            "success_rate": 1.0
+          },
+          "3": {
+            "count": 43,
+            "success_rate": 1.0
+          },
+          "4": {
+            "count": 42,
+            "success_rate": 1.0
+          },
+          "5": {
+            "count": 51,
+            "success_rate": 1.0
+          },
+          "6": {
+            "count": 45,
+            "success_rate": 1.0
+          },
+          "7": {
+            "count": 40,
+            "success_rate": 1.0
+          },
+          "8": {
+            "count": 61,
+            "success_rate": 1.0
+          },
+          "9": {
+            "count": 51,
+            "success_rate": 1.0
+          },
+          "10": {
+            "count": 55,
+            "success_rate": 1.0
+          },
+          "11": {
+            "count": 41,
+            "success_rate": 1.0
+          }
+        }
+      }
+    }
+  }
+}

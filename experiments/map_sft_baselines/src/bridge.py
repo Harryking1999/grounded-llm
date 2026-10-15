@@ -60,16 +60,21 @@ def return_scores(files, profile, config):
     return returned
 
 
+def record_progress(profile, progress, **updates):
+    progress.update(updates, updated=time.time())
+    atomic_json(profile['run_path'] / 'bridge_status.json', progress)
+
+
 def cycle(files, target, profile, config, policy, progress):
-    progress['phase'] = 'results'
+    record_progress(profile, progress, status='running', phase='results')
     progress['returned'] = return_scores(files, profile, config)
     progress['scores_synced_at'] = time.time()
     ready = sorted((profile['run_path'] / 'training').glob('B*/checkpoint-*/evaluation_ready.json'),
                    key=lambda p: -json.loads(p.read_text())['epoch'])
     archived = {(p.parent.parent.name, p.parent.name): p.parent / 'weights.pt' for p in ready}
-    progress['phase'] = 'retention'
+    record_progress(profile, progress, phase='retention')
     progress['deleted'] = prune_completed(files, profile, config, archived)
-    progress['phase'] = 'weights'
+    record_progress(profile, progress, phase='weights')
     published, blocked, seen = [], [], set()
     for marker in ready:
         base = marker.parent.parent.name
@@ -90,6 +95,7 @@ def cycle(files, target, profile, config, policy, progress):
             blocked.append(dict(baseline=base, checkpoint=marker.parent.name))
             continue
         execute(target, 'mkdir -p ' + shlex.quote(dest))
+        record_progress(profile, progress, checkpoint=str(marker.parent), phase='weights')
         for name in ('weights.pt', 'state.json', 'evaluation_ready.json'):
             publish(files, marker.parent / name, dest + '/' + name)
         published.append(dict(baseline=base, checkpoint=marker.parent.name))
@@ -117,7 +123,9 @@ def run(profile_path, credentials, cycles=None):
             atomic_json(root / 'bridge_status.json', progress)
             try:
                 jump, target = connect(profile, credentials)
+                target.get_transport().set_keepalive(30)
                 files = paramiko.SFTPClient.from_transport(target.get_transport(), window_size=64*1024*1024, max_packet_size=1024*1024)
+                files.get_channel().settimeout(120)
                 cycle(files, target, profile, config, policy, progress)
                 failures = 0
             except (OSError, EOFError, paramiko.SSHException, RuntimeError) as error:
@@ -125,6 +133,8 @@ def run(profile_path, credentials, cycles=None):
                 interval = min(interval * 2 ** min(failures - 1, 6), policy['retry_maximum_seconds'])
                 progress.update(status='retrying', error_type=type(error).__name__, error=str(error),
                                 consecutive_failures=failures, retry_at=time.time() + interval)
+                with (root / 'bridge_failures.jsonl').open('a') as log:
+                    log.write(json.dumps(dict(progress, failed_at=time.time())) + '\n')
             finally:
                 for client in (files, target, jump):
                     if client:

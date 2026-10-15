@@ -147,6 +147,8 @@ class BridgeTests(unittest.TestCase):
         self.assertEqual(failed['phase'], 'connect')
         self.assertEqual(failed['error'], 'quota')
         self.assertIn('retry_at', failed)
+        history = [json.loads(line) for line in (self.local / 'bridge_failures.jsonl').read_text().splitlines()]
+        self.assertEqual(history[0]['error'], 'quota')
         self.assertEqual(states[-1]['status'], 'running')
 
 

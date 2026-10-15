@@ -131,9 +131,41 @@ class QuarterTurnTest(unittest.TestCase):
             self.assertEqual(next_state, env.step(env.step(0, "U"), action))
             with self.assertRaises(ValueError):
                 MapReader(Cube2(), root / "last.pt")
+            repair = root / "repair"
+            repair.mkdir()
+            config["sampling"].update(complete_goal_distances=True,
+                                      decision_replay={"fraction": .5, "capacity": 128})
+            repaired = train(env, config, data, repair, "cpu", "repair-smoke", root / "best.pt")
+            self.assertGreater(repaired["last_model_training_coverage"]["replayed_pose_groups"], 0)
             config["training"]["progress_margin_weight"] = 1.
             with self.assertRaisesRegex(ValueError, "Archived loss experiments"):
                 train(env, config, data, root, "cpu", "retired-contract")
+
+    def test_complete_distance_supervision_and_replay_only_wrong_training_graphs(self):
+        env = self.env
+        config = json.loads(json.dumps(self.config))
+        config["sampling"].update(complete_goal_distances=True,
+                                  decision_replay={"fraction": .5, "capacity": 2})
+        data = {"relative_roots": np.array([np.flatnonzero(env.depth == 4)[0]]),
+                "protected_states": np.array([0, 12345, 23456])}
+        sampler = LocalGraphSampler(env, data, config, np.random.default_rng(103))
+        first = sampler.draw(4, 32)
+        pairs = set(map(tuple, np.sort(first["pairs"], axis=1)))
+        candidates = np.column_stack((first["children"].ravel(), np.repeat(first["goals"], 6)))
+        self.assertTrue(set(map(tuple, np.sort(candidates, axis=1))).issubset(pairs))
+        np.testing.assert_array_equal(env.distance(first["states"][first["pairs"][:, 0]],
+                                                   first["states"][first["pairs"][:, 1]]),
+                                      first["pair_distances"])
+        sampler.observe(first, -first["child_distances"].astype(float))
+        self.assertEqual(len(sampler.replay), 2)
+        retained = set(sampler.replay)
+        second = sampler.draw(4, 32)
+        posed = second["states"].reshape(4, 35)
+        self.assertEqual(len(retained & set(map(tuple, posed[:, :2]))), 2)
+        self.assertFalse(np.isin(second["states"], data["protected_states"]).any())
+        self.assertEqual(sampler.coverage()["fresh_pose_groups"], 6)
+        sampler.observe(second, second["child_distances"].astype(float))
+        self.assertEqual(len(sampler.replay), 0)
 
 
 if __name__ == "__main__":

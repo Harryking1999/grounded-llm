@@ -1,0 +1,23 @@
+{
+  "hypothesis": "Complete absolute goal labels plus replay of wrongly ordered training graphs improves the missing middle-distance decisions without changing Q or either baseline loss.",
+  "prepared_source_commit": "8eed6763204bd4c5b5fb468263b936186be13b68",
+  "checkpoint": "best.pt",
+  "seed": 20261020,
+  "training": {
+    "steps": 10000,
+    "learning_rate": 0.0003,
+    "minimum_learning_rate": 0.00001,
+    "eval_every": 1000
+  },
+  "sampling": {
+    "minimum_full_passes": 0.02
+  },
+  "conditions": {
+    "control": {},
+    "repair": {
+      "complete_goal_distances": true,
+      "decision_replay": {"fraction": 0.5, "capacity": 4096}
+    }
+  },
+  "comparison": "Same initial Q and Adam, exact rules, protected states, evaluation tasks, losses, update budget and learning-rate schedule. Repair spends part of the budget rechecking old errors and supervises more absolute pairs per graph; fresh-example counts therefore differ. Selection remains validation Huber plus full soft ranking CE. Report best and last. This joint intervention does not isolate its two components."
+}

@@ -45,7 +45,10 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
     if config["data"].get("builder") == "local_graph":
         from experiments.cube2_qmap.src.local_graph import LocalGraphSampler
         online = LocalGraphSampler(env, data, config, rng)
-        if online.sampler.steps_for_passes(options["graph_batch_size"], config["sampling"]["minimum_full_passes"]) > options["steps"]:
+        fresh_batch = options["graph_batch_size"]
+        if online.repair:
+            fresh_batch = max(1, fresh_batch - round(fresh_batch * online.repair["fraction"]))
+        if online.sampler.steps_for_passes(fresh_batch, config["sampling"]["minimum_full_passes"]) > options["steps"]:
             raise ValueError("Training budget cannot traverse the contracted relative layers")
     elif "sampling" in config:
         sampling = config["sampling"]
@@ -164,6 +167,8 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
                 scores = distance(candidate_q, goal_q[:, None])
                 truth = torch.as_tensor(batch["child_distances"], device=device)
                 valid = torch.ones_like(truth, dtype=torch.bool)
+                if online.repair:
+                    online.observe(batch, scores.detach().cpu().numpy())
             else:
                 sampled_ids = (pair_sampler.draw(options["batch_size"]) if pair_sampler is not None
                                else rng.integers(len(pairs), size=options["batch_size"]))

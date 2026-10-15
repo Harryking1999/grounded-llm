@@ -52,7 +52,6 @@ def summarize(root, names, device, source_commit):
             "best_coverage": summary["best_model_training_coverage"],
             "last_coverage": summary["last_model_training_coverage"]}
     (root / "study_summary.json").write_text(json.dumps(result, indent=2) + "\n")
-    plot_losses(root, names)
 
 
 def plot_losses(root, names):
@@ -91,6 +90,7 @@ def main():
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--source-commit", required=True)
     parser.add_argument("--devices", nargs=2, default=["cuda:0", "cuda:1"])
+    parser.add_argument("--plot", action="store_true", help="Optional local plot; needs matplotlib")
     args = parser.parse_args()
     contract = json.loads(args.contract.read_text())
     prepared = args.prepared_run.resolve()
@@ -142,6 +142,8 @@ def main():
     for log in logs:
         log.close()
     summarize(root, names, args.devices[0], args.source_commit)
+    if args.plot:
+        plot_losses(root, names)
     (root / "complete.json").write_text(json.dumps({"conditions": names, "source_commit": args.source_commit}) + "\n")
 
 

@@ -61,6 +61,8 @@ python -m experiments.map_sft_baselines.src.queue evaluate --config CONFIG --dat
 
 ## 验证与结果
 
+会议讨论使用 [多基线讨论汇报](results/discussion_report.md)：集中说明数据、监督、基线、当前成绩与解释，不包含运行日志。
+
 ```bash
 python -m unittest experiments.map_sft_baselines.tests.test_contract experiments.map_sft_baselines.tests.test_shard_pool -v
 ```

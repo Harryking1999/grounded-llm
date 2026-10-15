@@ -63,8 +63,10 @@ class MetricTest(unittest.TestCase):
     def test_checkpoint_distance_is_restored_and_old_models_default_to_l1(self):
         env = Hanoi(2)
         with tempfile.TemporaryDirectory() as tmp:
-            for metric in ("l1", "linf", "l2"):
+            for metric in ("l1", "linf", "l2", "max_l1"):
                 config = {"dimension": 4, "hidden": 8}
+                if metric == "max_l1":
+                    config["group_size"] = 2
                 if metric != "l1":
                     config["metric"] = metric
                 model = QMap(env.feature_dim, **config, cap=env.diameter)
@@ -75,7 +77,7 @@ class MetricTest(unittest.TestCase):
                 self.assertEqual(reader.model.metric, metric)
                 q = reader.encode([0, 1, 8])
                 np.testing.assert_allclose(reader.scores([0, 1], [8, 8]),
-                                           distance(q[:2], q[2], metric).numpy(), rtol=0, atol=0)
+                                           distance(q[:2], q[2], metric, config.get("group_size", 8)).numpy(), rtol=0, atol=0)
 
     def test_decisions_rollout_and_audit_use_the_models_distance(self):
         # A reversible path: 2 -- 0 -- 1 -- 3(goal). The readout choice differs

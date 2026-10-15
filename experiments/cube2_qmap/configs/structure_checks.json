@@ -1,0 +1,20 @@
+{
+  "hypothesis": "Complete multi-goal constraints and individually isolated edge, path, and paired-symmetry supervision can improve intrinsic fixed-metric Q geometry.",
+  "seed": 20261016,
+  "model": {"dimension": 128, "hidden": 256, "group_size": 8},
+  "data": {"path_depths": [6, 8], "goals": 6, "validation_poses": 4, "test_poses": 8, "maximum_template_states": 128},
+  "training": {"steps": 5000, "learning_rate": 0.001, "minimum_learning_rate": 0.00001, "eval_every": 1000, "sparse_pairs": 128, "rank_weight": 1.0, "temperature": 1.0},
+  "conditions": [
+    {"name": "linf_sparse_fixed", "metric": "linf", "fresh": false, "pairs": "sparse", "edge": 0.0, "path": 0.0, "symmetry": 0.0},
+    {"name": "linf_joint_fixed", "metric": "linf", "fresh": false, "pairs": "complete", "edge": 0.0, "path": 0.0, "symmetry": 0.0},
+    {"name": "group_joint_fixed", "metric": "max_l1", "fresh": false, "pairs": "complete", "edge": 0.0, "path": 0.0, "symmetry": 0.0},
+    {"name": "linf_augmented_control", "metric": "linf", "fresh": true, "pairs": "complete", "edge": 0.0, "path": 0.0, "symmetry": 0.0},
+    {"name": "linf_augmented_edge", "metric": "linf", "fresh": true, "pairs": "complete", "edge": 1.0, "path": 0.0, "symmetry": 0.0},
+    {"name": "linf_augmented_path", "metric": "linf", "fresh": true, "pairs": "complete", "edge": 0.0, "path": 1.0, "symmetry": 0.0},
+    {"name": "linf_augmented_symmetry", "metric": "linf", "fresh": true, "pairs": "complete", "edge": 0.0, "path": 0.0, "symmetry": 1.0}
+  ],
+  "selection": "Fixed-pose fit checks select by complete training distance Huber plus full ranking CE. Augmented conditions select by the same objective on validation poses. Test only once after selection; report last separately.",
+  "scope": "Small diagnostic, not a full-state global map. New poses of the identical relative template test presentation transfer, not unseen relation types. Complete-pair and sparse-pair conditions match state encoding and optimizer updates, but not pair-label exposure or pair arithmetic; compare optimization, not data efficiency. All original protected states and all structural heldout-pose states are excluded from training.",
+  "fit_criterion": {"maximum_absolute_distance_error": 0.25, "all_actions_shortest": true},
+  "followup": "Do not automatically launch more expensive training. Interpret each isolated check before choosing a full-state condition."
+}

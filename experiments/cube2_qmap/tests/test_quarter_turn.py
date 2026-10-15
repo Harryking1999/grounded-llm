@@ -7,12 +7,15 @@ import sys
 
 import numpy as np
 import torch
+from torch.nn import functional as F
 
 from experiments.cube2_qmap.src.environment import Cube2
 from experiments.cube2_qmap.src.local_graph import LocalGraphSampler, build_local_graph, local_template
 from experiments.puzzle_qmap.src.data import cube_pairs, pair_keys
 from experiments.puzzle_qmap.src.model import MapReader
 from experiments.puzzle_qmap.src.run import train
+from experiments.puzzle_qmap.src.model import QMap, distance
+from experiments.cube2_qmap.src.structure_study import build_template, objective, relation_values
 
 
 class QuarterTurnTest(unittest.TestCase):
@@ -26,6 +29,42 @@ class QuarterTurnTest(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         cls.tmp.cleanup()
+
+    def test_multigoal_template_has_exact_edges_and_disjoint_complete_poses(self):
+        config = json.loads((Path(__file__).parents[1] / "configs/structure_checks.json").read_text())
+        protected = np.array([0, 12345, 23456])
+        data = build_template(self.env, config, protected)
+        self.assertLessEqual(len(data["states"]), config["model"]["dimension"])
+        self.assertEqual(len(np.unique(data["tasks"][:, 1])), config["data"]["goals"])
+        used = set(protected)
+        for poses in data["poses"].values():
+            for row in poses:
+                self.assertFalse(used.intersection(row.tolist()))
+                used.update(row.tolist())
+                np.testing.assert_array_equal(self.env.successors(row[data["tasks"][:, 0]]), row[data["children"]])
+                np.testing.assert_array_equal(self.env.distance(row[:, None], row[None, :]), data["distances"])
+        exact = torch.tensor(data["distances"], dtype=torch.float32)
+        q = F.pad(exact, (0, 128 - len(exact)))[None]
+        model = QMap(self.env.feature_dim, 128, 256, 14, "linf")
+        pair, scores, parent, edges = relation_values(model, q, data, np.arange(len(data["pairs"])))
+        np.testing.assert_array_equal(pair[0].numpy(), data["distances"][tuple(data["pairs"].T)])
+        np.testing.assert_array_equal(scores[0].numpy(), data["truth"])
+        torch.testing.assert_close(edges, torch.ones_like(edges))
+        condition = {**config["conditions"][-1], "edge": 1., "path": 1.}
+        q = q.repeat(2, 1, 1).requires_grad_()
+        objective(model, q, data, config, condition, np.arange(len(data["pairs"]))).backward()
+        self.assertTrue(torch.isfinite(q.grad).all())
+
+    def test_group_norm_preserves_five_point_witness_and_spreads_gradient(self):
+        ids = np.array([1, 1574641, 1224721, 629857, 0])
+        exact = self.env.distance(ids[:, None], ids[None, :])
+        q = torch.zeros(5, 16, 8)
+        q[:, :5, 0] = torch.tensor(exact, dtype=torch.float32)
+        q = q.flatten(1)
+        torch.testing.assert_close(distance(q[:, None], q[None], "max_l1"), torch.tensor(exact).float())
+        x = torch.tensor([[1., 2., 0., 0.]], requires_grad=True)
+        distance(x, torch.zeros_like(x), "max_l1", 2).sum().backward()
+        torch.testing.assert_close(x.grad, torch.tensor([[1., 1., 0., 0.]]))
 
     def test_full_qtm_graph_and_same_face_composition(self):
         env = self.env

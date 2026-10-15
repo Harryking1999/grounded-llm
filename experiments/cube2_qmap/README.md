@@ -41,3 +41,15 @@ python -u -m experiments.cube2_qmap.src.metric_study --contract experiments/cube
 程序只依据验证集决定是否运行 L2；测试结果不参与条件选择。最终同时报告验证选定与末步模型的距离误差、排序和完整到达，不把 loss 降低当作成功。运行、日志和完整结果集中在同一个 Git 外目录；启动与结论记录于结果报告。
 
 L2 也不能精确表示四条边为 1、两条对角线为 2 的图四环：欧氏空间中距离 1+1=2 的等号迫使中间点位于两端中点，两条路径的中点因此重合。这不否定近似动作排序；对应检查见共享测试。结构调研与后续建议见[研究记录](results/structure_notes.md)。
+
+## 逐项结构检查
+
+[structure_checks.json](configs/structure_checks.json) 为小型多目标诊断合同，[structure_study.py](src/structure_study.py) 复用同一编码器与纯 Q 推理接口。先比较固定状态上的稀疏／完整距离监督及分组 L1-max；再在相同新呈现流上，分别加入边上界、路径进展或配对距离对称监督。各项不同时叠加，不加入目标条件读出或学习的转移头。
+
+```bash
+python -u -m experiments.cube2_qmap.src.structure_study --contract experiments/cube2_qmap/configs/structure_checks.json --prepared-run /PATH/TO/cube2_quarter_turn_8eed676 --out /PATH/TO/structure_checks --source-commit COMMIT --device cuda:2
+```
+
+完整距离与稀疏距离条件的状态编码和更新次数相同，标签曝光不同。固定呈现组按完整训练目标选模，仅用于有限集合拟合；新呈现组按验证目标选模。测试在选模后评估最佳与末步模型。原实验保护端点以及本次所有留出呈现中的输入状态均排除在训练之外；新呈现条件也不使用固定呈现的输入状态。其 `fit` 列在新呈现条件中是共同固定监测呈现，不能称为训练集成绩。动作候选和 rollout 中间状态由环境给出，且可能离开有限模板。
+
+分组规则为固定块内绝对差相加、块间取最大；块宽保存在 checkpoint 的 `group_size`。构造性 L∞ 可行解只证明小集合可表示。留出呈现仍然复用同一组相对关系，不能当成完整魔方或未见关系类型泛化。

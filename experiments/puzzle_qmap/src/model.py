@@ -7,7 +7,7 @@ from experiments.blocks_distance_map.src.model import BoardEncoder, distance as 
 MODEL_TYPE = "pure_q_symmetric_blocks"
 
 
-def distance(source, goal, metric="l1"):
+def distance(source, goal, metric="l1", group_size=8):
     if metric == "l1":
         return (blocks_distance(source, goal, "directed_sum") +
                 blocks_distance(goal, source, "directed_sum")) / 2
@@ -15,18 +15,26 @@ def distance(source, goal, metric="l1"):
         return (source - goal).abs().amax(dim=-1)
     if metric == "l2":
         return (source - goal).norm(p=2, dim=-1)
+    if metric == "max_l1":
+        difference = (source - goal).abs()
+        if group_size < 1 or difference.shape[-1] % group_size:
+            raise ValueError("Q dimension must be divisible by the positive group size")
+        return difference.reshape(*difference.shape[:-1], -1, group_size).sum(-1).amax(-1)
     raise ValueError(f"Unknown Q distance: {metric}")
 
 
 class QMap(BoardEncoder):
-    def __init__(self, feature_dim, dimension, hidden, cap, metric="l1"):
-        if metric not in ("l1", "linf", "l2"):
+    def __init__(self, feature_dim, dimension, hidden, cap, metric="l1", group_size=8):
+        if metric not in ("l1", "linf", "l2", "max_l1"):
             raise ValueError(f"Unknown Q distance: {metric}")
+        if metric == "max_l1" and (group_size < 1 or dimension % group_size):
+            raise ValueError("Q dimension must be divisible by the positive group size")
         super().__init__(dimension, hidden, cap, "symmetric_directed_sum", input_dim=feature_dim)
         self.metric = metric
+        self.group_size = group_size
 
     def distance(self, source, goal):
-        return distance(source, goal, self.metric)
+        return distance(source, goal, self.metric, self.group_size)
 
     def forward(self, features, pairs):
         return self.distance(self.encode(features[pairs[:, 0]]), self.encode(features[pairs[:, 1]]))

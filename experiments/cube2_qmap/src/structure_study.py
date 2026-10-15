@@ -75,6 +75,15 @@ def relation_values(model, q, data, pair_indices):
 
 
 def objective(model, q, data, config, condition, pair_indices):
+    if condition.get("coordinate_teacher", False):
+        if condition["fresh"] or model.metric != "linf":
+            raise ValueError("Finite anchor-coordinate probe requires fixed-pose Linf")
+        # All anchors belong to the fixed training set, with known exact
+        # distances. Only diagnoses discovery of a feasible finite embedding;
+        # random fixed anchors were already insufficient on the whole cube.
+        target = F.pad(torch.as_tensor(data["distances"], device=q.device).float(),
+                       (0, q.shape[-1] - len(data["states"])))
+        return F.smooth_l1_loss(q, target[None].expand_as(q))
     pair, scores, parent, edges = relation_values(model, q, data, pair_indices)
     pairs = data["pairs"][pair_indices]
     target = torch.as_tensor(data["distances"][pairs[:, 0], pairs[:, 1]], device=q.device).float()
@@ -268,6 +277,9 @@ def main():
     args = parser.parse_args()
     torch.set_num_threads(2)
     config = json.loads(args.contract.read_text())
+    if "base_contract" in config:
+        base = json.loads((args.contract.parent / config["base_contract"]).read_text())
+        config = {**base, **config}
     args.out.mkdir(parents=True, exist_ok=False)
     (args.out / "contract.json").write_text(json.dumps(config, indent=2) + "\n")
     env = Cube2(args.prepared_run / "oracle_depth.npy", metric="QTM_URF_6")

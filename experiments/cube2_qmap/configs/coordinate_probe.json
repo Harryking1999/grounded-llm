@@ -1,0 +1,8 @@
+{
+  "base_contract": "structure_checks.json",
+  "hypothesis": "The shared MLP can learn a known feasible multi-goal Linf embedding when coordinate discovery through max aggregation is removed.",
+  "conditions": [
+    {"name": "linf_anchor_teacher_fixed", "metric": "linf", "fresh": false, "pairs": "complete", "edge": 0.0, "path": 0.0, "symmetry": 0.0, "coordinate_teacher": true}
+  ],
+  "scope": "Finite training-set diagnostic only. Exactly the same template, poses, initialization and budget as structure_checks. Supervise the constructive distance-to-each-training-state coordinate target directly, replacing the pair/ranking objective. All anchors are fixed training states; no heldout states as anchors. Pure learned encoder at inference, no oracle. This does not overcome the previously observed full-cube fixed-anchor limitation or demonstrate unseen-relation generalization."
+}

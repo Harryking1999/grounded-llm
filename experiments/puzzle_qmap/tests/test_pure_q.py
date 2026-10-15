@@ -1,4 +1,3 @@
-import json
 from pathlib import Path
 import tempfile
 import unittest
@@ -47,16 +46,20 @@ class PureQTest(unittest.TestCase):
         self.assertTrue(torch.isfinite(scores.grad).all())
 
     def test_cube_symmetry_labels_edges_and_augmented_split(self):
-        env = Cube2()
+        env = Cube2(metric="QTM_URF_6")
         rng = np.random.default_rng(15)
         states, goals, transform = rng.integers(env.size, size=(3, 1000))
         changed = env.symmetry(states, transform)
         self.assertTrue(np.all(changed < env.size))
         np.testing.assert_array_equal(env.symmetry(env.successors(states), transform[:, None]),
                                       env.successors(changed))
-        config = json.loads((Path(__file__).parents[2] / "cube2_qmap/configs/study.json").read_text())
-        config["data"].update(pairs_train=500, pairs_validation=40, pairs_test=40,
-                              decisions_train=500, decisions_validation=40, decisions_test=40)
+        config = {
+            "seed": 15,
+            "data": {"pairs_train": 500, "pairs_validation": 40, "pairs_test": 40,
+                     "decisions_train": 500, "decisions_validation": 40, "decisions_test": 40},
+            "augmentation": {"kind": env.symmetry_kind, "enabled": True, "copies": 2,
+                             "max_attempts": 128},
+        }
         with tempfile.TemporaryDirectory() as tmp:
             env.build_oracle(Path(tmp) / "oracle.npy")
             np.testing.assert_array_equal(env.distance(states, goals),

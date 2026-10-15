@@ -2,7 +2,7 @@
 import numpy as np
 import torch
 
-from .model import distance, soft_rank_loss, edge_difference_loss, progress_margin_loss
+from .model import distance, soft_rank_loss
 from .sampling import task_indices
 
 
@@ -77,25 +77,6 @@ def ranking_loss(model, env, tasks, truth, device, temperature):
         targets.append(torch.as_tensor(truth[begin:begin + len(chunk)], device=device))
         masks.append(torch.as_tensor(children >= 0, device=device))
     return float(soft_rank_loss(torch.cat(scores), torch.cat(targets), torch.cat(masks), temperature))
-
-
-@torch.no_grad()
-def progress_loss(model, env, tasks, truth, device, margin=None):
-    losses, counts = [], []
-    for begin in range(0, len(tasks), 1024):
-        chunk = tasks[begin:begin + 1024]
-        children = env.successors(chunk[:, 0])
-        goal = encode(model, env, chunk[:, 1], device)
-        child_scores = distance(encode(model, env, np.maximum(children, 0), device), goal[:, None])
-        parent_scores = distance(encode(model, env, chunk[:, 0], device), goal)
-        valid = torch.as_tensor(children >= 0, device=device)
-        arguments = (parent_scores, child_scores,
-                     torch.as_tensor(env.distance(chunk[:, 0], chunk[:, 1]), device=device),
-                     torch.as_tensor(truth[begin:begin + len(chunk)], device=device), valid)
-        loss = edge_difference_loss(*arguments) if margin is None else progress_margin_loss(*arguments, margin)
-        counts.append(int(valid.sum()) if margin is None else len(chunk))
-        losses.append(float(loss))
-    return float(np.average(losses, weights=counts))
 
 
 @torch.no_grad()

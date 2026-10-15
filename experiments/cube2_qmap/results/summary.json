@@ -1,348 +1,103 @@
 {
-  "task": "cube2",
-  "model_type": "pure_q_symmetric_blocks",
-  "source_commit": "90ec4ca61be7f55138a2c09929b015403a167073",
-  "config": "experiments/cube2_qmap/configs/balanced_epochs.json",
-  "parent": {
-    "checkpoint": "/zhanghanyue/experiment/grounded_llm_puzzle_qmaps/runs/cube2_breadth_depth_a07b5f7/best.pt",
-    "source_commit": "a07b5f7fb1605aaf0fbd7935c16f3174859caf47",
-    "step": 19000
-  },
-  "best_step": 195000,
-  "last_step": 200000,
-  "training_seconds": 1612.0,
-  "stop_reason": "step_budget_exhausted",
-  "best_model_training_coverage": {
-    "pair_min_layer_passes": 9.492128207622054,
-    "decision_min_layer_passes": 4.746063842359174
-  },
-  "last_model_training_coverage": {
-    "pair_min_layer_passes": 9.735516351721765,
-    "decision_min_layer_passes": 4.8677581758608826
-  },
-  "loss_endpoints": {
-    "parent": {
-      "fixed_training_huber": 1.6970954779868312,
-      "fixed_training_rank_ce": 2.2590689659118652,
-      "fixed_training_total": 3.9561644438986967,
-      "fixed_training_rank_kl": 0.3188847303390503,
-      "validation_huber": 1.843108100845253,
-      "validation_rank_ce": 2.278583526611328,
-      "validation_total": 4.121691627456581
-    },
-    "best": {
-      "fixed_training_huber": 1.0249762628633035,
-      "fixed_training_rank_ce": 2.224120616912842,
-      "fixed_training_total": 3.249096879776145,
-      "fixed_training_rank_kl": 0.28393638134002686,
-      "validation_huber": 1.482373985343013,
-      "validation_rank_ce": 2.242365598678589,
-      "validation_total": 3.7247395840216018
-    },
-    "last": {
-      "fixed_training_huber": 1.0248295839899009,
-      "fixed_training_rank_ce": 2.2242934703826904,
-      "fixed_training_total": 3.2491230543725913,
-      "fixed_training_rank_kl": 0.2841092348098755,
-      "validation_huber": 1.4824895875606108,
-      "validation_rank_ce": 2.242604970932007,
-      "validation_total": 3.725094558492618
-    }
-  },
-  "training_rank_target_entropy": 1.940184235572815,
-  "validation_rank_target_entropy": 1.941724419593811,
-  "test": {
-    "pairs": {
-      "distance_pairs": 6000,
-      "mae": 1.944612601518631,
-      "huber": 1.4887533812312777,
-      "spearman": 0.6559318106229443
-    },
-    "soft_rank_loss": 2.2411184310913086,
-    "decisions": {
-      "count": 1000,
-      "shortest_action_rate": 0.518,
-      "uniform_tie_shortest_rate": 0.518,
-      "strict_candidate_order_accuracy": 0.6874479166666667
-    },
-    "rollout": {
-      "count": 512,
-      "solved": 151,
-      "success_rate": 0.294921875,
-      "cycle_rate": 0.705078125,
-      "budget_exhausted": 0,
-      "horizon": 22,
-      "mean_extra_steps_on_solved": 0.06622516556291391,
-      "illegal_action_rate": 0.0,
-      "by_start_distance": {
-        "1": {
-          "count": 46,
-          "success_rate": 1.0
-        },
-        "2": {
-          "count": 47,
-          "success_rate": 1.0
-        },
-        "3": {
-          "count": 47,
-          "success_rate": 0.8085106382978723
-        },
-        "4": {
-          "count": 47,
-          "success_rate": 0.3404255319148936
-        },
-        "5": {
-          "count": 47,
-          "success_rate": 0.06382978723404255
-        },
-        "6": {
-          "count": 46,
-          "success_rate": 0.021739130434782608
-        },
-        "7": {
-          "count": 46,
-          "success_rate": 0.0
-        },
-        "8": {
-          "count": 46,
-          "success_rate": 0.0
-        },
-        "9": {
-          "count": 46,
-          "success_rate": 0.0
-        },
-        "10": {
-          "count": 48,
-          "success_rate": 0.0
-        },
-        "11": {
-          "count": 46,
-          "success_rate": 0.0
-        }
+  "status": "global_shortest_successor_ordering_and_long_range_greedy_solving_unresolved",
+  "baseline": {
+    "source_commit": "8eed6763204bd4c5b5fb468263b936186be13b68",
+    "task": "cube2_qtm",
+    "loss_endpoints": {
+      "initial": {
+        "step": 0,
+        "training_huber": 6.331013750853564,
+        "training_rank_ce": 1.7884297370910645,
+        "training_total": 8.11944348794463,
+        "validation_huber": 6.963192675528057,
+        "validation_rank_ce": 1.7887232303619376,
+        "validation_total": 8.751915905889994
+      },
+      "best": {
+        "step": 160000,
+        "training_huber": 1.472006660466178,
+        "training_rank_ce": 1.8351987600326538,
+        "training_total": 3.307205420498832,
+        "validation_huber": 1.9368021108633886,
+        "validation_rank_ce": 1.8333189487457275,
+        "validation_total": 3.7701210596091164
+      },
+      "last": {
+        "step": 200000,
+        "training_huber": 1.4694656200265221,
+        "training_rank_ce": 1.8344415426254272,
+        "training_total": 3.3039071626519494,
+        "validation_huber": 1.9372338165345568,
+        "validation_rank_ce": 1.8343099355697632,
+        "validation_total": 3.77154375210432
       }
+    },
+    "decision_count": 1000,
+    "shortest_action_rate": 0.666,
+    "rollout_count": 512,
+    "solved": 131,
+    "two_state_cycles": 381
+  },
+  "archived_continuations": {
+    "absolute_control": {
+      "source_commit": "c4f32f51d8cf250a1518916f1488a0c28ecb27c0",
+      "shortest_action_rate": 0.665,
+      "main_test_solved": 131,
+      "reference_solved": 152,
+      "reserved_remix_solved": 144
+    },
+    "edge_difference": {
+      "source_commit": "c4f32f51d8cf250a1518916f1488a0c28ecb27c0",
+      "shortest_action_rate": 0.675,
+      "main_test_solved": 138,
+      "reference_solved": 145,
+      "reserved_remix_solved": 149
+    },
+    "progress_margin": {
+      "source_commit": "55649b5e5dc07d1571127c68e03f35fde2775558",
+      "shortest_action_rate": 0.668,
+      "main_test_solved": 132,
+      "reference_solved": 148,
+      "reserved_remix_solved": 146
     }
   },
-  "reference_test": {
-    "count": 512,
-    "solved": 136,
-    "success_rate": 0.265625,
-    "cycle_rate": 0.734375,
-    "budget_exhausted": 0,
-    "horizon": 22,
-    "mean_extra_steps_on_solved": 0.058823529411764705,
-    "illegal_action_rate": 0.0
+  "cohort_scope": {
+    "main_decisions": 1000,
+    "each_rollout_cohort": 512,
+    "reserved_remix": "new unordered pairs; existing heldout physical test endpoints; all relative types trained",
+    "checkpoints_selected_on_validation_only": true
   },
-  "last_checkpoint_test": {
-    "count": 512,
-    "solved": 152,
-    "success_rate": 0.296875,
-    "cycle_rate": 0.703125,
-    "budget_exhausted": 0,
-    "horizon": 22,
-    "mean_extra_steps_on_solved": 0.08552631578947369,
-    "illegal_action_rate": 0.0
-  },
-  "last_checkpoint_reference_test": {
-    "count": 512,
-    "solved": 135,
-    "success_rate": 0.263671875,
-    "cycle_rate": 0.736328125,
-    "budget_exhausted": 0,
-    "horizon": 22,
-    "mean_extra_steps_on_solved": 0.037037037037037035,
-    "illegal_action_rate": 0.0
-  },
-  "training_fit": {
-    "count": 1000,
-    "shortest_action_rate": 0.544,
-    "uniform_tie_shortest_rate": 0.544,
-    "strict_candidate_order_accuracy": 0.6984356445867107
-  },
-  "first_error_test": {
-    "count": 512,
-    "all_steps_shortest": 144,
-    "first_error_step": {
-      "1": 260,
-      "2": 78,
-      "3": 22,
-      "4": 7,
-      "5": 1
+  "local_training_fit": {
+    "scope": "training-only one-goal local fit; no global performance or heldout generalization claim",
+    "states": 206,
+    "parents": 45,
+    "initial": {
+      "absolute_huber": 0.8929690718650818,
+      "rank_ce": 1.6938817501068115,
+      "progress_margin": 0.6156479716300964,
+      "shortest_action_rate": 0.7555555701255798
     },
-    "first_error_parent_depth": {
-      "2": 1,
-      "3": 16,
-      "4": 40,
-      "5": 46,
-      "6": 42,
-      "7": 46,
-      "8": 55,
-      "9": 71,
-      "10": 45,
-      "11": 6
+    "final": {
+      "absolute_huber": 0.001342957140877843,
+      "rank_ce": 1.3572120666503906,
+      "progress_margin": 0.0004009193798992783,
+      "shortest_action_rate": 1.0
     },
-    "first_error_type": {
-      "same_layer": 216,
-      "away": 152
+    "local_reference_rollout": {
+      "solved": true,
+      "steps": 8,
+      "true_distance_trace": [
+        8,
+        7,
+        6,
+        5,
+        4,
+        3,
+        2,
+        1,
+        0
+      ]
     }
   },
-  "prior_breadth_depth_run": {
-    "source_commit": "a07b5f7fb1605aaf0fbd7935c16f3174859caf47",
-    "best_step": 19000,
-    "last_step": 20000,
-    "test": {
-      "distance_pairs": 6000,
-      "mae": 2.2988650017579397,
-      "spearman": 0.6493803652981074,
-      "shortest_action_rate": 0.541,
-      "strict_candidate_order_accuracy": 0.68875,
-      "solved": 147,
-      "count": 512,
-      "success_rate": 0.287109375,
-      "mean_extra_steps_on_solved": 0.013605442176870748,
-      "hamming_solved": 64,
-      "oracle_solved": 512
-    },
-    "training_fit": {
-      "shortest_action_rate": 0.536,
-      "mae": 2.1682357833820944
-    },
-    "data_coverage": {
-      "protected_states": 39360,
-      "protected_reference_states": 23577,
-      "relative_decision_types": 3674159,
-      "relative_decision_coverage": 1.0,
-      "trajectories": 16384,
-      "path_decisions": 122639,
-      "closed_forks": 8192,
-      "fork_decisions": 81920,
-      "near_pairs": 800000
-    },
-    "reference_test": {
-      "count": 512,
-      "solved": 139,
-      "success_rate": 0.271484375,
-      "cycle_rate": 0.728515625,
-      "budget_exhausted": 0,
-      "horizon": 22,
-      "mean_extra_steps_on_solved": 0.014388489208633094,
-      "illegal_action_rate": 0.0
-    },
-    "frozen_gradient_audit": {
-      "gradient_summary": {
-        "pair_loss": 1.2022314369678497,
-        "rank_loss": 2.273699402809143,
-        "pair_grad_norm": 0.4169906402627627,
-        "rank_grad_norm": 0.16694066300988197,
-        "cosine": -0.48175961275895435,
-        "combined_grad_norm": 0.3668278728922208,
-        "all_batches_conflict": true,
-        "cosine_between_mean_gradients": -0.9029910564422607,
-        "mean_pair_gradient_norm": 0.2990044951438904,
-        "mean_rank_gradient_norm": 0.12396851927042007,
-        "pair_derivative_wrt_distance_scale": -0.7242984001835188,
-        "rank_derivative_wrt_distance_scale": 0.30308545629183453
-      },
-      "alignment_conditions": {
-        "original": {
-          "cosine": -0.4552086368203163,
-          "cosine_between_mean_gradients": -0.8925127983093262,
-          "negative_cosine_batches": 12,
-          "batches": 12
-        },
-        "same_candidates": {
-          "cosine": -0.35123786454399425,
-          "cosine_between_mean_gradients": -0.8813067674636841,
-          "negative_cosine_batches": 12,
-          "batches": 12
-        },
-        "balanced_independent": {
-          "cosine": 0.7416385660568873,
-          "cosine_between_mean_gradients": 0.9684419631958008,
-          "negative_cosine_batches": 0,
-          "batches": 12
-        },
-        "balanced_same_candidates": {
-          "cosine": 0.7827400267124176,
-          "cosine_between_mean_gradients": 0.9738876819610596,
-          "negative_cosine_batches": 0,
-          "batches": 12
-        },
-        "importance_weighted": {
-          "cosine": 0.6633640428384145,
-          "cosine_between_mean_gradients": 0.9546060562133789,
-          "negative_cosine_batches": 0,
-          "batches": 12
-        }
-      },
-      "raw_artifacts": "runs/cube2_qmap/breadth_depth"
-    },
-    "earlier_pure_q": {
-      "source_commit": "6d76502d1f1748d5c26e054e327af86e33b9dd7b",
-      "same_fresh_test_solved": 146,
-      "reference_test_solved": 138
-    }
-  },
-  "remote_run": "/zhanghanyue/experiment/grounded_llm_puzzle_qmaps/runs/cube2_balanced_epochs_90ec4ca",
-  "local_artifacts": "runs/cube2_qmap/balanced_epochs",
-  "completion": {
-    "training": "complete",
-    "best_frozen_evaluation": "complete",
-    "last_frozen_evaluation": "complete",
-    "original_queue_exit": 1,
-    "wrapper_error": "trailing heredoc marker parsed as Python after writing final metrics",
-    "finalization_check": "passed",
-    "parameter_updates": 0
-  },
-  "limits": [
-    "single seed",
-    "sampling budget and learning rate changed together",
-    "no matched long-budget control",
-    "heldout absolute states, seen relative types"
-  ],
-  "last_layer_passes": {
-    "1": {
-      "pairs": 86.03874432167399,
-      "decisions": 567.8698834868542
-    },
-    "2": {
-      "pairs": 86.02085585710458,
-      "decisions": 566.3153059982966
-    },
-    "3": {
-      "pairs": 85.45271873580047,
-      "decisions": 520.7300441908598
-    },
-    "4": {
-      "pairs": 83.4480684502333,
-      "decisions": 402.79914326511187
-    },
-    "5": {
-      "pairs": 515.2110579184769,
-      "decisions": 257.6055289592384
-    },
-    "6": {
-      "pairs": 250.0293027503223,
-      "decisions": 125.01465137516115
-    },
-    "7": {
-      "pairs": 74.48077192336773,
-      "decisions": 37.24038596168386
-    },
-    "8": {
-      "pairs": 20.88199957379513,
-      "decisions": 10.440999786897565
-    },
-    "9": {
-      "pairs": 9.735516351721765,
-      "decisions": 4.8677581758608826
-    },
-    "10": {
-      "pairs": 29.29100196970555,
-      "decisions": 14.645501771476399
-    },
-    "11": {
-      "pairs": 3953.7441070290934,
-      "decisions": 1976.8719473348906
-    }
-  }
+  "archive_entry": "../../../DEVELOPMENT_MACHINES.md#7-qmap-历史归档"
 }

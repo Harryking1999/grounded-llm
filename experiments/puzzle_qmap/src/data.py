@@ -16,7 +16,7 @@ def state_split(ids):
 
 
 def pair_keys(rows, size):
-    rows = np.asarray(rows)
+    rows = np.asarray(rows, dtype=np.int64)
     return np.minimum(rows[:, 0], rows[:, 1]) * size + np.maximum(rows[:, 0], rows[:, 1])
 
 
@@ -48,9 +48,8 @@ def build(env, config, out):
     if config["data"].get("builder") == "local_graph":
         from experiments.cube2_qmap.src.local_graph import build_local_graph
         return build_local_graph(env, config, out)
-    if config["data"].get("builder") == "breadth_depth":
-        from experiments.cube2_qmap.src.data import build_breadth_depth
-        return build_breadth_depth(env, config, out)
+    if config["data"].get("builder") not in (None, "local_graph"):
+        raise ValueError("Archived data builders require their recorded source revision")
     options, augmentation = config["data"], config["augmentation"]
     if augmentation["kind"] != env.symmetry_kind:
         raise ValueError("Augmentation does not match this task's symmetry convention")

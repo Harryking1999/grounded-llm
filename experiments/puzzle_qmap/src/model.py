@@ -27,25 +27,6 @@ def soft_rank_loss(scores, truth, valid, temperature):
     return -(target * log_prob.masked_fill(~valid, 0)).sum(dim=-1).mean()
 
 
-def edge_difference_loss(parent_scores, child_scores, parent_truth, child_truth, valid):
-    """Supervise goal-distance change on every actual action, in move units."""
-    prediction = child_scores - parent_scores[:, None]
-    target = child_truth.float() - parent_truth.float()[:, None]
-    return torch.nn.functional.smooth_l1_loss(prediction[valid], target[valid])
-
-
-def progress_margin_loss(parent_scores, child_scores, parent_truth, child_truth, valid, margin):
-    """A true shortest successor must descend and beat every retreat candidate."""
-    good = valid & (child_truth == parent_truth[:, None] - 1)
-    if not bool(good.any(dim=1).all()):
-        raise ValueError("Every nonterminal parent needs an actual shortest successor")
-    best_good = child_scores.masked_fill(~good, torch.inf).min(dim=1).values
-    best_bad = child_scores.masked_fill(~(valid & ~good), torch.inf).min(dim=1).values
-    descent = torch.relu(best_good - parent_scores + margin)
-    order = torch.relu(best_good - best_bad + margin)
-    return torch.maximum(descent, order).mean()
-
-
 class MapReader:
     """Reusable frozen inference API. Needs features/rules, never an oracle."""
     def __init__(self, env, checkpoint, device="cpu"):

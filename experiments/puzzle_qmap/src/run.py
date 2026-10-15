@@ -10,8 +10,8 @@ import torch
 from torch.nn import functional as F
 
 from .data import build
-from .evaluate import decisions, encode, evaluate, pair_metrics, ranking_loss, progress_loss, task_indices
-from .model import MODEL_TYPE, QMap, distance, soft_rank_loss, edge_difference_loss, progress_margin_loss
+from .evaluate import decisions, encode, evaluate, pair_metrics, ranking_loss, task_indices
+from .model import MODEL_TYPE, QMap, distance, soft_rank_loss
 from .sampling import CoverageSampler, StratifiedEpochSampler
 from .tasks import make_environment
 
@@ -20,14 +20,8 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
     torch.manual_seed(config["seed"])
     rng = np.random.default_rng(config["seed"] + 1)
     options = config["training"]
-    supervision = options.get("distance_supervision", "absolute")
-    if supervision not in ("absolute", "edge_difference"):
-        raise ValueError("Unknown distance supervision")
-    if supervision == "edge_difference" and config["data"].get("builder") != "local_graph":
-        raise ValueError("Edge-difference training requires complete local graphs")
-    if options.get("progress_margin_weight", 0) and (config["data"].get("builder") != "local_graph" or
-                                                    "distance_supervision" not in options):
-        raise ValueError("Progress margin requires the explicit local-graph supervision contract")
+    if any(key in options for key in ("distance_supervision", "progress_margin_weight", "progress_margin")):
+        raise ValueError("Archived loss experiments require their recorded source revision")
     torch.set_num_threads(options["cpu_threads"])
     model = QMap(env.feature_dim, **config["model"], cap=env.diameter).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=options["learning_rate"])
@@ -123,19 +117,7 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
         rank = ranking_loss(model, env, val_tasks, data["child_distances_validation"][val_idx],
                             device, options["rank_temperature"])
         actions = decisions(model, env, val_tasks, device)
-        loss = metrics["huber"]
-        if "distance_supervision" in options:
-            metrics["edge_difference_huber"] = progress_loss(
-                model, env, val_tasks, data["child_distances_validation"][val_idx], device)
-            if supervision == "edge_difference":
-                loss = metrics["edge_difference_huber"]
-        score = loss + options["rank_weight"] * rank
-        if options.get("progress_margin_weight", 0):
-            metrics["progress_margin"] = progress_loss(model, env, val_tasks,
-                data["child_distances_validation"][val_idx], device, options["progress_margin"])
-            score += options["progress_margin_weight"] * metrics["progress_margin"]
-        if options.get("selection_metric") == "shortest_action_rate":
-            score = -actions["q"]["shortest_action_rate"]
+        score = metrics["huber"] + options["rank_weight"] * rank
         return score, metrics, actions["q"], rank
 
     def training_monitor():
@@ -151,13 +133,6 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
         result = {"pairs": pm, "soft_rank_loss": rank, "rank_target_entropy": entropy, "rank_kl": rank - entropy,
                   "objective": pm["huber"] + options["rank_weight"] * rank,
                   "decisions": decisions(model, env, probe_tasks, device)["q"]}
-        if "distance_supervision" in options:
-            result["edge_difference_huber"] = progress_loss(model, env, probe_tasks, truth, device)
-            if supervision == "edge_difference":
-                result["objective"] = result["edge_difference_huber"] + options["rank_weight"] * rank
-        if options.get("progress_margin_weight", 0):
-            result["progress_margin"] = progress_loss(model, env, probe_tasks, truth, device, options["progress_margin"])
-            result["objective"] += options["progress_margin_weight"] * result["progress_margin"]
         return result
 
     def save(step, destination):
@@ -189,17 +164,6 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
                 scores = distance(candidate_q, goal_q[:, None])
                 truth = torch.as_tensor(batch["child_distances"], device=device)
                 valid = torch.ones_like(truth, dtype=torch.bool)
-                if "distance_supervision" in options:
-                    parent_scores = distance(vectors[torch.as_tensor(batch["parents"], device=device)], goal_q)
-                    edge_loss = edge_difference_loss(parent_scores, scores,
-                        torch.as_tensor(batch["parent_distances"], device=device), truth, valid)
-                    absolute_loss = pair_loss
-                    if supervision == "edge_difference":
-                        pair_loss = edge_loss
-                if options.get("progress_margin_weight", 0):
-                    margin_loss = progress_margin_loss(parent_scores, scores,
-                        torch.as_tensor(batch["parent_distances"], device=device), truth, valid,
-                        options["progress_margin"])
             else:
                 sampled_ids = (pair_sampler.draw(options["batch_size"]) if pair_sampler is not None
                                else rng.integers(len(pairs), size=options["batch_size"]))
@@ -218,8 +182,6 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
                 truth = torch.as_tensor(data["child_distances_train"][idx], device=device)
             rank_loss = soft_rank_loss(scores, truth, valid, options["rank_temperature"])
             loss = pair_loss + options["rank_weight"] * rank_loss
-            if options.get("progress_margin_weight", 0):
-                loss = loss + options["progress_margin_weight"] * margin_loss
             optimizer.zero_grad(set_to_none=True)
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), 5.0)
@@ -244,14 +206,6 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
                           "validation_shortest_action_rate": actions["shortest_action_rate"],
                           "validation_objective": score, "selection_eligible": eligible,
                           "learning_rate": optimizer.param_groups[0]["lr"], "best_step": best_step, **covered}
-                if "distance_supervision" in options:
-                    record.update(absolute_distance_loss=float(absolute_loss.detach()),
-                                  edge_difference_loss=float(edge_loss.detach()),
-                                  validation_edge_difference_huber=metrics["edge_difference_huber"],
-                                  distance_supervision=supervision)
-                if options.get("progress_margin_weight", 0):
-                    record["progress_margin_loss"] = float(margin_loss.detach())
-                    record["validation_progress_margin"] = metrics["progress_margin"]
                 if probe_pairs is not None:
                     record["training_monitor"] = training_monitor()
                     val_tasks = data["tasks_validation"][val_idx]
@@ -274,9 +228,7 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
               "last_model_training_coverage": last_coverage, "parent": parent,
               "stop_reason": "step_budget_exhausted" if step == options["steps"] else "validation_patience",
               "torch_version": torch.__version__, "numpy_version": np.__version__,
-              "selection": ("maximum validation shortest action rate; earliest maximum retained"
-                            if options.get("selection_metric") == "shortest_action_rate" else
-                            "validation supervised distance Huber + rank_weight * full soft rank cross entropy"),
+              "selection": "validation distance Huber + rank_weight * full soft rank cross entropy",
               "initial_validation_objective": initial_score, "initial_validation_pairs": initial_pairs,
               "initial_validation_decisions": initial_decisions, "initial": initial_test,
               "initial_training_monitor": initial_training,

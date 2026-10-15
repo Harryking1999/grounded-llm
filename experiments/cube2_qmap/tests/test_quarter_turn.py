@@ -10,8 +10,8 @@ import torch
 
 from experiments.cube2_qmap.src.environment import Cube2
 from experiments.cube2_qmap.src.local_graph import LocalGraphSampler, build_local_graph, local_template
-from experiments.puzzle_qmap.src.data import cube_pairs
-from experiments.puzzle_qmap.src.model import MapReader, edge_difference_loss, progress_margin_loss
+from experiments.puzzle_qmap.src.data import cube_pairs, pair_keys
+from experiments.puzzle_qmap.src.model import MapReader
 from experiments.puzzle_qmap.src.run import train
 
 
@@ -50,37 +50,12 @@ class QuarterTurnTest(unittest.TestCase):
         subprocess.run([sys.executable, "-c", "import sys; import experiments.cube2_qmap.src.local_graph; "
                         "assert 'torch' not in sys.modules"], check=True)
 
-    def test_progress_supervision_corrects_the_actual_loop_order(self):
-        parent = torch.tensor([3.584487], requires_grad=True)
-        children = torch.tensor([[3.270956, 4.014374]], requires_grad=True)
-        truth = torch.tensor([[4, 2]])
-        valid = torch.ones_like(truth, dtype=torch.bool)
-        loss = edge_difference_loss(parent, children, torch.tensor([3]), truth, valid)
-        loss.backward()
-        # Gradient descent raises the wrongly preferred retreat and lowers the
-        # overlooked true shortest successor. Goal-specific offsets cancel.
-        self.assertLess(float(children.grad[0, 0]), 0)
-        self.assertGreater(float(children.grad[0, 1]), 0)
-        shifted = edge_difference_loss(parent + 17, children + 17, torch.tensor([3]), truth, valid)
-        torch.testing.assert_close(loss, shifted)
-        perfect = edge_difference_loss(torch.tensor([3.]), truth.float(), torch.tensor([3]), truth, valid)
-        self.assertEqual(float(perfect), 0)
-
-    def test_margin_rejects_a_false_nonterminal_minimum_and_wrong_order(self):
-        parent = torch.tensor([3.584487], requires_grad=True)
-        children = torch.tensor([[3.270956, 4.014374]], requires_grad=True)
-        truth, valid = torch.tensor([[4, 2]]), torch.tensor([[True, True]])
-        loss = progress_margin_loss(parent, children, torch.tensor([3]), truth, valid, 1.)
-        loss.backward()
-        self.assertGreater(float(loss.detach()), 0)
-        self.assertLess(float(children.grad[0, 0]), 0)
-        self.assertGreater(float(children.grad[0, 1]), 0)
-        exact = progress_margin_loss(torch.tensor([3.]), truth.float(), torch.tensor([3]), truth, valid, 1.)
-        self.assertEqual(float(exact), 0)
-        # At a maximum depth all actions may be shortest; descent still applies.
-        all_good = progress_margin_loss(torch.tensor([4.]), torch.tensor([[3., 3.]]),
-                                       torch.tensor([4]), torch.tensor([[3, 3]]), valid, 1.)
-        self.assertEqual(float(all_good), 0)
+    def test_state_pair_keys_do_not_overflow_int32_cube_ids(self):
+        rows = np.array([[3674158, 3674159], [3674159, 3674158]], dtype=np.int32)
+        keys = pair_keys(rows, self.env.size)
+        expected = 3674158 * self.env.size + 3674159
+        self.assertEqual(keys.dtype, np.int64)
+        np.testing.assert_array_equal(keys, [expected, expected])
 
     def test_complete_shared_graph_fresh_pose_labels_and_holdout(self):
         env, config = self.env, self.config
@@ -127,9 +102,15 @@ class QuarterTurnTest(unittest.TestCase):
             reference[f"parent_distances_{split}"] = rows[:, 2]
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
+            fresh = root / "fresh"
+            fresh.mkdir()
+            fresh_data, fresh_summary = build_local_graph(env, config, fresh)
+            self.assertNotIn("tasks_reference_test", fresh_data)
+            self.assertIsNone(fresh_summary["reference_source_commit"])
             ref = root / "reference"
             ref.mkdir()
             np.savez(ref / "data.npz", **reference)
+            config["data"]["reference_source_commit"] = "test-reference"
             (ref / "summary.json").write_text(json.dumps({"source_commit": config["data"]["reference_source_commit"]}))
             config["data"]["reference_data"] = str(ref / "data.npz")
             data, summary = build_local_graph(env, config, root)
@@ -150,20 +131,9 @@ class QuarterTurnTest(unittest.TestCase):
             self.assertEqual(next_state, env.step(env.step(0, "U"), action))
             with self.assertRaises(ValueError):
                 MapReader(Cube2(), root / "last.pt")
-            edge = root / "edge"
-            edge.mkdir()
-            config["training"].update(distance_supervision="edge_difference", selection_metric="shortest_action_rate")
-            continued = train(env, config, data, edge, "cpu", "progress-smoke", root / "best.pt")
-            records = [json.loads(line) for line in (edge / "progress.jsonl").read_text().splitlines()]
-            self.assertIn("validation_edge_difference_huber", records[-1])
-            self.assertIn("edge_difference_huber", continued["initial_training_monitor"])
-            self.assertIn("earliest maximum", continued["selection"])
-            margin = root / "margin"
-            margin.mkdir()
-            config["training"].update(distance_supervision="absolute", progress_margin_weight=1., progress_margin=1.)
-            train(env, config, data, margin, "cpu", "margin-smoke", root / "best.pt")
-            record = json.loads((margin / "progress.jsonl").read_text().splitlines()[-1])
-            self.assertGreaterEqual(record["progress_margin_loss"], 0)
+            config["training"]["progress_margin_weight"] = 1.
+            with self.assertRaisesRegex(ValueError, "Archived loss experiments"):
+                train(env, config, data, root, "cpu", "retired-contract")
 
 
 if __name__ == "__main__":

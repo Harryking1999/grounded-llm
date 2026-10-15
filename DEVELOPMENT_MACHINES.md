@@ -52,7 +52,7 @@ ssh grounded-4090
 | 4090 公共模型区 | `/opt/models`；使用前确认所需模型是否存在 |
 | 平台积木地图工作区 | `/zhanghanyue/experiment/grounded_llm_qmap_tree_132f5a1` |
 | 平台早期实验工作区 | `/zhanghanyue/experiment/grounded_llm` |
-| 平台汉诺塔／二阶魔方 Qmap | `/zhanghanyue/experiment/grounded_llm_puzzle_qmaps`；`code/<commit>/` 保存已提交源码，`runs/` 与 `logs/` 保存生成物；复用平台项目的 `.venv/bin/python` |
+| 平台汉诺塔／二阶魔方 Qmap | `/zhanghanyue/experiment/grounded_llm_puzzle_qmaps`；`code/current/` 保存当前已提交源码，`runs/` 与 `logs/` 用于新生成物；复用平台项目的 `.venv/bin/python`；完成的旧实验归档见第 7 节 |
 
 项目目录按 `code/`、`models/`、`maps/`、`data/`、`runs/`、`logs/` 分类。具体 run、checkpoint、数据版本、PID 与日志位置由实验 README 和忽略的 runtime 配置维护，本手册不逐次追加。
 
@@ -98,3 +98,12 @@ scp -r /home/zhangyue/transfer/grounded_llm/run-id gongruochen@10.28.0.80:/home/
 | `D:\Grounded_llm_step2` | `step2-path` | `codex/archive-step2-path` |
 
 需要恢复时可用 `git worktree move`；路径变化后重新核对虚拟环境与运行配置中的绝对路径。
+
+## 7. Qmap 历史归档
+
+| 位置 | 内容 |
+|---|---|
+| 本地 `D:\Grounded_llm_archive\qmap\20261016_cleanup\` | 清理前的三个 Qmap 目录、旧配置与报告、本地全部已完成运行和一次性诊断；归档自身的 README 说明布局 |
+| 平台 `/zhanghanyue/experiment/grounded_llm_puzzle_qmaps_archive/20261016_cleanup/` | 完整历史 `code/`、`runs/`、`logs/` 和传输包；内部绝对软链接已随归档重定位 |
+
+归档位于当前工作区之外，不作为新实验的默认数据来源。恢复某次运行时，按其 `source_commit` 在独立目录检出源码，并使用同一归档运行的 `config.json`、数据与 checkpoint。元数据内保留的旧绝对路径属于历史记录，恢复时应指向实际归档位置。不要把全部旧日志、模型和快照搬回当前源码目录。

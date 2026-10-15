@@ -96,11 +96,14 @@ def build_local_graph(env, config, out):
             config["augmentation"]["kind"] != env.symmetry_kind or
             not config["augmentation"]["enabled"]):
         raise ValueError("Local graph, rules and online symmetry must agree")
-    reference_path = Path(options["reference_data"])
-    metadata = json.loads((reference_path.parent / "summary.json").read_text())
-    if metadata["source_commit"] != options["reference_source_commit"]:
-        raise ValueError("Wrong reference evaluation states")
-    reference = dict(np.load(reference_path, allow_pickle=False))
+    reference, reference_commit = {}, None
+    if options.get("reference_data") is not None:
+        reference_path = Path(options["reference_data"])
+        metadata = json.loads((reference_path.parent / "summary.json").read_text())
+        reference_commit = metadata["source_commit"]
+        if reference_commit != options["reference_source_commit"]:
+            raise ValueError("Wrong reference evaluation states")
+        reference = dict(np.load(reference_path, allow_pickle=False))
     protected = np.zeros(env.size, dtype=bool)
     # Preserve endpoints of all old evaluation cohorts, including the earliest
     # reference, without reusing any old action or distance label.
@@ -113,14 +116,14 @@ def build_local_graph(env, config, out):
         rows = evaluation_pairs(env, rng, options[f"pairs_{split}"], bucket, buckets, protected)
         protected[rows[:, :2]] = True
         decorate(env, data, split, rows[:options[f"decisions_{split}"], :2], rows)
-    old_pairs = reference["pairs_test"]
-    relabeled = np.column_stack((old_pairs[:, :2], env.distance(old_pairs[:, 0], old_pairs[:, 1])))
-    # The first reference rollout is exactly the previous stratified cohort.
-    # Use its old parent labels to select it before relabeling the QTM task.
-    old_indices = task_indices(env, reference, "test", config["evaluation"]["rollout_count"], config)
-    ordered = np.r_[old_indices, np.setdiff1d(np.arange(len(reference["tasks_test"])), old_indices)]
-    decorate(env, data, "reference_test", reference["tasks_test"][ordered], relabeled)
-    data["reference_rollout_source_indices"] = old_indices
+    if reference:
+        old_pairs = reference["pairs_test"]
+        relabeled = np.column_stack((old_pairs[:, :2], env.distance(old_pairs[:, 0], old_pairs[:, 1])))
+        # Optional historical comparison: reuse endpoints, recompute QTM labels.
+        old_indices = task_indices(env, reference, "test", config["evaluation"]["rollout_count"], config)
+        ordered = np.r_[old_indices, np.setdiff1d(np.arange(len(reference["tasks_test"])), old_indices)]
+        decorate(env, data, "reference_test", reference["tasks_test"][ordered], relabeled)
+        data["reference_rollout_source_indices"] = old_indices
     data["protected_states"] = np.flatnonzero(protected).astype(np.int32)
     data["relative_roots"] = np.arange(1, env.size, dtype=np.int32)
     if options["relative_limit"] is not None:
@@ -138,7 +141,7 @@ def build_local_graph(env, config, out):
     if protected[states].any():
         raise ValueError("Protected state entered fixed training monitor")
     words, parents, children = local_template(env)
-    summary = {"split_unit": "protected_old_and_fresh_evaluation_parent_goal_endpoints",
+    summary = {"split_unit": "protected_evaluation_parent_goal_endpoints",
                "states_in_environment": env.size, "action_count": len(env.actions), "diameter": env.diameter,
                "protected_states": int(protected.sum()), "relative_root_types": len(data["relative_roots"]),
                "relative_root_coverage": len(data["relative_roots"]) / (env.size - 1),
@@ -146,11 +149,12 @@ def build_local_graph(env, config, out):
                "graph_two_step_sequences": int(children[1:].size),
                "online_common_left_multiplication": True,
                "training_arrays_are_fixed_monitor_only": True,
-               "reference_source_commit": metadata["source_commit"],
+               "reference_source_commit": reference_commit,
                "splits": {s: {"pairs": len(data[f"pairs_{s}"]), "decisions": len(data[f"tasks_{s}"]),
                               "distance_histogram": np.bincount(data[f"pairs_{s}"][:, 2],
                                                                   minlength=env.diameter + 1).tolist()}
-                          for s in ("train", "validation", "test", "reference_test")}}
+                          for s in ("train", "validation", "test", "reference_test")
+                          if f"tasks_{s}" in data}}
     np.savez_compressed(out / "data.npz", **data)
     (out / "data_summary.json").write_text(json.dumps(summary, indent=2) + "\n")
     return data, summary

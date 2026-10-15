@@ -7,6 +7,7 @@ import numpy as np
 
 from experiments.cube2_qmap.src.data import build_breadth_depth
 from experiments.cube2_qmap.src.environment import Cube2
+from experiments.cube2_qmap.src.audit import metric_witness, pentagonal_gap
 from experiments.puzzle_qmap.src.data import cube_pairs
 from experiments.puzzle_qmap.src.sampling import CoverageSampler
 
@@ -32,6 +33,7 @@ class CoverageDataTest(unittest.TestCase):
             (source / "summary.json").write_text(json.dumps({"source_commit": config["data"]["reference_source_commit"]}))
             config["data"]["reference_data"] = str(source / "data.npz")
             data, summary = build_breadth_depth(env, config, root)
+            self.assertEqual(metric_witness(env, [2051818, 1077874, 905101, 2319678, 2932767])["pentagonal_gap"], 1)
         forbidden = np.zeros(env.size, dtype=bool)
         forbidden[data["protected_states"]] = True
         for key in ("tasks_train", "children_train"):
@@ -62,6 +64,13 @@ class CoverageDataTest(unittest.TestCase):
         self.assertTrue(set(range(10)).issubset(draws))
         self.assertTrue(((draws >= 0) & (draws < 20)).all())
         self.assertTrue((draws >= 10).any())
+
+    def test_pentagonal_constraint_on_every_binary_cut(self):
+        # A coordinate absolute difference is a nonnegative sum/integral of
+        # binary threshold cuts, so this finite check verifies the sign convention.
+        for mask in range(32):
+            x = np.array([(mask >> bit) & 1 for bit in range(5)])
+            self.assertLessEqual(pentagonal_gap(np.abs(x[:, None] - x[None, :])), 0)
 
 
 if __name__ == "__main__":

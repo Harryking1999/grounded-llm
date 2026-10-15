@@ -410,6 +410,106 @@
     "diameter": 11,
     "maximum_neighbor_depth_difference": 1
   },
+  "metric_witnesses": {
+    "cube2": {
+      "state_ids": [
+        2051818,
+        1077874,
+        905101,
+        2319678,
+        2932767
+      ],
+      "distance_matrix": [
+        [
+          0,
+          4,
+          3,
+          3,
+          2
+        ],
+        [
+          4,
+          0,
+          5,
+          1,
+          4
+        ],
+        [
+          3,
+          5,
+          0,
+          4,
+          1
+        ],
+        [
+          3,
+          1,
+          4,
+          0,
+          4
+        ],
+        [
+          2,
+          4,
+          1,
+          4,
+          0
+        ]
+      ],
+      "pentagonal_gap": 1.0,
+      "max_error_lower_bound_on_these_ten_pairs": 0.1,
+      "scope": "rules out exact L1 fitting; does not rule out correct action ranking"
+    },
+    "hanoi3": {
+      "state_ids": [
+        1,
+        3,
+        9,
+        23,
+        17
+      ],
+      "distance_matrix": [
+        [
+          0,
+          3,
+          6,
+          5,
+          3
+        ],
+        [
+          3,
+          0,
+          6,
+          3,
+          3
+        ],
+        [
+          6,
+          6,
+          0,
+          3,
+          3
+        ],
+        [
+          5,
+          3,
+          3,
+          0,
+          6
+        ],
+        [
+          3,
+          3,
+          3,
+          6,
+          0
+        ]
+      ],
+      "pentagonal_gap": 1.0,
+      "max_error_lower_bound_on_these_ten_pairs": 0.1,
+      "scope": "rules out exact L1 fitting; does not rule out correct action ranking"
+    }
+  },
   "frozen_q": {
     "train": {
       "pairs": {

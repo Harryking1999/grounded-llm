@@ -8,6 +8,21 @@ import numpy as np
 from .environment import Cube2
 
 
+def pentagonal_gap(matrix):
+    """Every nonnegative sum of coordinate |x-y| has gap <= 0."""
+    a, b, c, d, e = range(5)
+    return float(matrix[a, b] + matrix[a, c] + matrix[b, c] + matrix[d, e] -
+                 matrix[a, d] - matrix[a, e] - matrix[b, d] - matrix[b, e] - matrix[c, d] - matrix[c, e])
+
+
+def metric_witness(env, ids):
+    ids = np.asarray(ids)
+    matrix = env.distance(ids[:, None], ids[None, :])
+    return {"state_ids": ids.tolist(), "distance_matrix": matrix.tolist(), "pentagonal_gap": pentagonal_gap(matrix),
+            "max_error_lower_bound_on_these_ten_pairs": max(0.0, pentagonal_gap(matrix)) / 10,
+            "scope": "rules out exact L1 fitting; does not rule out correct action ranking"}
+
+
 def audit(run, out):
     env = Cube2(run / "oracle_depth.npy")
     data = dict(np.load(run / "data.npz", allow_pickle=False))
@@ -55,6 +70,10 @@ def audit(run, out):
               "by_depth": by_depth,
               "structure": {"states": env.size, "degree": 9, "diameter": 11,
                             "maximum_neighbor_depth_difference": int(max(abs(i - j) for i, j in zip(*np.nonzero(layer_edges))))}}
+    from experiments.hanoi_qmap.src.environment import Hanoi
+    result["metric_witnesses"] = {
+        "cube2": metric_witness(env, [2051818, 1077874, 905101, 2319678, 2932767]),
+        "hanoi3": metric_witness(Hanoi(), [1, 3, 9, 23, 17])}
     # Fit on sampled training rows versus the actual heldout set locates a data
     # failure without treating a larger data set as proof of representability.
     import torch

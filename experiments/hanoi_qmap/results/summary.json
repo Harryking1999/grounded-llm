@@ -1,225 +1,380 @@
 {
+  "source_commit": "a07b5f7fb1605aaf0fbd7935c16f3174859caf47",
+  "analysis_commit": "83135f4777c94f68a8b51077407d63b34d539595",
   "model_type": "pure_q_symmetric_blocks",
-  "task": "hanoi3",
-  "source_commit": "6d76502d1f1748d5c26e054e327af86e33b9dd7b",
-  "best_step": 3000,
-  "last_step": 4000,
-  "training_seconds": 28.95,
-  "device": "cuda:0",
-  "torch_version": "2.7.1+cu128",
-  "numpy_version": "2.2.6",
-  "selection": "validation Huber + rank_weight * full soft rank cross entropy",
-  "remote_run": "/zhanghanyue/experiment/grounded_llm_puzzle_qmaps/runs/hanoi3_pure_6d76502",
-  "local_artifacts": "runs\\hanoi_qmap\\pure",
-  "data": {
-    "split_unit": "unordered_pair_peg_symmetry_orbit_seen_states",
-    "states_in_environment": 27,
-    "action_count": 6,
-    "diameter": 7,
-    "augmentation": {
-      "kind": "simultaneous_peg_permutation",
-      "pairs": {
-        "requested": 432,
-        "accepted_draws": 432,
-        "changed_rows": 357,
-        "fallback_rows": 0
-      },
-      "decisions": {
-        "requested": 156,
-        "accepted_draws": 156,
-        "changed_rows": 130,
-        "fallback_rows": 0
-      },
-      "base_pairs": 72,
-      "base_decisions": 26
-    },
-    "splits": {
-      "train": {
-        "pairs": 270,
-        "unique_unordered_pairs": 270,
-        "distance_histogram": [
-          27,
-          24,
-          30,
-          33,
-          48,
-          30,
-          48,
-          30
-        ],
-        "decisions": 132
-      },
-      "validation": {
-        "pairs": 54,
-        "unique_unordered_pairs": 54,
-        "distance_histogram": [
-          0,
-          15,
-          6,
-          12,
-          0,
-          15,
-          6,
-          0
-        ],
-        "decisions": 108
-      },
-      "test": {
-        "pairs": 54,
-        "unique_unordered_pairs": 54,
-        "distance_histogram": [
-          0,
-          0,
-          12,
-          15,
-          0,
-          18,
-          0,
-          9
-        ],
-        "decisions": 108
-      }
-    }
-  },
-  "test": {
-    "pairs": {
-      "count": 54,
-      "huber": 0.010809638193184886,
-      "mae": 0.12320671258149324,
-      "spearman": 0.9624154860313718,
-      "by_distance": {
+  "scope": "independent_training_per_disk_count_seen_states_relation_orbit_holdout",
+  "hanoi3_reference": {
+    "source_commit": "6d76502d1f1748d5c26e054e327af86e33b9dd7b",
+    "test": {
+      "count": 108,
+      "solved": 108,
+      "success_rate": 1.0,
+      "cycle_rate": 0.0,
+      "budget_exhausted": 0,
+      "horizon": 14,
+      "mean_extra_steps_on_solved": 0.0,
+      "illegal_action_rate": 0.0,
+      "by_start_distance": {
         "2": {
-          "count": 12,
-          "predicted_mean": 2.229075094064077,
-          "mae": 0.22907509406407675
+          "count": 24,
+          "success_rate": 1.0
         },
         "3": {
-          "count": 15,
-          "predicted_mean": 3.0770026048024497,
-          "mae": 0.10867584546407064
+          "count": 30,
+          "success_rate": 1.0
         },
         "5": {
-          "count": 18,
-          "predicted_mean": 5.107954502105713,
-          "mae": 0.10795450210571289
+          "count": 36,
+          "success_rate": 1.0
         },
         "7": {
-          "count": 9,
-          "predicted_mean": 6.9678568840026855,
-          "mae": 0.03677140341864692
-        }
-      }
-    },
-    "decisions": {
-      "q": {
-        "count": 108,
-        "shortest_action_rate": 1.0,
-        "uniform_tie_shortest_rate": 1.0,
-        "strict_candidate_order_accuracy": 1.0
-      },
-      "hamming": {
-        "count": 108,
-        "shortest_action_rate": 0.5092592592592593,
-        "uniform_tie_shortest_rate": 0.5092592592592593,
-        "strict_candidate_order_accuracy": 0.4878048780487805
-      },
-      "oracle": {
-        "count": 108,
-        "shortest_action_rate": 1.0,
-        "uniform_tie_shortest_rate": 1.0,
-        "strict_candidate_order_accuracy": 1.0
-      }
-    },
-    "soft_rank_loss": 0.7791868448257446,
-    "rollout": {
-      "q": {
-        "count": 108,
-        "solved": 108,
-        "success_rate": 1.0,
-        "cycle_rate": 0.0,
-        "budget_exhausted": 0,
-        "horizon": 14,
-        "mean_extra_steps_on_solved": 0.0,
-        "illegal_action_rate": 0.0,
-        "by_start_distance": {
-          "2": {
-            "count": 24,
-            "success_rate": 1.0
-          },
-          "3": {
-            "count": 30,
-            "success_rate": 1.0
-          },
-          "5": {
-            "count": 36,
-            "success_rate": 1.0
-          },
-          "7": {
-            "count": 18,
-            "success_rate": 1.0
-          }
-        }
-      },
-      "hamming": {
-        "count": 108,
-        "solved": 26,
-        "success_rate": 0.24074074074074073,
-        "cycle_rate": 0.7592592592592593,
-        "budget_exhausted": 0,
-        "horizon": 14,
-        "mean_extra_steps_on_solved": 0.038461538461538464,
-        "illegal_action_rate": 0.0,
-        "by_start_distance": {
-          "2": {
-            "count": 24,
-            "success_rate": 0.75
-          },
-          "3": {
-            "count": 30,
-            "success_rate": 0.23333333333333334
-          },
-          "5": {
-            "count": 36,
-            "success_rate": 0.027777777777777776
-          },
-          "7": {
-            "count": 18,
-            "success_rate": 0.0
-          }
-        }
-      },
-      "oracle": {
-        "count": 108,
-        "solved": 108,
-        "success_rate": 1.0,
-        "cycle_rate": 0.0,
-        "budget_exhausted": 0,
-        "horizon": 14,
-        "mean_extra_steps_on_solved": 0.0,
-        "illegal_action_rate": 0.0,
-        "by_start_distance": {
-          "2": {
-            "count": 24,
-            "success_rate": 1.0
-          },
-          "3": {
-            "count": 30,
-            "success_rate": 1.0
-          },
-          "5": {
-            "count": 36,
-            "success_rate": 1.0
-          },
-          "7": {
-            "count": 18,
-            "success_rate": 1.0
-          }
+          "count": 18,
+          "success_rate": 1.0
         }
       }
     }
   },
-  "initial_test": {
-    "mae": 3.9874782475332418,
-    "q_rollout": 0.1574074074074074
+  "studies": {
+    "4": {
+      "task": "hanoi4",
+      "source_commit": "a07b5f7fb1605aaf0fbd7935c16f3174859caf47",
+      "analysis_commit": "83135f4777c94f68a8b51077407d63b34d539595",
+      "best_step": 10000,
+      "last_step": 10000,
+      "best_model_training_coverage": {
+        "pair_broad_passes": 1087.0488322717622,
+        "decision_broad_passes": 849.933598937583
+      },
+      "remote_run": "/zhanghanyue/experiment/grounded_llm_puzzle_qmaps/runs/hanoi4_coverage_a07b5f7",
+      "local_artifacts": "runs/hanoi_qmap/hanoi4",
+      "states": 81,
+      "diameter": 15,
+      "train_pairs": 2355,
+      "train_decisions": 1506,
+      "test": {
+        "distance_pairs": 480,
+        "mae": 0.1576178771754106,
+        "spearman": 0.9952214720119867,
+        "shortest_action_rate": 0.9979166666666667,
+        "strict_candidate_order_accuracy": 0.9986631016042781,
+        "solved": 960,
+        "count": 960,
+        "success_rate": 1.0,
+        "mean_extra_steps_on_solved": 0.0020833333333333333,
+        "hamming_solved": 56,
+        "oracle_solved": 960
+      },
+      "training_fit": {
+        "shortest_action_rate": 1.0,
+        "mae": 0.12610708498178916
+      },
+      "first_error_test": {
+        "count": 960,
+        "all_steps_shortest": 958,
+        "first_error_step": {
+          "1": 2
+        },
+        "first_error_parent_depth": {
+          "5": 2
+        },
+        "first_error_type": {
+          "same_layer": 2,
+          "away": 0
+        }
+      },
+      "canonical_A_to_C": {
+        "solved": true,
+        "steps": 15,
+        "exact_steps": 15
+      },
+      "legal_edge_relation_coverage": 1.0,
+      "rollout_distance_bands": [
+        {
+          "distance_band": "1-7",
+          "solved": 420,
+          "count": 420
+        },
+        {
+          "distance_band": "8-15",
+          "solved": 540,
+          "count": 540
+        }
+      ]
+    },
+    "5": {
+      "task": "hanoi5",
+      "source_commit": "a07b5f7fb1605aaf0fbd7935c16f3174859caf47",
+      "analysis_commit": "83135f4777c94f68a8b51077407d63b34d539595",
+      "best_step": 12000,
+      "last_step": 15000,
+      "best_model_training_coverage": {
+        "pair_broad_passes": 147.52917447053738,
+        "decision_broad_passes": 108.06247361756016
+      },
+      "remote_run": "/zhanghanyue/experiment/grounded_llm_puzzle_qmaps/runs/hanoi5_coverage_a07b5f7",
+      "local_artifacts": "runs/hanoi_qmap/hanoi5",
+      "states": 243,
+      "diameter": 31,
+      "train_pairs": 20823,
+      "train_decisions": 14214,
+      "test": {
+        "distance_pairs": 4416,
+        "mae": 0.30410749967331474,
+        "spearman": 0.9981978373244911,
+        "shortest_action_rate": 0.986083984375,
+        "strict_candidate_order_accuracy": 0.9894047990028046,
+        "solved": 1020,
+        "count": 1024,
+        "success_rate": 0.99609375,
+        "mean_extra_steps_on_solved": 0.05588235294117647,
+        "hamming_solved": 35,
+        "oracle_solved": 1024
+      },
+      "training_fit": {
+        "shortest_action_rate": 0.991,
+        "mae": 0.2601368306134629
+      },
+      "first_error_test": {
+        "count": 1024,
+        "all_steps_shortest": 971,
+        "first_error_step": {
+          "1": 13,
+          "2": 2,
+          "3": 3,
+          "4": 1,
+          "5": 1,
+          "7": 1,
+          "8": 2,
+          "11": 1,
+          "13": 2,
+          "14": 1,
+          "15": 2,
+          "16": 3,
+          "18": 1,
+          "19": 1,
+          "21": 2,
+          "23": 1,
+          "24": 2,
+          "25": 7,
+          "26": 2,
+          "28": 1,
+          "29": 4
+        },
+        "first_error_parent_depth": {
+          "3": 24,
+          "6": 1,
+          "7": 14,
+          "12": 1,
+          "13": 2,
+          "15": 1,
+          "24": 2,
+          "26": 1,
+          "27": 1,
+          "28": 2,
+          "29": 2,
+          "30": 2
+        },
+        "first_error_type": {
+          "same_layer": 49,
+          "away": 4
+        }
+      },
+      "canonical_A_to_C": {
+        "solved": true,
+        "steps": 31,
+        "exact_steps": 31
+      },
+      "legal_edge_relation_coverage": 1.0,
+      "rollout_distance_bands": [
+        {
+          "distance_band": "1-7",
+          "solved": 204,
+          "count": 204
+        },
+        {
+          "distance_band": "8-15",
+          "solved": 274,
+          "count": 274
+        },
+        {
+          "distance_band": "16-31",
+          "solved": 542,
+          "count": 546
+        }
+      ]
+    },
+    "6": {
+      "task": "hanoi6",
+      "source_commit": "a07b5f7fb1605aaf0fbd7935c16f3174859caf47",
+      "analysis_commit": "83135f4777c94f68a8b51077407d63b34d539595",
+      "best_step": 19000,
+      "last_step": 20000,
+      "best_model_training_coverage": {
+        "pair_broad_passes": 26.078191683287226,
+        "decision_broad_passes": 18.906354463050203
+      },
+      "remote_run": "/zhanghanyue/experiment/grounded_llm_puzzle_qmaps/runs/hanoi6_coverage_a07b5f7",
+      "local_artifacts": "runs/hanoi_qmap/hanoi6",
+      "states": 729,
+      "diameter": 63,
+      "train_pairs": 186516,
+      "train_decisions": 128634,
+      "test": {
+        "distance_pairs": 39786,
+        "mae": 0.5515251124222187,
+        "spearman": 0.9987044023638251,
+        "shortest_action_rate": 0.9716796875,
+        "strict_candidate_order_accuracy": 0.9813924315283294,
+        "solved": 985,
+        "count": 1024,
+        "success_rate": 0.9619140625,
+        "mean_extra_steps_on_solved": 0.3299492385786802,
+        "hamming_solved": 16,
+        "oracle_solved": 1024
+      },
+      "training_fit": {
+        "shortest_action_rate": 0.983,
+        "mae": 0.5465507543574997
+      },
+      "first_error_test": {
+        "count": 1024,
+        "all_steps_shortest": 790,
+        "first_error_step": {
+          "1": 32,
+          "2": 4,
+          "3": 7,
+          "4": 5,
+          "5": 3,
+          "6": 3,
+          "7": 1,
+          "8": 3,
+          "9": 4,
+          "10": 2,
+          "11": 3,
+          "12": 1,
+          "13": 5,
+          "14": 3,
+          "15": 3,
+          "16": 3,
+          "17": 2,
+          "19": 4,
+          "20": 2,
+          "21": 5,
+          "22": 4,
+          "23": 4,
+          "24": 3,
+          "25": 2,
+          "26": 1,
+          "27": 4,
+          "28": 4,
+          "29": 2,
+          "30": 3,
+          "31": 6,
+          "32": 4,
+          "33": 7,
+          "34": 4,
+          "35": 4,
+          "36": 5,
+          "37": 3,
+          "38": 2,
+          "39": 6,
+          "40": 4,
+          "41": 2,
+          "42": 2,
+          "43": 2,
+          "44": 2,
+          "45": 3,
+          "46": 2,
+          "47": 2,
+          "48": 6,
+          "49": 9,
+          "50": 3,
+          "51": 6,
+          "52": 2,
+          "53": 4,
+          "54": 1,
+          "55": 3,
+          "56": 4,
+          "57": 6,
+          "58": 1,
+          "59": 3,
+          "61": 4
+        },
+        "first_error_parent_depth": {
+          "2": 3,
+          "3": 33,
+          "4": 11,
+          "5": 24,
+          "6": 19,
+          "7": 46,
+          "8": 3,
+          "9": 7,
+          "10": 2,
+          "11": 10,
+          "12": 7,
+          "13": 18,
+          "14": 4,
+          "15": 9,
+          "16": 1,
+          "22": 1,
+          "26": 2,
+          "27": 1,
+          "28": 1,
+          "29": 7,
+          "31": 5,
+          "40": 1,
+          "42": 1,
+          "43": 2,
+          "44": 1,
+          "45": 2,
+          "46": 2,
+          "47": 1,
+          "48": 1,
+          "50": 1,
+          "51": 2,
+          "52": 1,
+          "54": 1,
+          "57": 2,
+          "58": 1,
+          "62": 1
+        },
+        "first_error_type": {
+          "same_layer": 221,
+          "away": 13
+        }
+      },
+      "canonical_A_to_C": {
+        "solved": false,
+        "steps": 63,
+        "exact_steps": 63,
+        "stop": "cycle",
+        "first_nonshortest_step": 61,
+        "remaining_distance_before": 3,
+        "remaining_distance_after": 3
+      },
+      "legal_edge_relation_coverage": 1.0,
+      "rollout_distance_bands": [
+        {
+          "distance_band": "1-7",
+          "solved": 96,
+          "count": 98
+        },
+        {
+          "distance_band": "8-15",
+          "solved": 125,
+          "count": 130
+        },
+        {
+          "distance_band": "16-31",
+          "solved": 259,
+          "count": 265
+        },
+        {
+          "distance_band": "32-63",
+          "solved": 505,
+          "count": 531
+        }
+      ]
+    }
   }
 }

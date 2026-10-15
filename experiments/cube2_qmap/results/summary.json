@@ -572,5 +572,205 @@
       }
     ],
     "scope": "Sampled prefix, not full-run coverage. Node-goal cooccurrence includes ranking labels, not only calibrated distances. All groups share encoder parameters; sparse early overlap alone does not demonstrate a causal deficiency."
+  },
+  "route_complete_diagnostic": {
+    "source_commit": "8d06330ffff1244ca500c8edd6819cee912090bf",
+    "contract": "../configs/route_complete.json",
+    "scope": "One optimal-route-closed finite template, three initializations. All pair and action labels are relational; no coordinate teacher. Heldout poses reuse relation types and the same task cohort across seeds.",
+    "states": 71,
+    "distance_pairs": 2485,
+    "decisions": 23,
+    "initial_routes": 4,
+    "seeds": {
+      "20261016": {
+        "initial_q_max_difference": 1.430511474609375e-06,
+        "models": {
+          "free": {
+            "best_step": 5000,
+            "mae": 0.19254490733146667,
+            "p95_error": 0.6752509474754333,
+            "max_error": 3.602182388305664,
+            "optimal_decisions": 23,
+            "initial_routes_solved": 4,
+            "all_decision_routes_solved": 23,
+            "last_mae": 0.19254490733146667,
+            "last_initial_routes_solved": 4,
+            "criterion_passed": true,
+            "sampled_actual_updates": {
+              "count": 11,
+              "decision_regressions": 1,
+              "pair_regressions": 2,
+              "initial_q_rms_change": 0.0016191225731745362,
+              "maximum_objective_increase": 0
+            }
+          },
+          "encoder": {
+            "best_step": 5000,
+            "mae": 0.013396909460425377,
+            "p95_error": 0.032118041068315506,
+            "max_error": 1.7739715576171875,
+            "optimal_decisions": 23,
+            "initial_routes_solved": 4,
+            "all_decision_routes_solved": 23,
+            "last_mae": 0.013396909460425377,
+            "last_initial_routes_solved": 4,
+            "criterion_passed": true,
+            "sampled_actual_updates": {
+              "count": 11,
+              "decision_regressions": 0,
+              "pair_regressions": 0,
+              "initial_q_rms_change": 0.007579286117106676,
+              "maximum_objective_increase": 6.202142685651779e-06
+            },
+            "heldout": {
+              "validation": {
+                "mae": 2.407455623149872,
+                "optimal_decisions": 39,
+                "decision_count": 92,
+                "routes_solved": 0,
+                "route_count": 16
+              },
+              "test": {
+                "mae": 2.3914497792720795,
+                "optimal_decisions": 74,
+                "decision_count": 184,
+                "routes_solved": 0,
+                "route_count": 32
+              }
+            }
+          }
+        }
+      },
+      "20261017": {
+        "initial_q_max_difference": 1.430511474609375e-06,
+        "models": {
+          "free": {
+            "best_step": 5000,
+            "mae": 0.18952243030071259,
+            "p95_error": 0.7344708442687988,
+            "max_error": 2.8316240310668945,
+            "optimal_decisions": 23,
+            "initial_routes_solved": 4,
+            "all_decision_routes_solved": 23,
+            "last_mae": 0.18952243030071259,
+            "last_initial_routes_solved": 4,
+            "criterion_passed": true,
+            "sampled_actual_updates": {
+              "count": 11,
+              "decision_regressions": 1,
+              "pair_regressions": 2,
+              "initial_q_rms_change": 0.0015965016791597009,
+              "maximum_objective_increase": 0
+            }
+          },
+          "encoder": {
+            "best_step": 5000,
+            "mae": 0.02089163288474083,
+            "p95_error": 0.05160914734005928,
+            "max_error": 1.7369985580444336,
+            "optimal_decisions": 23,
+            "initial_routes_solved": 4,
+            "all_decision_routes_solved": 23,
+            "last_mae": 0.02089163288474083,
+            "last_initial_routes_solved": 4,
+            "criterion_passed": true,
+            "sampled_actual_updates": {
+              "count": 11,
+              "decision_regressions": 0,
+              "pair_regressions": 0,
+              "initial_q_rms_change": 0.007181909866631031,
+              "maximum_objective_increase": 0.0004539559595286846
+            },
+            "heldout": {
+              "validation": {
+                "mae": 2.5113500356674194,
+                "optimal_decisions": 40,
+                "decision_count": 92,
+                "routes_solved": 1,
+                "route_count": 16
+              },
+              "test": {
+                "mae": 2.439718633890152,
+                "optimal_decisions": 74,
+                "decision_count": 184,
+                "routes_solved": 0,
+                "route_count": 32
+              }
+            }
+          }
+        }
+      },
+      "20261018": {
+        "initial_q_max_difference": 1.430511474609375e-06,
+        "models": {
+          "free": {
+            "best_step": 5000,
+            "mae": 0.19428469240665436,
+            "p95_error": 0.7840029001235962,
+            "max_error": 3.6965785026550293,
+            "optimal_decisions": 23,
+            "initial_routes_solved": 4,
+            "all_decision_routes_solved": 23,
+            "last_mae": 0.19428469240665436,
+            "last_initial_routes_solved": 4,
+            "criterion_passed": true,
+            "sampled_actual_updates": {
+              "count": 11,
+              "decision_regressions": 0,
+              "pair_regressions": 1,
+              "initial_q_rms_change": 0.001618720474652946,
+              "maximum_objective_increase": 0
+            }
+          },
+          "encoder": {
+            "best_step": 5000,
+            "mae": 0.015574891120195389,
+            "p95_error": 0.04500456154346466,
+            "max_error": 1.8682589530944824,
+            "optimal_decisions": 23,
+            "initial_routes_solved": 4,
+            "all_decision_routes_solved": 23,
+            "last_mae": 0.015574891120195389,
+            "last_initial_routes_solved": 4,
+            "criterion_passed": true,
+            "sampled_actual_updates": {
+              "count": 11,
+              "decision_regressions": 0,
+              "pair_regressions": 5,
+              "initial_q_rms_change": 0.006548791658133268,
+              "maximum_objective_increase": 1.3682525604963303e-05
+            },
+            "heldout": {
+              "validation": {
+                "mae": 2.4293357133865356,
+                "optimal_decisions": 37,
+                "decision_count": 92,
+                "routes_solved": 0,
+                "route_count": 16
+              },
+              "test": {
+                "mae": 2.3902163207530975,
+                "optimal_decisions": 77,
+                "decision_count": 184,
+                "routes_solved": 0,
+                "route_count": 32
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "finite_template_audit": {
+    "template": "structure_checks_027cace",
+    "mae": 0.21358355818555735,
+    "median_absolute_error": 0.06784343719482422,
+    "p95_absolute_error": 0.9582797288894653,
+    "optimal_decisions": 103,
+    "decision_count": 103,
+    "nonterminal_first_steps": 93,
+    "next_decisions_without_explicit_supervision": 44,
+    "those_next_decisions_with_candidates_outside_template": 44,
+    "interpretation": "Original strict max-error failure and rollout failures do not establish that all finite relational structure was unlearned. Negative gradient cosine alone does not establish harmful Adam updates."
   }
 }

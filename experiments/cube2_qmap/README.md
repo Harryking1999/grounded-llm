@@ -53,3 +53,11 @@ python -u -m experiments.cube2_qmap.src.structure_study --contract experiments/c
 完整距离与稀疏距离条件的状态编码和更新次数相同，标签曝光不同。固定呈现组按完整训练目标选模，仅用于有限集合拟合；新呈现组按验证目标选模。测试在选模后评估最佳与末步模型。原实验保护端点以及本次所有留出呈现中的输入状态均排除在训练之外；新呈现条件也不使用固定呈现的输入状态。其 `fit` 列在新呈现条件中是共同固定监测呈现，不能称为训练集成绩。动作候选和 rollout 中间状态由环境给出，且可能离开有限模板。
 
 分组规则为固定块内绝对差相加、块间取最大；块宽保存在 checkpoint 的 `group_size`。构造性 L∞ 可行解只证明小集合可表示。留出呈现仍然复用同一组相对关系，不能当成完整魔方或未见关系类型泛化。
+
+## 关系监督的使用效率
+
+正式方向仍是通过距离与动作关系训练共享编码器，由网络自行组织 Q 坐标。直接坐标标签只用于 [coordinate_probe.json](configs/coordinate_probe.json) 与 [coordinate_shift_probe.json](configs/coordinate_shift_probe.json) 的有限拟合诊断；不是正式训练方案。[warm_start_checks.json](configs/warm_start_checks.json) 的后续对照也没有显示坐标预训练带来到达优势。
+
+[supervision_audit.py](src/supervision_audit.py) 读取有限地图 checkpoint，分别测量完整距离、排序、近程与远程监督的梯度及方向关系。[supervision_use.json](configs/supervision_use.json) 从同一有限地图出发，只检验显式排序项是否妨碍距离拟合；全部距离标签保留。[dense_supervision.json](configs/dense_supervision.json) 再检验同一距离标签能否更有效地传递给各坐标：保留硬最大距离 Huber，另对每个超过真实距离的坐标差施加惩罚。这不指定坐标含义，也不改变 L∞ 精确可行解集合。两种诊断均以相同完整训练距离 Huber 选模，报告最后一步，测试不参与选择。
+
+这几项小检查沿用 `structure_study` 的命令，将 `--contract` 换为对应合同，并用 `--pair-pretrained` 指向已完成完整关系组的 `best.pt`。初始化 checkpoint 的源码提交身份会与合同核对。它们只定位有限集合的优化问题；全空间到达仍由独立固定度量队列评估。当前数字与结论统一见[结果报告](results/report.md)。

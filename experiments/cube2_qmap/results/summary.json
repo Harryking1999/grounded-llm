@@ -183,5 +183,394 @@
     "exact_oracle_gap": 2,
     "scope": "Rules out exact all-pair L1 fitting in any dimension; does not rule out correct greedy decisions or identify all observed failure causes.",
     "alternative_feasibility": "Five anchor-distance coordinates with L-infinity reproduce this finite witness exactly; no learned-model performance claim."
+  },
+  "metric_comparison": {
+    "source_commit": "90f67338f10e4fbe6798625a97ac9ad82ee83dba",
+    "selection": "validation Huber + soft rank CE; test never selects metric fallback",
+    "conditions": {
+      "l1": {
+        "best_step": 160000,
+        "test_mae": 2.404685482604163,
+        "test_action_rate": 0.666,
+        "test_solved": 131,
+        "last_test_solved": 134,
+        "long_test_solved": 0,
+        "test_count": 512,
+        "long_test_count": 291
+      },
+      "linf": {
+        "best_step": 185000,
+        "test_mae": 2.674963990994862,
+        "test_action_rate": 0.629,
+        "test_solved": 119,
+        "last_test_solved": 121,
+        "long_test_solved": 1,
+        "test_count": 512,
+        "long_test_count": 291
+      },
+      "l2": {
+        "best_step": 170000,
+        "test_mae": 2.5689711243765694,
+        "test_action_rate": 0.67,
+        "test_solved": 133,
+        "last_test_solved": 134,
+        "long_test_solved": 0,
+        "test_count": 512,
+        "long_test_count": 291
+      }
+    }
+  },
+  "structural_diagnostics": {
+    "scope": "Finite 92-state relational template; heldout physical states reuse relative relation types. Coordinate targets are diagnostic only, not the adopted route.",
+    "runs": {
+      "structure_checks_027cace": {
+        "source_commit": "027cacef96c70908d7a6ad7ae49f3dea65c2b866",
+        "conditions": {
+          "linf_sparse_fixed": {
+            "best_step": 5000,
+            "fit_mae": 0.32537397742271423,
+            "fit_max_error": 3.1045093536376953,
+            "fit_action_rate": 1.0,
+            "finite_fit_passed": false,
+            "validation_objective": 5.802762031555176,
+            "validation_edge_mae": 2.108060598373413,
+            "validation_symmetry_gap": 1.4782196283340454,
+            "test_solved": 19,
+            "test_count": 128,
+            "last_test_solved": 19
+          },
+          "linf_joint_fixed": {
+            "best_step": 5000,
+            "fit_mae": 0.2135835587978363,
+            "fit_max_error": 2.0132360458374023,
+            "fit_action_rate": 1.0,
+            "finite_fit_passed": false,
+            "validation_objective": 5.485483646392822,
+            "validation_edge_mae": 2.4471423625946045,
+            "validation_symmetry_gap": 1.418063998222351,
+            "test_solved": 18,
+            "test_count": 128,
+            "last_test_solved": 18
+          },
+          "group_joint_fixed": {
+            "best_step": 5000,
+            "fit_mae": 0.29442012310028076,
+            "fit_max_error": 2.690018653869629,
+            "fit_action_rate": 1.0,
+            "finite_fit_passed": false,
+            "validation_objective": 5.91670036315918,
+            "validation_edge_mae": 1.5024935007095337,
+            "validation_symmetry_gap": 1.1903389692306519,
+            "test_solved": 18,
+            "test_count": 128,
+            "last_test_solved": 18
+          },
+          "linf_augmented_control": {
+            "best_step": 4000,
+            "fit_mae": 2.419485569000244,
+            "fit_max_error": 8.2211275100708,
+            "fit_action_rate": 0.5922330021858215,
+            "finite_fit_passed": false,
+            "validation_objective": 3.7076077461242676,
+            "validation_edge_mae": 2.5149104595184326,
+            "validation_symmetry_gap": 0.9072635769844055,
+            "test_solved": 31,
+            "test_count": 128,
+            "last_test_solved": 31
+          },
+          "linf_augmented_edge": {
+            "best_step": 5000,
+            "fit_mae": 3.1562917232513428,
+            "fit_max_error": 9.646656036376953,
+            "fit_action_rate": 0.582524299621582,
+            "finite_fit_passed": false,
+            "validation_objective": 4.605556011199951,
+            "validation_edge_mae": 0.6833438873291016,
+            "validation_symmetry_gap": 0.5686475038528442,
+            "test_solved": 27,
+            "test_count": 128,
+            "last_test_solved": 27
+          },
+          "linf_augmented_path": {
+            "best_step": 4000,
+            "fit_mae": 2.3043534755706787,
+            "fit_max_error": 8.595492362976074,
+            "fit_action_rate": 0.6116504669189453,
+            "finite_fit_passed": false,
+            "validation_objective": 3.805631160736084,
+            "validation_edge_mae": 2.434138536453247,
+            "validation_symmetry_gap": 0.9505411386489868,
+            "test_solved": 29,
+            "test_count": 128,
+            "last_test_solved": 28
+          },
+          "linf_augmented_symmetry": {
+            "best_step": 5000,
+            "fit_mae": 2.7710509300231934,
+            "fit_max_error": 10.412338256835938,
+            "fit_action_rate": 0.6504854559898376,
+            "finite_fit_passed": false,
+            "validation_objective": 4.262454986572266,
+            "validation_edge_mae": 3.9846417903900146,
+            "validation_symmetry_gap": 0.11654122173786163,
+            "test_solved": 24,
+            "test_count": 128,
+            "last_test_solved": 24
+          }
+        }
+      },
+      "coordinate_probe_90e19c2": {
+        "source_commit": "90e19c241383b43ddeaaa88364f06ed27b1f179b",
+        "conditions": {
+          "linf_anchor_teacher_fixed": {
+            "best_step": 5000,
+            "fit_mae": 0.13150444626808167,
+            "fit_max_error": 0.4485483169555664,
+            "fit_action_rate": 1.0,
+            "finite_fit_passed": false,
+            "validation_objective": 4.967043876647949,
+            "validation_edge_mae": 3.536057233810425,
+            "validation_symmetry_gap": 1.2877322435379028,
+            "test_solved": 19,
+            "test_count": 128,
+            "last_test_solved": 19
+          }
+        }
+      },
+      "coordinate_shift_probe_d242707": {
+        "source_commit": "d242707ebbf4a06cf8cc261a35d87b27d8648121",
+        "conditions": {
+          "linf_anchor_teacher_shifted": {
+            "best_step": 5000,
+            "fit_mae": 0.004620889667421579,
+            "fit_max_error": 0.0301666259765625,
+            "fit_action_rate": 1.0,
+            "finite_fit_passed": true,
+            "validation_objective": 5.131070613861084,
+            "validation_edge_mae": 3.0517570972442627,
+            "validation_symmetry_gap": 1.2014602422714233,
+            "test_solved": 17,
+            "test_count": 128,
+            "last_test_solved": 17
+          }
+        }
+      },
+      "warm_start_checks_c757458": {
+        "source_commit": "c757458d0ab22d24bcaafdc36e71d6abf55d1ca9",
+        "conditions": {
+          "pair_pretrained_augmented": {
+            "best_step": 4000,
+            "fit_mae": 1.9584732055664062,
+            "fit_max_error": 7.4651641845703125,
+            "fit_action_rate": 0.708737850189209,
+            "finite_fit_passed": false,
+            "validation_objective": 3.516395330429077,
+            "validation_edge_mae": 2.499857187271118,
+            "validation_symmetry_gap": 0.6174086928367615,
+            "test_solved": 34,
+            "test_count": 128,
+            "last_test_solved": 34
+          },
+          "coordinate_pretrained_augmented": {
+            "best_step": 4000,
+            "fit_mae": 2.041354179382324,
+            "fit_max_error": 7.776875019073486,
+            "fit_action_rate": 0.7281553745269775,
+            "finite_fit_passed": false,
+            "validation_objective": 3.434084415435791,
+            "validation_edge_mae": 2.522578716278076,
+            "validation_symmetry_gap": 0.5328377485275269,
+            "test_solved": 33,
+            "test_count": 128,
+            "last_test_solved": 33
+          }
+        }
+      },
+      "supervision_use_a90f3fa": {
+        "source_commit": "a90f3fab3a71eee62b1a4472ebd7cdb948c3eed2",
+        "conditions": {
+          "continue_pair_rank": {
+            "best_step": 5000,
+            "fit_mae": 0.2066841572523117,
+            "fit_max_error": 1.961857795715332,
+            "fit_action_rate": 1.0,
+            "finite_fit_passed": false,
+            "validation_objective": 5.51563835144043,
+            "validation_edge_mae": 2.4437215328216553,
+            "validation_symmetry_gap": 1.4008172750473022,
+            "test_solved": 18,
+            "test_count": 128,
+            "last_test_solved": 18
+          },
+          "continue_pair_only": {
+            "best_step": 5000,
+            "fit_mae": 0.2025911957025528,
+            "fit_max_error": 2.09560489654541,
+            "fit_action_rate": 1.0,
+            "finite_fit_passed": false,
+            "validation_objective": 5.5035247802734375,
+            "validation_edge_mae": 2.458466053009033,
+            "validation_symmetry_gap": 1.4047954082489014,
+            "test_solved": 18,
+            "test_count": 128,
+            "last_test_solved": 18
+          }
+        }
+      },
+      "dense_supervision_a1dabec": {
+        "source_commit": "a1dabecc55e3774211ec50fcb440f5598ec3d102",
+        "conditions": {
+          "pair_only_control": {
+            "best_step": 5000,
+            "fit_huber": 0.06724945455789566,
+            "fit_mae": 0.2025911957025528,
+            "fit_max_error": 2.09560489654541,
+            "fit_action_rate": 1.0,
+            "finite_fit_passed": false,
+            "validation_objective": 5.5035247802734375,
+            "test_solved": 18,
+            "test_count": 128,
+            "last_test_solved": 18
+          },
+          "pair_dense_upper": {
+            "best_step": 5000,
+            "fit_huber": 0.0678342953324318,
+            "fit_mae": 0.2041729986667633,
+            "fit_max_error": 2.0869874954223633,
+            "fit_action_rate": 1.0,
+            "finite_fit_passed": false,
+            "validation_objective": 5.489604949951172,
+            "test_solved": 19,
+            "test_count": 128,
+            "last_test_solved": 19
+          }
+        }
+      }
+    }
+  },
+  "supervision_gradient_audit": {
+    "source_commit": "a90f3fab3a71eee62b1a4472ebd7cdb948c3eed2",
+    "checkpoint": "/zhanghanyue/experiment/grounded_llm_puzzle_qmaps/runs/structure_checks_027cace/linf_joint_fixed/best.pt",
+    "scope": "Complete fixed finite map; gradients at one trained checkpoint, not a causal training comparison.",
+    "states": 92,
+    "supervised_pairs": 4186,
+    "minimum_pair_degree": 91,
+    "audit": {
+      "pair": {
+        "loss": 0.07315630465745926,
+        "q_gradient": {
+          "norm": 0.004279549233615398,
+          "coordinates_with_gradient": 57,
+          "state_coordinate_nonzero_fraction": 0.13349184393882751
+        },
+        "parameter_gradient_norm": 0.04183012247085571
+      },
+      "rank": {
+        "loss": 1.434151530265808,
+        "q_gradient": {
+          "norm": 0.004256042186170816,
+          "coordinates_with_gradient": 37,
+          "state_coordinate_nonzero_fraction": 0.04228940233588219
+        },
+        "parameter_gradient_norm": 0.04178507998585701
+      },
+      "dense_upper": {
+        "loss": 0.0009316664072684944,
+        "q_gradient": {
+          "norm": 0.00029592239297926426,
+          "coordinates_with_gradient": 97,
+          "state_coordinate_nonzero_fraction": 0.23250679671764374
+        },
+        "parameter_gradient_norm": 0.009744360111653805
+      },
+      "near": {
+        "loss": 0.006914149038493633,
+        "q_gradient": {
+          "norm": 0.00681207375600934,
+          "coordinates_with_gradient": 57,
+          "state_coordinate_nonzero_fraction": 0.08254075795412064
+        },
+        "parameter_gradient_norm": 0.10930471867322922
+      },
+      "far": {
+        "loss": 0.09578903764486313,
+        "q_gradient": {
+          "norm": 0.005551720038056374,
+          "coordinates_with_gradient": 34,
+          "state_coordinate_nonzero_fraction": 0.10478939861059189
+        },
+        "parameter_gradient_norm": 0.05561971291899681
+      },
+      "cosines": {
+        "pair_vs_rank": {
+          "q": -0.8654199242591858,
+          "parameters": -0.6693220138549805
+        },
+        "near_vs_far": {
+          "q": -0.12658101320266724,
+          "parameters": -0.32221195101737976
+        },
+        "pair_vs_dense_upper": {
+          "q": 0.15489450097084045,
+          "parameters": -0.1614425778388977
+        }
+      },
+      "coordinate_bounds": {
+        "overestimated_pairs": 2183,
+        "violating_coordinate_constraints": 4679,
+        "mean_violations_per_overestimated_pair": 2.143380641937256
+      },
+      "output_boundary_fraction": 0.0
+    }
+  },
+  "linf_dimension_bound": {
+    "source_commit": "5e6a6efb82e54b80c752035839252b17a056372f",
+    "witness": "linf_dimension_witness.json",
+    "dimension_lower_bound": 129,
+    "uniform_error_lower_bound_for_dimension_128": 0.5,
+    "scope": "Worst-case full-pair bound, not average error, ranking impossibility or a failure attribution."
+  },
+  "sampling_linkage_audit": {
+    "source_commit": "d328bed97deeca9d0d8ab99ddc80abad8ca60227",
+    "seed": 20261017,
+    "records": [
+      {
+        "draws": 32,
+        "graph_groups": 4096,
+        "unique_input_states": 140005,
+        "unique_node_goal_relations": 139264,
+        "node_states": 136654,
+        "node_states_with_multiple_goals": 2582,
+        "fraction_node_states_with_multiple_goals": 0.018894434118284134,
+        "maximum_goals_per_node_state": 4,
+        "unique_absolute_distance_pairs": 30715,
+        "same_batch_rank_relations_in_absolute_loss_mean": 0.16145778326135474
+      },
+      {
+        "draws": 512,
+        "graph_groups": 65536,
+        "unique_input_states": 1677166,
+        "unique_node_goal_relations": 2228149,
+        "node_states": 1646758,
+        "node_states_with_multiple_goals": 467114,
+        "fraction_node_states_with_multiple_goals": 0.2836567364482213,
+        "maximum_goals_per_node_state": 8,
+        "unique_absolute_distance_pairs": 491134,
+        "same_batch_rank_relations_in_absolute_loss_mean": 0.16177993821750591
+      },
+      {
+        "draws": 2048,
+        "graph_groups": 262144,
+        "unique_input_states": 3288992,
+        "unique_node_goal_relations": 8910897,
+        "node_states": 3267514,
+        "node_states_with_multiple_goals": 2491731,
+        "fraction_node_states_with_multiple_goals": 0.7625769927841166,
+        "maximum_goals_per_node_state": 14,
+        "unique_absolute_distance_pairs": 1964166,
+        "same_batch_rank_relations_in_absolute_loss_mean": 0.16169895906880605
+      }
+    ],
+    "scope": "Sampled prefix, not full-run coverage. Node-goal cooccurrence includes ranking labels, not only calibrated distances. All groups share encoder parameters; sparse early overlap alone does not demonstrate a causal deficiency."
   }
 }

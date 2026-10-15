@@ -39,7 +39,14 @@ class Cube2:
     actions = ("U", "U2", "U'", "R", "R2", "R'", "F", "F2", "F'")
     symmetry_kind = "common_left_multiplication"
 
-    def __init__(self, oracle_path=None):
+    def __init__(self, oracle_path=None, metric="HTM_URF_9"):
+        if metric not in ("HTM_URF_9", "QTM_URF_6"):
+            raise ValueError(f"Unknown cube metric: {metric}")
+        self.metric = metric
+        columns = np.arange(9) if metric == "HTM_URF_9" else np.array([0, 2, 3, 5, 6, 8])
+        self.actions = tuple(type(self).actions[i] for i in columns)
+        self.name = "cube2" if metric == "HTM_URF_9" else "cube2_qtm"
+        self.diameter = 11 if metric == "HTM_URF_9" else 14
         self.permutations = np.tile(np.arange(8), (5040, 1))
         self.permutations[:, SLOTS] = np.array(list(permutations(SLOTS)))
         self.twists = np.zeros((729, 8), dtype=np.int64)
@@ -53,11 +60,13 @@ class Cube2:
                 p, o = p[:, cp], (o[:, cp] + co) % 3
                 self.cp_next[:, 3 * face + power] = permutation_rank(p[:, SLOTS])
                 self.co_next[:, 3 * face + power] = o[:, SLOTS[:6]] @ POWERS
+        self.cp_next = self.cp_next[:, columns]
+        self.co_next = self.co_next[:, columns]
         self.depth = None
         if oracle_path is not None and Path(oracle_path).exists():
             self.depth = np.load(oracle_path, allow_pickle=False)
-            if self.depth.shape != (self.size,) or self.depth.dtype != np.uint8 or self.depth.max() != 11:
-                raise ValueError("Invalid complete HTM oracle table")
+            if self.depth.shape != (self.size,) or self.depth.dtype != np.uint8 or self.depth.max() != self.diameter:
+                raise ValueError(f"Invalid complete {metric} oracle table")
 
     def validate(self, state):
         if not isinstance(state, (int, np.integer)) or isinstance(state, (bool, np.bool_)) or not 0 <= state < self.size:

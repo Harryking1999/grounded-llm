@@ -1,0 +1,157 @@
+"""Exact QTM local graphs and freshly posed, layer-balanced training batches.
+
+Only the rule environment and offline labels live here; no learned dynamics.
+"""
+import json
+from pathlib import Path
+
+import numpy as np
+
+from experiments.puzzle_qmap.src.sampling import StratifiedEpochSampler
+from experiments.puzzle_qmap.src.evaluate import task_indices
+from .data import decorate, evaluation_pairs, pose_groups
+
+
+def local_template(env):
+    """34 unique words, seven parent slots and their complete six-way edges."""
+    one = env.successors(0)
+    words = np.unique(np.r_[0, one, env.successors(one).ravel()]).astype(np.int32)
+    parents = np.searchsorted(words, np.r_[0, one])
+    children = np.searchsorted(words, env.successors(words[parents]))
+    if len(words) != 34 or not np.array_equal(words[children], env.successors(words[parents])):
+        raise ValueError("Expected the complete radius-two QTM graph")
+    return words, parents, children
+
+
+class LocalGraphSampler:
+    """Traverse every relative root within its layer; re-pose the entire graph."""
+    def __init__(self, env, data, config, rng):
+        if env.name != "cube2_qtm":
+            raise ValueError("Local graph contract requires the six-action cube")
+        self.env, self.rng, self.config = env, rng, config
+        self.relatives = data["relative_roots"]
+        self.sampler = StratifiedEpochSampler(env.depth[self.relatives], rng)
+        self.forbidden = np.zeros(env.size, dtype=bool)
+        self.forbidden[data["protected_states"]] = True
+        self.words, self.parents, self.children = local_template(env)
+        self.local_distances = env.distance(self.words[:, None], self.words[None, :])
+        self.groups_drawn = 0
+        self.pair_histogram = np.zeros(env.diameter + 1, dtype=np.int64)
+        self.parent_histogram = np.zeros(env.diameter + 1, dtype=np.int64)
+
+    def coverage(self):
+        return {"root_min_layer_passes": self.sampler.passes,
+                "root_layers": self.sampler.coverage(), "online_pose_groups": self.groups_drawn,
+                "supervised_pair_distance_histogram": self.pair_histogram.tolist(),
+                "supervised_parent_distance_histogram": self.parent_histogram.tolist()}
+
+    def draw(self, groups=None, pair_count=None):
+        options = self.config["training"]
+        groups = options["graph_batch_size"] if groups is None else groups
+        pair_count = options["batch_size"] if pair_count is None else pair_count
+        roots = self.relatives[self.sampler.draw(groups)]
+        nodes = self.env.compose(roots[:, None], self.words[None, :])
+        labels = self.env.depth[nodes]
+        # Column zero is the shared goal. Every other state used in either loss
+        # belongs to this whole jointly transformed, split-safe local graph.
+        packed = pose_groups(self.env, np.column_stack((np.zeros(groups, dtype=int), nodes)),
+                             self.forbidden, self.rng, self.config["augmentation"]["max_attempts"])
+        width = packed.shape[1]
+        offsets = np.arange(groups)[:, None] * width
+        parent_labels = labels[:, self.parents]
+        live = parent_labels > 0  # A terminal parent does not have an optimal action.
+        child_labels = labels[:, self.children]
+        delta = child_labels.astype(int) - parent_labels[:, :, None].astype(int)
+        if not np.all(np.abs(delta[live]) == 1):
+            raise ValueError("QTM successor labels must advance or retreat by one")
+        parents = np.broadcast_to(offsets + 1 + self.parents, live.shape)[live]
+        goals = np.broadcast_to(offsets, live.shape)[live]
+        children = (offsets[:, :, None] + 1 + self.children)[live]
+
+        # Long-range goal calibration and short, composition-aware relations
+        # share the same Q evaluations. All labels use the full graph oracle.
+        near_count = round(pair_count * self.config["sampling"]["local_pair_fraction"])
+        goal_count = pair_count - near_count
+        chosen = self.rng.integers(groups * len(self.words), size=goal_count)
+        gi, ni = np.divmod(chosen, len(self.words))
+        goal_pairs = np.column_stack((gi * width + ni + 1, gi * width))
+        gi = self.rng.integers(groups, size=near_count)
+        a = self.rng.integers(len(self.words), size=near_count)
+        b = (a + self.rng.integers(1, len(self.words), size=near_count)) % len(self.words)
+        near_pairs = np.column_stack((gi * width + a + 1, gi * width + b + 1))
+        pair_labels = np.r_[labels.ravel()[chosen], self.local_distances[a, b]]
+        self.groups_drawn += groups
+        self.pair_histogram += np.bincount(pair_labels, minlength=self.env.diameter + 1)
+        self.parent_histogram += np.bincount(parent_labels[live], minlength=self.env.diameter + 1)
+        return {"states": packed.ravel(), "pairs": np.concatenate((goal_pairs, near_pairs)),
+                "pair_distances": pair_labels,
+                "parents": parents, "goals": goals, "children": children,
+                "child_distances": child_labels[live], "parent_distances": parent_labels[live],
+                "delta": delta[live], "relative_roots": roots}
+
+
+def build_local_graph(env, config, out):
+    """Keep exact relative coverage compact; produce poses online, never freeze them."""
+    options = config["data"]
+    if (env.name != "cube2_qtm" or config["rules"]["metric"] != env.metric or
+            config["augmentation"]["kind"] != env.symmetry_kind or
+            not config["augmentation"]["enabled"]):
+        raise ValueError("Local graph, rules and online symmetry must agree")
+    reference_path = Path(options["reference_data"])
+    metadata = json.loads((reference_path.parent / "summary.json").read_text())
+    if metadata["source_commit"] != options["reference_source_commit"]:
+        raise ValueError("Wrong reference evaluation states")
+    reference = dict(np.load(reference_path, allow_pickle=False))
+    protected = np.zeros(env.size, dtype=bool)
+    # Preserve endpoints of all old evaluation cohorts, including the earliest
+    # reference, without reusing any old action or distance label.
+    for key, rows in reference.items():
+        if key.startswith(("pairs_", "tasks_")) and any(s in key for s in ("validation", "test")):
+            protected[rows[:, :2]] = True
+    data, rng = {}, np.random.default_rng(config["seed"])
+    buckets = [np.flatnonzero(env.depth == d) for d in range(env.diameter + 1)]
+    for split, bucket in (("validation", 1), ("test", 2)):
+        rows = evaluation_pairs(env, rng, options[f"pairs_{split}"], bucket, buckets, protected)
+        protected[rows[:, :2]] = True
+        decorate(env, data, split, rows[:options[f"decisions_{split}"], :2], rows)
+    old_pairs = reference["pairs_test"]
+    relabeled = np.column_stack((old_pairs[:, :2], env.distance(old_pairs[:, 0], old_pairs[:, 1])))
+    # The first reference rollout is exactly the previous stratified cohort.
+    # Use its old parent labels to select it before relabeling the QTM task.
+    old_indices = task_indices(env, reference, "test", config["evaluation"]["rollout_count"], config)
+    ordered = np.r_[old_indices, np.setdiff1d(np.arange(len(reference["tasks_test"])), old_indices)]
+    decorate(env, data, "reference_test", reference["tasks_test"][ordered], relabeled)
+    data["reference_rollout_source_indices"] = old_indices
+    data["protected_states"] = np.flatnonzero(protected).astype(np.int32)
+    data["relative_roots"] = np.arange(1, env.size, dtype=np.int32)
+    if options["relative_limit"] is not None:
+        # Small smoke contracts still include every distance layer.
+        count = options["relative_limit"]
+        data["relative_roots"] = np.unique(np.r_[
+            [rng.choice(layer) for layer in buckets[1:]],
+            rng.choice(data["relative_roots"], count, replace=False)]).astype(np.int32)
+    probe = LocalGraphSampler(env, data, config, np.random.default_rng(config["seed"] + 51)).draw(
+        options["monitor_groups"], options["monitor_pairs"])
+    states = probe["states"]
+    pairs = np.column_stack((states[probe["pairs"]], probe["pair_distances"]))
+    tasks = np.column_stack((states[probe["parents"]], states[probe["goals"]]))
+    decorate(env, data, "train", tasks, pairs)
+    if protected[states].any():
+        raise ValueError("Protected state entered fixed training monitor")
+    words, parents, children = local_template(env)
+    summary = {"split_unit": "protected_old_and_fresh_evaluation_parent_goal_endpoints",
+               "states_in_environment": env.size, "action_count": len(env.actions), "diameter": env.diameter,
+               "protected_states": int(protected.sum()), "relative_root_types": len(data["relative_roots"]),
+               "relative_root_coverage": len(data["relative_roots"]) / (env.size - 1),
+               "graph_unique_nodes": len(words), "graph_parent_slots": len(parents),
+               "graph_two_step_sequences": int(children[1:].size),
+               "online_common_left_multiplication": True,
+               "training_arrays_are_fixed_monitor_only": True,
+               "reference_source_commit": metadata["source_commit"],
+               "splits": {s: {"pairs": len(data[f"pairs_{s}"]), "decisions": len(data[f"tasks_{s}"]),
+                              "distance_histogram": np.bincount(data[f"pairs_{s}"][:, 2],
+                                                                  minlength=env.diameter + 1).tolist()}
+                          for s in ("train", "validation", "test", "reference_test")}}
+    np.savez_compressed(out / "data.npz", **data)
+    (out / "data_summary.json").write_text(json.dumps(summary, indent=2) + "\n")
+    return data, summary

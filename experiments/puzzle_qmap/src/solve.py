@@ -8,7 +8,7 @@ from .tasks import make_environment
 
 def main():
     parser = argparse.ArgumentParser(__doc__)
-    parser.add_argument("--task", choices=("hanoi3", "hanoi4", "hanoi5", "hanoi6", "cube2"), required=True)
+    parser.add_argument("--task", choices=("hanoi3", "hanoi4", "hanoi5", "hanoi6", "cube2", "cube2_qtm"), required=True)
     parser.add_argument("--start", type=int)
     parser.add_argument("--goal", type=int)
     parser.add_argument("--scramble", default="", help="Cube U/R/F notation, space separated")
@@ -24,7 +24,7 @@ def main():
     for action in args.scramble.split():
         source = env.step(source, action)
     if args.checkpoint is None:
-        if env.name == "cube2" and env.depth is None:
+        if env.name.startswith("cube2") and env.depth is None:
             if args.oracle is None:
                 parser.error("Exact cube solving requires --oracle (builds it if missing)")
             env.build_oracle(args.oracle)

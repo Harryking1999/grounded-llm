@@ -101,11 +101,11 @@ def ranking_loss(model, env, tasks, truth, device, temperature):
 
 
 @torch.no_grad()
-def rollout(model, env, tasks, device, budget_multiplier):
+def rollout(model, env, tasks, device, budget_multiplier, horizon=None, return_tasks=False):
     results = {}
     exact = env.distance(tasks[:, 0], tasks[:, 1])
     # Same distance-independent horizon for all policies; no oracle-fed budget.
-    budget = int(env.diameter * budget_multiplier)
+    budget = int(env.diameter * budget_multiplier) if horizon is None else int(horizon)
     for policy in ("q", "hamming", "oracle"):
         current, goal = tasks[:, 0].copy(), tasks[:, 1]
         steps = np.zeros(len(tasks), dtype=int)
@@ -143,6 +143,8 @@ def rollout(model, env, tasks, device, budget_multiplier):
                            "illegal_action_rate": 0.0,
                            "by_start_distance": {str(d): {"count": int((exact == d).sum()), "success_rate": float(solved[exact == d].mean())}
                                                  for d in np.unique(exact)}}
+        if return_tasks:
+            results[policy]["per_task"] = {"solved": solved.tolist(), "steps": steps.tolist(), "cycles": cycles.tolist()}
     return results
 
 

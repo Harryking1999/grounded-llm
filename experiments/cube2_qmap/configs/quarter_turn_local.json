@@ -1,0 +1,61 @@
+{
+  "task": "cube2_qtm",
+  "seed": 20261016,
+  "rules": {
+    "size": "2x2x2",
+    "frame": "DBL_fixed_untwisted",
+    "metric": "QTM_URF_6",
+    "move_cost": 1
+  },
+  "data": {
+    "builder": "local_graph",
+    "reference_data": "runs/cube2_breadth_depth_a07b5f7/data.npz",
+    "reference_source_commit": "a07b5f7fb1605aaf0fbd7935c16f3174859caf47",
+    "pairs_validation": 2800,
+    "pairs_test": 7000,
+    "decisions_validation": 1400,
+    "decisions_test": 1400,
+    "relative_limit": null,
+    "monitor_groups": 1024,
+    "monitor_pairs": 6000
+  },
+  "augmentation": {
+    "enabled": true,
+    "kind": "common_left_multiplication",
+    "refresh": "every_graph_draw",
+    "max_attempts": 256
+  },
+  "model": {
+    "dimension": 128,
+    "hidden": 256
+  },
+  "training": {
+    "steps": 200000,
+    "batch_size": 1024,
+    "graph_batch_size": 128,
+    "learning_rate": 0.001,
+    "rank_weight": 1.0,
+    "rank_temperature": 1.0,
+    "eval_every": 5000,
+    "patience": null,
+    "min_improvement": 0.0001,
+    "cpu_threads": 4,
+    "min_steps": 0,
+    "minimum_learning_rate": 0.00001,
+    "monitor_training": true,
+    "retain_initial": true,
+    "save_last": true,
+    "evaluate_initial_test": false
+  },
+  "evaluation": {
+    "decision_count": 1000,
+    "rollout_count": 512,
+    "budget_multiplier": 2,
+    "stratified_tasks": true
+  },
+  "sampling": {
+    "kind": "online_stratified_local_graphs",
+    "minimum_full_passes": 1.0,
+    "local_pair_fraction": 0.25
+  }
+}

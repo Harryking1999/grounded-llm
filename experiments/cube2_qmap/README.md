@@ -6,6 +6,15 @@
 
 用户确认后的分层均衡续训使用 [balanced_epochs.json](configs/balanced_epochs.json)：固定复用广深数据及纯 Q／Adam，距离对按真距离、排序组按父状态真距离分层；每批等额配给，余数轮换，每层独立无放回遍历后重排。完整候选软目标与两个损失的权重均保持原定义。学习率逐渐降低，执行完整提高后的预算；各层实际覆盖轮次单独记录。起始权重参与验证选择，另存末步权重，避免覆盖门槛排除更好的早期模型。正式预算、最低覆盖与学习率只维护在配置中。
 
+用户已授权六动作纯 Q 对照，合同为 [quarter_turn_local.json](configs/quarter_turn_local.json)，具体数据与比较边界见 [DATA_DESIGN.md](DATA_DESIGN.md#六动作局部图与在线呈现)。`cube2_qtm` 只保留 U/U'、R/R'、F/F'；沿用同一个共享编码器、对称距离、Huber 和完整软排序，从头训练，不添加转移预测头。六动作与九动作的 oracle、标签、checkpoint 和输出目录分别保存。
+
+```bash
+python -m experiments.puzzle_qmap.src.run --config experiments/cube2_qmap/configs/quarter_turn_local.json --out runs/cube2_quarter_turn_RUN --source-commit COMMIT --device cuda:1
+python -m experiments.cube2_qmap.src.compare --run runs/cube2_quarter_turn_RUN --reference-run runs/cube2_balanced_epochs_90ec4ca --device cuda:1
+```
+
+相对根状态按真实距离均衡、层内无放回遍历，每次抽取重新为整个局部图选择共同左乘，所有图节点与目标均避开保护的评测端点。`data.npz` 中 `pairs_train`／`tasks_train` 在此条件下只是固定训练监测集；训练样本来自在线数据流。各根层覆盖、实际距离对／排序父层分布分别记录，不能将根层均衡说成展开后每层严格等额。固定训练监测集与验证集记录 Huber、软排序 CE 及目标熵；最佳模型按验证目标选择，测试只在训练结束后使用。
+
 ```bash
 python -m experiments.puzzle_qmap.src.run --config experiments/cube2_qmap/configs/balanced_epochs.json --out runs/cube2_qmap/BALANCED_RUN --source-commit COMMIT --device cuda:1 --prepared-run runs/cube2_qmap/breadth_depth --checkpoint runs/cube2_qmap/breadth_depth/best.pt
 ```

@@ -45,6 +45,9 @@ def cube_pairs(env, rng, count, split, buckets):
 
 
 def build(env, config, out):
+    if config["data"].get("builder") == "local_graph":
+        from experiments.cube2_qmap.src.local_graph import build_local_graph
+        return build_local_graph(env, config, out)
     if config["data"].get("builder") == "breadth_depth":
         from experiments.cube2_qmap.src.data import build_breadth_depth
         return build_breadth_depth(env, config, out)

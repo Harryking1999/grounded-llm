@@ -38,8 +38,14 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
                  eta_min=options["minimum_learning_rate"]) if "minimum_learning_rate" in options else None)
     pairs = data["pairs_train"]
     tasks, children = data["tasks_train"], data["children_train"]
+    online = None
     pair_sampler = rank_sampler = None
-    if "sampling" in config:
+    if config["data"].get("builder") == "local_graph":
+        from experiments.cube2_qmap.src.local_graph import LocalGraphSampler
+        online = LocalGraphSampler(env, data, config, rng)
+        if online.sampler.steps_for_passes(options["graph_batch_size"], config["sampling"]["minimum_full_passes"]) > options["steps"]:
+            raise ValueError("Training budget cannot traverse the contracted relative layers")
+    elif "sampling" in config:
         sampling = config["sampling"]
         parent_distance = data.get("parent_distances_train")
         if parent_distance is None:
@@ -62,6 +68,8 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
                     raise ValueError("Training budget cannot cover the contracted breadth")
 
     def coverage():
+        if online is not None:
+            return online.coverage()
         if isinstance(pair_sampler, StratifiedEpochSampler):
             return {"pair_min_layer_passes": pair_sampler.passes, "decision_min_layer_passes": rank_sampler.passes,
                     "pair_layers": pair_sampler.coverage(), "decision_layers": rank_sampler.coverage()}
@@ -69,10 +77,21 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
                 if pair_sampler is not None else {})
 
     # Features only: validation/test labels never enter this training store.
-    ids = np.unique(np.concatenate((pairs[:, :2].ravel(), tasks.ravel(), children[children >= 0])))
-    lookup = np.full(env.size, -1, dtype=np.int64)
-    lookup[ids] = np.arange(len(ids))
-    features = torch.as_tensor(env.features(ids), device=device)
+    if online is None:
+        ids = np.unique(np.concatenate((pairs[:, :2].ravel(), tasks.ravel(), children[children >= 0])))
+        lookup = np.full(env.size, -1, dtype=np.int64)
+        lookup[ids] = np.arange(len(ids))
+        features = torch.as_tensor(env.features(ids), device=device)
+    else:
+        # Fixed rule tables construct the same 192 one-hot inputs directly on
+        # the device. Fresh poses need no full-state feature cache or new head.
+        permutations = torch.as_tensor(env.permutations, device=device)
+        twists = torch.as_tensor(env.twists, device=device)
+
+    def online_encode(states):
+        ids = torch.as_tensor(states, device=device, dtype=torch.long)
+        joint = permutations[ids // 729] * 3 + twists[ids % 729]
+        return model.encode(F.one_hot(joint, 24).reshape(-1, env.feature_dim).float())
 
     def q(states):
         indices = lookup[states]
@@ -99,6 +118,20 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
         score = metrics["huber"] + options["rank_weight"] * rank
         return score, metrics, actions["q"], rank
 
+    def training_monitor():
+        pm = pair_metrics(model, env, probe_pairs, device)
+        candidates = env.successors(probe_tasks[:, 0])
+        truth = env.distance(np.maximum(candidates, 0), probe_tasks[:, 1, None])
+        rank = ranking_loss(model, env, probe_tasks, truth, device, options["rank_temperature"])
+        target = torch.as_tensor(truth, dtype=torch.float32, device=device)
+        valid = torch.as_tensor(candidates >= 0, device=device)
+        logits = (-target / options["rank_temperature"]).masked_fill(~valid, -torch.inf)
+        entropy = float(-(torch.softmax(logits, -1) *
+                          torch.log_softmax(logits, -1).masked_fill(~valid, 0)).sum(-1).mean())
+        return {"pairs": pm, "soft_rank_loss": rank, "rank_target_entropy": entropy, "rank_kl": rank - entropy,
+                "objective": pm["huber"] + options["rank_weight"] * rank,
+                "decisions": decisions(model, env, probe_tasks, device)["q"]}
+
     def save(step, destination):
         torch.save({"model_type": MODEL_TYPE, "task": env.name, "cap": env.diameter,
                     "actions": list(env.actions), "model": model.state_dict(),
@@ -107,6 +140,7 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
 
     started = time.monotonic()
     initial_score, initial_pairs, initial_decisions, _ = validate()
+    initial_training = training_monitor() if probe_pairs is not None else None
     initial_test = evaluate(model, env, data, config, device) if options.get("evaluate_initial_test", True) else None
     best, best_step, stale = float("inf"), 0, 0
     if options.get("retain_initial", False):
@@ -115,21 +149,34 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
     with (out / "progress.jsonl").open("w") as log:
         for step in range(1, options["steps"] + 1):
             model.train()
-            sampled_ids = (pair_sampler.draw(options["batch_size"]) if pair_sampler is not None
-                           else rng.integers(len(pairs), size=options["batch_size"]))
-            sampled = pairs[sampled_ids]
-            pair_loss = F.smooth_l1_loss(distance(q(sampled[:, 0]), q(sampled[:, 1])),
-                                         torch.as_tensor(sampled[:, 2], dtype=torch.float32, device=device))
-            idx = (rank_sampler.draw(options["decision_batch_size"]) if rank_sampler is not None
-                   else rng.integers(len(tasks), size=options["decision_batch_size"]))
-            candidate = children[idx]
-            valid = torch.as_tensor(candidate >= 0, device=device)
-            # Use an actual training parent for padding, never an arbitrary heldout ID.
-            safe = np.where(candidate >= 0, candidate, tasks[idx, 0, None])
-            candidate_q = q(safe)
-            goal_q = q(tasks[idx, 1])
-            scores = distance(candidate_q, goal_q[:, None])
-            truth = torch.as_tensor(data["child_distances_train"][idx], device=device)
+            if online is not None:
+                batch = online.draw()
+                vectors = online_encode(batch["states"])
+                pair_indices = torch.as_tensor(batch["pairs"], device=device)
+                pair_prediction = distance(vectors[pair_indices[:, 0]], vectors[pair_indices[:, 1]])
+                pair_target = torch.as_tensor(batch["pair_distances"], dtype=torch.float32, device=device)
+                pair_loss = F.smooth_l1_loss(pair_prediction, pair_target)
+                candidate_q = vectors[torch.as_tensor(batch["children"], device=device)]
+                goal_q = vectors[torch.as_tensor(batch["goals"], device=device)]
+                scores = distance(candidate_q, goal_q[:, None])
+                truth = torch.as_tensor(batch["child_distances"], device=device)
+                valid = torch.ones_like(truth, dtype=torch.bool)
+            else:
+                sampled_ids = (pair_sampler.draw(options["batch_size"]) if pair_sampler is not None
+                               else rng.integers(len(pairs), size=options["batch_size"]))
+                sampled = pairs[sampled_ids]
+                pair_loss = F.smooth_l1_loss(distance(q(sampled[:, 0]), q(sampled[:, 1])),
+                                             torch.as_tensor(sampled[:, 2], dtype=torch.float32, device=device))
+                idx = (rank_sampler.draw(options["decision_batch_size"]) if rank_sampler is not None
+                       else rng.integers(len(tasks), size=options["decision_batch_size"]))
+                candidate = children[idx]
+                valid = torch.as_tensor(candidate >= 0, device=device)
+                # Use an actual training parent for padding, never an arbitrary heldout ID.
+                safe = np.where(candidate >= 0, candidate, tasks[idx, 0, None])
+                candidate_q = q(safe)
+                goal_q = q(tasks[idx, 1])
+                scores = distance(candidate_q, goal_q[:, None])
+                truth = torch.as_tensor(data["child_distances_train"][idx], device=device)
             rank_loss = soft_rank_loss(scores, truth, valid, options["rank_temperature"])
             loss = pair_loss + options["rank_weight"] * rank_loss
             optimizer.zero_grad(set_to_none=True)
@@ -142,7 +189,7 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
                 score, metrics, actions, val_rank = validate()
                 covered = coverage()
                 eligible = (step >= options.get("min_steps", 0) and
-                            (not covered or isinstance(pair_sampler, StratifiedEpochSampler) or
+                            (not covered or online is not None or isinstance(pair_sampler, StratifiedEpochSampler) or
                              min(covered.values()) >= config["sampling"]["minimum_broad_passes"]))
                 if eligible and score < best - options["min_improvement"]:
                     best, best_step, stale = score, step, 0
@@ -157,8 +204,7 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
                           "validation_objective": score, "selection_eligible": eligible,
                           "learning_rate": optimizer.param_groups[0]["lr"], "best_step": best_step, **covered}
                 if probe_pairs is not None:
-                    record["training_monitor"] = {"pairs": pair_metrics(model, env, probe_pairs, device),
-                                                   "decisions": decisions(model, env, probe_tasks, device)["q"]}
+                    record["training_monitor"] = training_monitor()
                     val_tasks = data["tasks_validation"][val_idx]
                     val_depth = env.distance(val_tasks[:, 0], val_tasks[:, 1])
                     record["validation_decisions_by_depth"] = {
@@ -182,6 +228,7 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
               "selection": "validation Huber + rank_weight * full soft rank cross entropy",
               "initial_validation_objective": initial_score, "initial_validation_pairs": initial_pairs,
               "initial_validation_decisions": initial_decisions, "initial": initial_test,
+              "initial_training_monitor": initial_training,
               "final": evaluate(model, env, data, config, device)}
     # Compact interface examples, not an oracle table disguised as learned Q.
     export_ids = np.arange(env.size) if env.size < 1000 else np.unique(data["pairs_test"][:2048, :2])
@@ -216,7 +263,7 @@ def main():
         summary = {"reused_prepared_run": str(source)}
     else:
         env = make_environment(config["task"], args.out / "oracle_depth.npy")
-        if env.name == "cube2":
+        if env.name.startswith("cube2"):
             env.build_oracle(args.out / "oracle_depth.npy")
         data, summary = build(env, config, args.out)
     print(json.dumps({"data": summary}), flush=True)

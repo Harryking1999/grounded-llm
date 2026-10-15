@@ -21,5 +21,11 @@
       "progress_margin": 1.0
     }
   },
+  "evaluation_remix": {
+    "count": 512,
+    "seed": 20261019,
+    "endpoint_pool": "protected test endpoints from prepared_run",
+    "exclude_previously_evaluated_unordered_pairs": true
+  },
   "comparison": "same Q and Adam initialization, online random stream, rules, protected endpoints, update budget, learning-rate schedule and validation selection; edge_difference replaces the distance Huber target, progress_margin retains both baseline losses and adds a worst violated shortest-successor inequality"
 }

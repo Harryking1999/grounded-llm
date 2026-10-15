@@ -1,0 +1,13 @@
+{
+  "base_contract": "structure_checks.json",
+  "hypothesis": "A coherent finite coordinate map provides a better initialization for learning symmetry-transformed relations than finite pair/ranking pretraining.",
+  "initialization_source_commits": {
+    "pair_pretrained": "027cacef96c70908d7a6ad7ae49f3dea65c2b866",
+    "coordinate_pretrained": "d242707ebbf4a06cf8cc261a35d87b27d8648121"
+  },
+  "conditions": [
+    {"name": "pair_pretrained_augmented", "metric": "linf", "fresh": true, "pairs": "complete", "edge": 0.0, "path": 0.0, "symmetry": 0.0, "initialization": "pair_pretrained"},
+    {"name": "coordinate_pretrained_augmented", "metric": "linf", "fresh": true, "pairs": "complete", "edge": 0.0, "path": 0.0, "symmetry": 0.0, "initialization": "coordinate_pretrained"}
+  ],
+  "scope": "Both sources used identical fixed training states and pretraining update budgets. Source weights selected on finite training geometry, not heldout scores. Both followups use fresh Adam, the same new-pose stream, losses, architecture and update budget. Fixed fit poses are familiar from pretraining; validation/test remain excluded. Total updates include pretraining, so do not compare with the earlier random-initialization augmented control as a matched total-budget comparison. This is still transfer of known relative relations, not a full global map."
+}

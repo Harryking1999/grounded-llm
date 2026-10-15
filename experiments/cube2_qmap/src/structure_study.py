@@ -156,12 +156,22 @@ def measure(model, env, data, poses, config, device, with_rollout=False):
     return result
 
 
-def run_condition(env, data, config, condition, out, device, source_commit):
+def run_condition(env, data, config, condition, out, device, source_commit, checkpoint=None):
     out.mkdir()
     torch.manual_seed(config["seed"])
     rng = np.random.default_rng(config["seed"] + 1)
     model_config = {**config["model"], "metric": condition["metric"]}
     model = QMap(env.feature_dim, **model_config, cap=env.diameter).to(device)
+    parent = None
+    if checkpoint is not None:
+        saved = torch.load(checkpoint, map_location=device, weights_only=False)
+        expected = config["initialization_source_commits"][condition["initialization"]]
+        if (saved["source_commit"] != expected or saved["model_config"] != model_config or
+                saved["task"] != env.name or saved["actions"] != list(env.actions)):
+            raise ValueError("Wrong finite-map initialization checkpoint")
+        model.load_state_dict(saved["model"])
+        parent = {"checkpoint": str(checkpoint), "source_commit": saved["source_commit"], "step": saved["step"],
+                  "optimizer": "fresh Adam; no continuation of pretraining moments"}
     opts = config["training"]
     optimizer = torch.optim.Adam(model.parameters(), lr=opts["learning_rate"])
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, opts["steps"], opts["minimum_learning_rate"])
@@ -173,7 +183,7 @@ def run_condition(env, data, config, condition, out, device, source_commit):
     def save(path, step):
         torch.save({"model_type": MODEL_TYPE, "task": env.name, "actions": list(env.actions),
                     "model_config": model_config, "cap": env.diameter, "model": model.state_dict(),
-                    "source_commit": source_commit, "step": step}, path)
+                    "source_commit": source_commit, "step": step, "parent": parent}, path)
 
     def inspect(step, log):
         nonlocal best, best_step
@@ -218,7 +228,7 @@ def run_condition(env, data, config, condition, out, device, source_commit):
     final = {split: measure(model, env, data, poses, config, device, True)
              for split, poses in data["poses"].items()}
     criterion = config["fit_criterion"]
-    result = {"source_commit": source_commit, "condition": condition, "best_step": best_step,
+    result = {"source_commit": source_commit, "condition": condition, "best_step": best_step, "parent": parent,
               "seconds": time.monotonic() - started, "last": last, "best": final,
               "finite_fit_passed": (final["fit"]["max_error"] < criterion["maximum_absolute_distance_error"] and
                                     (not criterion["all_actions_shortest"] or final["fit"]["shortest_action_rate"] == 1.))}
@@ -283,6 +293,8 @@ def main():
     parser.add_argument("--source-commit", required=True)
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--audit-study", type=Path, help="Optional completed fixed-metric study to audit on validation")
+    parser.add_argument("--pair-pretrained", type=Path)
+    parser.add_argument("--coordinate-pretrained", type=Path)
     args = parser.parse_args()
     torch.set_num_threads(2)
     config = load_contract(args.contract)
@@ -303,8 +315,13 @@ def main():
                "linf_constructive_feasibility_max_error": float(np.abs(witness - exact).max()),
                "conditions": {}}
     for condition in config["conditions"]:
+        initialization = condition.get("initialization")
+        checkpoint = {"pair_pretrained": args.pair_pretrained,
+                      "coordinate_pretrained": args.coordinate_pretrained}.get(initialization)
+        if initialization is not None and checkpoint is None:
+            raise ValueError("A declared pretraining source is required")
         summary["conditions"][condition["name"]] = run_condition(
-            env, data, config, condition, args.out / condition["name"], args.device, args.source_commit)
+            env, data, config, condition, args.out / condition["name"], args.device, args.source_commit, checkpoint)
         (args.out / "study_summary.json").write_text(json.dumps(summary, indent=2) + "\n")
     if args.audit_study is not None:
         completed = json.loads((args.audit_study / "complete.json").read_text())

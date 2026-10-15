@@ -60,6 +60,8 @@ ssh grounded-4090
 
 各机器使用项目独立环境，不修改公共 Conda 环境或共享基座。依赖版本由实验配置和对应部署说明记录。
 
+4090 的 `gongruochen` 账号存在独立用户硬配额（当前查询为 100GB），整盘 `df` 有剩余空间并不代表账号仍可写；操作前同时检查 `quota -s`。训练完整存档以 028 为准，4090 的 `runs/map_sft_baselines/models/` 仅作受限推理缓存；其占用、自动清理与重连规则见实验 [README](experiments/map_sft_baselines/README.md) 和正式[缓存策略](experiments/map_sft_baselines/configs/bridge_retention.json)。
+
 ## 4. 文件传输与迁移
 
 源码通过 Git 同步，或传输已提交版本的归档。先创建接收目录，再执行：

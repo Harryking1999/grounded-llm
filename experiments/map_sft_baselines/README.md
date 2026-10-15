@@ -35,9 +35,15 @@ python -m experiments.map_sft_baselines.src.queue evaluate --config experiments/
 python -m experiments.map_sft_baselines.src.bridge --profile PRIVATE_RUNTIME_PROFILE
 ```
 
-桥接凭据仅通过 stdin 进入进程内存，运行 profile、路径映射、PID、日志、缓存与权重全部在 Git 忽略的运行目录。训练端保留完整恢复状态，评测端只接收推理导出。失败记录后停止相应队列，不静默重试。所有卡须空闲才领取任务，4090 的 0 号卡始终预留。
+桥接凭据仅通过 stdin 进入进程内存，运行 profile、路径映射、PID、日志、缓存与权重全部在 Git 忽略的运行目录。训练端保留完整恢复状态，评测端只接收推理导出。评测 worker 异常仍记录并停止相应队列；桥接的连接、存储和传输错误会记录失败阶段、错误及下次重试时间，再关闭连接并重连。所有卡须空闲才领取任务，4090 的 0 号卡始终预留。
 
 bridge 的 runtime profile 须包含 `config`（正式研究配置的绝对路径），以及源运行、目标运行、跳板/目标连接与 known_hosts 路径。停训策略从 runtime profile 读取；样本、评测规模和保存间隔从正式配置读取，不在队列中另写一套数值。
+
+桥接每轮先下载汇总曲线和报告，再清理权重，最后发布新权重。重建评测端时按 step 合并训练端已有曲线，避免较短的新曲线覆盖历史数字。`baselines` 指定回传范围，`publish_baselines` 可单独指定发送权重的条件，避免与 028 独立评测重复。逐题记录不自动复制到训练端。
+
+权重缓存策略由 [bridge_retention.json](configs/bridge_retention.json) 统一维护，profile 可用 `retention_config` 指定其绝对路径。默认只发布各条件最新 checkpoint，限制缓存总字节、各条件在途 checkpoint 数和每轮传输数；到达上限时保持回传结果并等待空间，不删除未完成评测来腾位置。用户账号配额与整盘剩余空间须分别检查。
+
+自动清理仅删除推理 `weights.pt` 及中断上传的 `.part`，不删除评测、报告、状态或训练端存档。完整权重须满足：028 有同身份非空存档、所有配置模式评测完成、汇总数字已回传，且该 checkpoint 没有 worker 占位。已退役条件可在确认存档及无占位后清理。清理与领取任务共用调度锁；保留 `weights_retired.json` 和就绪元数据，防止重新领取或反复上传。中断且未发布就绪标记的上传会先清理再重试。
 
 ## 多节点评测
 

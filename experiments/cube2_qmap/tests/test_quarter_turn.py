@@ -166,6 +166,8 @@ class QuarterTurnTest(unittest.TestCase):
         self.assertEqual(sampler.coverage()["fresh_pose_groups"], 6)
         sampler.observe(second, second["child_distances"].astype(float))
         self.assertEqual(len(sampler.replay), 0)
+        self.assertEqual(sampler.coverage()["replay_checks"], 2)
+        self.assertEqual(sampler.coverage()["replay_corrected"], 2)
 
 
 if __name__ == "__main__":

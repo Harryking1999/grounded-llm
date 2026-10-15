@@ -223,6 +223,9 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
                 if eligible and options["patience"] is not None and stale >= options["patience"]:
                     break
     last_coverage = coverage()
+    if online is not None and online.repair:
+        graphs = np.asarray(list(online.replay.values()), dtype=np.int32).reshape(-1, len(online.words) + 1)
+        np.savez_compressed(out / "training_replay.npz", graphs=graphs)
     if options.get("save_last", False):
         save(step, out / "last.pt")
     saved = torch.load(out / "best.pt", map_location=device, weights_only=False)

@@ -37,6 +37,7 @@ class LocalGraphSampler:
         self.groups_drawn = 0
         self.replay = {}
         self.replayed_groups = 0
+        self.replay_checks = self.replay_corrected = self.replay_evicted = 0
         self.repair = config["sampling"].get("decision_replay")
         if self.repair and (not 0 < self.repair["fraction"] < 1 or self.repair["capacity"] < 1):
             raise ValueError("Expected a bounded replay buffer and a nonzero fresh fraction")
@@ -50,7 +51,9 @@ class LocalGraphSampler:
                 "supervised_parent_distance_histogram": self.parent_histogram.tolist()}
         if self.repair:
             result.update(replayed_pose_groups=self.replayed_groups, replay_buffer_groups=len(self.replay),
-                          fresh_pose_groups=self.groups_drawn - self.replayed_groups)
+                          fresh_pose_groups=self.groups_drawn - self.replayed_groups,
+                          replay_checks=self.replay_checks, replay_corrected=self.replay_corrected,
+                          replay_evicted_unresolved=self.replay_evicted)
         return result
 
     def draw(self, groups=None, pair_count=None):
@@ -109,7 +112,8 @@ class LocalGraphSampler:
                 "pair_distances": pair_labels,
                 "parents": parents, "goals": goals, "children": children,
                 "child_distances": child_labels[live], "parent_distances": parent_labels[live],
-                "delta": delta[live], "relative_roots": roots}
+                "delta": delta[live], "relative_roots": roots,
+                "is_replay": np.arange(groups) >= groups - replay_count}
 
     def observe(self, batch, scores):
         """Training labels only: retain wrong graphs, remove rechecked correct ones."""
@@ -120,6 +124,8 @@ class LocalGraphSampler:
         wrong = truth[np.arange(len(truth)), chosen] != batch["parent_distances"] - 1
         graph_ids = batch["parents"] // (len(self.words) + 1)
         failed = np.bincount(graph_ids, weights=wrong, minlength=len(batch["relative_roots"])) > 0
+        self.replay_checks += int(batch["is_replay"].sum())
+        self.replay_corrected += int((batch["is_replay"] & ~failed).sum())
         packed = batch["states"].reshape(-1, len(self.words) + 1)
         for row, keep in zip(packed, failed):
             key = (int(row[0]), int(row[1]))
@@ -129,6 +135,7 @@ class LocalGraphSampler:
                 self.replay.pop(key, None)
         while len(self.replay) > self.repair["capacity"]:
             self.replay.pop(next(iter(self.replay)))
+            self.replay_evicted += 1
 
 
 def build_local_graph(env, config, out):

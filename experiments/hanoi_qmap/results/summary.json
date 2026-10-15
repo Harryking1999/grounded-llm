@@ -1,144 +1,140 @@
 {
+  "model_type": "pure_q_symmetric_blocks",
   "task": "hanoi3",
-  "source_commit": "fc87cce8ff6114f66824639cf336cad38fdc1973",
-  "best_step": 4000,
+  "source_commit": "6d76502d1f1748d5c26e054e327af86e33b9dd7b",
+  "best_step": 3000,
   "last_step": 4000,
-  "training_seconds": 43.99,
+  "training_seconds": 28.95,
   "device": "cuda:0",
   "torch_version": "2.7.1+cu128",
   "numpy_version": "2.2.6",
-  "selection": "validation MAE + rank_weight * (1 - validation shortest-action rate)",
-  "remote_run": "/zhanghanyue/experiment/grounded_llm_puzzle_qmaps/runs/hanoi3_fc87cce",
-  "local_artifacts": "runs\\hanoi_qmap\\first",
+  "selection": "validation Huber + rank_weight * full soft rank cross entropy",
+  "remote_run": "/zhanghanyue/experiment/grounded_llm_puzzle_qmaps/runs/hanoi3_pure_6d76502",
+  "local_artifacts": "runs\\hanoi_qmap\\pure",
   "data": {
-    "split_unit": "unordered_pair_seen_states",
+    "split_unit": "unordered_pair_peg_symmetry_orbit_seen_states",
     "states_in_environment": 27,
     "action_count": 6,
     "diameter": 7,
+    "augmentation": {
+      "kind": "simultaneous_peg_permutation",
+      "pairs": {
+        "requested": 432,
+        "accepted_draws": 432,
+        "changed_rows": 357,
+        "fallback_rows": 0
+      },
+      "decisions": {
+        "requested": 156,
+        "accepted_draws": 156,
+        "changed_rows": 130,
+        "fallback_rows": 0
+      },
+      "base_pairs": 72,
+      "base_decisions": 26
+    },
     "splits": {
       "train": {
-        "pairs": 272,
-        "unique_unordered_pairs": 272,
+        "pairs": 270,
+        "unique_unordered_pairs": 270,
         "distance_histogram": [
           27,
-          26,
-          35,
-          48,
+          24,
+          30,
           33,
-          42,
-          36,
-          25
+          48,
+          30,
+          48,
+          30
         ],
-        "decisions": 182,
-        "transitions": 52
+        "decisions": 132
       },
       "validation": {
-        "pairs": 53,
-        "unique_unordered_pairs": 53,
+        "pairs": 54,
+        "unique_unordered_pairs": 54,
         "distance_histogram": [
           0,
-          5,
-          7,
-          7,
-          8,
-          8,
-          10,
-          8
+          15,
+          6,
+          12,
+          0,
+          15,
+          6,
+          0
         ],
-        "decisions": 106,
-        "transitions": 9
+        "decisions": 108
       },
       "test": {
-        "pairs": 53,
-        "unique_unordered_pairs": 53,
+        "pairs": 54,
+        "unique_unordered_pairs": 54,
         "distance_histogram": [
           0,
-          8,
-          6,
-          5,
-          7,
-          13,
-          8,
-          6
+          0,
+          12,
+          15,
+          0,
+          18,
+          0,
+          9
         ],
-        "decisions": 106,
-        "transitions": 13
+        "decisions": 108
       }
     }
   },
   "test": {
     "pairs": {
-      "count": 53,
-      "mae": 0.16807908606979083,
-      "spearman": 0.9853797038409188,
+      "count": 54,
+      "huber": 0.010809638193184886,
+      "mae": 0.12320671258149324,
+      "spearman": 0.9624154860313718,
       "by_distance": {
-        "1": {
-          "count": 8,
-          "predicted_mean": 1.2341547459363937,
-          "mae": 0.23415474593639374
-        },
         "2": {
-          "count": 6,
-          "predicted_mean": 2.122877915700277,
-          "mae": 0.12287791570027669
+          "count": 12,
+          "predicted_mean": 2.229075094064077,
+          "mae": 0.22907509406407675
         },
         "3": {
-          "count": 5,
-          "predicted_mean": 3.1795087814331056,
-          "mae": 0.17950878143310547
-        },
-        "4": {
-          "count": 7,
-          "predicted_mean": 4.110360486166818,
-          "mae": 0.1103604861668178
+          "count": 15,
+          "predicted_mean": 3.0770026048024497,
+          "mae": 0.10867584546407064
         },
         "5": {
-          "count": 13,
-          "predicted_mean": 4.96239475103525,
-          "mae": 0.16485371956458458
-        },
-        "6": {
-          "count": 8,
-          "predicted_mean": 5.880486369132996,
-          "mae": 0.1392345428466797
+          "count": 18,
+          "predicted_mean": 5.107954502105713,
+          "mae": 0.10795450210571289
         },
         "7": {
-          "count": 6,
-          "predicted_mean": 6.809174617131551,
-          "mae": 0.2284406820933024
+          "count": 9,
+          "predicted_mean": 6.9678568840026855,
+          "mae": 0.03677140341864692
         }
       }
     },
     "decisions": {
       "q": {
-        "count": 106,
+        "count": 108,
         "shortest_action_rate": 1.0,
         "uniform_tie_shortest_rate": 1.0,
-        "strict_candidate_order_accuracy": 0.9957805907172996
+        "strict_candidate_order_accuracy": 1.0
       },
       "hamming": {
-        "count": 106,
-        "shortest_action_rate": 0.4339622641509434,
-        "uniform_tie_shortest_rate": 0.4544025157232704,
-        "strict_candidate_order_accuracy": 0.4388185654008439
+        "count": 108,
+        "shortest_action_rate": 0.5092592592592593,
+        "uniform_tie_shortest_rate": 0.5092592592592593,
+        "strict_candidate_order_accuracy": 0.4878048780487805
       },
       "oracle": {
-        "count": 106,
+        "count": 108,
         "shortest_action_rate": 1.0,
         "uniform_tie_shortest_rate": 1.0,
         "strict_candidate_order_accuracy": 1.0
       }
     },
-    "transitions": {
-      "count": 13,
-      "next_q_mse": 7.543868541717529,
-      "successor_retrieval_accuracy": 0.15384615384615385,
-      "identity_retrieval_accuracy": 0.3076923076923077
-    },
+    "soft_rank_loss": 0.7791868448257446,
     "rollout": {
       "q": {
-        "count": 106,
-        "solved": 106,
+        "count": 108,
+        "solved": 108,
         "success_rate": 1.0,
         "cycle_rate": 0.0,
         "budget_exhausted": 0,
@@ -146,79 +142,55 @@
         "mean_extra_steps_on_solved": 0.0,
         "illegal_action_rate": 0.0,
         "by_start_distance": {
-          "1": {
-            "count": 16,
-            "success_rate": 1.0
-          },
           "2": {
-            "count": 12,
+            "count": 24,
             "success_rate": 1.0
           },
           "3": {
-            "count": 10,
-            "success_rate": 1.0
-          },
-          "4": {
-            "count": 14,
+            "count": 30,
             "success_rate": 1.0
           },
           "5": {
-            "count": 26,
-            "success_rate": 1.0
-          },
-          "6": {
-            "count": 16,
+            "count": 36,
             "success_rate": 1.0
           },
           "7": {
-            "count": 12,
+            "count": 18,
             "success_rate": 1.0
           }
         }
       },
       "hamming": {
-        "count": 106,
+        "count": 108,
         "solved": 26,
-        "success_rate": 0.24528301886792453,
-        "cycle_rate": 0.7547169811320755,
+        "success_rate": 0.24074074074074073,
+        "cycle_rate": 0.7592592592592593,
         "budget_exhausted": 0,
         "horizon": 14,
         "mean_extra_steps_on_solved": 0.038461538461538464,
         "illegal_action_rate": 0.0,
         "by_start_distance": {
-          "1": {
-            "count": 16,
-            "success_rate": 1.0
-          },
           "2": {
-            "count": 12,
+            "count": 24,
             "success_rate": 0.75
           },
           "3": {
-            "count": 10,
-            "success_rate": 0.1
-          },
-          "4": {
-            "count": 14,
-            "success_rate": 0.0
+            "count": 30,
+            "success_rate": 0.23333333333333334
           },
           "5": {
-            "count": 26,
-            "success_rate": 0.0
-          },
-          "6": {
-            "count": 16,
-            "success_rate": 0.0
+            "count": 36,
+            "success_rate": 0.027777777777777776
           },
           "7": {
-            "count": 12,
+            "count": 18,
             "success_rate": 0.0
           }
         }
       },
       "oracle": {
-        "count": 106,
-        "solved": 106,
+        "count": 108,
+        "solved": 108,
         "success_rate": 1.0,
         "cycle_rate": 0.0,
         "budget_exhausted": 0,
@@ -226,32 +198,20 @@
         "mean_extra_steps_on_solved": 0.0,
         "illegal_action_rate": 0.0,
         "by_start_distance": {
-          "1": {
-            "count": 16,
-            "success_rate": 1.0
-          },
           "2": {
-            "count": 12,
+            "count": 24,
             "success_rate": 1.0
           },
           "3": {
-            "count": 10,
-            "success_rate": 1.0
-          },
-          "4": {
-            "count": 14,
+            "count": 30,
             "success_rate": 1.0
           },
           "5": {
-            "count": 26,
-            "success_rate": 1.0
-          },
-          "6": {
-            "count": 16,
+            "count": 36,
             "success_rate": 1.0
           },
           "7": {
-            "count": 12,
+            "count": 18,
             "success_rate": 1.0
           }
         }
@@ -259,195 +219,13 @@
     }
   },
   "initial_test": {
-    "pairs": {
-      "count": 53,
-      "mae": 3.8172638897063598,
-      "spearman": 0.26395340168848014,
-      "by_distance": {
-        "1": {
-          "count": 8,
-          "predicted_mean": 0.21863717213273048,
-          "mae": 0.7813628278672695
-        },
-        "2": {
-          "count": 6,
-          "predicted_mean": 0.2983485261599223,
-          "mae": 1.7016514738400776
-        },
-        "3": {
-          "count": 5,
-          "predicted_mean": 0.31051328778266907,
-          "mae": 2.689486712217331
-        },
-        "4": {
-          "count": 7,
-          "predicted_mean": 0.33873400517872404,
-          "mae": 3.661265994821276
-        },
-        "5": {
-          "count": 13,
-          "predicted_mean": 0.31378136804470647,
-          "mae": 4.686218631955294
-        },
-        "6": {
-          "count": 8,
-          "predicted_mean": 0.310364942997694,
-          "mae": 5.689635057002306
-        },
-        "7": {
-          "count": 6,
-          "predicted_mean": 0.2766739179690679,
-          "mae": 6.723326082030932
-        }
-      }
-    },
-    "decisions": {
-      "q": {
-        "count": 106,
-        "shortest_action_rate": 0.5094339622641509,
-        "uniform_tie_shortest_rate": 0.5094339622641509,
-        "strict_candidate_order_accuracy": 0.5949367088607594
-      },
-      "hamming": {
-        "count": 106,
-        "shortest_action_rate": 0.4339622641509434,
-        "uniform_tie_shortest_rate": 0.4544025157232704,
-        "strict_candidate_order_accuracy": 0.4388185654008439
-      },
-      "oracle": {
-        "count": 106,
-        "shortest_action_rate": 1.0,
-        "uniform_tie_shortest_rate": 1.0,
-        "strict_candidate_order_accuracy": 1.0
-      }
-    },
-    "transitions": {
-      "count": 13,
-      "next_q_mse": 0.09764585644006729,
-      "successor_retrieval_accuracy": 0.3076923076923077,
-      "identity_retrieval_accuracy": 0.23076923076923078
-    },
-    "rollout": {
-      "q": {
-        "count": 106,
-        "solved": 31,
-        "success_rate": 0.29245283018867924,
-        "cycle_rate": 0.7075471698113207,
-        "budget_exhausted": 0,
-        "horizon": 14,
-        "mean_extra_steps_on_solved": 0.0967741935483871,
-        "illegal_action_rate": 0.0,
-        "by_start_distance": {
-          "1": {
-            "count": 16,
-            "success_rate": 1.0
-          },
-          "2": {
-            "count": 12,
-            "success_rate": 0.8333333333333334
-          },
-          "3": {
-            "count": 10,
-            "success_rate": 0.2
-          },
-          "4": {
-            "count": 14,
-            "success_rate": 0.21428571428571427
-          },
-          "5": {
-            "count": 26,
-            "success_rate": 0.0
-          },
-          "6": {
-            "count": 16,
-            "success_rate": 0.0
-          },
-          "7": {
-            "count": 12,
-            "success_rate": 0.0
-          }
-        }
-      },
-      "hamming": {
-        "count": 106,
-        "solved": 26,
-        "success_rate": 0.24528301886792453,
-        "cycle_rate": 0.7547169811320755,
-        "budget_exhausted": 0,
-        "horizon": 14,
-        "mean_extra_steps_on_solved": 0.038461538461538464,
-        "illegal_action_rate": 0.0,
-        "by_start_distance": {
-          "1": {
-            "count": 16,
-            "success_rate": 1.0
-          },
-          "2": {
-            "count": 12,
-            "success_rate": 0.75
-          },
-          "3": {
-            "count": 10,
-            "success_rate": 0.1
-          },
-          "4": {
-            "count": 14,
-            "success_rate": 0.0
-          },
-          "5": {
-            "count": 26,
-            "success_rate": 0.0
-          },
-          "6": {
-            "count": 16,
-            "success_rate": 0.0
-          },
-          "7": {
-            "count": 12,
-            "success_rate": 0.0
-          }
-        }
-      },
-      "oracle": {
-        "count": 106,
-        "solved": 106,
-        "success_rate": 1.0,
-        "cycle_rate": 0.0,
-        "budget_exhausted": 0,
-        "horizon": 14,
-        "mean_extra_steps_on_solved": 0.0,
-        "illegal_action_rate": 0.0,
-        "by_start_distance": {
-          "1": {
-            "count": 16,
-            "success_rate": 1.0
-          },
-          "2": {
-            "count": 12,
-            "success_rate": 1.0
-          },
-          "3": {
-            "count": 10,
-            "success_rate": 1.0
-          },
-          "4": {
-            "count": 14,
-            "success_rate": 1.0
-          },
-          "5": {
-            "count": 26,
-            "success_rate": 1.0
-          },
-          "6": {
-            "count": 16,
-            "success_rate": 1.0
-          },
-          "7": {
-            "count": 12,
-            "success_rate": 1.0
-          }
-        }
-      }
-    }
+    "mae": 3.9874782475332418,
+    "q_rollout": 0.1574074074074074
+  },
+  "historical_auxiliary_condition": {
+    "source_commit": "fc87cce8ff6114f66824639cf336cad38fdc1973",
+    "q_solved": 106,
+    "q_count": 106,
+    "matched_ablation": false
   }
 }

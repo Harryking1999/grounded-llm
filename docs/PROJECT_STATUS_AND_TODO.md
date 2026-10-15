@@ -14,7 +14,7 @@
 | 冻结地图读取接口 | 既定训练与评测已完成，保留历史对照，不与新组直接混算 | [实验 README](../experiments/flamingo_map_reader/README.md)、[报告](../experiments/flamingo_map_reader/results/report.md) |
 | 独立无地图任务 SFT | 历史强基线；已保存完整断点并退出，为新评测释放资源 | [协议](../experiments/llm_task_sft/README.md)、[总报告](../experiments/llm_task_sft/results/report.md) |
 | 棋盘状态地图 | 提供冻结 Q 和独立地图贪心参照 | [协议与来源](../experiments/blocks_distance_map/README.md) |
-| 汉诺塔／二阶魔方地图 | 按用户要求恢复积木式纯 Q：复用编码器、双向平均距离、Huber 与完整软排序，移除转移头并加入划分安全的对称增强；实现与 smoke 已验证，待指定开发机验证正式配置。历史辅助头结果不代表当前纯 Q | [汉诺塔结果](../experiments/hanoi_qmap/results/report.md)、[魔方结果](../experiments/cube2_qmap/results/report.md)、[共享核心](../experiments/puzzle_qmap/README.md) |
+| 汉诺塔／二阶魔方地图 | 已恢复积木式纯 Q 并在指定机完成训练：共享编码器、对称距离、Huber／完整软排序及划分安全的对称增强；汉诺塔关系轨道留出 108/108，魔方未见状态 138/512、长程仍弱。没有转移头，未做无增强消融；旧辅助头条件单列历史 | [汉诺塔结果](../experiments/hanoi_qmap/results/report.md)、[魔方结果](../experiments/cube2_qmap/results/report.md)、[共享核心](../experiments/puzzle_qmap/README.md) |
 | 寻路接口与早期方案 | 作为机制和任务边界的历史证据 | [实验目录](../experiments/README.md) |
 
 ## 3. 已确定的比较原则

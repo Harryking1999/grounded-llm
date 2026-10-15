@@ -14,7 +14,7 @@
 | 冻结地图读取接口 | 既定训练与评测已完成，保留历史对照，不与新组直接混算 | [实验 README](../experiments/flamingo_map_reader/README.md)、[报告](../experiments/flamingo_map_reader/results/report.md) |
 | 独立无地图任务 SFT | 历史强基线；已保存完整断点并退出，为新评测释放资源 | [协议](../experiments/llm_task_sft/README.md)、[总报告](../experiments/llm_task_sft/results/report.md) |
 | 棋盘状态地图 | 提供冻结 Q 和独立地图贪心参照 | [协议与来源](../experiments/blocks_distance_map/README.md) |
-| 汉诺塔／二阶魔方地图 | 指定机重训及冻结评测完成。四／五／六盘汉诺塔留出关系到达为 960/960、1020/1024、985/1024；六盘经典 A→C 仍在剩余三步时循环。魔方完整相对广度与深路径／分叉实际训练后，同批新测试旧 Q 146/512、新 Q 147/512，无可信改善；训练侧也未拟合好。保持纯 Q；旧非纯 Q 实现及产物已退出工作区 | [魔方数据设计](../experiments/cube2_qmap/DATA_DESIGN.md)、[汉诺塔结果](../experiments/hanoi_qmap/results/report.md)、[魔方结果](../experiments/cube2_qmap/results/report.md) |
+| 汉诺塔／二阶魔方地图 | 四／五／六盘汉诺塔留出关系到达为 960/960、1020/1024、985/1024；六盘经典 A→C 仍循环。魔方同批新测试旧 Q 146/512、新 Q 147/512；冻结审计确认预算耗尽而非收敛停机，当前 checkpoint 存在两项监督梯度冲突、采样权重失配和对称迁移缺口。训练充分性尚未排除，后续建议先做匹配的降率续训与小集拟合检查，尚未启动。保持纯 Q；旧非纯 Q 实现及产物已退出工作区 | [魔方数据设计](../experiments/cube2_qmap/DATA_DESIGN.md)、[汉诺塔结果](../experiments/hanoi_qmap/results/report.md)、[魔方审计](../experiments/cube2_qmap/results/report.md#收敛与失败机制审计) |
 | 寻路接口与早期方案 | 作为机制和任务边界的历史证据 | [实验目录](../experiments/README.md) |
 
 ## 3. 已确定的比较原则

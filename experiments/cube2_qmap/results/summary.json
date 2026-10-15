@@ -294,5 +294,186 @@
       "predicted_mean": 7.574846074836595,
       "mae": 3.4251539251634053
     }
+  },
+  "convergence_audit": {
+    "status": "frozen_diagnostics_only_not_convergence_established",
+    "parameter_updates": 0,
+    "diagnostic_seed": 2026101601,
+    "checkpoint_step": 19000,
+    "stop_reason": "step_budget_exhausted",
+    "eligible_validation_events": 6,
+    "patience": 8,
+    "gradient_summary": {
+      "pair_loss": 1.2022314369678497,
+      "rank_loss": 2.273699402809143,
+      "pair_grad_norm": 0.4169906402627627,
+      "rank_grad_norm": 0.16694066300988197,
+      "cosine": -0.48175961275895435,
+      "combined_grad_norm": 0.3668278728922208,
+      "all_batches_conflict": true,
+      "cosine_between_mean_gradients": -0.9029910564422607,
+      "mean_pair_gradient_norm": 0.2990044951438904,
+      "mean_rank_gradient_norm": 0.12396851927042007,
+      "pair_derivative_wrt_distance_scale": -0.7242984001835188,
+      "rank_derivative_wrt_distance_scale": 0.30308545629183453
+    },
+    "validation_rank": {
+      "count": 1000,
+      "ce": 2.278583526611328,
+      "target_entropy": 1.941724419593811,
+      "kl": 0.3368591368198395,
+      "uniform_ce": 2.1972245773362196,
+      "shortest_action_rate": 0.54,
+      "chance_shortest": 0.23966666666666667,
+      "predicted_entropy": 1.839658260345459,
+      "mean_true_candidate_range": 1.768,
+      "mean_predicted_candidate_range": 2.2204701900482178,
+      "mean_optimal_vs_nonoptimal_gap": 0.35396137833595276
+    },
+    "training_mixture_rank": {
+      "count": 4096,
+      "ce": 2.271034002304077,
+      "target_entropy": 1.9638373851776123,
+      "kl": 0.3071964979171753,
+      "uniform_ce": 2.1972245773362196,
+      "shortest_action_rate": 0.3916015625,
+      "chance_shortest": 0.2257758246527778,
+      "predicted_entropy": 1.978488802909851,
+      "mean_true_candidate_range": 1.77880859375,
+      "mean_predicted_candidate_range": 1.778755784034729,
+      "mean_optimal_vs_nonoptimal_gap": -0.0674976259469986
+    },
+    "representation_current": {
+      "parameters": 148096,
+      "sigmoid_beyond_01_99": 0.03147851675748825,
+      "sigmoid_beyond_05_95": 0.22185498476028442,
+      "hidden1_always_zero_fraction": 0.0,
+      "hidden2_always_zero_fraction": 0.00390625,
+      "covariance_participation_rank": 36.19721221923828,
+      "linear_corner_feature_heldout_r2": 0.8014401367159582,
+      "symmetry_probe": {
+        "relative_types": 256,
+        "poses_per_type": 8,
+        "mean_distance_std_within_orbit": 0.32965314388275146,
+        "mean_distance_range_within_orbit": 1.0392624139785767,
+        "shortest_rate_across_poses": 0.53369140625,
+        "fraction_types_with_mixed_correctness": 0.4296875
+      }
+    },
+    "expected_depth_distributions": {
+      "pairs_sampling": [
+        0.0,
+        0.04545577022462209,
+        0.04546189407500527,
+        0.04549822892061211,
+        0.04570589549138382,
+        0.0468143124107387,
+        0.05227733129478808,
+        0.07641891036090906,
+        0.1638587843565636,
+        0.3023497968576557,
+        0.13034472032177358,
+        0.04581435568594807
+      ],
+      "rank_sampling": [
+        0.0,
+        0.04275206038140726,
+        0.04275818423179044,
+        0.04422686866846881,
+        0.048966235140002645,
+        0.05603992369248048,
+        0.05928231185385328,
+        0.08111282174188872,
+        0.1674295478926672,
+        0.3097483069118787,
+        0.12207293476446159,
+        0.025610804721100854
+      ],
+      "validation_pairs": [
+        0.0,
+        0.094,
+        0.08,
+        0.0875,
+        0.1035,
+        0.092,
+        0.0925,
+        0.096,
+        0.086,
+        0.0865,
+        0.096,
+        0.086
+      ]
+    },
+    "full_diagnostics": "runs/cube2_qmap/breadth_depth/convergence_audit.json",
+    "replay_script": "runs/cube2_qmap/breadth_depth/convergence_audit.py",
+    "loss_alignment_probe": {
+      "parameter_updates": 0,
+      "seed": 2026101602,
+      "conditions": {
+        "original": {
+          "pair_loss": 1.2057338058948517,
+          "rank_loss": 2.2733764052391052,
+          "cosine": -0.4552086368203163,
+          "pair_norm": 0.4020290896296501,
+          "rank_norm": 0.1673487164080143,
+          "pair_scale_derivative": -0.6684597904483477,
+          "rank_scale_derivative": 0.30320093284050625,
+          "cosine_between_mean_gradients": -0.8925127983093262,
+          "negative_cosine_batches": 12,
+          "batches": 12
+        },
+        "same_candidates": {
+          "pair_loss": 1.092014302810033,
+          "rank_loss": 2.280059893925985,
+          "cosine": -0.35123786454399425,
+          "pair_norm": 0.3441203683614731,
+          "rank_norm": 0.17090180392066637,
+          "pair_scale_derivative": -0.5685010949770609,
+          "rank_scale_derivative": 0.3205222984155019,
+          "cosine_between_mean_gradients": -0.8813067674636841,
+          "negative_cosine_batches": 12,
+          "batches": 12
+        },
+        "balanced_independent": {
+          "pair_loss": 1.6887671252091725,
+          "rank_loss": 2.2613818645477295,
+          "cosine": 0.7416385660568873,
+          "pair_norm": 0.8144797633091608,
+          "rank_norm": 0.19780535995960236,
+          "pair_scale_derivative": 1.9731627305348713,
+          "rank_scale_derivative": 0.42071985453367233,
+          "cosine_between_mean_gradients": 0.9684419631958008,
+          "negative_cosine_batches": 0,
+          "batches": 12
+        },
+        "balanced_same_candidates": {
+          "pair_loss": 1.5023148953914642,
+          "rank_loss": 2.260810395081838,
+          "cosine": 0.7827400267124176,
+          "pair_norm": 0.7179721196492513,
+          "rank_norm": 0.19513075177868208,
+          "pair_scale_derivative": 1.7396050492922466,
+          "rank_scale_derivative": 0.41613737990458805,
+          "cosine_between_mean_gradients": 0.9738876819610596,
+          "negative_cosine_batches": 0,
+          "batches": 12
+        },
+        "importance_weighted": {
+          "pair_loss": 1.7296509047349293,
+          "rank_loss": 2.2337647080421448,
+          "cosine": 0.6633640428384145,
+          "pair_norm": 0.8778551071882248,
+          "rank_norm": 0.20963400478164354,
+          "pair_scale_derivative": 2.0487755835056305,
+          "rank_scale_derivative": 0.40952067573865253,
+          "cosine_between_mean_gradients": 0.9546060562133789,
+          "negative_cosine_batches": 0,
+          "batches": 12
+        }
+      },
+      "full_diagnostics": "runs/cube2_qmap/breadth_depth/loss_alignment_probe.json",
+      "replay_script": "runs/cube2_qmap/breadth_depth/loss_alignment_probe.py",
+      "interpretation": "local gradient diagnostic; no evidence yet of improved policy after retraining"
+    }
   }
 }

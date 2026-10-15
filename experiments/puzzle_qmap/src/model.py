@@ -32,7 +32,7 @@ class MapReader:
     def __init__(self, env, checkpoint, device="cpu"):
         saved = torch.load(checkpoint, map_location=device, weights_only=False)
         if saved.get("model_type") != MODEL_TYPE:
-            raise ValueError("Expected a pure-Q checkpoint; historical auxiliary-head runs use their archived source")
+            raise ValueError("Expected a pure-Q checkpoint")
         if saved["task"] != env.name or saved["actions"] != list(env.actions):
             raise ValueError("Checkpoint belongs to a different task/action convention")
         self.env, self.device = env, device

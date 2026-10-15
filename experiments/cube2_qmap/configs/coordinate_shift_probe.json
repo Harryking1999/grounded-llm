@@ -1,0 +1,9 @@
+{
+  "base_contract": "coordinate_probe.json",
+  "hypothesis": "Translation-equivalent anchor targets away from sigmoid boundaries improve finite coordinate fitting without changing any target distance.",
+  "coordinate_target": {"offset": 0.5, "unused_value": 7.0},
+  "conditions": [
+    {"name": "linf_anchor_teacher_shifted", "metric": "linf", "fresh": false, "pairs": "complete", "edge": 0.0, "path": 0.0, "symmetry": 0.0, "coordinate_teacher": true}
+  ],
+  "scope": "Same finite anchor-coordinate probe with only a coordinate translation and unused constant changed. Both leave the constructive distance matrix exactly unchanged. This diagnoses sigmoid endpoint optimization, not new geometric expressivity or global generalization."
+}

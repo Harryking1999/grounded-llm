@@ -14,6 +14,12 @@ from .data import pose_groups
 from .environment import Cube2
 
 
+def load_contract(path):
+    config = json.loads(path.read_text())
+    parent = config.pop("base_contract", None)
+    return {**load_contract(path.parent / parent), **config} if parent else config
+
+
 def build_template(env, config, protected):
     rng = np.random.default_rng(config["seed"])
     paths = []
@@ -81,8 +87,11 @@ def objective(model, q, data, config, condition, pair_indices):
         # All anchors belong to the fixed training set, with known exact
         # distances. Only diagnoses discovery of a feasible finite embedding;
         # random fixed anchors were already insufficient on the whole cube.
-        target = F.pad(torch.as_tensor(data["distances"], device=q.device).float(),
-                       (0, q.shape[-1] - len(data["states"])))
+        target_options = config.get("coordinate_target", {})
+        target = F.pad(torch.as_tensor(data["distances"], device=q.device).float() + target_options.get("offset", 0.),
+                       (0, q.shape[-1] - len(data["states"])), value=target_options.get("unused_value", 0.))
+        if target.min() < 0 or target.max() > model.cap:
+            raise ValueError("Anchor target exceeds this encoder's output range")
         return F.smooth_l1_loss(q, target[None].expand_as(q))
     pair, scores, parent, edges = relation_values(model, q, data, pair_indices)
     pairs = data["pairs"][pair_indices]
@@ -276,10 +285,7 @@ def main():
     parser.add_argument("--audit-study", type=Path, help="Optional completed fixed-metric study to audit on validation")
     args = parser.parse_args()
     torch.set_num_threads(2)
-    config = json.loads(args.contract.read_text())
-    if "base_contract" in config:
-        base = json.loads((args.contract.parent / config["base_contract"]).read_text())
-        config = {**base, **config}
+    config = load_contract(args.contract)
     args.out.mkdir(parents=True, exist_ok=False)
     (args.out / "contract.json").write_text(json.dumps(config, indent=2) + "\n")
     env = Cube2(args.prepared_run / "oracle_depth.npy", metric="QTM_URF_6")

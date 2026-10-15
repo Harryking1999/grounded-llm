@@ -1,0 +1,13 @@
+{
+  "base_contract": "structure_checks.json",
+  "hypothesis": "At the fully connected, feasible 92-state map, a strong negative pair/rank gradient cosine may reflect ineffective use of redundant supervision. Removing only the explicit ranking term should improve complete distance fitting if it is obstructing optimization.",
+  "selection_metric": "huber",
+  "initialization_source_commits": {"pair_pretrained": "027cacef96c70908d7a6ad7ae49f3dea65c2b866"},
+  "conditions": [
+    {"name": "continue_pair_rank", "metric": "linf", "fresh": false, "pairs": "complete", "edge": 0.0, "path": 0.0, "symmetry": 0.0, "rank_weight": 1.0, "initialization": "pair_pretrained"},
+    {"name": "continue_pair_only", "metric": "linf", "fresh": false, "pairs": "complete", "edge": 0.0, "path": 0.0, "symmetry": 0.0, "rank_weight": 0.0, "initialization": "pair_pretrained"}
+  ],
+  "selection": "Both conditions use the same complete training distance Huber for selection, report last separately and inspect heldout poses only after selection. No coordinate labels. All parent/goal, child/goal and node/node distances remain supervised in both groups; only the redundant ranking CE is removed.",
+  "scope": "Short optimization diagnostic on a fully connected feasible finite map. Identical pretrained encoder, fresh Adam, updates, distance labels and schedule. Cannot establish full-cube generalization or the sufficiency of global training coverage.",
+  "followup": "Interpret the matched result before any larger experiment. Do not automatically expand the queue."
+}

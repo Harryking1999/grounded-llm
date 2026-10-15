@@ -106,7 +106,7 @@ def objective(model, q, data, config, condition, pair_indices):
     progress = parent[:, :, None] - scores
     path_loss = F.smooth_l1_loss(progress[:, good], torch.ones_like(progress[:, good]))
     symmetry = (pair[0] - pair[1]).square().mean() if len(q) == 2 else pair.new_zeros(())
-    loss = (pair_loss + config["training"]["rank_weight"] * rank +
+    loss = (pair_loss + condition.get("rank_weight", config["training"]["rank_weight"]) * rank +
             condition["edge"] * edge_loss + condition["path"] * path_loss +
             condition["symmetry"] * symmetry)
     return loss
@@ -189,7 +189,8 @@ def run_condition(env, data, config, condition, out, device, source_commit, chec
         nonlocal best, best_step
         fit = measure(model, env, data, data["poses"]["fit"], config, device)
         val = measure(model, env, data, data["poses"]["validation"], config, device)
-        score = val["objective"] if condition["fresh"] else fit["objective"]
+        monitor = val if condition["fresh"] else fit
+        score = monitor[config.get("selection_metric", "objective")]
         if score < best:
             best, best_step = score, step
             save(out / "best.pt", step)

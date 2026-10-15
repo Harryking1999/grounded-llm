@@ -40,7 +40,8 @@ def prompt(state, goal, executed, first=False, start=None, with_map=False, respo
 def answer(step, candidate=None, with_map=False, response_order='reason_first'):
     if candidate is None:
         return STOP_REASON+'\n<done/>'
-    action = legal_actions(step.current)[candidate-1]
+    action = (dict(rules.PLACEMENTS[step.candidate_actions[candidate-1]][1])
+              if hasattr(step, 'candidate_actions') else legal_actions(step.current)[candidate-1])
     text = reason(step.current, step.goal, action)
     if with_map:
         ranking='Map-distance ranking to the goal, closest to farthest: '+_ranking(step,10)+'.'
@@ -69,6 +70,32 @@ def demonstration(record, qmap, with_map, response_order='reason_first', cached_
     if state != goal:
         raise ValueError('Incomplete training trajectory')
     return Demonstration(tuple(turns),tuple(path),True)
+
+
+def renumber_trajectory(record, steps, seed, epoch, index, response_order='ranking_first'):
+    """Rebind IDs without changing any physical move, reason or Q content.
+
+    Sample identity and epoch determine the plan independently of rank, worker
+    scheduling and resume position. No additional physical samples are created.
+    """
+    from experiments.flamingo_map_reader.src.trajectory_protocol import numbered_step
+    rng = np.random.default_rng(np.random.SeedSequence([seed, epoch, index]))
+    demo = demonstration(record, None, True, response_order, cached_steps=steps)
+    turns, executed = [], []
+    for turn in demo.turns:
+        step = numbered_step(turn.step, tuple(map(int, rng.permutation(len(turn.step.candidate_actions)))))
+        chosen = None
+        if turn.chosen_id is not None:
+            physical = turn.step.candidate_actions[turn.chosen_id-1]
+            chosen = step.candidate_actions.index(physical)+1
+        update = turn_prompt(step, executed)
+        if not turns:
+            update = turn.user_text.split('[Environment update]', 1)[0]+update
+        turns.append(replace(turn, step=step, chosen_id=chosen, user_text=update,
+                             answer_text=answer(step, chosen, True, response_order)))
+        if chosen is not None:
+            executed.append(step.candidate_actions[chosen-1])
+    return replace(demo, turns=tuple(turns))
 
 def pseudo_timeline(timeline):
     """Nonzero deterministic slot vectors without state/goal information."""

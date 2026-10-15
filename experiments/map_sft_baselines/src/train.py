@@ -12,16 +12,33 @@ from torch.utils.data import DataLoader,Dataset,DistributedSampler
 from transformers import AutoTokenizer
 from experiments.flamingo_map_reader.src.train import collate_examples,to_device
 from experiments.llm_task_sft.src.train import scheduler_factor
-from .common import atomic_json,pseudo_timeline
+from .common import atomic_json,pseudo_timeline,renumber_trajectory
 from .modeling import build,infer_weights
 
 class Routes(Dataset):
-    def __init__(self,path,real_map):
+    def __init__(self,path,real_map,*,config=None,baseline=None,tokenizer=None):
         self.path=Path(path);self.meta=json.loads((self.path/'dataset.json').read_text());self.rows=self.meta['rows'];self.key='map' if real_map else 'plain'
+        self.config,self.baseline,self.tokenizer,self.epoch=config,baseline,tokenizer,0
+        self.renumber=bool(config and config['baselines'][baseline].get('renumber_each_epoch',False))
+        if self.renumber and (not real_map or tokenizer is None):raise ValueError('Epoch renumbering requires a map trajectory and tokenizer')
     def __len__(self):return len(self.rows)
     def __getitem__(self,index):
         item=torch.load(self.path/'trajectories'/self.rows[index]['prepared_file'],map_location='cpu',weights_only=False)[self.key]
+        if self.renumber:
+            from experiments.flamingo_map_reader.src.transcript import encode_trajectory
+            demo=renumber_trajectory(self.rows[index],item['steps'],self.config['seed'],self.epoch,index,
+                self.config['baselines'][self.baseline].get('response_order','reason_first'))
+            encoded=encode_trajectory(demo,self.tokenizer,self.config['maximum_sequence_tokens'])
+            return encoded,[turn.step for turn in demo.turns]
         return item['encoded'],item['steps']
+
+
+def learning_rate_factor(step,total,training):
+    warmup=training.get('warmup_steps',round(total*training['warmup_fraction']))
+    schedule=training.get('scheduler','cosine')
+    if schedule=='constant_with_warmup':return min(1.,step/max(1,warmup))
+    if schedule!='cosine':raise ValueError('Unsupported learning-rate scheduler')
+    return scheduler_factor(step,total,warmup,training['cosine_minimum_ratio'])
 
 def validate_resume_contract(saved,config,baseline):
     recipe=('model','seed','data','map','training','maximum_sequence_tokens')
@@ -48,25 +65,25 @@ def main():
     p=argparse.ArgumentParser()
     for name in ('config','data','model-path','out'):p.add_argument('--'+name,type=Path,required=True)
     p.add_argument('--baseline',required=True);p.add_argument('--smoke-steps',type=int);p.add_argument('--resume',type=Path)
-    a=p.parse_args();cfg=json.loads(a.config.read_text());spec=cfg['baselines'][a.baseline];t=cfg['training']
+    a=p.parse_args();cfg=json.loads(a.config.read_text());spec=cfg['baselines'][a.baseline];t=dict(cfg['training'],**spec.get('training',{}))
     rank,local,world=int(os.environ['RANK']),int(os.environ['LOCAL_RANK']),int(os.environ['WORLD_SIZE'])
     accumulation=t['gradient_accumulation_steps']
     if world!=t['world_size'] or world*t['micro_batch']*accumulation!=t['global_batch']:
         raise ValueError('DDP topology differs from the configured global batch')
     torch.cuda.set_device(local);dist.init_process_group('nccl');device=torch.device('cuda',local)
     random.seed(cfg['seed']);np.random.seed(cfg['seed']);torch.manual_seed(cfg['seed']);torch.set_num_threads(2)
-    data=Routes(a.data,spec['real_map'])
+    tokenizer=AutoTokenizer.from_pretrained(a.model_path,local_files_only=True)
+    data=Routes(a.data,spec['real_map'],config=cfg,baseline=a.baseline,tokenizer=tokenizer)
     if spec['real_map'] and data.meta.get('response_order','reason_first')!=spec.get('response_order','reason_first'):
         raise ValueError('Prepared assistant order differs from baseline configuration')
     ready=json.loads((a.data/'ready.json').read_text())
     if not a.smoke_steps and (len(data)!=cfg['data']['samples_per_epoch'] or ready['smoke']):raise ValueError('Formal training requires accepted complete common data')
-    tokenizer=AutoTokenizer.from_pretrained(a.model_path,local_files_only=True)
     model=build(cfg,a.baseline,a.model_path).to(device);wrapped=DDP(model,device_ids=[local],gradient_as_bucket_view=True)
     params=[p for p in model.parameters() if p.requires_grad]
     optimizer=torch.optim.AdamW(params,lr=t['learning_rate'],weight_decay=t['weight_decay'],fused=True)
     if len(data)%t['global_batch']:raise ValueError('Dataset must divide into complete global batches')
-    steps_epoch=len(data)//t['global_batch'];total=steps_epoch*t['epochs'];warmup=round(total*t['warmup_fraction'])
-    scheduler=torch.optim.lr_scheduler.LambdaLR(optimizer,lambda s:scheduler_factor(s,total,warmup,t['cosine_minimum_ratio']))
+    steps_epoch=len(data)//t['global_batch'];total=steps_epoch*t['epochs']
+    scheduler=torch.optim.lr_scheduler.LambdaLR(optimizer,lambda s:learning_rate_factor(s,total,t))
     step=0
     if a.resume:
         state=json.loads((a.resume/'state.json').read_text())
@@ -83,7 +100,7 @@ def main():
     loader=DataLoader(data,batch_size=t['micro_batch'],sampler=sampler,num_workers=2,collate_fn=collate)
     windows=deque(maxlen=50);start=time.monotonic();limit=a.smoke_steps or total
     for epoch in range(step//max(1,steps_epoch),t['epochs']):
-        sampler.set_epoch(epoch);it=iter(loader);skip=(step%max(1,steps_epoch))*accumulation
+        data.epoch=epoch;sampler.set_epoch(epoch);it=iter(loader);skip=(step%max(1,steps_epoch))*accumulation
         for _ in range(skip):next(it)
         while step<(epoch+1)*steps_epoch and step<limit:
             micro=[next(it) for _ in range(accumulation)]

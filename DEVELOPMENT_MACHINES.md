@@ -103,7 +103,7 @@ scp -r /home/zhangyue/transfer/grounded_llm/run-id gongruochen@10.28.0.80:/home/
 
 | 位置 | 内容 |
 |---|---|
-| 本地 `D:\Grounded_llm_archive\qmap\20261016_cleanup\` | 清理前的三个 Qmap 目录、旧配置与报告、本地全部已完成运行和一次性诊断；归档自身的 README 说明布局 |
+| 本地 `D:\Grounded_llm_archive\qmap\` | 清理前的 Qmap 工作区、后续已完成负结果和小检查分项归档；根目录及各归档的 README 说明布局 |
 | 平台 `/zhanghanyue/experiment/grounded_llm_puzzle_qmaps_archive/20261016_cleanup/` | 完整历史 `code/`、`runs/`、`logs/` 和传输包；内部绝对软链接已随归档重定位 |
 
 归档位于当前工作区之外，不作为新实验的默认数据来源。恢复某次运行时，按其 `source_commit` 在独立目录检出源码，并使用同一归档运行的 `config.json`、数据与 checkpoint。元数据内保留的旧绝对路径属于历史记录，恢复时应指向实际归档位置。不要把全部旧日志、模型和快照搬回当前源码目录。

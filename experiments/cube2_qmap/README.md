@@ -29,15 +29,3 @@ python -m unittest discover -s experiments/cube2_qmap/tests -v
 ```
 
 运行目录必须不存在。纯 Q 求解不加载 oracle；精确求解是独立裁判条件。
-
-## 当前数据修复对照
-
-[decision_replay.json](configs/decision_replay.json)只检验一个问题：补全每个局部图的全部节点—目标绝对距离，并重复训练当前排错的图，能否改善中程动作选择。共享编码器、距离、Huber 与完整软排序均不变。
-
-重放保存完整绝对布局及目标，重新评估后全组候选均选对才移出缓冲；池满时暂不接纳新的错题，保留未学会的题继续训练，始终保留新图配额。覆盖计数区分新图与重复图，不把重放算作新的相对类型遍历。原训练为同预算对照；两项数据修改一起检验，不分别归因。完整目标距离使每图的距离对增多，因此不是相同标签条数的消融。
-
-```bash
-python -m experiments.cube2_qmap.src.replay --contract experiments/cube2_qmap/configs/decision_replay.json --prepared-run ARCHIVED_BASELINE --condition repair --out runs/cube2_qmap/decision_replay/repair --source-commit COMMIT --device cuda:1
-```
-
-此处的“转移关系”指同一目标下真实合法后继的进退与排序，不新增转移预测头。测试和验证样本不进入错题缓冲；当前只做有上限的小对照。

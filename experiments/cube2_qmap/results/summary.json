@@ -99,5 +99,89 @@
       ]
     }
   },
-  "archive_entry": "../../../DEVELOPMENT_MACHINES.md#7-qmap-历史归档"
+  "archive_entry": "../../../DEVELOPMENT_MACHINES.md#7-qmap-历史归档",
+  "data_repair_trial": {
+    "source_commit": "35be4239828f8e69e3698f3d8f173d14e7a5b2a4",
+    "device": "cpu",
+    "parent_same_tasks": {
+      "test_optimal": 0.663,
+      "test_solved": 145,
+      "reference_solved": 151
+    },
+    "conditions": {
+      "control": {
+        "updates": 10000,
+        "best_step": 1,
+        "initial_train": {
+          "huber": 1.4815923385706076,
+          "rank_ce": 1.8456422090530396,
+          "optimal": 0.647
+        },
+        "last_train": {
+          "huber": 1.4812110879212088,
+          "rank_ce": 1.8462170362472534,
+          "optimal": 0.643
+        },
+        "best_test_solved": 145,
+        "last_test_solved": 143,
+        "best_test_optimal": 0.66,
+        "last_test_optimal": 0.657
+      },
+      "repair": {
+        "updates": 10000,
+        "best_step": 1,
+        "initial_train": {
+          "huber": 1.4815923385706076,
+          "rank_ce": 1.8456422090530396,
+          "optimal": 0.647
+        },
+        "last_train": {
+          "huber": 1.6734759418840883,
+          "rank_ce": 1.8635361194610596,
+          "optimal": 0.614
+        },
+        "best_test_solved": 145,
+        "last_test_solved": 133,
+        "best_test_optimal": 0.66,
+        "last_test_optimal": 0.659
+      }
+    },
+    "replay_corrected_events": 979,
+    "remaining_hard_pool": {
+      "graphs": 128,
+      "heldout_states_absent": true,
+      "scope": "final selected hard training graphs; conditional diagnostic, not a test set",
+      "fit": {
+        "initial": {
+          "optimal": 0.4921875,
+          "all_parent_choices_correct_graphs": 0
+        },
+        "last": {
+          "optimal": 0.71875,
+          "all_parent_choices_correct_graphs": 0
+        }
+      }
+    },
+    "conclusion": "Targeted training errors improved, fixed training monitor regressed, heldout solving did not improve. Archived failed branch."
+  },
+  "l1_obstruction": {
+    "task": "cube2_qtm",
+    "cycle": [
+      1,
+      1574641,
+      1224721,
+      629857
+    ],
+    "goal": 0,
+    "cycle_goal_distances": [
+      12,
+      11,
+      12,
+      11
+    ],
+    "necessary_l1_pentagonal_gap_max": 0,
+    "exact_oracle_gap": 2,
+    "scope": "Rules out exact all-pair L1 fitting in any dimension; does not rule out correct greedy decisions or identify all observed failure causes.",
+    "alternative_feasibility": "Five anchor-distance coordinates with L-infinity reproduce this finite witness exactly; no learned-model performance claim."
+  }
 }

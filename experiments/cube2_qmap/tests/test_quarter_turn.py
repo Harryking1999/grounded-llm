@@ -50,6 +50,27 @@ class QuarterTurnTest(unittest.TestCase):
         subprocess.run([sys.executable, "-c", "import sys; import experiments.cube2_qmap.src.local_graph; "
                         "assert 'torch' not in sys.modules"], check=True)
 
+    def test_qtm_square_and_far_goal_violate_an_l1_necessary_condition(self):
+        # U^4 = identity. A fifth point exposes a global obstruction even
+        # though the four-point local square itself embeds exactly in L1.
+        cycle = np.array([1, 1574641, 1224721, 629857])
+        np.testing.assert_array_equal(self.env.successors(cycle)[:, 0], np.roll(cycle, -1))
+        np.testing.assert_array_equal(self.env.distance(cycle[:, None], cycle[None, :]),
+                                      [[0, 1, 2, 1], [1, 0, 1, 2], [2, 1, 0, 1], [1, 2, 1, 0]])
+        np.testing.assert_array_equal(self.env.distance(cycle, 0), [12, 11, 12, 11])
+        ids = np.r_[cycle, 0]
+        exact = self.env.distance(ids[:, None], ids[None, :]).astype(float)
+        coefficients = np.outer([1, -1, 1, -1, 1], [1, -1, 1, -1, 1])
+        self.assertEqual((coefficients * exact).sum() / 2, 2)
+        # Every L1 coordinate is an integral of binary threshold cuts.
+        # The inequality holds for all 32 cuts, hence for every dimension.
+        for mask in range(32):
+            x = np.array([(mask >> bit) & 1 for bit in range(5)])
+            self.assertLessEqual((coefficients * np.abs(x[:, None] - x[None, :])).sum() / 2, 0)
+        # A constructive alternative for this finite metric: coordinates are
+        # distances to five anchors. This is an oracle feasibility proof only.
+        np.testing.assert_array_equal(np.abs(exact[:, None, :] - exact[None, :, :]).max(-1), exact)
+
     def test_state_pair_keys_do_not_overflow_int32_cube_ids(self):
         rows = np.array([[3674158, 3674159], [3674159, 3674158]], dtype=np.int32)
         keys = pair_keys(rows, self.env.size)
@@ -131,45 +152,9 @@ class QuarterTurnTest(unittest.TestCase):
             self.assertEqual(next_state, env.step(env.step(0, "U"), action))
             with self.assertRaises(ValueError):
                 MapReader(Cube2(), root / "last.pt")
-            repair = root / "repair"
-            repair.mkdir()
-            config["sampling"].update(complete_goal_distances=True,
-                                      decision_replay={"fraction": .5, "capacity": 128})
-            repaired = train(env, config, data, repair, "cpu", "repair-smoke", root / "best.pt")
-            self.assertGreater(repaired["last_model_training_coverage"]["replayed_pose_groups"], 0)
             config["training"]["progress_margin_weight"] = 1.
             with self.assertRaisesRegex(ValueError, "Archived loss experiments"):
                 train(env, config, data, root, "cpu", "retired-contract")
-
-    def test_complete_distance_supervision_and_replay_only_wrong_training_graphs(self):
-        env = self.env
-        config = json.loads(json.dumps(self.config))
-        config["sampling"].update(complete_goal_distances=True,
-                                  decision_replay={"fraction": .5, "capacity": 2})
-        data = {"relative_roots": np.array([np.flatnonzero(env.depth == 4)[0]]),
-                "protected_states": np.array([0, 12345, 23456])}
-        sampler = LocalGraphSampler(env, data, config, np.random.default_rng(103))
-        first = sampler.draw(4, 32)
-        pairs = set(map(tuple, np.sort(first["pairs"], axis=1)))
-        candidates = np.column_stack((first["children"].ravel(), np.repeat(first["goals"], 6)))
-        self.assertTrue(set(map(tuple, np.sort(candidates, axis=1))).issubset(pairs))
-        np.testing.assert_array_equal(env.distance(first["states"][first["pairs"][:, 0]],
-                                                   first["states"][first["pairs"][:, 1]]),
-                                      first["pair_distances"])
-        sampler.observe(first, -first["child_distances"].astype(float))
-        self.assertEqual(len(sampler.replay), 2)
-        retained = set(sampler.replay)
-        second = sampler.draw(4, 32)
-        posed = second["states"].reshape(4, 35)
-        self.assertEqual(len(retained & set(map(tuple, posed[:, :2]))), 2)
-        self.assertFalse(np.isin(second["states"], data["protected_states"]).any())
-        self.assertEqual(sampler.coverage()["fresh_pose_groups"], 6)
-        sampler.observe(second, -second["child_distances"].astype(float))
-        self.assertEqual(set(sampler.replay), retained)  # Capacity cannot evict unresolved lessons.
-        sampler.observe(second, second["child_distances"].astype(float))
-        self.assertEqual(len(sampler.replay), 0)
-        self.assertEqual(sampler.coverage()["replay_checks"], 4)
-        self.assertEqual(sampler.coverage()["replay_corrected"], 2)
 
 
 if __name__ == "__main__":

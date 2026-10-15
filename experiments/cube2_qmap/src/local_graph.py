@@ -35,46 +35,26 @@ class LocalGraphSampler:
         self.words, self.parents, self.children = local_template(env)
         self.local_distances = env.distance(self.words[:, None], self.words[None, :])
         self.groups_drawn = 0
-        self.replay = {}
-        self.replayed_groups = 0
-        self.replay_checks = self.replay_corrected = self.replay_not_admitted = 0
-        self.repair = config["sampling"].get("decision_replay")
-        if self.repair and (not 0 < self.repair["fraction"] < 1 or self.repair["capacity"] < 1):
-            raise ValueError("Expected a bounded replay buffer and a nonzero fresh fraction")
         self.pair_histogram = np.zeros(env.diameter + 1, dtype=np.int64)
         self.parent_histogram = np.zeros(env.diameter + 1, dtype=np.int64)
 
     def coverage(self):
-        result = {"root_min_layer_passes": self.sampler.passes,
+        return {"root_min_layer_passes": self.sampler.passes,
                 "root_layers": self.sampler.coverage(), "online_pose_groups": self.groups_drawn,
                 "supervised_pair_distance_histogram": self.pair_histogram.tolist(),
                 "supervised_parent_distance_histogram": self.parent_histogram.tolist()}
-        if self.repair:
-            result.update(replayed_pose_groups=self.replayed_groups, replay_buffer_groups=len(self.replay),
-                          fresh_pose_groups=self.groups_drawn - self.replayed_groups,
-                          replay_checks=self.replay_checks, replay_corrected=self.replay_corrected,
-                          replay_not_admitted=self.replay_not_admitted)
-        return result
 
     def draw(self, groups=None, pair_count=None):
         options = self.config["training"]
         groups = options["graph_batch_size"] if groups is None else groups
         pair_count = options["batch_size"] if pair_count is None else pair_count
-        replay_count = (min(len(self.replay), groups - 1, round(groups * self.repair["fraction"]))
-                        if self.repair else 0)
-        roots = self.relatives[self.sampler.draw(groups - replay_count)]
+        roots = self.relatives[self.sampler.draw(groups)]
         nodes = self.env.compose(roots[:, None], self.words[None, :])
+        labels = self.env.depth[nodes]
         # Column zero is the shared goal. Every other state used in either loss
         # belongs to this whole jointly transformed, split-safe local graph.
-        packed = pose_groups(self.env, np.column_stack((np.zeros(len(roots), dtype=int), nodes)),
+        packed = pose_groups(self.env, np.column_stack((np.zeros(groups, dtype=int), nodes)),
                              self.forbidden, self.rng, self.config["augmentation"]["max_attempts"])
-        if replay_count:
-            pool = list(self.replay.values())
-            selected = self.rng.choice(len(pool), replay_count, replace=False)
-            packed = np.concatenate((packed, np.stack([pool[i] for i in selected])))
-            self.replayed_groups += replay_count
-        roots = self.env.relative(packed[:, 0], packed[:, 1])
-        labels = self.env.depth[self.env.relative(packed[:, :1], packed[:, 1:])]
         width = packed.shape[1]
         offsets = np.arange(groups)[:, None] * width
         parent_labels = labels[:, self.parents]
@@ -89,15 +69,9 @@ class LocalGraphSampler:
 
         # Long-range goal calibration and short, composition-aware relations
         # share the same Q evaluations. All labels use the full graph oracle.
-        fraction = self.config["sampling"]["local_pair_fraction"]
-        if self.config["sampling"].get("complete_goal_distances", False):
-            if not 0 <= fraction < 1:
-                raise ValueError("Complete goal supervision needs a nonzero goal-pair fraction")
-            chosen = np.arange(groups * len(self.words))
-            near_count = round(len(chosen) * fraction / (1 - fraction))
-        else:
-            near_count = round(pair_count * fraction)
-            chosen = self.rng.integers(groups * len(self.words), size=pair_count - near_count)
+        near_count = round(pair_count * self.config["sampling"]["local_pair_fraction"])
+        goal_count = pair_count - near_count
+        chosen = self.rng.integers(groups * len(self.words), size=goal_count)
         gi, ni = np.divmod(chosen, len(self.words))
         goal_pairs = np.column_stack((gi * width + ni + 1, gi * width))
         gi = self.rng.integers(groups, size=near_count)
@@ -112,29 +86,7 @@ class LocalGraphSampler:
                 "pair_distances": pair_labels,
                 "parents": parents, "goals": goals, "children": children,
                 "child_distances": child_labels[live], "parent_distances": parent_labels[live],
-                "delta": delta[live], "relative_roots": roots,
-                "is_replay": np.arange(groups) >= groups - replay_count}
-
-    def observe(self, batch, scores):
-        """Training labels only: retain wrong graphs, remove rechecked correct ones."""
-        if not self.repair:
-            return
-        truth = batch["child_distances"]
-        chosen = np.asarray(scores).argmin(axis=1)
-        wrong = truth[np.arange(len(truth)), chosen] != batch["parent_distances"] - 1
-        graph_ids = batch["parents"] // (len(self.words) + 1)
-        failed = np.bincount(graph_ids, weights=wrong, minlength=len(batch["relative_roots"])) > 0
-        self.replay_checks += int(batch["is_replay"].sum())
-        self.replay_corrected += int((batch["is_replay"] & ~failed).sum())
-        packed = batch["states"].reshape(-1, len(self.words) + 1)
-        for row in packed[~failed]:
-            self.replay.pop((int(row[0]), int(row[1])), None)
-        for row in packed[failed]:
-            key = (int(row[0]), int(row[1]))
-            if key in self.replay or len(self.replay) < self.repair["capacity"]:
-                self.replay[key] = row.copy()
-            else:
-                self.replay_not_admitted += 1
+                "delta": delta[live], "relative_roots": roots}
 
 
 def build_local_graph(env, config, out):

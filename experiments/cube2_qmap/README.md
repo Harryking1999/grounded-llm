@@ -61,3 +61,15 @@ python -u -m experiments.cube2_qmap.src.structure_study --contract experiments/c
 [supervision_audit.py](src/supervision_audit.py) 读取有限地图 checkpoint，分别测量完整距离、排序、近程与远程监督的梯度及方向关系。[supervision_use.json](configs/supervision_use.json) 从同一有限地图出发，只检验显式排序项是否妨碍距离拟合；全部距离标签保留。[dense_supervision.json](configs/dense_supervision.json) 再检验同一距离标签能否更有效地传递给各坐标：保留硬最大距离 Huber，另对每个超过真实距离的坐标差施加惩罚。这不指定坐标含义，也不改变 L∞ 精确可行解集合。两种诊断均以相同完整训练距离 Huber 选模，报告最后一步，测试不参与选择。
 
 这几项小检查沿用 `structure_study` 的命令，将 `--contract` 换为对应合同，并用 `--pair-pretrained` 指向已完成完整关系组的 `best.pt`。初始化 checkpoint 的源码提交身份会与合同核对。它们只定位有限集合的优化问题；全空间到达仍由独立固定度量队列评估。当前数字与结论统一见[结果报告](results/report.md)。
+
+## 完整路线与参数化对照
+
+[route_complete.json](configs/route_complete.json) 与 [route_complete.py](src/route_complete.py) 实现下一项小型诊断：从八步起点和路径中间目标构造多目标关系，递归加入每个最优后继，直到目标；每个父节点保留全部六个动作候选。所有最优分支都闭合在受监督决策内，而非只监督一条选定路径。距离仍是完整状态集合的真实距离，网络自行组织坐标。
+
+自由坐标组以共享编码器的随机初始输出初始化，并保留同一 sigmoid 输出范围；两组使用同样的距离与排序标签、Adam、步数及学习率计划。参数化不同意味着相同学习率不保证相同的 Q 步长，因此记录实际 Adam 更新后的两项损失、Q 移动、距离关系与动作决策退化。验收同时检查距离平均／分位误差、所有受监督动作和完整起点路线；最大误差作为诊断，不再要求所有距离都低于同一个极小阈值。
+
+```bash
+python -u -m experiments.cube2_qmap.src.route_complete --contract experiments/cube2_qmap/configs/route_complete.json --prepared-run /PATH/TO/cube2_quarter_turn_8eed676 --out /NEW/RUN/seed_20261016 --source-commit COMMIT --seed 20261016 --device cuda:0
+```
+
+自由坐标仅用于有限集合诊断，不具备未见状态编码能力。覆盖路线评测中，两组均在首次进入不受监督的状态—目标决策时计为失败；从不屏蔽动作或用 oracle 纠正选择。共享编码器另行评测留出共同左乘状态集合，复用相同关系类型，不参与选模。

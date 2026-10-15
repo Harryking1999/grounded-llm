@@ -80,6 +80,12 @@ def relation_values(model, q, data, pair_indices):
     return pair, scores, parent, edges
 
 
+def dense_upper_loss(q, pairs, target):
+    """Redundant Linf upper bounds, with no assigned coordinate meanings."""
+    a, b = pairs.T
+    return F.relu((q[:, a] - q[:, b]).abs() - target[None, :, None]).square().mean()
+
+
 def objective(model, q, data, config, condition, pair_indices):
     if condition.get("coordinate_teacher", False):
         if condition["fresh"] or model.metric != "linf":
@@ -109,6 +115,10 @@ def objective(model, q, data, config, condition, pair_indices):
     loss = (pair_loss + condition.get("rank_weight", config["training"]["rank_weight"]) * rank +
             condition["edge"] * edge_loss + condition["path"] * path_loss +
             condition["symmetry"] * symmetry)
+    if condition.get("dense_upper", 0):
+        if model.metric != "linf":
+            raise ValueError("Coordinate upper-bound equivalence requires Linf")
+        loss = loss + condition["dense_upper"] * dense_upper_loss(q, pairs, target)
     return loss
 
 

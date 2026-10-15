@@ -9,17 +9,7 @@ from torch.nn import functional as F
 
 from experiments.puzzle_qmap.src.model import MapReader, soft_rank_loss
 from .environment import Cube2
-from .structure_study import load_contract, relation_values
-
-
-def dense_upper_loss(q, pairs, target):
-    """Every coordinate obeys the known pair distance, without assigning roles.
-
-    With Linf, all |q_ai-q_bi| <= d_ab is precisely D(a,b) <= d_ab.
-    This redundant penalty changes gradients, not the set of exact solutions.
-    """
-    a, b = pairs.T
-    return F.relu((q[:, a] - q[:, b]).abs() - target[None, :, None]).square().mean()
+from .structure_study import dense_upper_loss, load_contract, relation_values
 
 
 def describe_gradient(gradient):

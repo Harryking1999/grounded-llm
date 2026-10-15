@@ -1,0 +1,11 @@
+{
+  "base_contract": "supervision_use.json",
+  "hypothesis": "Distribute existing distance upper-bound supervision to every violating coordinate instead of relying on only the current max. This preserves all exact Linf solutions and assigns no coordinate identities.",
+  "conditions": [
+    {"name": "pair_only_control", "metric": "linf", "fresh": false, "pairs": "complete", "edge": 0.0, "path": 0.0, "symmetry": 0.0, "rank_weight": 0.0, "dense_upper": 0.0, "initialization": "pair_pretrained"},
+    {"name": "pair_dense_upper", "metric": "linf", "fresh": false, "pairs": "complete", "edge": 0.0, "path": 0.0, "symmetry": 0.0, "rank_weight": 0.0, "dense_upper": 1.0, "initialization": "pair_pretrained"}
+  ],
+  "penalty": "Mean squared relu(|Q_i(s)-Q_i(g)|-d(s,g)) over the same pairs and all coordinates. No extra truth labels; the max-distance Huber still penalizes underestimation and overestimation.",
+  "selection": "Both conditions select by complete training hard-Linf distance Huber; infer and evaluate using the unchanged hard maximum. Report best and last, with no test selection.",
+  "scope": "Same finite-map starting checkpoint, new Adam, labels and training budget. Tests a gradient-distribution mechanism, not a global training solution."
+}

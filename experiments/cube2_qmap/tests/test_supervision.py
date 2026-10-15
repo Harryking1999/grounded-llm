@@ -3,7 +3,7 @@ import unittest
 
 import torch
 
-from experiments.cube2_qmap.src.supervision_audit import dense_upper_loss
+from experiments.cube2_qmap.src.structure_study import dense_upper_loss
 
 
 class SupervisionTests(unittest.TestCase):

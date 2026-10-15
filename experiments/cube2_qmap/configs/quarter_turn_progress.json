@@ -1,0 +1,20 @@
+{
+  "base_config": "experiments/cube2_qmap/configs/quarter_turn_local.json",
+  "prepared_run": "runs/cube2_quarter_turn_8eed676",
+  "checkpoint": "runs/cube2_quarter_turn_8eed676/best.pt",
+  "training": {
+    "steps": 50000,
+    "learning_rate": 0.0003,
+    "minimum_learning_rate": 0.00001,
+    "eval_every": 2500,
+    "selection_metric": "shortest_action_rate"
+  },
+  "sampling": {
+    "minimum_full_passes": 0.25
+  },
+  "conditions": {
+    "absolute_control": "absolute",
+    "edge_difference": "edge_difference"
+  },
+  "comparison": "same Q and Adam initialization, online random stream, rules, protected endpoints, update budget, learning-rate schedule and validation selection; only distance Huber target changes"
+}

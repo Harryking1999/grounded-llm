@@ -2,6 +2,29 @@
 import numpy as np
 
 
+def task_indices(env, data, split, count, config):
+    """Deterministic distance-stratified evaluation selection; no learning stack."""
+    tasks = data[f"tasks_{split}"]
+    count = min(count, len(tasks))
+    if not config["evaluation"].get("stratified_tasks", False) or split == "reference_test":
+        return np.arange(count)
+    labels = data.get(f"parent_distances_{split}")
+    if labels is None:
+        labels = env.distance(tasks[:, 0], tasks[:, 1])
+    rng = np.random.default_rng(config["seed"] + (101 if split == "validation" else 102) + count)
+    levels = np.unique(labels)
+    selected = []
+    for level in levels:
+        pool = np.flatnonzero(labels == level)
+        selected.extend(rng.choice(pool, min(len(pool), count // len(levels)), replace=False).tolist())
+    remaining = np.setdiff1d(np.arange(len(tasks)), selected)
+    if len(selected) < count:
+        selected.extend(rng.choice(remaining, count - len(selected), replace=False).tolist())
+    result = np.asarray(selected)
+    rng.shuffle(result)
+    return result
+
+
 class StratifiedEpochSampler:
     """Equal layer quotas, with an independent shuffled epoch in every layer."""
     def __init__(self, labels, rng):

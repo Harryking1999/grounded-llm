@@ -7,8 +7,7 @@ from pathlib import Path
 
 import numpy as np
 
-from experiments.puzzle_qmap.src.sampling import StratifiedEpochSampler
-from experiments.puzzle_qmap.src.evaluate import task_indices
+from experiments.puzzle_qmap.src.sampling import StratifiedEpochSampler, task_indices
 from .data import decorate, evaluation_pairs, pose_groups
 
 

@@ -27,6 +27,13 @@ def soft_rank_loss(scores, truth, valid, temperature):
     return -(target * log_prob.masked_fill(~valid, 0)).sum(dim=-1).mean()
 
 
+def edge_difference_loss(parent_scores, child_scores, parent_truth, child_truth, valid):
+    """Supervise goal-distance change on every actual action, in move units."""
+    prediction = child_scores - parent_scores[:, None]
+    target = child_truth.float() - parent_truth.float()[:, None]
+    return torch.nn.functional.smooth_l1_loss(prediction[valid], target[valid])
+
+
 class MapReader:
     """Reusable frozen inference API. Needs features/rules, never an oracle."""
     def __init__(self, env, checkpoint, device="cpu"):

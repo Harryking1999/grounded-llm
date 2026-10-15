@@ -14,7 +14,7 @@
 | 冻结地图读取接口 | 既定训练与评测已完成，保留历史对照，不与新组直接混算 | [实验 README](../experiments/flamingo_map_reader/README.md)、[报告](../experiments/flamingo_map_reader/results/report.md) |
 | 独立无地图任务 SFT | 历史强基线；已保存完整断点并退出，为新评测释放资源 | [协议](../experiments/llm_task_sft/README.md)、[总报告](../experiments/llm_task_sft/results/report.md) |
 | 棋盘状态地图 | 提供冻结 Q 和独立地图贪心参照 | [协议与来源](../experiments/blocks_distance_map/README.md) |
-| 汉诺塔／二阶魔方地图 | 四／五／六盘汉诺塔留出关系到达为 960/960、1020/1024、985/1024；六盘经典 A→C 仍循环。魔方分层无放回均衡续训已完成，最慢排序层实际遍历 4.87 轮；固定训练总 loss 3.956→3.249、验证 4.122→3.725，末段进入平台。最佳模型同批到达 147→151/512，旧参考 139→136/512，求解没有稳定提升；保留稀少层绝对呈现迁移差的负面证据。保持纯 Q 两项损失；旧非纯 Q 实现及产物已退出工作区 | [均衡配置](../experiments/cube2_qmap/configs/balanced_epochs.json)、[汉诺塔结果](../experiments/hanoi_qmap/results/report.md)、[魔方结果与审计](../experiments/cube2_qmap/results/report.md) |
+| 汉诺塔／二阶魔方地图 | 四／五／六盘汉诺塔留出关系到达为 960/960、1020/1024、985/1024，六盘经典题仍循环。六动作局部图及在线共同左乘已训练完成：同题到达新队列 131 对 120/512，旧队列 151 对 151/512；中层单步最优率仍弱，381 个失败全部往返循环。用户已要求针对性修复，当前对比绝对距离与动作距离差 Huber，保持纯 Q 及完整软排序；旧非纯 Q 实现及产物已退出工作区 | [进展监督合同](../experiments/cube2_qmap/configs/quarter_turn_progress.json)、[汉诺塔结果](../experiments/hanoi_qmap/results/report.md)、[魔方结果与审计](../experiments/cube2_qmap/results/report.md) |
 | 寻路接口与早期方案 | 作为机制和任务边界的历史证据 | [实验目录](../experiments/README.md) |
 
 ## 3. 已确定的比较原则

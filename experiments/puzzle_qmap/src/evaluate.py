@@ -2,7 +2,8 @@
 import numpy as np
 import torch
 
-from .model import distance, soft_rank_loss
+from .model import distance, soft_rank_loss, edge_difference_loss
+from .sampling import task_indices
 
 
 def average_ranks(values):
@@ -13,28 +14,6 @@ def average_ranks(values):
 def correlation(x, y):
     x, y = average_ranks(x), average_ranks(y)
     return float(np.corrcoef(x, y)[0, 1]) if np.std(x) and np.std(y) else 0.0
-
-
-def task_indices(env, data, split, count, config):
-    tasks = data[f"tasks_{split}"]
-    count = min(count, len(tasks))
-    if not config["evaluation"].get("stratified_tasks", False) or split == "reference_test":
-        return np.arange(count)
-    labels = data.get(f"parent_distances_{split}")
-    if labels is None:
-        labels = env.distance(tasks[:, 0], tasks[:, 1])
-    rng = np.random.default_rng(config["seed"] + (101 if split == "validation" else 102) + count)
-    levels = np.unique(labels)
-    selected = []
-    for level in levels:
-        pool = np.flatnonzero(labels == level)
-        selected.extend(rng.choice(pool, min(len(pool), count // len(levels)), replace=False).tolist())
-    remaining = np.setdiff1d(np.arange(len(tasks)), selected)
-    if len(selected) < count:
-        selected.extend(rng.choice(remaining, count - len(selected), replace=False).tolist())
-    result = np.asarray(selected)
-    rng.shuffle(result)
-    return result
 
 
 @torch.no_grad()
@@ -98,6 +77,24 @@ def ranking_loss(model, env, tasks, truth, device, temperature):
         targets.append(torch.as_tensor(truth[begin:begin + len(chunk)], device=device))
         masks.append(torch.as_tensor(children >= 0, device=device))
     return float(soft_rank_loss(torch.cat(scores), torch.cat(targets), torch.cat(masks), temperature))
+
+
+@torch.no_grad()
+def progress_loss(model, env, tasks, truth, device):
+    losses, counts = [], []
+    for begin in range(0, len(tasks), 1024):
+        chunk = tasks[begin:begin + 1024]
+        children = env.successors(chunk[:, 0])
+        goal = encode(model, env, chunk[:, 1], device)
+        child_scores = distance(encode(model, env, np.maximum(children, 0), device), goal[:, None])
+        parent_scores = distance(encode(model, env, chunk[:, 0], device), goal)
+        valid = torch.as_tensor(children >= 0, device=device)
+        loss = edge_difference_loss(parent_scores, child_scores,
+                                    torch.as_tensor(env.distance(chunk[:, 0], chunk[:, 1]), device=device),
+                                    torch.as_tensor(truth[begin:begin + len(chunk)], device=device), valid)
+        counts.append(int(valid.sum()))
+        losses.append(float(loss))
+    return float(np.average(losses, weights=counts))
 
 
 @torch.no_grad()

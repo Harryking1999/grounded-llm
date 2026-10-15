@@ -15,6 +15,13 @@ python -m experiments.cube2_qmap.src.compare --run runs/cube2_quarter_turn_RUN -
 
 相对根状态按真实距离均衡、层内无放回遍历，每次抽取重新为整个局部图选择共同左乘，所有图节点与目标均避开保护的评测端点。`data.npz` 中 `pairs_train`／`tasks_train` 在此条件下只是固定训练监测集；训练样本来自在线数据流。各根层覆盖、实际距离对／排序父层分布分别记录，不能将根层均衡说成展开后每层严格等额。固定训练监测集与验证集记录 Huber、软排序 CE 及目标熵；最佳模型按验证目标选择，测试只在训练结束后使用。
 
+六动作首轮已经完成，完整 loss 曲线及单步／循环分析见 [结果报告](results/report.md)、[紧凑证据](results/quarter_turn_summary.json)。用户随后要求针对错误排序造成的往返循环修复，匹配续训合同为 [quarter_turn_progress.json](configs/quarter_turn_progress.json)。两组从同一个六动作 Q／Adam 开始，共用在线流和验证选择；对照继续绝对距离 Huber，干预将它替换为所有真实动作边的距离差 Huber。完整软排序及 Q 参数结构均不变。两组共同按验证最短动作率最大值选模型，平局保留较早 checkpoint，初始权重可获选；末步另报，不按测试结果改选。
+
+```bash
+python -m experiments.cube2_qmap.src.progress_experiment --contract experiments/cube2_qmap/configs/quarter_turn_progress.json --condition edge_difference --out runs/cube2_progress_RUN --source-commit COMMIT --device cuda:1
+python -m experiments.cube2_qmap.src.decision_audit --run runs/cube2_progress_RUN --device cuda:1
+```
+
 ```bash
 python -m experiments.puzzle_qmap.src.run --config experiments/cube2_qmap/configs/balanced_epochs.json --out runs/cube2_qmap/BALANCED_RUN --source-commit COMMIT --device cuda:1 --prepared-run runs/cube2_qmap/breadth_depth --checkpoint runs/cube2_qmap/breadth_depth/best.pt
 ```

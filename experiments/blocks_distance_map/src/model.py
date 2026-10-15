@@ -40,11 +40,11 @@ def board_bits(masks):
 
 
 class BoardEncoder(nn.Module):
-    def __init__(self, dimension, hidden, cap, metric):
+    def __init__(self, dimension, hidden, cap, metric, input_dim=100):
         super().__init__()
         self.cap = cap
         self.metric = metric
-        self.network = nn.Sequential(nn.Linear(100, hidden), nn.ReLU(),
+        self.network = nn.Sequential(nn.Linear(input_dim, hidden), nn.ReLU(),
                                      nn.Linear(hidden, hidden), nn.ReLU(),
                                      nn.Linear(hidden, dimension))
         nn.init.normal_(self.network[-1].weight, std=.01)

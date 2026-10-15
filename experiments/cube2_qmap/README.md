@@ -1,6 +1,6 @@
 # 二阶魔方 Qmap
 
-研究问题：在完整 2×2×2 魔方群上离线生成精确关系后，共享状态编码器能否在未参与任何训练损失的状态上表达远近、预测动作后继并支持纯 Q 贪心到达？正式参数见 [configs/study.json](configs/study.json)，共同模型与指标定义见 [共享核心](../puzzle_qmap/README.md)，首轮结果见 [results/report.md](results/report.md)。
+研究问题：在完整 2×2×2 魔方群上离线生成精确关系后，共享状态编码器能否在未参与任何训练损失的状态上表达远近、正确排序真实合法后继并支持纯 Q 贪心到达？正式参数见 [configs/study.json](configs/study.json)，共同模型与指标定义见 [共享核心](../puzzle_qmap/README.md)，结果见 [results/report.md](results/report.md)。
 
 ## 状态与动作约定
 
@@ -14,7 +14,7 @@
 
 转移表按角块排列和朝向分解，不储存巨大的完整邻接矩阵。从复原态完整 BFS，得到覆盖全部状态、最大距离为 11 的 uint8 表。任意两状态的精确距离通过群相对状态 `source^-1 * goal` 查表；`solve` 选真实距离每步减一的后继，因此支持任意规范目标，不只复原态。
 
-采样时均匀选择真实步数，再从对应 BFS 深度层取相对状态，与随机起点合成目标；不是把打乱动作数误当成最短距离。按完整状态空间的稳定哈希划分训练／验证／测试；训练状态对、排序组全部候选、转移两端均属于训练划分。每个排序训练组保留全部九个合法候选，不靠删掉难候选训练。距离表覆盖测试空间是**离线裁判**，不作为 Q 输入。
+采样时均匀选择真实步数，再从对应 BFS 深度层取相对状态，与随机起点合成目标；不是把打乱动作数误当成最短距离。按完整状态空间的稳定哈希划分训练／验证／测试。对训练状态对及整组候选作共同左乘增强 `s -> k*s`，保持精确距离与动作后继；增强后全部训练状态、目标与候选仍必须属于训练划分。每个排序训练组保留全部九个合法候选，不靠删掉难候选训练。距离表覆盖测试空间是**离线裁判**，不作为 Q 输入。编码器和完整软排序沿用积木实现，只有 Q 可训练。
 
 Q 输入为每个位置的 `(角块身份, 朝向)` 联合 one-hot，保留朝向与身份对应关系。全空间合法和非法状态检查与学习分开。训练若只得到局部远近而连续贪心失败，应报告该失败，不将精确 solver 的成功当成 Q 已学会求解。
 
@@ -22,6 +22,7 @@ Q 输入为每个位置的 `(角块身份, 朝向)` 联合 one-hot，保留朝�
 
 ```bash
 python -m unittest discover -s experiments/cube2_qmap/tests -v
+python -m unittest discover -s experiments/puzzle_qmap/tests -v
 python -m experiments.puzzle_qmap.src.run --config experiments/cube2_qmap/configs/study.json --out runs/cube2_qmap/RUN_ID --source-commit COMMIT --device cuda:1
 python -m experiments.puzzle_qmap.src.solve --task cube2 --scramble "R U F2 R'" --oracle runs/cube2_qmap/RUN_ID/oracle_depth.npy
 python -m experiments.puzzle_qmap.src.solve --task cube2 --scramble "R U F2 R'" --checkpoint runs/cube2_qmap/RUN_ID/best.pt

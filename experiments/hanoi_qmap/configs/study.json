@@ -2,12 +2,13 @@
   "task": "hanoi3",
   "seed": 20261015,
   "rules": {"disks": 3, "pegs": 3, "state_order": "smallest_disk_first_base3", "move_cost": 1},
-  "data": {"split": "all_unordered_pairs_70_15_15", "transitions_train": 2000, "transitions_validation": 2000, "transitions_test": 2000},
-  "model": {"dimension": 128, "hidden": 128},
+  "data": {"split": "unordered_pair_peg_symmetry_orbits_70_15_15"},
+  "augmentation": {"enabled": true, "kind": "simultaneous_peg_permutation", "copies": 6, "max_attempts": 1},
+  "model": {"dimension": 128, "hidden": 256},
   "training": {
-    "steps": 4000, "batch_size": 256, "decision_batch_size": 64, "transition_batch_size": 128,
-    "learning_rate": 0.0005, "rank_weight": 1.0, "rank_temperature": 0.25, "transition_weight": 0.1,
+    "steps": 4000, "batch_size": 512, "decision_batch_size": 256,
+    "learning_rate": 0.001, "rank_weight": 1.0, "rank_temperature": 1.0,
     "eval_every": 200, "patience": 10, "min_improvement": 0.0001, "cpu_threads": 4
   },
-  "evaluation": {"decision_count": 1000, "transition_count": 2000, "rollout_count": 1000, "budget_multiplier": 2}
+  "evaluation": {"decision_count": 1000, "rollout_count": 1000, "budget_multiplier": 2}
 }

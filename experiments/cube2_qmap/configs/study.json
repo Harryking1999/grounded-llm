@@ -5,14 +5,14 @@
   "data": {
     "split": "state_hash_80_10_10_all_supervision", "distance_sampling": "uniform_1_to_11",
     "pairs_train": 120000, "pairs_validation": 6000, "pairs_test": 6000,
-    "decisions_train": 120000, "decisions_validation": 1200, "decisions_test": 1200,
-    "transitions_train": 30000, "transitions_validation": 2000, "transitions_test": 2000
+    "decisions_train": 120000, "decisions_validation": 1200, "decisions_test": 1200
   },
-  "model": {"dimension": 128, "hidden": 512},
+  "augmentation": {"enabled": true, "kind": "common_left_multiplication", "copies": 1, "max_attempts": 64},
+  "model": {"dimension": 128, "hidden": 256},
   "training": {
-    "steps": 6000, "batch_size": 512, "decision_batch_size": 128, "transition_batch_size": 256,
-    "learning_rate": 0.0003, "rank_weight": 1.0, "rank_temperature": 0.5, "transition_weight": 0.1,
+    "steps": 6000, "batch_size": 512, "decision_batch_size": 256,
+    "learning_rate": 0.001, "rank_weight": 1.0, "rank_temperature": 1.0,
     "eval_every": 500, "patience": 8, "min_improvement": 0.0001, "cpu_threads": 4
   },
-  "evaluation": {"decision_count": 1000, "transition_count": 2000, "rollout_count": 512, "budget_multiplier": 2}
+  "evaluation": {"decision_count": 1000, "rollout_count": 512, "budget_multiplier": 2}
 }

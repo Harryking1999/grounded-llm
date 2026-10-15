@@ -1,8 +1,8 @@
-"""Matched static/transition/rollout evaluation; oracle is only a comparator."""
+"""Matched distance, full candidate ranking and rollout; no transition model."""
 import numpy as np
 import torch
 
-from .model import distance
+from .model import distance, soft_rank_loss
 
 
 def average_ranks(values):
@@ -31,7 +31,9 @@ def pair_metrics(model, env, rows, device):
         a, b = encode(model, env, chunk[:, 0], device), encode(model, env, chunk[:, 1], device)
         predictions.extend(distance(a, b).cpu().tolist())
     predictions, truth = np.asarray(predictions), rows[:, 2]
-    return {"count": len(rows), "mae": float(np.abs(predictions - truth).mean()),
+    error = np.abs(predictions - truth)
+    return {"count": len(rows), "huber": float(np.where(error < 1, .5 * error**2, error - .5).mean()),
+            "mae": float(error.mean()),
             "spearman": correlation(predictions, truth),
             "by_distance": {str(d): {"count": int((truth == d).sum()), "predicted_mean": float(predictions[truth == d].mean()),
                                      "mae": float(np.abs(predictions[truth == d] - d).mean())} for d in np.unique(truth)}}
@@ -64,23 +66,16 @@ def decisions(model, env, tasks, device):
 
 
 @torch.no_grad()
-def transitions(model, env, rows, device):
-    source, action, target = rows.T
-    q = encode(model, env, source, device)
-    predicted = model.predict_next(q, torch.as_tensor(action, device=device))
-    target_q = encode(model, env, target, device)
-    children = env.successors(source)
-    candidates = encode(model, env, np.maximum(children, 0), device)
-    errors = (predicted[:, None] - candidates).square().mean(dim=-1).cpu().numpy()
-    errors[children < 0] = np.inf
-    chosen = errors.argmin(axis=1)
-    # Candidate retrieval and identity baseline distinguish an action model from
-    # returning the current Q in a geometry where all successors are nearby.
-    identity = (q[:, None] - candidates).square().mean(dim=-1).cpu().numpy()
-    identity[children < 0] = np.inf
-    return {"count": len(rows), "next_q_mse": float((predicted - target_q).square().mean()),
-            "successor_retrieval_accuracy": float((children[np.arange(len(rows)), chosen] == target).mean()),
-            "identity_retrieval_accuracy": float((children[np.arange(len(rows)), identity.argmin(axis=1)] == target).mean())}
+def ranking_loss(model, env, tasks, truth, device, temperature):
+    scores, targets, masks = [], [], []
+    for begin in range(0, len(tasks), 1024):
+        chunk = tasks[begin:begin + 1024]
+        children = env.successors(chunk[:, 0])
+        scores.append(distance(encode(model, env, np.maximum(children, 0), device),
+                               encode(model, env, chunk[:, 1], device)[:, None]))
+        targets.append(torch.as_tensor(truth[begin:begin + len(chunk)], device=device))
+        masks.append(torch.as_tensor(children >= 0, device=device))
+    return float(soft_rank_loss(torch.cat(scores), torch.cat(targets), torch.cat(masks), temperature))
 
 
 @torch.no_grad()
@@ -134,10 +129,10 @@ def evaluate(model, env, data, config, device):
     metrics = {}
     for split in ("validation", "test"):
         tasks = data[f"tasks_{split}"][:config["evaluation"]["decision_count"]]
-        rows = data[f"transitions_{split}"][:config["evaluation"]["transition_count"]]
         metrics[split] = {"pairs": pair_metrics(model, env, data[f"pairs_{split}"], device),
                           "decisions": decisions(model, env, tasks, device),
-                          "transitions": transitions(model, env, rows, device),
+                          "soft_rank_loss": ranking_loss(model, env, tasks, data[f"child_distances_{split}"][:len(tasks)],
+                                                         device, config["training"]["rank_temperature"]),
                           "rollout": rollout(model, env, tasks[:config["evaluation"]["rollout_count"]], device,
                                              config["evaluation"]["budget_multiplier"])}
     return metrics

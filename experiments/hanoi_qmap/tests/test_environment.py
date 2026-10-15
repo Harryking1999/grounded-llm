@@ -1,11 +1,12 @@
 import tempfile
+import json
 from pathlib import Path
 import unittest
 
 import numpy as np
 
 from experiments.hanoi_qmap.src.environment import Hanoi
-from experiments.puzzle_qmap.src.data import build, pair_keys
+from experiments.puzzle_qmap.src.data import build, pair_keys, hanoi_orbit_keys
 
 
 class HanoiTest(unittest.TestCase):
@@ -43,16 +44,32 @@ class HanoiTest(unittest.TestCase):
 
     def test_labels_from_all_losses_do_not_cross_pair_split(self):
         env = Hanoi()
+        config = json.loads((Path(__file__).parents[1] / "configs/study.json").read_text())
         with tempfile.TemporaryDirectory() as tmp:
-            data, _ = build(env, {"seed": 20261015, "data": {}}, Path(tmp))
+            data, summary = build(env, config, Path(tmp))
         train = set(pair_keys(data["pairs_train"], env.size))
         for split in ("validation", "test"):
             self.assertFalse(train & set(pair_keys(data[f"pairs_{split}"], env.size)))
+            self.assertFalse(set(hanoi_orbit_keys(env, data["pairs_train"])) &
+                             set(hanoi_orbit_keys(env, data[f"pairs_{split}"])))
         for (parent, goal), children in zip(data["tasks_train"], data["children_train"]):
             for child in children[children >= 0]:
                 self.assertIn(min(child, goal) * 27 + max(child, goal), train)
-        for src, _, dst in data["transitions_train"]:
-            self.assertIn(min(src, dst) * 27 + max(src, dst), train)
+        self.assertFalse(any(key.startswith("transitions") for key in data))
+        self.assertGreater(summary["augmentation"]["pairs"]["changed_rows"], 0)
+        self.assertGreater(len(data["pairs_train"]), len(data["pairs_train_base"]))
+
+    def test_six_peg_symmetries_preserve_every_edge_and_distance(self):
+        env = Hanoi()
+        for transform in range(6):
+            renamed = env.symmetry(np.arange(27), transform)
+            self.assertEqual(len(np.unique(renamed)), 27)
+            np.testing.assert_array_equal(env.distances, env.distances[renamed[:, None], renamed[None, :]])
+            for state in range(27):
+                for action, child in enumerate(env.next[state]):
+                    renamed_action = env.symmetry_actions(action, transform)
+                    expected = -1 if child < 0 else env.symmetry(child, transform)
+                    self.assertEqual(env.next[renamed[state], renamed_action], expected)
 
 
 if __name__ == "__main__":

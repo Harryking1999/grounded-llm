@@ -8,12 +8,13 @@
 
 动作是有序柱对，只有源柱顶盘存在且小于目标柱顶盘时合法。无效动作抛出异常；批量 `successors` 保留六个动作槽，不合法槽为 -1。每次移动一个顶盘计一步。环境完整枚举合法状态和转移，再对每个目标 BFS，给任意状态对精确最短距离；`solve` 沿距离下降返回可重放最短动作。没有把递归算法藏在 Q 的选择器中。
 
-Q 输入是三个盘所在柱的 one-hot；与目标无关。数据覆盖全部无序不同状态对，按配置语义固定随机划分；恒等对加入训练。测试是**同一批状态的留出关系补全**，不是未见盘数或新状态泛化。训练候选的每个后继—目标关系和转移两端的无序关系都必须在训练集。
+Q 输入是三个盘所在柱的 one-hot；直接复用积木共享编码器，与目标无关。数据按无序状态对的六种柱置换轨道划分；每个训练轨道取一个种子关系，再同时重命名两端，完整增强并去重，恒等对加入训练。所有对称等价关系留在同一划分。测试是**同一批状态的留出关系轨道补全**，不是未见盘数或新状态泛化。训练候选的每个后继—目标关系都必须在训练轨道内。详细变换与损失见共享核心；没有动作条件转移头。
 
 ## 运行
 
 ```bash
 python -m unittest discover -s experiments/hanoi_qmap/tests -v
+python -m unittest discover -s experiments/puzzle_qmap/tests -v
 python -m experiments.puzzle_qmap.src.run --config experiments/hanoi_qmap/configs/study.json --out runs/hanoi_qmap/RUN_ID --source-commit COMMIT --device cuda:0
 python -m experiments.puzzle_qmap.src.solve --task hanoi3 --start 0 --goal 26
 python -m experiments.puzzle_qmap.src.solve --task hanoi3 --start 0 --goal 26 --checkpoint runs/hanoi_qmap/RUN_ID/best.pt

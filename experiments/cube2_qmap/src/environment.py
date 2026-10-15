@@ -37,6 +37,7 @@ class Cube2:
     diameter = 11
     feature_dim = 8 * 8 * 3
     actions = ("U", "U2", "U'", "R", "R2", "R'", "F", "F2", "F'")
+    symmetry_kind = "common_left_multiplication"
 
     def __init__(self, oracle_path=None):
         self.permutations = np.tile(np.arange(8), (5040, 1))
@@ -105,6 +106,20 @@ class Cube2:
         cp = np.take_along_axis(p, q, axis=-1)
         co = (np.take_along_axis(o, q, axis=-1) + r) % 3
         return permutation_rank(cp[..., SLOTS]) * 729 + co[..., SLOTS[:6]] @ POWERS
+
+    def sample_symmetry(self, rng, count):
+        return rng.integers(self.size, size=count)
+
+    def symmetry(self, ids, transform):
+        """Common left multiplication preserves right-action edges and distance.
+
+        This changes corner identities/reference twists in the DBL-fixed group;
+        it is not the operation of applying the same scramble to both inputs.
+        """
+        return self.compose(np.asarray(transform), np.asarray(ids))
+
+    def symmetry_actions(self, actions, transform):
+        return np.broadcast_arrays(actions, transform)[0]
 
     def relative(self, source, goal):
         """source^-1 * goal: its solved distance is d(source, goal)."""

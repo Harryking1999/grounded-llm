@@ -1,5 +1,6 @@
 """Three-disk Hanoi: rules, vectorized state interface, and exact BFS oracle."""
 from collections import deque
+from itertools import permutations
 
 import numpy as np
 
@@ -10,10 +11,17 @@ class Hanoi:
     diameter = 7
     feature_dim = 9
     actions = ("A>B", "A>C", "B>A", "B>C", "C>A", "C>B")
+    symmetry_kind = "simultaneous_peg_permutation"
+    symmetry_count = 6
 
     def __init__(self):
         self.positions = np.array([[s // 3**d % 3 for d in range(3)]
                                    for s in range(self.size)], dtype=np.int64)
+        self.peg_permutations = np.array(list(permutations(range(3))))
+        self.renamed = (self.peg_permutations[:, self.positions] @ np.array([1, 3, 9])).T
+        moves = [(i, j) for i in range(3) for j in range(3) if i != j]
+        self.renamed_actions = np.array([[moves.index((int(p[i]), int(p[j]))) for i, j in moves]
+                                        for p in self.peg_permutations]).T
         self.next = np.full((self.size, len(self.actions)), -1, dtype=np.int64)
         for state, positions in enumerate(self.positions):
             top = [next((d for d in range(3) if positions[d] == peg), 3)
@@ -50,6 +58,16 @@ class Hanoi:
 
     def successors(self, ids):
         return self.next[np.asarray(ids)]
+
+    def sample_symmetry(self, rng, count):
+        return rng.integers(self.symmetry_count, size=count)
+
+    def symmetry(self, ids, transform):
+        """Rename all pegs together; caller broadcasts one transform per group."""
+        return self.renamed[np.asarray(ids), np.asarray(transform)]
+
+    def symmetry_actions(self, actions, transform):
+        return self.renamed_actions[np.asarray(actions), np.asarray(transform)]
 
     def step(self, state, action):
         self.validate(state)

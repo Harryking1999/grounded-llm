@@ -1,41 +1,42 @@
-"""Goal-independent Q(s), fixed symmetric distance, separate transition head."""
+"""Only Q: reuse the blocks encoder and symmetrize its directed_sum metric."""
 import torch
-from torch import nn
+
+from experiments.blocks_distance_map.src.model import BoardEncoder, distance as blocks_distance
+
+
+MODEL_TYPE = "pure_q_symmetric_blocks"
 
 
 def distance(source, goal):
-    # Same dense-coordinate principle as blocks' directed_sum, symmetrized for
-    # reversible puzzles. No goal-conditioned scorer or learned distance head.
-    return (source - goal).abs().mean(dim=-1)
+    return (blocks_distance(source, goal, "directed_sum") +
+            blocks_distance(goal, source, "directed_sum")) / 2
 
 
-class QMap(nn.Module):
-    def __init__(self, feature_dim, actions, dimension, hidden, diameter):
-        super().__init__()
-        self.encoder = nn.Sequential(nn.Linear(feature_dim, hidden), nn.ReLU(),
-                                     nn.Linear(hidden, hidden), nn.ReLU(), nn.Linear(hidden, dimension))
-        self.transition = nn.Sequential(nn.Linear(dimension + actions, hidden), nn.ReLU(),
-                                        nn.Linear(hidden, dimension))
-        self.actions = actions
-        self.diameter = diameter
+class QMap(BoardEncoder):
+    def __init__(self, feature_dim, dimension, hidden, cap):
+        super().__init__(dimension, hidden, cap, "symmetric_directed_sum", input_dim=feature_dim)
 
-    def encode(self, features):
-        # Range permits average |Q(s)-Q(g)| up to 2*diameter.
-        return self.diameter * torch.tanh(self.encoder(features))
+    def forward(self, features, pairs):
+        return distance(self.encode(features[pairs[:, 0]]), self.encode(features[pairs[:, 1]]))
 
-    def predict_next(self, q, actions):
-        a = torch.nn.functional.one_hot(actions, self.actions).to(q.dtype)
-        return q + self.transition(torch.cat((q, a), dim=-1))
+
+def soft_rank_loss(scores, truth, valid, temperature):
+    """Blocks' full soft-distance target, with padding excluded from both sides."""
+    target = torch.softmax((-truth.float() / temperature).masked_fill(~valid, -torch.inf), dim=-1)
+    log_prob = torch.log_softmax((-scores / temperature).masked_fill(~valid, -torch.inf), dim=-1)
+    return -(target * log_prob.masked_fill(~valid, 0)).sum(dim=-1).mean()
 
 
 class MapReader:
     """Reusable frozen inference API. Needs features/rules, never an oracle."""
     def __init__(self, env, checkpoint, device="cpu"):
         saved = torch.load(checkpoint, map_location=device, weights_only=False)
+        if saved.get("model_type") != MODEL_TYPE:
+            raise ValueError("Expected a pure-Q checkpoint; historical auxiliary-head runs use their archived source")
         if saved["task"] != env.name or saved["actions"] != list(env.actions):
             raise ValueError("Checkpoint belongs to a different task/action convention")
         self.env, self.device = env, device
-        self.model = QMap(env.feature_dim, len(env.actions), **saved["model_config"], diameter=env.diameter).to(device)
+        self.model = QMap(env.feature_dim, **saved["model_config"], cap=saved["cap"]).to(device)
         self.model.load_state_dict(saved["model"])
         self.model.eval()
 

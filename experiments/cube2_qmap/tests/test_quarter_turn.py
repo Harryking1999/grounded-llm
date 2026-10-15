@@ -164,9 +164,11 @@ class QuarterTurnTest(unittest.TestCase):
         self.assertEqual(len(retained & set(map(tuple, posed[:, :2]))), 2)
         self.assertFalse(np.isin(second["states"], data["protected_states"]).any())
         self.assertEqual(sampler.coverage()["fresh_pose_groups"], 6)
+        sampler.observe(second, -second["child_distances"].astype(float))
+        self.assertEqual(set(sampler.replay), retained)  # Capacity cannot evict unresolved lessons.
         sampler.observe(second, second["child_distances"].astype(float))
         self.assertEqual(len(sampler.replay), 0)
-        self.assertEqual(sampler.coverage()["replay_checks"], 2)
+        self.assertEqual(sampler.coverage()["replay_checks"], 4)
         self.assertEqual(sampler.coverage()["replay_corrected"], 2)
 
 

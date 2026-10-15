@@ -16,7 +16,7 @@
     "control": {},
     "repair": {
       "complete_goal_distances": true,
-      "decision_replay": {"fraction": 0.5, "capacity": 4096}
+      "decision_replay": {"fraction": 0.5, "capacity": 128}
     }
   },
   "comparison": "Same initial Q and Adam, exact rules, protected states, evaluation tasks, losses, update budget and learning-rate schedule. Repair spends part of the budget rechecking old errors and supervises more absolute pairs per graph; fresh-example counts therefore differ. Selection remains validation Huber plus full soft ranking CE. Report best and last. This joint intervention does not isolate its two components."

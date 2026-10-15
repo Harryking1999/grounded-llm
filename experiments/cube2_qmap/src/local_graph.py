@@ -37,7 +37,7 @@ class LocalGraphSampler:
         self.groups_drawn = 0
         self.replay = {}
         self.replayed_groups = 0
-        self.replay_checks = self.replay_corrected = self.replay_evicted = 0
+        self.replay_checks = self.replay_corrected = self.replay_not_admitted = 0
         self.repair = config["sampling"].get("decision_replay")
         if self.repair and (not 0 < self.repair["fraction"] < 1 or self.repair["capacity"] < 1):
             raise ValueError("Expected a bounded replay buffer and a nonzero fresh fraction")
@@ -53,7 +53,7 @@ class LocalGraphSampler:
             result.update(replayed_pose_groups=self.replayed_groups, replay_buffer_groups=len(self.replay),
                           fresh_pose_groups=self.groups_drawn - self.replayed_groups,
                           replay_checks=self.replay_checks, replay_corrected=self.replay_corrected,
-                          replay_evicted_unresolved=self.replay_evicted)
+                          replay_not_admitted=self.replay_not_admitted)
         return result
 
     def draw(self, groups=None, pair_count=None):
@@ -127,15 +127,14 @@ class LocalGraphSampler:
         self.replay_checks += int(batch["is_replay"].sum())
         self.replay_corrected += int((batch["is_replay"] & ~failed).sum())
         packed = batch["states"].reshape(-1, len(self.words) + 1)
-        for row, keep in zip(packed, failed):
+        for row in packed[~failed]:
+            self.replay.pop((int(row[0]), int(row[1])), None)
+        for row in packed[failed]:
             key = (int(row[0]), int(row[1]))
-            if keep:
+            if key in self.replay or len(self.replay) < self.repair["capacity"]:
                 self.replay[key] = row.copy()
             else:
-                self.replay.pop(key, None)
-        while len(self.replay) > self.repair["capacity"]:
-            self.replay.pop(next(iter(self.replay)))
-            self.replay_evicted += 1
+                self.replay_not_admitted += 1
 
 
 def build_local_graph(env, config, out):

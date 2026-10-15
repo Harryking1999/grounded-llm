@@ -52,6 +52,7 @@ ssh grounded-4090
 | 4090 公共模型区 | `/opt/models`；使用前确认所需模型是否存在 |
 | 平台积木地图工作区 | `/zhanghanyue/experiment/grounded_llm_qmap_tree_132f5a1` |
 | 平台早期实验工作区 | `/zhanghanyue/experiment/grounded_llm` |
+| 平台汉诺塔／二阶魔方 Qmap | `/zhanghanyue/experiment/grounded_llm_puzzle_qmaps`；`code/<commit>/` 保存已提交源码，`runs/` 与 `logs/` 保存生成物；复用平台项目的 `.venv/bin/python` |
 
 项目目录按 `code/`、`models/`、`maps/`、`data/`、`runs/`、`logs/` 分类。具体 run、checkpoint、数据版本、PID 与日志位置由实验 README 和忽略的 runtime 配置维护，本手册不逐次追加。
 

@@ -14,6 +14,7 @@
 | 冻结地图读取接口 | 既定训练与评测已完成，保留历史对照，不与新组直接混算 | [实验 README](../experiments/flamingo_map_reader/README.md)、[报告](../experiments/flamingo_map_reader/results/report.md) |
 | 独立无地图任务 SFT | 历史强基线；已保存完整断点并退出，为新评测释放资源 | [协议](../experiments/llm_task_sft/README.md)、[总报告](../experiments/llm_task_sft/results/report.md) |
 | 棋盘状态地图 | 提供冻结 Q 和独立地图贪心参照 | [协议与来源](../experiments/blocks_distance_map/README.md) |
+| 汉诺塔／二阶魔方地图 | 新任务环境、完整精确求解器与数据／Q 训练管线已实现；在指定平台开发机验证首轮地图，不包含联合 LLM 训练 | [汉诺塔](../experiments/hanoi_qmap/README.md)、[魔方](../experiments/cube2_qmap/README.md)、[共享核心](../experiments/puzzle_qmap/README.md) |
 | 寻路接口与早期方案 | 作为机制和任务边界的历史证据 | [实验目录](../experiments/README.md) |
 
 ## 3. 已确定的比较原则
@@ -29,7 +30,7 @@
 2. **验证 10,000 条 B2。**检查数据缩减后到达率能否仍达九十多；后续数据不强制全部最短。
 3. **补 7B CoT 全参 SFT 基线。**会议规格见讨论稿；后续考虑地图组“排序＋A”、无地图组“CoT＋A”。
 4. **调研 FLAN。**确认数据与任务划分、实现和训练环境、迁移范围，以及泛化与遗忘的关系。
-5. **扩充任务并推进联合训练。**已有寻路、积木，计划加汉诺塔；再选两种，候选为 3×3 华容道类任务、2×2 魔方，同时寻找其他选择。先确认地图可解，再验证全参训练可行；按会议蓝图评测两层泛化。
+5. **扩充任务并推进联合训练。**已有寻路、积木；按用户要求先完成三层汉诺塔和二阶魔方 Qmap，分别验证关系几何、动作转移与纯地图连续到达。其结果支持到什么程度，再决定接入联合 SFT；3×3 华容道类任务等仍为候选。按会议蓝图评测两层泛化。
 
 ## 5. 文档入口与历史证据
 

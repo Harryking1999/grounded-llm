@@ -1,0 +1,134 @@
+"""One small Q-only pipeline: exact data -> train -> frozen evaluation/export."""
+import argparse
+import json
+from pathlib import Path
+import time
+
+import numpy as np
+import torch
+from torch.nn import functional as F
+
+from .data import build
+from .evaluate import decisions, encode, evaluate, pair_metrics
+from .model import QMap, distance
+from .tasks import make_environment
+
+
+def train(env, config, data, out, device, source_commit):
+    torch.manual_seed(config["seed"])
+    rng = np.random.default_rng(config["seed"] + 1)
+    options = config["training"]
+    torch.set_num_threads(options["cpu_threads"])
+    model = QMap(env.feature_dim, len(env.actions), **config["model"], diameter=env.diameter).to(device)
+    optimizer = torch.optim.Adam(model.parameters(), lr=options["learning_rate"])
+    pairs = data["pairs_train"]
+    tasks, children = data["tasks_train"], data["children_train"]
+    edges = data["transitions_train"]
+
+    # Features only: validation/test labels never enter this training store.
+    ids = np.unique(np.concatenate((pairs[:, :2].ravel(), tasks.ravel(), children[children >= 0], edges[:, [0, 2]].ravel())))
+    lookup = np.full(env.size, -1, dtype=np.int64)
+    lookup[ids] = np.arange(len(ids))
+    features = torch.as_tensor(env.features(ids), device=device)
+
+    def q(states):
+        indices = lookup[states]
+        if np.any(indices < 0):
+            raise ValueError("State outside the training feature store")
+        return model.encode(features[torch.as_tensor(indices, device=device)])
+
+    def validate():
+        model.eval()
+        metrics = pair_metrics(model, env, data["pairs_validation"], device)
+        actions = decisions(model, env, data["tasks_validation"][:config["evaluation"]["decision_count"]], device)
+        score = metrics["mae"] + options["rank_weight"] * (1 - actions["q"]["shortest_action_rate"])
+        return score, metrics, actions["q"]
+
+    started = time.monotonic()
+    initial_score, initial_pairs, initial_decisions = validate()
+    initial_test = evaluate(model, env, data, config, device)
+    best, best_step, stale = float("inf"), 0, 0
+    with (out / "progress.jsonl").open("w") as log:
+        for step in range(1, options["steps"] + 1):
+            model.train()
+            sampled = pairs[rng.integers(len(pairs), size=options["batch_size"])]
+            pair_loss = F.smooth_l1_loss(distance(q(sampled[:, 0]), q(sampled[:, 1])),
+                                         torch.as_tensor(sampled[:, 2], dtype=torch.float32, device=device))
+            idx = rng.integers(len(tasks), size=options["decision_batch_size"])
+            candidate = children[idx]
+            valid = torch.as_tensor(candidate >= 0, device=device)
+            # Use an actual training parent for padding, never an arbitrary heldout ID.
+            safe = np.where(candidate >= 0, candidate, tasks[idx, 0, None])
+            candidate_q = q(safe)
+            goal_q = q(tasks[idx, 1])
+            scores = distance(candidate_q, goal_q[:, None])
+            truth = torch.as_tensor(data["child_distances_train"][idx], device=device)
+            good = (truth == truth.min(dim=1, keepdim=True).values) & valid
+            logits = (-scores / options["rank_temperature"]).masked_fill(~valid, -torch.inf)
+            rank_loss = (logits.logsumexp(dim=1) - logits.masked_fill(~good, -torch.inf).logsumexp(dim=1)).mean()
+            sampled_edges = edges[rng.integers(len(edges), size=options["transition_batch_size"])]
+            source_q, target_q = q(sampled_edges[:, 0]), q(sampled_edges[:, 2])
+            predicted_q = model.predict_next(source_q, torch.as_tensor(sampled_edges[:, 1], device=device))
+            transition_loss = F.mse_loss(predicted_q, target_q.detach()) / env.diameter**2
+            loss = pair_loss + options["rank_weight"] * rank_loss + options["transition_weight"] * transition_loss
+            optimizer.zero_grad(set_to_none=True)
+            loss.backward()
+            torch.nn.utils.clip_grad_norm_(model.parameters(), 5.0)
+            optimizer.step()
+            if step == 1 or step % options["eval_every"] == 0 or step == options["steps"]:
+                score, metrics, actions = validate()
+                if score < best - options["min_improvement"]:
+                    best, best_step, stale = score, step, 0
+                    torch.save({"task": env.name, "actions": list(env.actions), "model": model.state_dict(),
+                                "model_config": config["model"], "config": config, "source_commit": source_commit,
+                                "step": step, "optimizer": optimizer.state_dict()}, out / "best.pt")
+                else:
+                    stale += 1
+                record = {"step": step, "seconds": round(time.monotonic() - started, 2),
+                          "distance_loss": float(pair_loss.detach()), "rank_loss": float(rank_loss.detach()),
+                          "transition_loss": float(transition_loss.detach()), "validation_mae": metrics["mae"],
+                          "validation_shortest_action_rate": actions["shortest_action_rate"],
+                          "validation_objective": score, "best_step": best_step}
+                log.write(json.dumps(record) + "\n")
+                log.flush()
+                print(json.dumps(record), flush=True)
+                if stale >= options["patience"]:
+                    break
+    saved = torch.load(out / "best.pt", map_location=device, weights_only=False)
+    model.load_state_dict(saved["model"])
+    result = {"task": env.name, "source_commit": source_commit, "best_step": best_step, "last_step": step,
+              "training_seconds": round(time.monotonic() - started, 2), "device": str(device),
+              "torch_version": torch.__version__, "numpy_version": np.__version__,
+              "selection": "validation MAE + rank_weight * (1 - validation shortest-action rate)",
+              "initial_validation_objective": initial_score, "initial_validation_pairs": initial_pairs,
+              "initial_validation_decisions": initial_decisions, "initial": initial_test,
+              "final": evaluate(model, env, data, config, device)}
+    # Compact interface examples, not an oracle table disguised as learned Q.
+    export_ids = np.arange(env.size) if env.size < 1000 else np.unique(data["pairs_test"][:2048, :2])
+    np.savez_compressed(out / "q_vectors.npz", states=export_ids, q=encode(model, env, export_ids, device).cpu().numpy())
+    (out / "summary.json").write_text(json.dumps(result, indent=2) + "\n")
+    return result
+
+
+def main():
+    parser = argparse.ArgumentParser(__doc__)
+    parser.add_argument("--config", type=Path, required=True)
+    parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument("--source-commit", required=True)
+    parser.add_argument("--device", default="cpu")
+    args = parser.parse_args()
+    config = json.loads(args.config.read_text(encoding="utf-8"))
+    args.out.mkdir(parents=True, exist_ok=False)
+    (args.out / "config.json").write_text(json.dumps(config, indent=2) + "\n")
+    env = make_environment(config["task"], args.out / "oracle_depth.npy")
+    if env.name == "cube2":
+        env.build_oracle(args.out / "oracle_depth.npy")
+    data, summary = build(env, config, args.out)
+    print(json.dumps({"data": summary}), flush=True)
+    result = train(env, config, data, args.out, args.device, args.source_commit)
+    print(json.dumps({"complete": str(args.out), "best_step": result["best_step"],
+                      "test_rollout": result["final"]["test"]["rollout"]}), flush=True)
+
+
+if __name__ == "__main__":
+    main()

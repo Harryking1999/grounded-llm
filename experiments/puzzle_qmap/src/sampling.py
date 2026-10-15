@@ -2,6 +2,58 @@
 import numpy as np
 
 
+class StratifiedEpochSampler:
+    """Equal layer quotas, with an independent shuffled epoch in every layer."""
+    def __init__(self, labels, rng):
+        labels = np.asarray(labels)
+        if labels.ndim != 1 or not len(labels) or np.any(labels < 0):
+            raise ValueError("Expected nonempty nonnegative distance labels")
+        self.rng = rng
+        self.levels = np.unique(labels)
+        self.orders = [rng.permutation(np.flatnonzero(labels == level)) for level in self.levels]
+        self.positions = np.zeros(len(self.levels), dtype=int)
+        self.drawn = np.zeros(len(self.levels), dtype=np.int64)
+        self.offset = 0
+
+    @property
+    def passes(self):
+        return min(self.drawn[i] / len(order) for i, order in enumerate(self.orders))
+
+    def coverage(self):
+        return {str(level): {"rows": len(order), "draws": int(self.drawn[i]),
+                             "passes": float(self.drawn[i] / len(order))}
+                for i, (level, order) in enumerate(zip(self.levels, self.orders))}
+
+    def steps_for_passes(self, batch_size, passes):
+        # Rotating remainder quotas make cumulative layer counts differ by <= 1.
+        required = max(int(np.ceil(passes * len(order))) for order in self.orders)
+        return int(np.ceil(len(self.levels) * required / batch_size))
+
+    def draw(self, count):
+        if count <= 0:
+            raise ValueError("Batch size must be positive")
+        quotas = np.full(len(self.levels), count // len(self.levels))
+        remainder = count % len(self.levels)
+        quotas[(self.offset + np.arange(remainder)) % len(self.levels)] += 1
+        self.offset = (self.offset + remainder) % len(self.levels)
+        pieces = []
+        for i, quota in enumerate(quotas):
+            remaining = int(quota)
+            while remaining:
+                order, start = self.orders[i], self.positions[i]
+                n = min(remaining, len(order) - start)
+                pieces.append(order[start:start + n])
+                self.positions[i] += n
+                self.drawn[i] += n
+                remaining -= n
+                if self.positions[i] == len(order):
+                    self.orders[i] = self.rng.permutation(order)
+                    self.positions[i] = 0
+        result = np.concatenate(pieces)
+        self.rng.shuffle(result)
+        return result
+
+
 class CoverageSampler:
     def __init__(self, labels, rng, broad_count, broad_fraction, context_start=None, context_fraction=0):
         self.rng, self.broad_count = rng, int(broad_count)

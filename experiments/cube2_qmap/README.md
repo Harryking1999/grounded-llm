@@ -4,6 +4,14 @@
 
 针对旧数据的覆盖缺口，新一轮使用 [breadth_depth.json](configs/breadth_depth.json)，第一性原理推导、覆盖审计、深路径与完整分叉、评测边界见 [DATA_DESIGN.md](DATA_DESIGN.md)。旧 `study.json` 保留为已有纯 Q 结果的合同，不覆盖旧产物。
 
+用户确认后的分层均衡续训使用 [balanced_epochs.json](configs/balanced_epochs.json)：固定复用广深数据及纯 Q／Adam，距离对按真距离、排序组按父状态真距离分层；每批等额配给，余数轮换，每层独立无放回遍历后重排。完整候选软目标与两个损失的权重均保持原定义。学习率逐渐降低，执行完整提高后的预算；各层实际覆盖轮次单独记录。起始权重参与验证选择，另存末步权重，避免覆盖门槛排除更好的早期模型。正式预算、最低覆盖与学习率只维护在配置中。
+
+```bash
+python -m experiments.puzzle_qmap.src.run --config experiments/cube2_qmap/configs/balanced_epochs.json --out runs/cube2_qmap/BALANCED_RUN --source-commit COMMIT --device cuda:1 --prepared-run runs/cube2_qmap/breadth_depth --checkpoint runs/cube2_qmap/breadth_depth/best.pt
+```
+
+`--prepared-run` 复用相同的数据、oracle 与划分；`--checkpoint` 恢复 Q 和 Adam，并使用新的固定种子采样流。这不声称恢复父运行的逐步随机序列。每次验证记录固定训练监测集、分层验证动作率与学习率；测试仅在模型按验证目标选定后评估。
+
 ## 状态与动作约定
 
 采用 [Kociemba 的角块顺序与朝向定义](https://www.kociemba.org/math/cubielevel.htm)：URF/UFL/ULB/UBR/DFR/DLF/DBL/DRB。状态是八角块排列 `cp` 和八个朝向 `co`；朝向取 0/1/2，总和必须模 3 为零。二阶魔方没有棱块，**不施加三阶角块／棱块奇偶耦合限制**。

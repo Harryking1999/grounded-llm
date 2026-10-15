@@ -52,6 +52,7 @@ def audit(run, device):
     all_gold_correct = np.ones(len(current), dtype=bool)
     gold_correct_count = np.zeros(len(current), dtype=int)
     gold_by_depth = {}
+    previous = np.full(len(current), -1, dtype=np.int64)
     # Use exact labels only to specify a fixed reference trajectory. Q is scored
     # independently at every reference state, even after it would have erred.
     for _ in range(env.diameter):
@@ -62,15 +63,23 @@ def audit(run, device):
         d = env.distance(current[ids], goals[ids])
         good = env.distance(child, goals[ids, None]) == d[:, None] - 1
         chosen_good = good[np.arange(len(ids)), value.argmin(1)]
+        selected = child[np.arange(len(ids)), value.argmin(1)]
         all_gold_correct[ids] &= chosen_good
         gold_correct_count[ids] += chosen_good
         for k in np.unique(d):
-            row = gold_by_depth.setdefault(str(k), {"count": 0, "correct": 0})
+            row = gold_by_depth.setdefault(str(k), {"count": 0, "correct": 0, "optimal_actions": 0,
+                                                   "reference_predecessor_present": 0,
+                                                   "q_selects_reference_predecessor": 0})
             row["count"] += int((d == k).sum())
             row["correct"] += int(chosen_good[d == k].sum())
+            row["optimal_actions"] += int(good[d == k].sum())
+            row["reference_predecessor_present"] += int((previous[ids[d == k]] >= 0).sum())
+            row["q_selects_reference_predecessor"] += int((selected[d == k] == previous[ids[d == k]]).sum())
+        previous[ids] = current[ids]
         current[ids] = child[np.arange(len(ids)), good.argmax(1)]
     for row in gold_by_depth.values():
         row["shortest_action_rate"] = row["correct"] / row["count"]
+        row["uniform_random_shortest_rate"] = row["optimal_actions"] / (row["count"] * len(env.actions))
 
     current = roll_tasks[:, 0].copy()
     active = current != goals

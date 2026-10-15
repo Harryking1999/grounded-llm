@@ -53,9 +53,40 @@ def plot(run, output):
     return entropy
 
 
+def plot_progress(control, treatment, output):
+    fig, axes = plt.subplots(2, 2, figsize=(10, 6), constrained_layout=True)
+    for run, color, label in ((control, "#2166ac", "Absolute-distance control"),
+                              (treatment, "#b35806", "Edge-difference supervision")):
+        summary = json.loads((run / "summary.json").read_text())
+        rows = [json.loads(line) for line in (run / "progress.jsonl").read_text().splitlines()]
+        step = np.array([row["step"] for row in rows]) / 1000
+        series = ([row["validation_edge_difference_huber"] for row in rows],
+                  [row["validation_soft_rank_loss"] for row in rows],
+                  np.array([row["validation_shortest_action_rate"] for row in rows]) * 100,
+                  [row["validation_huber"] for row in rows])
+        for ax, values in zip(axes.ravel(), series):
+            ax.plot(step, values, color=color, label=label, linewidth=1.7)
+        axes[1, 0].axvline(summary["best_step"] / 1000, color=color, linestyle=":", linewidth=1)
+    for ax, title, ylabel in zip(axes.ravel(),
+        ("Validation edge-difference Huber", "Validation full soft ranking CE",
+         "Validation shortest-action rate", "Validation absolute-distance Huber"),
+        ("Loss", "Loss", "Percent", "Loss")):
+        ax.set(xlabel="Additional updates (thousands)", ylabel=ylabel, title=title)
+        ax.spines[["top", "right"]].set_visible(False)
+        ax.grid(axis="y", color="0.9", linewidth=.6)
+    axes[0, 0].legend(frameon=False, fontsize=8)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(output, dpi=160)
+    plt.close(fig)
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(__doc__)
     parser.add_argument("--run", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--control", type=Path, help="Plot a matched progress-supervision comparison")
     args = parser.parse_args()
-    print(json.dumps({"validation_target_entropy": plot(args.run, args.output)}))
+    if args.control is None:
+        print(json.dumps({"validation_target_entropy": plot(args.run, args.output)}))
+    else:
+        plot_progress(args.control, args.run, args.output)

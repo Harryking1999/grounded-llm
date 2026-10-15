@@ -13,8 +13,13 @@
     "minimum_full_passes": 0.25
   },
   "conditions": {
-    "absolute_control": "absolute",
-    "edge_difference": "edge_difference"
+    "absolute_control": {"distance_supervision": "absolute"},
+    "edge_difference": {"distance_supervision": "edge_difference"},
+    "progress_margin": {
+      "distance_supervision": "absolute",
+      "progress_margin_weight": 1.0,
+      "progress_margin": 1.0
+    }
   },
-  "comparison": "same Q and Adam initialization, online random stream, rules, protected endpoints, update budget, learning-rate schedule and validation selection; only distance Huber target changes"
+  "comparison": "same Q and Adam initialization, online random stream, rules, protected endpoints, update budget, learning-rate schedule and validation selection; edge_difference replaces the distance Huber target, progress_margin retains both baseline losses and adds a worst violated shortest-successor inequality"
 }

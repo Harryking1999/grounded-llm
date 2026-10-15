@@ -17,6 +17,8 @@ python -m experiments.cube2_qmap.src.compare --run runs/cube2_quarter_turn_RUN -
 
 六动作首轮已经完成，完整 loss 曲线及单步／循环分析见 [结果报告](results/report.md)、[紧凑证据](results/quarter_turn_summary.json)。用户随后要求针对错误排序造成的往返循环修复，匹配续训合同为 [quarter_turn_progress.json](configs/quarter_turn_progress.json)。两组从同一个六动作 Q／Adam 开始，共用在线流和验证选择；对照继续绝对距离 Huber，干预将它替换为所有真实动作边的距离差 Huber。完整软排序及 Q 参数结构均不变。两组共同按验证最短动作率最大值选模型，平局保留较早 checkpoint，初始权重可获选；末步另报，不按测试结果改选。
 
+距离差替换的匹配结果没有修复长程失败，随后按用户的针对性修复要求检验 `progress_margin` 条件：恢复绝对距离 Huber，保留完整软排序，再监督“至少一个真实最优后继比当前状态更近，并领先最佳错误候选”。这是新增的第三项损失，具体定义及失败动机见数据设计；模型参数和推理器仍不变。该条件从同一初始权重与 Adam 开始，复用原匹配对照，不沿测试表现选择起点。
+
 ```bash
 python -m experiments.cube2_qmap.src.progress_experiment --contract experiments/cube2_qmap/configs/quarter_turn_progress.json --condition edge_difference --out runs/cube2_progress_RUN --source-commit COMMIT --device cuda:1
 python -m experiments.cube2_qmap.src.decision_audit --run runs/cube2_progress_RUN --device cuda:1

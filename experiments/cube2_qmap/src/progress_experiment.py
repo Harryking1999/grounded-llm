@@ -9,7 +9,7 @@ import sys
 def materialize(contract, condition):
     config = json.loads(Path(contract["base_config"]).read_text())
     config["training"].update(contract["training"])
-    config["training"]["distance_supervision"] = contract["conditions"][condition]
+    config["training"].update(contract["conditions"][condition])
     config["sampling"].update(contract["sampling"])
     return config
 

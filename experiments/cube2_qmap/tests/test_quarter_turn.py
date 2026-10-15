@@ -11,7 +11,7 @@ import torch
 from experiments.cube2_qmap.src.environment import Cube2
 from experiments.cube2_qmap.src.local_graph import LocalGraphSampler, build_local_graph, local_template
 from experiments.puzzle_qmap.src.data import cube_pairs
-from experiments.puzzle_qmap.src.model import MapReader, edge_difference_loss
+from experiments.puzzle_qmap.src.model import MapReader, edge_difference_loss, progress_margin_loss
 from experiments.puzzle_qmap.src.run import train
 
 
@@ -65,6 +65,22 @@ class QuarterTurnTest(unittest.TestCase):
         torch.testing.assert_close(loss, shifted)
         perfect = edge_difference_loss(torch.tensor([3.]), truth.float(), torch.tensor([3]), truth, valid)
         self.assertEqual(float(perfect), 0)
+
+    def test_margin_rejects_a_false_nonterminal_minimum_and_wrong_order(self):
+        parent = torch.tensor([3.584487], requires_grad=True)
+        children = torch.tensor([[3.270956, 4.014374]], requires_grad=True)
+        truth, valid = torch.tensor([[4, 2]]), torch.tensor([[True, True]])
+        loss = progress_margin_loss(parent, children, torch.tensor([3]), truth, valid, 1.)
+        loss.backward()
+        self.assertGreater(float(loss.detach()), 0)
+        self.assertLess(float(children.grad[0, 0]), 0)
+        self.assertGreater(float(children.grad[0, 1]), 0)
+        exact = progress_margin_loss(torch.tensor([3.]), truth.float(), torch.tensor([3]), truth, valid, 1.)
+        self.assertEqual(float(exact), 0)
+        # At a maximum depth all actions may be shortest; descent still applies.
+        all_good = progress_margin_loss(torch.tensor([4.]), torch.tensor([[3., 3.]]),
+                                       torch.tensor([4]), torch.tensor([[3, 3]]), valid, 1.)
+        self.assertEqual(float(all_good), 0)
 
     def test_complete_shared_graph_fresh_pose_labels_and_holdout(self):
         env, config = self.env, self.config
@@ -142,6 +158,12 @@ class QuarterTurnTest(unittest.TestCase):
             self.assertIn("validation_edge_difference_huber", records[-1])
             self.assertIn("edge_difference_huber", continued["initial_training_monitor"])
             self.assertIn("earliest maximum", continued["selection"])
+            margin = root / "margin"
+            margin.mkdir()
+            config["training"].update(distance_supervision="absolute", progress_margin_weight=1., progress_margin=1.)
+            train(env, config, data, margin, "cpu", "margin-smoke", root / "best.pt")
+            record = json.loads((margin / "progress.jsonl").read_text().splitlines()[-1])
+            self.assertGreaterEqual(record["progress_margin_loss"], 0)
 
 
 if __name__ == "__main__":

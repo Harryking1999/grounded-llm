@@ -11,7 +11,7 @@ from torch.nn import functional as F
 
 from .data import build
 from .evaluate import decisions, encode, evaluate, pair_metrics, ranking_loss, progress_loss, task_indices
-from .model import MODEL_TYPE, QMap, distance, soft_rank_loss, edge_difference_loss
+from .model import MODEL_TYPE, QMap, distance, soft_rank_loss, edge_difference_loss, progress_margin_loss
 from .sampling import CoverageSampler, StratifiedEpochSampler
 from .tasks import make_environment
 
@@ -25,6 +25,9 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
         raise ValueError("Unknown distance supervision")
     if supervision == "edge_difference" and config["data"].get("builder") != "local_graph":
         raise ValueError("Edge-difference training requires complete local graphs")
+    if options.get("progress_margin_weight", 0) and (config["data"].get("builder") != "local_graph" or
+                                                    "distance_supervision" not in options):
+        raise ValueError("Progress margin requires the explicit local-graph supervision contract")
     torch.set_num_threads(options["cpu_threads"])
     model = QMap(env.feature_dim, **config["model"], cap=env.diameter).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=options["learning_rate"])
@@ -127,6 +130,10 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
             if supervision == "edge_difference":
                 loss = metrics["edge_difference_huber"]
         score = loss + options["rank_weight"] * rank
+        if options.get("progress_margin_weight", 0):
+            metrics["progress_margin"] = progress_loss(model, env, val_tasks,
+                data["child_distances_validation"][val_idx], device, options["progress_margin"])
+            score += options["progress_margin_weight"] * metrics["progress_margin"]
         if options.get("selection_metric") == "shortest_action_rate":
             score = -actions["q"]["shortest_action_rate"]
         return score, metrics, actions["q"], rank
@@ -148,6 +155,9 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
             result["edge_difference_huber"] = progress_loss(model, env, probe_tasks, truth, device)
             if supervision == "edge_difference":
                 result["objective"] = result["edge_difference_huber"] + options["rank_weight"] * rank
+        if options.get("progress_margin_weight", 0):
+            result["progress_margin"] = progress_loss(model, env, probe_tasks, truth, device, options["progress_margin"])
+            result["objective"] += options["progress_margin_weight"] * result["progress_margin"]
         return result
 
     def save(step, destination):
@@ -186,6 +196,10 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
                     absolute_loss = pair_loss
                     if supervision == "edge_difference":
                         pair_loss = edge_loss
+                if options.get("progress_margin_weight", 0):
+                    margin_loss = progress_margin_loss(parent_scores, scores,
+                        torch.as_tensor(batch["parent_distances"], device=device), truth, valid,
+                        options["progress_margin"])
             else:
                 sampled_ids = (pair_sampler.draw(options["batch_size"]) if pair_sampler is not None
                                else rng.integers(len(pairs), size=options["batch_size"]))
@@ -204,6 +218,8 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
                 truth = torch.as_tensor(data["child_distances_train"][idx], device=device)
             rank_loss = soft_rank_loss(scores, truth, valid, options["rank_temperature"])
             loss = pair_loss + options["rank_weight"] * rank_loss
+            if options.get("progress_margin_weight", 0):
+                loss = loss + options["progress_margin_weight"] * margin_loss
             optimizer.zero_grad(set_to_none=True)
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), 5.0)
@@ -233,6 +249,9 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
                                   edge_difference_loss=float(edge_loss.detach()),
                                   validation_edge_difference_huber=metrics["edge_difference_huber"],
                                   distance_supervision=supervision)
+                if options.get("progress_margin_weight", 0):
+                    record["progress_margin_loss"] = float(margin_loss.detach())
+                    record["validation_progress_margin"] = metrics["progress_margin"]
                 if probe_pairs is not None:
                     record["training_monitor"] = training_monitor()
                     val_tasks = data["tasks_validation"][val_idx]

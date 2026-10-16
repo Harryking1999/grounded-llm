@@ -1,11 +1,12 @@
 """Coverage and leakage checks for the relational split, on an exact small graph."""
 import unittest
+import copy
 
 import numpy as np
 import torch
 
 from experiments.cube2_qmap.src.full_state_joint import (
-    FullStateSampler, RelationGuard, batch_losses, fixed_batch, sample_tasks, task_pairs)
+    FullStateSampler, RelationGuard, batch_losses, fixed_batch, restore_sampler, sample_tasks, task_pairs)
 from experiments.puzzle_qmap.src.model import QMap
 
 
@@ -83,6 +84,33 @@ class FullStateTests(unittest.TestCase):
         self.assertEqual(len(batch["pairs"]), len(tasks) * (1 + len(self.env.actions)))
         self.assertTrue(all(torch.isfinite(p.grad).all() for p in model.parameters()))
         self.assertGreater(sum(float(p.grad.abs().sum()) for p in model.parameters()), 0)
+
+    def test_new_and_legacy_resume_preserve_next_epoch_samples(self):
+        guard = RelationGuard(self.env.size, np.empty((0, 2)))
+        original = FullStateSampler(self.env, self.config, guard, self.layers)
+        for _ in range(2):
+            for parents in original.batches():
+                original.draw(parents)
+        saved = {"epoch": 2, "step": 12, "coverage": original.coverage()}
+        for legacy in (False, True):
+            checkpoint = copy.deepcopy(saved)
+            if not legacy:
+                checkpoint["sampler"] = original.state_dict()
+            restored = FullStateSampler(self.env, self.config, guard, self.layers)
+            self.assertEqual(restore_sampler(restored, checkpoint), (2, 12))
+            expected = FullStateSampler(self.env, self.config, guard, self.layers)
+            expected.load_state_dict(original.state_dict())
+            for a, b in zip(expected.batches(), restored.batches()):
+                np.testing.assert_array_equal(a, b)
+                aa, bb = expected.draw(a), restored.draw(b)
+                for key in aa:
+                    np.testing.assert_array_equal(aa[key], bb[key])
+
+    def test_mid_epoch_checkpoint_is_rejected(self):
+        sampler = FullStateSampler(self.env, self.config, RelationGuard(self.env.size, np.empty((0, 2))), self.layers)
+        sampler.draw(np.arange(8))
+        with self.assertRaisesRegex(ValueError, "completed epoch"):
+            restore_sampler(sampler, {"epoch": 1, "step": 1, "coverage": sampler.coverage()})
 
 
 if __name__ == "__main__":

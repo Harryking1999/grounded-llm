@@ -170,6 +170,39 @@ class FullStateSampler:
                 "rejected_heldout_or_terminal_tasks": self.rejected_tasks}
 
 
+    def state_dict(self):
+        return {"rng": self.rng.bit_generator.state, "seen": self.seen.copy(),
+                "histogram": self.histogram.copy(), "parents_drawn": self.parents_drawn,
+                "rejected_tasks": self.rejected_tasks}
+
+    def load_state_dict(self, state):
+        self.rng.bit_generator.state = state["rng"]
+        self.seen = state["seen"].copy()
+        self.histogram = state["histogram"].copy()
+        self.parents_drawn = state["parents_drawn"]
+        self.rejected_tasks = state["rejected_tasks"]
+
+
+def restore_sampler(sampler, saved):
+    """Resume complete epochs; reconstruct the original two-epoch legacy RNG."""
+    epoch, step = int(saved["epoch"]), int(saved["step"])
+    width = sampler.config["training"]["parent_batch_size"]
+    if (saved["coverage"]["parent_exposures"] != epoch * sampler.env.size or
+            step != epoch * ((sampler.env.size + width - 1) // width)):
+        raise ValueError("Resume requires a completed epoch; use an epoch_N.pt checkpoint")
+    if "sampler" in saved:
+        sampler.load_state_dict(saved["sampler"])
+    else:
+        # Old weights/Adam are never updated during this deterministic replay.
+        for completed in range(epoch):
+            for parents in sampler.batches():
+                sampler.draw(parents)
+            print(json.dumps({"reconstructed_sampler_epoch": completed + 1}), flush=True)
+    if sampler.coverage() != saved["coverage"]:
+        raise ValueError("Restored sampler does not match checkpoint exposure")
+    return epoch, step
+
+
 def batch_losses(model, features, batch, config):
     q = model.encode(features)
     a, b = batch["pairs"].T
@@ -214,6 +247,7 @@ def main():
     parser.add_argument("--source-commit", required=True)
     parser.add_argument("--seed", type=int, required=True)
     parser.add_argument("--device", default="cpu")
+    parser.add_argument("--resume-run", type=Path, help="Continue its last completed-epoch checkpoint with Adam")
     parser.add_argument("--smoke-steps", type=int, default=0, help="Nonformal throughput/flow check; never reports full coverage")
     args = parser.parse_args()
     torch.set_num_threads(2)
@@ -223,12 +257,31 @@ def main():
     env = Cube2(args.inputs / "oracle_depth.npy", metric="QTM_URF_6")
     base = dict(np.load(args.inputs / "base_data.npz", allow_pickle=False))
     old = dict(np.load(args.prior_study / "data_overlap.npz", allow_pickle=False))
-    checkpoint = args.prior_study / config["initialization"]["condition"] / config["initialization"]["checkpoint"]
+    if "continuation" in config and args.resume_run is None:
+        raise ValueError("This continuation contract requires --resume-run")
+    checkpoint = (args.resume_run / "last.pt" if args.resume_run else
+                  args.prior_study / config["initialization"]["condition"] / config["initialization"]["checkpoint"])
     saved = torch.load(checkpoint, map_location="cpu", weights_only=False)
-    if saved["source_commit"] != config["initialization"]["source_commit"] or saved["seed"] != args.seed or saved["model_config"] != config["model"]:
+    expected_source = config["continuation"]["source_commit"] if args.resume_run else config["initialization"]["source_commit"]
+    if saved["source_commit"] not in (expected_source, args.source_commit) or saved["seed"] != args.seed or saved["model_config"] != config["model"]:
         raise ValueError("Wrong starting checkpoint")
     cohorts, guard, layers = prepare(env, config, base, old)
     sampler = FullStateSampler(env, config, guard, layers)
+    starting_epoch, starting_step = 0, 0
+    if args.resume_run:
+        prior_contract = json.loads((args.resume_run / "contract.json").read_text())
+        for key in ("model", "data", "evaluation"):
+            if prior_contract[key] != config[key]:
+                raise ValueError(f"Continuation changed {key}")
+        for key, value in prior_contract["training"].items():
+            if key != "epochs" and config["training"][key] != value:
+                raise ValueError(f"Continuation changed training.{key}")
+        with np.load(args.resume_run / "relations.npz", allow_pickle=False) as prior_relations:
+            for key, value in {**cohorts, "heldout_keys": guard.keys}.items():
+                np.testing.assert_array_equal(value, prior_relations[key])
+        starting_epoch, starting_step = restore_sampler(sampler, saved)
+        if starting_epoch >= config["training"]["epochs"]:
+            raise ValueError("Checkpoint already reached the requested epoch budget")
     args.out.mkdir(parents=True, exist_ok=False)
     (args.out / "contract.json").write_text(json.dumps(config, indent=2) + "\n")
     np.savez_compressed(args.out / "relations.npz", **cohorts, heldout_keys=guard.keys)
@@ -241,16 +294,20 @@ def main():
     global_replay_features = torch.as_tensor(env.features(global_replay["states"]), device=args.device)
     opts = config["training"]
     optimizer = torch.optim.Adam(model.parameters(), lr=opts["learning_rate"])
-    started, step = time.monotonic(), 0
+    if args.resume_run:
+        optimizer.load_state_dict(saved["optimizer"])
+    started, step = time.monotonic(), starting_step
     result = {"source_commit": args.source_commit, "seed": args.seed, "smoke_steps": args.smoke_steps,
               "initial_checkpoint": str(checkpoint), "initial_source_commit": saved["source_commit"],
+              "starting_epoch": starting_epoch, "starting_step": starting_step,
+              "optimizer_restored": bool(args.resume_run),
               "heldout_relation_count": len(guard.keys), "evaluations": []}
 
     def save(path, epoch):
         torch.save({"model_type": MODEL_TYPE, "task": env.name, "actions": list(env.actions), "cap": env.diameter,
                     "model_config": config["model"], "source_commit": args.source_commit, "seed": args.seed,
                     "step": step, "epoch": epoch, "model": model.state_dict(), "optimizer": optimizer.state_dict(),
-                    "coverage": sampler.coverage()}, path)
+                    "coverage": sampler.coverage(), "sampler": sampler.state_dict()}, path)
 
     def inspect(epoch, log):
         row = {"step": step, "epoch": epoch, "seconds": time.monotonic() - started,
@@ -266,9 +323,9 @@ def main():
                           "old_routes": sum(m["initial_routes"]["solved"] for m in row["metrics"]["replay"])}), flush=True)
 
     with (args.out / "progress.jsonl").open("w") as log:
-        inspect(0, log)
-        finished_epochs = 0
-        for epoch in range(1, opts["epochs"] + 1):
+        inspect(starting_epoch, log)
+        finished_epochs = starting_epoch
+        for epoch in range(starting_epoch + 1, opts["epochs"] + 1):
             for parents in sampler.batches():
                 batch = sampler.draw(parents)
                 inputs = torch.as_tensor(env.features(batch["states"]), device=args.device)
@@ -284,7 +341,7 @@ def main():
                 torch.nn.utils.clip_grad_norm_(model.parameters(), opts["clip_norm"])
                 optimizer.step()
                 step += 1
-                if step % opts["log_every"] == 0 or (args.smoke_steps and step == args.smoke_steps):
+                if step % opts["log_every"] == 0 or (args.smoke_steps and step - starting_step == args.smoke_steps):
                     row = {"step": step, "epoch": epoch, "seconds": time.monotonic() - started,
                            "global_huber": float(huber.detach()), "global_rank": float(rank.detach()),
                            "replay_huber": float(rh.detach()), "replay_rank": float(rr.detach()),
@@ -294,8 +351,7 @@ def main():
                     print(json.dumps(row), flush=True)
                 if step % opts["evaluate_every"] == 0:
                     inspect(epoch - 1 + sampler.parents_drawn / env.size % 1, log)
-                    save(args.out / "last.pt", epoch)
-                if args.smoke_steps and step >= args.smoke_steps:
+                if args.smoke_steps and step - starting_step >= args.smoke_steps:
                     break
             if not args.smoke_steps:
                 if sampler.parents_drawn != epoch * env.size or not sampler.seen.all():
@@ -303,6 +359,7 @@ def main():
                 finished_epochs = epoch
             inspect(epoch if not args.smoke_steps else sampler.parents_drawn / env.size, log)
             save(args.out / f"epoch_{epoch}.pt", epoch)
+            save(args.out / "last.pt", finished_epochs)
             if args.smoke_steps:
                 break
         save(args.out / "last.pt", finished_epochs)

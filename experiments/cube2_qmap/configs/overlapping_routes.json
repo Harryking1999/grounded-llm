@@ -1,0 +1,16 @@
+{
+  "base_contract": "route_complete.json",
+  "hypothesis": "Interleaving optimal-route-closed multi-goal collections with shared physical states can retain learned relations and transfer to untrained relations more effectively than sequential training or disjoint interleaving.",
+  "data": {"seed": 20261019, "collections": 8, "minimum_shared_states": 7, "minimum_new_states": 40, "minimum_new_goals": 1, "maximum_pose_attempts": 4096, "validation_poses": 4, "test_poses": 8},
+  "training": {"updates_per_collection": 2000, "learning_rate": 0.0003, "eval_every": 2000, "rank_weight": 1.0, "temperature": 1.0, "clip_norm": 5.0},
+  "warmup_contract": "route_complete.json",
+  "conditions": [
+    {"name": "overlap_joint", "data_kind": "overlap", "schedule": "joint"},
+    {"name": "overlap_sequential", "data_kind": "overlap", "schedule": "sequential"},
+    {"name": "disjoint_joint", "data_kind": "disjoint", "schedule": "joint"}
+  ],
+  "evaluation": {"cross_distance_levels": [4, 5, 6, 7, 8, 9, 10], "cross_pairs_per_level": 64, "cross_decisions_per_level": 8, "stratification": "Eligible cross-pool relations may be absent at some levels. Restrict both physical cohorts to common available levels and matched counts per level; report macro averages and actual counts."},
+  "selection": "Primary comparison is the fixed final update after every collection received exactly the same number of updates. Save a secondary best by balanced full training objective only. Validation and test never select schedules, checkpoints or stopping. Use constant learning rate and fresh Adam for each branch from the identical warmup weights.",
+  "scope": "All collections reuse the same closed relative route template. Overlap means shared physical input states, not renamed identifiers. Each pool has all exact within-pool distance labels and complete action candidates. Cross-pool relations are held out from both losses and use seen physical states; a common disjoint heldout-pose cohort tests new physical inputs. Individual pools have a constructive feasible embedding, but their union is larger than 128, so exact joint feasibility is not established. Disjoint and overlapping cohorts have equal pool-label exposure but different unique-state counts.",
+  "followup": "Finish and interpret this small matched study; no automatic global sweep or new loss."
+}

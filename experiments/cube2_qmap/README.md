@@ -73,3 +73,17 @@ python -u -m experiments.cube2_qmap.src.route_complete --contract experiments/cu
 ```
 
 自由坐标仅用于有限集合诊断，不具备未见状态编码能力。覆盖路线评测中，两组均在首次进入不受监督的状态—目标决策时计为失败；从不屏蔽动作或用 oracle 纠正选择。共享编码器另行评测留出共同左乘状态集合，复用相同关系类型，不参与选模。
+
+## 重叠多目标集合、保持与推广
+
+[overlapping_routes.json](configs/overlapping_routes.json) 与 [overlapping_routes.py](src/overlapping_routes.py) 在 4090 上复现旧小地图，再从同一份权重分支比较：重叠集合交错联合训练、同批重叠集合顺序训练、无重叠集合交错联合训练。各集合共享完整路线模板，但重叠条件对齐真实父状态及其动作邻域，使新集合与某个旧集合共享物理输入状态；不只是复用编号。
+
+三条件的每集合更新次数和组内全部距离／动作标签相同，联合条件在每一轮中各访问每集合一次。新阶段统一使用全新 Adam 与常数学习率。主结果取固定预算的末步；辅助最佳点只按训练集合平均目标选择。顺序条件中尚未训练的集合会被监测，但其标签不进入当前更新。重叠和无重叠条件的不同物理输入数是干预本身的一部分，不能宣称所有信息量均匹配。
+
+评测分别报告旧集合保持、每个新集合拟合、已见状态之间未训练的新关系，以及共同的留出物理状态队列。新关系的父节点／候选到目标标签均不在任一训练集合的距离项或排序项中，所有输入却都见过；距离分层采用两个物理队列都具备的层及匹配计数。留出队列排除两种训练条件的全部输入，且不参与选模。记录实际新集合更新对旧集合损失、距离误差和动作选择的影响。
+
+```bash
+python -u -m experiments.cube2_qmap.src.overlapping_routes --contract experiments/cube2_qmap/configs/overlapping_routes.json --inputs /PATH/TO/cube2_overlap_inputs --out /NEW/RUN/seed_20261016 --source-commit COMMIT --seed 20261016 --device cuda:1
+```
+
+输入目录包含原精确 oracle、保护状态、已完成路线检查的 `base_data.npz`；权重按旧检查合同在目标机器重新训练，而非假定其他机器共享磁盘。集合个体的构造性可行性不证明超过 128 个状态的联合约束存在精确解。本轮保留原编码器、L∞ 和两项关系损失，不提供坐标答案。机器、产物及结果见[结果报告](results/report.md)。

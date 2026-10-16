@@ -12,12 +12,31 @@ def distance(source, goal, metric="l1", group_size=8):
 
 
 class QMap(StateEncoder):
-    def __init__(self, feature_dim, dimension, hidden, cap, metric="l1", group_size=8):
+    def __init__(self, feature_dim, dimension, hidden, cap, metric="l1", group_size=8, symmetry=None):
         if metric not in ("l1", "linf", "l2", "max_l1"):
             raise ValueError(f"Unknown Q distance: {metric}")
         if metric == "max_l1" and (group_size < 1 or dimension % group_size):
             raise ValueError("Q dimension must be divisible by the positive group size")
         super().__init__(dimension, hidden, cap, metric, input_dim=feature_dim, group_size=group_size)
+        if symmetry not in (None, "cube_axis_permutation_average"):
+            raise ValueError(f"Unknown Q symmetry: {symmetry}")
+        self.symmetry = symmetry
+        if symmetry is not None:
+            if feature_dim != 192 or dimension != 128 or metric != "linf":
+                raise ValueError("Cube axis projection requires 192 inputs, 128 Q channels and Linf")
+            from experiments.cube2_qmap.src.symmetry import axis_projection_indices
+            feature, align, action = axis_projection_indices()
+            for name, value in (("axis_feature_gather", feature), ("axis_output_align", align),
+                                ("axis_output_action", action)):
+                self.register_buffer(name, torch.as_tensor(value), persistent=False)
+
+    def encode(self, bits):
+        if self.symmetry is None:
+            return super().encode(bits)
+        presented = bits[..., self.axis_feature_gather]
+        encoded = super().encode(presented)
+        aligned = encoded.gather(-1, self.axis_output_align.expand_as(encoded))
+        return aligned.mean(dim=-2)
 
 
 class MapReader:

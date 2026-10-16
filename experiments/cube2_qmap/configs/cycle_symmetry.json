@@ -1,0 +1,12 @@
+{
+  "hypothesis": "Linked cycle endpoints, complete competitors, shortest exits and cross-branch targets can repair traps; exact solved-preserving axis equivariance can make those repairs transfer across presentations without identifying state Qs.",
+  "base_contract": "experiments/cube2_qmap/configs/fixed_goal.json",
+  "seed": 20261031,
+  "conditions": ["plain_base", "plain_cycles", "symmetric_base", "symmetric_cycles"],
+  "data": {"seed": 20261101, "target_distance_levels": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]},
+  "training": {"steps": 200, "parent_batch_size": 32, "balanced_replay_size": 16, "paths_per_batch": 8, "learning_rate": 0.0003, "temperature": 1.0, "global_weight": 0.1, "cycle_weight": 1.0, "clip_norm": 5.0, "exit_steps": 3, "branch_goals": 2, "packs_per_batch": 2, "cycle_candidates": 128, "pack_attempt_batches": 8, "log_every": 50, "cpu_threads": 2},
+  "evaluation": {"cycles": 32, "relations": 128},
+  "architecture": "Same 192->256->256->128 sigmoid MLP, shared across six solved-preserving presentations. Align each 128D output by 21 regular six-channel coordinate permutations plus two invariant channels, then average. Final distance is the unchanged Linf norm. Six forwards per state; floating-point tolerance applies. Plain checkpoint weights initialize the projection, but its initial predictions change and are evaluated separately. No manually assigned distance coordinates.",
+  "split": "Select frozen cycle monitors before training and protect their endpoints and complete stars. Close this mask and the historical fixed-goal mask under all six axis symmetries. Reject entire cycle packs containing a protected state. Apply the same closed mask to both control arms and all base, path, arbitrary-goal and cycle labels. Pretraining may have seen monitor relations; this measures continuation transfer and retention, not never-seen relations.",
+  "selection": "Fixed small update budget, fresh Adam for all conditions, same initial weights and matched base RNG streams. Cycle conditions add labels and compute. Report before/after per condition, including the changed projection initialization. No test-based checkpoint choice or automatic longer run. Detailed runtime output stays outside Git."
+}

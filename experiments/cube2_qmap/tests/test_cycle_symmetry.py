@@ -1,15 +1,50 @@
 import unittest
+import tempfile
+from pathlib import Path
 
 import numpy as np
 import torch
 
 from experiments.cube2_qmap.src.cycle_supervision import cycle_pack
+from experiments.cube2_qmap.src.cycle_trial import align_initialization, close_axis_mask
 from experiments.cube2_qmap.src.environment import Cube2
 from experiments.cube2_qmap.tests.test_full_state_joint import Ring
-from experiments.puzzle_qmap.src.model import QMap
+from experiments.puzzle_qmap.src.model import MODEL_TYPE, MapReader, QMap
 
 
 class CycleSymmetryTests(unittest.TestCase):
+    def test_output_relabeling_preserves_old_distances_before_projection(self):
+        env = Cube2(metric="QTM_URF_6")
+        config = {"dimension": 128, "hidden": 32, "metric": "linf"}
+        plain = QMap(env.feature_dim, **config, cap=14)
+        ids = np.random.default_rng(45).integers(env.size, size=40)
+        features = torch.as_tensor(env.features(ids))
+        old = plain.encode(features).detach()
+        state, report = align_initialization({"model": plain.state_dict(), "model_config": config, "cap": 14},
+                                              env, ids, "cpu")
+        plain.load_state_dict(state)
+        new = plain.encode(features).detach()
+        torch.testing.assert_close(plain.distance(old[:20], old[20:]), plain.distance(new[:20], new[20:]))
+        torch.testing.assert_close(new[:, 126], old[:, report["dominant_coordinate"]])
+
+    def test_checkpoint_reader_and_protected_symmetry_orbits(self):
+        env = Cube2(metric="QTM_URF_6")
+        config = {"dimension": 128, "hidden": 32, "metric": "linf",
+                  "symmetry": "cube_axis_permutation_average"}
+        model = QMap(env.feature_dim, **config, cap=14)
+        protected = np.zeros(env.size, dtype=bool)
+        protected[123456] = True
+        closed = close_axis_mask(env, protected)
+        self.assertTrue(closed[env.axis_symmetry(123456, np.arange(6))].all())
+        self.assertFalse(closed[0])
+        with tempfile.TemporaryDirectory() as directory:
+            checkpoint = Path(directory) / "q.pt"
+            torch.save({"model_type": MODEL_TYPE, "task": env.name, "actions": list(env.actions),
+                        "model_config": config, "cap": 14, "model": model.state_dict()}, checkpoint)
+            reader = MapReader(env, checkpoint)
+            expected = model.encode(torch.as_tensor(env.features([0, 123456])))
+            torch.testing.assert_close(reader.encode([0, 123456]), expected)
+
     def test_solved_center_face_symmetry_keeps_distinct_qs(self):
         torch.manual_seed(43)
         env = Cube2(metric="QTM_URF_6")

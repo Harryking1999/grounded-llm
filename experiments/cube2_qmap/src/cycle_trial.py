@@ -24,6 +24,31 @@ def close_axis_mask(env, mask):
     return closed
 
 
+@torch.no_grad()
+def align_initialization(saved, env, probe_states, device, invariant_channel=126):
+    """Move a learned channel into an invariant slot, without changing old D.
+
+    Channel selection reads old Q on training inputs only, not oracle labels.
+    The projection itself still changes distances and must be evaluated.
+    """
+    if invariant_channel not in (126, 127) or saved["model_config"]["dimension"] != 128:
+        raise ValueError("The projection has exactly two invariant slots: 126, 127")
+    plain = QMap(env.feature_dim, **saved["model_config"], cap=saved["cap"]).to(device)
+    plain.load_state_dict(saved["model"])
+    q = plain.encode(torch.as_tensor(env.features(probe_states), device=device))
+    goal = plain.encode(torch.as_tensor(env.features([0]), device=device))
+    counts = torch.bincount((q - goal).abs().argmax(-1), minlength=128).cpu().numpy()
+    dominant = int(counts.argmax())
+    permutation = torch.arange(128)
+    permutation[invariant_channel], permutation[dominant] = dominant, invariant_channel
+    state = {k: v.clone() for k, v in saved["model"].items()}
+    for key in ("network.4.weight", "network.4.bias"):
+        state[key] = state[key][permutation]
+    return state, {"dominant_coordinate": dominant, "invariant_channel": invariant_channel,
+                   "probe_states": len(probe_states), "dominant_share": float(counts.max() / len(probe_states)),
+                   "scope": "Output-row permutation preserves every original Linf distance before projection."}
+
+
 def run(config, checkpoint, oracle, policy_cache, out, source_commit, device, smoke_steps=0):
     out.mkdir(parents=True, exist_ok=False)
     (out / "contract.json").write_text(json.dumps(config, indent=2) + "\n")
@@ -67,10 +92,16 @@ def run(config, checkpoint, oracle, policy_cache, out, source_commit, device, sm
     relations = np.column_stack((selected.reshape(-1, 2), env.distance(*selected.reshape(-1, 2).T)))
     np.savez_compressed(out / "cohorts.npz", cycles=monitored, relations=relations, **cohorts)
     steps = smoke_steps or options["steps"]
+    initial_state, alignment = saved["model"], None
+    initialization = config.get("initialization")
+    if initialization:
+        probes = np.random.default_rng(config["seed"]).choice(train_states, initialization["probe_states"])
+        initial_state, alignment = align_initialization(saved, env, probes, device,
+                                                       initialization["invariant_channel"])
     result = {"source_commit": source_commit, "initial_checkpoint": str(checkpoint),
               "policy_cache": str(policy_cache), "initial_epoch": saved["epoch"],
               "smoke_steps": smoke_steps, "trainable_cycles": len(cycles),
-              "protected_states": int(protected.sum()), "conditions": {},
+              "protected_states": int(protected.sum()), "conditions": {}, "initialization_alignment": alignment,
               "scope": "Matched update counts and base batches. Cycle arms add labels and compute. "
                        "Both architectures initialize from the same weights with fresh Adam. "
                        "Historical and cycle monitors may have labels in pretraining; protected from this continuation, "
@@ -90,7 +121,12 @@ def run(config, checkpoint, oracle, policy_cache, out, source_commit, device, sm
             model_config["symmetry"] = "cube_axis_permutation_average"
         torch.manual_seed(config["seed"])
         model = QMap(env.feature_dim, **model_config, cap=saved["cap"]).to(device)
-        model.load_state_dict(saved["model"], strict=True)
+        model.load_state_dict(initial_state if symmetric else saved["model"], strict=True)
+        if symmetric and not (out / "symmetric_initial.pt").exists():
+            torch.save({"model_type": MODEL_TYPE, "task": env.name, "actions": list(env.actions),
+                        "model_config": model_config, "model": model.state_dict(), "cap": saved["cap"],
+                        "source_commit": source_commit, "steps": 0, "initial_epoch": saved["epoch"],
+                        "initialization_alignment": alignment}, out / "symmetric_initial.pt")
         optimizer = torch.optim.Adam(model.parameters(), lr=options["learning_rate"])
         rng = np.random.default_rng(config["seed"] + 1)
         cycle_rng = np.random.default_rng(config["seed"] + 2)
@@ -145,7 +181,8 @@ def run(config, checkpoint, oracle, policy_cache, out, source_commit, device, sm
         payload = {"model_type": MODEL_TYPE, "task": env.name, "actions": list(env.actions),
                    "model_config": model_config, "model": model.state_dict(), "cap": saved["cap"],
                    "source_commit": source_commit, "steps": steps, "initial_epoch": saved["epoch"],
-                   "optimizer": optimizer.state_dict(), "condition": condition, "smoke_steps": smoke_steps}
+                   "optimizer": optimizer.state_dict(), "condition": condition, "smoke_steps": smoke_steps,
+                   "initialization_alignment": alignment if symmetric else None}
         torch.save(payload, out / f"{condition}.pt")
         result["conditions"][condition] = {"initial": initial, "final": inspect(model), **counters}
         (out / "summary.json").write_text(json.dumps(result, indent=2) + "\n")

@@ -172,7 +172,8 @@ def audit_checkpoint(env, path, device, per_layer=256):
     translated = model.distance(encode(moved), encode(poses)).cpu().numpy()
     if not np.array_equal(env.distance(moved, poses), np.broadcast_to(env.depth[source, None], moved.shape)):
         raise ValueError("Common-left multiplication changed exact distance")
-    return {"checkpoint": str(path), "epoch": saved["epoch"], "source_commit": saved["source_commit"],
+    return {"checkpoint": str(path), "epoch": saved.get("epoch"), "steps": saved.get("steps"),
+            "source_commit": saved["source_commit"],
             "layers": layers,
             "axis_mean_distance_range_all_states": sum(frame_ranges) / env.size,
             "axis_sampled_states": len(sampled),

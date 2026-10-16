@@ -55,9 +55,44 @@ def inspect(model, env, restore_cohorts, arbitrary_cohorts, base, config, device
     return result
 
 
-def run(config, checkpoint, oracle, out, source_commit, device, smoke_steps=0):
+def restore_continuation(saved, prior, config, env, sampler, rng):
+    """Restore an epoch boundary, including legacy five-epoch sampler counters."""
+    previous = saved["config"]
+    for key in ("model", "seed", "data", "evaluation", "base_contract"):
+        if previous[key] != config[key]:
+            raise ValueError(f"Continuation changed {key}")
+    old_training = {k:v for k,v in previous["training"].items() if k != "epochs"}
+    new_training = {k:v for k,v in config["training"].items() if k != "epochs"}
+    if old_training != new_training:
+        raise ValueError("Continuation may change only the epoch budget")
+    epoch, step = saved["epoch"], saved["step"]
+    expected = epoch * ((env.size + config["training"]["parent_batch_size"] - 1) // config["training"]["parent_batch_size"])
+    if saved.get("smoke_steps") or epoch < 1 or step != expected or config["training"]["epochs"] <= epoch:
+        raise ValueError("Continuation requires a completed formal epoch and a larger total budget")
+    matches = [row for row in prior["evaluations"] if row["epoch"] == epoch and row["step"] == step]
+    if len(matches) != 1:
+        raise ValueError("Checkpoint has no unique matching completed evaluation")
+    row = matches[0]
+    rng.bit_generator.state = saved["rng"]
+    state = saved.get("sampler_state")
+    if state is None:
+        coverage = row["global_coverage"]
+        state = {"rng": saved["global_rng"], "seen": saved["global_seen"],
+                 "histogram": np.asarray(coverage["absolute_label_histogram"], dtype=np.int64),
+                 "parents_drawn": coverage["parent_exposures"],
+                 "rejected_tasks": coverage["rejected_heldout_or_terminal_tasks"]}
+    sampler.load_state_dict(state)
+    return row
+
+
+def run(config, checkpoint, oracle, out, source_commit, device, smoke_steps=0, resume_run=None):
     base = json.loads(Path(config["base_contract"]).read_text())
+    prior = None
+    if resume_run is not None:
+        checkpoint = resume_run / "last.pt"
     saved = torch.load(checkpoint, map_location="cpu", weights_only=False)
+    if resume_run is not None:
+        prior = json.loads((resume_run / "summary.json").read_text())
     if (saved["task"] != "cube2_qtm" or saved["model_config"] != config["model"] or
             saved.get("smoke_steps")):
         raise ValueError("Expected a matching formal Q checkpoint")
@@ -89,6 +124,21 @@ def run(config, checkpoint, oracle, out, source_commit, device, smoke_steps=0):
     seen = np.zeros(env.size, dtype=bool)
     exposed = np.zeros(env.diameter + 1, dtype=np.int64)
     path_labels = goal_labels = step = 0
+    starting_epoch = 0
+    if prior is not None:
+        row = restore_continuation(saved, prior, config, env, sampler, rng)
+        starting_epoch, step = saved["epoch"], saved["step"]
+        seen = saved["seen"].copy()
+        exposed = np.asarray(row["restoration_depth_exposures"], dtype=np.int64)
+        goal_labels, path_labels = row["restoration_labels"], row["path_labels"]
+        result.update(initial_checkpoint=prior["initial_checkpoint"],
+                      initial_source_commit=prior["initial_source_commit"],
+                      initial_epoch=prior["initial_epoch"],
+                      source_protected_fixed_goal_mask=prior["source_protected_fixed_goal_mask"],
+                      resume_run=str(resume_run), resume_source_commit=saved["source_commit"],
+                      starting_epoch=starting_epoch, starting_step=step,
+                      evaluations=[r for r in prior["evaluations"] if r["step"] < step])
+    starting_step = step
     started = time.monotonic()
 
     def record(epoch, log):
@@ -107,8 +157,8 @@ def run(config, checkpoint, oracle, out, source_commit, device, smoke_steps=0):
                           "global_validation_solved": row["metrics"]["arbitrary_goals"]["validation"]["rollout"]["solved"]}), flush=True)
 
     with (out / "progress.jsonl").open("w") as log:
-        record(0, log)
-        for epoch in range(1, options["epochs"] + 1):
+        record(starting_epoch, log)
+        for epoch in range(starting_epoch + 1, options["epochs"] + 1):
             for parents in sampler.batches():
                 replay = balanced_parents(restoration_layers, options["balanced_replay_size"],
                                            step * options["balanced_replay_size"], rng)
@@ -141,17 +191,18 @@ def run(config, checkpoint, oracle, out, source_commit, device, smoke_steps=0):
                            "global_huber": float(gh.detach()), "global_rank": float(gr.detach())}
                     log.write(json.dumps(row) + "\n");log.flush()
                     print(json.dumps(row), flush=True)
-                if smoke_steps and step >= smoke_steps:
+                if smoke_steps and step - starting_step >= smoke_steps:
                     break
-            complete_epoch = epoch if not smoke_steps else 0
+            complete_epoch = epoch if not smoke_steps else starting_epoch
             record(complete_epoch, log)
             payload = {"model_type": MODEL_TYPE, "task": env.name, "actions": list(env.actions),
                        "cap": env.diameter, "model_config": config["model"], "source_commit": source_commit,
-                       "initial_source_commit": saved["source_commit"], "seed": config["seed"],
+                       "initial_source_commit": result["initial_source_commit"], "seed": config["seed"],
                        "epoch": complete_epoch, "step": step, "smoke_steps": smoke_steps,
                        "model": model.state_dict(), "optimizer": optimizer.state_dict(),
                        "rng": rng.bit_generator.state, "global_rng": sampler.rng.bit_generator.state,
-                       "seen": seen, "global_seen": sampler.seen, "config": config}
+                       "seen": seen, "global_seen": sampler.seen,
+                       "sampler_state": sampler.state_dict(), "config": config}
             temporary = out / "last.pt.tmp"
             torch.save(payload, temporary);temporary.replace(out / "last.pt")
             if not smoke_steps:
@@ -169,9 +220,10 @@ def main():
     parser.add_argument("--source-commit", required=True)
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--smoke-steps", type=int, default=0)
+    parser.add_argument("--resume-run", type=Path)
     args = parser.parse_args()
     run(json.loads(args.contract.read_text()), args.checkpoint, args.oracle, args.out,
-        args.source_commit, args.device, args.smoke_steps)
+        args.source_commit, args.device, args.smoke_steps, args.resume_run)
 
 
 if __name__ == "__main__":

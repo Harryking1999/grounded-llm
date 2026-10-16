@@ -124,6 +124,21 @@ class BridgeTests(unittest.TestCase):
                 bridge.publish(self.files, self.source / 'weights.pt', str(self.payload / 'weights.pt'))
         self.assertFalse((self.payload / 'weights.pt.part').exists())
 
+    def test_source_retention_keeps_best_latest_and_unscored(self):
+        markers=[]
+        for step in [6250,12500,18750,25000]:
+            path=self.local/'training/B0'/f'checkpoint-{step}'
+            self.dump(path/'evaluation_ready.json',dict(baseline='B0',step=step,epoch=step/12500))
+            (path/'weights.pt').write_bytes(b'weights')
+            markers.append(path/'evaluation_ready.json')
+        # 6250 is best, 25000 latest; 18750 has no returned complete scores.
+        rows=[dict(self.row,step=6250),dict(self.row,step=12500,metrics={m:dict(tasks=510,arrival=1) for m in ['RO','TF']})]
+        self.dump(self.local/'results/B0/curve.json',rows)
+        deleted=bridge.prune_source(self.profile,self.config,markers)
+        self.assertEqual([r['step'] for r in deleted],[12500])
+        for step in [6250,18750,25000]:
+            self.assertTrue((self.local/'training/B0'/f'checkpoint-{step}'/'weights.pt').exists())
+
     def test_failure_status_and_reconnect_after_space_returns(self):
         config = self.root / 'config.json'
         self.dump(config, self.config)

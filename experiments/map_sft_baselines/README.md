@@ -67,6 +67,14 @@ python -m experiments.map_sft_baselines.src.queue evaluate --config CONFIG --dat
 
 ## 验证与结果
 
+## 10,000 条数据基线
+
+用户授权的小数据对照使用 [b2_10k.json](configs/b2_10k.json) 和 [qwen7b_ra_10k.json](configs/qwen7b_ra_10k.json)。从已验收的 50,000 条物理轨迹中，按来源棋盘及真实最短长度分层抽取，共用同一批 10,000 条轨迹；每张棋盘十条，初始即目标保持原比例。抽样不新增棋盘、不改变动作、排序标签、地图或测试题。实际目标大小和长度分布保存在数据目录的 `distribution.json`，近似匹配不意味着每一联合分布完全相同。
+
+B2 保持原 1.5B 地图全参接口与排序优先监督；7B 使用 Qwen2.5-7B-Instruct，无地图、全参、现有简短 Reason＋动作。用户确认暂不生成长 CoT，报告中应称为 7B R＋A 基线。7B 按自身 tokenizer 重新编码，输入物理轨迹相同。学习率、token 平均 CE、global batch、优化器和训练轮数沿用原合同；保存间隔按半轮随数据量缩放。7B 使用四卡 FSDP 分片，B2 使用两卡 DDP，不能把两者差异单独解释为地图因果收益。
+
+028 的 7B 仅保留最新一份完整恢复状态；完整评测回传后，推理权重仅保留最新与最高完整到达率检查点。未完成评测的权重不删除。启用时在桥接 profile 中设置 `source_retention: latest_and_best`。4090 只持有受限推理缓存，评测后先回传数字再删除缓存；每组独立目录、配置、队列与指标，不能同 50,000 条旧曲线拼接。
+
 会议讨论使用 [多基线讨论汇报](results/discussion_report.md)：集中说明数据、监督、基线、当前成绩与解释，不包含运行日志。
 
 ```bash

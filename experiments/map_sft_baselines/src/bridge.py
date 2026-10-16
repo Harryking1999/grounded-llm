@@ -74,6 +74,8 @@ def cycle(files, target, profile, config, policy, progress):
     archived = {(p.parent.parent.name, p.parent.name): p.parent / 'weights.pt' for p in ready}
     record_progress(profile, progress, phase='retention')
     progress['deleted'] = prune_completed(files, profile, config, archived)
+    if profile.get('source_retention') == 'latest_and_best':
+        progress['source_deleted'] = prune_source(profile, config, ready)
     record_progress(profile, progress, phase='weights')
     published, blocked, seen = [], [], set()
     for marker in ready:
@@ -103,6 +105,38 @@ def cycle(files, target, profile, config, policy, progress):
             break
     progress.update(published=published, blocked=blocked, phase='idle',
                     status='waiting_for_capacity' if blocked and not published else 'running')
+
+
+def prune_source(profile, config, ready):
+    """After full scores return, retain latest and best inference archives.
+
+    Pending/unscored weights are never removed. The trainer independently retains
+    the latest complete optimizer state. Metadata remains for run identity.
+    """
+    deleted=[]
+    for base in profile.get('publish_baselines', profile['baselines']):
+        markers=[p for p in ready if p.parent.parent.name==base]
+        if not markers:
+            continue
+        curve_path=profile['run_path']/'results'/base/'curve.json'
+        if not curve_path.exists():
+            continue
+        curve=json.loads(curve_path.read_text())
+        from .contract import evaluation_modes,cohort_size
+        complete=[row for row in curve if all(row.get('metrics',{}).get(m,{}).get('tasks')==cohort_size(config,m)
+                                             for m in evaluation_modes(config,base))]
+        if not complete:
+            continue
+        newest=max(json.loads(p.read_text())['step'] for p in markers)
+        best=max(complete,key=lambda row:(row['metrics']['RO']['arrival'],row['step']))['step']
+        scored={row['step'] for row in complete}
+        for marker in markers:
+            step=json.loads(marker.read_text())['step']
+            weight=marker.parent/'weights.pt'
+            if step in scored and step not in (newest,best) and weight.exists():
+                weight.unlink()
+                deleted.append(dict(baseline=base,step=step))
+    return deleted
 
 
 def run(profile_path, credentials, cycles=None):

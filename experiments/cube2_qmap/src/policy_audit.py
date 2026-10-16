@@ -50,6 +50,68 @@ def summarize_policy(env, next_state):
                          for d in range(env.diameter + 1)}}
 
 
+def two_cycle_basins(next_state):
+    """Classify eventual outcomes exactly, independent of the rollout budget.
+
+    -1 means solved, -2 means a different cycle, otherwise the smaller ID of
+    the two-cycle. Pointer doubling crosses every possible transient tail.
+    """
+    pointer = np.asarray(next_state)
+    endpoint = pointer.copy()
+    for _ in range((len(pointer) - 1).bit_length()):
+        endpoint = endpoint[endpoint]
+    two = (pointer[pointer[endpoint]] == endpoint) & (pointer[endpoint] != endpoint)
+    labels = np.full(len(pointer), -2, dtype=np.int32)
+    labels[two] = np.minimum(endpoint[two], pointer[endpoint[two]])
+    labels[endpoint == 0] = -1
+    return labels
+
+
+def cycle_diagnostics(env, height, next_state, oracle, examples=8):
+    """Locate traps and their true exits; oracle edits are diagnostic only."""
+    labels = two_cycle_basins(next_state)
+    representatives, counts = np.unique(labels[labels >= 0], return_counts=True)
+    partners = next_state[representatives]
+    low = np.where(env.depth[representatives] < env.depth[partners], representatives, partners)
+    high = np.where(low == representatives, partners, representatives)
+    if not np.all(env.depth[high].astype(int) == env.depth[low].astype(int) + 1):
+        raise ValueError("Expected quarter-turn two-cycles to join adjacent exact depths")
+    children = env.successors(low)
+    good = env.depth[children].astype(int) == env.depth[low, None].astype(int) - 1
+    best_exit = children[np.arange(len(low)), np.where(good, height[children], np.inf).argmin(-1)]
+    gap = height[best_exit] - height[high]
+    repaired = next_state.copy()
+    repaired[low] = oracle[low]
+    repaired_labels = two_cycle_basins(repaired)
+    rows = []
+    for index in np.argsort(-counts)[:examples]:
+        a, b, exit_state = map(int, (low[index], high[index], best_exit[index]))
+        rows.append({"cycle": [a, b], "true_goal_distances": [int(env.depth[a]), int(env.depth[b])],
+                     "predicted_goal_distances": [float(height[a]), float(height[b])],
+                     "basin_states": int(counts[index]), "exit": exit_state,
+                     "exit_true_goal_distance": int(env.depth[exit_state]),
+                     "exit_predicted_goal_distance": float(height[exit_state]),
+                     "exit_disadvantage": float(gap[index]),
+                     "both_complete_candidate_sets": [
+                         {"parent": parent, "children": env.successors(np.array([parent]))[0].tolist(),
+                          "true_distances": env.depth[env.successors(np.array([parent]))[0]].tolist(),
+                          "predicted_distances": height[env.successors(np.array([parent]))[0]].tolist()}
+                         for parent in (a, b)]})
+    reached = reach_within_budget(next_state, 0, 28) >= 0
+    return {"two_cycles": len(low), "two_cycle_basin_states": int((labels >= 0).sum()),
+            "other_cycle_basin_states": int((labels == -2).sum()),
+            "eventually_solved_states": int((labels == -1).sum()),
+            "solvable_but_exceed_28_steps": int(((labels == -1) & ~reached).sum()),
+            "exit_disadvantage_quantiles": np.quantile(gap, [0, .5, .9, 1]).tolist() if len(gap) else [],
+            "two_cycle_basin_states_by_lower_depth": np.bincount(
+                env.depth[low], weights=counts, minlength=env.diameter + 1).astype(int).tolist(),
+            "oracle_edit_only_current_cycle_exits_diagnostic": {
+                "edited_states": len(low), "eventually_solved_states": int((repaired_labels == -1).sum()),
+                "still_in_two_cycle_basins": int((repaired_labels >= 0).sum()),
+                "other_cycle_basin_states": int((repaired_labels == -2).sum())},
+            "largest_traps": rows}
+
+
 @torch.no_grad()
 def audit_checkpoint(env, path, device, per_layer=256):
     saved = torch.load(path, map_location="cpu", weights_only=False)
@@ -117,6 +179,7 @@ def audit_checkpoint(env, path, device, per_layer=256):
             "axis_states_correctness_changes": int((frame_good.any(-1) & ~frame_good.all(-1)).sum()),
             "common_left_mean_absolute_distance_change": float(np.abs(translated - height[source, None]).mean()),
             "baseline": summarize_policy(env, baseline),
+            "cycle_diagnostics": cycle_diagnostics(env, height, baseline, oracle),
             "symmetry_averaged_diagnostic": summarize_policy(env, symmetry_policy),
             "oracle_far_only_diagnostic": summarize_policy(env, far_repaired),
             "oracle_near_only_diagnostic": summarize_policy(env, near_repaired)}

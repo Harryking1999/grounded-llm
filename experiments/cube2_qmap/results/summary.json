@@ -772,5 +772,389 @@
     "next_decisions_without_explicit_supervision": 44,
     "those_next_decisions_with_candidates_outside_template": 44,
     "interpretation": "Original strict max-error failure and rollout failures do not establish that all finite relational structure was unlearned. Negative gradient cosine alone does not establish harmful Adam updates."
+  },
+  "overlapping_routes_4090": {
+    "training_source_commit": "2f53baab296ffacb58582ef182b817d488674cdc",
+    "evaluation_source_commit": "a020f410fac5545e9edff226c8aef9a23ffa86c2",
+    "machine": "4090; /home/gongruochen/grounded_llm; training GPUs 1-3, policy evaluation GPU 4",
+    "contract": "../configs/overlapping_routes.json",
+    "policy_contract": "../configs/overlap_policy_eval.json",
+    "primary": "fixed-budget last; no test selection",
+    "data": {
+      "overlap": {
+        "unique_states": 464,
+        "unique_goals": 16,
+        "maximum_overlap_with_a_prior_pool": [
+          0,
+          17,
+          20,
+          21,
+          8,
+          8,
+          17,
+          8
+        ]
+      },
+      "disjoint": {
+        "unique_states": 568,
+        "unique_goals": 16,
+        "maximum_overlap_with_a_prior_pool": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "scope": "One data construction, three initializations. All per-pool exposure matched. Overlap/disjoint cohorts have different physical endpoints and unique-state counts. Cross-relation distance strata/counts match; heldout physical-state tasks are common to all conditions. Warmup reproduced on 4090 from the earlier relational protocol.",
+    "seeds": {
+      "20261016": {
+        "warmup_mae": 0.013382467441260815,
+        "warmup_routes_solved": 4,
+        "warmup_new_state_test_solved": 1,
+        "conditions": {
+          "overlap_joint": {
+            "auxiliary_best_step": 16000,
+            "old_mae": 0.03165462240576744,
+            "new_pool_mean_mae": 0.05193504052502768,
+            "old_training_solved": 4,
+            "old_training_count": 4,
+            "all_training_solved": 32,
+            "all_training_count": 32,
+            "optimal_training_decisions": 184,
+            "training_decision_count": 184,
+            "novel_relations": {
+              "distance_count": 377,
+              "mae": 2.012865483286526,
+              "macro_mae": 1.8217724982116903,
+              "decision_count": 33,
+              "action_rate": 0.36363636363636365,
+              "macro_action_rate": 0.475
+            },
+            "initial_novel_macro_mae": 3.6284698406469174,
+            "novel_cross_goal_solved": 1,
+            "novel_cross_goal_count": 33,
+            "heldout_test_mae": 1.601551353931427,
+            "initial_heldout_test_mae": 2.368693485856056,
+            "heldout_test_solved": 2,
+            "heldout_test_count": 32,
+            "heldout_test_cycles": 30,
+            "heldout_test_budget_exhausted": 0,
+            "sampled_new_pool_updates": 15,
+            "old_decision_regressions_in_sampled_new_updates": 0,
+            "collection_update_range": [
+              2000,
+              2000
+            ]
+          },
+          "overlap_sequential": {
+            "auxiliary_best_step": 16000,
+            "old_mae": 1.5254544019699097,
+            "new_pool_mean_mae": 1.185769883915782,
+            "old_training_solved": 0,
+            "old_training_count": 4,
+            "all_training_solved": 8,
+            "all_training_count": 32,
+            "optimal_training_decisions": 127,
+            "training_decision_count": 184,
+            "novel_relations": {
+              "distance_count": 377,
+              "mae": 3.1525707017205438,
+              "macro_mae": 2.8072793956752085,
+              "decision_count": 33,
+              "action_rate": 0.2727272727272727,
+              "macro_action_rate": 0.225
+            },
+            "initial_novel_macro_mae": 3.6284698406469174,
+            "novel_cross_goal_solved": 0,
+            "novel_cross_goal_count": 33,
+            "heldout_test_mae": 1.9356710612773895,
+            "initial_heldout_test_mae": 2.368693485856056,
+            "heldout_test_solved": 0,
+            "heldout_test_count": 32,
+            "heldout_test_cycles": 32,
+            "heldout_test_budget_exhausted": 0,
+            "sampled_new_pool_updates": 14,
+            "old_decision_regressions_in_sampled_new_updates": 1,
+            "collection_update_range": [
+              2000,
+              2000
+            ]
+          },
+          "disjoint_joint": {
+            "auxiliary_best_step": 16000,
+            "old_mae": 0.01483425684273243,
+            "new_pool_mean_mae": 0.022118382954171727,
+            "old_training_solved": 4,
+            "old_training_count": 4,
+            "all_training_solved": 32,
+            "all_training_count": 32,
+            "optimal_training_decisions": 184,
+            "training_decision_count": 184,
+            "novel_relations": {
+              "distance_count": 377,
+              "mae": 2.61806268590831,
+              "macro_mae": 2.3128689279889363,
+              "decision_count": 33,
+              "action_rate": 0.3333333333333333,
+              "macro_action_rate": 0.45
+            },
+            "initial_novel_macro_mae": 3.961065297231537,
+            "novel_cross_goal_solved": 0,
+            "novel_cross_goal_count": 33,
+            "heldout_test_mae": 1.6669060587882996,
+            "initial_heldout_test_mae": 2.368693485856056,
+            "heldout_test_solved": 1,
+            "heldout_test_count": 32,
+            "heldout_test_cycles": 31,
+            "heldout_test_budget_exhausted": 0,
+            "sampled_new_pool_updates": 15,
+            "old_decision_regressions_in_sampled_new_updates": 0,
+            "collection_update_range": [
+              2000,
+              2000
+            ]
+          }
+        }
+      },
+      "20261017": {
+        "warmup_mae": 0.021866176277399063,
+        "warmup_routes_solved": 4,
+        "warmup_new_state_test_solved": 1,
+        "conditions": {
+          "overlap_joint": {
+            "auxiliary_best_step": 16000,
+            "old_mae": 0.023733852431178093,
+            "new_pool_mean_mae": 0.0376688614487648,
+            "old_training_solved": 4,
+            "old_training_count": 4,
+            "all_training_solved": 32,
+            "all_training_count": 32,
+            "optimal_training_decisions": 184,
+            "training_decision_count": 184,
+            "novel_relations": {
+              "distance_count": 377,
+              "mae": 1.9375906439611703,
+              "macro_mae": 1.7092173066751963,
+              "decision_count": 33,
+              "action_rate": 0.42424242424242425,
+              "macro_action_rate": 0.525
+            },
+            "initial_novel_macro_mae": 3.6566120361601437,
+            "novel_cross_goal_solved": 3,
+            "novel_cross_goal_count": 33,
+            "heldout_test_mae": 1.5648184716701508,
+            "initial_heldout_test_mae": 2.425756484270096,
+            "heldout_test_solved": 1,
+            "heldout_test_count": 32,
+            "heldout_test_cycles": 31,
+            "heldout_test_budget_exhausted": 0,
+            "sampled_new_pool_updates": 15,
+            "old_decision_regressions_in_sampled_new_updates": 0,
+            "collection_update_range": [
+              2000,
+              2000
+            ]
+          },
+          "overlap_sequential": {
+            "auxiliary_best_step": 14001,
+            "old_mae": 1.5749142169952393,
+            "new_pool_mean_mae": 1.1755734062088388,
+            "old_training_solved": 1,
+            "old_training_count": 4,
+            "all_training_solved": 12,
+            "all_training_count": 32,
+            "optimal_training_decisions": 132,
+            "training_decision_count": 184,
+            "novel_relations": {
+              "distance_count": 377,
+              "mae": 2.981601006788664,
+              "macro_mae": 2.675256452348386,
+              "decision_count": 33,
+              "action_rate": 0.42424242424242425,
+              "macro_action_rate": 0.525
+            },
+            "initial_novel_macro_mae": 3.6566120361601437,
+            "novel_cross_goal_solved": 0,
+            "novel_cross_goal_count": 33,
+            "heldout_test_mae": 1.9972606748342514,
+            "initial_heldout_test_mae": 2.425756484270096,
+            "heldout_test_solved": 3,
+            "heldout_test_count": 32,
+            "heldout_test_cycles": 29,
+            "heldout_test_budget_exhausted": 0,
+            "sampled_new_pool_updates": 14,
+            "old_decision_regressions_in_sampled_new_updates": 0,
+            "collection_update_range": [
+              2000,
+              2000
+            ]
+          },
+          "disjoint_joint": {
+            "auxiliary_best_step": 16000,
+            "old_mae": 0.015466256067156792,
+            "new_pool_mean_mae": 0.02690184728375503,
+            "old_training_solved": 4,
+            "old_training_count": 4,
+            "all_training_solved": 32,
+            "all_training_count": 32,
+            "optimal_training_decisions": 184,
+            "training_decision_count": 184,
+            "novel_relations": {
+              "distance_count": 377,
+              "mae": 2.5680938437383434,
+              "macro_mae": 2.303800358157866,
+              "decision_count": 33,
+              "action_rate": 0.2727272727272727,
+              "macro_action_rate": 0.225
+            },
+            "initial_novel_macro_mae": 4.044578109740042,
+            "novel_cross_goal_solved": 0,
+            "novel_cross_goal_count": 33,
+            "heldout_test_mae": 1.6418448239564896,
+            "initial_heldout_test_mae": 2.425756484270096,
+            "heldout_test_solved": 2,
+            "heldout_test_count": 32,
+            "heldout_test_cycles": 30,
+            "heldout_test_budget_exhausted": 0,
+            "sampled_new_pool_updates": 15,
+            "old_decision_regressions_in_sampled_new_updates": 0,
+            "collection_update_range": [
+              2000,
+              2000
+            ]
+          }
+        }
+      },
+      "20261018": {
+        "warmup_mae": 0.017023129388689995,
+        "warmup_routes_solved": 4,
+        "warmup_new_state_test_solved": 1,
+        "conditions": {
+          "overlap_joint": {
+            "auxiliary_best_step": 16000,
+            "old_mae": 0.035759009420871735,
+            "new_pool_mean_mae": 0.03050678702337401,
+            "old_training_solved": 4,
+            "old_training_count": 4,
+            "all_training_solved": 32,
+            "all_training_count": 32,
+            "optimal_training_decisions": 184,
+            "training_decision_count": 184,
+            "novel_relations": {
+              "distance_count": 377,
+              "mae": 1.8704276097548103,
+              "macro_mae": 1.6258234473399256,
+              "decision_count": 33,
+              "action_rate": 0.3939393939393939,
+              "macro_action_rate": 0.325
+            },
+            "initial_novel_macro_mae": 3.6150962955915795,
+            "novel_cross_goal_solved": 2,
+            "novel_cross_goal_count": 33,
+            "heldout_test_mae": 1.5684182345867157,
+            "initial_heldout_test_mae": 2.380816489458084,
+            "heldout_test_solved": 1,
+            "heldout_test_count": 32,
+            "heldout_test_cycles": 31,
+            "heldout_test_budget_exhausted": 0,
+            "sampled_new_pool_updates": 15,
+            "old_decision_regressions_in_sampled_new_updates": 0,
+            "collection_update_range": [
+              2000,
+              2000
+            ]
+          },
+          "overlap_sequential": {
+            "auxiliary_best_step": 14001,
+            "old_mae": 1.580420732498169,
+            "new_pool_mean_mae": 1.1579420457461052,
+            "old_training_solved": 0,
+            "old_training_count": 4,
+            "all_training_solved": 12,
+            "all_training_count": 32,
+            "optimal_training_decisions": 134,
+            "training_decision_count": 184,
+            "novel_relations": {
+              "distance_count": 377,
+              "mae": 3.1961957693732383,
+              "macro_mae": 2.793620697913968,
+              "decision_count": 33,
+              "action_rate": 0.36363636363636365,
+              "macro_action_rate": 0.475
+            },
+            "initial_novel_macro_mae": 3.6150962955915795,
+            "novel_cross_goal_solved": 0,
+            "novel_cross_goal_count": 33,
+            "heldout_test_mae": 2.0343087166547775,
+            "initial_heldout_test_mae": 2.380816489458084,
+            "heldout_test_solved": 0,
+            "heldout_test_count": 32,
+            "heldout_test_cycles": 32,
+            "heldout_test_budget_exhausted": 0,
+            "sampled_new_pool_updates": 14,
+            "old_decision_regressions_in_sampled_new_updates": 0,
+            "collection_update_range": [
+              2000,
+              2000
+            ]
+          },
+          "disjoint_joint": {
+            "auxiliary_best_step": 16000,
+            "old_mae": 0.01861315220594406,
+            "new_pool_mean_mae": 0.033523060381412506,
+            "old_training_solved": 4,
+            "old_training_count": 4,
+            "all_training_solved": 32,
+            "all_training_count": 32,
+            "optimal_training_decisions": 184,
+            "training_decision_count": 184,
+            "novel_relations": {
+              "distance_count": 377,
+              "mae": 2.626350027180477,
+              "macro_mae": 2.378770268702207,
+              "decision_count": 33,
+              "action_rate": 0.24242424242424243,
+              "macro_action_rate": 0.2
+            },
+            "initial_novel_macro_mae": 3.9106661913608636,
+            "novel_cross_goal_solved": 0,
+            "novel_cross_goal_count": 33,
+            "heldout_test_mae": 1.6472488790750504,
+            "initial_heldout_test_mae": 2.380816489458084,
+            "heldout_test_solved": 2,
+            "heldout_test_count": 32,
+            "heldout_test_cycles": 30,
+            "heldout_test_budget_exhausted": 0,
+            "sampled_new_pool_updates": 15,
+            "old_decision_regressions_in_sampled_new_updates": 0,
+            "collection_update_range": [
+              2000,
+              2000
+            ]
+          }
+        }
+      }
+    },
+    "novel_distance_stratum_counts": {
+      "4": 6,
+      "5": 51,
+      "6": 64,
+      "7": 64,
+      "8": 64,
+      "9": 64,
+      "10": 64
+    },
+    "novel_decision_stratum_counts": {
+      "6": 1,
+      "7": 8,
+      "8": 8,
+      "9": 8,
+      "10": 8
+    }
   }
 }

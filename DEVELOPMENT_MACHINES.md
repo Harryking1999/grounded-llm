@@ -53,6 +53,7 @@ ssh grounded-4090
 | 平台积木地图工作区 | `/zhanghanyue/experiment/grounded_llm_qmap_tree_132f5a1` |
 | 平台早期实验工作区 | `/zhanghanyue/experiment/grounded_llm` |
 | 平台汉诺塔／二阶魔方 Qmap | `/zhanghanyue/experiment/grounded_llm_puzzle_qmaps`；`code/current/` 保存当前已提交源码，`runs/` 与 `logs/` 用于新生成物；复用平台项目的 `.venv/bin/python`；完成的旧实验归档见第 7 节 |
+| 4090 二阶魔方 Qmap | `/home/gongruochen/grounded_llm`；提交快照放 `code/`，迁入的小型精确数据放 `data/`，产物放 `runs/` 与 `logs/`；使用该项目 `.venv/bin/python`，0 号卡继续预留 |
 
 项目目录按 `code/`、`models/`、`maps/`、`data/`、`runs/`、`logs/` 分类。具体 run、checkpoint、数据版本、PID 与日志位置由实验 README 和忽略的 runtime 配置维护，本手册不逐次追加。
 

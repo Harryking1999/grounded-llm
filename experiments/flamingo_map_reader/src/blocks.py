@@ -10,7 +10,7 @@ from experiments.blocks_distance_map.src.model import BoardEncoder, board_bits, 
 from experiments.blocks_distance_map.src.oracle import successors
 from experiments.gcml_counterexamples.src import blocks as rules
 
-from .memory import CURRENT, GOAL, SUCCESSOR, MapBatch
+from .memory import MapBatch, q_map_batch
 
 
 class FrozenBoardMap:
@@ -71,11 +71,7 @@ def blocks_step(qmap: FrozenBoardMap, current: int, goal: int,
     minimum = min(distances, default=float("inf"))
     minimal = tuple(i for i, d in enumerate(distances, 1)
                     if np.isclose(d, minimum, rtol=1e-10, atol=1e-12))
-    count = len(actions)
-    memory = MapBatch(vectors.unsqueeze(0),
-                      torch.tensor([[CURRENT, GOAL, *([SUCCESSOR] * count)]]),
-                      torch.tensor([[0, 0, *range(1, count + 1)]]),
-                      torch.ones((1, count + 2), dtype=torch.bool))
+    memory = q_map_batch(vectors)
     return BlocksStep(current, goal, memory, actions, destinations,
                       float(scores[0]), distances, minimal, current == goal)
 

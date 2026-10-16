@@ -1,0 +1,11 @@
+{
+  "hypothesis": "The shared blocks state MLP and two relation objectives can learn routing on a fixed graph without a learned V table.",
+  "graph_suite": "runs/sol_path256_16k/suite.json",
+  "model": {"state_dim": 128, "encoder_hidden_dim": 256, "metric": "directed_sum"},
+  "data": {"seed": 20261026, "first_heldout_distance": 3, "validation_tasks_per_distance": 16, "test_tasks_per_distance": 32, "extra_pair_fraction_per_split": 0.08},
+  "training": {"seed": 20261016, "steps": 20000, "batch_size": 512, "listwise_batch_size": 256, "learning_rate": 0.001, "listwise_weight": 1.0, "temperature": 1.0, "eval_every": 1000, "cpu_threads": 4},
+  "evaluation": {"budget_multiplier": 2},
+  "selection": "Best validation Huber plus full candidate soft rank CE; fixed step budget. Test is evaluated only before and after training, never for selection.",
+  "split": "Seen nodes, unseen unordered relations. Withhold each validation/test parent-to-goal and every candidate-to-goal relation in both directions from BOTH losses. Preserve all physical edge labels. Rollouts can later enter trained relations; this is not unseen-graph or unseen-trajectory generalization.",
+  "scope": "Same two-hidden-layer state MLP and mean Huber plus soft-distance ranking as blocks/Hanoi/cube. Node ID one-hot is the task input. Primary routing allows all legal neighbors, including return moves; detect deterministic cycles. No learned V, coordinates, search or LLM retraining. Task metrics remain explicit rather than claiming identical directed and reversible geometries."
+}

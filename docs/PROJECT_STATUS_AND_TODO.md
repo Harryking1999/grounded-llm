@@ -15,7 +15,7 @@
 | 独立无地图任务 SFT | 历史强基线；已保存完整断点并退出，为新评测释放资源 | [协议](../experiments/llm_task_sft/README.md)、[总报告](../experiments/llm_task_sft/results/report.md) |
 | 棋盘状态地图 | 提供冻结 Q 和独立地图贪心参照 | [协议与来源](../experiments/blocks_distance_map/README.md) |
 | 汉诺塔／二阶魔方地图 | 汉诺塔四、五盘较好，六盘仍有循环。魔方多目标续训与固定复原 Q 并行；后者包含路径中间关系，均以完整到达验收，尚未宣称成功 | [研究说明](../experiments/cube2_qmap/README.md)、[正式合同](../experiments/cube2_qmap/configs/full_state_joint.json) |
-| 寻路接口与早期方案 | 作为机制和任务边界的历史证据 | [实验目录](../experiments/README.md) |
+| 寻路纯 Q 地图 | 与积木、汉诺塔和魔方统一 MLP 骨干、距离与排序监督及 Q 槽位接口；节点独热输入，单独验收关系泛化和完整到达 | [实现与合同](../experiments/path_qmap/README.md) |
 
 ## 3. 已确定的比较原则
 

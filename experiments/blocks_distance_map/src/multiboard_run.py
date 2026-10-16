@@ -8,7 +8,7 @@ import numpy as np
 import torch
 from torch.nn import functional as F
 
-from .model import BoardEncoder, board_bits, distance, strata
+from .model import BoardEncoder, board_bits, distance, strata, soft_rank_loss
 from .multiboard_eval import (contrast_metrics, encoded_values, goal_rollouts,
                               listwise_groups, pair_scores, split_metrics)
 from .train import draw
@@ -19,8 +19,7 @@ def rank_loss(model, bits, pairs, groups, cap, count, temperature):
     rows = pairs[chosen]
     predicted = model(bits, rows[..., :2].reshape(-1, 2)).reshape(-1, chosen.shape[1])
     truth = torch.where(rows[..., 2] >= 0, rows[..., 2], cap).float()
-    target = torch.softmax(-truth / temperature, dim=1)
-    return -(target * torch.log_softmax(-predicted / temperature, dim=1)).sum(1).mean()
+    return soft_rank_loss(predicted, truth, torch.ones_like(truth, dtype=torch.bool), temperature)
 
 
 def atomic_save(payload, path):

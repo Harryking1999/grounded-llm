@@ -46,6 +46,18 @@ class MapBatch:
             raise ValueError("successor slots need a positive candidate ID")
 
 
+def q_map_batch(vectors: Tensor) -> MapBatch:
+    """Shared slot format: Q(current), Q(goal), then Q(actual legal successors)."""
+    if vectors.ndim != 2 or len(vectors) < 2:
+        raise ValueError("expected current, goal and optional successor Q vectors")
+    count = len(vectors) - 2
+    device = vectors.device
+    return MapBatch(vectors.unsqueeze(0),
+                    torch.tensor([[CURRENT, GOAL, *([SUCCESSOR] * count)]], device=device),
+                    torch.tensor([[0, 0, *range(1, count + 1)]], device=device),
+                    torch.ones((1, count + 2), dtype=torch.bool, device=device))
+
+
 @dataclass(frozen=True)
 class MapTimeline:
     """Concatenated snapshots, trajectory counts, and local per-token turn IDs."""

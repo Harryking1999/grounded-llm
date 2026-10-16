@@ -1,0 +1,14 @@
+{
+  "hypothesis": "A restoration-capable Q initialization can retain its goal-zero policy while linked arbitrary-goal stars and intermediate path distances extend the learned relations.",
+  "base_contract": "experiments/cube2_qmap/configs/fixed_goal.json",
+  "model": {"dimension": 128, "hidden": 256, "metric": "linf"},
+  "seed": 20261028,
+  "data": {"seed": 20261029, "target_distance_levels": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]},
+  "training": {"epochs": 5, "parent_batch_size": 256, "balanced_replay_size": 128, "paths_per_batch": 64, "learning_rate": 0.0003, "rank_weight": 1.0, "temperature": 1.0, "global_weight": 0.1, "clip_norm": 5.0, "log_every": 1000, "cpu_threads": 2},
+  "evaluation": {"global_distance_levels": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], "global_validation_per_level": 16, "global_test_per_level": 32, "horizon": 28},
+  "initialization": "Audit all saved multi-goal epoch checkpoints and one frozen fixed-goal checkpoint on the same restoration validation cohort. Select by solved count, then long-range solved count, then MAE; restore selected Q and Adam. Record the finite candidate inventory. Comparison is initialization selection, not a matched claim about training regimes.",
+  "supervision": "Every epoch visits every physical parent once. The same parents face solved and two linked arbitrary targets (distance-stratified target plus another parent's target). Keep the existing balanced restoration replay and all within-shortest-path intermediate pair distances. Arbitrary-goal stars additionally calibrate action edges and rank all six successors. Weighted means preserve the same Huber and soft-ranking objective families; 90% restoration/path and 10% arbitrary-goal weight. No extra prediction head or waypoint search.",
+  "split": "Preserve the original fixed-goal heldout state mask in every loss, including arbitrary goals, physical edges and intermediate pairs. Whole arbitrary-goal stars containing a heldout state are omitted. New arbitrary-goal evaluation targets are selected from that mask, so all their candidate-to-goal labels remain protected. This is clean for a fixed-goal initialization; a multi-goal initialization did not enforce this historical mask, so any such source must be labeled potentially seen during pretraining.",
+  "selection": "Five additional exhaustive epochs, primary final checkpoint, no test selection or automatic extension. Save epoch checkpoints, exact parent/global-parent coverage, per-distance errors, shortest-action rates, unrestricted arrival/cycles, and fixed restoration retention. Source and original 100-epoch jobs remain separate.",
+  "scope": "A bounded merged-supervision continuation, not proof of full-space distance fitting. A smoke run is explicitly not formal training. Detailed results remain outside Git until successful."
+}

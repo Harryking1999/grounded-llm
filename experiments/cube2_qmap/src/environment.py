@@ -67,6 +67,59 @@ class Cube2:
             self.depth = np.load(oracle_path, allow_pickle=False)
             if self.depth.shape != (self.size,) or self.depth.dtype != np.uint8 or self.depth.max() != self.diameter:
                 raise ValueError(f"Invalid complete {metric} oracle table")
+        self._build_axis_symmetries()
+
+    def _build_axis_symmetries(self):
+        """Six axis relabelings preserve DBL, solved and the U/R/F action set.
+
+        Even permutations are rotations around the URF--DBL diagonal; odd
+        permutations are reflections and reverse the quarter-turn direction.
+        Relabel positions AND cubie colors; rotating positions alone is wrong.
+        """
+        faces = CORNER_NAMES
+        self.axis_corner_map = np.empty((6, 8), dtype=np.int64)
+        self.axis_offset = np.empty((6, 8), dtype=np.int64)
+        self.axis_sign = np.empty(6, dtype=np.int64)
+        self.axis_action_map = np.empty((6, len(self.actions)), dtype=np.int64)
+        opposites = dict(zip("URF", "DLB"))
+        for transform, order in enumerate(permutations("URF")):
+            mapping = dict(zip("URF", order))
+            mapping.update({opposites[a]: opposites[b] for a, b in zip("URF", order)})
+            sign = None
+            for corner, colors in enumerate(faces):
+                renamed = "".join(mapping[color] for color in colors)
+                destination = next(i for i, other in enumerate(faces) if set(renamed) == set(other))
+                positions = [faces[destination].index(color) for color in renamed]
+                current_sign = 1 if (positions[1] - positions[0]) % 3 == 1 else -1
+                if sign is not None and sign != current_sign:
+                    raise ValueError("Axis relabeling has inconsistent orientation")
+                sign = current_sign
+                self.axis_corner_map[transform, corner] = destination
+                self.axis_offset[transform, corner] = positions[0]
+            self.axis_sign[transform] = sign
+            for action, name in enumerate(self.actions):
+                suffix = name[1:]
+                if sign < 0 and suffix != "2":
+                    suffix = "'" if suffix == "" else ""
+                self.axis_action_map[transform, action] = self.actions.index(mapping[name[0]] + suffix)
+
+    def axis_symmetry(self, ids, transform):
+        """A solved-preserving graph automorphism; supports broadcasted groups."""
+        ids, transform = np.broadcast_arrays(np.asarray(ids, dtype=np.int64), np.asarray(transform, dtype=np.int64))
+        if np.any((transform < 0) | (transform >= 6)):
+            raise ValueError("Axis symmetry index must be in [0, 6)")
+        p, o = self.permutations[ids // 729], self.twists[ids % 729]
+        corners, offset = self.axis_corner_map[transform], self.axis_offset[transform]
+        mapped = np.take_along_axis(corners, p, axis=-1)
+        twists = (self.axis_sign[transform, None] * o + offset -
+                  np.take_along_axis(offset, p, axis=-1)) % 3
+        new_p, new_o = np.empty_like(p), np.empty_like(o)
+        np.put_along_axis(new_p, corners, mapped, axis=-1)
+        np.put_along_axis(new_o, corners, twists, axis=-1)
+        return permutation_rank(new_p[..., SLOTS]) * 729 + new_o[..., SLOTS[:6]] @ POWERS
+
+    def axis_symmetry_actions(self, actions, transform):
+        return self.axis_action_map[np.asarray(transform), np.asarray(actions)]
 
     def validate(self, state):
         if not isinstance(state, (int, np.integer)) or isinstance(state, (bool, np.bool_)) or not 0 <= state < self.size:

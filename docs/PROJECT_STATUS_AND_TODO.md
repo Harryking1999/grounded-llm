@@ -14,7 +14,7 @@
 | 冻结地图读取接口 | 既定训练与评测已完成，保留历史对照，不与新组直接混算 | [实验 README](../experiments/flamingo_map_reader/README.md)、[报告](../experiments/flamingo_map_reader/results/report.md) |
 | 独立无地图任务 SFT | 历史强基线；已保存完整断点并退出，为新评测释放资源 | [协议](../experiments/llm_task_sft/README.md)、[总报告](../experiments/llm_task_sft/results/report.md) |
 | 棋盘状态地图 | 提供冻结 Q 和独立地图贪心参照 | [协议与来源](../experiments/blocks_distance_map/README.md) |
-| 汉诺塔／二阶魔方地图 | 汉诺塔四、五盘较好，六盘仍有循环。魔方尚未全局成功；正在落实全状态联合训练，以未训练关系和完整到达验收 | [研究说明](../experiments/cube2_qmap/README.md)、[正式合同](../experiments/cube2_qmap/configs/full_state_joint.json) |
+| 汉诺塔／二阶魔方地图 | 汉诺塔四、五盘较好，六盘仍有循环。魔方首轮全状态联合训练已完成，仍未可靠全局求解；以未训练关系和完整到达验收 | [研究说明](../experiments/cube2_qmap/README.md)、[正式合同](../experiments/cube2_qmap/configs/full_state_joint.json) |
 | 寻路接口与早期方案 | 作为机制和任务边界的历史证据 | [实验目录](../experiments/README.md) |
 
 ## 3. 已确定的比较原则

@@ -36,8 +36,8 @@ def prepare(env, config):
     return mask, train_layers, cohorts
 
 
-def path_relations(env, roots, heldout, rng):
-    """All intermediate pairs on sampled shortest restoration paths."""
+def shortest_paths(env, roots, rng):
+    """Sample paths for offline labels only; no path is exposed to inference."""
     roots = np.asarray(roots, dtype=np.int64)
     lengths = env.depth[roots].astype(int)
     paths = np.zeros((len(roots), env.diameter + 1), dtype=np.int64)
@@ -53,6 +53,12 @@ def path_relations(env, roots, heldout, rng):
             raise ValueError("Shortest restoration path has no advancing successor")
         choice = np.where(optimal, rng.random(optimal.shape), -1).argmax(-1)
         paths[active, step + 1] = children[np.arange(len(active)), choice]
+    return paths, lengths
+
+
+def path_relations(env, roots, heldout, rng):
+    """All intermediate pairs on sampled shortest restoration paths."""
+    paths, lengths = shortest_paths(env, roots, rng)
     a, b = np.triu_indices(env.diameter + 1, 1)
     valid = b[None] <= lengths[:, None]
     pairs = np.stack((paths[:, a], paths[:, b]), axis=-1)[valid]

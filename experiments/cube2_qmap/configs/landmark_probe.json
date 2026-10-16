@@ -1,0 +1,12 @@
+{
+  "hypothesis": "Intermediate distance labels alone do not teach candidate ranking toward intermediate goals; linked seven-step landmark stars may help bridge long restoration paths.",
+  "base_contract": "experiments/cube2_qmap/configs/fixed_goal.json",
+  "seed": 20261027,
+  "landmarks": {"goal_depth": 7, "root_depths": [8, 9, 10, 11, 12, 13, 14], "roots_per_batch": 8},
+  "training": {"steps": 1000, "parent_batch_size": 64, "balanced_replay_size": 32, "paths_per_batch": 16, "learning_rate": 0.0003, "rank_weight": 1.0, "temperature": 1.0, "clip_norm": 5.0, "landmark_weight": 1.0, "log_every": 250, "cpu_threads": 4},
+  "evaluation": {"starting_depth": 10, "first_leg_budget": 6, "total_budget": 28, "bank_size": 256},
+  "comparison": "Same completed checkpoint, restored Adam, identical base batches and fixed update count for control versus landmark supervision. Independent landmark RNG does not perturb base batches. Primary last checkpoint; no test selection.",
+  "split": "Retain original heldout state mask; reject a whole landmark star if parent, target or any candidate is held out. Test roots never supply training labels. Seven-step bank sampled from training states only, frozen before updates.",
+  "inference": "Report direct restoration plus a separately labeled waypoint policy: choose nearest Q landmark from a fixed training bank, greedily target it, then solved after exact landmark arrival; never use oracle routing. Oracle-provided shortest-path landmarks are an explicitly separate diagnostic upper bound, never a main policy.",
+  "scope": "Cheap matched local feasibility probe, not replacement of the running 100-epoch jobs or a claim that all ten-step states are covered by a small landmark bank. No learned V, extra head, fixed coordinate answers, search or retrieval of recorded solutions. Runtime records remain outside Git."
+}

@@ -120,12 +120,14 @@ class ExitGuard:
             raise ValueError("Guard needs nonterminal decisions with competing candidates")
         self.model = model
 
-    @torch.no_grad()
-    def margins(self):
+    def margin_tensor(self):
         q = self.model.encode(self.features)
         scores = self.model.distance(q[self.children], q[self.goal])
-        margin = scores.masked_fill(self.good, torch.inf).amin(-1) - scores.masked_fill(~self.good, torch.inf).amin(-1)
-        return margin.cpu().numpy()
+        return scores.masked_fill(self.good, torch.inf).amin(-1) - scores.masked_fill(~self.good, torch.inf).amin(-1)
+
+    @torch.no_grad()
+    def margins(self):
+        return self.margin_tensor().cpu().numpy()
 
     def report(self):
         margin = self.margins()
@@ -138,7 +140,39 @@ class ExitGuard:
         return bool(np.isfinite(margin).all() and (margin >= self.floors - 1e-6).all())
 
 
-def guarded_adam_step(model, optimizer, accepts, scales):
+    def project(self, before, delta, iterations, slack):
+        """Correct the worst violated exit using its margin derivative.
+
+        Derivatives are evaluated at the unchanged starting parameters. The
+        finite candidate is rechecked after every correction; this is not a
+        certificate from a linear approximation. The caller still backtracks
+        and can reject the entire displacement.
+        """
+        parameters = list(self.model.parameters())
+        self.last_projection_corrections = 0
+        for _ in range(iterations):
+            with torch.no_grad():
+                for p, old, movement in zip(parameters, before, delta):
+                    p.copy_(old + movement)
+            violation = self.floors - self.margins()
+            worst = int(violation.argmax())
+            if violation[worst] <= 1e-6:
+                break
+            with torch.no_grad():
+                for p, old in zip(parameters, before):
+                    p.copy_(old)
+            with torch.enable_grad():
+                derivative = torch.autograd.grad(self.margin_tensor()[worst], parameters)
+            squared_norm = sum(g.square().sum() for g in derivative)
+            if not torch.isfinite(squared_norm) or squared_norm <= 1e-12:
+                break
+            amount = (float(violation[worst]) + slack) / squared_norm
+            delta = [movement + amount * g for movement, g in zip(delta, derivative)]
+            self.last_projection_corrections += 1
+        return delta
+
+
+def guarded_adam_step(model, optimizer, accepts, scales, projector=None):
     """Accept a damped Adam proposal, or roll parameters AND optimizer back.
 
     On a damped acceptance Adam moments record the current gradient normally;
@@ -152,6 +186,11 @@ def guarded_adam_step(model, optimizer, accepts, scales):
     try:
         optimizer.step()
         delta = [p.detach() - old for p, old in zip(parameters, before)]
+        if projector is not None:
+            if accepts():
+                accepted = True
+                return 1.
+            delta = projector(before, delta)
         for scale in scales:
             with torch.no_grad():
                 for p, old, movement in zip(parameters, before, delta):
@@ -249,7 +288,7 @@ def run(config, checkpoint, oracle, historical_cohorts, out, source_commit, devi
                          **inspect(model)}
     del model
     for condition in config["conditions"]:
-        if condition not in ("base", "repair", "repair_guard"):
+        if condition not in ("base", "repair", "repair_guard", "repair_projected"):
             raise ValueError("Unknown repair condition")
         model = fresh_model()
         optimizer = torch.optim.Adam(model.parameters(), lr=options["learning_rate"])
@@ -260,7 +299,7 @@ def run(config, checkpoint, oracle, historical_cohorts, out, source_commit, devi
         pointer, margins = initial_pointer, initial_margins
         fixed = ExitGuard(model, env, fixed_guard, fixed_floors, device)
         pool = current_cycles(pointer, allowed)
-        history, scales, sampled = [], [], []
+        history, scales, sampled, corrections = [], [], [], []
         start = time.monotonic()
         with (out / (condition + ".jsonl")).open("w") as log:
             guard = fixed
@@ -269,7 +308,7 @@ def run(config, checkpoint, oracle, historical_cohorts, out, source_commit, devi
                     if step:
                         _, pointer, margins = full_policy(model, env, device)
                     pool = current_cycles(pointer, allowed)
-                    if condition == "repair_guard":
+                    if condition in ("repair_guard", "repair_projected"):
                         dynamic = choose_guard(env, margins, allowed, config["guard"]["dynamic_count"],
                                                config["guard"]["fragile_fraction"], guard_rng, exclude=fixed_guard)
                         floors = np.minimum(margins[dynamic] * config["guard"]["retain_fraction"],
@@ -315,14 +354,21 @@ def run(config, checkpoint, oracle, historical_cohorts, out, source_commit, devi
                 optimizer.zero_grad(set_to_none=True)
                 loss.backward()
                 norm = torch.nn.utils.clip_grad_norm_(model.parameters(), options["clip_norm"])
-                if condition == "repair_guard":
-                    scale = guarded_adam_step(model, optimizer, guard.accepts, config["guard"]["scales"])
+                guard.last_projection_corrections = 0
+                if condition in ("repair_guard", "repair_projected"):
+                    projector = None
+                    if condition == "repair_projected":
+                        projector = lambda before, delta: guard.project(before, delta,
+                            config["projection"]["max_corrections"], config["projection"]["slack"])
+                    scale = guarded_adam_step(model, optimizer, guard.accepts, config["guard"]["scales"], projector)
                 else:
                     optimizer.step()
                     scale = 1.
                 scales.append(scale)
+                corrections.append(guard.last_projection_corrections)
                 row = {"condition": condition, "step": step + 1, "loss": float(loss.detach()),
-                       "terms": terms, "gradient_norm_before_clip": float(norm), "accepted_scale": scale}
+                       "terms": terms, "gradient_norm_before_clip": float(norm), "accepted_scale": scale,
+                       "projection_corrections": guard.last_projection_corrections}
                 log.write(json.dumps(row) + "\n"); log.flush()
                 if (step + 1) % options["log_every"] == 0:
                     print(json.dumps(row), flush=True)
@@ -344,6 +390,7 @@ def run(config, checkpoint, oracle, historical_cohorts, out, source_commit, devi
         result["conditions"][condition] = {"final": final, "refreshes": history,
             "criteria": criteria, "all_criteria_pass": all(criteria.values()), "sampled_packs": len(sampled),
             "accepted_scales": {str(s): scales.count(s) for s in sorted(set(scales))},
+            "projection_corrections": sum(corrections),
             "elapsed_seconds": time.monotonic() - start}
         np.save(out / (condition + "_sampled_cycles.npy"), np.asarray(sampled, dtype=np.int64).reshape(-1, 2))
         (out / "summary.json").write_text(json.dumps(result, indent=2) + "\n")
@@ -358,7 +405,11 @@ def main():
     parser.add_argument("--source-commit", required=True)
     parser.add_argument("--device", default="cpu")
     args = parser.parse_args()
-    run(json.loads(args.contract.read_text()), args.checkpoint, args.oracle, args.historical_cohorts,
+    config = json.loads(args.contract.read_text())
+    if "repair_contract" in config:
+        parent = json.loads(Path(config["repair_contract"]).read_text())
+        config = {**parent, **config}
+    run(config, args.checkpoint, args.oracle, args.historical_cohorts,
         args.out, args.source_commit, args.device)
 
 

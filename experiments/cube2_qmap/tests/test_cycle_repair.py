@@ -4,7 +4,7 @@ import unittest
 import numpy as np
 import torch
 
-from experiments.cube2_qmap.src.cycle_repair import current_cycles, guarded_adam_step, split_cycle_losses
+from experiments.cube2_qmap.src.cycle_repair import ExitGuard, current_cycles, guarded_adam_step, split_cycle_losses
 from experiments.cube2_qmap.src.cycle_supervision import cycle_pack
 from experiments.cube2_qmap.tests.test_full_state_joint import Ring
 from experiments.puzzle_qmap.src.model import QMap
@@ -47,6 +47,50 @@ class CycleRepairTests(unittest.TestCase):
         torch.testing.assert_close(model.weight, before)
         for key, value in state.items():
             torch.testing.assert_close(optimizer.state[model.weight][key], value)
+
+    def test_direction_correction_can_preserve_progress_when_scaling_rejects(self):
+        model = torch.nn.Linear(2, 1, bias=False)
+        model.weight.data.zero_()
+        optimizer = torch.optim.Adam(model.parameters(), lr=.1)
+        (-model.weight.sum()).backward()
+
+        def projector(before, delta):
+            # The first component must stay fixed; the second remains free.
+            result = [d.clone() for d in delta]
+            result[0][0, 0] = 0.
+            return result
+
+        scale = guarded_adam_step(model, optimizer, lambda: abs(model.weight[0, 0].item()) < 1e-8,
+                                  [1., .5], projector)
+        self.assertEqual(scale, 1.)
+        self.assertAlmostEqual(model.weight[0, 0].item(), 0.)
+        self.assertGreater(model.weight[0, 1].item(), .09)
+
+    def test_exit_derivative_correction_passes_finite_guard(self):
+        env = Ring()
+        env.depth = env.distance(np.arange(env.size), 0)
+
+        class ScalarCoordinates(torch.nn.Module):
+            def __init__(self):
+                super().__init__()
+                self.q = torch.nn.Parameter(torch.tensor(env.depth, dtype=torch.float32)[:, None])
+
+            def encode(self, features):
+                return features @ self.q
+
+            def distance(self, a, b):
+                return (a - b).abs().amax(-1)
+
+        model = ScalarCoordinates()
+        guard = ExitGuard(model, env, [8], [1.9], "cpu")
+        optimizer = torch.optim.Adam(model.parameters(), lr=1.)
+        (-model.q[7] + .1 * model.q[20]).sum().backward()
+        scale = guarded_adam_step(model, optimizer, guard.accepts, [1., .5],
+                                  lambda before, delta: guard.project(before, delta, 4, .0001))
+        self.assertEqual(scale, 1.)
+        self.assertGreater(guard.last_projection_corrections, 0)
+        self.assertTrue(guard.accepts())
+        self.assertLess(model.q[20].item(), 19.1)
 
     def test_exit_and_relation_losses_have_independent_denominators(self):
         env = Ring()

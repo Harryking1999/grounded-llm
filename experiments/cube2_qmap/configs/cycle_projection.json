@@ -1,0 +1,8 @@
+{
+  "repair_contract": "experiments/cube2_qmap/configs/cycle_repair.json",
+  "conditions": ["repair_projected"],
+  "projection": {"max_corrections": 8, "slack": 0.0001},
+  "hypothesis": "When backtracking alone stalls, correcting the actual Adam displacement along derivatives of violated training-only exit margins can permit relation learning while preserving sampled correct exits.",
+  "comparison": "Inherit all data, seeds, initialization, loss weights, guards, refresh schedule and attempted update budget from cycle_repair.json. Compare to the completed repair_guard condition; this adds only direction correction before the same finite guard and backtracking. Policy-dependent pools can diverge as before. No extension of the earlier run or test-selected checkpoint.",
+  "projection_semantics": "For a rejected full Adam proposal, repeatedly find the largest finite guard-floor violation. At the unchanged pre-step parameters differentiate that exit margin, and add (violation+slack)*gradient/squared_gradient_norm to the proposed displacement. Recheck the finite candidate after each correction, up to eight. Then apply the original backtracking and rollback rules. Linearization alone never accepts a step; no guarantee outside the training-only guard cohort. Report accepted scales, rejected updates and direction-correction counts."
+}

@@ -63,7 +63,7 @@ python -m experiments.map_sft_baselines.src.queue evaluate --config CONFIG --dat
 
 辅助 runtime profile 复用桥接的公开 SSH 字段与 `target_run`（统一主节点目录），不保存凭据。未来节点采用相同入口、不同 `node-id` 和本机 GPU 配置。各节点动态队列状态、占位、PID 与日志留在远端运行目录。
 
-028 的训练卡释放后加入同一评测池，优先补 TF 与地图内容探针，其他节点继续覆盖 RO。评测入口加 `--training-queue TRAIN_RUN/training_queue.json`：有待分配训练时不领评测，B4 优先接空出的训练通道；之后只使用训练队列已释放且显存空闲的卡。具体卡号和评测模式读取正式配置的 `after_training_evaluation`，不停止或占用现有训练。评测运行目录与训练目录分开，推理权重可通过只读链接复用。
+028 的训练卡释放后加入同一评测池。已有训练调度器时，评测入口加 `--training-queue TRAIN_RUN/training_queue.json`：有待分配训练时不领评测，卡号与模式读取正式配置的 `after_training_evaluation`。独立训练进程则用 `--after-training TRAIN_RUN/training/BASELINE/finished.json --gpus GPU_LIST`，只在成功完成最终导出后启动该组评测，失败／提前停止不放行；仍检查实际 GPU 显存空闲。配合 `--coordination-profile` 从 4090 共用池领取 RO／TF／probe，避免重复分片。等待期间不保持 SSH 会话；凭据经 stdin 传入。评测运行目录与训练目录分开，推理权重可通过只读链接复用。
 
 ## 验证与结果
 

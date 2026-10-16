@@ -1,0 +1,14 @@
+{
+  "hypothesis": "A goal-independent Q encoder can learn restoration from fixed-goal distances, complete action ranking and intermediate pair distances on shortest restoration paths.",
+  "rules": {"metric": "QTM_URF_6", "fixed_goal": 0},
+  "model": {"dimension": 128, "hidden": 256, "metric": "linf"},
+  "seed": 20261016,
+  "data": {"seed": 20261023, "first_heldout_depth": 4, "heldout_fraction_per_split": 0.01, "minimum_heldout_per_layer": 16},
+  "training": {"epochs": 100, "parent_batch_size": 256, "balanced_replay_size": 128, "paths_per_batch": 64, "learning_rate": 0.0003, "rank_weight": 1.0, "temperature": 1.0, "clip_norm": 5.0, "log_every": 1000},
+  "evaluation": {"states_per_layer": 128, "horizon": 28, "final_exhaustive_policy": true},
+  "initialization": "Fresh random shared encoder, not the multi-goal checkpoint. Q(solved) is learned by the same encoder; no coordinate targets, scalar head, fixed anchor coordinates or search.",
+  "supervision": "Each epoch traverses all physical parents once, with distance-balanced additional parents. Huber calibrates all allowed parent/successor distances to solved AND every intermediate state pair on sampled shortest restoration paths, including nonadjacent pairs. Path index gaps are exact subpath distances, not arbitrary scramble lengths. Each next path action is sampled among all exact optimal actions. Apply the existing complete six-candidate soft ranking loss. No coordinate targets or arbitrary cross-path pair calibration.",
+  "split": "Disjoint heldout state-to-solved relations by exact depth. Mask heldout endpoints everywhere, including goal labels and intermediate path pairs; skip ranking tasks whose parent or any successor is held out. Heldout features may be encoded without receiving a direct label gradient. Never use a changing-goal symmetry augmentation.",
+  "selection": "Fixed 100 epochs; primary last checkpoint, no test-based selection or early stopping. Save complete-epoch model, Adam and RNG state. Periodic frozen greedy rollout; final exhaustive learned-policy evaluation over all states with the same fixed horizon.",
+  "scope": "Fixed-target restoration only, not an arbitrary-goal global map. This is a feasibility trial with one initialization, additional distance balancing and a new split, not an isolated causal comparison against the running multi-goal study. Runtime results stay outside Git until a successful result merits a report."
+}

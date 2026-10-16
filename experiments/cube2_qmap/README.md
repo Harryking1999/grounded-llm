@@ -36,3 +36,5 @@ L∞、L2 的现有尝试都尚未带来可靠的长程求解进展。精确表�
 正式参数与划分以 [full_state_joint.json](configs/full_state_joint.json) 为准，实现见 [full_state_joint.py](src/full_state_joint.py)。当前进度只维护在[项目状态页](../../docs/PROJECT_STATUS_AND_TODO.md)。
 
 另设[固定复原条件](configs/fixed_goal.json)：保留共享 Q 与固定距离，监督各状态到复原态的距离、每步候选排序，以及同一条最短复原路径内中间状态彼此的距离；验收完整复原，不将它当作任意目标地图的成功证据。
+
+[合并续训](configs/mixed_goal.json)将复原与多目标关系放进同一训练批次，保留路径中间距离、分层覆盖和原有复原能力监测。先按复原验证集选择已有断点，再续训同一个 Q；不合并两套网络权重，也不改写原来的运行。新增任意目标验收使用原固定复原条件中受保护的目标状态，所有损失继续排除这些状态的标签。

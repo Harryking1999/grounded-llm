@@ -87,3 +87,5 @@ python -u -m experiments.cube2_qmap.src.overlapping_routes --contract experiment
 ```
 
 输入目录包含原精确 oracle、保护状态、已完成路线检查的 `base_data.npz`；权重按旧检查合同在目标机器重新训练，而非假定其他机器共享磁盘。集合个体的构造性可行性不证明超过 128 个状态的联合约束存在精确解。本轮保留原编码器、L∞ 和两项关系损失，不提供坐标答案。机器、产物及结果见[结果报告](results/report.md)。
+
+[overlap_policy_eval.json](configs/overlap_policy_eval.json) 和 [overlap_policy_eval.py](src/overlap_policy_eval.py) 在训练结束后另行评测真正的完整贪心到达：允许中途进入任何合法状态，使用固定预算、全部六个动作，不用搜索或禁逆动作。分别保留旧图、全部训练图、跨目标新关系和留出物理状态的结果；与“首次离开受监督决策即失败”的覆盖路线指标区分。主比较仍取末步，不按新增评测重新选模。

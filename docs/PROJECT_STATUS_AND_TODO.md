@@ -14,7 +14,7 @@
 | 冻结地图读取接口 | 既定训练与评测已完成，保留历史对照，不与新组直接混算 | [实验 README](../experiments/flamingo_map_reader/README.md)、[报告](../experiments/flamingo_map_reader/results/report.md) |
 | 独立无地图任务 SFT | 历史强基线；已保存完整断点并退出，为新评测释放资源 | [协议](../experiments/llm_task_sft/README.md)、[总报告](../experiments/llm_task_sft/results/report.md) |
 | 棋盘状态地图 | 提供冻结 Q 和独立地图贪心参照 | [协议与来源](../experiments/blocks_distance_map/README.md) |
-| 汉诺塔／二阶魔方地图 | 汉诺塔六盘仍有循环。魔方对称 Q 保留为基准；当前死局刷新、独立出口配额与更新保护的小对照已完成。保护更新可小幅减循环，但大多数更新被拒；方向修正推进了关系拟合，尚未同时减少全局循环。暂不长训 | [研究说明](../experiments/cube2_qmap/README.md)、[循环修复](../experiments/cube2_qmap/configs/cycle_repair.json)、[方向修正](../experiments/cube2_qmap/configs/cycle_projection.json) |
+| 汉诺塔／二阶魔方地图 | 汉诺塔六盘仍有循环。按用户决定，魔方采用循环修复对照的 `repair_guard` 最终断点作为当前复原模型；保持对称 Q 与 L∞。远距离复原和任意目标关系仍不充分，方向修正未通过循环验收。暂不长训 | [研究说明](../experiments/cube2_qmap/README.md)、[循环修复](../experiments/cube2_qmap/configs/cycle_repair.json)、[方向修正](../experiments/cube2_qmap/configs/cycle_projection.json) |
 | 寻路纯 Q 地图 | 与积木、汉诺塔和魔方统一 MLP 骨干、距离与排序监督及 Q 槽位接口；节点独热输入，单独验收关系泛化和完整到达 | [实现与合同](../experiments/path_qmap/README.md) |
 
 ## 3. 已确定的比较原则

@@ -89,3 +89,17 @@ python -u -m experiments.cube2_qmap.src.overlapping_routes --contract experiment
 输入目录包含原精确 oracle、保护状态、已完成路线检查的 `base_data.npz`；权重按旧检查合同在目标机器重新训练，而非假定其他机器共享磁盘。集合个体的构造性可行性不证明超过 128 个状态的联合约束存在精确解。本轮保留原编码器、L∞ 和两项关系损失，不提供坐标答案。机器、产物及结果见[结果报告](results/report.md)。
 
 [overlap_policy_eval.json](configs/overlap_policy_eval.json) 和 [overlap_policy_eval.py](src/overlap_policy_eval.py) 在训练结束后另行评测真正的完整贪心到达：允许中途进入任何合法状态，使用固定预算、全部六个动作，不用搜索或禁逆动作。分别保留旧图、全部训练图、跨目标新关系和留出物理状态的结果；与“首次离开受监督决策即失败”的覆盖路线指标区分。主比较仍取末步，不按新增评测重新选模。
+
+## 全状态联合训练与关系留出
+
+[full_state_joint.json](configs/full_state_joint.json) 与 [full_state_joint.py](src/full_state_joint.py) 实施全物理状态范围的联合训练。从已完成的重叠联合末步权重继续，重置 Adam；每遍无放回遍历全部父状态，并监督每个父状态的六条动作边。每个动作星形邻域同时面对一个按距离分层产生的目标和另一个邻域的目标；所有父／候选到目标的距离进入绝对距离损失，同批完整六候选进入排序损失。跨邻域目标持续变化，关系不局限于原八个集合。
+
+固定重放轮流使用原八个集合的完整组内关系，以及一批新的全局父／候选目标关系。分别记录原图拟合、无中途限制的到达，以及新固定关系拟合。保留原共享编码器、128 维 L∞ 和两类损失；不提供坐标答案。
+
+这是**新划分协议**：全部物理状态都允许训练，历史保护端点不再排除。验证、测试及历史队列的父节点与六个候选到目标的无序距离对，全部屏蔽于在线距离标签和排序标签，固定重放也须无交集。新任务从距离四步及以上抽取，避免留出动作边与全边训练冲突。遍历结束后再将主结果解释为“状态见过、初始关系未直接训练”；完整轨迹可以进入其他已训练关系，不能称为整条轨迹全部关系都未见。旧版未见状态结果只作历史记录，不混用协议。
+
+```bash
+python -u -m experiments.cube2_qmap.src.full_state_joint --contract experiments/cube2_qmap/configs/full_state_joint.json --inputs /PATH/TO/cube2_overlap_inputs --prior-study /PATH/TO/cube2_overlap_2f53baa/seed_20261016 --out /NEW/RUN/seed_20261016 --source-commit COMMIT --seed 20261016 --device cuda:0
+```
+
+主结果固定为完整预算后的末步，逐距离报告误差、单步最优和真实贪心到达／循环；十四步层的所有动作均可最优，因此整体单步率必须结合分层与到达率解释。记录精确的父状态、动作边及标签曝光数；曝光完整不等于全部约束拟合成功。三个暖启动模型使用同一采样流和关系队列，无新旧采样器匹配消融，故本轮是方案有效性检查，不能单独归因于某一新增采样组件。短 `--smoke-steps` 仅检查流程和吞吐，不满足全状态验收，也不覆盖正式产物。

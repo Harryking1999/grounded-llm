@@ -45,6 +45,11 @@ def publish(baseline, sol56, legacy, out):
         result = ('待返回' if row is None else '服务失败待补' if row.get('service_error') else
                   '成功' if row['verdict'].get('solved') else labels.get(row['verdict'].get('failure'),'失败'))
         lines.append(f"| {case['id']} | {prior['per_case'][case['id']]['successes']}/8 | {result} |")
+    repeated_row = repeated['tasks']['blocks']
+    if repeated_row['valid_responses'] == repeated_row['planned']:
+        former_failures = [case['id'] for case in suite['cases'] if prior['per_case'][case['id']]['successes'] == 0]
+        recovered = sum(bool(latest[i]['verdict'].get('solved')) for i in former_failures)
+        lines += ['', f"历史 0/8 的 {len(former_failures)} 道题，本轮解出 {recovered}/{len(former_failures)}。严格 JSON 与终态声明通过 {repeated_row['contract_pass']}/{repeated_row['planned']}；执行成功单独计分。"]
     lines += ['', '## 接口与解释边界','']
     for name,result in (('5.6 同题组',older),('6.1 旧题组',repeated)):
         metadata = result['response_metadata_coverage']

@@ -82,3 +82,9 @@ python -m unittest experiments.map_sft_baselines.tests.test_contract experiments
 ```
 
 [results/report.md](results/report.md)记录准备、启动和验收；每条基线的半轮结果表独立维护。原始逐题回答和动态队列状态留在远端 `runs/map_sft_baselines/`，全局 [项目状态页](../../docs/PROJECT_STATUS_AND_TODO.md)只保留决策和入口。
+
+## B2_10k 首步诊断
+
+入口为 `src/decision_audit.py`，正式合同为 [b2_10k_decision_audit.json](configs/b2_10k_decision_audit.json)。固定 64 条非终止训练轨迹（来源棋盘互异）与 64 条非终止测试轨迹，在 1、4、10、20 epoch 自主生成首步；训练输入直接取原监督缓存，并核对与正式提示重建是否一致。报告环境最短动作率、参考动作精确匹配率、首个排序候选的地图最优率、合法率及回答重复率，不以平均 CE 替代决策指标。
+
+20 epoch 对全部 128 题追加文字替换、地图替换、地图向量清零。替换来源与原题具有相同合法候选数、不同状态；文字替换保留原地图，地图替换保留原文字，清零保留槽位角色、地址和有效掩码。这些刻意不匹配的输入只用于检测敏感性，不作为能力提升或常规准确率。另在没有排序／理由泄露答案的固定 `<action>` 前缀后，计算同一参考动作完整数字序列的条件对数概率；这属于强制前缀探针，不是正常生成概率或归一化动作分布。各条件保存逐题配对输出，按 train／test 分开汇总。

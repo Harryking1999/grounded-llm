@@ -1,6 +1,6 @@
 # 五任务纯文字完整规划基线
 
-**结果只看[模型、设置与预算对照表](results/report.md)。**初始五任务、旧积木复测和两组逐步状态实验均已完成，服务失败已补齐，定时跟进已暂停。所有加难探索已停止，不再派题。
+**结果只看[模型、设置与预算对照表](results/report.md)。**初始五任务、旧积木复测和两组 5.6 逐步状态实验均已完成。新增 6.1-sol high 的 S/Z 同题对照运行中，定时跟进只监测该组。所有加难探索已停止，不再派题。
 
 ## 实验合同与答卷来源
 
@@ -14,8 +14,11 @@
 | 6.1-sol high，旧十形状十二块 16 题 | [sol61_legacy_blocks12_new_prompt.json](configs/sol61_legacy_blocks12_new_prompt.json) | `runs/sol61_legacy_blocks12_new_prompt/` |
 | 5.6-sol high，原八形状＋逐步状态 40 题 | [sol56_blocks40_state_report.json](configs/sol56_blocks40_state_report.json) | `runs/sol56_blocks40_state_report/` |
 | 5.6-sol high，S/Z 八形状＋逐步状态 40 题 | [sol56_blocks40_sz_state_report.json](configs/sol56_blocks40_sz_state_report.json) | `runs/sol56_blocks40_sz_state_report/` |
+| 6.1-sol high，逐字复用上述 S/Z 40 题 | [sol61_blocks40_sz_state_report.json](configs/sol61_blocks40_sz_state_report.json) | `runs/sol61_blocks40_sz_state_report/` |
 
 提示词从 `tasks/<task>/prompts/README.md` 读取，生成后冻结在各运行目录的 `suite.json`。逐字同题组复制冻结内容；旧十形状保留原棋盘与形状目录，采用已确认的规则与完整计划 JSON；新 S/Z 八形状重新生成棋盘，与旧组不配对。
+
+6.1 的 S/Z 组直接复制已冻结的 5.6 S/Z 题集，包括逐步状态要求，不再次生成棋盘；只有请求模型不同，高强度、16k 请求及服务重试设置保持一致。
 
 ## 评分与实现
 

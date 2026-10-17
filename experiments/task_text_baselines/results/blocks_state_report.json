@@ -1,0 +1,111 @@
+{
+  "updated_at": "2026-10-18 01:44（北京时间）",
+  "baseline_blocks": {
+    "planned": 40,
+    "finished": 40,
+    "valid_responses": 40,
+    "service_errors": 0,
+    "solved": 37,
+    "contract_pass": 37,
+    "optimal": 37,
+    "optimal_evaluated": 40,
+    "failures": {
+      "success": 37,
+      "unsolved": 2,
+      "illegal_action": 1
+    },
+    "output_tokens": 158553,
+    "input_tokens": 26882,
+    "strata": {
+      "placements_12": {
+        "finished": 40,
+        "valid_responses": 40,
+        "service_errors": 0,
+        "solved": 37
+      }
+    },
+    "execution_solved": 37,
+    "budget_exceeded": 0,
+    "budget_unknown": 0
+  },
+  "state_report": {
+    "status": "running",
+    "model_request": {
+      "base_url": "https://jarodfund.xyz/v1",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "max_output_tokens": 16000,
+      "scoring_output_limit": 16000,
+      "timeout_seconds": 900,
+      "concurrency": 4,
+      "max_service_retries": 10,
+      "max_total_service_retries": 80,
+      "service_retry_delay_seconds": 30
+    },
+    "tasks": {
+      "blocks": {
+        "planned": 40,
+        "finished": 1,
+        "valid_responses": 1,
+        "service_errors": 0,
+        "solved": 1,
+        "contract_pass": 1,
+        "optimal": 1,
+        "optimal_evaluated": 1,
+        "failures": {
+          "success": 1
+        },
+        "output_tokens": 5526,
+        "input_tokens": 501,
+        "strata": {
+          "placements_12": {
+            "finished": 1,
+            "valid_responses": 1,
+            "service_errors": 0,
+            "solved": 1
+          }
+        },
+        "execution_solved": 1,
+        "budget_exceeded": 0,
+        "budget_unknown": 0
+      }
+    },
+    "recorded_attempts": 1,
+    "service_error_attempts": 0,
+    "returned_model_counts": {
+      "None": 1
+    },
+    "exceeded_output_limit": 0,
+    "run_path": "runs\\sol56_blocks40_state_report",
+    "updated_at": "2026-10-17T17:44:11.633936+00:00",
+    "response_metadata_coverage": {
+      "valid_answers": 1,
+      "model_reported": 0,
+      "effort_counts": {
+        "not_returned": 1
+      },
+      "effort_reported_on_reused_answers": 0
+    },
+    "budget_policy": {
+      "max_output_tokens": 16000,
+      "scope": "reasoning_plus_final_answer",
+      "exceeded": 0,
+      "unknown": 0,
+      "request_limit_counts": {
+        "16000": 1
+      }
+    }
+  },
+  "within_budget_state_accuracy": {
+    "evaluated": 12,
+    "valid": 12,
+    "correct": 12
+  },
+  "paired": {
+    "answered": 1,
+    "both_solved": 1,
+    "lost_success": 0,
+    "gained_success": 0,
+    "both_failed": 0
+  }
+}

@@ -1,6 +1,6 @@
 # 寻路：任务文字与监督格式
 
-状态：共享任务描述与规则、地图组／CoT 组每轮环境更新、SOTA／32B 组输出格式已由用户确认；地图组／CoT 组输出格式与监督答案仍待逐项确认。
+状态：共享任务描述与规则、地图组／CoT 组每轮环境更新、SOTA／32B 组输出格式及地图组逐轮输出格式已由用户确认；无地图 CoT 组输出格式仍待确认。
 
 ## 共享任务描述与规则
 
@@ -49,4 +49,29 @@ Use "solved" when your sequence reaches the goal; if already at the goal, output
 
 ## 监督答案：排序／Reason／Action
 
-待填地图排序、CoT／短 Reason、动作与终止答案，并说明哪些组监督哪些字段。不从地图自动正确这一假设生成标签；标签仍由离线环境裁判提供。
+### 地图组：已确认
+
+```text
+Map-distance ranking to the goal, closest to farthest: {ranking}.
+Reason: Moving from {from} to {to} is legal and leaves a route to the goal with one fewer move needed.
+<action>{local_id}</action>
+```
+
+排序沿用积木：最近的至多 10 个候选加 `current`，用 `<`、`=` 表示远近与并列。地图排序来自选定 Q，环境裁判另外验证动作与依据，不把地图排序自动视为正确动作标签。
+
+动作直接到达目标时，Reason 改为：
+
+```text
+Reason: Moving from {from} to {to} is legal and reaches the goal node.
+```
+
+已在目标时：
+
+```text
+Reason: The current node is the goal; no further move is needed.
+<done/>
+```
+
+### 无地图 CoT 组：待确认
+
+{cot_output_format_to_be_discussed}

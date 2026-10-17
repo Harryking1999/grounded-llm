@@ -329,7 +329,7 @@ Reason: The current board exactly matches the goal; no further removal is needed
 
 ### 寻路：任务文字与监督格式
 
-状态：共享任务描述与规则、地图组／CoT 组每轮环境更新、SOTA／32B 组输出格式及地图组逐轮输出格式已由用户确认；无地图 CoT 组输出格式仍待确认。
+状态：本任务全部文本已确认。按用户统一规则，无地图组直接去掉地图排序，保留相同 Reason 与动作；不单独重复确认。
 
 #### 共享任务描述与规则
 
@@ -401,9 +401,9 @@ Reason: The current node is the goal; no further move is needed.
 <done/>
 ```
 
-##### 无地图 CoT 组：待确认
+##### 无地图 CoT 组
 
-{cot_output_format_to_be_discussed}
+使用上面相同的 Reason、到达句式和停止答案，只去掉地图排序行，即 R→A。
 
 
 ### 数据说明例

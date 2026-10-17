@@ -18,9 +18,47 @@ from experiments.task_text_baselines.src.prepare_difficulty import reuse_answers
 from experiments.task_text_baselines.src.report import build
 from experiments.task_text_baselines.src.prepare_retest import retest_cases
 from experiments.sol_dag_blocks.src.tasks import BlocksTask
+from experiments.task_text_baselines.src.budget import rescore
 
 
 class TaskRulesTest(unittest.TestCase):
+    def test_budget_counts_reasoning_and_answer_and_preserves_execution(self):
+        record = {'verdict':{'solved':True,'contract_pass':True,'optimal':True},
+                  'usage':{'output_tokens':16001,'output_tokens_details':{'reasoning_tokens':15999}}}
+        scored = rescore(record,16000)
+        self.assertEqual(scored['verdict']['failure'],'budget_exceeded')
+        self.assertFalse(scored['verdict']['solved'])
+        self.assertTrue(scored['execution_verdict']['solved'])
+        self.assertTrue(record['verdict']['solved'])
+        self.assertEqual(rescore(scored,16000),scored)
+        record['usage']['output_tokens'] = 16000
+        self.assertTrue(rescore(record,16000)['verdict']['solved'])
+        del record['usage']
+        self.assertEqual(rescore(record,16000)['verdict']['failure'],'budget_unknown')
+
+    def test_over_budget_answer_is_not_retried_but_service_failure_is(self):
+        cases = [{'id':'long'},{'id':'network'}]
+        long = rescore({'verdict':{'solved':True},'usage':{'output_tokens':16001}},16000)
+        latest = {'long':long | {'attempt':1},'network':{'attempt':1,'service_error':'HTTPError'}}
+        self.assertEqual([r['id'] for r in pending(cases,latest,{'max_service_retries':2},1)],['network'])
+
+    def test_budgeted_api_call_rejects_server_overrun(self):
+        case = {'id':'test','task':'path','stratum':'test','prompt':'frozen','initial':0,'goal':0,
+                'neighbors':{'0':[]},'reference':{'length':0}}
+        api = {'model':'requested','reasoning_effort':'high','max_output_tokens':16000,
+               'scoring_output_limit':16000,'base_url':'https://example.invalid/v1','timeout_seconds':1}
+        response = {'status':'completed','model':'requested','usage':{'output_tokens':16001},
+                    'output_text':json.dumps({'actions':[],'final_status':'solved'})}
+        with patch('experiments.task_text_baselines.src.run.urllib.request.urlopen') as transport:
+            http = transport.return_value.__enter__.return_value
+            http.headers.get.return_value = 'application/json'
+            http.read.return_value = json.dumps(response).encode()
+            result = call(case,api,'test-key',1)
+        self.assertEqual(json.loads(transport.call_args.args[0].data)['max_output_tokens'],16000)
+        self.assertEqual(result['requested_max_output_tokens'],16000)
+        self.assertTrue(result['execution_verdict']['solved'])
+        self.assertEqual(result['verdict']['failure'],'budget_exceeded')
+
     def test_retest_copies_literal_prompts_and_keeps_source_unchanged(self):
         source = {'cases':[{'id':'path_00','task':'path','initial':0,'goal':1,
                   'neighbors':{'0':[1],'1':[0]},'prompt':'literal original prompt',

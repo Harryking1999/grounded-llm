@@ -6,6 +6,7 @@ from pathlib import Path
 
 from .report import build, NAMES
 from .run import write_json
+from .budget import output_limit
 
 
 def conditions(folder):
@@ -59,7 +60,8 @@ def render_report(baseline,qwen):
                 'puzzle8':'3×3，最短 4–30 步'}
     lines = ['# 五任务基线评测','',
              '**采用最初配置。最低难度要求改为 32B 不能可靠完成；GPT 作为强基线参照，不再要求稳定难住 GPT。**','',
-             '## 同题主结果','',
+             '## 同题主结果（16k 评分）','',
+             '统一上限为 16,000 输出 token，包含思考与最终答案；超限即错。以下从已保存答卷重算，不是重新在 16k 请求上限下生成。','',
              '| 任务 | Qwen3-32B 成功 | GPT 成功 | GPT 最优解 |',
              '|---|---:|---:|---:|']
     for task,row in qwen['tasks'].items():
@@ -68,21 +70,20 @@ def render_report(baseline,qwen):
         def cell(value):
             return f'{value}/{count}（{100*value/count:.1f}%）'
         lines.append(f"| {NAMES[task]} | {cell(row['solved'])} | {cell(gpt['solved'])} | {cell(gpt['optimal'])} |")
-    lines += ['',f"**总体成功：32B {qwen_solved}/{total}（{100*qwen_solved/total:.1f}%）；GPT {gpt_solved}/{total}（{100*gpt_solved/total:.1f}%）。** 两组各任务 40 题，均已完成并回收。",'',
+    lines += ['',f"**预算内成功：32B {qwen_solved}/{total}（{100*qwen_solved/total:.1f}%）；GPT {gpt_solved}/{total}（{100*gpt_solved/total:.1f}%）。** 两组各任务 40 题，均已完成并回收。",'',
+              f"原执行成功分别为 32B {sum(r['execution_solved'] for r in qwen['tasks'].values())}/{total}、GPT {sum(r['execution_solved'] for r in baseline['tasks'].values())}/{total}；该历史口径保留，当前主指标采用 16k。",'',
               '## 任务设置','', '| 任务 | 采用的初始条件 |','|---|---|']
     for task in qwen['tasks']:
         lines.append(f'| {NAMES[task]} | {settings[task]} |')
     lines += ['',
               '## 当前判断','',
-              '- 初始条件已满足本轮筛选要求。32B 在积木、汉诺塔、魔方和华容道上成功率为 2.5%–15%；寻路为 67.5%，保留作较简单的对照。',
-              '- GPT 整体成功率高，但最优性仍有差距：二阶魔方最优解率 35%，华容道 45%。后续同时比较能否完成与解法效率。',
+              '- 初始条件已满足本轮筛选要求；32B 表现不足，寻路保留作较简单的对照。',
+              '- 同时比较预算内成功率与最优解率，避免把无限延长思考或计划的结果计作预算内成功。',
               '- 这些结果用于确定任务条件；地图是否有额外收益，仍由匹配的地图／无地图训练与评测验证。','',
               '## 评测口径','',
               '两组使用相同题目、规则与提示词，一次输出完整计划，无中途反馈，客户端不提供工具。成功按环境回放到达目标判定；非最短的成功解照计成功，最优解率以全部 40 题为分母。服务失败已补测，正常错误答案不重抽。积木 12 指构造放置次数，不要求还原原来的 12 块。','',
               'Qwen3-32B 使用完整 BF16 权重并开启 thinking；GPT 请求模型为 gpt-6.1-sol，reasoning effort 为 high。两者思考模式不等同。', '']
-    failures = {name:sum(row['failures'].get(name,0) for row in qwen['tasks'].values())
-                for name in ('illegal_action','unsolved','truncated')}
-    lines.append(f"32B 的 {total-qwen_solved} 题失败包括：非法动作 {failures['illegal_action']}、未完成 {failures['unsolved']}、输出截断 {failures['truncated']}；主表没有因格式问题扣掉已经解出的题。")
+    lines.append(f"超出 16k 的答卷：32B {qwen['budget_policy']['exceeded']} 份、GPT {baseline['budget_policy']['exceeded']} 份，均计失败；用量缺失不计预算内成功。格式问题仍单列，成功要求实际完成且未超限。")
     metadata = baseline['response_metadata_coverage']
     lines += ['',f"GPT 的 {metadata['effort_counts'].get('high',0)}/200 份答卷回显模型名及 high，其余未回传强度；{baseline['exceeded_output_limit']} 份答卷超过请求 token 上限。因此报告为第三方接口下的实测结果，不声称后台配置独立核验或严格等预算。",'',
               '## 配置与补充','',
@@ -118,8 +119,9 @@ def main():
     parser.add_argument('--history',nargs='*',type=Path,default=[])
     parser.add_argument('--out',required=True,type=Path)
     args = parser.parse_args()
-    baseline,_ = build(args.baseline)
-    qwen,_ = build(args.qwen)
+    limit = output_limit()
+    baseline,_ = build(args.baseline,limit)
+    qwen,_ = build(args.qwen,limit)
     history = {path.name:build(path)[0] for path in args.history}
     supplemental = build(args.supplementary)[0] if args.supplementary else None
     args.out.mkdir(parents=True,exist_ok=True)
@@ -129,6 +131,7 @@ def main():
     write_json(args.out/'summary.json',{'updated_at':datetime.now(timezone(timedelta(hours=8))).isoformat(),
         'decision':'Retain initial conditions; Qwen3-32B unreliability is the minimum difficulty criterion; GPT is a strong reference, not a required failure target.',
         'main_config':'experiments/task_text_baselines/configs/sol_high_40.json',
+        'scoring_config':'experiments/task_text_baselines/configs/budget_16k.json',
         'baseline':baseline,'qwen':qwen,'supplementary_difficulty':supplemental,'retired_runs':history})
     print(json.dumps({'out':str(args.out),'qwen_status':qwen['status'],'supplementary_status':supplemental['status'] if supplemental else None}))
 

@@ -13,6 +13,7 @@ import urllib.error
 import urllib.request
 
 from .protocol import ROOT, judge
+from .budget import output_limit, rescore
 
 
 def write_json(path, value):
@@ -56,6 +57,7 @@ def call(case, api, key, attempt):
     body = {"model": api["model"], "input": case["prompt"], "reasoning": {"effort": api["reasoning_effort"]},
             "max_output_tokens": api["max_output_tokens"], "tools": [], "stream": True, "store": False}
     record = {"case_id": case["id"], "task": case["task"], "stratum": case["stratum"], "attempt": attempt,
+              "requested_max_output_tokens": api["max_output_tokens"],
               "started_at": datetime.now(timezone.utc).isoformat()}
     start = time.monotonic()
     request = urllib.request.Request(api["base_url"].rstrip("/") + "/responses", data=json.dumps(body).encode(),
@@ -88,6 +90,8 @@ def call(case, api, key, attempt):
     if record.get("service_error"):
         record["verdict"] = {"solved": False, "contract_pass": False, "failure": "service_error"}
     record["elapsed_seconds"] = round(time.monotonic() - start, 3)
+    if api.get('scoring_output_limit') is not None:
+        record = rescore(record,api['scoring_output_limit'])
     return record
 
 
@@ -129,10 +133,13 @@ def main():
     parser = argparse.ArgumentParser(__doc__)
     parser.add_argument("--out", required=True)
     parser.add_argument("--recovery-config", help="Service-only retry policy; model and sampling parameters remain frozen")
+    parser.add_argument('--budget-config',help='User-authorized output request and scoring limit')
     args = parser.parse_args()
     out = Path(args.out)
     suite = json.loads((out / "suite.json").read_text(encoding="utf-8"))
     cases, api = suite["cases"], dict(suite["config"]["api"])
+    if args.budget_config:
+        api['max_output_tokens'] = api['scoring_output_limit'] = output_limit(args.budget_config)
     if args.recovery_config:
         recovery = json.loads(Path(args.recovery_config).read_text(encoding="utf-8"))
         for name in ("max_service_retries", "max_total_service_retries", "service_retry_delay_seconds"):
@@ -143,14 +150,20 @@ def main():
     attempts = [json.loads(p.read_text(encoding="utf-8")) for p in records_dir.glob("*.json")]
     latest = {r["case_id"]: r for r in sorted(attempts, key=lambda r: (r["case_id"], r["attempt"]))}
     pending_cases = pending(cases, latest, api, suite["config"]["seed"])
+    previous = json.loads((out/'progress.json').read_text(encoding='utf-8')) if (out/'progress.json').exists() else None
     state = {"status": "running", "started_at": datetime.now(timezone.utc).isoformat(),
              "source_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
              "suite_source_commit": suite.get("source_commit"),
              "recovery_config": args.recovery_config,
+             "budget_config":args.budget_config,
+             "request_history":(previous.get('request_history',[]) + [{
+                 'source_commit':previous.get('source_commit'),'api':previous['api'],
+                 'started_at':previous.get('started_at'),'ended_at':previous['updated_at']}]) if previous else [],
              "api": api, "planned": len(cases), "inflight": []}
 
     def save():
-        state.update(summary=summary(list(latest.values()), cases), attempts=len(attempts),
+        scored = [rescore(r,api['scoring_output_limit']) for r in latest.values()] if api.get('scoring_output_limit') is not None else list(latest.values())
+        state.update(summary=summary(scored, cases), attempts=len(attempts),
                      updated_at=datetime.now(timezone.utc).isoformat())
         write_json(out / "progress.json", state)
 

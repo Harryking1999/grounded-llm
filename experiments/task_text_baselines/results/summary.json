@@ -1,7 +1,8 @@
 {
-  "updated_at": "2026-10-17T22:09:04.055407+08:00",
+  "updated_at": "2026-10-17T23:49:11.182023+08:00",
   "decision": "Retain initial conditions; Qwen3-32B unreliability is the minimum difficulty criterion; GPT is a strong reference, not a required failure target.",
   "main_config": "experiments/task_text_baselines/configs/sol_high_40.json",
+  "scoring_config": "experiments/task_text_baselines/configs/budget_16k.json",
   "baseline": {
     "status": "completed",
     "model_request": {
@@ -37,7 +38,10 @@
             "service_errors": 0,
             "solved": 38
           }
-        }
+        },
+        "execution_solved": 38,
+        "budget_exceeded": 0,
+        "budget_unknown": 0
       },
       "path": {
         "planned": 40,
@@ -102,7 +106,10 @@
             "service_errors": 0,
             "solved": 5
           }
-        }
+        },
+        "execution_solved": 40,
+        "budget_exceeded": 0,
+        "budget_unknown": 0
       },
       "hanoi": {
         "planned": 40,
@@ -115,7 +122,8 @@
         "optimal_evaluated": 40,
         "failures": {
           "success": 38,
-          "illegal_action": 2
+          "budget_exceeded": 1,
+          "illegal_action": 1
         },
         "output_tokens": 142516,
         "input_tokens": 27676,
@@ -144,20 +152,23 @@
             "service_errors": 0,
             "solved": 8
           }
-        }
+        },
+        "execution_solved": 38,
+        "budget_exceeded": 1,
+        "budget_unknown": 0
       },
       "cube2": {
         "planned": 40,
         "finished": 40,
         "valid_responses": 40,
         "service_errors": 0,
-        "solved": 39,
-        "contract_pass": 39,
+        "solved": 31,
+        "contract_pass": 31,
         "optimal": 14,
         "optimal_evaluated": 40,
         "failures": {
-          "success": 39,
-          "unsolved": 1
+          "success": 31,
+          "budget_exceeded": 9
         },
         "output_tokens": 351207,
         "input_tokens": 63302,
@@ -190,39 +201,43 @@
             "finished": 5,
             "valid_responses": 5,
             "service_errors": 0,
-            "solved": 5
+            "solved": 3
           },
           "distance_10": {
             "finished": 5,
             "valid_responses": 5,
             "service_errors": 0,
-            "solved": 5
+            "solved": 2
           },
           "distance_12": {
             "finished": 5,
             "valid_responses": 5,
             "service_errors": 0,
-            "solved": 5
+            "solved": 4
           },
           "distance_14": {
             "finished": 5,
             "valid_responses": 5,
             "service_errors": 0,
-            "solved": 5
+            "solved": 3
           }
-        }
+        },
+        "execution_solved": 39,
+        "budget_exceeded": 9,
+        "budget_unknown": 0
       },
       "puzzle8": {
         "planned": 40,
         "finished": 40,
         "valid_responses": 40,
         "service_errors": 0,
-        "solved": 40,
-        "contract_pass": 40,
+        "solved": 36,
+        "contract_pass": 36,
         "optimal": 18,
         "optimal_evaluated": 40,
         "failures": {
-          "success": 40
+          "success": 36,
+          "budget_exceeded": 4
         },
         "output_tokens": 256807,
         "input_tokens": 42019,
@@ -255,7 +270,7 @@
             "finished": 5,
             "valid_responses": 5,
             "service_errors": 0,
-            "solved": 5
+            "solved": 4
           },
           "distance_24": {
             "finished": 5,
@@ -267,15 +282,18 @@
             "finished": 5,
             "valid_responses": 5,
             "service_errors": 0,
-            "solved": 5
+            "solved": 3
           },
           "distance_30": {
             "finished": 5,
             "valid_responses": 5,
             "service_errors": 0,
-            "solved": 5
+            "solved": 4
           }
-        }
+        },
+        "execution_solved": 40,
+        "budget_exceeded": 4,
+        "budget_unknown": 0
       }
     },
     "recorded_attempts": 217,
@@ -295,6 +313,15 @@
         "high": 28
       },
       "effort_reported_on_reused_answers": 0
+    },
+    "budget_policy": {
+      "max_output_tokens": 16000,
+      "scope": "reasoning_plus_final_answer",
+      "exceeded": 14,
+      "unknown": 0,
+      "request_limit_counts": {
+        "32768": 200
+      }
     }
   },
   "qwen": {
@@ -314,9 +341,10 @@
         "optimal": 0,
         "optimal_evaluated": 40,
         "failures": {
-          "illegal_action": 33,
-          "unsolved": 6,
-          "success": 1
+          "budget_exceeded": 35,
+          "illegal_action": 2,
+          "success": 1,
+          "unsolved": 2
         },
         "output_tokens": 800727,
         "input_tokens": 22800,
@@ -327,21 +355,24 @@
             "service_errors": 0,
             "solved": 1
           }
-        }
+        },
+        "execution_solved": 1,
+        "budget_exceeded": 35,
+        "budget_unknown": 0
       },
       "path": {
         "planned": 40,
         "finished": 40,
         "valid_responses": 40,
         "service_errors": 0,
-        "solved": 27,
+        "solved": 26,
         "contract_pass": 18,
         "optimal": 23,
         "optimal_evaluated": 38,
         "failures": {
-          "success": 27,
-          "truncated": 2,
-          "illegal_action": 11
+          "success": 26,
+          "budget_exceeded": 7,
+          "illegal_action": 7
         },
         "output_tokens": 402843,
         "input_tokens": 186398,
@@ -386,7 +417,7 @@
             "finished": 5,
             "valid_responses": 5,
             "service_errors": 0,
-            "solved": 3
+            "solved": 2
           },
           "distance_10": {
             "finished": 5,
@@ -394,7 +425,10 @@
             "service_errors": 0,
             "solved": 1
           }
-        }
+        },
+        "execution_solved": 27,
+        "budget_exceeded": 7,
+        "budget_unknown": 0
       },
       "hanoi": {
         "planned": 40,
@@ -407,8 +441,8 @@
         "optimal_evaluated": 38,
         "failures": {
           "success": 4,
-          "illegal_action": 34,
-          "truncated": 2
+          "budget_exceeded": 25,
+          "illegal_action": 11
         },
         "output_tokens": 684517,
         "input_tokens": 14445,
@@ -437,20 +471,24 @@
             "service_errors": 0,
             "solved": 0
           }
-        }
+        },
+        "execution_solved": 4,
+        "budget_exceeded": 25,
+        "budget_unknown": 0
       },
       "cube2": {
         "planned": 40,
         "finished": 40,
         "valid_responses": 40,
         "service_errors": 0,
-        "solved": 2,
-        "contract_pass": 2,
-        "optimal": 2,
+        "solved": 1,
+        "contract_pass": 1,
+        "optimal": 1,
         "optimal_evaluated": 40,
         "failures": {
-          "unsolved": 38,
-          "success": 2
+          "budget_exceeded": 8,
+          "success": 1,
+          "unsolved": 31
         },
         "output_tokens": 486630,
         "input_tokens": 37600,
@@ -459,7 +497,7 @@
             "finished": 5,
             "valid_responses": 5,
             "service_errors": 0,
-            "solved": 2
+            "solved": 1
           },
           "distance_2": {
             "finished": 5,
@@ -503,7 +541,10 @@
             "service_errors": 0,
             "solved": 0
           }
-        }
+        },
+        "execution_solved": 2,
+        "budget_exceeded": 8,
+        "budget_unknown": 0
       },
       "puzzle8": {
         "planned": 40,
@@ -516,9 +557,9 @@
         "optimal_evaluated": 26,
         "failures": {
           "success": 6,
-          "illegal_action": 11,
-          "unsolved": 9,
-          "truncated": 14
+          "illegal_action": 4,
+          "unsolved": 3,
+          "budget_exceeded": 27
         },
         "output_tokens": 858684,
         "input_tokens": 11960,
@@ -571,7 +612,10 @@
             "service_errors": 0,
             "solved": 0
           }
-        }
+        },
+        "execution_solved": 6,
+        "budget_exceeded": 27,
+        "budget_unknown": 0
       }
     },
     "recorded_attempts": 200,
@@ -589,6 +633,15 @@
         "not_returned": 200
       },
       "effort_reported_on_reused_answers": 0
+    },
+    "budget_policy": {
+      "max_output_tokens": 16000,
+      "scope": "reasoning_plus_final_answer",
+      "exceeded": 102,
+      "unknown": 0,
+      "request_limit_counts": {
+        "32768": 200
+      }
     }
   },
   "supplementary_difficulty": {
@@ -626,7 +679,10 @@
             "service_errors": 0,
             "solved": 19
           }
-        }
+        },
+        "execution_solved": 19,
+        "budget_exceeded": 0,
+        "budget_unknown": 0
       },
       "cube3": {
         "planned": 20,
@@ -650,7 +706,10 @@
             "service_errors": 0,
             "solved": 13
           }
-        }
+        },
+        "execution_solved": 13,
+        "budget_exceeded": 0,
+        "budget_unknown": 0
       },
       "puzzle24": {
         "planned": 20,
@@ -675,7 +734,10 @@
             "service_errors": 0,
             "solved": 14
           }
-        }
+        },
+        "execution_solved": 14,
+        "budget_exceeded": 0,
+        "budget_unknown": 0
       },
       "hanoi": {
         "planned": 20,
@@ -699,7 +761,10 @@
             "service_errors": 0,
             "solved": 10
           }
-        }
+        },
+        "execution_solved": 10,
+        "budget_exceeded": 0,
+        "budget_unknown": 0
       }
     },
     "recorded_attempts": 87,
@@ -768,7 +833,10 @@
               "service_errors": 0,
               "solved": 4
             }
-          }
+          },
+          "execution_solved": 14,
+          "budget_exceeded": 0,
+          "budget_unknown": 0
         },
         "cube3": {
           "planned": 15,
@@ -804,7 +872,10 @@
               "service_errors": 0,
               "solved": 1
             }
-          }
+          },
+          "execution_solved": 11,
+          "budget_exceeded": 0,
+          "budget_unknown": 0
         },
         "puzzle15": {
           "planned": 15,
@@ -839,7 +910,10 @@
               "service_errors": 0,
               "solved": 4
             }
-          }
+          },
+          "execution_solved": 14,
+          "budget_exceeded": 0,
+          "budget_unknown": 0
         },
         "path": {
           "planned": 10,
@@ -869,7 +943,10 @@
               "service_errors": 0,
               "solved": 2
             }
-          }
+          },
+          "execution_solved": 6,
+          "budget_exceeded": 0,
+          "budget_unknown": 0
         },
         "hanoi": {
           "planned": 5,
@@ -893,7 +970,10 @@
               "service_errors": 0,
               "solved": 2
             }
-          }
+          },
+          "execution_solved": 2,
+          "budget_exceeded": 0,
+          "budget_unknown": 0
         }
       },
       "recorded_attempts": 53,
@@ -956,7 +1036,10 @@
               "service_errors": 0,
               "solved": 5
             }
-          }
+          },
+          "execution_solved": 10,
+          "budget_exceeded": 0,
+          "budget_unknown": 0
         },
         "cube3": {
           "planned": 15,
@@ -991,7 +1074,10 @@
               "service_errors": 0,
               "solved": 3
             }
-          }
+          },
+          "execution_solved": 13,
+          "budget_exceeded": 0,
+          "budget_unknown": 0
         },
         "puzzle15": {
           "planned": 20,
@@ -1032,7 +1118,10 @@
               "service_errors": 0,
               "solved": 4
             }
-          }
+          },
+          "execution_solved": 19,
+          "budget_exceeded": 0,
+          "budget_unknown": 0
         },
         "hanoi": {
           "planned": 15,
@@ -1069,7 +1158,10 @@
               "service_errors": 0,
               "solved": 3
             }
-          }
+          },
+          "execution_solved": 11,
+          "budget_exceeded": 0,
+          "budget_unknown": 0
         },
         "path": {
           "planned": 20,
@@ -1112,7 +1204,10 @@
               "service_errors": 1,
               "solved": 1
             }
-          }
+          },
+          "execution_solved": 15,
+          "budget_exceeded": 0,
+          "budget_unknown": 0
         }
       },
       "recorded_attempts": 135,
@@ -1170,7 +1265,10 @@
               "service_errors": 1,
               "solved": 4
             }
-          }
+          },
+          "execution_solved": 4,
+          "budget_exceeded": 0,
+          "budget_unknown": 0
         }
       },
       "recorded_attempts": 25,
@@ -1234,7 +1332,10 @@
               "service_errors": 1,
               "solved": 1
             }
-          }
+          },
+          "execution_solved": 6,
+          "budget_exceeded": 0,
+          "budget_unknown": 0
         }
       },
       "recorded_attempts": 28,
@@ -1290,7 +1391,10 @@
               "service_errors": 1,
               "solved": 1
             }
-          }
+          },
+          "execution_solved": 1,
+          "budget_exceeded": 0,
+          "budget_unknown": 0
         }
       },
       "recorded_attempts": 22,
@@ -1346,7 +1450,10 @@
               "service_errors": 1,
               "solved": 2
             }
-          }
+          },
+          "execution_solved": 2,
+          "budget_exceeded": 0,
+          "budget_unknown": 0
         }
       },
       "recorded_attempts": 13,

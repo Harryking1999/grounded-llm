@@ -5,12 +5,13 @@ import json
 from pathlib import Path
 
 from .run import summary, write_json
+from .budget import output_limit, rescore, POLICY
 
 NAMES = {"blocks":"积木", "path":"寻路", "hanoi":"汉诺塔", "cube2":"二阶魔方", "puzzle8":"8-Puzzle",
          "cube3":"三阶魔方", "puzzle15":"4×4 华容道", "puzzle24":"5×5 华容道"}
 
 
-def build(run):
+def build(run, limit=None):
     run = Path(run)
     progress = json.loads((run / "progress.json").read_text(encoding="utf-8"))
     suite = json.loads((run / "suite.json").read_text(encoding="utf-8"))
@@ -19,17 +20,30 @@ def build(run):
     for row in sorted(attempts, key=lambda r:(r["case_id"],r["attempt"])):
         latest[row["case_id"]] = row
     records = list(latest.values())
+    execution_records = [dict(r,verdict=r.get('execution_verdict',r['verdict'])) for r in records]
+    if limit is not None:
+        records = [rescore(r,limit) for r in records]
     valid = [row for row in records if not row.get('service_error')]
     metadata = {'valid_answers':len(valid),
                 'model_reported':sum(row.get('returned_model') is not None for row in valid),
                 'effort_counts':dict(Counter((row.get('returned_reasoning') or {}).get('effort') or 'not_returned' for row in valid)),
                 'effort_reported_on_reused_answers':sum(bool(row.get('reused_from')) and bool((row.get('returned_reasoning') or {}).get('effort')) for row in valid)}
     results = summary(records,suite["cases"])
+    execution = summary(execution_records,suite['cases'])
+    for task,row in results.items():
+        row['execution_solved'] = execution[task]['solved']
+        row['budget_exceeded'] = sum(r.get('budget_status') == 'exceeded' for r in records if r['task'] == task)
+        row['budget_unknown'] = sum(r.get('budget_status') == 'unknown' for r in records if r['task'] == task)
     result = {"status":progress["status"], "model_request":progress["api"], "tasks":results,
               "recorded_attempts":len(attempts), "service_error_attempts":sum(bool(r.get("service_error")) for r in attempts),
               "returned_model_counts":dict(Counter(str(r.get("returned_model")) for r in records)),
               "exceeded_output_limit":sum(r.get("exceeds_requested_budget") is True for r in records),
               "run_path":str(run), "updated_at":progress["updated_at"],"response_metadata_coverage":metadata}
+    if limit is not None:
+        result['budget_policy'] = {'max_output_tokens':limit,'scope':'reasoning_plus_final_answer',
+            'exceeded':sum(r.get('budget_status') == 'exceeded' for r in valid),
+            'unknown':sum(r.get('budget_status') == 'unknown' for r in valid),
+            'request_limit_counts':dict(Counter(str(r.get('requested_max_output_tokens',suite['config'].get('api',{}).get('max_output_tokens',progress['api'].get('max_output_tokens')))) for r in valid))}
     adaptive = suite["config"].get("study") == "adaptive_complete_plan_difficulty"
     policy = suite.get('current_policy',suite['config'])
     screening,confirmation = policy.get('cases_per_level',5),policy.get('confirmation_cases',10)
@@ -64,6 +78,8 @@ def build(run):
         for name, row in sorted(values["strata"].items()):
             lines.append(f"| {NAMES[task]} | {name} | {row['valid_responses']} | {row['service_errors']} | {row['solved']} |")
     lines += ["", "## 失败与解释边界", ""]
+    if limit is not None:
+        lines += [f'输出评分上限 {limit:,} token，包含思考与最终答案；超限即错，缺失用量不计预算内成功。历史答卷按新规则重算，不代表重新在该上限下生成。','']
     for task, values in results.items():
         failures = {k:v for k,v in values["failures"].items() if k != "success"}
         lines.append(f"- {NAMES[task]}：" + ("；".join(f"{k}={v}" for k,v in failures.items()) or "已返回题暂无失败。"))
@@ -80,8 +96,9 @@ def main():
     parser=argparse.ArgumentParser(__doc__)
     parser.add_argument("--run",required=True)
     parser.add_argument("--out",required=True)
+    parser.add_argument('--budget-config',type=Path,default=POLICY)
     args=parser.parse_args()
-    result,text=build(args.run)
+    result,text=build(args.run,output_limit(args.budget_config))
     out=Path(args.out)
     out.mkdir(parents=True,exist_ok=True)
     write_json(out / "summary.json",result)

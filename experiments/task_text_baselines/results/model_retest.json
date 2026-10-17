@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-17 22:36（北京时间）",
+  "updated_at": "2026-10-17 22:39（北京时间）",
   "original_sol61": {
     "status": "completed",
     "model_request": {
@@ -364,41 +364,41 @@
       "hanoi": {
         "planned": 40,
         "finished": 1,
-        "valid_responses": 0,
-        "service_errors": 1,
-        "solved": 0,
+        "valid_responses": 1,
+        "service_errors": 0,
+        "solved": 1,
         "contract_pass": 0,
-        "optimal": 0,
-        "optimal_evaluated": 0,
+        "optimal": 1,
+        "optimal_evaluated": 1,
         "failures": {
-          "service_error": 1
+          "success": 1
         },
-        "output_tokens": 0,
-        "input_tokens": 0,
+        "output_tokens": 8884,
+        "input_tokens": 4738,
         "strata": {
           "distance_128_255": {
             "finished": 1,
-            "valid_responses": 0,
-            "service_errors": 1,
-            "solved": 0
+            "valid_responses": 1,
+            "service_errors": 0,
+            "solved": 1
           }
         }
       },
       "cube2": {
         "planned": 40,
-        "finished": 2,
-        "valid_responses": 1,
+        "finished": 3,
+        "valid_responses": 2,
         "service_errors": 1,
-        "solved": 1,
-        "contract_pass": 1,
-        "optimal": 1,
-        "optimal_evaluated": 1,
+        "solved": 2,
+        "contract_pass": 2,
+        "optimal": 2,
+        "optimal_evaluated": 2,
         "failures": {
-          "success": 1,
+          "success": 2,
           "service_error": 1
         },
-        "output_tokens": 176,
-        "input_tokens": 953,
+        "output_tokens": 3495,
+        "input_tokens": 1906,
         "strata": {
           "distance_1": {
             "finished": 1,
@@ -407,6 +407,12 @@
             "solved": 1
           },
           "distance_4": {
+            "finished": 1,
+            "valid_responses": 1,
+            "service_errors": 0,
+            "solved": 1
+          },
+          "distance_8": {
             "finished": 1,
             "valid_responses": 0,
             "service_errors": 1,
@@ -438,21 +444,21 @@
         }
       }
     },
-    "recorded_attempts": 8,
-    "service_error_attempts": 2,
+    "recorded_attempts": 11,
+    "service_error_attempts": 3,
     "returned_model_counts": {
       "None": 7,
-      "gpt-5.6-sol": 1
+      "gpt-5.6-sol": 2
     },
     "exceeded_output_limit": 0,
     "run_path": "runs\\five_task_sol56_high_same40",
-    "updated_at": "2026-10-17T14:36:01.560339+00:00",
+    "updated_at": "2026-10-17T14:39:32.200113+00:00",
     "response_metadata_coverage": {
-      "valid_answers": 6,
-      "model_reported": 1,
+      "valid_answers": 8,
+      "model_reported": 2,
       "effort_counts": {
-        "not_returned": 5,
-        "high": 1
+        "not_returned": 6,
+        "high": 2
       },
       "effort_reported_on_reused_answers": 0
     }
@@ -473,41 +479,44 @@
     "tasks": {
       "blocks": {
         "planned": 16,
-        "finished": 1,
-        "valid_responses": 1,
-        "service_errors": 0,
-        "solved": 1,
-        "contract_pass": 1,
+        "finished": 7,
+        "valid_responses": 5,
+        "service_errors": 2,
+        "solved": 5,
+        "contract_pass": 4,
         "optimal": 0,
         "optimal_evaluated": 0,
         "failures": {
-          "success": 1
+          "success": 5,
+          "service_error": 2
         },
-        "output_tokens": 9219,
-        "input_tokens": 474,
+        "output_tokens": 38383,
+        "input_tokens": 6567,
         "strata": {
           "legacy_blocks12": {
-            "finished": 1,
-            "valid_responses": 1,
-            "service_errors": 0,
-            "solved": 1
+            "finished": 7,
+            "valid_responses": 5,
+            "service_errors": 2,
+            "solved": 5
           }
         }
       }
     },
-    "recorded_attempts": 1,
-    "service_error_attempts": 0,
+    "recorded_attempts": 7,
+    "service_error_attempts": 2,
     "returned_model_counts": {
-      "None": 1
+      "None": 6,
+      "gpt-6.1-sol": 1
     },
     "exceeded_output_limit": 0,
     "run_path": "runs\\sol61_legacy_blocks12_new_prompt",
-    "updated_at": "2026-10-17T14:35:59.871719+00:00",
+    "updated_at": "2026-10-17T14:39:28.465720+00:00",
     "response_metadata_coverage": {
-      "valid_answers": 1,
-      "model_reported": 0,
+      "valid_answers": 5,
+      "model_reported": 1,
       "effort_counts": {
-        "not_returned": 1
+        "not_returned": 4,
+        "high": 1
       },
       "effort_reported_on_reused_answers": 0
     }

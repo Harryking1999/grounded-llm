@@ -631,24 +631,10 @@ Allowed turns are U, U', R, R', F, and F'. A letter turns that face 90 degrees c
 Each quarter-turn costs one step. A 180-degree turn requires two quarter-turns.
 Reach the goal cube state exactly.
 
-Face-grid orientation:
-U: the top row touches B; the bottom row touches F; columns run from L to R.
-D: the top row touches F; the bottom row touches B; columns run from L to R.
-F: the top row touches U; the bottom row touches D; columns run from L to R.
-R: the top row touches U; the bottom row touches D; columns run from F to B.
-B: the top row touches U; the bottom row touches D; columns run from R to L.
-L: the top row touches U; the bottom row touches D; columns run from B to F.
+Action examples: each example starts independently from the state below.
+Do not apply these example turns in sequence.
 
-Initial cube state:
-{initial_cube_state}
-
-Goal cube state:
-{goal_cube_state}
-```
-
-格式说明例（复原状态；实际题目由环境生成）：
-
-```text
+[Before each example]
 Upper:
 0 0
 0 0
@@ -667,9 +653,135 @@ Right:
 Back:
 5 5
 5 5
+
+[After U]
+Upper:
+0 0
+0 0
+Front:
+1 1
+2 2
+Down:
+3 3
+3 3
+Left:
+2 2
+4 4
+Right:
+5 5
+1 1
+Back:
+4 4
+5 5
+
+[After U']
+Upper:
+0 0
+0 0
+Front:
+4 4
+2 2
+Down:
+3 3
+3 3
+Left:
+5 5
+4 4
+Right:
+2 2
+1 1
+Back:
+1 1
+5 5
+
+[After R]
+Upper:
+0 2
+0 2
+Front:
+2 3
+2 3
+Down:
+3 5
+3 5
+Left:
+4 4
+4 4
+Right:
+1 1
+1 1
+Back:
+0 5
+0 5
+
+[After R']
+Upper:
+0 5
+0 5
+Front:
+2 0
+2 0
+Down:
+3 2
+3 2
+Left:
+4 4
+4 4
+Right:
+1 1
+1 1
+Back:
+3 5
+3 5
+
+[After F]
+Upper:
+0 0
+4 4
+Front:
+2 2
+2 2
+Down:
+1 1
+3 3
+Left:
+4 3
+4 3
+Right:
+0 1
+0 1
+Back:
+5 5
+5 5
+
+[After F']
+Upper:
+0 0
+1 1
+Front:
+2 2
+2 2
+Down:
+4 4
+3 3
+Left:
+4 0
+4 0
+Right:
+3 1
+3 1
+Back:
+5 5
+5 5
+
+Initial cube state:
+{initial_cube_state}
+
+Goal cube state:
+{goal_cube_state}
 ```
 
-采用矩阵便于直接阅读各面；规定行列方向用于消除背面和底面的镜像歧义。贴纸转换实现后须验证其与现有角块状态、六动作转移的一致性。DBL 固定是内部参考系约束，不增加模型动作。
+六面矩阵与六种四分之一转示例参考 XoT；每个示例独立从同一复原状态出发，不是连续执行。教学示例在各组共用，不提供当前测试题的后继或解题轨迹。已核对这六个示例与当前角块环境的转移一致；完整双向贴纸转换尚未实现。DBL 固定是内部参考系约束，不增加模型动作。
 
 #### 地图组／CoT 组：每轮环境更新
 

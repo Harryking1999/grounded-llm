@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-18 02:28（北京时间）",
+  "updated_at": "2026-10-18 02:38（北京时间）",
   "same_questions": false,
   "baseline_blocks": {
     "planned": 40,
@@ -61,29 +61,30 @@
   },
   "new_blocks_8k": {
     "planned": 40,
-    "finished": 2,
-    "valid_responses": 2,
+    "finished": 30,
+    "valid_responses": 30,
     "service_errors": 0,
-    "solved": 1,
-    "contract_pass": 1,
+    "solved": 5,
+    "contract_pass": 5,
     "optimal": 0,
     "optimal_evaluated": 0,
     "failures": {
-      "budget_exceeded": 1,
-      "success": 1
+      "budget_exceeded": 22,
+      "unsolved": 3,
+      "success": 5
     },
-    "output_tokens": 17222,
-    "input_tokens": 1006,
+    "output_tokens": 366036,
+    "input_tokens": 15090,
     "strata": {
       "placements_12": {
-        "finished": 2,
-        "valid_responses": 2,
+        "finished": 30,
+        "valid_responses": 30,
         "service_errors": 0,
-        "solved": 1
+        "solved": 5
       }
     },
-    "execution_solved": 2,
-    "budget_exceeded": 1,
+    "execution_solved": 26,
+    "budget_exceeded": 22,
     "budget_unknown": 0
   },
   "state_report": {
@@ -103,61 +104,63 @@
     "tasks": {
       "blocks": {
         "planned": 40,
-        "finished": 2,
-        "valid_responses": 2,
+        "finished": 30,
+        "valid_responses": 30,
         "service_errors": 0,
-        "solved": 2,
-        "contract_pass": 2,
+        "solved": 22,
+        "contract_pass": 22,
         "optimal": 0,
         "optimal_evaluated": 0,
         "failures": {
-          "success": 2
+          "success": 22,
+          "unsolved": 3,
+          "budget_exceeded": 5
         },
-        "output_tokens": 17222,
-        "input_tokens": 1006,
+        "output_tokens": 366036,
+        "input_tokens": 15090,
         "strata": {
           "placements_12": {
-            "finished": 2,
-            "valid_responses": 2,
+            "finished": 30,
+            "valid_responses": 30,
             "service_errors": 0,
-            "solved": 2
+            "solved": 22
           }
         },
-        "execution_solved": 2,
-        "budget_exceeded": 0,
+        "execution_solved": 26,
+        "budget_exceeded": 5,
         "budget_unknown": 0
       }
     },
-    "recorded_attempts": 2,
-    "service_error_attempts": 0,
+    "recorded_attempts": 31,
+    "service_error_attempts": 1,
     "returned_model_counts": {
-      "None": 2
+      "None": 30
     },
-    "exceeded_output_limit": 0,
+    "exceeded_output_limit": 5,
     "run_path": "runs\\sol56_blocks40_sz_state_report",
-    "updated_at": "2026-10-17T18:28:54.153545+00:00",
+    "updated_at": "2026-10-17T18:38:37.813157+00:00",
     "response_metadata_coverage": {
-      "valid_answers": 2,
+      "valid_answers": 30,
       "model_reported": 0,
       "effort_counts": {
-        "not_returned": 2
+        "not_returned": 30
       },
       "effort_reported_on_reused_answers": 0
     },
     "budget_policy": {
       "max_output_tokens": 16000,
       "scope": "reasoning_plus_final_answer",
-      "exceeded": 0,
+      "exceeded": 5,
       "unknown": 0,
       "request_limit_counts": {
-        "16000": 2
+        "16000": 30
       }
     }
   },
   "within_budget_state_accuracy": {
-    "evaluated": 24,
-    "valid": 24,
-    "correct": 24
+    "evaluated": 264,
+    "valid": 264,
+    "correct": 264
   },
   "paired": {
     "answered": 0,

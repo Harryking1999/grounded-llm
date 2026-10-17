@@ -8,11 +8,20 @@ from experiments.task_text_baselines.src.difficulty import prepare_level
 from experiments.task_text_baselines.src.escalate import decision
 from experiments.task_text_baselines.src.protocol import ROOT
 from experiments.task_text_baselines.src.protocol import judge, prompt
-from experiments.task_text_baselines.src.run import extract_text, pending
+from experiments.task_text_baselines.src.run import extract_text, pending, summary
 from experiments.task_text_baselines.src.qwen import final_text, round_robin
 
 
 class TaskRulesTest(unittest.TestCase):
+    def test_stratum_separates_service_errors_from_valid_failure(self):
+        cases = [{'id':name,'task':'path'} for name in ('ok','wrong','network')]
+        records = [{'task':'path','stratum':'hard','verdict':{'solved':True}},
+                   {'task':'path','stratum':'hard','verdict':{'solved':False,'failure':'illegal_action'}},
+                   {'task':'path','stratum':'hard','service_error':'HTTPError',
+                    'verdict':{'solved':False,'failure':'service_error'}}]
+        row = summary(records,cases)['path']['strata']['hard']
+        self.assertEqual(row,{'finished':3,'valid_responses':2,'service_errors':1,'solved':1})
+
     def test_difficulty_requires_independent_confirmation(self):
         config = {'maximum_solved_fraction':0.5}
         def rows(solved,total):

@@ -52,10 +52,10 @@ def build(run):
             detail = f"第 {index+1} 步{category}" if index is not None else category
             origin = "原 40 题" if failure['origin'] == 'original_baseline' else '加难试验'
             lines.append(f"- {NAMES[task]}：{origin} `{failure['case_id']}` 出现{detail}，已停止升档。")
-    lines += ["", "## 难度分层", "", "| 任务 | 分层 | 已记录 | 解出 |", "|---|---|---:|---:|"]
+    lines += ["", "## 难度分层", "", "| 任务 | 分层 | 有效答卷 | 待补服务失败 | 解出 |", "|---|---|---:|---:|---:|"]
     for task, values in results.items():
         for name, row in sorted(values["strata"].items()):
-            lines.append(f"| {NAMES[task]} | {name} | {row['finished']} | {row['solved']} |")
+            lines.append(f"| {NAMES[task]} | {name} | {row['valid_responses']} | {row['service_errors']} | {row['solved']} |")
     lines += ["", "## 失败与解释边界", ""]
     for task, values in results.items():
         failures = {k:v for k,v in values["failures"].items() if k != "success"}

@@ -106,7 +106,11 @@ def summary(records, cases):
                         "failures": dict(Counter(r["verdict"].get("failure") or "success" for r in rows)),
                         "output_tokens": sum((r.get("usage") or {}).get("output_tokens") or 0 for r in rows),
                         "input_tokens": sum((r.get("usage") or {}).get("input_tokens") or 0 for r in rows),
-                        "strata": {name: {"finished": len(values), "solved": sum(bool(r["verdict"].get("solved")) for r in values)} for name, values in strata.items()}}
+                        "strata": {name: {"finished": len(values),
+                                          "valid_responses": sum(not bool(r.get("service_error")) for r in values),
+                                          "service_errors": sum(bool(r.get("service_error")) for r in values),
+                                          "solved": sum(bool(r["verdict"].get("solved")) for r in values)}
+                                   for name, values in strata.items()}}
     return result
 
 

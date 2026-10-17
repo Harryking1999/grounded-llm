@@ -31,12 +31,22 @@ def build(run):
              "", "每档最多 5 题，逐项加难、遇模型错误即停。打乱步数是生成参数，不等于最短距离。" if adaptive else "同一套各 40 题，一次输出完整计划，无工具、无中途反馈。主指标为环境回放到达目标，最优解和输出格式另计。",
              "", "| 任务 | 有效答卷／计划 | 待补服务失败 | 解出 | 严格合同通过 | 最优解 |", "|---|---:|---:|---:|---:|---:|"]
     for task, values in results.items():
-        lines.append(f"| {NAMES[task]} | {values['valid_responses']}/{values['planned']} | {values['service_errors']} | {values['solved']} | {values['contract_pass']} | {values['optimal']} |")
+        optimal = str(values['optimal']) if values['optimal_evaluated'] else '—'
+        lines.append(f"| {NAMES[task]} | {values['valid_responses']}/{values['planned']} | {values['service_errors']} | {values['solved']} | {values['contract_pass']} | {optimal} |")
     if adaptive:
         lines += ["", "## 首次错误与停止位置", ""]
         for task,row in progress.get("tasks",{}).items():
-            failure = row.get("first_error",{})
-            lines.append(f"- {NAMES[task]}：{row['status']}；"+json.dumps(failure,ensure_ascii=False))
+            failure = row.get("first_error")
+            if not failure:
+                label = {"active":"继续测试", "range_exhausted":"当前范围全部通过", "service_blocked":"连接失败，待补测"}.get(row['status'],row['status'])
+                lines.append(f"- {NAMES[task]}：{label}。")
+                continue
+            verdict = failure['verdict']
+            category = {"illegal_action":"非法动作", "unsolved":"计划未到目标", "parse_error":"答案无法解析", "truncated":"输出达到预算上限"}.get(verdict.get('failure'),"输出格式未通过")
+            index = verdict.get('first_illegal_index')
+            detail = f"第 {index+1} 步{category}" if index is not None else category
+            origin = "原 40 题" if failure['origin'] == 'original_baseline' else '加难试验'
+            lines.append(f"- {NAMES[task]}：{origin} `{failure['case_id']}` 出现{detail}，已停止升档。")
     lines += ["", "## 难度分层", "", "| 任务 | 分层 | 已记录 | 解出 |", "|---|---|---:|---:|"]
     for task, values in results.items():
         for name, row in sorted(values["strata"].items()):

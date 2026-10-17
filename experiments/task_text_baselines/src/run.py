@@ -102,6 +102,7 @@ def summary(records, cases):
                         "solved": sum(bool(r["verdict"].get("solved")) for r in rows),
                         "contract_pass": sum(bool(r["verdict"].get("contract_pass")) for r in rows),
                         "optimal": sum(bool(r["verdict"].get("optimal")) for r in rows),
+                        "optimal_evaluated": sum(r["verdict"].get("optimal") is not None for r in rows),
                         "failures": dict(Counter(r["verdict"].get("failure") or "success" for r in rows)),
                         "output_tokens": sum((r.get("usage") or {}).get("output_tokens") or 0 for r in rows),
                         "input_tokens": sum((r.get("usage") or {}).get("input_tokens") or 0 for r in rows),

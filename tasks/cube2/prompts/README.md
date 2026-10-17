@@ -22,7 +22,10 @@ Reach the goal cube state exactly.
 Face-grid orientation:
 U: the top row touches B; the bottom row touches F; columns run from L to R.
 D: the top row touches F; the bottom row touches B; columns run from L to R.
-F, R, B, L: the top row touches U and the bottom row touches D; columns run from L to R, F to B, R to L, and B to F, respectively.
+F: the top row touches U; the bottom row touches D; columns run from L to R.
+R: the top row touches U; the bottom row touches D; columns run from F to B.
+B: the top row touches U; the bottom row touches D; columns run from R to L.
+L: the top row touches U; the bottom row touches D; columns run from B to F.
 
 Initial cube state:
 {initial_cube_state}

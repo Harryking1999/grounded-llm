@@ -1,13 +1,25 @@
 # 寻路：任务文字与监督格式
 
-状态：新一轮统一文字待讨论；以下仅固定栏目和已知规则，不是可直接提交模型的正式提示。
+状态：共享任务描述与规则已由用户确认；每轮环境更新、各组输出格式与监督答案仍待逐项确认。
 
 ## 共享任务描述与规则
 
-在给定图上，从当前节点沿合法边到目标节点。现有纯 Q 合同使用固定的无向无权图；一步沿一条边移动，候选为所有合法邻居，包括返回动作。需要确认：新一轮图规模、是否展示全部邻接表、是否限制重复访问。不要直接沿用历史读取实验“每个节点最多访问一次”的提示。
+各组使用以下同一段描述与规则。按用户决定删除允许重访的说明，不添加禁止重访的限制，也不改变环境合法动作。
 
 ```text
-{task_description_and_rules_to_be_discussed}
+Find a valid path from the initial node to the goal node, as short as you can.
+Reaching the goal is the first priority; among valid solutions, prefer fewer moves.
+
+Rules: The graph is undirected and unweighted. Nodes are numbered 0 through {max_node_id}.
+An action move(from,to) moves from the current node to an adjacent node along a listed edge.
+Each move costs one step.
+Reach the goal node exactly.
+
+Neighbors:
+{adjacency_list}
+
+Initial node: {initial_node}
+Goal node: {goal_node}
 ```
 
 ## 地图组／CoT 组：每轮环境更新

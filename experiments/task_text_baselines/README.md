@@ -1,6 +1,6 @@
 # 五任务纯文字完整规划基线
 
-**结果只看[模型、设置与预算对照表](results/report.md)。**初始五任务、旧积木复测、逐步状态及 S/Z 仅动作双模型对照均已完成，服务失败已补齐，定时跟进已暂停。所有加难探索已停止，不再派题。
+**结果只看[模型、设置与预算对照表](results/report.md)。**初始五任务、旧积木复测、逐步状态及 S/Z 八形状仅动作对照均已完成。新增完整十形状、仅动作的 100 题双模型对照运行中，定时跟进仅监测本轮。此前加难探索均已停止，不再派题。
 
 ## 实验合同与答卷来源
 
@@ -17,12 +17,16 @@
 | 6.1-sol high，逐字复用上述 S/Z 40 题 | [sol61_blocks40_sz_state_report.json](configs/sol61_blocks40_sz_state_report.json) | `runs/sol61_blocks40_sz_state_report/` |
 | 5.6-sol high，S/Z 同题，仅动作 | [sol56_blocks40_sz_actions.json](configs/sol56_blocks40_sz_actions.json) | `runs/sol56_blocks40_sz_actions/` |
 | 6.1-sol high，S/Z 同题，仅动作 | [sol61_blocks40_sz_actions.json](configs/sol61_blocks40_sz_actions.json) | `runs/sol61_blocks40_sz_actions/` |
+| 6.1-sol high，完整十形状，新 100 题，仅动作 | [sol61_blocks100_sz10_actions.json](configs/sol61_blocks100_sz10_actions.json) | `runs/sol61_blocks100_sz10_actions/` |
+| 5.6-sol high，逐字复用上述 100 题，仅动作 | [sol56_blocks100_sz10_actions.json](configs/sol56_blocks100_sz10_actions.json) | `runs/sol56_blocks100_sz10_actions/` |
 
 提示词从 `tasks/<task>/prompts/README.md` 读取，生成后冻结在各运行目录的 `suite.json`。逐字同题组复制冻结内容；旧十形状保留原棋盘与形状目录，采用已确认的规则与完整计划 JSON；新 S/Z 八形状重新生成棋盘，与旧组不配对。
 
 6.1 的 S/Z 组直接复制已冻结的 5.6 S/Z 题集，包括逐步状态要求，不再次生成棋盘；只有请求模型不同，高强度、16k 请求及服务重试设置保持一致。
 
 S/Z 仅动作两组只删除冻结提示词末尾的逐步状态指令，保留全部题目、规则、参考解及动作／终态 JSON；5.6 和 6.1 逐字使用同一提示词。两组与各自已完成的逐步状态组构成同题输出要求对照。
+
+完整十形状 100 题复用历史目录和相邻构造：每步从全部可行、不重叠且相邻的放置中均匀选择，排除平移等价重复及历史题。保留已确认的当前规则和动作／终态 JSON，不要求状态报告；两个模型逐字同题同提示词，旧 16 题单列，不混入新 100 题。
 
 ## 评分与实现
 

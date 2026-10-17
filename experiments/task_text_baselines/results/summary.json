@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-17 19:14（北京时间）",
+  "updated_at": "2026-10-17 19:17（北京时间）",
   "api": {
     "status": "completed",
     "model_request": {
@@ -233,135 +233,103 @@
     "tasks": {
       "blocks": {
         "status": "active",
-        "level": 1
+        "level": 2,
+        "phase": "screen",
+        "level_results": []
       },
       "cube3": {
         "status": "active",
-        "level": 1
+        "level": 2,
+        "phase": "screen",
+        "level_results": []
       },
       "puzzle15": {
         "status": "active",
-        "level": 1
+        "level": 2,
+        "phase": "screen",
+        "level_results": []
       },
       "hanoi": {
-        "status": "model_error_found",
+        "status": "active",
         "level": 0,
-        "first_error": {
-          "case_id": "hanoi_32",
-          "origin": "original_baseline",
-          "verdict": {
-            "solved": false,
-            "contract_pass": false,
-            "strict_json": true,
-            "status_correct": false,
-            "reported_status": "solved",
-            "failure": "illegal_action",
-            "first_illegal_index": 15,
-            "illegal_detail": "Larger disk on smaller disk",
-            "executed": 15,
-            "plan_length": 247,
-            "optimal": false,
-            "excess_moves": null
-          }
-        }
+        "phase": "screen",
+        "level_results": []
       },
       "path": {
-        "status": "model_error_found",
+        "status": "active",
         "level": 0,
-        "first_error": {
-          "case_id": "path_level0_00",
-          "origin": "difficulty_ladder",
-          "level_value": 512,
-          "verdict": {
-            "solved": false,
-            "contract_pass": false,
-            "strict_json": true,
-            "status_correct": false,
-            "reported_status": "solved",
-            "failure": "illegal_action",
-            "first_illegal_index": 4,
-            "illegal_detail": "Not a current-node edge",
-            "executed": 4,
-            "plan_length": 10,
-            "optimal": false,
-            "excess_moves": null
-          }
-        }
+        "phase": "screen",
+        "level_results": []
       }
     },
     "summary": {
       "blocks": {
-        "planned": 10,
-        "finished": 10,
-        "valid_responses": 10,
+        "planned": 5,
+        "finished": 0,
+        "valid_responses": 0,
         "service_errors": 0,
-        "solved": 10,
-        "contract_pass": 9,
+        "solved": 0,
+        "contract_pass": 0,
         "optimal": 0,
         "optimal_evaluated": 0,
-        "failures": {
-          "success": 10
-        },
-        "output_tokens": 100716,
-        "input_tokens": 13134,
-        "strata": {
-          "SZ10_connected_12": {
-            "finished": 5,
-            "solved": 5
-          },
-          "SZ10_connected_16": {
-            "finished": 5,
-            "solved": 5
-          }
-        }
+        "failures": {},
+        "output_tokens": 0,
+        "input_tokens": 0,
+        "strata": {}
       },
       "cube3": {
-        "planned": 10,
-        "finished": 9,
-        "valid_responses": 9,
+        "planned": 5,
+        "finished": 0,
+        "valid_responses": 0,
         "service_errors": 0,
-        "solved": 9,
-        "contract_pass": 9,
+        "solved": 0,
+        "contract_pass": 0,
+        "optimal": 0,
+        "optimal_evaluated": 0,
+        "failures": {},
+        "output_tokens": 0,
+        "input_tokens": 0,
+        "strata": {}
+      },
+      "puzzle15": {
+        "planned": 5,
+        "finished": 1,
+        "valid_responses": 1,
+        "service_errors": 0,
+        "solved": 1,
+        "contract_pass": 1,
         "optimal": 0,
         "optimal_evaluated": 0,
         "failures": {
-          "success": 9
+          "success": 1
         },
-        "output_tokens": 143450,
-        "input_tokens": 28797,
+        "output_tokens": 1124,
+        "input_tokens": 344,
         "strata": {
-          "scramble_4": {
-            "finished": 5,
-            "solved": 5
-          },
-          "scramble_8": {
-            "finished": 4,
-            "solved": 4
+          "scramble_24": {
+            "finished": 1,
+            "solved": 1
           }
         }
       },
-      "puzzle15": {
-        "planned": 10,
-        "finished": 10,
-        "valid_responses": 10,
+      "hanoi": {
+        "planned": 5,
+        "finished": 1,
+        "valid_responses": 1,
         "service_errors": 0,
-        "solved": 10,
-        "contract_pass": 10,
-        "optimal": 0,
-        "optimal_evaluated": 0,
+        "solved": 1,
+        "contract_pass": 1,
+        "optimal": 1,
+        "optimal_evaluated": 1,
         "failures": {
-          "success": 10
+          "success": 1
         },
-        "output_tokens": 9812,
-        "input_tokens": 16031,
+        "output_tokens": 8073,
+        "input_tokens": 383,
         "strata": {
-          "scramble_8": {
-            "finished": 5,
-            "solved": 5
-          },
-          "scramble_16": {
-            "finished": 5,
-            "solved": 5
+          "distance_255_511": {
+            "finished": 1,
+            "solved": 1
           }
         }
       },
@@ -377,7 +345,7 @@
         "failures": {
           "illegal_action": 1
         },
-        "output_tokens": 1432,
+        "output_tokens": 2516,
         "input_tokens": 5880,
         "strata": {
           "nodes_512_eccentric_goal": {

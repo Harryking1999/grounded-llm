@@ -42,7 +42,7 @@ def main():
         "config":dict(config,api=api),"source_commit":source_commit,"cases":[]}
     state = json.loads((out/"progress.json").read_text(encoding="utf-8")) if (out/"progress.json").exists() else {
         "started_at":datetime.now(timezone.utc).isoformat(),"source_commit":source_commit,
-        "tasks":{task:{"status":"active","level":0} for task in config["tasks"]}}
+        "tasks":{task:{"status":"active","level":config['initial_levels'][task]} for task in config["tasks"]}}
     if state.get('stop_policy') != config['policy']:
         state.setdefault('policy_history',[]).append({'source_commit':state.get('policy_source_commit',state['source_commit']),
                                                      'policy':state.get('stop_policy'),'tasks':json.loads(json.dumps(state['tasks']))})

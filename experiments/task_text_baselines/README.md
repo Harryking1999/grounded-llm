@@ -46,6 +46,8 @@ python -u -m experiments.task_text_baselines.src.qwen --suite /path/to/frozen/su
 
 用户进一步要求“几乎全对也不行，希望被难住”。合同见 [difficulty_ladder.json](configs/difficulty_ladder.json)，入口为 `src/escalate.py`。每档先完整测五题；成功率高于一半则继续升档，否则冻结同档十道独立新题确认，确认组成功率仍不高于一半才记录找到困难条件。原先“首次错误即停”的运行记录和全部答卷保留，但不再以偶发错误停止加难。任务间轮换调度，最多四个并发请求，每任务最多一个在途请求。
 
+原初筛 `runs/five_task_sol_difficulty/` 已验证含 S/Z 十二／十六块、4×4 打乱八／十六步偏易，三阶打乱八步已返回题也全对。新确认策略在独立的 `runs/five_task_sol_challenge/` 启动，从二十块、三阶十二步打乱、4×4 二十四步打乱继续；九盘汉诺塔与 512 节点寻路各补完整档。新种子与初始档位见正式配置。原初筛不再派新题，其已有长请求正常落盘，避免阻塞其他任务。
+
 非法动作、未到目标、无法解析和预算截断分别保留；计划成功但格式不合规仍按解出计，严格格式另计。服务失败补调用，不重新采样错误答案。确认题必须与已测状态不同，不挑选已知失败题；适应性初筛与十题确认都不足以推断精确总体成功率。配置档位全部通过时如实记作范围耗尽，不声称已找到困难条件。
 
 - 积木复用用户此前确认的 10 种形状：保留 L3/I3、去掉二格条、加入四个方向的 S/Z 四格；从 12 次放置起测。形状和编号只读取原正式配置。构造沿用原含 Z 条件的连通棋盘；此次同时改变形状集与构造方式，不将结果差异归因于单一因素。
@@ -59,5 +61,5 @@ python -u -m experiments.task_text_baselines.src.qwen --suite /path/to/frozen/su
 三阶魔方、4×4 华容道与含 Z 积木只保存回放通过的可解参考方案及长度上界，不假设它是最短方案。寻路与汉诺塔仍使用精确最短距离。它们是寻找失败点的适应性小样本，不能据此估计总体成功率；旧 200 题及其 32B 同题比较保持独立。
 
 ```powershell
-python -u -m experiments.task_text_baselines.src.escalate --config experiments/task_text_baselines/configs/difficulty_ladder.json --out runs/five_task_sol_difficulty
+python -u -m experiments.task_text_baselines.src.escalate --config experiments/task_text_baselines/configs/difficulty_ladder.json --out runs/five_task_sol_challenge
 ```

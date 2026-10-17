@@ -3,11 +3,13 @@ import random
 import unittest
 from unittest.mock import patch
 import urllib.error
+from pathlib import Path
+from tempfile import TemporaryDirectory
 
 from experiments.hanoi_qmap.src.environment import Hanoi
 from experiments.task_text_baselines.src import cube2, cube3, hanoi, puzzle8, puzzle15
 from experiments.task_text_baselines.src.difficulty import graph_distances, prepare_level
-from experiments.task_text_baselines.src.escalate import decision
+from experiments.task_text_baselines.src.escalate import decision, main as escalate_main
 from experiments.task_text_baselines.src.protocol import ROOT
 from experiments.task_text_baselines.src.protocol import judge, prompt
 from experiments.task_text_baselines.src.run import call, extract_text, pending, summary
@@ -15,6 +17,28 @@ from experiments.task_text_baselines.src.qwen import final_text, round_robin
 
 
 class TaskRulesTest(unittest.TestCase):
+    def test_exhausted_service_attempts_remain_incomplete_without_new_calls(self):
+        config_path = ROOT/'experiments/task_text_baselines/configs/path_distance_stress.json'
+        config = json.loads(config_path.read_text())
+        case = {'id':'pending','task':'path','level':0,'phase':'screen','stratum':'long'}
+        with TemporaryDirectory() as temporary:
+            folder = Path(temporary)
+            (folder/'records').mkdir()
+            values = {'suite.json':{'config':config,'source_commit':'test','cases':[case]},
+                      'records/pending_attempt11.json':{'case_id':'pending','task':'path','stratum':'long',
+                          'attempt':11,'service_error':'HTTPError','verdict':{'solved':False,'failure':'service_error'}}}
+            for name,value in values.items():
+                (folder/name).write_text(json.dumps(value),encoding='utf-8')
+            with patch('sys.argv',['escalate','--config',str(config_path),'--out',str(folder)]), patch.dict(
+                    'os.environ',{'GND_API_KEY':'test-key'}), patch(
+                    'experiments.task_text_baselines.src.escalate.subprocess.check_output',return_value='test'), patch(
+                    'experiments.task_text_baselines.src.escalate.call') as api_call:
+                escalate_main()
+            api_call.assert_not_called()
+            result = json.loads((folder/'progress.json').read_text(encoding='utf-8'))
+            self.assertEqual(result['status'],'service_incomplete')
+            self.assertEqual(result['tasks']['path']['status'],'service_blocked')
+
     def test_path_distance_stress_is_connected_undirected_and_long(self):
         config = json.loads((ROOT/'experiments/task_text_baselines/configs/path_distance_stress.json').read_text())
         config['cases_per_level'] = 2

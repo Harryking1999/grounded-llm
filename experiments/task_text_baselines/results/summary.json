@@ -1,5 +1,7 @@
 {
-  "updated_at": "2026-10-17 21:43（北京时间）",
+  "updated_at": "2026-10-17T22:09:04.055407+08:00",
+  "decision": "Retain initial conditions; Qwen3-32B unreliability is the minimum difficulty criterion; GPT is a strong reference, not a required failure target.",
+  "main_config": "experiments/task_text_baselines/configs/sol_high_40.json",
   "baseline": {
     "status": "completed",
     "model_request": {
@@ -284,222 +286,18 @@
     },
     "exceeded_output_limit": 2,
     "run_path": "runs\\five_task_sol_high_40",
-    "updated_at": "2026-10-17T11:08:40.386589+00:00"
-  },
-  "current": {
-    "status": "running",
-    "model_request": {
-      "base_url": "https://jarodfund.xyz/v1",
-      "model": "gpt-6.1-sol",
-      "reasoning_effort": "high",
-      "max_output_tokens": 32768,
-      "timeout_seconds": 900,
-      "concurrency": 4,
-      "max_service_retries": 10,
-      "max_total_service_retries": 200,
-      "service_retry_delay_seconds": 30
-    },
-    "tasks": {
-      "blocks": {
-        "planned": 20,
-        "finished": 14,
-        "valid_responses": 14,
-        "service_errors": 0,
-        "solved": 14,
-        "contract_pass": 14,
-        "optimal": 0,
-        "optimal_evaluated": 0,
-        "failures": {
-          "success": 14
-        },
-        "output_tokens": 213715,
-        "input_tokens": 7756,
-        "strata": {
-          "SZ10_board15_connected_20": {
-            "finished": 14,
-            "valid_responses": 14,
-            "service_errors": 0,
-            "solved": 14
-          }
-        }
+    "updated_at": "2026-10-17T11:08:40.386589+00:00",
+    "response_metadata_coverage": {
+      "valid_answers": 200,
+      "model_reported": 28,
+      "effort_counts": {
+        "not_returned": 172,
+        "high": 28
       },
-      "cube3": {
-        "planned": 20,
-        "finished": 11,
-        "valid_responses": 11,
-        "service_errors": 0,
-        "solved": 10,
-        "contract_pass": 10,
-        "optimal": 0,
-        "optimal_evaluated": 0,
-        "failures": {
-          "success": 10,
-          "unsolved": 1
-        },
-        "output_tokens": 332791,
-        "input_tokens": 24937,
-        "strata": {
-          "scramble_20": {
-            "finished": 11,
-            "valid_responses": 11,
-            "service_errors": 0,
-            "solved": 10
-          }
-        }
-      },
-      "puzzle24": {
-        "planned": 20,
-        "finished": 11,
-        "valid_responses": 11,
-        "service_errors": 0,
-        "solved": 10,
-        "contract_pass": 10,
-        "optimal": 0,
-        "optimal_evaluated": 0,
-        "failures": {
-          "success": 10,
-          "unsolved": 1
-        },
-        "output_tokens": 247114,
-        "input_tokens": 4180,
-        "strata": {
-          "scramble_256": {
-            "finished": 11,
-            "valid_responses": 11,
-            "service_errors": 0,
-            "solved": 10
-          }
-        }
-      },
-      "hanoi": {
-        "planned": 20,
-        "finished": 10,
-        "valid_responses": 10,
-        "service_errors": 0,
-        "solved": 7,
-        "contract_pass": 7,
-        "optimal": 7,
-        "optimal_evaluated": 10,
-        "failures": {
-          "success": 7,
-          "illegal_action": 3
-        },
-        "output_tokens": 249919,
-        "input_tokens": 8147,
-        "strata": {
-          "distance_1023_2047": {
-            "finished": 10,
-            "valid_responses": 10,
-            "service_errors": 0,
-            "solved": 7
-          }
-        }
-      }
-    },
-    "recorded_attempts": 67,
-    "service_error_attempts": 21,
-    "returned_model_counts": {
-      "None": 45,
-      "gpt-6.1-sol": 1
-    },
-    "exceeded_output_limit": 5,
-    "run_path": "runs\\sol_difficulty_20",
-    "updated_at": "2026-10-17T13:43:21.135369+00:00"
-  },
-  "current_failures": [
-    {
-      "case_id": "cube3_level4_09",
-      "task": "cube3",
-      "verdict": {
-        "solved": false,
-        "contract_pass": false,
-        "strict_json": true,
-        "status_correct": false,
-        "reported_status": "solved",
-        "failure": "unsolved",
-        "first_illegal_index": null,
-        "illegal_detail": null,
-        "executed": 118,
-        "plan_length": 118,
-        "optimal": null,
-        "excess_moves": null
-      }
-    },
-    {
-      "case_id": "hanoi_level2_01",
-      "task": "hanoi",
-      "verdict": {
-        "solved": false,
-        "contract_pass": false,
-        "strict_json": true,
-        "status_correct": false,
-        "reported_status": "solved",
-        "failure": "illegal_action",
-        "first_illegal_index": 4,
-        "illegal_detail": "Larger disk on smaller disk",
-        "executed": 4,
-        "plan_length": 1340,
-        "optimal": false,
-        "excess_moves": null
-      }
-    },
-    {
-      "case_id": "hanoi_level2_02",
-      "task": "hanoi",
-      "verdict": {
-        "solved": false,
-        "contract_pass": false,
-        "strict_json": true,
-        "status_correct": false,
-        "reported_status": "solved",
-        "failure": "illegal_action",
-        "first_illegal_index": 284,
-        "illegal_detail": "Specified disk is not on top of source",
-        "executed": 284,
-        "plan_length": 1227,
-        "optimal": false,
-        "excess_moves": null
-      }
-    },
-    {
-      "case_id": "hanoi_level2_08",
-      "task": "hanoi",
-      "verdict": {
-        "solved": false,
-        "contract_pass": false,
-        "strict_json": true,
-        "status_correct": false,
-        "reported_status": "solved",
-        "failure": "illegal_action",
-        "first_illegal_index": 368,
-        "illegal_detail": "Specified disk is not on top of source",
-        "executed": 368,
-        "plan_length": 1887,
-        "optimal": false,
-        "excess_moves": null
-      }
-    },
-    {
-      "case_id": "puzzle24_level0_04",
-      "task": "puzzle24",
-      "verdict": {
-        "solved": false,
-        "contract_pass": false,
-        "strict_json": true,
-        "status_correct": false,
-        "reported_status": "no_solution",
-        "failure": "unsolved",
-        "first_illegal_index": null,
-        "illegal_detail": null,
-        "executed": 0,
-        "plan_length": 0,
-        "optimal": null,
-        "excess_moves": null
-      }
+      "effort_reported_on_reused_answers": 0
     }
-  ],
-  "reused_valid_answers": 8,
-  "qwen_last_collected": {
+  },
+  "qwen": {
     "status": "completed",
     "model_request": {
       "model": "Qwen/Qwen3-32B",
@@ -783,7 +581,145 @@
     },
     "exceeded_output_limit": 0,
     "run_path": "runs\\five_task_qwen32b_same40",
-    "updated_at": "2026-10-17T12:38:35.080970+00:00"
+    "updated_at": "2026-10-17T12:38:35.080970+00:00",
+    "response_metadata_coverage": {
+      "valid_answers": 200,
+      "model_reported": 200,
+      "effort_counts": {
+        "not_returned": 200
+      },
+      "effort_reported_on_reused_answers": 0
+    }
+  },
+  "supplementary_difficulty": {
+    "status": "stopped",
+    "model_request": {
+      "base_url": "https://jarodfund.xyz/v1",
+      "model": "gpt-6.1-sol",
+      "reasoning_effort": "high",
+      "max_output_tokens": 32768,
+      "timeout_seconds": 900,
+      "concurrency": 4,
+      "max_service_retries": 10,
+      "max_total_service_retries": 200,
+      "service_retry_delay_seconds": 30
+    },
+    "tasks": {
+      "blocks": {
+        "planned": 20,
+        "finished": 19,
+        "valid_responses": 19,
+        "service_errors": 0,
+        "solved": 19,
+        "contract_pass": 19,
+        "optimal": 0,
+        "optimal_evaluated": 0,
+        "failures": {
+          "success": 19
+        },
+        "output_tokens": 302830,
+        "input_tokens": 10526,
+        "strata": {
+          "SZ10_board15_connected_20": {
+            "finished": 19,
+            "valid_responses": 19,
+            "service_errors": 0,
+            "solved": 19
+          }
+        }
+      },
+      "cube3": {
+        "planned": 20,
+        "finished": 15,
+        "valid_responses": 15,
+        "service_errors": 0,
+        "solved": 13,
+        "contract_pass": 13,
+        "optimal": 0,
+        "optimal_evaluated": 0,
+        "failures": {
+          "success": 13,
+          "unsolved": 2
+        },
+        "output_tokens": 460964,
+        "input_tokens": 34005,
+        "strata": {
+          "scramble_20": {
+            "finished": 15,
+            "valid_responses": 15,
+            "service_errors": 0,
+            "solved": 13
+          }
+        }
+      },
+      "puzzle24": {
+        "planned": 20,
+        "finished": 16,
+        "valid_responses": 16,
+        "service_errors": 0,
+        "solved": 14,
+        "contract_pass": 14,
+        "optimal": 0,
+        "optimal_evaluated": 0,
+        "failures": {
+          "success": 14,
+          "unsolved": 1,
+          "illegal_action": 1
+        },
+        "output_tokens": 379943,
+        "input_tokens": 6080,
+        "strata": {
+          "scramble_256": {
+            "finished": 16,
+            "valid_responses": 16,
+            "service_errors": 0,
+            "solved": 14
+          }
+        }
+      },
+      "hanoi": {
+        "planned": 20,
+        "finished": 14,
+        "valid_responses": 14,
+        "service_errors": 0,
+        "solved": 10,
+        "contract_pass": 10,
+        "optimal": 10,
+        "optimal_evaluated": 14,
+        "failures": {
+          "success": 10,
+          "illegal_action": 4
+        },
+        "output_tokens": 360645,
+        "input_tokens": 9727,
+        "strata": {
+          "distance_1023_2047": {
+            "finished": 14,
+            "valid_responses": 14,
+            "service_errors": 0,
+            "solved": 10
+          }
+        }
+      }
+    },
+    "recorded_attempts": 87,
+    "service_error_attempts": 23,
+    "returned_model_counts": {
+      "None": 63,
+      "gpt-6.1-sol": 1
+    },
+    "exceeded_output_limit": 7,
+    "run_path": "runs\\sol_difficulty_20",
+    "updated_at": "2026-10-17T14:08:27.834117+00:00",
+    "response_metadata_coverage": {
+      "valid_answers": 64,
+      "model_reported": 1,
+      "effort_counts": {
+        "not_returned": 63,
+        "high": 1
+      },
+      "effort_reported_on_reused_answers": 1
+    }
   },
   "retired_runs": {
     "five_task_sol_difficulty": {
@@ -968,7 +904,16 @@
       },
       "exceeded_output_limit": 2,
       "run_path": "runs\\five_task_sol_difficulty",
-      "updated_at": "2026-10-17T11:30:41.938525+00:00"
+      "updated_at": "2026-10-17T11:30:41.938525+00:00",
+      "response_metadata_coverage": {
+        "valid_answers": 50,
+        "model_reported": 13,
+        "effort_counts": {
+          "not_returned": 37,
+          "high": 13
+        },
+        "effort_reported_on_reused_answers": 0
+      }
     },
     "five_task_sol_challenge": {
       "status": "stopped",
@@ -1178,7 +1123,16 @@
       },
       "exceeded_output_limit": 7,
       "run_path": "runs\\five_task_sol_challenge",
-      "updated_at": "2026-10-17T12:49:26.820821+00:00"
+      "updated_at": "2026-10-17T12:49:26.820821+00:00",
+      "response_metadata_coverage": {
+        "valid_answers": 73,
+        "model_reported": 12,
+        "effort_counts": {
+          "not_returned": 61,
+          "high": 12
+        },
+        "effort_reported_on_reused_answers": 0
+      }
     },
     "blocks_dense_stress": {
       "status": "completed_breakpoints_or_ranges",
@@ -1227,7 +1181,16 @@
       },
       "exceeded_output_limit": 0,
       "run_path": "runs\\blocks_dense_stress",
-      "updated_at": "2026-10-17T12:18:33.088972+00:00"
+      "updated_at": "2026-10-17T12:18:33.088972+00:00",
+      "response_metadata_coverage": {
+        "valid_answers": 4,
+        "model_reported": 1,
+        "effort_counts": {
+          "high": 1,
+          "not_returned": 3
+        },
+        "effort_reported_on_reused_answers": 0
+      }
     },
     "puzzle15_distance_stress": {
       "status": "completed_breakpoints_or_ranges",
@@ -1281,7 +1244,15 @@
       },
       "exceeded_output_limit": 0,
       "run_path": "runs\\puzzle15_distance_stress",
-      "updated_at": "2026-10-17T12:19:06.866015+00:00"
+      "updated_at": "2026-10-17T12:19:06.866015+00:00",
+      "response_metadata_coverage": {
+        "valid_answers": 6,
+        "model_reported": 0,
+        "effort_counts": {
+          "not_returned": 6
+        },
+        "effort_reported_on_reused_answers": 0
+      }
     },
     "puzzle15_far_stress": {
       "status": "completed_breakpoints_or_ranges",
@@ -1329,7 +1300,15 @@
       },
       "exceeded_output_limit": 0,
       "run_path": "runs\\puzzle15_far_stress",
-      "updated_at": "2026-10-17T12:18:17.346413+00:00"
+      "updated_at": "2026-10-17T12:18:17.346413+00:00",
+      "response_metadata_coverage": {
+        "valid_answers": 1,
+        "model_reported": 0,
+        "effort_counts": {
+          "not_returned": 1
+        },
+        "effort_reported_on_reused_answers": 0
+      }
     },
     "path_distance_stress": {
       "status": "service_incomplete",
@@ -1377,7 +1356,15 @@
       },
       "exceeded_output_limit": 0,
       "run_path": "runs\\path_distance_stress",
-      "updated_at": "2026-10-17T12:11:39.588907+00:00"
+      "updated_at": "2026-10-17T12:11:39.588907+00:00",
+      "response_metadata_coverage": {
+        "valid_answers": 2,
+        "model_reported": 0,
+        "effort_counts": {
+          "not_returned": 2
+        },
+        "effort_reported_on_reused_answers": 0
+      }
     }
   }
 }

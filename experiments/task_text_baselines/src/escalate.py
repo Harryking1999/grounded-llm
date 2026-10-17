@@ -32,7 +32,7 @@ def main():
     args = parser.parse_args()
     config = json.loads(Path(args.config).read_text(encoding="utf-8"))
     if config.get('retired'):
-        raise ValueError('This queue was retired; use difficulty_20.json')
+        raise ValueError('This queue was retired; see the experiment README for the current scope')
     if min(config['cases_per_level'],config['confirmation_cases']) < 20:
         raise ValueError('Current evaluation requires at least twenty cases per condition and confirmation')
     api = json.loads((ROOT/config["api_config"]).read_text())["api"]

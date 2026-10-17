@@ -1,6 +1,6 @@
 # 五任务纯文字完整规划基线
 
-用户授权为积木、寻路、汉诺塔、二阶魔方与 8-Puzzle 各构造 40 题，测试 GPT-6.1-sol high。检验既定文字外壳下的完整计划执行成功率，按任务与难度分层观察失败；不使用地图或模型侧工具。
+当前采用最初的五任务配置，每任务 40 题，同题比较 Qwen3-32B 与请求 high 的 GPT-6.1-sol。用户将最低难度要求改为 32B 不能可靠完成；GPT 作为强基线参照，不再要求稳定难住 GPT。完整计划成功率为主指标，最优解率用于区分能否完成与解法效率。
 
 当前紧凑结果见 [report.md](results/report.md)，对应数字见 [summary.json](results/summary.json)。运行中结果标注更新时间；尚未返回题与服务失败不当作模型答错。
 
@@ -44,33 +44,20 @@ python -u -m experiments.task_text_baselines.src.qwen --suite /path/to/frozen/su
 
 028 恢复连接后已回收完整 200 题，真实执行解出 40 题；逐题提示词与 GPT 原题集完全一致，全部未截断答案重新回放后与原判分一致。完整对照及失败类型见 [结果报告](results/report.md)。无需重启已完成的评测。
 
-## 当前加难队列：每档至少 20 题
+## 当前范围与补充探索
 
-唯一在用配置：[difficulty_20.json](configs/difficulty_20.json)。初筛和独立确认均为 20 道不同题；有效答卷不足时只报进度，不用旧五题样本宣布完成。
+主配置仍为 [sol_high_40.json](configs/sol_high_40.json) 与 [qwen32b_same40.json](configs/qwen32b_same40.json)。两组各 200 题均已完成；32B 解出 40 题，GPT 解出 195 题，完整任务设置与最优性见[主报告](results/report.md)。原始配置未因筛选标准改变而重新采样，正常错误答案也不重抽。
 
-| 任务 | 当前条件与边界 |
-|---|---|
-| 积木 | 用户指定 15×15、20 次非重叠放置、含 S/Z 的十种固定形状；撤下 28 块条件 |
-| 三阶魔方 | 扩充当前 20 步打乱档至 20 题；仍偏易则按配置继续，始终保持三阶 |
-| 华容道 | 只尝试 5×5；保证可解，Manhattan 下界至少 60，不提供动作示例；若仍偏易就停止该方向，不升至 6×6 |
-| 汉诺塔 | 当前 11 盘档扩充至 20 题，保留先前同题答案 |
-| 寻路 | 用户明确停止加难，不进入新队列 |
+所有加难配置现已停用，包括 `difficulty_20.json`。运行目录中的 `stop_requested` 阻止继续派题，已发出的请求正常落盘后退出。15×15 积木、三阶魔方、5×5 华容道和十一盘汉诺塔只作为[补充探索](results/difficulty_exploration.md)保留，不要求测满其原计划，也不与原各 40 题合并。更早的五题初筛、28 块积木和寻路加难同样保留原始答卷，不再运行。
 
-各组一次输出完整计划，无中途反馈，客户端不提供工具；规则和输出文字沿用任务原文，仅替换尺寸、数字范围与形状表。积木 20 指构造放置次数，不强制模型找回原来 20 块；任意合法分解都接受。构造／打乱长度仅是参考解上界，华容道 Manhattan 值是下界，均不冒充精确最短距离。汉诺塔继续使用精确距离。
+停止加难不改变任务自身的规则，也不自动触发新训练。后续地图／无地图／7B 的配对比较沿用确定的主任务条件；现有权重若尺寸或动作制不适用，应明示并另行准备，不以旧权重冒充已完成的新条件。
 
-先停止旧队列派新题并等待在途请求落盘，再冻结四组各 20 题及回放通过的参考解。`src/prepare_difficulty.py` 仅复用状态、目标、提示词完全相同且可复现判分的有效答卷，包括答错的答卷；原始服务失败记录一并保留来源。新旧运行分开，旧五题初筛作为历史探索保留，不替代新的分母。
+## 重建紧凑报告
+
+`src/snapshot.py` 只读取保存的答卷，不发 API 请求。主报告始终以最初配置和同题 32B 对照为中心；加难结果单独生成补充材料，避免旧队列状态再次覆盖当前主线。
 
 ```powershell
-python -m experiments.task_text_baselines.src.prepare_difficulty --config experiments/task_text_baselines/configs/difficulty_20.json --out runs/sol_difficulty_20
-python -u -m experiments.task_text_baselines.src.escalate --config experiments/task_text_baselines/configs/difficulty_20.json --out runs/sol_difficulty_20
+python -m experiments.task_text_baselines.src.snapshot --baseline runs/five_task_sol_high_40 --qwen runs/five_task_qwen32b_same40 --supplementary runs/sol_difficulty_20 --out experiments/task_text_baselines/results
 ```
 
-每档测完才判断是否继续；成功不高于一半时，用同条件 20 道独立新题确认。计划执行错误、未完成、格式问题、输出截断与服务失败分别报告；成功但格式不合规仍计解出，服务失败不计答错，正常答案不重采样。接口已观察到实际输出超过请求 token 上限，须单列，不能声称严格等预算。
-
-原始 200 题及其 Qwen3-32B 对照保持不变。`difficulty_ladder.json`、两组 4×4 距离压力配置、密集积木及长路径配置已标记停用，旧答卷保留在对应 `runs/`；队列入口拒绝再次用停用配置启动。新运行与报告位于 `runs/sol_difficulty_20/`，项目进度仍只更新权威状态页。
-
-紧凑结果由 `src/snapshot.py` 从已保存答卷重建，不发 API 请求；可选 `--history` 保留停用轮次的机器可读摘要：
-
-```powershell
-python -m experiments.task_text_baselines.src.snapshot --baseline runs/five_task_sol_high_40 --current runs/sol_difficulty_20 --qwen runs/five_task_qwen32b_same40 --out experiments/task_text_baselines/results
-```
+可选 `--history` 将更早停用轮次的摘要保存在机器可读结果中；原始题目、回答、服务失败、复用来源与配置快照继续保存在 Git 外的 `runs/`。

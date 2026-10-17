@@ -1,4 +1,4 @@
-"""Publish a compact baseline/current-queue snapshot from saved answers only."""
+"""Publish original-condition results with retired difficulty runs as supplements."""
 import argparse
 from datetime import datetime, timezone, timedelta
 import json
@@ -42,79 +42,94 @@ def label(task,stratum):
     return stratum
 
 
+def render_report(baseline,qwen):
+    if (baseline['tasks'].keys() != qwen['tasks'].keys() or
+            any(row['valid_responses'] != row['planned']
+                for result in (baseline,qwen) for row in result['tasks'].values()) or
+            any(row['planned'] != baseline['tasks'][task]['planned']
+                for task,row in qwen['tasks'].items())):
+        raise ValueError('The main report requires complete, matching baseline groups')
+    total = sum(row['planned'] for row in qwen['tasks'].values())
+    qwen_solved = sum(row['solved'] for row in qwen['tasks'].values())
+    gpt_solved = sum(row['solved'] for row in baseline['tasks'].values())
+    settings = {'blocks':'10×10，8 种形状，12 次放置',
+                'path':'256 节点三度图，最短 3–10 步',
+                'hanoi':'8 盘，最短 1–255 步',
+                'cube2':'2×2，最短 1–14 个四分之一转',
+                'puzzle8':'3×3，最短 4–30 步'}
+    lines = ['# 五任务基线评测','',
+             '**采用最初配置。最低难度要求改为 32B 不能可靠完成；GPT 作为强基线参照，不再要求稳定难住 GPT。**','',
+             '## 同题主结果','',
+             '| 任务 | Qwen3-32B 成功 | GPT 成功 | GPT 最优解 |',
+             '|---|---:|---:|---:|']
+    for task,row in qwen['tasks'].items():
+        gpt = baseline['tasks'][task]
+        count = row['planned']
+        def cell(value):
+            return f'{value}/{count}（{100*value/count:.1f}%）'
+        lines.append(f"| {NAMES[task]} | {cell(row['solved'])} | {cell(gpt['solved'])} | {cell(gpt['optimal'])} |")
+    lines += ['',f"**总体成功：32B {qwen_solved}/{total}（{100*qwen_solved/total:.1f}%）；GPT {gpt_solved}/{total}（{100*gpt_solved/total:.1f}%）。** 两组各任务 40 题，均已完成并回收。",'',
+              '## 任务设置','', '| 任务 | 采用的初始条件 |','|---|---|']
+    for task in qwen['tasks']:
+        lines.append(f'| {NAMES[task]} | {settings[task]} |')
+    lines += ['',
+              '## 当前判断','',
+              '- 初始条件已满足本轮筛选要求。32B 在积木、汉诺塔、魔方和华容道上成功率为 2.5%–15%；寻路为 67.5%，保留作较简单的对照。',
+              '- GPT 整体成功率高，但最优性仍有差距：二阶魔方最优解率 35%，华容道 45%。后续同时比较能否完成与解法效率。',
+              '- 这些结果用于确定任务条件；地图是否有额外收益，仍由匹配的地图／无地图训练与评测验证。','',
+              '## 评测口径','',
+              '两组使用相同题目、规则与提示词，一次输出完整计划，无中途反馈，客户端不提供工具。成功按环境回放到达目标判定；非最短的成功解照计成功，最优解率以全部 40 题为分母。服务失败已补测，正常错误答案不重抽。积木 12 指构造放置次数，不要求还原原来的 12 块。','',
+              'Qwen3-32B 使用完整 BF16 权重并开启 thinking；GPT 请求模型为 gpt-6.1-sol，reasoning effort 为 high。两者思考模式不等同。', '']
+    failures = {name:sum(row['failures'].get(name,0) for row in qwen['tasks'].values())
+                for name in ('illegal_action','unsolved','truncated')}
+    lines.append(f"32B 的 {total-qwen_solved} 题失败包括：非法动作 {failures['illegal_action']}、未完成 {failures['unsolved']}、输出截断 {failures['truncated']}；主表没有因格式问题扣掉已经解出的题。")
+    metadata = baseline['response_metadata_coverage']
+    lines += ['',f"GPT 的 {metadata['effort_counts'].get('high',0)}/200 份答卷回显模型名及 high，其余未回传强度；{baseline['exceeded_output_limit']} 份答卷超过请求 token 上限。因此报告为第三方接口下的实测结果，不声称后台配置独立核验或严格等预算。",'',
+              '## 配置与补充','',
+              '[初始题集配置](../configs/sol_high_40.json) · [32B 推理配置](../configs/qwen32b_same40.json) · [复现说明](../README.md)', '',
+              '此前加难探索已停止派新题，已有答卷保留为[补充结果](difficulty_exploration.md)，不混入主表、不再要求补满原加难计划。原始题目、答案和服务记录保存在 Git 外的 runs/。','']
+    return '\n'.join(lines)
+
+
+def render_supplement(folder,result):
+    progress = json.loads((folder/'progress.json').read_text(encoding='utf-8'))
+    groups,_ = conditions(folder)
+    inflight = len(progress.get('inflight',[]))
+    status = (f'已停止派新题，尚有 {inflight} 条已发出请求等待收尾。' if inflight else
+              '已停止，未完成题不再补测。')
+    lines = ['# 加难探索：补充结果','',
+             '用户已决定以初始配置下 32B 表现不足为最低要求，本轮加难不再作为当前目标。以下为已返回样本，包含复用答卷；未完成组不当作完整成功率，不与主结果合并。','',
+             status,'','| 任务 | 探索条件 | 阶段 | 有效／原计划 | 解出 | 服务失败未补 |',
+             '|---|---|---|---:|---:|---:|']
+    for (task,phase,stratum),row in groups.items():
+        lines.append(f"| {NAMES[task]} | {label(task,stratum)} | {'确认' if phase=='confirm' else '初筛'} | {row['valid']}/{row['planned']} | {row['solved']} | {row['service_errors']} |")
+    lines += ['',f"其中 {result['exceeded_output_limit']} 份答卷超过请求输出预算。",'',
+              '15×15 积木使用含 S/Z 十形状、20 次放置；5×5 华容道的 Manhattan 下界至少 60，参考解可回放。构造／打乱长度不代表精确最短距离。更早的五题初筛、28 块积木和长路径探索也已停用，原始结果保留，不再扩展。','',
+              '[返回主报告](report.md)','']
+    return '\n'.join(lines)
+
+
 def main():
     parser = argparse.ArgumentParser(__doc__)
     parser.add_argument('--baseline',required=True,type=Path)
-    parser.add_argument('--current',required=True,type=Path)
     parser.add_argument('--qwen',required=True,type=Path)
+    parser.add_argument('--supplementary','--current',dest='supplementary',type=Path)
     parser.add_argument('--history',nargs='*',type=Path,default=[])
     parser.add_argument('--out',required=True,type=Path)
     args = parser.parse_args()
     baseline,_ = build(args.baseline)
-    current,_ = build(args.current)
-    baseline_metadata = baseline['response_metadata_coverage']
-    current_metadata = current['response_metadata_coverage']
     qwen,_ = build(args.qwen)
-    qwen_complete = qwen['status'] == 'completed' and all(
-        row['valid_responses'] == row['planned'] for row in qwen['tasks'].values())
-    suite = json.loads((args.current/'suite.json').read_text(encoding='utf-8'))
     history = {path.name:build(path)[0] for path in args.history}
-    now = datetime.now(timezone(timedelta(hours=8))).strftime('%Y-%m-%d %H:%M（北京时间）')
-    lines = ['# 五任务纯文字评测：结果与当前安排','',f'更新时间：{now}。', '',
-             '## 当前队列：每档至少 20 题','',
-             '按用户最新范围：积木 15×15、20 块、含 S/Z；三阶魔方扩测；华容道试 5×5 后停止加尺寸；11 盘汉诺塔扩样；寻路停止加难。', '',
-             f"首批四组共 80 题已冻结并回放参考解，复用 {suite.get('reused_valid_answers',0)} 份完全同题的有效答卷，答错的也保留。有效答卷不足 20 时仅报告进度，服务失败不当作答错。",'',
-             '| 任务 | 条件 | 阶段 | 有效／本组题数 | 解出 | 待补服务失败 |',
-             '|---|---|---|---:|---:|---:|']
-    groups,failures = conditions(args.current)
-    for (task,phase,stratum),row in groups.items():
-        lines.append(f"| {NAMES[task]} | {label(task,stratum)} | {'独立确认' if phase=='confirm' else '初筛'} | {row['valid']}/{row['planned']} | {row['solved']} | {row['service_errors']} |")
-    if failures:
-        lines += ['', '**已返回题的具体失败**', '']
-        for row in failures:
-            verdict = row['verdict']
-            index = verdict.get('first_illegal_index')
-            detail = (f'第 {index+1} 步非法' if index is not None else
-                      '将已验证可解题误判为无解' if verdict.get('reported_status') == 'no_solution' else
-                      {'unsolved':'未到目标','parse_error':'答案无法解析','truncated':'输出截断'}.get(verdict.get('failure'),verdict.get('failure')))
-            lines.append(f"- {NAMES[row['task']]} `{row['case_id']}`：{detail}。")
-    lines += ['',
-              '5×5 题目均可解，Manhattan 下界至少 60，因此任何解至少需要 60 步；256 是构造步数上界。积木 20 是构造放置数，允许找到其他合法分解。参考解和距离下界均不提供给模型。', '',
-              '每档完成 20 题后再判断；成功不高于一半时另取同条件 20 道独立新题确认。保留所有合法返回，执行错误、未完成、格式和截断分别统计。', '',
-              f"当前加难答卷中 {current['exceeded_output_limit']} 份超出请求 token 上限；解出数按真实回放计，不能视为严格预算内成功。", '',
-              f"思考强度证据：所有请求均设 high；当前 {current_metadata['valid_answers']} 份有效答卷中，{current_metadata['effort_counts'].get('high',0)} 份回显 high（其中 {current_metadata['effort_reported_on_reused_answers']} 份来自复用旧答卷），{current_metadata['effort_counts'].get('not_returned',0)} 份未回传强度。回显属于第三方接口声明，不能独立证明后台计算配置。", '',
-              '## 原始各 40 题：GPT-6.1-sol high','',
-              '| 任务 | 有效答卷 | 解出 | 非法动作 | 最优解 |','|---|---:|---:|---:|---:|']
-    for task,row in baseline['tasks'].items():
-        lines.append(f"| {NAMES[task]} | {row['valid_responses']}/40 | {row['solved']} | {row['failures'].get('illegal_action',0)} | {row['optimal']} |")
-    lines += ['', '共 195/200 解出，原题服务失败已补完。积木八形状、12 次放置、10×10；寻路 256 节点、距离 3–10；汉诺塔八盘、距离 1–255；二阶魔方距离 1–14；3×3 华容道距离 4–30。非最短成功解仍计解出。', '',
-              '积木两题移除到了空格；汉诺塔两题违反盘子大小规则；魔方一题未复原。基础设施失败未计入这些模型错误。', '',
-              f"原题 {baseline['exceeded_output_limit']} 份答卷超出请求预算。{baseline_metadata['effort_counts'].get('high',0)}/{baseline_metadata['valid_answers']} 份答卷回显 gpt-6.1-sol、high、standard，其余 {baseline_metadata['effort_counts'].get('not_returned',0)} 份未回传强度。此前将接口描述为一律不回传过于笼统；准确表述是全量请求 high、部分回显确认，其余未知。客户端请求不提供工具、无中途反馈，第三方后台身份与强度不能独立核验。", '',
-              '## 同题 Qwen3-32B：完整结果' if qwen_complete else '## 同题 Qwen3-32B：最后回收的快照','',
-              ('028 连接恢复后已回收完整 200 题；断连期间评测正常结束。完整 BF16、四卡 TP、thinking 模式，原题及提示词与 GPT 完全一致，正常错误答案没有重抽。' if qwen_complete else
-               f"最近回收的远端进度时间为 {qwen['updated_at']}；以下仍是部分题，不能当作完整成功率比较。"), '',
-              '| 任务 | 有效答卷 | Qwen 解出 | 成功率 | GPT 同题解出 |','|---|---:|---:|---:|---:|']
-    for task,row in qwen['tasks'].items():
-        rate = f"{100*row['solved']/row['planned']:.1f}%" if qwen_complete else '未结束'
-        lines.append(f"| {NAMES[task]} | {row['valid_responses']}/40 | {row['solved']} | {rate} | {baseline['tasks'][task]['solved']}/40 |")
-    if qwen_complete:
-        total = sum(row['solved'] for row in qwen['tasks'].values())
-        strict = sum(row['contract_pass'] for row in qwen['tasks'].values())
-        failure_counts = {name:sum(row['failures'].get(name,0) for row in qwen['tasks'].values())
-                          for name in ('illegal_action','unsolved','truncated')}
-        lines += ['',f"总计 {total}/200（{total/2:.1f}%），GPT 同题 195/200（97.5%）。主指标按实际执行：严格格式与终态声明通过 {strict}/200，未用格式问题扣掉已解出的题。",'',
-                  f"失败分解：非法动作 {failure_counts['illegal_action']}，合法但未完成 {failure_counts['unsolved']}，输出截断 {failure_counts['truncated']}。Qwen thinking 不等同于 GPT high；GPT 接口存在超预算答卷，因此本表不能声称严格等预算。"]
-    lines += ['', '## 历史探索与入口','',
-              '此前五题一档的探索、28 块积木、4×4 压力题和寻路加难均已停止派新题，旧答卷保留。它们不替代当前每档 20 题；复用答卷也不当作新增独立试验重复计算。', '',
-              '[当前配置](../configs/difficulty_20.json) · [执行与复用说明](../README.md) · [原题配置](../configs/sol_high_40.json) · [32B 配置](../configs/qwen32b_same40.json)', '',
-              '原始题目、答卷、服务失败与来源均在 Git 外的 runs/；当前运行 runs/sol_difficulty_20/。', '']
+    supplemental = build(args.supplementary)[0] if args.supplementary else None
     args.out.mkdir(parents=True,exist_ok=True)
-    (args.out/'report.md').write_text('\n'.join(lines),encoding='utf-8')
-    write_json(args.out/'summary.json',{'updated_at':now,'baseline':baseline,'current':current,
-                                      'current_failures':[{'case_id':r['case_id'],'task':r['task'],'verdict':r['verdict']} for r in failures],
-                                      'reused_valid_answers':suite.get('reused_valid_answers',0),
-                                      'qwen_last_collected':qwen,'retired_runs':history})
-    print(json.dumps({'out':str(args.out),'current_valid':sum(r['valid_responses'] for r in current['tasks'].values())}))
+    (args.out/'report.md').write_text(render_report(baseline,qwen),encoding='utf-8',newline='\n')
+    if supplemental:
+        (args.out/'difficulty_exploration.md').write_text(render_supplement(args.supplementary,supplemental),encoding='utf-8',newline='\n')
+    write_json(args.out/'summary.json',{'updated_at':datetime.now(timezone(timedelta(hours=8))).isoformat(),
+        'decision':'Retain initial conditions; Qwen3-32B unreliability is the minimum difficulty criterion; GPT is a strong reference, not a required failure target.',
+        'main_config':'experiments/task_text_baselines/configs/sol_high_40.json',
+        'baseline':baseline,'qwen':qwen,'supplementary_difficulty':supplemental,'retired_runs':history})
+    print(json.dumps({'out':str(args.out),'qwen_status':qwen['status'],'supplementary_status':supplemental['status'] if supplemental else None}))
 
 
 if __name__ == '__main__':

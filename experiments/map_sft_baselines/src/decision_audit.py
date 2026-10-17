@@ -82,6 +82,7 @@ def main():
         parser.add_argument('--'+key, type=Path, required=True)
     parser.add_argument('--epoch', type=int, required=True)
     parser.add_argument('--split', choices=['all', 'train', 'test'], default='all')
+    parser.add_argument('--prepare-only', action='store_true')
     args = parser.parse_args()
     policy = json.loads(args.config.read_text())
     if args.epoch not in policy['epochs']:
@@ -111,13 +112,15 @@ def main():
         if all(len(donors[c]) == 2 for c in counts):
             break
     if any(len(donors[c]) < 2 for c in counts):
-        raise ValueError('Cannot match map donors without changing candidate count')
+        raise ValueError('Cannot match map donor candidate counts: '+str({c:len(donors[c]) for c in sorted(counts) if len(donors[c])<2}))
     args.out.mkdir(parents=True, exist_ok=True)
     cohort = dict(seed=policy['seed'], splits=selected, donors=dict(donors))
     cohort_path = args.out/'cohort.json'
     if cohort_path.exists() and json.loads(cohort_path.read_text()) != json.loads(json.dumps(cohort)):
         raise ValueError('Fixed cohort changed')
     atomic_json(cohort_path, cohort)
+    if args.prepare_only:
+        return
     destination = args.out/f'epoch-{args.epoch}'
     if args.split != 'all':
         destination = destination/args.split

@@ -103,8 +103,8 @@ class Drawing:
 
 def main():
     d = Drawing()
-    # The right stack contains complete augmented layers. The expanded middle
-    # view is the selected orange component, not an additional processing path.
+    # Only the selected complete layer is expanded in the right stack. The
+    # middle view magnifies its orange component, not another processing path.
     d.rect(1015, 63, 270, 753, width=1.6)
     d.text(1150, 37, "Qwen2.5-1.5B", 24)
     d.block(1050, 78, 200, 32, "LM head", BLUE_LIGHT)
@@ -118,18 +118,18 @@ def main():
         d.block(1050, y+110, 200, 34, "Gated Cross-Attn", PEACH, size=18)
         d.arrow([(1150, y+110), (1150, y+86)])
 
-    layer(130, "Layer L")
+    d.block(1050, 225, 200, 34, "Layer L", "#EEF0F2")
     layer(335, "Layer ℓ", selected=True)
-    layer(550, "Layer 1")
-    d.arrow([(1150, 182), (1150, 110)])
+    d.block(1050, 625, 200, 34, "Layer 1", "#EEF0F2")
+    d.arrow([(1150, 225), (1150, 110)])
     d.arrow([(1150, 387), (1150, 327)])
     d.dots(1150, 313)
-    d.arrow([(1150, 300), (1150, 274)])
-    d.arrow([(1150, 602), (1150, 542)])
+    d.arrow([(1150, 300), (1150, 259)])
+    d.arrow([(1150, 625), (1150, 542)])
     d.dots(1150, 528)
     d.arrow([(1150, 515), (1150, 479)])
     d.block(1050, 760, 200, 34, "Embedding", BLUE_LIGHT)
-    d.arrow([(1150, 760), (1150, 694)])
+    d.arrow([(1150, 760), (1150, 659)])
     d.text(1150, 841, "Text tokens", 20)
     d.arrow([(1150, 825), (1150, 794)])
 

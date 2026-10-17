@@ -28,7 +28,7 @@ def build(run):
     adaptive = suite["config"].get("study") == "adaptive_complete_plan_difficulty"
     lines = ["# 逐项加难试验" if adaptive else "# 五任务纯文字完整规划基线", "",
              f"状态：{progress['status']}。模型请求：`{progress['api']['model']}`；推理设置：`{progress['api']['reasoning_effort']}`。",
-             "", "每档最多 5 题，逐项加难、遇模型错误即停。打乱步数是生成参数，不等于最短距离。" if adaptive else "同一套各 40 题，一次输出完整计划，无工具、无中途反馈。主指标为环境回放到达目标，最优解和输出格式另计。",
+             "", "每档最多 5 题，逐项加难、遇执行失败即停；成功答案的格式问题单列。打乱步数是生成参数，不等于最短距离。" if adaptive else "同一套各 40 题，一次输出完整计划，无工具、无中途反馈。主指标为环境回放到达目标，最优解和输出格式另计。",
              "", "| 任务 | 有效答卷／计划 | 待补服务失败 | 解出 | 严格合同通过 | 最优解 |", "|---|---:|---:|---:|---:|---:|"]
     for task, values in results.items():
         optimal = str(values['optimal']) if values['optimal_evaluated'] else '—'

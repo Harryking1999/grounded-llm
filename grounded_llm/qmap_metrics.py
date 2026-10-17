@@ -125,4 +125,3 @@ def rollout(model, env, tasks, device, budget_multiplier, horizon=None, return_t
         if return_tasks:
             results[policy]["per_task"] = {"solved": solved.tolist(), "steps": steps.tolist(), "cycles": cycles.tolist()}
     return results
-

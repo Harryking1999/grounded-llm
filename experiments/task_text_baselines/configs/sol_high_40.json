@@ -1,0 +1,24 @@
+{
+  "study": "five_task_complete_plan_baseline",
+  "seed": 20261017,
+  "cases_per_task": 40,
+  "protocol": "one_response_complete_plan_no_tools_no_feedback",
+  "api": {
+    "base_url": "https://jarodfund.xyz/v1",
+    "model": "gpt-6.1-sol",
+    "reasoning_effort": "high",
+    "max_output_tokens": 32768,
+    "timeout_seconds": 900,
+    "concurrency": 4,
+    "max_service_retries": 2,
+    "max_total_service_retries": 12
+  },
+  "tasks": {
+    "blocks": {"placements": 12, "goal": "empty", "sampling": "uniform shape then uniform nonoverlapping legal placement; reject duplicates", "optimality": "offline exact-cover minimum; placement count is not assumed optimal"},
+    "path": {"node_count": 256, "regular_degree": 3, "graph_seed": 20260910, "distances": [3,4,5,6,7,8,9,10], "per_distance": 5, "sampling": "fixed graph reconstructed from historical generator seed; new distinct endpoint pairs"},
+    "hanoi": {"disks": 8, "goal_peg": "C", "distance_ranges": [[1,31],[32,63],[64,127],[128,255]], "per_range": 10, "sampling": "uniform distinct configurations within exact-distance strata"},
+    "cube2": {"metric": "QTM_URF_6", "goal": 0, "distances": [1,2,4,6,8,10,12,14], "per_distance": 5, "sampling": "uniform distinct states within exact BFS depth; DBL fixed"},
+    "puzzle8": {"goal": [0,1,2,3,4,5,6,7,8], "distances": [4,8,12,16,20,24,28,30], "per_distance": 5, "sampling": "uniform distinct states within exact BFS depth"}
+  },
+  "evaluation": "Replay actions with the task environment; stop on the first illegal action. Report execution success, strict JSON/status contract, illegal action, remaining-unsolved, truncation and service errors separately. No model-failure resampling. Success does not require a shortest plan; optimality is secondary. No tools or test-state successors in prompts. Each task uses its task-owned shared rules and complete-plan output contract."
+}

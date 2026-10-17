@@ -7,6 +7,7 @@
 | 目录 | 作用 |
 |---|---|
 | [map_sft_baselines](map_sft_baselines/README.md) | 当前同数据对照：地图、主干训练范围与接口容量 |
+| [task_text_baselines](task_text_baselines/README.md) | 五任务各 40 题的纯文字完整计划基线；GPT-6.1-sol high |
 | [llm_task_sft](llm_task_sft/README.md) | 独立无地图任务 SFT 的历史协议与结果 |
 | [flamingo_map_reader](flamingo_map_reader/README.md) | 已完成的冻结读取接口、两任务证据和 FFN 负结果 |
 | [blocks_distance_map](blocks_distance_map/README.md) | 冻结积木 Q 的来源、编码器与精确裁判 |

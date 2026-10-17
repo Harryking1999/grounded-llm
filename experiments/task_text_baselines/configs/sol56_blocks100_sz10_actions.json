@@ -1,0 +1,21 @@
+{
+  "study": "blocks_ten_shape_hundred_case_comparison",
+  "seed": 20261018,
+  "source_suite": "runs/sol61_blocks100_sz10_actions/suite.json",
+  "case_mode": "copy_frozen",
+  "expected_cases": 100,
+  "samples_per_case": 1,
+  "api": {
+    "base_url": "https://jarodfund.xyz/v1",
+    "model": "gpt-5.6-sol",
+    "reasoning_effort": "high",
+    "max_output_tokens": 16000,
+    "scoring_output_limit": 16000,
+    "timeout_seconds": 900,
+    "concurrency": 4,
+    "max_service_retries": 10,
+    "max_total_service_retries": 200,
+    "service_retry_delay_seconds": 30
+  },
+  "comparison": "Copy the one hundred newly frozen ten-shape twelve-placement cases, literal action-only prompts, IDs and witnesses unchanged from the 6.1 suite. Change only the requested model to gpt-5.6-sol. Keep high, the 16000-token request and retry policy; additionally score saved reasoning-plus-answer output at 8000. No board_after, tools or intermediate feedback. One valid answer per case; preserve model errors, truncations and overruns without resampling."
+}

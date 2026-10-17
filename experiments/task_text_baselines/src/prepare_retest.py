@@ -8,7 +8,7 @@ import random
 
 from experiments.sol_dag_blocks.src.tasks import BlocksTask
 from experiments.gcml_counterexamples.src import blocks
-from .difficulty import harder_prompt
+from .difficulty import blocks_case, harder_prompt
 from .protocol import ROOT, judge
 from .run import write_json
 from .prepare import make_blocks
@@ -19,6 +19,23 @@ def retest_cases(config, source):
         raise ValueError('Retests use exactly one valid answer per question')
     if config['case_mode'] == 'copy_frozen':
         cases = deepcopy(source['cases'])
+    elif config['case_mode'] == 'blocks_connected_actions':
+        options = deepcopy(source['config']['blocks'])
+        rules = BlocksTask(options)
+        seen = {rules.normalized_key(rules.from_grid(c['grid']))
+                for c in source['cases'] if 'grid' in c}
+        rng, cases = random.Random(config['seed']), []
+        for _ in range(config['expected_cases']*100):
+            case = blocks_case(options,config['construction_placements'],rng)
+            key = rules.normalized_key(case['initial'])
+            if key in seen:
+                continue
+            seen.add(key)
+            case['id'] = f"blocks10_{len(cases):03d}"
+            case['prompt'] = harder_prompt(case)
+            cases.append(case)
+            if len(cases) == config['expected_cases']:
+                break
     elif config['case_mode'] == 'blocks_no_state_report':
         cases = deepcopy(source['cases'])
         suffix = '\n\n'+config['format_removal']

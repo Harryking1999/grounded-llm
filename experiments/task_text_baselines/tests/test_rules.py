@@ -23,6 +23,27 @@ from experiments.gcml_counterexamples.src import blocks
 
 
 class TaskRulesTest(unittest.TestCase):
+    def test_ten_shape_actions_suite_keeps_legacy_generation_and_replays(self):
+        old = json.loads((ROOT/'experiments/sol_dag_blocks/configs/sol_medium.json').read_text())
+        rules = BlocksTask(old['blocks'])
+        config = {'case_mode':'blocks_connected_actions','seed':20261018,
+                  'expected_cases':100,'samples_per_case':1,'construction_placements':12}
+        cases = retest_cases(config,{'config':old,'cases':[]})
+        self.assertEqual(len({rules.normalized_key(c['initial']) for c in cases}),100)
+        for case in cases:
+            self.assertEqual(case['shape_options']['shape_rows'],old['blocks']['shape_rows'])
+            self.assertEqual(len(case['reference']['actions']),12)
+            self.assertNotIn('board_after',case['prompt'])
+            self.assertNotIn('state_report_required',case)
+            self.assertIsNone(case['reference']['length'])
+            state = 0
+            for action in case['reference']['actions']:
+                mask = rules.by_action[action['shape_id'],action['row'],action['col']]
+                self.assertFalse(state & mask)
+                self.assertTrue(not state or mask & rules.boundary(state))
+                state |= mask
+            self.assertEqual(state,case['initial'])
+
     def test_sz_replacement_generates_solvable_twelve_placement_boards(self):
         config = json.loads((ROOT/'experiments/task_text_baselines/configs/sol56_blocks40_sz_state_report.json').read_text())
         with patch('builtins.print'):

@@ -1,0 +1,22 @@
+{
+  "study": "blocks_ten_shape_hundred_case_comparison",
+  "seed": 20261018,
+  "source_suite": "experiments/sol_dag_blocks/runs/suite.json",
+  "case_mode": "blocks_connected_actions",
+  "construction_placements": 12,
+  "expected_cases": 100,
+  "samples_per_case": 1,
+  "api": {
+    "base_url": "https://jarodfund.xyz/v1",
+    "model": "gpt-6.1-sol",
+    "reasoning_effort": "high",
+    "max_output_tokens": 16000,
+    "scoring_output_limit": 16000,
+    "timeout_seconds": 900,
+    "concurrency": 4,
+    "max_service_retries": 10,
+    "max_total_service_retries": 200,
+    "service_retry_delay_seconds": 30
+  },
+  "comparison": "Generate one hundred fresh 10x10 boards using the historical full ten-shape catalogue (four L3, two I3, four S/Z orientations) and twelve nonoverlapping placements. At each construction step uniformly choose among all feasible placements touching the existing occupied region. Reject translation-equivalent duplicates within the new suite and against historical source boards. No model-dependent or difficulty filtering. Use the currently confirmed shared rules and complete actions/final_status JSON contract, no board_after, tools or intermediate feedback. Construction witnesses certify solvability, not optimality. One valid answer per case; only service failures may be retried. Request high and 16000 reasoning-plus-answer tokens, score at both 16000 and 8000. Compare models on identical new questions; historical sixteen and eight-shape forty-case results remain separate and do not isolate shape-count effects."
+}

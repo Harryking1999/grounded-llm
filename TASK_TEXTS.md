@@ -612,7 +612,7 @@ Reason: The current configuration exactly matches the goal; no further move is n
 
 ### 二阶魔方：任务文字与监督格式
 
-状态：用户已确定参考 XoT，采用六面 `2×2` 数字矩阵作为 LLM 侧表示。以下共享规则为待确认草案，其余输出合同仍待确认；尚未实现贴纸转换或启动新评测。Q 编码器继续使用角块身份与朝向的 192 维独热输入。
+状态：用户已确定参考 XoT，采用六面 `2×2` 数字矩阵和动作前后示例作为 LLM 侧表示。共享规则、每轮更新、完整计划输出和监督答案草案均已补齐，整套措辞待最终确认；尚未实现完整贴纸转换或启动新评测。Q 编码器继续使用角块身份与朝向的 192 维独热输入。
 
 #### 共享任务描述与规则
 
@@ -785,23 +785,67 @@ Goal cube state:
 
 #### 地图组／CoT 组：每轮环境更新
 
-待填：真实当前魔方、目标、实际转动历史、候选 ID 与转动的对应关系。地图组额外获得当前／目标／真实后继 Q 槽位。
+两组使用相同文字，初始规则与目标沿用首轮输入。当前状态使用上面的六面矩阵格式，转动历史来自环境实际执行结果。地图组额外获得当前／目标／六个真实后继 Q 槽位；无地图组不收 Q。
 
 ```text
-{environment_update_to_be_discussed}
+[Environment update]
+Current cube state:
+{current_cube_state}
+Actual executed actions: {executed_actions_or_none}
+Legal next moves:
+{local_id}: {turn}
+...
+Candidate numbers may change between turns; use only the numbers above.
+[/Environment update]
 ```
+
+`{turn}` 为 U、U'、R、R'、F、F' 之一。每轮列出六个候选；候选 ID 是本轮控制地址，不是固定的转动编号。执行后由环境更新真实状态，不采用模型自报的状态。
 
 #### SOTA 组／32B 组：输出格式
 
-待填完整转动序列、终止状态和是否允许输出额外说明；共享同一规则与呈现。
+共享同一任务规则、六面表示和固定动作示例。一次输出完整剩余计划，无中途反馈；动作使用转动名称，不使用本轮候选 ID。
 
 ```text
-{sota_32b_output_contract_to_be_discussed}
+Plan the complete remaining sequence from the current cube state and output it once. There is no intermediate feedback; the judge stops at the first illegal action.
+Return only JSON with "actions" (an array of strings, each one of "U", "U'", "R", "R'", "F", or "F'") and "final_status" ("solved", "no_solution", or "unsolved"). Do not include any explanation or commentary outside the JSON.
+Use "solved" when your sequence reaches the goal; if already at the goal, output an empty actions array. Use "no_solution" only when the goal is unreachable, not merely because you could not find a plan; otherwise use "unsolved".
 ```
+
+格式示例（不对应上面的具体魔方）：
+
+```json
+{"actions":["R","U'","F"],"final_status":"solved"}
+```
+
+已在目标时输出 `{"actions":[],"final_status":"solved"}`。是否到达由环境执行验证，不能以模型的 `final_status` 作为正确性证据。此组与地图／CoT 的逐轮反馈条件不同，结果中注明。
 
 #### 监督答案：排序／Reason／Action
 
-待填排序、CoT／短 Reason、单步动作与停止。复原和任意目标条件分别准备；当前复原断点不等于任意目标已解决。
+地图组沿用积木的排序→简短 Reason→单步动作：
+
+```text
+Map-distance ranking to the goal, closest to farthest: {ranking}.
+Reason: Turning {turn} is legal and leaves a cube state with one fewer turn needed to reach the goal.
+<action>{local_id}</action>
+```
+
+排序包含六个候选和 `current`，按 Q 到目标的距离由近及远排列，用 `<`、`=` 表示远近与并列。动作正确性及“剩余最短步数减少一步”的依据由环境真值另行验证，不把 Q 排序直接当作正确动作标签。
+
+动作直接到达目标时：
+
+```text
+Reason: Turning {turn} is legal and reaches the goal cube state.
+<action>{local_id}</action>
+```
+
+已在目标时：
+
+```text
+Reason: The current cube state exactly matches the goal; no further turn is needed.
+<done/>
+```
+
+无地图 CoT 组直接去掉排序行，保留相同 Reason、动作和停止标签，不单独确认。以上均为简短 R＋A 监督，不是长 CoT。复原和任意可达目标共用文字格式，但数据与结果分别报告；当前复原断点不等于任意目标已解决。
 
 
 ### 数据说明例

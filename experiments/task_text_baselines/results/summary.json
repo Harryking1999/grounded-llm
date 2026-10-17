@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-17 20:53（北京时间）",
+  "updated_at": "2026-10-17 21:11（北京时间）",
   "baseline": {
     "status": "completed",
     "model_request": {
@@ -302,109 +302,165 @@
     "tasks": {
       "blocks": {
         "planned": 20,
-        "finished": 1,
-        "valid_responses": 0,
-        "service_errors": 1,
-        "solved": 0,
-        "contract_pass": 0,
+        "finished": 5,
+        "valid_responses": 5,
+        "service_errors": 0,
+        "solved": 5,
+        "contract_pass": 5,
         "optimal": 0,
         "optimal_evaluated": 0,
         "failures": {
-          "service_error": 1
+          "success": 5
         },
-        "output_tokens": 0,
-        "input_tokens": 0,
+        "output_tokens": 79604,
+        "input_tokens": 2770,
         "strata": {
           "SZ10_board15_connected_20": {
-            "finished": 1,
-            "valid_responses": 0,
-            "service_errors": 1,
-            "solved": 0
+            "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
+            "solved": 5
           }
         }
       },
       "cube3": {
         "planned": 20,
-        "finished": 3,
-        "valid_responses": 3,
+        "finished": 6,
+        "valid_responses": 6,
         "service_errors": 0,
-        "solved": 3,
-        "contract_pass": 3,
+        "solved": 6,
+        "contract_pass": 6,
         "optimal": 0,
         "optimal_evaluated": 0,
         "failures": {
-          "success": 3
+          "success": 6
         },
-        "output_tokens": 87435,
-        "input_tokens": 6801,
+        "output_tokens": 183350,
+        "input_tokens": 13602,
         "strata": {
           "scramble_20": {
-            "finished": 3,
-            "valid_responses": 3,
+            "finished": 6,
+            "valid_responses": 6,
             "service_errors": 0,
-            "solved": 3
+            "solved": 6
           }
         }
       },
       "puzzle24": {
         "planned": 20,
-        "finished": 1,
-        "valid_responses": 0,
-        "service_errors": 1,
-        "solved": 0,
-        "contract_pass": 0,
+        "finished": 5,
+        "valid_responses": 5,
+        "service_errors": 0,
+        "solved": 4,
+        "contract_pass": 4,
         "optimal": 0,
         "optimal_evaluated": 0,
         "failures": {
-          "service_error": 1
+          "success": 4,
+          "unsolved": 1
         },
-        "output_tokens": 0,
-        "input_tokens": 0,
+        "output_tokens": 88975,
+        "input_tokens": 1900,
         "strata": {
           "scramble_256": {
-            "finished": 1,
-            "valid_responses": 0,
-            "service_errors": 1,
-            "solved": 0
+            "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
+            "solved": 4
           }
         }
       },
       "hanoi": {
         "planned": 20,
-        "finished": 6,
-        "valid_responses": 5,
-        "service_errors": 1,
-        "solved": 3,
-        "contract_pass": 3,
-        "optimal": 3,
-        "optimal_evaluated": 5,
+        "finished": 8,
+        "valid_responses": 8,
+        "service_errors": 0,
+        "solved": 6,
+        "contract_pass": 6,
+        "optimal": 6,
+        "optimal_evaluated": 8,
         "failures": {
-          "success": 3,
-          "illegal_action": 2,
-          "service_error": 1
+          "success": 6,
+          "illegal_action": 2
         },
-        "output_tokens": 116451,
-        "input_tokens": 6172,
+        "output_tokens": 186005,
+        "input_tokens": 7357,
         "strata": {
           "distance_1023_2047": {
-            "finished": 6,
-            "valid_responses": 5,
-            "service_errors": 1,
-            "solved": 3
+            "finished": 8,
+            "valid_responses": 8,
+            "service_errors": 0,
+            "solved": 6
           }
         }
       }
     },
-    "recorded_attempts": 23,
+    "recorded_attempts": 39,
     "service_error_attempts": 15,
     "returned_model_counts": {
-      "None": 10,
+      "None": 23,
       "gpt-6.1-sol": 1
     },
-    "exceeded_output_limit": 1,
+    "exceeded_output_limit": 3,
     "run_path": "runs\\sol_difficulty_20",
-    "updated_at": "2026-10-17T12:53:26.534916+00:00"
+    "updated_at": "2026-10-17T13:11:38.162915+00:00"
   },
+  "current_failures": [
+    {
+      "case_id": "hanoi_level2_01",
+      "task": "hanoi",
+      "verdict": {
+        "solved": false,
+        "contract_pass": false,
+        "strict_json": true,
+        "status_correct": false,
+        "reported_status": "solved",
+        "failure": "illegal_action",
+        "first_illegal_index": 4,
+        "illegal_detail": "Larger disk on smaller disk",
+        "executed": 4,
+        "plan_length": 1340,
+        "optimal": false,
+        "excess_moves": null
+      }
+    },
+    {
+      "case_id": "hanoi_level2_02",
+      "task": "hanoi",
+      "verdict": {
+        "solved": false,
+        "contract_pass": false,
+        "strict_json": true,
+        "status_correct": false,
+        "reported_status": "solved",
+        "failure": "illegal_action",
+        "first_illegal_index": 284,
+        "illegal_detail": "Specified disk is not on top of source",
+        "executed": 284,
+        "plan_length": 1227,
+        "optimal": false,
+        "excess_moves": null
+      }
+    },
+    {
+      "case_id": "puzzle24_level0_04",
+      "task": "puzzle24",
+      "verdict": {
+        "solved": false,
+        "contract_pass": false,
+        "strict_json": true,
+        "status_correct": false,
+        "reported_status": "no_solution",
+        "failure": "unsolved",
+        "first_illegal_index": null,
+        "illegal_detail": null,
+        "executed": 0,
+        "plan_length": 0,
+        "optimal": null,
+        "excess_moves": null
+      }
+    }
+  ],
   "reused_valid_answers": 8,
   "qwen_last_collected": {
     "status": "running",

@@ -22,7 +22,8 @@ def conditions(folder):
             row['service_errors'] += bool(record.get('service_error'))
             row['valid'] += not bool(record.get('service_error'))
             row['solved'] += bool(record['verdict'].get('solved'))
-    return groups
+    failures = [row for row in latest.values() if not row.get('service_error') and not row['verdict'].get('solved')]
+    return groups,failures
 
 
 def label(task,stratum):
@@ -61,8 +62,18 @@ def main():
              f"首批四组共 80 题已冻结并回放参考解，复用 {suite.get('reused_valid_answers',0)} 份完全同题的有效答卷，答错的也保留。有效答卷不足 20 时仅报告进度，服务失败不当作答错。",'',
              '| 任务 | 条件 | 阶段 | 有效／本组题数 | 解出 | 待补服务失败 |',
              '|---|---|---|---:|---:|---:|']
-    for (task,phase,stratum),row in conditions(args.current).items():
+    groups,failures = conditions(args.current)
+    for (task,phase,stratum),row in groups.items():
         lines.append(f"| {NAMES[task]} | {label(task,stratum)} | {'独立确认' if phase=='confirm' else '初筛'} | {row['valid']}/{row['planned']} | {row['solved']} | {row['service_errors']} |")
+    if failures:
+        lines += ['', '**已返回题的具体失败**', '']
+        for row in failures:
+            verdict = row['verdict']
+            index = verdict.get('first_illegal_index')
+            detail = (f'第 {index+1} 步非法' if index is not None else
+                      '将已验证可解题误判为无解' if verdict.get('reported_status') == 'no_solution' else
+                      {'unsolved':'未到目标','parse_error':'答案无法解析','truncated':'输出截断'}.get(verdict.get('failure'),verdict.get('failure')))
+            lines.append(f"- {NAMES[row['task']]} `{row['case_id']}`：{detail}。")
     lines += ['',
               '5×5 题目均可解，Manhattan 下界至少 60，因此任何解至少需要 60 步；256 是构造步数上界。积木 20 是构造放置数，允许找到其他合法分解。参考解和距离下界均不提供给模型。', '',
               '每档完成 20 题后再判断；成功不高于一半时另取同条件 20 道独立新题确认。保留所有合法返回，执行错误、未完成、格式和截断分别统计。', '',
@@ -86,6 +97,7 @@ def main():
     args.out.mkdir(parents=True,exist_ok=True)
     (args.out/'report.md').write_text('\n'.join(lines),encoding='utf-8')
     write_json(args.out/'summary.json',{'updated_at':now,'baseline':baseline,'current':current,
+                                      'current_failures':[{'case_id':r['case_id'],'task':r['task'],'verdict':r['verdict']} for r in failures],
                                       'reused_valid_answers':suite.get('reused_valid_answers',0),
                                       'qwen_last_collected':qwen,'retired_runs':history})
     print(json.dumps({'out':str(args.out),'current_valid':sum(r['valid_responses'] for r in current['tasks'].values())}))

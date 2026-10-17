@@ -29,6 +29,11 @@ def first_rank_candidate(text):
     return int(match.group(1)) if match else None
 
 
+def reference_candidate(action_keys, reference_key):
+    """JSON stores reference tuples as lists; compare physical moves consistently."""
+    return [tuple(key) for key in action_keys].index(tuple(reference_key))+1
+
+
 def summarize(rows):
     groups = defaultdict(list)
     for row in rows:
@@ -166,8 +171,8 @@ def main():
                 donor = next(x for x in donors[count] if x['start'] != record['start'])
                 other = sorted_step(qmap, int(donor['start']), int(donor['goal']))
                 reference = (record['route_ids'][0] if split == 'train' else
-                    next(i+1 for i, action in enumerate(legal_actions(int(record['start'])))
-                         if action_key(action) == record['reference_actions'][0]))
+                    reference_candidate([action_key(action) for action in legal_actions(int(record['start']))],
+                                        record['reference_actions'][0]))
                 conditions = policy['conditions'] if args.epoch == policy['intervention_epoch'] else ['natural']
                 natural = None
                 for condition in conditions:

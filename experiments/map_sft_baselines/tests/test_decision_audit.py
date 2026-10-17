@@ -1,8 +1,13 @@
 import unittest
-from experiments.map_sft_baselines.src.decision_audit import select_records, first_rank_candidate, summarize
+from experiments.map_sft_baselines.src.decision_audit import select_records, first_rank_candidate, summarize, reference_candidate
 
 
 class DecisionAuditTests(unittest.TestCase):
+    def test_reference_action_survives_json_list_conversion(self):
+        self.assertEqual(reference_candidate([(1, 2, 3), (4, 5, 6)], [4, 5, 6]), 2)
+        with self.assertRaises(ValueError):
+            reference_candidate([(1, 2, 3)], [4, 5, 6])
+
     def test_fixed_nonterminal_distinct_board_cohort(self):
         rows = [dict(start=i+1, goal=0, board_row=i//2, trajectory_id=str(i)) for i in range(20)]
         rows.append(dict(start=0, goal=0, board_row=99, trajectory_id='done'))

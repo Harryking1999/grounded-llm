@@ -1,8 +1,14 @@
 import unittest
-from experiments.map_sft_baselines.src.decision_audit import select_records, first_rank_candidate, summarize, reference_candidate
+from experiments.map_sft_baselines.src.decision_audit import select_records, first_rank_candidate, summarize, reference_candidate, donor_records
 
 
 class DecisionAuditTests(unittest.TestCase):
+    def test_donors_include_intermediate_states_and_exclude_terminal(self):
+        rows=[dict(trajectory_id='a',pairs=[['15','1'],['7','1'],['1','1']])]
+        donors=donor_records(rows)
+        self.assertEqual([x['start'] for x in donors],['15','7'])
+        self.assertEqual(donors[1]['trajectory_id'],'a:turn-1')
+
     def test_reference_action_survives_json_list_conversion(self):
         self.assertEqual(reference_candidate([(1, 2, 3), (4, 5, 6)], [4, 5, 6]), 2)
         with self.assertRaises(ValueError):

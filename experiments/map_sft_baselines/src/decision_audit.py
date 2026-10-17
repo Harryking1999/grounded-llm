@@ -34,6 +34,13 @@ def reference_candidate(action_keys, reference_key):
     return [tuple(key) for key in action_keys].index(tuple(reference_key))+1
 
 
+def donor_records(records):
+    """Use legal intermediate training states, rather than changing the test cohort."""
+    return [dict(start=str(state), goal=str(goal), trajectory_id=f"{row['trajectory_id']}:turn-{i}")
+            for row in records for i, (state, goal) in enumerate(row['pairs'])
+            if int(state) != int(goal)]
+
+
 def summarize(rows):
     groups = defaultdict(list)
     for row in rows:
@@ -92,7 +99,7 @@ def main():
                     test=select_records(test, policy['samples_per_split'], policy['seed']+1))
     # Donors preserve slot count and addresses, while carrying a different physical task.
     donors = defaultdict(list)
-    donor_pool = list(train)
+    donor_pool = donor_records(train)
     random.Random(policy['seed']+2).shuffle(donor_pool)
     counts = {len(legal_actions(int(x['start']))) for rows in selected.values() for x in rows}
     for row in donor_pool:
@@ -181,7 +188,7 @@ def main():
                     if condition == 'map_zero_vectors':
                         map_step = replace(original, map_batch=replace(original.map_batch,
                                                 vectors=torch.zeros_like(original.map_batch.vectors)))
-                    ids = cached_prefix(donor) if condition == 'text_swap' else original_ids
+                    ids = prefix(donor) if condition == 'text_swap' else original_ids
                     answer = generate(ids, map_step)
                     scored = score(answer, original, oracle, True)
                     rank = first_rank_candidate(answer)

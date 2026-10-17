@@ -51,6 +51,8 @@ def extract_text(data):
 
 
 def call(case, api, key, attempt):
+    if attempt > 1:
+        time.sleep(api.get('service_retry_delay_seconds',0))
     body = {"model": api["model"], "input": case["prompt"], "reasoning": {"effort": api["reasoning_effort"]},
             "max_output_tokens": api["max_output_tokens"], "tools": [], "stream": True, "store": False}
     record = {"case_id": case["id"], "task": case["task"], "stratum": case["stratum"], "attempt": attempt,
@@ -133,8 +135,8 @@ def main():
     cases, api = suite["cases"], dict(suite["config"]["api"])
     if args.recovery_config:
         recovery = json.loads(Path(args.recovery_config).read_text(encoding="utf-8"))
-        for name in ("max_service_retries", "max_total_service_retries"):
-            api[name] = recovery[name]
+        for name in ("max_service_retries", "max_total_service_retries", "service_retry_delay_seconds"):
+            api[name] = recovery.get(name,0) if name == 'service_retry_delay_seconds' else recovery[name]
     key = os.environ["GND_API_KEY"]
     records_dir = out / "records"
     records_dir.mkdir(exist_ok=True)

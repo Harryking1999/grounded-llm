@@ -1,6 +1,8 @@
 import json
 import random
 import unittest
+from unittest.mock import patch
+import urllib.error
 
 from experiments.hanoi_qmap.src.environment import Hanoi
 from experiments.task_text_baselines.src import cube2, cube3, hanoi, puzzle8, puzzle15
@@ -8,11 +10,26 @@ from experiments.task_text_baselines.src.difficulty import prepare_level
 from experiments.task_text_baselines.src.escalate import decision
 from experiments.task_text_baselines.src.protocol import ROOT
 from experiments.task_text_baselines.src.protocol import judge, prompt
-from experiments.task_text_baselines.src.run import extract_text, pending, summary
+from experiments.task_text_baselines.src.run import call, extract_text, pending, summary
 from experiments.task_text_baselines.src.qwen import final_text, round_robin
 
 
 class TaskRulesTest(unittest.TestCase):
+    def test_service_retry_waits_without_changing_the_request(self):
+        case = {'id':'retry','task':'path','stratum':'hard','prompt':'frozen'}
+        api = {'model':'requested','reasoning_effort':'high','max_output_tokens':32768,
+               'base_url':'https://example.invalid/v1','timeout_seconds':1,
+               'service_retry_delay_seconds':30}
+        with patch('experiments.task_text_baselines.src.run.time.sleep') as sleep, patch(
+                'experiments.task_text_baselines.src.run.urllib.request.urlopen',
+                side_effect=urllib.error.URLError('temporary')) as open_request:
+            record = call(case,api,'test-key',2)
+        sleep.assert_called_once_with(30)
+        body = json.loads(open_request.call_args.args[0].data)
+        self.assertEqual(body['input'],'frozen')
+        self.assertEqual(body['max_output_tokens'],32768)
+        self.assertEqual(record['service_error'],'URLError')
+
     def test_stratum_separates_service_errors_from_valid_failure(self):
         cases = [{'id':name,'task':'path'} for name in ('ok','wrong','network')]
         records = [{'task':'path','stratum':'hard','verdict':{'solved':True}},

@@ -33,7 +33,7 @@ def main():
     config = json.loads(Path(args.config).read_text(encoding="utf-8"))
     api = json.loads((ROOT/config["api_config"]).read_text())["api"]
     recovery = json.loads((ROOT/config["service_recovery"]).read_text())
-    api.update({key:recovery[key] for key in ("max_service_retries","max_total_service_retries")})
+    api.update({key:recovery[key] for key in ("max_service_retries","max_total_service_retries","service_retry_delay_seconds")})
     api["concurrency"] = config["concurrency"]
     out = Path(args.out)
     (out/"records").mkdir(parents=True,exist_ok=True)
@@ -46,15 +46,19 @@ def main():
     if state.get('stop_policy') != config['policy']:
         state.setdefault('policy_history',[]).append({'source_commit':state.get('policy_source_commit',state['source_commit']),
                                                      'policy':state.get('stop_policy'),'tasks':json.loads(json.dumps(state['tasks']))})
+    latest = latest_records(out)
     for item in state['tasks'].values():
         if item['status'] == 'model_error_found':
             item['status'] = 'active'
             item.setdefault('historical_first_errors',[]).append(item.pop('first_error'))
         item.setdefault('phase','screen')
         item.setdefault('level_results',[])
+        if item['status'] == 'service_blocked':
+            record = latest.get(item.get('case_id'),{})
+            if record.get('service_error') and record['attempt'] <= api['max_service_retries']:
+                item['status'] = 'active'
     suite['current_policy'] = dict(config,source_commit=source_commit)
     state.update(status='running',api=api,stop_policy=config['policy'],policy_source_commit=source_commit)
-    latest = latest_records(out)
     key = os.environ["GND_API_KEY"]
 
     def save():

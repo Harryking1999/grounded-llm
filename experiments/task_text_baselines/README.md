@@ -20,7 +20,7 @@ python -m experiments.task_text_baselines.src.run --out runs/five_task_sol_high_
 python -m experiments.task_text_baselines.src.report --run runs/five_task_sol_high_40 --out runs/five_task_sol_high_40/summary
 ```
 
-用户要求补齐 API 失败后，采用 [服务补测策略](configs/service_recovery.json)；只扩大基础设施重试次数，不改变题目、模型、提示词、输出预算或正常答卷。`stop_requested` 只停止新调度，等待在途请求落盘后才恢复；不可同时启动两个写同一运行目录的 worker。汇总将有效答卷与仍待补测的服务错误分开。
+用户要求补齐 API 失败后，采用 [服务补测策略](configs/service_recovery.json)；只调整基础设施重试，不改变题目、模型、提示词、输出预算或正常答卷。观察到“服务更新中”的 HTTP 503 连续快速耗尽重试后，补测增加等待间隔并扩大有限次数；恢复时只重新激活仍有重试额度的服务失败任务。`stop_requested` 只停止新调度，等待在途请求落盘后才恢复；不可同时启动两个写同一运行目录的 worker。汇总将有效答卷与仍待补测的服务错误分开。
 
 第三方接口短探针接受了请求并正常返回，但省略返回模型名称与 reasoning 配置。报告分别记录请求值与返回值，不把请求标签视为独立身份验证。运行还记录服务端工具元信息与是否超出请求 token 上限。
 

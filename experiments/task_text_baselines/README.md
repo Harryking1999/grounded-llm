@@ -66,3 +66,9 @@ python -u -m experiments.task_text_baselines.src.escalate --config experiments/t
 每档测完才判断是否继续；成功不高于一半时，用同条件 20 道独立新题确认。计划执行错误、未完成、格式问题、输出截断与服务失败分别报告；成功但格式不合规仍计解出，服务失败不计答错，正常答案不重采样。接口已观察到实际输出超过请求 token 上限，须单列，不能声称严格等预算。
 
 原始 200 题及其 Qwen3-32B 对照保持不变。`difficulty_ladder.json`、两组 4×4 距离压力配置、密集积木及长路径配置已标记停用，旧答卷保留在对应 `runs/`；队列入口拒绝再次用停用配置启动。新运行与报告位于 `runs/sol_difficulty_20/`，项目进度仍只更新权威状态页。
+
+紧凑结果由 `src/snapshot.py` 从已保存答卷重建，不发 API 请求；可选 `--history` 保留停用轮次的机器可读摘要：
+
+```powershell
+python -m experiments.task_text_baselines.src.snapshot --baseline runs/five_task_sol_high_40 --current runs/sol_difficulty_20 --qwen runs/five_task_qwen32b_same40 --out experiments/task_text_baselines/results
+```

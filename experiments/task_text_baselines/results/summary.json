@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-10-17 20:13（北京时间）",
-  "api": {
+  "updated_at": "2026-10-17 20:53（北京时间）",
+  "baseline": {
     "status": "completed",
     "model_request": {
       "base_url": "https://jarodfund.xyz/v1",
@@ -283,278 +283,85 @@
       "gpt-6.1-sol": 28
     },
     "exceeded_output_limit": 2,
-    "run_path": "D:\\Grounded_llm\\runs\\five_task_sol_high_40",
+    "run_path": "runs\\five_task_sol_high_40",
     "updated_at": "2026-10-17T11:08:40.386589+00:00"
   },
-  "adaptive": {
+  "current": {
     "status": "running",
+    "model_request": {
+      "base_url": "https://jarodfund.xyz/v1",
+      "model": "gpt-6.1-sol",
+      "reasoning_effort": "high",
+      "max_output_tokens": 32768,
+      "timeout_seconds": 900,
+      "concurrency": 4,
+      "max_service_retries": 10,
+      "max_total_service_retries": 200,
+      "service_retry_delay_seconds": 30
+    },
     "tasks": {
       "blocks": {
-        "status": "range_exhausted",
-        "level": 4,
-        "phase": "screen",
-        "level_results": [
-          {
-            "level": 2,
-            "level_value": 20,
-            "phase": "screen",
-            "valid": 5,
-            "solved": 5,
-            "decision": "advance",
-            "failures": {
-              "illegal_action": 0,
-              "unsolved": 0,
-              "parse_error": 0,
-              "truncated": 0
-            }
-          },
-          {
-            "level": 3,
-            "level_value": 24,
-            "phase": "screen",
-            "valid": 5,
-            "solved": 5,
-            "decision": "advance",
-            "failures": {
-              "illegal_action": 0,
-              "unsolved": 0,
-              "parse_error": 0,
-              "truncated": 0
-            }
-          }
-        ]
-      },
-      "cube3": {
-        "status": "active",
-        "level": 3,
-        "phase": "screen",
-        "level_results": [
-          {
-            "level": 2,
-            "level_value": 12,
-            "phase": "screen",
-            "valid": 5,
-            "solved": 5,
-            "decision": "advance",
-            "failures": {
-              "illegal_action": 0,
-              "unsolved": 0,
-              "parse_error": 0,
-              "truncated": 0
-            }
-          }
-        ]
-      },
-      "puzzle15": {
-        "status": "active",
-        "level": 4,
-        "phase": "screen",
-        "level_results": [
-          {
-            "level": 2,
-            "level_value": 24,
-            "phase": "screen",
-            "valid": 5,
-            "solved": 5,
-            "decision": "advance",
-            "failures": {
-              "illegal_action": 0,
-              "unsolved": 0,
-              "parse_error": 0,
-              "truncated": 0
-            }
-          },
-          {
-            "level": 3,
-            "level_value": 32,
-            "phase": "screen",
-            "valid": 5,
-            "solved": 5,
-            "decision": "advance",
-            "failures": {
-              "illegal_action": 0,
-              "unsolved": 0,
-              "parse_error": 0,
-              "truncated": 0
-            }
-          }
-        ]
-      },
-      "hanoi": {
-        "status": "active",
-        "level": 2,
-        "phase": "screen",
-        "level_results": [
-          {
-            "level": 0,
-            "level_value": 9,
-            "phase": "screen",
-            "valid": 5,
-            "solved": 4,
-            "decision": "advance",
-            "failures": {
-              "illegal_action": 0,
-              "unsolved": 1,
-              "parse_error": 0,
-              "truncated": 0
-            }
-          },
-          {
-            "level": 1,
-            "level_value": 10,
-            "phase": "screen",
-            "valid": 5,
-            "solved": 4,
-            "decision": "advance",
-            "failures": {
-              "illegal_action": 1,
-              "unsolved": 0,
-              "parse_error": 0,
-              "truncated": 0
-            }
-          }
-        ]
-      },
-      "path": {
-        "status": "service_blocked",
-        "level": 3,
-        "phase": "screen",
-        "level_results": [
-          {
-            "level": 0,
-            "level_value": 512,
-            "phase": "screen",
-            "valid": 5,
-            "solved": 4,
-            "decision": "advance",
-            "failures": {
-              "illegal_action": 1,
-              "unsolved": 0,
-              "parse_error": 0,
-              "truncated": 0
-            }
-          },
-          {
-            "level": 1,
-            "level_value": 1024,
-            "phase": "screen",
-            "valid": 5,
-            "solved": 5,
-            "decision": "advance",
-            "failures": {
-              "illegal_action": 0,
-              "unsolved": 0,
-              "parse_error": 0,
-              "truncated": 0
-            }
-          },
-          {
-            "level": 2,
-            "level_value": 2048,
-            "phase": "screen",
-            "valid": 5,
-            "solved": 5,
-            "decision": "advance",
-            "failures": {
-              "illegal_action": 0,
-              "unsolved": 0,
-              "parse_error": 0,
-              "truncated": 0
-            }
-          }
-        ],
-        "case_id": "path_level3_01"
-      }
-    },
-    "summary": {
-      "blocks": {
-        "planned": 10,
-        "finished": 10,
-        "valid_responses": 10,
-        "service_errors": 0,
-        "solved": 10,
-        "contract_pass": 10,
-        "optimal": 0,
-        "optimal_evaluated": 0,
-        "failures": {
-          "success": 10
-        },
-        "output_tokens": 160871,
-        "input_tokens": 4740,
-        "strata": {
-          "SZ10_connected_20": {
-            "finished": 5,
-            "valid_responses": 5,
-            "service_errors": 0,
-            "solved": 5
-          },
-          "SZ10_connected_24": {
-            "finished": 5,
-            "valid_responses": 5,
-            "service_errors": 0,
-            "solved": 5
-          }
-        }
-      },
-      "cube3": {
-        "planned": 10,
-        "finished": 7,
-        "valid_responses": 6,
+        "planned": 20,
+        "finished": 1,
+        "valid_responses": 0,
         "service_errors": 1,
-        "solved": 6,
-        "contract_pass": 6,
+        "solved": 0,
+        "contract_pass": 0,
         "optimal": 0,
         "optimal_evaluated": 0,
         "failures": {
-          "success": 6,
           "service_error": 1
         },
-        "output_tokens": 197735,
-        "input_tokens": 17799,
+        "output_tokens": 0,
+        "input_tokens": 0,
         "strata": {
-          "scramble_12": {
-            "finished": 5,
-            "valid_responses": 5,
-            "service_errors": 0,
-            "solved": 5
-          },
-          "scramble_16": {
-            "finished": 2,
-            "valid_responses": 1,
+          "SZ10_board15_connected_20": {
+            "finished": 1,
+            "valid_responses": 0,
             "service_errors": 1,
-            "solved": 1
+            "solved": 0
           }
         }
       },
-      "puzzle15": {
-        "planned": 15,
-        "finished": 11,
-        "valid_responses": 10,
-        "service_errors": 1,
-        "solved": 10,
-        "contract_pass": 10,
+      "cube3": {
+        "planned": 20,
+        "finished": 3,
+        "valid_responses": 3,
+        "service_errors": 0,
+        "solved": 3,
+        "contract_pass": 3,
         "optimal": 0,
         "optimal_evaluated": 0,
         "failures": {
-          "success": 10,
+          "success": 3
+        },
+        "output_tokens": 87435,
+        "input_tokens": 6801,
+        "strata": {
+          "scramble_20": {
+            "finished": 3,
+            "valid_responses": 3,
+            "service_errors": 0,
+            "solved": 3
+          }
+        }
+      },
+      "puzzle24": {
+        "planned": 20,
+        "finished": 1,
+        "valid_responses": 0,
+        "service_errors": 1,
+        "solved": 0,
+        "contract_pass": 0,
+        "optimal": 0,
+        "optimal_evaluated": 0,
+        "failures": {
           "service_error": 1
         },
-        "output_tokens": 134307,
-        "input_tokens": 7637,
+        "output_tokens": 0,
+        "input_tokens": 0,
         "strata": {
-          "scramble_24": {
-            "finished": 5,
-            "valid_responses": 5,
-            "service_errors": 0,
-            "solved": 5
-          },
-          "scramble_32": {
-            "finished": 5,
-            "valid_responses": 5,
-            "service_errors": 0,
-            "solved": 5
-          },
-          "scramble_48": {
+          "scramble_256": {
             "finished": 1,
             "valid_responses": 0,
             "service_errors": 1,
@@ -563,274 +370,49 @@
         }
       },
       "hanoi": {
-        "planned": 15,
-        "finished": 15,
-        "valid_responses": 14,
-        "service_errors": 1,
-        "solved": 10,
-        "contract_pass": 10,
-        "optimal": 10,
-        "optimal_evaluated": 14,
-        "failures": {
-          "success": 10,
-          "unsolved": 1,
-          "illegal_action": 3,
-          "service_error": 1
-        },
-        "output_tokens": 209851,
-        "input_tokens": 9637,
-        "strata": {
-          "distance_255_511": {
-            "finished": 5,
-            "valid_responses": 5,
-            "service_errors": 0,
-            "solved": 4
-          },
-          "distance_511_1023": {
-            "finished": 5,
-            "valid_responses": 5,
-            "service_errors": 0,
-            "solved": 4
-          },
-          "distance_1023_2047": {
-            "finished": 5,
-            "valid_responses": 4,
-            "service_errors": 1,
-            "solved": 2
-          }
-        }
-      },
-      "path": {
         "planned": 20,
-        "finished": 17,
-        "valid_responses": 16,
+        "finished": 6,
+        "valid_responses": 5,
         "service_errors": 1,
-        "solved": 15,
-        "contract_pass": 15,
-        "optimal": 15,
-        "optimal_evaluated": 16,
+        "solved": 3,
+        "contract_pass": 3,
+        "optimal": 3,
+        "optimal_evaluated": 5,
         "failures": {
-          "illegal_action": 1,
-          "success": 15,
+          "success": 3,
+          "illegal_action": 2,
           "service_error": 1
         },
-        "output_tokens": 54577,
-        "input_tokens": 305166,
+        "output_tokens": 116451,
+        "input_tokens": 6172,
         "strata": {
-          "nodes_512_eccentric_goal": {
-            "finished": 5,
+          "distance_1023_2047": {
+            "finished": 6,
             "valid_responses": 5,
-            "service_errors": 0,
-            "solved": 4
-          },
-          "nodes_1024_eccentric_goal": {
-            "finished": 5,
-            "valid_responses": 5,
-            "service_errors": 0,
-            "solved": 5
-          },
-          "nodes_2048_eccentric_goal": {
-            "finished": 5,
-            "valid_responses": 5,
-            "service_errors": 0,
-            "solved": 5
-          },
-          "nodes_4096_eccentric_goal": {
-            "finished": 2,
-            "valid_responses": 1,
             "service_errors": 1,
-            "solved": 1
+            "solved": 3
           }
         }
       }
-    }
+    },
+    "recorded_attempts": 23,
+    "service_error_attempts": 15,
+    "returned_model_counts": {
+      "None": 10,
+      "gpt-6.1-sol": 1
+    },
+    "exceeded_output_limit": 1,
+    "run_path": "runs\\sol_difficulty_20",
+    "updated_at": "2026-10-17T12:53:26.534916+00:00"
   },
-  "additional_stress_conditions": {
-    "puzzle15_distance_stress": {
-      "status": "running",
-      "tasks": {
-        "puzzle15": {
-          "status": "active",
-          "level": 1,
-          "phase": "screen",
-          "level_results": [
-            {
-              "level": 0,
-              "level_value": 128,
-              "phase": "screen",
-              "valid": 5,
-              "solved": 5,
-              "decision": "advance",
-              "failures": {
-                "illegal_action": 0,
-                "unsolved": 0,
-                "parse_error": 0,
-                "truncated": 0
-              }
-            }
-          ]
-        }
-      },
-      "summary": {
-        "puzzle15": {
-          "planned": 10,
-          "finished": 6,
-          "valid_responses": 5,
-          "service_errors": 1,
-          "solved": 5,
-          "contract_pass": 5,
-          "optimal": 0,
-          "optimal_evaluated": 0,
-          "failures": {
-            "success": 5,
-            "service_error": 1
-          },
-          "output_tokens": 96603,
-          "input_tokens": 1720,
-          "strata": {
-            "scramble_128": {
-              "finished": 5,
-              "valid_responses": 5,
-              "service_errors": 0,
-              "solved": 5
-            },
-            "scramble_256": {
-              "finished": 1,
-              "valid_responses": 0,
-              "service_errors": 1,
-              "solved": 0
-            }
-          }
-        }
-      },
-      "exceeded_output_limit": 0,
-      "updated_at": "2026-10-17T12:13:44.965877+00:00"
-    },
-    "puzzle15_far_stress": {
-      "status": "running",
-      "tasks": {
-        "puzzle15": {
-          "status": "active",
-          "level": 0,
-          "phase": "screen",
-          "level_results": []
-        }
-      },
-      "summary": {
-        "puzzle15": {
-          "planned": 5,
-          "finished": 2,
-          "valid_responses": 1,
-          "service_errors": 1,
-          "solved": 1,
-          "contract_pass": 1,
-          "optimal": 0,
-          "optimal_evaluated": 0,
-          "failures": {
-            "success": 1,
-            "service_error": 1
-          },
-          "output_tokens": 17128,
-          "input_tokens": 344,
-          "strata": {
-            "scramble_256": {
-              "finished": 2,
-              "valid_responses": 1,
-              "service_errors": 1,
-              "solved": 1
-            }
-          }
-        }
-      },
-      "exceeded_output_limit": 0,
-      "updated_at": "2026-10-17T12:13:42.399319+00:00"
-    },
-    "blocks_dense_stress": {
-      "status": "running",
-      "tasks": {
-        "blocks": {
-          "status": "active",
-          "level": 0,
-          "phase": "screen",
-          "level_results": []
-        }
-      },
-      "summary": {
-        "blocks": {
-          "planned": 5,
-          "finished": 5,
-          "valid_responses": 4,
-          "service_errors": 1,
-          "solved": 4,
-          "contract_pass": 4,
-          "optimal": 0,
-          "optimal_evaluated": 0,
-          "failures": {
-            "success": 4,
-            "service_error": 1
-          },
-          "output_tokens": 57354,
-          "input_tokens": 6093,
-          "strata": {
-            "SZ10_connected_28": {
-              "finished": 5,
-              "valid_responses": 4,
-              "service_errors": 1,
-              "solved": 4
-            }
-          }
-        }
-      },
-      "exceeded_output_limit": 0,
-      "updated_at": "2026-10-17T12:13:49.375088+00:00"
-    },
-    "path_distance_stress": {
-      "status": "service_incomplete",
-      "tasks": {
-        "path": {
-          "status": "service_blocked",
-          "level": 0,
-          "phase": "screen",
-          "level_results": [],
-          "case_id": "path_level0_02"
-        }
-      },
-      "summary": {
-        "path": {
-          "planned": 5,
-          "finished": 3,
-          "valid_responses": 2,
-          "service_errors": 1,
-          "solved": 2,
-          "contract_pass": 2,
-          "optimal": 2,
-          "optimal_evaluated": 2,
-          "failures": {
-            "success": 2,
-            "service_error": 1
-          },
-          "output_tokens": 9064,
-          "input_tokens": 8676,
-          "strata": {
-            "nodes_512_tree_eccentric_goal": {
-              "finished": 3,
-              "valid_responses": 2,
-              "service_errors": 1,
-              "solved": 2
-            }
-          }
-        }
-      },
-      "exceeded_output_limit": 0,
-      "updated_at": "2026-10-17T12:11:39.588907+00:00"
-    }
-  },
+  "reused_valid_answers": 8,
   "qwen_last_collected": {
-    "status_at_collection": "running",
-    "remote_updated_at": "2026-10-17T11:09:42.960483+00:00",
-    "connection_status": "login02_timeout",
-    "source_commit": "7c5295f",
-    "summary": {
+    "status": "running",
+    "model_request": {
+      "model": "Qwen/Qwen3-32B",
+      "reasoning_effort": "Qwen thinking mode"
+    },
+    "tasks": {
       "blocks": {
         "planned": 40,
         "finished": 11,
@@ -979,11 +561,608 @@
         }
       }
     },
-    "gpus_at_collection": [
-      0,
-      1,
-      2,
-      3
-    ]
+    "recorded_attempts": 52,
+    "service_error_attempts": 0,
+    "returned_model_counts": {
+      "Qwen/Qwen3-32B": 52
+    },
+    "exceeded_output_limit": 0,
+    "run_path": "runs\\five_task_qwen32b_same40",
+    "updated_at": "2026-10-17T11:09:42.960483+00:00"
+  },
+  "retired_runs": {
+    "five_task_sol_difficulty": {
+      "status": "stopped",
+      "model_request": {
+        "base_url": "https://jarodfund.xyz/v1",
+        "model": "gpt-6.1-sol",
+        "reasoning_effort": "high",
+        "max_output_tokens": 32768,
+        "timeout_seconds": 900,
+        "concurrency": 4,
+        "max_service_retries": 5,
+        "max_total_service_retries": 200
+      },
+      "tasks": {
+        "blocks": {
+          "planned": 15,
+          "finished": 14,
+          "valid_responses": 14,
+          "service_errors": 0,
+          "solved": 14,
+          "contract_pass": 13,
+          "optimal": 0,
+          "optimal_evaluated": 0,
+          "failures": {
+            "success": 14
+          },
+          "output_tokens": 175836,
+          "input_tokens": 15030,
+          "strata": {
+            "SZ10_connected_12": {
+              "finished": 5,
+              "valid_responses": 5,
+              "service_errors": 0,
+              "solved": 5
+            },
+            "SZ10_connected_16": {
+              "finished": 5,
+              "valid_responses": 5,
+              "service_errors": 0,
+              "solved": 5
+            },
+            "SZ10_connected_20": {
+              "finished": 4,
+              "valid_responses": 4,
+              "service_errors": 0,
+              "solved": 4
+            }
+          }
+        },
+        "cube3": {
+          "planned": 15,
+          "finished": 12,
+          "valid_responses": 12,
+          "service_errors": 0,
+          "solved": 11,
+          "contract_pass": 11,
+          "optimal": 0,
+          "optimal_evaluated": 0,
+          "failures": {
+            "success": 11,
+            "unsolved": 1
+          },
+          "output_tokens": 229928,
+          "input_tokens": 39795,
+          "strata": {
+            "scramble_4": {
+              "finished": 5,
+              "valid_responses": 5,
+              "service_errors": 0,
+              "solved": 5
+            },
+            "scramble_8": {
+              "finished": 5,
+              "valid_responses": 5,
+              "service_errors": 0,
+              "solved": 5
+            },
+            "scramble_12": {
+              "finished": 2,
+              "valid_responses": 2,
+              "service_errors": 0,
+              "solved": 1
+            }
+          }
+        },
+        "puzzle15": {
+          "planned": 15,
+          "finished": 14,
+          "valid_responses": 14,
+          "service_errors": 0,
+          "solved": 14,
+          "contract_pass": 14,
+          "optimal": 0,
+          "optimal_evaluated": 0,
+          "failures": {
+            "success": 14
+          },
+          "output_tokens": 62418,
+          "input_tokens": 25801,
+          "strata": {
+            "scramble_8": {
+              "finished": 5,
+              "valid_responses": 5,
+              "service_errors": 0,
+              "solved": 5
+            },
+            "scramble_16": {
+              "finished": 5,
+              "valid_responses": 5,
+              "service_errors": 0,
+              "solved": 5
+            },
+            "scramble_24": {
+              "finished": 4,
+              "valid_responses": 4,
+              "service_errors": 0,
+              "solved": 4
+            }
+          }
+        },
+        "path": {
+          "planned": 10,
+          "finished": 7,
+          "valid_responses": 7,
+          "service_errors": 0,
+          "solved": 6,
+          "contract_pass": 6,
+          "optimal": 6,
+          "optimal_evaluated": 7,
+          "failures": {
+            "illegal_action": 1,
+            "success": 6
+          },
+          "output_tokens": 11486,
+          "input_tokens": 65209,
+          "strata": {
+            "nodes_512_eccentric_goal": {
+              "finished": 5,
+              "valid_responses": 5,
+              "service_errors": 0,
+              "solved": 4
+            },
+            "nodes_1024_eccentric_goal": {
+              "finished": 2,
+              "valid_responses": 2,
+              "service_errors": 0,
+              "solved": 2
+            }
+          }
+        },
+        "hanoi": {
+          "planned": 5,
+          "finished": 3,
+          "valid_responses": 3,
+          "service_errors": 0,
+          "solved": 2,
+          "contract_pass": 2,
+          "optimal": 2,
+          "optimal_evaluated": 3,
+          "failures": {
+            "success": 2,
+            "unsolved": 1
+          },
+          "output_tokens": 32579,
+          "input_tokens": 1150,
+          "strata": {
+            "distance_255_511": {
+              "finished": 3,
+              "valid_responses": 3,
+              "service_errors": 0,
+              "solved": 2
+            }
+          }
+        }
+      },
+      "recorded_attempts": 53,
+      "service_error_attempts": 3,
+      "returned_model_counts": {
+        "None": 37,
+        "gpt-6.1-sol": 13
+      },
+      "exceeded_output_limit": 2,
+      "run_path": "runs\\five_task_sol_difficulty",
+      "updated_at": "2026-10-17T11:30:41.938525+00:00"
+    },
+    "five_task_sol_challenge": {
+      "status": "stopped",
+      "model_request": {
+        "base_url": "https://jarodfund.xyz/v1",
+        "model": "gpt-6.1-sol",
+        "reasoning_effort": "high",
+        "max_output_tokens": 32768,
+        "timeout_seconds": 900,
+        "concurrency": 4,
+        "max_service_retries": 10,
+        "max_total_service_retries": 200,
+        "service_retry_delay_seconds": 30
+      },
+      "tasks": {
+        "blocks": {
+          "planned": 10,
+          "finished": 10,
+          "valid_responses": 10,
+          "service_errors": 0,
+          "solved": 10,
+          "contract_pass": 10,
+          "optimal": 0,
+          "optimal_evaluated": 0,
+          "failures": {
+            "success": 10
+          },
+          "output_tokens": 160871,
+          "input_tokens": 4740,
+          "strata": {
+            "SZ10_connected_20": {
+              "finished": 5,
+              "valid_responses": 5,
+              "service_errors": 0,
+              "solved": 5
+            },
+            "SZ10_connected_24": {
+              "finished": 5,
+              "valid_responses": 5,
+              "service_errors": 0,
+              "solved": 5
+            }
+          }
+        },
+        "cube3": {
+          "planned": 15,
+          "finished": 13,
+          "valid_responses": 13,
+          "service_errors": 0,
+          "solved": 13,
+          "contract_pass": 13,
+          "optimal": 0,
+          "optimal_evaluated": 0,
+          "failures": {
+            "success": 13
+          },
+          "output_tokens": 414101,
+          "input_tokens": 33668,
+          "strata": {
+            "scramble_12": {
+              "finished": 5,
+              "valid_responses": 5,
+              "service_errors": 0,
+              "solved": 5
+            },
+            "scramble_16": {
+              "finished": 5,
+              "valid_responses": 5,
+              "service_errors": 0,
+              "solved": 5
+            },
+            "scramble_20": {
+              "finished": 3,
+              "valid_responses": 3,
+              "service_errors": 0,
+              "solved": 3
+            }
+          }
+        },
+        "puzzle15": {
+          "planned": 20,
+          "finished": 19,
+          "valid_responses": 19,
+          "service_errors": 0,
+          "solved": 19,
+          "contract_pass": 19,
+          "optimal": 0,
+          "optimal_evaluated": 0,
+          "failures": {
+            "success": 19
+          },
+          "output_tokens": 282620,
+          "input_tokens": 19127,
+          "strata": {
+            "scramble_24": {
+              "finished": 5,
+              "valid_responses": 5,
+              "service_errors": 0,
+              "solved": 5
+            },
+            "scramble_32": {
+              "finished": 5,
+              "valid_responses": 5,
+              "service_errors": 0,
+              "solved": 5
+            },
+            "scramble_48": {
+              "finished": 5,
+              "valid_responses": 5,
+              "service_errors": 0,
+              "solved": 5
+            },
+            "scramble_64": {
+              "finished": 4,
+              "valid_responses": 4,
+              "service_errors": 0,
+              "solved": 4
+            }
+          }
+        },
+        "hanoi": {
+          "planned": 15,
+          "finished": 15,
+          "valid_responses": 15,
+          "service_errors": 0,
+          "solved": 11,
+          "contract_pass": 11,
+          "optimal": 11,
+          "optimal_evaluated": 15,
+          "failures": {
+            "success": 11,
+            "unsolved": 1,
+            "illegal_action": 3
+          },
+          "output_tokens": 233284,
+          "input_tokens": 14229,
+          "strata": {
+            "distance_255_511": {
+              "finished": 5,
+              "valid_responses": 5,
+              "service_errors": 0,
+              "solved": 4
+            },
+            "distance_511_1023": {
+              "finished": 5,
+              "valid_responses": 5,
+              "service_errors": 0,
+              "solved": 4
+            },
+            "distance_1023_2047": {
+              "finished": 5,
+              "valid_responses": 5,
+              "service_errors": 0,
+              "solved": 3
+            }
+          }
+        },
+        "path": {
+          "planned": 20,
+          "finished": 17,
+          "valid_responses": 16,
+          "service_errors": 1,
+          "solved": 15,
+          "contract_pass": 15,
+          "optimal": 15,
+          "optimal_evaluated": 16,
+          "failures": {
+            "illegal_action": 1,
+            "success": 15,
+            "service_error": 1
+          },
+          "output_tokens": 54577,
+          "input_tokens": 305166,
+          "strata": {
+            "nodes_512_eccentric_goal": {
+              "finished": 5,
+              "valid_responses": 5,
+              "service_errors": 0,
+              "solved": 4
+            },
+            "nodes_1024_eccentric_goal": {
+              "finished": 5,
+              "valid_responses": 5,
+              "service_errors": 0,
+              "solved": 5
+            },
+            "nodes_2048_eccentric_goal": {
+              "finished": 5,
+              "valid_responses": 5,
+              "service_errors": 0,
+              "solved": 5
+            },
+            "nodes_4096_eccentric_goal": {
+              "finished": 2,
+              "valid_responses": 1,
+              "service_errors": 1,
+              "solved": 1
+            }
+          }
+        }
+      },
+      "recorded_attempts": 135,
+      "service_error_attempts": 62,
+      "returned_model_counts": {
+        "None": 62,
+        "gpt-6.1-sol": 12
+      },
+      "exceeded_output_limit": 7,
+      "run_path": "runs\\five_task_sol_challenge",
+      "updated_at": "2026-10-17T12:49:26.820821+00:00"
+    },
+    "blocks_dense_stress": {
+      "status": "completed_breakpoints_or_ranges",
+      "model_request": {
+        "base_url": "https://jarodfund.xyz/v1",
+        "model": "gpt-6.1-sol",
+        "reasoning_effort": "high",
+        "max_output_tokens": 32768,
+        "timeout_seconds": 900,
+        "concurrency": 1,
+        "max_service_retries": 10,
+        "max_total_service_retries": 200,
+        "service_retry_delay_seconds": 30
+      },
+      "tasks": {
+        "blocks": {
+          "planned": 5,
+          "finished": 5,
+          "valid_responses": 4,
+          "service_errors": 1,
+          "solved": 4,
+          "contract_pass": 4,
+          "optimal": 0,
+          "optimal_evaluated": 0,
+          "failures": {
+            "success": 4,
+            "service_error": 1
+          },
+          "output_tokens": 57354,
+          "input_tokens": 6093,
+          "strata": {
+            "SZ10_connected_28": {
+              "finished": 5,
+              "valid_responses": 4,
+              "service_errors": 1,
+              "solved": 4
+            }
+          }
+        }
+      },
+      "recorded_attempts": 25,
+      "service_error_attempts": 21,
+      "returned_model_counts": {
+        "gpt-6.1-sol": 1,
+        "None": 4
+      },
+      "exceeded_output_limit": 0,
+      "run_path": "runs\\blocks_dense_stress",
+      "updated_at": "2026-10-17T12:18:33.088972+00:00"
+    },
+    "puzzle15_distance_stress": {
+      "status": "completed_breakpoints_or_ranges",
+      "model_request": {
+        "base_url": "https://jarodfund.xyz/v1",
+        "model": "gpt-6.1-sol",
+        "reasoning_effort": "high",
+        "max_output_tokens": 32768,
+        "timeout_seconds": 900,
+        "concurrency": 1,
+        "max_service_retries": 10,
+        "max_total_service_retries": 200,
+        "service_retry_delay_seconds": 30
+      },
+      "tasks": {
+        "puzzle15": {
+          "planned": 10,
+          "finished": 7,
+          "valid_responses": 6,
+          "service_errors": 1,
+          "solved": 6,
+          "contract_pass": 6,
+          "optimal": 0,
+          "optimal_evaluated": 0,
+          "failures": {
+            "success": 6,
+            "service_error": 1
+          },
+          "output_tokens": 112819,
+          "input_tokens": 2064,
+          "strata": {
+            "scramble_128": {
+              "finished": 5,
+              "valid_responses": 5,
+              "service_errors": 0,
+              "solved": 5
+            },
+            "scramble_256": {
+              "finished": 2,
+              "valid_responses": 1,
+              "service_errors": 1,
+              "solved": 1
+            }
+          }
+        }
+      },
+      "recorded_attempts": 28,
+      "service_error_attempts": 22,
+      "returned_model_counts": {
+        "None": 7
+      },
+      "exceeded_output_limit": 0,
+      "run_path": "runs\\puzzle15_distance_stress",
+      "updated_at": "2026-10-17T12:19:06.866015+00:00"
+    },
+    "puzzle15_far_stress": {
+      "status": "completed_breakpoints_or_ranges",
+      "model_request": {
+        "base_url": "https://jarodfund.xyz/v1",
+        "model": "gpt-6.1-sol",
+        "reasoning_effort": "high",
+        "max_output_tokens": 32768,
+        "timeout_seconds": 900,
+        "concurrency": 1,
+        "max_service_retries": 10,
+        "max_total_service_retries": 200,
+        "service_retry_delay_seconds": 30
+      },
+      "tasks": {
+        "puzzle15": {
+          "planned": 5,
+          "finished": 2,
+          "valid_responses": 1,
+          "service_errors": 1,
+          "solved": 1,
+          "contract_pass": 1,
+          "optimal": 0,
+          "optimal_evaluated": 0,
+          "failures": {
+            "success": 1,
+            "service_error": 1
+          },
+          "output_tokens": 17128,
+          "input_tokens": 344,
+          "strata": {
+            "scramble_256": {
+              "finished": 2,
+              "valid_responses": 1,
+              "service_errors": 1,
+              "solved": 1
+            }
+          }
+        }
+      },
+      "recorded_attempts": 22,
+      "service_error_attempts": 21,
+      "returned_model_counts": {
+        "None": 2
+      },
+      "exceeded_output_limit": 0,
+      "run_path": "runs\\puzzle15_far_stress",
+      "updated_at": "2026-10-17T12:18:17.346413+00:00"
+    },
+    "path_distance_stress": {
+      "status": "service_incomplete",
+      "model_request": {
+        "base_url": "https://jarodfund.xyz/v1",
+        "model": "gpt-6.1-sol",
+        "reasoning_effort": "high",
+        "max_output_tokens": 32768,
+        "timeout_seconds": 900,
+        "concurrency": 1,
+        "max_service_retries": 10,
+        "max_total_service_retries": 200,
+        "service_retry_delay_seconds": 30
+      },
+      "tasks": {
+        "path": {
+          "planned": 5,
+          "finished": 3,
+          "valid_responses": 2,
+          "service_errors": 1,
+          "solved": 2,
+          "contract_pass": 2,
+          "optimal": 2,
+          "optimal_evaluated": 2,
+          "failures": {
+            "success": 2,
+            "service_error": 1
+          },
+          "output_tokens": 9064,
+          "input_tokens": 8676,
+          "strata": {
+            "nodes_512_tree_eccentric_goal": {
+              "finished": 3,
+              "valid_responses": 2,
+              "service_errors": 1,
+              "solved": 2
+            }
+          }
+        }
+      },
+      "recorded_attempts": 13,
+      "service_error_attempts": 11,
+      "returned_model_counts": {
+        "None": 3
+      },
+      "exceeded_output_limit": 0,
+      "run_path": "runs\\path_distance_stress",
+      "updated_at": "2026-10-17T12:11:39.588907+00:00"
+    }
   }
 }

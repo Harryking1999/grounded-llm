@@ -20,7 +20,7 @@ def latest_records(folder):
 def baseline_failure(folder,task):
     original_task = {"cube3":"cube2","puzzle15":"puzzle8"}.get(task,task)
     for row in latest_records(folder).values():
-        if row["task"] == original_task and not row.get("service_error") and not row["verdict"].get("contract_pass"):
+        if row["task"] == original_task and not row.get("service_error") and not row["verdict"].get("solved"):
             return {"case_id":row["case_id"],"origin":"original_baseline","verdict":row["verdict"]}
     return None
 
@@ -52,6 +52,13 @@ def main():
         write_json(out/"progress.json",state)
 
     state["status"] = "running"
+    state["stop_policy"] = config["policy"]
+    state["policy_source_commit"] = source_commit
+    # Formatting is secondary to reaching the goal; retain the answer and continue.
+    for item in state["tasks"].values():
+        if item["status"] == "model_error_found" and item.get("first_error",{}).get("verdict",{}).get("solved"):
+            item["status"] = "active"
+            del item["first_error"]
     save()
     fatal = False
     while not fatal and any(row["status"] == "active" for row in state["tasks"].values()):
@@ -82,7 +89,7 @@ def main():
             for case in cases:
                 record = latest.get(case["id"])
                 if record is not None and not record.get("service_error"):
-                    if not record["verdict"].get("contract_pass"):
+                    if not record["verdict"].get("solved"):
                         item.update(status="model_error_found",first_error={"case_id":case["id"],"origin":"difficulty_ladder","level_value":case["level_value"],"verdict":record["verdict"]})
                         break
                     continue

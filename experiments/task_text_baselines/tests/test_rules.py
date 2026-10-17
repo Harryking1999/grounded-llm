@@ -15,9 +15,32 @@ from experiments.task_text_baselines.src.protocol import judge, prompt
 from experiments.task_text_baselines.src.run import call, extract_text, pending, summary
 from experiments.task_text_baselines.src.qwen import final_text, round_robin
 from experiments.task_text_baselines.src.prepare_difficulty import reuse_answers
+from experiments.task_text_baselines.src.report import build
 
 
 class TaskRulesTest(unittest.TestCase):
+    def test_report_distinguishes_requested_high_from_returned_metadata(self):
+        with TemporaryDirectory() as temporary:
+            folder = Path(temporary)
+            (folder/'records').mkdir()
+            api = {'model':'requested','reasoning_effort':'high'}
+            (folder/'progress.json').write_text(json.dumps({'status':'running','api':api,'updated_at':'test'}))
+            cases = [{'id':str(i),'task':'path'} for i in range(3)]
+            (folder/'suite.json').write_text(json.dumps({'config':{},'cases':cases}))
+            for i in range(3):
+                row = {'case_id':str(i),'task':'path','stratum':'test','attempt':1,'verdict':{'solved':False}}
+                if i != 1:
+                    row.update(returned_model='requested',returned_reasoning={'effort':'high'})
+                if i == 0:
+                    row['reused_from'] = {'run':'prior'}
+                if i == 2:
+                    row['service_error'] = 'HTTPError'
+                (folder/'records'/f'{i}.json').write_text(json.dumps(row))
+            result,_ = build(folder)
+            self.assertEqual(result['response_metadata_coverage'],{
+                'valid_answers':2,'model_reported':1,'effort_counts':{'high':1,'not_returned':1},
+                'effort_reported_on_reused_answers':1})
+
     def test_new_queue_rejects_five_case_contracts(self):
         config = {'cases_per_level':5,'confirmation_cases':20}
         with TemporaryDirectory() as temporary:

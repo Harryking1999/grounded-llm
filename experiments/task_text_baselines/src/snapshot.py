@@ -52,6 +52,8 @@ def main():
     args = parser.parse_args()
     baseline,_ = build(args.baseline)
     current,_ = build(args.current)
+    baseline_metadata = baseline['response_metadata_coverage']
+    current_metadata = current['response_metadata_coverage']
     qwen,_ = build(args.qwen)
     qwen_complete = qwen['status'] == 'completed' and all(
         row['valid_responses'] == row['planned'] for row in qwen['tasks'].values())
@@ -80,13 +82,14 @@ def main():
               '5×5 题目均可解，Manhattan 下界至少 60，因此任何解至少需要 60 步；256 是构造步数上界。积木 20 是构造放置数，允许找到其他合法分解。参考解和距离下界均不提供给模型。', '',
               '每档完成 20 题后再判断；成功不高于一半时另取同条件 20 道独立新题确认。保留所有合法返回，执行错误、未完成、格式和截断分别统计。', '',
               f"当前加难答卷中 {current['exceeded_output_limit']} 份超出请求 token 上限；解出数按真实回放计，不能视为严格预算内成功。", '',
+              f"思考强度证据：所有请求均设 high；当前 {current_metadata['valid_answers']} 份有效答卷中，{current_metadata['effort_counts'].get('high',0)} 份回显 high（其中 {current_metadata['effort_reported_on_reused_answers']} 份来自复用旧答卷），{current_metadata['effort_counts'].get('not_returned',0)} 份未回传强度。回显属于第三方接口声明，不能独立证明后台计算配置。", '',
               '## 原始各 40 题：GPT-6.1-sol high','',
               '| 任务 | 有效答卷 | 解出 | 非法动作 | 最优解 |','|---|---:|---:|---:|---:|']
     for task,row in baseline['tasks'].items():
         lines.append(f"| {NAMES[task]} | {row['valid_responses']}/40 | {row['solved']} | {row['failures'].get('illegal_action',0)} | {row['optimal']} |")
     lines += ['', '共 195/200 解出，原题服务失败已补完。积木八形状、12 次放置、10×10；寻路 256 节点、距离 3–10；汉诺塔八盘、距离 1–255；二阶魔方距离 1–14；3×3 华容道距离 4–30。非最短成功解仍计解出。', '',
               '积木两题移除到了空格；汉诺塔两题违反盘子大小规则；魔方一题未复原。基础设施失败未计入这些模型错误。', '',
-              f"原题 {baseline['exceeded_output_limit']} 份答卷超出请求预算。接口未返回模型名与 reasoning 配置，名称及 high 仅指请求值；客户端请求不提供工具、无中途反馈，后台身份与强度不能独立核验。", '',
+              f"原题 {baseline['exceeded_output_limit']} 份答卷超出请求预算。{baseline_metadata['effort_counts'].get('high',0)}/{baseline_metadata['valid_answers']} 份答卷回显 gpt-6.1-sol、high、standard，其余 {baseline_metadata['effort_counts'].get('not_returned',0)} 份未回传强度。此前将接口描述为一律不回传过于笼统；准确表述是全量请求 high、部分回显确认，其余未知。客户端请求不提供工具、无中途反馈，第三方后台身份与强度不能独立核验。", '',
               '## 同题 Qwen3-32B：完整结果' if qwen_complete else '## 同题 Qwen3-32B：最后回收的快照','',
               ('028 连接恢复后已回收完整 200 题；断连期间评测正常结束。完整 BF16、四卡 TP、thinking 模式，原题及提示词与 GPT 完全一致，正常错误答案没有重抽。' if qwen_complete else
                f"最近回收的远端进度时间为 {qwen['updated_at']}；以下仍是部分题，不能当作完整成功率比较。"), '',

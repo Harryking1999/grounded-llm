@@ -19,12 +19,17 @@ def build(run):
     for row in sorted(attempts, key=lambda r:(r["case_id"],r["attempt"])):
         latest[row["case_id"]] = row
     records = list(latest.values())
+    valid = [row for row in records if not row.get('service_error')]
+    metadata = {'valid_answers':len(valid),
+                'model_reported':sum(row.get('returned_model') is not None for row in valid),
+                'effort_counts':dict(Counter((row.get('returned_reasoning') or {}).get('effort') or 'not_returned' for row in valid)),
+                'effort_reported_on_reused_answers':sum(bool(row.get('reused_from')) and bool((row.get('returned_reasoning') or {}).get('effort')) for row in valid)}
     results = summary(records,suite["cases"])
     result = {"status":progress["status"], "model_request":progress["api"], "tasks":results,
               "recorded_attempts":len(attempts), "service_error_attempts":sum(bool(r.get("service_error")) for r in attempts),
               "returned_model_counts":dict(Counter(str(r.get("returned_model")) for r in records)),
               "exceeded_output_limit":sum(r.get("exceeds_requested_budget") is True for r in records),
-              "run_path":str(run), "updated_at":progress["updated_at"]}
+              "run_path":str(run), "updated_at":progress["updated_at"],"response_metadata_coverage":metadata}
     adaptive = suite["config"].get("study") == "adaptive_complete_plan_difficulty"
     policy = suite.get('current_policy',suite['config'])
     screening,confirmation = policy.get('cases_per_level',5),policy.get('confirmation_cases',10)

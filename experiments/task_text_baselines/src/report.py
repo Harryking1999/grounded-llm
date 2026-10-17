@@ -61,6 +61,7 @@ def build(run):
         failures = {k:v for k,v in values["failures"].items() if k != "success"}
         lines.append(f"- {NAMES[task]}：" + ("；".join(f"{k}={v}" for k,v in failures.items()) or "已返回题暂无失败。"))
     lines += [f"- 服务错误尝试共 {result['service_error_attempts']} 次；只重试基础设施失败，模型答错和截断不重采样。",
+              f"- 最新答卷中 {result['exceeded_output_limit']} 份超出请求的输出 token 上限；保留执行结果，但不能视为严格预算内成功。",
               f"- 已记录输出 token 总数：{sum((r.get('usage') or {}).get('output_tokens') or 0 for r in attempts):,}。",
               "- 第三方接口未提供返回模型名称与 reasoning 配置时，只能确认提交了请求参数，不能独立核验后台身份或强度。",
               "- 本轮加难是寻找失败点的适应性小样本试验，不估计整体成功率；完整计划，无工具、无中途反馈。" if adaptive else "- 积木按 12 次不重叠放置构造，最短移除数可能更少；其余按精确距离分层。结果只描述本轮题集。",

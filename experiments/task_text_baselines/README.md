@@ -74,7 +74,7 @@ python -m experiments.task_text_baselines.src.retest_report --baseline runs/five
 
 ## 当前范围与补充探索
 
-用户追加的 [积木逐步状态对照](configs/sol56_blocks40_state_report.json)已启动：5.6-sol high 重做原 40 题，仅在冻结提示词后追加每步 `board_after`（十行、每行十位的完整棋盘）要求，仍一次输出完整计划。新组请求与评分上限均为 16k；与原无状态组 37/40 配对比较执行成功、预算内成功、严格合同和合法前缀逐步状态准确率，见[报告](results/blocks_state_report.md)。模型自报状态不反馈给环境。原组混用请求上限的限制仍明确注明。
+用户追加的 [积木逐步状态对照](configs/sol56_blocks40_state_report.json)已完成：5.6-sol high 重做原 40 题，仅在冻结提示词后追加每步 `board_after`（十行、每行十位的完整棋盘）要求，仍一次输出完整计划。新组预算内成功与严格合同均为 **36/40**，原无状态为 **37/40**；全部答卷未超 16k，无服务补测。合法前缀的完整状态正确 **446/469（95.1%）**；3 题从成功变失败、2 题从失败变成功。这批题未复现旧的大幅下降。平均输出由约 3,964 增至 7,643 token（含思考）；不能据此单独确定内部机制。见[报告](results/blocks_state_report.md)。模型自报状态不反馈给环境，原组混用请求上限的限制仍明确注明。
 
 ```powershell
 python -m experiments.task_text_baselines.src.prepare_retest --config experiments/task_text_baselines/configs/sol56_blocks40_state_report.json --out runs/sol56_blocks40_state_report

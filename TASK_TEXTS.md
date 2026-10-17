@@ -885,7 +885,7 @@ Reason: The current cube state exactly matches the goal; no further turn is need
 
 ### 8-Puzzle：任务文字与监督格式
 
-状态：用户已要求新增任务；以下为整套待确认草案。参考 [XoT 提示词](https://github.com/microsoft/Everything-of-Thoughts-XoT/blob/main/xot_all_in_one/xot/prompter/prompts/prompts_npuzzle.py)的 3×3 数字表示、空格移动方向与动作教学方式，目标说明例沿用其左上角为空格的布局。不继承其九步题集／预算；本项目实现与正式评测尚未开始。
+状态：用户已要求新增任务；以下为整套待确认草案。参考 [XoT 提示词](https://github.com/microsoft/Everything-of-Thoughts-XoT/blob/main/xot_all_in_one/xot/prompter/prompts/prompts_npuzzle.py)的 3×3 数字表示与空格移动方向，按用户要求不加入动作示例。目标说明例沿用其左上角为空格的布局。不继承其九步题集／预算；本项目实现与正式评测尚未开始。
 
 #### 共享任务描述与规则
 
@@ -900,31 +900,6 @@ The blank must stay inside the board. Diagonal moves are not allowed.
 Each move costs one step.
 Reach the goal board exactly.
 
-Action examples: each example starts independently from this board:
-3 1 2
-4 0 5
-6 7 8
-
-After Up:
-3 0 2
-4 1 5
-6 7 8
-
-After Down:
-3 1 2
-4 7 5
-6 0 8
-
-After Left:
-3 1 2
-0 4 5
-6 7 8
-
-After Right:
-3 1 2
-4 5 0
-6 7 8
-
 Initial board:
 {initial_board_3_rows}
 
@@ -932,7 +907,7 @@ Goal board:
 {goal_board_3_rows}
 ```
 
-中文：通过移动空格，将初始棋盘变为目标棋盘；优先完成，再尽量少走。Up／Down／Left／Right 指空格移动方向，数字块相应反向滑入空格。规定方向可避免将“空格向左”误读成“数字块向左”。教学示例各组共用，不提供当前测试题的后继或搜索轨迹。
+中文：通过移动空格，将初始棋盘变为目标棋盘；优先完成，再尽量少走。Up／Down／Left／Right 指空格移动方向，数字块相应反向滑入空格。规定方向可避免将“空格向左”误读成“数字块向左”。各组共用上述规则文字，不加入动作教学示例。
 
 目标说明例与 XoT 对齐，初始／当前状态使用同样格式：
 

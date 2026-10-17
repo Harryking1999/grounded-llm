@@ -8,6 +8,7 @@
 | 寻路 | [path](path/README.md) | [prompts](path/prompts/README.md) | [data](path/data/README.md) | [Qmap](path/Qmap/README.md) |
 | 汉诺塔 | [hanoi](hanoi/README.md) | [prompts](hanoi/prompts/README.md) | [data](hanoi/data/README.md) | [Qmap](hanoi/Qmap/README.md) |
 | 二阶魔方 | [cube2](cube2/README.md) | [prompts](cube2/prompts/README.md) | [data](cube2/data/README.md) | [Qmap](cube2/Qmap/README.md) |
+| 8-Puzzle（数字华容道） | [puzzle8](puzzle8/README.md) | [prompts](puzzle8/prompts/README.md) | [data](puzzle8/data/README.md) | [Qmap](puzzle8/Qmap/README.md) |
 
 ## 每个任务采用相同布局
 
@@ -27,8 +28,8 @@ tasks/<task>/
 ## 文字分组
 
 - 地图组／CoT 组：共享任务描述与规则，每轮收到真实环境更新。地图向量是地图组的独立输入，不把精确裁判距离放进文字。
-- SOTA 组／32B 组：共享同一任务的描述与规则，明确输出格式规范。积木已确定一次输出完整剩余计划 JSON、无中途反馈；其余任务输出格式占位。预算和题集在正式配置中确定，不照搬旧整段计划结果充当匹配基线。
-- 监督答案单列排序、Reason、Action。现有积木地图组是排序→R→A，无地图 7B 是简短 R→A；长 CoT 尚未准备。其他任务先占位。
+- SOTA 组／32B 组：共享同一任务的描述与规则，一次输出完整剩余计划 JSON、无中途反馈。积木、寻路与汉诺塔格式已确定；魔方与 8-Puzzle 已补齐草案待确认。预算和题集在正式配置中确定，不照搬旧整段计划结果充当匹配基线。
+- 监督答案单列排序、Reason、Action。地图组是排序→R→A，无地图组删除排序行；长 CoT 尚未准备。魔方与 8-Puzzle 整套文字仍待最终确认。
 
 ## 代码和权重怎么维护
 

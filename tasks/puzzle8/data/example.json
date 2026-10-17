@@ -1,0 +1,19 @@
+{
+  "example_kind": "one_move_schema_fixture_not_training_data",
+  "task": "puzzle8",
+  "state_encoding": "3x3_rows_top_to_bottom_zero_is_blank",
+  "current": [[1, 0, 2], [3, 4, 5], [6, 7, 8]],
+  "goal": [[0, 1, 2], [3, 4, 5], [6, 7, 8]],
+  "executed_actions": [],
+  "candidates": [
+    {"id": 0, "action": "Left", "successor": [[0, 1, 2], [3, 4, 5], [6, 7, 8]]},
+    {"id": 1, "action": "Down", "successor": [[1, 4, 2], [3, 0, 5], [6, 7, 8]]},
+    {"id": 2, "action": "Right", "successor": [[1, 2, 0], [3, 4, 5], [6, 7, 8]]}
+  ],
+  "qmap_supervision": {"pair_distance": 1, "candidate_distances": [0, 2, 2]},
+  "supervised_answer": {
+    "ranking": null,
+    "reason": "Moving the blank left is legal and reaches the goal board.",
+    "action": "<action>0</action>"
+  }
+}

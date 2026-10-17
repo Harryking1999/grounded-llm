@@ -17,6 +17,7 @@
 | 寻路 | [run.py](../experiments/path_qmap/src/run.py) | [reader.py](../experiments/path_qmap/src/reader.py) |
 | 汉诺塔 | [汉诺塔独立训练](../experiments/hanoi_qmap/src/run.py)、[数据](../experiments/hanoi_qmap/src/data.py)、[评测](../experiments/hanoi_qmap/src/evaluate.py) | [环境](../experiments/hanoi_qmap/src/environment.py)、[本任务 QMap／MapReader](../experiments/hanoi_qmap/src/model.py) |
 | 魔方 | [魔方独立训练](../experiments/cube2_qmap/src/run.py)、[关系数据](../experiments/cube2_qmap/src/relation_data.py)、[评测](../experiments/cube2_qmap/src/evaluate.py)；已采用模型的[循环修复续训](../experiments/cube2_qmap/src/cycle_repair.py) | [环境](../experiments/cube2_qmap/src/environment.py)、[本任务 QMap／MapReader](../experiments/cube2_qmap/src/model.py) |
+| 8-Puzzle | 尚未实现或训练 | [任务适配规划](puzzle8/Qmap/README.md)；不复用其他任务权重 |
 
 “方法对齐”指共享模型骨干、关系监督和接口；不表示所有历史运行具有相同采样、损失权重或距离几何。积木有向距离、汉诺塔对称 L1、当前魔方 L∞ 的区别保留在配置中。魔方的额外循环修复属于明确记录的任务适配，不将其描述为所有任务已有的相同训练流程。
 

@@ -4,7 +4,8 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-TASKS = (("blocks", "积木"), ("path", "寻路"), ("hanoi", "汉诺塔"), ("cube2", "二阶魔方"))
+TASKS = (("blocks", "积木"), ("path", "寻路"), ("hanoi", "汉诺塔"), ("cube2", "二阶魔方"),
+         ("puzzle8", "8-Puzzle（数字华容道）"))
 
 
 def render():

@@ -9,7 +9,7 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 
-from experiments.puzzle_qmap.src.model import MODEL_TYPE, QMap, soft_rank_loss
+from .model import MODEL_TYPE, QMap, soft_rank_loss
 from .data import pose_groups
 from .environment import Cube2
 

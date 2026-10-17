@@ -6,9 +6,9 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from experiments.puzzle_qmap.src.evaluate import encode
-from experiments.puzzle_qmap.src.model import MapReader
-from experiments.puzzle_qmap.src.tasks import make_environment
+from .evaluate import encode
+from .model import MapReader
+from .run import make_environment
 
 
 def audit(run, device="cpu"):

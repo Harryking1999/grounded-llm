@@ -10,7 +10,7 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from experiments.puzzle_qmap.src.model import QMap
+from .model import QMap
 from .environment import Cube2
 from .fixed_goal import reach_within_budget
 

@@ -7,8 +7,8 @@ import time
 import numpy as np
 import torch
 
-from experiments.puzzle_qmap.src.evaluate import decisions, pair_metrics, rollout
-from experiments.puzzle_qmap.src.model import MODEL_TYPE, QMap
+from .evaluate import decisions, pair_metrics, rollout
+from .model import MODEL_TYPE, QMap
 from .environment import Cube2
 from .full_state_joint import batch_losses
 

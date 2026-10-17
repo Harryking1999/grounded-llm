@@ -6,8 +6,8 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from experiments.puzzle_qmap.src.evaluate import evaluate
-from experiments.puzzle_qmap.src.tasks import make_environment
+from .evaluate import evaluate
+from .run import make_environment
 from .environment import POWERS, SLOTS, permutation_rank
 
 

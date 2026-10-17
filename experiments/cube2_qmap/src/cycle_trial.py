@@ -6,8 +6,8 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from experiments.puzzle_qmap.src.evaluate import pair_metrics, rollout
-from experiments.puzzle_qmap.src.model import MODEL_TYPE, QMap
+from .evaluate import pair_metrics, rollout
+from .model import MODEL_TYPE, QMap
 from .cycle_supervision import cycle_pack
 from .environment import Cube2
 from .fixed_goal import balanced_parents, evaluate, make_batch, prepare

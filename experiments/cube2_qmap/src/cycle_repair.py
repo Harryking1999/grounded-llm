@@ -13,8 +13,8 @@ import numpy as np
 import torch
 from torch.nn import functional as F
 
-from experiments.puzzle_qmap.src.evaluate import pair_metrics, rollout
-from experiments.puzzle_qmap.src.model import MODEL_TYPE, QMap, soft_rank_loss
+from .evaluate import pair_metrics, rollout
+from .model import MODEL_TYPE, QMap, soft_rank_loss
 from .cycle_supervision import cycle_pack
 from .cycle_trial import close_axis_mask
 from .environment import Cube2

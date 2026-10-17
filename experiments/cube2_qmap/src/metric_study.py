@@ -26,9 +26,9 @@ def validation_gate(control, candidate, contract):
 def summarize(root, names, device, source_commit):
     import numpy as np
     import torch
-    from experiments.puzzle_qmap.src.evaluate import evaluate
-    from experiments.puzzle_qmap.src.model import MapReader
-    from experiments.puzzle_qmap.src.tasks import make_environment
+    from .evaluate import evaluate
+    from .model import MapReader
+    from .run import make_environment
 
     torch.set_num_threads(4)
     result = {"source_commit": source_commit, "conditions": {}}
@@ -115,7 +115,7 @@ def main():
         path.write_text(json.dumps(config, indent=2) + "\n")
         log = (root / (name + ".log")).open("w")
         logs.append(log)
-        command = [sys.executable, "-u", "-m", "experiments.puzzle_qmap.src.run",
+        command = [sys.executable, "-u", "-m", "experiments.cube2_qmap.src.run",
                    "--config", str(path), "--prepared-run", str(prepared), "--out", str(root / name),
                    "--source-commit", args.source_commit, "--device", device]
         child = subprocess.Popen(command, stdout=log, stderr=subprocess.STDOUT)

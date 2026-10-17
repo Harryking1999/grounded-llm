@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from experiments.puzzle_qmap.src.data import cube_pairs
+from .relation_data import cube_pairs
 
 
 def pose_groups(env, groups, forbidden, rng, max_attempts):

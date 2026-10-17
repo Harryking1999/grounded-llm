@@ -8,8 +8,8 @@ import numpy as np
 import torch
 from torch.nn import functional as F
 
-from experiments.puzzle_qmap.src.evaluate import encode, rollout, task_indices
-from experiments.puzzle_qmap.src.model import MODEL_TYPE, MapReader, QMap, soft_rank_loss
+from .evaluate import encode, rollout, task_indices
+from .model import MODEL_TYPE, MapReader, QMap, soft_rank_loss
 from .data import pose_groups
 from .environment import Cube2
 

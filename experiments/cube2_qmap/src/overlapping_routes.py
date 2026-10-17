@@ -8,8 +8,8 @@ import time
 import numpy as np
 import torch
 
-from experiments.puzzle_qmap.src.data import pair_keys
-from experiments.puzzle_qmap.src.model import MODEL_TYPE, QMap
+from .relation_data import pair_keys
+from .model import MODEL_TYPE, QMap
 from .data import pose_groups
 from .environment import Cube2
 from .route_complete import actual_update, losses, metrics, run_model

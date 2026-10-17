@@ -6,8 +6,8 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from experiments.puzzle_qmap.src.evaluate import rollout
-from experiments.puzzle_qmap.src.model import MapReader
+from .evaluate import rollout
+from .model import MapReader
 from .environment import Cube2
 
 

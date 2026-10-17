@@ -8,9 +8,9 @@ import numpy as np
 import torch
 from torch.nn import functional as F
 
-from experiments.puzzle_qmap.src.data import pair_keys
-from experiments.puzzle_qmap.src.evaluate import decisions, pair_metrics, rollout
-from experiments.puzzle_qmap.src.model import MODEL_TYPE, QMap, soft_rank_loss
+from .relation_data import pair_keys
+from .evaluate import decisions, pair_metrics, rollout
+from .model import MODEL_TYPE, QMap, soft_rank_loss
 from .environment import Cube2
 from .route_complete import losses, metrics
 

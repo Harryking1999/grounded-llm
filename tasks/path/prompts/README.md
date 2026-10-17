@@ -1,6 +1,6 @@
 # 寻路：任务文字与监督格式
 
-状态：共享任务描述与规则已由用户确认；每轮环境更新、各组输出格式与监督答案仍待逐项确认。
+状态：共享任务描述与规则、地图组／CoT 组每轮环境更新已由用户确认；各组输出格式与监督答案仍待逐项确认。
 
 ## 共享任务描述与规则
 
@@ -24,10 +24,17 @@ Goal node: {goal_node}
 
 ## 地图组／CoT 组：每轮环境更新
 
-待填：真实当前节点、目标、实际路径、本轮候选 ID 与下一节点的对应表。地图组额外获得当前／目标／合法后继 Q 槽位。
+使用真实当前节点、实际走过的节点序列和本轮全部合法邻居；不因历史访问过滤候选。地图组额外获得当前／目标／合法后继 Q 槽位，目标与邻接表沿用首轮文本。
 
 ```text
-{environment_update_to_be_discussed}
+[Environment update]
+Current node: {current_node}
+Actual executed path: [{visited_nodes_in_order}]
+Legal next moves:
+{local_id}: move({current_node},{next_node})
+...
+Candidate numbers may change between turns; use only the numbers above.
+[/Environment update]
 ```
 
 ## SOTA 组／32B 组：输出格式

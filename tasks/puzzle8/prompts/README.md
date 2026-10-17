@@ -9,9 +9,8 @@ Find a valid sequence of moves from the initial board to the goal board, as shor
 Reaching the goal is the first priority; among valid solutions, prefer fewer moves.
 
 Rules: The board is a 3x3 grid containing tiles numbered 1 through 8 and one blank, represented by 0.
-Each number appears exactly once. Rows are shown from top to bottom and columns from left to right.
+Each number appears exactly once.
 An action Up, Down, Left, or Right moves the blank one cell in that direction by swapping it with the adjacent tile.
-The blank must stay inside the board. Diagonal moves are not allowed.
 Each move costs one step.
 Reach the goal board exactly.
 

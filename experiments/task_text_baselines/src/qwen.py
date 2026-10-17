@@ -55,6 +55,11 @@ def main():
              "config": config, "source_commit": args.source_commit,
              "runtime": {name:version(name) for name in ("vllm","torch","transformers")},
              "planned": len(suite["cases"]), "started_at": datetime.now(timezone.utc).isoformat(), "inflight": []}
+    if (out / "progress.json").exists():
+        previous = json.loads((out / "progress.json").read_text(encoding="utf-8"))
+        state["previous_launches"] = previous.get("previous_launches",[]) + [
+            {key:previous[key] for key in ("source_commit","config","runtime","started_at")}
+            | {"completed_before_resume":len(records)}]
 
     def save():
         state.update(summary=summary(records, suite["cases"]), updated_at=datetime.now(timezone.utc).isoformat())
@@ -95,6 +100,7 @@ def main():
             if generated.finish_reason == "length":
                 verdict = {"solved":False,"contract_pass":False,"failure":"truncated"}
             record = {"case_id":case["id"],"task":case["task"],"stratum":case["stratum"],"attempt":1,
+                      "source_commit":args.source_commit,"batch_size":len(batch),
                       "returned_model":config["model"],
                       "response_status":"completed" if generated.finish_reason != "length" else "incomplete",
                       "finish_reason":generated.finish_reason,"raw_output":raw,"full_output":tokenizer.decode(tokens,skip_special_tokens=False),

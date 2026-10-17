@@ -111,8 +111,11 @@ def main():
             donors[count].append(row)
         if all(len(donors[c]) == 2 for c in counts):
             break
-    if any(len(donors[c]) < 2 for c in counts):
-        raise ValueError('Cannot match map donor candidate counts: '+str({c:len(donors[c]) for c in sorted(counts) if len(donors[c])<2}))
+    unmatched = [row['trajectory_id'] for records in selected.values() for row in records
+                 if not any(d['start'] != row['start']
+                            for d in donors[len(legal_actions(int(row['start'])))])]
+    if unmatched:
+        raise ValueError('No distinct-state matched donor for '+str(unmatched))
     args.out.mkdir(parents=True, exist_ok=True)
     cohort = dict(seed=policy['seed'], splits=selected, donors=dict(donors))
     cohort_path = args.out/'cohort.json'

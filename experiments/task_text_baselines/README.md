@@ -8,7 +8,7 @@
 
 接口曾在请求上限之外继续输出，因此请求参数不等于实际计算约束。历史答卷来自原请求上限，按 16k 重算不能冒充在 16k 下重新生成。5.6 已在旧请求收尾后，用现有 worker 加 `--budget-config experiments/task_text_baselines/configs/budget_16k.json` 完成剩余题；新答卷记录实际请求上限，progress 保留前后请求历史。即使接口超发，超限答案也不计成功。
 
-当前紧凑结果见 [report.md](results/report.md)，对应数字见 [summary.json](results/summary.json)。运行中结果标注更新时间；尚未返回题与服务失败不当作模型答错。
+当前结果统一从[模型、设置与预算对照表](results/README.md)阅读；详细初始结果见 [report.md](results/report.md)，对应数字见 [summary.json](results/summary.json)。运行中结果标注更新时间；尚未返回题与服务失败不当作模型答错。
 
 正式参数见 [sol_high_40.json](configs/sol_high_40.json)。文字从 `tasks/<task>/prompts/README.md` 读取；生成后冻结题目、提示词与参考解在 Git 外的 `runs/five_task_sol_high_40/suite.json`。魔方共用固定动作教学示例，8-Puzzle 按用户要求无动作示例。各题只提交一次完整计划，无中途反馈。此条件与逐轮地图／CoT 反馈条件不同。
 
@@ -61,7 +61,7 @@ python -u -m experiments.task_text_baselines.src.qwen --suite /path/to/frozen/su
 
 两组已全部完成并补齐服务失败。5.6 五任务原执行成功 182/200，16k 预算内为 175/200；6.1 旧十二块为 16/16，包含历史 0/8 的三道题，全部未超 16k。5.6 的完整 200 份执行结果已重新回放，判分一致。定时跟进在本轮完成后停止。
 
-两组均请求 high。原答卷保留，当前统一按 16k 评分；5.6 包含前后两个请求上限阶段，不能冒充严格等生成预算。旧十二块的构造解只保证可解，不作为精确最短解。历史 5.6 使用 medium、旧提示词、每题八次，不能用该历史差值单独判断模型升级或逐步状态输出的贡献。要单独验证逐步状态输出的影响，应固定模型、题目与预算，仅改变是否要求 board_after；该对照尚未运行。
+两组均请求 high。原答卷保留，当前统一按 16k 评分；5.6 包含前后两个请求上限阶段，不能冒充严格等生成预算。旧十二块的构造解只保证可解，不作为精确最短解。历史 5.6 使用 medium、旧提示词、每题八次，不能用该历史差值单独判断模型升级或逐步状态输出的贡献。原八形状的逐步状态对照已完成，见下文；旧十形状 16 题尚未做隔离 board_after 要求的匹配对照。
 
 ```powershell
 python -m experiments.task_text_baselines.src.prepare_retest --config experiments/task_text_baselines/configs/sol56_high_same40.json --out runs/five_task_sol56_high_same40
@@ -86,7 +86,7 @@ python -m experiments.task_text_baselines.src.state_report --baseline runs/five_
 
 ## S/Z 替换与 8k 评分
 
-用户追加的 [S/Z 八形状条件](configs/sol56_blocks40_sz_state_report.json)已启动：将原 4、5 号双格替换为横向 S、Z 四格，保留其他六形状与 12 次构造放置。沿用初始题集“均匀选形状，再均匀选不重叠放置”的生成方式，不额外要求连通或每题必含 S/Z；新生成 40 道可解题，与旧题不配对。5.6-sol high 保留逐步状态输出，请求仍为 16k；参考解只保证可解，不表示精确最短解，进展见[S/Z 报告](results/blocks_sz_state_report.md)。
+用户追加的 [S/Z 八形状条件](configs/sol56_blocks40_sz_state_report.json)已完成：将原 4、5 号双格替换为横向 S、Z 四格，保留其他六形状与 12 次构造放置。沿用初始题集“均匀选形状，再均匀选不重叠放置”的生成方式，不额外要求连通或每题必含 S/Z；新生成 40 道可解题，与旧题不配对。5.6-sol high 保留逐步状态输出，请求为 16k；原执行到达 36/40，16k 内到达与严格合同均为 30/40，8k 内到达 6/40。预算内棋盘报告正确 360/360，全部答卷合法前缀为 432/444。40 份最终答卷已回放，服务失败已补齐，定时跟进已暂停；参考解不表示精确最短解，见[S/Z 报告](results/blocks_sz_state_report.md)。
 
 [8k 敏感性报告](results/budget_sensitivity.md)按 [budget_8k.json](configs/budget_8k.json)重算已有答卷，不增加 API 调用。原积木无状态组在 8k 下仍为 37/40，逐步状态组为 27/40（16k 下为 36/40）。8k 包含思考与答案，严格超过 8,000 才计错；评分重算不代表在 8k 请求上限下重新生成。
 

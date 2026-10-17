@@ -1,0 +1,14 @@
+{
+  "baseline": "B2_sortfirst",
+  "seed": 20261017,
+  "samples_per_split": 64,
+  "epochs": [4],
+  "intervention_epoch": 20,
+  "conditions": ["natural"],
+  "max_new_tokens": 256,
+  "sample_unit": "nonterminal_trajectory_first_step",
+  "donor_matching": "same_legal_candidate_count_different_state",
+  "donor_pool": "all_nonterminal_decision_states_in_training_trajectories",
+  "comparison": "B2_50k_epoch4_vs_B2_10k_epoch20_both_50000_optimizer_updates",
+  "action_probability_probe": "not_run_for_this_control"
+}

@@ -1,0 +1,21 @@
+{
+  "study": "blocks_sz_matched_model_comparison",
+  "seed": 20261017,
+  "source_suite": "runs/sol56_blocks40_sz_state_report/suite.json",
+  "case_mode": "copy_frozen",
+  "expected_cases": 40,
+  "samples_per_case": 1,
+  "api": {
+    "base_url": "https://jarodfund.xyz/v1",
+    "model": "gpt-6.1-sol",
+    "reasoning_effort": "high",
+    "max_output_tokens": 16000,
+    "scoring_output_limit": 16000,
+    "timeout_seconds": 900,
+    "concurrency": 4,
+    "max_service_retries": 10,
+    "max_total_service_retries": 80,
+    "service_retry_delay_seconds": 30
+  },
+  "comparison": "Copy all forty frozen 5.6 S/Z eight-shape twelve-placement cases unchanged, including IDs, boards, shape catalogue, literal prompts, per-action board_after requirement and reference witnesses. Change only the requested model to gpt-6.1-sol; retain high, the 16000-token request and service retry settings. One valid answer per case, no tools or intermediate feedback. Score reported reasoning-plus-answer output at both 16000 and 8000 tokens; do not resample model errors, truncations or overruns. Reference witnesses certify solvability, not shortestness."
+}

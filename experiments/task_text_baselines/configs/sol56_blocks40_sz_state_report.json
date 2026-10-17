@@ -1,0 +1,28 @@
+{
+  "study": "blocks_sz_state_report_comparison",
+  "seed": 20261017,
+  "source_suite": "runs/sol56_blocks40_state_report/suite.json",
+  "case_mode": "blocks_new_shapes_state_report",
+  "expected_cases": 40,
+  "samples_per_case": 1,
+  "blocks": {
+    "grid_size": 10,
+    "placements": 12,
+    "shape_rows": ["11/10", "10/11", "11/01", "01/11", "011/110", "110/011", "1/1/1", "111"],
+    "shape_subclasses": ["L3", "L3", "L3", "L3", "S4", "Z4", "I3", "I3"],
+    "sampling": "Uniform shape ID, then uniform legal nonoverlapping placement, as in the initial suite; reject duplicate boards. Do not force connectivity or S/Z presence in each board."
+  },
+  "api": {
+    "base_url": "https://jarodfund.xyz/v1",
+    "model": "gpt-5.6-sol",
+    "reasoning_effort": "high",
+    "max_output_tokens": 16000,
+    "scoring_output_limit": 16000,
+    "timeout_seconds": 900,
+    "concurrency": 4,
+    "max_service_retries": 10,
+    "max_total_service_retries": 80,
+    "service_retry_delay_seconds": 30
+  },
+  "comparison": "Replace only original shape IDs 4 and 5 (dominoes) by horizontal S and Z tetrominoes. Keep eight shapes and twelve construction placements. Generate forty new solvable boards under the new catalogue, preserving the original sampling method; do not treat them as matched old questions. Inherit the exact per-action board_after requirement from source_suite. Reference construction certifies solvability, not shortestness. Report both 16000- and 8000-token retrospective scoring; request generation at 16000."
+}

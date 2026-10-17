@@ -23,6 +23,21 @@ from experiments.gcml_counterexamples.src import blocks
 
 
 class TaskRulesTest(unittest.TestCase):
+    def test_sz_replacement_generates_solvable_twelve_placement_boards(self):
+        config = json.loads((ROOT/'experiments/task_text_baselines/configs/sol56_blocks40_sz_state_report.json').read_text())
+        with patch('builtins.print'):
+            cases = retest_cases(config,{'config':{'format_addition':'Predict board_after.'}})
+        self.assertEqual(len(cases),40)
+        self.assertEqual(len({c['initial'] for c in cases}),40)
+        for case in cases:
+            self.assertEqual(case['generation_placements'],12)
+            self.assertEqual(len(case['reference']['actions']),12)
+            self.assertIsNone(case['reference']['length'])
+            self.assertEqual(case['shape_options']['shape_rows'][4:6],['011/110','110/011'])
+            self.assertIn('4=011/110; 5=110/011',case['prompt'])
+            self.assertNotIn('4=1/1;',case['prompt'])
+            self.assertTrue(case['state_report_required'])
+
     def test_state_report_retest_changes_only_output_requirement(self):
         action = {'shape_id':4,'row':0,'col':0}
         case = {'id':'blocks_00','task':'blocks','initial':1+(1<<10),'goal':0,

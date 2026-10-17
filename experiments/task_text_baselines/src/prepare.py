@@ -24,11 +24,17 @@ def choose_by_depth(table, depths, count, rng):
 
 def make_blocks(options, count, rng):
     cases, seen = [], set()
+    custom = options.get('shape_rows')
+    if custom:
+        from experiments.sol_dag_blocks.src.tasks import BlocksTask
+        rules = BlocksTask(options)
+    placements = rules.placements if custom else blocks.PLACEMENTS
+    shape_count = len(rules.shapes) if custom else len(blocks.SHAPES)
     while len(cases) < count:
         state, witness = 0, []
         for _ in range(options["placements"]):
-            shape = rng.randrange(len(blocks.SHAPES))
-            candidates = [(mask, action) for mask, action in blocks.PLACEMENTS if action["shape_id"] == shape and not mask & state]
+            shape = rng.randrange(shape_count)
+            candidates = [(mask, action) for mask, action in placements if action["shape_id"] == shape and not mask & state]
             if not candidates:
                 break
             mask, action = rng.choice(candidates)
@@ -37,13 +43,20 @@ def make_blocks(options, count, rng):
         if len(witness) != options["placements"] or state in seen:
             continue
         seen.add(state)
-        exact = blocks.solver()
-        minimum, indices = exact(state)
-        assert minimum is not None
+        if custom:
+            minimum, reference = None,witness
+        else:
+            exact = blocks.solver()
+            minimum, indices = exact(state)
+            assert minimum is not None
+            reference = [blocks.PLACEMENTS[i][1] for i in indices]
         cases.append({"task": "blocks", "initial": state, "goal": 0,
-                      "stratum": "placements_12", "generation_placements": len(witness),
-                      "reference": {"length": minimum, "actions": [blocks.PLACEMENTS[i][1] for i in indices]}})
-        print(f"prepared blocks {len(cases)}/{count}, exact minimum={minimum}", flush=True)
+                      "stratum": f"placements_{options['placements']}", "generation_placements": len(witness),
+                      **({'shape_options':options} if custom else {}),
+                      "reference": {"length": minimum, "actions": reference,
+                                    **({'upper_bound':len(witness)} if custom else {})}})
+        detail = f"reference upper bound={len(witness)}" if custom else f"exact minimum={minimum}"
+        print(f"prepared blocks {len(cases)}/{count}, {detail}", flush=True)
     return cases
 
 

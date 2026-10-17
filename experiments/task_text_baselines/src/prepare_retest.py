@@ -4,12 +4,14 @@ from copy import deepcopy
 import json
 from pathlib import Path
 import subprocess
+import random
 
 from experiments.sol_dag_blocks.src.tasks import BlocksTask
 from experiments.gcml_counterexamples.src import blocks
 from .difficulty import harder_prompt
 from .protocol import ROOT, judge
 from .run import write_json
+from .prepare import make_blocks
 
 
 def retest_cases(config, source):
@@ -22,6 +24,12 @@ def retest_cases(config, source):
         for case in cases:
             case['state_report_required'] = True
             case['prompt'] += '\n\n'+config['format_addition']
+    elif config['case_mode'] == 'blocks_new_shapes_state_report':
+        cases = make_blocks(config['blocks'],config['expected_cases'],random.Random(config['seed']))
+        for index,case in enumerate(cases):
+            case['id'] = f'blocks_sz_{index:02d}'
+            case['state_report_required'] = True
+            case['prompt'] = harder_prompt(case)+'\n\n'+source['config']['format_addition']
     elif config['case_mode'] == 'legacy_blocks12_new_prompt':
         options = source['config']['blocks']
         rules = BlocksTask(options)
@@ -44,9 +52,10 @@ def retest_cases(config, source):
         actions = deepcopy(case['reference']['actions'])
         if case.get('state_report_required'):
             state = case['initial']
+            rules = BlocksTask(case['shape_options']) if case.get('shape_options') else None
             for action in actions:
-                state = blocks.apply(state,action)
-                action['board_after'] = blocks.to_grid(state).split('/')
+                state = rules.apply(state,action) if rules else blocks.apply(state,action)
+                action['board_after'] = rules.to_rows(state) if rules else blocks.to_grid(state).split('/')
         verdict = judge(case,json.dumps({'actions':actions, 'final_status':'solved'}))
         if not verdict['contract_pass']:
             raise ValueError(f"Reference replay failed: {case['id']}")

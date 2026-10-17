@@ -84,6 +84,19 @@ python -m experiments.task_text_baselines.src.state_report --baseline runs/five_
 
 原始答卷在上述忽略目录；后台汇总写入 `runs/sol56_blocks40_state_report/summary/`，正式报告为回收快照。
 
+## S/Z 替换与 8k 评分
+
+用户追加 [S/Z 八形状条件](configs/sol56_blocks40_sz_state_report.json)：将原 4、5 号双格替换为横向 S、Z 四格，保留其他六形状与 12 次构造放置。沿用初始题集“均匀选形状，再均匀选不重叠放置”的生成方式，不额外要求连通或每题必含 S/Z；新生成 40 道可解题，与旧题不配对。5.6-sol high 保留逐步状态输出，请求仍为 16k；参考解只保证可解，不表示精确最短解。
+
+[8k 敏感性报告](results/budget_sensitivity.md)按 [budget_8k.json](configs/budget_8k.json)重算已有答卷，不增加 API 调用。原积木无状态组在 8k 下仍为 37/40，逐步状态组为 27/40（16k 下为 36/40）。8k 包含思考与答案，严格超过 8,000 才计错；评分重算不代表在 8k 请求上限下重新生成。
+
+```powershell
+python -m experiments.task_text_baselines.src.prepare_retest --config experiments/task_text_baselines/configs/sol56_blocks40_sz_state_report.json --out runs/sol56_blocks40_sz_state_report
+python -u -m experiments.task_text_baselines.src.run --out runs/sol56_blocks40_sz_state_report --budget-config experiments/task_text_baselines/configs/budget_16k.json
+python -m experiments.task_text_baselines.src.state_report --baseline runs/sol56_blocks40_state_report --run runs/sol56_blocks40_sz_state_report --out experiments/task_text_baselines/results
+python -m experiments.task_text_baselines.src.budget_report --qwen runs/five_task_qwen32b_same40 --sol56 runs/five_task_sol56_high_same40 --sol61 runs/five_task_sol_high_40 --legacy runs/sol61_legacy_blocks12_new_prompt --states runs/sol56_blocks40_state_report --sz runs/sol56_blocks40_sz_state_report --out experiments/task_text_baselines/results
+```
+
 题集配置仍为 [sol_high_40.json](configs/sol_high_40.json) 与 [qwen32b_same40.json](configs/qwen32b_same40.json)，评分另由上述预算合同决定。两组各 200 题均已完成；原执行成功 32B 40、GPT 195，按 16k 重算为 32B 38、GPT 183，完整设置见[主报告](results/report.md)。题目未因筛选或评分标准改变而重新采样。
 
 所有加难配置现已停用，包括 `difficulty_20.json`。运行目录中的 `stop_requested` 阻止继续派题，已发出的请求正常落盘后退出。15×15 积木、三阶魔方、5×5 华容道和十一盘汉诺塔只作为[补充探索](results/difficulty_exploration.md)保留，不要求测满其原计划，也不与原各 40 题合并。更早的五题初筛、28 块积木和寻路加难同样保留原始答卷，不再运行。

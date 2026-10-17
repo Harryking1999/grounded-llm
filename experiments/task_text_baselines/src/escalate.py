@@ -160,6 +160,7 @@ def main():
                 save()
     state['inflight'] = []
     state['status'] = ('api_fatal' if fatal else 'service_budget_exhausted' if exhausted else 'stopped' if (out/'stop_requested').exists()
+                       else 'service_incomplete' if any(item['status'] == 'service_blocked' for item in state['tasks'].values())
                        else 'completed_breakpoints_or_ranges')
     save()
     result,text = build(out)

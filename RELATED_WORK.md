@@ -49,3 +49,13 @@ Shibo Hao 等，*EMNLP*，2023。
 *首图对比直接生成推理链与基于 world state、reward 和搜索的 RAP。图源：Hao 等，Fig. 1；从 [EMNLP 正式论文 PDF](https://aclanthology.org/2023.emnlp-main.507.pdf) 提取，图内内容未改动，[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)。*
 
 **对我们的参考。** RAP 主要让 LLM 自身充当 world model；我们当前探索的是由显式 external cognitive map／roadmap 向 LLM 提供状态与动作后果。
+
+## 4. WorMI：检索多个领域模型，通过两级 attention 接入冻结 LLM
+
+**World Model Implanting for Test-time Adaptation of Embodied Agents**
+
+Minjong Yoo、Jinwoo Jang、Sihyung Yoon、Honguk Woo，*ICML*，2025。
+
+[论文](https://proceedings.mlr.press/v267/yoo25a.html) · [代码](https://github.com/mjyoo2/WorMI) · [带原图的精读分享报告](docs/WORMI_READING_REPORT.md)
+
+WorMI 将已见领域轨迹训练出的 Llama-1B 模型检索并接入冻结 Llama-3B。公开实现先在同一 token 位置融合多个 WM，再通过跨 token attention 注入主模型，在 benchmark 内留出任务／场景上取得收益。它为我们的 cross-attention 接口提供结构参考，但其隐式领域知识不同于显式地图；结果尚未分离状态估计、转移预测和规划各自的贡献。精读报告详述数据来源、两级数据流、层配置、实验及实现差异。

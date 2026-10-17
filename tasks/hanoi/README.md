@@ -1,6 +1,6 @@
 # 汉诺塔任务工作区
 
-已有三至六盘 Qmap；下一轮强基线候选为八盘。现有环境仅支持一至六盘，八盘实现与正式配置尚待准备，不能把六盘权重当作八盘地图。
+已有三至六盘 Qmap；旧 Qmap 环境支持一至六盘。新一轮八盘纯文字基线已有独立[环境与单目标 BFS](../../experiments/task_text_baselines/src/hanoi.py)及[正式配置](../../experiments/task_text_baselines/configs/sol_high_40.json)，尚无八盘 Qmap 权重；不能把六盘权重当作八盘地图。
 
 - [文字、规则与各组提示](prompts/README.md)：任务内原文；根目录 `TASK_TEXTS.md` 是自动集中副本。
 - [数据准备与示例](data/README.md)：小例说明字段，不冒充正式训练集。

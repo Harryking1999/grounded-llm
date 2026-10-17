@@ -9,7 +9,7 @@
 
 ### 积木：任务文字与监督格式
 
-状态：现有八形状、10×10 棋盘 SFT 条件已填入。这里的“八形状”是动作目录，不等于每个生成棋盘恰好含八次操作；新的 12 积木条件需另定配置。
+状态：现有八形状、10×10 棋盘 SFT 条件已填入。“八形状”是动作目录，不等于棋盘的构造块数。本轮基础评测按 12 次放置构造；用户新指定的含 S/Z 十形状加难条件独立维护在 [difficulty_ladder.json](experiments/task_text_baselines/configs/difficulty_ladder.json)，不改变此处既有 SFT 规则。
 
 #### 共享任务描述与规则
 
@@ -612,7 +612,7 @@ Reason: The current configuration exactly matches the goal; no further move is n
 
 ### 二阶魔方：任务文字与监督格式
 
-状态：用户已确定参考 XoT，采用六面 `2×2` 数字矩阵和动作前后示例作为 LLM 侧表示。共享规则、每轮更新、完整计划输出和监督答案草案均已补齐，整套措辞待最终确认；尚未实现完整贴纸转换或启动新评测。Q 编码器继续使用角块身份与朝向的 192 维独热输入。
+状态：用户已确定参考 XoT，采用六面 `2×2` 数字矩阵和动作前后示例作为 LLM 侧表示。共享规则、每轮更新、完整计划输出和监督答案已补齐，用户已授权使用当前文字开展纯文字基线。双向贴纸转换已实现并检查；Q 编码器继续使用角块身份与朝向的 192 维独热输入。
 
 #### 共享任务描述与规则
 
@@ -781,7 +781,7 @@ Goal cube state:
 {goal_cube_state}
 ```
 
-六面矩阵与六种四分之一转示例参考 XoT；每个示例独立从同一复原状态出发，不是连续执行。教学示例在各组共用，不提供当前测试题的后继或解题轨迹。已核对这六个示例与当前角块环境的转移一致；完整双向贴纸转换尚未实现。DBL 固定是内部参考系约束，不增加模型动作。
+六面矩阵与六种四分之一转示例参考 XoT；每个示例独立从同一复原状态出发，不是连续执行。教学示例在各组共用，不提供当前测试题的后继或解题轨迹。已核对这六个示例与当前角块环境的转移一致；[双向贴纸转换](experiments/task_text_baselines/src/cube2.py)已通过随机状态往返检查。DBL 固定是内部参考系约束，不增加模型动作。
 
 #### 地图组／CoT 组：每轮环境更新
 
@@ -885,7 +885,7 @@ Reason: The current cube state exactly matches the goal; no further turn is need
 
 ### 8-Puzzle：任务文字与监督格式
 
-状态：用户已要求新增任务；以下为整套待确认草案。参考 [XoT 提示词](https://github.com/microsoft/Everything-of-Thoughts-XoT/blob/main/xot_all_in_one/xot/prompter/prompts/prompts_npuzzle.py)的 3×3 数字表示与空格移动方向，按用户要求不加入动作示例。目标说明例沿用其左上角为空格的布局。不继承其九步题集／预算；本项目实现与正式评测尚未开始。
+状态：参考 [XoT 提示词](https://github.com/microsoft/Everything-of-Thoughts-XoT/blob/main/xot_all_in_one/xot/prompter/prompts/prompts_npuzzle.py)的 3×3 数字表示与空格移动方向，按用户要求不加入动作示例，并精简冗余说明。用户已授权使用当前文字开展纯文字基线；目标说明例沿用其左上角为空格的布局，不继承其九步题集／预算。
 
 #### 共享任务描述与规则
 

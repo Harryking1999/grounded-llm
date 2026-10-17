@@ -1,6 +1,6 @@
 # 8-Puzzle（数字华容道）任务工作区
 
-新加入的独立任务：3×3 棋盘、八个数字块和一个空格；这里指八数码滑块拼图。当前完成任务文字草案和小型数据说明例，尚无本项目环境实现、正式数据、训练、评测或 Qmap 权重。
+新加入的独立任务：3×3 棋盘、八个数字块和一个空格；这里指八数码滑块拼图。当前文字与数据说明例已补齐；纯文字基线已有独立[环境与 BFS](../../experiments/task_text_baselines/src/puzzle8.py)、[题集准备和评测](../../experiments/task_text_baselines/README.md)。尚无 Qmap 训练或权重，评测进度见状态页。
 
 - [任务规则、每轮更新与输出草案](prompts/README.md)
 - [数据说明](data/README.md)与[结构示例](data/example.json)

@@ -1,6 +1,6 @@
 # 8-Puzzle：任务文字与监督格式
 
-状态：用户已要求新增任务；以下为整套待确认草案。参考 [XoT 提示词](https://github.com/microsoft/Everything-of-Thoughts-XoT/blob/main/xot_all_in_one/xot/prompter/prompts/prompts_npuzzle.py)的 3×3 数字表示与空格移动方向，按用户要求不加入动作示例。目标说明例沿用其左上角为空格的布局。不继承其九步题集／预算；本项目实现与正式评测尚未开始。
+状态：参考 [XoT 提示词](https://github.com/microsoft/Everything-of-Thoughts-XoT/blob/main/xot_all_in_one/xot/prompter/prompts/prompts_npuzzle.py)的 3×3 数字表示与空格移动方向，按用户要求不加入动作示例，并精简冗余说明。用户已授权使用当前文字开展纯文字基线；目标说明例沿用其左上角为空格的布局，不继承其九步题集／预算。
 
 ## 共享任务描述与规则
 

@@ -2,6 +2,7 @@
 import argparse
 import json
 from pathlib import Path
+import re
 
 ROOT = Path(__file__).resolve().parents[1]
 TASKS = (("blocks", "积木"), ("path", "寻路"), ("hanoi", "汉诺塔"), ("cube2", "二阶魔方"),
@@ -16,6 +17,9 @@ def render():
     for name, title in TASKS:
         base = ROOT / "tasks" / name
         text = (base / "prompts/README.md").read_text(encoding="utf-8").strip()
+        # Relative source links must stay usable from the root reading copy.
+        text = re.sub(r'\]\((\.\.?/[^)\s]+)\)',
+                      lambda match: '](' + (base / 'prompts' / match[1]).resolve().relative_to(ROOT).as_posix() + ')',text)
         # Heading nesting only; the words themselves remain task-owned.
         text = "\n".join("##" + line if line.startswith("#") else line for line in text.splitlines())
         parts.append(f"\n## {title}\n\n来源：`tasks/{name}/prompts/README.md`\n\n{text}\n")

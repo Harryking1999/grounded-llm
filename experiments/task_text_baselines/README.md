@@ -42,6 +42,8 @@ python -u -m experiments.task_text_baselines.src.qwen --suite /path/to/frozen/su
 
 原始逐题输出、进度和运行记录放在 `runs/five_task_qwen32b_same40/`，与 API 答卷分开；两者均可用 `src/report.py` 生成紧凑汇总。
 
+028 恢复连接后已回收完整 200 题，真实执行解出 40 题；逐题提示词与 GPT 原题集完全一致，全部未截断答案重新回放后与原判分一致。完整对照及失败类型见 [结果报告](results/report.md)。无需重启已完成的评测。
+
 ## 当前加难队列：每档至少 20 题
 
 唯一在用配置：[difficulty_20.json](configs/difficulty_20.json)。初筛和独立确认均为 20 道不同题；有效答卷不足时只报进度，不用旧五题样本宣布完成。

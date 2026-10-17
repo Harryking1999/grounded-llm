@@ -53,6 +53,8 @@ def main():
     baseline,_ = build(args.baseline)
     current,_ = build(args.current)
     qwen,_ = build(args.qwen)
+    qwen_complete = qwen['status'] == 'completed' and all(
+        row['valid_responses'] == row['planned'] for row in qwen['tasks'].values())
     suite = json.loads((args.current/'suite.json').read_text(encoding='utf-8'))
     history = {path.name:build(path)[0] for path in args.history}
     now = datetime.now(timezone(timedelta(hours=8))).strftime('%Y-%m-%d %H:%M（北京时间）')
@@ -85,11 +87,20 @@ def main():
     lines += ['', '共 195/200 解出，原题服务失败已补完。积木八形状、12 次放置、10×10；寻路 256 节点、距离 3–10；汉诺塔八盘、距离 1–255；二阶魔方距离 1–14；3×3 华容道距离 4–30。非最短成功解仍计解出。', '',
               '积木两题移除到了空格；汉诺塔两题违反盘子大小规则；魔方一题未复原。基础设施失败未计入这些模型错误。', '',
               f"原题 {baseline['exceeded_output_limit']} 份答卷超出请求预算。接口未返回模型名与 reasoning 配置，名称及 high 仅指请求值；客户端请求不提供工具、无中途反馈，后台身份与强度不能独立核验。", '',
-              '## 同题 Qwen3-32B：最后回收的快照','',
-              f"028 的 GPU 0–3、完整 BF16、thinking 模式；最近回收时间 {qwen['updated_at']}。此前跳板 SSH 超时，当前远端进度尚未核实。以下是部分题，不能当作完整成功率比较。", '',
-              '| 任务 | 有效答卷 | 解出 |','|---|---:|---:|']
+              '## 同题 Qwen3-32B：完整结果' if qwen_complete else '## 同题 Qwen3-32B：最后回收的快照','',
+              ('028 连接恢复后已回收完整 200 题；断连期间评测正常结束。完整 BF16、四卡 TP、thinking 模式，原题及提示词与 GPT 完全一致，正常错误答案没有重抽。' if qwen_complete else
+               f"最近回收的远端进度时间为 {qwen['updated_at']}；以下仍是部分题，不能当作完整成功率比较。"), '',
+              '| 任务 | 有效答卷 | Qwen 解出 | 成功率 | GPT 同题解出 |','|---|---:|---:|---:|---:|']
     for task,row in qwen['tasks'].items():
-        lines.append(f"| {NAMES[task]} | {row['valid_responses']}/40 | {row['solved']} |")
+        rate = f"{100*row['solved']/row['planned']:.1f}%" if qwen_complete else '未结束'
+        lines.append(f"| {NAMES[task]} | {row['valid_responses']}/40 | {row['solved']} | {rate} | {baseline['tasks'][task]['solved']}/40 |")
+    if qwen_complete:
+        total = sum(row['solved'] for row in qwen['tasks'].values())
+        strict = sum(row['contract_pass'] for row in qwen['tasks'].values())
+        failure_counts = {name:sum(row['failures'].get(name,0) for row in qwen['tasks'].values())
+                          for name in ('illegal_action','unsolved','truncated')}
+        lines += ['',f"总计 {total}/200（{total/2:.1f}%），GPT 同题 195/200（97.5%）。主指标按实际执行：严格格式与终态声明通过 {strict}/200，未用格式问题扣掉已解出的题。",'',
+                  f"失败分解：非法动作 {failure_counts['illegal_action']}，合法但未完成 {failure_counts['unsolved']}，输出截断 {failure_counts['truncated']}。Qwen thinking 不等同于 GPT high；GPT 接口存在超预算答卷，因此本表不能声称严格等预算。"]
     lines += ['', '## 历史探索与入口','',
               '此前五题一档的探索、28 块积木、4×4 压力题和寻路加难均已停止派新题，旧答卷保留。它们不替代当前每档 20 题；复用答卷也不当作新增独立试验重复计算。', '',
               '[当前配置](../configs/difficulty_20.json) · [执行与复用说明](../README.md) · [原题配置](../configs/sol_high_40.json) · [32B 配置](../configs/qwen32b_same40.json)', '',

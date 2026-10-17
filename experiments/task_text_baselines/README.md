@@ -86,7 +86,7 @@ python -m experiments.task_text_baselines.src.state_report --baseline runs/five_
 
 ## S/Z 替换与 8k 评分
 
-用户追加 [S/Z 八形状条件](configs/sol56_blocks40_sz_state_report.json)：将原 4、5 号双格替换为横向 S、Z 四格，保留其他六形状与 12 次构造放置。沿用初始题集“均匀选形状，再均匀选不重叠放置”的生成方式，不额外要求连通或每题必含 S/Z；新生成 40 道可解题，与旧题不配对。5.6-sol high 保留逐步状态输出，请求仍为 16k；参考解只保证可解，不表示精确最短解。
+用户追加的 [S/Z 八形状条件](configs/sol56_blocks40_sz_state_report.json)已启动：将原 4、5 号双格替换为横向 S、Z 四格，保留其他六形状与 12 次构造放置。沿用初始题集“均匀选形状，再均匀选不重叠放置”的生成方式，不额外要求连通或每题必含 S/Z；新生成 40 道可解题，与旧题不配对。5.6-sol high 保留逐步状态输出，请求仍为 16k；参考解只保证可解，不表示精确最短解，进展见[S/Z 报告](results/blocks_sz_state_report.md)。
 
 [8k 敏感性报告](results/budget_sensitivity.md)按 [budget_8k.json](configs/budget_8k.json)重算已有答卷，不增加 API 调用。原积木无状态组在 8k 下仍为 37/40，逐步状态组为 27/40（16k 下为 36/40）。8k 包含思考与答案，严格超过 8,000 才计错；评分重算不代表在 8k 请求上限下重新生成。
 

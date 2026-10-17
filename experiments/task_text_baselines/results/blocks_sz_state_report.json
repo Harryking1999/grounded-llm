@@ -1,0 +1,169 @@
+{
+  "updated_at": "2026-10-18 02:28（北京时间）",
+  "same_questions": false,
+  "baseline_blocks": {
+    "planned": 40,
+    "finished": 40,
+    "valid_responses": 40,
+    "service_errors": 0,
+    "solved": 36,
+    "contract_pass": 36,
+    "optimal": 35,
+    "optimal_evaluated": 40,
+    "failures": {
+      "success": 36,
+      "illegal_action": 2,
+      "unsolved": 2
+    },
+    "output_tokens": 305707,
+    "input_tokens": 20040,
+    "strata": {
+      "placements_12": {
+        "finished": 40,
+        "valid_responses": 40,
+        "service_errors": 0,
+        "solved": 36
+      }
+    },
+    "execution_solved": 36,
+    "budget_exceeded": 0,
+    "budget_unknown": 0
+  },
+  "secondary_output_limit": 8000,
+  "baseline_blocks_8k": {
+    "planned": 40,
+    "finished": 40,
+    "valid_responses": 40,
+    "service_errors": 0,
+    "solved": 27,
+    "contract_pass": 27,
+    "optimal": 26,
+    "optimal_evaluated": 40,
+    "failures": {
+      "budget_exceeded": 11,
+      "success": 27,
+      "illegal_action": 1,
+      "unsolved": 1
+    },
+    "output_tokens": 305707,
+    "input_tokens": 20040,
+    "strata": {
+      "placements_12": {
+        "finished": 40,
+        "valid_responses": 40,
+        "service_errors": 0,
+        "solved": 27
+      }
+    },
+    "execution_solved": 36,
+    "budget_exceeded": 11,
+    "budget_unknown": 0
+  },
+  "new_blocks_8k": {
+    "planned": 40,
+    "finished": 2,
+    "valid_responses": 2,
+    "service_errors": 0,
+    "solved": 1,
+    "contract_pass": 1,
+    "optimal": 0,
+    "optimal_evaluated": 0,
+    "failures": {
+      "budget_exceeded": 1,
+      "success": 1
+    },
+    "output_tokens": 17222,
+    "input_tokens": 1006,
+    "strata": {
+      "placements_12": {
+        "finished": 2,
+        "valid_responses": 2,
+        "service_errors": 0,
+        "solved": 1
+      }
+    },
+    "execution_solved": 2,
+    "budget_exceeded": 1,
+    "budget_unknown": 0
+  },
+  "state_report": {
+    "status": "running",
+    "model_request": {
+      "base_url": "https://jarodfund.xyz/v1",
+      "model": "gpt-5.6-sol",
+      "reasoning_effort": "high",
+      "max_output_tokens": 16000,
+      "scoring_output_limit": 16000,
+      "timeout_seconds": 900,
+      "concurrency": 4,
+      "max_service_retries": 10,
+      "max_total_service_retries": 80,
+      "service_retry_delay_seconds": 30
+    },
+    "tasks": {
+      "blocks": {
+        "planned": 40,
+        "finished": 2,
+        "valid_responses": 2,
+        "service_errors": 0,
+        "solved": 2,
+        "contract_pass": 2,
+        "optimal": 0,
+        "optimal_evaluated": 0,
+        "failures": {
+          "success": 2
+        },
+        "output_tokens": 17222,
+        "input_tokens": 1006,
+        "strata": {
+          "placements_12": {
+            "finished": 2,
+            "valid_responses": 2,
+            "service_errors": 0,
+            "solved": 2
+          }
+        },
+        "execution_solved": 2,
+        "budget_exceeded": 0,
+        "budget_unknown": 0
+      }
+    },
+    "recorded_attempts": 2,
+    "service_error_attempts": 0,
+    "returned_model_counts": {
+      "None": 2
+    },
+    "exceeded_output_limit": 0,
+    "run_path": "runs\\sol56_blocks40_sz_state_report",
+    "updated_at": "2026-10-17T18:28:54.153545+00:00",
+    "response_metadata_coverage": {
+      "valid_answers": 2,
+      "model_reported": 0,
+      "effort_counts": {
+        "not_returned": 2
+      },
+      "effort_reported_on_reused_answers": 0
+    },
+    "budget_policy": {
+      "max_output_tokens": 16000,
+      "scope": "reasoning_plus_final_answer",
+      "exceeded": 0,
+      "unknown": 0,
+      "request_limit_counts": {
+        "16000": 2
+      }
+    }
+  },
+  "within_budget_state_accuracy": {
+    "evaluated": 24,
+    "valid": 24,
+    "correct": 24
+  },
+  "paired": {
+    "answered": 0,
+    "both_solved": 0,
+    "lost_success": 0,
+    "gained_success": 0,
+    "both_failed": 0
+  }
+}

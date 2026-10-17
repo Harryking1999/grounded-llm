@@ -9,7 +9,7 @@
 
 ### 积木：任务文字与监督格式
 
-状态：现有八形状、10×10 棋盘 SFT 条件已填入。“八形状”是动作目录，不等于棋盘的构造块数。本轮基础评测按 12 次放置构造；用户新指定的含 S/Z 十形状加难条件独立维护在 [difficulty_ladder.json](experiments/task_text_baselines/configs/difficulty_ladder.json)，不改变此处既有 SFT 规则。
+状态：现有八形状、10×10 棋盘 SFT 条件已填入。“八形状”是动作目录，不等于棋盘的构造块数。本轮基础评测按 12 次放置构造；用户指定的 15×15、20 块、含 S/Z 十形状加难条件独立维护在 [difficulty_20.json](experiments/task_text_baselines/configs/difficulty_20.json)，不改变此处既有 SFT 规则。
 
 #### 共享任务描述与规则
 

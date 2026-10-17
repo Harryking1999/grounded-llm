@@ -6,7 +6,7 @@ import random
 
 from experiments.qwen_path_blocks.src.prepare_path_suite import regular_connected_graph, shortest
 from experiments.sol_dag_blocks.src.tasks import BlocksTask
-from . import cube3, hanoi, puzzle15
+from . import cube3, hanoi, sliding
 from .prepare import make_hanoi
 from .protocol import ROOT, prompt, section_text, judge
 
@@ -46,8 +46,8 @@ def uniform_tree(size,rng):
 
 
 def scramble(task,length,rng):
-    env = cube3 if task == "cube3" else puzzle15
-    goal = cube3.solved() if task == "cube3" else tuple(range(16))
+    env = cube3 if task == "cube3" else sliding
+    goal = cube3.solved() if task == "cube3" else tuple(range(25 if task == 'puzzle24' else 16))
     state,actions,seen = goal,[],{goal}
     for _ in range(length):
         candidates = []
@@ -66,7 +66,7 @@ def scramble(task,length,rng):
     witness = [(a[:-1] if a.endswith("'") else a+"'") if task == "cube3" else INVERSE[a] for a in reversed(actions)]
     return {"task":task,"initial":list(state),"goal":list(goal),"stratum":f"scramble_{length}",
             "generation_scramble":actions,"reference":{"length":None,"upper_bound":length,"actions":witness},
-            **({"manhattan_lower_bound":puzzle15.manhattan(state)} if task == "puzzle15" else {})}
+            **({"manhattan_lower_bound":sliding.manhattan(state)} if task in ("puzzle15","puzzle24") else {})}
 
 
 def blocks_case(options,count,rng):
@@ -84,7 +84,7 @@ def blocks_case(options,count,rng):
             actions.append(action)
         if len(actions) == count:
             return {"task":"blocks","initial":state,"goal":0,"shape_options":options,
-                    "stratum":f"SZ10_connected_{count}","generation_placements":count,
+                    "stratum":f"SZ10_connected_{count}" if task.size == 10 else f"SZ10_board{task.size}_connected_{count}","generation_placements":count,
                     "reference":{"length":None,"upper_bound":count,"actions":actions}}
     raise ValueError("Could not construct requested connected blocks case")
 
@@ -98,11 +98,12 @@ def harder_prompt(case):
         return text.replace(old,"Shapes (/ separates rows): "+shapes)
     if task in ("hanoi","path"):
         return prompt(case)
-    if task == "puzzle15":
+    if task in ("puzzle15","puzzle24"):
+        size = 5 if task == 'puzzle24' else 4
         text = section_text("puzzle8","共享任务描述与规则")
-        text = text.replace("3x3","4x4").replace("1 through 8","1 through 15")
-        text = text.replace("{initial_board_3_rows}",puzzle15.render(case["initial"]))
-        text = text.replace("{goal_board_3_rows}",puzzle15.render(case["goal"]))
+        text = text.replace("3x3",f"{size}x{size}").replace("1 through 8",f"1 through {size*size-1}")
+        text = text.replace("{initial_board_3_rows}",sliding.render(case["initial"]))
+        text = text.replace("{goal_board_3_rows}",sliding.render(case["goal"]))
         return text+"\n\n"+section_text("puzzle8","SOTA 组／32B 组")
     text = section_text("cube2","共享任务描述与规则").split("Action examples:")[0]
     text = text.replace("2x2","3x3")
@@ -149,10 +150,12 @@ def prepare_level(task,level,options,config):
             raise ValueError('Unable to sample the configured difficulty condition')
         if task == "blocks":
             options_source = json.loads((ROOT/options["shape_config"]).read_text())["blocks"]
+            if 'grid_size' in options:
+                options_source['grid_size'] = options['grid_size']
             case = blocks_case(options_source,value,rng)
-        elif task in ("cube3","puzzle15"):
+        elif task in ("cube3","puzzle15","puzzle24"):
             case = scramble(task,value,rng)
-            if task == 'puzzle15' and case['manhattan_lower_bound'] < options.get('minimum_manhattan',0):
+            if task in ('puzzle15','puzzle24') and case['manhattan_lower_bound'] < options.get('minimum_manhattan',0):
                 continue
         elif task == "hanoi":
             case = rows[len(cases)]

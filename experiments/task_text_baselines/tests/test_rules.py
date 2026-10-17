@@ -7,24 +7,90 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 from experiments.hanoi_qmap.src.environment import Hanoi
-from experiments.task_text_baselines.src import cube2, cube3, hanoi, puzzle8, puzzle15
+from experiments.task_text_baselines.src import cube2, cube3, hanoi, puzzle8, puzzle15, sliding
 from experiments.task_text_baselines.src.difficulty import graph_distances, prepare_level
 from experiments.task_text_baselines.src.escalate import decision, main as escalate_main
 from experiments.task_text_baselines.src.protocol import ROOT
 from experiments.task_text_baselines.src.protocol import judge, prompt
 from experiments.task_text_baselines.src.run import call, extract_text, pending, summary
 from experiments.task_text_baselines.src.qwen import final_text, round_robin
+from experiments.task_text_baselines.src.prepare_difficulty import reuse_answers
 
 
 class TaskRulesTest(unittest.TestCase):
+    def test_new_queue_rejects_five_case_contracts(self):
+        config = {'cases_per_level':5,'confirmation_cases':20}
+        with TemporaryDirectory() as temporary:
+            path = Path(temporary)/'config.json'
+            path.write_text(json.dumps(config))
+            with patch('sys.argv',['escalate','--config',str(path),'--out',temporary]):
+                with self.assertRaisesRegex(ValueError,'at least twenty'):
+                    escalate_main()
+
+    def test_expanded_suite_reuses_wrong_answers_without_resampling(self):
+        case = {'id':'old','task':'path','initial':0,'goal':1,'prompt':'frozen',
+                'neighbors':{'0':[1],'1':[0]},'reference':{'length':1}}
+        raw = json.dumps({'actions':[],'final_status':'unsolved'})
+        record = {'case_id':'old','attempt':1,'raw_output':raw,'verdict':judge(case,raw)}
+        with TemporaryDirectory() as temporary:
+            prior,out = Path(temporary)/'prior',Path(temporary)/'out'
+            (prior/'records').mkdir(parents=True)
+            (out/'records').mkdir(parents=True)
+            (prior/'progress.json').write_text(json.dumps({'status':'stopped','inflight':[]}))
+            (prior/'suite.json').write_text(json.dumps({'source_commit':'prior','cases':[case]}))
+            (prior/'records/old_attempt1.json').write_text(json.dumps(record))
+            reused = reuse_answers([case | {'id':'expanded'}],prior,out)
+            self.assertEqual(len(reused),1)
+            saved = json.loads((out/'records/expanded_attempt1.json').read_text())
+            self.assertFalse(saved['verdict']['solved'])
+            self.assertEqual(saved['reused_from']['case_id'],'old')
+            (prior/'progress.json').write_text(json.dumps({'status':'running','inflight':['old']}))
+            with self.assertRaises(RuntimeError):
+                reuse_answers([case],prior,out)
+
+    def test_new_board_conditions_render_and_replay_all_twenty(self):
+        config = json.loads((ROOT/'experiments/task_text_baselines/configs/difficulty_20.json').read_text())
+        for task in ('blocks','puzzle24'):
+            cases = prepare_level(task,0,config['tasks'][task],config)
+            self.assertEqual(len(cases),20)
+            self.assertEqual(len({str(case['initial']) for case in cases}),20)
+            for case in cases:
+                self.assertTrue(judge(case,json.dumps({'actions':case['reference']['actions'],'final_status':'solved'}))['solved'])
+                if task == 'blocks':
+                    self.assertEqual(case['shape_options']['grid_size'],15)
+                    self.assertEqual(case['generation_placements'],20)
+                    self.assertTrue(any(action['shape_id'] >= 6 for action in case['reference']['actions']))
+                    board = case['prompt'].split('Initial board:\n')[1].split('\n\n')[0].splitlines()
+                    self.assertEqual([len(row) for row in board],[15]*15)
+                    self.assertIn('15x15',case['prompt'])
+                    self.assertIn('6=011/110',case['prompt'])
+                else:
+                    self.assertIn('5x5',case['prompt'])
+                    self.assertIn('1 through 24',case['prompt'])
+                    self.assertNotIn('Action examples',case['prompt'])
+                    self.assertGreaterEqual(case['manhattan_lower_bound'],60)
+        state = tuple(range(25))
+        self.assertEqual(sliding.step(sliding.step(state,'Right'),'Left'),state)
+        with self.assertRaises(ValueError):
+            sliding.step(state,'Up')
+        last_blank = tuple(range(1,25))+(0,)
+        for action in ('Down','Right'):
+            with self.assertRaises(ValueError):
+                sliding.step(last_blank,action)
+
     def test_exhausted_service_attempts_remain_incomplete_without_new_calls(self):
         config_path = ROOT/'experiments/task_text_baselines/configs/path_distance_stress.json'
         config = json.loads(config_path.read_text())
+        config.pop('retired',None)
+        config['cases_per_level'] = config['confirmation_cases'] = 20
         case = {'id':'pending','task':'path','level':0,'phase':'screen','stratum':'long'}
         with TemporaryDirectory() as temporary:
             folder = Path(temporary)
+            config_path = folder/'config.json'
+            config_path.write_text(json.dumps(config),encoding='utf-8')
             (folder/'records').mkdir()
-            values = {'suite.json':{'config':config,'source_commit':'test','cases':[case]},
+            cases = [case]+[case | {'id':f'untouched_{i}'} for i in range(19)]
+            values = {'suite.json':{'config':config,'source_commit':'test','cases':cases},
                       'records/pending_attempt11.json':{'case_id':'pending','task':'path','stratum':'long',
                           'attempt':11,'service_error':'HTTPError','verdict':{'solved':False,'failure':'service_error'}}}
             for name,value in values.items():

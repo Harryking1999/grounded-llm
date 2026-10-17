@@ -11,5 +11,7 @@
   "confirmation_cases": 10,
   "maximum_solved_fraction": 0.5,
   "tasks": {"puzzle15": {"scramble_lengths": [256,512], "minimum_manhattan": 52}},
-  "policy": "The first four valid answers in the Manhattan-at-least-40 condition all solved. Increase the guaranteed distance floor to 52 while keeping the same 4x4 board, goal, rules, prompt template, model request and output budget. Generate reversible self-avoiding walks, reject states below the floor and freeze five cases before any calls. Use ten distinct fresh cases for confirmation only when at most half solve. Retain every valid answer from both conditions and report them separately; selected stress cases do not estimate original-distribution success rates. Do not expose the lower bound, generation sequence or witness to the model. Retry only service failures."
+  "policy": "The first four valid answers in the Manhattan-at-least-40 condition all solved. Increase the guaranteed distance floor to 52 while keeping the same 4x4 board, goal, rules, prompt template, model request and output budget. Generate reversible self-avoiding walks, reject states below the floor and freeze five cases before any calls. Use ten distinct fresh cases for confirmation only when at most half solve. Retain every valid answer from both conditions and report them separately; selected stress cases do not estimate original-distribution success rates. Do not expose the lower bound, generation sequence or witness to the model. Retry only service failures.",
+  "retired": true,
+  "superseded_by": "experiments/task_text_baselines/configs/difficulty_20.json"
 }

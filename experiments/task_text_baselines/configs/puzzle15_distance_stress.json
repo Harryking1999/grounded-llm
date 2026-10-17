@@ -11,5 +11,7 @@
   "confirmation_cases": 10,
   "maximum_solved_fraction": 0.5,
   "tasks": {"puzzle15": {"scramble_lengths": [128,256], "minimum_manhattan": 40}},
-  "policy": "Supplement the size ladder with 4x4 states whose Manhattan lower bound is at least 40, so every valid solution requires at least 40 moves. Keep the same prompt, fixed goal, model request and output budget. Freeze five unseen cases before sampling; if at most half solve, use ten distinct fresh cases with the same constraint for confirmation. Count formatting separately; retry infrastructure errors only. Scramble lengths are upper bounds, never exact distances. Keep this selected stress condition separate from the unfiltered ladder and original 40-case success rates."
+  "policy": "Supplement the size ladder with 4x4 states whose Manhattan lower bound is at least 40, so every valid solution requires at least 40 moves. Keep the same prompt, fixed goal, model request and output budget. Freeze five unseen cases before sampling; if at most half solve, use ten distinct fresh cases with the same constraint for confirmation. Count formatting separately; retry infrastructure errors only. Scramble lengths are upper bounds, never exact distances. Keep this selected stress condition separate from the unfiltered ladder and original 40-case success rates.",
+  "retired": true,
+  "superseded_by": "experiments/task_text_baselines/configs/difficulty_20.json"
 }

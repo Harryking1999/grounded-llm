@@ -31,6 +31,10 @@ def main():
     parser.add_argument("--out",required=True)
     args = parser.parse_args()
     config = json.loads(Path(args.config).read_text(encoding="utf-8"))
+    if config.get('retired'):
+        raise ValueError('This queue was retired; use difficulty_20.json')
+    if min(config['cases_per_level'],config['confirmation_cases']) < 20:
+        raise ValueError('Current evaluation requires at least twenty cases per condition and confirmation')
     api = json.loads((ROOT/config["api_config"]).read_text())["api"]
     recovery = json.loads((ROOT/config["service_recovery"]).read_text())
     api.update({key:recovery[key] for key in ("max_service_retries","max_total_service_retries","service_retry_delay_seconds")})
@@ -75,6 +79,9 @@ def main():
                 return None
             cases = [case for case in suite['cases'] if case['task'] == task and case['level'] == level
                      and case.get('phase','screen') == phase]
+            expected = config['confirmation_cases'] if phase == 'confirm' else config['cases_per_level']
+            if cases and len(cases) != expected:
+                raise ValueError('Frozen case count differs from the current contract; prepare an expanded suite first')
             if not cases:
                 generation = dict(config)
                 if phase == 'confirm':

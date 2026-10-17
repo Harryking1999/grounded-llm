@@ -1,0 +1,20 @@
+{
+  "study": "adaptive_complete_plan_difficulty",
+  "seed": 20261018,
+  "prior_screen_run": "runs/five_task_sol_challenge",
+  "initial_levels": {"blocks": 0, "cube3": 4, "puzzle24": 0, "hanoi": 2},
+  "api_config": "experiments/task_text_baselines/configs/sol_high_40.json",
+  "service_recovery": "experiments/task_text_baselines/configs/service_recovery.json",
+  "baseline_run": "runs/five_task_sol_high_40",
+  "cases_per_level": 20,
+  "confirmation_cases": 20,
+  "maximum_solved_fraction": 0.5,
+  "concurrency": 4,
+  "tasks": {
+    "blocks": {"shape_config": "experiments/sol_dag_blocks/configs/sol_medium.json", "grid_size": 15, "construction_counts": [20]},
+    "cube3": {"scramble_lengths": [4,8,12,16,20,24,32]},
+    "puzzle24": {"scramble_lengths": [256], "minimum_manhattan": 60},
+    "hanoi": {"disk_counts": [9,10,11]}
+  },
+  "policy": "User revision: complete at least twenty independent questions per condition; use twenty additional distinct questions for confirmation if at most half solve. Blocks are exactly 15x15 with twenty connected construction placements and the existing ten fixed shapes including SZ; discard the 28-placement direction. Cube remains 3x3, expand the current twenty-turn scramble condition to twenty cases while preserving matching existing answers, then continue to twenty-four and thirty-two turns only if still easy. Expand eleven-disk Hanoi to twenty cases. Try one 5x5 sliding-puzzle condition, reversible 256-move construction with Manhattan lower bound at least sixty; do not escalate beyond 5x5 even if all solve. Stop all path escalation. Rules and output templates retain the existing wording except board size, tile range and shape catalogue. Initial twenty cases per task are frozen and reference-replayed before calls. Import only exactly matching prior valid answers with source provenance; retain failures and never resample a valid answer. Report historical five-case screens separately, not as completed twenty-case results. Preserve all retired runs. Retry service failures only, and report budget overruns separately."
+}

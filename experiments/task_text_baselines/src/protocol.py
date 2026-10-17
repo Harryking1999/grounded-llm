@@ -4,7 +4,7 @@ from pathlib import Path
 import re
 
 from experiments.gcml_counterexamples.src import blocks
-from . import cube2, cube3, hanoi, puzzle8, puzzle15
+from . import cube2, cube3, hanoi, puzzle8, puzzle15, sliding
 
 ROOT = Path(__file__).resolve().parents[3]
 
@@ -19,7 +19,14 @@ def prompt(case):
     task = case["task"]
     text = section_text(task, "共享任务描述与规则")
     if task == "blocks":
-        fields = {"initial_board_10_rows": blocks.to_grid(int(case["initial"])).replace("/", "\n"), "goal_board_10_rows": blocks.to_grid(int(case["goal"])).replace("/", "\n")}
+        if case.get('shape_options'):
+            from experiments.sol_dag_blocks.src.tasks import BlocksTask
+            rules = BlocksTask(case['shape_options'])
+            text = text.replace('10x10',f'{rules.size}x{rules.size}')
+            fields = {'initial_board_10_rows':'\n'.join(rules.to_rows(int(case['initial']))),
+                      'goal_board_10_rows':'\n'.join(rules.to_rows(int(case['goal'])))}
+        else:
+            fields = {"initial_board_10_rows": blocks.to_grid(int(case["initial"])).replace("/", "\n"), "goal_board_10_rows": blocks.to_grid(int(case["goal"])).replace("/", "\n")}
     elif task == "path":
         fields = {"max_node_id": len(case["neighbors"]) - 1,
                   "adjacency_list": "\n".join(f"{i}: " + ", ".join(map(str, case["neighbors"][str(i)])) for i in range(len(case["neighbors"]))),
@@ -54,8 +61,8 @@ def judge(case, raw):
     if not isinstance(output, dict) or not isinstance(output.get("actions"), list):
         return {"solved": False, "contract_pass": False, "failure": "parse_error", "strict_json": strict}
     task, actions = case["task"], output["actions"]
-    state = tuple(case["initial"]) if task in ("hanoi", "puzzle8", "puzzle15", "cube3") else case["initial"]
-    goal = tuple(case["goal"]) if task in ("hanoi", "puzzle8", "puzzle15", "cube3") else case["goal"]
+    state = tuple(case["initial"]) if task in ("hanoi", "puzzle8", "puzzle15", "puzzle24", "cube3") else case["initial"]
+    goal = tuple(case["goal"]) if task in ("hanoi", "puzzle8", "puzzle15", "puzzle24", "cube3") else case["goal"]
     shape_rules = None
     if task == "blocks" and case.get("shape_options"):
         from experiments.sol_dag_blocks.src.tasks import BlocksTask
@@ -73,7 +80,7 @@ def judge(case, raw):
                 state = action["to"]
             else:
                 state = {"hanoi": hanoi.step, "cube2": cube2.step, "cube3":cube3.step,
-                         "puzzle8": puzzle8.step, "puzzle15":puzzle15.step}[task](state, action)
+                         "puzzle8": puzzle8.step, "puzzle15":puzzle15.step, "puzzle24":sliding.step}[task](state, action)
             executed += 1
         except (ValueError, TypeError, KeyError, IndexError) as error:
             illegal, detail = index, str(error)

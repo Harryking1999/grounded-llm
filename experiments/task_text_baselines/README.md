@@ -62,6 +62,8 @@ python -u -m experiments.task_text_baselines.src.qwen --suite /path/to/frozen/su
 
 4×4 另补[距离下界压力条件](configs/puzzle15_distance_stress.json)：只接收 Manhattan 距离下界至少 40 的可解棋盘，每个动作最多使此距离减少 1，故任何有效解至少 40 步。它补足“打乱很长但实际离目标近”的风险；不把下界或参考解发给模型。该条件单独保存在 `runs/puzzle15_distance_stress/`，同样先五题初筛、必要时十道独立题确认，不混入原始成功率。
 
+若二十四块档位耗尽仍未确认困难条件，队列接上[密集积木条件](configs/blocks_dense_stress.json)的二十八／三十块，保持十形状和 10×10 尺寸。原始构造中记录形状与占格数；密度接近上限时可行性会改变实际形状比例，不把差异归因于块数一个因素。三十二块在当前随机连通构造检查中失败，不作为已就绪档位，也不记作模型失败。
+
 ```powershell
 python -u -m experiments.task_text_baselines.src.escalate --config experiments/task_text_baselines/configs/difficulty_ladder.json --out runs/five_task_sol_challenge
 ```

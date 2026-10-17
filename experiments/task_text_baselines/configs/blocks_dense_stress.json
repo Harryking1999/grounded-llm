@@ -1,0 +1,15 @@
+{
+  "study": "adaptive_complete_plan_difficulty",
+  "seed": 20261020,
+  "api_config": "experiments/task_text_baselines/configs/sol_high_40.json",
+  "service_recovery": "experiments/task_text_baselines/configs/service_recovery.json",
+  "baseline_run": "runs/five_task_sol_high_40",
+  "prior_screen_run": "runs/five_task_sol_challenge",
+  "initial_levels": {"blocks": 0},
+  "cases_per_level": 5,
+  "concurrency": 1,
+  "confirmation_cases": 10,
+  "maximum_solved_fraction": 0.5,
+  "tasks": {"blocks": {"shape_config": "experiments/sol_dag_blocks/configs/sol_medium.json", "construction_counts": [28,30]}},
+  "policy": "Start only if the primary ladder exhausts its 24-placement blocks condition without confirming substantial failures. Keep the same 10x10 board, ten fixed orientations including SZ, prompt, model and output budget. Increase connected construction count to 28 and then 30; record actual occupied cells and shape frequencies because feasibility changes the realized construction mixture. Use five-case screens and ten distinct-case confirmations at solved fraction <=0.5. Larger construction count is not an exact optimal distance or a guarantee of greater difficulty. Preserve every answer; retry service failures only. Stop unresolved at range_exhausted if the conditions remain too easy."
+}

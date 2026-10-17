@@ -50,6 +50,7 @@ ssh grounded-4090
 | 共用资源 | 位置 |
 |---|---|
 | 028 基座模型（只读复用） | `/ssdwork/fuzhizhang/model_base/Qwen2.5-1.5B-Instruct` |
+| 028 Qwen3-32B（只读复用） | `/ssdwork/fuzhizhang/model_base/Qwen3-32B`；完整 BF16 权重、配置与 tokenizer 已核对 |
 | 平台、4090 项目基座 | 各项目根目录下 `models/Qwen2.5-1.5B-Instruct` |
 | 4090 公共模型区 | `/opt/models`；使用前确认所需模型是否存在 |
 | 平台积木地图工作区 | `/zhanghanyue/experiment/grounded_llm_qmap_tree_132f5a1` |

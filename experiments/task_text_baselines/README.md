@@ -21,3 +21,17 @@ python -m experiments.task_text_baselines.src.report --run runs/five_task_sol_hi
 用户要求补齐 API 失败后，采用 [服务补测策略](configs/service_recovery.json)；只扩大基础设施重试次数，不改变题目、模型、提示词、输出预算或正常答卷。`stop_requested` 只停止新调度，等待在途请求落盘后才恢复；不可同时启动两个写同一运行目录的 worker。汇总将有效答卷与仍待补测的服务错误分开。
 
 第三方接口短探针接受了请求并正常返回，但省略返回模型名称与 reasoning 配置。报告分别记录请求值与返回值，不把请求标签视为独立身份验证。运行还记录服务端工具元信息与是否超出请求 token 上限。
+
+## 同题 Qwen3-32B
+
+用户指定在 028 使用 GPU 0–3。只读复用已有完整 BF16 基座，不下载量化版，不复制到 4090。正式推理合同见 [qwen32b_same40.json](configs/qwen32b_same40.json)：开启 Qwen thinking，输出预算包含思考与答案；该模式不等同于 GPT 的 high。依赖装在对应运行目录的独立虚拟环境，不修改共享项目环境。
+
+`src/qwen.py` 读取同一个冻结 `suite.json`，保持全部题目与 user prompt 不变；任务轮流排队，每题只取一个样本，已完成题不重采样。截断和模型答错均保留。裁判只在生成后执行，不向模型提供搜索工具。
+
+在已提交源码快照目录执行：
+
+```bash
+python -u -m experiments.task_text_baselines.src.qwen --suite /path/to/frozen/suite.json --config experiments/task_text_baselines/configs/qwen32b_same40.json --out /path/to/qwen-run --model-path /ssdwork/fuzhizhang/model_base/Qwen3-32B --gpus 0,1,2,3 --source-commit COMMIT
+```
+
+原始逐题输出、进度和运行记录放在 `runs/five_task_qwen32b_same40/`，与 API 答卷分开；两者均可用 `src/report.py` 生成紧凑汇总。

@@ -6,6 +6,7 @@ from experiments.hanoi_qmap.src.environment import Hanoi
 from experiments.task_text_baselines.src import cube2, hanoi, puzzle8
 from experiments.task_text_baselines.src.protocol import judge, prompt
 from experiments.task_text_baselines.src.run import extract_text, pending
+from experiments.task_text_baselines.src.qwen import final_text, round_robin
 
 
 class TaskRulesTest(unittest.TestCase):
@@ -86,6 +87,16 @@ class TaskRulesTest(unittest.TestCase):
         rows = pending(cases,latest,{"max_service_retries":5},42)
         self.assertEqual(rows.pop()["id"],"network")
         self.assertEqual([row["id"] for row in rows],["new"])
+
+    def test_qwen_keeps_final_answer_and_stable_case_indices(self):
+        class Tokenizer:
+            def convert_tokens_to_ids(self, value):
+                return 9
+            def decode(self, values, skip_special_tokens):
+                return ",".join(map(str,values))
+        self.assertEqual(final_text([1,2,9,3,4],Tokenizer()),("3,4",3))
+        cases = [{"task":task} for task in ("a","a","b","b","c")]
+        self.assertEqual([index for index,_ in round_robin(cases)],[0,2,4,1,3])
 
 
 if __name__ == '__main__':

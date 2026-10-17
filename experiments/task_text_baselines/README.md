@@ -1,12 +1,12 @@
 # 五任务纯文字完整规划基线
 
-当前采用最初的五任务配置，每任务 40 题，同题比较 Qwen3-32B 与请求 high 的 GPT-6.1-sol。用户将最低难度要求改为 32B 不能可靠完成；GPT 作为强基线参照。当前主指标为 **16k 预算内完整计划成功率**，最优解率另计。
+当前采用最初的五任务配置，每任务 40 题，同题比较 Qwen3-32B、GPT-5.6-sol high 与 GPT-6.1-sol high。三组均已完成，16k 预算内成功分别为 **38/200、175/200、183/200**。用户将最低难度要求改为 32B 不能可靠完成；GPT 作为强基线参照。最优解率另计。
 
 ## 输出预算
 
 评分合同见 [budget_16k.json](configs/budget_16k.json)：16,000 输出 token，包含思考与最终答案；超过上限即计失败，用量缺失不计预算内成功。原始答卷与执行判分保留，报告派生预算分，不重新采样正常答卷。
 
-接口曾在请求上限之外继续输出，因此请求参数不等于实际计算约束。历史答卷来自原请求上限，按 16k 重算不能冒充在 16k 下重新生成。5.6 剩余题等待在途请求落盘后，用现有 worker 加 `--budget-config experiments/task_text_baselines/configs/budget_16k.json` 续跑；新答卷记录实际请求上限，progress 保留前后请求历史，服务失败仍按原配置有限重试。即使接口继续超发，超限答案也不计成功。
+接口曾在请求上限之外继续输出，因此请求参数不等于实际计算约束。历史答卷来自原请求上限，按 16k 重算不能冒充在 16k 下重新生成。5.6 已在旧请求收尾后，用现有 worker 加 `--budget-config experiments/task_text_baselines/configs/budget_16k.json` 完成剩余题；新答卷记录实际请求上限，progress 保留前后请求历史。即使接口超发，超限答案也不计成功。
 
 当前紧凑结果见 [report.md](results/report.md)，对应数字见 [summary.json](results/summary.json)。运行中结果标注更新时间；尚未返回题与服务失败不当作模型答错。
 
@@ -59,7 +59,9 @@ python -u -m experiments.task_text_baselines.src.qwen --suite /path/to/frozen/su
 | 5.6-sol 五任务 | 逐字复用原五任务 200 题、提示词与参考解，不重新采样 | [同题合同](configs/sol56_high_same40.json) |
 | 6.1-sol 旧十二块 | 原 16 张棋盘与含 S/Z 十形状；当前规则和完整计划 JSON，不要求 board_after | [旧题合同](configs/sol61_legacy_blocks12_new_prompt.json) |
 
-两组均请求 high。原答卷保留，当前统一按 16k 评分，5.6 剩余题改为请求 16k；不同请求上限不能冒充严格等生成预算。旧十二块的构造解只保证可解，不作为精确最短解。历史 5.6 使用 medium、旧提示词、每题八次，不能用该历史差值单独判断模型升级或逐步状态输出的贡献。要单独验证逐步状态输出的影响，应固定模型、题目与预算，仅改变是否要求 board_after；该对照尚未运行。
+两组已全部完成并补齐服务失败。5.6 五任务原执行成功 182/200，16k 预算内为 175/200；6.1 旧十二块为 16/16，包含历史 0/8 的三道题，全部未超 16k。5.6 的完整 200 份执行结果已重新回放，判分一致。定时跟进在本轮完成后停止。
+
+两组均请求 high。原答卷保留，当前统一按 16k 评分；5.6 包含前后两个请求上限阶段，不能冒充严格等生成预算。旧十二块的构造解只保证可解，不作为精确最短解。历史 5.6 使用 medium、旧提示词、每题八次，不能用该历史差值单独判断模型升级或逐步状态输出的贡献。要单独验证逐步状态输出的影响，应固定模型、题目与预算，仅改变是否要求 board_after；该对照尚未运行。
 
 ```powershell
 python -m experiments.task_text_baselines.src.prepare_retest --config experiments/task_text_baselines/configs/sol56_high_same40.json --out runs/five_task_sol56_high_same40

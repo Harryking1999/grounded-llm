@@ -98,13 +98,15 @@ scp -r /home/zhangyue/transfer/grounded_llm/run-id gongruochen@10.28.0.80:/home/
 
 以下可恢复工作树保存在 Git 忽略的 `D:\Grounded_llm\tmp\archived-worktrees\`：
 
-| 原位置 | 归档子目录 | 分支 |
+| 原位置 | 归档子目录 | 历史分支（已归档，工作树 detached） |
 |---|---|---|
 | `D:\Grounded_llm_global_context` | `step2-global-context` | `codex/archive-step2-global-context` |
 | `D:\Grounded_llm_harness` | `experiment-harness` | `codex/archive-experiment-harness` |
 | `D:\Grounded_llm_step2` | `step2-path` | `codex/archive-step2-path` |
 
 需要恢复时可用 `git worktree move`；路径变化后重新核对虚拟环境与运行配置中的绝对路径。
+
+2026-10-17 清理后，本机其余旧研究工作树也转为 detached，内容和 Git 忽略产物保留。当前日常开发使用 `D:\Grounded_llm`；不要将旧工作树的状态页当作主工作区现状。
 
 ## 7. Qmap 历史归档
 
@@ -114,3 +116,14 @@ scp -r /home/zhangyue/transfer/grounded_llm/run-id gongruochen@10.28.0.80:/home/
 | 平台 `/zhanghanyue/experiment/grounded_llm_puzzle_qmaps_archive/20261016_cleanup/` | 完整历史 `code/`、`runs/`、`logs/` 和传输包；内部绝对软链接已随归档重定位 |
 
 归档位于当前工作区之外，不作为新实验的默认数据来源。恢复某次运行时，按其 `source_commit` 在独立目录检出源码，并使用同一归档运行的 `config.json`、数据与 checkpoint。元数据内保留的旧绝对路径属于历史记录，恢复时应指向实际归档位置。不要把全部旧日志、模型和快照搬回当前源码目录。
+
+## 8. Git 分支清理的恢复入口
+
+旧本地分支已保存为 `refs/archive/2026-10-17/<原分支名>`；这些不是日常开发分支。整合前全部引用还保存在仓库外 `D:\Grounded_llm_archive\git\grounded-llm-before-cleanup-20261017.bundle`，不提交进源代码仓库。恢复时先检查引用，再创建新分支，例如：
+
+```powershell
+git show refs/archive/2026-10-17/codex/cube-metric-trials --stat
+git switch -c codex/recover-cube refs/archive/2026-10-17/codex/cube-metric-trials
+```
+
+旧 worktree 保留原目录和 detached commit，可按 `git worktree list` 定位。远端过时分支清理后，如需其未纳入 main 的历史，使用对应 `archive/2026-10-17/` 标签；这些历史不作为新运行的默认代码。

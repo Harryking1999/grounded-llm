@@ -41,7 +41,7 @@
 - [任务目录](../tasks/README.md)：四个同构工作区；[全部文字集中副本](../TASK_TEXTS.md)；[统一 Qmap 方法与独立实现](../tasks/QMAP_METHOD.md)。任务内文字是原文，根目录副本自动生成。
 - experiments/ 保存正式研究、配置、实现、正确性测试和结果；旧 puzzle_qmap 只作历史复现／导入兼容，当前汉诺塔和魔方各自训练。
 - 选定 Qmap 权重位于 tasks/<task>/Qmap/checkpoints/，由 Git 忽略；来源和适用条件见各自 selection.json。积木新图、魔方选定复原模型与汉诺塔六盘参考已收拢；寻路新方法的验证最优权重也已收拢。原始运行与归档保留。
-- 当前整理分支 codex/task-workspace 已本地合入积木 codex/tenk-sft-baselines 与魔方／汉诺塔／新寻路 Q 所在的 codex/cube-metric-trials 历史。其他任务分支与工作树保留，不自动合入、不删除、不改写历史。本次未 push。
+- 主工作区整合了积木、魔方／汉诺塔／新寻路 Q、架构图、相关工作阅读报告及已完成的 32B 寻路结果。31 条旧本地分支已保存恢复引用后删除；旧工作树以 detached 状态保留源码和忽略产物，历史失败实现不重新作为当前入口。整理完成后按用户授权推送 main；恢复方法见开发机手册。
 - [开发机手册](../DEVELOPMENT_MACHINES.md)只维护连接和存储；不从旧 PID、队列记录或磁盘读数推断当前 GPU 状态。本轮整理没有启动正式训练或付费模型测试。
 
 已完成的旧基线收尾与 10k／7B 试验不再列为待启动。历史冻结接口、FFN 负结果和独立 SFT 见[实验目录](../experiments/README.md)；历史讨论保留当时语境，不覆盖本页当前安排。

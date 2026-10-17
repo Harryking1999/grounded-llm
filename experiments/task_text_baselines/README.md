@@ -60,6 +60,8 @@ python -u -m experiments.task_text_baselines.src.qwen --suite /path/to/frozen/su
 
 三阶魔方、4×4 华容道与含 Z 积木只保存回放通过的可解参考方案及长度上界，不假设它是最短方案。寻路与汉诺塔仍使用精确最短距离。它们是寻找失败点的适应性小样本，不能据此估计总体成功率；旧 200 题及其 32B 同题比较保持独立。
 
+4×4 另补[距离下界压力条件](configs/puzzle15_distance_stress.json)：只接收 Manhattan 距离下界至少 40 的可解棋盘，每个动作最多使此距离减少 1，故任何有效解至少 40 步。它补足“打乱很长但实际离目标近”的风险；不把下界或参考解发给模型。该条件单独保存在 `runs/puzzle15_distance_stress/`，同样先五题初筛、必要时十道独立题确认，不混入原始成功率。
+
 ```powershell
 python -u -m experiments.task_text_baselines.src.escalate --config experiments/task_text_baselines/configs/difficulty_ladder.json --out runs/five_task_sol_challenge
 ```

@@ -22,6 +22,14 @@ class TaskRulesTest(unittest.TestCase):
         self.assertEqual(decision(rows(5,10),'confirm',config),'difficulty_confirmed')
         self.assertEqual(decision(rows(6,10),'confirm',config),'advance')
 
+    def test_puzzle15_distance_stress_has_provable_floor_and_valid_witness(self):
+        config = json.loads((ROOT/'experiments/task_text_baselines/configs/puzzle15_distance_stress.json').read_text())
+        config['cases_per_level'] = 2
+        for case in prepare_level('puzzle15',0,config['tasks']['puzzle15'],config):
+            self.assertGreaterEqual(case['manhattan_lower_bound'],40)
+            self.assertLessEqual(case['manhattan_lower_bound'],case['reference']['upper_bound'])
+            self.assertNotIn('Manhattan',case['prompt'])
+
     def test_blank_directions_edges_and_inverses(self):
         start = (3,1,2,4,0,5,6,7,8)
         self.assertEqual(puzzle8.step(start, "Left"), (3,1,2,0,4,5,6,7,8))

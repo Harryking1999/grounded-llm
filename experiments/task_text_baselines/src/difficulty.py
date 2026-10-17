@@ -99,12 +99,18 @@ def prepare_level(task,level,options,config):
     if task == "hanoi":
         maximum = 2**value-1
         rows = make_hanoi({"disks":value,"goal_peg":"C","distance_ranges":[[maximum//2,maximum]],"per_range":count},rng)
+    attempted = 0
     while len(cases) < count:
+        attempted += 1
+        if attempted > 100000:
+            raise ValueError('Unable to sample the configured difficulty condition')
         if task == "blocks":
             options_source = json.loads((ROOT/options["shape_config"]).read_text())["blocks"]
             case = blocks_case(options_source,value,rng)
         elif task in ("cube3","puzzle15"):
             case = scramble(task,value,rng)
+            if task == 'puzzle15' and case['manhattan_lower_bound'] < options.get('minimum_manhattan',0):
+                continue
         elif task == "hanoi":
             case = rows[len(cases)]
         else:

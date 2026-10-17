@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-17 23:50（北京时间）",
+  "updated_at": "2026-10-17 23:52（北京时间）",
   "original_sol61": {
     "status": "completed",
     "model_request": {
@@ -322,44 +322,45 @@
     }
   },
   "sol56": {
-    "status": "stopped",
+    "status": "running",
     "model_request": {
       "base_url": "https://jarodfund.xyz/v1",
       "model": "gpt-5.6-sol",
       "reasoning_effort": "high",
-      "max_output_tokens": 32768,
+      "max_output_tokens": 16000,
       "timeout_seconds": 900,
       "concurrency": 4,
       "max_service_retries": 10,
       "max_total_service_retries": 200,
-      "service_retry_delay_seconds": 30
+      "service_retry_delay_seconds": 30,
+      "scoring_output_limit": 16000
     },
     "tasks": {
       "blocks": {
         "planned": 40,
-        "finished": 28,
-        "valid_responses": 28,
+        "finished": 31,
+        "valid_responses": 31,
         "service_errors": 0,
-        "solved": 25,
-        "contract_pass": 25,
-        "optimal": 25,
-        "optimal_evaluated": 28,
+        "solved": 28,
+        "contract_pass": 28,
+        "optimal": 28,
+        "optimal_evaluated": 31,
         "failures": {
-          "success": 25,
+          "success": 28,
           "unsolved": 2,
           "illegal_action": 1
         },
-        "output_tokens": 111622,
-        "input_tokens": 12712,
+        "output_tokens": 120817,
+        "input_tokens": 14074,
         "strata": {
           "placements_12": {
-            "finished": 28,
-            "valid_responses": 28,
+            "finished": 31,
+            "valid_responses": 31,
             "service_errors": 0,
-            "solved": 25
+            "solved": 28
           }
         },
-        "execution_solved": 25,
+        "execution_solved": 28,
         "budget_exceeded": 0,
         "budget_unknown": 0
       },
@@ -433,18 +434,18 @@
       },
       "hanoi": {
         "planned": 40,
-        "finished": 26,
-        "valid_responses": 26,
+        "finished": 27,
+        "valid_responses": 27,
         "service_errors": 0,
-        "solved": 26,
-        "contract_pass": 25,
-        "optimal": 26,
-        "optimal_evaluated": 26,
+        "solved": 27,
+        "contract_pass": 26,
+        "optimal": 27,
+        "optimal_evaluated": 27,
         "failures": {
-          "success": 26
+          "success": 27
         },
-        "output_tokens": 171158,
-        "input_tokens": 14165,
+        "output_tokens": 179380,
+        "input_tokens": 14542,
         "strata": {
           "distance_1_31": {
             "finished": 6,
@@ -459,10 +460,10 @@
             "solved": 8
           },
           "distance_64_127": {
-            "finished": 7,
-            "valid_responses": 7,
+            "finished": 8,
+            "valid_responses": 8,
             "service_errors": 0,
-            "solved": 7
+            "solved": 8
           },
           "distance_128_255": {
             "finished": 5,
@@ -471,7 +472,7 @@
             "solved": 5
           }
         },
-        "execution_solved": 26,
+        "execution_solved": 27,
         "budget_exceeded": 0,
         "budget_unknown": 0
       },
@@ -615,20 +616,20 @@
         "budget_unknown": 0
       }
     },
-    "recorded_attempts": 143,
+    "recorded_attempts": 147,
     "service_error_attempts": 7,
     "returned_model_counts": {
-      "None": 134,
+      "None": 138,
       "gpt-5.6-sol": 2
     },
     "exceeded_output_limit": 8,
     "run_path": "runs\\five_task_sol56_high_same40",
-    "updated_at": "2026-10-17T15:49:36.896295+00:00",
+    "updated_at": "2026-10-17T15:52:30.520248+00:00",
     "response_metadata_coverage": {
-      "valid_answers": 136,
+      "valid_answers": 140,
       "model_reported": 2,
       "effort_counts": {
-        "not_returned": 134,
+        "not_returned": 138,
         "high": 2
       },
       "effort_reported_on_reused_answers": 0
@@ -639,7 +640,8 @@
       "exceeded": 8,
       "unknown": 0,
       "request_limit_counts": {
-        "32768": 136
+        "32768": 136,
+        "16000": 4
       }
     }
   },

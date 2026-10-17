@@ -525,7 +525,7 @@ Candidate numbers may change between turns; use only the numbers above.
 
 ```text
 Plan the complete remaining sequence from the current configuration and output it once. There is no intermediate feedback; the judge stops at the first illegal action.
-Return JSON with "actions" (an array of objects with an integer "disk_id" and "from" and "to" fields, each containing "A", "B", or "C") and "final_status" ("solved", "no_solution", or "unsolved").
+Return JSON with "actions" (an array of objects with integer "disk_id" and string "from" and "to" fields; peg names are "A", "B", or "C") and "final_status" ("solved", "no_solution", or "unsolved").
 Use "solved" when your sequence reaches the goal; if already at the goal, output an empty actions array. Use "no_solution" only when the goal is unreachable, not merely because you could not find a plan; otherwise use "unsolved".
 ```
 

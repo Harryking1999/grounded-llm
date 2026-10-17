@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-17 19:17（北京时间）",
+  "updated_at": "2026-10-17 20:09（北京时间）",
   "api": {
     "status": "completed",
     "model_request": {
@@ -31,6 +31,8 @@
         "strata": {
           "placements_12": {
             "finished": 40,
+            "valid_responses": 40,
+            "service_errors": 0,
             "solved": 38
           }
         }
@@ -52,34 +54,50 @@
         "strata": {
           "distance_3": {
             "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
             "solved": 5
           },
           "distance_4": {
             "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
             "solved": 5
           },
           "distance_5": {
             "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
             "solved": 5
           },
           "distance_6": {
             "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
             "solved": 5
           },
           "distance_7": {
             "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
             "solved": 5
           },
           "distance_8": {
             "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
             "solved": 5
           },
           "distance_9": {
             "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
             "solved": 5
           },
           "distance_10": {
             "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
             "solved": 5
           }
         }
@@ -102,18 +120,26 @@
         "strata": {
           "distance_1_31": {
             "finished": 10,
+            "valid_responses": 10,
+            "service_errors": 0,
             "solved": 10
           },
           "distance_32_63": {
             "finished": 10,
+            "valid_responses": 10,
+            "service_errors": 0,
             "solved": 10
           },
           "distance_64_127": {
             "finished": 10,
+            "valid_responses": 10,
+            "service_errors": 0,
             "solved": 10
           },
           "distance_128_255": {
             "finished": 10,
+            "valid_responses": 10,
+            "service_errors": 0,
             "solved": 8
           }
         }
@@ -136,34 +162,50 @@
         "strata": {
           "distance_1": {
             "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
             "solved": 5
           },
           "distance_2": {
             "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
             "solved": 5
           },
           "distance_4": {
             "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
             "solved": 4
           },
           "distance_6": {
             "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
             "solved": 5
           },
           "distance_8": {
             "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
             "solved": 5
           },
           "distance_10": {
             "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
             "solved": 5
           },
           "distance_12": {
             "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
             "solved": 5
           },
           "distance_14": {
             "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
             "solved": 5
           }
         }
@@ -185,34 +227,50 @@
         "strata": {
           "distance_4": {
             "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
             "solved": 5
           },
           "distance_8": {
             "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
             "solved": 5
           },
           "distance_12": {
             "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
             "solved": 5
           },
           "distance_16": {
             "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
             "solved": 5
           },
           "distance_20": {
             "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
             "solved": 5
           },
           "distance_24": {
             "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
             "solved": 5
           },
           "distance_28": {
             "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
             "solved": 5
           },
           "distance_30": {
             "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
             "solved": 5
           }
         }
@@ -232,132 +290,544 @@
     "status": "running",
     "tasks": {
       "blocks": {
-        "status": "active",
-        "level": 2,
+        "status": "range_exhausted",
+        "level": 4,
         "phase": "screen",
-        "level_results": []
+        "level_results": [
+          {
+            "level": 2,
+            "level_value": 20,
+            "phase": "screen",
+            "valid": 5,
+            "solved": 5,
+            "decision": "advance",
+            "failures": {
+              "illegal_action": 0,
+              "unsolved": 0,
+              "parse_error": 0,
+              "truncated": 0
+            }
+          },
+          {
+            "level": 3,
+            "level_value": 24,
+            "phase": "screen",
+            "valid": 5,
+            "solved": 5,
+            "decision": "advance",
+            "failures": {
+              "illegal_action": 0,
+              "unsolved": 0,
+              "parse_error": 0,
+              "truncated": 0
+            }
+          }
+        ]
       },
       "cube3": {
         "status": "active",
-        "level": 2,
+        "level": 3,
         "phase": "screen",
-        "level_results": []
+        "level_results": [
+          {
+            "level": 2,
+            "level_value": 12,
+            "phase": "screen",
+            "valid": 5,
+            "solved": 5,
+            "decision": "advance",
+            "failures": {
+              "illegal_action": 0,
+              "unsolved": 0,
+              "parse_error": 0,
+              "truncated": 0
+            }
+          }
+        ]
       },
       "puzzle15": {
         "status": "active",
-        "level": 2,
+        "level": 4,
         "phase": "screen",
-        "level_results": []
+        "level_results": [
+          {
+            "level": 2,
+            "level_value": 24,
+            "phase": "screen",
+            "valid": 5,
+            "solved": 5,
+            "decision": "advance",
+            "failures": {
+              "illegal_action": 0,
+              "unsolved": 0,
+              "parse_error": 0,
+              "truncated": 0
+            }
+          },
+          {
+            "level": 3,
+            "level_value": 32,
+            "phase": "screen",
+            "valid": 5,
+            "solved": 5,
+            "decision": "advance",
+            "failures": {
+              "illegal_action": 0,
+              "unsolved": 0,
+              "parse_error": 0,
+              "truncated": 0
+            }
+          }
+        ]
       },
       "hanoi": {
         "status": "active",
-        "level": 0,
+        "level": 2,
         "phase": "screen",
-        "level_results": []
+        "level_results": [
+          {
+            "level": 0,
+            "level_value": 9,
+            "phase": "screen",
+            "valid": 5,
+            "solved": 4,
+            "decision": "advance",
+            "failures": {
+              "illegal_action": 0,
+              "unsolved": 1,
+              "parse_error": 0,
+              "truncated": 0
+            }
+          },
+          {
+            "level": 1,
+            "level_value": 10,
+            "phase": "screen",
+            "valid": 5,
+            "solved": 4,
+            "decision": "advance",
+            "failures": {
+              "illegal_action": 1,
+              "unsolved": 0,
+              "parse_error": 0,
+              "truncated": 0
+            }
+          }
+        ]
       },
       "path": {
-        "status": "active",
-        "level": 0,
+        "status": "service_blocked",
+        "level": 3,
         "phase": "screen",
-        "level_results": []
+        "level_results": [
+          {
+            "level": 0,
+            "level_value": 512,
+            "phase": "screen",
+            "valid": 5,
+            "solved": 4,
+            "decision": "advance",
+            "failures": {
+              "illegal_action": 1,
+              "unsolved": 0,
+              "parse_error": 0,
+              "truncated": 0
+            }
+          },
+          {
+            "level": 1,
+            "level_value": 1024,
+            "phase": "screen",
+            "valid": 5,
+            "solved": 5,
+            "decision": "advance",
+            "failures": {
+              "illegal_action": 0,
+              "unsolved": 0,
+              "parse_error": 0,
+              "truncated": 0
+            }
+          },
+          {
+            "level": 2,
+            "level_value": 2048,
+            "phase": "screen",
+            "valid": 5,
+            "solved": 5,
+            "decision": "advance",
+            "failures": {
+              "illegal_action": 0,
+              "unsolved": 0,
+              "parse_error": 0,
+              "truncated": 0
+            }
+          }
+        ],
+        "case_id": "path_level3_01"
       }
     },
     "summary": {
       "blocks": {
-        "planned": 5,
-        "finished": 0,
-        "valid_responses": 0,
+        "planned": 10,
+        "finished": 10,
+        "valid_responses": 10,
         "service_errors": 0,
-        "solved": 0,
-        "contract_pass": 0,
-        "optimal": 0,
-        "optimal_evaluated": 0,
-        "failures": {},
-        "output_tokens": 0,
-        "input_tokens": 0,
-        "strata": {}
-      },
-      "cube3": {
-        "planned": 5,
-        "finished": 0,
-        "valid_responses": 0,
-        "service_errors": 0,
-        "solved": 0,
-        "contract_pass": 0,
-        "optimal": 0,
-        "optimal_evaluated": 0,
-        "failures": {},
-        "output_tokens": 0,
-        "input_tokens": 0,
-        "strata": {}
-      },
-      "puzzle15": {
-        "planned": 5,
-        "finished": 1,
-        "valid_responses": 1,
-        "service_errors": 0,
-        "solved": 1,
-        "contract_pass": 1,
+        "solved": 10,
+        "contract_pass": 10,
         "optimal": 0,
         "optimal_evaluated": 0,
         "failures": {
-          "success": 1
+          "success": 10
         },
-        "output_tokens": 1124,
-        "input_tokens": 344,
+        "output_tokens": 160871,
+        "input_tokens": 4740,
+        "strata": {
+          "SZ10_connected_20": {
+            "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
+            "solved": 5
+          },
+          "SZ10_connected_24": {
+            "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
+            "solved": 5
+          }
+        }
+      },
+      "cube3": {
+        "planned": 10,
+        "finished": 7,
+        "valid_responses": 6,
+        "service_errors": 1,
+        "solved": 6,
+        "contract_pass": 6,
+        "optimal": 0,
+        "optimal_evaluated": 0,
+        "failures": {
+          "success": 6,
+          "service_error": 1
+        },
+        "output_tokens": 197735,
+        "input_tokens": 17799,
+        "strata": {
+          "scramble_12": {
+            "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
+            "solved": 5
+          },
+          "scramble_16": {
+            "finished": 2,
+            "valid_responses": 1,
+            "service_errors": 1,
+            "solved": 1
+          }
+        }
+      },
+      "puzzle15": {
+        "planned": 15,
+        "finished": 11,
+        "valid_responses": 10,
+        "service_errors": 1,
+        "solved": 10,
+        "contract_pass": 10,
+        "optimal": 0,
+        "optimal_evaluated": 0,
+        "failures": {
+          "success": 10,
+          "service_error": 1
+        },
+        "output_tokens": 134307,
+        "input_tokens": 7637,
         "strata": {
           "scramble_24": {
+            "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
+            "solved": 5
+          },
+          "scramble_32": {
+            "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
+            "solved": 5
+          },
+          "scramble_48": {
             "finished": 1,
-            "solved": 1
+            "valid_responses": 0,
+            "service_errors": 1,
+            "solved": 0
           }
         }
       },
       "hanoi": {
-        "planned": 5,
-        "finished": 1,
-        "valid_responses": 1,
-        "service_errors": 0,
-        "solved": 1,
-        "contract_pass": 1,
-        "optimal": 1,
-        "optimal_evaluated": 1,
+        "planned": 15,
+        "finished": 15,
+        "valid_responses": 14,
+        "service_errors": 1,
+        "solved": 10,
+        "contract_pass": 10,
+        "optimal": 10,
+        "optimal_evaluated": 14,
         "failures": {
-          "success": 1
+          "success": 10,
+          "unsolved": 1,
+          "illegal_action": 3,
+          "service_error": 1
         },
-        "output_tokens": 8073,
-        "input_tokens": 383,
+        "output_tokens": 209851,
+        "input_tokens": 9637,
         "strata": {
           "distance_255_511": {
-            "finished": 1,
-            "solved": 1
+            "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
+            "solved": 4
+          },
+          "distance_511_1023": {
+            "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
+            "solved": 4
+          },
+          "distance_1023_2047": {
+            "finished": 5,
+            "valid_responses": 4,
+            "service_errors": 1,
+            "solved": 2
           }
         }
       },
       "path": {
-        "planned": 5,
-        "finished": 1,
-        "valid_responses": 1,
-        "service_errors": 0,
-        "solved": 0,
-        "contract_pass": 0,
-        "optimal": 0,
-        "optimal_evaluated": 1,
+        "planned": 20,
+        "finished": 17,
+        "valid_responses": 16,
+        "service_errors": 1,
+        "solved": 15,
+        "contract_pass": 15,
+        "optimal": 15,
+        "optimal_evaluated": 16,
         "failures": {
-          "illegal_action": 1
+          "illegal_action": 1,
+          "success": 15,
+          "service_error": 1
         },
-        "output_tokens": 2516,
-        "input_tokens": 5880,
+        "output_tokens": 54577,
+        "input_tokens": 305166,
         "strata": {
           "nodes_512_eccentric_goal": {
-            "finished": 1,
-            "solved": 0
+            "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
+            "solved": 4
+          },
+          "nodes_1024_eccentric_goal": {
+            "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
+            "solved": 5
+          },
+          "nodes_2048_eccentric_goal": {
+            "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
+            "solved": 5
+          },
+          "nodes_4096_eccentric_goal": {
+            "finished": 2,
+            "valid_responses": 1,
+            "service_errors": 1,
+            "solved": 1
           }
         }
       }
     }
   },
+  "additional_stress_conditions": {
+    "puzzle15_distance_stress": {
+      "status": "running",
+      "tasks": {
+        "puzzle15": {
+          "status": "active",
+          "level": 1,
+          "phase": "screen",
+          "level_results": [
+            {
+              "level": 0,
+              "level_value": 128,
+              "phase": "screen",
+              "valid": 5,
+              "solved": 5,
+              "decision": "advance",
+              "failures": {
+                "illegal_action": 0,
+                "unsolved": 0,
+                "parse_error": 0,
+                "truncated": 0
+              }
+            }
+          ]
+        }
+      },
+      "summary": {
+        "puzzle15": {
+          "planned": 10,
+          "finished": 6,
+          "valid_responses": 5,
+          "service_errors": 1,
+          "solved": 5,
+          "contract_pass": 5,
+          "optimal": 0,
+          "optimal_evaluated": 0,
+          "failures": {
+            "success": 5,
+            "service_error": 1
+          },
+          "output_tokens": 96603,
+          "input_tokens": 1720,
+          "strata": {
+            "scramble_128": {
+              "finished": 5,
+              "valid_responses": 5,
+              "service_errors": 0,
+              "solved": 5
+            },
+            "scramble_256": {
+              "finished": 1,
+              "valid_responses": 0,
+              "service_errors": 1,
+              "solved": 0
+            }
+          }
+        }
+      },
+      "exceeded_output_limit": 0,
+      "updated_at": "2026-10-17T12:09:03.708245+00:00"
+    },
+    "puzzle15_far_stress": {
+      "status": "running",
+      "tasks": {
+        "puzzle15": {
+          "status": "active",
+          "level": 0,
+          "phase": "screen",
+          "level_results": []
+        }
+      },
+      "summary": {
+        "puzzle15": {
+          "planned": 5,
+          "finished": 1,
+          "valid_responses": 0,
+          "service_errors": 1,
+          "solved": 0,
+          "contract_pass": 0,
+          "optimal": 0,
+          "optimal_evaluated": 0,
+          "failures": {
+            "service_error": 1
+          },
+          "output_tokens": 0,
+          "input_tokens": 0,
+          "strata": {
+            "scramble_256": {
+              "finished": 1,
+              "valid_responses": 0,
+              "service_errors": 1,
+              "solved": 0
+            }
+          }
+        }
+      },
+      "exceeded_output_limit": 0,
+      "updated_at": "2026-10-17T12:09:04.118680+00:00"
+    },
+    "blocks_dense_stress": {
+      "status": "running",
+      "tasks": {
+        "blocks": {
+          "status": "active",
+          "level": 0,
+          "phase": "screen",
+          "level_results": []
+        }
+      },
+      "summary": {
+        "blocks": {
+          "planned": 5,
+          "finished": 4,
+          "valid_responses": 3,
+          "service_errors": 1,
+          "solved": 3,
+          "contract_pass": 3,
+          "optimal": 0,
+          "optimal_evaluated": 0,
+          "failures": {
+            "success": 3,
+            "service_error": 1
+          },
+          "output_tokens": 42674,
+          "input_tokens": 5619,
+          "strata": {
+            "SZ10_connected_28": {
+              "finished": 4,
+              "valid_responses": 3,
+              "service_errors": 1,
+              "solved": 3
+            }
+          }
+        }
+      },
+      "exceeded_output_limit": 0,
+      "updated_at": "2026-10-17T12:09:04.692385+00:00"
+    },
+    "path_distance_stress": {
+      "status": "completed_breakpoints_or_ranges",
+      "tasks": {
+        "path": {
+          "status": "service_blocked",
+          "level": 0,
+          "phase": "screen",
+          "level_results": [],
+          "case_id": "path_level0_02"
+        }
+      },
+      "summary": {
+        "path": {
+          "planned": 5,
+          "finished": 3,
+          "valid_responses": 2,
+          "service_errors": 1,
+          "solved": 2,
+          "contract_pass": 2,
+          "optimal": 2,
+          "optimal_evaluated": 2,
+          "failures": {
+            "success": 2,
+            "service_error": 1
+          },
+          "output_tokens": 9064,
+          "input_tokens": 8676,
+          "strata": {
+            "nodes_512_tree_eccentric_goal": {
+              "finished": 3,
+              "valid_responses": 2,
+              "service_errors": 1,
+              "solved": 2
+            }
+          }
+        }
+      },
+      "exceeded_output_limit": 0,
+      "updated_at": "2026-10-17T12:09:02.000855+00:00"
+    }
+  },
   "qwen_last_collected": {
-    "status": "running",
+    "status_at_collection": "running",
+    "remote_updated_at": "2026-10-17T11:09:42.960483+00:00",
+    "connection_status": "login02_timeout",
     "source_commit": "7c5295f",
     "summary": {
       "blocks": {
@@ -379,6 +849,8 @@
         "strata": {
           "placements_12": {
             "finished": 11,
+            "valid_responses": 11,
+            "service_errors": 0,
             "solved": 1
           }
         }
@@ -402,14 +874,20 @@
         "strata": {
           "distance_3": {
             "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
             "solved": 5
           },
           "distance_4": {
             "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
             "solved": 4
           },
           "distance_5": {
             "finished": 1,
+            "valid_responses": 1,
+            "service_errors": 0,
             "solved": 0
           }
         }
@@ -432,6 +910,8 @@
         "strata": {
           "distance_1_31": {
             "finished": 10,
+            "valid_responses": 10,
+            "service_errors": 0,
             "solved": 4
           }
         }
@@ -454,10 +934,14 @@
         "strata": {
           "distance_1": {
             "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
             "solved": 2
           },
           "distance_2": {
             "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
             "solved": 0
           }
         }
@@ -481,16 +965,20 @@
         "strata": {
           "distance_4": {
             "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
             "solved": 5
           },
           "distance_8": {
             "finished": 5,
+            "valid_responses": 5,
+            "service_errors": 0,
             "solved": 1
           }
         }
       }
     },
-    "gpus": [
+    "gpus_at_collection": [
       0,
       1,
       2,

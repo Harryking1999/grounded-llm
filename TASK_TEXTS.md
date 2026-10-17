@@ -465,35 +465,92 @@ Reason: The current node is the goal; no further move is needed.
 
 ### 汉诺塔：任务文字与监督格式
 
-状态：文字先占位，下一轮八盘候选与历史三至六盘实验分开记录。
+状态：整套文本已由用户确认，并按要求在动作中加入盘编号。八盘是新一轮候选，文字示例不代表八盘环境、训练或权重已经完成。
 
 #### 共享任务描述与规则
 
-三根柱 A/B/C；盘按大小编号，只能移动一根柱的顶盘到另一根柱，且不能把大盘放在小盘上。每次合法移动计一步，准确到达给定目标。盘大小与柱内显示顺序、起点／目标是否仅限整塔，需要在正式提示中明确。
+```text
+Find a valid sequence of moves from the initial configuration to the goal configuration, as short as you can.
+Reaching the goal is the first priority; among valid solutions, prefer fewer moves.
+
+Rules: There are three pegs, A, B, and C, and {disk_count} disks numbered from 1 (smallest) to {disk_count} (largest).
+Each peg lists its disks from bottom to top.
+An action move(disk_id,from,to) moves the specified disk from one peg to another. The disk must be on top of the source peg.
+Only one disk may be moved at a time. Never place a larger disk on a smaller disk.
+Each move costs one step.
+Reach the goal configuration exactly.
+
+Initial configuration:
+{initial_configuration}
+
+Goal configuration:
+{goal_configuration}
+```
+
+`configuration` 的显示格式如下；数字是固定盘编号，最右侧是柱顶，`[]` 表示空柱。八盘整塔初始摆放的说明例：
 
 ```text
-{task_description_and_rules_to_be_discussed}
+A: [8, 7, 6, 5, 4, 3, 2, 1]
+B: []
+C: []
 ```
+
+例如执行 `move(1,A,C)` 后：
+
+```text
+A: [8, 7, 6, 5, 4, 3, 2]
+B: []
+C: [1]
+```
+
+初始、当前和目标摆放均用相同格式，可表达任意合法目标，不只整塔。盘编号与本轮候选编号相互独立；加入盘编号不改变合法动作集合，解析时须校验它确为源柱顶盘。
 
 #### 地图组／CoT 组：每轮环境更新
 
-待填：各柱实际盘序、目标盘序、实际历史、本轮合法候选与物理移动的对应表；地图组额外获得当前／目标／合法后继 Q 槽位。
+地图组额外获得当前／目标／合法后继 Q 槽位；两组文字更新相同。
 
 ```text
-{environment_update_to_be_discussed}
+[Environment update]
+Current configuration:
+{current_configuration}
+Actual executed actions: {executed_actions_or_none}
+Legal next moves:
+{local_id}: move({disk_id},{from},{to})
+...
+Candidate numbers may change between turns; use only the numbers above.
+[/Environment update]
 ```
 
 #### SOTA 组／32B 组：输出格式
 
-待填完整移动序列与终止声明；共享任务描述和规则，反馈与预算在正式配置确定。
-
 ```text
-{sota_32b_output_contract_to_be_discussed}
+Plan the complete remaining sequence from the current configuration and output it once. There is no intermediate feedback; the judge stops at the first illegal action.
+Return JSON with "actions" (an array of objects with an integer "disk_id" and "from" and "to" fields, each containing "A", "B", or "C") and "final_status" ("solved", "no_solution", or "unsolved").
+Use "solved" when your sequence reaches the goal; if already at the goal, output an empty actions array. Use "no_solution" only when the goal is unreachable, not merely because you could not find a plan; otherwise use "unsolved".
 ```
 
 #### 监督答案：排序／Reason／Action
 
-待填排序、CoT／短 Reason、动作及停止答案。八盘示例、监督数据与权重尚未准备，历史六盘结果不填成八盘结果。
+```text
+Map-distance ranking to the goal, closest to farthest: {ranking}.
+Reason: Moving disk {disk_id} from {from} to {to} is legal and leaves a solvable configuration with one fewer move needed.
+<action>{local_id}</action>
+```
+
+排序规则沿用积木，最近的至多 10 个候选加 `current`，用 `<`、`=` 表示远近与并列。无地图组直接去掉排序行，保留相同 Reason 与控制标签。
+
+动作直接到达目标时，Reason 改为：
+
+```text
+Reason: Moving disk {disk_id} from {from} to {to} is legal and reaches the goal configuration.
+```
+
+已在目标时：
+
+```text
+Reason: The current configuration exactly matches the goal; no further move is needed.
+<done/>
+```
 
 
 ### 数据说明例

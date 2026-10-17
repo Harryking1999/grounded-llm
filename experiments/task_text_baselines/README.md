@@ -74,6 +74,16 @@ python -m experiments.task_text_baselines.src.retest_report --baseline runs/five
 
 ## 当前范围与补充探索
 
+用户追加授权 [积木逐步状态对照](configs/sol56_blocks40_state_report.json)：5.6-sol high 重做原 40 题，仅在冻结提示词后追加每步 `board_after`（十行、每行十位的完整棋盘）要求，仍一次输出完整计划。新组请求与评分上限均为 16k；与原无状态组 37/40 配对比较执行成功、预算内成功、严格合同和合法前缀逐步状态准确率。模型自报状态不反馈给环境。原组混用请求上限的限制仍明确注明。
+
+```powershell
+python -m experiments.task_text_baselines.src.prepare_retest --config experiments/task_text_baselines/configs/sol56_blocks40_state_report.json --out runs/sol56_blocks40_state_report
+python -u -m experiments.task_text_baselines.src.run --out runs/sol56_blocks40_state_report --budget-config experiments/task_text_baselines/configs/budget_16k.json
+python -m experiments.task_text_baselines.src.state_report --baseline runs/five_task_sol56_high_same40 --run runs/sol56_blocks40_state_report --out experiments/task_text_baselines/results
+```
+
+原始答卷在上述忽略目录；后台汇总写入 `runs/sol56_blocks40_state_report/summary/`，正式报告为回收快照。
+
 题集配置仍为 [sol_high_40.json](configs/sol_high_40.json) 与 [qwen32b_same40.json](configs/qwen32b_same40.json)，评分另由上述预算合同决定。两组各 200 题均已完成；原执行成功 32B 40、GPT 195，按 16k 重算为 32B 38、GPT 183，完整设置见[主报告](results/report.md)。题目未因筛选或评分标准改变而重新采样。
 
 所有加难配置现已停用，包括 `difficulty_20.json`。运行目录中的 `stop_requested` 阻止继续派题，已发出的请求正常落盘后退出。15×15 积木、三阶魔方、5×5 华容道和十一盘汉诺塔只作为[补充探索](results/difficulty_exploration.md)保留，不要求测满其原计划，也不与原各 40 题合并。更早的五题初筛、28 块积木和寻路加难同样保留原始答卷，不再运行。

@@ -1,0 +1,22 @@
+{
+  "study": "blocks_state_report_comparison",
+  "seed": 20261017,
+  "source_suite": "runs/five_task_sol56_high_same40/suite.json",
+  "case_mode": "blocks_state_report",
+  "expected_cases": 40,
+  "samples_per_case": 1,
+  "format_addition": "For every action, also include \"board_after\": an array of exactly ten strings of ten binary characters (0 or 1), representing the entire current board immediately after that removal, in the same row and column order as the input.",
+  "api": {
+    "base_url": "https://jarodfund.xyz/v1",
+    "model": "gpt-5.6-sol",
+    "reasoning_effort": "high",
+    "max_output_tokens": 16000,
+    "scoring_output_limit": 16000,
+    "timeout_seconds": 900,
+    "concurrency": 4,
+    "max_service_retries": 10,
+    "max_total_service_retries": 80,
+    "service_retry_delay_seconds": 30
+  },
+  "comparison": "Use the same forty original 10x10, eight-shape, twelve-placement boards and literal prompts; append only the board_after format requirement. One complete plan with no tools or intermediate feedback. Score execution separately from predicted state accuracy and the stricter output contract. Output budget includes reasoning and final answer; overrun is failure and is never resampled. Historical no-state answers had mixed requested limits, although all forty reported outputs fit 16000; disclose that limitation rather than claiming a perfectly isolated generation condition."
+}

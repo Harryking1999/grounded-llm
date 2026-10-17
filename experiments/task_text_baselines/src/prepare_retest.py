@@ -6,6 +6,7 @@ from pathlib import Path
 import subprocess
 
 from experiments.sol_dag_blocks.src.tasks import BlocksTask
+from experiments.gcml_counterexamples.src import blocks
 from .difficulty import harder_prompt
 from .protocol import ROOT, judge
 from .run import write_json
@@ -16,6 +17,11 @@ def retest_cases(config, source):
         raise ValueError('Retests use exactly one valid answer per question')
     if config['case_mode'] == 'copy_frozen':
         cases = deepcopy(source['cases'])
+    elif config['case_mode'] == 'blocks_state_report':
+        cases = deepcopy([c for c in source['cases'] if c['task'] == 'blocks'])
+        for case in cases:
+            case['state_report_required'] = True
+            case['prompt'] += '\n\n'+config['format_addition']
     elif config['case_mode'] == 'legacy_blocks12_new_prompt':
         options = source['config']['blocks']
         rules = BlocksTask(options)
@@ -35,7 +41,13 @@ def retest_cases(config, source):
     if len(cases) != config['expected_cases']:
         raise ValueError('Source question count differs from the committed contract')
     for case in cases:
-        verdict = judge(case,json.dumps({'actions':case['reference']['actions'], 'final_status':'solved'}))
+        actions = deepcopy(case['reference']['actions'])
+        if case.get('state_report_required'):
+            state = case['initial']
+            for action in actions:
+                state = blocks.apply(state,action)
+                action['board_after'] = blocks.to_grid(state).split('/')
+        verdict = judge(case,json.dumps({'actions':actions, 'final_status':'solved'}))
         if not verdict['contract_pass']:
             raise ValueError(f"Reference replay failed: {case['id']}")
     return cases

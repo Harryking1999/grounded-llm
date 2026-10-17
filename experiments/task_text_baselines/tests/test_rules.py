@@ -19,9 +19,41 @@ from experiments.task_text_baselines.src.report import build
 from experiments.task_text_baselines.src.prepare_retest import retest_cases
 from experiments.sol_dag_blocks.src.tasks import BlocksTask
 from experiments.task_text_baselines.src.budget import rescore
+from experiments.gcml_counterexamples.src import blocks
 
 
 class TaskRulesTest(unittest.TestCase):
+    def test_state_report_retest_changes_only_output_requirement(self):
+        action = {'shape_id':4,'row':0,'col':0}
+        case = {'id':'blocks_00','task':'blocks','initial':1+(1<<10),'goal':0,
+                'prompt':'original frozen prompt','reference':{'length':1,'actions':[action]}}
+        config = {'case_mode':'blocks_state_report','expected_cases':1,'samples_per_case':1,
+                  'format_addition':'Predict board_after.'}
+        repeated, = retest_cases(config,{'cases':[case]})
+        self.assertEqual(repeated['prompt'],case['prompt']+'\n\n'+config['format_addition'])
+        self.assertEqual(repeated['reference'],case['reference'])
+        self.assertNotIn('state_report_required',case)
+        self.assertTrue(repeated['state_report_required'])
+
+    def test_reported_board_never_overrides_real_state_or_execution_score(self):
+        case = {'task':'blocks','initial':1+(1<<10),'goal':0,'reference':{'length':1},
+                'state_report_required':True}
+        action = {'shape_id':4,'row':0,'col':0}
+        missing = judge(case,json.dumps({'actions':[action],'final_status':'solved'}))
+        self.assertTrue(missing['solved'])
+        self.assertFalse(missing['contract_pass'])
+        self.assertEqual(missing['state_reports_valid'],0)
+        wrong = action | {'board_after':blocks.to_grid(case['initial']).split('/')}
+        result = judge(case,json.dumps({'actions':[wrong],'final_status':'solved'}))
+        self.assertTrue(result['solved'])
+        self.assertEqual(result['state_reports_correct'],0)
+        correct = action | {'board_after':['0'*10]*10}
+        self.assertTrue(judge(case,json.dumps({'actions':[correct],'final_status':'solved'}))['contract_pass'])
+        repeated = judge(case,json.dumps({'actions':[wrong,correct],'final_status':'solved'}))
+        self.assertFalse(repeated['solved'])
+        self.assertEqual(repeated['first_illegal_index'],1)
+        self.assertEqual(repeated['state_reports_evaluated'],1)
+
     def test_budget_counts_reasoning_and_answer_and_preserves_execution(self):
         record = {'verdict':{'solved':True,'contract_pass':True,'optimal':True},
                   'usage':{'output_tokens':16001,'output_tokens_details':{'reasoning_tokens':15999}}}

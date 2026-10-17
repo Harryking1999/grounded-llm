@@ -68,6 +68,7 @@ def judge(case, raw):
         from experiments.sol_dag_blocks.src.tasks import BlocksTask
         shape_rules = BlocksTask(case["shape_options"])
     illegal, detail, executed = None, None, 0
+    reports_valid, reports_correct = 0, 0
     for index, action in enumerate(actions):
         try:
             if task == "blocks":
@@ -85,13 +86,25 @@ def judge(case, raw):
         except (ValueError, TypeError, KeyError, IndexError) as error:
             illegal, detail = index, str(error)
             break
+        if task == 'blocks' and case.get('state_report_required'):
+            expected = shape_rules.to_rows(int(state)) if shape_rules else blocks.to_grid(int(state)).split('/')
+            reported = action.get('board_after')
+            valid = (isinstance(reported,list) and len(reported) == len(expected) and
+                     all(isinstance(row,str) and len(row) == len(expected[0]) and not set(row)-{'0','1'} for row in reported))
+            reports_valid += valid
+            reports_correct += valid and reported == expected
     solved = illegal is None and state == goal
     status = output.get("final_status")
     status_correct = status == ("solved" if solved else "unsolved")
     minimum = case["reference"]["length"]
-    return {"solved": solved, "contract_pass": solved and strict and status_correct,
+    result = {"solved": solved, "contract_pass": solved and strict and status_correct,
             "strict_json": strict, "status_correct": status_correct, "reported_status": status,
             "failure": "illegal_action" if illegal is not None else None if solved else "unsolved",
             "first_illegal_index": illegal, "illegal_detail": detail, "executed": executed,
             "plan_length": len(actions), "optimal": solved and len(actions) == minimum if minimum is not None else None,
             "excess_moves": len(actions) - minimum if solved and minimum is not None else None}
+    if task == 'blocks' and case.get('state_report_required'):
+        result.update(state_reports_evaluated=executed,state_reports_valid=reports_valid,
+                      state_reports_correct=reports_correct)
+        result['contract_pass'] = result['contract_pass'] and reports_correct == executed
+    return result

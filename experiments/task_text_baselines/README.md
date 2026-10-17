@@ -64,6 +64,8 @@ python -u -m experiments.task_text_baselines.src.qwen --suite /path/to/frozen/su
 
 若二十四块档位耗尽仍未确认困难条件，队列接上[密集积木条件](configs/blocks_dense_stress.json)的二十八块，保持十形状和 10×10 尺寸。原始构造中记录形状与占格数；密度接近上限时可行性会改变实际形状比例，不把差异归因于块数一个因素。二十八块的五题已通过生成与参考解回放；三十块虽能生成单题，批量检查仍失败，三十二块也未通过当前有界构造，因此两档均不派题、不记作模型失败。
 
+三度寻路图在 2048 节点仍全部解出，因此另补[长路径条件](configs/path_distance_stress.json)：均匀带标号树，精确最短距离至少 64，保持原无向无权规则和文字模板；BFS 参考解只供裁判使用。树图改变了拓扑及路径长度，结果单列于 `runs/path_distance_stress/`，不归因于节点数一个因素。仍采用五题初筛与十题独立确认。
+
 ```powershell
 python -u -m experiments.task_text_baselines.src.escalate --config experiments/task_text_baselines/configs/difficulty_ladder.json --out runs/five_task_sol_challenge
 ```

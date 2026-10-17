@@ -1,5 +1,6 @@
 """Prepare replay-verified harder conditions from the existing task text."""
 from collections import deque
+import heapq
 import json
 import random
 
@@ -10,6 +11,38 @@ from .prepare import make_hanoi
 from .protocol import ROOT, prompt, section_text, judge
 
 INVERSE = {"Up":"Down","Down":"Up","Left":"Right","Right":"Left"}
+
+
+def graph_distances(graph,source):
+    depths,queue = {source:0},deque([source])
+    while queue:
+        node = queue.popleft()
+        for child in graph[node]:
+            if child not in depths:
+                depths[child] = depths[node] + 1
+                queue.append(child)
+    return depths
+
+
+def uniform_tree(size,rng):
+    sequence = [rng.randrange(size) for _ in range(size-2)]
+    degree = [1]*size
+    for node in sequence:
+        degree[node] += 1
+    leaves = [node for node in range(size) if degree[node] == 1]
+    heapq.heapify(leaves)
+    graph = {node:[] for node in range(size)}
+    for node in sequence:
+        leaf = heapq.heappop(leaves)
+        graph[leaf].append(node)
+        graph[node].append(leaf)
+        degree[node] -= 1
+        if degree[node] == 1:
+            heapq.heappush(leaves,node)
+    a,b = leaves
+    graph[a].append(b)
+    graph[b].append(a)
+    return graph
 
 
 def scramble(task,length,rng):
@@ -94,7 +127,17 @@ def prepare_level(task,level,options,config):
     cases,seen = [],set()
     value = levels(task,options)[level]
     if task == "path":
-        graph = regular_connected_graph(value,options["regular_degree"],rng)
+        if options.get('family') == 'uniform_tree':
+            for _ in range(1000):
+                graph = uniform_tree(value,rng)
+                distances = graph_distances(graph,0)
+                end = max(distances,key=distances.get)
+                if max(graph_distances(graph,end).values()) >= options['minimum_distance']:
+                    break
+            else:
+                raise ValueError('Unable to generate a tree with the configured distance floor')
+        else:
+            graph = regular_connected_graph(value,options["regular_degree"],rng)
         neighbors = {str(n):sorted(vs) for n,vs in graph.items()}
     if task == "hanoi":
         maximum = 2**value-1
@@ -115,18 +158,15 @@ def prepare_level(task,level,options,config):
             case = rows[len(cases)]
         else:
             source = rng.randrange(value)
-            depths,queue = {source:0},deque([source])
-            while queue:
-                node = queue.popleft()
-                for child in graph[node]:
-                    if child not in depths:
-                        depths[child] = depths[node]+1
-                        queue.append(child)
+            depths = graph_distances(graph,source)
             farthest = max(depths.values())
+            if farthest < options.get('minimum_distance',0):
+                continue
             goal = rng.choice([n for n,d in depths.items() if d == farthest])
             actions = shortest(graph,source,goal)
+            family = '_tree' if options.get('family') == 'uniform_tree' else ''
             case = {"task":"path","initial":source,"goal":goal,"neighbors":neighbors,
-                    "stratum":f"nodes_{value}_eccentric_goal","reference":{"length":len(actions),"actions":actions}}
+                    "stratum":f"nodes_{value}{family}_eccentric_goal","reference":{"length":len(actions),"actions":actions}}
         identity = json.dumps([case["initial"],case["goal"]])
         if identity in seen:
             continue

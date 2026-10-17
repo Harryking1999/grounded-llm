@@ -1,0 +1,15 @@
+{
+  "study": "adaptive_complete_plan_difficulty",
+  "seed": 20261021,
+  "api_config": "experiments/task_text_baselines/configs/sol_high_40.json",
+  "service_recovery": "experiments/task_text_baselines/configs/service_recovery.json",
+  "baseline_run": "runs/five_task_sol_high_40",
+  "prior_screen_run": "runs/five_task_sol_challenge",
+  "initial_levels": {"path": 0},
+  "cases_per_level": 5,
+  "concurrency": 1,
+  "confirmation_cases": 10,
+  "maximum_solved_fraction": 0.5,
+  "tasks": {"path": {"node_counts": [512,1024,2048], "family": "uniform_tree", "minimum_distance": 64}},
+  "policy": "The regular-graph ladder remained easy through 2048 nodes while paths remained short. Supplement it with uniformly sampled labelled trees, rejecting trees with diameter below 64, then sampling distinct source/farthest-goal pairs with exact distance at least 64. Freeze five cases per level and use ten fresh cases for confirmation when at most half solve. Keep rules, prompt template, model request and output budget unchanged. Record the changed graph family and exact path lengths; do not attribute differences only to node count or mix these cases with original success rates. The judge and BFS references are not available to the model. Preserve every valid answer and retry service failures only."
+}

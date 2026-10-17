@@ -6,7 +6,7 @@ import urllib.error
 
 from experiments.hanoi_qmap.src.environment import Hanoi
 from experiments.task_text_baselines.src import cube2, cube3, hanoi, puzzle8, puzzle15
-from experiments.task_text_baselines.src.difficulty import prepare_level
+from experiments.task_text_baselines.src.difficulty import graph_distances, prepare_level
 from experiments.task_text_baselines.src.escalate import decision
 from experiments.task_text_baselines.src.protocol import ROOT
 from experiments.task_text_baselines.src.protocol import judge, prompt
@@ -15,6 +15,20 @@ from experiments.task_text_baselines.src.qwen import final_text, round_robin
 
 
 class TaskRulesTest(unittest.TestCase):
+    def test_path_distance_stress_is_connected_undirected_and_long(self):
+        config = json.loads((ROOT/'experiments/task_text_baselines/configs/path_distance_stress.json').read_text())
+        config['cases_per_level'] = 2
+        for case in prepare_level('path',0,config['tasks']['path'],config):
+            graph = case['neighbors']
+            self.assertEqual(sum(map(len,graph.values())),2*(len(graph)-1))
+            integer_graph = {int(node):neighbors for node,neighbors in graph.items()}
+            self.assertEqual(len(graph_distances(integer_graph,0)),len(graph))
+            for source,neighbors in graph.items():
+                for target in neighbors:
+                    self.assertIn(int(source),graph[str(target)])
+            self.assertGreaterEqual(case['reference']['length'],64)
+            self.assertNotIn('reference',case['prompt'])
+
     def test_service_retry_waits_without_changing_the_request(self):
         case = {'id':'retry','task':'path','stratum':'hard','prompt':'frozen'}
         api = {'model':'requested','reasoning_effort':'high','max_output_tokens':32768,

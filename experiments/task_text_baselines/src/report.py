@@ -35,7 +35,7 @@ def build(run):
     screening,confirmation = policy.get('cases_per_level',5),policy.get('confirmation_cases',10)
     lines = ["# 逐项加难试验" if adaptive else "# 五任务纯文字完整规划基线", "",
              f"状态：{progress['status']}。模型请求：`{progress['api']['model']}`；推理设置：`{progress['api']['reasoning_effort']}`。",
-             "", f"每档先测 {screening} 题，成功率不高于一半时用同档 {confirmation} 道独立新题确认；仍不高于一半才标记找到困难条件。格式问题单列，打乱步数不等于最短距离。" if adaptive else "同一套各 40 题，一次输出完整计划，无工具、无中途反馈。主指标为环境回放到达目标，最优解和输出格式另计。",
+             "", f"每档先测 {screening} 题，成功率不高于一半时用同档 {confirmation} 道独立新题确认；仍不高于一半才标记找到困难条件。格式问题单列，打乱步数不等于最短距离。" if adaptive else f"冻结题集共 {len(suite['cases'])} 题，一次输出完整计划，无工具、无中途反馈。主指标为环境回放到达目标，最优解和输出格式另计。",
              "", "| 任务 | 有效答卷／计划 | 待补服务失败 | 解出 | 严格合同通过 | 最优解 |", "|---|---:|---:|---:|---:|---:|"]
     for task, values in results.items():
         optimal = str(values['optimal']) if values['optimal_evaluated'] else '—'

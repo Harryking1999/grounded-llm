@@ -87,6 +87,7 @@ def render_report(baseline,qwen):
     lines += ['',f"GPT 的 {metadata['effort_counts'].get('high',0)}/200 份答卷回显模型名及 high，其余未回传强度；{baseline['exceeded_output_limit']} 份答卷超过请求 token 上限。因此报告为第三方接口下的实测结果，不声称后台配置独立核验或严格等预算。",'',
               '## 配置与补充','',
               '[初始题集配置](../configs/sol_high_40.json) · [32B 推理配置](../configs/qwen32b_same40.json) · [复现说明](../README.md)', '',
+              '新增 [5.6 同题五任务与 6.1 旧十二块题复测](model_retest.md)单独呈现，主表保留上述完整结果。','',
               '此前加难探索已停止派新题，已有答卷保留为[补充结果](difficulty_exploration.md)，不混入主表、不再要求补满原加难计划。原始题目、答案和服务记录保存在 Git 外的 runs/。','']
     return '\n'.join(lines)
 

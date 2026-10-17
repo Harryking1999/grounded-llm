@@ -44,6 +44,26 @@ python -u -m experiments.task_text_baselines.src.qwen --suite /path/to/frozen/su
 
 028 恢复连接后已回收完整 200 题，真实执行解出 40 题；逐题提示词与 GPT 原题集完全一致，全部未截断答案重新回放后与原判分一致。完整对照及失败类型见 [结果报告](results/report.md)。无需重启已完成的评测。
 
+## 新增模型与旧题复测
+
+用户授权新增两组，每题一次有效答案，结果单列在[复测报告](results/model_retest.md)：
+
+| 组别 | 题目与文字 | 配置 |
+|---|---|---|
+| 5.6-sol 五任务 | 逐字复用原五任务 200 题、提示词与参考解，不重新采样 | [同题合同](configs/sol56_high_same40.json) |
+| 6.1-sol 旧十二块 | 原 16 张棋盘与含 S/Z 十形状；当前规则和完整计划 JSON，不要求 board_after | [旧题合同](configs/sol61_legacy_blocks12_new_prompt.json) |
+
+两组均请求 high，输出预算与原 6.1 组相同；实际超限与回显缺失分别记录。旧十二块的构造解只保证可解，不作为精确最短解。历史 5.6 使用 medium、旧提示词、每题八次，不能用该历史差值单独判断模型升级幅度。当前已完成的 6.1 与 32B 原答卷不重跑。
+
+```powershell
+python -m experiments.task_text_baselines.src.prepare_retest --config experiments/task_text_baselines/configs/sol56_high_same40.json --out runs/five_task_sol56_high_same40
+python -m experiments.task_text_baselines.src.prepare_retest --config experiments/task_text_baselines/configs/sol61_legacy_blocks12_new_prompt.json --out runs/sol61_legacy_blocks12_new_prompt
+# 为两个目录分别调用现有 src.run；仅从环境传入 GND_API_KEY。
+python -m experiments.task_text_baselines.src.retest_report --baseline runs/five_task_sol_high_40 --sol56 runs/five_task_sol56_high_same40 --legacy runs/sol61_legacy_blocks12_new_prompt --out experiments/task_text_baselines/results
+```
+
+复测队列只重试服务错误，正常答错和截断均保留；原始回答位于上面的忽略目录。
+
 ## 当前范围与补充探索
 
 主配置仍为 [sol_high_40.json](configs/sol_high_40.json) 与 [qwen32b_same40.json](configs/qwen32b_same40.json)。两组各 200 题均已完成；32B 解出 40 题，GPT 解出 195 题，完整任务设置与最优性见[主报告](results/report.md)。原始配置未因筛选标准改变而重新采样，正常错误答案也不重抽。

@@ -16,9 +16,37 @@ from experiments.task_text_baselines.src.run import call, extract_text, pending,
 from experiments.task_text_baselines.src.qwen import final_text, round_robin
 from experiments.task_text_baselines.src.prepare_difficulty import reuse_answers
 from experiments.task_text_baselines.src.report import build
+from experiments.task_text_baselines.src.prepare_retest import retest_cases
+from experiments.sol_dag_blocks.src.tasks import BlocksTask
 
 
 class TaskRulesTest(unittest.TestCase):
+    def test_retest_copies_literal_prompts_and_keeps_source_unchanged(self):
+        source = {'cases':[{'id':'path_00','task':'path','initial':0,'goal':1,
+                  'neighbors':{'0':[1],'1':[0]},'prompt':'literal original prompt',
+                  'reference':{'length':1,'actions':[{'from':0,'to':1}]}}]}
+        config = {'case_mode':'copy_frozen','samples_per_case':1,'expected_cases':1}
+        copied = retest_cases(config,source)
+        self.assertEqual(copied,source['cases'])
+        copied[0]['prompt'] = 'modified'
+        self.assertEqual(source['cases'][0]['prompt'],'literal original prompt')
+
+    def test_legacy_retest_keeps_sz_shape_ids_with_new_output_contract(self):
+        options = json.loads((ROOT/'experiments/sol_dag_blocks/configs/sol_medium.json').read_text())['blocks']
+        rules = BlocksTask(options)
+        mask = rules.by_action[6,0,0]
+        source = {'config':{'blocks':options},'cases':[{'id':'blocks12_00','condition':'blocks12',
+                  'grid':'/'.join(rules.to_rows(mask)),'construction_objects':1,
+                  'construction_reference':[{'shape_id':6,'row':0,'col':0}]}]}
+        config = {'case_mode':'legacy_blocks12_new_prompt','source_condition':'blocks12',
+                  'samples_per_case':1,'expected_cases':1}
+        case, = retest_cases(config,source)
+        self.assertEqual(case['initial'],mask)
+        self.assertIn('6=011/110',case['prompt'])
+        self.assertNotIn('board_after',case['prompt'])
+        self.assertIsNone(case['reference']['length'])
+        self.assertFalse(judge(case,json.dumps({'actions':[{'shape_id':6,'row':0,'col':0}],'final_status':'solved'}))['optimal'])
+
     def test_report_distinguishes_requested_high_from_returned_metadata(self):
         with TemporaryDirectory() as temporary:
             folder = Path(temporary)

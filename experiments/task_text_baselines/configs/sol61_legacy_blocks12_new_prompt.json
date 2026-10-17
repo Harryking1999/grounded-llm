@@ -1,0 +1,21 @@
+{
+  "study": "frozen_task_text_retest",
+  "seed": 20261017,
+  "source_suite": "experiments/sol_dag_blocks/runs/suite.json",
+  "case_mode": "legacy_blocks12_new_prompt",
+  "source_condition": "blocks12",
+  "expected_cases": 16,
+  "samples_per_case": 1,
+  "api": {
+    "base_url": "https://jarodfund.xyz/v1",
+    "model": "gpt-6.1-sol",
+    "reasoning_effort": "high",
+    "max_output_tokens": 32768,
+    "timeout_seconds": 900,
+    "concurrency": 2,
+    "max_service_retries": 10,
+    "max_total_service_retries": 32,
+    "service_retry_delay_seconds": 30
+  },
+  "comparison": "Keep all sixteen historical twelve-placement boards and their original ten shapes including S/Z. Render current shared task rules and complete-plan JSON contract with that shape catalogue; do not require board_after. One valid answer per case. Historical 5.6 results used medium, eight samples per board and a different prompt, so this is not an isolated model upgrade comparison. Construction witnesses certify solvability, not optimality."
+}

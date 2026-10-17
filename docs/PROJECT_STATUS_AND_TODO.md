@@ -22,6 +22,8 @@
 
 积木完整基线设置与最优结果见[实验报告](../experiments/map_sft_baselines/results/report.md)；10k B2 整题失败分解和四检查点诊断见[专项诊断](../experiments/map_sft_baselines/results/b2_10k_diagnosis.md)。502/510 题出现不可恢复动作，362 题前两步就已失败；固定输出 49 不是全局机制。数据多样性和学习率时程仍未拆开。
 
+本轮 GPT 五任务、同题 32B 和逐项加难的进展与失败案例统一见[纯文字评测结果](../experiments/task_text_baselines/results/report.md)，不与旧 SFT 指标混用。
+
 ## 3. 短期有序 TODO
 
 1. **维护任务文字与对应裁判。**五项任务文字已填齐；用户授权按当前文本开展纯文字基线。魔方六面转换、八盘汉诺塔与 8-Puzzle 规则已实现；新增三阶魔方、4×4 华容道和含 S/Z 积木加难条件。11 项针对性检查通过，原 200 题及各加难档生成的参考方案均通过回放。逐轮地图／CoT 的模型接口接入仍待后续落实。

@@ -1,5 +1,6 @@
-"""Run the authorized difficulty ladder, stopping each task at its first model error."""
+"""Find harder task conditions and confirm them on independent fresh questions."""
 import argparse
+from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 from datetime import datetime, timezone
 import json
 import os
@@ -17,12 +18,11 @@ def latest_records(folder):
     return {row["case_id"]:row for row in sorted(rows,key=lambda r:(r["case_id"],r["attempt"]))}
 
 
-def baseline_failure(folder,task):
-    original_task = {"cube3":"cube2","puzzle15":"puzzle8"}.get(task,task)
-    for row in latest_records(folder).values():
-        if row["task"] == original_task and not row.get("service_error") and not row["verdict"].get("solved"):
-            return {"case_id":row["case_id"],"origin":"original_baseline","verdict":row["verdict"]}
-    return None
+def decision(rows, phase, config):
+    fraction = sum(bool(row['verdict'].get('solved')) for row in rows)/len(rows)
+    if fraction > config['maximum_solved_fraction']:
+        return 'advance'
+    return 'confirm' if phase == 'screen' else 'difficulty_confirmed'
 
 
 def main():
@@ -38,11 +38,22 @@ def main():
     out = Path(args.out)
     (out/"records").mkdir(parents=True,exist_ok=True)
     source_commit = subprocess.check_output(["git","rev-parse","HEAD"],cwd=ROOT,text=True).strip()
-    suite = json.loads((out/"suite.json").read_text()) if (out/"suite.json").exists() else {
+    suite = json.loads((out/"suite.json").read_text(encoding="utf-8")) if (out/"suite.json").exists() else {
         "config":dict(config,api=api),"source_commit":source_commit,"cases":[]}
-    state = json.loads((out/"progress.json").read_text()) if (out/"progress.json").exists() else {
-        "status":"running","started_at":datetime.now(timezone.utc).isoformat(),"source_commit":source_commit,
-        "api":api,"tasks":{task:{"status":"active","level":0} for task in config["tasks"]}}
+    state = json.loads((out/"progress.json").read_text(encoding="utf-8")) if (out/"progress.json").exists() else {
+        "started_at":datetime.now(timezone.utc).isoformat(),"source_commit":source_commit,
+        "tasks":{task:{"status":"active","level":0} for task in config["tasks"]}}
+    if state.get('stop_policy') != config['policy']:
+        state.setdefault('policy_history',[]).append({'source_commit':state.get('policy_source_commit',state['source_commit']),
+                                                     'policy':state.get('stop_policy'),'tasks':json.loads(json.dumps(state['tasks']))})
+    for item in state['tasks'].values():
+        if item['status'] == 'model_error_found':
+            item['status'] = 'active'
+            item.setdefault('historical_first_errors',[]).append(item.pop('first_error'))
+        item.setdefault('phase','screen')
+        item.setdefault('level_results',[])
+    suite['current_policy'] = dict(config,source_commit=source_commit)
+    state.update(status='running',api=api,stop_policy=config['policy'],policy_source_commit=source_commit)
     latest = latest_records(out)
     key = os.environ["GND_API_KEY"]
 
@@ -51,87 +62,107 @@ def main():
         write_json(out/"suite.json",suite)
         write_json(out/"progress.json",state)
 
-    state["status"] = "running"
-    state["stop_policy"] = config["policy"]
-    state["policy_source_commit"] = source_commit
-    # Formatting is secondary to reaching the goal; retain the answer and continue.
-    for item in state["tasks"].values():
-        if item["status"] == "model_error_found" and item.get("first_error",{}).get("verdict",{}).get("solved"):
-            item["status"] = "active"
-            del item["first_error"]
-    for task,item in state["tasks"].items():
-        if task not in config["stop_from_original_baseline"] and item.get("first_error",{}).get("origin") == "original_baseline":
-            item["status"] = "active"
-            del item["first_error"]
-    save()
-    fatal = False
-    while not fatal and any(row["status"] == "active" for row in state["tasks"].values()):
-        for task,options in config["tasks"].items():
-            item = state["tasks"][task]
-            if item["status"] != "active":
-                continue
-            if (out/"stop_requested").exists():
-                state["status"] = "stopped"
-                save()
-                return
-            failure = baseline_failure(ROOT/config["baseline_run"],task) if task in config["stop_from_original_baseline"] else None
-            if failure:
-                item.update(status="model_error_found",first_error=failure)
-                save()
-                continue
-            level = item["level"]
+    def next_case(task):
+        item,options = state['tasks'][task],config['tasks'][task]
+        while item['status'] == 'active':
+            level,phase = item['level'],item['phase']
             if level >= len(levels(task,options)):
-                item["status"] = "range_exhausted"
-                save()
-                continue
-            cases = [case for case in suite["cases"] if case["task"] == task and case["level"] == level]
+                item['status'] = 'range_exhausted'
+                return None
+            cases = [case for case in suite['cases'] if case['task'] == task and case['level'] == level
+                     and case.get('phase','screen') == phase]
             if not cases:
-                cases = prepare_level(task,level,options,config)
-                suite["cases"].extend(cases)
-                save()
-            selected = None
-            for case in cases:
-                record = latest.get(case["id"])
-                if record is not None and not record.get("service_error"):
-                    if not record["verdict"].get("solved"):
-                        item.update(status="model_error_found",first_error={"case_id":case["id"],"origin":"difficulty_ladder","level_value":case["level_value"],"verdict":record["verdict"]})
+                generation = dict(config)
+                if phase == 'confirm':
+                    generation.update(cases_per_level=config['confirmation_cases'],seed=config['seed']+10000000)
+                for retry in range(100):
+                    generated = prepare_level(task,level,options,generation)
+                    prior = {json.dumps([case['initial'],case['goal']]) for case in suite['cases'] if case['task'] == task}
+                    if all(json.dumps([case['initial'],case['goal']]) not in prior for case in generated):
                         break
+                    generation['seed'] += 1000000
+                else:
+                    raise ValueError('Cannot construct independent confirmation set')
+                for case in generated:
+                    case['phase'] = phase
+                    if phase == 'confirm':
+                        case['id'] = case['id'].replace('_level','_confirm_level')
+                suite['cases'].extend(generated)
+                cases = generated
+                save()
+            for case in cases:
+                record = latest.get(case['id'])
+                if record and not record.get('service_error'):
                     continue
-                if record and record["attempt"] > api["max_service_retries"]:
-                    item.update(status="service_blocked",case_id=case["id"])
-                    break
-                selected = case
-                break
-            if item["status"] != "active":
-                save()
-                continue
-            if selected is None:
-                item["level"] += 1
-                save()
-                continue
-            attempt = latest.get(selected["id"],{}).get("attempt",0)+1
-            if attempt > 1 and sum(max(0,row["attempt"]-1) for row in latest.values()) >= api["max_total_service_retries"]:
-                state["status"] = "service_budget_exhausted"
-                save()
-                return
-            state["inflight"] = [selected["id"]]
+                if record and record['attempt'] > api['max_service_retries']:
+                    item.update(status='service_blocked',case_id=case['id'])
+                    return None
+                return case
+            rows = [latest[case['id']] for case in cases]
+            action = decision(rows,phase,config)
+            result = {'level':level,'level_value':cases[0]['level_value'],'phase':phase,'valid':len(rows),
+                      'solved':sum(bool(row['verdict'].get('solved')) for row in rows),'decision':action,
+                      'failures':{name:sum(row['verdict'].get('failure') == name for row in rows)
+                                  for name in ('illegal_action','unsolved','parse_error','truncated')}}
+            item['level_results'].append(result)
+            if action == 'difficulty_confirmed':
+                item.update(status=action,confirmed=result)
+                return None
+            if action == 'advance':
+                item.update(level=level+1,phase='screen')
+            else:
+                item['phase'] = 'confirm'
+        return None
+
+    save()
+    tasks = list(config['tasks'])
+    cursor = 0
+    fatal = False
+    exhausted = False
+    with ThreadPoolExecutor(max_workers=api['concurrency']) as executor:
+        active = {}
+        while active or any(row['status'] == 'active' for row in state['tasks'].values()):
+            if not fatal and not exhausted and not (out/'stop_requested').exists():
+                for _ in range(len(tasks)):
+                    if len(active) >= api['concurrency']:
+                        break
+                    task = tasks[cursor % len(tasks)]
+                    cursor += 1
+                    if task in {case['task'] for case in active.values()}:
+                        continue
+                    case = next_case(task)
+                    if case is None:
+                        continue
+                    attempt = latest.get(case['id'],{}).get('attempt',0)+1
+                    retries = sum(max(0,row['attempt']-1) for row in latest.values()) + sum(
+                        bool(latest.get(c['id'])) for c in active.values())
+                    if attempt > 1 and retries >= api['max_total_service_retries']:
+                        exhausted = True
+                        break
+                    active[executor.submit(call,case,api,key,attempt)] = case
+            state['inflight'] = [case['id'] for case in active.values()]
             save()
-            record = call(selected,api,key,attempt)
-            write_json(out/"records"/f"{selected['id']}_attempt{attempt}.json",record)
-            latest[selected["id"]] = record
-            state["inflight"] = []
-            fatal = record.get("http_status") in (400,401,403,404) or record.get("service_error") in ("returned_model_mismatch","unexpected_output_item")
-            print(json.dumps({"case":selected["id"],"level_value":selected["level_value"],"attempt":attempt,"verdict":record["verdict"]}),flush=True)
-            save()
-            if fatal:
+            if not active:
                 break
-    state["status"] = "api_fatal" if fatal else "completed_breakpoints_or_ranges"
+            completed,_ = wait(active,timeout=10,return_when=FIRST_COMPLETED)
+            for future in completed:
+                case = active.pop(future)
+                record = future.result()
+                write_json(out/'records'/f"{case['id']}_attempt{record['attempt']}.json",record)
+                latest[case['id']] = record
+                fatal = fatal or record.get('http_status') in (400,401,403,404) or record.get('service_error') in ('returned_model_mismatch','unexpected_output_item')
+                print(json.dumps({'case':case['id'],'level_value':case['level_value'],'phase':case.get('phase','screen'),
+                                  'attempt':record['attempt'],'verdict':record['verdict']}),flush=True)
+                save()
+    state['inflight'] = []
+    state['status'] = ('api_fatal' if fatal else 'service_budget_exhausted' if exhausted else 'stopped' if (out/'stop_requested').exists()
+                       else 'completed_breakpoints_or_ranges')
     save()
     result,text = build(out)
-    (out/"summary").mkdir(exist_ok=True)
-    write_json(out/"summary/summary.json",result)
-    (out/"summary/report.md").write_text(text,encoding="utf-8")
+    (out/'summary').mkdir(exist_ok=True)
+    write_json(out/'summary/summary.json',result)
+    (out/'summary/report.md').write_text(text,encoding='utf-8')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

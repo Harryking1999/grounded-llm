@@ -28,14 +28,19 @@ def build(run):
     adaptive = suite["config"].get("study") == "adaptive_complete_plan_difficulty"
     lines = ["# 逐项加难试验" if adaptive else "# 五任务纯文字完整规划基线", "",
              f"状态：{progress['status']}。模型请求：`{progress['api']['model']}`；推理设置：`{progress['api']['reasoning_effort']}`。",
-             "", "每档最多 5 题，逐项加难、遇执行失败即停；成功答案的格式问题单列。打乱步数是生成参数，不等于最短距离。" if adaptive else "同一套各 40 题，一次输出完整计划，无工具、无中途反馈。主指标为环境回放到达目标，最优解和输出格式另计。",
+             "", "每档先测 5 题，成功率不高于一半时用同档 10 道独立新题确认；仍不高于一半才标记找到困难条件。格式问题单列，打乱步数不等于最短距离。" if adaptive else "同一套各 40 题，一次输出完整计划，无工具、无中途反馈。主指标为环境回放到达目标，最优解和输出格式另计。",
              "", "| 任务 | 有效答卷／计划 | 待补服务失败 | 解出 | 严格合同通过 | 最优解 |", "|---|---:|---:|---:|---:|---:|"]
     for task, values in results.items():
         optimal = str(values['optimal']) if values['optimal_evaluated'] else '—'
         lines.append(f"| {NAMES[task]} | {values['valid_responses']}/{values['planned']} | {values['service_errors']} | {values['solved']} | {values['contract_pass']} | {optimal} |")
     if adaptive:
-        lines += ["", "## 首次错误与停止位置", ""]
+        lines += ["", "## 当前难度与独立确认", ""]
         for task,row in progress.get("tasks",{}).items():
+            if 'level_results' in row:
+                label = {'active':'继续加难／确认','difficulty_confirmed':'已找到困难条件','range_exhausted':'当前档位耗尽，尚未确认困难条件','service_blocked':'服务失败待补'}.get(row['status'],row['status'])
+                done = '；'.join(f"{r['level_value']} 档 {'确认' if r['phase']=='confirm' else '初测'} {r['solved']}/{r['valid']}" for r in row['level_results'])
+                lines.append(f"- {NAMES[task]}：{label}。{done}")
+                continue
             failure = row.get("first_error")
             if not failure:
                 label = {"active":"继续测试", "range_exhausted":"当前范围全部通过", "service_blocked":"连接失败，待补测"}.get(row['status'],row['status'])

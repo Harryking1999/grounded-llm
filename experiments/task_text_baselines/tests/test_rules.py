@@ -5,6 +5,7 @@ import unittest
 from experiments.hanoi_qmap.src.environment import Hanoi
 from experiments.task_text_baselines.src import cube2, cube3, hanoi, puzzle8, puzzle15
 from experiments.task_text_baselines.src.difficulty import prepare_level
+from experiments.task_text_baselines.src.escalate import decision
 from experiments.task_text_baselines.src.protocol import ROOT
 from experiments.task_text_baselines.src.protocol import judge, prompt
 from experiments.task_text_baselines.src.run import extract_text, pending
@@ -12,6 +13,15 @@ from experiments.task_text_baselines.src.qwen import final_text, round_robin
 
 
 class TaskRulesTest(unittest.TestCase):
+    def test_difficulty_requires_independent_confirmation(self):
+        config = {'maximum_solved_fraction':0.5}
+        def rows(solved,total):
+            return [{'verdict':{'solved':i<solved}} for i in range(total)]
+        self.assertEqual(decision(rows(4,5),'screen',config),'advance')
+        self.assertEqual(decision(rows(2,5),'screen',config),'confirm')
+        self.assertEqual(decision(rows(5,10),'confirm',config),'difficulty_confirmed')
+        self.assertEqual(decision(rows(6,10),'confirm',config),'advance')
+
     def test_blank_directions_edges_and_inverses(self):
         start = (3,1,2,4,0,5,6,7,8)
         self.assertEqual(puzzle8.step(start, "Left"), (3,1,2,0,4,5,6,7,8))

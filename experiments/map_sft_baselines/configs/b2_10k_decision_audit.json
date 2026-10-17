@@ -1,0 +1,13 @@
+{
+  "baseline": "B2_10k",
+  "seed": 20261017,
+  "samples_per_split": 64,
+  "epochs": [1, 4, 10, 20],
+  "intervention_epoch": 20,
+  "conditions": ["natural", "text_swap", "map_swap", "map_zero_vectors"],
+  "max_new_tokens": 256,
+  "sample_unit": "nonterminal_trajectory_first_step",
+  "donor_matching": "same_legal_candidate_count_different_state",
+  "donor_pool": "all_nonterminal_decision_states_in_training_trajectories",
+  "action_probability_probe": "log_probability_of_reference_action_digits_after_fixed_action_tag_without_reason_or_ranking"
+}

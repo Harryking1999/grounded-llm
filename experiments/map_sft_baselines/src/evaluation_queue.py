@@ -12,6 +12,16 @@ from .shard_pool import ShardPool
 MODULE = 'experiments.map_sft_baselines.src.evaluate'
 
 
+def training_completed(path):
+    """Only successful final export releases an explicitly assigned GPU group."""
+    if not path.exists():
+        return False
+    state = json.loads(path.read_text())
+    if state.get('status') != 'completed':
+        raise RuntimeError('Training did not complete successfully; evaluation handoff blocked')
+    return True
+
+
 def released_training_gpus(path, gpus):
     """Fail closed until the training scheduler has assigned pending work."""
     if not path.exists():
@@ -77,6 +87,17 @@ def run(args, config):
     # Node IDs only label owners; the same coordinator directory arbitrates every node.
     status = root / 'evaluation_queue.json'
     with FileLock(str(root / 'evaluation_queue.lock'), timeout=0):
+        completion = getattr(args, 'after_training', None)
+        if completion:
+            try:
+                while not training_completed(completion):
+                    atomic_json(status, dict(status='waiting_for_training', pid=os.getpid(),
+                        updated=time.time(), completion=str(completion), gpus=gpus, active={}, failed=[]))
+                    time.sleep(config['execution']['poll_seconds'])
+            except Exception as error:
+                atomic_json(status, dict(status='failed', pid=os.getpid(), updated=time.time(),
+                    active={}, failed=[dict(error=str(error))]))
+                raise
         jump = target = files = None
         if args.coordination_profile:
             import paramiko

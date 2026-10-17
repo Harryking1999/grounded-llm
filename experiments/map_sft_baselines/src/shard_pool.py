@@ -168,14 +168,16 @@ class ShardPool:
 
     def checkpoints(self):
         if not self.files:
-            return [self.read(p) for p in (self.root / 'models').glob('B*/checkpoint-*/evaluation_ready.json')]
+            return [self.read(p) for p in (self.root / 'models').glob('B*/checkpoint-*/evaluation_ready.json')
+                    if not p.with_name('weights_retired.json').exists()]
         result = []
         for base in self.files.listdir(str(self.root / 'models')):
             if not base.startswith('B'):
                 continue
             for name in self.files.listdir(str(self.root / 'models' / base)):
                 marker = self.root / 'models' / base / name / 'evaluation_ready.json'
-                if name.startswith('checkpoint-') and self.exists(marker):
+                if (name.startswith('checkpoint-') and self.exists(marker) and
+                        not self.exists(marker.with_name('weights_retired.json'))):
                     result.append(self.read(marker))
         return result
 

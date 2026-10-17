@@ -13,6 +13,8 @@
 
 [平台入口](https://172.16.78.10:32206/index.html?#/developEnv)：业务管理 → 开发环境 → SSH 查看。旧平台端口不作为自动恢复目标。
 
+当前平台评测入口使用 `35016`。`40048` 由用户用于其他任务；不得自动连接、重启队列、调整 GPU 或修改其配置和目录，除非用户再次明确授权。
+
 ## 2. SSH 连接与认证
 
 本地使用 PowerShell，远端使用 Bash。
@@ -60,6 +62,8 @@ ssh grounded-4090
 平台 `/zhanghanyue` 可跨其开发环境复用。028 的 `/ssdwork` 为节点本地磁盘；028、login02、4090 与平台之间没有已确认的共享目录，不能假定相同路径代表同一文件。
 
 各机器使用项目独立环境，不修改公共 Conda 环境或共享基座。依赖版本由实验配置和对应部署说明记录。
+
+4090 的 `gongruochen` 账号存在独立用户硬配额（当前查询为 100GB），整盘 `df` 有剩余空间并不代表账号仍可写；操作前同时检查 `quota -s`。训练完整存档以 028 为准，4090 的 `runs/map_sft_baselines/models/` 仅作受限推理缓存；其占用、自动清理与重连规则见实验 [README](experiments/map_sft_baselines/README.md) 和正式[缓存策略](experiments/map_sft_baselines/configs/bridge_retention.json)。
 
 ## 4. 文件传输与迁移
 

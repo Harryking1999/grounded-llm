@@ -35,9 +35,15 @@ python -m experiments.map_sft_baselines.src.queue evaluate --config experiments/
 python -m experiments.map_sft_baselines.src.bridge --profile PRIVATE_RUNTIME_PROFILE
 ```
 
-桥接凭据仅通过 stdin 进入进程内存，运行 profile、路径映射、PID、日志、缓存与权重全部在 Git 忽略的运行目录。训练端保留完整恢复状态，评测端只接收推理导出。失败记录后停止相应队列，不静默重试。所有卡须空闲才领取任务，4090 的 0 号卡始终预留。
+桥接凭据仅通过 stdin 进入进程内存，运行 profile、路径映射、PID、日志、缓存与权重全部在 Git 忽略的运行目录。训练端保留完整恢复状态，评测端只接收推理导出。评测 worker 异常仍记录并停止相应队列；桥接的连接、存储和传输错误会记录失败阶段、错误及下次重试时间，再关闭连接并重连。所有卡须空闲才领取任务，4090 的 0 号卡始终预留。
 
 bridge 的 runtime profile 须包含 `config`（正式研究配置的绝对路径），以及源运行、目标运行、跳板/目标连接与 known_hosts 路径。停训策略从 runtime profile 读取；样本、评测规模和保存间隔从正式配置读取，不在队列中另写一套数值。
+
+桥接每轮先下载汇总曲线和报告，再清理权重，最后发布新权重。重建评测端时按 step 合并训练端已有曲线，避免较短的新曲线覆盖历史数字。`baselines` 指定回传范围，`publish_baselines` 可单独指定发送权重的条件，避免与 028 独立评测重复。逐题记录不自动复制到训练端。`bridge_status.json` 实时记录连接、回传、清理、上传阶段；`bridge_failures.jsonl` 保留历次 I/O 失败记录，即使之后重连成功也不覆盖。
+
+权重缓存策略由 [bridge_retention.json](configs/bridge_retention.json) 统一维护，profile 可用 `retention_config` 指定其绝对路径。默认只发布各条件最新 checkpoint，限制缓存总字节、各条件在途 checkpoint 数和每轮传输数；到达上限时保持回传结果并等待空间，不删除未完成评测来腾位置。用户账号配额与整盘剩余空间须分别检查。
+
+自动清理仅删除推理 `weights.pt` 及中断上传的 `.part`，不删除评测、报告、状态或训练端存档。完整权重须满足：028 有同身份非空存档、所有配置模式评测完成、汇总数字已回传，且该 checkpoint 没有 worker 占位。已退役条件可在确认存档及无占位后清理。清理与领取任务共用调度锁；保留 `weights_retired.json` 和就绪元数据，防止重新领取或反复上传。中断且未发布就绪标记的上传会先清理再重试。
 
 ## 多节点评测
 
@@ -57,9 +63,17 @@ python -m experiments.map_sft_baselines.src.queue evaluate --config CONFIG --dat
 
 辅助 runtime profile 复用桥接的公开 SSH 字段与 `target_run`（统一主节点目录），不保存凭据。未来节点采用相同入口、不同 `node-id` 和本机 GPU 配置。各节点动态队列状态、占位、PID 与日志留在远端运行目录。
 
-028 的训练卡释放后加入同一评测池，优先补 TF 与地图内容探针，其他节点继续覆盖 RO。评测入口加 `--training-queue TRAIN_RUN/training_queue.json`：有待分配训练时不领评测，B4 优先接空出的训练通道；之后只使用训练队列已释放且显存空闲的卡。具体卡号和评测模式读取正式配置的 `after_training_evaluation`，不停止或占用现有训练。评测运行目录与训练目录分开，推理权重可通过只读链接复用。
+028 的训练卡释放后加入同一评测池。已有训练调度器时，评测入口加 `--training-queue TRAIN_RUN/training_queue.json`：有待分配训练时不领评测，卡号与模式读取正式配置的 `after_training_evaluation`。独立训练进程则用 `--after-training TRAIN_RUN/training/BASELINE/finished.json --gpus GPU_LIST`，只在成功完成最终导出后启动该组评测，失败／提前停止不放行；仍检查实际 GPU 显存空闲。配合 `--coordination-profile` 从 4090 共用池领取 RO／TF／probe，避免重复分片。等待期间不保持 SSH 会话；凭据经 stdin 传入。评测运行目录与训练目录分开，推理权重可通过只读链接复用。
 
 ## 验证与结果
+
+## 10,000 条数据基线
+
+用户授权的小数据对照使用 [b2_10k.json](configs/b2_10k.json) 和 [qwen7b_ra_10k.json](configs/qwen7b_ra_10k.json)。从已验收的 50,000 条物理轨迹中，按来源棋盘及真实最短长度分层抽取，共用同一批 10,000 条轨迹；每张棋盘十条，初始即目标保持原比例。抽样不新增棋盘、不改变动作、排序标签、地图或测试题。实际目标大小和长度分布保存在数据目录的 `distribution.json`，近似匹配不意味着每一联合分布完全相同。
+
+B2 保持原 1.5B 地图全参接口与排序优先监督；7B 使用 Qwen2.5-7B-Instruct，无地图、全参、现有简短 Reason＋动作。用户确认暂不生成长 CoT，报告中应称为 7B R＋A 基线。7B 按自身 tokenizer 重新编码，输入物理轨迹相同。学习率、token 平均 CE、global batch、优化器和训练轮数沿用原合同；保存间隔按半轮随数据量缩放。7B 使用四卡 FSDP 分片，B2 使用两卡 DDP，不能把两者差异单独解释为地图因果收益。
+
+028 的 7B 仅保留最新一份完整恢复状态；完整评测回传后，推理权重仅保留最新与最高完整到达率检查点。未完成评测的权重不删除。启用时在桥接 profile 中设置 `source_retention: latest_and_best`。4090 只持有受限推理缓存，评测后先回传数字再删除缓存；每组独立目录、配置、队列与指标，不能同 50,000 条旧曲线拼接。
 
 会议讨论使用 [多基线讨论汇报](results/discussion_report.md)：集中说明数据、监督、基线、当前成绩与解释，不包含运行日志。
 
@@ -68,3 +82,11 @@ python -m unittest experiments.map_sft_baselines.tests.test_contract experiments
 ```
 
 [results/report.md](results/report.md)记录准备、启动和验收；每条基线的半轮结果表独立维护。原始逐题回答和动态队列状态留在远端 `runs/map_sft_baselines/`，全局 [项目状态页](../../docs/PROJECT_STATUS_AND_TODO.md)只保留决策和入口。
+
+## B2_10k 首步诊断
+
+入口为 `src/decision_audit.py`，正式合同为 [b2_10k_decision_audit.json](configs/b2_10k_decision_audit.json)。固定 64 条非终止训练轨迹（来源棋盘互异）与 64 条非终止测试轨迹，在 1、4、10、20 epoch 自主生成首步；训练文字输入直接取原监督缓存，并核对与正式提示重建是否一致；地图由相同冻结 Q 重算。报告环境最短动作率、参考动作精确匹配率、首个排序候选的地图最优率、合法率及回答重复率，不以平均 CE 替代决策指标。
+
+20 epoch 对全部 128 题追加文字替换、地图替换、地图向量清零。替换来源取自训练轨迹中的合法决策状态，与原题具有相同合法候选数、不同状态；文字替换保留原地图，地图替换保留原文字，清零保留槽位角色、地址和有效掩码。这些刻意不匹配的输入只用于检测敏感性，不作为能力提升或常规准确率。另在没有排序／理由泄露答案的固定 `<action>` 前缀后，计算同一参考动作完整数字序列的条件对数概率；这属于强制前缀探针，不是正常生成概率或归一化动作分布。各条件保存逐题配对输出，按 train／test 分开汇总。
+
+同一固定题目的等更新步数对照使用 [b2_matched_update_control.json](configs/b2_matched_update_control.json)。完整科学结果见[专项诊断](results/b2_10k_diagnosis.md)，不在 README 记录运行日志。

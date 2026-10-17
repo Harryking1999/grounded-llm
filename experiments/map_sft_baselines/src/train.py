@@ -15,6 +15,45 @@ from experiments.llm_task_sft.src.train import scheduler_factor
 from .common import atomic_json,pseudo_timeline,renumber_trajectory
 from .modeling import build,infer_weights
 
+
+def shard_model(model, local):
+    from functools import partial
+    from torch.distributed.fsdp import FullyShardedDataParallel as FSDP, MixedPrecision
+    from torch.distributed.fsdp.wrap import transformer_auto_wrap_policy
+    from transformers.models.qwen2.modeling_qwen2 import Qwen2DecoderLayer
+    return FSDP(model, device_id=local, use_orig_params=True,
+                auto_wrap_policy=partial(transformer_auto_wrap_policy,
+                                         transformer_layer_cls={Qwen2DecoderLayer}),
+                mixed_precision=MixedPrecision(param_dtype=torch.bfloat16,
+                                                reduce_dtype=torch.float32,
+                                                buffer_dtype=torch.bfloat16))
+
+
+def save_sharded(model, optimizer, scheduler, out, config, baseline, step, steps_epoch, rank):
+    from torch.distributed.fsdp import (FullyShardedDataParallel as FSDP, StateDictType,
+                                       FullStateDictConfig, FullOptimStateDictConfig)
+    path = out / f'checkpoint-{step}'
+    path.mkdir(parents=True, exist_ok=True)
+    torch.save(dict(torch=torch.get_rng_state(), cuda=torch.cuda.get_rng_state(),
+                    python=random.getstate(), numpy=np.random.get_state()), path / f'rng_{rank}.pt')
+    with FSDP.state_dict_type(model, StateDictType.FULL_STATE_DICT,
+                             FullStateDictConfig(offload_to_cpu=True, rank0_only=True),
+                             FullOptimStateDictConfig(offload_to_cpu=True, rank0_only=True)):
+        weights = model.state_dict()
+        optim = FSDP.optim_state_dict(model, optimizer)
+    if rank == 0:
+        torch.save(dict(baseline=baseline, weights={k:v.to(torch.bfloat16) if v.is_floating_point() else v
+                                                   for k,v in weights.items()}), path / 'weights.pt')
+        torch.save(dict(model=weights, optimizer=optim, scheduler=scheduler.state_dict()), path / 'resume.pt')
+        atomic_json(path / 'state.json', dict(step=step, epoch=step/steps_epoch, baseline=baseline, config=config))
+    dist.barrier()
+    if rank == 0:
+        atomic_json(path / 'evaluation_ready.json', dict(step=step, epoch=step/steps_epoch, baseline=baseline))
+        keep = config['training'].get('keep_resume_checkpoints', 2)
+        for old in sorted(out.glob('checkpoint-*'),key=lambda p:int(p.name.split('-')[-1]))[:-keep]:
+            (old / 'resume.pt').unlink(missing_ok=True)
+    dist.barrier()
+
 class Routes(Dataset):
     def __init__(self,path,real_map,*,config=None,baseline=None,tokenizer=None):
         self.path=Path(path);self.meta=json.loads((self.path/'dataset.json').read_text());self.rows=self.meta['rows'];self.key='map' if real_map else 'plain'
@@ -78,8 +117,10 @@ def main():
         raise ValueError('Prepared assistant order differs from baseline configuration')
     ready=json.loads((a.data/'ready.json').read_text())
     if not a.smoke_steps and (len(data)!=cfg['data']['samples_per_epoch'] or ready['smoke']):raise ValueError('Formal training requires accepted complete common data')
-    model=build(cfg,a.baseline,a.model_path).to(device);wrapped=DDP(model,device_ids=[local],gradient_as_bucket_view=True)
-    params=[p for p in model.parameters() if p.requires_grad]
+    sharded=t.get('distributed_strategy','ddp')=='fsdp'
+    model=build(cfg,a.baseline,a.model_path)
+    wrapped=shard_model(model,local) if sharded else DDP(model.to(device),device_ids=[local],gradient_as_bucket_view=True)
+    params=[p for p in wrapped.parameters() if p.requires_grad]
     optimizer=torch.optim.AdamW(params,lr=t['learning_rate'],weight_decay=t['weight_decay'],fused=True)
     if len(data)%t['global_batch']:raise ValueError('Dataset must divide into complete global batches')
     steps_epoch=len(data)//t['global_batch'];total=steps_epoch*t['epochs']
@@ -88,8 +129,15 @@ def main():
     if a.resume:
         state=json.loads((a.resume/'state.json').read_text())
         validate_resume_contract(state,cfg,a.baseline)
-        saved=torch.load(a.resume/'resume.pt',map_location=device,weights_only=False)
-        model.load_state_dict(saved['model'],strict=False);optimizer.load_state_dict(saved['optimizer']);scheduler.load_state_dict(saved['scheduler']);step=state['step']
+        saved=torch.load(a.resume/'resume.pt',map_location='cpu' if sharded else device,weights_only=False)
+        if sharded:
+            from torch.distributed.fsdp import FullyShardedDataParallel as FSDP, StateDictType, FullStateDictConfig
+            with FSDP.state_dict_type(wrapped,StateDictType.FULL_STATE_DICT,FullStateDictConfig(offload_to_cpu=True,rank0_only=False)):
+                wrapped.load_state_dict(saved['model'])
+                optimizer.load_state_dict(FSDP.optim_state_dict_to_load(wrapped,optimizer,saved['optimizer']))
+        else:
+            model.load_state_dict(saved['model'],strict=False);optimizer.load_state_dict(saved['optimizer'])
+        scheduler.load_state_dict(saved['scheduler']);step=state['step']
         rng=torch.load(a.resume/f'rng_{rank}.pt',weights_only=False,map_location='cpu');torch.set_rng_state(rng['torch']);torch.cuda.set_rng_state(rng['cuda']);random.setstate(rng['python']);np.random.set_state(rng['numpy'])
     a.out.mkdir(parents=True,exist_ok=True)
     sampler=DistributedSampler(data,num_replicas=world,rank=rank,seed=cfg['seed'])
@@ -116,7 +164,7 @@ def main():
                         scaled=loss*n*world/count
                     scaled.backward()
                 loss_sum+=loss.detach()*n
-            grad=torch.nn.utils.clip_grad_norm_(params,t['gradient_clip_norm'])
+            grad=wrapped.clip_grad_norm_(t['gradient_clip_norm']) if sharded else torch.nn.utils.clip_grad_norm_(params,t['gradient_clip_norm'])
             if not torch.isfinite(grad):raise FloatingPointError('Nonfinite training gradient')
             optimizer.step();scheduler.step();step+=1;windows.append(time.monotonic()-began);dist.all_reduce(loss_sum)
             if rank==0 and (step%t['log_steps']==0 or step==1):
@@ -125,7 +173,8 @@ def main():
                 atomic_json(a.out/'progress.json',log);print(json.dumps(log),flush=True)
             stop=torch.tensor(int((a.out/'stop_after_checkpoint').exists()),device=device);dist.all_reduce(stop,op=dist.ReduceOp.MAX)
             if step%t['save_steps']==0 or step==limit or step==total or bool(stop):
-                save(model,optimizer,scheduler,a.out,cfg,a.baseline,step,steps_epoch,rank)
+                if sharded:save_sharded(wrapped,optimizer,scheduler,a.out,cfg,a.baseline,step,steps_epoch,rank)
+                else:save(model,optimizer,scheduler,a.out,cfg,a.baseline,step,steps_epoch,rank)
                 if bool(stop):
                     if rank==0:atomic_json(a.out/'finished.json',dict(status='stopped',step=step))
                     dist.destroy_process_group();return

@@ -5,7 +5,7 @@ import unittest
 from experiments.hanoi_qmap.src.environment import Hanoi
 from experiments.task_text_baselines.src import cube2, hanoi, puzzle8
 from experiments.task_text_baselines.src.protocol import judge, prompt
-from experiments.task_text_baselines.src.run import extract_text
+from experiments.task_text_baselines.src.run import extract_text, pending
 
 
 class TaskRulesTest(unittest.TestCase):
@@ -77,6 +77,15 @@ class TaskRulesTest(unittest.TestCase):
         response={"output":[{"type":"message","channel":"commentary","content":[{"type":"output_text","text":"working"}]},
                             {"type":"message","channel":"final","content":[{"type":"output_text","text":"answer"}]}]}
         self.assertEqual(extract_text(response),"answer")
+
+    def test_resume_only_retries_service_failures_and_prioritizes_them(self):
+        cases = [{"id":name} for name in ("ok","wrong","truncated","network","new","exhausted")]
+        latest = {name:{"attempt":1} for name in ("ok","wrong","truncated")}
+        latest.update(network={"attempt":1,"service_error":"URLError"},
+                      exhausted={"attempt":6,"service_error":"URLError"})
+        rows = pending(cases,latest,{"max_service_retries":5},42)
+        self.assertEqual(rows.pop()["id"],"network")
+        self.assertEqual([row["id"] for row in rows],["new"])
 
 
 if __name__ == '__main__':

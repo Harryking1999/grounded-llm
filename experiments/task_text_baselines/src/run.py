@@ -97,6 +97,8 @@ def summary(records, cases):
         for row in rows:
             strata[row["stratum"]].append(row)
         result[task] = {"planned": sum(c["task"] == task for c in cases), "finished": len(rows),
+                        "valid_responses": sum(not bool(r.get("service_error")) for r in rows),
+                        "service_errors": sum(bool(r.get("service_error")) for r in rows),
                         "solved": sum(bool(r["verdict"].get("solved")) for r in rows),
                         "contract_pass": sum(bool(r["verdict"].get("contract_pass")) for r in rows),
                         "optimal": sum(bool(r["verdict"].get("optimal")) for r in rows),
@@ -107,22 +109,37 @@ def summary(records, cases):
     return result
 
 
+def pending(cases, latest, api, seed):
+    rows = [c for c in cases if c["id"] not in latest or
+            latest[c["id"]].get("service_error") and latest[c["id"]]["attempt"] <= api["max_service_retries"]]
+    random.Random(seed).shuffle(rows)
+    # Dispatch uses pop(): failed infrastructure attempts come first.
+    rows.sort(key=lambda c: bool(latest.get(c["id"], {}).get("service_error")))
+    return rows
+
+
 def main():
     parser = argparse.ArgumentParser(__doc__)
     parser.add_argument("--out", required=True)
+    parser.add_argument("--recovery-config", help="Service-only retry policy; model and sampling parameters remain frozen")
     args = parser.parse_args()
     out = Path(args.out)
     suite = json.loads((out / "suite.json").read_text(encoding="utf-8"))
-    cases, api = suite["cases"], suite["config"]["api"]
+    cases, api = suite["cases"], dict(suite["config"]["api"])
+    if args.recovery_config:
+        recovery = json.loads(Path(args.recovery_config).read_text(encoding="utf-8"))
+        for name in ("max_service_retries", "max_total_service_retries"):
+            api[name] = recovery[name]
     key = os.environ["GND_API_KEY"]
     records_dir = out / "records"
     records_dir.mkdir(exist_ok=True)
     attempts = [json.loads(p.read_text(encoding="utf-8")) for p in records_dir.glob("*.json")]
     latest = {r["case_id"]: r for r in sorted(attempts, key=lambda r: (r["case_id"], r["attempt"]))}
-    pending_cases = [c for c in cases if c["id"] not in latest or latest[c["id"]].get("service_error") and latest[c["id"]]["attempt"] <= api["max_service_retries"]]
-    random.Random(suite["config"]["seed"]).shuffle(pending_cases)
+    pending_cases = pending(cases, latest, api, suite["config"]["seed"])
     state = {"status": "running", "started_at": datetime.now(timezone.utc).isoformat(),
              "source_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
+             "suite_source_commit": suite.get("source_commit"),
+             "recovery_config": args.recovery_config,
              "api": api, "planned": len(cases), "inflight": []}
 
     def save():
@@ -159,11 +176,12 @@ def main():
                 if error:
                     fatal = fatal or record.get("http_status") in (400,401,403,404) or error in ("returned_model_mismatch", "unexpected_output_item")
                     if not fatal and record["attempt"] <= api["max_service_retries"] and retry_total < api["max_total_service_retries"]:
-                        pending_cases.insert(0,case)
+                        pending_cases.append(case)
                 print(json.dumps({"finished": len(latest), "case": case["id"], "attempt": record["attempt"], "solved": record["verdict"].get("solved"), "failure": record["verdict"].get("failure"), "seconds": record["elapsed_seconds"]}), flush=True)
                 save()
     state["inflight"] = []
-    state["status"] = "completed" if len(latest) == len(cases) and not pending_cases else "stopped"
+    state["status"] = ("completed" if all(not r.get("service_error") for r in latest.values())
+                       else "service_incomplete") if len(latest) == len(cases) and not pending_cases else "stopped"
     state["completed_at"] = datetime.now(timezone.utc).isoformat()
     save()
 

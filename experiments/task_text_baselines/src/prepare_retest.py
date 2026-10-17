@@ -19,6 +19,14 @@ def retest_cases(config, source):
         raise ValueError('Retests use exactly one valid answer per question')
     if config['case_mode'] == 'copy_frozen':
         cases = deepcopy(source['cases'])
+    elif config['case_mode'] == 'blocks_no_state_report':
+        cases = deepcopy(source['cases'])
+        suffix = '\n\n'+config['format_removal']
+        for case in cases:
+            if case['task'] != 'blocks' or not case.get('state_report_required') or not case['prompt'].endswith(suffix):
+                raise ValueError('Source must be a frozen blocks state-report case with the exact format suffix')
+            case['prompt'] = case['prompt'][:-len(suffix)]
+            del case['state_report_required']
     elif config['case_mode'] == 'blocks_state_report':
         cases = deepcopy([c for c in source['cases'] if c['task'] == 'blocks'])
         for case in cases:

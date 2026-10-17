@@ -1,0 +1,22 @@
+{
+  "study": "blocks_sz_actions_matched_comparison",
+  "seed": 20261017,
+  "source_suite": "runs/sol56_blocks40_sz_state_report/suite.json",
+  "case_mode": "blocks_no_state_report",
+  "expected_cases": 40,
+  "samples_per_case": 1,
+  "format_removal": "For every action, also include \"board_after\": an array of exactly ten strings of ten binary characters (0 or 1), representing the entire current board immediately after that removal, in the same row and column order as the input.",
+  "api": {
+    "base_url": "https://jarodfund.xyz/v1",
+    "model": "gpt-5.6-sol",
+    "reasoning_effort": "high",
+    "max_output_tokens": 16000,
+    "scoring_output_limit": 16000,
+    "timeout_seconds": 900,
+    "concurrency": 4,
+    "max_service_retries": 10,
+    "max_total_service_retries": 80,
+    "service_retry_delay_seconds": 30
+  },
+  "comparison": "Keep all forty frozen S/Z eight-shape twelve-placement problems, IDs and reference witnesses. Remove only the exact appended board_after instruction and its scoring requirement. Keep the complete-plan actions/final_status JSON contract, no tools and no intermediate feedback. Request high and 16000 reasoning-plus-answer tokens; also score saved answers at 8000. One valid answer per case; only service failures may be retried. Compare with the same-model state-report answers and the matched 6.1 actions-only run."
+}

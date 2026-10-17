@@ -50,6 +50,21 @@ class TaskRulesTest(unittest.TestCase):
         self.assertNotIn('state_report_required',case)
         self.assertTrue(repeated['state_report_required'])
 
+    def test_no_state_retest_preserves_problem_and_removes_only_exact_suffix(self):
+        case = {'id':'blocks_00','task':'blocks','initial':1+(1<<10),'goal':0,
+                'prompt':'original frozen prompt\n\nPredict board_after.',
+                'state_report_required':True,
+                'reference':{'length':1,'actions':[{'shape_id':4,'row':0,'col':0}]}}
+        config = {'case_mode':'blocks_no_state_report','expected_cases':1,
+                  'samples_per_case':1,'format_removal':'Predict board_after.'}
+        repeated, = retest_cases(config,{'cases':[case]})
+        self.assertEqual(repeated['prompt'],'original frozen prompt')
+        self.assertEqual({k:v for k,v in repeated.items() if k!='prompt'},
+                         {k:v for k,v in case.items() if k not in ('prompt','state_report_required')})
+        self.assertTrue(case['state_report_required'])
+        with self.assertRaises(ValueError):
+            retest_cases(config,{'cases':[case | {'prompt':'different suffix'}]})
+
     def test_reported_board_never_overrides_real_state_or_execution_score(self):
         case = {'task':'blocks','initial':1+(1<<10),'goal':0,'reference':{'length':1},
                 'state_report_required':True}

@@ -9,3 +9,5 @@
 - 当前进展与下一步只维护在 [项目状态页](../../docs/PROJECT_STATUS_AND_TODO.md)。
 
 按本任务独立准备数据、训练和评测。共用 MLP、距离与排序损失等基础组件；不同任务的状态编码、动作、采样与训练入口分别维护。
+
+已有历史强模型材料：[Qwen3-32B 五图 120 题](../../experiments/external_map_interface/results/path256_qwen32b_thinking.md)。它使用旧整段路径协议，与新 Q 的固定图关系留出评测不是同题匹配比较，不直接相减。

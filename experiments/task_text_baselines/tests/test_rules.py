@@ -3,7 +3,9 @@ import random
 import unittest
 
 from experiments.hanoi_qmap.src.environment import Hanoi
-from experiments.task_text_baselines.src import cube2, hanoi, puzzle8
+from experiments.task_text_baselines.src import cube2, cube3, hanoi, puzzle8, puzzle15
+from experiments.task_text_baselines.src.difficulty import prepare_level
+from experiments.task_text_baselines.src.protocol import ROOT
 from experiments.task_text_baselines.src.protocol import judge, prompt
 from experiments.task_text_baselines.src.run import extract_text, pending
 from experiments.task_text_baselines.src.qwen import final_text, round_robin
@@ -97,6 +99,43 @@ class TaskRulesTest(unittest.TestCase):
         self.assertEqual(final_text([1,2,9,3,4],Tokenizer()),("3,4",3))
         cases = [{"task":task} for task in ("a","a","b","b","c")]
         self.assertEqual([index for index,_ in round_robin(cases)],[0,2,4,1,3])
+
+    def test_cube3_corner_frames_match_authoritative_cube2(self):
+        state2,state = 0,cube3.solved(size=2)
+        rng = random.Random(41)
+        for _ in range(60):
+            action = rng.choice(("U","U'","R","R'","F","F'"))
+            state2,state = cube2.step(state2,action),cube3.step(state,action,size=2)
+            expected = cube2.grids(state2)
+            self.assertEqual(list(state),[v for face in cube3.FACES for v in expected[face]])
+        unique = tuple(range(54))
+        for action in cube3.ACTIONS:
+            state = unique
+            for _ in range(4):
+                state = cube3.step(state,action)
+            self.assertEqual(state,unique)
+            turned = cube3.step(unique,action)
+            self.assertEqual([turned[i*9+4] for i in range(6)],[i*9+4 for i in range(6)])
+            self.assertEqual(sorted(turned),list(unique))
+
+    def test_harder_cases_preserve_contract_and_replay_witnesses(self):
+        config = json.loads((ROOT/'experiments/task_text_baselines/configs/difficulty_ladder.json').read_text())
+        config["cases_per_level"] = 2
+        for task in config["tasks"]:
+            for case in prepare_level(task,0,config["tasks"][task],config):
+                verdict = judge(case,json.dumps({"actions":case["reference"]["actions"],"final_status":"solved"}))
+                self.assertTrue(verdict["contract_pass"],(case["id"],verdict))
+                self.assertNotIn("board_after",case["prompt"])
+                if task == 'puzzle15':
+                    self.assertIn("4x4",case["prompt"])
+                    self.assertIn("1 through 15",case["prompt"])
+                    self.assertNotIn("Action examples",case["prompt"])
+                    self.assertLessEqual(puzzle15.manhattan(case["initial"]),case["reference"]["upper_bound"])
+                if task == 'cube3':
+                    self.assertIn("3x3",case["prompt"])
+                    self.assertIn("[After B']",case["prompt"])
+                if task == 'blocks':
+                    self.assertIn("6=011/110",case["prompt"])
 
 
 if __name__ == '__main__':

@@ -6,7 +6,8 @@ from pathlib import Path
 
 from .run import summary, write_json
 
-NAMES = {"blocks":"积木", "path":"寻路", "hanoi":"汉诺塔", "cube2":"二阶魔方", "puzzle8":"8-Puzzle"}
+NAMES = {"blocks":"积木", "path":"寻路", "hanoi":"汉诺塔", "cube2":"二阶魔方", "puzzle8":"8-Puzzle",
+         "cube3":"三阶魔方", "puzzle15":"4×4 华容道"}
 
 
 def build(run):
@@ -24,13 +25,19 @@ def build(run):
               "returned_model_counts":dict(Counter(str(r.get("returned_model")) for r in records)),
               "exceeded_output_limit":sum(r.get("exceeds_requested_budget") is True for r in records),
               "run_path":str(run), "updated_at":progress["updated_at"]}
-    lines = ["# 五任务纯文字完整规划基线", "",
+    adaptive = suite["config"].get("study") == "adaptive_complete_plan_difficulty"
+    lines = ["# 逐项加难试验" if adaptive else "# 五任务纯文字完整规划基线", "",
              f"状态：{progress['status']}。模型请求：`{progress['api']['model']}`；推理设置：`{progress['api']['reasoning_effort']}`。",
-             "", "同一套各 40 题，一次输出完整计划，无工具、无中途反馈。主指标为环境回放到达目标，最优解和输出格式另计。",
+             "", "每档最多 5 题，逐项加难、遇模型错误即停。打乱步数是生成参数，不等于最短距离。" if adaptive else "同一套各 40 题，一次输出完整计划，无工具、无中途反馈。主指标为环境回放到达目标，最优解和输出格式另计。",
              "", "| 任务 | 有效答卷／计划 | 待补服务失败 | 解出 | 严格合同通过 | 最优解 |", "|---|---:|---:|---:|---:|---:|"]
     for task, values in results.items():
         lines.append(f"| {NAMES[task]} | {values['valid_responses']}/{values['planned']} | {values['service_errors']} | {values['solved']} | {values['contract_pass']} | {values['optimal']} |")
-    lines += ["", "## 难度分层", "", "| 任务 | 分层 | 已返回 | 解出 |", "|---|---|---:|---:|"]
+    if adaptive:
+        lines += ["", "## 首次错误与停止位置", ""]
+        for task,row in progress.get("tasks",{}).items():
+            failure = row.get("first_error",{})
+            lines.append(f"- {NAMES[task]}：{row['status']}；"+json.dumps(failure,ensure_ascii=False))
+    lines += ["", "## 难度分层", "", "| 任务 | 分层 | 已记录 | 解出 |", "|---|---|---:|---:|"]
     for task, values in results.items():
         for name, row in sorted(values["strata"].items()):
             lines.append(f"| {NAMES[task]} | {name} | {row['finished']} | {row['solved']} |")
@@ -41,7 +48,7 @@ def build(run):
     lines += [f"- 服务错误尝试共 {result['service_error_attempts']} 次；只重试基础设施失败，模型答错和截断不重采样。",
               f"- 已记录输出 token 总数：{sum((r.get('usage') or {}).get('output_tokens') or 0 for r in attempts):,}。",
               "- 第三方接口未提供返回模型名称与 reasoning 配置时，只能确认提交了请求参数，不能独立核验后台身份或强度。",
-              "- 积木按 12 次不重叠放置构造，最短移除数可能更少；其余按精确距离分层。结果只描述本轮题集。",
+              "- 本轮加难是寻找失败点的适应性小样本试验，不估计整体成功率；完整计划，无工具、无中途反馈。" if adaptive else "- 积木按 12 次不重叠放置构造，最短移除数可能更少；其余按精确距离分层。结果只描述本轮题集。",
               "- 配置与原始逐题结果保留在运行目录；研究参数见本实验 configs/，不从本表反推全部运行设置。", ""]
     return result,"\n".join(lines)
 

@@ -4,7 +4,7 @@ from pathlib import Path
 import re
 
 from experiments.gcml_counterexamples.src import blocks
-from . import cube2, hanoi, puzzle8
+from . import cube2, cube3, hanoi, puzzle8, puzzle15
 
 ROOT = Path(__file__).resolve().parents[3]
 
@@ -54,13 +54,17 @@ def judge(case, raw):
     if not isinstance(output, dict) or not isinstance(output.get("actions"), list):
         return {"solved": False, "contract_pass": False, "failure": "parse_error", "strict_json": strict}
     task, actions = case["task"], output["actions"]
-    state = tuple(case["initial"]) if task in ("hanoi", "puzzle8") else case["initial"]
-    goal = tuple(case["goal"]) if task in ("hanoi", "puzzle8") else case["goal"]
+    state = tuple(case["initial"]) if task in ("hanoi", "puzzle8", "puzzle15", "cube3") else case["initial"]
+    goal = tuple(case["goal"]) if task in ("hanoi", "puzzle8", "puzzle15", "cube3") else case["goal"]
+    shape_rules = None
+    if task == "blocks" and case.get("shape_options"):
+        from experiments.sol_dag_blocks.src.tasks import BlocksTask
+        shape_rules = BlocksTask(case["shape_options"])
     illegal, detail, executed = None, None, 0
     for index, action in enumerate(actions):
         try:
             if task == "blocks":
-                state = blocks.apply(int(state), action)
+                state = shape_rules.apply(int(state),action) if shape_rules else blocks.apply(int(state), action)
             elif task == "path":
                 if not isinstance(action, dict) or set(action) != {"from", "to"} or any(type(action[k]) is not int for k in ("from", "to")):
                     raise ValueError("Expected integer from/to object")
@@ -68,7 +72,8 @@ def judge(case, raw):
                     raise ValueError("Not a current-node edge")
                 state = action["to"]
             else:
-                state = {"hanoi": hanoi.step, "cube2": cube2.step, "puzzle8": puzzle8.step}[task](state, action)
+                state = {"hanoi": hanoi.step, "cube2": cube2.step, "cube3":cube3.step,
+                         "puzzle8": puzzle8.step, "puzzle15":puzzle15.step}[task](state, action)
             executed += 1
         except (ValueError, TypeError, KeyError, IndexError) as error:
             illegal, detail = index, str(error)
@@ -81,5 +86,5 @@ def judge(case, raw):
             "strict_json": strict, "status_correct": status_correct, "reported_status": status,
             "failure": "illegal_action" if illegal is not None else None if solved else "unsolved",
             "first_illegal_index": illegal, "illegal_detail": detail, "executed": executed,
-            "plan_length": len(actions), "optimal": solved and len(actions) == minimum,
-            "excess_moves": len(actions) - minimum if solved else None}
+            "plan_length": len(actions), "optimal": solved and len(actions) == minimum if minimum is not None else None,
+            "excess_moves": len(actions) - minimum if solved and minimum is not None else None}

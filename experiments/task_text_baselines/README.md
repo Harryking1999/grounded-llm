@@ -35,3 +35,19 @@ python -u -m experiments.task_text_baselines.src.qwen --suite /path/to/frozen/su
 ```
 
 原始逐题输出、进度和运行记录放在 `runs/five_task_qwen32b_same40/`，与 API 答卷分开；两者均可用 `src/report.py` 生成紧凑汇总。
+
+## 按任务逐项加难
+
+用户要求现有条件解得好时逐项加难，直到 GPT 开始犯错。合同见 [difficulty_ladder.json](configs/difficulty_ladder.json)，入口为 `src/escalate.py`；每档最多五题、每题一个有效答案，在任务间轮换。任一任务出现首个模型错误即停止该任务升档；原 40 题中已出现的错误也计入停止条件。非法动作、未到目标、格式错误与预算截断分别保留，服务错误只补调用，不算模型错误。全部档位通过时如实记作范围耗尽，不声称已找到失败阈值。
+
+- 积木复用用户此前确认的 10 种形状：保留 L3/I3、去掉二格条、加入四个方向的 S/Z 四格；从 12 次放置起测。形状和编号只读取原正式配置。构造沿用原含 Z 条件的连通棋盘；此次同时改变形状集与构造方式，不将结果差异归因于单一因素。
+- 魔方升至三阶，六面 3×3 数字，允许六面的正／逆四分之一转；沿用独立动作前后示例，以打乱长度逐档增加。
+- 华容道升至 4×4，0 仍为空格、方向仍移动空格；不加动作示例或冗余规则。
+- 汉诺塔仅在现有八盘无模型错误时加盘；若八盘已错，先报告该失败点。
+- 寻路保留无向无权三度图与原动作格式，增加节点数，每个起点选择其最远目标。
+
+三阶魔方、4×4 华容道与含 Z 积木只保存回放通过的可解参考方案及长度上界，不假设它是最短方案。寻路与汉诺塔仍使用精确最短距离。它们是寻找失败点的适应性小样本，不能据此估计总体成功率；旧 200 题及其 32B 同题比较保持独立。
+
+```powershell
+python -u -m experiments.task_text_baselines.src.escalate --config experiments/task_text_baselines/configs/difficulty_ladder.json --out runs/five_task_sol_difficulty
+```

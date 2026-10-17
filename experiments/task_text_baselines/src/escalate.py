@@ -59,6 +59,10 @@ def main():
         if item["status"] == "model_error_found" and item.get("first_error",{}).get("verdict",{}).get("solved"):
             item["status"] = "active"
             del item["first_error"]
+    for task,item in state["tasks"].items():
+        if task not in config["stop_from_original_baseline"] and item.get("first_error",{}).get("origin") == "original_baseline":
+            item["status"] = "active"
+            del item["first_error"]
     save()
     fatal = False
     while not fatal and any(row["status"] == "active" for row in state["tasks"].values()):
@@ -70,7 +74,7 @@ def main():
                 state["status"] = "stopped"
                 save()
                 return
-            failure = baseline_failure(ROOT/config["baseline_run"],task)
+            failure = baseline_failure(ROOT/config["baseline_run"],task) if task in config["stop_from_original_baseline"] else None
             if failure:
                 item.update(status="model_error_found",first_error=failure)
                 save()

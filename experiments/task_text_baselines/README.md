@@ -62,7 +62,7 @@ python -m experiments.task_text_baselines.src.prepare_retest --config experiment
 python -m experiments.task_text_baselines.src.retest_report --baseline runs/five_task_sol_high_40 --sol56 runs/five_task_sol56_high_same40 --legacy runs/sol61_legacy_blocks12_new_prompt --out experiments/task_text_baselines/results
 ```
 
-复测队列只重试服务错误，正常答错和截断均保留；原始回答位于上面的忽略目录。
+复测队列只重试服务错误，正常答错和截断均保留；原始回答位于上面的忽略目录。后台将最新汇总写入 `runs/model_retests/summary/`；受跟踪报告是注明更新时间的回收快照，避免后台持续修改源码工作区。
 
 ## 当前范围与补充探索
 

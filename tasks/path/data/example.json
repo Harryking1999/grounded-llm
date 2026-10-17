@@ -1,0 +1,47 @@
+{
+  "example_kind": "schema_fixture_not_training_sample",
+  "task": "path",
+  "neighbors": {
+    "0": [
+      1
+    ],
+    "1": [
+      0,
+      2
+    ],
+    "2": [
+      1
+    ]
+  },
+  "current": 0,
+  "goal": 2,
+  "candidates": [
+    {
+      "id": 1,
+      "action": {
+        "from_node": 0,
+        "to_node": 1
+      },
+      "successor": 1
+    }
+  ],
+  "qmap_supervision": {
+    "pair": {
+      "source": 0,
+      "target": 2,
+      "distance": 2
+    },
+    "decision": {
+      "parent": 0,
+      "goal": 2,
+      "child_distances": [
+        1
+      ]
+    }
+  },
+  "supervised_answer": {
+    "ranking": null,
+    "reason": null,
+    "action": null
+  }
+}

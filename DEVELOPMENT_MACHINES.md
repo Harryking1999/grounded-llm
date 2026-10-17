@@ -59,6 +59,8 @@ ssh grounded-4090
 
 项目目录按 `code/`、`models/`、`maps/`、`data/`、`runs/`、`logs/` 分类。具体 run、checkpoint、数据版本、PID 与日志位置由实验 README 和忽略的 runtime 配置维护，本手册不逐次追加。
 
+本地日常阅读入口为 `tasks/<task>/`；选定 Qmap 的本地副本放在各任务 `Qmap/checkpoints/`（Git 忽略），来源登记在同目录 `selection.json`。远端原运行目录不随本地入口整理移动，不能假设这些副本路径在远端已存在。
+
 平台 `/zhanghanyue` 可跨其开发环境复用。028 的 `/ssdwork` 为节点本地磁盘；028、login02、4090 与平台之间没有已确认的共享目录，不能假定相同路径代表同一文件。
 
 各机器使用项目独立环境，不修改公共 Conda 环境或共享基座。依赖版本由实验配置和对应部署说明记录。

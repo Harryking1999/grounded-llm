@@ -1,4 +1,6 @@
-# Qmap：让状态向量本身具有远近关系
+# Qmap 历史公共实现与兼容入口
+
+当前工作区按任务拆分：汉诺塔使用 `experiments/hanoi_qmap/src/run.py`，魔方使用 `experiments/cube2_qmap/src/run.py` 及其专属续训脚本，寻路使用 `experiments/path_qmap/src/run.py`。本目录保留历史训练与导入兼容，不再作为当前混合训练入口。任务入口见 [tasks](../../tasks/README.md)，统一方法与基础组件见 [QMAP_METHOD](../../tasks/QMAP_METHOD.md)。以下内容保留原研究设计语境。
 
 目标是让网络通过距离和动作关系，自行形成有远近关系的状态空间。每个状态只对应一个与目标无关的向量 Q(s)；面对不同目标时，使用同一组坐标和固定距离规则。
 
@@ -22,7 +24,7 @@ Q 在这里是状态向量，不是强化学习的动作价值 Q(s,a)。网络�
 | 汉诺塔任务 | [任务说明](../hanoi_qmap/README.md) |
 | 寻路的节点独热输入与统一 Q 训练 | [任务说明](../path_qmap/README.md) |
 | 当前工作与下一步 | [项目状态](../../docs/PROJECT_STATUS_AND_TODO.md) |
-| 模型与冻结读取接口 | [model.py](src/model.py) |
-| 评测与命令行求解 | [evaluate.py](src/evaluate.py)、[solve.py](src/solve.py) |
+| 当前模型与冻结读取接口 | [汉诺塔](../hanoi_qmap/src/model.py)、[魔方](../cube2_qmap/src/model.py) |
+| 当前评测 | [汉诺塔](../hanoi_qmap/src/evaluate.py)、[魔方](../cube2_qmap/src/evaluate.py)；[历史命令行求解](src/solve.py) |
 
 参数以各任务 configs/ 为准。不同 checkpoint 可以使用不同固定距离，不能将历史 L1 默认值当作全部模型的读出规则。日志、数据和权重放在 Git 外；未取得目标成功前，文档不追加逐次实验记录。

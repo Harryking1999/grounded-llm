@@ -1,0 +1,47 @@
+{
+  "example_kind": "historical_three_disk_schema_fixture_not_eight_disk_training",
+  "task": "hanoi3",
+  "state_encoding": "smallest_disk_first_peg_indices",
+  "current": [
+    0,
+    0,
+    0
+  ],
+  "goal": [
+    2,
+    2,
+    2
+  ],
+  "candidates": [
+    {
+      "id": 1,
+      "action": "A>B",
+      "successor": [
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 2,
+      "action": "A>C",
+      "successor": [
+        2,
+        0,
+        0
+      ]
+    }
+  ],
+  "qmap_supervision": {
+    "pair_distance": 7,
+    "candidate_distances": [
+      7,
+      6
+    ]
+  },
+  "supervised_answer": {
+    "ranking": null,
+    "reason": null,
+    "action": null
+  }
+}

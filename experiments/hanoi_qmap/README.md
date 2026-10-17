@@ -1,6 +1,6 @@
 # 三至六盘汉诺塔 Qmap
 
-用同一个纯 Q 范式，分别训练各盘数的状态地图。模型、距离和损失见[共享说明](../puzzle_qmap/README.md)，完整到达与六盘失败见[结果报告](results/report.md)。这不是一个模型跨盘数泛化。
+用同一个纯 Q 范式，分别训练各盘数的状态地图。本任务独立维护 [数据](src/data.py)、[训练](src/run.py)、[模型适配](src/model.py)与[评测](src/evaluate.py)，不再使用混合 puzzle 训练入口。与其他任务共享基础 MLP、距离和排序方法，见[统一方法](../../tasks/QMAP_METHOD.md)。完整到达与六盘失败见[结果报告](results/report.md)，文字、数据和选定权重见[任务工作区](../../tasks/hanoi/README.md)。这不是一个模型跨盘数泛化；八盘候选尚未实现。
 
 ## 规则与状态
 
@@ -21,7 +21,7 @@
 [三盘](configs/study.json)、[四盘](configs/hanoi4.json)、[五盘](configs/hanoi5.json)、[六盘](configs/hanoi6.json)各有独立配置。三盘是较早合同，不与后续盘数作匹配泛化比较。
 
 ```bash
-python -m experiments.puzzle_qmap.src.run --config experiments/hanoi_qmap/configs/hanoi4.json --out runs/hanoi_qmap/RUN_ID --source-commit COMMIT --device cuda:0
+python -m experiments.hanoi_qmap.src.run --config experiments/hanoi_qmap/configs/hanoi4.json --out runs/hanoi_qmap/RUN_ID --source-commit COMMIT --device cuda:0
 python -m experiments.puzzle_qmap.src.solve --task hanoi4 --start 0 --goal 80 --checkpoint runs/hanoi_qmap/RUN_ID/best.pt
 python -m unittest discover -s experiments/hanoi_qmap/tests -v
 ```

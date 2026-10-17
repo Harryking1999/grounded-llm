@@ -1,6 +1,6 @@
 # 实验目录
 
-当前主实验：[同数据地图与 SFT 多基线](map_sft_baselines/README.md)。其余目录分别保存独立协议或历史证据，目录内的“当前”以该实验语境为准。
+当前按[任务工作区](../tasks/README.md)开展单任务文字、数据、Qmap 与 SFT 的准备。[同数据地图与 SFT 多基线](map_sft_baselines/README.md)保存已完成的积木结果。其余目录分别保存独立协议或历史证据，目录内的“当前”以该实验语境为准。
 
 项目进度只维护在[状态页](../docs/PROJECT_STATUS_AND_TODO.md)。各实验有独立的参数、数据和比较边界；已完成的历史实验不作为新运行的默认启动指令。
 
@@ -10,8 +10,9 @@
 | [llm_task_sft](llm_task_sft/README.md) | 独立无地图任务 SFT 的历史协议与结果 |
 | [flamingo_map_reader](flamingo_map_reader/README.md) | 已完成的冻结读取接口、两任务证据和 FFN 负结果 |
 | [blocks_distance_map](blocks_distance_map/README.md) | 冻结积木 Q 的来源、编码器与精确裁判 |
-| [puzzle_qmap](puzzle_qmap/README.md) | 汉诺塔／魔方 Qmap 的统一阅读入口：纯 Q 设计、现有结论与代码分工 |
+| [puzzle_qmap](puzzle_qmap/README.md) | 历史公共实现与导入兼容；当前汉诺塔、魔方的训练实现已分开 |
 | [hanoi_qmap](hanoi_qmap/README.md)、[cube2_qmap](cube2_qmap/README.md) | 三至六盘汉诺塔、二阶魔方的规则、精确数据与任务结果 |
+| [path_qmap](path_qmap/README.md) | 当前统一方法寻路 Q：StateEncoder、距离与候选排序监督，不是旧 Q/V |
 | [external_map_interface](external_map_interface/README.md) | 寻路 Q/V 与环境依赖；显式距离接口的历史试验 |
 | [cml_map_scaling](cml_map_scaling/README.md) | 图地图训练与几何结果；旧连续 token 接口 |
 | [qwen_path_blocks](qwen_path_blocks/README.md)、[sol_dag_blocks](sol_dag_blocks/README.md)、[gcml_counterexamples](gcml_counterexamples/README.md) | 独立模型基线 |

@@ -1,0 +1,58 @@
+{
+  "example_kind": "constructed_schema_fixture_not_training_sample",
+  "task": "blocks",
+  "start": "25769803779",
+  "goal": "25769803776",
+  "board_row": null,
+  "shortest_moves": 1,
+  "route_ids": [
+    1
+  ],
+  "pairs": [
+    [
+      "25769803779",
+      "25769803776"
+    ]
+  ],
+  "initial_board": [
+    "1100000000",
+    "0000000000",
+    "0000000000",
+    "0001100000",
+    "0000000000",
+    "0000000000",
+    "0000000000",
+    "0000000000",
+    "0000000000",
+    "0000000000"
+  ],
+  "goal_board": [
+    "0000000000",
+    "0000000000",
+    "0000000000",
+    "0001100000",
+    "0000000000",
+    "0000000000",
+    "0000000000",
+    "0000000000",
+    "0000000000",
+    "0000000000"
+  ],
+  "reference_action": {
+    "shape_id": 5,
+    "row": 0,
+    "col": 0
+  },
+  "sota_answer": {
+    "actions": [
+      {
+        "shape_id": 5,
+        "row": 0,
+        "col": 0
+      }
+    ],
+    "final_status": "solved"
+  },
+  "cot_ra_answer": "Reason: Clearing (0,0) and (0,1) is legal and leaves exactly the goal board.\n<action>1</action>",
+  "map_answer_template": "{ranking_from_selected_Q}\nReason: Clearing (0,0) and (0,1) is legal and leaves exactly the goal board.\n<action>1</action>"
+}

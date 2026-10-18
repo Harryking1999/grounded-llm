@@ -13,6 +13,7 @@ import torch.distributed as dist
 
 from .full_graph_sampling import JointData
 from .failure_sampling import FailureData
+from .broad_sampling import BroadData
 from .model import BoardEncoder, soft_rank_loss
 from .multiboard_run import atomic_save
 
@@ -65,7 +66,8 @@ def run(config, out, source_commit, smoke_steps=None, resume=None):
     for group in optimizer.param_groups:
         group["lr"] = options["learning_rate"]
     model = DistributedDataParallel(raw, device_ids=[local]) if world > 1 else raw
-    sampler_type = FailureData if "failure_diagnosis" in options else JointData
+    sampler_type = (BroadData if options.get("expanded_stream") else
+                    FailureData if "failure_diagnosis" in options else JointData)
     sampler = sampler_type(config["graph_data"], config["legacy_data"], options, rank, world)
     out = Path(out)
     first_step = 0
@@ -115,6 +117,11 @@ def run(config, out, source_commit, smoke_steps=None, resume=None):
         optimizer.zero_grad(set_to_none=True)
         loss.backward()
         optimizer.step()
+        if hasattr(sampler, "record_update"):
+            rank_nonzero = torch.zeros(len(order), device=device, dtype=torch.bool)
+            rank_nonzero[order] = nonzero.reshape(-1)[slots]
+            sampler.record_update(arrays, (scores[:len(truth)].detach() != truth).cpu().numpy(),
+                                  rank_nonzero.cpu().numpy())
         if step == 1 or step % options["log_every"] == 0 or step == smoke_steps:
             if rank == 0:
                 record = {"step": step, "seconds": time.monotonic() - started,
@@ -136,6 +143,14 @@ def run(config, out, source_commit, smoke_steps=None, resume=None):
                 dist.gather_object(sampler.report(), reports, dst=0)
             else:
                 reports = [sampler.report()]
+            sketches = None
+            if hasattr(sampler, "sketch_state"):
+                sketches = [None] * world if rank == 0 else None
+                local_sketch = {"sketches": sampler.sketch_state(), "roots": sampler.phase_roots}
+                if world > 1:
+                    dist.gather_object(local_sketch, sketches, dst=0)
+                else:
+                    sketches = [local_sketch]
             if rank == 0:
                 path = out / "checkpoints" / f"step_{step:06d}.pt"
                 atomic_save({"model_type": "board_mlp", "model": raw.state_dict(),
@@ -147,6 +162,15 @@ def run(config, out, source_commit, smoke_steps=None, resume=None):
                 exposure = sampler.report()
                 exposure["all_rank_action_types_in_candidate_rows"] = int(actions.sum().item())
                 exposure["per_rank_draw_reports"] = reports
+                if sketches is not None:
+                    exposure["global_stream_phase"] = sampler.merged_exposure([s["sketches"] for s in sketches])
+                    exposure["global_stream_phase"]["distinct_roots"] = int(np.logical_or.reduce([s["roots"] for s in sketches]).sum())
+                    exposure["global_stream_phase"]["distance_by_goal_draws"] = {}
+                    for report in reports:
+                        for key, histogram in report["stream_phase"]["local_distance_by_goal"].items():
+                            merged = exposure["global_stream_phase"]["distance_by_goal_draws"].setdefault(key, {})
+                            for distance, count in histogram.items():
+                                merged[distance] = merged.get(distance, 0) + count
                 (out / f"exposure_{step:06d}.json").write_text(json.dumps(exposure, indent=2) + "\n")
             if world > 1:
                 dist.barrier()

@@ -8,6 +8,7 @@ import numpy as np
 import torch
 
 from experiments.blocks_distance_map.src.broad_sampling import BroadData, Cardinality
+from experiments.blocks_distance_map.src.clear_distance_index import build_component
 from experiments.blocks_distance_map.src.full_graph_data import local_tiles
 from experiments.blocks_distance_map.src.symbolic_graph import build_symbolic, SymbolicComponent
 from experiments.blocks_distance_map.src.oracle import DistanceOracle
@@ -66,6 +67,30 @@ class BroadSamplingTest(unittest.TestCase):
             self.assertEqual(expanded.affine[0], data.affine[0])
             self.assertEqual(set(expanded.order), {0, 1})
             for s in (data, resumed, expanded): s.close()
+            build_component(path / "graphs/0", path / "clear/0")
+            shifted = [c + 20 for c in cells]
+            double = {"initial": str(1023 | (1023 << 20)), "construction": [{}],
+                      "components": [{"graph": 0, "cells": cells}, {"graph": 0, "cells": shifted}]}
+            (path / "roots.json").write_text(json.dumps([double]))
+            indexed = BroadData(path, path / "legacy.npz", {**options,
+                "clear_index_data": str(path / "clear"), "clear_broad_fraction": 0,
+                "clear_distance_cycle": [6, 7, 8, 9, 10, 13],
+                "stream_distance_cycle": [6, 7, 8], "medium_deep_source_fraction": .5})
+            s, g = indexed.clear_rows(0, 180)
+            distance = indexed.roots[0].distance_parts(s, g).sum(-1)
+            self.assertTrue(set(distance).issubset({6, 7, 8}))
+            self.assertTrue({6, 7, 8}.issubset(set(distance)))
+            for mask, truth in zip(indexed.roots[0].packed(s), distance):
+                self.assertEqual(oracle.distance(int(mask[0]), 0), truth)
+            batch = indexed.batch(128, 32)
+            for ss, gg, dd in ((batch[0], batch[1], batch[2]), (batch[3], batch[4], batch[5])):
+                np.testing.assert_array_equal(dd, [oracle.distance(int(a[0]), int(b[0])) for a, b in zip(ss, gg)])
+            saved = copy.deepcopy(indexed.state_dict())
+            replay = BroadData(path, path / "legacy.npz", indexed.options)
+            replay.load_state_dict(saved)
+            for a, b in zip(indexed.batch(128, 32), replay.batch(128, 32)):
+                np.testing.assert_array_equal(a, b)
+            indexed.close(); replay.close()
 
 
 if __name__ == "__main__":

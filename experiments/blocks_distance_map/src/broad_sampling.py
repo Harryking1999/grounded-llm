@@ -6,6 +6,7 @@ import numpy as np
 import torch
 
 from .full_graph_sampling import JointData
+from .clear_distance_index import ClearDistanceIndex
 
 
 class Cardinality:
@@ -64,6 +65,18 @@ class BroadData(JointData):
         self.actual_distances = {}
         self.fork_degrees = {}
         self.stream_calls = 0
+        self.clear_requested_distances, self.clear_actual_distances = {}, {}
+        index_path = options.get("clear_index_data")
+        self.clear_indexes = ({gid: ClearDistanceIndex(Path(index_path) / str(gid)) for gid in self.graphs}
+                              if index_path else None)
+        self.clear_suffixes = []
+        if self.clear_indexes is not None:
+            for root in self.roots:
+                suffix = [None] * (len(root.parts) + 1)
+                suffix[-1] = np.asarray([1], dtype=np.uint64)
+                for i in reversed(range(len(root.parts))):
+                    suffix[i] = np.convolve(self.clear_indexes[root.record["components"][i]["graph"]].sizes, suffix[i + 1])
+                self.clear_suffixes.append(suffix)
         previous = options.get("previous_sampler_root")
         if previous:
             state = torch.load(Path(previous) / f"sampler_{options['previous_sampler_step']:06d}_rank{rank}.pt",
@@ -88,6 +101,51 @@ class BroadData(JointData):
     def add_hist(target, values):
         for key, count in distance_histogram(values).items():
             target[key] = target.get(key, 0) + count
+
+    def clear_rows(self, board, count, ranking=False):
+        if self.clear_indexes is None:
+            return super().clear_rows(board, count, ranking)
+        broad = round(count * self.options.get("clear_broad_fraction", .15))
+        old_source, old_goal = super().clear_rows(board, broad, ranking)
+        count -= broad
+        if not count:
+            return old_source, old_goal
+        root, suffix = self.roots[board], self.clear_suffixes[board]
+        available = np.flatnonzero(suffix[0])
+        available = available[available > 0]
+        cycle = np.asarray(self.options.get("clear_distance_cycle", [2, 3, 4, 5, 6, 7, 8, 6, 7, 8, 9, 10, 11, 12, 13]))
+        wanted = cycle[(np.arange(count) + int(self.rng.integers(len(cycle)))) % len(cycle)]
+        actual = wanted.copy()
+        for distance in np.unique(wanted):
+            if distance in available:
+                continue
+            lo, hi = (14, 18) if distance >= 14 else (9, 13) if distance >= 9 else (6, 8) if distance >= 6 else (1, 5)
+            pool = available[(available >= lo) & (available <= hi)]
+            if not len(pool):
+                pool = available[np.abs(available - distance) == np.abs(available - distance).min()]
+            selected = wanted == distance
+            actual[selected] = self.rng.choice(pool, int(selected.sum()))
+        self.add_hist(self.clear_requested_distances, wanted)
+        self.add_hist(self.clear_actual_distances, actual)
+        remaining = actual.copy()
+        source = np.empty((count, len(root.parts)), dtype=np.int64)
+        for i, (graph, _) in enumerate(root.parts):
+            index = self.clear_indexes[root.record["components"][i]["graph"]]
+            distances = np.arange(len(index.sizes))
+            rest = remaining[:, None] - distances
+            valid = (rest >= 0) & (rest < len(suffix[i + 1]))
+            weights = np.where(valid, index.sizes[None, :] * suffix[i + 1][np.clip(rest, 0, len(suffix[i + 1]) - 1)], 0).astype(float)
+            choice = (np.cumsum(weights, -1) <= self.rng.random(count)[:, None] * weights.sum(-1)[:, None]).sum(-1)
+            for distance in np.unique(choice):
+                rows = choice == distance
+                source[rows, i] = graph.rank(index.sample(distance, int(rows.sum()), self.rng))
+            remaining -= choice
+        assert np.all(remaining == 0)
+        goal = np.tile([g.zero_id for g, _ in root.parts], (count, 1))
+        # This changes sampling, never the graph or legal action set. The broad
+        # stream and retained clear fraction still include unreachable states;
+        # stars below retain every legal trap action at each clearable parent.
+        return np.concatenate((old_source, source)), np.concatenate((old_goal, goal))
 
     def _paths(self, root, start, length=18):
         # Walk directly on component bit masks: no repeated BDD unrank/rank at
@@ -126,7 +184,17 @@ class BroadData(JointData):
         # graph sources; not only optimal clearing paths or fixed failure goals.
         path = self._paths(root, initial)
         first_depth = self.rng.choice([0, 0, 0, 1, 2, 3, 4], count)
+        # Spread medium-distance starts across both dense twelve-block roots
+        # and smaller residual states; depth and goal distance are separate axes.
+        deep = ((wanted >= 6) & (wanted <= 8) &
+                (self.rng.random(count) < self.options.get("medium_deep_source_fraction", 0)))
+        first_depth[deep] = self.rng.integers(2, 7, size=int(deep.sum()))
         first_depth[wanted >= 9] = self.rng.integers(2, size=int((wanted >= 9).sum()))
+        # At least two cells per remaining move and a nonempty goal. Do not
+        # choose a residual source too small even to admit its requested band.
+        occupied = np.unpackbits(path.view(np.uint8), axis=-1).sum(-1)
+        depth_cap = np.maximum((occupied >= (2 * wanted + 2)[:, None]).sum(-1) - 1, 0)
+        first_depth = np.minimum(first_depth, depth_cap)
         source = path[np.arange(count), first_depth]
         uniform = (np.arange(count) % 2 == 0) & (wanted <= 5)
         local = root.decode(self.rng.integers(root.size, size=int(uniform.sum())))
@@ -143,7 +211,10 @@ class BroadData(JointData):
                              np.where(wanted[:, None] >= 6, (distances >= 6) & (distances <= 8),
                                       (distances >= 1) & (distances <= 5))) & nonempty
         choices = np.where(exact.any(-1)[:, None], exact, same_band)
-        choices = np.where(choices.any(-1)[:, None], choices, (distances > 0) & nonempty)
+        fallback = (distances > 0) & nonempty
+        hardest = np.where(fallback, distances, -1).max(-1)
+        fallback &= (wanted < 6)[:, None] | (distances == hardest[:, None])
+        choices = np.where(choices.any(-1)[:, None], choices, fallback)
         # If the sampled source is a leaf, equality remains a legitimate broad
         # relation, reported as distance0 instead of claiming a long example.
         choices[~choices.any(-1), 0] = True
@@ -209,6 +280,7 @@ class BroadData(JointData):
         state["broad_stream"] = {"sketches": self.sketch_state(), "roots": self.phase_roots,
             "histograms": self.phase_histograms, "requested": self.requested_distances,
             "initial": self.initial_distances, "actual": self.actual_distances, "fork_degrees": self.fork_degrees,
+            "clear_requested": self.clear_requested_distances, "clear_actual": self.clear_actual_distances,
             "stream_calls": self.stream_calls, "prefix_roots": self.prefix_roots}
         return state
 
@@ -220,6 +292,8 @@ class BroadData(JointData):
         self.phase_histograms = stream["histograms"]
         self.requested_distances, self.initial_distances = stream["requested"], stream["initial"]
         self.actual_distances = stream["actual"]
+        self.clear_requested_distances = stream.get("clear_requested", {})
+        self.clear_actual_distances = stream.get("clear_actual", {})
         self.fork_degrees, self.stream_calls = stream["fork_degrees"], stream["stream_calls"]
         self.prefix_roots = stream["prefix_roots"]
 
@@ -229,6 +303,8 @@ class BroadData(JointData):
             "requested_stream_distance_draws": self.requested_distances,
             "before_cross_branch_distance_draws": self.initial_distances,
             "actual_stream_distance_draws": self.actual_distances, "fork_degree_draws": self.fork_degrees,
+            "requested_indexed_clear_distances": self.clear_requested_distances,
+            "actual_indexed_clear_parent_distances": self.clear_actual_distances,
             "local_estimated_distinct": {k: v.estimate() for k, v in self.phase_sketches.items()},
             "estimate_relative_standard_error": 1.04 / math.sqrt(1 << 14),
             "scope": "This new phase only, packed global state-pair HLL shared identity across roots; per-rank until merged at complete checkpoint. Nonzero score derivatives do not imply nonzero parameter gradients. Earlier distinct exposure unknown outside the certified broad prefix."}

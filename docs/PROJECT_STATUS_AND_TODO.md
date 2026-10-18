@@ -15,11 +15,11 @@
 
 | 任务 | 当前结论 | 下一步／依据 |
 |---|---|---|
-| [积木](../tasks/blocks/README.md) | 原八形状12块条件清空改善，但复杂中间目标仍未可靠，保留原选用权重 | 从首轮能力保持候选扩增多初盘完整精确图和流式关系曝光，联合验收原510、清空及困难非空目标，失败分叉作为其中一部分；用户已授权增大不可达标签以分离长程有限关系，其他模型与损失保持；[12块地图报告](../experiments/blocks_distance_map/results/blocks12_joint_report.md)、[历史地图](../experiments/blocks_distance_map/results/report.md)、[并行SFT诊断](../experiments/map_sft_baselines/results/b2_four_controls.md) |
+| [积木](../tasks/blocks/README.md) | 广覆盖独立关系尚未共同改善原510、清空及困难中间目标；保留原选用及首轮421/510能力保持权重 | 从首轮有效父联合训练同起点多目标、同目标多起点、完整候选及跨分支多步关系；按实际更新的结构组曝光和四项同题得失验收，保持独立未见初盘；仅沿用已授权不可达修正；[12块地图报告](../experiments/blocks_distance_map/results/blocks12_joint_report.md)、[历史地图](../experiments/blocks_distance_map/results/report.md)、[并行SFT诊断](../experiments/map_sft_baselines/results/b2_four_controls.md) |
 | [寻路](../tasks/path/README.md) | 采用统一方法 Q 和已选定权重，旧 Q/V 保留为历史对照 | 统一文字与新条件参数；[权重来源](../tasks/path/Qmap/selection.json) |
 | [汉诺塔](../tasks/hanoi/README.md) | 用户采用八盘整塔目标地图，正式评测仅考虑任意合法起点到指定柱的整塔终点 | 保留残留失败与中间目标补充结果，不追加训练；[权重及范围](../tasks/hanoi/Qmap/selection.json)、[实验报告](../experiments/hanoi_qmap/results/report.md) |
 | [二阶魔方](../tasks/cube2/README.md) | 采用用户指定的复原断点，保留二阶主条件，三阶探索停止 | 继续定位复原与关系泛化不足；[权重来源](../tasks/cube2/Qmap/selection.json) |
-| [8-Puzzle（数字华容道）](../tasks/puzzle8/README.md) | 保留3×3主条件；残留循环吸引域及长程中间目标仍失败，尚无通过可靠性验收的权重 | 保留高复原候选并扩大训练中间目标覆盖，维护原关系能力；当前远端入口需恢复，之后接续完整权重与采样状态；以完整复原、长程关系、同题得失及实际曝光验收；[实验报告](../experiments/puzzle8_qmap/results/report.md) |
+| [8-Puzzle（数字华容道）](../tasks/puzzle8/README.md) | 保留3×3主条件和已完整保护的97.80%复原候选；困难中间关系仍需扩大，未完成全部可靠性验收 | 已从完整保护权重和采样状态继续联合训练，维护高复原能力并扩大中间目标；以完整复原、长程关系、同题得失及实际曝光验收；[实验报告](../experiments/puzzle8_qmap/results/report.md) |
 
 五任务纯文字强基线及补充对照已完成，结果和比较边界见[统一评测报告](../experiments/task_text_baselines/results/report.md)，不与不同设置的旧 SFT 指标混用。
 

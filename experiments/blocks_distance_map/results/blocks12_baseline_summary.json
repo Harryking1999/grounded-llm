@@ -1,0 +1,31 @@
+{
+  "analysis_commit": "571b4d6",
+  "scorer": {
+    "checkpoint": "/zhanghanyue/experiment/grounded_llm_blocks12_qmap/models/parent_986cb4d_step015000.pt",
+    "source_commit": "986cb4d",
+    "step": 80000
+  },
+  "scope": "fresh twelve-placement boards, original eight shapes; greedy Q without oracle access",
+  "boards": 200,
+  "sections": {
+    "clear": {
+      "tasks": 200,
+      "outcomes": {
+        "local_coverage_failure": 161,
+        "reached": 31,
+        "globally_unreachable": 8
+      },
+      "success_rate": 0.155
+    },
+    "intermediate": {
+      "tasks": 400,
+      "outcomes": {
+        "reached": 214,
+        "removed_goal_cell": 76,
+        "local_coverage_failure": 108,
+        "globally_unreachable": 2
+      },
+      "success_rate": 0.535
+    }
+  }
+}

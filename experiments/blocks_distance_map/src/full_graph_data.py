@@ -79,8 +79,9 @@ def build_graph(width, tiles, out, maximum_states):
 
 
 def _build_job(job):
+    from .symbolic_graph import build_symbolic
     gid, width, tiles, out, maximum = job
-    result = build_graph(width, tiles, out, maximum)
+    result = build_symbolic(width, tiles, out, maximum)
     print(json.dumps({"completed_component": gid, **{k: result[k] for k in ("states", "edges")}}), flush=True)
     return gid, result
 
@@ -94,6 +95,7 @@ class Component:
         for name in ("states", "removed", "distances", "offsets", "children"):
             setattr(self, name, np.load(path / f"{name}.npy", mmap_mode="r"))
         self.size = len(self.states)
+        self.initial_id, self.zero_id = 0, int(np.argmin(self.states))
 
     def close(self):
         for name in ("states", "removed", "distances", "offsets", "children"):
@@ -107,6 +109,25 @@ class Component:
         safe = np.minimum(index, len(self.removed) - 1)
         valid = ((source & goal) == goal) & (index < len(self.removed)) & (self.removed[safe] == delta)
         return np.where(valid, self.distances[safe], -1).astype(np.int16)
+
+    def degrees(self, ids):
+        return self.offsets[ids + 1] - self.offsets[ids]
+
+    def take(self, ids, offsets):
+        return self.children[self.offsets[ids] + offsets]
+
+    def star(self, ids):
+        degree = self.degrees(ids)
+        rows = np.repeat(np.arange(len(ids)), degree)
+        offsets = np.arange(len(rows)) - np.repeat(np.cumsum(degree) - degree, degree)
+        return rows, self.take(ids[rows], offsets)
+
+
+def load_component(path):
+    from .symbolic_graph import SymbolicComponent
+    summary = json.loads((Path(path) / "summary.json").read_text())
+    return (SymbolicComponent if summary.get("representation") == "symbolic_complete_BFS"
+            else Component)(path)
 
 
 class Root:
@@ -147,7 +168,7 @@ class Root:
         current = local_ids.copy()
         limits = np.broadcast_to(steps, current.shape[:-1])
         for move in range(int(np.max(limits, initial=0))):
-            degrees = np.stack([g.offsets[current[:, i] + 1] - g.offsets[current[:, i]]
+            degrees = np.stack([g.degrees(current[:, i])
                                 for i, (g, _) in enumerate(self.parts)], -1)
             total = degrees.sum(-1)
             active = (total > 0) & (move < limits)
@@ -162,7 +183,7 @@ class Root:
             for i, (graph, _) in enumerate(self.parts):
                 keep = np.flatnonzero(selected == i)
                 rows = ids[keep]
-                current[rows, i] = graph.children[graph.offsets[current[rows, i]] + offset[keep]]
+                current[rows, i] = graph.take(current[rows, i], offset[keep])
         return current
 
 
@@ -187,9 +208,15 @@ def prepare(config, out):
         roots.append({**record, "components": parts})
         if len(roots) == config["train_boards"]:
             break
+    if len(roots) != config["train_boards"]:
+        raise ValueError("Insufficient distinct training roots")
+    action_counts = [sum(int(r["initial"]) & tile == tile for r in roots)
+                     for tile, _ in blocks.PLACEMENTS]
+    if not all(action_counts):
+        raise ValueError("Training roots do not cover every original placement action")
     (out / "roots.json").write_text(json.dumps(roots) + "\n")
     (out / "graph_specs.json").write_text(json.dumps(specs) + "\n")
-    jobs = [(i, width, tiles, out / "graphs" / str(i), config["maximum_component_states"])
+    jobs = [(i, width, tiles, out / "graphs" / str(i), config["maximum_diagram_nodes"])
             for i, (width, tiles) in enumerate(specs)]
     with ProcessPoolExecutor(max_workers=config["workers"]) as executor:
         summaries = dict(executor.map(_build_job, jobs))
@@ -206,6 +233,9 @@ def prepare(config, out):
                "root_directed_edge_counts": edges,
                "total_root_local_states": sum(counts), "total_root_local_pairs": sum(pairs),
                "total_root_local_edges": sum(edges),
+               "actions_available": len(action_counts),
+               "action_training_root_counts": action_counts,
+               "representation": "symbolic_complete_BFS_component_products",
                "scope": "Complete Cartesian-product removal DAG for every selected twelve-placement root; exact arbitrary-pair lookup. Counts are root-local and may overlap across roots. Available relations are not actual training exposure.",
                "evaluation_root_overlap": 0}
     (out / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")

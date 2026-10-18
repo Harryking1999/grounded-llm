@@ -9,9 +9,29 @@ from experiments.blocks_distance_map.src.full_graph_data import (
     Component, Root, build_graph, components, local_tiles,
 )
 from experiments.blocks_distance_map.src.oracle import DistanceOracle, successors
+from experiments.blocks_distance_map.src.symbolic_graph import build_symbolic, SymbolicComponent
 
 
 class CompleteGraphTest(unittest.TestCase):
+    def test_symbolic_all_states_pairs_and_actions_equal_explicit_bfs(self):
+        tiles = [3, 6, 12, 24, 48, 7, 14, 28, 56]
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp)
+            build_graph(6, tiles, path / "dense", 1000)
+            build_symbolic(6, tiles, path / "symbolic", 10000)
+            dense, symbolic = Component(path / "dense"), SymbolicComponent(path / "symbolic")
+            ids = np.arange(symbolic.size)
+            masks = symbolic.states[ids]
+            self.assertEqual(set(masks), set(dense.states))
+            np.testing.assert_array_equal(symbolic.rank(masks), ids)
+            source, goal = np.meshgrid(masks, masks, indexing="ij")
+            np.testing.assert_array_equal(symbolic.distance(source, goal), dense.distance(source, goal))
+            for i, mask in enumerate(masks):
+                _, children = symbolic.star(np.asarray([i]))
+                self.assertEqual(set(symbolic.states[children]),
+                                 {int(mask) ^ tile for tile in tiles if int(mask) & tile == tile})
+            dense.close()
+
     def test_full_product_all_pairs_match_original_oracle_and_all_transitions(self):
         initial = (1 << 0) | (1 << 1) | (1 << 10) | (1 << 66) | (1 << 67)
         with tempfile.TemporaryDirectory() as temp:

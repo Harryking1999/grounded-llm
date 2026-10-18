@@ -7,7 +7,9 @@
   "evaluation_boards": 200,
   "evaluation_seed": 2026101835,
   "workers": 4,
-  "maximum_component_states": 20000000,
+  "representation": "symbolic_complete_BFS_component_products",
+  "dependency": "dd==0.6.0 (CUDD for preparation only; numpy for training lookup)",
+  "maximum_diagram_nodes": 2000000,
   "limit_policy": "fail_and_report_incomplete_no_truncation_no_false_unreachable_labels",
   "actual_training": "broad_sampling_recorded_separately_from_complete_available_representation"
 }

@@ -56,6 +56,37 @@ def train_cases(roots, count, seed):
 
 def evaluate_rows(rows, scorer, oracle):
     results, bins = [], {}
+    trajectory = {"forks": 0, "shortest_choices": 0, "reachable_choices": 0,
+                  "complete_candidate_relations": 0, "finite_at_or_above_original_cap": 0,
+                  "cap_conflict_forks": 0, "cap_conflict_reachable_choices": 0,
+                  "distance_bins": {}}
+
+    class AuditedScorer:
+        """Labels are computed after Q scores; they never filter/select actions."""
+        def __init__(self, source):
+            self.source = source
+
+        def scores(self, masks, goal):
+            scores = scorer.scores(masks, goal)
+            truth = oracle.distance(self.source, goal)
+            labels = np.asarray([oracle.distance(mask, goal) for mask in masks])
+            choice = int(scores.argmin())
+            finite = labels[labels >= 0]
+            conflict = bool(len(finite) and np.any(labels < 0) and finite.min() >= scorer.model.cap)
+            trajectory["forks"] += 1
+            trajectory["shortest_choices"] += int(labels[choice] == truth - 1)
+            trajectory["reachable_choices"] += int(labels[choice] >= 0)
+            trajectory["complete_candidate_relations"] += len(labels)
+            trajectory["finite_at_or_above_original_cap"] += int((labels >= scorer.model.cap).sum())
+            trajectory["cap_conflict_forks"] += conflict
+            trajectory["cap_conflict_reachable_choices"] += conflict and bool(labels[choice] >= 0)
+            key = str(truth) if truth <= 2 else "3-4" if truth <= 4 else "5-8" if truth <= 8 else "9+"
+            bucket = trajectory["distance_bins"].setdefault(key, {"forks": 0, "shortest": 0, "reachable": 0})
+            bucket["forks"] += 1
+            bucket["shortest"] += int(labels[choice] == truth - 1)
+            bucket["reachable"] += int(labels[choice] >= 0)
+            self.source = masks[choice]
+            return scores
     for index, row in enumerate(rows):
         source, goal = int(row["source"]), int(row["goal"])
         truth = oracle.distance(source, goal)
@@ -72,13 +103,13 @@ def evaluate_rows(rows, scorer, oracle):
             group["shortest_choices"] += int(distances[int(scores.argmin())] == truth - 1)
             group["candidate_count"] += len(candidates)
             group["absolute_error_sum"] += float(np.abs(scores - np.where(distances < 0, cap, distances)).sum())
-        outcome = trace(scorer, source, goal, oracle)
+        outcome = trace(AuditedScorer(source), source, goal, oracle)
         group["tasks"] += 1
         group["reached"] += outcome["outcome"] == "reached"
         results.append({**row, **outcome})
         if (index + 1) % 100 == 0:
             print(json.dumps({"evaluated": index + 1, "total": len(rows)}), flush=True)
-    return results, bins
+    return results, bins, trajectory
 
 
 def run(config, checkpoint, out, device, source_commit):
@@ -88,14 +119,14 @@ def run(config, checkpoint, out, device, source_commit):
     oracle = DistanceOracle(cache_limit=config["evaluation"]["oracle_cache_limit"],
                             seconds=config["evaluation"]["oracle_seconds"])
     scorer = QScorer(checkpoint, device)
-    evaluated, bins = evaluate_rows(baseline, scorer, oracle)
+    evaluated, bins, unseen_trajectory = evaluate_rows(baseline, scorer, oracle)
     train = train_cases(roots, config["evaluation"]["train_roots"], config["training"]["seed"] + 1)
-    train_rows, train_bins = evaluate_rows(train, scorer, oracle)
+    train_rows, train_bins, train_trajectory = evaluate_rows(train, scorer, oracle)
     parent_file = out.parent / "train_parent_cases.json"
     if parent_file.exists():
         train_parent = json.loads(parent_file.read_text())
     else:
-        train_parent, _ = evaluate_rows(train, QScorer(config["parent_checkpoint"], device), oracle)
+        train_parent, _, _ = evaluate_rows(train, QScorer(config["parent_checkpoint"], device), oracle)
         parent_file.parent.mkdir(parents=True, exist_ok=True)
         parent_file.write_text(json.dumps(train_parent) + "\n")
     result = {"analysis_commit": source_commit, "checkpoint": str(checkpoint),
@@ -103,6 +134,7 @@ def run(config, checkpoint, out, device, source_commit):
               "train_roots": sections(train_rows), "matched_train_parent": matched(train_parent, train_rows),
               "distance_bins_unseen": bins,
               "distance_bins_train": train_bins, "cycles": 0, "illegal_actions": 0,
+              "trajectory_forks_unseen": unseen_trajectory, "trajectory_forks_train": train_trajectory,
               "policy": "original_Q_argmin_all_legal_actions_no_search_or_oracle_filters",
               "rows": evaluated, "train_rows": train_rows}
     out.parent.mkdir(parents=True, exist_ok=True)

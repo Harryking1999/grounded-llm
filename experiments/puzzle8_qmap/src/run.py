@@ -15,6 +15,7 @@ from .evaluate import evaluate
 from .policy_audit import audit
 from .data_sampling import DataMix
 from .branch_data import BranchData
+from .graph_data import GraphData
 
 
 def train(env, config, data, out, device, source_commit, checkpoint=None):
@@ -41,7 +42,8 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
     for sampler, batch in ((ps, options["batch_size"]), (rs, options["decision_batch_size"])):
         if checkpoint is None and options["steps"] * round(batch * .5) < sampler.broad_count:
             raise ValueError("Budget must cover every training relation and decision")
-    mixture = (BranchData(env, data, config["branch_data"], rng, out) if "branch_data" in config else
+    mixture = (GraphData(env, data, config["graph_data"], rng, out) if "graph_data" in config else
+               BranchData(env, data, config["branch_data"], rng, out) if "branch_data" in config else
                DataMix(env, data, config["data_sampling"], rng) if "data_sampling" in config else None)
     features = torch.as_tensor(env.features(np.arange(env.size)), device=device)
     def q(ids):
@@ -143,6 +145,7 @@ def main():
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--prepared-run", type=Path)
     parser.add_argument("--checkpoint", type=Path)
+    parser.add_argument("--full-distance-table", type=Path)
     args = parser.parse_args()
     config = json.loads(args.config.read_text(encoding="utf-8"))
     if config["task"] != "puzzle8":
@@ -161,6 +164,13 @@ def main():
         env.goal_columns = {int(g): i for i, g in enumerate(oracle["goals"])}
         data = dict(np.load(args.prepared_run / "data.npz"))
         summary = {"prepared_run": str(args.prepared_run)}
+    if args.full_distance_table is not None:
+        oracle_summary = json.loads((args.full_distance_table.parent / "summary.json").read_text())
+        if not oracle_summary["complete"] or oracle_summary["shape"] != [env.size, env.size]:
+            raise ValueError("The full source-goal oracle is incomplete or mismatched")
+        env.full_distances = np.load(args.full_distance_table, mmap_mode="r")
+        (args.out / "full_oracle_source.json").write_text(json.dumps({"path": str(args.full_distance_table),
+                  "summary": oracle_summary}, indent=2) + "\n")
     print(json.dumps({"data": summary}), flush=True)
     train(env, config, data, args.out, args.device, args.source_commit, args.checkpoint)
 

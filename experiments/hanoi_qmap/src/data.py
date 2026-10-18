@@ -45,6 +45,15 @@ def build(env, config, out):
         # learned by a warm-start checkpoint into validation or test.
         split_keys[0] = np.union1d(split_keys[0], required)
         split_keys[1:] = [np.setdiff1d(group, required) for group in split_keys[1:]]
+    if "relation_coverage" in options:
+        fraction = options["relation_coverage"]
+        if not .7 <= fraction < 1:
+            raise ValueError("Expanded relation coverage must preserve original training and a holdout")
+        keep = max(1, round((1 - fraction) * len(keys) / 2))
+        for i in (1, 2):
+            group = split_keys[i]
+            split_keys[0] = np.union1d(split_keys[0], group[:-keep])
+            split_keys[i] = group[-keep:]
     membership = np.full(env.size**2, -1, dtype=np.int8)
     for i, name in enumerate(SPLITS):
         selected = pairs[np.isin(orbit, split_keys[i])]
@@ -124,5 +133,8 @@ def build(env, config, out):
                                                for g in towers}
         if any(count != env.size - 1 for count in summary["tower_decision_coverage"].values()):
             raise ValueError("Tower goal decisions are not closed over the complete graph")
+    if "relation_coverage" in options:
+        summary["training_orbit_fraction"] = len(split_keys[0]) / len(keys)
+        summary["full_decision_fraction"] = len(data["tasks_train"]) / (env.size * (env.size - 1))
     (out / "data_summary.json").write_text(json.dumps(summary, indent=2) + "\n")
     return data, summary

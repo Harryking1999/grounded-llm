@@ -39,6 +39,8 @@ class Puzzle8:
         self.goal_columns = {int(g): i for i, g in enumerate(goals)}
 
     def distance(self, source, goal):
+        if hasattr(self, "full_distances"):
+            return self.full_distances[np.asarray(goal), np.asarray(source)].astype(np.int64)
         source, goal = np.broadcast_arrays(source, goal)
         columns = np.asarray([self.goal_columns[int(g)] for g in goal.ravel()]).reshape(goal.shape)
         return self.tables[columns, source].astype(np.int64)

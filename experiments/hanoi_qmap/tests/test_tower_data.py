@@ -20,6 +20,7 @@ class TowerCoverageTest(unittest.TestCase):
         base["rules"]["disks"] = 3
         config = copy.deepcopy(base)
         config["data"]["require_all_tower_relations"] = True
+        config["data"]["relation_coverage"] = .99
         config["model"] = dict(dimension=8, hidden=16)
         config["training"].update(steps=1, batch_size=16, decision_batch_size=8, eval_every=1,
                                   cpu_threads=1, min_steps=0, retain_initial=True)

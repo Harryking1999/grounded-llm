@@ -16,6 +16,7 @@ from .policy_audit import audit
 from .data_sampling import DataMix
 from .branch_data import BranchData
 from .graph_data import GraphData
+from .failure_sampling import FailureGraphData
 from .checkpoint_audit import same_tasks, cycle_ranking
 from grounded_llm.qmap_metrics import rollout
 from .batch_parallel import BatchParallel
@@ -65,7 +66,9 @@ def train(env, config, data, out, device, source_commit, checkpoint=None, resume
     for sampler, batch in ((ps, options["batch_size"]), (rs, options["decision_batch_size"])):
         if checkpoint is None and options["steps"] * round(batch * .5) < sampler.broad_count:
             raise ValueError("Budget must cover every training relation and decision")
-    mixture = (GraphData(env, data, config["graph_data"], rng, out) if "graph_data" in config else
+    mixture = (FailureGraphData(env, data, config["graph_data"], rng, out, config["failure_sampling"])
+               if "failure_sampling" in config else
+               GraphData(env, data, config["graph_data"], rng, out) if "graph_data" in config else
                BranchData(env, data, config["branch_data"], rng, out) if "branch_data" in config else
                DataMix(env, data, config["data_sampling"], rng) if "data_sampling" in config else None)
     if checkpoint is not None and isinstance(mixture, GraphData):
@@ -123,6 +126,8 @@ def train(env, config, data, out, device, source_commit, checkpoint=None, resume
         reference = state["within"].copy()
         if mixture is not None and not resume:
             mixture.refresh(state["hard_parents"])
+            if isinstance(mixture, FailureGraphData):
+                mixture.mine(model, features, state)
         initial_validation_mae = pair_metrics(model, env, data["pairs_validation"], device)["mae"]
         if isinstance(mixture, GraphData):
             monitor_reference = intermediate_stage(model, env, data, config, device)
@@ -195,6 +200,8 @@ def train(env, config, data, out, device, source_commit, checkpoint=None, resume
                     policy, state = audit(model, env, device, reference=reference, cohort=data["tasks_restoration"][:, 0])
                     if mixture is not None:
                         mixture.refresh(state["hard_parents"])
+                        if isinstance(mixture, FailureGraphData):
+                            mixture.mine(model, features, state)
                     selection_score = -policy["within_budget"]
                     eligible = pm["mae"] <= initial_validation_mae + config["continuation"]["maximum_validation_mae_increase"]
                 if eligible and selection_score < best:
@@ -218,6 +225,8 @@ def train(env, config, data, out, device, source_commit, checkpoint=None, resume
                     stage = out / "stages" / f"step_{step:06d}"
                     stage.mkdir(parents=True, exist_ok=True)
                     (stage / "cycle_rankings.json").write_text(json.dumps(cycle_ranking(env, state)) + "\n")
+                    if isinstance(mixture, FailureGraphData):
+                        save(step, stage / "checkpoint.pt")
                     save(step, out / "last.pt")
                 log.write(json.dumps(record) + "\n"); log.flush()
                 print(json.dumps(record), flush=True)

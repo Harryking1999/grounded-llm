@@ -111,7 +111,7 @@ def structure(env, allowed, protected, levels):
 
 
 class GraphData:
-    def __init__(self, env, data, options, rng, out):
+    def __init__(self, env, data, options, rng, out, route_cache=None):
         if not hasattr(env, "full_distances"):
             raise ValueError("Joint full-graph training requires the complete source-goal table")
         self.env, self.data, self.options, self.rng = env, data, options, rng
@@ -130,7 +130,10 @@ class GraphData:
         self.edges = edges[~np.isin(edges, self.protected).any(-1)].astype(np.int32)
         self.es = Epoch(len(self.edges), rng)
         route_path = out / "graph_structure.npz"
-        self.routes = structure(env, self.allowed, self.protected, options["descendant_steps"])
+        if route_cache is not None:
+            self.routes = np.load(route_cache)["tasks"]
+        else:
+            self.routes = structure(env, self.allowed, self.protected, options["descendant_steps"])
         np.savez_compressed(route_path, tasks=self.routes)
         self.rp, self.rr = StreamEpoch(len(self.routes), rng), StreamEpoch(len(self.routes), rng)
         self.hard = np.column_stack((self.parents[self.parents != 0], np.zeros((self.parents != 0).sum(), dtype=int)))

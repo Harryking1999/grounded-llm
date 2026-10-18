@@ -1,6 +1,6 @@
 # 汉诺塔 Qmap
 
-用同一个纯 Q 范式，分别训练各盘数的状态地图。本任务独立维护 [数据](src/data.py)、[训练](src/run.py)、[模型适配](src/model.py)与[评测](src/evaluate.py)，不再使用混合 puzzle 训练入口。与其他任务共享基础 MLP、距离和排序方法，见[统一方法](../../tasks/QMAP_METHOD.md)。完整到达与六盘失败见[结果报告](results/report.md)，文字、数据和选定权重见[任务工作区](../../tasks/hanoi/README.md)。这不是一个模型跨盘数泛化；八盘 [首轮合同](configs/hanoi8.json)已训练完成，随机关系与整塔到达仍不足。
+用同一个纯 Q 范式，分别训练各盘数的状态地图。本任务独立维护 [数据](src/data.py)、[训练](src/run.py)、[模型适配](src/model.py)与[评测](src/evaluate.py)，不再使用混合 puzzle 训练入口。与其他任务共享基础 MLP、距离和排序方法，见[统一方法](../../tasks/QMAP_METHOD.md)。当前用户已采用八盘全图阶段所选地图，正式范围为[任意合法起点到指定整塔终点](configs/hanoi8_tower_evaluation.json)；完整结果见[报告](results/report.md)，加载与权重见[任务入口](../../tasks/hanoi/Qmap/README.md)。三至六盘只作历史条件，不作跨盘数泛化主张。
 
 ## 规则与状态
 

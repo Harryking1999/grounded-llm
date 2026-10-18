@@ -1,20 +1,26 @@
 {
-  "task": "hanoi6",
-  "status": "selected_historical_reference_new_eight_disk_target_pending",
-  "checkpoint": "checkpoints/hanoi6_best.pt",
-  "source_commit": "a07b5f7fb1605aaf0fbd7935c16f3174859caf47",
-  "source_run": "runs/hanoi_qmap/hanoi6",
+  "task": "hanoi8",
+  "status": "selected_by_user_for_full_tower_goals",
+  "checkpoint": "checkpoints/hanoi8_full_coverage_fb7ffe6_best.pt",
+  "source_commit": "fb7ffe6f7a6a69bf3ba3a908126905d7b500af24",
+  "source_run": "runs/hanoi8_full_coverage_fb7ffe6",
   "source_checkpoint": "best.pt",
-  "selection": "best_validation_distance_plus_rank_objective_within_hanoi6",
-  "config": "experiments/hanoi_qmap/configs/hanoi6.json",
-  "scope": "six_disk_only_not_eight_disk",
-  "evidence": "experiments/hanoi_qmap/results/summary.json",
-  "requested_condition": {
-    "task": "hanoi8",
-    "status": "full_graph_joint_completed_not_selected",
-    "checkpoint": null,
-    "config": "experiments/hanoi_qmap/configs/hanoi8_full_coverage.json",
-    "evidence": "experiments/hanoi_qmap/results/full_coverage_summary.json",
-    "reason": "Six tower directions solve, but general intermediate-goal rollout remains 151/1024; historical six-disk weights above are not eight-disk weights."
+  "selection": "best_all_state_tower_arrival_checkpoint_accepted_by_user_for_tower_goal_evaluation",
+  "config": "experiments/hanoi_qmap/configs/hanoi8_full_coverage.json",
+  "evaluation_config": "experiments/hanoi_qmap/configs/hanoi8_tower_evaluation.json",
+  "scope": "eight_disks_any_legal_start_to_specified_full_tower_goal_on_A_B_or_C",
+  "evidence": "experiments/hanoi_qmap/results/full_coverage_summary.json",
+  "limitations": "21 of 19680 nonterminal tower-goal tasks fail in two cycles. Arbitrary intermediate goals are outside the adopted evaluation scope; intermediate results remain reported.",
+  "historical_reference": {
+    "task": "hanoi6",
+    "status": "historical_six_disk_reference_only",
+    "checkpoint": "checkpoints/hanoi6_best.pt",
+    "source_commit": "a07b5f7fb1605aaf0fbd7935c16f3174859caf47",
+    "source_run": "runs/hanoi_qmap/hanoi6",
+    "source_checkpoint": "best.pt",
+    "selection": "best_validation_distance_plus_rank_objective_within_hanoi6",
+    "config": "experiments/hanoi_qmap/configs/hanoi6.json",
+    "scope": "six_disk_only_not_eight_disk",
+    "evidence": "experiments/hanoi_qmap/results/summary.json"
   }
 }

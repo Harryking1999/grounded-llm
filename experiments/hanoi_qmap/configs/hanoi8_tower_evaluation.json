@@ -1,0 +1,16 @@
+{
+  "task": "hanoi8",
+  "base_training_config": "experiments/hanoi_qmap/configs/hanoi8_full_coverage.json",
+  "selection": "tasks/hanoi/Qmap/selection.json",
+  "evaluation_scope": {
+    "starts": "all_legal_states",
+    "goals": "full_tower_on_each_of_A_B_C",
+    "exclude_start_equal_goal": true,
+    "policy": "unchanged_greedy_q",
+    "budget": "inherit_base_evaluation_budget_multiplier",
+    "primary": "full_state_tower_goal_arrival",
+    "standard_tower_to_tower": "supplementary_six_directions",
+    "arbitrary_intermediate_goals": "supplementary_only_not_adoption_requirement"
+  },
+  "decision": "User explicitly accepted the current map and restricted formal evaluation to full-tower target states. This does not claim perfect success or reliable arbitrary-goal solving."
+}

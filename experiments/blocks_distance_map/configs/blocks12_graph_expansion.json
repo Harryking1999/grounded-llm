@@ -1,8 +1,8 @@
 {
   "study": "blocks_distance_map",
   "condition": "twelve_nonoverlapping_construction_placements_original_eight_shapes_10x10",
-  "coverage": "5000 distinct twelve-placement roots; preserve previous1000 index prefix; reuse complete components; build every new unique component without truncation",
-  "train_boards": 5000,
+  "coverage": "10000 distinct twelve-placement roots; preserve previous5000 index prefix; reuse all complete components; build each new unique component without truncation. Current GPU training remains on complete5000 until a matched checkpoint handoff.",
+  "train_boards": 10000,
   "seed": 2026101841,
   "evaluation_boards": 200,
   "evaluation_seed": 2026101835,
@@ -12,5 +12,5 @@
   "maximum_diagram_nodes": 2000000,
   "limit_policy": "fail_and_report_incomplete_no_truncation_no_false_unreachable_labels",
   "actual_training": "broad_sampling_recorded_separately_from_complete_available_representation",
-  "reuse_graph_data": "/tmp/blocks12_graphs_676140c"
+  "reuse_graph_data": "/tmp/blocks12_graphs_5000"
 }

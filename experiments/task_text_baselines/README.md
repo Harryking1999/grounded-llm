@@ -1,6 +1,6 @@
 # 五任务纯文字完整规划基线
 
-**结果只看[模型、设置与预算对照表](results/report.md)。**初始五任务、旧积木复测、逐步状态、S/Z 八形状仅动作及完整十形状 100 题双模型对照均已完成。服务失败已补齐，定时跟进已暂停。此前加难探索均已停止，不再派题。
+**结果只看[模型、设置与预算对照表](results/report.md)。**初始五任务、DeepSeek Flash 同题 200 题、旧积木复测、逐步状态、S/Z 八形状仅动作及完整十形状 100 题双模型对照均已完成。服务失败已补齐，定时跟进已暂停。此前加难探索均已停止，不再派题。
 
 ## 实验合同与答卷来源
 
@@ -11,6 +11,7 @@
 | 6.1-sol high，初始五任务各 40 题 | [sol_high_40.json](configs/sol_high_40.json) | `runs/five_task_sol_high_40/` |
 | Qwen3-32B thinking，同题 200 题 | [qwen32b_same40.json](configs/qwen32b_same40.json) | `runs/five_task_qwen32b_same40/` |
 | 5.6-sol high，同题 200 题 | [sol56_high_same40.json](configs/sol56_high_same40.json) | `runs/five_task_sol56_high_same40/` |
+| DeepSeek Flash high，初始五任务同题 200 题，16k | [deepseek_flash_same40_16k.json](configs/deepseek_flash_same40_16k.json) | `runs/deepseek_flash_same40_16k/` |
 | 6.1-sol high，旧十形状十二块 16 题 | [sol61_legacy_blocks12_new_prompt.json](configs/sol61_legacy_blocks12_new_prompt.json) | `runs/sol61_legacy_blocks12_new_prompt/` |
 | 5.6-sol high，原八形状＋逐步状态 40 题 | [sol56_blocks40_state_report.json](configs/sol56_blocks40_state_report.json) | `runs/sol56_blocks40_state_report/` |
 | 5.6-sol high，S/Z 八形状＋逐步状态 40 题 | [sol56_blocks40_sz_state_report.json](configs/sol56_blocks40_sz_state_report.json) | `runs/sol56_blocks40_sz_state_report/` |
@@ -21,6 +22,8 @@
 | 5.6-sol high，逐字复用上述 100 题，仅动作 | [sol56_blocks100_sz10_actions.json](configs/sol56_blocks100_sz10_actions.json) | `runs/sol56_blocks100_sz10_actions/` |
 
 提示词从 `tasks/<task>/prompts/README.md` 读取，生成后冻结在各运行目录的 `suite.json`。逐字同题组复制冻结内容；旧十形状保留原棋盘与形状目录，采用已确认的规则与完整计划 JSON；新 S/Z 八形状重新生成棋盘，与旧组不配对。
+
+DeepSeek 组逐字复制初始五任务 200 题，积木采用原八形状、12 次构造、仅动作输出。官方当前 Flash 接口对应 V4.1-Flash-1017，旧 V4 Flash 名称已转接，在线模型列表未提供 R1；不得将本轮记为原 V4 或 R1 实测。通过现有 Responses 入口请求 high，思考和答案共限 16k；返回身份、强度、用量和截断保留在原始答卷。进度及结果见统一结果表。
 
 6.1 的 S/Z 组直接复制已冻结的 5.6 S/Z 题集，包括逐步状态要求，不再次生成棋盘；只有请求模型不同，高强度、16k 请求及服务重试设置保持一致。
 

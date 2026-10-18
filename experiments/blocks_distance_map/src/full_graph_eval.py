@@ -14,6 +14,44 @@ from .oracle import DistanceOracle, successors
 from .tree_supervision_eval import QScorer
 
 
+def distance_goal_success(rows):
+    result = {}
+    for band, low, high in (("6-8", 6, 8), ("9-13", 9, 13)):
+        for kind, empty in (("clear", True), ("nonempty", False)):
+            chosen = [r for r in rows if low <= r["true_distance"] <= high and (r["goal"] == "0") == empty]
+            result[f"{band}_{kind}"] = {"tasks": len(chosen),
+                "success": sum(r["outcome"] == "reached" for r in chosen)}
+    return result
+
+
+def historical_retention(manifest, checkpoint, reference=None):
+    from experiments.flamingo_map_reader.src.blocks import FrozenBoardMap
+    from experiments.flamingo_map_reader.src.blocks_sft import greedy_demonstration
+    data = json.loads(Path(manifest).read_text())
+    records = [r for r in data["records"] if r["split"] == "test"]
+    if len(records) != 510:
+        raise ValueError("Historical retention requires the unchanged fixed510 tasks")
+    qmap = FrozenBoardMap.load(checkpoint, "cpu")
+    rows = []
+    for r in records:
+        demo = greedy_demonstration(qmap, int(r["start"]), int(r["goal"]),
+            rng=np.random.default_rng(r["sample_seed"]),
+            max_actions=data["config"]["maximum_demonstration_actions"],
+            reported=data["config"]["data"]["reported_candidates"])
+        rows.append({"trajectory_id": r["trajectory_id"], "true_distance": r["shortest_moves"],
+                     "success": demo.success})
+    result = {"tasks": len(rows), "success": sum(r["success"] for r in rows),
+            "6-8_success": sum(r["success"] for r in rows if 6 <= r["true_distance"] <= 8),
+            "rows": rows, "scope": "Exact original fixed510, original greedy/RNG/budget; no oracle action selection"}
+    if reference:
+        before = json.loads(Path(reference).read_text())["models"]["after_first_10000"]["rows"]
+        if [r["trajectory_id"] for r in before] != [r["trajectory_id"] for r in rows]:
+            raise ValueError("Historical retention task identities changed")
+        result["old_success_lost"] = sum(a["success"] and not b["success"] for a, b in zip(before, rows))
+        result["new_success_gained"] = sum(not a["success"] and b["success"] for a, b in zip(before, rows))
+    return result
+
+
 def sections(rows):
     result = {}
     for key, selected in (("clear", [r for r in rows if r["goal"] == "0"]),
@@ -138,6 +176,22 @@ def run(config, checkpoint, out, device, source_commit):
               "trajectory_forks_unseen": unseen_trajectory, "trajectory_forks_train": train_trajectory,
               "policy": "original_Q_argmin_all_legal_actions_no_search_or_oracle_filters",
               "rows": evaluated, "train_rows": train_rows}
+    result["distance_goal_success"] = distance_goal_success(evaluated)
+    settings = config["evaluation"]
+    if settings.get("intermediate_6_8_cases"):
+        medium = json.loads(Path(settings["intermediate_6_8_cases"]).read_text())["rows"]
+        medium_rows, _, _ = evaluate_rows(medium, scorer, oracle)
+        result["intermediate_6_8_rows"] = medium_rows
+        result["distance_goal_success"] = distance_goal_success(evaluated + medium_rows)
+    if settings.get("historical_510_manifest"):
+        result["historical_retention"] = historical_retention(settings["historical_510_manifest"], checkpoint,
+                                                             settings.get("historical_510_reference"))
+    if settings.get("minimum_joint_success"):
+        result["joint_quality"] = {"clear": result["unseen_roots"]["clear"]["success"],
+            "nonempty_6_8": result["distance_goal_success"]["6-8_nonempty"]["success"],
+            "nonempty_9_13": result["distance_goal_success"]["9-13_nonempty"]["success"],
+            "historical_510": result["historical_retention"]["success"],
+            "historical_6_8": result["historical_retention"]["6-8_success"]}
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(result, indent=2) + "\n")
     # Preserve the accepted parent unless both core unseen-goal scores hold.
@@ -145,6 +199,15 @@ def run(config, checkpoint, out, device, source_commit):
     selection = out.parent / "selection.json"
     score = sum(section["success"] for section in result["unseen_roots"].values())
     previous = json.loads(selection.read_text()) if selection.exists() else {"success": 245}
+    if "joint_quality" in result:
+        quality = result["joint_quality"]
+        floors = settings["minimum_joint_success"]
+        accepted = accepted and all(quality[k] >= v for k, v in floors.items())
+        accepted = accepted and all(quality[k] >= v for k, v in previous.get("joint_quality", {}).items())
+        score = sum(quality.values())
+        # The old selector's score includes trivial one-step tasks; do not compare unlike sums.
+        if "joint_quality" not in previous:
+            previous = {**previous, "success": sum(floors.values())}
     if "unseen_roots" in previous:
         accepted = accepted and all(result["unseen_roots"][key]["success"] >=
                                     previous["unseen_roots"][key]["success"]
@@ -152,6 +215,8 @@ def run(config, checkpoint, out, device, source_commit):
     if accepted and score > previous["success"]:
         selected = {"success": score, "checkpoint": str(checkpoint), "evaluation": str(out),
                     "unseen_roots": result["unseen_roots"]}
+        if "joint_quality" in result:
+            selected["joint_quality"] = result["joint_quality"]
         selection.write_text(json.dumps(selected, indent=2) + "\n")
         shutil.copy2(checkpoint, out.parent / "best.pt")
     print(json.dumps({k: result[k] for k in ("unseen_roots", "matched_baseline", "train_roots")}), flush=True)

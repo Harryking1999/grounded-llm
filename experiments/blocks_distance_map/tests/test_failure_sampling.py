@@ -13,9 +13,44 @@ from experiments.blocks_distance_map.src.full_graph_data import local_tiles
 from experiments.blocks_distance_map.src.symbolic_graph import build_symbolic, SymbolicComponent
 from experiments.blocks_distance_map.src.oracle import DistanceOracle
 from experiments.blocks_distance_map.src.full_graph_run import relation_batch
+from experiments.blocks_distance_map.src.full_graph_sampling import JointData
+from experiments.blocks_distance_map.src.full_graph_eval import distance_goal_success
 
 
 class FailureSamplingTest(unittest.TestCase):
+    def test_long_focus_keeps_exact_labels_and_goal_distance_intersection(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp)
+            cells = [0, 1, 3, 4, 6, 7, 30, 31, 33, 34, 36, 37]
+            initial = sum(1 << c for c in cells)
+            build_symbolic(len(cells), local_tiles(cells), path / "graphs" / "0", 10000)
+            graph = SymbolicComponent(path / "graphs" / "0")
+            masks = [sum(((int(mask) >> bit) & 1) << cell for bit, cell in enumerate(cells))
+                     for mask in graph.states[np.arange(graph.size)]]
+            (path / "roots.json").write_text(json.dumps([{"initial": str(initial), "construction": [{}],
+                "components": [{"graph": 0, "cells": cells}]}]))
+            (path / "summary.json").write_text(json.dumps({"complete": True,
+                "total_root_local_pairs": graph.size ** 2, "total_root_local_states": graph.size}))
+            oracle = DistanceOracle()
+            rows = [[i, j, oracle.distance(s, g), int(oracle.distance(s, g) < 0)]
+                    for i, s in enumerate(masks) for j, g in enumerate(masks)]
+            np.savez(path / "legacy.npz", states=np.asarray(masks, dtype=str), train=np.asarray(rows))
+            options = {"seed": 18, "boards_per_batch": 1, "legacy_fraction": .5,
+                       "legacy_long_fraction": .75, "broad_fraction": .25, "clear_fraction": .35}
+            sampler = JointData(path, path / "legacy.npz", options)
+            batch = sampler.batch(128, 32)
+            self.assertGreaterEqual(int(((batch[2] >= 6) & (batch[2] <= 13)).sum()), 48)
+            np.testing.assert_array_equal(batch[2], [oracle.distance(int(s[0]), int(g[0]))
+                                                    for s, g in zip(batch[0], batch[1])])
+            sampler.close()
+        values = distance_goal_success([
+            {"goal": "0", "true_distance": 7, "outcome": "reached"},
+            {"goal": "2", "true_distance": 7, "outcome": "removed_goal_cell"},
+            {"goal": "0", "true_distance": 12, "outcome": "reached"}])
+        self.assertEqual(values["6-8_clear"], {"tasks": 1, "success": 1})
+        self.assertEqual(values["6-8_nonempty"], {"tasks": 1, "success": 0})
+        self.assertEqual(values["9-13_clear"], {"tasks": 1, "success": 1})
+
     def test_exact_forks_actual_exposure_and_sampler_resume(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp)

@@ -48,6 +48,9 @@ class JointData:
         self.legacy_masks = packed_masks(legacy["states"])
         self.legacy_rows = legacy["train"]
         self.legacy_groups = listwise_groups(self.legacy_rows, options["seed"], per_anchor=4)
+        long_rows = (self.legacy_rows[:, 2] >= 6) & (self.legacy_rows[:, 2] <= 13)
+        self.legacy_long_pairs = np.flatnonzero(long_rows)
+        self.legacy_long_groups = np.flatnonzero(long_rows[self.legacy_groups].any(-1))
         self.legacy_strata = [np.flatnonzero(mask) for mask in (
             self.legacy_rows[:, 2] == 1, self.legacy_rows[:, 2] == 2,
             (self.legacy_rows[:, 2] >= 3) & (self.legacy_rows[:, 2] <= 4),
@@ -203,9 +206,16 @@ class JointData:
             count = remaining if i == len(self.legacy_strata) - 1 else round(legacy_pair * weight)
             ids.extend(self.rng.choice(pool, count).tolist())
             remaining -= count
+        focus = self.options.get("legacy_long_fraction", 0)
+        focused = round(legacy_pair * focus)
+        if focused and len(self.legacy_long_pairs):
+            ids[:focused] = self.rng.choice(self.legacy_long_pairs, focused).tolist()
         old = self.legacy_rows[ids]
         sources, goals, labels = [self.legacy_masks[old[:, 0]]], [self.legacy_masks[old[:, 1]]], [old[:, 2]]
         group = self.legacy_groups[self.rng.integers(len(self.legacy_groups), size=legacy_rank)]
+        focused = round(legacy_rank * focus)
+        if focused and len(self.legacy_long_groups):
+            group[:focused] = self.legacy_groups[self.rng.choice(self.legacy_long_groups, focused)]
         rows = self.legacy_rows[group]
         rank_sources = [self.legacy_masks[rows[..., 0]].reshape(-1, 2)]
         rank_goals = [self.legacy_masks[rows[..., 1]].reshape(-1, 2)]

@@ -1,4 +1,5 @@
 """Streaming exact relations across expanded roots, goals and distance bands."""
+import copy
 import math
 from pathlib import Path
 
@@ -75,6 +76,7 @@ class BroadData(JointData):
         self._pending_bundle_huber, self._pending_bundle_candidates = [], []
         self._pending_bundle_forks, self._pending_bundle_events = [], {}
         self._bundle_rank_roles = {}
+        self.layer_views, self.layer_suffixes = {}, {}
         index_path = options.get("clear_index_data")
         self.clear_indexes = ({gid: ClearDistanceIndex(Path(index_path) / str(gid)) for gid in self.graphs}
                               if index_path else None)
@@ -206,7 +208,84 @@ class BroadData(JointData):
             source[uniform, i] = graph.states[local[:, i]]
         return source
 
+    def _layer_targets(self, board, wanted):
+        """Sample existing exact BFS layers directly, without random-walk bias."""
+        root = self.roots[board]
+        if board not in self.layer_suffixes:
+            suffix = [None] * (len(root.parts) + 1)
+            suffix[-1] = np.asarray([1], dtype=np.uint64)
+            for i in reversed(range(len(root.parts))):
+                graph = root.parts[i][0]
+                if id(graph) not in self.layer_views:
+                    views = []
+                    for node in graph.layers:
+                        view = copy.copy(graph)
+                        view.root = int(node)
+                        view.size = int(graph.counts[node]) << int(graph.level[node])
+                        views.append(view)
+                    self.layer_views[id(graph)] = views
+                sizes = np.asarray([v.size for v in self.layer_views[id(graph)]], dtype=np.uint64)
+                suffix[i] = np.convolve(sizes, suffix[i + 1])
+            self.layer_suffixes[board] = suffix
+        suffix = self.layer_suffixes[board]
+        counts = suffix[0].copy()
+        empty_parts = [int(g.distance((1 << g.width) - 1, 0)) for g, _ in root.parts]
+        if min(empty_parts) >= 0:
+            counts[sum(empty_parts)] -= 1
+        available = np.flatnonzero(counts)
+        available = available[available > 0]
+        if not len(available):
+            raise ValueError("Root has no positive-distance nonempty target")
+        wanted = np.asarray(wanted)
+        actual = wanted.copy()
+        for d in np.unique(wanted):
+            if d not in available:
+                lo, hi = (14, 18) if d >= 14 else (9, 13) if d >= 9 else (6, 8) if d >= 6 else (1, 5)
+                pool = available[(available >= lo) & (available <= hi)]
+                if not len(pool):
+                    pool = available[np.abs(available - d) == np.abs(available - d).min()]
+                actual[wanted == d] = self.rng.choice(pool, int((wanted == d).sum()))
+        targets = np.zeros((len(actual), len(root.parts)), dtype=np.uint64)
+        pending = np.arange(len(actual))
+        while len(pending):
+            remaining = actual[pending].copy()
+            for i, (graph, _) in enumerate(root.parts):
+                views = self.layer_views[id(graph)]
+                sizes = np.asarray([v.size for v in views], dtype=np.uint64)
+                rest = remaining[:, None] - np.arange(len(sizes))
+                valid = (rest >= 0) & (rest < len(suffix[i + 1]))
+                weights = np.where(valid, sizes[None, :] * suffix[i + 1][np.clip(rest, 0, len(suffix[i + 1]) - 1)], 0).astype(float)
+                choice = (np.cumsum(weights, -1) <= self.rng.random(len(pending))[:, None] * weights.sum(-1)[:, None]).sum(-1)
+                for d in np.unique(choice):
+                    rows = choice == d
+                    targets[pending[rows], i] = views[d].unrank(self.rng.integers(views[d].size, size=int(rows.sum())))
+                remaining -= choice
+            assert np.all(remaining == 0)
+            # Conditional uniform sampling excludes only the empty target here;
+            # the separate clearing stream continues to train empty targets.
+            pending = pending[~targets[pending].any(-1)]
+        return targets, actual
+
     def _structure_rows(self, board, count, cross):
+        fraction = self.options.get("exact_layer_fraction", 0)
+        if not 0 <= fraction <= 1:
+            raise ValueError("exact_layer_fraction must be in [0, 1]")
+        indexed = int(count * fraction)
+        plain = self._path_structure_rows(board, count - indexed, cross)
+        if not indexed:
+            return plain
+        root = self.roots[board]
+        cycle = np.asarray(self.options["stream_distance_cycle"])
+        wanted = cycle[(np.arange(indexed) + int(self.rng.integers(len(cycle)))) % len(cycle)]
+        goals, actual = self._layer_targets(board, wanted)
+        sources = np.tile([g.initial_id for g, _ in root.parts], (indexed, 1))
+        goal_ids = np.stack([g.rank(goals[:, i]) for i, (g, _) in enumerate(root.parts)], -1)
+        self.add_hist(self.requested_distances, wanted)
+        self.add_hist(self.initial_distances, actual)
+        self.add_hist(self.actual_distances, actual)
+        return np.concatenate((sources, plain[0])), np.concatenate((goal_ids, plain[1]))
+
+    def _path_structure_rows(self, board, count, cross):
         root = self.roots[board]
         self.stream_calls += 1
         if not count:
@@ -268,6 +347,9 @@ class BroadData(JointData):
         cycle = np.asarray(self.options.get("stream_distance_cycle", [6, 7, 8, 9, 10, 11, 12, 13]))
         wanted = cycle[(np.arange(bundles) + int(self.rng.integers(len(cycle)))) % len(cycle)]
         masks = self._sources(root, bundles, wanted)
+        indexed = int(bundles * self.options.get("exact_layer_fraction", 0))
+        if indexed:
+            masks[:indexed] = [np.uint64((1 << g.width) - 1) for g, _ in root.parts]
         degree = sum(((masks[:, i, None] & g.tiles) == g.tiles).sum(-1)
                      for i, (g, _) in enumerate(root.parts))
         left_choice = (self.rng.random(bundles) * degree).astype(int)
@@ -300,6 +382,30 @@ class BroadData(JointData):
             targets.append(target(path, targets))
         starts = np.stack([masks] + [path[:, 1] for path in paths], axis=1)
         targets = np.stack(targets, axis=1)
+        if indexed:
+            for j in range(3):
+                targets[:indexed, j], _ = self._layer_targets(board, wanted[:indexed])
+            # Shared reachable goals across distinct branches, while the other
+            # two independently sampled goals retain reachable/unreachable cross
+            # relations. No candidate is removed from the ranking forks.
+            candidates = []
+            for part, (graph, _) in enumerate(root.parts):
+                for tile in graph.tiles:
+                    successor = masks[:indexed].copy()
+                    successor[:, part] ^= tile
+                    candidates.append(successor)
+            candidates = np.stack(candidates, axis=1)
+            feasible = np.stack([g.distance(candidates[:, :, i], targets[:indexed, 0, i, None])
+                                 for i, (g, _) in enumerate(root.parts)], -1)
+            feasible = (feasible >= 0).all(-1)
+            unused = np.ones(feasible.shape, dtype=bool)
+            for j in range(3):
+                choices = feasible & unused
+                choices = np.where(choices.any(-1)[:, None], choices, unused)
+                choices = np.where(choices.any(-1)[:, None], choices, True)
+                selected = np.where(choices, self.rng.random(choices.shape), -1).argmax(-1)
+                starts[:indexed, j + 1] = candidates[np.arange(indexed), selected]
+                unused[np.arange(indexed), selected] = False
         # Shared source, shared goal, both branch continuations and cross-branch
         # goals. Crossing branches can be finite, unreachable or reconvergent;
         # query the exact graph instead of assuming a tree or assigning a label.

@@ -9,9 +9,9 @@
     "seed": 2026101851,
     "learning_rate": 0.0003,
     "steps": 1000,
-    "batch_size_per_rank": 8192,
-    "rank_contexts_per_rank": 1024,
-    "boards_per_batch": 8,
+    "batch_size_per_rank": 32768,
+    "rank_contexts_per_rank": 4096,
+    "boards_per_batch": 16,
     "legacy_fraction": 0.45,
     "broad_fraction": 0.15,
     "clear_fraction": 0.3,
@@ -74,7 +74,8 @@
       16,
       18
     ],
-    "branch_bundle_fraction": 0.5
+    "branch_bundle_fraction": 0.5,
+    "exact_layer_fraction": 0.5
   },
   "evaluation": {
     "train_roots": 100,
@@ -92,5 +93,5 @@
     "historical_510_reference": "/tmp/blocks12_goal_retention/historical_same_case_audit.json"
   },
   "policy": "unchanged_greedy_all_legal_successors_no_search_no_oracle_action_selection",
-  "rationale": "The10000-root exact-distance phase1000 retained clear160/200 but historical421to416, nonempty6--8 seventy to54,9--13 fifty to51. Its all-rank actual-update HLL estimated49.08m relations across8000 roots, so query volume alone has not preserved joint solving. Keep the421/510 first10000 parent and its Adam/sampler lineage; do not continue from a rejected tradeoff model. Preserve45percent historical replay and the same broad/clear/nonempty distance mixture. Within half of existing nonempty structure slots, sample twelve correlated exact contexts: the full Cartesian product of four sources (A and three legal successors) and three nonempty goals on independent legal multi-step branches. Use three distinct first actions wherever degree permits. Prefer distinct goals within the same closest exact distance stratum; report genuine merges or missing branches instead of claiming a complete group. Deduplicate complete groups and shared-source/shared-goal subgroups across roots and ranks only after actual Adam updates. Shared-source, shared-goal and crossed branch contexts jointly shape one Q. Keep all legal candidates at each ranking parent, including traps and nonoptimal continuations. Branch reconvergence is represented as a DAG with exact oracle labels, never forced into a tree. Count actual-update bundle relations, forks, distance and genuine branching/reconvergence separately across both ranks. No test rows or test failures are sampled. No new loss/model/optimizer or greedy change; only previously authorized unreachable19. Natural completion of the current unique queue precedes deployment; two thousand updates is a feedback window, not delivery. Sampler audit found a concrete retention bug: focused legacy replacement used the first half of a finite-first ordered stratified array, erasing every historical short finite Huber relation. Replace a random subset instead, preserving a genuine mixture of long focus plus background finite and unreachable training relations. Keep all negative labels and full legal forks; no loss-weight change. Record actual-update historical Huber distances across both ranks. Use a single1000-update feedback window before choosing a next phase, not an automatic2000-step extension."
+  "rationale": "The previous structured1000 stage preserved historical421/510 but clear159/200, nonempty6-8=55/200 and9-13=49/200 failed joint retention. Keep the original first10000 parent and its Adam/sampler lineage. Existing BDD-layer audit of200 training roots found exact nonempty12-step goals in190 roots and13-step goals in36, while actual sampled bundle anchors contained only69 distance13 rows despite10755 requests. Replace half of structure contexts and bundles with uniform nonempty targets from existing exact BFS layers, reporting finite fallback distances honestly. In indexed bundles use one shared reachable target to select distinct legal successor sources, cross all four sources with three exact-layer targets, and retain every legal candidate. Preserve random-path residual starts, broad relations, clearing and historical training streams, all original losses and weights, and authorized unreachable19. Increase per-rank Huber batch8192 to32768, rank contexts1024 to4096 and roots8 to16 on the same twoA100s. Assess actual update throughput, all-rank distinct exposure and fixed four-core same-case quality after1000 updates. No test rows, extra inference search, model or supervision changes."
 }

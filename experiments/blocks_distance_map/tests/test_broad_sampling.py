@@ -157,6 +157,35 @@ class BroadSamplingTest(unittest.TestCase):
             for a, b in zip(bundled.batch(256, 96), replay.batch(256, 96)):
                 np.testing.assert_array_equal(a, b)
             bundled.close(); replay.close()
+            layered = BroadData(path, path / "legacy.npz", {**options,
+                "branch_bundle_fraction": .5, "exact_layer_fraction": 1,
+                "stream_distance_cycle": [6, 7, 8, 13]})
+            wanted = np.tile([2, 3, 6, 7, 8, 13], 20)
+            goals, actual = layered._layer_targets(0, wanted)
+            full = int(double["initial"])
+            packed_goals = [int(a) | (int(b) << 20) for a, b in goals]
+            self.assertTrue(all(packed_goals))
+            np.testing.assert_array_equal(actual, [oracle.distance(full, g) for g in packed_goals])
+            self.assertTrue((actual[wanted == 6] == 6).all())
+            # The final Huber rows retain requested long finite relationships;
+            # exact labels and full candidate sets are independently checked.
+            batch = layered.batch(512, 96)
+            for s, g, d in ((batch[0], batch[1], batch[2]), (batch[3], batch[4], batch[5])):
+                np.testing.assert_array_equal(d, [oracle.distance(int(a[0]), int(b[0])) for a, b in zip(s, g)])
+            source, goal = layered.structure_rows(0, 120, False)
+            star = layered.stars(layered.roots[0], source, goal)
+            degree = sum(g.degrees(source[:, i]) for i, (g, _) in enumerate(layered.roots[0].parts))
+            np.testing.assert_array_equal(np.bincount(star[-1], minlength=len(source)), degree)
+            groups = layered.roots[0].packed(source[:60])[:, 0].reshape(-1, 12)
+            shared_goals = layered.roots[0].packed(goal[:60])[:, 0].reshape(-1, 12)
+            self.assertTrue(all(oracle.distance(int(s), int(g)) >= 0
+                                for s, g in zip(groups[:, 3], shared_goals[:, 3])))
+            state = copy.deepcopy(layered.state_dict())
+            resumed = BroadData(path, path / "legacy.npz", layered.options)
+            resumed.load_state_dict(state)
+            for a, b in zip(layered.batch(256, 96), resumed.batch(256, 96)):
+                np.testing.assert_array_equal(a, b)
+            layered.close(); resumed.close()
 
 
 if __name__ == "__main__":

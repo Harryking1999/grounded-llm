@@ -1,0 +1,26 @@
+{
+  "study": "frozen_task_text_retest",
+  "seed": 20261017,
+  "source_suite": "runs/five_task_sol_high_40/suite.json",
+  "case_mode": "copy_frozen",
+  "expected_cases": 200,
+  "samples_per_case": 1,
+  "api": {
+    "base_url": "https://api.deepseek.com",
+    "model": "deepseek-flash",
+    "reasoning_effort": "high",
+    "max_output_tokens": 16000,
+    "scoring_output_limit": 16000,
+    "timeout_seconds": 900,
+    "concurrency": 16,
+    "max_service_retries": 3,
+    "max_total_service_retries": 60,
+    "service_retry_delay_seconds": 15
+  },
+  "comparison": "Copy all 200 original questions, literal prompts and reference solutions unchanged: 40 per task, including original eight-shape blocks with 12 construction placements and actions-only output. One valid response per question; no model-error or truncation resampling. ACC is budgeted full-task execution success. Historical baselines have differing generation caps; compare their 16k rescoring without claiming matched generation or compute.",
+  "model_version_note": "Official docs and authenticated /models checked 2026-10-18 identify deepseek-flash as DeepSeek-V4.1-Flash-1017. The requested legacy v4-flash model has retired and routes to this successor; R1 is absent from the live official model list. Preserve returned model and reasoning fields; do not label this as an original V4 or R1 measurement.",
+  "references": [
+    "https://api-docs.deepseek.com/quick_start/pricing/",
+    "https://api-docs.deepseek.com/api/create-response/"
+  ]
+}

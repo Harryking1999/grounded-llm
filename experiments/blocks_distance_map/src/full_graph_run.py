@@ -52,7 +52,7 @@ def run(config, out, source_commit, smoke_steps=None, resume=None):
     old = parent["config"]["training"]
     if options["original_cap"] != parent["cap"]:
         raise ValueError("Original unreachable label cap changed")
-    for key in ("temperature", "listwise_weight"):
+    for key in ("temperature", "listwise_weight", "learning_rate"):
         if options[key] != old[key]:
             raise ValueError(f"Original loss setting changed: {key}")
     model_config = parent["config"]["model"]

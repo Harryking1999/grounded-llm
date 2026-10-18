@@ -72,7 +72,8 @@ def evaluate_rows(rows, scorer, oracle):
             labels = np.asarray([oracle.distance(mask, goal) for mask in masks])
             choice = int(scores.argmin())
             finite = labels[labels >= 0]
-            conflict = bool(len(finite) and np.any(labels < 0) and finite.min() >= scorer.model.cap)
+            label_cap = getattr(scorer, "label_cap", scorer.model.cap)
+            conflict = bool(len(finite) and np.any(labels < 0) and finite.min() >= label_cap)
             trajectory["forks"] += 1
             trajectory["shortest_choices"] += int(labels[choice] == truth - 1)
             trajectory["reachable_choices"] += int(labels[choice] >= 0)
@@ -98,7 +99,7 @@ def evaluate_rows(rows, scorer, oracle):
         if candidates:
             scores = scorer.scores([child for _, child in candidates], goal)
             distances = np.asarray([oracle.distance(child, goal) for _, child in candidates])
-            cap = scorer.model.cap
+            cap = getattr(scorer, "label_cap", scorer.model.cap)
             group["forks"] += 1
             group["shortest_choices"] += int(distances[int(scores.argmin())] == truth - 1)
             group["candidate_count"] += len(candidates)

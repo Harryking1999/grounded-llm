@@ -75,6 +75,8 @@ class JointData:
                                                      "finite_at_or_above_original_cap")}
                               for kind in ("huber", "rank_candidates")}
         self.action_candidate_contexts = np.zeros(len(blocks.PLACEMENTS), dtype=np.int64)
+        self.ranking_gradient_counts = {"contexts_with_nonzero_score_gradient": 0,
+            "candidates_with_nonzero_score_gradient": 0, "contexts_with_nonuniform_target": 0}
 
     def close(self):
         for graph in self.graphs.values():
@@ -249,7 +251,8 @@ class JointData:
                 "pair_counts": self.pair_counts, "rank_counts": self.rank_counts,
                 "action_exposed": self.action_exposed, "root_stars_seen": self.root_stars_seen,
                 "distance_bins": self.distance_bins, "action_candidate_contexts": self.action_candidate_contexts,
-                "rank_candidates": self.rank_candidates, "actual_rank_contexts": self.actual_rank_contexts}
+                "rank_candidates": self.rank_candidates, "actual_rank_contexts": self.actual_rank_contexts,
+                "ranking_gradient_counts": self.ranking_gradient_counts}
 
     def load_state_dict(self, state):
         self.rng.bit_generator.state = state["rng"]
@@ -259,6 +262,7 @@ class JointData:
             setattr(self, key, state[key])
         self.distance_bins = state["distance_bins"]
         self.action_candidate_contexts = state["action_candidate_contexts"]
+        self.ranking_gradient_counts = state.get("ranking_gradient_counts", self.ranking_gradient_counts)
 
     def report(self):
         unique = sum(min(int(n), root.size ** 2) for n, root in zip(self.broad, self.roots))
@@ -283,4 +287,5 @@ class JointData:
                 "actions_available": len(self.action_exposed),
                 "local_rank_candidate_draws": self.rank_candidates,
                 "local_actual_rank_contexts": self.actual_rank_contexts,
+                "local_ranking_gradient_counts": self.ranking_gradient_counts,
                 "note": "Broad pair cursors aggregate disjoint distributed ranks and count direct Huber pairs only. Rank counts are requested contexts; actionless parents contribute no ranking loss. Other draws are counts, not unique global-state coverage."}

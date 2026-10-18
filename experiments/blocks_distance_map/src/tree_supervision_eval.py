@@ -66,6 +66,7 @@ class QScorer:
         self.model.load_state_dict(saved["model"])
         self.model.eval()
         self.metric = saved["metric"]
+        self.label_cap = saved.get("unreachable_label", saved["cap"])
         self.device = device
         self.cache = {}
         self.identity = {"checkpoint": str(checkpoint),

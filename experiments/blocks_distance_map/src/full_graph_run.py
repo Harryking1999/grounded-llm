@@ -12,6 +12,7 @@ from torch.nn.parallel import DistributedDataParallel
 import torch.distributed as dist
 
 from .full_graph_sampling import JointData
+from .failure_sampling import FailureData
 from .model import BoardEncoder, soft_rank_loss
 from .multiboard_run import atomic_save
 
@@ -51,7 +52,7 @@ def run(config, out, source_commit, smoke_steps=None, resume=None):
     parent = torch.load(config["parent_checkpoint"], map_location=device, weights_only=False)
     old = parent["config"]["training"]
     if options["original_cap"] != parent["cap"]:
-        raise ValueError("Original unreachable label cap changed")
+        raise ValueError("Original encoder coordinate scale changed")
     for key in ("temperature", "listwise_weight", "learning_rate"):
         if options[key] != old[key]:
             raise ValueError(f"Original loss setting changed: {key}")
@@ -64,7 +65,8 @@ def run(config, out, source_commit, smoke_steps=None, resume=None):
     for group in optimizer.param_groups:
         group["lr"] = options["learning_rate"]
     model = DistributedDataParallel(raw, device_ids=[local]) if world > 1 else raw
-    sampler = JointData(config["graph_data"], config["legacy_data"], options, rank, world)
+    sampler_type = FailureData if "failure_diagnosis" in options else JointData
+    sampler = sampler_type(config["graph_data"], config["legacy_data"], options, rank, world)
     out = Path(out)
     first_step = 0
     if resume is not None:
@@ -87,7 +89,8 @@ def run(config, out, source_commit, smoke_steps=None, resume=None):
     for step in range(first_step + 1, last + 1):
         begin = time.monotonic()
         arrays = sampler.batch(options["batch_size_per_rank"], options["rank_contexts_per_rank"])
-        bits, pairs, truth, rt, order, slots, shape = relation_batch(arrays, device, parent["cap"])
+        bits, pairs, truth, rt, order, slots, shape = relation_batch(
+            arrays, device, options.get("unreachable_label", parent.get("unreachable_label", parent["cap"])))
         prepared = time.monotonic()
         scores = model(bits, pairs)
         point = F.smooth_l1_loss(scores[:len(truth)], truth)
@@ -97,6 +100,17 @@ def run(config, out, source_commit, smoke_steps=None, resume=None):
         valid = torch.zeros(shape[0] * shape[1], device=device, dtype=torch.bool)
         valid[slots] = True
         ranking = soft_rank_loss(rank_scores, rank_truth, valid.reshape(shape), options["temperature"])
+        with torch.no_grad():
+            mask = valid.reshape(shape)
+            predicted = torch.softmax((-rank_scores / options["temperature"]).masked_fill(~mask, -torch.inf), -1)
+            desired = torch.softmax((-rank_truth / options["temperature"]).masked_fill(~mask, -torch.inf), -1)
+            nonzero = mask & (predicted != desired)
+            counters = sampler.ranking_gradient_counts
+            counters["contexts_with_nonzero_score_gradient"] += int(nonzero.any(-1).sum())
+            counters["candidates_with_nonzero_score_gradient"] += int(nonzero.sum())
+            counters["contexts_with_nonuniform_target"] += int((
+                rank_truth.masked_fill(~mask, -torch.inf).max(-1).values !=
+                rank_truth.masked_fill(~mask, torch.inf).min(-1).values).sum())
         loss = point + options["listwise_weight"] * ranking
         optimizer.zero_grad(set_to_none=True)
         loss.backward()
@@ -127,6 +141,7 @@ def run(config, out, source_commit, smoke_steps=None, resume=None):
                 atomic_save({"model_type": "board_mlp", "model": raw.state_dict(),
                              "optimizer": optimizer.state_dict(), "step": parent["step"] + step,
                              "continuation_step": step, "metric": parent["metric"], "cap": parent["cap"],
+                             "unreachable_label": options.get("unreachable_label", parent.get("unreachable_label", parent["cap"])),
                              "config": {"model": model_config, "training": options},
                              "source_commit": source_commit}, path)
                 exposure = sampler.report()

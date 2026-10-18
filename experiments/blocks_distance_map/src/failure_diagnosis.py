@@ -54,7 +54,7 @@ def trace_error(scorer, source, goal, oracle):
         finite = labels >= 0
         true = oracle.distance(state, goal)
         best_good = float(scores[finite].min())
-        cap = scorer.model.cap
+        cap = getattr(scorer, "label_cap", scorer.model.cap)
         star = {"source": str(state), "goal": str(goal), "step": step,
                 "true_distance": true, "degree": len(candidates),
                 "reachable_candidates": int(finite.sum()),

@@ -19,7 +19,7 @@
 | [寻路](../tasks/path/README.md) | 采用统一方法 Q 和已选定权重，旧 Q/V 保留为历史对照 | 统一文字与新条件参数；[权重来源](../tasks/path/Qmap/selection.json) |
 | [汉诺塔](../tasks/hanoi/README.md) | 用户采用八盘整塔目标地图，正式评测仅考虑任意合法起点到指定柱的整塔终点 | 保留残留失败与中间目标补充结果，不追加训练；[权重及范围](../tasks/hanoi/Qmap/selection.json)、[实验报告](../experiments/hanoi_qmap/results/report.md) |
 | [二阶魔方](../tasks/cube2/README.md) | 采用用户指定的复原断点，保留二阶主条件，三阶探索停止 | 继续定位复原与关系泛化不足；[权重来源](../tasks/cube2/Qmap/selection.json) |
-| [8-Puzzle（数字华容道）](../tasks/puzzle8/README.md) | 保留3×3主条件和已完整保护的97.80%复原候选；困难中间关系仍需扩大，未完成全部可靠性验收 | 已从完整保护权重和采样状态继续联合训练，维护高复原能力并扩大中间目标；以完整复原、长程关系、同题得失及实际曝光验收；[实验报告](../experiments/puzzle8_qmap/results/report.md) |
+| [8-Puzzle（数字华容道）](../tasks/puzzle8/README.md) | 已保护98.28%复原工作候选；困难中间关系仍需扩大，严格验证关系保持尚未通过 | 维护高复原能力并扩大中间目标，保留94.47%等历史候选；以完整复原、长程关系、同题得失及实际曝光验收；[实验报告](../experiments/puzzle8_qmap/results/report.md) |
 
 五任务纯文字强基线及补充对照已完成，结果和比较边界见[统一评测报告](../experiments/task_text_baselines/results/report.md)，不与不同设置的旧 SFT 指标混用。
 

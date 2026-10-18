@@ -1,0 +1,59 @@
+{
+  "task": "hanoi8",
+  "seed": 20261018,
+  "rules": {
+    "disks": 8,
+    "pegs": 3,
+    "state_order": "smallest_disk_first_base3",
+    "move_cost": 1
+  },
+  "data": {
+    "split": "unordered_pair_peg_symmetry_orbits_70_15_15",
+    "require_all_legal_edges": true,
+    "require_all_tower_relations": true
+  },
+  "augmentation": {
+    "enabled": true,
+    "kind": "simultaneous_peg_permutation",
+    "copies": 6,
+    "max_attempts": 1
+  },
+  "model": {
+    "dimension": 128,
+    "hidden": 256
+  },
+  "training": {
+    "steps": 60000,
+    "batch_size": 512,
+    "decision_batch_size": 256,
+    "learning_rate": 0.0001,
+    "rank_weight": 1.0,
+    "rank_temperature": 1.0,
+    "eval_every": 5000,
+    "patience": null,
+    "min_improvement": 0.0001,
+    "cpu_threads": 4,
+    "min_steps": 0,
+    "save_last": true,
+    "evaluate_initial_test": true,
+    "retain_initial": true
+  },
+  "evaluation": {
+    "decision_count": 4096,
+    "rollout_count": 1024,
+    "budget_multiplier": 2,
+    "stratified_tasks": true,
+    "full_tower_policy": true
+  },
+  "sampling": {
+    "broad_fraction": 0.5,
+    "context_fraction": 0.0,
+    "minimum_broad_passes": 0.0,
+    "tower_fraction": 0.4
+  },
+  "selection": {
+    "kind": "tower_restoration_with_relation_guard",
+    "maximum_validation_mae_increase": 0.25
+  },
+  "hypothesis": "Preserve every original training orbit and promote all complete tower-goal orbits into training, closing every legal branch and downstream state for restoration. Change only relation exposure; retain the original Q losses."
+}

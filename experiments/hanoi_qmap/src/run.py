@@ -10,10 +10,11 @@ import torch
 from torch.nn import functional as F
 
 from .data import build
-from .evaluate import decisions, encode, evaluate, pair_metrics, ranking_loss, task_indices
+from .evaluate import decisions, encode, evaluate, pair_metrics, ranking_loss, task_indices, tower_policy
 from .model import MODEL_TYPE, QMap, soft_rank_loss
 from grounded_llm.qmap_sampling import CoverageSampler, StratifiedEpochSampler
 from .environment import Hanoi
+from .tower_data import TowerData
 
 def make_environment(task, oracle_path=None):
     if not task.startswith("hanoi") or not task[5:].isdigit():
@@ -49,6 +50,10 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
     pairs = data["pairs_train"]
     tasks, children = data["tasks_train"], data["children_train"]
     pair_sampler = rank_sampler = None
+    tower_fraction = config.get("sampling", {}).get("tower_fraction", 0.)
+    if tower_fraction and (not 0 < tower_fraction < 1 or not config["data"].get("require_all_tower_relations", False)):
+        raise ValueError("Tower replay requires complete tower relations and a mixed sampling fraction")
+    tower = TowerData(env, data, rng) if tower_fraction else None
     if "sampling" in config:
         sampling = config["sampling"]
         parent_distance = data.get("parent_distances_train")
@@ -68,15 +73,18 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
                                            int(data["context_task_start"]) if "context_task_start" in data else None,
                                            sampling["context_fraction"])
             for sampler, batch in ((pair_sampler, options["batch_size"]), (rank_sampler, options["decision_batch_size"])):
-                if options["steps"] * round(batch * sampling["broad_fraction"]) / sampler.broad_count < sampling["minimum_broad_passes"]:
+                if options["steps"] * round(round(batch * (1 - tower_fraction)) * sampling["broad_fraction"]) / sampler.broad_count < sampling["minimum_broad_passes"]:
                     raise ValueError("Training budget cannot cover the contracted breadth")
 
     def coverage():
         if isinstance(pair_sampler, StratifiedEpochSampler):
             return {"pair_min_layer_passes": pair_sampler.passes, "decision_min_layer_passes": rank_sampler.passes,
                     "pair_layers": pair_sampler.coverage(), "decision_layers": rank_sampler.coverage()}
-        return ({"pair_broad_passes": pair_sampler.passes, "decision_broad_passes": rank_sampler.passes}
-                if pair_sampler is not None else {})
+        result = ({"pair_broad_passes": pair_sampler.passes, "decision_broad_passes": rank_sampler.passes}
+                  if pair_sampler is not None else {})
+        if tower is not None:
+            result.update(tower.report())
+        return result
 
     # Features only: validation/test labels never enter this training store.
     ids = np.unique(np.concatenate((pairs[:, :2].ravel(), tasks.ravel(), children[children >= 0])))
@@ -132,22 +140,32 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
 
     started = time.monotonic()
     initial_score, initial_pairs, initial_decisions, _ = validate()
+    tower_selection = config.get("selection", {}).get("kind") == "tower_restoration_with_relation_guard"
+    initial_policy = tower_policy(model, env, device) if tower_selection else None
     initial_training = training_monitor() if probe_pairs is not None else None
     initial_test = evaluate(model, env, data, config, device) if options.get("evaluate_initial_test", True) else None
     best, best_step, stale = float("inf"), 0, 0
     if options.get("retain_initial", False):
-        best = initial_score
+        best = -initial_policy["within_budget"] if tower_selection else initial_score
         save(0, out / "best.pt")
     with (out / "progress.jsonl").open("w") as log:
         for step in range(1, options["steps"] + 1):
             model.train()
-            sampled_ids = (pair_sampler.draw(options["batch_size"]) if pair_sampler is not None
-                           else rng.integers(len(pairs), size=options["batch_size"]))
+            tower_count = round(options["batch_size"] * tower_fraction)
+            broad_count = options["batch_size"] - tower_count
+            sampled_ids = (pair_sampler.draw(broad_count) if pair_sampler is not None
+                           else rng.integers(len(pairs), size=broad_count))
+            if tower is not None:
+                sampled_ids = np.r_[sampled_ids, tower.draw(tower_count, False)]
             sampled = pairs[sampled_ids]
             pair_loss = F.smooth_l1_loss(model.distance(q(sampled[:, 0]), q(sampled[:, 1])),
                                          torch.as_tensor(sampled[:, 2], dtype=torch.float32, device=device))
-            idx = (rank_sampler.draw(options["decision_batch_size"]) if rank_sampler is not None
-                   else rng.integers(len(tasks), size=options["decision_batch_size"]))
+            tower_count = round(options["decision_batch_size"] * tower_fraction)
+            broad_count = options["decision_batch_size"] - tower_count
+            idx = (rank_sampler.draw(broad_count) if rank_sampler is not None
+                   else rng.integers(len(tasks), size=broad_count))
+            if tower is not None:
+                idx = np.r_[idx, tower.draw(tower_count, True)]
             candidate = children[idx]
             valid = torch.as_tensor(candidate >= 0, device=device)
             # Use an actual training parent for padding, never an arbitrary heldout ID.
@@ -170,8 +188,13 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
                 eligible = (step >= options.get("min_steps", 0) and
                             (not covered or isinstance(pair_sampler, StratifiedEpochSampler) or
                              min(covered.values()) >= config["sampling"]["minimum_broad_passes"]))
-                if eligible and score < best - options["min_improvement"]:
-                    best, best_step, stale = score, step, 0
+                policy = tower_policy(model, env, device) if tower_selection else None
+                selection_score = score
+                if tower_selection:
+                    eligible &= metrics["mae"] <= initial_pairs["mae"] + config["selection"]["maximum_validation_mae_increase"]
+                    selection_score = -policy["within_budget"]
+                if eligible and selection_score < best - options["min_improvement"]:
+                    best, best_step, stale = selection_score, step, 0
                     save(step, out / "best.pt")
                 elif eligible:
                     stale += 1
@@ -182,6 +205,10 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
                           "validation_shortest_action_rate": actions["shortest_action_rate"],
                           "validation_objective": score, "selection_eligible": eligible,
                           "learning_rate": optimizer.param_groups[0]["lr"], "best_step": best_step, **covered}
+                if tower is not None:
+                    record["tower_data"] = tower.report()
+                if policy is not None:
+                    record["all_state_towers"] = policy
                 if probe_pairs is not None:
                     record["training_monitor"] = training_monitor()
                     val_tasks = data["tasks_validation"][val_idx]
@@ -204,7 +231,9 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
               "last_model_training_coverage": last_coverage, "parent": parent,
               "stop_reason": "step_budget_exhausted" if step == options["steps"] else "validation_patience",
               "torch_version": torch.__version__, "numpy_version": np.__version__,
-              "selection": "validation distance Huber + rank_weight * full soft rank cross entropy",
+              "selection": ("all-state tower restoration with fixed validation distance guard" if tower_selection else
+                            "validation distance Huber + rank_weight * full soft rank cross entropy"),
+              "initial_tower_policy": initial_policy,
               "initial_validation_objective": initial_score, "initial_validation_pairs": initial_pairs,
               "initial_validation_decisions": initial_decisions, "initial": initial_test,
               "initial_training_monitor": initial_training,

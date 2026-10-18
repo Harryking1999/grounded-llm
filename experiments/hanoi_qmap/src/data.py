@@ -37,9 +37,17 @@ def build(env, config, out):
         if len(required) > int(len(keys) * .7):
             raise ValueError("Required edge orbits exceed the training allocation")
     boundaries = (0, int(len(keys) * .7), int(len(keys) * .85), len(keys))
+    split_keys = [keys[boundaries[i]:boundaries[i + 1]] for i in range(3)]
+    if options.get("require_all_tower_relations", False):
+        towers = np.array([0, (env.size - 1) // 2, env.size - 1])
+        required = np.unique(orbit[np.isin(pairs[:, :2], towers).any(-1)])
+        # Only promote complete orbits into training. Never move a relation
+        # learned by a warm-start checkpoint into validation or test.
+        split_keys[0] = np.union1d(split_keys[0], required)
+        split_keys[1:] = [np.setdiff1d(group, required) for group in split_keys[1:]]
     membership = np.full(env.size**2, -1, dtype=np.int8)
     for i, name in enumerate(SPLITS):
-        selected = pairs[np.isin(orbit, keys[boundaries[i]:boundaries[i + 1]])]
+        selected = pairs[np.isin(orbit, split_keys[i])]
         membership[pair_keys(selected, env.size)] = i
         # One seed relation per training orbit; augmentation supplies its
         # jointly renamed variants. Validation/test enumerate whole orbits.
@@ -111,5 +119,10 @@ def build(env, config, out):
                                   "unique_unordered_pairs": len(np.unique(pair_keys(data[f"pairs_{name}"], env.size))),
                                   "distance_histogram": np.bincount(data[f"pairs_{name}"][:, 2], minlength=env.diameter + 1).tolist(),
                                   "decisions": len(data[f"tasks_{name}"])} for name in SPLITS}}
+    if options.get("require_all_tower_relations", False):
+        summary["tower_decision_coverage"] = {str(g): int((data["tasks_train"][:, 1] == g).sum())
+                                               for g in towers}
+        if any(count != env.size - 1 for count in summary["tower_decision_coverage"].values()):
+            raise ValueError("Tower goal decisions are not closed over the complete graph")
     (out / "data_summary.json").write_text(json.dumps(summary, indent=2) + "\n")
     return data, summary

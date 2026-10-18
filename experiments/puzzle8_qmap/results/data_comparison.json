@@ -1,0 +1,280 @@
+{
+  "control": {
+    "source_commit": "c06ea0e",
+    "best_step": 18000,
+    "last_step": 20000,
+    "training_seconds": 197.87,
+    "parent": {
+      "checkpoint": "/zhanghanyue/experiment/grounded_llm_puzzle_qmaps/runs/puzzle8_6155519/best.pt",
+      "source_commit": "6155519",
+      "step": 40000
+    },
+    "selected_policy": {
+      "nonterminal_states": 181439,
+      "horizon": 62,
+      "eventually_solved": 58959,
+      "within_budget": 58959,
+      "within_budget_rate": 0.32495218778763113,
+      "shortest_action_rate": 0.8014153517160038,
+      "wrong_decisions": 36031,
+      "two_cycles": 6912,
+      "cycle_nodes": 13824,
+      "other_cycle_nodes": 0,
+      "local_minima": 20101,
+      "restoration_mae": 1.2872866273870254,
+      "previously_solved_lost": 11764,
+      "previously_failed_gained": 21320,
+      "same1024": {
+        "count": 1024,
+        "solved": 332,
+        "cycle_count": 692,
+        "mean_extra_steps_on_solved": 0.5843373493975904
+      }
+    },
+    "last_policy": {
+      "nonterminal_states": 181439,
+      "horizon": 62,
+      "eventually_solved": 57552,
+      "within_budget": 57552,
+      "within_budget_rate": 0.3171975154184051,
+      "shortest_action_rate": 0.8014153517160038,
+      "wrong_decisions": 36031,
+      "two_cycles": 6906,
+      "cycle_nodes": 13812,
+      "other_cycle_nodes": 0,
+      "local_minima": 19918,
+      "restoration_mae": 1.2883083895355671,
+      "previously_solved_lost": 12505,
+      "previously_failed_gained": 20654,
+      "same1024": {
+        "count": 1024,
+        "solved": 347,
+        "cycle_count": 677,
+        "mean_extra_steps_on_solved": 0.5648414985590778
+      }
+    },
+    "selected_validation_mae": 3.9391645419812598,
+    "selected_test_mae": 4.2915149263126615,
+    "selected_test_solved": 237,
+    "last_validation_mae": 3.9434889652707716,
+    "last_selection_eligible": true,
+    "curve": [
+      {
+        "step": 1,
+        "validation_mae": 3.8440423630316847,
+        "solved": 49493,
+        "cycles": 7530,
+        "eligible": true
+      },
+      {
+        "step": 2000,
+        "validation_mae": 3.8757683628525657,
+        "solved": 54710,
+        "cycles": 6968,
+        "eligible": true
+      },
+      {
+        "step": 4000,
+        "validation_mae": 3.901750527650845,
+        "solved": 56560,
+        "cycles": 6838,
+        "eligible": true
+      },
+      {
+        "step": 6000,
+        "validation_mae": 3.907019723995398,
+        "solved": 57720,
+        "cycles": 6956,
+        "eligible": true
+      },
+      {
+        "step": 8000,
+        "validation_mae": 3.896773611962714,
+        "solved": 57711,
+        "cycles": 6870,
+        "eligible": true
+      },
+      {
+        "step": 10000,
+        "validation_mae": 3.925403377362717,
+        "solved": 57697,
+        "cycles": 6844,
+        "eligible": true
+      },
+      {
+        "step": 12000,
+        "validation_mae": 3.934883651127868,
+        "solved": 58257,
+        "cycles": 6818,
+        "eligible": true
+      },
+      {
+        "step": 14000,
+        "validation_mae": 3.9160408142354024,
+        "solved": 58796,
+        "cycles": 6796,
+        "eligible": true
+      },
+      {
+        "step": 16000,
+        "validation_mae": 3.952220839575432,
+        "solved": 58945,
+        "cycles": 6824,
+        "eligible": true
+      },
+      {
+        "step": 18000,
+        "validation_mae": 3.9391645419812598,
+        "solved": 58959,
+        "cycles": 6912,
+        "eligible": true
+      },
+      {
+        "step": 20000,
+        "validation_mae": 3.9434889652707716,
+        "solved": 57552,
+        "cycles": 6906,
+        "eligible": true
+      }
+    ]
+  },
+  "local_data": {
+    "source_commit": "c06ea0e",
+    "best_step": 1,
+    "last_step": 20000,
+    "training_seconds": 218.01,
+    "parent": {
+      "checkpoint": "/zhanghanyue/experiment/grounded_llm_puzzle_qmaps/runs/puzzle8_6155519/best.pt",
+      "source_commit": "6155519",
+      "step": 40000
+    },
+    "selected_policy": {
+      "nonterminal_states": 181439,
+      "horizon": 62,
+      "eventually_solved": 49532,
+      "within_budget": 49532,
+      "within_budget_rate": 0.27299533176439467,
+      "shortest_action_rate": 0.7900065586781232,
+      "wrong_decisions": 38101,
+      "two_cycles": 7536,
+      "cycle_nodes": 15072,
+      "other_cycle_nodes": 0,
+      "local_minima": 21523,
+      "restoration_mae": 1.3417850183402031,
+      "previously_solved_lost": 117,
+      "previously_failed_gained": 246,
+      "same1024": {
+        "count": 1024,
+        "solved": 307,
+        "cycle_count": 717,
+        "mean_extra_steps_on_solved": 0.742671009771987
+      }
+    },
+    "last_policy": {
+      "nonterminal_states": 181439,
+      "horizon": 62,
+      "eventually_solved": 117508,
+      "within_budget": 117508,
+      "within_budget_rate": 0.6476446629445709,
+      "shortest_action_rate": 0.8954083741643197,
+      "wrong_decisions": 18977,
+      "two_cycles": 3686,
+      "cycle_nodes": 7372,
+      "other_cycle_nodes": 0,
+      "local_minima": 15182,
+      "restoration_mae": 0.9247412275812016,
+      "previously_solved_lost": 9545,
+      "previously_failed_gained": 77650,
+      "same1024": {
+        "count": 1024,
+        "solved": 662,
+        "cycle_count": 362,
+        "mean_extra_steps_on_solved": 0.649546827794562
+      }
+    },
+    "selected_validation_mae": 3.8446402035982143,
+    "selected_test_mae": 4.268049569698421,
+    "selected_test_solved": 232,
+    "last_validation_mae": 6.316819133533097,
+    "last_selection_eligible": false,
+    "curve": [
+      {
+        "step": 1,
+        "validation_mae": 3.8446402035982143,
+        "solved": 49532,
+        "cycles": 7536,
+        "eligible": true
+      },
+      {
+        "step": 2000,
+        "validation_mae": 4.748494856573267,
+        "solved": 73544,
+        "cycles": 5867,
+        "eligible": false
+      },
+      {
+        "step": 4000,
+        "validation_mae": 5.221002369437151,
+        "solved": 80671,
+        "cycles": 5388,
+        "eligible": false
+      },
+      {
+        "step": 6000,
+        "validation_mae": 5.538499343754721,
+        "solved": 88855,
+        "cycles": 4965,
+        "eligible": false
+      },
+      {
+        "step": 8000,
+        "validation_mae": 5.745820569746384,
+        "solved": 93090,
+        "cycles": 4777,
+        "eligible": false
+      },
+      {
+        "step": 10000,
+        "validation_mae": 5.873919503944248,
+        "solved": 97712,
+        "cycles": 4597,
+        "eligible": false
+      },
+      {
+        "step": 12000,
+        "validation_mae": 6.013441243809739,
+        "solved": 104285,
+        "cycles": 4429,
+        "eligible": false
+      },
+      {
+        "step": 14000,
+        "validation_mae": 6.098815374653309,
+        "solved": 108341,
+        "cycles": 4136,
+        "eligible": false
+      },
+      {
+        "step": 16000,
+        "validation_mae": 6.188127809012364,
+        "solved": 111235,
+        "cycles": 4020,
+        "eligible": false
+      },
+      {
+        "step": 18000,
+        "validation_mae": 6.276971346285329,
+        "solved": 117375,
+        "cycles": 3864,
+        "eligible": false
+      },
+      {
+        "step": 20000,
+        "validation_mae": 6.316819133533097,
+        "solved": 117508,
+        "cycles": 3686,
+        "eligible": false
+      }
+    ]
+  }
+}

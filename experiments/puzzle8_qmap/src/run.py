@@ -14,6 +14,7 @@ from .model import QMap, MODEL_TYPE, soft_rank_loss
 from .evaluate import evaluate
 from .policy_audit import audit
 from .data_sampling import DataMix
+from .branch_data import BranchData
 
 
 def train(env, config, data, out, device, source_commit, checkpoint=None):
@@ -40,7 +41,8 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
     for sampler, batch in ((ps, options["batch_size"]), (rs, options["decision_batch_size"])):
         if checkpoint is None and options["steps"] * round(batch * .5) < sampler.broad_count:
             raise ValueError("Budget must cover every training relation and decision")
-    mixture = DataMix(env, data, config["data_sampling"], rng) if "data_sampling" in config else None
+    mixture = (BranchData(env, data, config["branch_data"], rng, out) if "branch_data" in config else
+               DataMix(env, data, config["data_sampling"], rng) if "data_sampling" in config else None)
     features = torch.as_tensor(env.features(np.arange(env.size)), device=device)
     def q(ids):
         return model.encode(features[torch.as_tensor(ids, device=device, dtype=torch.long)])

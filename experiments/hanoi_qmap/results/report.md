@@ -19,12 +19,12 @@
 训练来源 a07b5f7，冻结诊断 83135f4；[紧凑数字](summary.json)。完整配置、权重、轨迹和旧报告已归档，位置见[开发机手册](../../../DEVELOPMENT_MACHINES.md#7-qmap-历史归档)。
 
 
-## 八盘首轮（进行中）
+## 八盘首轮（已完成）
 
 按用户授权保留当前分支，源码 `6155519`，正式合同为 [hanoi8.json](../configs/hanoi8.json)。完整枚举状态对并构造精确距离，以无序关系及六种共同柱置换作为不可拆分轨道；一步关系全部训练，其他关系轨道留出。对称变换作用于整组当前／目标／后继，不分别规范化两个状态而丢失相对柱关系。
 
 本地原有训练回归与八盘新增检查共八项通过；40048 远端复核八盘精确裁判与六种对称动作对应通过。使用用户指定的 `root@172.16.78.10:40048` GPU 0，复用 `/zhanghanyue/experiment/flamingo_map_reader/.venv/bin/python`，代码快照为 `/zhanghanyue/experiment/grounded_llm_puzzle_qmaps/code/qmap_6155519`。
 
-运行目录：`/zhanghanyue/experiment/grounded_llm_puzzle_qmaps/runs/hanoi8_6155519`；日志：同根目录 `logs/hanoi8_6155519.log`。完整关系数据已构造并进入实际梯度更新，启动检查通过；尚无最终训练结果。完成后自动按验证目标选择 `best.pt`，保留 `last.pt`，并写出随机关系与六个整塔方向的 `summary.json`。不能将六盘历史权重称为本轮八盘结果。
+运行目录：`/zhanghanyue/experiment/grounded_llm_puzzle_qmaps/runs/hanoi8_6155519`；日志：同根目录 `logs/hanoi8_6155519.log`。训练已完成；按验证合同选择的最佳断点与最终断点均为第 100,000 步，保存 `best.pt`、`last.pt` 和 `summary.json`。不能将六盘历史权重称为本轮八盘结果。
 
-最近跟进：训练正常推进到 65,000/100,000 步，验证一步最优动作率 89.82%；尚未完成，不能据此报告整题成功率。已设置本聊天定时跟进，完成后回收结果，正常未完成时不反复通知。
+八盘测试随机关系到达 **221/1024（21.58%）**，一步最优率 90.75%，距离 MAE 1.80；失败均进入循环。六个标准整塔方向仅 C→B 成功，268 步，比精确解多 13 步，其余五个方向均循环。精确裁判随机题与整塔方向全部成功。这表明平均一步指标不足以证明长程可用，不能采用为可靠八盘地图。紧凑结果见 [hanoi8_summary.json](hanoi8_summary.json)，原始小型结果回收在本地忽略目录 `runs/qmap_followup_6155519/hanoi8/`。

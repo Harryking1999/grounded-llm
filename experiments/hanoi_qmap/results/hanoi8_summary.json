@@ -1,0 +1,249 @@
+{
+  "task": "hanoi8",
+  "source_commit": "6155519",
+  "best_step": 100000,
+  "last_step": 100000,
+  "training_seconds": 1581.1,
+  "stop_reason": "step_budget_exhausted",
+  "best_model_training_coverage": {
+    "pair_broad_passes": 1.6986591872579329,
+    "decision_broad_passes": 1.2368304133506567
+  },
+  "selection": "validation distance Huber + rank_weight * full soft rank cross entropy",
+  "torch_version": "2.7.1+cu128",
+  "numpy_version": "2.2.6",
+  "final": {
+    "validation": {
+      "pairs": {
+        "count": 3228006,
+        "huber": 1.4058081890947505,
+        "mae": 1.8074986333715215,
+        "spearman": 0.9986156455042813
+      },
+      "decisions": {
+        "q": {
+          "count": 4096,
+          "shortest_action_rate": 0.911865234375,
+          "uniform_tie_shortest_rate": 0.911865234375,
+          "strict_candidate_order_accuracy": 0.946044667084116
+        },
+        "hamming": {
+          "count": 4096,
+          "shortest_action_rate": 0.332275390625,
+          "uniform_tie_shortest_rate": 0.33683268229166663,
+          "strict_candidate_order_accuracy": 0.33041118764349825
+        },
+        "oracle": {
+          "count": 4096,
+          "shortest_action_rate": 1.0,
+          "uniform_tie_shortest_rate": 1.0,
+          "strict_candidate_order_accuracy": 1.0
+        }
+      },
+      "rollout": {
+        "q": {
+          "count": 1024,
+          "solved": 221,
+          "success_rate": 0.2158203125,
+          "cycle_rate": 0.7841796875,
+          "budget_exhausted": 0,
+          "horizon": 510,
+          "mean_extra_steps_on_solved": 4.53393665158371,
+          "illegal_action_rate": 0.0
+        },
+        "hamming": {
+          "count": 1024,
+          "solved": 5,
+          "success_rate": 0.0048828125,
+          "cycle_rate": 0.9951171875,
+          "budget_exhausted": 0,
+          "horizon": 510,
+          "mean_extra_steps_on_solved": 0.0,
+          "illegal_action_rate": 0.0
+        },
+        "oracle": {
+          "count": 1024,
+          "solved": 1024,
+          "success_rate": 1.0,
+          "cycle_rate": 0.0,
+          "budget_exhausted": 0,
+          "horizon": 510,
+          "mean_extra_steps_on_solved": 0.0,
+          "illegal_action_rate": 0.0
+        }
+      }
+    },
+    "test": {
+      "pairs": {
+        "count": 3227925,
+        "huber": 1.3989503541077575,
+        "mae": 1.8003547870302103,
+        "spearman": 0.9986337490709323
+      },
+      "decisions": {
+        "q": {
+          "count": 4096,
+          "shortest_action_rate": 0.907470703125,
+          "uniform_tie_shortest_rate": 0.907470703125,
+          "strict_candidate_order_accuracy": 0.9484151646985706
+        },
+        "hamming": {
+          "count": 4096,
+          "shortest_action_rate": 0.335693359375,
+          "uniform_tie_shortest_rate": 0.3311360677083333,
+          "strict_candidate_order_accuracy": 0.3298114771079345
+        },
+        "oracle": {
+          "count": 4096,
+          "shortest_action_rate": 1.0,
+          "uniform_tie_shortest_rate": 1.0,
+          "strict_candidate_order_accuracy": 1.0
+        }
+      },
+      "rollout": {
+        "q": {
+          "count": 1024,
+          "solved": 221,
+          "success_rate": 0.2158203125,
+          "cycle_rate": 0.7841796875,
+          "budget_exhausted": 0,
+          "horizon": 510,
+          "mean_extra_steps_on_solved": 4.597285067873303,
+          "illegal_action_rate": 0.0
+        },
+        "hamming": {
+          "count": 1024,
+          "solved": 5,
+          "success_rate": 0.0048828125,
+          "cycle_rate": 0.9951171875,
+          "budget_exhausted": 0,
+          "horizon": 510,
+          "mean_extra_steps_on_solved": 0.0,
+          "illegal_action_rate": 0.0
+        },
+        "oracle": {
+          "count": 1024,
+          "solved": 1024,
+          "success_rate": 1.0,
+          "cycle_rate": 0.0,
+          "budget_exhausted": 0,
+          "horizon": 510,
+          "mean_extra_steps_on_solved": 0.0,
+          "illegal_action_rate": 0.0
+        }
+      }
+    },
+    "standard_towers": {
+      "rollout": {
+        "q": {
+          "count": 6,
+          "solved": 1,
+          "success_rate": 0.16666666666666666,
+          "cycle_rate": 0.8333333333333334,
+          "budget_exhausted": 0,
+          "horizon": 510,
+          "mean_extra_steps_on_solved": 13.0,
+          "illegal_action_rate": 0.0,
+          "per_task": {
+            "solved": [
+              false,
+              false,
+              false,
+              false,
+              false,
+              true
+            ],
+            "steps": [
+              263,
+              199,
+              230,
+              252,
+              260,
+              268
+            ],
+            "cycles": [
+              true,
+              true,
+              true,
+              true,
+              true,
+              false
+            ]
+          }
+        },
+        "hamming": {
+          "count": 6,
+          "solved": 0,
+          "success_rate": 0.0,
+          "cycle_rate": 1.0,
+          "budget_exhausted": 0,
+          "horizon": 510,
+          "mean_extra_steps_on_solved": null,
+          "illegal_action_rate": 0.0,
+          "per_task": {
+            "solved": [
+              false,
+              false,
+              false,
+              false,
+              false,
+              false
+            ],
+            "steps": [
+              3,
+              3,
+              3,
+              3,
+              3,
+              3
+            ],
+            "cycles": [
+              true,
+              true,
+              true,
+              true,
+              true,
+              true
+            ]
+          }
+        },
+        "oracle": {
+          "count": 6,
+          "solved": 6,
+          "success_rate": 1.0,
+          "cycle_rate": 0.0,
+          "budget_exhausted": 0,
+          "horizon": 510,
+          "mean_extra_steps_on_solved": 0.0,
+          "illegal_action_rate": 0.0,
+          "per_task": {
+            "solved": [
+              true,
+              true,
+              true,
+              true,
+              true,
+              true
+            ],
+            "steps": [
+              255,
+              255,
+              255,
+              255,
+              255,
+              255
+            ],
+            "cycles": [
+              false,
+              false,
+              false,
+              false,
+              false,
+              false
+            ]
+          }
+        }
+      }
+    }
+  }
+}

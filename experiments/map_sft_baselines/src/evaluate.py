@@ -1,5 +1,6 @@
 """Identical reference states and own-history rollout with existing NDCG gains."""
 import argparse,json
+from dataclasses import replace
 from pathlib import Path
 import torch
 from transformers import AutoTokenizer,StoppingCriteria,StoppingCriteriaList
@@ -41,7 +42,11 @@ def main():
     a=p.parse_args();cfg=json.loads(a.config.read_text());spec=cfg['baselines'][a.baseline];torch.set_num_threads(1)
     records=json.loads((a.data/'evaluation.json').read_text())
     if len(records)!=cfg['evaluation']['tasks']:raise ValueError('Evaluation cohort differs from configuration')
+    donor_records=records
     if a.mode=='probe':records=[records[i] for i in json.loads((a.data/'probe_indices.json').read_text())]
+    training_probe=[]
+    if a.mode=='probe' and cfg['evaluation'].get('first_turn_diagnosis',False):
+        training_probe=json.loads((a.data/'training_probe.json').read_text())
     records=records[a.start:a.stop];tokenizer=AutoTokenizer.from_pretrained(a.model_path,local_files_only=True)
     reader=build(cfg,a.baseline,a.model_path,False,a.checkpoint).cuda();qmap=CachedMap(FrozenBoardMap.load(a.q_checkpoint))
     oracle=DistanceOracle(cache_limit=2000000,seconds=86400);cases=[];a.out.mkdir(parents=True,exist_ok=True)
@@ -71,6 +76,41 @@ def main():
                 text=generate(messages,steps,map_ids);row=score(text,step,oracle,spec['real_map']);turns.append(row)
                 if a.mode=='probe' and not step.done:
                     altered,_=reverse_candidate_q(step);other=generate(messages,[altered],[0]*len(ids));row['reverse']=score(other,step,oracle,True);row['changed_action']=row['candidate']!=row['reverse']['candidate']
+                    if index==0 and cfg['evaluation'].get('first_turn_diagnosis',False):
+                        from experiments.flamingo_map_reader.src.trajectory_protocol import numbered_step
+                        from experiments.flamingo_map_reader.src.blocks_prompt import turn_prompt
+                        zero=replace(step,map_batch=replace(step.map_batch,vectors=torch.zeros_like(step.map_batch.vectors)))
+                        zero_score=score(generate(messages,[zero],[0]*len(ids)),step,oracle,True)
+                        row['map_zero']=zero_score
+                        row['map_zero_action_changed']=(zero_score['candidate'],zero_score['error'])!=(row['candidate'],row['error'])
+                        numbered=numbered_step(step,tuple(reversed(range(len(step.candidate_actions)))))
+                        new_text=update.split('[Environment update]',1)[0]+turn_prompt(numbered,[])
+                        new_messages=[dict(role='user',content=new_text)]
+                        new_ids=tokenizer.apply_chat_template(new_messages,tokenize=True,add_generation_prompt=True)
+                        result=score(generate(new_messages,[numbered],[0]*len(new_ids)),numbered,oracle,True)
+                        row['renumber']=result
+                        row['renumber_safe']=result['safe']
+                        def physical(scored,source):
+                            return source.candidate_actions[scored['candidate']-1] if scored['candidate'] is not None and scored['error'] is None else None
+                        row['renumber_same_physical_action']=physical(result,numbered)==physical(row,step) and physical(row,step) is not None
+                        donor=next((r for r in donor_records if int(r['start'])!=state and
+                            len(legal_actions(int(r['start'])))==len(step.candidate_actions)),None)
+                        row['text_swap_available']=donor is not None
+                        if donor:
+                            donor_text=prompt(int(donor['start']),int(donor['goal']),[],True,int(donor['start']),True,spec['response_order'])
+                            swapped=[dict(role='user',content=donor_text)]
+                            swapped_ids=tokenizer.apply_chat_template(swapped,tokenize=True,add_generation_prompt=True)
+                            result=score(generate(swapped,[step],[0]*len(swapped_ids)),step,oracle,True)
+                            row['text_swap']=dict(result,donor_id=donor['trajectory_id'])
+                            row['text_swap_action_changed']=(result['candidate'],result['error'])!=(row['candidate'],row['error'])
+                        probe_index=a.start+len(cases)
+                        if probe_index<len(training_probe):
+                            train=training_probe[probe_index]
+                            train_step=sorted_step(qmap,int(train['start']),int(train['goal']))
+                            train_text=prompt(int(train['start']),int(train['goal']),[],True,int(train['start']),True,spec['response_order'])
+                            train_messages=[dict(role='user',content=train_text)]
+                            train_ids=tokenizer.apply_chat_template(train_messages,tokenize=True,add_generation_prompt=True)
+                            row['training_probe']=dict(score(generate(train_messages,[train_step],[0]*len(train_ids)),train_step,oracle,True),trajectory_id=train['trajectory_id'])
                 if a.mode!='RO':
                     if index==len(record['reference_actions']):break
                     action=action_from_key(record['reference_actions'][index]);executed.append(action);state=rules.apply(state,action);continue

@@ -19,4 +19,13 @@ def summarize(cases):
         rows = [row for row in ranked if key in row]
         result[key] = dict(denominator=len(rows),
                            value=sum(row[key] for row in rows) / len(rows) if rows else None)
+    for key in ('changed_action','map_zero_action_changed','renumber_safe',
+                'renumber_same_physical_action','text_swap_available','text_swap_action_changed'):
+        rows = [row for row in turns if key in row]
+        if rows:
+            result[key] = rate(key, rows)
+    training = [row['training_probe'] for row in turns if 'training_probe' in row]
+    if training:
+        result['training_probe_safe'] = rate('safe', training)
+        result['training_probe_optimal'] = rate('optimal', training)
     return result

@@ -10,10 +10,18 @@ def steps_per_epoch(config):
 
 def checkpoint_steps(config):
     interval = config['training']['save_steps']
-    total = steps_per_epoch(config) * config['training']['epochs']
+    total = training_steps(config)
     if interval <= 0 or total % interval:
         raise ValueError('Checkpoint interval must divide the training horizon')
     return range(interval, total + 1, interval)
+
+
+def training_steps(config):
+    horizon = steps_per_epoch(config) * config['training']['epochs']
+    total = config['training'].get('maximum_updates', horizon)
+    if not isinstance(total, int) or not 0 < total <= horizon:
+        raise ValueError('Update limit must be positive and within the epoch horizon')
+    return total
 
 
 def cohort_size(config, mode):

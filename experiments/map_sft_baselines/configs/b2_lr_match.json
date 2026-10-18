@@ -1,0 +1,105 @@
+{
+  "study": "blocks_b2_diagnosis_B2_lr_match",
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "seed": 20261013,
+  "maximum_sequence_tokens": 32768,
+  "data": {
+    "training_boards": 1000,
+    "ordinary_per_board": 49,
+    "samples_per_epoch": 10000,
+    "minimum_shortest_moves": 6,
+    "random_routes": [
+      128,
+      256,
+      512
+    ],
+    "coverage_target": 292758,
+    "coverage_per_board_target": 293,
+    "oracle_cache_limit": 2000000,
+    "oracle_seconds_per_board": 600,
+    "selection": "longest_then_new_state_goal_then_start_and_goal_size",
+    "numbering": "shape_id_row_col_sorted"
+  },
+  "map": {
+    "memory_mode": "address_key_state_value",
+    "state_dim": 128,
+    "projection_dim": 256,
+    "role_and_id_dim": 32,
+    "attention_heads": 4,
+    "attention_head_dim": 64,
+    "cross_attention_every_n_layers": 1,
+    "maximum_candidates": 664
+  },
+  "training": {
+    "epochs": 20,
+    "world_size": 2,
+    "micro_batch": 1,
+    "gradient_accumulation_steps": 2,
+    "global_batch": 4,
+    "learning_rate": 2e-05,
+    "weight_decay": 0.01,
+    "warmup_fraction": 0.05,
+    "cosine_minimum_ratio": 0.1,
+    "gradient_clip_norm": 1.0,
+    "checkpoint_layers": true,
+    "loss_chunk_tokens": 128,
+    "loss": "global_assistant_token_mean_cross_entropy",
+    "save_steps": 12500,
+    "log_steps": 10,
+    "maximum_updates": 50000,
+    "scheduler_total_steps": 250000,
+    "warmup_steps": 12500,
+    "keep_resume_checkpoints": 1
+  },
+  "baselines": {
+    "B2_lr_match": {
+      "interface": true,
+      "real_map": true,
+      "full_llm": true,
+      "response_order": "ranking_first"
+    }
+  },
+  "execution": {
+    "initial_baselines": [
+      "B2_lr_match"
+    ],
+    "pending_baselines": [],
+    "retired_baselines": [],
+    "gpu_pairs": [
+      [
+        0,
+        1
+      ]
+    ],
+    "evaluation_gpus": [
+      1
+    ],
+    "poll_seconds": 60
+  },
+  "evaluation": {
+    "tasks": 510,
+    "modes": [
+      "TF",
+      "RO"
+    ],
+    "probe_tasks": 100,
+    "shard_tasks": 32,
+    "max_new_tokens": 256,
+    "action_budget": 32,
+    "main_metric": "arrival",
+    "first_turn_diagnosis": true
+  },
+  "early_stop": {
+    "mode": "flag_only",
+    "minimum_epochs": 5,
+    "patience_points": 6,
+    "minimum_gain_tasks": 5
+  },
+  "subset": {
+    "source_samples": 50000,
+    "method": "board_length_stratified",
+    "per_board": 10,
+    "terminal_samples": 200,
+    "shared_physical_routes_with": "Qwen2.5-7B-Instruct_10k"
+  }
+}

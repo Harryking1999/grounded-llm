@@ -14,6 +14,7 @@ from experiments.flamingo_map_reader.src.train import collate_examples,to_device
 from experiments.llm_task_sft.src.train import scheduler_factor
 from .common import atomic_json,pseudo_timeline,renumber_trajectory
 from .modeling import build,infer_weights
+from .contract import training_steps
 
 
 def shard_model(model, local):
@@ -73,6 +74,8 @@ class Routes(Dataset):
 
 
 def learning_rate_factor(step,total,training):
+    total=training.get('scheduler_total_steps',total)
+    if total <= 0:raise ValueError('Scheduler horizon must be positive')
     warmup=training.get('warmup_steps',round(total*training['warmup_fraction']))
     schedule=training.get('scheduler','cosine')
     if schedule=='constant_with_warmup':return min(1.,step/max(1,warmup))
@@ -96,7 +99,9 @@ def save(model,optimizer,scheduler,out,config,baseline,step,steps_epoch,rank):
     dist.barrier()
     if rank==0:
         atomic_json(path/'evaluation_ready.json',dict(step=step,epoch=step/steps_epoch,baseline=baseline))
-        previous=sorted(out.glob('checkpoint-*'),key=lambda p:int(p.name.split('-')[-1]))[:-2]
+        keep=config['training'].get('keep_resume_checkpoints',2)
+        if keep < 1:raise ValueError('At least one resume checkpoint must be retained')
+        previous=sorted(out.glob('checkpoint-*'),key=lambda p:int(p.name.split('-')[-1]))[:-keep]
         for old in previous:(old/'resume.pt').unlink(missing_ok=True)
     dist.barrier()
 
@@ -123,7 +128,7 @@ def main():
     params=[p for p in wrapped.parameters() if p.requires_grad]
     optimizer=torch.optim.AdamW(params,lr=t['learning_rate'],weight_decay=t['weight_decay'],fused=True)
     if len(data)%t['global_batch']:raise ValueError('Dataset must divide into complete global batches')
-    steps_epoch=len(data)//t['global_batch'];total=steps_epoch*t['epochs']
+    steps_epoch=len(data)//t['global_batch'];total=training_steps(dict(cfg,training=t))
     scheduler=torch.optim.lr_scheduler.LambdaLR(optimizer,lambda s:learning_rate_factor(s,total,t))
     step=0
     if a.resume:

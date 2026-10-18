@@ -13,7 +13,7 @@
 
 | 任务 | 正式训练实现入口 | 适配／加载 |
 |---|---|---|
-| 积木 | [多棋盘训练](../experiments/blocks_distance_map/src/multiboard_run.py)、[树关系](../experiments/blocks_distance_map/src/tree_supervision_run.py)、[续训](../experiments/blocks_distance_map/src/tree_continue_run.py) | [BoardEncoder](../experiments/blocks_distance_map/src/model.py)、[FrozenBoardMap](../experiments/flamingo_map_reader/src/blocks.py) |
+| 积木 | [多棋盘训练](../experiments/blocks_distance_map/src/multiboard_run.py)、[树关系](../experiments/blocks_distance_map/src/tree_supervision_run.py)、[续训](../experiments/blocks_distance_map/src/tree_continue_run.py)、[12块多初盘完整图联合续训](../experiments/blocks_distance_map/src/full_graph_run.py) | [BoardEncoder](../experiments/blocks_distance_map/src/model.py)、[FrozenBoardMap](../experiments/flamingo_map_reader/src/blocks.py) |
 | 寻路 | [run.py](../experiments/path_qmap/src/run.py) | [reader.py](../experiments/path_qmap/src/reader.py) |
 | 汉诺塔 | [汉诺塔独立训练](../experiments/hanoi_qmap/src/run.py)、[数据](../experiments/hanoi_qmap/src/data.py)、[评测](../experiments/hanoi_qmap/src/evaluate.py) | [环境](../experiments/hanoi_qmap/src/environment.py)、[本任务 QMap／MapReader](../experiments/hanoi_qmap/src/model.py) |
 | 魔方 | [魔方独立训练](../experiments/cube2_qmap/src/run.py)、[关系数据](../experiments/cube2_qmap/src/relation_data.py)、[评测](../experiments/cube2_qmap/src/evaluate.py)；已采用模型的[循环修复续训](../experiments/cube2_qmap/src/cycle_repair.py) | [环境](../experiments/cube2_qmap/src/environment.py)、[本任务 QMap／MapReader](../experiments/cube2_qmap/src/model.py) |

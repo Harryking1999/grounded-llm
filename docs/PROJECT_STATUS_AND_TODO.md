@@ -15,11 +15,11 @@
 
 | 任务 | 当前结论 | 下一步／依据 |
 |---|---|---|
-| [积木](../tasks/blocks/README.md) | 已有地图与 SFT 基线；准备原八形状12块条件的多初盘全图续训 | 全部状态与转移精确表示，广采样并单独报告曝光；[地图报告](../experiments/blocks_distance_map/results/report.md)、[并行SFT诊断](../experiments/map_sft_baselines/results/b2_four_controls.md) |
+| [积木](../tasks/blocks/README.md) | 原八形状12块条件已完整表示一组多初盘求解图；联合续训与验收未完成，保留原选用权重 | 严格区分可查询关系与实际曝光，按训练初盘及未见初盘的清空／中间目标同题验收；[地图报告](../experiments/blocks_distance_map/results/report.md)、[并行SFT诊断](../experiments/map_sft_baselines/results/b2_four_controls.md) |
 | [寻路](../tasks/path/README.md) | 采用统一方法 Q 和已选定权重，旧 Q/V 保留为历史对照 | 统一文字与新条件参数；[权重来源](../tasks/path/Qmap/selection.json) |
 | [汉诺塔](../tasks/hanoi/README.md) | 用户采用八盘整塔目标地图，正式评测仅考虑任意合法起点到指定柱的整塔终点 | 保留残留失败与中间目标补充结果，不追加训练；[权重及范围](../tasks/hanoi/Qmap/selection.json)、[实验报告](../experiments/hanoi_qmap/results/report.md) |
 | [二阶魔方](../tasks/cube2/README.md) | 采用用户指定的复原断点，保留二阶主条件，三阶探索停止 | 继续定位复原与关系泛化不足；[权重来源](../tasks/cube2/Qmap/selection.json) |
-| [8-Puzzle（数字华容道）](../tasks/puzzle8/README.md) | 保留3×3主条件；全图联合续训中，尚未采用权重 | 落实起终点与完整分支关系的实际训练覆盖，按完整复原和中间关系验收；[实验报告](../experiments/puzzle8_qmap/results/report.md) |
+| [8-Puzzle（数字华容道）](../tasks/puzzle8/README.md) | 保留3×3主条件；接续中断的全图联合训练，仍无通过可靠性验收的权重 | 保留原最佳，按完整复原、循环、中间目标、同题得失与真实关系曝光逐档验收；[实验报告](../experiments/puzzle8_qmap/results/report.md) |
 
 五任务纯文字强基线及补充对照已完成，结果和比较边界见[统一评测报告](../experiments/task_text_baselines/results/report.md)，不与不同设置的旧 SFT 指标混用。
 

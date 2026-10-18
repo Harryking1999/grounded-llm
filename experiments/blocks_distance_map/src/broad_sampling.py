@@ -57,7 +57,8 @@ class BroadData(JointData):
         super().__init__(path, legacy_path, options, rank, world)
         self.phase_sketches = {k: Cardinality() for k in (
             "relations", "huber_relations", "rank_candidate_relations", "forks", "goals",
-            "nonzero_huber_score_relations", "nonzero_rank_score_relations")}
+            "nonzero_huber_score_relations", "nonzero_rank_score_relations",
+            "bundle_huber_relations", "bundle_rank_candidate_relations", "bundle_forks")}
         self.phase_roots = np.zeros(len(self.roots), dtype=bool)
         self.phase_histograms = {}
         self.requested_distances = {}
@@ -66,6 +67,11 @@ class BroadData(JointData):
         self.fork_degrees = {}
         self.stream_calls = 0
         self.clear_requested_distances, self.clear_actual_distances = {}, {}
+        self.bundle_histograms = {}
+        self.bundle_update_counts = {}
+        self._pending_bundle_huber, self._pending_bundle_candidates = [], []
+        self._pending_bundle_forks, self._pending_bundle_events = [], {}
+        self._bundle_rank_roles = {}
         index_path = options.get("clear_index_data")
         self.clear_indexes = ({gid: ClearDistanceIndex(Path(index_path) / str(gid)) for gid in self.graphs}
                               if index_path else None)
@@ -147,17 +153,19 @@ class BroadData(JointData):
         # stars below retain every legal trap action at each clearable parent.
         return np.concatenate((old_source, source)), np.concatenate((old_goal, goal))
 
-    def _paths(self, root, start, length=18):
+    def _paths(self, root, start, length=18, first_choices=None):
         # Walk directly on component bit masks: no repeated BDD unrank/rank at
         # every move. All legal actions retain nonzero sampling probability.
         current = start.copy()
         result = [current.copy()]
-        for _ in range(length):
+        for move in range(length):
             legal = [(current[:, i, None] & graph.tiles) == graph.tiles
                      for i, (graph, _) in enumerate(root.parts)]
             degrees = np.stack([x.sum(-1) for x in legal], -1)
             total = degrees.sum(-1)
             choice = (self.rng.random(len(start)) * total).astype(np.int64)
+            if move == 0 and first_choices is not None:
+                choice = np.asarray(first_choices)
             ends = np.cumsum(degrees, axis=-1)
             part = (choice[:, None] >= ends).sum(-1)
             begins = np.column_stack((np.zeros(len(start), dtype=np.int64), ends[:, :-1]))
@@ -171,15 +179,8 @@ class BroadData(JointData):
             result.append(current.copy())
         return np.stack(result, axis=1)
 
-    def structure_rows(self, board, count, cross):
-        root = self.roots[board]
-        self.stream_calls += 1
-        if not count:
-            empty = root.decode(np.zeros(0, dtype=np.uint64))
-            return empty, empty.copy()
+    def _sources(self, root, count, wanted):
         initial = np.tile([int(g.states[np.asarray([g.initial_id])][0]) for g, _ in root.parts], (count, 1)).astype(np.uint64)
-        cycle = np.asarray(self.options.get("stream_distance_cycle", [2, 3, 4, 5, 6, 7, 8, 6, 7, 8, 9, 10, 11, 12, 13]))
-        wanted = cycle[(np.arange(count) + int(self.rng.integers(len(cycle)))) % len(cycle)]
         # Whole-root and several different intermediate sources, plus uniform
         # graph sources; not only optimal clearing paths or fixed failure goals.
         path = self._paths(root, initial)
@@ -200,6 +201,17 @@ class BroadData(JointData):
         local = root.decode(self.rng.integers(root.size, size=int(uniform.sum())))
         for i, (graph, _) in enumerate(root.parts):
             source[uniform, i] = graph.states[local[:, i]]
+        return source
+
+    def _structure_rows(self, board, count, cross):
+        root = self.roots[board]
+        self.stream_calls += 1
+        if not count:
+            empty = root.decode(np.zeros(0, dtype=np.uint64))
+            return empty, empty.copy()
+        cycle = np.asarray(self.options.get("stream_distance_cycle", [2, 3, 4, 5, 6, 7, 8, 6, 7, 8, 9, 10, 11, 12, 13]))
+        wanted = cycle[(np.arange(count) + int(self.rng.integers(len(cycle)))) % len(cycle)]
+        source = self._sources(root, count, wanted)
         # Continue independently after each sampled source, retaining every
         # intermediate goal along each random legal path for exact stratification.
         paths = self._paths(root, source)
@@ -238,6 +250,71 @@ class BroadData(JointData):
         return (np.stack([g.rank(source[:, i]) for i, (g, _) in enumerate(root.parts)], -1),
                 np.stack([g.rank(goal[:, i]) for i, (g, _) in enumerate(root.parts)], -1))
 
+    def structure_rows(self, board, count, cross):
+        # Six related contexts occupy existing structure slots, not extra loss
+        # terms. Independent broad/clear/legacy streams remain in the batch.
+        fraction = self.options.get("branch_bundle_fraction", 0)
+        if not 0 <= fraction <= 1:
+            raise ValueError("branch_bundle_fraction must be in [0, 1]")
+        bundles = min(int(count * fraction) // 6, max(count - 1, 0) // 6)
+        remaining = count - 6 * bundles
+        plain = self._structure_rows(board, remaining, cross)
+        if not bundles:
+            return plain
+        root = self.roots[board]
+        cycle = np.asarray(self.options.get("stream_distance_cycle", [6, 7, 8, 9, 10, 11, 12, 13]))
+        wanted = cycle[(np.arange(bundles) + int(self.rng.integers(len(cycle)))) % len(cycle)]
+        masks = self._sources(root, bundles, wanted)
+        degree = sum(((masks[:, i, None] & g.tiles) == g.tiles).sum(-1)
+                     for i, (g, _) in enumerate(root.parts))
+        left_choice = (self.rng.random(bundles) * degree).astype(int)
+        # Different immediate actions whenever a real fork exists; independent
+        # random walks alone can repeatedly select the same branch.
+        offset = 1 + (self.rng.random(bundles) * np.maximum(degree - 1, 0)).astype(int)
+        right_choice = (left_choice + offset) % np.maximum(degree, 1)
+        left = self._paths(root, masks, first_choices=left_choice)
+        right = self._paths(root, masks, first_choices=right_choice)
+        def target(path):
+            distance = sum(g.distance(masks[:, None, i], path[:, :, i])
+                           for i, (g, _) in enumerate(root.parts))
+            valid = (path != 0).any(-1) & (distance > 0)
+            error = np.where(valid, np.abs(distance - wanted[:, None]), 1000)
+            chosen = (error + self.rng.random(error.shape) * .01).argmin(-1)
+            chosen[~valid.any(-1)] = 0
+            return path[np.arange(bundles), chosen]
+        gl, gr = target(left), target(right)
+        sl, sr = left[:, 1], right[:, 1]
+        # Shared source, shared goal, both branch continuations and cross-branch
+        # goals. Crossing branches can be finite, unreachable or reconvergent;
+        # query the exact graph instead of assuming a tree or assigning a label.
+        source = np.stack((masks, masks, sl, sr, sr, sl), axis=1).reshape(-1, masks.shape[-1])
+        goal = np.stack((gl, gr, gl, gl, gr, gr), axis=1).reshape(source.shape)
+        roles = np.tile(["shared_source_left", "shared_source_right", "left_followup",
+                         "right_to_left_goal", "right_followup", "left_to_right_goal"], bundles)
+        source_ids = np.stack([g.rank(source[:, i]) for i, (g, _) in enumerate(root.parts)], -1)
+        goal_ids = np.stack([g.rank(goal[:, i]) for i, (g, _) in enumerate(root.parts)], -1)
+        keys = np.column_stack((root.packed(source_ids), root.packed(goal_ids)))
+        distances = root.distance_parts(source_ids, goal_ids)
+        truth = np.where((distances < 0).any(-1), -1, distances.sum(-1))
+        if cross:
+            self._pending_bundle_huber.append((keys, truth, roles, wanted))
+        else:
+            self._bundle_rank_roles.update((tuple(key), role) for key, role in zip(keys, roles))
+        events = {"groups": bundles, "anchors_with_distinct_actions": int((degree > 1).sum()),
+                  "distinct_goal_pairs": int((gl != gr).any(-1).sum()),
+                  "reconverged_goal_pairs": int(((gl == gr).all(-1) & (degree > 1)).sum())}
+        for key, value in events.items():
+            self._pending_bundle_events[key] = self._pending_bundle_events.get(key, 0) + value
+        # Keep ordinary rows last: JointData may replace its final rank row by
+        # the mandatory first full-root fork, leaving these bundles intact.
+        return (np.concatenate((source_ids, plain[0])), np.concatenate((goal_ids, plain[1])))
+
+    def batch(self, pair_count, rank_count):
+        self._pending_bundle_huber, self._pending_bundle_candidates = [], []
+        self._pending_bundle_forks, self._pending_bundle_events = [], {}
+        self._bundle_rank_roles = {}
+        return super().batch(pair_count, rank_count)
+
     def boards(self):
         result = super().boards()
         self.phase_roots[result] = True
@@ -248,11 +325,31 @@ class BroadData(JointData):
         active = degree > 0
         self.phase_sketches["forks"].add(np.column_stack((root.packed(source[active]), root.packed(goal[active]))))
         self.add_hist(self.fork_degrees, degree)
-        return super().stars(root, source, goal)
+        result = super().stars(root, source, goal)
+        if result is not None and self._bundle_rank_roles:
+            keys = np.column_stack((root.packed(source), root.packed(goal)))
+            selected = np.asarray([tuple(key) in self._bundle_rank_roles for key in keys]) & active
+            self._pending_bundle_forks.append(keys[selected])
+            s, g, truth, groups = result
+            use = selected[groups]
+            self._pending_bundle_candidates.append((np.column_stack((s[use], g[use])), truth[use]))
+        return result
 
     def record_update(self, arrays, huber_nonzero, rank_nonzero):
         # Called only after successful optimizer.step, so an aborted sampling or
         # forward call contributes no exposure to this phase's committed counts.
+        for keys, truth, roles, wanted in self._pending_bundle_huber:
+            self.phase_sketches["bundle_huber_relations"].add(keys)
+            self.add_hist(self.bundle_histograms.setdefault("huber_requested_anchor_distance", {}), wanted)
+            for role in np.unique(roles):
+                self.add_hist(self.bundle_histograms.setdefault("huber_" + role, {}), truth[roles == role])
+        for keys, truth in self._pending_bundle_candidates:
+            self.phase_sketches["bundle_rank_candidate_relations"].add(keys)
+            self.add_hist(self.bundle_histograms.setdefault("rank_candidates", {}), truth)
+        for keys in self._pending_bundle_forks:
+            self.phase_sketches["bundle_forks"].add(keys)
+        for key, value in self._pending_bundle_events.items():
+            self.bundle_update_counts[key] = self.bundle_update_counts.get(key, 0) + value
         for kind, source, goal, truth, mask in (
             ("huber", arrays[0], arrays[1], arrays[2], huber_nonzero),
             ("rank_candidate", arrays[3], arrays[4], arrays[5], rank_nonzero)):
@@ -281,19 +378,23 @@ class BroadData(JointData):
             "histograms": self.phase_histograms, "requested": self.requested_distances,
             "initial": self.initial_distances, "actual": self.actual_distances, "fork_degrees": self.fork_degrees,
             "clear_requested": self.clear_requested_distances, "clear_actual": self.clear_actual_distances,
+            "bundle_histograms": self.bundle_histograms, "bundle_update_counts": self.bundle_update_counts,
             "stream_calls": self.stream_calls, "prefix_roots": self.prefix_roots}
         return state
 
     def load_state_dict(self, state):
         super().load_state_dict(state)
         stream = state["broad_stream"]
-        self.phase_sketches = {k: Cardinality(v) for k, v in stream["sketches"].items()}
+        for k, v in stream["sketches"].items():
+            self.phase_sketches[k] = Cardinality(v)
         self.phase_roots = stream["roots"]
         self.phase_histograms = stream["histograms"]
         self.requested_distances, self.initial_distances = stream["requested"], stream["initial"]
         self.actual_distances = stream["actual"]
         self.clear_requested_distances = stream.get("clear_requested", {})
         self.clear_actual_distances = stream.get("clear_actual", {})
+        self.bundle_histograms = stream.get("bundle_histograms", {})
+        self.bundle_update_counts = stream.get("bundle_update_counts", {})
         self.fork_degrees, self.stream_calls = stream["fork_degrees"], stream["stream_calls"]
         self.prefix_roots = stream["prefix_roots"]
 
@@ -305,6 +406,8 @@ class BroadData(JointData):
             "actual_stream_distance_draws": self.actual_distances, "fork_degree_draws": self.fork_degrees,
             "requested_indexed_clear_distances": self.clear_requested_distances,
             "actual_indexed_clear_parent_distances": self.clear_actual_distances,
+            "branch_bundle_actual_update_draws": self.bundle_update_counts,
+            "branch_bundle_actual_distance_draws": self.bundle_histograms,
             "local_estimated_distinct": {k: v.estimate() for k, v in self.phase_sketches.items()},
             "estimate_relative_standard_error": 1.04 / math.sqrt(1 << 14),
             "scope": "This new phase only, packed global state-pair HLL shared identity across roots; per-rank until merged at complete checkpoint. Nonzero score derivatives do not imply nonzero parameter gradients. Earlier distinct exposure unknown outside the certified broad prefix."}

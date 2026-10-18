@@ -171,6 +171,16 @@ def run(config, out, source_commit, smoke_steps=None, resume=None):
                             merged = exposure["global_stream_phase"]["distance_by_goal_draws"].setdefault(key, {})
                             for distance, count in histogram.items():
                                 merged[distance] = merged.get(distance, 0) + count
+                    for key in ("branch_bundle_actual_update_draws", "branch_bundle_actual_distance_draws"):
+                        merged = exposure["global_stream_phase"][key] = {}
+                        for report in reports:
+                            for name, value in report["stream_phase"].get(key, {}).items():
+                                if isinstance(value, dict):
+                                    bucket = merged.setdefault(name, {})
+                                    for distance, count in value.items():
+                                        bucket[distance] = bucket.get(distance, 0) + count
+                                else:
+                                    merged[name] = merged.get(name, 0) + value
                 (out / f"exposure_{step:06d}.json").write_text(json.dumps(exposure, indent=2) + "\n")
             if world > 1:
                 dist.barrier()

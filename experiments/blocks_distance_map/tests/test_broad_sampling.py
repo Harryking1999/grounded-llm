@@ -91,6 +91,47 @@ class BroadSamplingTest(unittest.TestCase):
             for a, b in zip(indexed.batch(128, 32), replay.batch(128, 32)):
                 np.testing.assert_array_equal(a, b)
             indexed.close(); replay.close()
+            bundled = BroadData(path, path / "legacy.npz", {**options,
+                "branch_bundle_fraction": .5, "stream_distance_cycle": [6, 7, 8]})
+            source, goal = bundled.structure_rows(0, 120, True)
+            root = bundled.roots[0]
+            ss, gg = root.packed(source)[:, 0], root.packed(goal)[:, 0]
+            # Ten six-context groups explicitly share sources and goals. The
+            # two first actions differ at every branching anchor; DAG merges
+            # remain legal, and all cross-branch labels come from the oracle.
+            ss, gg = ss[:60].reshape(-1, 6), gg[:60].reshape(-1, 6)
+            np.testing.assert_array_equal(ss[:, 0], ss[:, 1])
+            np.testing.assert_array_equal(gg[:, 0], gg[:, 2])
+            np.testing.assert_array_equal(gg[:, 0], gg[:, 3])
+            np.testing.assert_array_equal(gg[:, 1], gg[:, 4])
+            np.testing.assert_array_equal(gg[:, 1], gg[:, 5])
+            degrees = sum(g.degrees(source[:60:6, i]) for i, (g, _) in enumerate(root.parts))
+            self.assertTrue((ss[degrees > 1, 2] != ss[degrees > 1, 3]).all())
+            for a, b, c, d in zip(ss[:, 2], ss[:, 3], gg[:, 0], gg[:, 1]):
+                self.assertGreaterEqual(oracle.distance(int(a), int(c)), 0)
+                self.assertGreaterEqual(oracle.distance(int(b), int(d)), 0)
+            self.assertEqual(bundled.phase_sketches["bundle_huber_relations"].estimate(), 0)
+            batch = bundled.batch(256, 96)
+            for s, g, d in ((batch[0], batch[1], batch[2]), (batch[3], batch[4], batch[5])):
+                np.testing.assert_array_equal(d, [oracle.distance(int(a[0]), int(b[0])) for a, b in zip(s, g)])
+            # Every selected bundle ranking parent retains its entire original
+            # legal candidate set, including unreachable target continuations.
+            source, goal = bundled.structure_rows(0, 120, False)
+            star = bundled.stars(root, source, goal)
+            degree = sum(g.degrees(source[:, i]) for i, (g, _) in enumerate(root.parts))
+            np.testing.assert_array_equal(np.bincount(star[-1], minlength=len(source)), degree)
+            # Begin a real batch again: diagnostics above must not be recorded
+            # as optimizer exposure by the subsequent actual-update hook.
+            batch = bundled.batch(256, 96)
+            bundled.record_update(batch, np.ones(len(batch[2]), bool), np.ones(len(batch[5]), bool))
+            self.assertGreater(bundled.phase_sketches["bundle_huber_relations"].estimate(), 0)
+            self.assertGreater(bundled.phase_sketches["bundle_rank_candidate_relations"].estimate(), 0)
+            saved = copy.deepcopy(bundled.state_dict())
+            replay = BroadData(path, path / "legacy.npz", bundled.options)
+            replay.load_state_dict(saved)
+            for a, b in zip(bundled.batch(256, 96), replay.batch(256, 96)):
+                np.testing.assert_array_equal(a, b)
+            bundled.close(); replay.close()
 
 
 if __name__ == "__main__":

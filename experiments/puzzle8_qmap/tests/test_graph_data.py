@@ -60,6 +60,8 @@ class GraphDataTest(unittest.TestCase):
             self.assertEqual(sampler.gr.size, len(sampler.parents) * len(sampler.sources))
             self.assertFalse(np.isin(sampler.routes, sampler.protected).any())
             self.assertEqual(sampler.report()["observed_broad_goals"], len(sampler.sources))
+            self.assertEqual(sum(sampler.report()["distance_exposure"]["pair_draws_by_distance"]), 2048)
+            self.assertEqual(sum(sampler.report()["distance_exposure"]["legal_candidate_draws_by_distance"]), int((children >= 0).sum()))
             saved = copy.deepcopy(sampler.state_dict())
             expected_pairs = sampler.pairs(111)
             expected_tasks = sampler.tasks(79)

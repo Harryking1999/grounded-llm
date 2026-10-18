@@ -166,7 +166,7 @@ def train(env, config, data, out, device, source_commit, checkpoint=None, resume
             if step <= start_step + 5:
                 if str(device).startswith("cuda"):
                     torch.cuda.synchronize(device)
-                elapsed = time.monotonic() - update_started
+                elapsed = max(time.monotonic() - update_started, 1e-9)
                 print(json.dumps({"update_timing": {"step": step, "seconds": elapsed,
                     "sampling_and_forward_seconds": prepared_at - update_started,
                     "pairs_per_second": options["batch_size"] / elapsed,

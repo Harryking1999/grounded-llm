@@ -137,6 +137,9 @@ class GraphData:
         self.hard_pair_draws = self.hard_decision_draws = 0
         self.seen_sources = np.zeros(env.size, dtype=bool)
         self.seen_goals = np.zeros(env.size, dtype=bool)
+        self.pair_distance_draws = np.zeros(env.diameter + 1, dtype=np.int64)
+        self.candidate_distance_draws = np.zeros(env.diameter + 1, dtype=np.int64)
+        self.distance_tracking_start = {"all_pairs_draws": 0, "all_decision_draws": 0}
         summary = {"states": env.size, "full_exact_ordered_pairs": env.size ** 2,
                    "available_joint_pairs": self.gp.size, "available_joint_decisions": self.gr.size,
                    "structure_decisions": len(self.routes), "structure_parent_states": len(np.unique(self.routes[:, 0])),
@@ -164,7 +167,10 @@ class GraphData:
                              for name in ("ps", "rs")},
                 "hard": self.hard, "hard_pair_draws": self.hard_pair_draws,
                 "hard_decision_draws": self.hard_decision_draws,
-                "seen_sources": self.seen_sources, "seen_goals": self.seen_goals}
+                "seen_sources": self.seen_sources, "seen_goals": self.seen_goals,
+                "distance_exposure": {"pairs": self.pair_distance_draws,
+                                      "candidates": self.candidate_distance_draws,
+                                      "start": self.distance_tracking_start}}
 
     def load_state_dict(self, state):
         for name, values in state["streams"].items():
@@ -179,6 +185,13 @@ class GraphData:
         for name in ("hard", "hard_pair_draws", "hard_decision_draws", "seen_sources", "seen_goals"):
             setattr(self, name, state[name])
         self.rng.bit_generator.state = state["rng"]
+        if "distance_exposure" in state:
+            self.pair_distance_draws = state["distance_exposure"]["pairs"]
+            self.candidate_distance_draws = state["distance_exposure"]["candidates"]
+            self.distance_tracking_start = state["distance_exposure"]["start"]
+        else:
+            self.distance_tracking_start = {"all_pairs_draws": self.gp.draws,
+                                            "all_decision_draws": self.gr.draws}
 
     def resume_legacy_broad(self, coverage):
         # Construction order and seed must match the parent. Only these streams
@@ -222,7 +235,9 @@ class GraphData:
         rows = np.concatenate((self.data["pairs_train"][self.ps.draw(a), :2],
                                np.column_stack((restore, np.zeros(b, dtype=int))),
                                self.graph(c - edge_count, False), self.edges[self.es.draw(edge_count)])).astype(np.int32)
-        return np.column_stack((rows, self.env.distance(rows[:, 0], rows[:, 1])))
+        distances = self.env.distance(rows[:, 0], rows[:, 1])
+        self.pair_distance_draws += np.bincount(distances, minlength=len(self.pair_distance_draws))
+        return np.column_stack((rows, distances))
 
     def tasks(self, count):
         a, b, c = self.counts(count)
@@ -232,6 +247,7 @@ class GraphData:
         children = self.env.next[rows[:, 0]]
         truth = np.where(children >= 0, self.env.distance(np.maximum(children, 0), rows[:, 1, None]),
                          self.env.diameter + 1).astype(np.int8)
+        self.candidate_distance_draws += np.bincount(truth[children >= 0], minlength=len(self.candidate_distance_draws))
         return rows, children, truth
 
     def report(self):
@@ -242,4 +258,8 @@ class GraphData:
                 "observed_broad_sources": int(self.seen_sources.sum()), "observed_broad_goals": int(self.seen_goals.sum()),
                 "structure_pair_passes": self.rp.passes, "structure_decision_passes": self.rr.passes,
                 "hard_pair_draws": self.hard_pair_draws, "hard_decision_draws": self.hard_decision_draws,
-                "edge_pair_passes": self.es.passes, "structure_decisions": len(self.routes), "hard_contexts": len(self.hard)}
+                "edge_pair_passes": self.es.passes, "structure_decisions": len(self.routes), "hard_contexts": len(self.hard),
+                "distance_exposure": {"pair_draws_by_distance": self.pair_distance_draws.tolist(),
+                                      "legal_candidate_draws_by_distance": self.candidate_distance_draws.tolist(),
+                                      "tracking_started_after": self.distance_tracking_start,
+                                      "scope": "Actual gradient-sampled labels across all mixture components, repeated draws counted; legacy histograms unavailable"}}

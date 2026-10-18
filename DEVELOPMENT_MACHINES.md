@@ -93,7 +93,7 @@ scp -r /home/zhangyue/transfer/grounded_llm/run-id gongruochen@10.28.0.80:/home/
 ## 5. 文档维护边界
 
 - 机器、连接端口、存储根目录或认证方法改变时，原位修改对应条目。
-- 实验参数放在实验 `configs/`；启动、恢复、迁移来源、验证计数与结果放在对应实验报告或 runtime 文件。
+- 实验参数放在实验 `configs/`；启动、恢复、迁移来源、验证计数与逐次结果放在独立结果文件或忽略的 runtime，实验报告仅保留当前结论与入口。
 - 当前研究状态与下一步只维护在 [项目状态页](docs/PROJECT_STATUS_AND_TODO.md)。
 - 本手册不记录训练 step、epoch、分片计数、运行时间线、逐次日志或实验结论。
 

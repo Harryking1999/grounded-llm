@@ -4,10 +4,11 @@ Moves use connected tiles and only remove cells. Components cannot interact.
 Covering source XOR goal is equivalent to removing that mask from the original
 component, so one complete BFS also gives exact distances for every state pair.
 """
-from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import ProcessPoolExecutor, as_completed
 import argparse
 import json
 import math
+import os
 from pathlib import Path
 
 import numpy as np
@@ -194,6 +195,19 @@ def prepare(config, out):
     excluded = {r["initial"] for r in construct(config["evaluation_boards"], 12, config["evaluation_seed"])}
     candidates = construct(config["train_boards"] + config["evaluation_boards"], 12, config["seed"])
     roots, specs, catalog = [], [], {}
+    reuse = Path(config["reuse_graph_data"]) if config.get("reuse_graph_data") else None
+    reused = {}
+    previous_roots = []
+    if reuse:
+        previous = json.loads((reuse / "summary.json").read_text())
+        if not previous["complete"]:
+            raise ValueError("Cannot reuse incomplete exact graphs")
+        previous_roots = json.loads((reuse / "roots.json").read_text())
+        for width, tiles in json.loads((reuse / "graph_specs.json").read_text()):
+            catalog[(width, tuple(tiles))] = len(specs)
+            specs.append((width, tiles))
+        for i in range(len(specs)):
+            reused[i] = json.loads((reuse / "graphs" / str(i) / "summary.json").read_text())
     for record in candidates:
         if record["initial"] in excluded:
             continue
@@ -210,16 +224,30 @@ def prepare(config, out):
             break
     if len(roots) != config["train_boards"]:
         raise ValueError("Insufficient distinct training roots")
+    if previous_roots and roots[:len(previous_roots)] != previous_roots:
+        raise ValueError("Expansion must preserve the exact previous root/index prefix")
     action_counts = [sum(int(r["initial"]) & tile == tile for r in roots)
                      for tile, _ in blocks.PLACEMENTS]
     if not all(action_counts):
         raise ValueError("Training roots do not cover every original placement action")
     (out / "roots.json").write_text(json.dumps(roots) + "\n")
     (out / "graph_specs.json").write_text(json.dumps(specs) + "\n")
+    (out / "graphs").mkdir()
+    for i, summary in reused.items():
+        if not summary["complete"]:
+            raise ValueError("Incomplete reused component")
+        os.symlink((reuse / "graphs" / str(i)).resolve(), out / "graphs" / str(i), target_is_directory=True)
     jobs = [(i, width, tiles, out / "graphs" / str(i), config["maximum_diagram_nodes"])
-            for i, (width, tiles) in enumerate(specs)]
+            for i, (width, tiles) in enumerate(specs) if i not in reused]
+    summaries = dict(reused)
     with ProcessPoolExecutor(max_workers=config["workers"]) as executor:
-        summaries = dict(executor.map(_build_job, jobs))
+        futures = [executor.submit(_build_job, job) for job in jobs]
+        for future in as_completed(futures):
+            i, summary = future.result()
+            summaries[i] = summary
+            if len(summaries) % 100 == 0 or len(summaries) == len(specs):
+                print(json.dumps({"complete_components": len(summaries), "total_components": len(specs),
+                                  "reused_components": len(reused)}), flush=True)
     counts, pairs, edges = [], [], []
     for root in roots:
         parts = [summaries[p["graph"]] for p in root["components"]]
@@ -228,6 +256,9 @@ def prepare(config, out):
         pairs.append(size * size)
         edges.append(sum(p["edges"] * (size // p["states"]) for p in parts))
     summary = {"complete": True, "train_roots": len(roots), "component_graphs": len(specs),
+               "distinct_initial_masks": len({r["initial"] for r in roots}),
+               "distinct_root_component_structures": len({tuple(sorted(p["graph"] for p in r["components"])) for r in roots}),
+               "reused_roots": len(previous_roots), "reused_component_graphs": len(reused),
                "component_states": sum(s["states"] for s in summaries.values()),
                "root_state_counts": counts, "root_ordered_pair_counts": pairs,
                "root_directed_edge_counts": edges,

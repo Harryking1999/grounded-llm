@@ -1,0 +1,1548 @@
+{
+  "status": "not_accepted_training_failure_repair_queued_at_next_complete_boundary",
+  "stages": [
+    {
+      "step": 1000,
+      "seconds": 4421.4,
+      "policy": {
+        "nonterminal_states": 181439,
+        "horizon": 62,
+        "eventually_solved": 142908,
+        "within_budget": 142908,
+        "within_budget_rate": 0.787636616163008,
+        "shortest_action_rate": 0.9940586092295483,
+        "wrong_decisions": 1078,
+        "two_cycles": 271,
+        "cycle_nodes": 542,
+        "other_cycle_nodes": 0,
+        "local_minima": 9824,
+        "restoration_mae": 0.5561992479554508,
+        "cycle_examples": [
+          {
+            "states": [
+              119,
+              189
+            ],
+            "depth": [
+              7,
+              8
+            ],
+            "q_distance": [
+              8.75253677368164,
+              8.226764678955078
+            ],
+            "exit_candidates": [
+              69
+            ]
+          },
+          {
+            "states": [
+              124,
+              178
+            ],
+            "depth": [
+              7,
+              8
+            ],
+            "q_distance": [
+              8.302834510803223,
+              7.941352844238281
+            ],
+            "exit_candidates": [
+              72
+            ]
+          },
+          {
+            "states": [
+              130,
+              203
+            ],
+            "depth": [
+              7,
+              8
+            ],
+            "q_distance": [
+              9.201698303222656,
+              8.526269912719727
+            ],
+            "exit_candidates": [
+              75
+            ]
+          },
+          {
+            "states": [
+              273,
+              430
+            ],
+            "depth": [
+              9,
+              10
+            ],
+            "q_distance": [
+              10.108724594116211,
+              10.562084197998047
+            ],
+            "exit_candidates": [
+              155
+            ]
+          },
+          {
+            "states": [
+              281,
+              423
+            ],
+            "depth": [
+              9,
+              10
+            ],
+            "q_distance": [
+              10.247459411621094,
+              10.610526084899902
+            ],
+            "exit_candidates": [
+              158
+            ]
+          }
+        ],
+        "previously_solved_lost": 13245,
+        "previously_failed_gained": 16097,
+        "same1024": {
+          "count": 1024,
+          "solved": 812,
+          "cycle_count": 212,
+          "mean_extra_steps_on_solved": 0.08620689655172414
+        }
+      },
+      "sampling": {
+        "original_pair_passes": 23.1168430335097,
+        "original_decision_passes": 23.11697044185649,
+        "restoration_pair_passes": 3467.5154320987654,
+        "restoration_decision_passes": 3467.5345432900313,
+        "all_pairs_draws": 632591000,
+        "all_pairs_passes": 0.01921742668150552,
+        "all_decision_draws": 665985000,
+        "all_decision_passes": 0.020234576737197252,
+        "observed_broad_sources": 181432,
+        "observed_broad_goals": 181432,
+        "structure_pair_passes": 64.00259183757667,
+        "structure_decision_passes": 71.11403802755848,
+        "hard_pair_draws": 113246000,
+        "hard_decision_draws": 125829000,
+        "edge_pair_passes": 260.0890465323941,
+        "structure_decisions": 7077604,
+        "hard_contexts": 4681,
+        "distance_exposure": {
+          "pair_draws_by_distance": [
+            8345142,
+            143434573,
+            29837070,
+            24097124,
+            25203261,
+            22692113,
+            25428574,
+            24579912,
+            30266193,
+            32682250,
+            34986180,
+            33892716,
+            37190320,
+            40117963,
+            45819634,
+            52456783,
+            65514271,
+            72171720,
+            89177518,
+            95794081,
+            130966299,
+            145415118,
+            183456820,
+            172352697,
+            182716308,
+            133476951,
+            110053026,
+            54805978,
+            30464150,
+            9404764,
+            4861411,
+            3393928
+          ],
+          "legal_candidate_draws_by_distance": [
+            37764306,
+            27608858,
+            97707691,
+            71029605,
+            81363500,
+            60482166,
+            83938781,
+            74720471,
+            91648730,
+            93710749,
+            110994522,
+            104265813,
+            113894253,
+            124438647,
+            137731381,
+            162113525,
+            190348932,
+            212800674,
+            256823655,
+            290643921,
+            353261051,
+            436035682,
+            492297656,
+            516180173,
+            484841691,
+            399075364,
+            288750468,
+            162915569,
+            78565682,
+            27610783,
+            14721835,
+            127951
+          ],
+          "tracking_started_after": {
+            "all_pairs_draws": 66926231,
+            "all_decision_draws": 37469145
+          },
+          "scope": "Actual gradient-sampled labels across all mixture components, repeated draws counted; legacy histograms unavailable"
+        }
+      },
+      "validation_mae": 2.935445712938293,
+      "best_step": 1000,
+      "selection_eligible": true,
+      "intermediate": {
+        "validation": {
+          "count": 1024,
+          "solved": 367,
+          "success_rate": 0.3583984375,
+          "cycle_rate": 0.6416015625,
+          "budget_exhausted": 0,
+          "horizon": 62,
+          "mean_extra_steps_on_solved": 0.11989100817438691,
+          "illegal_action_rate": 0.0,
+          "by_start_distance": {
+            "1": {
+              "count": 13,
+              "success_rate": 1.0
+            },
+            "2": {
+              "count": 25,
+              "success_rate": 1.0
+            },
+            "3": {
+              "count": 33,
+              "success_rate": 1.0
+            },
+            "4": {
+              "count": 33,
+              "success_rate": 1.0
+            },
+            "5": {
+              "count": 33,
+              "success_rate": 1.0
+            },
+            "6": {
+              "count": 34,
+              "success_rate": 0.9411764705882353
+            },
+            "7": {
+              "count": 36,
+              "success_rate": 0.9722222222222222
+            },
+            "8": {
+              "count": 34,
+              "success_rate": 0.8823529411764706
+            },
+            "9": {
+              "count": 38,
+              "success_rate": 0.7631578947368421
+            },
+            "10": {
+              "count": 35,
+              "success_rate": 0.8
+            },
+            "11": {
+              "count": 35,
+              "success_rate": 0.3142857142857143
+            },
+            "12": {
+              "count": 36,
+              "success_rate": 0.3611111111111111
+            },
+            "13": {
+              "count": 34,
+              "success_rate": 0.23529411764705882
+            },
+            "14": {
+              "count": 35,
+              "success_rate": 0.2857142857142857
+            },
+            "15": {
+              "count": 35,
+              "success_rate": 0.2
+            },
+            "16": {
+              "count": 40,
+              "success_rate": 0.15
+            },
+            "17": {
+              "count": 36,
+              "success_rate": 0.1111111111111111
+            },
+            "18": {
+              "count": 34,
+              "success_rate": 0.08823529411764706
+            },
+            "19": {
+              "count": 33,
+              "success_rate": 0.09090909090909091
+            },
+            "20": {
+              "count": 37,
+              "success_rate": 0.0
+            },
+            "21": {
+              "count": 38,
+              "success_rate": 0.05263157894736842
+            },
+            "22": {
+              "count": 37,
+              "success_rate": 0.08108108108108109
+            },
+            "23": {
+              "count": 33,
+              "success_rate": 0.030303030303030304
+            },
+            "24": {
+              "count": 35,
+              "success_rate": 0.0
+            },
+            "25": {
+              "count": 34,
+              "success_rate": 0.029411764705882353
+            },
+            "26": {
+              "count": 34,
+              "success_rate": 0.029411764705882353
+            },
+            "27": {
+              "count": 35,
+              "success_rate": 0.0
+            },
+            "28": {
+              "count": 34,
+              "success_rate": 0.058823529411764705
+            },
+            "29": {
+              "count": 36,
+              "success_rate": 0.027777777777777776
+            },
+            "30": {
+              "count": 35,
+              "success_rate": 0.0
+            },
+            "31": {
+              "count": 4,
+              "success_rate": 0.0
+            }
+          },
+          "same_tasks": {
+            "count": 1024,
+            "baseline_solved": 362,
+            "candidate_solved": 367,
+            "previously_solved_lost": 7,
+            "previously_failed_gained": 12,
+            "net_gain": 5
+          }
+        },
+        "test": {
+          "count": 1024,
+          "solved": 339,
+          "success_rate": 0.3310546875,
+          "cycle_rate": 0.6689453125,
+          "budget_exhausted": 0,
+          "horizon": 62,
+          "mean_extra_steps_on_solved": 0.11209439528023599,
+          "illegal_action_rate": 0.0,
+          "by_start_distance": {
+            "1": {
+              "count": 11,
+              "success_rate": 1.0
+            },
+            "2": {
+              "count": 19,
+              "success_rate": 1.0
+            },
+            "3": {
+              "count": 33,
+              "success_rate": 1.0
+            },
+            "4": {
+              "count": 34,
+              "success_rate": 0.9705882352941176
+            },
+            "5": {
+              "count": 33,
+              "success_rate": 1.0
+            },
+            "6": {
+              "count": 34,
+              "success_rate": 0.9117647058823529
+            },
+            "7": {
+              "count": 35,
+              "success_rate": 0.9428571428571428
+            },
+            "8": {
+              "count": 36,
+              "success_rate": 0.8333333333333334
+            },
+            "9": {
+              "count": 36,
+              "success_rate": 0.7222222222222222
+            },
+            "10": {
+              "count": 37,
+              "success_rate": 0.6756756756756757
+            },
+            "11": {
+              "count": 35,
+              "success_rate": 0.4857142857142857
+            },
+            "12": {
+              "count": 37,
+              "success_rate": 0.35135135135135137
+            },
+            "13": {
+              "count": 39,
+              "success_rate": 0.28205128205128205
+            },
+            "14": {
+              "count": 35,
+              "success_rate": 0.11428571428571428
+            },
+            "15": {
+              "count": 34,
+              "success_rate": 0.14705882352941177
+            },
+            "16": {
+              "count": 36,
+              "success_rate": 0.1111111111111111
+            },
+            "17": {
+              "count": 33,
+              "success_rate": 0.09090909090909091
+            },
+            "18": {
+              "count": 36,
+              "success_rate": 0.0
+            },
+            "19": {
+              "count": 35,
+              "success_rate": 0.02857142857142857
+            },
+            "20": {
+              "count": 35,
+              "success_rate": 0.0
+            },
+            "21": {
+              "count": 34,
+              "success_rate": 0.058823529411764705
+            },
+            "22": {
+              "count": 35,
+              "success_rate": 0.02857142857142857
+            },
+            "23": {
+              "count": 36,
+              "success_rate": 0.027777777777777776
+            },
+            "24": {
+              "count": 35,
+              "success_rate": 0.0
+            },
+            "25": {
+              "count": 36,
+              "success_rate": 0.0
+            },
+            "26": {
+              "count": 36,
+              "success_rate": 0.05555555555555555
+            },
+            "27": {
+              "count": 37,
+              "success_rate": 0.0
+            },
+            "28": {
+              "count": 35,
+              "success_rate": 0.0
+            },
+            "29": {
+              "count": 35,
+              "success_rate": 0.02857142857142857
+            },
+            "30": {
+              "count": 34,
+              "success_rate": 0.0
+            },
+            "31": {
+              "count": 8,
+              "success_rate": 0.0
+            }
+          },
+          "same_tasks": {
+            "count": 1024,
+            "baseline_solved": 335,
+            "candidate_solved": 339,
+            "previously_solved_lost": 6,
+            "previously_failed_gained": 10,
+            "net_gain": 4
+          }
+        }
+      }
+    },
+    {
+      "step": 1001,
+      "seconds": 4430.32,
+      "policy": {
+        "nonterminal_states": 181439,
+        "horizon": 62,
+        "eventually_solved": 142888,
+        "within_budget": 142888,
+        "within_budget_rate": 0.787526386278584,
+        "shortest_action_rate": 0.9940641207237694,
+        "wrong_decisions": 1077,
+        "two_cycles": 271,
+        "cycle_nodes": 542,
+        "other_cycle_nodes": 0,
+        "local_minima": 9822,
+        "restoration_mae": 0.5561757567488109,
+        "cycle_examples": [
+          {
+            "states": [
+              119,
+              189
+            ],
+            "depth": [
+              7,
+              8
+            ],
+            "q_distance": [
+              8.752180099487305,
+              8.22657299041748
+            ],
+            "exit_candidates": [
+              69
+            ]
+          },
+          {
+            "states": [
+              124,
+              178
+            ],
+            "depth": [
+              7,
+              8
+            ],
+            "q_distance": [
+              8.30144214630127,
+              7.940143585205078
+            ],
+            "exit_candidates": [
+              72
+            ]
+          },
+          {
+            "states": [
+              130,
+              203
+            ],
+            "depth": [
+              7,
+              8
+            ],
+            "q_distance": [
+              9.199946403503418,
+              8.524785995483398
+            ],
+            "exit_candidates": [
+              75
+            ]
+          },
+          {
+            "states": [
+              273,
+              430
+            ],
+            "depth": [
+              9,
+              10
+            ],
+            "q_distance": [
+              10.107827186584473,
+              10.56098747253418
+            ],
+            "exit_candidates": [
+              155
+            ]
+          },
+          {
+            "states": [
+              281,
+              423
+            ],
+            "depth": [
+              9,
+              10
+            ],
+            "q_distance": [
+              10.24687671661377,
+              10.610177993774414
+            ],
+            "exit_candidates": [
+              158
+            ]
+          }
+        ],
+        "previously_solved_lost": 13248,
+        "previously_failed_gained": 16080,
+        "same1024": {
+          "count": 1024,
+          "solved": 813,
+          "cycle_count": 211,
+          "mean_extra_steps_on_solved": 0.08610086100861009
+        }
+      },
+      "sampling": {
+        "original_pair_passes": 23.13995987654321,
+        "original_decision_passes": 23.14008741229835,
+        "restoration_pair_passes": 3470.9829475308643,
+        "restoration_decision_passes": 3471.0020778333214,
+        "all_pairs_draws": 633157231,
+        "all_pairs_passes": 0.01923462816354889,
+        "all_decision_draws": 666614145,
+        "all_decision_passes": 0.020253692006732337,
+        "observed_broad_sources": 181432,
+        "observed_broad_goals": 181432,
+        "structure_pair_passes": 64.06659442941425,
+        "structure_decision_passes": 71.18515206558604,
+        "hard_pair_draws": 113359246,
+        "hard_decision_draws": 125954829,
+        "edge_pair_passes": 260.3491355789265,
+        "structure_decisions": 7077604,
+        "hard_contexts": 4680,
+        "distance_exposure": {
+          "pair_draws_by_distance": [
+            8353495,
+            143578321,
+            29867131,
+            24121222,
+            25228343,
+            22714877,
+            25453960,
+            24604494,
+            30296811,
+            32715332,
+            35021376,
+            33927280,
+            37228312,
+            40158686,
+            45866134,
+            52509426,
+            65579860,
+            72243932,
+            89266438,
+            95889965,
+            131096375,
+            145559257,
+            183639237,
+            172525197,
+            182900152,
+            133610559,
+            110163392,
+            54860225,
+            30494411,
+            9414208,
+            4866379,
+            3397213
+          ],
+          "legal_candidate_draws_by_distance": [
+            37801749,
+            27636322,
+            97805187,
+            71100512,
+            81445441,
+            60542939,
+            84022595,
+            74795352,
+            91740193,
+            93805064,
+            111106985,
+            104372428,
+            114011218,
+            124565298,
+            137871030,
+            162276706,
+            190539865,
+            213014117,
+            257081247,
+            290933828,
+            353612064,
+            436468331,
+            492788144,
+            516696282,
+            485326819,
+            399475240,
+            289039535,
+            163077244,
+            78644031,
+            27638372,
+            14737236,
+            128079
+          ],
+          "tracking_started_after": {
+            "all_pairs_draws": 66926231,
+            "all_decision_draws": 37469145
+          },
+          "scope": "Actual gradient-sampled labels across all mixture components, repeated draws counted; legacy histograms unavailable"
+        }
+      },
+      "validation_mae": 2.9354345013759664,
+      "best_step": 1000,
+      "selection_eligible": true,
+      "intermediate": {
+        "validation": {
+          "count": 1024,
+          "solved": 367,
+          "success_rate": 0.3583984375,
+          "cycle_rate": 0.6416015625,
+          "budget_exhausted": 0,
+          "horizon": 62,
+          "mean_extra_steps_on_solved": 0.11989100817438691,
+          "illegal_action_rate": 0.0,
+          "by_start_distance": {
+            "1": {
+              "count": 13,
+              "success_rate": 1.0
+            },
+            "2": {
+              "count": 25,
+              "success_rate": 1.0
+            },
+            "3": {
+              "count": 33,
+              "success_rate": 1.0
+            },
+            "4": {
+              "count": 33,
+              "success_rate": 1.0
+            },
+            "5": {
+              "count": 33,
+              "success_rate": 1.0
+            },
+            "6": {
+              "count": 34,
+              "success_rate": 0.9411764705882353
+            },
+            "7": {
+              "count": 36,
+              "success_rate": 0.9722222222222222
+            },
+            "8": {
+              "count": 34,
+              "success_rate": 0.8823529411764706
+            },
+            "9": {
+              "count": 38,
+              "success_rate": 0.7631578947368421
+            },
+            "10": {
+              "count": 35,
+              "success_rate": 0.8
+            },
+            "11": {
+              "count": 35,
+              "success_rate": 0.3142857142857143
+            },
+            "12": {
+              "count": 36,
+              "success_rate": 0.3611111111111111
+            },
+            "13": {
+              "count": 34,
+              "success_rate": 0.23529411764705882
+            },
+            "14": {
+              "count": 35,
+              "success_rate": 0.2857142857142857
+            },
+            "15": {
+              "count": 35,
+              "success_rate": 0.2
+            },
+            "16": {
+              "count": 40,
+              "success_rate": 0.15
+            },
+            "17": {
+              "count": 36,
+              "success_rate": 0.1111111111111111
+            },
+            "18": {
+              "count": 34,
+              "success_rate": 0.08823529411764706
+            },
+            "19": {
+              "count": 33,
+              "success_rate": 0.09090909090909091
+            },
+            "20": {
+              "count": 37,
+              "success_rate": 0.0
+            },
+            "21": {
+              "count": 38,
+              "success_rate": 0.05263157894736842
+            },
+            "22": {
+              "count": 37,
+              "success_rate": 0.08108108108108109
+            },
+            "23": {
+              "count": 33,
+              "success_rate": 0.030303030303030304
+            },
+            "24": {
+              "count": 35,
+              "success_rate": 0.0
+            },
+            "25": {
+              "count": 34,
+              "success_rate": 0.029411764705882353
+            },
+            "26": {
+              "count": 34,
+              "success_rate": 0.029411764705882353
+            },
+            "27": {
+              "count": 35,
+              "success_rate": 0.0
+            },
+            "28": {
+              "count": 34,
+              "success_rate": 0.058823529411764705
+            },
+            "29": {
+              "count": 36,
+              "success_rate": 0.027777777777777776
+            },
+            "30": {
+              "count": 35,
+              "success_rate": 0.0
+            },
+            "31": {
+              "count": 4,
+              "success_rate": 0.0
+            }
+          },
+          "same_tasks": {
+            "count": 1024,
+            "baseline_solved": 362,
+            "candidate_solved": 367,
+            "previously_solved_lost": 7,
+            "previously_failed_gained": 12,
+            "net_gain": 5
+          }
+        },
+        "test": {
+          "count": 1024,
+          "solved": 339,
+          "success_rate": 0.3310546875,
+          "cycle_rate": 0.6689453125,
+          "budget_exhausted": 0,
+          "horizon": 62,
+          "mean_extra_steps_on_solved": 0.11209439528023599,
+          "illegal_action_rate": 0.0,
+          "by_start_distance": {
+            "1": {
+              "count": 11,
+              "success_rate": 1.0
+            },
+            "2": {
+              "count": 19,
+              "success_rate": 1.0
+            },
+            "3": {
+              "count": 33,
+              "success_rate": 1.0
+            },
+            "4": {
+              "count": 34,
+              "success_rate": 0.9705882352941176
+            },
+            "5": {
+              "count": 33,
+              "success_rate": 1.0
+            },
+            "6": {
+              "count": 34,
+              "success_rate": 0.9117647058823529
+            },
+            "7": {
+              "count": 35,
+              "success_rate": 0.9428571428571428
+            },
+            "8": {
+              "count": 36,
+              "success_rate": 0.8333333333333334
+            },
+            "9": {
+              "count": 36,
+              "success_rate": 0.7222222222222222
+            },
+            "10": {
+              "count": 37,
+              "success_rate": 0.6756756756756757
+            },
+            "11": {
+              "count": 35,
+              "success_rate": 0.4857142857142857
+            },
+            "12": {
+              "count": 37,
+              "success_rate": 0.35135135135135137
+            },
+            "13": {
+              "count": 39,
+              "success_rate": 0.28205128205128205
+            },
+            "14": {
+              "count": 35,
+              "success_rate": 0.11428571428571428
+            },
+            "15": {
+              "count": 34,
+              "success_rate": 0.14705882352941177
+            },
+            "16": {
+              "count": 36,
+              "success_rate": 0.1111111111111111
+            },
+            "17": {
+              "count": 33,
+              "success_rate": 0.09090909090909091
+            },
+            "18": {
+              "count": 36,
+              "success_rate": 0.0
+            },
+            "19": {
+              "count": 35,
+              "success_rate": 0.02857142857142857
+            },
+            "20": {
+              "count": 35,
+              "success_rate": 0.0
+            },
+            "21": {
+              "count": 34,
+              "success_rate": 0.058823529411764705
+            },
+            "22": {
+              "count": 35,
+              "success_rate": 0.02857142857142857
+            },
+            "23": {
+              "count": 36,
+              "success_rate": 0.027777777777777776
+            },
+            "24": {
+              "count": 35,
+              "success_rate": 0.0
+            },
+            "25": {
+              "count": 36,
+              "success_rate": 0.0
+            },
+            "26": {
+              "count": 36,
+              "success_rate": 0.05555555555555555
+            },
+            "27": {
+              "count": 37,
+              "success_rate": 0.0
+            },
+            "28": {
+              "count": 35,
+              "success_rate": 0.0
+            },
+            "29": {
+              "count": 35,
+              "success_rate": 0.02857142857142857
+            },
+            "30": {
+              "count": 34,
+              "success_rate": 0.0
+            },
+            "31": {
+              "count": 8,
+              "success_rate": 0.0
+            }
+          },
+          "same_tasks": {
+            "count": 1024,
+            "baseline_solved": 335,
+            "candidate_solved": 339,
+            "previously_solved_lost": 6,
+            "previously_failed_gained": 10,
+            "net_gain": 4
+          }
+        }
+      }
+    }
+  ],
+  "diagnosis": {
+    "checkpoint": "/tmp/puzzle8_full_coverage_b566aaa/stages/step_001000/checkpoint.pt",
+    "step": 1000,
+    "adam_steps": [
+      281000
+    ],
+    "restoration_by_depth": {
+      "0": {
+        "states": 1,
+        "success": 1,
+        "wrong_decisions": 0
+      },
+      "1": {
+        "states": 2,
+        "success": 2,
+        "wrong_decisions": 0
+      },
+      "2": {
+        "states": 4,
+        "success": 4,
+        "wrong_decisions": 0
+      },
+      "3": {
+        "states": 8,
+        "success": 8,
+        "wrong_decisions": 0
+      },
+      "4": {
+        "states": 16,
+        "success": 16,
+        "wrong_decisions": 0
+      },
+      "5": {
+        "states": 20,
+        "success": 20,
+        "wrong_decisions": 0
+      },
+      "6": {
+        "states": 39,
+        "success": 39,
+        "wrong_decisions": 0
+      },
+      "7": {
+        "states": 62,
+        "success": 57,
+        "wrong_decisions": 5
+      },
+      "8": {
+        "states": 116,
+        "success": 108,
+        "wrong_decisions": 0
+      },
+      "9": {
+        "states": 152,
+        "success": 143,
+        "wrong_decisions": 4
+      },
+      "10": {
+        "states": 286,
+        "success": 255,
+        "wrong_decisions": 16
+      },
+      "11": {
+        "states": 396,
+        "success": 322,
+        "wrong_decisions": 13
+      },
+      "12": {
+        "states": 748,
+        "success": 598,
+        "wrong_decisions": 14
+      },
+      "13": {
+        "states": 1024,
+        "success": 838,
+        "wrong_decisions": 10
+      },
+      "14": {
+        "states": 1893,
+        "success": 1545,
+        "wrong_decisions": 9
+      },
+      "15": {
+        "states": 2512,
+        "success": 2008,
+        "wrong_decisions": 10
+      },
+      "16": {
+        "states": 4485,
+        "success": 3587,
+        "wrong_decisions": 9
+      },
+      "17": {
+        "states": 5638,
+        "success": 4508,
+        "wrong_decisions": 27
+      },
+      "18": {
+        "states": 9529,
+        "success": 7630,
+        "wrong_decisions": 32
+      },
+      "19": {
+        "states": 10878,
+        "success": 8627,
+        "wrong_decisions": 57
+      },
+      "20": {
+        "states": 16993,
+        "success": 13478,
+        "wrong_decisions": 54
+      },
+      "21": {
+        "states": 17110,
+        "success": 13534,
+        "wrong_decisions": 108
+      },
+      "22": {
+        "states": 23952,
+        "success": 18925,
+        "wrong_decisions": 98
+      },
+      "23": {
+        "states": 20224,
+        "success": 15876,
+        "wrong_decisions": 187
+      },
+      "24": {
+        "states": 24047,
+        "success": 18777,
+        "wrong_decisions": 135
+      },
+      "25": {
+        "states": 15578,
+        "success": 12065,
+        "wrong_decisions": 142
+      },
+      "26": {
+        "states": 14560,
+        "success": 11269,
+        "wrong_decisions": 94
+      },
+      "27": {
+        "states": 6274,
+        "success": 4856,
+        "wrong_decisions": 39
+      },
+      "28": {
+        "states": 3910,
+        "success": 3040,
+        "wrong_decisions": 12
+      },
+      "29": {
+        "states": 760,
+        "success": 600,
+        "wrong_decisions": 3
+      },
+      "30": {
+        "states": 221,
+        "success": 172,
+        "wrong_decisions": 0
+      },
+      "31": {
+        "states": 2,
+        "success": 2,
+        "wrong_decisions": 0
+      }
+    },
+    "scope": "Oracle labels only; original greedy policy; monitoring goals excluded from repair labels",
+    "validation": {
+      "tasks": 1024,
+      "success": 367,
+      "by_true_distance": {
+        "16": {
+          "tasks": 40,
+          "success": 6
+        },
+        "5": {
+          "tasks": 33,
+          "success": 33
+        },
+        "20": {
+          "tasks": 37,
+          "success": 0
+        },
+        "21": {
+          "tasks": 38,
+          "success": 2
+        },
+        "24": {
+          "tasks": 35,
+          "success": 0
+        },
+        "14": {
+          "tasks": 35,
+          "success": 10
+        },
+        "18": {
+          "tasks": 34,
+          "success": 3
+        },
+        "6": {
+          "tasks": 34,
+          "success": 32
+        },
+        "25": {
+          "tasks": 34,
+          "success": 1
+        },
+        "29": {
+          "tasks": 36,
+          "success": 1
+        },
+        "9": {
+          "tasks": 38,
+          "success": 29
+        },
+        "7": {
+          "tasks": 36,
+          "success": 35
+        },
+        "26": {
+          "tasks": 34,
+          "success": 1
+        },
+        "4": {
+          "tasks": 33,
+          "success": 33
+        },
+        "8": {
+          "tasks": 34,
+          "success": 30
+        },
+        "12": {
+          "tasks": 36,
+          "success": 13
+        },
+        "10": {
+          "tasks": 35,
+          "success": 28
+        },
+        "30": {
+          "tasks": 35,
+          "success": 0
+        },
+        "22": {
+          "tasks": 37,
+          "success": 3
+        },
+        "28": {
+          "tasks": 34,
+          "success": 2
+        },
+        "3": {
+          "tasks": 33,
+          "success": 33
+        },
+        "19": {
+          "tasks": 33,
+          "success": 3
+        },
+        "13": {
+          "tasks": 34,
+          "success": 8
+        },
+        "27": {
+          "tasks": 35,
+          "success": 0
+        },
+        "17": {
+          "tasks": 36,
+          "success": 4
+        },
+        "15": {
+          "tasks": 35,
+          "success": 7
+        },
+        "23": {
+          "tasks": 33,
+          "success": 1
+        },
+        "1": {
+          "tasks": 13,
+          "success": 13
+        },
+        "2": {
+          "tasks": 25,
+          "success": 25
+        },
+        "11": {
+          "tasks": 35,
+          "success": 11
+        },
+        "31": {
+          "tasks": 4,
+          "success": 0
+        }
+      },
+      "first_error_remaining_distance": {
+        "14": 30,
+        "20": 31,
+        "16": 36,
+        "24": 36,
+        "8": 14,
+        "22": 37,
+        "17": 39,
+        "25": 23,
+        "10": 17,
+        "29": 17,
+        "12": 31,
+        "27": 21,
+        "23": 33,
+        "28": 13,
+        "11": 31,
+        "19": 46,
+        "13": 32,
+        "15": 35,
+        "18": 35,
+        "26": 28,
+        "7": 7,
+        "21": 39,
+        "9": 22,
+        "6": 4
+      },
+      "first_error_step": {
+        "2": 80,
+        "0": 218,
+        "5": 35,
+        "6": 25,
+        "1": 101,
+        "19": 1,
+        "3": 72,
+        "4": 60,
+        "7": 25,
+        "11": 6,
+        "10": 4,
+        "9": 6,
+        "13": 1,
+        "8": 18,
+        "14": 1,
+        "12": 2,
+        "18": 1,
+        "17": 1
+      },
+      "first_error_degree": {
+        "4": 206,
+        "2": 97,
+        "3": 354
+      }
+    },
+    "test": {
+      "tasks": 1024,
+      "success": 339,
+      "by_true_distance": {
+        "25": {
+          "tasks": 36,
+          "success": 0
+        },
+        "20": {
+          "tasks": 35,
+          "success": 0
+        },
+        "30": {
+          "tasks": 34,
+          "success": 0
+        },
+        "5": {
+          "tasks": 33,
+          "success": 33
+        },
+        "13": {
+          "tasks": 39,
+          "success": 11
+        },
+        "28": {
+          "tasks": 35,
+          "success": 0
+        },
+        "11": {
+          "tasks": 35,
+          "success": 17
+        },
+        "16": {
+          "tasks": 36,
+          "success": 4
+        },
+        "12": {
+          "tasks": 37,
+          "success": 13
+        },
+        "2": {
+          "tasks": 19,
+          "success": 19
+        },
+        "27": {
+          "tasks": 37,
+          "success": 0
+        },
+        "17": {
+          "tasks": 33,
+          "success": 3
+        },
+        "19": {
+          "tasks": 35,
+          "success": 1
+        },
+        "3": {
+          "tasks": 33,
+          "success": 33
+        },
+        "10": {
+          "tasks": 37,
+          "success": 25
+        },
+        "8": {
+          "tasks": 36,
+          "success": 30
+        },
+        "21": {
+          "tasks": 34,
+          "success": 2
+        },
+        "24": {
+          "tasks": 35,
+          "success": 0
+        },
+        "22": {
+          "tasks": 35,
+          "success": 1
+        },
+        "7": {
+          "tasks": 35,
+          "success": 33
+        },
+        "29": {
+          "tasks": 35,
+          "success": 1
+        },
+        "15": {
+          "tasks": 34,
+          "success": 5
+        },
+        "1": {
+          "tasks": 11,
+          "success": 11
+        },
+        "26": {
+          "tasks": 36,
+          "success": 2
+        },
+        "9": {
+          "tasks": 36,
+          "success": 26
+        },
+        "4": {
+          "tasks": 34,
+          "success": 33
+        },
+        "23": {
+          "tasks": 36,
+          "success": 1
+        },
+        "6": {
+          "tasks": 34,
+          "success": 31
+        },
+        "18": {
+          "tasks": 36,
+          "success": 0
+        },
+        "14": {
+          "tasks": 35,
+          "success": 4
+        },
+        "31": {
+          "tasks": 8,
+          "success": 0
+        }
+      },
+      "first_error_remaining_distance": {
+        "24": 36,
+        "19": 38,
+        "26": 27,
+        "23": 33,
+        "25": 37,
+        "16": 35,
+        "21": 40,
+        "17": 33,
+        "18": 35,
+        "13": 32,
+        "12": 42,
+        "10": 16,
+        "8": 14,
+        "22": 37,
+        "14": 41,
+        "15": 41,
+        "27": 15,
+        "4": 6,
+        "29": 12,
+        "11": 18,
+        "9": 17,
+        "20": 41,
+        "6": 4,
+        "7": 6,
+        "28": 17,
+        "5": 12
+      },
+      "first_error_step": {
+        "1": 122,
+        "4": 43,
+        "2": 95,
+        "3": 76,
+        "0": 206,
+        "6": 28,
+        "5": 36,
+        "9": 14,
+        "13": 3,
+        "7": 23,
+        "8": 13,
+        "14": 4,
+        "16": 1,
+        "10": 9,
+        "11": 5,
+        "12": 5,
+        "21": 1,
+        "15": 1
+      },
+      "first_error_degree": {
+        "3": 371,
+        "4": 211,
+        "2": 103
+      }
+    }
+  },
+  "repair": {
+    "source_commit": "0d3e52b",
+    "contract": "experiments/puzzle8_qmap/configs/failure_repair.json",
+    "boundary": "wait for complete old step 2000 without duplicate training",
+    "parent": "existing best under original validation guard; full Adam and sampler copied at handoff",
+    "run": "/tmp/puzzle8_failure_repair/run",
+    "scope": "training-only basin-weighted restoration and distance/degree-balanced intermediate errors; no heldout failures in replay; reuse full distance table and route cache",
+    "quality_status": "no new repair checkpoint yet"
+  }
+}

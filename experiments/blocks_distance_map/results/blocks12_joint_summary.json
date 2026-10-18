@@ -1,10 +1,10 @@
 {
   "source_commit": "9aa8498",
-  "stage": 4000,
+  "stage": 10000,
   "cumulative_parent_updates": 80000,
-  "checkpoint_remote": "/tmp/blocks12_joint_9aa8498/run/checkpoints/step_004000.pt",
-  "checkpoint_local": "runs/qmap_dual_20261018/blocks12/checkpoints/step_004000.pt",
-  "status": "latest_stage_not_selected_not_final_acceptance",
+  "checkpoint_remote": "/tmp/blocks12_joint_9aa8498/run/checkpoints/step_010000.pt",
+  "checkpoint_local": "runs\\qmap_dual_20261018\\blocks12\\checkpoints\\step_010000.pt",
+  "status": "diagnosed_parent_for_failure_repair_not_final_acceptance",
   "graph_coverage": {
     "train_roots": 1000,
     "total_root_local_states": 51296001272,
@@ -13,123 +13,123 @@
     "actions_available": 664
   },
   "exposure": {
-    "huber_draws": 16384000,
-    "rank_candidate_draws": 41642973,
-    "actual_rank_contexts": 2021582,
-    "broad_unique_root_local_pairs": 3264000,
-    "broad_pair_fraction": 4.668410374419649e-13,
+    "huber_draws": 40960000,
+    "rank_candidate_draws": 103983176,
+    "actual_rank_contexts": 5054035,
+    "broad_unique_root_local_pairs": 8160000,
+    "broad_pair_fraction": 1.1671025936049122e-12,
     "roots_exposed": 1000,
     "complete_initial_forks_exposed_per_rank": 1000,
     "actions_exposed": 664,
     "minimum_distinct_initial_root_contexts_per_action": 32,
     "distance_bin_draws_all_ranks": {
       "huber": {
-        "0": 182468,
-        "1": 1020533,
-        "2": 1168661,
-        "3-4": 1968233,
-        "5-8": 1715467,
-        "9+": 963427,
-        "unreachable": 9365211,
-        "finite_at_or_above_original_cap": 31
+        "0": 456312,
+        "1": 2550212,
+        "2": 2921747,
+        "3-4": 4920258,
+        "5-8": 4288914,
+        "9+": 2409273,
+        "unreachable": 23413284,
+        "finite_at_or_above_original_cap": 71
       },
       "rank_candidates": {
-        "0": 114288,
-        "1": 638487,
-        "2": 703714,
-        "3-4": 1237744,
-        "5-8": 2683678,
-        "9+": 4259648,
-        "unreachable": 32005414,
-        "finite_at_or_above_original_cap": 1425
+        "0": 286845,
+        "1": 1597666,
+        "2": 1759875,
+        "3-4": 3098495,
+        "5-8": 6711046,
+        "9+": 10552865,
+        "unreachable": 79976384,
+        "finite_at_or_above_original_cap": 3294
       }
     }
   },
   "evaluation": {
     "analysis_commit": "9aa8498",
-    "checkpoint": "/tmp/blocks12_joint_9aa8498/run/checkpoints/step_004000.pt",
+    "checkpoint": "/tmp/blocks12_joint_9aa8498/run/checkpoints/step_010000.pt",
     "unseen_roots": {
       "clear": {
         "tasks": 200,
-        "success": 131,
+        "success": 160,
         "outcomes": {
-          "local_coverage_failure": 55,
-          "reached": 131,
-          "globally_unreachable": 14
+          "reached": 160,
+          "globally_unreachable": 11,
+          "local_coverage_failure": 29
         },
-        "success_rate": 0.655
+        "success_rate": 0.8
       },
       "intermediate": {
         "tasks": 400,
-        "success": 227,
+        "success": 250,
         "outcomes": {
-          "reached": 227,
-          "local_coverage_failure": 130,
-          "removed_goal_cell": 41,
-          "globally_unreachable": 2
+          "reached": 250,
+          "local_coverage_failure": 103,
+          "removed_goal_cell": 42,
+          "globally_unreachable": 5
         },
-        "success_rate": 0.5675
+        "success_rate": 0.625
       }
     },
     "matched_baseline": {
       "clear": {
-        "old_success_new_failure": 6,
-        "new_success": 106,
-        "net": 100,
-        "both_success": 25
+        "old_success_new_failure": 4,
+        "new_success": 133,
+        "net": 129,
+        "both_success": 27
       },
       "intermediate": {
-        "old_success_new_failure": 11,
-        "new_success": 24,
-        "net": 13,
-        "both_success": 203
+        "old_success_new_failure": 13,
+        "new_success": 49,
+        "net": 36,
+        "both_success": 201
       }
     },
     "train_roots": {
       "clear": {
         "tasks": 100,
-        "success": 71,
+        "success": 84,
         "outcomes": {
-          "reached": 71,
-          "local_coverage_failure": 25,
-          "globally_unreachable": 4
+          "local_coverage_failure": 11,
+          "reached": 84,
+          "globally_unreachable": 5
         },
-        "success_rate": 0.71
+        "success_rate": 0.84
       },
       "intermediate": {
         "tasks": 200,
-        "success": 120,
+        "success": 126,
         "outcomes": {
-          "reached": 120,
-          "local_coverage_failure": 58,
-          "removed_goal_cell": 21,
+          "reached": 126,
+          "local_coverage_failure": 47,
+          "removed_goal_cell": 26,
           "globally_unreachable": 1
         },
-        "success_rate": 0.6
+        "success_rate": 0.63
       }
     },
     "matched_train_parent": {
       "clear": {
-        "old_success_new_failure": 4,
-        "new_success": 60,
-        "net": 56,
-        "both_success": 11
+        "old_success_new_failure": 1,
+        "new_success": 70,
+        "net": 69,
+        "both_success": 14
       },
       "intermediate": {
         "old_success_new_failure": 1,
-        "new_success": 19,
-        "net": 18,
+        "new_success": 25,
+        "net": 24,
         "both_success": 101
       }
     },
     "distance_bins_unseen": {
       "9+": {
         "tasks": 400,
-        "reached": 158,
+        "reached": 210,
         "forks": 400,
-        "shortest_choices": 288,
+        "shortest_choices": 315,
         "candidate_count": 25872,
-        "absolute_error_sum": 33825.49485492706
+        "absolute_error_sum": 31289.749314308167
       },
       "1": {
         "tasks": 200,
@@ -137,17 +137,17 @@
         "forks": 200,
         "shortest_choices": 200,
         "candidate_count": 12936,
-        "absolute_error_sum": 60365.729962825775
+        "absolute_error_sum": 55882.59070777893
       }
     },
     "distance_bins_train": {
       "9+": {
         "tasks": 200,
-        "reached": 91,
+        "reached": 110,
         "forks": 200,
-        "shortest_choices": 155,
+        "shortest_choices": 162,
         "candidate_count": 13092,
-        "absolute_error_sum": 15070.95641708374
+        "absolute_error_sum": 13088.363624095917
       },
       "1": {
         "tasks": 100,
@@ -155,80 +155,80 @@
         "forks": 100,
         "shortest_choices": 100,
         "candidate_count": 6546,
-        "absolute_error_sum": 26822.321353435516
+        "absolute_error_sum": 22425.632697343826
       }
     },
     "cycles": 0,
     "illegal_actions": 0,
     "trajectory_forks_unseen": {
-      "forks": 2782,
-      "shortest_choices": 2421,
-      "reachable_choices": 2540,
-      "complete_candidate_relations": 98218,
+      "forks": 3227,
+      "shortest_choices": 2935,
+      "reachable_choices": 3037,
+      "complete_candidate_relations": 105148,
       "finite_at_or_above_original_cap": 3,
       "cap_conflict_forks": 0,
       "cap_conflict_reachable_choices": 0,
       "distance_bins": {
         "9+": {
-          "forks": 1154,
-          "shortest": 893,
-          "reachable": 962
-        },
-        "1": {
-          "forks": 358,
-          "shortest": 358,
-          "reachable": 358
+          "forks": 1222,
+          "shortest": 1013,
+          "reachable": 1077
         },
         "5-8": {
-          "forks": 787,
-          "shortest": 695,
-          "reachable": 741
+          "forks": 959,
+          "shortest": 882,
+          "reachable": 916
         },
         "3-4": {
-          "forks": 323,
-          "shortest": 317,
-          "reachable": 319
+          "forks": 425,
+          "shortest": 420,
+          "reachable": 423
         },
         "2": {
-          "forks": 160,
-          "shortest": 158,
-          "reachable": 160
+          "forks": 211,
+          "shortest": 210,
+          "reachable": 211
+        },
+        "1": {
+          "forks": 410,
+          "shortest": 410,
+          "reachable": 410
         }
       }
     },
     "trajectory_forks_train": {
-      "forks": 1545,
-      "shortest_choices": 1359,
-      "reachable_choices": 1436,
-      "complete_candidate_relations": 52502,
+      "forks": 1684,
+      "shortest_choices": 1543,
+      "reachable_choices": 1594,
+      "complete_candidate_relations": 54679,
       "finite_at_or_above_original_cap": 13,
       "cap_conflict_forks": 0,
       "cap_conflict_reachable_choices": 0,
       "distance_bins": {
         "9+": {
-          "forks": 610,
-          "shortest": 490,
-          "reachable": 529
-        },
-        "5-8": {
-          "forks": 461,
-          "shortest": 403,
-          "reachable": 435
-        },
-        "3-4": {
-          "forks": 191,
-          "shortest": 184,
-          "reachable": 190
-        },
-        "2": {
-          "forks": 92,
-          "shortest": 91,
-          "reachable": 91
+          "forks": 639,
+          "shortest": 536,
+          "reachable": 572
         },
         "1": {
-          "forks": 191,
-          "shortest": 191,
-          "reachable": 191
+          "forks": 210,
+          "shortest": 210,
+          "reachable": 210
+        },
+        "5-8": {
+          "forks": 503,
+          "shortest": 467,
+          "reachable": 480
+        },
+        "3-4": {
+          "forks": 222,
+          "shortest": 220,
+          "reachable": 222
+        },
+        "2": {
+          "forks": 110,
+          "shortest": 110,
+          "reachable": 110
         }
       }
     },
@@ -240,19 +240,19 @@
       },
       "12": {
         "tasks": 59,
-        "success": 8
+        "success": 11
       },
       "10": {
         "tasks": 44,
-        "success": 8
+        "success": 12
       },
       "11": {
         "tasks": 89,
-        "success": 11
+        "success": 25
       },
       "9": {
         "tasks": 7,
-        "success": 0
+        "success": 2
       },
       "13": {
         "tasks": 1,
@@ -266,11 +266,11 @@
       },
       "11": {
         "tasks": 44,
-        "success": 9
+        "success": 10
       },
       "12": {
         "tasks": 33,
-        "success": 3
+        "success": 10
       },
       "10": {
         "tasks": 20,
@@ -278,7 +278,7 @@
       },
       "9": {
         "tasks": 3,
-        "success": 2
+        "success": 0
       }
     }
   },
@@ -318,7 +318,7 @@
     "Finite-distance 13 and unreachable cap 13 can collapse supervision.",
     "Shared-filesystem deployment stalled; active run remains on node disk and stage 1000 is backed up locally."
   ],
-  "stage_training_seconds": 1750.9112390447408,
+  "stage_training_seconds": 4369.841357332654,
   "stage_history": [
     {
       "stage": 1000,
@@ -1415,35 +1415,2260 @@
           }
         }
       }
+    },
+    {
+      "stage": 5000,
+      "training_seconds": 2185.7159423027188,
+      "exposure": {
+        "huber_draws": 20480000,
+        "rank_candidate_draws": 52036551,
+        "actual_rank_contexts": 2526981,
+        "broad_unique_root_local_pairs": 4080000,
+        "broad_pair_fraction": 5.835512968024561e-13,
+        "roots_exposed": 1000,
+        "complete_initial_forks_exposed_per_rank": 1000,
+        "actions_exposed": 664,
+        "minimum_distinct_initial_root_contexts_per_action": 32,
+        "distance_bin_draws_all_ranks": {
+          "huber": {
+            "0": 228139,
+            "1": 1273952,
+            "2": 1462039,
+            "3-4": 2461277,
+            "5-8": 2143495,
+            "9+": 1204266,
+            "unreachable": 11706832,
+            "finite_at_or_above_original_cap": 39
+          },
+          "rank_candidates": {
+            "0": 142855,
+            "1": 798527,
+            "2": 879993,
+            "3-4": 1548398,
+            "5-8": 3355327,
+            "9+": 5306283,
+            "unreachable": 40005168,
+            "finite_at_or_above_original_cap": 1744
+          }
+        }
+      },
+      "evaluation": {
+        "analysis_commit": "9aa8498",
+        "checkpoint": "/tmp/blocks12_joint_9aa8498/run/checkpoints/step_005000.pt",
+        "unseen_roots": {
+          "clear": {
+            "tasks": 200,
+            "success": 126,
+            "outcomes": {
+              "local_coverage_failure": 60,
+              "reached": 126,
+              "globally_unreachable": 14
+            },
+            "success_rate": 0.63
+          },
+          "intermediate": {
+            "tasks": 400,
+            "success": 226,
+            "outcomes": {
+              "reached": 226,
+              "local_coverage_failure": 127,
+              "removed_goal_cell": 44,
+              "globally_unreachable": 3
+            },
+            "success_rate": 0.565
+          }
+        },
+        "matched_baseline": {
+          "clear": {
+            "old_success_new_failure": 10,
+            "new_success": 105,
+            "net": 95,
+            "both_success": 21
+          },
+          "intermediate": {
+            "old_success_new_failure": 11,
+            "new_success": 23,
+            "net": 12,
+            "both_success": 203
+          }
+        },
+        "train_roots": {
+          "clear": {
+            "tasks": 100,
+            "success": 70,
+            "outcomes": {
+              "reached": 70,
+              "globally_unreachable": 9,
+              "local_coverage_failure": 21
+            },
+            "success_rate": 0.7
+          },
+          "intermediate": {
+            "tasks": 200,
+            "success": 120,
+            "outcomes": {
+              "reached": 120,
+              "local_coverage_failure": 57,
+              "removed_goal_cell": 21,
+              "globally_unreachable": 2
+            },
+            "success_rate": 0.6
+          }
+        },
+        "matched_train_parent": {
+          "clear": {
+            "old_success_new_failure": 4,
+            "new_success": 59,
+            "net": 55,
+            "both_success": 11
+          },
+          "intermediate": {
+            "old_success_new_failure": 2,
+            "new_success": 20,
+            "net": 18,
+            "both_success": 100
+          }
+        },
+        "distance_bins_unseen": {
+          "9+": {
+            "tasks": 400,
+            "reached": 152,
+            "forks": 400,
+            "shortest_choices": 295,
+            "candidate_count": 25872,
+            "absolute_error_sum": 33595.26038360596
+          },
+          "1": {
+            "tasks": 200,
+            "reached": 200,
+            "forks": 200,
+            "shortest_choices": 200,
+            "candidate_count": 12936,
+            "absolute_error_sum": 60404.562992572784
+          }
+        },
+        "distance_bins_train": {
+          "9+": {
+            "tasks": 200,
+            "reached": 90,
+            "forks": 200,
+            "shortest_choices": 145,
+            "candidate_count": 13092,
+            "absolute_error_sum": 14200.026220321655
+          },
+          "1": {
+            "tasks": 100,
+            "reached": 100,
+            "forks": 100,
+            "shortest_choices": 100,
+            "candidate_count": 6546,
+            "absolute_error_sum": 26169.169231176376
+          }
+        },
+        "cycles": 0,
+        "illegal_actions": 0,
+        "trajectory_forks_unseen": {
+          "forks": 2755,
+          "shortest_choices": 2396,
+          "reachable_choices": 2507,
+          "complete_candidate_relations": 98015,
+          "finite_at_or_above_original_cap": 3,
+          "cap_conflict_forks": 0,
+          "cap_conflict_reachable_choices": 0,
+          "distance_bins": {
+            "9+": {
+              "forks": 1162,
+              "shortest": 903,
+              "reachable": 972
+            },
+            "1": {
+              "forks": 352,
+              "shortest": 352,
+              "reachable": 352
+            },
+            "5-8": {
+              "forks": 775,
+              "shortest": 684,
+              "reachable": 721
+            },
+            "3-4": {
+              "forks": 313,
+              "shortest": 305,
+              "reachable": 309
+            },
+            "2": {
+              "forks": 153,
+              "shortest": 152,
+              "reachable": 153
+            }
+          }
+        },
+        "trajectory_forks_train": {
+          "forks": 1483,
+          "shortest_choices": 1304,
+          "reachable_choices": 1373,
+          "complete_candidate_relations": 50688,
+          "finite_at_or_above_original_cap": 13,
+          "cap_conflict_forks": 0,
+          "cap_conflict_reachable_choices": 0,
+          "distance_bins": {
+            "9+": {
+              "forks": 596,
+              "shortest": 464,
+              "reachable": 508
+            },
+            "5-8": {
+              "forks": 422,
+              "shortest": 380,
+              "reachable": 402
+            },
+            "3-4": {
+              "forks": 184,
+              "shortest": 180,
+              "reachable": 182
+            },
+            "2": {
+              "forks": 91,
+              "shortest": 90,
+              "reachable": 91
+            },
+            "1": {
+              "forks": 190,
+              "shortest": 190,
+              "reachable": 190
+            }
+          }
+        },
+        "policy": "original_Q_argmin_all_legal_actions_no_search_or_oracle_filters",
+        "intermediate_by_true_distance_unseen": {
+          "1": {
+            "tasks": 200,
+            "success": 200
+          },
+          "12": {
+            "tasks": 59,
+            "success": 9
+          },
+          "10": {
+            "tasks": 44,
+            "success": 4
+          },
+          "11": {
+            "tasks": 89,
+            "success": 13
+          },
+          "9": {
+            "tasks": 7,
+            "success": 0
+          },
+          "13": {
+            "tasks": 1,
+            "success": 0
+          }
+        },
+        "intermediate_by_true_distance_train": {
+          "1": {
+            "tasks": 100,
+            "success": 100
+          },
+          "11": {
+            "tasks": 44,
+            "success": 9
+          },
+          "12": {
+            "tasks": 33,
+            "success": 3
+          },
+          "10": {
+            "tasks": 20,
+            "success": 7
+          },
+          "9": {
+            "tasks": 3,
+            "success": 1
+          }
+        }
+      }
+    },
+    {
+      "stage": 6000,
+      "training_seconds": 2622.4069163072854,
+      "exposure": {
+        "huber_draws": 24576000,
+        "rank_candidate_draws": 62436550,
+        "actual_rank_contexts": 3032390,
+        "broad_unique_root_local_pairs": 4896000,
+        "broad_pair_fraction": 7.002615561629473e-13,
+        "roots_exposed": 1000,
+        "complete_initial_forks_exposed_per_rank": 1000,
+        "actions_exposed": 664,
+        "minimum_distinct_initial_root_contexts_per_action": 32,
+        "distance_bin_draws_all_ranks": {
+          "huber": {
+            "0": 273756,
+            "1": 1528753,
+            "2": 1754702,
+            "3-4": 2952876,
+            "5-8": 2572618,
+            "9+": 1444847,
+            "unreachable": 14048448,
+            "finite_at_or_above_original_cap": 47
+          },
+          "rank_candidates": {
+            "0": 171592,
+            "1": 957853,
+            "2": 1056652,
+            "3-4": 1857653,
+            "5-8": 4027633,
+            "9+": 6359828,
+            "unreachable": 48005339,
+            "finite_at_or_above_original_cap": 2062
+          }
+        }
+      },
+      "evaluation": {
+        "analysis_commit": "9aa8498",
+        "checkpoint": "/tmp/blocks12_joint_9aa8498/run/checkpoints/step_006000.pt",
+        "unseen_roots": {
+          "clear": {
+            "tasks": 200,
+            "success": 144,
+            "outcomes": {
+              "local_coverage_failure": 46,
+              "reached": 144,
+              "globally_unreachable": 10
+            },
+            "success_rate": 0.72
+          },
+          "intermediate": {
+            "tasks": 400,
+            "success": 231,
+            "outcomes": {
+              "reached": 231,
+              "local_coverage_failure": 118,
+              "removed_goal_cell": 48,
+              "globally_unreachable": 3
+            },
+            "success_rate": 0.5775
+          }
+        },
+        "matched_baseline": {
+          "clear": {
+            "old_success_new_failure": 8,
+            "new_success": 121,
+            "net": 113,
+            "both_success": 23
+          },
+          "intermediate": {
+            "old_success_new_failure": 11,
+            "new_success": 28,
+            "net": 17,
+            "both_success": 203
+          }
+        },
+        "train_roots": {
+          "clear": {
+            "tasks": 100,
+            "success": 76,
+            "outcomes": {
+              "reached": 76,
+              "local_coverage_failure": 15,
+              "globally_unreachable": 9
+            },
+            "success_rate": 0.76
+          },
+          "intermediate": {
+            "tasks": 200,
+            "success": 126,
+            "outcomes": {
+              "reached": 126,
+              "local_coverage_failure": 57,
+              "removed_goal_cell": 16,
+              "globally_unreachable": 1
+            },
+            "success_rate": 0.63
+          }
+        },
+        "matched_train_parent": {
+          "clear": {
+            "old_success_new_failure": 4,
+            "new_success": 65,
+            "net": 61,
+            "both_success": 11
+          },
+          "intermediate": {
+            "old_success_new_failure": 2,
+            "new_success": 26,
+            "net": 24,
+            "both_success": 100
+          }
+        },
+        "distance_bins_unseen": {
+          "9+": {
+            "tasks": 400,
+            "reached": 175,
+            "forks": 400,
+            "shortest_choices": 293,
+            "candidate_count": 25872,
+            "absolute_error_sum": 33022.95760011673
+          },
+          "1": {
+            "tasks": 200,
+            "reached": 200,
+            "forks": 200,
+            "shortest_choices": 200,
+            "candidate_count": 12936,
+            "absolute_error_sum": 58933.72056603432
+          }
+        },
+        "distance_bins_train": {
+          "9+": {
+            "tasks": 200,
+            "reached": 102,
+            "forks": 200,
+            "shortest_choices": 150,
+            "candidate_count": 13092,
+            "absolute_error_sum": 13674.588471412659
+          },
+          "1": {
+            "tasks": 100,
+            "reached": 100,
+            "forks": 100,
+            "shortest_choices": 100,
+            "candidate_count": 6546,
+            "absolute_error_sum": 25385.82543706894
+          }
+        },
+        "cycles": 0,
+        "illegal_actions": 0,
+        "trajectory_forks_unseen": {
+          "forks": 2915,
+          "shortest_choices": 2570,
+          "reachable_choices": 2690,
+          "complete_candidate_relations": 99724,
+          "finite_at_or_above_original_cap": 3,
+          "cap_conflict_forks": 0,
+          "cap_conflict_reachable_choices": 0,
+          "distance_bins": {
+            "9+": {
+              "forks": 1174,
+              "shortest": 919,
+              "reachable": 992
+            },
+            "1": {
+              "forks": 375,
+              "shortest": 375,
+              "reachable": 375
+            },
+            "5-8": {
+              "forks": 828,
+              "shortest": 749,
+              "reachable": 789
+            },
+            "3-4": {
+              "forks": 360,
+              "shortest": 352,
+              "reachable": 357
+            },
+            "2": {
+              "forks": 178,
+              "shortest": 175,
+              "reachable": 177
+            }
+          }
+        },
+        "trajectory_forks_train": {
+          "forks": 1583,
+          "shortest_choices": 1428,
+          "reachable_choices": 1485,
+          "complete_candidate_relations": 51961,
+          "finite_at_or_above_original_cap": 13,
+          "cap_conflict_forks": 0,
+          "cap_conflict_reachable_choices": 0,
+          "distance_bins": {
+            "9+": {
+              "forks": 603,
+              "shortest": 486,
+              "reachable": 525
+            },
+            "5-8": {
+              "forks": 468,
+              "shortest": 434,
+              "reachable": 451
+            },
+            "3-4": {
+              "forks": 207,
+              "shortest": 204,
+              "reachable": 204
+            },
+            "2": {
+              "forks": 103,
+              "shortest": 102,
+              "reachable": 103
+            },
+            "1": {
+              "forks": 202,
+              "shortest": 202,
+              "reachable": 202
+            }
+          }
+        },
+        "policy": "original_Q_argmin_all_legal_actions_no_search_or_oracle_filters",
+        "intermediate_by_true_distance_unseen": {
+          "1": {
+            "tasks": 200,
+            "success": 200
+          },
+          "12": {
+            "tasks": 59,
+            "success": 5
+          },
+          "10": {
+            "tasks": 44,
+            "success": 8
+          },
+          "11": {
+            "tasks": 89,
+            "success": 16
+          },
+          "9": {
+            "tasks": 7,
+            "success": 2
+          },
+          "13": {
+            "tasks": 1,
+            "success": 0
+          }
+        },
+        "intermediate_by_true_distance_train": {
+          "1": {
+            "tasks": 100,
+            "success": 100
+          },
+          "11": {
+            "tasks": 44,
+            "success": 11
+          },
+          "12": {
+            "tasks": 33,
+            "success": 9
+          },
+          "10": {
+            "tasks": 20,
+            "success": 6
+          },
+          "9": {
+            "tasks": 3,
+            "success": 0
+          }
+        }
+      }
+    },
+    {
+      "stage": 7000,
+      "training_seconds": 3059.4540607891977,
+      "exposure": {
+        "huber_draws": 28672000,
+        "rank_candidate_draws": 72828057,
+        "actual_rank_contexts": 3537906,
+        "broad_unique_root_local_pairs": 5712000,
+        "broad_pair_fraction": 8.169718155234386e-13,
+        "roots_exposed": 1000,
+        "complete_initial_forks_exposed_per_rank": 1000,
+        "actions_exposed": 664,
+        "minimum_distinct_initial_root_contexts_per_action": 32,
+        "distance_bin_draws_all_ranks": {
+          "huber": {
+            "0": 319372,
+            "1": 1783724,
+            "2": 2047128,
+            "3-4": 3444104,
+            "5-8": 3001733,
+            "9+": 1686068,
+            "unreachable": 16389871,
+            "finite_at_or_above_original_cap": 53
+          },
+          "rank_candidates": {
+            "0": 200441,
+            "1": 1117706,
+            "2": 1232364,
+            "3-4": 2167530,
+            "5-8": 4697318,
+            "9+": 7410195,
+            "unreachable": 56002503,
+            "finite_at_or_above_original_cap": 2346
+          }
+        }
+      },
+      "evaluation": {
+        "analysis_commit": "9aa8498",
+        "checkpoint": "/tmp/blocks12_joint_9aa8498/run/checkpoints/step_007000.pt",
+        "unseen_roots": {
+          "clear": {
+            "tasks": 200,
+            "success": 157,
+            "outcomes": {
+              "local_coverage_failure": 34,
+              "reached": 157,
+              "globally_unreachable": 9
+            },
+            "success_rate": 0.785
+          },
+          "intermediate": {
+            "tasks": 400,
+            "success": 228,
+            "outcomes": {
+              "reached": 228,
+              "local_coverage_failure": 123,
+              "removed_goal_cell": 47,
+              "globally_unreachable": 2
+            },
+            "success_rate": 0.57
+          }
+        },
+        "matched_baseline": {
+          "clear": {
+            "old_success_new_failure": 2,
+            "new_success": 128,
+            "net": 126,
+            "both_success": 29
+          },
+          "intermediate": {
+            "old_success_new_failure": 12,
+            "new_success": 26,
+            "net": 14,
+            "both_success": 202
+          }
+        },
+        "train_roots": {
+          "clear": {
+            "tasks": 100,
+            "success": 79,
+            "outcomes": {
+              "reached": 79,
+              "local_coverage_failure": 14,
+              "globally_unreachable": 7
+            },
+            "success_rate": 0.79
+          },
+          "intermediate": {
+            "tasks": 200,
+            "success": 129,
+            "outcomes": {
+              "reached": 129,
+              "local_coverage_failure": 56,
+              "removed_goal_cell": 14,
+              "globally_unreachable": 1
+            },
+            "success_rate": 0.645
+          }
+        },
+        "matched_train_parent": {
+          "clear": {
+            "old_success_new_failure": 3,
+            "new_success": 67,
+            "net": 64,
+            "both_success": 12
+          },
+          "intermediate": {
+            "old_success_new_failure": 2,
+            "new_success": 29,
+            "net": 27,
+            "both_success": 100
+          }
+        },
+        "distance_bins_unseen": {
+          "9+": {
+            "tasks": 400,
+            "reached": 185,
+            "forks": 400,
+            "shortest_choices": 300,
+            "candidate_count": 25872,
+            "absolute_error_sum": 32100.812401771545
+          },
+          "1": {
+            "tasks": 200,
+            "reached": 200,
+            "forks": 200,
+            "shortest_choices": 200,
+            "candidate_count": 12936,
+            "absolute_error_sum": 58103.689234972
+          }
+        },
+        "distance_bins_train": {
+          "9+": {
+            "tasks": 200,
+            "reached": 108,
+            "forks": 200,
+            "shortest_choices": 159,
+            "candidate_count": 13092,
+            "absolute_error_sum": 13266.412751197815
+          },
+          "1": {
+            "tasks": 100,
+            "reached": 100,
+            "forks": 100,
+            "shortest_choices": 100,
+            "candidate_count": 6546,
+            "absolute_error_sum": 24509.102514982224
+          }
+        },
+        "cycles": 0,
+        "illegal_actions": 0,
+        "trajectory_forks_unseen": {
+          "forks": 2998,
+          "shortest_choices": 2673,
+          "reachable_choices": 2783,
+          "complete_candidate_relations": 101245,
+          "finite_at_or_above_original_cap": 3,
+          "cap_conflict_forks": 0,
+          "cap_conflict_reachable_choices": 0,
+          "distance_bins": {
+            "9+": {
+              "forks": 1177,
+              "shortest": 941,
+              "reachable": 1005
+            },
+            "1": {
+              "forks": 385,
+              "shortest": 385,
+              "reachable": 385
+            },
+            "5-8": {
+              "forks": 865,
+              "shortest": 790,
+              "reachable": 825
+            },
+            "3-4": {
+              "forks": 382,
+              "shortest": 372,
+              "reachable": 380
+            },
+            "2": {
+              "forks": 189,
+              "shortest": 185,
+              "reachable": 188
+            }
+          }
+        },
+        "trajectory_forks_train": {
+          "forks": 1627,
+          "shortest_choices": 1487,
+          "reachable_choices": 1535,
+          "complete_candidate_relations": 52399,
+          "finite_at_or_above_original_cap": 13,
+          "cap_conflict_forks": 0,
+          "cap_conflict_reachable_choices": 0,
+          "distance_bins": {
+            "9+": {
+              "forks": 604,
+              "shortest": 496,
+              "reachable": 528
+            },
+            "5-8": {
+              "forks": 488,
+              "shortest": 458,
+              "reachable": 474
+            },
+            "3-4": {
+              "forks": 219,
+              "shortest": 217,
+              "reachable": 217
+            },
+            "2": {
+              "forks": 108,
+              "shortest": 108,
+              "reachable": 108
+            },
+            "1": {
+              "forks": 208,
+              "shortest": 208,
+              "reachable": 208
+            }
+          }
+        },
+        "policy": "original_Q_argmin_all_legal_actions_no_search_or_oracle_filters",
+        "intermediate_by_true_distance_unseen": {
+          "1": {
+            "tasks": 200,
+            "success": 200
+          },
+          "12": {
+            "tasks": 59,
+            "success": 5
+          },
+          "10": {
+            "tasks": 44,
+            "success": 6
+          },
+          "11": {
+            "tasks": 89,
+            "success": 16
+          },
+          "9": {
+            "tasks": 7,
+            "success": 1
+          },
+          "13": {
+            "tasks": 1,
+            "success": 0
+          }
+        },
+        "intermediate_by_true_distance_train": {
+          "1": {
+            "tasks": 100,
+            "success": 100
+          },
+          "11": {
+            "tasks": 44,
+            "success": 11
+          },
+          "12": {
+            "tasks": 33,
+            "success": 10
+          },
+          "10": {
+            "tasks": 20,
+            "success": 7
+          },
+          "9": {
+            "tasks": 3,
+            "success": 1
+          }
+        }
+      }
+    },
+    {
+      "stage": 8000,
+      "training_seconds": 3494.3531151227653,
+      "exposure": {
+        "huber_draws": 32768000,
+        "rank_candidate_draws": 83214591,
+        "actual_rank_contexts": 4043305,
+        "broad_unique_root_local_pairs": 6528000,
+        "broad_pair_fraction": 9.336820748839299e-13,
+        "roots_exposed": 1000,
+        "complete_initial_forks_exposed_per_rank": 1000,
+        "actions_exposed": 664,
+        "minimum_distinct_initial_root_contexts_per_action": 32,
+        "distance_bin_draws_all_ranks": {
+          "huber": {
+            "0": 365051,
+            "1": 2038651,
+            "2": 2339411,
+            "3-4": 3936056,
+            "5-8": 3430719,
+            "9+": 1927158,
+            "unreachable": 18730954,
+            "finite_at_or_above_original_cap": 57
+          },
+          "rank_candidates": {
+            "0": 229249,
+            "1": 1277779,
+            "2": 1408886,
+            "3-4": 2478212,
+            "5-8": 5369657,
+            "9+": 8454702,
+            "unreachable": 63996106,
+            "finite_at_or_above_original_cap": 2657
+          }
+        }
+      },
+      "evaluation": {
+        "analysis_commit": "9aa8498",
+        "checkpoint": "/tmp/blocks12_joint_9aa8498/run/checkpoints/step_008000.pt",
+        "unseen_roots": {
+          "clear": {
+            "tasks": 200,
+            "success": 145,
+            "outcomes": {
+              "local_coverage_failure": 43,
+              "reached": 145,
+              "globally_unreachable": 12
+            },
+            "success_rate": 0.725
+          },
+          "intermediate": {
+            "tasks": 400,
+            "success": 234,
+            "outcomes": {
+              "reached": 234,
+              "local_coverage_failure": 117,
+              "removed_goal_cell": 45,
+              "globally_unreachable": 4
+            },
+            "success_rate": 0.585
+          }
+        },
+        "matched_baseline": {
+          "clear": {
+            "old_success_new_failure": 5,
+            "new_success": 119,
+            "net": 114,
+            "both_success": 26
+          },
+          "intermediate": {
+            "old_success_new_failure": 11,
+            "new_success": 31,
+            "net": 20,
+            "both_success": 203
+          }
+        },
+        "train_roots": {
+          "clear": {
+            "tasks": 100,
+            "success": 77,
+            "outcomes": {
+              "local_coverage_failure": 12,
+              "reached": 77,
+              "globally_unreachable": 11
+            },
+            "success_rate": 0.77
+          },
+          "intermediate": {
+            "tasks": 200,
+            "success": 126,
+            "outcomes": {
+              "reached": 126,
+              "local_coverage_failure": 56,
+              "removed_goal_cell": 16,
+              "globally_unreachable": 2
+            },
+            "success_rate": 0.63
+          }
+        },
+        "matched_train_parent": {
+          "clear": {
+            "old_success_new_failure": 4,
+            "new_success": 66,
+            "net": 62,
+            "both_success": 11
+          },
+          "intermediate": {
+            "old_success_new_failure": 1,
+            "new_success": 25,
+            "net": 24,
+            "both_success": 101
+          }
+        },
+        "distance_bins_unseen": {
+          "9+": {
+            "tasks": 400,
+            "reached": 179,
+            "forks": 400,
+            "shortest_choices": 294,
+            "candidate_count": 25872,
+            "absolute_error_sum": 32161.80515241623
+          },
+          "1": {
+            "tasks": 200,
+            "reached": 200,
+            "forks": 200,
+            "shortest_choices": 200,
+            "candidate_count": 12936,
+            "absolute_error_sum": 57994.295746803284
+          }
+        },
+        "distance_bins_train": {
+          "9+": {
+            "tasks": 200,
+            "reached": 103,
+            "forks": 200,
+            "shortest_choices": 156,
+            "candidate_count": 13092,
+            "absolute_error_sum": 13001.615753173828
+          },
+          "1": {
+            "tasks": 100,
+            "reached": 100,
+            "forks": 100,
+            "shortest_choices": 100,
+            "candidate_count": 6546,
+            "absolute_error_sum": 24323.220289230347
+          }
+        },
+        "cycles": 0,
+        "illegal_actions": 0,
+        "trajectory_forks_unseen": {
+          "forks": 2940,
+          "shortest_choices": 2609,
+          "reachable_choices": 2719,
+          "complete_candidate_relations": 99901,
+          "finite_at_or_above_original_cap": 3,
+          "cap_conflict_forks": 0,
+          "cap_conflict_reachable_choices": 0,
+          "distance_bins": {
+            "9+": {
+              "forks": 1179,
+              "shortest": 929,
+              "reachable": 1000
+            },
+            "1": {
+              "forks": 379,
+              "shortest": 379,
+              "reachable": 379
+            },
+            "5-8": {
+              "forks": 833,
+              "shortest": 762,
+              "reachable": 795
+            },
+            "3-4": {
+              "forks": 366,
+              "shortest": 360,
+              "reachable": 363
+            },
+            "2": {
+              "forks": 183,
+              "shortest": 179,
+              "reachable": 182
+            }
+          }
+        },
+        "trajectory_forks_train": {
+          "forks": 1601,
+          "shortest_choices": 1453,
+          "reachable_choices": 1504,
+          "complete_candidate_relations": 52676,
+          "finite_at_or_above_original_cap": 13,
+          "cap_conflict_forks": 0,
+          "cap_conflict_reachable_choices": 0,
+          "distance_bins": {
+            "9+": {
+              "forks": 611,
+              "shortest": 501,
+              "reachable": 537
+            },
+            "1": {
+              "forks": 203,
+              "shortest": 203,
+              "reachable": 203
+            },
+            "5-8": {
+              "forks": 474,
+              "shortest": 438,
+              "reachable": 453
+            },
+            "3-4": {
+              "forks": 209,
+              "shortest": 208,
+              "reachable": 208
+            },
+            "2": {
+              "forks": 104,
+              "shortest": 103,
+              "reachable": 103
+            }
+          }
+        },
+        "policy": "original_Q_argmin_all_legal_actions_no_search_or_oracle_filters",
+        "intermediate_by_true_distance_unseen": {
+          "1": {
+            "tasks": 200,
+            "success": 200
+          },
+          "12": {
+            "tasks": 59,
+            "success": 6
+          },
+          "10": {
+            "tasks": 44,
+            "success": 6
+          },
+          "11": {
+            "tasks": 89,
+            "success": 19
+          },
+          "9": {
+            "tasks": 7,
+            "success": 3
+          },
+          "13": {
+            "tasks": 1,
+            "success": 0
+          }
+        },
+        "intermediate_by_true_distance_train": {
+          "1": {
+            "tasks": 100,
+            "success": 100
+          },
+          "11": {
+            "tasks": 44,
+            "success": 12
+          },
+          "12": {
+            "tasks": 33,
+            "success": 9
+          },
+          "10": {
+            "tasks": 20,
+            "success": 5
+          },
+          "9": {
+            "tasks": 3,
+            "success": 0
+          }
+        }
+      }
+    },
+    {
+      "stage": 9000,
+      "training_seconds": 3930.6295920051634,
+      "exposure": {
+        "huber_draws": 36864000,
+        "rank_candidate_draws": 93593343,
+        "actual_rank_contexts": 4548630,
+        "broad_unique_root_local_pairs": 7344000,
+        "broad_pair_fraction": 1.050392334244421e-12,
+        "roots_exposed": 1000,
+        "complete_initial_forks_exposed_per_rank": 1000,
+        "actions_exposed": 664,
+        "minimum_distinct_initial_root_contexts_per_action": 32,
+        "distance_bin_draws_all_ranks": {
+          "huber": {
+            "0": 410709,
+            "1": 2294243,
+            "2": 2630568,
+            "3-4": 4428377,
+            "5-8": 3859774,
+            "9+": 2168013,
+            "unreachable": 21072316,
+            "finite_at_or_above_original_cap": 63
+          },
+          "rank_candidates": {
+            "0": 258034,
+            "1": 1437270,
+            "2": 1584422,
+            "3-4": 2789051,
+            "5-8": 6037752,
+            "9+": 9502946,
+            "unreachable": 71983868,
+            "finite_at_or_above_original_cap": 2966
+          }
+        }
+      },
+      "evaluation": {
+        "analysis_commit": "9aa8498",
+        "checkpoint": "/tmp/blocks12_joint_9aa8498/run/checkpoints/step_009000.pt",
+        "unseen_roots": {
+          "clear": {
+            "tasks": 200,
+            "success": 146,
+            "outcomes": {
+              "local_coverage_failure": 44,
+              "reached": 146,
+              "globally_unreachable": 10
+            },
+            "success_rate": 0.73
+          },
+          "intermediate": {
+            "tasks": 400,
+            "success": 235,
+            "outcomes": {
+              "reached": 235,
+              "local_coverage_failure": 116,
+              "removed_goal_cell": 47,
+              "globally_unreachable": 2
+            },
+            "success_rate": 0.5875
+          }
+        },
+        "matched_baseline": {
+          "clear": {
+            "old_success_new_failure": 6,
+            "new_success": 121,
+            "net": 115,
+            "both_success": 25
+          },
+          "intermediate": {
+            "old_success_new_failure": 11,
+            "new_success": 32,
+            "net": 21,
+            "both_success": 203
+          }
+        },
+        "train_roots": {
+          "clear": {
+            "tasks": 100,
+            "success": 81,
+            "outcomes": {
+              "local_coverage_failure": 12,
+              "reached": 81,
+              "globally_unreachable": 7
+            },
+            "success_rate": 0.81
+          },
+          "intermediate": {
+            "tasks": 200,
+            "success": 129,
+            "outcomes": {
+              "reached": 129,
+              "local_coverage_failure": 49,
+              "removed_goal_cell": 21,
+              "globally_unreachable": 1
+            },
+            "success_rate": 0.645
+          }
+        },
+        "matched_train_parent": {
+          "clear": {
+            "old_success_new_failure": 3,
+            "new_success": 69,
+            "net": 66,
+            "both_success": 12
+          },
+          "intermediate": {
+            "old_success_new_failure": 1,
+            "new_success": 28,
+            "net": 27,
+            "both_success": 101
+          }
+        },
+        "distance_bins_unseen": {
+          "9+": {
+            "tasks": 400,
+            "reached": 181,
+            "forks": 400,
+            "shortest_choices": 297,
+            "candidate_count": 25872,
+            "absolute_error_sum": 31707.644991874695
+          },
+          "1": {
+            "tasks": 200,
+            "reached": 200,
+            "forks": 200,
+            "shortest_choices": 200,
+            "candidate_count": 12936,
+            "absolute_error_sum": 56486.51602447033
+          }
+        },
+        "distance_bins_train": {
+          "9+": {
+            "tasks": 200,
+            "reached": 110,
+            "forks": 200,
+            "shortest_choices": 160,
+            "candidate_count": 13092,
+            "absolute_error_sum": 13395.558376312256
+          },
+          "1": {
+            "tasks": 100,
+            "reached": 100,
+            "forks": 100,
+            "shortest_choices": 100,
+            "candidate_count": 6546,
+            "absolute_error_sum": 23377.9832136631
+          }
+        },
+        "cycles": 0,
+        "illegal_actions": 0,
+        "trajectory_forks_unseen": {
+          "forks": 2953,
+          "shortest_choices": 2631,
+          "reachable_choices": 2734,
+          "complete_candidate_relations": 99350,
+          "finite_at_or_above_original_cap": 3,
+          "cap_conflict_forks": 0,
+          "cap_conflict_reachable_choices": 0,
+          "distance_bins": {
+            "9+": {
+              "forks": 1161,
+              "shortest": 926,
+              "reachable": 985
+            },
+            "1": {
+              "forks": 381,
+              "shortest": 381,
+              "reachable": 381
+            },
+            "5-8": {
+              "forks": 852,
+              "shortest": 776,
+              "reachable": 813
+            },
+            "3-4": {
+              "forks": 371,
+              "shortest": 367,
+              "reachable": 369
+            },
+            "2": {
+              "forks": 188,
+              "shortest": 181,
+              "reachable": 186
+            }
+          }
+        },
+        "trajectory_forks_train": {
+          "forks": 1654,
+          "shortest_choices": 1511,
+          "reachable_choices": 1564,
+          "complete_candidate_relations": 52565,
+          "finite_at_or_above_original_cap": 13,
+          "cap_conflict_forks": 0,
+          "cap_conflict_reachable_choices": 0,
+          "distance_bins": {
+            "9+": {
+              "forks": 603,
+              "shortest": 501,
+              "reachable": 531
+            },
+            "1": {
+              "forks": 210,
+              "shortest": 210,
+              "reachable": 210
+            },
+            "5-8": {
+              "forks": 507,
+              "shortest": 470,
+              "reachable": 492
+            },
+            "3-4": {
+              "forks": 224,
+              "shortest": 220,
+              "reachable": 221
+            },
+            "2": {
+              "forks": 110,
+              "shortest": 110,
+              "reachable": 110
+            }
+          }
+        },
+        "policy": "original_Q_argmin_all_legal_actions_no_search_or_oracle_filters",
+        "intermediate_by_true_distance_unseen": {
+          "1": {
+            "tasks": 200,
+            "success": 200
+          },
+          "12": {
+            "tasks": 59,
+            "success": 8
+          },
+          "10": {
+            "tasks": 44,
+            "success": 7
+          },
+          "11": {
+            "tasks": 89,
+            "success": 18
+          },
+          "9": {
+            "tasks": 7,
+            "success": 2
+          },
+          "13": {
+            "tasks": 1,
+            "success": 0
+          }
+        },
+        "intermediate_by_true_distance_train": {
+          "1": {
+            "tasks": 100,
+            "success": 100
+          },
+          "11": {
+            "tasks": 44,
+            "success": 13
+          },
+          "12": {
+            "tasks": 33,
+            "success": 10
+          },
+          "10": {
+            "tasks": 20,
+            "success": 6
+          },
+          "9": {
+            "tasks": 3,
+            "success": 0
+          }
+        }
+      }
+    },
+    {
+      "stage": 10000,
+      "training_seconds": 4369.841357332654,
+      "exposure": {
+        "huber_draws": 40960000,
+        "rank_candidate_draws": 103983176,
+        "actual_rank_contexts": 5054035,
+        "broad_unique_root_local_pairs": 8160000,
+        "broad_pair_fraction": 1.1671025936049122e-12,
+        "roots_exposed": 1000,
+        "complete_initial_forks_exposed_per_rank": 1000,
+        "actions_exposed": 664,
+        "minimum_distinct_initial_root_contexts_per_action": 32,
+        "distance_bin_draws_all_ranks": {
+          "huber": {
+            "0": 456312,
+            "1": 2550212,
+            "2": 2921747,
+            "3-4": 4920258,
+            "5-8": 4288914,
+            "9+": 2409273,
+            "unreachable": 23413284,
+            "finite_at_or_above_original_cap": 71
+          },
+          "rank_candidates": {
+            "0": 286845,
+            "1": 1597666,
+            "2": 1759875,
+            "3-4": 3098495,
+            "5-8": 6711046,
+            "9+": 10552865,
+            "unreachable": 79976384,
+            "finite_at_or_above_original_cap": 3294
+          }
+        }
+      },
+      "evaluation": {
+        "analysis_commit": "9aa8498",
+        "checkpoint": "/tmp/blocks12_joint_9aa8498/run/checkpoints/step_010000.pt",
+        "unseen_roots": {
+          "clear": {
+            "tasks": 200,
+            "success": 160,
+            "outcomes": {
+              "reached": 160,
+              "globally_unreachable": 11,
+              "local_coverage_failure": 29
+            },
+            "success_rate": 0.8
+          },
+          "intermediate": {
+            "tasks": 400,
+            "success": 250,
+            "outcomes": {
+              "reached": 250,
+              "local_coverage_failure": 103,
+              "removed_goal_cell": 42,
+              "globally_unreachable": 5
+            },
+            "success_rate": 0.625
+          }
+        },
+        "matched_baseline": {
+          "clear": {
+            "old_success_new_failure": 4,
+            "new_success": 133,
+            "net": 129,
+            "both_success": 27
+          },
+          "intermediate": {
+            "old_success_new_failure": 13,
+            "new_success": 49,
+            "net": 36,
+            "both_success": 201
+          }
+        },
+        "train_roots": {
+          "clear": {
+            "tasks": 100,
+            "success": 84,
+            "outcomes": {
+              "local_coverage_failure": 11,
+              "reached": 84,
+              "globally_unreachable": 5
+            },
+            "success_rate": 0.84
+          },
+          "intermediate": {
+            "tasks": 200,
+            "success": 126,
+            "outcomes": {
+              "reached": 126,
+              "local_coverage_failure": 47,
+              "removed_goal_cell": 26,
+              "globally_unreachable": 1
+            },
+            "success_rate": 0.63
+          }
+        },
+        "matched_train_parent": {
+          "clear": {
+            "old_success_new_failure": 1,
+            "new_success": 70,
+            "net": 69,
+            "both_success": 14
+          },
+          "intermediate": {
+            "old_success_new_failure": 1,
+            "new_success": 25,
+            "net": 24,
+            "both_success": 101
+          }
+        },
+        "distance_bins_unseen": {
+          "9+": {
+            "tasks": 400,
+            "reached": 210,
+            "forks": 400,
+            "shortest_choices": 315,
+            "candidate_count": 25872,
+            "absolute_error_sum": 31289.749314308167
+          },
+          "1": {
+            "tasks": 200,
+            "reached": 200,
+            "forks": 200,
+            "shortest_choices": 200,
+            "candidate_count": 12936,
+            "absolute_error_sum": 55882.59070777893
+          }
+        },
+        "distance_bins_train": {
+          "9+": {
+            "tasks": 200,
+            "reached": 110,
+            "forks": 200,
+            "shortest_choices": 162,
+            "candidate_count": 13092,
+            "absolute_error_sum": 13088.363624095917
+          },
+          "1": {
+            "tasks": 100,
+            "reached": 100,
+            "forks": 100,
+            "shortest_choices": 100,
+            "candidate_count": 6546,
+            "absolute_error_sum": 22425.632697343826
+          }
+        },
+        "cycles": 0,
+        "illegal_actions": 0,
+        "trajectory_forks_unseen": {
+          "forks": 3227,
+          "shortest_choices": 2935,
+          "reachable_choices": 3037,
+          "complete_candidate_relations": 105148,
+          "finite_at_or_above_original_cap": 3,
+          "cap_conflict_forks": 0,
+          "cap_conflict_reachable_choices": 0,
+          "distance_bins": {
+            "9+": {
+              "forks": 1222,
+              "shortest": 1013,
+              "reachable": 1077
+            },
+            "5-8": {
+              "forks": 959,
+              "shortest": 882,
+              "reachable": 916
+            },
+            "3-4": {
+              "forks": 425,
+              "shortest": 420,
+              "reachable": 423
+            },
+            "2": {
+              "forks": 211,
+              "shortest": 210,
+              "reachable": 211
+            },
+            "1": {
+              "forks": 410,
+              "shortest": 410,
+              "reachable": 410
+            }
+          }
+        },
+        "trajectory_forks_train": {
+          "forks": 1684,
+          "shortest_choices": 1543,
+          "reachable_choices": 1594,
+          "complete_candidate_relations": 54679,
+          "finite_at_or_above_original_cap": 13,
+          "cap_conflict_forks": 0,
+          "cap_conflict_reachable_choices": 0,
+          "distance_bins": {
+            "9+": {
+              "forks": 639,
+              "shortest": 536,
+              "reachable": 572
+            },
+            "1": {
+              "forks": 210,
+              "shortest": 210,
+              "reachable": 210
+            },
+            "5-8": {
+              "forks": 503,
+              "shortest": 467,
+              "reachable": 480
+            },
+            "3-4": {
+              "forks": 222,
+              "shortest": 220,
+              "reachable": 222
+            },
+            "2": {
+              "forks": 110,
+              "shortest": 110,
+              "reachable": 110
+            }
+          }
+        },
+        "policy": "original_Q_argmin_all_legal_actions_no_search_or_oracle_filters",
+        "intermediate_by_true_distance_unseen": {
+          "1": {
+            "tasks": 200,
+            "success": 200
+          },
+          "12": {
+            "tasks": 59,
+            "success": 11
+          },
+          "10": {
+            "tasks": 44,
+            "success": 12
+          },
+          "11": {
+            "tasks": 89,
+            "success": 25
+          },
+          "9": {
+            "tasks": 7,
+            "success": 2
+          },
+          "13": {
+            "tasks": 1,
+            "success": 0
+          }
+        },
+        "intermediate_by_true_distance_train": {
+          "1": {
+            "tasks": 100,
+            "success": 100
+          },
+          "11": {
+            "tasks": 44,
+            "success": 10
+          },
+          "12": {
+            "tasks": 33,
+            "success": 10
+          },
+          "10": {
+            "tasks": 20,
+            "success": 6
+          },
+          "9": {
+            "tasks": 3,
+            "success": 0
+          }
+        }
+      }
     }
   ],
   "cap_boundary_probe_stage": 1000,
   "selection": {
-    "success": 346,
-    "checkpoint": "/tmp/blocks12_joint_9aa8498/run/checkpoints/step_003000.pt",
-    "evaluation": "/tmp/blocks12_joint_9aa8498/run/evaluation/step_003000.json",
+    "success": 410,
+    "checkpoint": "/tmp/blocks12_joint_9aa8498/run/checkpoints/step_010000.pt",
+    "evaluation": "/tmp/blocks12_joint_9aa8498/run/evaluation/step_010000.json",
     "unseen_roots": {
       "clear": {
         "tasks": 200,
-        "success": 118,
+        "success": 160,
         "outcomes": {
-          "local_coverage_failure": 68,
-          "reached": 118,
-          "globally_unreachable": 14
+          "reached": 160,
+          "globally_unreachable": 11,
+          "local_coverage_failure": 29
         },
-        "success_rate": 0.59
+        "success_rate": 0.8
       },
       "intermediate": {
         "tasks": 400,
-        "success": 228,
+        "success": 250,
         "outcomes": {
-          "reached": 228,
-          "local_coverage_failure": 131,
-          "removed_goal_cell": 39,
-          "globally_unreachable": 2
+          "reached": 250,
+          "local_coverage_failure": 103,
+          "removed_goal_cell": 42,
+          "globally_unreachable": 5
         },
-        "success_rate": 0.57
+        "success_rate": 0.625
       }
     }
+  },
+  "failure_diagnosis": {
+    "parent_phase_updates": 10000,
+    "seed": 2026101901,
+    "monitor_long": {
+      "tasks": 200,
+      "success": 50,
+      "by_true_distance": {
+        "12": {
+          "tasks": 59,
+          "success": 11
+        },
+        "10": {
+          "tasks": 44,
+          "success": 12
+        },
+        "11": {
+          "tasks": 89,
+          "success": 25
+        },
+        "9": {
+          "tasks": 7,
+          "success": 2
+        },
+        "13": {
+          "tasks": 1,
+          "success": 0
+        }
+      },
+      "failure_types": {
+        "local_coverage_failure": 103,
+        "removed_goal_cell": 42,
+        "globally_unreachable": 5
+      },
+      "failure_step": {
+        "0": 50,
+        "1": 42,
+        "2": 20,
+        "4": 14,
+        "5": 6,
+        "7": 2,
+        "3": 14,
+        "6": 2
+      },
+      "failure_remaining_distance": {
+        "12": 17,
+        "10": 36,
+        "11": 39,
+        "9": 17,
+        "7": 14,
+        "6": 7,
+        "8": 16,
+        "13": 1,
+        "5": 1,
+        "4": 2
+      },
+      "failure_degree": {
+        "54": 5,
+        "44": 2,
+        "52": 4,
+        "84": 2,
+        "68": 3,
+        "48": 7,
+        "47": 2,
+        "71": 4,
+        "69": 2,
+        "41": 7,
+        "33": 4,
+        "12": 2,
+        "38": 3,
+        "55": 2,
+        "22": 1,
+        "58": 5,
+        "20": 2,
+        "21": 1,
+        "25": 1,
+        "53": 3,
+        "82": 2,
+        "35": 2,
+        "43": 2,
+        "30": 3,
+        "70": 3,
+        "16": 1,
+        "50": 5,
+        "39": 3,
+        "57": 4,
+        "67": 1,
+        "32": 2,
+        "46": 4,
+        "75": 1,
+        "76": 1,
+        "31": 1,
+        "14": 1,
+        "27": 1,
+        "15": 2,
+        "56": 2,
+        "73": 2,
+        "26": 2,
+        "29": 2,
+        "60": 3,
+        "34": 1,
+        "45": 2,
+        "37": 4,
+        "40": 1,
+        "72": 1,
+        "51": 2,
+        "65": 4,
+        "49": 1,
+        "62": 2,
+        "36": 2,
+        "59": 2,
+        "63": 2,
+        "91": 1,
+        "66": 1,
+        "8": 2,
+        "42": 1,
+        "28": 2,
+        "88": 1,
+        "61": 3,
+        "19": 1,
+        "17": 1,
+        "74": 1
+      },
+      "failure_action_shape": {
+        "2": 17,
+        "1": 22,
+        "0": 18,
+        "3": 14,
+        "7": 21,
+        "6": 27,
+        "4": 16,
+        "5": 15
+      },
+      "cap_conflict_first_errors": 0,
+      "all_first_errors_are_ranking_errors": true
+    },
+    "training_arbitrary_residual_goals": {
+      "tasks": 2000,
+      "success": 533,
+      "by_true_distance": {
+        "11": {
+          "tasks": 950,
+          "success": 273
+        },
+        "10": {
+          "tasks": 397,
+          "success": 124
+        },
+        "12": {
+          "tasks": 597,
+          "success": 125
+        },
+        "8": {
+          "tasks": 3,
+          "success": 0
+        },
+        "9": {
+          "tasks": 50,
+          "success": 11
+        },
+        "13": {
+          "tasks": 3,
+          "success": 0
+        }
+      },
+      "failure_types": {
+        "local_coverage_failure": 1001,
+        "removed_goal_cell": 438,
+        "globally_unreachable": 28
+      },
+      "failure_step": {
+        "1": 545,
+        "2": 185,
+        "0": 433,
+        "3": 101,
+        "4": 81,
+        "5": 53,
+        "7": 22,
+        "6": 28,
+        "8": 14,
+        "9": 5
+      },
+      "failure_remaining_distance": {
+        "10": 370,
+        "9": 195,
+        "8": 111,
+        "7": 79,
+        "12": 143,
+        "11": 441,
+        "4": 25,
+        "6": 51,
+        "5": 40,
+        "13": 2,
+        "3": 9,
+        "2": 1
+      },
+      "failure_degree": {
+        "50": 35,
+        "31": 25,
+        "60": 26,
+        "32": 18,
+        "24": 13,
+        "30": 28,
+        "65": 22,
+        "34": 19,
+        "37": 20,
+        "35": 21,
+        "72": 15,
+        "39": 19,
+        "67": 23,
+        "66": 25,
+        "75": 14,
+        "58": 27,
+        "62": 23,
+        "54": 40,
+        "19": 14,
+        "56": 38,
+        "84": 8,
+        "64": 25,
+        "85": 4,
+        "14": 6,
+        "61": 26,
+        "45": 42,
+        "86": 3,
+        "89": 4,
+        "68": 22,
+        "73": 9,
+        "80": 12,
+        "83": 4,
+        "42": 21,
+        "69": 17,
+        "51": 31,
+        "79": 9,
+        "43": 34,
+        "22": 12,
+        "15": 7,
+        "36": 20,
+        "44": 22,
+        "18": 10,
+        "47": 20,
+        "57": 40,
+        "55": 33,
+        "52": 36,
+        "59": 27,
+        "77": 13,
+        "71": 21,
+        "25": 12,
+        "81": 5,
+        "28": 8,
+        "26": 12,
+        "46": 28,
+        "12": 7,
+        "23": 12,
+        "48": 29,
+        "10": 6,
+        "13": 3,
+        "9": 2,
+        "41": 22,
+        "40": 24,
+        "63": 33,
+        "29": 13,
+        "78": 6,
+        "49": 32,
+        "17": 8,
+        "53": 40,
+        "20": 10,
+        "33": 26,
+        "11": 4,
+        "74": 15,
+        "21": 11,
+        "92": 2,
+        "27": 6,
+        "38": 16,
+        "82": 8,
+        "70": 18,
+        "16": 7,
+        "76": 16,
+        "90": 4,
+        "87": 8,
+        "107": 1,
+        "94": 1,
+        "97": 1,
+        "8": 2,
+        "95": 1,
+        "104": 1,
+        "6": 1,
+        "98": 1,
+        "7": 1,
+        "5": 1
+      },
+      "failure_action_shape": {
+        "3": 222,
+        "0": 174,
+        "4": 130,
+        "1": 201,
+        "6": 221,
+        "5": 97,
+        "2": 184,
+        "7": 238
+      },
+      "cap_conflict_first_errors": 0,
+      "all_first_errors_are_ranking_errors": true
+    },
+    "training_original_tile_residual_goals": {
+      "tasks": 2000,
+      "success": 1321,
+      "by_true_distance": {
+        "11": {
+          "tasks": 937,
+          "success": 661
+        },
+        "10": {
+          "tasks": 1018,
+          "success": 631
+        },
+        "9": {
+          "tasks": 45,
+          "success": 29
+        }
+      },
+      "failure_types": {
+        "local_coverage_failure": 325,
+        "removed_goal_cell": 288,
+        "globally_unreachable": 66
+      },
+      "failure_step": {
+        "0": 129,
+        "1": 222,
+        "8": 7,
+        "3": 81,
+        "7": 11,
+        "4": 57,
+        "2": 95,
+        "6": 31,
+        "5": 41,
+        "9": 4,
+        "10": 1
+      },
+      "failure_remaining_distance": {
+        "10": 161,
+        "9": 181,
+        "3": 12,
+        "8": 90,
+        "7": 75,
+        "5": 33,
+        "6": 51,
+        "4": 11,
+        "11": 61,
+        "2": 4
+      },
+      "failure_degree": {
+        "53": 13,
+        "71": 4,
+        "19": 5,
+        "44": 10,
+        "37": 12,
+        "68": 6,
+        "21": 8,
+        "40": 12,
+        "72": 10,
+        "63": 16,
+        "32": 13,
+        "34": 10,
+        "33": 8,
+        "64": 19,
+        "54": 10,
+        "56": 9,
+        "65": 12,
+        "31": 13,
+        "66": 8,
+        "27": 7,
+        "39": 15,
+        "59": 11,
+        "76": 10,
+        "52": 12,
+        "83": 4,
+        "70": 16,
+        "51": 17,
+        "60": 15,
+        "29": 7,
+        "45": 13,
+        "48": 18,
+        "47": 6,
+        "67": 10,
+        "61": 11,
+        "69": 17,
+        "74": 14,
+        "42": 13,
+        "58": 20,
+        "55": 16,
+        "36": 6,
+        "50": 13,
+        "30": 7,
+        "28": 15,
+        "49": 8,
+        "35": 16,
+        "86": 2,
+        "79": 7,
+        "15": 3,
+        "77": 5,
+        "82": 4,
+        "73": 6,
+        "46": 12,
+        "23": 5,
+        "24": 10,
+        "93": 2,
+        "75": 6,
+        "41": 3,
+        "78": 7,
+        "81": 4,
+        "38": 11,
+        "80": 5,
+        "26": 7,
+        "98": 1,
+        "20": 5,
+        "22": 2,
+        "16": 3,
+        "17": 6,
+        "57": 8,
+        "62": 11,
+        "25": 4,
+        "90": 2,
+        "18": 2,
+        "43": 10,
+        "11": 1,
+        "13": 1,
+        "85": 1,
+        "14": 1,
+        "92": 1,
+        "95": 1,
+        "6": 1,
+        "84": 2,
+        "12": 1,
+        "96": 1
+      },
+      "failure_action_shape": {
+        "0": 78,
+        "1": 69,
+        "7": 103,
+        "3": 72,
+        "5": 107,
+        "4": 98,
+        "6": 84,
+        "2": 68
+      },
+      "cap_conflict_first_errors": 0,
+      "all_first_errors_are_ranking_errors": true
+    },
+    "cap_frequency": {
+      "scope": "Exact full-initial-source to every reachable goal in each training root; root-local counts overlap. Not all arbitrary-source pairs and not model error attribution.",
+      "distance_histogram": {
+        "0": 1000,
+        "1": 64698,
+        "2": 1738618,
+        "3": 25494471,
+        "4": 225437121,
+        "5": 1255719049,
+        "6": 4477485167,
+        "7": 10201623207,
+        "8": 14593518210,
+        "9": 12634724836,
+        "10": 6200564886,
+        "11": 1531486066,
+        "12": 146717209,
+        "13": 1422547,
+        "14": 4187
+      },
+      "roots_by_maximum_distance": {
+        "12": 722,
+        "13": 234,
+        "14": 18,
+        "11": 26
+      },
+      "distance13_or_more": 1426734,
+      "distance14_or_more": 4187,
+      "total_full_source_relations": 51296001272,
+      "examples": [
+        {
+          "root": 49,
+          "full_source_goals_distance14": 90,
+          "root_states": 78112440
+        },
+        {
+          "root": 115,
+          "full_source_goals_distance14": 393,
+          "root_states": 154931016
+        },
+        {
+          "root": 118,
+          "full_source_goals_distance14": 90,
+          "root_states": 118209792
+        },
+        {
+          "root": 143,
+          "full_source_goals_distance14": 81,
+          "root_states": 73047552
+        },
+        {
+          "root": 151,
+          "full_source_goals_distance14": 27,
+          "root_states": 26103072
+        },
+        {
+          "root": 171,
+          "full_source_goals_distance14": 24,
+          "root_states": 26061888
+        },
+        {
+          "root": 313,
+          "full_source_goals_distance14": 33,
+          "root_states": 234320632
+        },
+        {
+          "root": 339,
+          "full_source_goals_distance14": 3,
+          "root_states": 68716000
+        },
+        {
+          "root": 431,
+          "full_source_goals_distance14": 81,
+          "root_states": 96438072
+        },
+        {
+          "root": 437,
+          "full_source_goals_distance14": 1050,
+          "root_states": 399992320
+        },
+        {
+          "root": 441,
+          "full_source_goals_distance14": 30,
+          "root_states": 93206400
+        },
+        {
+          "root": 480,
+          "full_source_goals_distance14": 48,
+          "root_states": 29329920
+        },
+        {
+          "root": 525,
+          "full_source_goals_distance14": 234,
+          "root_states": 112671216
+        },
+        {
+          "root": 574,
+          "full_source_goals_distance14": 1529,
+          "root_states": 345435048
+        },
+        {
+          "root": 735,
+          "full_source_goals_distance14": 60,
+          "root_states": 74655360
+        },
+        {
+          "root": 748,
+          "full_source_goals_distance14": 243,
+          "root_states": 178547200
+        },
+        {
+          "root": 791,
+          "full_source_goals_distance14": 135,
+          "root_states": 73991016
+        },
+        {
+          "root": 944,
+          "full_source_goals_distance14": 36,
+          "root_states": 45467136
+        }
+      ],
+      "distance14_or_more_fraction": 8.162429616683357e-08
+    },
+    "historical_exact_failure_relation_gradient_hits": "not recorded; cannot reconstruct; new repair stream tracks exact cross-rank identities"
+  },
+  "repair_continuation": {
+    "source_commit": "d42863d",
+    "config": "experiments/blocks_distance_map/configs/blocks12_failure_repair.json",
+    "runtime": "/tmp/blocks12_failure_repair",
+    "parent": "/tmp/blocks12_joint_9aa8498/run/checkpoints/step_010000.pt",
+    "unreachable_label": 19,
+    "encoder_scale": 13,
+    "status": "training; no new quality result yet",
+    "review_window_not_acceptance": 3000
   }
 }

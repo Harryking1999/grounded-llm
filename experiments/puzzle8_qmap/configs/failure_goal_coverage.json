@@ -1,0 +1,113 @@
+{
+  "task": "puzzle8",
+  "seed": 20261018,
+  "rules": {
+    "board": [
+      3,
+      3
+    ],
+    "goal": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      0
+    ],
+    "move": "blank_direction",
+    "move_cost": 1
+  },
+  "data": {
+    "component": "all_states_reachable_from_standard_goal",
+    "intermediate_goals": [
+      24,
+      4,
+      4
+    ],
+    "eval_per_depth": 256,
+    "standard_goal_full_coverage": true
+  },
+  "model": {
+    "dimension": 128,
+    "hidden": 256,
+    "metric": "l1"
+  },
+  "training": {
+    "steps": 2000,
+    "batch_size": 262144,
+    "decision_batch_size": 262144,
+    "learning_rate": 0.0001,
+    "rank_weight": 1.0,
+    "rank_temperature": 1.0,
+    "eval_every": 1000,
+    "cpu_threads": 4,
+    "reuse_state_encodings": true
+  },
+  "evaluation": {
+    "decision_count": 4096,
+    "rollout_count": 1024,
+    "budget_multiplier": 2,
+    "stratified_tasks": true
+  },
+  "continuation": {
+    "maximum_validation_mae_increase": 0.25,
+    "checkpoint_selection": "all_state_restoration_with_validation_MAE_and_intermediate_success_guards",
+    "acceptance": {
+      "minimum_full_state_restoration_rate": 0.99,
+      "maximum_test_goal_mae_increase": 0.25,
+      "report_cycle_count": true
+    },
+    "parent_checkpoint": "/tmp/puzzle8_failure_retention/run/best.pt",
+    "minimum_validation_intermediate_solved": 367,
+    "minimum_full_state_restoration_solved": 171397
+  },
+  "graph_data": {
+    "fractions": [
+      0.2,
+      0.2,
+      0.6
+    ],
+    "route_fraction": 0.5,
+    "hard_fraction": 0.2,
+    "edge_fraction": 0.1,
+    "descendant_steps": [
+      0,
+      1,
+      2,
+      4,
+      8,
+      16,
+      31
+    ]
+  },
+  "purpose": "Joint exact-relation continuation after known-goal fitting improved while heldout relation success deteriorated. Preserve union of solved original training contexts from old82, retained94 and95 candidates; references select contexts only, never provide labels, scores or execution. All targets remain exact oracle distances/full legal forks and multistep descendants. Increase fresh training goals16to64 and refresh errors every250 updates while full fixed same-task evaluation remains1000. Preserve every broad sampler cursor, Adam, learning rate, original losses/weights/temperature/model and greedy62. Guard full restoration at least171397 and original validation intermediate367 before replacement. Parent is previous best under validation guards; repeated monitoring is not final independent acceptance. Two thousand updates is a feedback window.",
+  "failure_sampling": {
+    "structure_cache": "/tmp/puzzle8_full_coverage_b566aaa/graph_structure.npz",
+    "fresh_goals_per_refresh": 64,
+    "errors_per_distance_degree": 32,
+    "restoration_fraction": 0.3,
+    "descendant_steps": [
+      0,
+      0,
+      1,
+      2,
+      4,
+      8
+    ],
+    "graph_fraction": 0.5,
+    "retention_fraction": 0.5,
+    "retention_checkpoint": [
+      "/tmp/puzzle8_failure_repair/parent.pt",
+      "/tmp/puzzle8_failure_repair/run/stages/step_001000/checkpoint.pt",
+      "/tmp/puzzle8_failure_repair/run/stages/step_002000/checkpoint.pt"
+    ],
+    "retention_restore_checkpoint": [
+      "/tmp/puzzle8_failure_repair/run/stages/step_001000/checkpoint.pt",
+      "/tmp/puzzle8_failure_repair/run/stages/step_002000/checkpoint.pt"
+    ],
+    "refresh_every": 250
+  }
+}

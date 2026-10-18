@@ -1,0 +1,225 @@
+{
+  "source_commit": "ecfbb23",
+  "task": "hanoi8",
+  "parent": {
+    "checkpoint": "/zhanghanyue/experiment/grounded_llm_puzzle_qmaps/runs/hanoi8_6155519/best.pt",
+    "source_commit": "6155519",
+    "step": 100000
+  },
+  "best_step": 40000,
+  "last_step": 60000,
+  "training_seconds": 929.92,
+  "selection": "all-state tower restoration with fixed validation distance guard",
+  "best_model_training_coverage": {
+    "pair_broad_passes": 0.4085786662506593,
+    "decision_broad_passes": 0.2969926218547228,
+    "tower_pair_passes": 416.6666666666667,
+    "tower_decision_passes": 207.3170731707317
+  },
+  "last_model_training_coverage": {
+    "pair_broad_passes": 0.6128679993759889,
+    "decision_broad_passes": 0.4454889327820842,
+    "tower_pair_passes": 625.0,
+    "tower_decision_passes": 310.9756097560976
+  },
+  "initial": {
+    "all_state_towers": {
+      "nonterminal_tasks": 19680,
+      "within_budget": 3094,
+      "rate": 0.15721544715447155,
+      "horizon": 510,
+      "by_goal": {
+        "0": {
+          "within_budget": 20,
+          "rate": 0.003048780487804878,
+          "shortest_action_rate": 0.9492378048780488,
+          "two_cycles": 24,
+          "tower_starts_solved": {
+            "3280": false,
+            "6560": false
+          }
+        },
+        "3280": {
+          "within_budget": 3062,
+          "rate": 0.46676829268292686,
+          "shortest_action_rate": 0.9358231707317073,
+          "two_cycles": 14,
+          "tower_starts_solved": {
+            "0": false,
+            "6560": true
+          }
+        },
+        "6560": {
+          "within_budget": 12,
+          "rate": 0.001829268292682927,
+          "shortest_action_rate": 0.9457317073170731,
+          "two_cycles": 27,
+          "tower_starts_solved": {
+            "0": false,
+            "3280": false
+          }
+        }
+      }
+    },
+    "standard_towers": {
+      "count": 6,
+      "solved": 1,
+      "success_rate": 0.16666666666666666,
+      "cycle_rate": 0.8333333333333334,
+      "budget_exhausted": 0,
+      "horizon": 510,
+      "mean_extra_steps_on_solved": 13.0,
+      "illegal_action_rate": 0.0,
+      "by_start_distance": {
+        "255": {
+          "count": 6,
+          "success_rate": 0.16666666666666666
+        }
+      },
+      "per_task": {
+        "solved": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          true
+        ],
+        "steps": [
+          263,
+          199,
+          230,
+          252,
+          260,
+          268
+        ],
+        "cycles": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          false
+        ]
+      }
+    },
+    "random_test": {
+      "pairs": {
+        "count": 3224877,
+        "huber": 1.399430577195915,
+        "mae": 1.8008378816774833,
+        "spearman": 0.9986323075639857
+      },
+      "rollout": {
+        "count": 1024,
+        "solved": 213,
+        "success_rate": 0.2080078125,
+        "cycle_rate": 0.7919921875,
+        "budget_exhausted": 0,
+        "horizon": 510,
+        "mean_extra_steps_on_solved": 4.516431924882629,
+        "illegal_action_rate": 0.0
+      }
+    }
+  },
+  "final": {
+    "all_state_towers": {
+      "nonterminal_tasks": 19680,
+      "within_budget": 19641,
+      "rate": 0.9980182926829269,
+      "horizon": 510,
+      "by_goal": {
+        "0": {
+          "within_budget": 6560,
+          "rate": 1.0,
+          "shortest_action_rate": 0.9992378048780488,
+          "two_cycles": 0,
+          "tower_starts_solved": {
+            "3280": true,
+            "6560": true
+          }
+        },
+        "3280": {
+          "within_budget": 6521,
+          "rate": 0.9940548780487805,
+          "shortest_action_rate": 0.9952743902439024,
+          "two_cycles": 4,
+          "tower_starts_solved": {
+            "0": true,
+            "6560": true
+          }
+        },
+        "6560": {
+          "within_budget": 6560,
+          "rate": 1.0,
+          "shortest_action_rate": 0.9986280487804878,
+          "two_cycles": 0,
+          "tower_starts_solved": {
+            "0": true,
+            "3280": true
+          }
+        }
+      }
+    },
+    "standard_towers": {
+      "count": 6,
+      "solved": 6,
+      "success_rate": 1.0,
+      "cycle_rate": 0.0,
+      "budget_exhausted": 0,
+      "horizon": 510,
+      "mean_extra_steps_on_solved": 0.3333333333333333,
+      "illegal_action_rate": 0.0,
+      "by_start_distance": {
+        "255": {
+          "count": 6,
+          "success_rate": 1.0
+        }
+      },
+      "per_task": {
+        "solved": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ],
+        "steps": [
+          257,
+          255,
+          255,
+          255,
+          255,
+          255
+        ],
+        "cycles": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      }
+    },
+    "random_test": {
+      "pairs": {
+        "count": 3224877,
+        "huber": 1.349296721039223,
+        "mae": 1.6967862447169773,
+        "spearman": 0.998494838076434
+      },
+      "rollout": {
+        "count": 1024,
+        "solved": 219,
+        "success_rate": 0.2138671875,
+        "cycle_rate": 0.7861328125,
+        "budget_exhausted": 0,
+        "horizon": 510,
+        "mean_extra_steps_on_solved": 2.65296803652968,
+        "illegal_action_rate": 0.0
+      }
+    }
+  }
+}

@@ -60,3 +60,8 @@ GPU 0 的汉诺塔独立运行，积木诊断实验保持原样。依赖已在�
 完整精确起终点矩阵正在平台CPU后台构造：源码8f9ba92，合同 [full_pair_data.json](../configs/full_pair_data.json)，数据目录同根 data/puzzle8_full_pairs_8f9ba92，日志 logs/puzzle8_full_pairs_8f9ba92.log。规模181,440²，即32,920,473,600对，int8约32.9GB；完成标记仅在所有目标行写好后生成。
 
 后续单组联合合同为 [full_graph_joint.json](../configs/full_graph_joint.json)。训练池合并全图起终点对、全动作边、每个父状态的全部第一步分支、多尺度后续、跨分支精确距离及最优后续闭合，保留原数据与复原错误重放。巨量组合由索引流遍历；原留出目标的边界继续保护。不得把数据全表覆盖写成网络已经学会全部关系。
+
+
+分叉阶段795d1a1已完成，最佳120k、最终130k；[紧凑结果](branch_summary.json)。保持原损失，所选地图全状态复原128,915/181,439（71.05%），同题720/1024，仍有2,255个两状态环。中间目标测试285/1024，距离MAE3.86；相比原始基线复原和关系均改善，但仍未达到可用要求。该阶段权重仅作为下一阶段全图联合训练的纯数据暖启动，不采用被否决的额外损失权重。
+
+完整数据生成已改用经CPU精确行核对的GPU批量BFS接续，源码545f4f5、GPU1、进程1338；保留原CPU已完成目标行，仅计算剩余目标行，不改变标签。源数据目录仍为data/puzzle8_full_pairs_8f9ba92，完成summary记录GPU接续来源。单组全图联合训练已部署fb7ffe6，在/tmp/qmap_fb7ffe6缓存相同Git源码运行（共享存储解包曾阻塞，正式归档仍在code/qmap_fb7ffe6/source.tar）；数据和产物继续留持久根目录。queue_puzzle.sh等待完整表后启动runs/puzzle8_full_graph_fb7ffe6，原额外对照不恢复。

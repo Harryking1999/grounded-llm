@@ -1,0 +1,47 @@
+{
+  "source_commit": "795d1a1",
+  "task": "puzzle8",
+  "parent": {
+    "checkpoint": "/zhanghanyue/experiment/grounded_llm_puzzle_qmaps/runs/puzzle8_6155519/best.pt",
+    "source_commit": "6155519",
+    "step": 40000
+  },
+  "best_step": 120000,
+  "last_step": 130000,
+  "training_seconds": 1576.19,
+  "selection": "all-state restoration count subject to fixed validation MAE guard; identical in both continuation arms",
+  "policy": {
+    "nonterminal_states": 181439,
+    "horizon": 62,
+    "eventually_solved": 128915,
+    "within_budget": 128915,
+    "within_budget_rate": 0.71051427752578,
+    "shortest_action_rate": 0.9452818853719432,
+    "wrong_decisions": 9928,
+    "two_cycles": 2255,
+    "cycle_nodes": 4510,
+    "other_cycle_nodes": 0,
+    "local_minima": 12651,
+    "restoration_mae": 0.7033503776184635,
+    "previously_solved_lost": 10662,
+    "previously_failed_gained": 90174,
+    "same1024": {
+      "count": 1024,
+      "solved": 720,
+      "cycle_count": 304,
+      "mean_extra_steps_on_solved": 0.3055555555555556
+    }
+  },
+  "intermediate": {
+    "validation": {
+      "mae": 3.683527164232335,
+      "shortest_action_rate": 0.7373046875,
+      "solved": 289
+    },
+    "test": {
+      "mae": 3.8599252069729775,
+      "shortest_action_rate": 0.74169921875,
+      "solved": 285
+    }
+  }
+}

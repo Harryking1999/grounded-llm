@@ -1,4 +1,5 @@
 import contextlib
+import copy
 import io
 import json
 from pathlib import Path
@@ -11,9 +12,36 @@ from experiments.puzzle8_qmap.src.environment import Puzzle8
 from experiments.puzzle8_qmap.src.data import build
 from experiments.puzzle8_qmap.src.run import train
 from experiments.puzzle8_qmap.src.model import MapReader
+from experiments.puzzle8_qmap.src.model import QMap, soft_rank_loss
+from torch.nn import functional as F
 
 
 class PuzzleMapTest(unittest.TestCase):
+    def test_shared_state_encoding_keeps_original_objective_and_gradients(self):
+        torch.manual_seed(18)
+        model = QMap(dimension=8, hidden=16)
+        cached_model = copy.deepcopy(model)
+        features = torch.rand(17, 81)
+        rows = torch.randint(17, (31, 2))
+        tasks = torch.randint(17, (23, 2))
+        children = torch.randint(-1, 17, (23, 4))
+        children[:, 0] = 0
+        valid = children >= 0
+        distances = torch.randint(32, (31,)).float()
+        labels = torch.randint(32, (23, 4))
+        def objective(net, reuse):
+            table = net.encode(features) if reuse else None
+            def q(ids):
+                return table[ids] if reuse else net.encode(features[ids])
+            return (F.smooth_l1_loss(net.distance(q(rows[:, 0]), q(rows[:, 1])), distances)
+                    + soft_rank_loss(net.distance(q(children.clamp_min(0)), q(tasks[:, 1])[:, None]),
+                                     labels, valid, 1.))
+        original, cached = objective(model, False), objective(cached_model, True)
+        torch.testing.assert_close(original, cached)
+        original.backward(); cached.backward()
+        for a, b in zip(model.parameters(), cached_model.parameters()):
+            torch.testing.assert_close(a.grad, b.grad, atol=1e-6, rtol=1e-4)
+
     def test_complete_graph_exact_labels_split_and_actual_update(self):
         env = Puzzle8()
         self.assertEqual(env.size, 181440)

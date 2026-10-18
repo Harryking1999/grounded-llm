@@ -41,6 +41,22 @@ class StreamEpoch:
                 self.key = np.uint64(self.rng.integers(0, 2 ** 63)) & self.mask
         return np.concatenate(pieces) if pieces else np.empty(0, dtype=np.int64)
 
+    def state_dict(self):
+        return {"size": self.size, "key": int(self.key),
+                "position": self.position, "draws": self.draws}
+
+    def load_state_dict(self, state):
+        if state["size"] != self.size or not 0 <= state["position"] < self.size:
+            raise ValueError("Mismatched stream state")
+        self.key = np.uint64(state["key"])
+        self.position, self.draws = int(state["position"]), int(state["draws"])
+
+    def resume_first_pass(self, draws):
+        """Legacy checkpoints record counts but not stream keys; first key is reproducible."""
+        if not 0 <= draws < self.size:
+            raise ValueError("Legacy stream recovery requires an unwrapped first pass")
+        self.position = self.draws = int(draws)
+
 
 def structure(env, allowed, protected, levels):
     """Every first-action fork, multiscale descendants, cross-branch endpoints.
@@ -136,6 +152,41 @@ class GraphData:
         parents = parents[self.allowed[parents]]
         if len(parents):
             self.hard = np.column_stack((parents, np.zeros(len(parents), dtype=int))).astype(np.int32)
+
+    def state_dict(self):
+        return {"rng": self.rng.bit_generator.state,
+                "streams": {name: getattr(self, name).state_dict() for name in ("gp", "gr", "rp", "rr")},
+                "epochs": {name: {key: getattr(getattr(self, name), key)
+                                   for key in ("order", "position", "draws")}
+                           for name in ("sp", "sr", "es")},
+                "coverage": {name: {key: getattr(getattr(self, name), key)
+                                     for key in ("order", "position", "completed")}
+                             for name in ("ps", "rs")},
+                "hard": self.hard, "hard_pair_draws": self.hard_pair_draws,
+                "hard_decision_draws": self.hard_decision_draws,
+                "seen_sources": self.seen_sources, "seen_goals": self.seen_goals}
+
+    def load_state_dict(self, state):
+        for name, values in state["streams"].items():
+            getattr(self, name).load_state_dict(values)
+        for family in ("epochs", "coverage"):
+            for name, values in state[family].items():
+                sampler = getattr(self, name)
+                if len(values["order"]) != len(sampler.order):
+                    raise ValueError("Mismatched graph sampler state")
+                for key, value in values.items():
+                    setattr(sampler, key, value)
+        for name in ("hard", "hard_pair_draws", "hard_decision_draws", "seen_sources", "seen_goals"):
+            setattr(self, name, state[name])
+        self.rng.bit_generator.state = state["rng"]
+
+    def resume_legacy_broad(self, coverage):
+        # Construction order and seed must match the parent. Only these streams
+        # are still in their first epoch and can be recovered from counts alone.
+        self.gp.resume_first_pass(coverage["all_pairs_draws"])
+        self.gr.resume_first_pass(coverage["all_decision_draws"])
+        print(json.dumps({"legacy_broad_stream_resume": self.report(),
+                          "note": "Broad streams continue their original permutation; replay samplers restart. Future checkpoints save all sampler state."}), flush=True)
 
     def counts(self, count):
         a, b = [round(count * f) for f in self.options["fractions"][:2]]

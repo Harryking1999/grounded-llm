@@ -45,9 +45,32 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
     mixture = (GraphData(env, data, config["graph_data"], rng, out) if "graph_data" in config else
                BranchData(env, data, config["branch_data"], rng, out) if "branch_data" in config else
                DataMix(env, data, config["data_sampling"], rng) if "data_sampling" in config else None)
+    if checkpoint is not None and isinstance(mixture, GraphData):
+        if "graph_sampler_state" in saved:
+            if any(config[k] != saved["config"][k] for k in ("seed", "graph_data")):
+                raise ValueError("Graph sampler recovery requires matching seed and data mixture")
+            mixture.load_state_dict(saved["graph_sampler_state"])
+        elif "graph_data" in saved["config"]:
+            if any(config[k] != saved["config"][k] for k in ("seed", "graph_data")):
+                raise ValueError("Legacy graph stream recovery requires matching seed and data mixture")
+            mixture.resume_legacy_broad(saved["coverage"])
+    target = config.get("continuation", {}).get("minimum_broad_passes")
+    if target is not None:
+        if not isinstance(mixture, GraphData):
+            raise ValueError("Broad exposure budget requires joint graph data")
+        _, _, count = mixture.counts(options["batch_size"])
+        count -= round(count * mixture.options["edge_fraction"])
+        pair_broad = count - round(count * mixture.options["route_fraction"])
+        _, _, count = mixture.counts(options["decision_batch_size"])
+        rank_broad = count - round(count * mixture.options["route_fraction"])
+        if any(stream.draws + options["steps"] * per_step < target * stream.size
+               for stream, per_step in ((mixture.gp, pair_broad), (mixture.gr, rank_broad))):
+            raise ValueError("Continuation budget does not reach the requested actual broad exposure")
     features = torch.as_tensor(env.features(np.arange(env.size)), device=device)
+    encoded = None
     def q(ids):
-        return model.encode(features[torch.as_tensor(ids, device=device, dtype=torch.long)])
+        index = torch.as_tensor(ids, device=device, dtype=torch.long)
+        return encoded[index] if encoded is not None else model.encode(features[index])
     idx = task_indices(env, data, "validation", config["evaluation"]["decision_count"], config)
     vt = data["tasks_validation"][idx]
     best, best_step = float("inf"), 0
@@ -57,6 +80,7 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
                     "model": model.state_dict(), "optimizer": optimizer.state_dict(),
                     "config": config, "source_commit": source_commit,
                     "step": (parent["step"] if parent else 0) + step, "continuation_step": step, "parent": parent,
+                    **({"graph_sampler_state": mixture.state_dict()} if isinstance(mixture, GraphData) else {}),
                     "coverage": (mixture.report() if mixture is not None else
                                  {"pair_passes": ps.passes, "decision_passes": rs.passes})}, path)
     initial_policy = initial_validation_mae = None
@@ -73,6 +97,9 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
     with (out / "progress.jsonl").open("w") as log:
         for step in range(1, options["steps"] + 1):
             model.train()
+            # Reuse the same deterministic MLP result for repeated state IDs.
+            # Losses, reductions, labels and gradients are otherwise unchanged.
+            encoded = model.encode(features) if options.get("reuse_state_encodings", False) else None
             rows = (pairs[ps.draw(options["batch_size"])] if mixture is None
                     else mixture.pairs(options["batch_size"]))
             pair_loss = F.smooth_l1_loss(model.distance(q(rows[:, 0]), q(rows[:, 1])),
@@ -91,6 +118,7 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), 5.)
             optimizer.step()
+            encoded = None
             if step == 1 or step % options["eval_every"] == 0 or step == options["steps"]:
                 model.eval()
                 pm = pair_metrics(model, env, data["pairs_validation"], device)
@@ -119,6 +147,8 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
                     record.update(policy=policy, sampling=mixture.report() if mixture is not None else None)
                     if mixture is not None:
                         record.update(pair_passes=mixture.ps.passes, decision_passes=mixture.rs.passes)
+                if isinstance(mixture, GraphData):
+                    save(step, out / "last.pt")
                 log.write(json.dumps(record) + "\n"); log.flush()
                 print(json.dumps(record), flush=True)
     save(step, out / "last.pt")
@@ -129,6 +159,9 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
                "selection": ("all-state restoration count subject to fixed validation MAE guard"
                              if parent else "heldout intermediate goal distance Huber + full soft rank cross entropy after one coverage pass"),
                "parent": parent, "initial_policy": initial_policy,
+               "best_model_training_coverage": saved["coverage"],
+               "last_model_training_coverage": (mixture.report() if mixture is not None else
+                                                 {"pair_passes": ps.passes, "decision_passes": rs.passes}),
                "torch_version": torch.__version__, "numpy_version": np.__version__,
                "final": evaluate(model, env, data, config, device)}
     if parent is not None:

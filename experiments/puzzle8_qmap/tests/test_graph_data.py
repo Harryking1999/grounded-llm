@@ -1,4 +1,5 @@
 from pathlib import Path
+import copy
 import tempfile
 import unittest
 import numpy as np
@@ -6,6 +7,17 @@ from experiments.puzzle8_qmap.src.graph_data import StreamEpoch, GraphData
 
 
 class GraphDataTest(unittest.TestCase):
+    def test_legacy_first_pass_resume_skips_exposed_rows(self):
+        old = StreamEpoch(1031, np.random.default_rng(18))
+        prefix = old.draw(113)
+        resumed = StreamEpoch(1031, np.random.default_rng(18))
+        resumed.resume_first_pass(113)
+        remainder = resumed.draw(918)
+        self.assertEqual(len(np.intersect1d(prefix, remainder)), 0)
+        np.testing.assert_array_equal(np.sort(np.r_[prefix, remainder]), np.arange(1031))
+        with self.assertRaises(ValueError):
+            resumed.resume_first_pass(1031)
+
     def test_large_space_stream_is_a_complete_permutation(self):
         for size in [1, 2, 3, 17, 257, 1031]:
             sampler = StreamEpoch(size, np.random.default_rng(18))
@@ -48,6 +60,15 @@ class GraphDataTest(unittest.TestCase):
             self.assertEqual(sampler.gr.size, len(sampler.parents) * len(sampler.sources))
             self.assertFalse(np.isin(sampler.routes, sampler.protected).any())
             self.assertEqual(sampler.report()["observed_broad_goals"], len(sampler.sources))
+            saved = copy.deepcopy(sampler.state_dict())
+            expected_pairs = sampler.pairs(111)
+            expected_tasks = sampler.tasks(79)
+            restored = GraphData(env, data, options, np.random.default_rng(42), Path(temp))
+            restored.load_state_dict(saved)
+            np.testing.assert_array_equal(restored.pairs(111), expected_pairs)
+            for actual, expected in zip(restored.tasks(79), expected_tasks):
+                np.testing.assert_array_equal(actual, expected)
+            self.assertEqual(restored.report(), sampler.report())
 
 
 if __name__ == "__main__":

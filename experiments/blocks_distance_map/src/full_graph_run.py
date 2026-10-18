@@ -1,0 +1,155 @@
+"""Continue the original Q/Adam on exact multi-root graph relations and full forks."""
+import argparse
+import json
+import os
+from pathlib import Path
+import time
+
+import numpy as np
+import torch
+from torch.nn import functional as F
+from torch.nn.parallel import DistributedDataParallel
+import torch.distributed as dist
+
+from .full_graph_sampling import JointData
+from .model import BoardEncoder, soft_rank_loss
+from .multiboard_run import atomic_save
+
+
+def relation_batch(batch, device, cap):
+    source, goal, truth, rs, rg, rt, groups = batch
+    packed = np.concatenate((source, goal, rs, rg))
+    states, indices = np.unique(packed, axis=0, return_inverse=True)
+    bits = ((states[:, np.arange(100) // 64] >>
+             (np.arange(100, dtype=np.uint64) % 64)) & 1).astype(np.float32)
+    a, b, c = len(source), len(rs), len(source) * 2
+    pairs = np.concatenate((np.stack((indices[:a], indices[a:c]), -1),
+                            np.stack((indices[c:c+b], indices[c+b:]), -1)))
+    order = np.argsort(groups, kind="stable")
+    counts = np.bincount(groups)
+    offsets = np.cumsum(counts) - counts
+    columns = np.arange(len(groups)) - np.repeat(offsets, counts)
+    slots = groups[order] * counts.max() + columns
+    return (torch.as_tensor(bits, device=device), torch.as_tensor(pairs, device=device),
+            torch.as_tensor(np.where(truth < 0, cap, truth), device=device).float(),
+            torch.as_tensor(np.where(rt[order] < 0, cap, rt[order]), device=device).float(),
+            torch.as_tensor(order, device=device), torch.as_tensor(slots, device=device),
+            (len(counts), int(counts.max())))
+
+
+def run(config, out, source_commit, smoke_steps=None, resume=None):
+    world = int(os.environ.get("WORLD_SIZE", 1))
+    rank = int(os.environ.get("RANK", 0))
+    local = int(os.environ.get("LOCAL_RANK", 0))
+    device = torch.device(f"cuda:{local}" if torch.cuda.is_available() else "cpu")
+    if world > 1:
+        torch.cuda.set_device(local)
+        dist.init_process_group("nccl")
+    options = config["training"]
+    torch.set_num_threads(options["cpu_threads"])
+    torch.manual_seed(options["seed"])
+    parent = torch.load(config["parent_checkpoint"], map_location=device, weights_only=False)
+    old = parent["config"]["training"]
+    if options["original_cap"] != parent["cap"]:
+        raise ValueError("Original unreachable label cap changed")
+    for key in ("temperature", "listwise_weight"):
+        if options[key] != old[key]:
+            raise ValueError(f"Original loss setting changed: {key}")
+    model_config = parent["config"]["model"]
+    raw = BoardEncoder(model_config["state_dim"], model_config["encoder_hidden_dim"],
+                       parent["cap"], parent["metric"]).to(device)
+    raw.load_state_dict(parent["model"])
+    optimizer = torch.optim.Adam(raw.parameters(), lr=options["learning_rate"])
+    optimizer.load_state_dict(parent["optimizer"])
+    for group in optimizer.param_groups:
+        group["lr"] = options["learning_rate"]
+    model = DistributedDataParallel(raw, device_ids=[local]) if world > 1 else raw
+    sampler = JointData(config["graph_data"], config["legacy_data"], options, rank, world)
+    out = Path(out)
+    first_step = 0
+    if resume is not None:
+        restored = torch.load(resume, map_location=device, weights_only=False)
+        first_step = restored["continuation_step"]
+        raw.load_state_dict(restored["model"])
+        optimizer.load_state_dict(restored["optimizer"])
+        sampler.load_state_dict(torch.load(out / f"sampler_{first_step:06d}_rank{rank}.pt",
+                                          map_location="cpu", weights_only=False))
+    if rank == 0:
+        if resume is None:
+            out.mkdir(parents=True, exist_ok=False)
+            (out / "checkpoints").mkdir()
+            (out / "config.json").write_text(json.dumps(config, indent=2) + "\n")
+            (out / "source_commit.txt").write_text(source_commit + "\n")
+    if world > 1:
+        dist.barrier()
+    started = time.monotonic()
+    last = smoke_steps or options["steps"]
+    for step in range(first_step + 1, last + 1):
+        begin = time.monotonic()
+        arrays = sampler.batch(options["batch_size_per_rank"], options["rank_contexts_per_rank"])
+        bits, pairs, truth, rt, order, slots, shape = relation_batch(arrays, device, parent["cap"])
+        prepared = time.monotonic()
+        scores = model(bits, pairs)
+        point = F.smooth_l1_loss(scores[:len(truth)], truth)
+        rank_scores = torch.zeros(shape[0] * shape[1], device=device).scatter(
+            0, slots, scores[len(truth):][order]).reshape(shape)
+        rank_truth = torch.zeros(shape[0] * shape[1], device=device).scatter(0, slots, rt).reshape(shape)
+        valid = torch.zeros(shape[0] * shape[1], device=device, dtype=torch.bool)
+        valid[slots] = True
+        ranking = soft_rank_loss(rank_scores, rank_truth, valid.reshape(shape), options["temperature"])
+        loss = point + options["listwise_weight"] * ranking
+        optimizer.zero_grad(set_to_none=True)
+        loss.backward()
+        optimizer.step()
+        if step == 1 or step % options["log_every"] == 0 or step == smoke_steps:
+            if rank == 0:
+                record = {"step": step, "seconds": time.monotonic() - started,
+                          "sampling_seconds": prepared - begin,
+                          "pointwise": point.item(), "soft_rank": ranking.item(),
+                          "unique_batch_states": len(bits), "exposure": sampler.report()}
+                with (out / "progress.jsonl").open("a") as handle:
+                    handle.write(json.dumps(record) + "\n")
+                print(json.dumps(record), flush=True)
+        if step % options["checkpoint_every"] == 0 or step == last:
+            # Sampler states stay separate so NumPy RNG metadata never enters
+            # inference checkpoints loaded by the existing weights-only reader.
+            atomic_save(sampler.state_dict(), out / f"sampler_{step:06d}_rank{rank}.pt")
+            actions = torch.as_tensor(sampler.action_exposed, device=device, dtype=torch.int32)
+            if world > 1:
+                dist.all_reduce(actions, op=dist.ReduceOp.MAX)
+            reports = [None] * world if rank == 0 else None
+            if world > 1:
+                dist.gather_object(sampler.report(), reports, dst=0)
+            else:
+                reports = [sampler.report()]
+            if rank == 0:
+                path = out / "checkpoints" / f"step_{step:06d}.pt"
+                atomic_save({"model_type": "board_mlp", "model": raw.state_dict(),
+                             "optimizer": optimizer.state_dict(), "step": parent["step"] + step,
+                             "continuation_step": step, "metric": parent["metric"], "cap": parent["cap"],
+                             "config": {"model": model_config, "training": options},
+                             "source_commit": source_commit}, path)
+                exposure = sampler.report()
+                exposure["all_rank_action_types_in_candidate_rows"] = int(actions.sum().item())
+                exposure["per_rank_draw_reports"] = reports
+                (out / f"exposure_{step:06d}.json").write_text(json.dumps(exposure, indent=2) + "\n")
+            if world > 1:
+                dist.barrier()
+    sampler.close()
+    if world > 1:
+        dist.destroy_process_group()
+
+
+def main():
+    parser = argparse.ArgumentParser(__doc__)
+    parser.add_argument("--config", type=Path, required=True)
+    parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument("--source-commit", required=True)
+    parser.add_argument("--smoke-steps", type=int)
+    parser.add_argument("--resume", type=Path)
+    args = parser.parse_args()
+    run(json.loads(args.config.read_text()), args.out, args.source_commit, args.smoke_steps, args.resume)
+
+
+if __name__ == "__main__":
+    main()

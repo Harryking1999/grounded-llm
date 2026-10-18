@@ -1,0 +1,27 @@
+{
+  "study": "blocks_distance_map",
+  "scope": "one_shared_original_Q_all_1000_complete_twelve_placement_graphs",
+  "parent_checkpoint": "/zhanghanyue/experiment/grounded_llm_blocks12_qmap/models/parent_986cb4d_step015000.pt",
+  "graph_data": "/tmp/blocks12_graphs_676140c",
+  "legacy_data": "/zhanghanyue/experiment/grounded_llm_blocks12_qmap/data/legacy_tree_continue_986cb4d.npz",
+  "baseline_cases": "/zhanghanyue/experiment/grounded_llm_blocks12_qmap/runs/blocks12_baseline_571b4d6/cases.json",
+  "training": {
+    "seed": 2026101851,
+    "learning_rate": 0.0001,
+    "steps": 10000,
+    "batch_size_per_rank": 2048,
+    "rank_contexts_per_rank": 256,
+    "boards_per_batch": 4,
+    "legacy_fraction": 0.2,
+    "broad_fraction": 0.25,
+    "clear_fraction": 0.35,
+    "listwise_weight": 1.0,
+    "temperature": 1.0,
+    "original_cap": 13,
+    "cpu_threads": 2,
+    "log_every": 100,
+    "checkpoint_every": 1000
+  },
+  "evaluation": {"train_roots": 100, "oracle_seconds": 14400, "oracle_cache_limit": 8000000},
+  "policy": "unchanged_greedy_all_legal_successors_no_search_no_oracle_action_selection"
+}

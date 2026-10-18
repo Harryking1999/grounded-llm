@@ -1,5 +1,31 @@
 # 积木状态地图
 
+## 12块原形状多初盘完整图续训
+
+正式合同为 [blocks12_full_graph_joint.json](configs/blocks12_full_graph_joint.json)。
+`full_graph_run` 从已验收的 `986cb4d` 父权重与 Adam 状态继续训练，同一 Q 联合接收旧关系、
+1000个不同12次构造初盘的精确起终点关系、清空、不同步数后续和全部合法候选。
+Huber、原 soft-rank、温度与权重保持不变。BDD完整图复用现存数据，不能将1000根的
+root-local计数称为整个积木任务的全部状态。阶段记录与限制见
+[12块联合训练报告](results/blocks12_joint_report.md)。
+
+```bash
+python -m torch.distributed.run --standalone --nproc_per_node=2 \
+  -m experiments.blocks_distance_map.src.full_graph_run \
+  --config experiments/blocks_distance_map/configs/blocks12_full_graph_joint.json \
+  --out RUN --source-commit COMMIT
+python -m experiments.blocks_distance_map.src.full_graph_eval \
+  --config experiments/blocks_distance_map/configs/blocks12_full_graph_joint.json \
+  --checkpoint RUN/checkpoints/step_001000.pt --out RUN/evaluation/step_001000.json \
+  --source-commit COMMIT --device cpu
+```
+
+每1000次更新保存checkpoint、匹配的各rank采样状态和曝光。实际曝光按距离桶、根和rank
+报告；非重复全对遍历只为直接Huber broad流提供精确计数，其余为draw数。
+`--resume RUN/checkpoints/step_001000.pt` 与相同 `--out RUN` 恢复模型、Adam及匹配采样状态。
+固定200个未进入训练的初盘共600题是反复查看的监测集；另记录100个训练初盘表现。
+候选仅在清空和中间目标均不低于父模型及此前选定候选时晋级，原父权重始终保留。
+
 本目录维护冻结棋盘编码器 Q、精确裁判、地图监督和纯地图评测。最新对照实验采用补清空与长程关系后续训 15,000 步的 Q：`tree_continue_986cb4d/checkpoints/step_015000.pt`；相同 510 题独立贪心到达 397/510，旧版为 345/510。该对照和来源边界见 [结果报告](results/report.md)，接入 LLM 的新实验见 [map_sft_baselines](../map_sft_baselines/README.md)。
 
 # Blocks distance-supervised Q-map

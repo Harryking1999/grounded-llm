@@ -82,7 +82,23 @@ def learning_rate_factor(step,total,training):
     if schedule!='cosine':raise ValueError('Unsupported learning-rate scheduler')
     return scheduler_factor(step,total,warmup,training['cosine_minimum_ratio'])
 
-def validate_resume_contract(saved,config,baseline):
+def validate_resume_contract(saved,config,baseline,allow_horizon_extension=False):
+    if allow_horizon_extension:
+        previous=saved['config']
+        old_training,new_training=previous['training'],config['training']
+        old_total,new_total=training_steps(previous),training_steps(config)
+        # Only an explicit longer horizon is permitted; the LR prefix must be identical.
+        if (new_total<=old_total or
+                new_training.get('scheduler_total_steps',0)<new_total or
+                old_training.get('scheduler_total_steps')!=new_training.get('scheduler_total_steps')):
+            raise ValueError('Extension requires a longer budget and an unchanged explicit scheduler horizon')
+        old_recipe={k:v for k,v in old_training.items() if k not in ('epochs','maximum_updates')}
+        new_recipe={k:v for k,v in new_training.items() if k not in ('epochs','maximum_updates')}
+        if old_recipe!=new_recipe:
+            raise ValueError('Extension may only change epochs and maximum_updates')
+        from copy import deepcopy
+        saved=deepcopy(saved)
+        saved['config']['training']=dict(new_training)
     recipe=('model','seed','data','map','training','maximum_sequence_tokens')
     if (saved['baseline']!=baseline or saved['config']['baselines'][baseline]!=config['baselines'][baseline]
             or any(saved['config'][key]!=config[key] for key in recipe)):
@@ -109,7 +125,9 @@ def main():
     p=argparse.ArgumentParser()
     for name in ('config','data','model-path','out'):p.add_argument('--'+name,type=Path,required=True)
     p.add_argument('--baseline',required=True);p.add_argument('--smoke-steps',type=int);p.add_argument('--resume',type=Path)
+    p.add_argument('--extend-training',action='store_true',help='Explicitly extend a completed run without changing its optimizer or LR schedule')
     a=p.parse_args();cfg=json.loads(a.config.read_text());spec=cfg['baselines'][a.baseline];t=dict(cfg['training'],**spec.get('training',{}))
+    if a.extend_training and not a.resume:raise ValueError('Extension requires a resume checkpoint')
     rank,local,world=int(os.environ['RANK']),int(os.environ['LOCAL_RANK']),int(os.environ['WORLD_SIZE'])
     accumulation=t['gradient_accumulation_steps']
     if world!=t['world_size'] or world*t['micro_batch']*accumulation!=t['global_batch']:
@@ -133,7 +151,7 @@ def main():
     step=0
     if a.resume:
         state=json.loads((a.resume/'state.json').read_text())
-        validate_resume_contract(state,cfg,a.baseline)
+        validate_resume_contract(state,cfg,a.baseline,allow_horizon_extension=a.extend_training)
         saved=torch.load(a.resume/'resume.pt',map_location='cpu' if sharded else device,weights_only=False)
         if sharded:
             from torch.distributed.fsdp import FullyShardedDataParallel as FSDP, StateDictType, FullStateDictConfig

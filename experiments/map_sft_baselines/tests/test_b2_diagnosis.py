@@ -4,6 +4,7 @@ import unittest
 
 from experiments.map_sft_baselines.src.contract import training_steps, checkpoint_steps
 from experiments.map_sft_baselines.src.train import learning_rate_factor
+from experiments.map_sft_baselines.src.train import validate_resume_contract
 from experiments.map_sft_baselines.src.coverage_subset import select_coverage, decision_pairs
 from experiments.map_sft_baselines.src.metrics import summarize
 
@@ -34,6 +35,28 @@ class DiagnosisTests(unittest.TestCase):
         cfg['training']['maximum_updates'] = 53000
         with self.assertRaises(ValueError):
             training_steps(cfg)
+
+    def test_explicit_extension_preserves_recipe_and_schedule(self):
+        from copy import deepcopy
+        root=Path(__file__).parents[1]/'configs'
+        new=json.loads((root/'b2_coverage.json').read_text())
+        old=deepcopy(new)
+        old['training'].update(epochs=7,maximum_updates=50000)
+        saved=dict(config=old,baseline='B2_coverage')
+        with self.assertRaises(ValueError):
+            validate_resume_contract(saved,new,'B2_coverage')
+        validate_resume_contract(saved,new,'B2_coverage',allow_horizon_extension=True)
+        for step in (0,12500,50000):
+            self.assertEqual(learning_rate_factor(step,50000,old['training']),
+                             learning_rate_factor(step,150000,new['training']))
+        changed=deepcopy(new);changed['training']['learning_rate']*=2
+        with self.assertRaises(ValueError):
+            validate_resume_contract(saved,changed,'B2_coverage',allow_horizon_extension=True)
+        changed=deepcopy(new);changed['training']['scheduler_total_steps']=150000
+        with self.assertRaises(ValueError):
+            validate_resume_contract(saved,changed,'B2_coverage',allow_horizon_extension=True)
+        with self.assertRaises(ValueError):
+            validate_resume_contract(saved,old,'B2_coverage',allow_horizon_extension=True)
 
     def test_coverage_avoids_duplicates_without_changing_length_or_board_quota(self):
         rows = []

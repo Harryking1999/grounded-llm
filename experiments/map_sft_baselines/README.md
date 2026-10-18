@@ -94,7 +94,7 @@ python -m unittest experiments.map_sft_baselines.tests.test_contract experiments
 
 ## B2 小数据四组受控诊断
 
-用户授权在 028 八卡、四个两卡通道开展学习率对齐、覆盖、重编号、MLP 四组；4090 的 1–4 号卡独立评测，0 号卡预留。正式合同为 `configs/b2_lr_match.json`、`b2_coverage.json`、`b2_renumber.json`、`b2_mlp.json`。四组从同一基座重训，Q 冻结，保持全参、排序优先监督；共同更新预算与逐步学习率由配置中的 `maximum_updates`、`scheduler_total_steps`、`warmup_steps` 明确分开。覆盖组最后一个 epoch 可以只跑一部分，不能用 epoch 横轴冒充等预算。
+用户授权在 028 八卡、四个两卡通道开展学习率对齐、覆盖、重编号、MLP 四组；4090 的 1–4 号卡独立评测，0 号卡预留。正式合同为 `configs/b2_lr_match.json`、`b2_coverage.json`、`b2_renumber.json`、`b2_mlp.json`。四组从同一基座重训，Q 冻结，保持全参、排序优先监督；共同更新预算与逐步学习率由配置中的 `maximum_updates`、`scheduler_total_steps`、`warmup_steps` 明确分开。用户后续明确要求覆盖组也跑满 20 epoch，因此覆盖组延长至 150k 更新，其他三组仍为 50k。前 50k 更新保留为等预算比较，覆盖组最终结果另作同 epoch、不同曝光预算的比较。续训从原 50k 完整恢复断点接续，不重置优化器、RNG 或学习率；`src/extend_run.py` 等待原阶段成功结束后启动，`--extend-training` 只允许在固定显式学习率时程下延长 epochs 和更新上限。
 
 覆盖选择入口 `src/coverage_subset.py` 在来源棋盘及最短长度配额内最大化新增非终止状态—目标对。预先采用的覆盖判据是原 50k 唯一对的 80%，只是执行用启发式，不是已证明的充分性阈值；10k 未达标时按用户授权改用 30k，不继续扩展。实际源数据有 338,664 个唯一对；原 10k 为 68,256，覆盖优选 10k 为 68,326，仅增加 70；30k 为 204,478（60.38%），仍未达到上述启发式阈值，但已经是用户授权的上限。原数据决策重复率很低，覆盖组应解释为增加不同经验为主的对照，不能把收益独归于筛选算法。详细分布和选样报告放生成数据目录，避免把唯一对计数误当成关系机制的证明。
 

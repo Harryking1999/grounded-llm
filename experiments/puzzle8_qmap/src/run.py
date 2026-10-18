@@ -16,9 +16,25 @@ from .policy_audit import audit
 from .data_sampling import DataMix
 from .branch_data import BranchData
 from .graph_data import GraphData
+from .checkpoint_audit import same_tasks, cycle_ranking
+from grounded_llm.qmap_metrics import rollout
 
 
-def train(env, config, data, out, device, source_commit, checkpoint=None):
+def intermediate_stage(model, env, data, config, device, reference=None):
+    """Fixed-cohort monitoring, never used for checkpoint selection."""
+    result = {}
+    for split in ("validation", "test"):
+        index = task_indices(env, data, split, config["evaluation"]["rollout_count"], config)
+        values = rollout(model, env, data[f"tasks_{split}"][index], device,
+                         config["evaluation"]["budget_multiplier"], return_tasks=True)["q"]
+        if reference is not None:
+            values["same_tasks"] = same_tasks(reference[split]["per_task"]["solved"],
+                                              values["per_task"]["solved"])
+        result[split] = values
+    return result
+
+
+def train(env, config, data, out, device, source_commit, checkpoint=None, resume=False):
     torch.manual_seed(config["seed"])
     options = config["training"]
     torch.set_num_threads(options["cpu_threads"])
@@ -26,6 +42,7 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
     model = QMap(**config["model"]).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=options["learning_rate"])
     parent = None
+    start_step = 0
     if checkpoint is not None:
         saved = torch.load(checkpoint, map_location=device, weights_only=False)
         if (saved.get("model_type") != MODEL_TYPE or saved["actions"] != list(env.actions)
@@ -36,6 +53,11 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
         for group in optimizer.param_groups:
             group["lr"] = options["learning_rate"]
         parent = {"checkpoint": str(checkpoint), "source_commit": saved["source_commit"], "step": saved["step"]}
+        if resume:
+            if saved["config"] != config or "graph_sampler_state" not in saved:
+                raise ValueError("Resume requires the original contract and complete sampler state")
+            start_step = saved["continuation_step"]
+            parent = saved["parent"]
     pairs, tasks = data["pairs_train"], data["tasks_train"]
     ps = CoverageSampler(pairs[:, 2], rng, len(pairs), .5)
     rs = CoverageSampler(data["parent_distances_train"], rng, len(tasks), .5)
@@ -63,7 +85,7 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
         pair_broad = count - round(count * mixture.options["route_fraction"])
         _, _, count = mixture.counts(options["decision_batch_size"])
         rank_broad = count - round(count * mixture.options["route_fraction"])
-        if any(stream.draws + options["steps"] * per_step < target * stream.size
+        if any(stream.draws + (options["steps"] - start_step) * per_step < target * stream.size
                for stream, per_step in ((mixture.gp, pair_broad), (mixture.gr, rank_broad))):
             raise ValueError("Continuation budget does not reach the requested actual broad exposure")
     features = torch.as_tensor(env.features(np.arange(env.size)), device=device)
@@ -74,28 +96,49 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
     idx = task_indices(env, data, "validation", config["evaluation"]["decision_count"], config)
     vt = data["tasks_validation"][idx]
     best, best_step = float("inf"), 0
+    elapsed_before = (json.loads((out / "progress.jsonl").read_text().splitlines()[-1])["seconds"]
+                      if resume else 0.)
     started = time.monotonic()
     def save(step, path):
+        pending = path.with_suffix(path.suffix + ".pending")
         torch.save({"model_type": MODEL_TYPE, "task": env.name, "actions": list(env.actions),
                     "model": model.state_dict(), "optimizer": optimizer.state_dict(),
                     "config": config, "source_commit": source_commit,
                     "step": (parent["step"] if parent else 0) + step, "continuation_step": step, "parent": parent,
                     **({"graph_sampler_state": mixture.state_dict()} if isinstance(mixture, GraphData) else {}),
                     "coverage": (mixture.report() if mixture is not None else
-                                 {"pair_passes": ps.passes, "decision_passes": rs.passes})}, path)
+                                 {"pair_passes": ps.passes, "decision_passes": rs.passes})}, pending)
+        pending.replace(path)
     initial_policy = initial_validation_mae = None
+    monitor_reference = None
     reference = None
+    if resume:
+        resumed_model = {key: value.detach().clone() for key, value in model.state_dict().items()}
+        reference_saved = torch.load(parent["checkpoint"], map_location=device, weights_only=False)
+        model.load_state_dict(reference_saved["model"])
     if parent is not None:
         initial_policy, state = audit(model, env, device, cohort=data["tasks_restoration"][:, 0])
         reference = state["within"].copy()
-        if mixture is not None:
+        if mixture is not None and not resume:
             mixture.refresh(state["hard_parents"])
         initial_validation_mae = pair_metrics(model, env, data["pairs_validation"], device)["mae"]
+        if isinstance(mixture, GraphData):
+            monitor_reference = intermediate_stage(model, env, data, config, device)
         best = -initial_policy["within_budget"]
-        save(0, out / "best.pt")
+        if not resume:
+            save(0, out / "best.pt")
         print(json.dumps({"initial_policy": initial_policy, "initial_validation_mae": initial_validation_mae}), flush=True)
-    with (out / "progress.jsonl").open("w") as log:
-        for step in range(1, options["steps"] + 1):
+    if resume:
+        best_saved = torch.load(out / "best.pt", map_location=device, weights_only=False)
+        model.load_state_dict(best_saved["model"])
+        best_policy, _ = audit(model, env, device)
+        best, best_step = -best_policy["within_budget"], best_saved["continuation_step"]
+        model.load_state_dict(resumed_model)
+        print(json.dumps({"resumed_step": start_step, "best_step": best_step,
+                          "preserved_best_solved": -best}), flush=True)
+    with (out / "progress.jsonl").open("a" if resume else "w") as log:
+        for step in range(start_step + 1, options["steps"] + 1):
+            update_started = time.monotonic()
             model.train()
             # Reuse the same deterministic MLP result for repeated state IDs.
             # Losses, reductions, labels and gradients are otherwise unchanged.
@@ -114,12 +157,22 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
             truth = torch.as_tensor(labels, device=device)
             rank_loss = soft_rank_loss(scores, truth, valid, options["rank_temperature"])
             loss = pair_loss + options["rank_weight"] * rank_loss
+            prepared_at = time.monotonic()
             optimizer.zero_grad(set_to_none=True)
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), 5.)
             optimizer.step()
             encoded = None
-            if step == 1 or step % options["eval_every"] == 0 or step == options["steps"]:
+            if step <= start_step + 5:
+                if str(device).startswith("cuda"):
+                    torch.cuda.synchronize(device)
+                elapsed = time.monotonic() - update_started
+                print(json.dumps({"update_timing": {"step": step, "seconds": elapsed,
+                    "sampling_and_forward_seconds": prepared_at - update_started,
+                    "pairs_per_second": options["batch_size"] / elapsed,
+                    "full_candidate_decisions_per_second": options["decision_batch_size"] / elapsed,
+                    "scope": "real mixed sampling, encoding, labels, backward and Adam; excludes stage evaluation"}}), flush=True)
+            if step == start_step + 1 or step % options["eval_every"] == 0 or step == options["steps"]:
                 model.eval()
                 pm = pair_metrics(model, env, data["pairs_validation"], device)
                 rank = ranking_loss(model, env, vt, data["child_distances_validation"][idx],
@@ -137,7 +190,7 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
                 if eligible and selection_score < best:
                     best, best_step = selection_score, step
                     save(step, out / "best.pt")
-                record = {"step": step, "seconds": round(time.monotonic() - started, 2),
+                record = {"step": step, "seconds": round(elapsed_before + time.monotonic() - started, 2),
                           "distance_loss": float(pair_loss.detach()), "rank_loss": float(rank_loss.detach()),
                           "validation_mae": pm["mae"], "validation_objective": score,
                           "validation_shortest_action_rate": decisions(model, env, vt, device)["q"]["shortest_action_rate"],
@@ -148,6 +201,13 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
                     if mixture is not None:
                         record.update(pair_passes=mixture.ps.passes, decision_passes=mixture.rs.passes)
                 if isinstance(mixture, GraphData):
+                    record["intermediate"] = intermediate_stage(model, env, data, config, device, monitor_reference)
+                    record["validation_pairs_by_distance"] = pm["by_distance"]
+                    # Compact stage outcomes survive later last.pt overwrites.
+                    # All candidates and basin sizes live in a separate result.
+                    stage = out / "stages" / f"step_{step:06d}"
+                    stage.mkdir(parents=True, exist_ok=True)
+                    (stage / "cycle_rankings.json").write_text(json.dumps(cycle_ranking(env, state)) + "\n")
                     save(step, out / "last.pt")
                 log.write(json.dumps(record) + "\n"); log.flush()
                 print(json.dumps(record), flush=True)
@@ -155,7 +215,7 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
     saved = torch.load(out / "best.pt", map_location=device, weights_only=False)
     model.load_state_dict(saved["model"])
     summary = {"task": env.name, "source_commit": source_commit, "best_step": best_step,
-               "last_step": step, "training_seconds": round(time.monotonic() - started, 2),
+               "last_step": step, "training_seconds": round(elapsed_before + time.monotonic() - started, 2),
                "selection": ("all-state restoration count subject to fixed validation MAE guard"
                              if parent else "heldout intermediate goal distance Huber + full soft rank cross entropy after one coverage pass"),
                "parent": parent, "initial_policy": initial_policy,
@@ -179,12 +239,24 @@ def main():
     parser.add_argument("--prepared-run", type=Path)
     parser.add_argument("--checkpoint", type=Path)
     parser.add_argument("--full-distance-table", type=Path)
+    parser.add_argument("--resume-run", action="store_true", help="Append to an interrupted run from its last published complete checkpoint")
     args = parser.parse_args()
     config = json.loads(args.config.read_text(encoding="utf-8"))
     if config["task"] != "puzzle8":
         raise ValueError("Puzzle8 trainer requires its own task contract")
-    args.out.mkdir(parents=True, exist_ok=False)
-    (args.out / "config.json").write_text(json.dumps(config, indent=2) + "\n")
+    if args.resume_run:
+        if json.loads((args.out / "config.json").read_text()) != config:
+            raise ValueError("Resume must preserve the original run contract")
+        if args.checkpoint is not None:
+            raise ValueError("--resume-run uses the existing run's last.pt")
+        args.checkpoint = args.out / "last.pt"
+        rows = [json.loads(line) for line in (args.out / "progress.jsonl").read_text().splitlines() if line]
+        saved = torch.load(args.checkpoint, map_location="cpu", weights_only=False)
+        if rows[-1]["step"] != saved["continuation_step"]:
+            raise ValueError("Progress and last checkpoint disagree; inspect interrupted publication before resuming")
+    else:
+        args.out.mkdir(parents=True, exist_ok=False)
+        (args.out / "config.json").write_text(json.dumps(config, indent=2) + "\n")
     env = Puzzle8()
     if args.prepared_run is None:
         data, summary = build(env, config, args.out)
@@ -205,7 +277,7 @@ def main():
         (args.out / "full_oracle_source.json").write_text(json.dumps({"path": str(args.full_distance_table),
                   "summary": oracle_summary}, indent=2) + "\n")
     print(json.dumps({"data": summary}), flush=True)
-    train(env, config, data, args.out, args.device, args.source_commit, args.checkpoint)
+    train(env, config, data, args.out, args.device, args.source_commit, args.checkpoint, args.resume_run)
 
 
 if __name__ == "__main__":

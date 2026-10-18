@@ -62,3 +62,13 @@ python -m unittest discover -s experiments/puzzle8_qmap/tests -v
 完整曝光是数据要求，仍不等于网络学会；最佳与最终断点分别报告实际曝光和真实求解，不把训练完成作为可靠地图的验收。
 
 续训按正式合同的`training.eval_every`报告更新阶段；更新步数与解题动作数分开。读取`progress.jsonl`可取得每档完整复原、循环、旧成功丢失、原同题、验证距离与实际曝光。`python -m experiments.puzzle8_qmap.src.progress_report --run RUN --after-step STEP --prepared-run BASE_DATA`汇总新增档位，并对最新已发布断点补测固定中间目标完整到达，写入该运行的`intermediate_progress.jsonl`；重复调用复用同一断点结果，不改变训练或选模。
+
+中断后使用同一正式合同、原运行目录与`--resume-run`恢复；不传`--checkpoint`，入口读取原目录的`last.pt`，保留原始父模型、验证保持边界、`best.pt`和累计更新步数，从剩余预算接续，追加阶段记录。模型、Adam及全部数据流恢复；此确定性MLP没有随机层，针对性中断测试确认恢复后的参数与不中断运行逐位一致。原子发布checkpoint避免正常读取时遇到半写文件，入口仍核对最近完整progress与checkpoint步数。
+
+新版训练器在每档直接保存固定中间目标逐题成败及相对原始父模型的得失、验证距离分桶，另写`stages/step_NNNNNN/cycle_rankings.json`，列出每个实际环的所有合法候选、真距离、Q距离和受影响起点数。中间目标测试监测不参与训练或选模，反复查看同题不构成独立泛化证据；旧版已覆盖断点不能据最新模型虚构历史中间目标结果。
+
+完整同题审计入口如下。它只读取两个断点和原固定数据，输出全状态复原、循环排序、固定中间目标逐题得失、按真距离的误差与全候选排序，以及广域置换流实际独特关系数。逐流计数不声称是所有重放分量去重后的总量。
+
+```bash
+python -m experiments.puzzle8_qmap.src.checkpoint_audit --checkpoint RUN/best.pt --baseline-checkpoint BASE/best.pt --prepared-run PREPARED --out RUN/matched_audit.json --device cpu
+```

@@ -1,0 +1,70 @@
+{
+  "study": "blocks_distance_map",
+  "scope": "joint_exact_distance_bands_clear_and_nonempty_goals_with_historical_retention",
+  "parent_checkpoint": "/tmp/blocks12_joint_9aa8498/run/checkpoints/step_010000.pt",
+  "graph_data": "/tmp/blocks12_graphs_676140c",
+  "legacy_data": "/tmp/blocks12_joint_9aa8498/data/legacy_tree_continue_986cb4d.npz",
+  "baseline_cases": "/tmp/blocks12_joint_9aa8498/data/baseline_cases.json",
+  "training": {
+    "seed": 2026101851,
+    "learning_rate": 0.0003,
+    "steps": 2000,
+    "batch_size_per_rank": 2048,
+    "rank_contexts_per_rank": 256,
+    "boards_per_batch": 4,
+    "legacy_fraction": 0.4,
+    "broad_fraction": 0.25,
+    "clear_fraction": 0.35,
+    "listwise_weight": 1.0,
+    "temperature": 1.0,
+    "original_cap": 13,
+    "unreachable_label": 19,
+    "failure_diagnosis": "/tmp/blocks12_balanced_training_diagnosis/first10000.json",
+    "failure_fraction": 0.5,
+    "repair_descendant_steps": [
+      0,
+      0,
+      0,
+      1,
+      2,
+      4
+    ],
+    "previous_sampler_root": "/tmp/blocks12_joint_9aa8498/run",
+    "previous_sampler_step": 10000,
+    "cpu_threads": 2,
+    "log_every": 100,
+    "checkpoint_every": 1000,
+    "retention_diagnosis": "/tmp/blocks12_balanced_training_diagnosis/first10000.json",
+    "hard_negative_fraction": 0.25,
+    "retention_fraction": 0.25,
+    "fresh_fraction": 0.25,
+    "fresh_distance_cycle": [
+      6,
+      7,
+      8,
+      -1,
+      -1,
+      -1
+    ],
+    "legacy_long_fraction": 0.5,
+    "long_context_fraction": 0.5
+  },
+  "evaluation": {
+    "train_roots": 100,
+    "oracle_seconds": 14400,
+    "oracle_cache_limit": 8000000,
+    "intermediate_6_8_cases": "/tmp/blocks12_goal_retention/monitor_6_8_cases.json",
+    "historical_510_manifest": "/tmp/blocks12_goal_retention/historical_llm_manifest.json",
+    "minimum_joint_success": {
+      "clear": 160,
+      "nonempty_6_8": 70,
+      "nonempty_9_13": 50,
+      "historical_510": 421,
+      "historical_6_8": 412
+    },
+    "historical_510_reference": "/tmp/blocks12_goal_retention/historical_same_case_audit.json",
+    "clear_6_8_cases": "/tmp/blocks12_balanced_relation_repair/clear_6_8_cases.json"
+  },
+  "policy": "unchanged_greedy_all_legal_successors_no_search_no_oracle_action_selection",
+  "rationale": "Continue first10000 lineage only; reject parent candidates unless all original510, new full-root clear, new6--8 and9--13 nonempty goals hold. First retention1000 improves original510421to426 and clear160to165 but loses new6--8=70to59, long50to51; not accepted. Prior training diagnostic almost exclusively targeted9--13 initial goals (only3 of2000 at8). New exact training diagnostic has1000 explicitly6/7/8 residual targets and1000 arbitrary complex long goals across same1000 full graphs, generated without Q-based selection; never train monitor errors. Retain successful first10000 training trajectories from this balanced set, mine selected-parent errors and all legal candidates/optimal descendants. Half repair contexts stop optimal descendants atdistance6 so hard parents are not all transformed to easier relations; remaining half continue toward near targets. Preserve broad, clear and legacy distributions including legacy40percent with half6--13 focus, exact negative child relations, same19 unreachable/13 encoder, originalloss/weights/temperature/lr/Adam/model/greedy. Runtime may select a jointly passed descendant with matching sampler state after previous complete2000 boundary; otherwise explicitfirst10000 parent and its own broad prefix. Added6--8 clearable witness residual monitor uses same200 unseen roots, model-independent exact labels, separate from nonempty and full-root tasks; never pool its easy199/200 with difficult relations.2000 is review window."
+}

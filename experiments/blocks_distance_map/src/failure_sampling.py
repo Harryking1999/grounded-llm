@@ -61,6 +61,7 @@ class FailureData(JointData):
         self.repair_pair_draws = self.repair_rank_requested = 0
         self.optimal_transition_draws = 0
         self.repair_distances = np.zeros(64, dtype=np.int64)
+        self.repair_initial_distances = np.zeros(64, dtype=np.int64)
         self.repair_pairs_seen, self.repair_forks_seen = set(), set()
         self.repair_candidates_seen = set()
         self.last_repair_count = 0
@@ -121,10 +122,14 @@ class FailureData(JointData):
             source[:fresh], goal[:fresh] = initial, current
         levels = np.asarray(self.options["repair_descendant_steps"])
         steps = levels[(np.arange(count) + int(self.rng.integers(len(levels)))) % len(levels)]
+        initial_parts = root.distance_parts(source, goal)
+        self.repair_initial_distances += np.bincount(initial_parts.sum(-1), minlength=64)
+        preserve = np.arange(count) < round(count * self.options.get("long_context_fraction", 0))
+        minimum = np.where(preserve, 6, 1)
         for depth in range(int(steps.max(initial=0))):
             parts = root.distance_parts(source, goal)
             distances = np.where((parts < 0).any(-1), -1, parts.sum(-1))
-            active = (depth < steps) & (distances > 1)
+            active = (depth < steps) & (distances > minimum)
             # Sample uniformly among every optimal outgoing action. This is a
             # label-side sampler, not search or filtering in the evaluated Q.
             choices = [[] for _ in range(count)]
@@ -153,6 +158,7 @@ class FailureData(JointData):
             source, goal = np.concatenate((source, bad[:, 0])), np.concatenate((goal, bad[:, 1]))
             distances = np.r_[distances, np.full(negatives, len(self.repair_distances) - 1)]
             self.hard_negative_draws += negatives
+            self.repair_initial_distances[-1] += negatives
         self.repair_distances += np.bincount(distances, minlength=len(self.repair_distances))
         if ranking:
             self.repair_rank_requested += total
@@ -191,6 +197,7 @@ class FailureData(JointData):
             "pair_draws": self.repair_pair_draws, "rank_requested": self.repair_rank_requested,
             "optimal_transition_draws": self.optimal_transition_draws,
             "distances": self.repair_distances,
+            "initial_distances": self.repair_initial_distances,
             "pairs_seen": self.repair_pairs_seen, "forks_seen": self.repair_forks_seen,
             "candidates_seen": self.repair_candidates_seen,
             "hard_negative_draws": self.hard_negative_draws, "retention_draws": self.retention_draws}
@@ -207,6 +214,7 @@ class FailureData(JointData):
         self.repair_rank_requested = repair["rank_requested"]
         self.optimal_transition_draws = repair["optimal_transition_draws"]
         self.repair_distances = repair["distances"]
+        self.repair_initial_distances = repair.get("initial_distances", np.zeros(64, dtype=np.int64))
         self.repair_pairs_seen = repair["pairs_seen"]
         self.repair_forks_seen = repair["forks_seen"]
         self.repair_candidates_seen = repair["candidates_seen"]
@@ -224,6 +232,8 @@ class FailureData(JointData):
             "local_distinct_forks": len(self.repair_forks_seen),
             "local_distinct_candidate_relations": len(self.repair_candidates_seen),
             "parent_distance_draws": self.repair_distances.tolist(),
+            "pre_descendant_distance_draws": self.repair_initial_distances.tolist(),
+            "pre_descendant_histogram_scope": "Counts start when this field is introduced; prior stage cannot be reconstructed",
             "distance_histogram_unreachable_index": 63,
             "hard_negative_huber_draws": self.hard_negative_draws,
             "retention_context_draws": self.retention_draws,

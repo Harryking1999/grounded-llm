@@ -183,6 +183,12 @@ def run(config, checkpoint, out, device, source_commit):
         medium_rows, _, _ = evaluate_rows(medium, scorer, oracle)
         result["intermediate_6_8_rows"] = medium_rows
         result["distance_goal_success"] = distance_goal_success(evaluated + medium_rows)
+    if settings.get("clear_6_8_cases"):
+        residual = json.loads(Path(settings["clear_6_8_cases"]).read_text())["rows"]
+        clear_rows, _, _ = evaluate_rows(residual, scorer, oracle)
+        result["clear_6_8_rows"] = clear_rows
+        result["distance_goal_success"] = distance_goal_success(
+            evaluated + result.get("intermediate_6_8_rows", []) + clear_rows)
     if settings.get("historical_510_manifest"):
         result["historical_retention"] = historical_retention(settings["historical_510_manifest"], checkpoint,
                                                              settings.get("historical_510_reference"))

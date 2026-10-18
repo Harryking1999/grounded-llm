@@ -10,6 +10,29 @@ import torch
 from .full_graph_eval import evaluate_rows
 from .oracle import DistanceOracle, successors
 from .tree_supervision_eval import QScorer
+from experiments.gcml_counterexamples.src import blocks
+
+
+def make_clear_cases(monitor, seed):
+    """Residual starts, exact6/7/8 to zero, same unseen root boards; no Q filtering."""
+    rng = random.Random(seed)
+    oracle = DistanceOracle(cache_limit=8000000, seconds=14400)
+    result = []
+    for board, record in enumerate(monitor["roots"]):
+        tiles = [blocks.PLACEMENTS[blocks.BY_ACTION[(a["shape_id"], a["row"], a["col"]) ]][0]
+                 for a in record["construction"]]
+        wanted = 6 + board % 3
+        for _ in range(1000):
+            source = 0
+            for tile in rng.sample(tiles, wanted):
+                source |= tile
+            if oracle.distance(source, 0) == wanted:
+                result.append({"board": board, "source": str(source), "goal": "0",
+                               "true_distance": wanted})
+                break
+        else:
+            raise RuntimeError(f"Could not construct exact {wanted}-move clearing on root {board}")
+    return result
 
 
 def make_cases(monitor, seed):
@@ -38,13 +61,15 @@ def make_cases(monitor, seed):
     return result
 
 
-def run(monitor, checkpoint, cases, out, reference=None, seed=2026101904):
+def run(monitor, checkpoint, cases, out, reference=None, seed=2026101904, goal_kind="nonempty"):
     torch.set_num_threads(2)
     if cases.exists():
         dataset = json.loads(cases.read_text())
     else:
-        dataset = {"seed": seed, "rows": make_cases(json.loads(monitor.read_text())["rows"], seed),
-            "scope": "Fixed exact-distance 6/7/8 goals on existing unseen monitoring roots; generated without model scores. Added at user request; original 9--13 tasks unchanged. Diagnostic monitoring, not sealed final acceptance or training data."}
+        raw = json.loads(monitor.read_text())
+        dataset = {"seed": seed, "goal_kind": goal_kind,
+            "rows": make_clear_cases(raw, seed) if goal_kind == "clear" else make_cases(raw["rows"], seed),
+            "scope": "Fixed exact-distance6/7/8 on unchanged unseen monitor roots, model-independent generation. Clear tasks use residual starts and goal0; nonempty tasks use full-root starts. Original9--13 and full-root clearing tasks unchanged. Repeated monitoring, not sealed final acceptance or training data."}
         cases.parent.mkdir(parents=True, exist_ok=True)
         pending = cases.with_suffix(".pending")
         pending.write_text(json.dumps(dataset) + "\n")
@@ -83,5 +108,6 @@ if __name__ == "__main__":
     parser.add_argument("--cases", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--reference", type=Path)
+    parser.add_argument("--goal-kind", choices=["nonempty", "clear"], default="nonempty")
     args = parser.parse_args()
-    run(args.monitor_cases, args.checkpoint, args.cases, args.out, args.reference)
+    run(args.monitor_cases, args.checkpoint, args.cases, args.out, args.reference, goal_kind=args.goal_kind)

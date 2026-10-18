@@ -68,6 +68,19 @@ class FailureSamplingTest(unittest.TestCase):
             np.testing.assert_array_equal(batch[2], [oracle.distance(int(s[0]), int(g[0]))
                                                     for s, g in zip(batch[0], batch[1])])
             sampler.close()
+            star = {"source": str(initial), "goal": "0"}
+            (path / "diagnosis.json").write_text(json.dumps({"training_long": {"rows": [
+                {"board": 0, "source": str(initial), "success": True, "trajectory": [star]}]}}))
+            options.update(failure_diagnosis=str(path / "diagnosis.json"), failure_fraction=1,
+                           repair_descendant_steps=[4], fresh_fraction=0, long_context_fraction=1)
+            replay = FailureData(path, path / "legacy.npz", options)
+            a, g = replay.repaired_rows(0, 32, True)
+            np.testing.assert_array_equal(replay.roots[0].distance_parts(a, g).sum(-1), np.full(32, 6))
+            options["long_context_fraction"] = 0
+            a, g = replay.repaired_rows(0, 32, True)
+            np.testing.assert_array_equal(replay.roots[0].distance_parts(a, g).sum(-1), np.full(32, 2))
+            self.assertEqual(replay.repair_initial_distances[6], 64)
+            replay.close()
         values = distance_goal_success([
             {"goal": "0", "true_distance": 7, "outcome": "reached"},
             {"goal": "2", "true_distance": 7, "outcome": "removed_goal_cell"},

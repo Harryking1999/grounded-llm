@@ -1,11 +1,22 @@
 import unittest
 
 from experiments.blocks_distance_map.src.blocks12_eval import construct
-from experiments.blocks_distance_map.src.intermediate_6_8 import make_cases
+from experiments.blocks_distance_map.src.intermediate_6_8 import make_cases, make_clear_cases
 from experiments.blocks_distance_map.src.oracle import DistanceOracle
 
 
 class IntermediateBandTest(unittest.TestCase):
+    def test_clear_distance_crosses_goal_type_with_residual_starts(self):
+        roots = construct(3, 12, 41)
+        first = make_clear_cases({"roots": roots}, 29)
+        self.assertEqual(first, make_clear_cases({"roots": roots}, 29))
+        self.assertEqual([r["true_distance"] for r in first], [6, 7, 8])
+        oracle = DistanceOracle()
+        for row in first:
+            self.assertEqual(row["goal"], "0")
+            self.assertEqual(oracle.distance(int(row["source"]), 0), row["true_distance"])
+            self.assertEqual(int(row["source"]) & int(roots[row["board"]]["initial"]), int(row["source"]))
+
     def test_fixed_cases_are_exact_and_exclude_easy_tasks(self):
         roots = construct(3, 12, 41)
         inputs = [{"board": i, "source": r["initial"]} for i, r in enumerate(roots)]

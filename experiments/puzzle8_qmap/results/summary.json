@@ -1,0 +1,207 @@
+{
+  "task": "puzzle8",
+  "source_commit": "6155519",
+  "best_step": 40000,
+  "last_step": 60000,
+  "training_seconds": 652.87,
+  "selection": "heldout intermediate goal distance Huber + full soft rank cross entropy after one coverage pass",
+  "torch_version": "2.7.1+cu128",
+  "numpy_version": "2.2.6",
+  "final": {
+    "validation": {
+      "pairs": {
+        "count": 6599,
+        "huber": 3.367507484910974,
+        "mae": 3.8439301505813566,
+        "spearman": 0.8555822136586685
+      },
+      "decisions": {
+        "q": {
+          "count": 4096,
+          "shortest_action_rate": 0.71240234375,
+          "uniform_tie_shortest_rate": 0.71240234375,
+          "strict_candidate_order_accuracy": 0.7161968466316292
+        },
+        "hamming": {
+          "count": 4096,
+          "shortest_action_rate": 0.585205078125,
+          "uniform_tie_shortest_rate": 0.5749715169270833,
+          "strict_candidate_order_accuracy": 0.3651855390985826
+        },
+        "oracle": {
+          "count": 4096,
+          "shortest_action_rate": 1.0,
+          "uniform_tie_shortest_rate": 1.0,
+          "strict_candidate_order_accuracy": 1.0
+        }
+      },
+      "rollout": {
+        "q": {
+          "count": 1024,
+          "solved": 273,
+          "success_rate": 0.2666015625,
+          "cycle_rate": 0.7333984375,
+          "budget_exhausted": 0,
+          "horizon": 62,
+          "mean_extra_steps_on_solved": 0.10989010989010989,
+          "illegal_action_rate": 0.0
+        },
+        "hamming": {
+          "count": 1024,
+          "solved": 81,
+          "success_rate": 0.0791015625,
+          "cycle_rate": 0.9208984375,
+          "budget_exhausted": 0,
+          "horizon": 62,
+          "mean_extra_steps_on_solved": 0.0,
+          "illegal_action_rate": 0.0
+        },
+        "oracle": {
+          "count": 1024,
+          "solved": 1024,
+          "success_rate": 1.0,
+          "cycle_rate": 0.0,
+          "budget_exhausted": 0,
+          "horizon": 62,
+          "mean_extra_steps_on_solved": 0.0,
+          "illegal_action_rate": 0.0
+        }
+      }
+    },
+    "test": {
+      "pairs": {
+        "count": 6551,
+        "huber": 3.7874507550814074,
+        "mae": 4.267350049842097,
+        "spearman": 0.8303761059792044
+      },
+      "decisions": {
+        "q": {
+          "count": 4096,
+          "shortest_action_rate": 0.703125,
+          "uniform_tie_shortest_rate": 0.703125,
+          "strict_candidate_order_accuracy": 0.7090144036251821
+        },
+        "hamming": {
+          "count": 4096,
+          "shortest_action_rate": 0.580322265625,
+          "uniform_tie_shortest_rate": 0.5725504557291666,
+          "strict_candidate_order_accuracy": 0.35426444408480334
+        },
+        "oracle": {
+          "count": 4096,
+          "shortest_action_rate": 1.0,
+          "uniform_tie_shortest_rate": 1.0,
+          "strict_candidate_order_accuracy": 1.0
+        }
+      },
+      "rollout": {
+        "q": {
+          "count": 1024,
+          "solved": 232,
+          "success_rate": 0.2265625,
+          "cycle_rate": 0.7734375,
+          "budget_exhausted": 0,
+          "horizon": 62,
+          "mean_extra_steps_on_solved": 0.0603448275862069,
+          "illegal_action_rate": 0.0
+        },
+        "hamming": {
+          "count": 1024,
+          "solved": 102,
+          "success_rate": 0.099609375,
+          "cycle_rate": 0.900390625,
+          "budget_exhausted": 0,
+          "horizon": 62,
+          "mean_extra_steps_on_solved": 0.0,
+          "illegal_action_rate": 0.0
+        },
+        "oracle": {
+          "count": 1024,
+          "solved": 1024,
+          "success_rate": 1.0,
+          "cycle_rate": 0.0,
+          "budget_exhausted": 0,
+          "horizon": 62,
+          "mean_extra_steps_on_solved": 0.0,
+          "illegal_action_rate": 0.0
+        }
+      }
+    },
+    "restoration_seen_states": {
+      "rollout": {
+        "q": {
+          "count": 1024,
+          "solved": 305,
+          "success_rate": 0.2978515625,
+          "cycle_rate": 0.7021484375,
+          "budget_exhausted": 0,
+          "horizon": 62,
+          "mean_extra_steps_on_solved": 0.7344262295081967,
+          "illegal_action_rate": 0.0
+        },
+        "hamming": {
+          "count": 1024,
+          "solved": 0,
+          "success_rate": 0.0,
+          "cycle_rate": 1.0,
+          "budget_exhausted": 0,
+          "horizon": 62,
+          "mean_extra_steps_on_solved": null,
+          "illegal_action_rate": 0.0
+        },
+        "oracle": {
+          "count": 1024,
+          "solved": 1024,
+          "success_rate": 1.0,
+          "cycle_rate": 0.0,
+          "budget_exhausted": 0,
+          "horizon": 62,
+          "mean_extra_steps_on_solved": 0.0,
+          "illegal_action_rate": 0.0
+        }
+      }
+    }
+  },
+  "restoration_diagnostic": {
+    "best": {
+      "step": 40000,
+      "coverage": {
+        "pair_passes": 2.257495590828924,
+        "decision_passes": 1.1287540165014136
+      },
+      "all_state_mae": 1.3417879449969037,
+      "all_state_decisions": {
+        "count": 181439,
+        "shortest_action_rate": 0.7899404207474688,
+        "uniform_tie_shortest_rate": 0.7899404207474688,
+        "strict_candidate_order_accuracy": 0.7924959723737348
+      },
+      "same1024_rollout": {}
+    },
+    "last": {
+      "step": 60000,
+      "coverage": {
+        "pair_passes": 3.386243386243386,
+        "decision_passes": 1.6931310247521205
+      },
+      "all_state_mae": 1.3432917540922524,
+      "all_state_decisions": {
+        "count": 181439,
+        "shortest_action_rate": 0.796085736804105,
+        "uniform_tie_shortest_rate": 0.796085736804105,
+        "strict_candidate_order_accuracy": 0.7971196150817446
+      },
+      "same1024_rollout": {
+        "count": 1024,
+        "solved": 303,
+        "success_rate": 0.2958984375,
+        "cycle_rate": 0.7041015625,
+        "budget_exhausted": 0,
+        "horizon": 62,
+        "mean_extra_steps_on_solved": 0.8778877887788779,
+        "illegal_action_rate": 0.0
+      }
+    }
+  }
+}

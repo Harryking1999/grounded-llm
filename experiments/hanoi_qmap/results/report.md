@@ -26,3 +26,5 @@
 本地原有训练回归与八盘新增检查共八项通过；40048 远端复核八盘精确裁判与六种对称动作对应通过。使用用户指定的 `root@172.16.78.10:40048` GPU 0，复用 `/zhanghanyue/experiment/flamingo_map_reader/.venv/bin/python`，代码快照为 `/zhanghanyue/experiment/grounded_llm_puzzle_qmaps/code/qmap_6155519`。
 
 运行目录：`/zhanghanyue/experiment/grounded_llm_puzzle_qmaps/runs/hanoi8_6155519`；日志：同根目录 `logs/hanoi8_6155519.log`。完整关系数据已构造并进入实际梯度更新，启动检查通过；尚无最终训练结果。完成后自动按验证目标选择 `best.pt`，保留 `last.pt`，并写出随机关系与六个整塔方向的 `summary.json`。不能将六盘历史权重称为本轮八盘结果。
+
+最近跟进：训练正常推进到 65,000/100,000 步，验证一步最优动作率 89.82%；尚未完成，不能据此报告整题成功率。已设置本聊天定时跟进，完成后回收结果，正常未完成时不反复通知。

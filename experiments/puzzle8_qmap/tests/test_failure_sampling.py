@@ -7,7 +7,7 @@ import torch
 
 from experiments.puzzle8_qmap.src.failure_sampling import FailureGraphData
 from experiments.puzzle8_qmap.src.graph_data import GraphData
-from experiments.puzzle8_qmap.src.model import QMap
+from experiments.puzzle8_qmap.src.model import QMap, MODEL_TYPE
 from experiments.puzzle8_qmap.src.policy_audit import audit
 
 
@@ -38,6 +38,12 @@ class FailureReplayTest(unittest.TestCase):
                 return FailureGraphData(env, data, options, np.random.default_rng(19), path, repair)
             sampler = make()
             model = QMap(dimension=8, hidden=16)
+            reference = path / "reference.pt"
+            torch.save({"task": "puzzle8", "model_type": MODEL_TYPE,
+                        "config": {"model": {"dimension": 8, "hidden": 16}},
+                        "model": model.state_dict()}, reference)
+            repair.update(retention_fraction=.5, retention_checkpoint=str(reference),
+                          retention_restore_checkpoint=str(reference))
             _, state = audit(model, env, "cpu")
             sampler.mine(model, torch.as_tensor(env.features(np.arange(8))), state)
             for pool in (sampler.repair_middle, sampler.repair_restore):
@@ -50,6 +56,11 @@ class FailureReplayTest(unittest.TestCase):
             np.testing.assert_array_equal(truth, env.distance(children, tasks[:, 1, None]))
             self.assertTrue(sampler.repair_seen["huber"])
             self.assertTrue(sampler.repair_seen["candidates"])
+            self.assertGreater(sampler.retention_draws, 0)
+            for pool in (sampler.retention_restore, sampler.retention_middle):
+                if pool is not None:
+                    self.assertTrue(sampler.allowed[pool[:, 0]].all())
+                    self.assertFalse(np.isin(pool[:, 1], sampler.protected).any())
             state = copy.deepcopy(sampler.state_dict())
             wanted = sampler.tasks(128)
             restored = make()

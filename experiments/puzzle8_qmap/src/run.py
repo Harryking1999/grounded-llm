@@ -23,7 +23,7 @@ from .batch_parallel import BatchParallel
 
 
 def intermediate_stage(model, env, data, config, device, reference=None):
-    """Fixed-cohort monitoring, never used for checkpoint selection."""
+    """Fixed cohorts; only validation may guard selection, never test."""
     result = {}
     for split in ("validation", "test"):
         index = task_indices(env, data, split, config["evaluation"]["rollout_count"], config)
@@ -73,7 +73,10 @@ def train(env, config, data, out, device, source_commit, checkpoint=None, resume
                DataMix(env, data, config["data_sampling"], rng) if "data_sampling" in config else None)
     if checkpoint is not None and isinstance(mixture, GraphData):
         if "graph_sampler_state" in saved:
-            if any(config[k] != saved["config"][k] for k in ("seed", "graph_data")):
+            adjustable = {"fractions", "route_fraction", "hard_fraction", "edge_fraction"}
+            if (config["seed"] != saved["config"]["seed"] or
+                    {k: v for k, v in config["graph_data"].items() if k not in adjustable} !=
+                    {k: v for k, v in saved["config"]["graph_data"].items() if k not in adjustable}):
                 raise ValueError("Graph sampler recovery requires matching seed and data mixture")
             mixture.load_state_dict(saved["graph_sampler_state"])
         elif "graph_data" in saved["config"]:
@@ -132,6 +135,9 @@ def train(env, config, data, out, device, source_commit, checkpoint=None, resume
         if isinstance(mixture, GraphData):
             monitor_reference = intermediate_stage(model, env, data, config, device)
         best = -initial_policy["within_budget"]
+        minimum_middle = config["continuation"].get("minimum_validation_intermediate_solved")
+        if minimum_middle is not None and monitor_reference["validation"]["solved"] < minimum_middle:
+            best = float("inf")
         if not resume:
             save(0, out / "best.pt")
         print(json.dumps({"initial_policy": initial_policy, "initial_validation_mae": initial_validation_mae}), flush=True)
@@ -140,6 +146,11 @@ def train(env, config, data, out, device, source_commit, checkpoint=None, resume
         model.load_state_dict(best_saved["model"])
         best_policy, _ = audit(model, env, device)
         best, best_step = -best_policy["within_budget"], best_saved["continuation_step"]
+        minimum_middle = config.get("continuation", {}).get("minimum_validation_intermediate_solved")
+        if minimum_middle is not None:
+            kept_middle = intermediate_stage(model, env, data, config, device)
+            if kept_middle["validation"]["solved"] < minimum_middle:
+                best = float("inf")
         model.load_state_dict(resumed_model)
         print(json.dumps({"resumed_step": start_step, "best_step": best_step,
                           "preserved_best_solved": -best}), flush=True)
@@ -196,6 +207,7 @@ def train(env, config, data, out, device, source_commit, checkpoint=None, resume
                 eligible = min(ps.passes, rs.passes) >= 1
                 selection_score = score
                 policy = None
+                intermediate = None
                 if parent is not None:
                     policy, state = audit(model, env, device, reference=reference, cohort=data["tasks_restoration"][:, 0])
                     if mixture is not None:
@@ -204,6 +216,11 @@ def train(env, config, data, out, device, source_commit, checkpoint=None, resume
                             mixture.mine(model, features, state)
                     selection_score = -policy["within_budget"]
                     eligible = pm["mae"] <= initial_validation_mae + config["continuation"]["maximum_validation_mae_increase"]
+                if isinstance(mixture, GraphData):
+                    intermediate = intermediate_stage(model, env, data, config, device, monitor_reference)
+                    minimum_middle = config.get("continuation", {}).get("minimum_validation_intermediate_solved")
+                    if minimum_middle is not None:
+                        eligible = eligible and intermediate["validation"]["solved"] >= minimum_middle
                 if eligible and selection_score < best:
                     best, best_step = selection_score, step
                     save(step, out / "best.pt")
@@ -218,7 +235,7 @@ def train(env, config, data, out, device, source_commit, checkpoint=None, resume
                     if mixture is not None:
                         record.update(pair_passes=mixture.ps.passes, decision_passes=mixture.rs.passes)
                 if isinstance(mixture, GraphData):
-                    record["intermediate"] = intermediate_stage(model, env, data, config, device, monitor_reference)
+                    record["intermediate"] = intermediate
                     record["validation_pairs_by_distance"] = pm["by_distance"]
                     # Compact stage outcomes survive later last.pt overwrites.
                     # All candidates and basin sizes live in a separate result.
@@ -237,7 +254,7 @@ def train(env, config, data, out, device, source_commit, checkpoint=None, resume
     model.load_state_dict(saved["model"])
     summary = {"task": env.name, "source_commit": source_commit, "best_step": best_step,
                "last_step": step, "training_seconds": round(elapsed_before + time.monotonic() - started, 2),
-               "selection": ("all-state restoration count subject to fixed validation MAE guard"
+               "selection": ("all-state restoration subject to validation MAE and configured validation intermediate success guards"
                              if parent else "heldout intermediate goal distance Huber + full soft rank cross entropy after one coverage pass"),
                "parent": parent, "initial_policy": initial_policy,
                "best_model_training_coverage": saved["coverage"],

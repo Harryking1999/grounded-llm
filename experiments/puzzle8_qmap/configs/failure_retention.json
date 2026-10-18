@@ -1,0 +1,104 @@
+{
+  "task": "puzzle8",
+  "seed": 20261018,
+  "rules": {
+    "board": [
+      3,
+      3
+    ],
+    "goal": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      0
+    ],
+    "move": "blank_direction",
+    "move_cost": 1
+  },
+  "data": {
+    "component": "all_states_reachable_from_standard_goal",
+    "intermediate_goals": [
+      24,
+      4,
+      4
+    ],
+    "eval_per_depth": 256,
+    "standard_goal_full_coverage": true
+  },
+  "model": {
+    "dimension": 128,
+    "hidden": 256,
+    "metric": "l1"
+  },
+  "training": {
+    "steps": 2000,
+    "batch_size": 262144,
+    "decision_batch_size": 262144,
+    "learning_rate": 0.0001,
+    "rank_weight": 1.0,
+    "rank_temperature": 1.0,
+    "eval_every": 1000,
+    "cpu_threads": 4,
+    "reuse_state_encodings": true
+  },
+  "evaluation": {
+    "decision_count": 4096,
+    "rollout_count": 1024,
+    "budget_multiplier": 2,
+    "stratified_tasks": true
+  },
+  "continuation": {
+    "maximum_validation_mae_increase": 0.25,
+    "checkpoint_selection": "all_state_restoration_with_validation_MAE_and_intermediate_success_guards",
+    "acceptance": {
+      "minimum_full_state_restoration_rate": 0.99,
+      "maximum_test_goal_mae_increase": 0.25,
+      "report_cycle_count": true
+    },
+    "parent_checkpoint": "/tmp/puzzle8_failure_repair/run/stages/step_002000/checkpoint.pt",
+    "minimum_validation_intermediate_solved": 367
+  },
+  "graph_data": {
+    "fractions": [
+      0.2,
+      0.2,
+      0.6
+    ],
+    "route_fraction": 0.5,
+    "hard_fraction": 0.2,
+    "edge_fraction": 0.1,
+    "descendant_steps": [
+      0,
+      1,
+      2,
+      4,
+      8,
+      16,
+      31
+    ]
+  },
+  "purpose": "Joint continuation after restoration gains but intermediate regressions. Retain old solved training-only intermediate relations and current solved restoration contexts, emphasizing newly wrong forks4x, jointly with errors and exact optimal descendants. Half repair draws retain previous successes; increase original relation share10to20 percent and reduce unconditioned restoration30to20 percent. All legal candidates, original loss/weights/temperature/Adam/learning rate and broad stream positions remain. Validation intermediate successes must retain pre-repair367/1024 before choosing a new best. Test never selects or trains. Two thousand is a feedback window, not completion.",
+  "failure_sampling": {
+    "structure_cache": "/tmp/puzzle8_full_coverage_b566aaa/graph_structure.npz",
+    "fresh_goals_per_refresh": 16,
+    "errors_per_distance_degree": 32,
+    "restoration_fraction": 0.3,
+    "descendant_steps": [
+      0,
+      0,
+      1,
+      2,
+      4,
+      8
+    ],
+    "graph_fraction": 0.5,
+    "retention_fraction": 0.5,
+    "retention_checkpoint": "/tmp/puzzle8_failure_repair/parent.pt",
+    "retention_restore_checkpoint": "/tmp/puzzle8_failure_repair/run/stages/step_002000/checkpoint.pt"
+  }
+}

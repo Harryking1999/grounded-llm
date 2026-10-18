@@ -19,6 +19,31 @@ class FailureGraphData(GraphData):
         self.repair_distances = {key: np.zeros(env.diameter + 1, dtype=np.int64)
                                  for key in ("huber", "forks")}
         self.mine_round = 0
+        self.retention_restore = self.retention_middle = None
+        self.retention_weights_restore = self.retention_weights_middle = None
+        self.retention_draws = 0
+        self._retention_encoded = {}
+
+    def retained_states(self, model, features, goal, children, legal, truth):
+        path = self.repair.get("retention_restore_checkpoint" if goal == 0 else "retention_checkpoint")
+        if path is None:
+            return None, None
+        if path not in self._retention_encoded:
+            from .checkpoint_audit import load_model
+            reference = load_model(torch.load(path, map_location=features.device, weights_only=False), features.device)
+            self._retention_encoded[path] = torch.cat([reference.encode(part) for part in features.split(8192)])
+        encoded = self._retention_encoded[path]
+        heights = model.distance(encoded, encoded[int(goal)]).cpu().numpy()
+        pointer = self.env.next[np.arange(self.env.size), np.where(legal, heights[children], np.inf).argmin(-1)]
+        pointer[goal] = goal
+        jump = pointer.copy()
+        length = np.ones(self.env.size, dtype=np.int64)
+        length[goal] = 0
+        for _ in range(self.env.size.bit_length()):
+            length, jump = length + length[jump], jump[jump]
+        within = (jump == goal) & (length <= 62)
+        correct = self.env.distance(pointer, goal) == truth - 1
+        return within, correct
 
     @torch.no_grad()
     def mine(self, model, features, state):
@@ -27,6 +52,8 @@ class FailureGraphData(GraphData):
         fresh = self.rng.choice(self.sources, self.repair["fresh_goals_per_refresh"], replace=False)
         goals = np.setdiff1d(np.unique(np.r_[known, fresh, 0]), self.protected)
         middle = []
+        retention = {"restore": [], "middle": []}
+        retained_weights = {"restore": [], "middle": []}
         legal = self.env.next >= 0
         children = np.maximum(self.env.next, 0)
         for goal in goals:
@@ -35,6 +62,20 @@ class FailureGraphData(GraphData):
                                    np.where(legal, height[children], np.inf).argmin(-1)]
             truth = self.env.distance(np.arange(self.env.size), int(goal))
             wrong = self.allowed & (truth > 0) & (self.env.distance(chosen, int(goal)) != truth - 1)
+            within, correct = self.retained_states(model, features, int(goal), children, legal, truth)
+            degree = legal.sum(-1)
+            if within is not None:
+                family = "restore" if int(goal) == 0 else "middle"
+                for distance in range(1, self.env.diameter + 1):
+                    for branches in np.unique(degree):
+                        for lost in (False, True):
+                            pool = np.flatnonzero(self.allowed & within & correct & (truth == distance) &
+                                                  (degree == branches) & (wrong == lost))
+                            if len(pool):
+                                take = self.rng.choice(pool, min(len(pool), self.repair["errors_per_distance_degree"]),
+                                                       replace=False)
+                                retention[family].append(np.column_stack((take, np.full(len(take), goal))))
+                                retained_weights[family].extend([4. if lost else 1.] * len(take))
             if int(goal) == 0:
                 parents = np.flatnonzero(wrong)
                 if not len(parents):
@@ -48,7 +89,6 @@ class FailureGraphData(GraphData):
                 continue
             # Equal quotas per distance and branch degree avoid overwhelming
             # the replay pool with the most common long or easy contexts.
-            degree = legal.sum(-1)
             for distance in range(1, self.env.diameter + 1):
                 for branches in np.unique(degree):
                     pool = np.flatnonzero(wrong & (truth == distance) & (degree == branches))
@@ -56,6 +96,11 @@ class FailureGraphData(GraphData):
                         take = self.rng.choice(pool, min(len(pool), self.repair["errors_per_distance_degree"]),
                                                replace=False)
                         middle.append(np.column_stack((take, np.full(len(take), goal))))
+        for family in ("restore", "middle"):
+            if retention[family]:
+                setattr(self, f"retention_{family}", np.concatenate(retention[family]))
+                weights = np.asarray(retained_weights[family])
+                setattr(self, f"retention_weights_{family}", weights / weights.sum())
         self.repair_middle = (np.concatenate(middle) if middle else
                               np.column_stack((self.parents[:1], self.sources[-1:])))
         self.mine_round += 1
@@ -67,9 +112,19 @@ class FailureGraphData(GraphData):
 
     def repair_rows(self, count, ranking):
         restore = round(count * self.repair["restoration_fraction"])
-        a = self.repair_restore[self.rng.choice(len(self.repair_restore), restore, p=self.restore_weights)]
-        b = self.repair_middle[self.rng.integers(len(self.repair_middle), size=count - restore)]
-        rows = np.concatenate((a, b)).copy()
+        retained = []
+        counts = []
+        for family, total in (("restore", restore), ("middle", count - restore)):
+            pool = getattr(self, f"retention_{family}")
+            keep = round(total * self.repair.get("retention_fraction", 0)) if pool is not None else 0
+            if keep:
+                weights = getattr(self, f"retention_weights_{family}")
+                retained.append(pool[self.rng.choice(len(pool), keep, p=weights)])
+            counts.append(total - keep)
+            self.retention_draws += keep
+        a = self.repair_restore[self.rng.choice(len(self.repair_restore), counts[0], p=self.restore_weights)]
+        b = self.repair_middle[self.rng.integers(len(self.repair_middle), size=counts[1])]
+        rows = np.concatenate((a, b, *retained)).copy()
         levels = np.asarray(self.repair["descendant_steps"])
         steps = levels[self.rng.integers(len(levels), size=count)]
         for depth in range(int(steps.max(initial=0))):
@@ -104,6 +159,9 @@ class FailureGraphData(GraphData):
         result["failure_repair"] = {"restore": self.repair_restore, "middle": self.repair_middle,
             "weights": self.restore_weights, "seen": self.repair_seen, "draws": self.repair_draws,
             "distances": self.repair_distances, "mine_round": self.mine_round}
+        result["failure_repair"]["retention"] = {"restore": self.retention_restore,
+            "middle": self.retention_middle, "weights_restore": self.retention_weights_restore,
+            "weights_middle": self.retention_weights_middle, "draws": self.retention_draws}
         return result
 
     def load_state_dict(self, state):
@@ -114,6 +172,11 @@ class FailureGraphData(GraphData):
             self.restore_weights, self.repair_seen = repair["weights"], repair["seen"]
             self.repair_draws, self.repair_distances = repair["draws"], repair["distances"]
             self.mine_round = repair["mine_round"]
+            if "retention" in repair:
+                kept = repair["retention"]
+                self.retention_restore, self.retention_middle = kept["restore"], kept["middle"]
+                self.retention_weights_restore, self.retention_weights_middle = kept["weights_restore"], kept["weights_middle"]
+                self.retention_draws = kept["draws"]
 
     def report(self):
         result = super().report()
@@ -121,5 +184,6 @@ class FailureGraphData(GraphData):
             "distinct": {key: len(value) for key, value in self.repair_seen.items()},
             "distance_draws": {key: value.tolist() for key, value in self.repair_distances.items()},
             "mine_round": self.mine_round,
+            "old_success_context_draws": self.retention_draws,
             "scope": "Global single sampler across replicas; exact distinct replay relations, overlapping original streams; candidate appearance is not nonzero score gradient"}
         return result

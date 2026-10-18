@@ -17,3 +17,12 @@
 三盘早期合同为 108/108 到达；其数据条件不同，不与上表混作跨盘数能力证据。
 
 训练来源 a07b5f7，冻结诊断 83135f4；[紧凑数字](summary.json)。完整配置、权重、轨迹和旧报告已归档，位置见[开发机手册](../../../DEVELOPMENT_MACHINES.md#7-qmap-历史归档)。
+
+
+## 八盘首轮（进行中）
+
+按用户授权保留当前分支，源码 `6155519`，正式合同为 [hanoi8.json](../configs/hanoi8.json)。完整枚举状态对并构造精确距离，以无序关系及六种共同柱置换作为不可拆分轨道；一步关系全部训练，其他关系轨道留出。对称变换作用于整组当前／目标／后继，不分别规范化两个状态而丢失相对柱关系。
+
+本地原有训练回归与八盘新增检查共八项通过；40048 远端复核八盘精确裁判与六种对称动作对应通过。使用用户指定的 `root@172.16.78.10:40048` GPU 0，复用 `/zhanghanyue/experiment/flamingo_map_reader/.venv/bin/python`，代码快照为 `/zhanghanyue/experiment/grounded_llm_puzzle_qmaps/code/qmap_6155519`。
+
+运行目录：`/zhanghanyue/experiment/grounded_llm_puzzle_qmaps/runs/hanoi8_6155519`；日志：同根目录 `logs/hanoi8_6155519.log`。完整关系数据已构造并进入实际梯度更新，启动检查通过；尚无最终训练结果。完成后自动按验证目标选择 `best.pt`，保留 `last.pt`，并写出随机关系与六个整塔方向的 `summary.json`。不能将六盘历史权重称为本轮八盘结果。

@@ -22,6 +22,7 @@ class FailureGraphData(GraphData):
         self.retention_restore = self.retention_middle = None
         self.retention_weights_restore = self.retention_weights_middle = None
         self.retention_draws = 0
+        self.repair_goals_seen = set()
         self._retention_encoded = {}
 
     def retained_states(self, model, features, goal, children, legal, truth):
@@ -150,6 +151,7 @@ class FailureGraphData(GraphData):
         key = "forks" if ranking else "huber"
         self.repair_draws[key] += count
         self.repair_seen[key].update((rows[:, 0].astype(np.int64) * self.env.size + rows[:, 1]).tolist())
+        self.repair_goals_seen.update(np.unique(rows[:, 1]).tolist())
         self.repair_distances[key] += np.bincount(self.env.distance(rows[:, 0], rows[:, 1]),
                                                 minlength=self.env.diameter + 1)
         if ranking:
@@ -168,6 +170,7 @@ class FailureGraphData(GraphData):
         result["failure_repair"] = {"restore": self.repair_restore, "middle": self.repair_middle,
             "weights": self.restore_weights, "seen": self.repair_seen, "draws": self.repair_draws,
             "distances": self.repair_distances, "mine_round": self.mine_round}
+        result["failure_repair"]["goals_seen"] = self.repair_goals_seen
         result["failure_repair"]["retention"] = {"restore": self.retention_restore,
             "middle": self.retention_middle, "weights_restore": self.retention_weights_restore,
             "weights_middle": self.retention_weights_middle, "draws": self.retention_draws}
@@ -181,6 +184,9 @@ class FailureGraphData(GraphData):
             self.restore_weights, self.repair_seen = repair["weights"], repair["seen"]
             self.repair_draws, self.repair_distances = repair["draws"], repair["distances"]
             self.mine_round = repair["mine_round"]
+            self.repair_goals_seen = repair.get("goals_seen")
+            if self.repair_goals_seen is None:
+                self.repair_goals_seen = {k % self.env.size for k in self.repair_seen["huber"]}
             if "retention" in repair:
                 kept = repair["retention"]
                 self.retention_restore, self.retention_middle = kept["restore"], kept["middle"]
@@ -194,5 +200,6 @@ class FailureGraphData(GraphData):
             "distance_draws": {key: value.tolist() for key, value in self.repair_distances.items()},
             "mine_round": self.mine_round,
             "old_success_context_draws": self.retention_draws,
+            "distinct_training_goals_gradient_exposed": len(self.repair_goals_seen),
             "scope": "Global single sampler across replicas; exact distinct replay relations, overlapping original streams; candidate appearance is not nonzero score gradient"}
         return result

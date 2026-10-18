@@ -198,6 +198,13 @@ def train(env, config, data, out, device, source_commit, checkpoint=None, resume
                     "pairs_per_second": options["batch_size"] / elapsed,
                     "full_candidate_decisions_per_second": options["decision_batch_size"] / elapsed,
                     "scope": "real mixed sampling, encoding, labels, backward and Adam; excludes stage evaluation"}}), flush=True)
+            refresh_every = config.get("failure_sampling", {}).get("refresh_every", 0)
+            if (isinstance(mixture, FailureGraphData) and refresh_every and step % refresh_every == 0
+                    and step % options["eval_every"] != 0 and step != options["steps"]):
+                model.eval()
+                _, refresh_state = audit(model, env, device)
+                mixture.refresh(refresh_state["hard_parents"])
+                mixture.mine(model, features, refresh_state)
             if step == start_step + 1 or step % options["eval_every"] == 0 or step == options["steps"]:
                 model.eval()
                 pm = pair_metrics(model, env, data["pairs_validation"], device)

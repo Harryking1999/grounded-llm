@@ -99,13 +99,27 @@ def summarize(rows):
             "all_first_errors_are_ranking_errors": all(e["chosen_truth"] < 0 and e["reachable_candidates"] > 0 for e in errors)}
 
 
-def training_cases(records, seed, per_root=2):
+def training_cases(records, seed, per_root=2, goal_mode="witness"):
     """Nonempty long goals from known legal tilings, without model-based filtering."""
     rng = random.Random(seed)
     for board, record in enumerate(records):
         tiles = [blocks.PLACEMENTS[blocks.BY_ACTION[(a["shape_id"], a["row"], a["col"]) ]][0]
                  for a in record["construction"]]
         for number in range(per_root):
+            if goal_mode == "random_path":
+                state, path = int(record["initial"]), []
+                while True:
+                    choices = successors(state)
+                    if not choices:
+                        break
+                    _, state = rng.choice(choices)
+                    if state:
+                        path.append(state)
+                if not path:
+                    raise ValueError("No nonempty legal descendant")
+                goal = path[-1]
+                yield {"board": board, "source": record["initial"], "goal": str(goal)}
+                continue
             keep = 1 + number % 3
             goal = 0
             for tile in rng.sample(tiles, keep):
@@ -113,7 +127,7 @@ def training_cases(records, seed, per_root=2):
             yield {"board": board, "source": record["initial"], "goal": str(goal)}
 
 
-def run(checkpoint, graph_data, monitor_cases, out, seed, train_roots=1000, per_root=2, device="cpu"):
+def run(checkpoint, graph_data, monitor_cases, out, seed, train_roots=1000, per_root=2, device="cpu", goal_mode="witness"):
     torch.set_num_threads(2)
     scorer = QScorer(checkpoint, device)
     records = json.loads((graph_data / "roots.json").read_text())
@@ -124,9 +138,10 @@ def run(checkpoint, graph_data, monitor_cases, out, seed, train_roots=1000, per_
     monitor = [r for r in monitor if r["goal"] != "0" and r["true_distance"] > 1]
     oracle = DistanceOracle(cache_limit=8000000, seconds=14400)
     result = {"checkpoint": str(checkpoint), "identity": scorer.identity,
-              "seed": seed, "scope": "Diagnostic only; monitoring failures never enter repair training"}
+              "seed": seed, "training_goal_mode": goal_mode,
+              "scope": "Diagnostic only; monitoring failures never enter repair training"}
     for name, cases in (("monitor_long", monitor),
-                        ("training_long", training_cases(records[:train_roots], seed, per_root))):
+                        ("training_long", training_cases(records[:train_roots], seed, per_root, goal_mode))):
         rows = []
         for index, row in enumerate(cases):
             truth_oracle = oracle if name == "monitor_long" else RootOracle(roots[row["board"]])
@@ -152,9 +167,10 @@ def main():
     p.add_argument("--train-roots", type=int, default=1000)
     p.add_argument("--per-root", type=int, default=2)
     p.add_argument("--device", default="cpu")
+    p.add_argument("--goal-mode", choices=["witness", "random_path"], default="witness")
     args = p.parse_args()
     run(args.checkpoint, args.graph_data, args.monitor_cases, args.out, args.seed,
-        args.train_roots, args.per_root, args.device)
+        args.train_roots, args.per_root, args.device, args.goal_mode)
 
 
 if __name__ == "__main__":

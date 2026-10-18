@@ -60,3 +60,5 @@ python -m unittest discover -s experiments/puzzle8_qmap/tests -v
 续训恢复模型、Adam及采样状态，每次评估保存最佳和最近断点。旧全图断点只保存了广域采样计数：在原种子与相同初始化顺序下恢复未绕回的首轮置换位置，跳过已曝光前缀；旧的复原、结构和其他重放流重新起步并明确记录，不虚构完整恢复。此后的断点保存全部采样器和NumPy随机状态，检查覆盖跨断点样本的连续性。标签表可缓存到节点本地盘以避免共享盘随机读取，持久原始数据与训练产物继续保留。
 
 完整曝光是数据要求，仍不等于网络学会；最佳与最终断点分别报告实际曝光和真实求解，不把训练完成作为可靠地图的验收。
+
+续训按正式合同的`training.eval_every`报告更新阶段；更新步数与解题动作数分开。读取`progress.jsonl`可取得每档完整复原、循环、旧成功丢失、原同题、验证距离与实际曝光。`python -m experiments.puzzle8_qmap.src.progress_report --run RUN --after-step STEP --prepared-run BASE_DATA`汇总新增档位，并对最新已发布断点补测固定中间目标完整到达，写入该运行的`intermediate_progress.jsonl`；重复调用复用同一断点结果，不改变训练或选模。

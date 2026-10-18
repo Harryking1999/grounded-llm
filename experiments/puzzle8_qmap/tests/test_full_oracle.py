@@ -3,7 +3,7 @@ import tempfile
 import unittest
 import numpy as np
 from scipy.sparse import csr_matrix
-from experiments.puzzle8_qmap.src.full_oracle import initialize, fill
+from experiments.puzzle8_qmap.src.full_oracle import initialize, fill, tensor_bfs
 
 
 class FullOracleTest(unittest.TestCase):
@@ -21,6 +21,13 @@ class FullOracleTest(unittest.TestCase):
             import experiments.puzzle8_qmap.src.full_oracle as module
             del module.TABLE
             del table
+
+    def test_tensor_frontiers_match_exact_shortest_paths(self):
+        import torch
+        dense = torch.tensor([[0., 1., 0., 0.], [1., 0., 1., 0.],
+                              [0., 1., 0., 1.], [0., 0., 1., 0.]])
+        actual = tensor_bfs(dense.to_sparse(), torch.tensor([3, 0]), 4, 3)
+        np.testing.assert_array_equal(actual, [[3, 2, 1, 0], [0, 1, 2, 3]])
 
 
 if __name__ == "__main__":

@@ -1,0 +1,515 @@
+{
+  "task": "puzzle8",
+  "status": "continuation_running_not_accepted",
+  "graph_and_exact_relation_coverage": {
+    "states": 181440,
+    "full_exact_ordered_pairs": 32920473600,
+    "available_joint_pairs": 32917570624,
+    "available_joint_decisions": 32913216256,
+    "structure_decisions": 7077604,
+    "structure_parent_states": 181408,
+    "structure_goal_states": 181432,
+    "directed_edges": 483792,
+    "protected_goal_ids": [
+      6179,
+      21379,
+      27847,
+      62162,
+      73442,
+      113285,
+      125953,
+      131701
+    ],
+    "scope": "One joint training pool. Full source-goal distances and full legal stars; every parent fork, multiscale downstream and cross-branch relations; no new loss or supervision type."
+  },
+  "preserved_baseline": {
+    "checkpoint": "/zhanghanyue/experiment/grounded_llm_puzzle_qmaps/runs/puzzle8_full_graph_fb7ffe6/best.pt",
+    "full_state": {
+      "nonterminal_states": 181439,
+      "horizon": 62,
+      "eventually_solved": 140056,
+      "within_budget": 140056,
+      "within_budget_rate": 0.7719178346441504,
+      "shortest_action_rate": 0.9890045690287094,
+      "wrong_decisions": 1995,
+      "two_cycles": 567,
+      "cycle_nodes": 1134,
+      "other_cycle_nodes": 0,
+      "local_minima": 9771,
+      "restoration_mae": 0.5650831020198285,
+      "previously_solved_lost": 29328,
+      "previously_failed_gained": 40469,
+      "same1024": {
+        "count": 1024,
+        "solved": 798,
+        "cycle_count": 226,
+        "mean_extra_steps_on_solved": 0.10025062656641603
+      }
+    },
+    "intermediate_test_solved": 335,
+    "sampling": {
+      "original_pair_passes": 2.6984126984126986,
+      "original_decision_passes": 1.349213785349346,
+      "restoration_pair_passes": 406.0846560846561,
+      "restoration_decision_passes": 203.0434471089457,
+      "all_pairs_draws": 66360000,
+      "all_pairs_passes": 0.0020159446381385546,
+      "all_decision_draws": 36840000,
+      "all_decision_passes": 0.0011193072021116793,
+      "observed_broad_sources": 181432,
+      "observed_broad_goals": 181432,
+      "structure_pair_passes": 7.494061549643071,
+      "structure_decision_passes": 4.170903034416732,
+      "hard_pair_draws": 13320000,
+      "hard_decision_draws": 7440000,
+      "edge_pair_passes": 30.50897906538347,
+      "structure_decisions": 7077604,
+      "hard_contexts": 8588
+    }
+  },
+  "curve": [
+    {
+      "step": 1,
+      "seconds": 6.76,
+      "full_state_solved": 139929,
+      "full_state_rate": 0.7712178748780582,
+      "two_cycles": 570,
+      "previously_solved_lost": 313,
+      "previously_failed_gained": 186,
+      "same1024_solved": 799,
+      "validation_mae": 2.9402632617574693,
+      "best_step": 0,
+      "sampling": {
+        "original_pair_passes": 0.0231168430335097,
+        "original_decision_passes": 0.023116970441856493,
+        "restoration_pair_passes": 3.4675154320987653,
+        "restoration_decision_passes": 3.4675345432900313,
+        "all_pairs_draws": 66926231,
+        "all_pairs_passes": 0.0020331461201819217,
+        "all_decision_draws": 37469145,
+        "all_decision_passes": 0.0011384224716467649,
+        "observed_broad_sources": 181155,
+        "observed_broad_goals": 181203,
+        "structure_pair_passes": 0.06400259183757667,
+        "structure_decision_passes": 0.07111403802755847,
+        "hard_pair_draws": 113246,
+        "hard_decision_draws": 125829,
+        "edge_pair_passes": 0.26008904653239406,
+        "structure_decisions": 7077604,
+        "hard_contexts": 8584
+      }
+    },
+    {
+      "step": 2,
+      "seconds": 14.79,
+      "full_state_solved": 139879,
+      "full_state_rate": 0.7709423001669983,
+      "two_cycles": 572,
+      "previously_solved_lost": 440,
+      "previously_failed_gained": 263,
+      "same1024_solved": 797,
+      "validation_mae": 2.9402296673187545,
+      "best_step": 0,
+      "sampling": {
+        "original_pair_passes": 0.0462336860670194,
+        "original_decision_passes": 0.046233940883712986,
+        "restoration_pair_passes": 6.935030864197531,
+        "restoration_decision_passes": 6.935069086580063,
+        "all_pairs_draws": 67492462,
+        "all_pairs_passes": 0.002050347602225289,
+        "all_decision_draws": 38098290,
+        "all_decision_passes": 0.0011575377411818504,
+        "observed_broad_sources": 181432,
+        "observed_broad_goals": 181432,
+        "structure_pair_passes": 0.12800518367515334,
+        "structure_decision_passes": 0.14222807605511695,
+        "hard_pair_draws": 226492,
+        "hard_decision_draws": 251658,
+        "edge_pair_passes": 0.5201780930647881,
+        "structure_decisions": 7077604,
+        "hard_contexts": 8587,
+        "distance_exposure": {
+          "pair_draws_by_distance": [
+            8410,
+            143670,
+            30028,
+            24086,
+            25182,
+            22519,
+            25543,
+            24601,
+            30193,
+            32889,
+            34873,
+            33811,
+            37370,
+            39985,
+            45721,
+            52393,
+            65928,
+            72520,
+            89097,
+            95844,
+            130881,
+            145311,
+            183994,
+            172904,
+            183044,
+            133515,
+            109933,
+            54732,
+            30561,
+            9449,
+            4791,
+            3374
+          ],
+          "legal_candidate_draws_by_distance": [
+            38004,
+            27807,
+            97818,
+            71259,
+            81092,
+            60612,
+            84486,
+            74820,
+            92162,
+            93815,
+            111386,
+            104187,
+            113837,
+            124388,
+            137826,
+            161915,
+            190275,
+            212338,
+            256752,
+            290953,
+            353805,
+            436684,
+            493303,
+            517801,
+            484647,
+            399022,
+            288998,
+            162971,
+            78285,
+            27789,
+            14718,
+            142
+          ],
+          "tracking_started_after": {
+            "all_pairs_draws": 66926231,
+            "all_decision_draws": 37469145
+          },
+          "scope": "Actual gradient-sampled labels across all mixture components, repeated draws counted; legacy histograms unavailable"
+        }
+      },
+      "intermediate": {
+        "validation": {
+          "count": 1024,
+          "solved": 362,
+          "success_rate": 0.353515625,
+          "cycle_rate": 0.646484375,
+          "budget_exhausted": 0,
+          "horizon": 62,
+          "mean_extra_steps_on_solved": 0.08287292817679558,
+          "illegal_action_rate": 0.0,
+          "by_start_distance": {
+            "1": {
+              "count": 13,
+              "success_rate": 1.0
+            },
+            "2": {
+              "count": 25,
+              "success_rate": 1.0
+            },
+            "3": {
+              "count": 33,
+              "success_rate": 1.0
+            },
+            "4": {
+              "count": 33,
+              "success_rate": 1.0
+            },
+            "5": {
+              "count": 33,
+              "success_rate": 1.0
+            },
+            "6": {
+              "count": 34,
+              "success_rate": 0.9411764705882353
+            },
+            "7": {
+              "count": 36,
+              "success_rate": 0.9166666666666666
+            },
+            "8": {
+              "count": 34,
+              "success_rate": 0.8823529411764706
+            },
+            "9": {
+              "count": 38,
+              "success_rate": 0.7631578947368421
+            },
+            "10": {
+              "count": 35,
+              "success_rate": 0.7714285714285715
+            },
+            "11": {
+              "count": 35,
+              "success_rate": 0.37142857142857144
+            },
+            "12": {
+              "count": 36,
+              "success_rate": 0.3611111111111111
+            },
+            "13": {
+              "count": 34,
+              "success_rate": 0.20588235294117646
+            },
+            "14": {
+              "count": 35,
+              "success_rate": 0.2857142857142857
+            },
+            "15": {
+              "count": 35,
+              "success_rate": 0.17142857142857143
+            },
+            "16": {
+              "count": 40,
+              "success_rate": 0.15
+            },
+            "17": {
+              "count": 36,
+              "success_rate": 0.1388888888888889
+            },
+            "18": {
+              "count": 34,
+              "success_rate": 0.11764705882352941
+            },
+            "19": {
+              "count": 33,
+              "success_rate": 0.06060606060606061
+            },
+            "20": {
+              "count": 37,
+              "success_rate": 0.0
+            },
+            "21": {
+              "count": 38,
+              "success_rate": 0.02631578947368421
+            },
+            "22": {
+              "count": 37,
+              "success_rate": 0.02702702702702703
+            },
+            "23": {
+              "count": 33,
+              "success_rate": 0.0
+            },
+            "24": {
+              "count": 35,
+              "success_rate": 0.0
+            },
+            "25": {
+              "count": 34,
+              "success_rate": 0.058823529411764705
+            },
+            "26": {
+              "count": 34,
+              "success_rate": 0.029411764705882353
+            },
+            "27": {
+              "count": 35,
+              "success_rate": 0.02857142857142857
+            },
+            "28": {
+              "count": 34,
+              "success_rate": 0.058823529411764705
+            },
+            "29": {
+              "count": 36,
+              "success_rate": 0.0
+            },
+            "30": {
+              "count": 35,
+              "success_rate": 0.0
+            },
+            "31": {
+              "count": 4,
+              "success_rate": 0.0
+            }
+          },
+          "same_tasks": {
+            "count": 1024,
+            "baseline_solved": 362,
+            "candidate_solved": 362,
+            "previously_solved_lost": 0,
+            "previously_failed_gained": 0,
+            "net_gain": 0
+          }
+        },
+        "test": {
+          "count": 1024,
+          "solved": 333,
+          "success_rate": 0.3251953125,
+          "cycle_rate": 0.6748046875,
+          "budget_exhausted": 0,
+          "horizon": 62,
+          "mean_extra_steps_on_solved": 0.12012012012012012,
+          "illegal_action_rate": 0.0,
+          "by_start_distance": {
+            "1": {
+              "count": 11,
+              "success_rate": 1.0
+            },
+            "2": {
+              "count": 19,
+              "success_rate": 1.0
+            },
+            "3": {
+              "count": 33,
+              "success_rate": 1.0
+            },
+            "4": {
+              "count": 34,
+              "success_rate": 0.9705882352941176
+            },
+            "5": {
+              "count": 33,
+              "success_rate": 1.0
+            },
+            "6": {
+              "count": 34,
+              "success_rate": 0.9117647058823529
+            },
+            "7": {
+              "count": 35,
+              "success_rate": 0.9428571428571428
+            },
+            "8": {
+              "count": 36,
+              "success_rate": 0.8333333333333334
+            },
+            "9": {
+              "count": 36,
+              "success_rate": 0.7222222222222222
+            },
+            "10": {
+              "count": 37,
+              "success_rate": 0.6486486486486487
+            },
+            "11": {
+              "count": 35,
+              "success_rate": 0.4857142857142857
+            },
+            "12": {
+              "count": 37,
+              "success_rate": 0.2972972972972973
+            },
+            "13": {
+              "count": 39,
+              "success_rate": 0.23076923076923078
+            },
+            "14": {
+              "count": 35,
+              "success_rate": 0.11428571428571428
+            },
+            "15": {
+              "count": 34,
+              "success_rate": 0.14705882352941177
+            },
+            "16": {
+              "count": 36,
+              "success_rate": 0.08333333333333333
+            },
+            "17": {
+              "count": 33,
+              "success_rate": 0.12121212121212122
+            },
+            "18": {
+              "count": 36,
+              "success_rate": 0.0
+            },
+            "19": {
+              "count": 35,
+              "success_rate": 0.05714285714285714
+            },
+            "20": {
+              "count": 35,
+              "success_rate": 0.0
+            },
+            "21": {
+              "count": 34,
+              "success_rate": 0.029411764705882353
+            },
+            "22": {
+              "count": 35,
+              "success_rate": 0.02857142857142857
+            },
+            "23": {
+              "count": 36,
+              "success_rate": 0.027777777777777776
+            },
+            "24": {
+              "count": 35,
+              "success_rate": 0.0
+            },
+            "25": {
+              "count": 36,
+              "success_rate": 0.0
+            },
+            "26": {
+              "count": 36,
+              "success_rate": 0.027777777777777776
+            },
+            "27": {
+              "count": 37,
+              "success_rate": 0.02702702702702703
+            },
+            "28": {
+              "count": 35,
+              "success_rate": 0.0
+            },
+            "29": {
+              "count": 35,
+              "success_rate": 0.0
+            },
+            "30": {
+              "count": 34,
+              "success_rate": 0.0
+            },
+            "31": {
+              "count": 8,
+              "success_rate": 0.0
+            }
+          },
+          "same_tasks": {
+            "count": 1024,
+            "baseline_solved": 335,
+            "candidate_solved": 333,
+            "previously_solved_lost": 2,
+            "previously_failed_gained": 0,
+            "net_gain": -2
+          }
+        }
+      }
+    }
+  ],
+  "checkpoint_selection_note": "Training best is only restoration plus validation-MAE guard; deployment also requires matched intermediate rollout and regression review",
+  "node_run": "/tmp/puzzle8_full_coverage_b566aaa",
+  "persistent_run": "/zhanghanyue/experiment/grounded_llm_puzzle_qmaps/runs/puzzle8_full_coverage_b566aaa",
+  "local_backup": "runs/qmap_dual_20261018/puzzle8",
+  "remaining": [
+    "Publish first 1000-update stage",
+    "Complete planned actual broad exposure budget",
+    "Meet >=99% full-state restoration without serious intermediate-goal regression",
+    "Audit complete-fork and downstream decisions by true distance",
+    "Select a checkpoint only after matched two-core acceptance"
+  ],
+  "limitations": [
+    "Legacy distance histograms unavailable; new counters begin after recovered step 1",
+    "Fixed test-cohort monitoring is not independent generalization",
+    "Broad permutation ID coverage excludes replay overlap and does not demonstrate learning"
+  ]
+}

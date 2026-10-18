@@ -13,7 +13,7 @@
 
 [平台入口](https://172.16.78.10:32206/index.html?#/developEnv)：业务管理 → 开发环境 → SSH 查看。旧平台端口不作为自动恢复目标。
 
-当前平台评测入口使用 `35016`。`40048` 原由用户用于其他任务；用户已在本轮明确授权将其用于八盘汉诺塔与数字华容道 Qmap 训练，连接后仍须确认资源。不得据此重启其他队列或调整其他任务。
+当前平台评测入口使用 `35016`；用户亦已授权在该环境开展原八形状、12次构造的积木Qmap续训。`40048` 原由用户用于其他任务；用户已在本轮明确授权将其用于八盘汉诺塔与数字华容道 Qmap 训练，连接后仍须确认资源。不得据此重启其他队列或调整其他任务。
 
 ## 2. SSH 连接与认证
 
@@ -53,7 +53,7 @@ ssh grounded-4090
 | 028 Qwen3-32B（只读复用） | `/ssdwork/fuzhizhang/model_base/Qwen3-32B`；完整 BF16 权重、配置与 tokenizer 已核对 |
 | 平台、4090 项目基座 | 各项目根目录下 `models/Qwen2.5-1.5B-Instruct` |
 | 4090 公共模型区 | `/opt/models`；使用前确认所需模型是否存在 |
-| 平台积木地图工作区 | `/zhanghanyue/experiment/grounded_llm_qmap_tree_132f5a1` |
+| 平台积木地图工作区 | `/zhanghanyue/experiment/grounded_llm_qmap_tree_132f5a1` 为现有八形状地图来源；12块新条件使用 `/zhanghanyue/experiment/grounded_llm_blocks12_qmap`，节点临时盘缓存数据，产物与源码归档持久保存 |
 | 平台早期实验工作区 | `/zhanghanyue/experiment/grounded_llm` |
 | 平台汉诺塔／二阶魔方 Qmap | `/zhanghanyue/experiment/grounded_llm_puzzle_qmaps`；`code/current/` 保存当前已提交源码，`runs/` 与 `logs/` 用于新生成物；复用平台项目的 `.venv/bin/python`；完成的旧实验归档见第 7 节 |
 | 4090 二阶魔方 Qmap | `/home/gongruochen/grounded_llm`；提交快照放 `code/`，迁入的小型精确数据放 `data/`，产物放 `runs/` 与 `logs/`；使用该项目 `.venv/bin/python`，0 号卡继续预留 |

@@ -140,3 +140,18 @@ GPU1短测比较原小批量与复用状态编码的大批量，采用后者；�
 GPU1正式训练持续，空闲GPU0与GPU2只执行极短吞吐检查。一次捕获原GraphData完整采样器的下一全局混合batch，在固定2,097,152条距离及同量候选上比较原单卡与双卡各半；不新增模型、标签、损失或训练条件，不向正式run写权重。单卡计算（不含CPU标签采样）稳态约3.52–3.56秒；双卡归并梯度后一次clip／Adam稳态1.82–1.84秒。原distance没有改变，目标值为单卡2.070059299、双卡2.070059418，最大参数梯度差`2.70e-7`；从正式成熟Adam断点实际更新1步与4步后的最大参数差均为`5.96e-8`。两卡浮点归约次序不同，不声称逐位复现单卡轨迹。
 
 随机初始化float32的近零bias梯度在Adam epsilon下可放大归约噪声，因此另用float64检查不等长分片的精确加权、clip仅一次、真实Adam更新与副本同步，且以以上成熟断点GPU实测补充，未用理论等价代替实际参数检查。局部abs化L1只带来约2%计算收益，因此不采用，避免不必要的distance归约变化。后续计划在累计1000完整档位发布后才切换同一模型的双卡执行，不中断当前有效训练；未发布尾部如需重放，以已保存sampler为准，不累计虚构曝光。首个千步质量仍未产生，当前仍不能交付可靠Qmap。
+
+### 当前后台角色与后续验收入口
+
+双卡执行源码`580b11e`已提交并通过15项检查，部署于`/tmp/qmap_580b11e`；完整Git源归档已写`code/qmap_580b11e/source.tar`。**目前仍由单卡进程107训练，首个1000档未发布**，不是已完成双卡切换或已验收。以下均为本次运行的Git外runtime脚本，节点盘和本地`tmp/`各留一份；不可据本节旧PID重启或终止进程，先核对实际命令与输出。
+
+| 角色 | 节点入口 | 已核实PID | 行为与完成条件 |
+|---|---|---:|---|
+| 当前训练 | `/tmp/qmap_a4bd97e`，日志`/tmp/puzzle8_full_coverage_resume_a4bd97e.log` | 107 | 同一合同、GPU1、累计更新继续；当前最新发布step 2 |
+| 单次双卡切换 | `/tmp/puzzle8_switch_580b11e.sh`，日志`/tmp/puzzle8_full_coverage_parallel_580b11e.log` | 617 | 等progress至少1000且last步数一致，等物理GPU0空闲，仅终止本任务107，再同目录`--resume-run --device cuda:0 --devices cuda:0 cuda:1`；物理可见顺序`1,0`，global batch不变 |
+| 历史完整断点保留 | `/tmp/puzzle8_keep_checkpoints.py`，日志`/tmp/puzzle8_keep_checkpoints.log` | 628 | 每30秒先硬链接当前完整last快照，再读其真实step，保存`stages/step_NNNNNN/checkpoint.pt`；完整Adam和采样器随断点保留，不受后续best或last替换影响 |
+| 持久回存 | `/tmp/puzzle8_sync_a4bd97e.sh`，日志`/tmp/puzzle8_sync_a4bd97e.log` | 760 | 每60秒以cp回存整个节点run（含stages）及两个训练日志，checkpoint临时复制后原子重命名；跨107退出与617接续持续运行，summary出现后最终回存并退出 |
+
+权威活跃run镜像为`/tmp/puzzle8_full_coverage_b566aaa`；持久run仍为`/zhanghanyue/experiment/grounded_llm_puzzle_qmaps/runs/puzzle8_full_coverage_b566aaa`，共享盘阻塞时可能滞后。step 2已发布完整断点及best、config、progress、图汇总、循环结果已回收到本地`runs/qmap_dual_20261018/puzzle8/`，并独立保留`stages/step_000002/checkpoint.pt`。本地历史副本不与可覆盖的last硬链接。后续本地回收由现有20分钟心跳在发现新档时执行；节点保留与持久回存不会自动代替本地备份。
+
+训练内best只是“全状态复原＋验证MAE guard”候选，不是最终采用。每个历史完整断点保留，是为了在某阶段复原上升但中间目标明显退化时，仍可回到兼顾两项能力的较早候选。后续必须逐档报告完整复原、循环、固定中间目标同题得失、距离／排序分桶、结构决策及实际标签曝光；千步未生成、完整预算未完成、99%及关系保持未通过，均明确保留为未完成。

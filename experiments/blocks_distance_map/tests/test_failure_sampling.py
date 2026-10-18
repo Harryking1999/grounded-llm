@@ -36,14 +36,24 @@ class FailureSamplingTest(unittest.TestCase):
                     for i, s in enumerate(masks) for j, g in enumerate(masks)]
             np.savez(path / "legacy.npz", states=np.asarray(masks, dtype=str), train=np.asarray(rows))
             star = {"source": str(initial), "goal": str(initial ^ 3)}
+            bad_action = blocks.BY_ACTION[(4, 0, 0)]
+            bad = initial ^ blocks.PLACEMENTS[bad_action][0]
+            star.update(chosen_action=bad_action, failure_type="removed_goal_cell",
+                        candidates=[{"action": bad_action, "state": str(bad), "truth": -1}])
             diagnostic = {"training_long": {"rows": [{"board": 0, "source": str(initial),
                 "success": False, "failure": star, "trajectory": [star]}]},
                 "monitor_long": {"rows": [{"board": 999, "source": "invalid"}]}}
             (path / "diagnosis.json").write_text(json.dumps(diagnostic))
+            retained = {"training_long": {"rows": [{"board": 0, "source": str(initial),
+                        "success": True, "trajectory": [star]}]}}
+            (path / "retention.json").write_text(json.dumps(retained))
             options = {"seed": 18, "boards_per_batch": 1, "legacy_fraction": .1,
                        "broad_fraction": .25, "clear_fraction": .35, "failure_fraction": .5,
                        "repair_descendant_steps": [0, 1, 2],
-                       "failure_diagnosis": str(path / "diagnosis.json")}
+                       "failure_diagnosis": str(path / "diagnosis.json"),
+                       "retention_diagnosis": str(path / "retention.json"),
+                       "hard_negative_fraction": .25, "retention_fraction": .25,
+                       "fresh_fraction": .25}
             def make():
                 return FailureData(path, path / "legacy.npz", options)
             sampler = make()
@@ -55,6 +65,8 @@ class FailureSamplingTest(unittest.TestCase):
             self.assertEqual(sum(sampler.report()["local_pair_draws"].values()), 128)
             self.assertTrue(sampler.repair_pairs_seen)
             self.assertTrue(sampler.repair_candidates_seen)
+            self.assertGreater(sampler.hard_negative_draws, 0)
+            self.assertGreater(sampler.retention_draws, 0)
             state = copy.deepcopy(sampler.state_dict())
             wanted = sampler.batch(128, 32)
             restored = make()
@@ -62,7 +74,14 @@ class FailureSamplingTest(unittest.TestCase):
             for actual, expected in zip(restored.batch(128, 32), wanted):
                 np.testing.assert_array_equal(actual, expected)
             self.assertEqual(restored.report(), sampler.report())
-            for item in (sampler, restored):
+            torch.save(sampler.state_dict(), path / "sampler_001000_rank0.pt")
+            options.update(previous_sampler_root=str(path), previous_sampler_step=1000)
+            continued = make()
+            np.testing.assert_array_equal(continued.broad, sampler.broad)
+            self.assertEqual(continued.repair_pairs_seen, sampler.repair_pairs_seen)
+            self.assertEqual(continued.repair_pair_draws, sampler.repair_pair_draws)
+            self.assertEqual(continued.hard_negative_draws, sampler.hard_negative_draws)
+            for item in (sampler, restored, continued):
                 item.close()
 
     def test_only_unreachable_targets_change_and_label_exceeds_finite_bound(self):

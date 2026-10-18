@@ -14,7 +14,9 @@ class FailureData(JointData):
         # Deliberately ignore monitor_long. Only training roots can seed repair.
         rows = diagnostic["training_long"]["rows"]
         self.packets = [[] for _ in self.roots]
-        self.packet_origins = []
+        self.packet_weights = [[] for _ in self.roots]
+        self.negative_packets = [[] for _ in self.roots]
+        self.retention_packets = [[] for _ in self.roots]
         for row in rows:
             board = row["board"]
             if row["source"] != self.roots[board].record["initial"]:
@@ -28,13 +30,31 @@ class FailureData(JointData):
                 if (source, goal) in seen:
                     continue
                 seen.add((source, goal))
-                ids = []
-                for mask in (source, goal):
-                    ids.append([int(graph.rank(np.asarray([sum(((mask >> cell) & 1) << bit
-                                      for bit, cell in enumerate(cells))], dtype=np.uint64))[0])
-                                for graph, cells in root.parts])
-                self.packets[board].append(ids)
+                self.packets[board].append(self.encode_pair(root, source, goal))
+                first_error = not row["success"] and star is row["failure"]
+                self.packet_weights[board].append(4 if first_error else 1)
+            if not row["success"] and row["failure"].get("candidates"):
+                failure = row["failure"]
+                chosen = next(c for c in failure["candidates"] if c["action"] == failure["chosen_action"])
+                packet = self.encode_pair(root, int(chosen["state"]), int(failure["goal"]))
+                # Direct Huber negatives target the actual wrong legal child.
+                # Ranking continues to use its reachable parent and full fork.
+                repeat = 3 if failure["failure_type"] == "removed_goal_cell" else 1
+                self.negative_packets[board].extend([packet] * repeat)
+        if options.get("retention_diagnosis"):
+            retained = json.loads(Path(options["retention_diagnosis"]).read_text())["training_long"]["rows"]
+            for row in retained:
+                if row["success"]:
+                    root = self.roots[row["board"]]
+                    if row["source"] != root.record["initial"]:
+                        raise ValueError("Retention must use matching training roots")
+                    for star in row["trajectory"]:
+                        self.retention_packets[row["board"]].append(
+                            self.encode_pair(root, int(star["source"]), int(star["goal"])))
         self.packets = [np.asarray(rows, dtype=np.int64) for rows in self.packets]
+        self.negative_packets = [np.asarray(rows, dtype=np.int64) for rows in self.negative_packets]
+        self.retention_packets = [np.asarray(rows, dtype=np.int64) for rows in self.retention_packets]
+        self.packet_weights = [np.asarray(w, dtype=float) / sum(w) for w in self.packet_weights]
         if any(not len(rows) for rows in self.packets):
             raise ValueError("Each training root needs at least one diagnosed context")
         self.packet_seen = [np.zeros(len(rows), dtype=bool) for rows in self.packets]
@@ -44,6 +64,7 @@ class FailureData(JointData):
         self.repair_pairs_seen, self.repair_forks_seen = set(), set()
         self.repair_candidates_seen = set()
         self.last_repair_count = 0
+        self.hard_negative_draws = self.retention_draws = 0
         # Continue the certified broad prefix, without calling repeats unique.
         previous = options.get("previous_sampler_root")
         if previous:
@@ -52,16 +73,36 @@ class FailureData(JointData):
             state = torch.load(Path(previous) / f"sampler_{step:06d}_rank{rank}.pt",
                                map_location="cpu", weights_only=False)
             super().load_state_dict(state)
+            if "failure_repair" in state:
+                self.load_repair_tracking(state["failure_repair"], same_pool=False)
+
+    @staticmethod
+    def encode_pair(root, source, goal):
+        return [[int(graph.rank(np.asarray([sum(((mask >> cell) & 1) << bit
+                          for bit, cell in enumerate(cells))], dtype=np.uint64))[0])
+                 for graph, cells in root.parts] for mask in (source, goal)]
 
     def repaired_rows(self, board, count, ranking):
         root = self.roots[board]
-        selected = self.rng.integers(len(self.packets[board]), size=count)
+        total = count
+        negatives = (round(count * self.options.get("hard_negative_fraction", 0))
+                     if not ranking and len(self.negative_packets[board]) else 0)
+        count -= negatives
+        selected = self.rng.choice(len(self.packets[board]), size=count, p=self.packet_weights[board])
         rows = self.packets[board][selected]
         source, goal = rows[:, 0].copy(), rows[:, 1].copy()
         # New arbitrary residual goals keep repair from memorizing the two
         # diagnostic targets per root. Preserve the last nonempty descendant.
-        fresh = count // 2
-        self.packet_seen[board][selected[fresh:]] = True
+        fresh = round(count * self.options.get("fresh_fraction", .5))
+        retain = (round(count * self.options.get("retention_fraction", 0))
+                  if len(self.retention_packets[board]) else 0)
+        if fresh + retain > count:
+            raise ValueError("Fresh and retention fractions exceed repair budget")
+        self.packet_seen[board][selected[fresh:count-retain if retain else count]] = True
+        if retain:
+            kept = self.retention_packets[board][self.rng.integers(len(self.retention_packets[board]), size=retain)]
+            source[-retain:], goal[-retain:] = kept[:, 0], kept[:, 1]
+            self.retention_draws += retain
         if fresh:
             initial = np.tile([g.initial_id for g, _ in root.parts], (fresh, 1))
             current = initial.copy()
@@ -97,11 +138,19 @@ class FailureData(JointData):
         distances = np.where((labels < 0).any(-1), -1, labels.sum(-1))
         if (distances < 0).any():
             raise AssertionError("Optimal continuation lost reachability")
+        if negatives:
+            bad = self.negative_packets[board][self.rng.integers(len(self.negative_packets[board]), size=negatives)]
+            parts = root.distance_parts(bad[:, 0], bad[:, 1])
+            if (parts >= 0).all(-1).any():
+                raise AssertionError("Hard negative must be exactly unreachable")
+            source, goal = np.concatenate((source, bad[:, 0])), np.concatenate((goal, bad[:, 1]))
+            distances = np.r_[distances, np.full(negatives, len(self.repair_distances) - 1)]
+            self.hard_negative_draws += negatives
         self.repair_distances += np.bincount(distances, minlength=len(self.repair_distances))
         if ranking:
-            self.repair_rank_requested += count
+            self.repair_rank_requested += total
         else:
-            self.repair_pair_draws += count
+            self.repair_pair_draws += total
         return source, goal
 
     def root_rows(self, board, count, ranking):
@@ -136,13 +185,17 @@ class FailureData(JointData):
             "optimal_transition_draws": self.optimal_transition_draws,
             "distances": self.repair_distances,
             "pairs_seen": self.repair_pairs_seen, "forks_seen": self.repair_forks_seen,
-            "candidates_seen": self.repair_candidates_seen}
+            "candidates_seen": self.repair_candidates_seen,
+            "hard_negative_draws": self.hard_negative_draws, "retention_draws": self.retention_draws}
         return result
 
     def load_state_dict(self, state):
         super().load_state_dict(state)
-        repair = state["failure_repair"]
-        self.packet_seen = repair["packet_seen"]
+        self.load_repair_tracking(state["failure_repair"])
+
+    def load_repair_tracking(self, repair, same_pool=True):
+        if same_pool:
+            self.packet_seen = repair["packet_seen"]
         self.repair_pair_draws = repair["pair_draws"]
         self.repair_rank_requested = repair["rank_requested"]
         self.optimal_transition_draws = repair["optimal_transition_draws"]
@@ -150,16 +203,22 @@ class FailureData(JointData):
         self.repair_pairs_seen = repair["pairs_seen"]
         self.repair_forks_seen = repair["forks_seen"]
         self.repair_candidates_seen = repair["candidates_seen"]
+        self.hard_negative_draws = repair.get("hard_negative_draws", 0)
+        self.retention_draws = repair.get("retention_draws", 0)
 
     def report(self):
         result = super().report()
         result["failure_repair"] = {"training_only_seed_contexts": sum(map(len, self.packets)),
             "different_seed_contexts_drawn": sum(int(v.sum()) for v in self.packet_seen),
+            "seed_count_scope": "Current diagnostic pool; exact relation sets and draw counters retain the parent checkpoint prefix",
             "pair_draws": self.repair_pair_draws, "rank_contexts_requested": self.repair_rank_requested,
             "optimal_transition_draws": self.optimal_transition_draws,
             "local_distinct_huber_relations": len(self.repair_pairs_seen),
             "local_distinct_forks": len(self.repair_forks_seen),
             "local_distinct_candidate_relations": len(self.repair_candidates_seen),
             "parent_distance_draws": self.repair_distances.tolist(),
+            "distance_histogram_unreachable_index": 63,
+            "hard_negative_huber_draws": self.hard_negative_draws,
+            "retention_context_draws": self.retention_draws,
             "scope": "All legal candidates at each selected fork; all optimal actions have nonzero sampling probability; full closure is queryable, not exhaustively gradient-exposed"}
         return result

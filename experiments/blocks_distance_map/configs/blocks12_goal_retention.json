@@ -1,0 +1,48 @@
+{
+  "study": "blocks_distance_map",
+  "scope": "same_joint_Q_latest_failure_children_goal_preservation_and_success_retention",
+  "parent_checkpoint": "/tmp/blocks12_failure_repair/run/checkpoints/step_002000.pt",
+  "graph_data": "/tmp/blocks12_graphs_676140c",
+  "legacy_data": "/tmp/blocks12_joint_9aa8498/data/legacy_tree_continue_986cb4d.npz",
+  "baseline_cases": "/tmp/blocks12_joint_9aa8498/data/baseline_cases.json",
+  "training": {
+    "seed": 2026101851,
+    "learning_rate": 0.0003,
+    "steps": 2000,
+    "batch_size_per_rank": 2048,
+    "rank_contexts_per_rank": 256,
+    "boards_per_batch": 4,
+    "legacy_fraction": 0.2,
+    "broad_fraction": 0.25,
+    "clear_fraction": 0.35,
+    "listwise_weight": 1.0,
+    "temperature": 1.0,
+    "original_cap": 13,
+    "unreachable_label": 19,
+    "failure_diagnosis": "/tmp/blocks12_failure_repair/run/diagnosis/step_002000.json",
+    "failure_fraction": 0.5,
+    "repair_descendant_steps": [
+      0,
+      0,
+      1,
+      2,
+      4
+    ],
+    "previous_sampler_root": "/tmp/blocks12_failure_repair/run",
+    "previous_sampler_step": 2000,
+    "cpu_threads": 2,
+    "log_every": 100,
+    "checkpoint_every": 1000,
+    "retention_diagnosis": "/tmp/blocks12_joint_9aa8498/run/diagnosis/random_path_010000.json",
+    "hard_negative_fraction": 0.25,
+    "retention_fraction": 0.25,
+    "fresh_fraction": 0.25
+  },
+  "evaluation": {
+    "train_roots": 100,
+    "oracle_seconds": 14400,
+    "oracle_cache_limit": 8000000
+  },
+  "policy": "unchanged_greedy_all_legal_successors_no_search_no_oracle_action_selection",
+  "rationale": "First repair checkpoint improved clear160->172 and long50->56, but lost14 clear and30 long tasks; goal deletion failures42->77. Of1467 original training failures,1467 parent pairs and1449 complete forks entered updates;975 old wrong choices became reachable, yet total fixed training goals533->519. Next joint window therefore updates to selected current-model errors, adds exactly unreachable actually chosen legal children as direct Huber examples (goal deletion weighted3x), and retains old successful training trajectories. Full reachable-parent forks and optimal descendants remain under original rank loss; never train on monitoring failures. Preserve global broad and exact replay exposure prefix, original learning rate, loss weights, supervision and greedy execution; unreachable target remains authorized19. Runtime selects the better completed parent by both clear and long goals, with matching sampler/diagnosis. Two thousand is a feedback window, not acceptance."
+}

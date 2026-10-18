@@ -18,6 +18,7 @@ from .branch_data import BranchData
 from .graph_data import GraphData
 from .checkpoint_audit import same_tasks, cycle_ranking
 from grounded_llm.qmap_metrics import rollout
+from .batch_parallel import BatchParallel
 
 
 def intermediate_stage(model, env, data, config, device, reference=None):
@@ -34,7 +35,7 @@ def intermediate_stage(model, env, data, config, device, reference=None):
     return result
 
 
-def train(env, config, data, out, device, source_commit, checkpoint=None, resume=False):
+def train(env, config, data, out, device, source_commit, checkpoint=None, resume=False, parallel_devices=None):
     torch.manual_seed(config["seed"])
     options = config["training"]
     torch.set_num_threads(options["cpu_threads"])
@@ -89,6 +90,7 @@ def train(env, config, data, out, device, source_commit, checkpoint=None, resume
                for stream, per_step in ((mixture.gp, pair_broad), (mixture.gr, rank_broad))):
             raise ValueError("Continuation budget does not reach the requested actual broad exposure")
     features = torch.as_tensor(env.features(np.arange(env.size)), device=device)
+    parallel = BatchParallel(model, features, parallel_devices) if parallel_devices else None
     encoded = None
     def q(ids):
         index = torch.as_tensor(ids, device=device, dtype=torch.long)
@@ -142,33 +144,41 @@ def train(env, config, data, out, device, source_commit, checkpoint=None, resume
             model.train()
             # Reuse the same deterministic MLP result for repeated state IDs.
             # Losses, reductions, labels and gradients are otherwise unchanged.
-            encoded = model.encode(features) if options.get("reuse_state_encodings", False) else None
+            encoded = model.encode(features) if options.get("reuse_state_encodings", False) and parallel is None else None
             rows = (pairs[ps.draw(options["batch_size"])] if mixture is None
                     else mixture.pairs(options["batch_size"]))
-            pair_loss = F.smooth_l1_loss(model.distance(q(rows[:, 0]), q(rows[:, 1])),
-                                        torch.as_tensor(rows[:, 2], device=device, dtype=torch.float32))
+            if parallel is None:
+                pair_loss = F.smooth_l1_loss(model.distance(q(rows[:, 0]), q(rows[:, 1])),
+                                            torch.as_tensor(rows[:, 2], device=device, dtype=torch.float32))
             if mixture is None:
                 sampled = rs.draw(options["decision_batch_size"])
                 batch_tasks, children, labels = tasks[sampled], data["children_train"][sampled], data["child_distances_train"][sampled]
             else:
                 batch_tasks, children, labels = mixture.tasks(options["decision_batch_size"])
-            valid = torch.as_tensor(children >= 0, device=device)
-            scores = model.distance(q(np.maximum(children, 0)), q(batch_tasks[:, 1])[:, None])
-            truth = torch.as_tensor(labels, device=device)
-            rank_loss = soft_rank_loss(scores, truth, valid, options["rank_temperature"])
-            loss = pair_loss + options["rank_weight"] * rank_loss
-            prepared_at = time.monotonic()
-            optimizer.zero_grad(set_to_none=True)
-            loss.backward()
-            torch.nn.utils.clip_grad_norm_(model.parameters(), 5.)
-            optimizer.step()
+            if parallel is None:
+                valid = torch.as_tensor(children >= 0, device=device)
+                scores = model.distance(q(np.maximum(children, 0)), q(batch_tasks[:, 1])[:, None])
+                truth = torch.as_tensor(labels, device=device)
+                rank_loss = soft_rank_loss(scores, truth, valid, options["rank_temperature"])
+                loss = pair_loss + options["rank_weight"] * rank_loss
+                prepared_at = time.monotonic()
+                optimizer.zero_grad(set_to_none=True)
+                loss.backward()
+                torch.nn.utils.clip_grad_norm_(model.parameters(), 5.)
+                optimizer.step()
+            else:
+                prepared_at = time.monotonic()
+                pair_loss, rank_loss = parallel.update(rows, batch_tasks, children, labels, optimizer,
+                                                       options["rank_weight"], options["rank_temperature"])
             encoded = None
             if step <= start_step + 5:
                 if str(device).startswith("cuda"):
                     torch.cuda.synchronize(device)
                 elapsed = max(time.monotonic() - update_started, 1e-9)
                 print(json.dumps({"update_timing": {"step": step, "seconds": elapsed,
-                    "sampling_and_forward_seconds": prepared_at - update_started,
+                    "sampling_and_forward_seconds": prepared_at - update_started if parallel is None else None,
+                    "sampling_seconds": prepared_at - update_started if parallel is not None else None,
+                    "replicas": len(parallel.models) if parallel is not None else 1,
                     "pairs_per_second": options["batch_size"] / elapsed,
                     "full_candidate_decisions_per_second": options["decision_batch_size"] / elapsed,
                     "scope": "real mixed sampling, encoding, labels, backward and Adam; excludes stage evaluation"}}), flush=True)
@@ -211,6 +221,8 @@ def train(env, config, data, out, device, source_commit, checkpoint=None, resume
                     save(step, out / "last.pt")
                 log.write(json.dumps(record) + "\n"); log.flush()
                 print(json.dumps(record), flush=True)
+    if parallel is not None:
+        parallel.close()
     save(step, out / "last.pt")
     saved = torch.load(out / "best.pt", map_location=device, weights_only=False)
     model.load_state_dict(saved["model"])
@@ -236,6 +248,7 @@ def main():
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--source-commit", required=True)
     parser.add_argument("--device", default="cpu")
+    parser.add_argument("--devices", nargs="+", help="Optional replicas splitting the same global relation batches; first must match --device")
     parser.add_argument("--prepared-run", type=Path)
     parser.add_argument("--checkpoint", type=Path)
     parser.add_argument("--full-distance-table", type=Path)
@@ -277,7 +290,7 @@ def main():
         (args.out / "full_oracle_source.json").write_text(json.dumps({"path": str(args.full_distance_table),
                   "summary": oracle_summary}, indent=2) + "\n")
     print(json.dumps({"data": summary}), flush=True)
-    train(env, config, data, args.out, args.device, args.source_commit, args.checkpoint, args.resume_run)
+    train(env, config, data, args.out, args.device, args.source_commit, args.checkpoint, args.resume_run, args.devices)
 
 
 if __name__ == "__main__":

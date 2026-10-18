@@ -1,0 +1,154 @@
+{
+  "checkpoint": "/tmp/blocks12_joint_9aa8498/run/checkpoints/step_010000.pt",
+  "identity": "D(A,B)-D(B,A)+D(B,C)-D(C,B)-D(A,C)+D(C,A)=0",
+  "metric": "directed_sum",
+  "certified_training_root_chains": 1000,
+  "derivation": "positive(x)-positive(-x)=x; D(s,g)-D(g,s) is a scalar potential difference for directed_sum, in every dimension and at every coordinate scale",
+  "maximum_absolute_predicted_residual": 4.291534423828125e-06,
+  "caps": {
+    "13": {
+      "target_identity_residual": -13,
+      "six_pair_absolute_error_sum_at_least": 13,
+      "six_pair_equal_weight_mean_huber_at_least": 1.6666666666666665,
+      "model_six_pair_mean_absolute_error": 4.605160768429438,
+      "model_forward_mean_absolute_error": 5.750870091835658,
+      "model_reverse_mean_absolute_error": 3.4594514450232188
+    },
+    "19": {
+      "target_identity_residual": -19,
+      "six_pair_absolute_error_sum_at_least": 19,
+      "six_pair_equal_weight_mean_huber_at_least": 2.6666666666666665,
+      "model_six_pair_mean_absolute_error": 6.6175591220060985,
+      "model_forward_mean_absolute_error": 5.750870091835658,
+      "model_reverse_mean_absolute_error": 7.484248152176539
+    }
+  },
+  "examples": [
+    {
+      "root": 0,
+      "states": [
+        "507722321085798584977920623619",
+        "505244020794405353734950355971",
+        "505244020794405212585145140227"
+      ],
+      "truth": [
+        1,
+        -1,
+        1,
+        -1,
+        2,
+        -1
+      ],
+      "scores": [
+        6.101769924163818,
+        10.518608093261719,
+        7.9640727043151855,
+        10.264212608337402,
+        11.683759689331055,
+        18.400737762451172
+      ],
+      "predicted_identity_residual": 0.0
+    },
+    {
+      "root": 1,
+      "states": [
+        "3092597977183903166054318192",
+        "3092597977183903153161027696",
+        "3092446713738383546761920624"
+      ],
+      "truth": [
+        1,
+        -1,
+        1,
+        -1,
+        2,
+        -1
+      ],
+      "scores": [
+        5.637753963470459,
+        11.617288589477539,
+        6.4717841148376465,
+        9.089689254760742,
+        8.659866333007812,
+        17.257305145263672
+      ],
+      "predicted_identity_residual": -9.5367431640625e-07
+    },
+    {
+      "root": 2,
+      "states": [
+        "643249596098610873775350876472",
+        "643172149214504835299008055608",
+        "643172149214504835299007268920"
+      ],
+      "truth": [
+        1,
+        -1,
+        1,
+        -1,
+        2,
+        -1
+      ],
+      "scores": [
+        5.5684356689453125,
+        8.908544540405273,
+        5.785091400146484,
+        11.139493942260742,
+        8.653403282165527,
+        17.347911834716797
+      ],
+      "predicted_identity_residual": -2.86102294921875e-06
+    },
+    {
+      "root": 3,
+      "states": [
+        "54598725057905554449407001612",
+        "54598725057905554449407001600",
+        "14868586922090381251863233536"
+      ],
+      "truth": [
+        1,
+        -1,
+        1,
+        -1,
+        2,
+        -1
+      ],
+      "scores": [
+        5.537515163421631,
+        9.317914009094238,
+        5.862575531005859,
+        7.89458703994751,
+        9.385921478271484,
+        15.198331832885742
+      ],
+      "predicted_identity_residual": 0.0
+    },
+    {
+      "root": 4,
+      "states": [
+        "1083953389842012193228401786",
+        "154893897468169672466705530",
+        "129256092719781063802"
+      ],
+      "truth": [
+        1,
+        -1,
+        1,
+        -1,
+        2,
+        -1
+      ],
+      "scores": [
+        4.771869659423828,
+        9.885588645935059,
+        8.541889190673828,
+        8.661136627197266,
+        11.181340217590332,
+        16.414304733276367
+      ],
+      "predicted_identity_residual": -1.9073486328125e-06
+    }
+  ],
+  "scope": "Analytic incompatibility of all six exact regression targets, present for every certified two-action chain. Not proof of a greedy success-rate ceiling; no model, labels, losses or execution changed by this read-only audit."
+}

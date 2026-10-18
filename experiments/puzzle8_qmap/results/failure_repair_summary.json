@@ -1000,6 +1000,506 @@
           }
         }
       }
+    },
+    {
+      "step": 2000,
+      "seconds": 7618.08,
+      "policy": {
+        "nonterminal_states": 181439,
+        "horizon": 62,
+        "eventually_solved": 149486,
+        "within_budget": 149486,
+        "within_budget_rate": 0.8238912251500504,
+        "shortest_action_rate": 0.9937830345184883,
+        "wrong_decisions": 1128,
+        "two_cycles": 335,
+        "cycle_nodes": 670,
+        "other_cycle_nodes": 0,
+        "local_minima": 9819,
+        "restoration_mae": 0.5550480527377085,
+        "cycle_examples": [
+          {
+            "states": [
+              119,
+              189
+            ],
+            "depth": [
+              7,
+              8
+            ],
+            "q_distance": [
+              8.59591293334961,
+              8.236898422241211
+            ],
+            "exit_candidates": [
+              69
+            ]
+          },
+          {
+            "states": [
+              124,
+              178
+            ],
+            "depth": [
+              7,
+              8
+            ],
+            "q_distance": [
+              8.066475868225098,
+              7.854743003845215
+            ],
+            "exit_candidates": [
+              72
+            ]
+          },
+          {
+            "states": [
+              140,
+              223
+            ],
+            "depth": [
+              7,
+              8
+            ],
+            "q_distance": [
+              8.822395324707031,
+              8.955239295959473
+            ],
+            "exit_candidates": [
+              79
+            ]
+          },
+          {
+            "states": [
+              316,
+              512
+            ],
+            "depth": [
+              9,
+              10
+            ],
+            "q_distance": [
+              10.74897575378418,
+              10.668390274047852
+            ],
+            "exit_candidates": [
+              185
+            ]
+          },
+          {
+            "states": [
+              417,
+              702
+            ],
+            "depth": [
+              9,
+              10
+            ],
+            "q_distance": [
+              10.223255157470703,
+              10.39371109008789
+            ],
+            "exit_candidates": [
+              266
+            ]
+          }
+        ],
+        "previously_solved_lost": 6569,
+        "previously_failed_gained": 15999,
+        "same1024": {
+          "count": 1024,
+          "solved": 851,
+          "cycle_count": 173,
+          "mean_extra_steps_on_solved": 0.07520564042303172
+        }
+      },
+      "sampling": {
+        "original_pair_passes": 46.2336860670194,
+        "original_decision_passes": 46.23394088371298,
+        "restoration_pair_passes": 6935.030864197531,
+        "restoration_decision_passes": 6935.0690865800625,
+        "all_pairs_draws": 1198822000,
+        "all_pairs_passes": 0.03641890872487249,
+        "all_decision_draws": 1295130000,
+        "all_decision_passes": 0.03934984627228282,
+        "observed_broad_sources": 181432,
+        "observed_broad_goals": 181432,
+        "structure_pair_passes": 128.00518367515335,
+        "structure_decision_passes": 142.22807605511696,
+        "hard_pair_draws": 226492000,
+        "hard_decision_draws": 251658000,
+        "edge_pair_passes": 520.1780930647882,
+        "structure_decisions": 7077604,
+        "hard_contexts": 4956,
+        "distance_exposure": {
+          "pair_draws_by_distance": [
+            16696862,
+            287005859,
+            59705768,
+            48214445,
+            50427387,
+            45416918,
+            50900803,
+            49237099,
+            60664560,
+            65536294,
+            70384458,
+            68500080,
+            75268779,
+            80919458,
+            92204190,
+            105248196,
+            131256372,
+            144483008,
+            178345045,
+            191357417,
+            261247198,
+            289803390,
+            365857984,
+            344751954,
+            365894583,
+            267229377,
+            220502258,
+            109097171,
+            60627446,
+            18867956,
+            9765822,
+            6788711
+          ],
+          "legal_candidate_draws_by_distance": [
+            75565307,
+            55243498,
+            195513749,
+            142126255,
+            162814763,
+            121057370,
+            168028752,
+            149742974,
+            183691436,
+            187933906,
+            223442329,
+            210643586,
+            230522690,
+            250920356,
+            277216441,
+            325479159,
+            381359871,
+            426013097,
+            513575091,
+            580735670,
+            704241279,
+            869378563,
+            981468301,
+            1032851283,
+            971329013,
+            798616220,
+            578963280,
+            323765755,
+            156461549,
+            55433768,
+            29569595,
+            257239
+          ],
+          "tracking_started_after": {
+            "all_pairs_draws": 66926231,
+            "all_decision_draws": 37469145
+          },
+          "scope": "Actual gradient-sampled labels across all mixture components, repeated draws counted; legacy histograms unavailable"
+        }
+      },
+      "validation_mae": 2.931736962906175,
+      "best_step": 2000,
+      "selection_eligible": true,
+      "intermediate": {
+        "validation": {
+          "count": 1024,
+          "solved": 367,
+          "success_rate": 0.3583984375,
+          "cycle_rate": 0.6416015625,
+          "budget_exhausted": 0,
+          "horizon": 62,
+          "mean_extra_steps_on_solved": 0.10899182561307902,
+          "illegal_action_rate": 0.0,
+          "by_start_distance": {
+            "1": {
+              "count": 13,
+              "success_rate": 1.0
+            },
+            "2": {
+              "count": 25,
+              "success_rate": 1.0
+            },
+            "3": {
+              "count": 33,
+              "success_rate": 1.0
+            },
+            "4": {
+              "count": 33,
+              "success_rate": 1.0
+            },
+            "5": {
+              "count": 33,
+              "success_rate": 1.0
+            },
+            "6": {
+              "count": 34,
+              "success_rate": 0.9411764705882353
+            },
+            "7": {
+              "count": 36,
+              "success_rate": 0.9166666666666666
+            },
+            "8": {
+              "count": 34,
+              "success_rate": 0.8823529411764706
+            },
+            "9": {
+              "count": 38,
+              "success_rate": 0.7631578947368421
+            },
+            "10": {
+              "count": 35,
+              "success_rate": 0.7714285714285715
+            },
+            "11": {
+              "count": 35,
+              "success_rate": 0.34285714285714286
+            },
+            "12": {
+              "count": 36,
+              "success_rate": 0.3888888888888889
+            },
+            "13": {
+              "count": 34,
+              "success_rate": 0.23529411764705882
+            },
+            "14": {
+              "count": 35,
+              "success_rate": 0.3142857142857143
+            },
+            "15": {
+              "count": 35,
+              "success_rate": 0.17142857142857143
+            },
+            "16": {
+              "count": 40,
+              "success_rate": 0.15
+            },
+            "17": {
+              "count": 36,
+              "success_rate": 0.1111111111111111
+            },
+            "18": {
+              "count": 34,
+              "success_rate": 0.11764705882352941
+            },
+            "19": {
+              "count": 33,
+              "success_rate": 0.06060606060606061
+            },
+            "20": {
+              "count": 37,
+              "success_rate": 0.0
+            },
+            "21": {
+              "count": 38,
+              "success_rate": 0.02631578947368421
+            },
+            "22": {
+              "count": 37,
+              "success_rate": 0.10810810810810811
+            },
+            "23": {
+              "count": 33,
+              "success_rate": 0.030303030303030304
+            },
+            "24": {
+              "count": 35,
+              "success_rate": 0.0
+            },
+            "25": {
+              "count": 34,
+              "success_rate": 0.029411764705882353
+            },
+            "26": {
+              "count": 34,
+              "success_rate": 0.029411764705882353
+            },
+            "27": {
+              "count": 35,
+              "success_rate": 0.02857142857142857
+            },
+            "28": {
+              "count": 34,
+              "success_rate": 0.058823529411764705
+            },
+            "29": {
+              "count": 36,
+              "success_rate": 0.027777777777777776
+            },
+            "30": {
+              "count": 35,
+              "success_rate": 0.0
+            },
+            "31": {
+              "count": 4,
+              "success_rate": 0.0
+            }
+          },
+          "same_tasks": {
+            "count": 1024,
+            "baseline_solved": 362,
+            "candidate_solved": 367,
+            "previously_solved_lost": 6,
+            "previously_failed_gained": 11,
+            "net_gain": 5
+          }
+        },
+        "test": {
+          "count": 1024,
+          "solved": 337,
+          "success_rate": 0.3291015625,
+          "cycle_rate": 0.6708984375,
+          "budget_exhausted": 0,
+          "horizon": 62,
+          "mean_extra_steps_on_solved": 0.10089020771513353,
+          "illegal_action_rate": 0.0,
+          "by_start_distance": {
+            "1": {
+              "count": 11,
+              "success_rate": 1.0
+            },
+            "2": {
+              "count": 19,
+              "success_rate": 1.0
+            },
+            "3": {
+              "count": 33,
+              "success_rate": 1.0
+            },
+            "4": {
+              "count": 34,
+              "success_rate": 0.9705882352941176
+            },
+            "5": {
+              "count": 33,
+              "success_rate": 1.0
+            },
+            "6": {
+              "count": 34,
+              "success_rate": 0.9117647058823529
+            },
+            "7": {
+              "count": 35,
+              "success_rate": 0.9428571428571428
+            },
+            "8": {
+              "count": 36,
+              "success_rate": 0.8333333333333334
+            },
+            "9": {
+              "count": 36,
+              "success_rate": 0.7222222222222222
+            },
+            "10": {
+              "count": 37,
+              "success_rate": 0.6756756756756757
+            },
+            "11": {
+              "count": 35,
+              "success_rate": 0.45714285714285713
+            },
+            "12": {
+              "count": 37,
+              "success_rate": 0.35135135135135137
+            },
+            "13": {
+              "count": 39,
+              "success_rate": 0.2564102564102564
+            },
+            "14": {
+              "count": 35,
+              "success_rate": 0.14285714285714285
+            },
+            "15": {
+              "count": 34,
+              "success_rate": 0.17647058823529413
+            },
+            "16": {
+              "count": 36,
+              "success_rate": 0.1111111111111111
+            },
+            "17": {
+              "count": 33,
+              "success_rate": 0.09090909090909091
+            },
+            "18": {
+              "count": 36,
+              "success_rate": 0.0
+            },
+            "19": {
+              "count": 35,
+              "success_rate": 0.02857142857142857
+            },
+            "20": {
+              "count": 35,
+              "success_rate": 0.0
+            },
+            "21": {
+              "count": 34,
+              "success_rate": 0.058823529411764705
+            },
+            "22": {
+              "count": 35,
+              "success_rate": 0.02857142857142857
+            },
+            "23": {
+              "count": 36,
+              "success_rate": 0.027777777777777776
+            },
+            "24": {
+              "count": 35,
+              "success_rate": 0.0
+            },
+            "25": {
+              "count": 36,
+              "success_rate": 0.0
+            },
+            "26": {
+              "count": 36,
+              "success_rate": 0.0
+            },
+            "27": {
+              "count": 37,
+              "success_rate": 0.0
+            },
+            "28": {
+              "count": 35,
+              "success_rate": 0.0
+            },
+            "29": {
+              "count": 35,
+              "success_rate": 0.02857142857142857
+            },
+            "30": {
+              "count": 34,
+              "success_rate": 0.0
+            },
+            "31": {
+              "count": 8,
+              "success_rate": 0.0
+            }
+          },
+          "same_tasks": {
+            "count": 1024,
+            "baseline_solved": 335,
+            "candidate_solved": 337,
+            "previously_solved_lost": 10,
+            "previously_failed_gained": 12,
+            "net_gain": 2
+          }
+        }
+      }
     }
   ],
   "diagnosis": {
@@ -1539,10 +2039,554 @@
   "repair": {
     "source_commit": "0d3e52b",
     "contract": "experiments/puzzle8_qmap/configs/failure_repair.json",
-    "boundary": "wait for complete old step 2000 without duplicate training",
+    "boundary": "old complete step 2000 saved; handed off to selected step 2000, cumulative Adam 282000",
     "parent": "existing best under original validation guard; full Adam and sampler copied at handoff",
     "run": "/tmp/puzzle8_failure_repair/run",
     "scope": "training-only basin-weighted restoration and distance/degree-balanced intermediate errors; no heldout failures in replay; reuse full distance table and route cache",
-    "quality_status": "no new repair checkpoint yet"
+    "quality_status": "no new repair checkpoint yet",
+    "handoff": {
+      "latest_complete_old_step": 2000,
+      "selected_parent_step": 2000,
+      "selected_parent_adam_step": 282000,
+      "selected_by": "original full restoration with validation MAE guard",
+      "note": "A few updates after the published boundary may exist only in memory; not added to continuation exposure."
+    },
+    "launch_repair": "First launch failed before updates due to CR in last device argument; run saved as launch_failed_cuda_carriage; restarted from same complete parent with original contract, no duplicate training",
+    "log": "/tmp/puzzle8_failure_repair/logs/train_retry.log"
+  },
+  "parent_2000_diagnosis": {
+    "checkpoint": "/tmp/puzzle8_full_coverage_b566aaa/stages/step_002000/checkpoint.pt",
+    "step": 2000,
+    "adam_steps": [
+      282000
+    ],
+    "restoration_by_depth": {
+      "0": {
+        "states": 1,
+        "success": 1,
+        "wrong_decisions": 0
+      },
+      "1": {
+        "states": 2,
+        "success": 2,
+        "wrong_decisions": 0
+      },
+      "2": {
+        "states": 4,
+        "success": 4,
+        "wrong_decisions": 0
+      },
+      "3": {
+        "states": 8,
+        "success": 8,
+        "wrong_decisions": 0
+      },
+      "4": {
+        "states": 16,
+        "success": 16,
+        "wrong_decisions": 0
+      },
+      "5": {
+        "states": 20,
+        "success": 20,
+        "wrong_decisions": 0
+      },
+      "6": {
+        "states": 39,
+        "success": 39,
+        "wrong_decisions": 0
+      },
+      "7": {
+        "states": 62,
+        "success": 57,
+        "wrong_decisions": 5
+      },
+      "8": {
+        "states": 116,
+        "success": 108,
+        "wrong_decisions": 0
+      },
+      "9": {
+        "states": 152,
+        "success": 145,
+        "wrong_decisions": 3
+      },
+      "10": {
+        "states": 286,
+        "success": 259,
+        "wrong_decisions": 14
+      },
+      "11": {
+        "states": 396,
+        "success": 332,
+        "wrong_decisions": 9
+      },
+      "12": {
+        "states": 748,
+        "success": 619,
+        "wrong_decisions": 10
+      },
+      "13": {
+        "states": 1024,
+        "success": 868,
+        "wrong_decisions": 8
+      },
+      "14": {
+        "states": 1893,
+        "success": 1609,
+        "wrong_decisions": 12
+      },
+      "15": {
+        "states": 2512,
+        "success": 2094,
+        "wrong_decisions": 10
+      },
+      "16": {
+        "states": 4485,
+        "success": 3740,
+        "wrong_decisions": 14
+      },
+      "17": {
+        "states": 5638,
+        "success": 4712,
+        "wrong_decisions": 24
+      },
+      "18": {
+        "states": 9529,
+        "success": 7961,
+        "wrong_decisions": 38
+      },
+      "19": {
+        "states": 10878,
+        "success": 9038,
+        "wrong_decisions": 63
+      },
+      "20": {
+        "states": 16993,
+        "success": 14091,
+        "wrong_decisions": 57
+      },
+      "21": {
+        "states": 17110,
+        "success": 14141,
+        "wrong_decisions": 152
+      },
+      "22": {
+        "states": 23952,
+        "success": 19772,
+        "wrong_decisions": 126
+      },
+      "23": {
+        "states": 20224,
+        "success": 16666,
+        "wrong_decisions": 185
+      },
+      "24": {
+        "states": 24047,
+        "success": 19778,
+        "wrong_decisions": 127
+      },
+      "25": {
+        "states": 15578,
+        "success": 12702,
+        "wrong_decisions": 132
+      },
+      "26": {
+        "states": 14560,
+        "success": 11827,
+        "wrong_decisions": 71
+      },
+      "27": {
+        "states": 6274,
+        "success": 4987,
+        "wrong_decisions": 53
+      },
+      "28": {
+        "states": 3910,
+        "success": 3106,
+        "wrong_decisions": 12
+      },
+      "29": {
+        "states": 760,
+        "success": 605,
+        "wrong_decisions": 3
+      },
+      "30": {
+        "states": 221,
+        "success": 178,
+        "wrong_decisions": 0
+      },
+      "31": {
+        "states": 2,
+        "success": 2,
+        "wrong_decisions": 0
+      }
+    },
+    "validation": {
+      "tasks": 1024,
+      "success": 367,
+      "by_true_distance": {
+        "16": {
+          "tasks": 40,
+          "success": 6
+        },
+        "5": {
+          "tasks": 33,
+          "success": 33
+        },
+        "20": {
+          "tasks": 37,
+          "success": 0
+        },
+        "21": {
+          "tasks": 38,
+          "success": 1
+        },
+        "24": {
+          "tasks": 35,
+          "success": 0
+        },
+        "14": {
+          "tasks": 35,
+          "success": 11
+        },
+        "18": {
+          "tasks": 34,
+          "success": 4
+        },
+        "6": {
+          "tasks": 34,
+          "success": 32
+        },
+        "25": {
+          "tasks": 34,
+          "success": 1
+        },
+        "29": {
+          "tasks": 36,
+          "success": 1
+        },
+        "9": {
+          "tasks": 38,
+          "success": 29
+        },
+        "7": {
+          "tasks": 36,
+          "success": 33
+        },
+        "26": {
+          "tasks": 34,
+          "success": 1
+        },
+        "4": {
+          "tasks": 33,
+          "success": 33
+        },
+        "8": {
+          "tasks": 34,
+          "success": 30
+        },
+        "12": {
+          "tasks": 36,
+          "success": 14
+        },
+        "10": {
+          "tasks": 35,
+          "success": 27
+        },
+        "30": {
+          "tasks": 35,
+          "success": 0
+        },
+        "22": {
+          "tasks": 37,
+          "success": 4
+        },
+        "28": {
+          "tasks": 34,
+          "success": 2
+        },
+        "3": {
+          "tasks": 33,
+          "success": 33
+        },
+        "19": {
+          "tasks": 33,
+          "success": 2
+        },
+        "13": {
+          "tasks": 34,
+          "success": 8
+        },
+        "27": {
+          "tasks": 35,
+          "success": 1
+        },
+        "17": {
+          "tasks": 36,
+          "success": 4
+        },
+        "15": {
+          "tasks": 35,
+          "success": 6
+        },
+        "23": {
+          "tasks": 33,
+          "success": 1
+        },
+        "1": {
+          "tasks": 13,
+          "success": 13
+        },
+        "2": {
+          "tasks": 25,
+          "success": 25
+        },
+        "11": {
+          "tasks": 35,
+          "success": 12
+        },
+        "31": {
+          "tasks": 4,
+          "success": 0
+        }
+      },
+      "first_error_remaining_distance": {
+        "14": 32,
+        "20": 30,
+        "16": 37,
+        "24": 36,
+        "8": 14,
+        "22": 36,
+        "17": 41,
+        "25": 27,
+        "10": 16,
+        "29": 17,
+        "12": 30,
+        "27": 21,
+        "23": 32,
+        "28": 13,
+        "11": 30,
+        "19": 47,
+        "13": 34,
+        "15": 31,
+        "26": 26,
+        "18": 32,
+        "7": 8,
+        "21": 39,
+        "9": 22,
+        "6": 6
+      },
+      "first_error_step": {
+        "2": 78,
+        "0": 215,
+        "5": 34,
+        "6": 25,
+        "1": 104,
+        "19": 2,
+        "3": 77,
+        "4": 61,
+        "7": 24,
+        "11": 7,
+        "10": 3,
+        "9": 6,
+        "13": 2,
+        "8": 15,
+        "14": 1,
+        "12": 2,
+        "17": 1
+      },
+      "first_error_degree": {
+        "4": 204,
+        "2": 97,
+        "3": 356
+      }
+    },
+    "test": {
+      "tasks": 1024,
+      "success": 337,
+      "by_true_distance": {
+        "25": {
+          "tasks": 36,
+          "success": 0
+        },
+        "20": {
+          "tasks": 35,
+          "success": 0
+        },
+        "30": {
+          "tasks": 34,
+          "success": 0
+        },
+        "5": {
+          "tasks": 33,
+          "success": 33
+        },
+        "13": {
+          "tasks": 39,
+          "success": 10
+        },
+        "28": {
+          "tasks": 35,
+          "success": 0
+        },
+        "11": {
+          "tasks": 35,
+          "success": 16
+        },
+        "16": {
+          "tasks": 36,
+          "success": 4
+        },
+        "12": {
+          "tasks": 37,
+          "success": 13
+        },
+        "2": {
+          "tasks": 19,
+          "success": 19
+        },
+        "27": {
+          "tasks": 37,
+          "success": 0
+        },
+        "17": {
+          "tasks": 33,
+          "success": 3
+        },
+        "19": {
+          "tasks": 35,
+          "success": 1
+        },
+        "3": {
+          "tasks": 33,
+          "success": 33
+        },
+        "10": {
+          "tasks": 37,
+          "success": 25
+        },
+        "8": {
+          "tasks": 36,
+          "success": 30
+        },
+        "21": {
+          "tasks": 34,
+          "success": 2
+        },
+        "24": {
+          "tasks": 35,
+          "success": 0
+        },
+        "22": {
+          "tasks": 35,
+          "success": 1
+        },
+        "7": {
+          "tasks": 35,
+          "success": 33
+        },
+        "29": {
+          "tasks": 35,
+          "success": 1
+        },
+        "15": {
+          "tasks": 34,
+          "success": 6
+        },
+        "1": {
+          "tasks": 11,
+          "success": 11
+        },
+        "26": {
+          "tasks": 36,
+          "success": 0
+        },
+        "9": {
+          "tasks": 36,
+          "success": 26
+        },
+        "4": {
+          "tasks": 34,
+          "success": 33
+        },
+        "23": {
+          "tasks": 36,
+          "success": 1
+        },
+        "6": {
+          "tasks": 34,
+          "success": 31
+        },
+        "18": {
+          "tasks": 36,
+          "success": 0
+        },
+        "14": {
+          "tasks": 35,
+          "success": 5
+        },
+        "31": {
+          "tasks": 8,
+          "success": 0
+        }
+      },
+      "first_error_remaining_distance": {
+        "24": 36,
+        "19": 37,
+        "26": 28,
+        "23": 31,
+        "25": 36,
+        "16": 40,
+        "21": 40,
+        "17": 34,
+        "18": 30,
+        "13": 33,
+        "12": 39,
+        "10": 18,
+        "8": 14,
+        "22": 38,
+        "14": 40,
+        "20": 43,
+        "15": 39,
+        "27": 17,
+        "4": 7,
+        "29": 11,
+        "11": 20,
+        "9": 19,
+        "6": 4,
+        "7": 6,
+        "28": 16,
+        "5": 11
+      },
+      "first_error_step": {
+        "1": 119,
+        "4": 41,
+        "2": 96,
+        "3": 79,
+        "0": 206,
+        "6": 29,
+        "5": 36,
+        "13": 2,
+        "9": 12,
+        "7": 24,
+        "8": 14,
+        "18": 1,
+        "16": 1,
+        "26": 1,
+        "10": 9,
+        "11": 6,
+        "14": 3,
+        "12": 5,
+        "22": 1,
+        "21": 1,
+        "15": 1
+      },
+      "first_error_degree": {
+        "3": 373,
+        "4": 211,
+        "2": 103
+      }
+    }
   }
 }

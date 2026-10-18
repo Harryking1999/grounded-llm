@@ -58,7 +58,9 @@ class BroadData(JointData):
         self.phase_sketches = {k: Cardinality() for k in (
             "relations", "huber_relations", "rank_candidate_relations", "forks", "goals",
             "nonzero_huber_score_relations", "nonzero_rank_score_relations",
-            "bundle_huber_relations", "bundle_rank_candidate_relations", "bundle_forks")}
+            "bundle_huber_relations", "bundle_rank_candidate_relations", "bundle_forks",
+            "bundle_huber_groups", "bundle_shared_source_groups", "bundle_shared_goal_groups",
+            "bundle_cross_branch_groups")}
         self.phase_roots = np.zeros(len(self.roots), dtype=bool)
         self.phase_histograms = {}
         self.requested_distances = {}
@@ -251,13 +253,13 @@ class BroadData(JointData):
                 np.stack([g.rank(goal[:, i]) for i, (g, _) in enumerate(root.parts)], -1))
 
     def structure_rows(self, board, count, cross):
-        # Six related contexts occupy existing structure slots, not extra loss
+        # Twelve related contexts occupy existing structure slots, not extra loss
         # terms. Independent broad/clear/legacy streams remain in the batch.
         fraction = self.options.get("branch_bundle_fraction", 0)
         if not 0 <= fraction <= 1:
             raise ValueError("branch_bundle_fraction must be in [0, 1]")
-        bundles = min(int(count * fraction) // 6, max(count - 1, 0) // 6)
-        remaining = count - 6 * bundles
+        bundles = min(int(count * fraction) // 12, max(count - 1, 0) // 12)
+        remaining = count - 12 * bundles
         plain = self._structure_rows(board, remaining, cross)
         if not bundles:
             return plain
@@ -272,37 +274,56 @@ class BroadData(JointData):
         # random walks alone can repeatedly select the same branch.
         offset = 1 + (self.rng.random(bundles) * np.maximum(degree - 1, 0)).astype(int)
         right_choice = (left_choice + offset) % np.maximum(degree, 1)
-        left = self._paths(root, masks, first_choices=left_choice)
-        right = self._paths(root, masks, first_choices=right_choice)
-        def target(path):
+        third_offset = 1 + (self.rng.random(bundles) * np.maximum(degree - 2, 0)).astype(int)
+        third_offset += third_offset >= offset
+        third_choice = np.where(degree >= 3, (left_choice + third_offset) % np.maximum(degree, 1), left_choice)
+        paths = [self._paths(root, masks, first_choices=choice)
+                 for choice in (left_choice, right_choice, third_choice)]
+        def target(path, previous):
             distance = sum(g.distance(masks[:, None, i], path[:, :, i])
                            for i, (g, _) in enumerate(root.parts))
             valid = (path != 0).any(-1) & (distance > 0)
             error = np.where(valid, np.abs(distance - wanted[:, None]), 1000)
+            # Prefer different goals within the same closest exact distance;
+            # retain/report genuine merges when no such alternative exists.
+            distinct = valid.copy()
+            for earlier in previous:
+                distinct &= (path != earlier[:, None]).any(-1)
+            distinct &= error == error.min(-1)[:, None]
+            error = np.where(distinct.any(-1)[:, None] & ~distinct, 1000, error)
             chosen = (error + self.rng.random(error.shape) * .01).argmin(-1)
             chosen[~valid.any(-1)] = 0
             return path[np.arange(bundles), chosen]
-        gl, gr = target(left), target(right)
-        sl, sr = left[:, 1], right[:, 1]
+        targets = []
+        for path in paths:
+            targets.append(target(path, targets))
+        starts = np.stack([masks] + [path[:, 1] for path in paths], axis=1)
+        targets = np.stack(targets, axis=1)
         # Shared source, shared goal, both branch continuations and cross-branch
         # goals. Crossing branches can be finite, unreachable or reconvergent;
         # query the exact graph instead of assuming a tree or assigning a label.
-        source = np.stack((masks, masks, sl, sr, sr, sl), axis=1).reshape(-1, masks.shape[-1])
-        goal = np.stack((gl, gr, gl, gl, gr, gr), axis=1).reshape(source.shape)
-        roles = np.tile(["shared_source_left", "shared_source_right", "left_followup",
-                         "right_to_left_goal", "right_followup", "left_to_right_goal"], bundles)
+        source = np.repeat(starts, 3, axis=1).reshape(-1, masks.shape[-1])
+        goal = np.tile(targets, (1, 4, 1)).reshape(source.shape)
+        roles = np.tile([f"source_{s}_goal_{g}" for s in range(4) for g in range(3)], bundles)
         source_ids = np.stack([g.rank(source[:, i]) for i, (g, _) in enumerate(root.parts)], -1)
         goal_ids = np.stack([g.rank(goal[:, i]) for i, (g, _) in enumerate(root.parts)], -1)
         keys = np.column_stack((root.packed(source_ids), root.packed(goal_ids)))
         distances = root.distance_parts(source_ids, goal_ids)
         truth = np.where((distances < 0).any(-1), -1, distances.sum(-1))
+        distinct_goals = ((targets[:, 0] != targets[:, 1]).any(-1) &
+                          (targets[:, 0] != targets[:, 2]).any(-1) &
+                          (targets[:, 1] != targets[:, 2]).any(-1))
+        complete = (degree >= 3) & distinct_goals
         if cross:
-            self._pending_bundle_huber.append((keys, truth, roles, wanted))
+            self._pending_bundle_huber.append((keys, truth, roles, wanted, complete))
         else:
             self._bundle_rank_roles.update((tuple(key), role) for key, role in zip(keys, roles))
         events = {"groups": bundles, "anchors_with_distinct_actions": int((degree > 1).sum()),
-                  "distinct_goal_pairs": int((gl != gr).any(-1).sum()),
-                  "reconverged_goal_pairs": int(((gl == gr).all(-1) & (degree > 1)).sum())}
+                  "anchors_with_three_distinct_actions": int((degree >= 3).sum()),
+                  "three_distinct_goals": int(distinct_goals.sum()),
+                  "complete_four_source_three_goal_groups": int(complete.sum()),
+                  "goal_pair_merges": sum(int((targets[:, a] == targets[:, b]).all(-1).sum())
+                                          for a, b in ((0, 1), (0, 2), (1, 2)))}
         for key, value in events.items():
             self._pending_bundle_events[key] = self._pending_bundle_events.get(key, 0) + value
         # Keep ordinary rows last: JointData may replace its final rank row by
@@ -338,9 +359,19 @@ class BroadData(JointData):
     def record_update(self, arrays, huber_nonzero, rank_nonzero):
         # Called only after successful optimizer.step, so an aborted sampling or
         # forward call contributes no exposure to this phase's committed counts.
-        for keys, truth, roles, wanted in self._pending_bundle_huber:
+        def canonical(groups):
+            order = np.lexsort(tuple(groups[:, :, i] for i in reversed(range(4))))
+            return np.take_along_axis(groups, order[:, :, None], axis=1).reshape(len(groups), -1)
+        for keys, truth, roles, wanted, complete in self._pending_bundle_huber:
             self.phase_sketches["bundle_huber_relations"].add(keys)
             self.add_hist(self.bundle_histograms.setdefault("huber_requested_anchor_distance", {}), wanted)
+            groups = keys.reshape(-1, 12, 4)[complete]
+            if len(groups):
+                self.phase_sketches["bundle_huber_groups"].add(canonical(groups))
+                self.phase_sketches["bundle_shared_source_groups"].add(canonical(groups.reshape(-1, 3, 4)))
+                shared_goal = groups.reshape(-1, 4, 3, 4).transpose(0, 2, 1, 3).reshape(-1, 4, 4)
+                self.phase_sketches["bundle_shared_goal_groups"].add(canonical(shared_goal))
+                self.phase_sketches["bundle_cross_branch_groups"].add(canonical(groups[:, 3:]))
             for role in np.unique(roles):
                 self.add_hist(self.bundle_histograms.setdefault("huber_" + role, {}), truth[roles == role])
         for keys, truth in self._pending_bundle_candidates:

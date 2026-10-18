@@ -96,18 +96,22 @@ class BroadSamplingTest(unittest.TestCase):
             source, goal = bundled.structure_rows(0, 120, True)
             root = bundled.roots[0]
             ss, gg = root.packed(source)[:, 0], root.packed(goal)[:, 0]
-            # Ten six-context groups explicitly share sources and goals. The
-            # two first actions differ at every branching anchor; DAG merges
+            # Five twelve-context groups explicitly share sources and goals.
+            # First actions differ whenever enough branches exist; DAG merges
             # remain legal, and all cross-branch labels come from the oracle.
-            ss, gg = ss[:60].reshape(-1, 6), gg[:60].reshape(-1, 6)
+            ss, gg = ss[:60].reshape(-1, 12), gg[:60].reshape(-1, 12)
             np.testing.assert_array_equal(ss[:, 0], ss[:, 1])
-            np.testing.assert_array_equal(gg[:, 0], gg[:, 2])
+            np.testing.assert_array_equal(ss[:, 0], ss[:, 2])
             np.testing.assert_array_equal(gg[:, 0], gg[:, 3])
+            np.testing.assert_array_equal(gg[:, 0], gg[:, 6])
+            np.testing.assert_array_equal(gg[:, 0], gg[:, 9])
             np.testing.assert_array_equal(gg[:, 1], gg[:, 4])
-            np.testing.assert_array_equal(gg[:, 1], gg[:, 5])
-            degrees = sum(g.degrees(source[:60:6, i]) for i, (g, _) in enumerate(root.parts))
-            self.assertTrue((ss[degrees > 1, 2] != ss[degrees > 1, 3]).all())
-            for a, b, c, d in zip(ss[:, 2], ss[:, 3], gg[:, 0], gg[:, 1]):
+            np.testing.assert_array_equal(gg[:, 1], gg[:, 7])
+            degrees = sum(g.degrees(source[:60:12, i]) for i, (g, _) in enumerate(root.parts))
+            self.assertTrue((ss[degrees > 1, 3] != ss[degrees > 1, 6]).all())
+            self.assertTrue((ss[degrees >= 3, 3] != ss[degrees >= 3, 9]).all())
+            self.assertTrue((ss[degrees >= 3, 6] != ss[degrees >= 3, 9]).all())
+            for a, b, c, d in zip(ss[:, 3], ss[:, 6], gg[:, 0], gg[:, 1]):
                 self.assertGreaterEqual(oracle.distance(int(a), int(c)), 0)
                 self.assertGreaterEqual(oracle.distance(int(b), int(d)), 0)
             self.assertEqual(bundled.phase_sketches["bundle_huber_relations"].estimate(), 0)
@@ -126,6 +130,8 @@ class BroadSamplingTest(unittest.TestCase):
             bundled.record_update(batch, np.ones(len(batch[2]), bool), np.ones(len(batch[5]), bool))
             self.assertGreater(bundled.phase_sketches["bundle_huber_relations"].estimate(), 0)
             self.assertGreater(bundled.phase_sketches["bundle_rank_candidate_relations"].estimate(), 0)
+            self.assertGreater(bundled.phase_sketches["bundle_shared_source_groups"].estimate(), 0)
+            self.assertGreater(bundled.phase_sketches["bundle_shared_goal_groups"].estimate(), 0)
             saved = copy.deepcopy(bundled.state_dict())
             replay = BroadData(path, path / "legacy.npz", bundled.options)
             replay.load_state_dict(saved)

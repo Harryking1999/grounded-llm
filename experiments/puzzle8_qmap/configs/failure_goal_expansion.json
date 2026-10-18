@@ -60,7 +60,7 @@
       "maximum_test_goal_mae_increase": 0.25,
       "report_cycle_count": true
     },
-    "parent_checkpoint": "/tmp/puzzle8_failure_goal_coverage/run/stages/step_002000/checkpoint.pt",
+    "parent_checkpoint": "/tmp/puzzle8_failure_goal_coverage/run/stages/step_001000/checkpoint.pt",
     "minimum_validation_intermediate_solved": 367,
     "minimum_full_state_restoration_solved": 177456
   },
@@ -83,7 +83,7 @@
       31
     ]
   },
-  "purpose": "Continue the preserved97.866% all-state restoration candidate and its exact Adam/graph sampler, rather than reverting to95% because validation intermediate355 misses strict367 guard. Keep that guard for formal selection and report the limitation; user accepts high restoration with small intermediate fluctuation. Preserve old94.47,97.80 and97.866 candidates. Expand fresh train goals64to128 per refresh and include current restoration-correct training contexts alongside historical training successes; exact labels/full forks only, no score distillation or search. Original model/loss weights/lr/batch and broad sampler positions unchanged. Fixed monitor is never mined. Each1000 evaluates restoration, loops, distance-binned intermediate and matched losses/gains; feedback window does not imply acceptance.",
+  "purpose": "Continue the preserved97.8048% all-state restoration candidate and its exact Adam/graph sampler, rather than reverting to95% because validation intermediate355 misses strict367 guard. Keep that guard for formal selection and report the limitation; user accepts high restoration with small intermediate fluctuation. Preserve old94.47 and97.80 complete candidates. The former node was replaced and97.866 stage2000 checkpoint was lost from/tmp before recovery; retain its measured results as history, but never claim its weight is available. Restore the complete local97.80 stage1000 including Adam and sampler and continue without regenerating the exact table. Expand fresh train goals64to128 per refresh and include current restoration-correct training contexts alongside historical training successes; exact labels/full forks only, no score distillation or search. Original model/loss weights/lr/batch and broad sampler positions unchanged. Fixed monitor is never mined. Each1000 evaluates restoration, loops, distance-binned intermediate and matched losses/gains; feedback window does not imply acceptance.",
   "failure_sampling": {
     "structure_cache": "/tmp/puzzle8_full_coverage_b566aaa/graph_structure.npz",
     "fresh_goals_per_refresh": 128,
@@ -107,7 +107,7 @@
     "retention_restore_checkpoint": [
       "/tmp/puzzle8_failure_repair/run/stages/step_001000/checkpoint.pt",
       "/tmp/puzzle8_failure_repair/run/stages/step_002000/checkpoint.pt",
-      "/tmp/puzzle8_failure_goal_coverage/run/stages/step_002000/checkpoint.pt"
+      "/tmp/puzzle8_failure_goal_coverage/run/stages/step_001000/checkpoint.pt"
     ],
     "refresh_every": 250
   }

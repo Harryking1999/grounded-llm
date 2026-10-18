@@ -12,7 +12,9 @@ class FailureData(JointData):
         super().__init__(path, legacy_path, options, rank, world)
         diagnostic = json.loads(Path(options["failure_diagnosis"]).read_text())
         # Deliberately ignore monitor_long. Only training roots can seed repair.
-        rows = diagnostic["training_long"]["rows"]
+        rows = list(diagnostic["training_long"]["rows"])
+        for path in options.get("additional_failure_diagnoses", []):
+            rows.extend(json.loads(Path(path).read_text())["training_long"]["rows"])
         self.packets = [[] for _ in self.roots]
         self.packet_weights = [[] for _ in self.roots]
         self.negative_packets = [[] for _ in self.roots]

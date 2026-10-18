@@ -1,0 +1,52 @@
+{
+  "oracle": {
+    "task": "puzzle8",
+    "states": 181440,
+    "shape": [
+      181440,
+      181440
+    ],
+    "dtype": "int8",
+    "complete": true,
+    "ordered_pairs": 32920473600,
+    "label_bytes": 32920473600,
+    "source_commit": "545f4f5",
+    "goal_state": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      0
+    ],
+    "move": "blank_direction",
+    "move_cost": 1,
+    "cpu_prefix_rows": 122368,
+    "gpu_completion_rows": 59072,
+    "gpu_completion_seconds": 139.44
+  },
+  "joint_training_pool": {
+    "states": 181440,
+    "full_exact_ordered_pairs": 32920473600,
+    "available_joint_pairs": 32917570624,
+    "available_joint_decisions": 32913216256,
+    "structure_decisions": 7077604,
+    "structure_parent_states": 181408,
+    "structure_goal_states": 181432,
+    "directed_edges": 483792,
+    "protected_goal_ids": [
+      6179,
+      21379,
+      27847,
+      62162,
+      73442,
+      113285,
+      125953,
+      131701
+    ],
+    "scope": "One joint training pool. Full source-goal distances and full legal stars; every parent fork, multiscale downstream and cross-branch relations; no new loss or supervision type."
+  }
+}

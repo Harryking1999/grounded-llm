@@ -1,0 +1,536 @@
+{
+  "task": "puzzle8",
+  "source_commit": "fb7ffe6",
+  "parent": {
+    "checkpoint": "/zhanghanyue/experiment/grounded_llm_puzzle_qmaps/runs/puzzle8_branch_routes_795d1a1/best.pt",
+    "source_commit": "795d1a1",
+    "step": 160000
+  },
+  "best_step": 120000,
+  "last_step": 130000,
+  "training_seconds": 1608.24,
+  "selection": "all-state restoration count subject to fixed validation MAE guard",
+  "metadata_note": "One joint full-graph run; raw source summary retained an obsolete phrase about two continuation arms. No extra arm was launched for this full-graph run.",
+  "initial_policy": {
+    "nonterminal_states": 181439,
+    "horizon": 62,
+    "eventually_solved": 128915,
+    "within_budget": 128915,
+    "within_budget_rate": 0.71051427752578,
+    "shortest_action_rate": 0.9452818853719432,
+    "wrong_decisions": 9928,
+    "two_cycles": 2255,
+    "cycle_nodes": 4510,
+    "other_cycle_nodes": 0,
+    "local_minima": 12651,
+    "restoration_mae": 0.7033503776184635,
+    "same1024": {
+      "count": 1024,
+      "solved": 720,
+      "cycle_count": 304,
+      "mean_extra_steps_on_solved": 0.3055555555555556
+    }
+  },
+  "selected_policy": {
+    "nonterminal_states": 181439,
+    "horizon": 62,
+    "eventually_solved": 140056,
+    "within_budget": 140056,
+    "within_budget_rate": 0.7719178346441504,
+    "shortest_action_rate": 0.9890045690287094,
+    "wrong_decisions": 1995,
+    "two_cycles": 567,
+    "cycle_nodes": 1134,
+    "other_cycle_nodes": 0,
+    "local_minima": 9771,
+    "restoration_mae": 0.5650831020198285,
+    "previously_solved_lost": 29328,
+    "previously_failed_gained": 40469,
+    "same1024": {
+      "count": 1024,
+      "solved": 798,
+      "cycle_count": 226,
+      "mean_extra_steps_on_solved": 0.10025062656641603
+    }
+  },
+  "intermediate": {
+    "validation": {
+      "pairs": {
+        "count": 6599,
+        "huber": 2.4681850926330795,
+        "mae": 2.940101854655576,
+        "spearman": 0.9233330954939066
+      },
+      "decisions": {
+        "count": 4096,
+        "shortest_action_rate": 0.772216796875,
+        "uniform_tie_shortest_rate": 0.772216796875,
+        "strict_candidate_order_accuracy": 0.7821309125656952
+      },
+      "rollout": {
+        "count": 1024,
+        "solved": 362,
+        "success_rate": 0.353515625,
+        "cycle_rate": 0.646484375,
+        "budget_exhausted": 0,
+        "horizon": 62,
+        "mean_extra_steps_on_solved": 0.08287292817679558,
+        "illegal_action_rate": 0.0
+      },
+      "oracle_solved": 1024
+    },
+    "test": {
+      "pairs": {
+        "count": 6551,
+        "huber": 2.569814925363046,
+        "mae": 3.042664619642912,
+        "spearman": 0.9093191453696341
+      },
+      "decisions": {
+        "count": 4096,
+        "shortest_action_rate": 0.770263671875,
+        "uniform_tie_shortest_rate": 0.770263671875,
+        "strict_candidate_order_accuracy": 0.7834601068134003
+      },
+      "rollout": {
+        "count": 1024,
+        "solved": 335,
+        "success_rate": 0.3271484375,
+        "cycle_rate": 0.6728515625,
+        "budget_exhausted": 0,
+        "horizon": 62,
+        "mean_extra_steps_on_solved": 0.11940298507462686,
+        "illegal_action_rate": 0.0
+      },
+      "oracle_solved": 1024
+    }
+  },
+  "last_policy": {
+    "nonterminal_states": 181439,
+    "horizon": 62,
+    "eventually_solved": 137322,
+    "within_budget": 137322,
+    "within_budget_rate": 0.7568494094433942,
+    "shortest_action_rate": 0.9900517529307371,
+    "wrong_decisions": 1805,
+    "two_cycles": 534,
+    "cycle_nodes": 1068,
+    "other_cycle_nodes": 0,
+    "local_minima": 9741,
+    "restoration_mae": 0.5586027895909468,
+    "previously_solved_lost": 30761,
+    "previously_failed_gained": 39168,
+    "same1024": {
+      "count": 1024,
+      "solved": 794,
+      "cycle_count": 230,
+      "mean_extra_steps_on_solved": 0.14105793450881612
+    }
+  },
+  "selected_sampling": {
+    "original_pair_passes": 2.6984126984126986,
+    "original_decision_passes": 1.349213785349346,
+    "restoration_pair_passes": 406.0846560846561,
+    "restoration_decision_passes": 203.0434471089457,
+    "all_pairs_draws": 66360000,
+    "all_pairs_passes": 0.0020159446381385546,
+    "all_decision_draws": 36840000,
+    "all_decision_passes": 0.0011193072021116793,
+    "observed_broad_sources": 181432,
+    "observed_broad_goals": 181432,
+    "structure_pair_passes": 7.494061549643071,
+    "structure_decision_passes": 4.170903034416732,
+    "hard_pair_draws": 13320000,
+    "hard_decision_draws": 7440000,
+    "edge_pair_passes": 30.50897906538347,
+    "structure_decisions": 7077604,
+    "hard_contexts": 8588
+  },
+  "last_sampling": {
+    "original_pair_passes": 2.9232804232804233,
+    "original_decision_passes": 1.4616482674617917,
+    "restoration_pair_passes": 439.92504409171073,
+    "restoration_decision_passes": 219.96373436802452,
+    "all_pairs_draws": 71890000,
+    "all_pairs_passes": 0.002183940024650101,
+    "all_decision_draws": 39910000,
+    "all_decision_passes": 0.0012125828022876526,
+    "observed_broad_sources": 181432,
+    "observed_broad_goals": 181432,
+    "structure_pair_passes": 8.118566678779993,
+    "structure_decision_passes": 4.518478287284793,
+    "hard_pair_draws": 14430000,
+    "hard_decision_draws": 8060000,
+    "edge_pair_passes": 33.05139398749876,
+    "structure_decisions": 7077604,
+    "hard_contexts": 7746
+  },
+  "curve": [
+    {
+      "step": 1,
+      "restoration_solved": 128739,
+      "two_cycles": 2271,
+      "validation_mae": 3.6833070483166517,
+      "best_step": 0
+    },
+    {
+      "step": 10000,
+      "restoration_solved": 114185,
+      "two_cycles": 2318,
+      "validation_mae": 3.108180652117798,
+      "best_step": 0
+    },
+    {
+      "step": 20000,
+      "restoration_solved": 116900,
+      "two_cycles": 1845,
+      "validation_mae": 3.0471857051846474,
+      "best_step": 0
+    },
+    {
+      "step": 30000,
+      "restoration_solved": 115747,
+      "two_cycles": 1581,
+      "validation_mae": 3.0303891666153375,
+      "best_step": 0
+    },
+    {
+      "step": 40000,
+      "restoration_solved": 117627,
+      "two_cycles": 1349,
+      "validation_mae": 2.999382561455172,
+      "best_step": 0
+    },
+    {
+      "step": 50000,
+      "restoration_solved": 123358,
+      "two_cycles": 1117,
+      "validation_mae": 3.0007537243709113,
+      "best_step": 0
+    },
+    {
+      "step": 60000,
+      "restoration_solved": 122136,
+      "two_cycles": 1019,
+      "validation_mae": 2.9768903552808443,
+      "best_step": 0
+    },
+    {
+      "step": 70000,
+      "restoration_solved": 132585,
+      "two_cycles": 865,
+      "validation_mae": 2.9629219696907985,
+      "best_step": 70000
+    },
+    {
+      "step": 80000,
+      "restoration_solved": 122202,
+      "two_cycles": 840,
+      "validation_mae": 2.9661983809230508,
+      "best_step": 70000
+    },
+    {
+      "step": 90000,
+      "restoration_solved": 133337,
+      "two_cycles": 698,
+      "validation_mae": 2.9495630780211504,
+      "best_step": 90000
+    },
+    {
+      "step": 100000,
+      "restoration_solved": 136803,
+      "two_cycles": 657,
+      "validation_mae": 2.9442764918250304,
+      "best_step": 100000
+    },
+    {
+      "step": 110000,
+      "restoration_solved": 134431,
+      "two_cycles": 619,
+      "validation_mae": 2.9429994229205287,
+      "best_step": 100000
+    },
+    {
+      "step": 120000,
+      "restoration_solved": 140056,
+      "two_cycles": 567,
+      "validation_mae": 2.940101854655576,
+      "best_step": 120000
+    },
+    {
+      "step": 130000,
+      "restoration_solved": 137322,
+      "two_cycles": 534,
+      "validation_mae": 2.926665256377115,
+      "best_step": 120000
+    }
+  ],
+  "cycle_basins": {
+    "scope": "posthoc read-only basin audit of selected unchanged greedy Q policy",
+    "source_commit": "fb7ffe6",
+    "checkpoint_step": 280000,
+    "cycle_count": 567,
+    "failed_states": 41383,
+    "largest_basin": 3758,
+    "top10_failed_states": 17541,
+    "top10_failed_fraction": 0.4238697049513085,
+    "top10": [
+      {
+        "cycle_states": [
+          109,
+          189
+        ],
+        "cycle_depths": [
+          7,
+          8
+        ],
+        "cycle_q_distances": [
+          8.846312522888184,
+          8.247894287109375
+        ],
+        "basin_states": 3758,
+        "shallower_cycle_state": 109,
+        "exit_states": [
+          64
+        ],
+        "exit_true_distances": [
+          6
+        ],
+        "exit_q_distances": [
+          8.64098834991455
+        ]
+      },
+      {
+        "cycle_states": [
+          124,
+          178
+        ],
+        "cycle_depths": [
+          7,
+          8
+        ],
+        "cycle_q_distances": [
+          8.089412689208984,
+          7.880742073059082
+        ],
+        "basin_states": 2454,
+        "shallower_cycle_state": 124,
+        "exit_states": [
+          72
+        ],
+        "exit_true_distances": [
+          6
+        ],
+        "exit_q_distances": [
+          8.499778747558594
+        ]
+      },
+      {
+        "cycle_states": [
+          140,
+          223
+        ],
+        "cycle_depths": [
+          7,
+          8
+        ],
+        "cycle_q_distances": [
+          8.452516555786133,
+          8.735448837280273
+        ],
+        "basin_states": 1922,
+        "shallower_cycle_state": 140,
+        "exit_states": [
+          79
+        ],
+        "exit_true_distances": [
+          6
+        ],
+        "exit_q_distances": [
+          8.74224853515625
+        ]
+      },
+      {
+        "cycle_states": [
+          698,
+          1091
+        ],
+        "cycle_depths": [
+          10,
+          11
+        ],
+        "cycle_q_distances": [
+          11.30070972442627,
+          11.774019241333008
+        ],
+        "basin_states": 1770,
+        "shallower_cycle_state": 698,
+        "exit_states": [
+          415
+        ],
+        "exit_true_distances": [
+          9
+        ],
+        "exit_q_distances": [
+          11.905491828918457
+        ]
+      },
+      {
+        "cycle_states": [
+          281,
+          423
+        ],
+        "cycle_depths": [
+          9,
+          10
+        ],
+        "cycle_q_distances": [
+          10.119888305664062,
+          10.52170467376709
+        ],
+        "basin_states": 1565,
+        "shallower_cycle_state": 281,
+        "exit_states": [
+          158
+        ],
+        "exit_true_distances": [
+          8
+        ],
+        "exit_q_distances": [
+          10.542146682739258
+        ]
+      },
+      {
+        "cycle_states": [
+          615,
+          981
+        ],
+        "cycle_depths": [
+          10,
+          11
+        ],
+        "cycle_q_distances": [
+          11.836095809936523,
+          11.473358154296875
+        ],
+        "basin_states": 1249,
+        "shallower_cycle_state": 615,
+        "exit_states": [
+          371
+        ],
+        "exit_true_distances": [
+          9
+        ],
+        "exit_q_distances": [
+          12.131746292114258
+        ]
+      },
+      {
+        "cycle_states": [
+          417,
+          702
+        ],
+        "cycle_depths": [
+          9,
+          10
+        ],
+        "cycle_q_distances": [
+          10.279321670532227,
+          10.415485382080078
+        ],
+        "basin_states": 1243,
+        "shallower_cycle_state": 417,
+        "exit_states": [
+          266
+        ],
+        "exit_true_distances": [
+          8
+        ],
+        "exit_q_distances": [
+          10.66112232208252
+        ]
+      },
+      {
+        "cycle_states": [
+          427,
+          716
+        ],
+        "cycle_depths": [
+          10,
+          11
+        ],
+        "cycle_q_distances": [
+          11.478530883789062,
+          11.553542137145996
+        ],
+        "basin_states": 1241,
+        "shallower_cycle_state": 427,
+        "exit_states": [
+          272
+        ],
+        "exit_true_distances": [
+          9
+        ],
+        "exit_q_distances": [
+          11.83145809173584
+        ]
+      },
+      {
+        "cycle_states": [
+          789,
+          1258
+        ],
+        "cycle_depths": [
+          11,
+          12
+        ],
+        "cycle_q_distances": [
+          12.36422348022461,
+          12.017816543579102
+        ],
+        "basin_states": 1198,
+        "shallower_cycle_state": 789,
+        "exit_states": [
+          482
+        ],
+        "exit_true_distances": [
+          10
+        ],
+        "exit_q_distances": [
+          12.430377960205078
+        ]
+      },
+      {
+        "cycle_states": [
+          617,
+          984
+        ],
+        "cycle_depths": [
+          10,
+          11
+        ],
+        "cycle_q_distances": [
+          11.156341552734375,
+          11.208211898803711
+        ],
+        "basin_states": 1141,
+        "shallower_cycle_state": 617,
+        "exit_states": [
+          373
+        ],
+        "exit_true_distances": [
+          9
+        ],
+        "exit_q_distances": [
+          11.598407745361328
+        ]
+      }
+    ]
+  },
+  "acceptance": {
+    "minimum_full_state_restoration_rate": 0.99,
+    "achieved_full_state_restoration_rate": 0.7719178346441504,
+    "passed": false,
+    "selected_for_task": false
+  }
+}

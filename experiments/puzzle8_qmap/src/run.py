@@ -126,7 +126,7 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
     model.load_state_dict(saved["model"])
     summary = {"task": env.name, "source_commit": source_commit, "best_step": best_step,
                "last_step": step, "training_seconds": round(time.monotonic() - started, 2),
-               "selection": ("all-state restoration count subject to fixed validation MAE guard; identical in both continuation arms"
+               "selection": ("all-state restoration count subject to fixed validation MAE guard"
                              if parent else "heldout intermediate goal distance Huber + full soft rank cross entropy after one coverage pass"),
                "parent": parent, "initial_policy": initial_policy,
                "torch_version": torch.__version__, "numpy_version": np.__version__,

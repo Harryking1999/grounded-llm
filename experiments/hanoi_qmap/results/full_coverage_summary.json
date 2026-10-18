@@ -1,0 +1,449 @@
+{
+  "task": "hanoi8",
+  "source_commit": "fb7ffe6",
+  "parent": {
+    "checkpoint": "/zhanghanyue/experiment/grounded_llm_puzzle_qmaps/runs/hanoi8_tower_coverage_ecfbb23/best.pt",
+    "source_commit": "ecfbb23",
+    "step": 40000
+  },
+  "best_step": 40000,
+  "last_step": 60000,
+  "training_seconds": 977.0,
+  "selection": "all-state tower restoration with fixed validation distance guard",
+  "best_model_training_coverage": {
+    "pair_broad_passes": 1.1524085667500286,
+    "decision_broad_passes": 0.29279978155419556,
+    "tower_pair_passes": 1664.6341463414635,
+    "tower_decision_passes": 833.3333333333334
+  },
+  "last_model_training_coverage": {
+    "pair_broad_passes": 1.7286128501250428,
+    "decision_broad_passes": 0.4391996723312933,
+    "tower_pair_passes": 2496.951219512195,
+    "tower_decision_passes": 1250.0
+  },
+  "initial": {
+    "all_state_towers": {
+      "nonterminal_tasks": 19680,
+      "within_budget": 19641,
+      "rate": 0.9980182926829269,
+      "horizon": 510,
+      "by_goal": {
+        "0": {
+          "within_budget": 6560,
+          "rate": 1.0,
+          "shortest_action_rate": 0.9992378048780488,
+          "two_cycles": 0,
+          "tower_starts_solved": {
+            "3280": true,
+            "6560": true
+          }
+        },
+        "3280": {
+          "within_budget": 6521,
+          "rate": 0.9940548780487805,
+          "shortest_action_rate": 0.9952743902439024,
+          "two_cycles": 4,
+          "tower_starts_solved": {
+            "0": true,
+            "6560": true
+          }
+        },
+        "6560": {
+          "within_budget": 6560,
+          "rate": 1.0,
+          "shortest_action_rate": 0.9986280487804878,
+          "two_cycles": 0,
+          "tower_starts_solved": {
+            "0": true,
+            "3280": true
+          }
+        }
+      }
+    },
+    "standard_towers": {
+      "count": 6,
+      "solved": 6,
+      "success_rate": 1.0,
+      "cycle_rate": 0.0,
+      "budget_exhausted": 0,
+      "horizon": 510,
+      "mean_extra_steps_on_solved": 0.3333333333333333,
+      "illegal_action_rate": 0.0,
+      "by_start_distance": {
+        "255": {
+          "count": 6,
+          "success_rate": 1.0
+        }
+      },
+      "per_task": {
+        "solved": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ],
+        "steps": [
+          257,
+          255,
+          255,
+          255,
+          255,
+          255
+        ],
+        "cycles": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      }
+    },
+    "intermediate": {
+      "validation": {
+        "pairs": {
+          "count": 107379,
+          "huber": 1.2033065117382638,
+          "mae": 1.547284608884026,
+          "spearman": 0.9986765990010258
+        },
+        "decisions": {
+          "count": 4096,
+          "shortest_action_rate": 0.881591796875,
+          "uniform_tie_shortest_rate": 0.881591796875,
+          "strict_candidate_order_accuracy": 0.9312279243714938
+        },
+        "rollout": {
+          "count": 1024,
+          "solved": 177,
+          "success_rate": 0.1728515625,
+          "cycle_rate": 0.8271484375,
+          "budget_exhausted": 0,
+          "horizon": 510,
+          "mean_extra_steps_on_solved": 2.327683615819209,
+          "illegal_action_rate": 0.0
+        },
+        "oracle_solved": 1024
+      },
+      "test": {
+        "pairs": {
+          "count": 107376,
+          "huber": 1.208508615075007,
+          "mae": 1.5513772668963377,
+          "spearman": 0.9986318855559471
+        },
+        "decisions": {
+          "count": 4096,
+          "shortest_action_rate": 0.8720703125,
+          "uniform_tie_shortest_rate": 0.8720703125,
+          "strict_candidate_order_accuracy": 0.9247178212695454
+        },
+        "rollout": {
+          "count": 1024,
+          "solved": 152,
+          "success_rate": 0.1484375,
+          "cycle_rate": 0.8515625,
+          "budget_exhausted": 0,
+          "horizon": 510,
+          "mean_extra_steps_on_solved": 1.644736842105263,
+          "illegal_action_rate": 0.0
+        },
+        "oracle_solved": 1024
+      }
+    }
+  },
+  "final": {
+    "all_state_towers": {
+      "nonterminal_tasks": 19680,
+      "within_budget": 19659,
+      "rate": 0.9989329268292683,
+      "horizon": 510,
+      "by_goal": {
+        "0": {
+          "within_budget": 6560,
+          "rate": 1.0,
+          "shortest_action_rate": 1.0,
+          "two_cycles": 0,
+          "tower_starts_solved": {
+            "3280": true,
+            "6560": true
+          }
+        },
+        "3280": {
+          "within_budget": 6539,
+          "rate": 0.9967987804878049,
+          "shortest_action_rate": 0.9972560975609757,
+          "two_cycles": 2,
+          "tower_starts_solved": {
+            "0": true,
+            "6560": true
+          }
+        },
+        "6560": {
+          "within_budget": 6560,
+          "rate": 1.0,
+          "shortest_action_rate": 0.9989329268292683,
+          "two_cycles": 0,
+          "tower_starts_solved": {
+            "0": true,
+            "3280": true
+          }
+        }
+      }
+    },
+    "standard_towers": {
+      "count": 6,
+      "solved": 6,
+      "success_rate": 1.0,
+      "cycle_rate": 0.0,
+      "budget_exhausted": 0,
+      "horizon": 510,
+      "mean_extra_steps_on_solved": 0.16666666666666666,
+      "illegal_action_rate": 0.0,
+      "by_start_distance": {
+        "255": {
+          "count": 6,
+          "success_rate": 1.0
+        }
+      },
+      "per_task": {
+        "solved": [
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
+        ],
+        "steps": [
+          255,
+          255,
+          255,
+          256,
+          255,
+          255
+        ],
+        "cycles": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ]
+      }
+    },
+    "intermediate": {
+      "validation": {
+        "pairs": {
+          "count": 107379,
+          "huber": 1.2290975850777148,
+          "mae": 1.5650577509662675,
+          "spearman": 0.9986520285814545
+        },
+        "decisions": {
+          "count": 4096,
+          "shortest_action_rate": 0.879638671875,
+          "uniform_tie_shortest_rate": 0.879638671875,
+          "strict_candidate_order_accuracy": 0.9298774153334719
+        },
+        "rollout": {
+          "count": 1024,
+          "solved": 168,
+          "success_rate": 0.1640625,
+          "cycle_rate": 0.8359375,
+          "budget_exhausted": 0,
+          "horizon": 510,
+          "mean_extra_steps_on_solved": 2.0535714285714284,
+          "illegal_action_rate": 0.0
+        },
+        "oracle_solved": 1024
+      },
+      "test": {
+        "pairs": {
+          "count": 107376,
+          "huber": 1.2323935988627714,
+          "mae": 1.5662884771415329,
+          "spearman": 0.9986095571071322
+        },
+        "decisions": {
+          "count": 4096,
+          "shortest_action_rate": 0.87255859375,
+          "uniform_tie_shortest_rate": 0.87255859375,
+          "strict_candidate_order_accuracy": 0.924924924924925
+        },
+        "rollout": {
+          "count": 1024,
+          "solved": 151,
+          "success_rate": 0.1474609375,
+          "cycle_rate": 0.8525390625,
+          "budget_exhausted": 0,
+          "horizon": 510,
+          "mean_extra_steps_on_solved": 1.2384105960264902,
+          "illegal_action_rate": 0.0
+        },
+        "oracle_solved": 1024
+      }
+    }
+  },
+  "last_policy": {
+    "nonterminal_tasks": 19680,
+    "within_budget": 19645,
+    "rate": 0.9982215447154471,
+    "horizon": 510,
+    "by_goal": {
+      "0": {
+        "within_budget": 6560,
+        "rate": 1.0,
+        "shortest_action_rate": 0.9998475609756098,
+        "two_cycles": 0,
+        "tower_starts_solved": {
+          "3280": true,
+          "6560": true
+        }
+      },
+      "3280": {
+        "within_budget": 6525,
+        "rate": 0.9946646341463414,
+        "shortest_action_rate": 0.9975609756097561,
+        "two_cycles": 3,
+        "tower_starts_solved": {
+          "0": true,
+          "6560": true
+        }
+      },
+      "6560": {
+        "within_budget": 6560,
+        "rate": 1.0,
+        "shortest_action_rate": 0.999390243902439,
+        "two_cycles": 0,
+        "tower_starts_solved": {
+          "0": true,
+          "3280": true
+        }
+      }
+    }
+  },
+  "training_relation_audit": {
+    "scope": "posthoc read-only audit of 1024 training decision rows; not heldout evidence",
+    "seed": 20261422,
+    "source_commit": "fb7ffe6",
+    "metrics": {
+      "initial": {
+        "mae": 1.715368787990883,
+        "decisions": {
+          "count": 1024,
+          "shortest_action_rate": 0.912109375,
+          "uniform_tie_shortest_rate": 0.912109375,
+          "strict_candidate_order_accuracy": 0.9473903966597077
+        },
+        "rollout": {
+          "count": 1024,
+          "solved": 187,
+          "success_rate": 0.1826171875,
+          "cycle_rate": 0.8173828125,
+          "budget_exhausted": 0,
+          "horizon": 510,
+          "mean_extra_steps_on_solved": 2.0053475935828877,
+          "illegal_action_rate": 0.0
+        }
+      },
+      "final": {
+        "mae": 1.6745740822516382,
+        "decisions": {
+          "count": 1024,
+          "shortest_action_rate": 0.9189453125,
+          "uniform_tie_shortest_rate": 0.9189453125,
+          "strict_candidate_order_accuracy": 0.9507306889352818
+        },
+        "rollout": {
+          "count": 1024,
+          "solved": 194,
+          "success_rate": 0.189453125,
+          "cycle_rate": 0.810546875,
+          "budget_exhausted": 0,
+          "horizon": 510,
+          "mean_extra_steps_on_solved": 1.8608247422680413,
+          "illegal_action_rate": 0.0
+        }
+      }
+    },
+    "exposure_note": "Rows were sampled from the training pool; exact gradient exposure was not checked for that cohort. See seen_decision_audit for guaranteed exposed rows."
+  },
+  "cycle_audit": {
+    "scope": "read-only exact functional graph cycle audit of selected checkpoint",
+    "by_goal": {
+      "0": {
+        "eventually_solved": 6560,
+        "cycle_basins": 0,
+        "cycle_length_histogram": {}
+      },
+      "3280": {
+        "eventually_solved": 6539,
+        "cycle_basins": 21,
+        "cycle_length_histogram": {
+          "2": 2
+        }
+      },
+      "6560": {
+        "eventually_solved": 6560,
+        "cycle_basins": 0,
+        "cycle_length_histogram": {}
+      }
+    }
+  },
+  "adoption": {
+    "selected": false,
+    "reason": "Tower restoration is strong, but heldout intermediate rollout 151/1024 and the guaranteed rank-exposed decision audit 200/1024 remain unreliable."
+  },
+  "seen_decision_audit": {
+    "scope": "posthoc read-only audit of 1024 decision rows guaranteed exposed in the broad rank sampler before the selected checkpoint; reconstruct initial NumPy permutations, sample only the unwrapped consumed prefix",
+    "seed": 20261423,
+    "source_commit": "fb7ffe6",
+    "guaranteed_rank_prefix_rows": 12280000,
+    "metrics": {
+      "initial": {
+        "mae": 1.7341734173242003,
+        "decisions": {
+          "count": 1024,
+          "shortest_action_rate": 0.9287109375,
+          "uniform_tie_shortest_rate": 0.9287109375,
+          "strict_candidate_order_accuracy": 0.9606950765411667
+        },
+        "rollout": {
+          "count": 1024,
+          "solved": 204,
+          "success_rate": 0.19921875,
+          "cycle_rate": 0.80078125,
+          "budget_exhausted": 0,
+          "horizon": 510,
+          "mean_extra_steps_on_solved": 2.5784313725490198,
+          "illegal_action_rate": 0.0
+        }
+      },
+      "final": {
+        "mae": 1.6866504439385608,
+        "decisions": {
+          "count": 1024,
+          "shortest_action_rate": 0.931640625,
+          "uniform_tie_shortest_rate": 0.931640625,
+          "strict_candidate_order_accuracy": 0.9623500206868019
+        },
+        "rollout": {
+          "count": 1024,
+          "solved": 200,
+          "success_rate": 0.1953125,
+          "cycle_rate": 0.8046875,
+          "budget_exhausted": 0,
+          "horizon": 510,
+          "mean_extra_steps_on_solved": 2.22,
+          "illegal_action_rate": 0.0
+        }
+      }
+    }
+  }
+}

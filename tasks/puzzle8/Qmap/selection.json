@@ -1,8 +1,9 @@
 {
   "task": "puzzle8",
-  "status": "first_run_completed_not_selected",
+  "status": "full_graph_joint_completed_not_selected",
   "checkpoint": null,
-  "config": "experiments/puzzle8_qmap/configs/puzzle8.json",
-  "scope": "all_standard_goal_reachable_states_and_sampled_intermediate_goal_relations",
-  "evidence": "experiments/puzzle8_qmap/results/summary.json"
+  "config": "experiments/puzzle8_qmap/configs/full_graph_joint.json",
+  "scope": "all_reachable_states_and_nearly_all_source_goal_pairs_with_full_forks_and_downstream_closure",
+  "evidence": "experiments/puzzle8_qmap/results/full_graph_summary.json",
+  "reason": "Full-state restoration 77.19% with 567 cycles is below the formal 99% acceptance criterion."
 }

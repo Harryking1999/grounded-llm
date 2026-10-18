@@ -8,5 +8,13 @@
   "selection": "best_validation_distance_plus_rank_objective_within_hanoi6",
   "config": "experiments/hanoi_qmap/configs/hanoi6.json",
   "scope": "six_disk_only_not_eight_disk",
-  "evidence": "experiments/hanoi_qmap/results/summary.json"
+  "evidence": "experiments/hanoi_qmap/results/summary.json",
+  "requested_condition": {
+    "task": "hanoi8",
+    "status": "full_graph_joint_completed_not_selected",
+    "checkpoint": null,
+    "config": "experiments/hanoi_qmap/configs/hanoi8_full_coverage.json",
+    "evidence": "experiments/hanoi_qmap/results/full_coverage_summary.json",
+    "reason": "Six tower directions solve, but general intermediate-goal rollout remains 151/1024; historical six-disk weights above are not eight-disk weights."
+  }
 }

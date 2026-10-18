@@ -1,9 +1,26 @@
 {
   "task": "puzzle8",
-  "status": "full_graph_joint_completed_not_selected",
-  "checkpoint": null,
-  "config": "experiments/puzzle8_qmap/configs/full_graph_joint.json",
-  "scope": "all_reachable_states_and_nearly_all_source_goal_pairs_with_full_forks_and_downstream_closure",
-  "evidence": "experiments/puzzle8_qmap/results/full_graph_summary.json",
-  "reason": "Full-state restoration 77.19% with 567 cycles is below the formal 99% acceptance criterion."
+  "status": "selected_by_user",
+  "checkpoint": "tasks/puzzle8/Qmap/checkpoints/selected_98_28.pt",
+  "config": "experiments/puzzle8_qmap/configs/failure_goal_expansion.json",
+  "scope": "all181440 reachable8-puzzle states to standard restoration goal; intermediate capability measured separately",
+  "source_commit": "caf87d7",
+  "checkpoint_step": 286000,
+  "evidence": "runs/qmap_dual_20261018/puzzle8/goal_expansion/stages/step_001000/metrics.json",
+  "metrics": {
+    "restored": 178326,
+    "nonterminal_states": 181439,
+    "restoration_rate": 0.9828427184894096,
+    "two_cycles": 426,
+    "intermediate_test": {
+      "solved": 328,
+      "count": 1024
+    },
+    "intermediate_validation": {
+      "solved": 352,
+      "count": 1024
+    }
+  },
+  "reason": "User selected98.28% restoration candidate and shifted optimization priority to blocks. Selection does not assert strict intermediate367/1024 guard was passed.",
+  "resume_checkpoint": "runs/qmap_dual_20261018/puzzle8/goal_expansion/stages/step_001000/checkpoint.pt"
 }

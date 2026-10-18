@@ -4,4 +4,4 @@
 
 与其他 Qmap 共享两层 MLP、128 维 Q、固定对称距离及距离／候选排序监督。输入为九位置的九类独热。完整覆盖全状态到复原终点，并构造全状态到多组中间目标的精确距离；最终以复原为主要 rollout，留出中间目标检查关系补全。覆盖全部状态不代表全部状态对或未见状态泛化。
 
-尚无已验证采用权重；选定后放入 Git 忽略的 `checkpoints/` 并更新 [selection.json](selection.json)。不使用其他任务或旧 XoT 权重替代。
+用户已选用全状态复原98.28%的权重，入口见 [selection.json](selection.json)，本地推理文件为 `checkpoints/selected_98_28.pt`。固定中间目标328/1024，严格中间关系保持门槛尚未通过；具体能力范围见[当前报告](../../../experiments/puzzle8_qmap/results/report.md)。后续优化优先投入积木。

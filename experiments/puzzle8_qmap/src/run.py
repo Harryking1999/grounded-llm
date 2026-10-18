@@ -216,6 +216,9 @@ def train(env, config, data, out, device, source_commit, checkpoint=None, resume
                             mixture.mine(model, features, state)
                     selection_score = -policy["within_budget"]
                     eligible = pm["mae"] <= initial_validation_mae + config["continuation"]["maximum_validation_mae_increase"]
+                    minimum_restore = config["continuation"].get("minimum_full_state_restoration_solved")
+                    if minimum_restore is not None:
+                        eligible = eligible and policy["within_budget"] >= minimum_restore
                 if isinstance(mixture, GraphData):
                     intermediate = intermediate_stage(model, env, data, config, device, monitor_reference)
                     minimum_middle = config.get("continuation", {}).get("minimum_validation_intermediate_solved")

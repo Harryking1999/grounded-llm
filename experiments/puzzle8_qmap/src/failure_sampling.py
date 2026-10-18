@@ -25,25 +25,34 @@ class FailureGraphData(GraphData):
         self._retention_encoded = {}
 
     def retained_states(self, model, features, goal, children, legal, truth):
-        path = self.repair.get("retention_restore_checkpoint" if goal == 0 else "retention_checkpoint")
-        if path is None:
+        paths = self.repair.get("retention_restore_checkpoint" if goal == 0 else "retention_checkpoint")
+        if paths is None:
             return None, None
-        if path not in self._retention_encoded:
-            from .checkpoint_audit import load_model
-            reference = load_model(torch.load(path, map_location=features.device, weights_only=False), features.device)
-            self._retention_encoded[path] = torch.cat([reference.encode(part) for part in features.split(8192)])
-        encoded = self._retention_encoded[path]
-        heights = model.distance(encoded, encoded[int(goal)]).cpu().numpy()
-        pointer = self.env.next[np.arange(self.env.size), np.where(legal, heights[children], np.inf).argmin(-1)]
-        pointer[goal] = goal
-        jump = pointer.copy()
-        length = np.ones(self.env.size, dtype=np.int64)
-        length[goal] = 0
-        for _ in range(self.env.size.bit_length()):
-            length, jump = length + length[jump], jump[jump]
-        within = (jump == goal) & (length <= 62)
-        correct = self.env.distance(pointer, goal) == truth - 1
-        return within, correct
+        if isinstance(paths, str):
+            paths = [paths]
+        within_any = np.zeros(self.env.size, dtype=bool)
+        solved_correct_any = within_any.copy()
+        for path in dict.fromkeys(paths):
+            if path not in self._retention_encoded:
+                from .checkpoint_audit import load_model
+                reference = load_model(torch.load(path, map_location=features.device, weights_only=False), features.device)
+                self._retention_encoded[path] = torch.cat([reference.encode(part) for part in features.split(8192)])
+            encoded = self._retention_encoded[path]
+            heights = model.distance(encoded, encoded[int(goal)]).cpu().numpy()
+            pointer = self.env.next[np.arange(self.env.size), np.where(legal, heights[children], np.inf).argmin(-1)]
+            pointer[goal] = goal
+            jump = pointer.copy()
+            length = np.ones(self.env.size, dtype=np.int64)
+            length[goal] = 0
+            for _ in range(self.env.size.bit_length()):
+                length, jump = length + length[jump], jump[jump]
+            within = (jump == goal) & (length <= 62)
+            correct = self.env.distance(pointer, goal) == truth - 1
+            within_any |= within
+            solved_correct_any |= within & correct
+        # References select training contexts only. Labels and every candidate
+        # still come from the original exact oracle; no teacher scores enter loss.
+        return within_any, solved_correct_any
 
     @torch.no_grad()
     def mine(self, model, features, state):

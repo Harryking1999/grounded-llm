@@ -44,6 +44,20 @@ class FailureReplayTest(unittest.TestCase):
                         "model": model.state_dict()}, reference)
             repair.update(retention_fraction=.5, retention_checkpoint=str(reference),
                           retention_restore_checkpoint=str(reference))
+            alternative = path / "alternative.pt"
+            second = QMap(dimension=8, hidden=16)
+            torch.save({"task": "puzzle8", "model_type": MODEL_TYPE,
+                        "config": {"model": {"dimension": 8, "hidden": 16}},
+                        "model": second.state_dict()}, alternative)
+            masks = []
+            features = torch.as_tensor(env.features(np.arange(8)))
+            for refs in (str(reference), str(alternative), [str(reference), str(alternative)]):
+                repair["retention_restore_checkpoint"] = refs
+                with torch.no_grad():
+                    masks.append(sampler.retained_states(model, features, 0, env.next,
+                        env.next >= 0, env.distance(np.arange(8), 0)))
+            for k in (0, 1):
+                np.testing.assert_array_equal(masks[2][k], masks[0][k] | masks[1][k])
             _, state = audit(model, env, "cpu")
             sampler.mine(model, torch.as_tensor(env.features(np.arange(8))), state)
             for pool in (sampler.repair_middle, sampler.repair_restore):

@@ -1,0 +1,235 @@
+{
+  "source_commit": "9aa8498",
+  "stage": 1000,
+  "cumulative_parent_updates": 80000,
+  "checkpoint_remote": "/tmp/blocks12_joint_9aa8498/run/checkpoints/step_001000.pt",
+  "checkpoint_local": "runs/qmap_dual_20261018/blocks12/checkpoints/step_001000.pt",
+  "status": "stage_candidate_not_final_acceptance",
+  "graph_coverage": {
+    "train_roots": 1000,
+    "total_root_local_states": 51296001272,
+    "total_root_local_edges": 615045333572,
+    "total_root_local_pairs": 6991673263954997870,
+    "actions_available": 664
+  },
+  "exposure": {
+    "huber_draws": 4096000,
+    "rank_candidate_draws": 10478598,
+    "actual_rank_contexts": 505469,
+    "broad_unique_root_local_pairs": 816000,
+    "broad_pair_fraction": 1.1671025936049123e-13,
+    "roots_exposed": 1000,
+    "complete_initial_forks_exposed_per_rank": 1000,
+    "actions_exposed": 664,
+    "minimum_distinct_initial_root_contexts_per_action": 32,
+    "distance_bin_draws_all_ranks": {
+      "huber": {
+        "0": 45685,
+        "1": 254813,
+        "2": 291755,
+        "3-4": 492499,
+        "5-8": 429194,
+        "9+": 240697,
+        "unreachable": 2341357,
+        "finite_at_or_above_original_cap": 12
+      },
+      "rank_candidates": {
+        "0": 28294,
+        "1": 158817,
+        "2": 174049,
+        "3-4": 307840,
+        "5-8": 669587,
+        "9+": 1123598,
+        "unreachable": 8016413,
+        "finite_at_or_above_original_cap": 426
+      }
+    }
+  },
+  "evaluation": {
+    "unseen_roots": {
+      "clear": {
+        "tasks": 200,
+        "success": 95,
+        "outcomes": {
+          "local_coverage_failure": 91,
+          "reached": 95,
+          "globally_unreachable": 14
+        },
+        "success_rate": 0.475
+      },
+      "intermediate": {
+        "tasks": 400,
+        "success": 223,
+        "outcomes": {
+          "reached": 223,
+          "local_coverage_failure": 122,
+          "removed_goal_cell": 54,
+          "globally_unreachable": 1
+        },
+        "success_rate": 0.5575
+      }
+    },
+    "matched_baseline": {
+      "clear": {
+        "old_success_new_failure": 11,
+        "new_success": 75,
+        "net": 64,
+        "both_success": 20
+      },
+      "intermediate": {
+        "old_success_new_failure": 11,
+        "new_success": 20,
+        "net": 9,
+        "both_success": 203
+      }
+    },
+    "train_roots": {
+      "clear": {
+        "tasks": 100,
+        "success": 47,
+        "outcomes": {
+          "local_coverage_failure": 49,
+          "globally_unreachable": 4,
+          "reached": 47
+        },
+        "success_rate": 0.47
+      },
+      "intermediate": {
+        "tasks": 200,
+        "success": 113,
+        "outcomes": {
+          "reached": 113,
+          "local_coverage_failure": 53,
+          "removed_goal_cell": 33,
+          "globally_unreachable": 1
+        },
+        "success_rate": 0.565
+      }
+    },
+    "matched_train_parent": {
+      "clear": {
+        "old_success_new_failure": 6,
+        "new_success": 38,
+        "net": 32,
+        "both_success": 9
+      },
+      "intermediate": {
+        "old_success_new_failure": 1,
+        "new_success": 12,
+        "net": 11,
+        "both_success": 101
+      }
+    },
+    "trajectory_forks_unseen": {
+      "forks": 2428,
+      "shortest_choices": 2013,
+      "reachable_choices": 2146,
+      "complete_candidate_relations": 90556,
+      "finite_at_or_above_original_cap": 3,
+      "cap_conflict_forks": 0,
+      "cap_conflict_reachable_choices": 0,
+      "distance_bins": {
+        "9+": {
+          "forks": 1105,
+          "shortest": 809,
+          "reachable": 885
+        },
+        "1": {
+          "forks": 318,
+          "shortest": 318,
+          "reachable": 318
+        },
+        "5-8": {
+          "forks": 637,
+          "shortest": 532,
+          "reachable": 580
+        },
+        "3-4": {
+          "forks": 247,
+          "shortest": 236,
+          "reachable": 242
+        },
+        "2": {
+          "forks": 121,
+          "shortest": 118,
+          "reachable": 121
+        }
+      }
+    },
+    "trajectory_forks_train": {
+      "forks": 1257,
+      "shortest_choices": 1048,
+      "reachable_choices": 1117,
+      "complete_candidate_relations": 47246,
+      "finite_at_or_above_original_cap": 13,
+      "cap_conflict_forks": 0,
+      "cap_conflict_reachable_choices": 0,
+      "distance_bins": {
+        "9+": {
+          "forks": 562,
+          "shortest": 419,
+          "reachable": 456
+        },
+        "5-8": {
+          "forks": 348,
+          "shortest": 288,
+          "reachable": 316
+        },
+        "1": {
+          "forks": 160,
+          "shortest": 160,
+          "reachable": 160
+        },
+        "3-4": {
+          "forks": 126,
+          "shortest": 121,
+          "reachable": 124
+        },
+        "2": {
+          "forks": 61,
+          "shortest": 60,
+          "reachable": 61
+        }
+      }
+    },
+    "cycles": 0,
+    "illegal_actions": 0
+  },
+  "cap_boundary_probe": {
+    "root": 49,
+    "source": "19879581418889974702871304388",
+    "goal": "147573952591823896576",
+    "true_distance": 14,
+    "cap": 13,
+    "candidate_labels": {
+      "13": 17,
+      "-1": 57
+    },
+    "models": {
+      "parent": {
+        "chosen_action": 52,
+        "true_remaining_distance": -1,
+        "predicted_distance": 7.70235013961792,
+        "reachable_choice": false,
+        "mean_good_score": 8.065154075622559,
+        "mean_unreachable_score": 8.103057861328125
+      },
+      "step_001000": {
+        "chosen_action": 544,
+        "true_remaining_distance": -1,
+        "predicted_distance": 12.228657722473145,
+        "reachable_choice": false,
+        "mean_good_score": 13.630505561828613,
+        "mean_unreachable_score": 14.008798599243164
+      }
+    }
+  },
+  "limitations": [
+    "Fixed 600 unseen-training-root cases and 300 training-root cases are repeated monitoring, not sealed final tests.",
+    "Trace ends at goal or first irreversible error; later dead-path forks are not included.",
+    "Only broad direct-Huber stream has certified unique root-local relation counts; other counts are draws.",
+    "Finite-distance 13 and unreachable cap 13 can collapse supervision.",
+    "Shared-filesystem deployment stalled; active run remains on node disk and stage 1000 is backed up locally."
+  ],
+  "stage_training_seconds": 440.9683885984123
+}

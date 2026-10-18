@@ -13,6 +13,28 @@ def key(source, goal):
     return int(source) << 100 | int(goal)
 
 
+def target_mass(stars, caps=(13, 19)):
+    values, distances = [], []
+    for star in stars:
+        labels = np.asarray([c["truth"] for c in star["candidates"]], dtype=float)
+        finite = labels >= 0
+        masses = []
+        for cap in caps:
+            probability = np.exp(-np.where(finite, labels, cap))
+            probability /= probability.sum()
+            masses.extend((float(probability[finite].sum()),
+                           float(probability[labels == star["true_distance"] - 1].sum())))
+        values.append(masses)
+        distances.append(star["true_distance"])
+    a = np.asarray(values).reshape(-1, 2 * len(caps))
+    return {"caps": list(caps), "forks": len(stars),
+            "columns": [f"{kind}_mass_cap{cap}" for cap in caps for kind in ("reachable", "optimal")],
+            "mean": a.mean(0).tolist() if len(a) else [],
+            "by_remaining_distance": {str(d): {"forks": int((np.asarray(distances) == d).sum()),
+                 "mean": a[np.asarray(distances) == d].mean(0).tolist()} for d in sorted(set(distances))},
+            "scope": "Original temperature-one soft-rank target distribution only; no claim of a measured training effect"}
+
+
 def run(sampler_root, step, checkpoint, diagnosis, out):
     torch.set_num_threads(2)
     states = [torch.load(path, map_location="cpu", weights_only=False)
@@ -58,6 +80,7 @@ def run(sampler_root, step, checkpoint, diagnosis, out):
             bucket["now_reachable"] += reachable
             bucket["now_shortest"] += shortest
         result[section] = hits
+        result[section]["prior_error_target_mass"] = target_mass(failures)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(result, indent=2) + "\n")
     print(json.dumps(result), flush=True)

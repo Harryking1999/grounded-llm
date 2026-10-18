@@ -36,7 +36,15 @@
     "retention_diagnosis": "/tmp/blocks12_joint_9aa8498/run/diagnosis/random_path_010000.json",
     "hard_negative_fraction": 0.25,
     "retention_fraction": 0.25,
-    "fresh_fraction": 0.25
+    "fresh_fraction": 0.25,
+    "fresh_distance_cycle": [
+      6,
+      7,
+      8,
+      -1,
+      -1,
+      -1
+    ]
   },
   "evaluation": {
     "train_roots": 100,
@@ -44,5 +52,5 @@
     "oracle_cache_limit": 8000000
   },
   "policy": "unchanged_greedy_all_legal_successors_no_search_no_oracle_action_selection",
-  "rationale": "First repair checkpoint improved clear160->172 and long50->56, but lost14 clear and30 long tasks; goal deletion failures42->77. Of1467 original training failures,1467 parent pairs and1449 complete forks entered updates;975 old wrong choices became reachable, yet total fixed training goals533->519. Next joint window therefore updates to selected current-model errors, adds exactly unreachable actually chosen legal children as direct Huber examples (goal deletion weighted3x), and retains old successful training trajectories. Full reachable-parent forks and optimal descendants remain under original rank loss; never train on monitoring failures. Preserve global broad and exact replay exposure prefix, original learning rate, loss weights, supervision and greedy execution; unreachable target remains authorized19. Runtime selects the better completed parent by both clear and long goals, with matching sampler/diagnosis. Two thousand is a feedback window, not acceptance."
+  "rationale": "First repair checkpoint improved clear160->172 and long50->56, but lost14 clear and30 long tasks; goal deletion failures42->77. Of1467 original training failures,1467 parent pairs and1449 complete forks entered updates;975 old wrong choices became reachable, yet total fixed training goals533->519. Next joint window therefore updates to selected current-model errors, adds exactly unreachable actually chosen legal children as direct Huber examples (goal deletion weighted3x), and retains old successful training trajectories. Full reachable-parent forks and optimal descendants remain under original rank loss; never train on monitoring failures. Preserve global broad and exact replay exposure prefix, original learning rate, loss weights, supervision and greedy execution; unreachable target remains authorized19. Runtime selects the better completed parent by both clear and long goals, with matching sampler/diagnosis. Two thousand is a feedback window, not acceptance. User requested fixed 6--8 and9--13 reporting; new6--8 unseen monitor is70->71/200 and never enters training. Half fresh training goals seek exact6/7/8 distances on the1000 training roots, half keep complex long residuals; full forks and descendant relations remain joint."
 }

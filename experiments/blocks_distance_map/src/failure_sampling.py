@@ -107,10 +107,17 @@ class FailureData(JointData):
             initial = np.tile([g.initial_id for g, _ in root.parts], (fresh, 1))
             current = initial.copy()
             zero = np.asarray([g.zero_id for g, _ in root.parts])
+            cycle = self.options.get("fresh_distance_cycle", [-1])
+            wanted = np.asarray(cycle)[np.arange(fresh) % len(cycle)]
+            frozen = np.zeros(fresh, dtype=bool)
             for _ in range(18):
-                child = root.advance(current, self.rng, np.ones(fresh, dtype=int))
-                keep = (child != zero).any(-1)
+                child = root.advance(current, self.rng, (~frozen).astype(int))
+                keep = (child != zero).any(-1) & ~frozen
                 current[keep] = child[keep]
+                check = (wanted > 0) & ~frozen
+                if check.any():
+                    parts = root.distance_parts(initial[check], current[check])
+                    frozen[np.flatnonzero(check)] = parts.sum(-1) == wanted[check]
             source[:fresh], goal[:fresh] = initial, current
         levels = np.asarray(self.options["repair_descendant_steps"])
         steps = levels[(np.arange(count) + int(self.rng.integers(len(levels)))) % len(levels)]

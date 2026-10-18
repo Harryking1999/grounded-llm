@@ -19,7 +19,7 @@
 | 魔方 | [魔方独立训练](../experiments/cube2_qmap/src/run.py)、[关系数据](../experiments/cube2_qmap/src/relation_data.py)、[评测](../experiments/cube2_qmap/src/evaluate.py)；已采用模型的[循环修复续训](../experiments/cube2_qmap/src/cycle_repair.py) | [环境](../experiments/cube2_qmap/src/environment.py)、[本任务 QMap／MapReader](../experiments/cube2_qmap/src/model.py) |
 | 8-Puzzle | [独立训练](../experiments/puzzle8_qmap/src/run.py)、[完整状态与目标关系数据](../experiments/puzzle8_qmap/src/data.py)、[评测](../experiments/puzzle8_qmap/src/evaluate.py) | [环境](../experiments/puzzle8_qmap/src/environment.py)、[QMap／MapReader](../experiments/puzzle8_qmap/src/model.py)；不复用其他任务权重 |
 
-“方法对齐”指共享模型骨干、关系监督和接口；不表示所有历史运行具有相同采样、损失权重或距离几何。积木有向距离、汉诺塔对称 L1、当前魔方 L∞ 的区别保留在配置中。魔方的额外循环修复属于明确记录的任务适配，不将其描述为所有任务已有的相同训练流程。
+当前所有任务保持统一的距离 Huber＋候选软排序监督和损失配方；针对失败，先从数据覆盖、关系组合与采样修正，不新增任务专属损失或监督。该约束适用于当前及后续工作。历史运行并非全部具有相同采样、损失权重或距离几何。积木有向距离、汉诺塔对称 L1、当前魔方 L∞ 的区别保留在配置中。魔方的额外循环修复属于明确记录的任务适配，不将其描述为所有任务已有的相同训练流程。
 
 汉诺塔和魔方分别拥有训练、数据、模型适配与评测编排，不使用混合 `puzzle` 训练器作为当前入口。基础指标和批次采样放在 `grounded_llm/qmap_metrics.py`、`grounded_llm/qmap_sampling.py`；旧 `puzzle_qmap` 仅为历史复现与导入兼容保留。寻路采用同一分支新增的 `path_qmap` 实现，不回退旧 Q/V。
 

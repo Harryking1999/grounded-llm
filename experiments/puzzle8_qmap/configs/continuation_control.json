@@ -1,0 +1,63 @@
+{
+  "task": "puzzle8",
+  "seed": 20261018,
+  "rules": {
+    "board": [
+      3,
+      3
+    ],
+    "goal": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      0
+    ],
+    "move": "blank_direction",
+    "move_cost": 1
+  },
+  "data": {
+    "component": "all_states_reachable_from_standard_goal",
+    "intermediate_goals": [
+      24,
+      4,
+      4
+    ],
+    "eval_per_depth": 256,
+    "standard_goal_full_coverage": true
+  },
+  "model": {
+    "dimension": 128,
+    "hidden": 256,
+    "metric": "l1"
+  },
+  "training": {
+    "steps": 20000,
+    "batch_size": 512,
+    "decision_batch_size": 256,
+    "learning_rate": 0.0001,
+    "rank_weight": 1.0,
+    "rank_temperature": 1.0,
+    "eval_every": 2000,
+    "cpu_threads": 4
+  },
+  "evaluation": {
+    "decision_count": 4096,
+    "rollout_count": 1024,
+    "budget_multiplier": 2,
+    "stratified_tasks": true
+  },
+  "continuation": {
+    "maximum_validation_mae_increase": 0.25,
+    "checkpoint_selection": "all_state_restoration_count_with_validation_guard",
+    "acceptance": {
+      "minimum_full_state_restoration_rate": 0.99,
+      "maximum_test_goal_mae_increase": 0.25,
+      "report_cycle_count": true
+    }
+  }
+}

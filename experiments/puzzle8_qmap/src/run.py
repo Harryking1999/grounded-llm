@@ -12,21 +12,35 @@ from .environment import Puzzle8
 from .data import build
 from .model import QMap, MODEL_TYPE, soft_rank_loss
 from .evaluate import evaluate
+from .policy_audit import audit
+from .data_sampling import DataMix
 
 
-def train(env, config, data, out, device, source_commit):
+def train(env, config, data, out, device, source_commit, checkpoint=None):
     torch.manual_seed(config["seed"])
     options = config["training"]
     torch.set_num_threads(options["cpu_threads"])
     rng = np.random.default_rng(config["seed"] + 1)
     model = QMap(**config["model"]).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=options["learning_rate"])
+    parent = None
+    if checkpoint is not None:
+        saved = torch.load(checkpoint, map_location=device, weights_only=False)
+        if (saved.get("model_type") != MODEL_TYPE or saved["actions"] != list(env.actions)
+                or saved["config"]["model"] != config["model"] or "repair_config" in saved):
+            raise ValueError("Continuation must use a matching original-objective Q checkpoint")
+        model.load_state_dict(saved["model"])
+        optimizer.load_state_dict(saved["optimizer"])
+        for group in optimizer.param_groups:
+            group["lr"] = options["learning_rate"]
+        parent = {"checkpoint": str(checkpoint), "source_commit": saved["source_commit"], "step": saved["step"]}
     pairs, tasks = data["pairs_train"], data["tasks_train"]
     ps = CoverageSampler(pairs[:, 2], rng, len(pairs), .5)
     rs = CoverageSampler(data["parent_distances_train"], rng, len(tasks), .5)
     for sampler, batch in ((ps, options["batch_size"]), (rs, options["decision_batch_size"])):
-        if options["steps"] * round(batch * .5) < sampler.broad_count:
+        if checkpoint is None and options["steps"] * round(batch * .5) < sampler.broad_count:
             raise ValueError("Budget must cover every training relation and decision")
+    mixture = DataMix(env, data, config["data_sampling"], rng) if "data_sampling" in config else None
     features = torch.as_tensor(env.features(np.arange(env.size)), device=device)
     def q(ids):
         return model.encode(features[torch.as_tensor(ids, device=device, dtype=torch.long)])
@@ -37,19 +51,36 @@ def train(env, config, data, out, device, source_commit):
     def save(step, path):
         torch.save({"model_type": MODEL_TYPE, "task": env.name, "actions": list(env.actions),
                     "model": model.state_dict(), "optimizer": optimizer.state_dict(),
-                    "config": config, "source_commit": source_commit, "step": step,
-                    "coverage": {"pair_passes": ps.passes, "decision_passes": rs.passes}}, path)
+                    "config": config, "source_commit": source_commit,
+                    "step": (parent["step"] if parent else 0) + step, "continuation_step": step, "parent": parent,
+                    "coverage": (mixture.report() if mixture is not None else
+                                 {"pair_passes": ps.passes, "decision_passes": rs.passes})}, path)
+    initial_policy = initial_validation_mae = None
+    reference = None
+    if parent is not None:
+        initial_policy, state = audit(model, env, device, cohort=data["tasks_restoration"][:, 0])
+        reference = state["within"].copy()
+        if mixture is not None:
+            mixture.refresh(state["hard_parents"])
+        initial_validation_mae = pair_metrics(model, env, data["pairs_validation"], device)["mae"]
+        best = -initial_policy["within_budget"]
+        save(0, out / "best.pt")
+        print(json.dumps({"initial_policy": initial_policy, "initial_validation_mae": initial_validation_mae}), flush=True)
     with (out / "progress.jsonl").open("w") as log:
         for step in range(1, options["steps"] + 1):
             model.train()
-            rows = pairs[ps.draw(options["batch_size"])]
+            rows = (pairs[ps.draw(options["batch_size"])] if mixture is None
+                    else mixture.pairs(options["batch_size"]))
             pair_loss = F.smooth_l1_loss(model.distance(q(rows[:, 0]), q(rows[:, 1])),
                                         torch.as_tensor(rows[:, 2], device=device, dtype=torch.float32))
-            sampled = rs.draw(options["decision_batch_size"])
-            children = data["children_train"][sampled]
+            if mixture is None:
+                sampled = rs.draw(options["decision_batch_size"])
+                batch_tasks, children, labels = tasks[sampled], data["children_train"][sampled], data["child_distances_train"][sampled]
+            else:
+                batch_tasks, children, labels = mixture.tasks(options["decision_batch_size"])
             valid = torch.as_tensor(children >= 0, device=device)
-            scores = model.distance(q(np.maximum(children, 0)), q(tasks[sampled, 1])[:, None])
-            truth = torch.as_tensor(data["child_distances_train"][sampled], device=device)
+            scores = model.distance(q(np.maximum(children, 0)), q(batch_tasks[:, 1])[:, None])
+            truth = torch.as_tensor(labels, device=device)
             rank_loss = soft_rank_loss(scores, truth, valid, options["rank_temperature"])
             loss = pair_loss + options["rank_weight"] * rank_loss
             optimizer.zero_grad(set_to_none=True)
@@ -63,8 +94,16 @@ def train(env, config, data, out, device, source_commit):
                                      device, options["rank_temperature"])
                 score = pm["huber"] + options["rank_weight"] * rank
                 eligible = min(ps.passes, rs.passes) >= 1
-                if eligible and score < best:
-                    best, best_step = score, step
+                selection_score = score
+                policy = None
+                if parent is not None:
+                    policy, state = audit(model, env, device, reference=reference, cohort=data["tasks_restoration"][:, 0])
+                    if mixture is not None:
+                        mixture.refresh(state["hard_parents"])
+                    selection_score = -policy["within_budget"]
+                    eligible = pm["mae"] <= initial_validation_mae + config["continuation"]["maximum_validation_mae_increase"]
+                if eligible and selection_score < best:
+                    best, best_step = selection_score, step
                     save(step, out / "best.pt")
                 record = {"step": step, "seconds": round(time.monotonic() - started, 2),
                           "distance_loss": float(pair_loss.detach()), "rank_loss": float(rank_loss.detach()),
@@ -72,6 +111,10 @@ def train(env, config, data, out, device, source_commit):
                           "validation_shortest_action_rate": decisions(model, env, vt, device)["q"]["shortest_action_rate"],
                           "pair_passes": ps.passes, "decision_passes": rs.passes,
                           "selection_eligible": eligible, "best_step": best_step}
+                if parent is not None:
+                    record.update(policy=policy, sampling=mixture.report() if mixture is not None else None)
+                    if mixture is not None:
+                        record.update(pair_passes=mixture.ps.passes, decision_passes=mixture.rs.passes)
                 log.write(json.dumps(record) + "\n"); log.flush()
                 print(json.dumps(record), flush=True)
     save(step, out / "last.pt")
@@ -79,9 +122,13 @@ def train(env, config, data, out, device, source_commit):
     model.load_state_dict(saved["model"])
     summary = {"task": env.name, "source_commit": source_commit, "best_step": best_step,
                "last_step": step, "training_seconds": round(time.monotonic() - started, 2),
-               "selection": "heldout intermediate goal distance Huber + full soft rank cross entropy after one coverage pass",
+               "selection": ("all-state restoration count subject to fixed validation MAE guard; identical in both continuation arms"
+                             if parent else "heldout intermediate goal distance Huber + full soft rank cross entropy after one coverage pass"),
+               "parent": parent, "initial_policy": initial_policy,
                "torch_version": torch.__version__, "numpy_version": np.__version__,
                "final": evaluate(model, env, data, config, device)}
+    if parent is not None:
+        summary["all_state_policy"], _ = audit(model, env, device, reference=reference, cohort=data["tasks_restoration"][:, 0])
     (out / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
     return summary
 
@@ -92,6 +139,8 @@ def main():
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--source-commit", required=True)
     parser.add_argument("--device", default="cpu")
+    parser.add_argument("--prepared-run", type=Path)
+    parser.add_argument("--checkpoint", type=Path)
     args = parser.parse_args()
     config = json.loads(args.config.read_text(encoding="utf-8"))
     if config["task"] != "puzzle8":
@@ -99,9 +148,19 @@ def main():
     args.out.mkdir(parents=True, exist_ok=False)
     (args.out / "config.json").write_text(json.dumps(config, indent=2) + "\n")
     env = Puzzle8()
-    data, summary = build(env, config, args.out)
+    if args.prepared_run is None:
+        data, summary = build(env, config, args.out)
+    else:
+        parent_config = json.loads((args.prepared_run / "config.json").read_text())
+        if any(config[k] != parent_config[k] for k in ("task", "rules", "data", "model")):
+            raise ValueError("Prepared labels must match the base contract")
+        oracle = np.load(args.prepared_run / "oracle.npz")
+        env.tables = oracle["distances"]
+        env.goal_columns = {int(g): i for i, g in enumerate(oracle["goals"])}
+        data = dict(np.load(args.prepared_run / "data.npz"))
+        summary = {"prepared_run": str(args.prepared_run)}
     print(json.dumps({"data": summary}), flush=True)
-    train(env, config, data, args.out, args.device, args.source_commit)
+    train(env, config, data, args.out, args.device, args.source_commit, args.checkpoint)
 
 
 if __name__ == "__main__":

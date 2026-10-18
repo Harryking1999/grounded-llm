@@ -16,4 +16,11 @@ def evaluate(model, env, data, config, device):
                                                          device, config["training"]["rank_temperature"]),
                           "rollout": rollout(model, env, data[f"tasks_{split}"][roll_idx], device,
                                              config["evaluation"]["budget_multiplier"])}
+    # Always expose the long standard tower tasks; random relation rollouts can
+    # hide the critical bridge errors already observed in the six-disk map.
+    import numpy as np
+    towers = np.array([0, (env.size - 1) // 2, env.size - 1])
+    tower_tasks = np.array([(s, g) for s in towers for g in towers if s != g])
+    metrics["standard_towers"] = rollout(model, env, tower_tasks, device,
+                                          config["evaluation"]["budget_multiplier"], return_tasks=True)
     return metrics

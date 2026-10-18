@@ -38,7 +38,8 @@ class IndependentHanoiTrainingTest(unittest.TestCase):
             with contextlib.redirect_stdout(io.StringIO()):
                 before = historical_train(env, config, prior, old, 'cpu', 'test')
                 after = train(env, config, data, new, 'cpu', 'test')
-            self.assertEqual(before['final'], after['final'])
+            self.assertEqual(before['final'], {k: v for k, v in after['final'].items() if k != 'standard_towers'})
+            self.assertEqual(after['final']['standard_towers']['oracle']['solved'], 6)
             a = torch.load(old / 'best.pt', weights_only=False)['model']
             b = torch.load(new / 'best.pt', weights_only=False)['model']
             for key in a:

@@ -1,4 +1,4 @@
-"""Hanoi with 1--6 disks: shared rules, state interface and exact BFS oracle."""
+"""Hanoi with 1--8 disks: shared rules, state interface and exact BFS oracle."""
 from collections import deque
 from itertools import permutations
 
@@ -12,8 +12,8 @@ class Hanoi:
     symmetry_count = 6
 
     def __init__(self, disks=3):
-        if not isinstance(disks, int) or isinstance(disks, bool) or not 1 <= disks <= 6:
-            raise ValueError("This study supports 1--6 disks")
+        if not isinstance(disks, int) or isinstance(disks, bool) or not 1 <= disks <= 8:
+            raise ValueError("This study supports 1--8 disks")
         self.disks, self.name = disks, f"hanoi{disks}"
         self.size, self.diameter, self.feature_dim = 3**disks, 2**disks - 1, 3 * disks
         self.powers = 3 ** np.arange(disks)
@@ -32,6 +32,15 @@ class Hanoi:
                                                 for j in range(3) if i != j):
                 if top[src] < top[dst]:
                     self.next[state, action] = state + (dst - src) * 3**top[src]
+        if disks >= 7:
+            # The same unweighted BFS oracle, compiled for the larger graph.
+            from scipy.sparse import csr_matrix
+            from scipy.sparse.csgraph import shortest_path
+            rows, actions = np.where(self.next >= 0)
+            graph = csr_matrix((np.ones(len(rows)), (rows, self.next[rows, actions])),
+                               shape=(self.size, self.size))
+            self.distances = shortest_path(graph, directed=False, unweighted=True).astype(np.int16)
+            return
         self.distances = np.full((self.size, self.size), -1, dtype=np.int16)
         for goal in range(self.size):
             self.distances[goal, goal] = 0

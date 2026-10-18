@@ -1,0 +1,50 @@
+{
+  "task": "hanoi8",
+  "seed": 20261018,
+  "rules": {
+    "disks": 8,
+    "pegs": 3,
+    "state_order": "smallest_disk_first_base3",
+    "move_cost": 1
+  },
+  "data": {
+    "split": "unordered_pair_peg_symmetry_orbits_70_15_15",
+    "require_all_legal_edges": true
+  },
+  "augmentation": {
+    "enabled": true,
+    "kind": "simultaneous_peg_permutation",
+    "copies": 6,
+    "max_attempts": 1
+  },
+  "model": {
+    "dimension": 128,
+    "hidden": 256
+  },
+  "training": {
+    "steps": 100000,
+    "batch_size": 512,
+    "decision_batch_size": 256,
+    "learning_rate": 0.001,
+    "rank_weight": 1.0,
+    "rank_temperature": 1.0,
+    "eval_every": 5000,
+    "patience": null,
+    "min_improvement": 0.0001,
+    "cpu_threads": 4,
+    "min_steps": 1000,
+    "save_last": true,
+    "evaluate_initial_test": false
+  },
+  "evaluation": {
+    "decision_count": 4096,
+    "rollout_count": 1024,
+    "budget_multiplier": 2,
+    "stratified_tasks": true
+  },
+  "sampling": {
+    "broad_fraction": 0.5,
+    "context_fraction": 0.0,
+    "minimum_broad_passes": 1.0
+  }
+}

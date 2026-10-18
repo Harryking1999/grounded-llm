@@ -1,7 +1,7 @@
 # 8-Puzzle Qmap
 
-当前没有本任务 Q 编码器适配、训练实现或已采用权重。来源状态见 [selection.json](selection.json)；不得使用魔方、汉诺塔或旧 XoT 的 policy/value 权重代替本任务 Q。
+独立训练入口为 `experiments/puzzle8_qmap/src/run.py`，正式合同为 `experiments/puzzle8_qmap/configs/puzzle8.json`，方法和运行结果见[实验 README](../../../experiments/puzzle8_qmap/README.md)。
 
-后续按[统一方法](../../QMAP_METHOD.md)独立实现：与目标无关的 Q(s)、两层隐藏 MLP、128 维输出、距离与候选排序监督，以及当前／目标／真实合法后继槽位。候选输入编码为九个位置各自的九类独热，总计 81 维；这是待配置确认的方案，尚未训练。固定距离规则、采样与训练预算尚未确定。
+与其他 Qmap 共享两层 MLP、128 维 Q、固定对称距离及距离／候选排序监督。输入为九位置的九类独热。完整覆盖全状态到复原终点，并构造全状态到多组中间目标的精确距离；最终以复原为主要 rollout，留出中间目标检查关系补全。覆盖全部状态不代表全部状态对或未见状态泛化。
 
-不在文字讨论阶段创建空训练器或未执行的正式配置。选定权重后才放入 Git 忽略的 `checkpoints/`，并更新来源和适用范围。
+尚无已验证采用权重；选定后放入 Git 忽略的 `checkpoints/` 并更新 [selection.json](selection.json)。不使用其他任务或旧 XoT 权重替代。

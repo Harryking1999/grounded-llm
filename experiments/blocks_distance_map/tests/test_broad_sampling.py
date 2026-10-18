@@ -91,6 +91,25 @@ class BroadSamplingTest(unittest.TestCase):
             for a, b in zip(indexed.batch(128, 32), replay.batch(128, 32)):
                 np.testing.assert_array_equal(a, b)
             indexed.close(); replay.close()
+            # Two independent identical components double every finite exact
+            # distance, providing historical short AND6--10-step relations.
+            old_rows = np.asarray(rows + [[int(graph.initial_id), int(graph.zero_id),
+                                          oracle.distance(1023, 0), 0]])
+            old_rows[old_rows[:, 2] >= 0, 2] *= 2
+            doubled_masks = np.asarray([str(int(m) | (int(m) << 20)) for m in masks])
+            np.savez(path / "legacy_double.npz", states=doubled_masks, train=old_rows)
+            retention = BroadData(path, path / "legacy_double.npz", {**options,
+                "legacy_fraction": 1, "legacy_long_fraction": .5})
+            retained_batch = retention.batch(6144, 96)
+            truth = retained_batch[2]
+            self.assertGreater(((truth >= 0) & (truth < 6)).mean(), .10)
+            self.assertGreater((truth < 0).mean(), .10)
+            self.assertGreater((truth >= 6).mean(), .45)
+            retention.record_update(retained_batch, np.ones(len(truth), bool),
+                                    np.ones(len(retained_batch[5]), bool))
+            self.assertEqual(retention.legacy_update_distances,
+                             {str(int(d)): int(n) for d, n in zip(*np.unique(truth, return_counts=True))})
+            retention.close()
             bundled = BroadData(path, path / "legacy.npz", {**options,
                 "branch_bundle_fraction": .5, "stream_distance_cycle": [6, 7, 8]})
             source, goal = bundled.structure_rows(0, 120, True)

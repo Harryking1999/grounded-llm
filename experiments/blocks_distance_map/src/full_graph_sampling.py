@@ -209,7 +209,12 @@ class JointData:
         focus = self.options.get("legacy_long_fraction", 0)
         focused = round(legacy_pair * focus)
         if focused and len(self.legacy_long_pairs):
-            ids[:focused] = self.rng.choice(self.legacy_long_pairs, focused).tolist()
+            # The strata above append finite rows before unreachable rows.
+            # Replacing a prefix at focus=.5 erased ALL historical short finite
+            # supervision, rather than mixing half focused and half broad rows.
+            ids = np.asarray(ids, dtype=np.int64)
+            slots = self.rng.choice(legacy_pair, focused, replace=False)
+            ids[slots] = self.rng.choice(self.legacy_long_pairs, focused)
         old = self.legacy_rows[ids]
         sources, goals, labels = [self.legacy_masks[old[:, 0]]], [self.legacy_masks[old[:, 1]]], [old[:, 2]]
         group = self.legacy_groups[self.rng.integers(len(self.legacy_groups), size=legacy_rank)]

@@ -70,6 +70,7 @@ class BroadData(JointData):
         self.stream_calls = 0
         self.clear_requested_distances, self.clear_actual_distances = {}, {}
         self.bundle_histograms = {}
+        self.legacy_update_distances = {}
         self.bundle_update_counts = {}
         self._pending_bundle_huber, self._pending_bundle_candidates = [], []
         self._pending_bundle_forks, self._pending_bundle_events = [], {}
@@ -359,6 +360,8 @@ class BroadData(JointData):
     def record_update(self, arrays, huber_nonzero, rank_nonzero):
         # Called only after successful optimizer.step, so an aborted sampling or
         # forward call contributes no exposure to this phase's committed counts.
+        legacy_count = round(len(arrays[2]) * self.options["legacy_fraction"])
+        self.add_hist(self.legacy_update_distances, arrays[2][:legacy_count])
         def canonical(groups):
             order = np.lexsort(tuple(groups[:, :, i] for i in reversed(range(4))))
             return np.take_along_axis(groups, order[:, :, None], axis=1).reshape(len(groups), -1)
@@ -410,6 +413,7 @@ class BroadData(JointData):
             "initial": self.initial_distances, "actual": self.actual_distances, "fork_degrees": self.fork_degrees,
             "clear_requested": self.clear_requested_distances, "clear_actual": self.clear_actual_distances,
             "bundle_histograms": self.bundle_histograms, "bundle_update_counts": self.bundle_update_counts,
+            "legacy_update_distances": self.legacy_update_distances,
             "stream_calls": self.stream_calls, "prefix_roots": self.prefix_roots}
         return state
 
@@ -426,6 +430,7 @@ class BroadData(JointData):
         self.clear_actual_distances = stream.get("clear_actual", {})
         self.bundle_histograms = stream.get("bundle_histograms", {})
         self.bundle_update_counts = stream.get("bundle_update_counts", {})
+        self.legacy_update_distances = stream.get("legacy_update_distances", {})
         self.fork_degrees, self.stream_calls = stream["fork_degrees"], stream["stream_calls"]
         self.prefix_roots = stream["prefix_roots"]
 
@@ -439,6 +444,7 @@ class BroadData(JointData):
             "actual_indexed_clear_parent_distances": self.clear_actual_distances,
             "branch_bundle_actual_update_draws": self.bundle_update_counts,
             "branch_bundle_actual_distance_draws": self.bundle_histograms,
+            "legacy_actual_huber_distances": self.legacy_update_distances,
             "local_estimated_distinct": {k: v.estimate() for k, v in self.phase_sketches.items()},
             "estimate_relative_standard_error": 1.04 / math.sqrt(1 << 14),
             "scope": "This new phase only, packed global state-pair HLL shared identity across roots; per-rank until merged at complete checkpoint. Nonzero score derivatives do not imply nonzero parameter gradients. Earlier distinct exposure unknown outside the certified broad prefix."}

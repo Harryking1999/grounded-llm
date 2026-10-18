@@ -171,7 +171,8 @@ def run(config, out, source_commit, smoke_steps=None, resume=None):
                             merged = exposure["global_stream_phase"]["distance_by_goal_draws"].setdefault(key, {})
                             for distance, count in histogram.items():
                                 merged[distance] = merged.get(distance, 0) + count
-                    for key in ("branch_bundle_actual_update_draws", "branch_bundle_actual_distance_draws"):
+                    for key in ("branch_bundle_actual_update_draws", "branch_bundle_actual_distance_draws",
+                                "legacy_actual_huber_distances"):
                         merged = exposure["global_stream_phase"][key] = {}
                         for report in reports:
                             for name, value in report["stream_phase"].get(key, {}).items():

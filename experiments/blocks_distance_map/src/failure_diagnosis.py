@@ -99,14 +99,35 @@ def summarize(rows):
             "all_first_errors_are_ranking_errors": all(e["chosen_truth"] < 0 and e["reachable_candidates"] > 0 for e in errors)}
 
 
-def training_cases(records, seed, per_root=2, goal_mode="witness"):
+def training_cases(records, seed, per_root=2, goal_mode="witness", roots=None):
     """Nonempty long goals from known legal tilings, without model-based filtering."""
     rng = random.Random(seed)
     for board, record in enumerate(records):
         tiles = [blocks.PLACEMENTS[blocks.BY_ACTION[(a["shape_id"], a["row"], a["col"]) ]][0]
                  for a in record["construction"]]
         for number in range(per_root):
-            if goal_mode == "random_path":
+            if goal_mode in ("random_path", "balanced6_13"):
+                if goal_mode == "balanced6_13" and number % 2 == 0:
+                    if roots is None:
+                        raise ValueError("Balanced goals require existing exact root graphs")
+                    exact = RootOracle(roots[board])
+                    wanted = 6 + board % 3
+                    for _ in range(100):
+                        state, eligible = int(record["initial"]), []
+                        while True:
+                            choices = successors(state)
+                            if not choices:
+                                break
+                            _, state = rng.choice(choices)
+                            if state and exact.distance(int(record["initial"]), state) == wanted:
+                                eligible.append(state)
+                        if eligible:
+                            goal = rng.choice(eligible)
+                            break
+                    else:
+                        raise ValueError(f"Training root {board} lacks sampled exact {wanted}-move goal")
+                    yield {"board": board, "source": record["initial"], "goal": str(goal)}
+                    continue
                 state, path = int(record["initial"]), []
                 while True:
                     choices = successors(state)
@@ -141,7 +162,7 @@ def run(checkpoint, graph_data, monitor_cases, out, seed, train_roots=1000, per_
               "seed": seed, "training_goal_mode": goal_mode,
               "scope": "Diagnostic only; monitoring failures never enter repair training"}
     for name, cases in (("monitor_long", monitor),
-                        ("training_long", training_cases(records[:train_roots], seed, per_root, goal_mode))):
+                        ("training_long", training_cases(records[:train_roots], seed, per_root, goal_mode, roots))):
         rows = []
         for index, row in enumerate(cases):
             truth_oracle = oracle if name == "monitor_long" else RootOracle(roots[row["board"]])
@@ -167,7 +188,7 @@ def main():
     p.add_argument("--train-roots", type=int, default=1000)
     p.add_argument("--per-root", type=int, default=2)
     p.add_argument("--device", default="cpu")
-    p.add_argument("--goal-mode", choices=["witness", "random_path"], default="witness")
+    p.add_argument("--goal-mode", choices=["witness", "random_path", "balanced6_13"], default="witness")
     args = p.parse_args()
     run(args.checkpoint, args.graph_data, args.monitor_cases, args.out, args.seed,
         args.train_roots, args.per_root, args.device, args.goal_mode)

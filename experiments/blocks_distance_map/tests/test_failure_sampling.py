@@ -15,9 +15,34 @@ from experiments.blocks_distance_map.src.oracle import DistanceOracle
 from experiments.blocks_distance_map.src.full_graph_run import relation_batch
 from experiments.blocks_distance_map.src.full_graph_sampling import JointData
 from experiments.blocks_distance_map.src.full_graph_eval import distance_goal_success
+from experiments.blocks_distance_map.src.failure_diagnosis import training_cases
+from experiments.blocks_distance_map.src.full_graph_data import Root
 
 
 class FailureSamplingTest(unittest.TestCase):
+    def test_balanced_goals_exact_medium_with_long_goals_retained(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp)
+            actions = [{"shape_id": 5, "row": r, "col": c}
+                       for r in (0, 3, 6) for c in (0, 3, 6)]
+            initial = sum(blocks.PLACEMENTS[blocks.BY_ACTION[(a["shape_id"], a["row"], a["col"]) ]][0]
+                          for a in actions)
+            cells = list(blocks.cells(initial))
+            build_symbolic(len(cells), local_tiles(cells), path / "graph", 10000)
+            graph = SymbolicComponent(path / "graph")
+            record = {"initial": str(initial), "construction": actions,
+                      "components": [{"graph": 0, "cells": cells}]}
+            roots = [Root(record, {0: graph}) for _ in range(3)]
+            rows = list(training_cases([record] * 3, 25, 2, "balanced6_13", roots))
+            oracle = DistanceOracle()
+            self.assertEqual(len(rows), 6)
+            self.assertEqual([oracle.distance(int(r["source"]), int(r["goal"])) for r in rows[::2]],
+                             [6, 7, 8])
+            self.assertTrue(all(oracle.distance(int(r["source"]), int(r["goal"])) == 8
+                                for r in rows[1::2]))
+            self.assertEqual(rows, list(training_cases([record] * 3, 25, 2, "balanced6_13", roots)))
+            graph.close()
+
     def test_long_focus_keeps_exact_labels_and_goal_distance_intersection(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp)

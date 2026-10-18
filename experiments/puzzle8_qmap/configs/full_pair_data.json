@@ -1,0 +1,9 @@
+{
+  "task": "puzzle8",
+  "coverage": "all_ordered_source_goal_pairs",
+  "oracle": "exact_unweighted_shortest_paths_on_complete_reachable_component",
+  "storage": "int8_goal_by_source_matrix",
+  "workers": 4,
+  "goal_rows_per_chunk": 256,
+  "purpose": "Complete labels for all source-goal pairs and every legal candidate transition, shared by one joint Qmap training run."
+}

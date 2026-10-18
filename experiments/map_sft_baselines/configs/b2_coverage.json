@@ -97,10 +97,10 @@
   },
   "subset": {
     "source_samples": 50000,
-    "method": "board_length_stratified",
-    "per_board": 10,
-    "terminal_samples": 200,
-    "shared_physical_routes_with": "Qwen2.5-7B-Instruct_10k"
+    "method": "marginal_state_goal_coverage_with_length_quotas",
+    "per_board": 30,
+    "terminal_samples": 600,
+    "selection_report": "coverage_report.json"
   },
   "coverage_selection": {
     "minimum_source_pair_fraction": 0.8,

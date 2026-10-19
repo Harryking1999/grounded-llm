@@ -194,7 +194,7 @@ def main():
                 latest[case["id"]] = record
                 error = record.get("service_error")
                 if error:
-                    fatal = fatal or record.get("http_status") in (400,401,403,404) or error in ("returned_model_mismatch", "unexpected_output_item")
+                    fatal = fatal or record.get("http_status") in (400,401,402,403,404) or error in ("returned_model_mismatch", "unexpected_output_item")
                     if not fatal and record["attempt"] <= api["max_service_retries"] and retry_total < api["max_total_service_retries"]:
                         pending_cases.append(case)
                 print(json.dumps({"finished": len(latest), "case": case["id"], "attempt": record["attempt"], "solved": record["verdict"].get("solved"), "failure": record["verdict"].get("failure"), "seconds": record["elapsed_seconds"]}), flush=True)

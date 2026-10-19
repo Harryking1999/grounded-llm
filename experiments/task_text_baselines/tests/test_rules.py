@@ -12,7 +12,7 @@ from experiments.task_text_baselines.src.difficulty import graph_distances, prep
 from experiments.task_text_baselines.src.escalate import decision, main as escalate_main
 from experiments.task_text_baselines.src.protocol import ROOT
 from experiments.task_text_baselines.src.protocol import judge, prompt
-from experiments.task_text_baselines.src.run import call, extract_text, pending, summary
+from experiments.task_text_baselines.src.run import call, extract_text, pending, summary, main as run_main
 from experiments.task_text_baselines.src.qwen import final_text, round_robin
 from experiments.task_text_baselines.src.prepare_difficulty import reuse_answers
 from experiments.task_text_baselines.src.report import build
@@ -23,6 +23,27 @@ from experiments.gcml_counterexamples.src import blocks
 
 
 class TaskRulesTest(unittest.TestCase):
+    def test_insufficient_balance_stops_dispatch_without_retrying(self):
+        with TemporaryDirectory() as folder:
+            out = Path(folder)
+            cases = [{'id':name,'task':'path','stratum':'test','prompt':'frozen'}
+                     for name in ('first','second')]
+            suite = {'config':{'seed':1,'api':{'concurrency':1,
+                     'max_service_retries':3,'max_total_service_retries':60}},'cases':cases}
+            (out/'suite.json').write_text(json.dumps(suite),encoding='utf-8')
+            def no_balance(case, api, key, attempt):
+                return {'case_id':case['id'],'task':'path','stratum':'test',
+                        'attempt':attempt,'service_error':'HTTPError','http_status':402,
+                        'elapsed_seconds':0,'verdict':{'solved':False,'contract_pass':False,
+                                                      'failure':'service_error'}}
+            with patch('sys.argv',['run','--out',str(out)]), patch.dict(
+                    'os.environ',{'GND_API_KEY':'test-key'}), patch(
+                    'experiments.task_text_baselines.src.run.call',side_effect=no_balance) as request, patch('builtins.print'):
+                run_main()
+            self.assertEqual(request.call_count,1)
+            self.assertEqual(len(list((out/'records').glob('*.json'))),1)
+            self.assertEqual(json.loads((out/'progress.json').read_text())['status'],'stopped')
+
     def test_ten_shape_actions_suite_keeps_legacy_generation_and_replays(self):
         old = json.loads((ROOT/'experiments/sol_dag_blocks/configs/sol_medium.json').read_text())
         rules = BlocksTask(old['blocks'])

@@ -23,7 +23,7 @@
 
 五任务纯文字强基线及补充对照已完成，结果和比较边界见[统一评测报告](../experiments/task_text_baselines/results/report.md)，不与不同设置的旧 SFT 指标混用。
 
-用户追加 DeepSeek Flash high 积木原八形状十二次构造清空／二阶复原各 100 题，检验提高输出预算后原截断失败是否改善；各保留原 40 题配对并新增 60 题，采用 [64k 正式合同](../experiments/task_text_baselines/configs/deepseek_blocks_cube100_64k.json)，结果待回填。
+用户追加 DeepSeek Flash high 积木原八形状十二次构造清空／二阶复原各 100 道新题，排除历史及已取消混合题集中的状态，采用 [64k 正式合同](../experiments/task_text_baselines/configs/deepseek_blocks_cube100_64k.json)，结果待回填；魔方沿用原距离层但权重调整，不作旧题配对比较。
 
 ## 3. 短期有序 TODO
 

@@ -1,11 +1,9 @@
 # 积木 Qmap
 
-当前采用用户指定的 **ffba71f结构化1000步候选**，正式优化与验收为12块清空，固定1000题781/1000（78.1%）。权重为 `checkpoints/structured_1000_ffba71f.pt`；原选用权重和首轮421父模型保留。
+当前采用清空候选 **835/1000（83.5%）**，正式验收须≥900/1000且历史510无明显退化；**目前未完成**。原810、789及历史权重保留；当前来源和权重见[selection.json](selection.json)。
 
-训练与评测：`experiments.blocks_distance_map.src.full_graph_run`、`full_graph_eval`；兼容原 `FrozenBoardMap` 加载。历史训练入口为 `tree_continue_run.py`。
+正式目标仅为12块原八形状积木清空，使用[固定1000题](../data/clear1000.json)及[验收合同](../../../experiments/blocks_distance_map/configs/blocks12_clear_acceptance.json)。历史510为424/510，独立列出；非空及近清空目标仅辅助，不能冒充清空成绩。
 
-共享基础：两层隐藏 MLP、128 维 Q、距离监督与候选排序，见 `tasks/QMAP_METHOD.md`；任务状态编码、数据、训练与评测分别维护。参数只在正式合同中定义，见 `selection.json` 的 `config`。
+原两层MLP、128维Q、Huber、soft-rank、Adam与纯贪心不变，参见[统一方法](../../QMAP_METHOD.md)。仅沿用已授权不可达19。训练模块`experiments.blocks_distance_map.src.full_graph_run`，固定验收模块`blocks12_eval`；续训显式传入正式合同中的`continuation_checkpoint`作`--resume`，兼容原`FrozenBoardMap`加载。
 
-选定模型来源与适用条件记录在 [selection.json](selection.json)。选定权重放 `checkpoints/`，由 Git 忽略；过程断点与原始日志仍留在运行／归档目录。新时间戳不等于更好的权重，不用失败续训覆盖已采用模型。
-
-成绩及比较范围见[能力总表](../../README.md#任务能力总表)。[固定1000题](../data/clear1000.json)与[验收合同](../../../experiments/blocks_distance_map/configs/blocks12_clear_acceptance.json)用于正式同题比较；原510回归421/510单列历史指标。非空目标仅作辅助诊断，地标与完整分支仍参与联合训练。当前权重的1.5B接图训练尚无对应结果，历史SFT成绩单独标记。
+[简明报告](../../../experiments/blocks_distance_map/results/blocks12_joint_report.md)与[能力总表](../../README.md#任务能力总表)维护当前成绩；过程断点、日志和曝光留在忽略runtime。当前地图的文字40题、1.5B／7B接图成绩未测，不沿用旧权重分数。

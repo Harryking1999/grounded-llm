@@ -2,13 +2,16 @@
   "mode": "frozen_clear",
   "cases": "tasks/blocks/data/clear1000.json",
   "case_count": 1000,
-  "reference_results": "runs/qmap_dual_20261018/blocks12/clear1000_frozen/first10000_9aa8498/results.json",
+  "reference_results": "runs/qmap_dual_20261018/blocks12/clear_forks_028_1000/evaluation/step_001000/results.json",
   "historical_510_manifest": "runs/qmap_dual_20261018/blocks12/historical_llm_manifest.json",
-  "historical_510_reference": "runs/qmap_dual_20261018/blocks12/clear1000_frozen/first10000_9aa8498/results.json",
+  "historical_510_reference": "runs/qmap_dual_20261018/blocks12/clear_forks_028_1000/evaluation/step_001000/results.json",
   "policy": "original_argmin_all_legal_successors_goal0_no_search_no_oracle",
   "action_budget": "initial_occupied_cells // 2; strictly decreasing removals, identical for all models",
   "text_model_generation_budget_tokens": 16000,
-  "scope": "Formal12-placement original-eight-shape clearing only; arbitrary nonempty and near-clear targets auxiliary, not acceptance gates. Historical510 separate. No benchmark failures used for training.",
+  "scope": "Formal12-placement original-eight-shape clearing only. Completion requires>=900/1000 with no substantial historical510 regression. Fixed comparisons against810 checkpoint;789 preserved as original baseline. Same greedy,budget and questions,no test failures used for training. Nonempty only auxiliary.",
   "diagnose_failures": true,
-  "diagnostic_seconds": 90
+  "diagnostic_seconds": 90,
+  "minimum_clear_success": 900,
+  "minimum_clear_success_rate": 0.9,
+  "historical_510_floor": 421
 }

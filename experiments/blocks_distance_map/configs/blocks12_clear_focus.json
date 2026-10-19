@@ -8,7 +8,7 @@
   "training": {
     "seed": 2026101851,
     "learning_rate": 0.0003,
-    "steps": 2000,
+    "steps": 3000,
     "batch_size_per_rank": 16384,
     "rank_contexts_per_rank": 2048,
     "boards_per_batch": 16,
@@ -82,12 +82,14 @@
     "every_updates": 1000,
     "primary": "fixed_clear1000",
     "historical_regression": "fixed510",
-    "target_success_rate": 0.85,
+    "target_success_rate": 0.9,
     "nonempty_targets": "auxiliary_diagnostics_only",
-    "never_train_test_failures": true
+    "never_train_test_failures": true,
+    "minimum_success_count": 900,
+    "comparison_checkpoint": "clear_forks_step001000_810"
   },
   "policy": "unchanged_greedy_all_legal_successors_no_search_no_oracle_action_selection",
-  "rationale": "Continue the verified810/1000 clearing and424/510 historical candidate, restoring complete Adam plus all four sampler states. Baseline is first10000 9aa8498:789/1000 and421/510. Keep the same complete-fork clearing recipe after its first joint gain; next full feedback at cumulative2000. No test failures enter training.25% historical replay; remaining75% is85% clearing (half indexed parents, half complete parent/all-child forks in the original Huber),5% broad,10% grouped landmarks. Sixteen roots/rank/update, four idle028 H100 GPUs, global Huber65536/ranking8192, original lr/Adam/model/loss/greedy unchanged.",
+  "rationale": "Continue same unified Qmap from the complete2000 checkpoint after810->835/1000 and historical424/510 retained. Formal completion requires at least900/1000, not850. Fixed comparisons use810 checkpoint; preserve789 and all best weights. Same clearing complete-fork Huber recipe,16 roots/rank,batch16384/rank,rank2048/rank,four028 GPUs; original model/loss/lr/Adam and greedy unchanged. Next full feedback at cumulative3000; if two completed stages fail net improvement, revise sampling rather than spend a blind budget. No test failures enter training.",
   "resources": {
     "host": "grounded-028",
     "allowed_gpu_indices": [
@@ -105,5 +107,5 @@
     "world_size": 4,
     "start_only_when_idle": true
   },
-  "continuation_checkpoint": "runs/blocks12_clear_forks/run/checkpoints/step_001000.pt"
+  "continuation_checkpoint": "runs/blocks12_clear_forks/run/checkpoints/step_002000.pt"
 }

@@ -85,17 +85,20 @@
     "never_train_test_failures": true
   },
   "policy": "unchanged_greedy_all_legal_successors_no_search_no_oracle_action_selection",
-  "rationale": "Concentrate the unchanged original losses on clearing:25% legal historical replay; remaining75% consists of70% clearing,10% broad pairs and20% grouped landmark/full-fork continuations. Exact clearing-distance layers span intermediate starts, with every legal successor including traps retained. Reuse10000 exact root graphs/indexes. Continue user-selectedffba71f full Adam and both sampler states; preserve selected inference weight. One1000-update feedback window, same fixed1000 clearing tasks plus separate historical510. Use one idle permitted4090 card, alternating both retained sampler shards at the same global batch65536/ranking8192; GPU0 reserved. No arbitrary-nonempty acceptance threshold. Legal historical replay reuses archived original132f5a1 training split; later extended legacy pool currently unavailable with platform SSH. No held-out rows are added.",
+  "rationale": "Concentrate the unchanged original losses on clearing:25% legal historical replay; remaining75% consists of70% clearing,10% broad pairs and20% grouped landmark/full-fork continuations. Exact clearing-distance layers span intermediate starts, with every legal successor including traps retained. Reuse10000 exact root graphs/indexes. Continue user-selectedffba71f full Adam and both sampler states; preserve selected inference weight. One1000-update feedback window, same fixed1000 clearing tasks plus separate historical510. Use one idle permitted028 H100 card, alternating both retained sampler shards at the same global batch65536/ranking8192; existing tasks on GPUs0-3 remain untouched. No arbitrary-nonempty acceptance threshold. Legal historical replay reuses archived original132f5a1 training split; later extended legacy pool currently unavailable with platform SSH. No held-out rows are added.",
   "resources": {
-    "host": "grounded-4090",
+    "host": "grounded-028",
     "allowed_gpu_indices": [
-      1,
-      2,
-      3,
-      4
+      4,
+      5,
+      6,
+      7
     ],
     "reserved_gpu_indices": [
-      0
+      0,
+      1,
+      2,
+      3
     ],
     "world_size": 1,
     "start_only_when_idle": true

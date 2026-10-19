@@ -292,7 +292,7 @@
       "11step": 76,
       "12step": 807
     },
-    "domain": "Complete1000 failed; protected-history condition fromsame889 pending1000",
+    "domain": "Both matched1000 domain conditions failed. Original sampling continues its preserved1000 checkpoint to2000; no architecture or label changes.",
     "source": "48fedad",
     "config": "experiments/blocks_distance_map/configs/blocks12_clear_domain.json",
     "domain1000": {
@@ -327,6 +327,77 @@
       "nonempty_negative_huber_draws": 1640000,
       "selection": "Rejected and ended after complete1000 because of severe historical regression; any unpublished post1000 partial updates excluded",
       "conclusion": "Nonempty goal type alone is insufficient to classify historical negatives as irrelevant; this combined change does not establish an architectural cause."
+    },
+    "protected_history1000": {
+      "clear1000": 867,
+      "historical510": 407,
+      "lost_vs889": 67,
+      "gained_vs889": 45,
+      "historical_lost_vs889": 45,
+      "historical_gained_vs889": 19,
+      "11step": 73,
+      "12step": 794,
+      "selection": "Rejected, historical below421 floor, recipe ended after complete1000"
+    },
+    "historical_negative_role_audit": {
+      "scope": "Exact reconstruction of the failed domain FIRST completed four-rank Huber update from saved889 RNG states. Legacy sampling occurs before any root sampling. Original stored relation provenance flags, not inferred from benchmark failures. Counts are draws, overlapping tags not additive. Not a claim about the whole1000 window.",
+      "per_rank": [
+        {
+          "rank": 0,
+          "historical_nonempty_negative_draws_before_cap": 1405,
+          "dropped_negative_draws": 995,
+          "dropped_distinct_legacy_rows": 994,
+          "dropped_sibling_or_goal_swap_decision_draws": 761,
+          "dropped_sibling_goal_draws": 758,
+          "dropped_goal_swap_draws": 72,
+          "dropped_base_draws": 191,
+          "dropped_with_cross_leaf_tag_draws": 46
+        },
+        {
+          "rank": 1,
+          "historical_nonempty_negative_draws_before_cap": 1401,
+          "dropped_negative_draws": 991,
+          "dropped_distinct_legacy_rows": 991,
+          "dropped_sibling_or_goal_swap_decision_draws": 744,
+          "dropped_sibling_goal_draws": 742,
+          "dropped_goal_swap_draws": 57,
+          "dropped_base_draws": 195,
+          "dropped_with_cross_leaf_tag_draws": 54
+        },
+        {
+          "rank": 2,
+          "historical_nonempty_negative_draws_before_cap": 1398,
+          "dropped_negative_draws": 988,
+          "dropped_distinct_legacy_rows": 986,
+          "dropped_sibling_or_goal_swap_decision_draws": 772,
+          "dropped_sibling_goal_draws": 770,
+          "dropped_goal_swap_draws": 60,
+          "dropped_base_draws": 178,
+          "dropped_with_cross_leaf_tag_draws": 40
+        },
+        {
+          "rank": 3,
+          "historical_nonempty_negative_draws_before_cap": 1413,
+          "dropped_negative_draws": 1003,
+          "dropped_distinct_legacy_rows": 1003,
+          "dropped_sibling_or_goal_swap_decision_draws": 784,
+          "dropped_sibling_goal_draws": 778,
+          "dropped_goal_swap_draws": 73,
+          "dropped_base_draws": 175,
+          "dropped_with_cross_leaf_tag_draws": 50
+        }
+      ],
+      "total": {
+        "historical_nonempty_negative_draws_before_cap": 5617,
+        "dropped_negative_draws": 3977,
+        "dropped_sibling_or_goal_swap_decision_draws": 3061,
+        "dropped_sibling_goal_draws": 3048,
+        "dropped_goal_swap_draws": 262,
+        "dropped_base_draws": 739,
+        "dropped_with_cross_leaf_tag_draws": 190,
+        "dropped_distinct_legacy_rows": 3968
+      },
+      "finding": "The removed nonempty negatives include historical sibling-goal/goal-swap decision supervision, so goal!=empty does not identify irrelevant constraints."
     }
   },
   "disjoint_contexts_2000": {

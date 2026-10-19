@@ -8,7 +8,7 @@
   "training": {
     "seed": 2026101851,
     "learning_rate": 0.0003,
-    "steps": 3000,
+    "steps": 5000,
     "batch_size_per_rank": 16384,
     "rank_contexts_per_rank": 2048,
     "boards_per_batch": 16,
@@ -89,7 +89,7 @@
     "comparison_checkpoint": "clear_forks_step001000_810"
   },
   "policy": "unchanged_greedy_all_legal_successors_no_search_no_oracle_action_selection",
-  "rationale": "Continue same unified Qmap from the complete2000 checkpoint after810->835/1000 and historical424/510 retained. Formal completion requires at least900/1000, not850. Fixed comparisons use810 checkpoint; preserve789 and all best weights. Same clearing complete-fork Huber recipe,16 roots/rank,batch16384/rank,rank2048/rank,four028 GPUs; original model/loss/lr/Adam and greedy unchanged. Next full feedback at cumulative3000; if two completed stages fail net improvement, revise sampling rather than spend a blind budget. No test failures enter training.",
+  "rationale": "Continue verified840/1000, historical435/510, from cumulative3000 fullAdam/four sampler states. Fixed810 reference retained; original789 and all best checkpoints protected. Identical complete-fork clearing recipe earned810->835->840. Evaluate at4000 then5000, stop/revise after two complete stages without a new best. Formal completion>=900/1000, historical no substantial regression. One unifiedQ, same model/loss/weights/lr/Adam and puregreedy;10000 exact roots; no test failures enter training.",
   "resources": {
     "host": "grounded-028",
     "allowed_gpu_indices": [
@@ -107,5 +107,5 @@
     "world_size": 4,
     "start_only_when_idle": true
   },
-  "continuation_checkpoint": "runs/blocks12_clear_forks/run/checkpoints/step_002000.pt"
+  "continuation_checkpoint": "runs/blocks12_clear_forks/run/checkpoints/step_003000.pt"
 }

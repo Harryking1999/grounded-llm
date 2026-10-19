@@ -52,7 +52,7 @@ def algebra(checkpoint, states):
         "potential_and_distance_max_span": cap * math.sqrt(dimension),
         "minimum_potential_span_for_12_edges_with_each_reverse_at_least19": 12 * 18,
         "dynamic_label_conclusion": "Potential consistency is necessary, not sufficient: triangle inequalities and bounded directed-L1 coordinates also apply. A 12-edge chain with forward1 and every reverse>=19 requires span216, exceeding this encoder bound. No formal labels changed.",
-        "single_clear_target_embedding_existence": "For arbitrary labels y(S) in[0,19], z(S)=y(S)/sqrt(dimension) in every coordinate and z(empty)=0 represents D(S,empty)=y(S), since19/sqrt(dimension)<cap. This does not prove that the finite MLP learns/generalizes that assignment."}
+        "single_clear_target_embedding_existence": "For labels y(S) in[0,19], z(S)=1+y(S)/sqrt(dimension) in every coordinate and z(empty)=1 represents D(S,empty)=y(S), strictly inside the sigmoid coordinate bounds. This establishes feasibility of the distance expression, not that the fixed finite MLP realizes, learns or generalizes that assignment."}
 
 
 def run(config, checkpoint, completed_updates, out):

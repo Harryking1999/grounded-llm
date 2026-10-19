@@ -18,3 +18,9 @@ class DirectedAuditTest(unittest.TestCase):
         self.assertEqual(len(pairs), 6)
         del labels[(1, 7)]
         self.assertEqual(closed_chains(labels), ([], set()))
+
+    def test_single_clear_target_has_no_six_pair_obstruction(self):
+        truth = torch.arange(20, dtype=torch.float64)
+        z = (1 + truth[:, None] / 128 ** .5).repeat(1, 128)
+        self.assertTrue(((z > 0) & (z < 13)).all())
+        torch.testing.assert_close(distance(z, z[0], "directed_sum"), truth)

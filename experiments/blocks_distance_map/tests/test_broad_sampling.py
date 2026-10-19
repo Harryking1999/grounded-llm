@@ -111,6 +111,21 @@ class BroadSamplingTest(unittest.TestCase):
             for a, b in zip(indexed.batch(128, 32), replay.batch(128, 32)):
                 np.testing.assert_array_equal(a, b)
             indexed.close(); replay.close()
+            forked = BroadData(path, path / "legacy.npz", {**options,
+                "clear_index_data": str(path / "clear"), "clear_broad_fraction": 0,
+                "clear_distance_cycle": [8], "clear_fork_huber_fraction": .7,
+                "clear_fraction": .9, "broad_fraction": .05})
+            batch = forked.batch(512, 32)
+            huber_sources = set(map(int, batch[0][:, 0]))
+            initial = int(double["initial"])
+            from experiments.blocks_distance_map.src.oracle import successors
+            self.assertTrue({child for _, child in successors(initial)}.issubset(huber_sources))
+            np.testing.assert_array_equal(batch[2], [oracle.distance(int(a[0]), int(b[0]))
+                                                    for a, b in zip(batch[0], batch[1])])
+            self.assertEqual(forked.phase_sketches["clear_fork_huber_groups"].estimate(), 0)
+            forked.record_update(batch, np.ones(len(batch[2]), bool), np.ones(len(batch[5]), bool))
+            self.assertGreater(forked.phase_sketches["clear_fork_huber_groups"].estimate(), 0)
+            forked.close()
             # Two independent identical components double every finite exact
             # distance, providing historical short AND6--10-step relations.
             old_rows = np.asarray(rows + [[int(graph.initial_id), int(graph.zero_id),

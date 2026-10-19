@@ -61,7 +61,7 @@ class BroadData(JointData):
             "nonzero_huber_score_relations", "nonzero_rank_score_relations",
             "bundle_huber_relations", "bundle_rank_candidate_relations", "bundle_forks",
             "bundle_huber_groups", "bundle_shared_source_groups", "bundle_shared_goal_groups",
-            "bundle_cross_branch_groups")}
+            "bundle_cross_branch_groups", "clear_fork_huber_relations", "clear_fork_huber_groups")}
         self.phase_roots = np.zeros(len(self.roots), dtype=bool)
         self.phase_histograms = {}
         self.requested_distances = {}
@@ -76,6 +76,7 @@ class BroadData(JointData):
         self._pending_bundle_huber, self._pending_bundle_candidates = [], []
         self._pending_bundle_forks, self._pending_bundle_events = [], {}
         self._bundle_rank_roles = {}
+        self._pending_clear_forks = []
         self.layer_views, self.layer_suffixes = {}, {}
         index_path = options.get("clear_index_data")
         self.clear_indexes = ({gid: ClearDistanceIndex(Path(index_path) / str(gid)) for gid in self.graphs}
@@ -167,6 +168,30 @@ class BroadData(JointData):
             remaining -= choice
         assert np.all(remaining == 0)
         goal = np.tile([g.zero_id for g, _ in root.parts], (count, 1))
+        if not ranking and self.options.get("clear_fork_huber_fraction", 0):
+            budget = int(count * self.options["clear_fork_huber_fraction"])
+            # Complete forks also enter the existing distance Huber, including
+            # unreachable children. Soft-rank alone need not fit their distances.
+            anchors, ids = np.unique(source, axis=0, return_index=True)
+            deep = np.flatnonzero((actual[ids] >= 10) & (actual[ids] <= 12))
+            other = np.flatnonzero(~np.isin(np.arange(len(ids)), deep))
+            self.rng.shuffle(deep); self.rng.shuffle(other)
+            order = list(deep) + list(other)
+            anchors = anchors[order]
+            degree = sum(g.degrees(anchors[:, i]) for i, (g, _) in enumerate(root.parts))
+            anchors = anchors[np.cumsum(degree + 1) <= budget]
+            children = [anchors]
+            for i, (graph, _) in enumerate(root.parts):
+                parents, successors = graph.star(anchors[:, i])
+                child = anchors[parents].copy()
+                child[:, i] = successors
+                children.append(child)
+            group_rows = np.concatenate(children)
+            if len(group_rows):
+                source[-len(group_rows):] = group_rows
+                self._pending_clear_forks.append((
+                    np.column_stack((root.packed(group_rows), np.zeros((len(group_rows), 2), dtype=np.uint64))),
+                    np.column_stack((root.packed(anchors), np.zeros((len(anchors), 2), dtype=np.uint64)))))
         # This changes sampling, never the graph or legal action set. The broad
         # stream and retained clear fraction still include unreachable states;
         # stars below retain every legal trap action at each clearable parent.
@@ -455,6 +480,7 @@ class BroadData(JointData):
         self._pending_bundle_huber, self._pending_bundle_candidates = [], []
         self._pending_bundle_forks, self._pending_bundle_events = [], {}
         self._bundle_rank_roles = {}
+        self._pending_clear_forks = []
         return super().batch(pair_count, rank_count)
 
     def boards(self):
@@ -480,6 +506,11 @@ class BroadData(JointData):
     def record_update(self, arrays, huber_nonzero, rank_nonzero):
         # Called only after successful optimizer.step, so an aborted sampling or
         # forward call contributes no exposure to this phase's committed counts.
+        for pairs, forks in self._pending_clear_forks:
+            self.phase_sketches["clear_fork_huber_relations"].add(pairs)
+            self.phase_sketches["clear_fork_huber_groups"].add(forks)
+            key = "clear_complete_forks_in_huber"
+            self.bundle_update_counts[key] = self.bundle_update_counts.get(key, 0) + len(forks)
         legacy_count = round(len(arrays[2]) * self.options["legacy_fraction"])
         self.add_hist(self.legacy_update_distances, arrays[2][:legacy_count])
         def canonical(groups):

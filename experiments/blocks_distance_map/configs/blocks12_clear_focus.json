@@ -11,10 +11,10 @@
     "steps": 1000,
     "batch_size_per_rank": 16384,
     "rank_contexts_per_rank": 2048,
-    "boards_per_batch": 8,
+    "boards_per_batch": 16,
     "legacy_fraction": 0.25,
-    "broad_fraction": 0.1,
-    "clear_fraction": 0.7,
+    "broad_fraction": 0.05,
+    "clear_fraction": 0.85,
     "listwise_weight": 1.0,
     "temperature": 1.0,
     "original_cap": 13,
@@ -74,7 +74,8 @@
     "branch_bundle_fraction": 0.5,
     "exact_layer_fraction": 0.5,
     "sampler_shards": 4,
-    "previous_sampler_world": 2
+    "previous_sampler_world": 2,
+    "clear_fork_huber_fraction": 0.5
   },
   "evaluation": {
     "acceptance_config": "experiments/blocks_distance_map/configs/blocks12_clear_acceptance.json",
@@ -86,7 +87,7 @@
     "never_train_test_failures": true
   },
   "policy": "unchanged_greedy_all_legal_successors_no_search_no_oracle_action_selection",
-  "rationale": "Continue first10000 9aa8498 full Adam and both parent samplers, baseline789/1000 and historical421/510. Four authorized idle028 H100 GPUs keep global Huber65536 and ranking8192 with unchanged lr/Adam. Split both parent future sampling streams into four nonoverlapping shards.25% legal historical replay; remaining75% is70% exact clearing layers,10% broad and20% grouped landmarks/full-fork continuations, retaining all legal successors including traps. Reuse10000 complete root graphs and clearing indexes. Fixed1000 clearing is primary; historical510 is separate protection; arbitrary nonempty is auxiliary. No held-out rows or failures enter training. One1000-update feedback window before data-driven continuation.",
+  "rationale": "Restart from preserved789/1000 first10000 fullAdam after clearing745/1000 but historical423/510.234/255 first irrecoverable choices occur at remaining10-12; complete ranking candidates were exposed but trap scores can remain near10 against exact unreachable19. Put complete clearing fork parents AND every legal child into existing distance Huber, never changing loss, labels or weights.25% legal historical replay; remaining75% is85% clearing (half indexed parents, half complete-fork groups),5% broad,10% multigoal/multistep landmarks. Sixteen roots/rank/update covers all10000 training roots within a1000-update window. Keep global batch65536/ranking8192 on four idle028 H100 GPUs. Fixed1000 and separate historical510 feedback; no test failures are training inputs.",
   "resources": {
     "host": "grounded-028",
     "allowed_gpu_indices": [

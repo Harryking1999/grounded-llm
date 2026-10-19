@@ -89,6 +89,7 @@ class BroadData(JointData):
         self._pending_clear_retention = []
         self._clear_rank_slots = None
         self.clear_retention = {}
+        self.clear_retention_priorities = {}
         self._clear_huber_decisions = []
         retention = options.get("clear_retention_pool")
         if retention:
@@ -107,6 +108,11 @@ class BroadData(JointData):
                     raise ValueError("Retained clearing states must be exactly clearable")
                 deep = (parts.sum(-1) >= 10) & (parts.sum(-1) <= 12)
                 self.clear_retention[board] = ids[deep] if deep.any() else ids
+                priorities = np.asarray(row.get("priorities", np.ones(len(ids))), dtype=float)
+                if priorities.shape != (len(ids),) or not (priorities > 0).all():
+                    raise ValueError("Training-context sampling priorities must be positive and aligned")
+                priorities = priorities[deep] if deep.any() else priorities
+                self.clear_retention_priorities[board] = priorities / priorities.sum()
         self.layer_views, self.layer_suffixes = {}, {}
         index_path = options.get("clear_index_data")
         self.clear_indexes = ({gid: ClearDistanceIndex(Path(index_path) / str(gid)) for gid in self.graphs}
@@ -228,7 +234,7 @@ class BroadData(JointData):
             anchors = anchors[order]
             if board in self.clear_retention:
                 pool = self.clear_retention[board]
-                kept = pool[self.rng.integers(len(pool))]
+                kept = pool[self.rng.choice(len(pool), p=self.clear_retention_priorities[board])]
                 anchors = np.concatenate((kept[None], anchors[~(anchors == kept).all(-1)]))
             if initial_fork:
                 # Unique distance-layer sampling can dilute the actual start

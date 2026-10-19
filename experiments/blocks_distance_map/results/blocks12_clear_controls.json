@@ -292,9 +292,42 @@
       "11step": 76,
       "12step": 807
     },
-    "domain": "pending formal1000, no early300 judgement",
+    "domain": "Complete1000 failed; protected-history condition fromsame889 pending1000",
     "source": "48fedad",
-    "config": "experiments/blocks_distance_map/configs/blocks12_clear_domain.json"
+    "config": "experiments/blocks_distance_map/configs/blocks12_clear_domain.json",
+    "domain1000": {
+      "clear1000": 861,
+      "historical510": 274,
+      "lost_vs889": 85,
+      "gained_vs889": 57,
+      "historical_lost_vs889": 171,
+      "historical_gained_vs889": 12,
+      "distance_bins": {
+        "11": {
+          "count": 81,
+          "success": 75
+        },
+        "12": {
+          "count": 919,
+          "success": 786
+        }
+      },
+      "legacy_huber_distance_draws": {
+        "-1": 2155883,
+        "1": 2534712,
+        "2": 2533621,
+        "3": 1433633,
+        "4": 1098683,
+        "5": 1265034,
+        "6": 3620854,
+        "7": 1534403,
+        "8": 206111,
+        "9": 1066
+      },
+      "nonempty_negative_huber_draws": 1640000,
+      "selection": "Rejected and ended after complete1000 because of severe historical regression; any unpublished post1000 partial updates excluded",
+      "conclusion": "Nonempty goal type alone is insufficient to classify historical negatives as irrelevant; this combined change does not establish an architectural cause."
+    }
   },
   "disjoint_contexts_2000": {
     "clear1000": 899,
@@ -355,12 +388,89 @@
     "phi_span": 90.0,
     "existing128D_cap13_bound": 147.0782104868019,
     "construction12_chain_min_phi_span_if_every_reverse_ge19": 216,
-    "finding": "This small probe passes necessary algebra and triangle checks, not a directed-L1 embedding proof. Across actual12-removal chains, any scheme keeping each reverse>=19 requires Phi span>=216, beyond147.078. Phi=-9*cells exceeds the bound even further. Dynamic labels cannot be assumed representable in the unchanged bounded encoder."
+    "finding": "This small probe passes necessary algebra and triangle checks, not a directed-L1 embedding proof. Across actual12-removal chains, any scheme keeping each reverse>=19 requires Phi span>=216, beyond147.078. Phi=-9*cells exceeds the bound even further. Dynamic labels cannot be assumed representable in the unchanged bounded encoder.",
+    "constant24_offline_saturated_huber_check": [
+      {
+        "prediction": 12.0,
+        "dHuber_dprediction_target19": -1.0,
+        "dHuber_dprediction_target24": -1.0
+      },
+      {
+        "prediction": 17.0,
+        "dHuber_dprediction_target19": -1.0,
+        "dHuber_dprediction_target24": -1.0
+      },
+      {
+        "prediction": 18.0,
+        "dHuber_dprediction_target19": -1.0,
+        "dHuber_dprediction_target24": -1.0
+      },
+      {
+        "prediction": 19.0,
+        "dHuber_dprediction_target19": 0.0,
+        "dHuber_dprediction_target24": -1.0
+      },
+      {
+        "prediction": 22.0,
+        "dHuber_dprediction_target19": 1.0,
+        "dHuber_dprediction_target24": -1.0
+      }
+    ],
+    "constant24_conclusion": "For mistaken exits predicted<=18, original smoothL1(beta1) has derivative-1 for both19 and24. Raising the target alone does not increase their immediate score gradient, and increases the three-state algebra residual from19 to24. No training labels changed.",
+    "minimal_aggregation_proposal_offline_only": {
+      "name": "2*directed_max",
+      "encoder_dimensions_unchanged": 128,
+      "coordinate_cap_unchanged": 13,
+      "additional_parameters": 0,
+      "three_state_label_matrix": [
+        [
+          0.0,
+          1.0,
+          2.0
+        ],
+        [
+          19.0,
+          0.0,
+          1.0
+        ],
+        [
+          19.0,
+          19.0,
+          0.0
+        ]
+      ],
+      "explicit_coordinate_range": [
+        1.0,
+        10.5
+      ],
+      "three_state_prediction_max_error": 0.0,
+      "three_state_predictions": [
+        [
+          0.0,
+          1.0,
+          2.0
+        ],
+        [
+          19.0,
+          0.0,
+          1.0
+        ],
+        [
+          19.0,
+          19.0,
+          0.0
+        ]
+      ],
+      "claim": "This removes the specific six-pair contradiction using the existing coordinate range and128 dimensions. It is not a full-graph representation proof or an evaluated model. Formal model.py and inference unchanged.",
+      "approval": "Required before a separate matched training ablation; not launched"
+    },
+    "constant19_semantics": "With all finite distances<=18, replacing infinity by19 gives a valid directed quasimetric: unreachable S->G implies at least one leg through any X is unreachable. The inconsistency is with directed_sum extra potential identity, not an inherent contradiction of the abstract19 label matrix. A scaled directed-max representation exists with one coordinate per goal; this is not a proof that128 coordinates suffice globally."
   },
   "unapproved_model_proposal": {
     "status": "not implemented or trained; separate approval required",
     "minimal_change": "Keep current encoder and original Huber/soft-rank/labels/greedy; replace constrained directed_sum with positive asymmetric ordered-pair score head f(z_source,z_goal).",
-    "purpose": "Remove compulsory potential-difference antisymmetry; must test same parent/task/data budget separately. This is not evidence it will improve clearing."
+    "purpose": "Remove compulsory potential-difference antisymmetry; must test same parent/task/data budget separately. This is not evidence it will improve clearing.",
+    "parameter_free_candidate": "2*directed_max: offline three-state example exactly fits all six labels inside original128D cap13 with no extra parameters; not a full graph proof, not trained. Requires separate approval."
   },
   "intermediate_300_same_parent_controls": {
     "A": {

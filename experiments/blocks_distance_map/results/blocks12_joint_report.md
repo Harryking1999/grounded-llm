@@ -19,10 +19,10 @@
 
 889来自300次更新：实际覆盖4800训练初盘，1966.08万Huber行，约1430.49万独特Huber关系、25.58万完整清空分叉组（全四rank合并HLL，标准误约0.81%）；决策相关／分叉外清空不可达曝光547.39万／28.81万。复用10000初盘完整BDD及距离索引，未扩大状态图或改标签。
 
-当前对照：从同889完整父状态、相同batch续训；原采样1000为883/1000、历史425，丢58／增52。分散初盘2000为899／417，未通过历史421底线，保留889。A/B/C已完成且不延长；清空监督域对照减少无关非空不可达Huber，完整清空负候选保持，至少1000步后同题比较，不以300步判断。
+当前对照：同889完整父状态、相同batch各1000步，原采样883／历史425（丢58、增52）；收窄监督域861／274（丢85、增57；历史丢171、增12），严重退化，已结束该配方。非空目标不能作为“无关负关系”的判据；下一对照恢复完整原历史分布，只收窄新增图辅助关系，仍由同889开始。分散初盘2000的899／417也未通过历史421底线，均未替换889。
 
 数学审计：实际`directed_sum`严格满足反对称势差恒等式；真实1→1→2链与反向19的标签残差为19。重放前32次已完成更新、全四rank209.7万Huber行，仅130组正反关系共现，上述1/1/2六关系链共现0；不能据此认定该矛盾是当前退化主因。单批全rank梯度余弦−0.948→−0.927，仅属分布诊断。动态标签仅离线研究：12步链若每条反向≥19，势差至少216，超过现编码器147.08范围；正式标签仍19。
 
-复现：[最佳来源合同](../configs/blocks12_decision_clear.json)、[当前对比合同](../configs/blocks12_clear_domain.json)、[验收合同](../configs/blocks12_clear_acceptance.json)、[固定1000题](../../../tasks/blocks/data/clear1000.json)。模块`experiments.blocks_distance_map.src.full_graph_run`，从完整断点`--resume`；`blocks12_eval`按原贪心验收，参照880的实际评测配置保存在结果目录。
+复现：[最佳来源合同](../configs/blocks12_decision_clear.json)、[当前对比合同](../configs/blocks12_clear_domain_retention.json)、[验收合同](../configs/blocks12_clear_acceptance.json)、[固定1000题](../../../tasks/blocks/data/clear1000.json)。模块`experiments.blocks_distance_map.src.full_graph_run`，从完整断点`--resume`；`blocks12_eval`按原贪心验收，参照880的实际评测配置保存在结果目录。
 
 证据：[889完整状态、逐题结果与曝光](../../../runs/qmap_dual_20261018/blocks12/decision_clear_028_300/)、[梯度及合法训练路径池](../../../runs/qmap_dual_20261018/blocks12/decision_clear_028_support/)、[101丢失／43新增逐分叉诊断](../../../runs/qmap_dual_20261018/blocks12/lost101_gained43_diagnosis.json)、[当前运行索引](../../../runs/qmap_dual_20261018/current_qmap_runtime.json)。华容道保持已选98.28%，汉诺塔不动。

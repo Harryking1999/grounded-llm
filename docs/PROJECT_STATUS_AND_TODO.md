@@ -15,7 +15,7 @@
 
 | 任务 | 当前结论 | 下一步／依据 |
 |---|---|---|
-| [积木](../tasks/blocks/README.md) | 正式目标为12块清空；现用清空图固定1000题880/1000（88.0%），未达900正式门槛，历史429/510，保留历史权重 | 相对810参照净增70，丢62／新增132；原510单列历史回归；非空目标仅辅助诊断；028空闲卡主攻清空90%以上；[采用入口](../tasks/blocks/Qmap/selection.json)、[12块地图报告](../experiments/blocks_distance_map/results/blocks12_joint_report.md)、[任务能力表](../tasks/README.md#任务能力总表) |
+| [积木](../tasks/blocks/README.md) | 正式目标为12块清空；现用清空图固定1000题889/1000（88.9%），未达900正式门槛，历史433/510，保留880完整状态及历史权重 | 相对880参照净增9，丢48／新增57；原510单列历史回归；非空目标仅辅助诊断；028空闲卡主攻清空90%以上；[采用入口](../tasks/blocks/Qmap/selection.json)、[12块地图报告](../experiments/blocks_distance_map/results/blocks12_joint_report.md)、[任务能力表](../tasks/README.md#任务能力总表) |
 | [寻路](../tasks/path/README.md) | 采用统一方法 Q 和已选定权重，旧 Q/V 保留为历史对照 | 统一文字与新条件参数；[权重来源](../tasks/path/Qmap/selection.json) |
 | [汉诺塔](../tasks/hanoi/README.md) | 用户采用八盘整塔目标地图，正式评测仅考虑任意合法起点到指定柱的整塔终点 | 保留残留失败与中间目标补充结果，不追加训练；[权重及范围](../tasks/hanoi/Qmap/selection.json)、[实验报告](../experiments/hanoi_qmap/results/report.md) |
 | [二阶魔方](../tasks/cube2/README.md) | 采用用户指定的复原断点，保留二阶主条件，三阶探索停止 | 继续定位复原与关系泛化不足；[权重来源](../tasks/cube2/Qmap/selection.json) |

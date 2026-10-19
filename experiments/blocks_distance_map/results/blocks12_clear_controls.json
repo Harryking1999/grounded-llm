@@ -1,0 +1,187 @@
+{
+  "parent": {
+    "clear1000": 880,
+    "historical510": 429,
+    "checkpoint": "tasks/blocks/Qmap/checkpoints/clear_forks_4000_e127e8f.pt",
+    "full_state": "runs/qmap_dual_20261018/blocks12/clear_forks_028_4000/run/checkpoints/step_004000.pt"
+  },
+  "same_parent_controls": {
+    "A": {
+      "updates": 300,
+      "clear1000": 854,
+      "distance_bins": {
+        "11": {
+          "count": 81,
+          "success": 73
+        },
+        "12": {
+          "count": 919,
+          "success": 781
+        }
+      },
+      "clear_lost": 62,
+      "clear_gained": 36,
+      "historical510": 434,
+      "historical_lost": 15,
+      "historical_gained": 20,
+      "results": "runs/qmap_dual_20261018/blocks12/clear_ablation_028_A/A/evaluation/results.json"
+    },
+    "B": {
+      "updates": 300,
+      "clear1000": 862,
+      "distance_bins": {
+        "11": {
+          "count": 81,
+          "success": 75
+        },
+        "12": {
+          "count": 919,
+          "success": 787
+        }
+      },
+      "clear_lost": 65,
+      "clear_gained": 47,
+      "historical510": 434,
+      "historical_lost": 22,
+      "historical_gained": 27,
+      "results": "runs/qmap_dual_20261018/blocks12/clear_ablation_028_B/B/evaluation/results.json"
+    },
+    "C": {
+      "updates": 300,
+      "clear1000": 869,
+      "distance_bins": {
+        "11": {
+          "count": 81,
+          "success": 72
+        },
+        "12": {
+          "count": 919,
+          "success": 797
+        }
+      },
+      "clear_lost": 56,
+      "clear_gained": 45,
+      "historical510": 428,
+      "historical_lost": 24,
+      "historical_gained": 23,
+      "results": "runs/qmap_dual_20261018/blocks12/clear_ablation_028_C/C/evaluation/results.json"
+    }
+  },
+  "diagnosis": {
+    "lost_cases": 101,
+    "gained_cases": 43,
+    "old_good_new_bad_same_fork": 85,
+    "old_bad_new_good_same_fork": 27,
+    "mean_bad_score_delta_on_lost": -0.4107029862923197,
+    "mean_good_score_delta_on_lost": -0.15842718653159565,
+    "finite_vs_unreachable_gradient_cosines_parent": [
+      -0.8742303252220154,
+      -0.9031625986099243
+    ],
+    "scope": "Two real rank0 batches only; not a proof of capacity limits",
+    "full_cases": "runs/qmap_dual_20261018/blocks12/lost101_gained43_diagnosis.json",
+    "gradients": "runs/qmap_dual_20261018/blocks12/granular_gradient_audit.json"
+  },
+  "decision": "ABC300 stopped854/862/869. Decision-context sampling300 produced889/1000 and433/510, lost48/gained57 vs880. Continue this effective recipe to1000 evaluation; not yet900. Original880 remains fully protected.",
+  "decision_context_validation": {
+    "source_commit": "4f413b5",
+    "parent": "same880_full_Adam_and_four_samplers",
+    "updates": 300,
+    "clear1000": 889,
+    "distance_bins": {
+      "11": {
+        "count": 81,
+        "success": 76
+      },
+      "12": {
+        "count": 919,
+        "success": 813
+      }
+    },
+    "clear_lost": 48,
+    "clear_gained": 57,
+    "historical510": 433,
+    "historical_lost": 20,
+    "historical_gained": 24,
+    "global_huber_draws": 19660800,
+    "global_distinct_huber_HLL": 14304901,
+    "global_distinct_full_clear_forks_HLL": 255776,
+    "global_distinct_retention_full_forks_HLL": 2297,
+    "global_actual_train_roots": 4800,
+    "global_clear_negative_draws_by_context": {
+      "huber_clear_decision": 5473898,
+      "huber_clear_outside_decision": 288110
+    },
+    "HLL_relative_standard_error": 0.008125,
+    "gradient_and_margin_audit": [
+      {
+        "batch": 0,
+        "checkpoint": "best880",
+        "cosine_finite_vs_all_clear_unreachable": -0.8978455662727356,
+        "mixed_clear_forks": 1365,
+        "mean_gap_bad_minus_good": 1.5314480066299438,
+        "median_gap_bad_minus_good": 0.6707563400268555,
+        "fraction_good_exit_beats_bad": 0.9575091600418091
+      },
+      {
+        "batch": 0,
+        "checkpoint": "decision_after300",
+        "cosine_finite_vs_all_clear_unreachable": -0.9445505142211914,
+        "mixed_clear_forks": 1365,
+        "mean_gap_bad_minus_good": 1.8038793802261353,
+        "median_gap_bad_minus_good": 0.8717203140258789,
+        "fraction_good_exit_beats_bad": 0.9824175834655762
+      },
+      {
+        "batch": 1,
+        "checkpoint": "best880",
+        "cosine_finite_vs_all_clear_unreachable": -0.9251761436462402,
+        "mixed_clear_forks": 1369,
+        "mean_gap_bad_minus_good": 1.8910125494003296,
+        "median_gap_bad_minus_good": 1.0081820487976074,
+        "fraction_good_exit_beats_bad": 0.9824689626693726
+      },
+      {
+        "batch": 1,
+        "checkpoint": "decision_after300",
+        "cosine_finite_vs_all_clear_unreachable": -0.948006272315979,
+        "mixed_clear_forks": 1369,
+        "mean_gap_bad_minus_good": 2.1536550521850586,
+        "median_gap_bad_minus_good": 1.262690544128418,
+        "fraction_good_exit_beats_bad": 0.9912344813346863
+      }
+    ],
+    "audit_scope": "Two fixed training batches, raw gradients only; cosine conflict did not diminish. Exact same batch replayed for880 and889 margin comparison. Not a claim about global gradients or capacity limits.",
+    "results": "runs/qmap_dual_20261018/blocks12/decision_clear_028_300/evaluation/step_000300/results.json",
+    "support": "runs/qmap_dual_20261018/blocks12/decision_clear_028_support",
+    "full_checkpoint": "runs/qmap_dual_20261018/blocks12/decision_clear_028_300/run/checkpoints/step_000300.pt"
+  },
+  "decision_context_stages": [
+    {
+      "updates": 300,
+      "clear1000": 889,
+      "historical510": 433,
+      "lost_vs880": 48,
+      "gained_vs880": 57,
+      "11step": 76,
+      "12step": 813
+    },
+    {
+      "updates": 1000,
+      "clear1000": 876,
+      "historical510": 425,
+      "lost_vs880": 66,
+      "gained_vs880": 62,
+      "11step": 75,
+      "12step": 801
+    }
+  ],
+  "selected_candidate": {
+    "checkpoint": "tasks/blocks/Qmap/checkpoints/decision_clear_300_4f413b5.pt",
+    "clear1000": 889,
+    "historical510": 433,
+    "complete": false,
+    "target_clear1000": 900,
+    "parent880_full_state_preserved": true
+  }
+}

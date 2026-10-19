@@ -97,19 +97,22 @@ scp -r /home/zhangyue/transfer/grounded_llm/run-id gongruochen@10.28.0.80:/home/
 - 当前研究状态与下一步只维护在 [项目状态页](docs/PROJECT_STATUS_AND_TODO.md)。
 - 本手册不记录训练 step、epoch、分片计数、运行时间线、逐次日志或实验结论。
 
-## 6. 本地旧工作树位置
+## 6. 本地历史工作区的恢复
 
-以下可恢复工作树保存在 Git 忽略的 `D:\Grounded_llm\tmp\archived-worktrees\`：
+日常源码仅使用 `D:\Grounded_llm`。旧 worktree 的实体检出、虚拟环境和缓存已移除；源码历史保存在第 8 节的既有归档引用，不依赖旧目录存在。
 
-| 原位置 | 归档子目录 | 历史分支（已归档，工作树 detached） |
-|---|---|---|
-| `D:\Grounded_llm_global_context` | `step2-global-context` | `codex/archive-step2-global-context` |
-| `D:\Grounded_llm_harness` | `experiment-harness` | `codex/archive-experiment-harness` |
-| `D:\Grounded_llm_step2` | `step2-path` | `codex/archive-step2-path` |
+旧工作树中 Git 外的结果与材料保存在 `D:\Grounded_llm_archive\worktrees\`，保留各自的 `runs/`、`outputs/`、`tmp/` 层次：
 
-需要恢复时可用 `git worktree move`；路径变化后重新核对虚拟环境与运行配置中的绝对路径。
+| 产物子目录 | 对应源码引用（前缀均为 `refs/archive/2026-10-17/`） |
+|---|---|
+| `blocks-multigoal` | `codex/blocks-multigoal` |
+| `wormi-reading` | `codex/wormi-reading` |
+| `experiment-harness` | `codex/archive-experiment-harness` |
+| `step2-global-context` | `codex/archive-step2-global-context` |
+| `step2-path` | `codex/archive-step2-path` |
+| `qwen32b-path120` | `codex/qwen32b-path120` |
 
-其他旧研究工作树可用 `git worktree list` 定位；detached 不等于内容已整合或可以删除。当前日常开发使用 `D:\Grounded_llm`，旧工作树的状态页不代表主工作区现状。查看独有提交可用 `git log HEAD..<工作树提交> --oneline`，先核对内容是否已通过其他提交纳入，再决定是否恢复。
+没有独有运行材料的旧工作树只保留 Git 历史，不创建空产物目录。复现时按原配置与提交导出源码，并把历史绝对路径映射到归档位置；不要把旧状态页或启动脚本当作当前指令。
 
 ## 7. Qmap 历史归档
 
@@ -129,4 +132,4 @@ git show refs/archive/2026-10-17/codex/cube-metric-trials --stat
 git switch -c codex/recover-cube refs/archive/2026-10-17/codex/cube-metric-trials
 ```
 
-旧 worktree 保留原目录和 detached commit，可按 `git worktree list` 定位。远端过时分支清理后，如需其未纳入 main 的历史，使用对应 `archive/2026-10-17/` 标签；这些历史不作为新运行的默认代码。
+本地独有源码按上述归档引用恢复，Git 外材料见第 6、7 节。已归档的远端历史也可用对应 `archive/2026-10-17/` 标签定位；这些历史不作为新运行的默认代码。

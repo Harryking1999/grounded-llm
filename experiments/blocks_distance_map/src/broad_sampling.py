@@ -62,7 +62,7 @@ class BroadData(JointData):
             "bundle_huber_relations", "bundle_rank_candidate_relations", "bundle_forks",
             "bundle_huber_groups", "bundle_shared_source_groups", "bundle_shared_goal_groups",
             "bundle_cross_branch_groups", "clear_fork_huber_relations", "clear_fork_huber_groups",
-            "clear_initial_fork_huber_groups")}
+            "clear_initial_fork_huber_groups", "clear_branch_followup_huber_groups")}
         self.phase_roots = np.zeros(len(self.roots), dtype=bool)
         self.phase_histograms = {}
         self.requested_distances = {}
@@ -79,6 +79,8 @@ class BroadData(JointData):
         self._bundle_rank_roles = {}
         self._pending_clear_forks = []
         self._pending_clear_initial_forks = []
+        self._pending_clear_followups = []
+        self._clear_rank_anchors = {}
         self.layer_views, self.layer_suffixes = {}, {}
         index_path = options.get("clear_index_data")
         self.clear_indexes = ({gid: ClearDistanceIndex(Path(index_path) / str(gid)) for gid in self.graphs}
@@ -177,6 +179,10 @@ class BroadData(JointData):
             # Roots share a schedule across ranks. One designated rank supplies
             # this full initial fork; other ranks retain their downstream forks.
             source[0] = initial
+        if ranking and board in self._clear_rank_anchors:
+            anchors = self._clear_rank_anchors[board]
+            take = min(len(source), len(anchors))
+            source[:take] = anchors[:take]
         if not ranking and self.options.get("clear_fork_huber_fraction", 0):
             budget = int(count * self.options["clear_fork_huber_fraction"])
             # Complete forks also enter the existing distance Huber, including
@@ -193,8 +199,49 @@ class BroadData(JointData):
                 # complete first fork while retaining downstream groups below.
                 same = (anchors == initial).all(-1)
                 anchors = np.concatenate((initial[None], anchors[~same]))
+            followups = np.empty((0, source.shape[1]), dtype=np.int64)
+            if len(anchors) and self.options.get("clear_branch_followups", False):
+                # Keep two linked branches of the same deep fork. Their full
+                # subsequent forks receive the same exact distance supervision;
+                # no model prediction or evaluation failure selects these rows.
+                seed = anchors[:1]
+                next_rows = []
+                for i, (graph, _) in enumerate(root.parts):
+                    parents, successors = graph.star(seed[:, i])
+                    child = seed[parents].copy()
+                    child[:, i] = successors
+                    next_rows.append(child)
+                children = np.concatenate(next_rows)
+                if len(children):
+                    zeros = np.tile([g.zero_id for g, _ in root.parts], (len(children), 1))
+                    parts = root.distance_parts(children, zeros)
+                    finite = (parts >= 0).all(-1)
+                    distances = np.where(finite, parts.sum(-1), -1)
+                    good = np.flatnonzero(finite)
+                    bad = np.flatnonzero(~finite)
+                    selected = []
+                    if len(good):
+                        best = good[distances[good] == distances[good].min()]
+                        selected.append(int(self.rng.choice(best)))
+                    alternative = bad if len(bad) else np.setdiff1d(good, selected)
+                    if len(alternative):
+                        selected.append(int(self.rng.choice(alternative)))
+                    followups = children[selected]
+                    # Stable deduplication leaves the seed, its linked branches,
+                    # then the remaining distance-stratified anchors in order.
+                    anchors = np.concatenate((seed, followups, anchors[1:]))
+                    _, keep = np.unique(anchors, axis=0, return_index=True)
+                    anchors = anchors[np.sort(keep)]
             degree = sum(g.degrees(anchors[:, i]) for i, (g, _) in enumerate(root.parts))
             anchors = anchors[np.cumsum(degree + 1) <= budget]
+            if self.options.get("clear_branch_followups", False):
+                self._clear_rank_anchors[board] = anchors.copy()
+            if len(anchors) and len(followups):
+                selected = (followups[:, None] == anchors[None]).all(-1).any(-1)
+                kept = followups[selected]
+                if len(kept):
+                    self._pending_clear_followups.append(np.column_stack((
+                        root.packed(np.repeat(seed, len(kept), axis=0)), root.packed(kept))))
             children = [anchors]
             for i, (graph, _) in enumerate(root.parts):
                 parents, successors = graph.star(anchors[:, i])
@@ -501,6 +548,8 @@ class BroadData(JointData):
         self._bundle_rank_roles = {}
         self._pending_clear_forks = []
         self._pending_clear_initial_forks = []
+        self._pending_clear_followups = []
+        self._clear_rank_anchors = {}
         return super().batch(pair_count, rank_count)
 
     def boards(self):
@@ -528,6 +577,8 @@ class BroadData(JointData):
         # forward call contributes no exposure to this phase's committed counts.
         for forks in self._pending_clear_initial_forks:
             self.phase_sketches["clear_initial_fork_huber_groups"].add(forks)
+        for links in self._pending_clear_followups:
+            self.phase_sketches["clear_branch_followup_huber_groups"].add(links)
         for pairs, forks in self._pending_clear_forks:
             self.phase_sketches["clear_fork_huber_relations"].add(pairs)
             self.phase_sketches["clear_fork_huber_groups"].add(forks)

@@ -155,6 +155,30 @@ class BroadSamplingTest(unittest.TestCase):
                 if rank == 0:
                     self.assertTrue({child for _, child in successors(initial)}.issubset(packed))
                 sharded.close()
+            tree = BroadData(path, path / "legacy.npz", {**anchored.options,
+                "clear_branch_followups": True})
+            batch = tree.batch(2048, 128)
+            self.assertTrue(tree._pending_clear_followups)
+            huber = set(map(int, batch[0][:, 0]))
+            ranked = set(map(int, batch[3][:, 0]))
+            for links in tree._pending_clear_followups:
+                for link in links:
+                    parent, child = int(link[0]), int(link[2])
+                    self.assertEqual(parent, initial)
+                    self.assertIn(child, {s for _, s in successors(parent)})
+                    # Both the parent and this branch's complete next fork
+                    # occur in distance Huber AND the original soft-rank pool.
+                    for anchor in (parent, child):
+                        following = {s for _, s in successors(anchor)}
+                        self.assertTrue(following.issubset(huber))
+                        self.assertTrue(following.issubset(ranked))
+            for ss, gg, dd in ((batch[0], batch[1], batch[2]), (batch[3], batch[4], batch[5])):
+                np.testing.assert_array_equal(dd, [oracle.distance(int(a[0]), int(b[0]))
+                                                  for a, b in zip(ss, gg)])
+            self.assertEqual(tree.phase_sketches["clear_branch_followup_huber_groups"].estimate(), 0)
+            tree.record_update(batch, np.ones(len(batch[2]), bool), np.ones(len(batch[5]), bool))
+            self.assertGreater(tree.phase_sketches["clear_branch_followup_huber_groups"].estimate(), 0)
+            tree.close()
             # Two independent identical components double every finite exact
             # distance, providing historical short AND6--10-step relations.
             old_rows = np.asarray(rows + [[int(graph.initial_id), int(graph.zero_id),

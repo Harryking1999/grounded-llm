@@ -44,7 +44,9 @@ def historical_retention(manifest, checkpoint, reference=None):
             "6-8_success": sum(r["success"] for r in rows if 6 <= r["true_distance"] <= 8),
             "rows": rows, "scope": "Exact original fixed510, original greedy/RNG/budget; no oracle action selection"}
     if reference:
-        before = json.loads(Path(reference).read_text())["models"]["after_first_10000"]["rows"]
+        previous = json.loads(Path(reference).read_text())
+        before = (previous["models"]["after_first_10000"]["rows"] if "models" in previous
+                  else previous.get("historical_510", previous)["rows"])
         if [r["trajectory_id"] for r in before] != [r["trajectory_id"] for r in rows]:
             raise ValueError("Historical retention task identities changed")
         result["old_success_lost"] = sum(a["success"] and not b["success"] for a, b in zip(before, rows))

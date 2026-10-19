@@ -1,0 +1,10 @@
+{
+  "study": "blocks_distance_map",
+  "base_config": "experiments/blocks_distance_map/configs/blocks12_decision_margins.json",
+  "purpose": "Matched889 control: distribute each unchanged global batch across64 distinct training roots rather than16 shared across four ranks",
+  "fixed_parent": "runs/blocks12_decision_margins/parent/checkpoint.pt",
+  "fixed_sampler_root": "runs/blocks12_decision_margins/parent",
+  "sampling_overrides": {"rank_disjoint_roots": true},
+  "short_feedback_updates": 300,
+  "execution": "Same889 model and fullAdam step94300, same four sampler RNG/cursors, same fixed training-only priority pool and data fractions, same total65536 Huber rows/8192 complete rank contexts per update. Only root schedule lanes differ. Same original loss, labels19, model, lr0.0003 and greedy. Same fixed1000/historical510 versus889. No test examples in training. Stop shortcontrol unless improves889 and historical>=421; effective recipe may continue with per1000 evaluation, stop after two no-best stages. Preserve889 and880 complete states. GPU4-7 only, oneDDP Qmap, wait for preceding queue to finish normally."
+}

@@ -1,50 +1,7 @@
 {
   "task": "blocks",
-  "status": "selected_by_user_for_twelve_piece_clear",
-  "checkpoint": "checkpoints/structured_1000_ffba71f.pt",
-  "source_commit": "ffba71f",
-  "source_run": "runs/qmap_dual_20261018/blocks12/branch_coverage_replay/run",
-  "source_checkpoint": "checkpoints/step_001000.pt",
-  "selection": "user_adopted_ffba71f_preserved_for_clear1000_optimization",
-  "config": "experiments/blocks_distance_map/configs/blocks12_branch_coverage.json",
   "scope": "original_eight_shapes;twelve-placement_legal_roots_and_intermediate_starts_to_empty;formal_fixed_clear1000;nonempty_targets_auxiliary_only",
   "evaluation_distribution": "tasks/blocks/data/clear1000.json",
-  "evidence": "runs/qmap_dual_20261018/blocks12/branch_coverage_replay/run/evaluation/step_001000.json",
-  "metrics": {
-    "clear": {
-      "success": 781,
-      "count": 1000,
-      "success_rate": 0.781,
-      "cohorts": 5,
-      "cases_per_cohort": 200
-    },
-    "near_clear_medium": {
-      "success": 180,
-      "count": 200,
-      "actual_distances": [
-        7,
-        8
-      ]
-    },
-    "near_clear_long": {
-      "success": 137,
-      "count": 200,
-      "actual_distances": [
-        9,
-        10,
-        11
-      ]
-    },
-    "historical_510": {
-      "success": 421,
-      "count": 510
-    },
-    "previous_clear_monitor": {
-      "success": 159,
-      "count": 200
-    }
-  },
-  "limitations": "Clear1000=781/1000 is a fixed formal monitor, not independent final generalization. Historical510 and nonempty diagnostics are separate; no claim of85% clearing.",
   "historical_reference": {
     "task": "blocks",
     "status": "selected",
@@ -57,8 +14,53 @@
     "scope": "current_eight_shape_blocks_map_and_recent_map_sft",
     "evidence": "experiments/map_sft_baselines/results/b2_10k_diagnosis.md"
   },
-  "runtime_config": "runs/qmap_dual_20261018/blocks12/branch_coverage_replay/run/config.json",
-  "config_source_commit": "ffba71f",
   "clear_evaluation_config": "experiments/blocks_distance_map/configs/blocks12_clear_acceptance.json",
-  "clear_evidence": "runs/qmap_dual_20261018/blocks12/clear_retest/results.json"
+  "status": "selected_after_fixed_clear1000_and_historical510_joint_gain",
+  "checkpoint": "checkpoints/clear_forks_1000_5c64fb4.pt",
+  "source_commit": "5c64fb4",
+  "source_run": "runs/qmap_dual_20261018/blocks12/clear_forks_028_1000/run",
+  "source_checkpoint": "checkpoints/step_001000.pt",
+  "selection": "clearing_primary_joint_gain_over789_baseline_with_historical_regression_improved",
+  "config": "experiments/blocks_distance_map/configs/blocks12_clear_focus.json",
+  "config_source_commit": "5c64fb4",
+  "runtime_config": "runs/qmap_dual_20261018/blocks12/clear_forks_028_1000/run/config.json",
+  "evidence": "runs/qmap_dual_20261018/blocks12/clear_forks_028_1000/evaluation/step_001000/results.json",
+  "clear_evidence": "runs/qmap_dual_20261018/blocks12/clear_forks_028_1000/evaluation/step_001000/results.json",
+  "metrics": {
+    "clear": {
+      "success": 810,
+      "count": 1000,
+      "success_rate": 0.81,
+      "distance_bins": {
+        "11": {
+          "count": 81,
+          "success": 69
+        },
+        "12": {
+          "count": 919,
+          "success": 741
+        }
+      },
+      "matched_789_baseline": {
+        "old_success": 789,
+        "new_success": 810,
+        "lost": 121,
+        "gained": 142
+      }
+    },
+    "historical_510": {
+      "success": 424,
+      "count": 510,
+      "lost": 47,
+      "gained": 50
+    }
+  },
+  "limitations": "Fixed1000 monitor=810/1000, below85% target;121 prior successes lost despite142 gained. Historical510 separate. Independent final unseen evaluation pending; no new text40 or near-clear result.",
+  "previous_selected": {
+    "checkpoint": "checkpoints/structured_1000_ffba71f.pt",
+    "source_commit": "ffba71f",
+    "clear1000": 781,
+    "historical510": 421,
+    "evidence": "runs/qmap_dual_20261018/blocks12/clear_retest/results.json"
+  }
 }

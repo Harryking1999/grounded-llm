@@ -8,8 +8,8 @@
 
 | 任务／目标范围／测试集 | DeepSeek | Qwen3-32B | 5.6 | 6.1 | 7B SFT | 认知地图本身贪心 | 1.5B＋认知地图：单任务训 | 1.5B＋认知地图：统一训 |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
-| **积木：12块清空，固定1000题（正式）** | - | - | - | - | - | **78.1%（781/1000）** | - | - |
-| 积木：原文字40题，12块清空 | 77.5%（31/40） | 2.5%（1/40） | 92.5%（37/40） | 95%（38/40） | - | 67.5%（27/40） | - | - |
+| **积木：12块清空，固定1000题（正式）** | - | - | - | - | - | **81.0%（810/1000）** | - | - |
+| 积木：原文字40题，12块清空 | 77.5%（31/40） | 2.5%（1/40） | 92.5%（37/40） | 95%（38/40） | - | - | - | - |
 | 寻路：原文字40题 | 97.5%（39/40） | 65%（26/40） | 100%（40/40） | 100%（40/40） | - | - | - | - |
 | 寻路：固定留出256题 | - | - | - | - | - | **98.05%（251/256）** | - | - |
 | 八盘汉诺塔：原文字40题 | 42.5%（17/40） | 10%（4/40） | 97.5%（39/40） | 95%（38/40） | - | - | - | - |
@@ -23,17 +23,17 @@
 
 **积木历史回归（单独题集，非12块清空1000题）：**
 
-| 测试集 | 当前地图贪心 ffba71f | 旧地图贪心986cb4d | 1.5B＋旧地图：单任务SFT | 7B无地图SFT |
+| 测试集 | 当前地图贪心5c64fb4 | 旧地图贪心986cb4d | 1.5B＋旧地图：单任务SFT | 7B无地图SFT |
 |---|---:|---:|---:|---:|
-| 原地图SFT固定510题 | 82.55%（421/510） | 77.84%（397/510） | 94.12%（480/510） | 92.16%（470/510） |
+| 原地图SFT固定510题 | 83.14%（424/510） | 77.84%（397/510） | 94.12%（480/510） | 92.16%（470/510） |
 
 旧1.5B为50k B2，7B为10k R＋A最佳断点，训练条件不同；不能据分差单独归因地图。旧1.5B到达且正确停止为475/510。统一训指同一个1.5B读图模型跨任务训练，各任务Qmap仍独立。
 
-积木正式范围仅清空，非空终点为辅助诊断，不再占主要验收门槛；[固定1000题](blocks/data/clear1000.json)、[验收合同](../experiments/blocks_distance_map/configs/blocks12_clear_acceptance.json)。五组各200题已测149、156、154、168、154，共781；文字原40题单列，未冒充1000题成绩。尚无新的1.5B／7B在此1000题上的结果。首轮9aa8498另按同1000题补测789/1000（78.9%），相对现用图丢130、新增138；未改选，不称续训提升，见[模型比较](../experiments/blocks_distance_map/results/blocks12_joint_report.md)。
+积木正式范围仅清空，非空终点仅辅助；[固定1000题](blocks/data/clear1000.json)、[验收合同](../experiments/blocks_distance_map/configs/blocks12_clear_acceptance.json)。当前图同题810/1000；相对首轮789基线丢121、新增142，净增21，历史510由421增至424。原文字40题尚未补测当前图；旧ffba71f在该40题为27/40，不填作当前图成绩。尚无新的1.5B／7B在1000题上的结果；独立最终泛化仍待验收，见[模型比较](../experiments/blocks_distance_map/results/blocks12_joint_report.md)。
 
 采用权重：[积木](blocks/Qmap/selection.json)、[寻路](path/Qmap/selection.json)、[汉诺塔](hanoi/Qmap/selection.json)、[二阶魔方](cube2/Qmap/selection.json)、[华容道](puzzle8/Qmap/selection.json)。全状态评测包含地图训练状态，不称独立新状态泛化；原文字每任务40题、思考＋答案16k token，其他任务验收范围保持原定义。
 
-证据：[积木1000及文字40逐题](../runs/qmap_dual_20261018/blocks12/clear_retest/results.json)、[纯文字四模型](../experiments/task_text_baselines/results/report.md)、[历史SFT](../experiments/map_sft_baselines/results/report.md)、[寻路](../experiments/path_qmap/results/summary.json)、[汉诺塔](../experiments/hanoi_qmap/results/full_coverage_summary.json)、[魔方](../runs/cube2_qmap/cycle_repair_f42c487/summary.json)、[华容道](../runs/qmap_dual_20261018/puzzle8/goal_expansion/stages/step_001000/metrics.json)。后续仅在相应题集行原位更新真实结果。
+证据：[当前积木1000逐题](../runs/qmap_dual_20261018/blocks12/clear_forks_028_1000/evaluation/step_001000/results.json)、[纯文字四模型](../experiments/task_text_baselines/results/report.md)、[历史SFT](../experiments/map_sft_baselines/results/report.md)、[寻路](../experiments/path_qmap/results/summary.json)、[汉诺塔](../experiments/hanoi_qmap/results/full_coverage_summary.json)、[魔方](../runs/cube2_qmap/cycle_repair_f42c487/summary.json)、[华容道](../runs/qmap_dual_20261018/puzzle8/goal_expansion/stages/step_001000/metrics.json)。后续仅在相应题集行原位更新真实结果。
 
 ## 任务目录
 

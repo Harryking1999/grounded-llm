@@ -1,5 +1,6 @@
 """Streaming exact relations across expanded roots, goals and distance bands."""
 import copy
+import json
 import math
 from pathlib import Path
 
@@ -64,7 +65,8 @@ class BroadData(JointData):
             "bundle_huber_groups", "bundle_shared_source_groups", "bundle_shared_goal_groups",
             "bundle_cross_branch_groups", "clear_fork_huber_relations", "clear_fork_huber_groups",
             "clear_initial_fork_huber_groups", "clear_branch_followup_huber_groups",
-            "clear_path_landmark_huber_groups", "clear_path_landmark_huber_relations")}
+            "clear_path_landmark_huber_groups", "clear_path_landmark_huber_relations",
+            "clear_retention_huber_groups")}
         self.phase_roots = np.zeros(len(self.roots), dtype=bool)
         self.phase_histograms = {}
         self.requested_distances = {}
@@ -84,7 +86,27 @@ class BroadData(JointData):
         self._pending_clear_followups = []
         self._clear_rank_anchors = {}
         self._pending_clear_landmarks = []
+        self._pending_clear_retention = []
         self._clear_rank_slots = None
+        self.clear_retention = {}
+        self._clear_huber_decisions = []
+        retention = options.get("clear_retention_pool")
+        if retention:
+            for row in json.loads(Path(retention).read_text())["rows"]:
+                board = row["board"]
+                root = self.roots[board]
+                if row["initial"] != root.record["initial"]:
+                    raise ValueError("Clearing retention must use the matching training root")
+                masks = [int(state) for state in row["states"]]
+                ids = np.stack([graph.rank(np.asarray([
+                    sum(((mask >> cell) & 1) << bit for bit, cell in enumerate(cells))
+                    for mask in masks], dtype=np.uint64)) for graph, cells in root.parts], -1)
+                zeros = np.tile([g.zero_id for g, _ in root.parts], (len(ids), 1))
+                parts = root.distance_parts(ids, zeros)
+                if (parts < 0).any():
+                    raise ValueError("Retained clearing states must be exactly clearable")
+                deep = (parts.sum(-1) >= 10) & (parts.sum(-1) <= 12)
+                self.clear_retention[board] = ids[deep] if deep.any() else ids
         self.layer_views, self.layer_suffixes = {}, {}
         index_path = options.get("clear_index_data")
         self.clear_indexes = ({gid: ClearDistanceIndex(Path(index_path) / str(gid)) for gid in self.graphs}
@@ -138,11 +160,17 @@ class BroadData(JointData):
 
     def clear_rows(self, board, count, ranking=False):
         if self.clear_indexes is None:
-            return super().clear_rows(board, count, ranking)
+            result = super().clear_rows(board, count, ranking)
+            if not ranking:
+                self._clear_huber_decisions.append(np.zeros(count, dtype=bool))
+            return result
+        decision_rows = np.zeros(count, dtype=bool)
         broad = round(count * self.options.get("clear_broad_fraction", .15))
         old_source, old_goal = super().clear_rows(board, broad, ranking)
         count -= broad
         if not count:
+            if not ranking:
+                self._clear_huber_decisions.append(decision_rows)
             return old_source, old_goal
         root, suffix = self.roots[board], self.clear_suffixes[board]
         available = np.flatnonzero(suffix[0])
@@ -198,6 +226,10 @@ class BroadData(JointData):
             self.rng.shuffle(deep); self.rng.shuffle(other)
             order = list(deep) + list(other)
             anchors = anchors[order]
+            if board in self.clear_retention:
+                pool = self.clear_retention[board]
+                kept = pool[self.rng.integers(len(pool))]
+                anchors = np.concatenate((kept[None], anchors[~(anchors == kept).all(-1)]))
             if initial_fork:
                 # Unique distance-layer sampling can dilute the actual start
                 # among many other deep states. Give each training root its
@@ -245,21 +277,30 @@ class BroadData(JointData):
                 if self._clear_rank_slots is not None:
                     anchors = anchors[:self._clear_rank_slots]
                 self._clear_rank_anchors[board] = anchors.copy()
+            if board in self.clear_retention and len(anchors):
+                retained = (anchors[:, None] == self.clear_retention[board][None]).all(-1).any(-1)
+                if retained.any():
+                    packed = root.packed(anchors[retained])
+                    self._pending_clear_retention.append(np.column_stack((packed, np.zeros_like(packed))))
             if len(anchors) and len(followups):
                 selected = (followups[:, None] == anchors[None]).all(-1).any(-1)
                 kept = followups[selected]
                 if len(kept):
                     self._pending_clear_followups.append(np.column_stack((
                         root.packed(np.repeat(seed, len(kept), axis=0)), root.packed(kept))))
-            children = [anchors]
+            zeros = np.tile([g.zero_id for g, _ in root.parts], (len(anchors), 1))
+            clearable_parent = (root.distance_parts(anchors, zeros) >= 0).all(-1)
+            children, decision_parts = [anchors], [clearable_parent]
             for i, (graph, _) in enumerate(root.parts):
                 parents, successors = graph.star(anchors[:, i])
                 child = anchors[parents].copy()
                 child[:, i] = successors
                 children.append(child)
+                decision_parts.append(clearable_parent[parents])
             group_rows = np.concatenate(children)
             if len(group_rows):
                 source[-len(group_rows):] = group_rows
+                decision_rows[-len(group_rows):] = np.concatenate(decision_parts)
                 initial_rows = anchors[(anchors == initial).all(-1)]
                 if len(initial_rows):
                     self._pending_clear_initial_forks.append(np.column_stack((
@@ -270,6 +311,8 @@ class BroadData(JointData):
         # This changes sampling, never the graph or legal action set. The broad
         # stream and retained clear fraction still include unreachable states;
         # stars below retain every legal trap action at each clearable parent.
+        if not ranking:
+            self._clear_huber_decisions.append(decision_rows)
         return np.concatenate((old_source, source)), np.concatenate((old_goal, goal))
 
     def _paths(self, root, start, length=18, first_choices=None):
@@ -617,10 +660,23 @@ class BroadData(JointData):
         self._pending_clear_followups = []
         self._clear_rank_anchors = {}
         self._pending_clear_landmarks = []
+        self._pending_clear_retention = []
+        self._clear_huber_decisions = []
         root_rank = (rank_count - round(rank_count * self.options["legacy_fraction"])) // self.options["boards_per_batch"]
         clear_rank = round(root_rank * self.options["clear_fraction"])
         self._clear_rank_slots = clear_rank - round(clear_rank * self.options.get("clear_broad_fraction", .15))
-        return super().batch(pair_count, rank_count)
+        result = super().batch(pair_count, rank_count)
+        legacy = round(pair_count * self.options["legacy_fraction"])
+        masks = [np.zeros(legacy, dtype=bool)]
+        for number, clear_mask in enumerate(self._clear_huber_decisions):
+            n = ((pair_count - legacy) // self.options["boards_per_batch"] +
+                 (number < (pair_count - legacy) % self.options["boards_per_batch"]))
+            broad = round(n * self.options["broad_fraction"])
+            masks.extend((np.zeros(broad, dtype=bool), clear_mask,
+                          np.zeros(n - broad - len(clear_mask), dtype=bool)))
+        self.last_huber_decision_mask = np.concatenate(masks)
+        assert len(self.last_huber_decision_mask) == pair_count
+        return result
 
     def boards(self):
         if not self.options.get("rank_disjoint_roots", False):
@@ -660,6 +716,12 @@ class BroadData(JointData):
         return result
 
     def record_update(self, arrays, huber_nonzero, rank_nonzero):
+        for keys in self._pending_clear_retention:
+            self.phase_sketches["clear_retention_huber_groups"].add(keys)
+        empty_goal = (arrays[1] == 0).all(-1)
+        for name, chosen in (("huber_clear_decision", self.last_huber_decision_mask),
+                             ("huber_clear_outside_decision", empty_goal & ~self.last_huber_decision_mask)):
+            self.add_hist(self.phase_histograms.setdefault(name, {}), arrays[2][chosen])
         # Called only after successful optimizer.step, so an aborted sampling or
         # forward call contributes no exposure to this phase's committed counts.
         for forks in self._pending_clear_initial_forks:

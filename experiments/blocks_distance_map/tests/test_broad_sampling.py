@@ -144,7 +144,26 @@ class BroadSamplingTest(unittest.TestCase):
             self.assertEqual(forked.phase_sketches["clear_fork_huber_groups"].estimate(), 0)
             forked.record_update(batch, np.ones(len(batch[2]), bool), np.ones(len(batch[5]), bool))
             self.assertGreater(forked.phase_sketches["clear_fork_huber_groups"].estimate(), 0)
+            decision = forked.last_huber_decision_mask
+            self.assertTrue(decision.any())
+            self.assertTrue((batch[1][decision] == 0).all())
+            self.assertEqual(sum(forked.phase_histograms["huber_clear_decision"].values()), int(decision.sum()))
             forked.close()
+            retention_path = path / "retained.json"
+            retention_path.write_text(json.dumps({"rows": [{"board": 0,
+                "initial": double["initial"], "states": [double["initial"]]}]}))
+            retained = BroadData(path, path / "legacy.npz", {**options,
+                "clear_index_data": str(path / "clear"), "clear_broad_fraction": .02,
+                "clear_distance_cycle": [8], "clear_fork_huber_fraction": .8,
+                "clear_fraction": .9, "broad_fraction": .05,
+                "clear_retention_pool": str(retention_path), "clear_branch_followups": True,
+                "clear_dead_followup_fraction": 0})
+            batch = retained.batch(512, 32)
+            np.testing.assert_array_equal(batch[2], [oracle.distance(int(a[0]), int(b[0]))
+                                                    for a, b in zip(batch[0], batch[1])])
+            retained.record_update(batch, np.ones(len(batch[2]), bool), np.ones(len(batch[5]), bool))
+            self.assertGreater(retained.phase_sketches["clear_retention_huber_groups"].estimate(), 0)
+            retained.close()
             anchored = BroadData(path, path / "legacy.npz", {**options,
                 "clear_index_data": str(path / "clear"), "clear_broad_fraction": 0,
                 "clear_distance_cycle": [1], "clear_fork_huber_fraction": .5,

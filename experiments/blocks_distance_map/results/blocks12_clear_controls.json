@@ -216,6 +216,65 @@
         "gained_vs889": 39
       }
     },
-    "status": "Disjoint preserved300 resumed toward>=1000 without resettingAdam/samplers; shared16 and originalABC queued to complete>=1000 after active continuation ends.300 cannot establish that a recipe is ineffective."
+    "status": "Disjoint64 completed1000=881/421, not selected; continue second complete1000 stage. Shared16 and originalABC preserved300 states queued for>=1000. Current selected889/433 and880 fullstate preserved.",
+    "disjoint64_complete1000": {
+      "clear": 881,
+      "history": 421,
+      "lost_vs889": 57,
+      "gained_vs889": 49,
+      "11step": 74,
+      "12step": 807,
+      "full_checkpoint": "runs/qmap_dual_20261018/blocks12/disjoint_contexts_028_1000/run/checkpoints/step_001000.pt",
+      "source_commit": "02f90ff",
+      "actual_train_roots_this_phase": 10000,
+      "actual_huber_draws": 65536000,
+      "distinct_huber_HLL": 37549786,
+      "complete_clearing_forks_HLL": 659628
+    }
+  },
+  "global_gradient_schedule_audit": {
+    "scope": "One matched full4rank update from889 frozen model. Equal mean of per-rank original loss gradients, matching DDP; two root schedules, same total batch and889 sampler states. CPU diagnostic only, no optimizer updates/test data. Single-step evidence, not a capacity proof or selection criterion.",
+    "results": {
+      "16_shared_roots": {
+        "actual_distinct_roots": 16,
+        "loss_contributions": {
+          "clear_finite": 0.2271440252661705,
+          "clear_negative_decision": 0.5802527517080307,
+          "clear_negative_other": 0.024968671146780252,
+          "other_huber": 1.0405788123607635,
+          "full_original_ranking": 2.2923566699028015
+        },
+        "gradient_norms": {
+          "clear_finite": 3.623727798461914,
+          "clear_negative_decision": 3.4797723293304443,
+          "clear_negative_other": 0.08145946264266968,
+          "other_huber": 0.25543320178985596,
+          "full_original_ranking": 1.3226772546768188
+        },
+        "cosine_clear_finite_vs_clear_negative": -0.9429574012756348,
+        "cosine_clear_finite_vs_decision_negative": -0.9425784945487976,
+        "cosine_clear_huber_vs_original_ranking": 0.028848791494965553
+      },
+      "64_disjoint_roots": {
+        "actual_distinct_roots": 64,
+        "loss_contributions": {
+          "clear_finite": 0.23304146900773048,
+          "clear_negative_decision": 0.5856119990348816,
+          "clear_negative_other": 0.02479163184762001,
+          "other_huber": 1.0436797142028809,
+          "full_original_ranking": 2.337418556213379
+        },
+        "gradient_norms": {
+          "clear_finite": 3.818354606628418,
+          "clear_negative_decision": 3.381788492202759,
+          "clear_negative_other": 0.08568203449249268,
+          "other_huber": 0.25134414434432983,
+          "full_original_ranking": 1.506300926208496
+        },
+        "cosine_clear_finite_vs_clear_negative": -0.9785374402999878,
+        "cosine_clear_finite_vs_decision_negative": -0.9779280424118042,
+        "cosine_clear_huber_vs_original_ranking": 0.1981157809495926
+      }
+    }
   }
 }

@@ -76,7 +76,7 @@ def board_worker(job):
         selected=select_additional(candidates,original,rng)
         if selected is not None:break
     if selected is None:
-        raise ValueError(f'Board {row}: insufficient new certified routes under the DESIGN sampling limit')
+        raise ValueError(f'Board {row}: {len(candidates)} new certified routes, need {sum(bool(r["shortest_moves"]) for r in original)} after {number} sampled routes')
     terminal_candidates=sorted({s for r in selected for s,g in r['pairs'][1:]
                                 if s not in TERMINAL and (s,s) not in EXCLUDED},
                                key=lambda state:(-state.bit_count(),state))

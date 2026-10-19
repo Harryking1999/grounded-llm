@@ -10,7 +10,10 @@ from .shard_pool import ShardPool
 def dispatch_lock(pool):
     path = pool.root / 'evaluation_dispatch.lock'
     try:
-        pool.files.mkdir(str(path))
+        if pool.files:
+            pool.files.mkdir(str(path))
+        else:
+            path.mkdir()
     except OSError:
         if pool.exists(path):
             yield False
@@ -19,7 +22,10 @@ def dispatch_lock(pool):
     try:
         yield True
     finally:
-        pool.files.rmdir(str(path))
+        if pool.files:
+            pool.files.rmdir(str(path))
+        else:
+            path.rmdir()
 
 
 def cache_entries(pool):

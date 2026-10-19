@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from unittest.mock import Mock, patch
 from experiments.map_sft_baselines.src import bridge
-from experiments.map_sft_baselines.src.retention import prune_completed, has_capacity
+from experiments.map_sft_baselines.src.retention import dispatch_lock, prune_completed, has_capacity
 from experiments.map_sft_baselines.src.shard_pool import ShardPool
 from experiments.map_sft_baselines.tests.test_shard_pool import LocalSFTP
 
@@ -105,6 +105,21 @@ class BridgeTests(unittest.TestCase):
         (self.remote / 'evaluation_dispatch.lock').mkdir()
         self.assertEqual(self.prune(), [])
         self.assertTrue((self.payload / 'weights.pt').exists())
+
+    def test_dispatch_lock_excludes_other_owner_and_releases_after_error(self):
+        for files in (None, self.files):
+            with self.subTest(local=files is None):
+                pool = ShardPool(str(self.remote), files)
+                with self.assertRaisesRegex(RuntimeError, 'interrupted'):
+                    with dispatch_lock(pool) as acquired:
+                        self.assertTrue(acquired)
+                        with dispatch_lock(pool) as second:
+                            self.assertFalse(second)
+                        self.assertTrue(pool.exists(pool.root / 'evaluation_dispatch.lock'))
+                        raise RuntimeError('interrupted')
+                with dispatch_lock(pool) as acquired:
+                    self.assertTrue(acquired)
+                self.assertFalse(pool.exists(pool.root / 'evaluation_dispatch.lock'))
 
     def test_capacity_and_interrupted_upload_recovery(self):
         self.payload.mkdir(parents=True)

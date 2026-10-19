@@ -7,67 +7,67 @@
   },
   "same_parent_controls": {
     "A": {
-      "updates": 300,
-      "clear1000": 854,
+      "updates": 1000,
+      "clear1000": 839,
+      "historical510": 432,
+      "clear_lost": 93,
+      "clear_gained": 52,
+      "historical_lost": 25,
+      "historical_gained": 28,
       "distance_bins": {
         "11": {
           "count": 81,
-          "success": 73
+          "success": 69
         },
         "12": {
           "count": 919,
-          "success": 781
+          "success": 770
         }
       },
-      "clear_lost": 62,
-      "clear_gained": 36,
-      "historical510": 434,
-      "historical_lost": 15,
-      "historical_gained": 20,
-      "results": "runs/qmap_dual_20261018/blocks12/clear_ablation_028_A/A/evaluation/results.json",
-      "interpretation": "Intermediate300 observation; insufficient to judge recipe. Resume retained state to>=1000 under updated user requirement."
+      "results": "runs\\qmap_dual_20261018\\blocks12\\minimum1000_controls_028_A1000\\A\\evaluation_001000\\results.json",
+      "interpretation": "Complete1000 matched880-parent control, did not beat880; recipe ended, full states preserved"
     },
     "B": {
-      "updates": 300,
-      "clear1000": 862,
+      "updates": 1000,
+      "clear1000": 841,
+      "historical510": 428,
+      "clear_lost": 89,
+      "clear_gained": 50,
+      "historical_lost": 28,
+      "historical_gained": 27,
       "distance_bins": {
         "11": {
           "count": 81,
-          "success": 75
+          "success": 70
         },
         "12": {
           "count": 919,
-          "success": 787
+          "success": 771
         }
       },
-      "clear_lost": 65,
-      "clear_gained": 47,
-      "historical510": 434,
-      "historical_lost": 22,
-      "historical_gained": 27,
-      "results": "runs/qmap_dual_20261018/blocks12/clear_ablation_028_B/B/evaluation/results.json",
-      "interpretation": "Intermediate300 observation; insufficient to judge recipe. Resume retained state to>=1000 under updated user requirement."
+      "results": "runs\\qmap_dual_20261018\\blocks12\\minimum1000_controls_028_B1000\\B\\evaluation_001000\\results.json",
+      "interpretation": "Complete1000 matched880-parent control, did not beat880; recipe ended, full states preserved"
     },
     "C": {
-      "updates": 300,
-      "clear1000": 869,
+      "updates": 1000,
+      "clear1000": 824,
+      "historical510": 424,
+      "clear_lost": 102,
+      "clear_gained": 46,
+      "historical_lost": 34,
+      "historical_gained": 29,
       "distance_bins": {
         "11": {
           "count": 81,
-          "success": 72
+          "success": 69
         },
         "12": {
           "count": 919,
-          "success": 797
+          "success": 755
         }
       },
-      "clear_lost": 56,
-      "clear_gained": 45,
-      "historical510": 428,
-      "historical_lost": 24,
-      "historical_gained": 23,
-      "results": "runs/qmap_dual_20261018/blocks12/clear_ablation_028_C/C/evaluation/results.json",
-      "interpretation": "Intermediate300 observation; insufficient to judge recipe. Resume retained state to>=1000 under updated user requirement."
+      "results": "runs\\qmap_dual_20261018\\blocks12\\minimum1000_controls_028_C1000\\C\\evaluation_001000\\results.json",
+      "interpretation": "Complete1000 matched880-parent control, did not beat880; recipe ended, full states preserved"
     }
   },
   "diagnosis": {
@@ -336,7 +336,8 @@
     "coexposed_finite_and_reverse_pairs": 130,
     "coexposed_complete_six_relation_chains": 0,
     "limitation": "Finite sampled prefix. Structural contradiction proven, prevalence of full contradictory chains over1000updates and causal contribution to clearing failure not established.",
-    "evidence": "runs\\qmap_dual_20261018\\blocks12\\clear_domain_028_support\\directed_sampling_audit.json"
+    "evidence": "runs\\qmap_dual_20261018\\blocks12\\clear_domain_028_support\\directed_sampling_audit.json",
+    "coexposure_pattern": "forward1,1,2 with all three reverses labeled19; other possible contradictory patterns were not exhaustively counted"
   },
   "dynamic_labels_offline": {
     "scope": "Offline small real legal removal graph only, not a formal task or training condition; no labels deployed",
@@ -360,5 +361,70 @@
     "status": "not implemented or trained; separate approval required",
     "minimal_change": "Keep current encoder and original Huber/soft-rank/labels/greedy; replace constrained directed_sum with positive asymmetric ordered-pair score head f(z_source,z_goal).",
     "purpose": "Remove compulsory potential-difference antisymmetry; must test same parent/task/data budget separately. This is not evidence it will improve clearing."
+  },
+  "intermediate_300_same_parent_controls": {
+    "A": {
+      "updates": 1000,
+      "clear1000": 839,
+      "historical510": 432,
+      "clear_lost": 93,
+      "clear_gained": 52,
+      "historical_lost": 25,
+      "historical_gained": 28,
+      "distance_bins": {
+        "11": {
+          "count": 81,
+          "success": 69
+        },
+        "12": {
+          "count": 919,
+          "success": 770
+        }
+      },
+      "results": "runs\\qmap_dual_20261018\\blocks12\\minimum1000_controls_028_A1000\\A\\evaluation_001000\\results.json",
+      "interpretation": "Complete1000 matched880-parent control, did not beat880; recipe ended, full states preserved"
+    },
+    "B": {
+      "updates": 1000,
+      "clear1000": 841,
+      "historical510": 428,
+      "clear_lost": 89,
+      "clear_gained": 50,
+      "historical_lost": 28,
+      "historical_gained": 27,
+      "distance_bins": {
+        "11": {
+          "count": 81,
+          "success": 70
+        },
+        "12": {
+          "count": 919,
+          "success": 771
+        }
+      },
+      "results": "runs\\qmap_dual_20261018\\blocks12\\minimum1000_controls_028_B1000\\B\\evaluation_001000\\results.json",
+      "interpretation": "Complete1000 matched880-parent control, did not beat880; recipe ended, full states preserved"
+    },
+    "C": {
+      "updates": 1000,
+      "clear1000": 824,
+      "historical510": 424,
+      "clear_lost": 102,
+      "clear_gained": 46,
+      "historical_lost": 34,
+      "historical_gained": 29,
+      "distance_bins": {
+        "11": {
+          "count": 81,
+          "success": 69
+        },
+        "12": {
+          "count": 919,
+          "success": 755
+        }
+      },
+      "results": "runs\\qmap_dual_20261018\\blocks12\\minimum1000_controls_028_C1000\\C\\evaluation_001000\\results.json",
+      "interpretation": "Complete1000 matched880-parent control, did not beat880; recipe ended, full states preserved"
+    }
   }
 }

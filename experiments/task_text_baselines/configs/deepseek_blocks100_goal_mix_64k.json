@@ -1,0 +1,36 @@
+{
+  "study": "blocks_clear_nonempty_goal_mix",
+  "hypothesis": "Test whether Flash can preserve explicit nonempty target cells over long removal plans, including isolated target cells, alongside the familiar clearing objective.",
+  "seed": 2026101908,
+  "source_suite": "runs/five_task_sol_high_40/suite.json",
+  "exclude_suites": [
+    "runs/deepseek_blocks_cube100_64k/suite.json",
+    "runs/deepseek_blocks_cube_fresh100_64k/suite.json"
+  ],
+  "case_mode": "blocks_goal_mix",
+  "expected_cases": 100,
+  "samples_per_case": 1,
+  "generation": {
+    "clear_cases": 50,
+    "nonempty_isolated_cases": 25,
+    "nonempty_retained_cases": 25,
+    "nonempty_min_distance": 9,
+    "nonempty_max_distance": 13,
+    "isolated_cases_per_distance": 5,
+    "random_paths_per_root": 16,
+    "max_candidate_roots": 20000
+  },
+  "api": {
+    "base_url": "https://api.deepseek.com",
+    "model": "deepseek-flash",
+    "reasoning_effort": "high",
+    "max_output_tokens": 64000,
+    "scoring_output_limit": 64000,
+    "timeout_seconds": 2400,
+    "concurrency": 16,
+    "max_service_retries": 3,
+    "max_total_service_retries": 60,
+    "service_retry_delay_seconds": 15
+  },
+  "comparison": "100 distinct fresh initial boards under original eight shapes, twelve construction placements and the existing text/JSON contract. Exclude translation-equivalent roots in previous Flash suites. Fifty clear tasks have the original unfiltered clearing distribution. Fifty reachable nonempty tasks have exact shortest distance9--13:25 have an orthogonally isolated occupied goal cell (five per exact distance),25 have no isolated cell and every goal cell belongs to a legal goal-board shape. Normal retained goals are accepted anywhere in9--13, with actual distance counts reported. Descendants come from the optimal clearing certificate and random legal removal paths; selection uses only task properties, never model scores. Goal types and distance distributions are not matched causal comparisons. The model receives only initial/goal boards, shared rules and output instructions, without distances, certificates or candidate lists. One valid response per case; only service failures retry; wrong answers, truncation and over-budget answers are retained. Independently replay every plan against the exact goal, and diagnose any removal of a required target cell. No Q model, training or agent-side tools."
+}

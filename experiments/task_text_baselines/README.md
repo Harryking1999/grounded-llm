@@ -14,6 +14,7 @@ DeepSeek 积木／二阶魔方新题复测见 [64k 合同](configs/deepseek_bloc
 | Qwen3-32B thinking，同题 200 题 | [qwen32b_same40.json](configs/qwen32b_same40.json) | `runs/five_task_qwen32b_same40/` |
 | 5.6-sol high，同题 200 题 | [sol56_high_same40.json](configs/sol56_high_same40.json) | `runs/five_task_sol56_high_same40/` |
 | DeepSeek Flash high，初始五任务同题 200 题，16k | [deepseek_flash_same40_16k.json](configs/deepseek_flash_same40_16k.json) | `runs/deepseek_flash_same40_16k/` |
+| DeepSeek Flash high，清空／非空目标各 50 新题，64k | [deepseek_blocks100_goal_mix_64k.json](configs/deepseek_blocks100_goal_mix_64k.json) | `runs/deepseek_blocks100_goal_mix_64k/` |
 | 6.1-sol high，旧十形状十二块 16 题 | [sol61_legacy_blocks12_new_prompt.json](configs/sol61_legacy_blocks12_new_prompt.json) | `runs/sol61_legacy_blocks12_new_prompt/` |
 | 5.6-sol high，原八形状＋逐步状态 40 题 | [sol56_blocks40_state_report.json](configs/sol56_blocks40_state_report.json) | `runs/sol56_blocks40_state_report/` |
 | 5.6-sol high，S/Z 八形状＋逐步状态 40 题 | [sol56_blocks40_sz_state_report.json](configs/sol56_blocks40_sz_state_report.json) | `runs/sol56_blocks40_sz_state_report/` |
@@ -38,6 +39,7 @@ S/Z 仅动作两组只删除冻结提示词末尾的逐步状态指令，保留�
 主评分为 [16k 合同](configs/budget_16k.json)，附加 [8k 合同](configs/budget_8k.json)，都包含思考与最终答案；超限即错，用量缺失不计预算内成功。原执行分保留。请求上限阶段、第三方接口强度缺失与其他比较限制统一写在结果表中。
 
 - `src/prepare.py`、`src/prepare_retest.py`：准备冻结题集并回放参考解。
+- `src/blocks_goal_mix.py`：清空／非空目标混合题；用差集精确覆盖核验非空目标最短步数，孤立格按上下左右邻接判断。
 - `src/run.py`：API 调用、断点续跑和有限服务重试；凭据只从进程环境传入。
 - `src/qwen.py`：完整 BF16 Qwen3-32B、TP4、thinking，依赖见 [requirements-qwen.txt](requirements-qwen.txt)。
 - `src/protocol.py`：独立环境裁判、合法动作和逐步状态判分。

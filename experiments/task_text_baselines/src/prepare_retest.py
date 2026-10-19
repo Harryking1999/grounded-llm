@@ -20,7 +20,10 @@ import numpy as np
 def retest_cases(config, source):
     if config['samples_per_case'] != 1:
         raise ValueError('Retests use exactly one valid answer per question')
-    if config['case_mode'] == 'copy_frozen':
+    if config['case_mode'] == 'blocks_goal_mix':
+        from .blocks_goal_mix import make_cases
+        cases = make_cases(config, source)
+    elif config['case_mode'] == 'copy_frozen':
         cases = deepcopy(source['cases'])
     elif config['case_mode'] == 'fresh_blocks_cube':
         excluded = [c for c in source['cases'] if c['task'] in config['tasks']]

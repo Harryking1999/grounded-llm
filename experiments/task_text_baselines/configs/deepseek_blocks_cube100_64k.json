@@ -1,0 +1,33 @@
+{
+  "study": "blocks_cube_output_budget_retest",
+  "seed": 20261019,
+  "source_suite": "runs/five_task_sol_high_40/suite.json",
+  "case_mode": "extend_blocks_cube",
+  "cube_oracle": "runs/five_task_sol_high_40/cube2_qtm_depth.npy",
+  "expected_cases": 200,
+  "samples_per_case": 1,
+  "tasks": {
+    "blocks": {"total_cases": 100},
+    "cube2": {
+      "total_cases": 100,
+      "distances": [1, 2, 4, 6, 8, 10, 12, 14],
+      "counts": [5, 5, 15, 15, 15, 15, 15, 15]
+    }
+  },
+  "api": {
+    "base_url": "https://api.deepseek.com",
+    "model": "deepseek-flash",
+    "reasoning_effort": "high",
+    "max_output_tokens": 64000,
+    "scoring_output_limit": 64000,
+    "timeout_seconds": 2400,
+    "concurrency": 16,
+    "max_service_retries": 3,
+    "max_total_service_retries": 60,
+    "service_retry_delay_seconds": 15
+  },
+  "comparison": "100 per task: retain the original 40 literal prompts and witnesses, add 60 distinct cases per task from the original task generators. Blocks use the original eight shapes and 12 construction placements, empty goal and actions-only output. Cube uses DBL-fixed QTM U/R/F quarter-turns and solved goal; retain five cases at depths 1 and 2, extend each original depth 4/6/8/10/12/14 to 15. Report paired original-40 results separately from new-60 and pooled-100; pooled depth weights differ from the old 40. One valid answer per case, no tools or intermediate feedback. No model-error or truncation resampling. 64k means 64,000 thinking plus final output tokens; also rescore at 8k/16k without claiming those are matched generation caps.",
+  "hypothesis": "A larger requested output budget may resolve failures previously censored by the 16k cap; success and persistent execution errors remain independent outcomes.",
+  "model_version_note": "Official model details checked 2026-10-19 label deepseek-flash as DeepSeek-V4.1-Flash-1017. Preserve returned identity, reasoning, usage and incomplete_details; do not infer backend identity from an alias alone.",
+  "references": ["https://api-docs.deepseek.com/quick_start/pricing/", "https://api-docs.deepseek.com/api/create-response/"]
+}

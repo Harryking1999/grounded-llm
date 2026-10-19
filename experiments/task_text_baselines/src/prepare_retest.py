@@ -12,6 +12,9 @@ from .difficulty import blocks_case, harder_prompt
 from .protocol import ROOT, judge
 from .run import write_json
 from .prepare import make_blocks
+from . import cube2
+from .protocol import prompt
+import numpy as np
 
 
 def retest_cases(config, source):
@@ -19,6 +22,46 @@ def retest_cases(config, source):
         raise ValueError('Retests use exactly one valid answer per question')
     if config['case_mode'] == 'copy_frozen':
         cases = deepcopy(source['cases'])
+    elif config['case_mode'] == 'extend_blocks_cube':
+        cases = deepcopy([c for c in source['cases'] if c['task'] in config['tasks']])
+        rng = random.Random(config['seed'])
+        for case in cases:
+            if case['prompt'] != prompt(case):
+                raise ValueError('Task text changed since the source suite was frozen')
+        for task, options in config['tasks'].items():
+            group = [c for c in cases if c['task'] == task]
+            seen = {c['initial'] for c in group}
+            if task == 'blocks':
+                remaining = options['total_cases'] - len(group)
+                while remaining > 0:
+                    for case in make_blocks(source['config']['tasks']['blocks'], remaining, rng):
+                        if case['initial'] in seen:
+                            continue
+                        seen.add(case['initial'])
+                        case['id'] = f'blocks_{len(seen)-1:02d}'
+                        case['prompt'] = prompt(case)
+                        cases.append(case)
+                        remaining -= 1
+            elif task == 'cube2':
+                env = cube2.environment()
+                # Reuse the original exact oracle; it remains outside model input.
+                env.depth = np.load(ROOT/config['cube_oracle'], allow_pickle=False)
+                if env.depth.shape != (env.size,) or env.depth.dtype != np.uint8 or env.depth.max() != env.diameter:
+                    raise ValueError('Invalid QTM oracle')
+                for depth, total in zip(options['distances'], options['counts'], strict=True):
+                    existing = sum(c['stratum'] == f'distance_{depth}' for c in group)
+                    pool = [int(s) for s in np.flatnonzero(env.depth == depth) if int(s) not in seen]
+                    for state in rng.sample(pool, total-existing):
+                        case = {'id':f'cube2_{len(seen):02d}', 'task':'cube2',
+                                'initial':state, 'goal':0, 'stratum':f'distance_{depth}',
+                                'reference':{'length':depth, 'actions':env.solve(state,0)}}
+                        seen.add(state)
+                        case['prompt'] = prompt(case)
+                        cases.append(case)
+            else:
+                raise ValueError(f'Unsupported extension task: {task}')
+            if len(seen) != options['total_cases']:
+                raise ValueError(f'Task count differs from the contract: {task}')
     elif config['case_mode'] == 'blocks_connected_actions':
         options = deepcopy(source['config']['blocks'])
         rules = BlocksTask(options)

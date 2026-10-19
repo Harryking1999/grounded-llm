@@ -1,32 +1,26 @@
 # 积木状态地图
 
-## 12块原形状多初盘完整图续训
+## 当前：12块原形状清空
 
-正式合同为 [blocks12_full_graph_joint.json](configs/blocks12_full_graph_joint.json)。
-`full_graph_run` 从已验收的 `986cb4d` 父权重与 Adam 状态继续训练，同一 Q 联合接收旧关系、
-1000个不同12次构造初盘的精确起终点关系、清空、不同步数后续和全部合法候选。
-Huber、原 soft-rank、温度与权重保持不变。BDD完整图复用现存数据，不能将1000根的
-root-local计数称为整个积木任务的全部状态。阶段记录与限制见
-[12块联合训练报告](results/blocks12_joint_report.md)。
+正式入口为[清空训练合同](configs/blocks12_clear_focus.json)、[固定1000题验收合同](configs/blocks12_clear_acceptance.json)及[精简报告](results/blocks12_joint_report.md)。采用权重见[任务selection](../../tasks/blocks/Qmap/selection.json)。正式完成须固定1000题≥900成功，原510题历史能力无明显退化；非空目标仅辅助，不作为清空晋级门槛。
+
+从当前最佳完整checkpoint／Adam／全部四rank采样器续训，同一Q联合接收10000训练初盘的精确清空距离、全部合法候选、完整父／后继分叉、广域历史及多步／地标关系。复用完整BDD／分量积图及清空索引；根内可查询覆盖、实际曝光和真实求解分开记录。保留原模型、Huber、soft-rank权重、学习率、Adam和纯贪心，仅沿用不可达19修正。
 
 ```bash
-python -m torch.distributed.run --standalone --nproc_per_node=2 \
+python -m torch.distributed.run --standalone --nproc_per_node=4 \
   -m experiments.blocks_distance_map.src.full_graph_run \
-  --config experiments/blocks_distance_map/configs/blocks12_full_graph_joint.json \
-  --out RUN --source-commit COMMIT
-python -m experiments.blocks_distance_map.src.full_graph_eval \
-  --config experiments/blocks_distance_map/configs/blocks12_full_graph_joint.json \
-  --checkpoint RUN/checkpoints/step_001000.pt --out RUN/evaluation/step_001000.json \
-  --source-commit COMMIT --device cpu
+  --config experiments/blocks_distance_map/configs/blocks12_clear_focus.json \
+  --out RUN --resume RESUME_CHECKPOINT --source-commit COMMIT
+python -m experiments.blocks_distance_map.src.blocks12_eval \
+  --config experiments/blocks_distance_map/configs/blocks12_clear_acceptance.json \
+  --checkpoint CHECKPOINT --out EVALUATION --source-commit COMMIT --device cpu
 ```
 
-每1000次更新保存checkpoint、匹配的各rank采样状态和曝光。实际曝光按距离桶、根和rank
-报告；非重复全对遍历只为直接Huber broad流提供精确计数，其余为draw数。
-`--resume RUN/checkpoints/step_001000.pt` 与相同 `--out RUN` 恢复模型、Adam及匹配采样状态。
-固定200个未进入训练的初盘共600题是反复查看的监测集；另记录100个训练初盘表现。
-候选仅在清空和中间目标均不低于父模型及此前选定候选时晋级，原父权重始终保留。
+`RESUME_CHECKPOINT`使用合同中的`continuation_checkpoint`，`RUN`包含匹配的全部rank采样器。每1000更新固定同题评测，比较810参照的新增／丢失、11步／12步清空和历史510；未超过当前最佳不替换，连续两档无净改善则调整采样。具体机器与活动路径只见忽略的[运行索引](../../runs/qmap_dual_20261018/current_qmap_runtime.json)。
 
-本目录维护冻结棋盘编码器 Q、精确裁判、地图监督和纯地图评测。最新对照实验采用补清空与长程关系后续训 15,000 步的 Q：`tree_continue_986cb4d/checkpoints/step_015000.pt`；相同 510 题独立贪心到达 397/510，旧版为 345/510。该对照和来源边界见 [结果报告](results/report.md)，接入 LLM 的新实验见 [map_sft_baselines](../map_sft_baselines/README.md)。
+## 历史协议与来源（不作为本轮验收口径）
+
+本目录维护冻结棋盘编码器 Q、精确裁判、地图监督和纯地图评测。历史对照实验采用补清空与长程关系后续训 15,000 步的 Q：`tree_continue_986cb4d/checkpoints/step_015000.pt`；相同 510 题独立贪心到达 397/510，旧版为 345/510。该对照和来源边界见 [结果报告](results/report.md)，接入 LLM 的新实验见 [map_sft_baselines](../map_sft_baselines/README.md)。
 
 # Blocks distance-supervised Q-map
 

@@ -15,6 +15,25 @@ from experiments.blocks_distance_map.src.oracle import DistanceOracle
 
 
 class BroadSamplingTest(unittest.TestCase):
+    def test_disjoint_root_batches_survive_epoch_boundaries_and_resume(self):
+        samplers = []
+        for rank in range(4):
+            data = object.__new__(BroadData)
+            data.options = {"boards_per_batch": 2, "rank_disjoint_roots": True}
+            data.roots, data.rank, data.world = list(range(20)), rank, 4
+            data.order, data.position = np.arange(20), 0
+            data.schedule_rng = np.random.default_rng(17)
+            data.phase_roots = np.zeros(20, dtype=bool)
+            samplers.append(data)
+        for _ in range(8):
+            batches = [s.boards() for s in samplers]
+            self.assertEqual(len(set(sum(batches, []))), 8)
+            self.assertTrue(all(s.position == samplers[0].position for s in samplers))
+            self.assertTrue(all(np.array_equal(s.order, samplers[0].order) for s in samplers))
+        self.assertTrue(np.logical_or.reduce([s.phase_roots for s in samplers]).all())
+        restored = copy.deepcopy(samplers[0])
+        self.assertEqual(restored.boards(), samplers[0].boards())
+
     def test_global_cardinality_deduplicates_shards_and_overlapping_roots(self):
         rng = np.random.default_rng(60)
         rows = rng.integers(1 << 60, size=(50000, 4), dtype=np.uint64)

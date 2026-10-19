@@ -178,7 +178,8 @@ class BroadData(JointData):
         goal = np.tile([g.zero_id for g, _ in root.parts], (count, 1))
         initial = np.asarray([g.initial_id for g, _ in root.parts], dtype=np.int64)
         initial_fork = (self.options.get("clear_initial_fork_first", False)
-                        and board % self.world == self.rank)
+                        and (self.options.get("rank_disjoint_roots", False)
+                             or board % self.world == self.rank))
         if ranking and initial_fork:
             # Roots share a schedule across ranks. One designated rank supplies
             # this full initial fork; other ranks retain their downstream forks.
@@ -619,7 +620,24 @@ class BroadData(JointData):
         return super().batch(pair_count, rank_count)
 
     def boards(self):
-        result = super().boards()
+        if not self.options.get("rank_disjoint_roots", False):
+            result = super().boards()
+        else:
+            count = self.options["boards_per_batch"] * self.world
+            if count > len(self.roots):
+                raise ValueError("Disjoint root batches exceed the available training roots")
+            # All ranks consume the same global root schedule, then take
+            # disjoint lanes. Pair/RNG cursors within each root remain intact.
+            selected = []
+            while len(selected) < count:
+                if self.position == len(self.order):
+                    order = self.schedule_rng.permutation(len(self.roots))
+                    repeated = np.isin(order, selected)
+                    self.order = np.concatenate((order[~repeated], order[repeated]))
+                    self.position = 0
+                selected.append(int(self.order[self.position]))
+                self.position += 1
+            result = selected[self.rank::self.world]
         self.phase_roots[result] = True
         return result
 

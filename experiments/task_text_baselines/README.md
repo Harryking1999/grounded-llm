@@ -2,9 +2,7 @@
 
 **结果只看[模型、设置与预算对照表](results/report.md)。**初始五任务、DeepSeek Flash 同题 200 题、旧积木复测、逐步状态、S/Z 八形状仅动作及完整十形状 100 题双模型对照均已完成。服务失败已补齐，定时跟进已暂停。此前加难探索均已停止，不再派题。
 
-用户追加的 DeepSeek 积木／二阶魔方各 **100 道新题**采用 [64k 合同](configs/deepseek_blocks_cube100_64k.json)，输出目录 `runs/deepseek_blocks_cube_fresh100_64k/`，排除历史及已取消混合题集中的状态。64k 为思考与答案共 64,000 token，保持原八形状十二次构造清空、二阶复原、一次完整计划和无工具条件。魔方沿用原距离层，因一转仅有一个未用状态，层权重有所调整，按层报告；本轮不构成旧题配对比较。误按旧 40＋新 60 准备的运行已取消，答卷不计入新结果，原合同可由提交 `ec55021` 追溯。
-
-本轮因 HTTP 402 余额不足停止，用户决定先保留当前结果：积木有效答卷 76 题、成功 74 题；魔方有效答卷 74 题、成功 16 题；尚缺 50 份有效答卷，不作为各 100 题的最终成绩。全部有效回显均为 Flash high。断点及模型核对见同一输出目录的 `progress.json`、`verification.json`、`model_audit.json`；未经用户新的继续指令不恢复请求。
+DeepSeek 积木／二阶魔方新题复测见 [64k 合同](configs/deepseek_blocks_cube100_64k.json)与[结果表](results/report.md)。原始答卷、进度与失败记录仅存 Git 外 `runs/deepseek_blocks_cube_fresh100_64k/`。
 
 ## 实验合同与答卷来源
 

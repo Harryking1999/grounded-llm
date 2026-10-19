@@ -23,4 +23,4 @@
 
 汉诺塔和魔方分别拥有训练、数据、模型适配与评测编排，不使用混合 `puzzle` 训练器作为当前入口。基础指标和批次采样放在 `grounded_llm/qmap_metrics.py`、`grounded_llm/qmap_sampling.py`；旧 `puzzle_qmap` 仅为历史复现与导入兼容保留。寻路采用同一分支新增的 `path_qmap` 实现，不回退旧 Q/V。
 
-`Qmap/selection.json` 记录已经采用的 checkpoint。`best` 必须同时说明选择标准与适用条件；魔方是用户指定的复原断点，不能称为任意目标最优地图。汉诺塔六盘历史权重不能用于声称已完成八盘。寻路新纯 Q 没有已核实的成功权重时保持空缺，不能用旧 Q/V 替代。
+`Qmap/selection.json` 记录已经采用的 checkpoint、选择标准与适用条件。魔方的复原断点不能称为任意目标最优地图；汉诺塔六盘历史权重不能用于八盘；寻路采用该任务 selection 中的纯 Q。新条件没有已核实权重时保持空缺，不能用旧任务或旧动作制权重替代。

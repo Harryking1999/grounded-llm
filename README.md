@@ -1,17 +1,27 @@
 # Grounded LLM with Cognitive Maps
 
-研究显式状态地图能否提升 LLM 的动作判断和连续任务完成。环境提供当前状态、合法候选与执行反馈；地图经 cross-attention 接入 LLM。
+研究显式状态地图能否改善 LLM 的动作判断和连续任务完成。当前环境提供状态、合法候选与执行反馈，地图通过 cross-attention 接入 LLM；研究范围与证据边界见[研究简述](docs/RESEARCH_BRIEF.md)。
 
-当前按寻路、积木、汉诺塔和魔方分别整理规则外壳、文字、数据和 Qmap，先针对任务独立训练与评测，再考虑泛化和合并。积木同数据多基线及 10k／7B 训练已有完整结果；下一步先统一任务文字、测试强基线并调试地图有效的条件。
+## 日常入口
 
-## 阅读入口
+- **现在做什么：**[项目状态与有序 TODO](docs/PROJECT_STATUS_AND_TODO.md)。
+- **某个任务怎么做、做到什么程度：**[五任务工作区与能力表](tasks/README.md)。
+- **代码在哪里、哪些可以复用：**[实验与实现索引](experiments/README.md)、[Qmap 方法](tasks/QMAP_METHOD.md)。
+- **规则与提示词：**[集中阅读副本](TASK_TEXTS.md)，原文在各任务 `prompts/`。
+- **远端怎么连接、产物在哪里：**[开发机手册](DEVELOPMENT_MACHINES.md)。
+- **协作方式：**[AGENTS.md](AGENTS.md)。
 
-1. [项目状态与有序 TODO](docs/PROJECT_STATUS_AND_TODO.md)：唯一项目进度页。
-2. [研究简述](docs/RESEARCH_BRIEF.md)：假设、定义与证伪边界。
-3. [按任务工作区](tasks/README.md)：每个任务的 Qmap、文字、数据与独立实现；[全部文字总览](TASK_TEXTS.md)方便集中查看。
-4. [积木多基线结果](experiments/map_sft_baselines/results/report.md)、[实验目录](experiments/README.md)：已有指标、正式配置与历史证据。
-5. [开发机手册](DEVELOPMENT_MACHINES.md)：连接、存储与迁移方法。
+## 目录职责
 
-文献和任务来源见 [Related Work](RELATED_WORK.md)、[GCML Tasks](docs/GCML_TASKS.md)。协作约定见 [AGENTS.md](AGENTS.md)。
+| 目录 | 内容 |
+|---|---|
+| `tasks/` | 五任务入口、提示原文、小型示例、所选地图来源 |
+| `experiments/` | 正式实现、配置、针对性检查和研究结果；按索引区分当前入口与历史依赖 |
+| `grounded_llm/` | 已复用的基础组件与早期 harness；不是所有新任务的统一训练器 |
+| `docs/` | 研究定义、唯一状态页、文献报告；`archive/` 与 `meetings/` 保留历史语境 |
+| `runs/`、`logs/`、`outputs/`、`tmp/` | Git 外的运行产物与临时工作，不作为当前指令来源 |
+| `data/`、`literature_review/` | Git 外的大型数据和文献工作材料 |
 
-全局文档不维护局部运行时间线。实验参数放在对应 `configs/`，结果在实验报告，原始数据、模型、日志、PID 和本机凭据留在 Git 外。
+当前进度只更新状态页，数值比较见任务能力表和实验结果；本页不维护第二份计划。历史记录按需查询，不需要从头读完才能工作。
+
+文献导航：[RELATED_WORK.md](RELATED_WORK.md)、[GCML 任务来源](docs/GCML_TASKS.md)。WorMI 有[详细精读](docs/WORMI_PAPER_READING_REPORT.md)和[分享稿](docs/WORMI_READING_REPORT.md)，用途不同，不是两份项目状态。

@@ -1,0 +1,22 @@
+{
+  "study": "blocks_distance_map",
+  "hypothesis": "Historical nonempty negatives cannot be classified as irrelevant from goal type alone; preserve original legacy sampling and narrow only newly expanded auxiliary supervision",
+  "base_config": "experiments/blocks_distance_map/configs/blocks12_decision_margins.json",
+  "parent": "retained889_complete_Adam_and_four_sampler_states",
+  "comparison": "Original shared16 at1000=883/425; broad domain at1000=861/274. Same889, full Adam, batch and update budget; restore only original historical negative distribution versus the failed broad-domain condition.",
+  "sampling_overrides": {
+    "clear_supervision_domain": true,
+    "legacy_nonempty_negative_fraction": null
+  },
+  "scope": "Keep all original25% historical stream strata, including finite and unreachable training relations. Only expanded-root broad targets and small clearing-path landmarks use reachable descendants. Preserve every clearing action/candidate, exact finite labels, negative19,10-12 layers and reachable branch followups. No benchmark cases or failures enter training.",
+  "unchanged": ["encoder", "directed_sum", "Huber", "soft_rank", "loss_weights", "temperature", "learning_rate0.0003", "Adam", "unreachable19", "global_batch65536", "rank_contexts8192", "shared16_root_schedule", "pure_greedy"],
+  "minimum_updates_per_condition": 1000,
+  "evaluation_every_updates": 1000,
+  "maximum_initial_updates": 2000,
+  "stop_after_consecutive_complete_windows_without_joint_improvement": 2,
+  "stop_on_severe_historical_regression": true,
+  "formal_minimum_success": 900,
+  "historical_floor": 421,
+  "resources": {"host": "grounded-028", "allowed_gpus": [4, 5, 6, 7], "world_size": 4},
+  "dynamic_labels_and_metric_changes": "offline_analysis_only_not_authorized_for_training"
+}

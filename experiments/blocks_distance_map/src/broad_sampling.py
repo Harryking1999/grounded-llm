@@ -170,6 +170,13 @@ class BroadData(JointData):
             remaining -= choice
         assert np.all(remaining == 0)
         goal = np.tile([g.zero_id for g, _ in root.parts], (count, 1))
+        initial = np.asarray([g.initial_id for g, _ in root.parts], dtype=np.int64)
+        initial_fork = (self.options.get("clear_initial_fork_first", False)
+                        and board % self.world == self.rank)
+        if ranking and initial_fork:
+            # Roots share a schedule across ranks. One designated rank supplies
+            # this full initial fork; other ranks retain their downstream forks.
+            source[0] = initial
         if not ranking and self.options.get("clear_fork_huber_fraction", 0):
             budget = int(count * self.options["clear_fork_huber_fraction"])
             # Complete forks also enter the existing distance Huber, including
@@ -180,8 +187,7 @@ class BroadData(JointData):
             self.rng.shuffle(deep); self.rng.shuffle(other)
             order = list(deep) + list(other)
             anchors = anchors[order]
-            initial = np.asarray([g.initial_id for g, _ in root.parts], dtype=np.int64)
-            if self.options.get("clear_initial_fork_first", False):
+            if initial_fork:
                 # Unique distance-layer sampling can dilute the actual start
                 # among many other deep states. Give each training root its
                 # complete first fork while retaining downstream groups below.

@@ -142,6 +142,19 @@ class BroadSamplingTest(unittest.TestCase):
             np.testing.assert_array_equal(batch[2], [oracle.distance(int(a[0]), int(b[0]))
                                                     for a, b in zip(batch[0], batch[1])])
             anchored.close()
+            # Four ranks visit the same root together. Supply its first fork
+            # once, retaining the other ranks' distinct downstream supervision.
+            for rank in range(4):
+                sharded = BroadData(path, path / "legacy.npz", anchored.options, rank, 4)
+                source, _ = sharded.clear_rows(0, 512, False)
+                packed = set(map(int, sharded.roots[0].packed(source)[:, 0]))
+                self.assertEqual(initial in packed, rank == 0)
+                source, _ = sharded.clear_rows(0, 64, True)
+                root_ids = np.asarray([g.initial_id for g, _ in sharded.roots[0].parts])
+                self.assertEqual(bool((source == root_ids).all(-1).any()), rank == 0)
+                if rank == 0:
+                    self.assertTrue({child for _, child in successors(initial)}.issubset(packed))
+                sharded.close()
             # Two independent identical components double every finite exact
             # distance, providing historical short AND6--10-step relations.
             old_rows = np.asarray(rows + [[int(graph.initial_id), int(graph.zero_id),

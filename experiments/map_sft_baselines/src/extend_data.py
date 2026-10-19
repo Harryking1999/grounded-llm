@@ -28,17 +28,11 @@ def heldout_pairs(source_manifest,references):
     return excluded
 
 
-def choose_length_matched(candidates,original):
-    quotas=Counter(row['shortest_moves'] for row in original if row['shortest_moves'])
-    groups=defaultdict(list)
-    for row in candidates:groups[row['shortest_moves']].append(row)
-    if any(len(groups[length])<quota for length,quota in quotas.items()):return None
+def select_additional(candidates,original,rng):
+    quota=sum(bool(row['shortest_moves']) for row in original)
+    if len(candidates)<quota:return None
     seen={(int(s),int(g)) for row in original for s,g in row['pairs']}
-    selected=[]
-    # Match each source board's complete length histogram, not just its mean.
-    for length,quota in sorted(quotas.items(),reverse=True):
-        selected.extend(choose(groups[length],quota,seen,np.random.default_rng(0)))
-    return selected
+    return choose(candidates,quota,seen,rng,prior=[row for row in original if row['shortest_moves']])
 
 
 def initialize(config,source,out,model_path,excluded,initial_pairs,terminal_states):
@@ -56,7 +50,6 @@ def board_worker(job):
     row,mask,reference=board;board=(row,int(mask),reference)
     rng=np.random.default_rng(CFG['seed']+int(row));q=CachedMap(QMAP)
     oracle=DistanceOracle(cache_limit=CFG['data']['oracle_cache_limit'],seconds=CFG['data']['oracle_seconds_per_board'])
-    lengths={r['shortest_moves'] for r in original if r['shortest_moves']}
     paths=sample_paths(board,0,rng);evaluated=set();candidates=[];unknown=0;began=time.monotonic();selected=None
     for number in CFG['data']['random_routes']:
         previous=len(paths)-1
@@ -66,7 +59,7 @@ def board_worker(job):
             evaluated.add((start,goal))
             try:d=oracle.distance(start,goal)
             except OracleBudgetExceeded:unknown+=1;continue
-            if d not in lengths:continue
+            if d<CFG['data']['minimum_shortest_moves']:continue
             state=start;route=[];visited=[]
             for index in range(d):
                 if (state,goal) in EXCLUDED:break
@@ -80,10 +73,10 @@ def board_worker(job):
             if state==goal and len(route)==d:
                 candidates.append(dict(start=str(start),goal=str(goal),shortest_moves=d,
                     route_ids=route,pairs=visited,board_row=int(row)))
-        selected=choose_length_matched(candidates,original)
+        selected=select_additional(candidates,original,rng)
         if selected is not None:break
     if selected is None:
-        raise ValueError(f'Board {row}: insufficient new certified routes with the original length quotas')
+        raise ValueError(f'Board {row}: insufficient new certified routes under the DESIGN sampling limit')
     terminal_candidates=sorted({s for r in selected for s,g in r['pairs'][1:]
                                 if s not in TERMINAL and (s,s) not in EXCLUDED},
                                key=lambda state:(-state.bit_count(),state))

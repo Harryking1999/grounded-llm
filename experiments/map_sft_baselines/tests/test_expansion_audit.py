@@ -4,7 +4,7 @@ import unittest
 
 from experiments.map_sft_baselines.src.contract import training_steps,checkpoint_steps
 from experiments.map_sft_baselines.src.train import learning_rate_factor
-from experiments.map_sft_baselines.src.extend_data import choose_length_matched,heldout_pairs
+from experiments.map_sft_baselines.src.extend_data import select_additional
 from experiments.map_sft_baselines.src.leakage_audit import audit_exposure
 
 
@@ -18,13 +18,14 @@ class ExpansionAuditTests(unittest.TestCase):
         for step in (0,1,7500,12500,50000,150000,250000):
             self.assertEqual(learning_rate_factor(step,250000,new['training']),learning_rate_factor(step,250000,old['training']))
 
-    def test_extra_routes_match_per_board_length_counts_and_add_coverage(self):
+    def test_extra_routes_follow_design_length_before_coverage(self):
+        import random
         def row(state,length):return dict(start=str(state),goal='0',shortest_moves=length,pairs=[(state,0)])
         old=[row(1,6),row(2,7)]
         pool=[row(1,6),row(3,6),row(4,7),row(5,8)]
-        selected=choose_length_matched(pool,old)
-        self.assertEqual({r['start'] for r in selected},{'3','4'})
-        self.assertIsNone(choose_length_matched([row(3,6)],old))
+        selected=select_additional(pool,old,random.Random(0))
+        self.assertEqual({r['start'] for r in selected},{'5','4'})
+        self.assertIsNone(select_additional([row(3,6)],old,random.Random(0)))
 
     def test_audit_distinguishes_direct_pair_candidate_slot_and_board_overlap(self):
         from experiments.gcml_counterexamples.src import blocks as rules

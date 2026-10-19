@@ -35,8 +35,10 @@ def init_worker(config,q_path,model_path,excluded,out):
 def goal_bucket(goal):
     return 0 if not goal else 1 if goal.bit_count()<=2 else 2 if goal.bit_count()<=4 else 3
 
-def choose(candidates,quota,seen,rng):
+def choose(candidates,quota,seen,rng,prior=()):
     selected=[];starts=Counter();sizes=Counter();goals=Counter()
+    for row in prior:
+        starts[row['start']]+=1;sizes[goal_bucket(int(row['goal']))]+=1;goals[row['goal']]+=1
     pool=list(candidates)
     while pool and len(selected)<quota:
         length=max(r['shortest_moves'] for r in pool)

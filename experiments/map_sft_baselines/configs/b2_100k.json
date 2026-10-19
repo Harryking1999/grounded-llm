@@ -11,14 +11,13 @@
     "random_routes": [
       128,
       256,
-      512,
-      1024
+      512
     ],
     "coverage_target": 292758,
     "coverage_per_board_target": 293,
     "oracle_cache_limit": 2000000,
     "oracle_seconds_per_board": 600,
-    "selection": "inherit_50k_add_length_matched_certified_routes",
+    "selection": "inherit_50k_then_longest_new_coverage_start_goal_diversity",
     "numbering": "shape_id_row_col_sorted",
     "terminal_per_board": 2
   },
@@ -106,8 +105,8 @@
     "per_board": 100,
     "terminal_samples": 2000,
     "inherit_all_source_routes": true,
-    "additional_nonterminal_length_histogram": "match_original_per_board",
     "additional_terminal": "new_intermediate_training_state_equal_to_goal",
-    "exclude": "all_source_validation_and_test_initial_and_reference_pairs"
+    "exclude": "all_source_validation_and_test_initial_and_reference_pairs",
+    "additional_selection": "DESIGN length then novel state-goal coverage then start and goal diversity; no length quotas"
   }
 }

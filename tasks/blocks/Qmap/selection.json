@@ -16,21 +16,21 @@
   },
   "clear_evaluation_config": "experiments/blocks_distance_map/configs/blocks12_clear_acceptance.json",
   "status": "selected_clearing_candidate_not_completed",
-  "checkpoint": "checkpoints/clear_forks_3000_f9a1086.pt",
-  "source_commit": "f9a1086",
-  "source_run": "runs/qmap_dual_20261018/blocks12/clear_forks_028_3000/run",
-  "source_checkpoint": "checkpoints/step_003000.pt",
+  "checkpoint": "checkpoints/clear_forks_4000_e127e8f.pt",
+  "source_commit": "e127e8f",
+  "source_run": "runs/qmap_dual_20261018/blocks12/clear_forks_028_4000/run",
+  "source_checkpoint": "checkpoints/step_004000.pt",
   "selection": "higher_clear1000_with_historical510_retained",
   "config": "experiments/blocks_distance_map/configs/blocks12_clear_focus.json",
-  "config_source_commit": "f9a1086",
-  "runtime_config": "runs/qmap_dual_20261018/blocks12/clear_forks_028_3000/run/continuation_003000.json",
-  "evidence": "runs/qmap_dual_20261018/blocks12/clear_forks_028_3000/evaluation/step_003000/results.json",
-  "clear_evidence": "runs/qmap_dual_20261018/blocks12/clear_forks_028_3000/evaluation/step_003000/results.json",
+  "config_source_commit": "e127e8f",
+  "runtime_config": "runs/qmap_dual_20261018/blocks12/clear_forks_028_4000/run/continuation_004000.json",
+  "evidence": "runs/qmap_dual_20261018/blocks12/clear_forks_028_4000/evaluation/step_004000/results.json",
+  "clear_evidence": "runs/qmap_dual_20261018/blocks12/clear_forks_028_4000/evaluation/step_004000/results.json",
   "metrics": {
     "clear": {
-      "success": 840,
+      "success": 880,
       "count": 1000,
-      "success_rate": 0.84,
+      "success_rate": 0.88,
       "distance_bins": {
         "11": {
           "count": 81,
@@ -38,24 +38,24 @@
         },
         "12": {
           "count": 919,
-          "success": 765
+          "success": 805
         }
       },
       "matched_810_reference": {
         "old_success": 810,
-        "new_success": 840,
-        "lost": 89,
-        "gained": 119
+        "new_success": 880,
+        "lost": 62,
+        "gained": 132
       }
     },
     "historical_510": {
-      "success": 435,
+      "success": 429,
       "count": 510,
-      "lost_vs810": 28,
-      "gained_vs810": 39
+      "lost_vs810": 44,
+      "gained_vs810": 49
     }
   },
-  "limitations": "NOT COMPLETE:840/1000 below required900;89 old successes lost/119 gained vs810. Historical435/510 retained, no new text40 or near-clear results. Independent final unseen evaluation pending.",
+  "limitations": "NOT COMPLETE:880/1000 below required900; vs810 lost62/gained132, vs840 lost47/gained87. Historical429/510 vs prior435 and original421. No new text40 or near-clear score. Independent final unseen evaluation pending.",
   "protected_earlier_selection": {
     "checkpoint": "checkpoints/structured_1000_ffba71f.pt",
     "source_commit": "ffba71f",
@@ -64,11 +64,11 @@
     "evidence": "runs/qmap_dual_20261018/blocks12/clear_retest/results.json"
   },
   "previous_selected": {
-    "checkpoint": "checkpoints/clear_forks_2000_3f5477c.pt",
-    "source_commit": "3f5477c",
-    "clear1000": 835,
-    "historical510": 424,
-    "evidence": "runs/qmap_dual_20261018/blocks12/clear_forks_028_2000/evaluation/step_002000/compared_with_810.json"
+    "checkpoint": "checkpoints/clear_forks_3000_f9a1086.pt",
+    "source_commit": "f9a1086",
+    "clear1000": 840,
+    "historical510": 435,
+    "evidence": "runs/qmap_dual_20261018/blocks12/clear_forks_028_3000/evaluation/step_003000/results.json"
   },
   "acceptance": {
     "minimum_clear_success": 900,

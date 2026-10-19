@@ -1,0 +1,21 @@
+{
+  "study": "blocks_distance_map",
+  "hypothesis": "Reduce irrelevant incompatible reverse/nonempty Huber constraints while preserving every clearing fork, exact finite label and original losses",
+  "base_config": "experiments/blocks_distance_map/configs/blocks12_decision_margins.json",
+  "parent": "retained889_complete_Adam_and_four_sampler_states",
+  "comparison": "Original shared16 margins control completed to1000 from the same889 parent; no300-step stopping",
+  "sampling_overrides": {
+    "clear_supervision_domain": true,
+    "legacy_nonempty_negative_fraction": 0.1
+  },
+  "unchanged": ["model", "encoder", "finite_exact_labels", "unreachable19", "Huber", "soft_rank", "loss_weights", "temperature", "learning_rate", "Adam", "global_batch65536", "rank_contexts8192", "four_shared_root_streams", "full_legal_candidates", "pure_greedy", "fixed_cases_and_budget"],
+  "scope": "Same10000 complete training graphs. All clearing candidates including dead exits retained; historical negative nonempty point rows above10% resampled to exact finite historical strata; broad targets sampled among legal descendants; small path landmark groups use common reachable descendants. No fixed benchmark failures used for training.",
+  "minimum_updates_per_condition": 1000,
+  "evaluation_every_updates": 1000,
+  "maximum_initial_updates": 2000,
+  "stop_after_consecutive_complete_windows_without_joint_improvement": 2,
+  "formal_minimum_success": 900,
+  "historical_floor": 421,
+  "resources": {"host": "grounded-028", "allowed_gpus": [4, 5, 6, 7], "world_size": 4},
+  "dynamic_unreachable_labels": "offline_analysis_only_no_training_change"
+}

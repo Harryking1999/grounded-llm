@@ -253,6 +253,34 @@ class BroadSamplingTest(unittest.TestCase):
             landmarks.record_update(batch, np.ones(len(batch[2]), bool), np.ones(len(batch[5]), bool))
             self.assertGreater(landmarks.phase_sketches["clear_path_landmark_huber_groups"].estimate(), 0)
             landmarks.close()
+            domain = BroadData(path, path / "legacy.npz", {**tree.options,
+                "clear_path_landmarks": True, "clear_supervision_domain": True,
+                "legacy_nonempty_negative_fraction": .1})
+            batch = domain.batch(2048, 128)
+            for source, goal, truth in ((batch[0], batch[1], batch[2]), (batch[3], batch[4], batch[5])):
+                np.testing.assert_array_equal(truth, [oracle.distance(int(s[0]), int(g[0]))
+                                                     for s, g in zip(source, goal)])
+            legacy_count = round(2048 * domain.options["legacy_fraction"])
+            bad_history = ((batch[2][:legacy_count] < 0) &
+                           batch[1][:legacy_count].any(-1)).sum()
+            self.assertLessEqual(bad_history, round(legacy_count * .1))
+            for pairs, _ in domain._pending_clear_landmarks:
+                self.assertTrue(all(oracle.distance(int(s), int(g)) >= 0
+                                    for s, g in zip(pairs[:, 0], pairs[:, 2])))
+            source, goal = domain.broad_rows(0, 64)
+            root = domain.roots[0]
+            self.assertTrue((root.distance_parts(source, goal) >= 0).all())
+            stars = domain.stars(root, source, goal)
+            degrees = sum(g.degrees(source[:, i]) for i, (g, _) in enumerate(root.parts))
+            np.testing.assert_array_equal(np.bincount(stars[-1], minlength=len(source)), degrees)
+            # Complete clearing decisions still include genuinely dead exits.
+            self.assertTrue((batch[2][domain.last_huber_decision_mask] < 0).any())
+            saved = copy.deepcopy(domain.state_dict())
+            replay = BroadData(path, path / "legacy.npz", domain.options)
+            replay.load_state_dict(saved)
+            for a, b in zip(domain.batch(2048, 128), replay.batch(2048, 128)):
+                np.testing.assert_array_equal(a, b)
+            domain.close(); replay.close()
             # Two independent identical components double every finite exact
             # distance, providing historical short AND6--10-step relations.
             old_rows = np.asarray(rows + [[int(graph.initial_id), int(graph.zero_id),

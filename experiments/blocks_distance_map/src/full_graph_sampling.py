@@ -215,6 +215,7 @@ class JointData:
             ids = np.asarray(ids, dtype=np.int64)
             slots = self.rng.choice(legacy_pair, focused, replace=False)
             ids[slots] = self.rng.choice(self.legacy_long_pairs, focused)
+        ids = self.legacy_pair_ids(np.asarray(ids, dtype=np.int64))
         old = self.legacy_rows[ids]
         sources, goals, labels = [self.legacy_masks[old[:, 0]]], [self.legacy_masks[old[:, 1]]], [old[:, 2]]
         group = self.legacy_groups[self.rng.integers(len(self.legacy_groups), size=legacy_rank)]
@@ -258,6 +259,10 @@ class JointData:
         return (np.concatenate(sources), np.concatenate(goals), pair_truth,
                 np.concatenate(rank_sources), np.concatenate(rank_goals), rank_truth,
                 np.concatenate(rank_groups))
+
+    def legacy_pair_ids(self, ids):
+        """Optional context resampling; the original stream consumes no new RNG."""
+        return ids
 
     def state_dict(self):
         return {"rng": self.rng.bit_generator.state, "schedule_rng": self.schedule_rng.bit_generator.state,

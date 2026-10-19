@@ -164,6 +164,38 @@ class BroadData(JointData):
         for key, count in distance_histogram(values).items():
             target[key] = target.get(key, 0) + count
 
+    def legacy_pair_ids(self, ids):
+        limit = self.options.get("legacy_nonempty_negative_fraction")
+        if limit is None:
+            return ids
+        if not 0 <= limit <= 1:
+            raise ValueError("Historical nonempty-negative sampling fraction must be in [0,1]")
+        old = self.legacy_rows[ids]
+        nonempty = self.legacy_masks[old[:, 1]].any(-1)
+        slots = np.flatnonzero((old[:, 2] < 0) & nonempty)
+        replace = self.rng.permutation(slots)[round(len(ids) * limit):]
+        if not len(replace):
+            return ids
+        finite = [pool for pool, _ in self.legacy_strata if (self.legacy_rows[pool, 2] >= 0).all()]
+        if len(replace) and not finite:
+            raise ValueError("Finite historical relations are required for supervision-domain sampling")
+        # Preserve every selected clearing negative. Only unrelated nonempty
+        # negative point rows are resampled, with exact finite historical labels.
+        for selected, pool in zip(np.array_split(replace, len(finite)), finite):
+            ids[selected] = self.rng.choice(pool, len(selected))
+        return ids
+
+    def broad_rows(self, board, count, ranking=False):
+        source, goal = super().broad_rows(board, count, ranking)
+        if count and self.options.get("clear_supervision_domain", False):
+            root = self.roots[board]
+            # Retain arbitrary intermediate starts alongside full-root starts;
+            # targets are legal descendants, not unrelated reverse negatives.
+            source[::2] = [g.initial_id for g, _ in root.parts]
+            steps = 1 + (np.arange(count) + int(self.rng.integers(12))) % 12
+            goal = root.advance(source, self.rng, steps)
+        return source, goal
+
     def clear_rows(self, board, count, ranking=False):
         if self.clear_indexes is None:
             result = super().clear_rows(board, count, ranking)
@@ -532,6 +564,15 @@ class BroadData(JointData):
                 paths.append(path)
             starts = [state] + [path[1] for path in paths]
             landmarks = [path[int(self.rng.integers(1, len(path) - 1))] for path in paths]
+            if self.options.get("clear_supervision_domain", False):
+                # Shared descendants of all branches form genuine merge
+                # landmarks. Construction tiles certify reachability; no
+                # candidate is removed from the subsequent complete forks.
+                common = [tiles[i] for i in remaining
+                          if all(start & tiles[i] == tiles[i] for start in starts)]
+                order = self.rng.permutation(len(common))
+                landmarks = [sum(common[int(i)] for i in order[:keep])
+                             for keep in np.linspace(0, len(common), 4, dtype=int)[1:]]
             group_rows = [(start, goal) for start in starts for goal in landmarks]
             # A small auxiliary quota may contain less than twelve rows. Avoid
             # repeatedly selecting only the first source/goal roles on truncation.

@@ -207,7 +207,9 @@ def prepare(config, out):
             catalog[(width, tuple(tiles))] = len(specs)
             specs.append((width, tiles))
         for i in range(len(specs)):
-            reused[i] = json.loads((reuse / "graphs" / str(i) / "summary.json").read_text())
+            summary_path = reuse / "graphs" / str(i) / "summary.json"
+            if summary_path.exists() or not config.get("rebuild_missing_components", False):
+                reused[i] = json.loads(summary_path.read_text())
     for record in candidates:
         if record["initial"] in excluded:
             continue
@@ -226,6 +228,11 @@ def prepare(config, out):
         raise ValueError("Insufficient distinct training roots")
     if previous_roots and roots[:len(previous_roots)] != previous_roots:
         raise ValueError("Expansion must preserve the exact previous root/index prefix")
+    if config.get("forbidden_roots"):
+        frozen = json.loads(Path(config["forbidden_roots"]).read_text())
+        heldout = {int(r["source"]) for r in frozen["cases"]}
+        if any(int(r["initial"]) in heldout for r in roots):
+            raise ValueError("Fixed clearing benchmark roots must not enter training")
     action_counts = [sum(int(r["initial"]) & tile == tile for r in roots)
                      for tile, _ in blocks.PLACEMENTS]
     if not all(action_counts):

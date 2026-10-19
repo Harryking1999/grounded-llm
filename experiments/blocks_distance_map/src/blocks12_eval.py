@@ -60,6 +60,8 @@ def trace(scorer, source, goal, oracle):
 
 
 def run(config, checkpoint, out, source_commit, device):
+    if config.get("mode") == "frozen_clear":
+        return frozen_clear(config, checkpoint, out, source_commit, device)
     if config.get("mode") == "clear_sets":
         return clear_sets(config, checkpoint, out, source_commit, device)
     out.mkdir(parents=True, exist_ok=False)
@@ -159,6 +161,63 @@ def clear_sets(config, checkpoint, out, source_commit, device):
     result["new_seed_aggregate"] = {"count": sum(g["count"] for g in generated),
                                   "success": sum(g["success"] for g in generated)}
     (out / "results.json").write_text(json.dumps(result, indent=2) + "\n")
+    return result
+
+
+def frozen_clear(config, checkpoint, out, source_commit, device):
+    """Replay the fixed clearing benchmark without an oracle in execution."""
+    cases = json.loads(Path(config["cases"]).read_text())["cases"]
+    if (len(cases) != config["case_count"] or len({c["source"] for c in cases}) != len(cases)
+            or len({c["id"] for c in cases}) != len(cases)
+            or any(int(c["goal"]) != 0 for c in cases)):
+        raise ValueError("Fixed clearing benchmark identity/count/goal mismatch")
+    scorer = QScorer(checkpoint, device)
+    rows = []
+    for case in cases:
+        state, moves = int(case["source"]), 0
+        budget = state.bit_count() // 2
+        while state and moves < budget:
+            candidates = successors(state)
+            if not candidates:
+                break
+            choice = int(np.argmin(scorer.scores([child for _, child in candidates], 0)))
+            state = candidates[choice][1]
+            moves += 1
+        rows.append({**case, "moves": moves, "outcome": "reached" if state == 0 else "no_candidate",
+                     "final_state": str(state)})
+    result = {"source_commit": source_commit, "checkpoint": str(checkpoint),
+              "model_identity": scorer.identity, "cases": config["cases"], "count": len(rows),
+              "success": sum(r["outcome"] == "reached" for r in rows),
+              "policy": "original_argmin_all_legal_successors_goal0_no_search_no_oracle",
+              "rows": rows}
+    reference_path = config.get("reference_results")
+    if reference_path:
+        reference = json.loads(Path(reference_path).read_text())
+        old = reference.get("rows")
+        if old is None:
+            old = [r for name, group in reference["groups"].items()
+                   if name.startswith("seed_") for r in group["rows"]]
+        if [(r["id"], r["source"], r["goal"]) for r in old] != [
+                (r["id"], r["source"], r["goal"]) for r in rows]:
+            raise ValueError("Reference results must contain the identical ordered1000 cases")
+        before = np.asarray([r["outcome"] == "reached" for r in old])
+        after = np.asarray([r["outcome"] == "reached" for r in rows])
+        result["matched_reference"] = {"old_success": int(before.sum()),
+            "new_success": int(after.sum()), "lost": int((before & ~after).sum()),
+            "gained": int((~before & after).sum())}
+    result["distance_bins"] = {}
+    for distance in sorted({r["true_distance"] for r in rows}):
+        subset = [r for r in rows if r["true_distance"] == distance]
+        result["distance_bins"][str(distance)] = {"count": len(subset),
+            "success": sum(r["outcome"] == "reached" for r in subset)}
+    if config.get("historical_510_manifest"):
+        from .full_graph_eval import historical_retention
+        result["historical_510"] = historical_retention(config["historical_510_manifest"], checkpoint,
+                                                       config.get("historical_510_reference"))
+    out.mkdir(parents=True, exist_ok=False)
+    (out / "config.json").write_text(json.dumps(config, indent=2) + "\n")
+    (out / "results.json").write_text(json.dumps(result, indent=2) + "\n")
+    print(json.dumps({k: v for k, v in result.items() if k not in ("rows", "historical_510")}), flush=True)
     return result
 
 

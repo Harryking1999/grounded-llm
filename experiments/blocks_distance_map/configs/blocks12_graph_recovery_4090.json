@@ -1,0 +1,18 @@
+{
+  "study": "blocks_distance_map",
+  "condition": "twelve_nonoverlapping_construction_placements_original_eight_shapes_10x10",
+  "coverage": "Recover the SAME10000 roots/component IDs from preserved5000 metadata and original generator seed; exact compressed components only. Original platform data currently inaccessible, no alternate smaller graph or new random pool. Reuse any complete component available.",
+  "train_boards": 10000,
+  "seed": 2026101841,
+  "evaluation_boards": 200,
+  "evaluation_seed": 2026101835,
+  "workers": 4,
+  "representation": "symbolic_complete_BFS_component_products",
+  "dependency": "dd==0.6.0 (CUDD for preparation only; numpy for training lookup)",
+  "maximum_diagram_nodes": 2000000,
+  "limit_policy": "fail_and_report_incomplete_no_truncation_no_false_unreachable_labels",
+  "actual_training": "broad_sampling_recorded_separately_from_complete_available_representation",
+  "reuse_graph_data": "data/blocks12_graph_metadata_5000",
+  "rebuild_missing_components": true,
+  "forbidden_roots": "tasks/blocks/data/clear1000.json"
+}

@@ -9,9 +9,9 @@
     "seed": 2026101851,
     "learning_rate": 0.0003,
     "steps": 1000,
-    "batch_size_per_rank": 32768,
-    "rank_contexts_per_rank": 4096,
-    "boards_per_batch": 16,
+    "batch_size_per_rank": 65536,
+    "rank_contexts_per_rank": 8192,
+    "boards_per_batch": 32,
     "legacy_fraction": 0.25,
     "broad_fraction": 0.1,
     "clear_fraction": 0.7,
@@ -72,7 +72,8 @@
       18
     ],
     "branch_bundle_fraction": 0.5,
-    "exact_layer_fraction": 0.5
+    "exact_layer_fraction": 0.5,
+    "sampler_shards": 2
   },
   "evaluation": {
     "acceptance_config": "experiments/blocks_distance_map/configs/blocks12_clear_acceptance.json",
@@ -84,7 +85,7 @@
     "never_train_test_failures": true
   },
   "policy": "unchanged_greedy_all_legal_successors_no_search_no_oracle_action_selection",
-  "rationale": "Concentrate the unchanged original losses on clearing:25% legal historical replay; remaining75% consists of70% clearing,10% broad pairs and20% grouped landmark/full-fork continuations. Exact clearing-distance layers span intermediate starts, with every legal successor including traps retained. Reuse10000 exact root graphs/indexes. Continue user-selectedffba71f full Adam and both sampler states; preserve selected inference weight. One1000-update feedback window, same fixed1000 clearing tasks plus separate historical510. Wait for two idle permitted4090 cards; GPU0 reserved. No arbitrary-nonempty acceptance threshold. Legal historical replay reuses archived original132f5a1 training split; later extended legacy pool currently unavailable with platform SSH. No held-out rows are added.",
+  "rationale": "Concentrate the unchanged original losses on clearing:25% legal historical replay; remaining75% consists of70% clearing,10% broad pairs and20% grouped landmark/full-fork continuations. Exact clearing-distance layers span intermediate starts, with every legal successor including traps retained. Reuse10000 exact root graphs/indexes. Continue user-selectedffba71f full Adam and both sampler states; preserve selected inference weight. One1000-update feedback window, same fixed1000 clearing tasks plus separate historical510. Use one idle permitted4090 card, alternating both retained sampler shards at the same global batch65536/ranking8192; GPU0 reserved. No arbitrary-nonempty acceptance threshold. Legal historical replay reuses archived original132f5a1 training split; later extended legacy pool currently unavailable with platform SSH. No held-out rows are added.",
   "resources": {
     "host": "grounded-4090",
     "allowed_gpu_indices": [
@@ -96,7 +97,7 @@
     "reserved_gpu_indices": [
       0
     ],
-    "world_size": 2,
+    "world_size": 1,
     "start_only_when_idle": true
   }
 }

@@ -68,7 +68,13 @@ def run(config, out, source_commit, smoke_steps=None, resume=None):
     model = DistributedDataParallel(raw, device_ids=[local]) if world > 1 else raw
     sampler_type = (BroadData if options.get("expanded_stream") else
                     FailureData if "failure_diagnosis" in options else JointData)
-    sampler = sampler_type(config["graph_data"], config["legacy_data"], options, rank, world)
+    sampler_world = int(options.get("sampler_shards", world))
+    if world > 1 and sampler_world != world:
+        raise ValueError("Distributed sampler shards must match the process count")
+    shard_ids = list(range(sampler_world)) if world == 1 else [rank]
+    samplers = [sampler_type(config["graph_data"], config["legacy_data"], options, shard, sampler_world)
+                for shard in shard_ids]
+    sampler = samplers[0]
     out = Path(out)
     first_step = 0
     if resume is not None:
@@ -76,8 +82,9 @@ def run(config, out, source_commit, smoke_steps=None, resume=None):
         first_step = restored["continuation_step"]
         raw.load_state_dict(restored["model"])
         optimizer.load_state_dict(restored["optimizer"])
-        sampler.load_state_dict(torch.load(out / f"sampler_{first_step:06d}_rank{rank}.pt",
-                                          map_location="cpu", weights_only=False))
+        for shard, sampler in zip(shard_ids, samplers):
+            sampler.load_state_dict(torch.load(out / f"sampler_{first_step:06d}_rank{shard}.pt",
+                                              map_location="cpu", weights_only=False))
     if rank == 0:
         if resume is None:
             out.mkdir(parents=True, exist_ok=False)
@@ -89,6 +96,9 @@ def run(config, out, source_commit, smoke_steps=None, resume=None):
     started = time.monotonic()
     last = smoke_steps or options["steps"]
     for step in range(first_step + 1, last + 1):
+        # A single idle GPU can alternate both retained distributed data streams.
+        # Each update still uses the original Huber+soft-rank on one full batch.
+        sampler = samplers[(step - 1) % len(samplers)]
         begin = time.monotonic()
         arrays = sampler.batch(options["batch_size_per_rank"], options["rank_contexts_per_rank"])
         bits, pairs, truth, rt, order, slots, shape = relation_batch(
@@ -134,15 +144,17 @@ def run(config, out, source_commit, smoke_steps=None, resume=None):
         if step % options["checkpoint_every"] == 0 or step == last:
             # Sampler states stay separate so NumPy RNG metadata never enters
             # inference checkpoints loaded by the existing weights-only reader.
-            atomic_save(sampler.state_dict(), out / f"sampler_{step:06d}_rank{rank}.pt")
-            actions = torch.as_tensor(sampler.action_exposed, device=device, dtype=torch.int32)
+            for shard, local_sampler in zip(shard_ids, samplers):
+                atomic_save(local_sampler.state_dict(), out / f"sampler_{step:06d}_rank{shard}.pt")
+            actions = torch.as_tensor(np.logical_or.reduce([s.action_exposed for s in samplers]),
+                                      device=device, dtype=torch.int32)
             if world > 1:
                 dist.all_reduce(actions, op=dist.ReduceOp.MAX)
             reports = [None] * world if rank == 0 else None
             if world > 1:
                 dist.gather_object(sampler.report(), reports, dst=0)
             else:
-                reports = [sampler.report()]
+                reports = [s.report() for s in samplers]
             sketches = None
             if hasattr(sampler, "sketch_state"):
                 sketches = [None] * world if rank == 0 else None
@@ -150,7 +162,7 @@ def run(config, out, source_commit, smoke_steps=None, resume=None):
                 if world > 1:
                     dist.gather_object(local_sketch, sketches, dst=0)
                 else:
-                    sketches = [local_sketch]
+                    sketches = [{"sketches": s.sketch_state(), "roots": s.phase_roots} for s in samplers]
             if rank == 0:
                 path = out / "checkpoints" / f"step_{step:06d}.pt"
                 atomic_save({"model_type": "board_mlp", "model": raw.state_dict(),
@@ -161,7 +173,10 @@ def run(config, out, source_commit, smoke_steps=None, resume=None):
                              "source_commit": source_commit}, path)
                 exposure = sampler.report()
                 exposure["all_rank_action_types_in_candidate_rows"] = int(actions.sum().item())
-                exposure["per_rank_draw_reports"] = reports
+                exposure["physical_world_size"] = world
+                exposure["sampler_shards"] = sampler_world
+                exposure["per_rank_draw_reports" if world > 1 or sampler_world == 1
+                         else "serialized_sampler_shard_reports"] = reports
                 if sketches is not None:
                     exposure["global_stream_phase"] = sampler.merged_exposure([s["sketches"] for s in sketches])
                     exposure["global_stream_phase"]["distinct_roots"] = int(np.logical_or.reduce([s["roots"] for s in sketches]).sum())
@@ -185,7 +200,8 @@ def run(config, out, source_commit, smoke_steps=None, resume=None):
                 (out / f"exposure_{step:06d}.json").write_text(json.dumps(exposure, indent=2) + "\n")
             if world > 1:
                 dist.barrier()
-    sampler.close()
+    for sampler in samplers:
+        sampler.close()
     if world > 1:
         dist.destroy_process_group()
 

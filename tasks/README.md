@@ -8,7 +8,7 @@
 
 | 任务／目标范围 | DeepSeek | Qwen3-32B | 5.6 | 6.1 | 认知地图本身贪心 | 1.5B＋认知地图：单任务训 | 1.5B＋认知地图：统一训 |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| 积木：原八形状，12块清空 | 77.5% | 2.5% | 92.5% | 95% | **79.5%（159/200，清空）** | 旧参照：94.12%（480/510）¹ | - |
+| 积木：原八形状，12块清空 | 77.5% | 2.5% | 92.5% | 95% | **78.1%（781/1000，清空）** | 旧参照：94.12%（480/510）¹ | - |
 | 寻路：256节点 | 97.5% | 65% | 100% | 100% | **98.05%（251/256）** | - | - |
 | 八盘汉诺塔：指定柱整塔终点 | 42.5% | 10% | 97.5% | 95% | **99.89%（19,659/19,680）** | - | - |
 | 二阶魔方：复原 | 12.5% | 2.5% | 65% | 77.5% | **77.47%（2,846,397/3,674,160）** | - | - |
@@ -16,12 +16,12 @@
 | 过桥（计划） | - | - | - | - | - | - | - |
 | 推箱子（计划） | - | - | - | - | - | - | - |
 
-¹ 旧1.5B参照来自50k B2、旧地图986cb4d和原510题；不是本行12块清空或当前地图的成绩，不与79.5%相减比较。旧地图同题贪心397/510；B2到达480/510，到达且正确停止475/510。统一训练尚无结果。
+¹ 旧1.5B参照来自50k B2、旧地图986cb4d和原510题；不是本行12块清空或当前地图的成绩，不与78.1%相减比较。旧地图同题贪心397/510；B2到达480/510，到达且正确停止475/510。统一训练尚无结果。
 
-**积木分项：**采用ffba71f结构化1000步候选。12块清空为159/200，父模型160/200，尚未改善；41题因错误移除进入不可达残留，其中25题在前两步走死。另测保留原构造块的近清空非空目标：7–8步180/200（90%）、9–11步137/200（68.5%）；这两个数都不是清空率，未覆盖6、12、13步，也不代表其他铺法目标泛化。原510回归421/510。当前地图尚无对应1.5B接图训练成绩。
+**积木分项：**采用ffba71f结构化1000步候选。12块清空采用5组各200题复测，共781/1000（78.1%）；各组为74.5%、78%、77%、84%、77%。另测保留原构造块的近清空非空目标：7–8步180/200（90%）、9–11步137/200（68.5%）；这两个数都不是清空率，未覆盖6、12、13步，也不代表其他铺法目标泛化。原510回归421/510。当前地图尚无对应1.5B接图训练成绩。
 
 采用权重与来源：[积木](blocks/Qmap/selection.json)、[寻路](path/Qmap/selection.json)、[汉诺塔](hanoi/Qmap/selection.json)、[二阶魔方](cube2/Qmap/selection.json)、[华容道](puzzle8/Qmap/selection.json)。寻路填留出测试；汉诺塔、魔方、华容道填全状态范围内复原，包含训练状态，非新状态泛化。
-成绩依据：[纯文字四模型](../experiments/task_text_baselines/results/report.md)、[积木当前候选](../runs/qmap_dual_20261018/blocks12/branch_coverage_replay/run/evaluation/step_001000.json)、[积木近清空逐题](../runs/qmap_dual_20261018/blocks12/near_clear_readonly_pilot.json)、[历史1.5B单训](../experiments/map_sft_baselines/results/report.md)、[寻路](../experiments/path_qmap/results/summary.json)、[汉诺塔](../experiments/hanoi_qmap/results/full_coverage_summary.json)、[魔方repair_guard.final.policy](../runs/cube2_qmap/cycle_repair_f42c487/summary.json)、[华容道](../runs/qmap_dual_20261018/puzzle8/goal_expansion/stages/step_001000/metrics.json)。
+成绩依据：[积木清空1000题复测](../runs/qmap_dual_20261018/blocks12/clear_retest/results.json)、[纯文字四模型](../experiments/task_text_baselines/results/report.md)、[积木当前候选](../runs/qmap_dual_20261018/blocks12/branch_coverage_replay/run/evaluation/step_001000.json)、[积木近清空逐题](../runs/qmap_dual_20261018/blocks12/near_clear_readonly_pilot.json)、[历史1.5B单训](../experiments/map_sft_baselines/results/report.md)、[寻路](../experiments/path_qmap/results/summary.json)、[汉诺塔](../experiments/hanoi_qmap/results/full_coverage_summary.json)、[魔方repair_guard.final.policy](../runs/cube2_qmap/cycle_repair_f42c487/summary.json)、[华容道](../runs/qmap_dual_20261018/puzzle8/goal_expansion/stages/step_001000/metrics.json)。
 
 后续原位填入同分布的新结果；统一训练指同一个1.5B读图模型跨任务训练，各任务Qmap独立。过桥、推箱子为现有待办占位，规则、难度和题集待确定。
 

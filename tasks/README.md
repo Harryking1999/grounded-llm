@@ -29,7 +29,7 @@
 
 旧1.5B为50k B2，7B为10k R＋A最佳断点，训练条件不同；不能据分差单独归因地图。旧1.5B到达且正确停止为475/510。统一训指同一个1.5B读图模型跨任务训练，各任务Qmap仍独立。
 
-积木正式范围仅清空，非空终点为辅助诊断，不再占主要验收门槛；[固定1000题](blocks/data/clear1000.json)、[验收合同](../experiments/blocks_distance_map/configs/blocks12_clear_acceptance.json)。五组各200题已测149、156、154、168、154，共781；文字原40题单列，未冒充1000题成绩。尚无新的1.5B／7B在此1000题上的结果。
+积木正式范围仅清空，非空终点为辅助诊断，不再占主要验收门槛；[固定1000题](blocks/data/clear1000.json)、[验收合同](../experiments/blocks_distance_map/configs/blocks12_clear_acceptance.json)。五组各200题已测149、156、154、168、154，共781；文字原40题单列，未冒充1000题成绩。尚无新的1.5B／7B在此1000题上的结果。首轮9aa8498另按同1000题补测789/1000（78.9%），相对现用图丢130、新增138；未改选，不称续训提升，见[模型比较](../experiments/blocks_distance_map/results/blocks12_joint_report.md)。
 
 采用权重：[积木](blocks/Qmap/selection.json)、[寻路](path/Qmap/selection.json)、[汉诺塔](hanoi/Qmap/selection.json)、[二阶魔方](cube2/Qmap/selection.json)、[华容道](puzzle8/Qmap/selection.json)。全状态评测包含地图训练状态，不称独立新状态泛化；原文字每任务40题、思考＋答案16k token，其他任务验收范围保持原定义。
 

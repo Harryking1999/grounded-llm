@@ -61,7 +61,8 @@ class BroadData(JointData):
             "nonzero_huber_score_relations", "nonzero_rank_score_relations",
             "bundle_huber_relations", "bundle_rank_candidate_relations", "bundle_forks",
             "bundle_huber_groups", "bundle_shared_source_groups", "bundle_shared_goal_groups",
-            "bundle_cross_branch_groups", "clear_fork_huber_relations", "clear_fork_huber_groups")}
+            "bundle_cross_branch_groups", "clear_fork_huber_relations", "clear_fork_huber_groups",
+            "clear_initial_fork_huber_groups")}
         self.phase_roots = np.zeros(len(self.roots), dtype=bool)
         self.phase_histograms = {}
         self.requested_distances = {}
@@ -77,6 +78,7 @@ class BroadData(JointData):
         self._pending_bundle_forks, self._pending_bundle_events = [], {}
         self._bundle_rank_roles = {}
         self._pending_clear_forks = []
+        self._pending_clear_initial_forks = []
         self.layer_views, self.layer_suffixes = {}, {}
         index_path = options.get("clear_index_data")
         self.clear_indexes = ({gid: ClearDistanceIndex(Path(index_path) / str(gid)) for gid in self.graphs}
@@ -178,6 +180,13 @@ class BroadData(JointData):
             self.rng.shuffle(deep); self.rng.shuffle(other)
             order = list(deep) + list(other)
             anchors = anchors[order]
+            initial = np.asarray([g.initial_id for g, _ in root.parts], dtype=np.int64)
+            if self.options.get("clear_initial_fork_first", False):
+                # Unique distance-layer sampling can dilute the actual start
+                # among many other deep states. Give each training root its
+                # complete first fork while retaining downstream groups below.
+                same = (anchors == initial).all(-1)
+                anchors = np.concatenate((initial[None], anchors[~same]))
             degree = sum(g.degrees(anchors[:, i]) for i, (g, _) in enumerate(root.parts))
             anchors = anchors[np.cumsum(degree + 1) <= budget]
             children = [anchors]
@@ -189,6 +198,10 @@ class BroadData(JointData):
             group_rows = np.concatenate(children)
             if len(group_rows):
                 source[-len(group_rows):] = group_rows
+                initial_rows = anchors[(anchors == initial).all(-1)]
+                if len(initial_rows):
+                    self._pending_clear_initial_forks.append(np.column_stack((
+                        root.packed(initial_rows), np.zeros((len(initial_rows), 2), dtype=np.uint64))))
                 self._pending_clear_forks.append((
                     np.column_stack((root.packed(group_rows), np.zeros((len(group_rows), 2), dtype=np.uint64))),
                     np.column_stack((root.packed(anchors), np.zeros((len(anchors), 2), dtype=np.uint64)))))
@@ -481,6 +494,7 @@ class BroadData(JointData):
         self._pending_bundle_forks, self._pending_bundle_events = [], {}
         self._bundle_rank_roles = {}
         self._pending_clear_forks = []
+        self._pending_clear_initial_forks = []
         return super().batch(pair_count, rank_count)
 
     def boards(self):
@@ -506,6 +520,8 @@ class BroadData(JointData):
     def record_update(self, arrays, huber_nonzero, rank_nonzero):
         # Called only after successful optimizer.step, so an aborted sampling or
         # forward call contributes no exposure to this phase's committed counts.
+        for forks in self._pending_clear_initial_forks:
+            self.phase_sketches["clear_initial_fork_huber_groups"].add(forks)
         for pairs, forks in self._pending_clear_forks:
             self.phase_sketches["clear_fork_huber_relations"].add(pairs)
             self.phase_sketches["clear_fork_huber_groups"].add(forks)

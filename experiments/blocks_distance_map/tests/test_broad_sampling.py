@@ -126,6 +126,22 @@ class BroadSamplingTest(unittest.TestCase):
             forked.record_update(batch, np.ones(len(batch[2]), bool), np.ones(len(batch[5]), bool))
             self.assertGreater(forked.phase_sketches["clear_fork_huber_groups"].estimate(), 0)
             forked.close()
+            anchored = BroadData(path, path / "legacy.npz", {**options,
+                "clear_index_data": str(path / "clear"), "clear_broad_fraction": 0,
+                "clear_distance_cycle": [1], "clear_fork_huber_fraction": .5,
+                "clear_initial_fork_first": True, "clear_fraction": .9, "broad_fraction": .05})
+            batch = anchored.batch(512, 32)
+            # Even when the layer stream draws only shallow states, the full
+            # training-root fork belongs to Huber with every legal child.
+            packed = set(map(int, batch[0][:, 0]))
+            self.assertIn(initial, packed)
+            self.assertTrue({child for _, child in successors(initial)}.issubset(packed))
+            self.assertEqual(anchored.phase_sketches["clear_initial_fork_huber_groups"].estimate(), 0)
+            anchored.record_update(batch, np.ones(len(batch[2]), bool), np.ones(len(batch[5]), bool))
+            self.assertEqual(anchored.phase_sketches["clear_initial_fork_huber_groups"].estimate(), 1)
+            np.testing.assert_array_equal(batch[2], [oracle.distance(int(a[0]), int(b[0]))
+                                                    for a, b in zip(batch[0], batch[1])])
+            anchored.close()
             # Two independent identical components double every finite exact
             # distance, providing historical short AND6--10-step relations.
             old_rows = np.asarray(rows + [[int(graph.initial_id), int(graph.zero_id),

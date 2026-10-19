@@ -1,0 +1,74 @@
+{
+  "study": "blocks_distance_map",
+  "purpose": "Same880 full-Adam/four-sampler short data ablation; final product remains oneQmap",
+  "base_config": "experiments/blocks_distance_map/configs/blocks12_clear_focus.json",
+  "fixed_parent_checkpoint": "runs/blocks12_clear_forks/run/checkpoints/step_004000.pt",
+  "fixed_parent_sampler_root": "runs/blocks12_clear_forks/run",
+  "fixed_parent_sampler_step": 4000,
+  "expected_parent_clear_success": 880,
+  "expected_parent_historical_success": 429,
+  "parent_model_step": 94000,
+  "updates_per_variant": 300,
+  "common_training_overrides": {
+    "steps": 300,
+    "checkpoint_every": 300,
+    "log_every": 100,
+    "previous_sampler_root": "runs/blocks12_clear_ablation/parent",
+    "previous_sampler_step": 0,
+    "previous_sampler_world": 4,
+    "clear_initial_fork_first": true,
+    "clear_bind_huber_rank": true,
+    "rank_disjoint_roots": false,
+    "legacy_fraction": 0.25,
+    "broad_fraction": 0.05,
+    "clear_fork_huber_fraction": 0.5,
+    "clear_dead_followup_fraction": 0.25
+  },
+  "variants": {
+    "A": {
+      "description": "Complete clearing forks plus retained broad and historical relations",
+      "training_overrides": {
+        "clear_fraction": 0.95,
+        "clear_branch_followups": false,
+        "clear_path_landmarks": false
+      }
+    },
+    "B": {
+      "description": "A plus linked subsequent full forks inside the same distance budget",
+      "training_overrides": {
+        "clear_fraction": 0.95,
+        "clear_branch_followups": true,
+        "clear_path_landmarks": false
+      }
+    },
+    "C": {
+      "description": "B plus small clearing-path landmark quota, replacing2percent of root-local clearing rows",
+      "training_overrides": {
+        "clear_fraction": 0.93,
+        "clear_branch_followups": true,
+        "clear_path_landmarks": true
+      }
+    }
+  },
+  "evaluation": {
+    "acceptance_config": "experiments/blocks_distance_map/configs/blocks12_clear_acceptance.json",
+    "reference_results": "runs/blocks12_clear_forks/evaluation/step_004000/results.json",
+    "historical_510_reference": "runs/blocks12_clear_forks/evaluation/step_004000/results.json",
+    "same_cases_rules_budget_and_greedy": true,
+    "primary": "fixed1000_original_shape12_clearing",
+    "historical": "original510",
+    "report_separate_lost_gained": true
+  },
+  "resources": {
+    "host": "grounded-028",
+    "gpu_indices": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "world_size": 4,
+    "execution": "sequentialABC; each uses all four permitted idle cards, no overlap with live training"
+  },
+  "constraints": "Original model, encoder, Huber, soft-rank/weight/temperature, lr0.0003 and fullAdam unchanged. Unreachable19; exact finite distances; puregreedy all legal actions, no oracle selection or search. Fixed test cases never enter training. Same sampler RNG/cursors and root schedule at start; only data organization/proportions differ. Original880 preserved; no lower-performing candidate replaces it. Diagnostic exposure counters reset in identical sampler clones without changing root_stars_seen, schedules, RNG or pair cursors."
+}

@@ -161,6 +161,19 @@ class BroadSamplingTest(unittest.TestCase):
             np.testing.assert_array_equal(batch[2], [oracle.distance(int(a[0]), int(b[0]))
                                                     for a, b in zip(batch[0], batch[1])])
             anchored.close()
+            single = BroadData(path, path / "legacy.npz", {**anchored.options,
+                "clear_bind_huber_rank": True, "clear_branch_followups": False,
+                "clear_fraction": .95, "broad_fraction": .05})
+            batch = single.batch(2048, 128)
+            self.assertTrue(single._clear_rank_anchors)
+            self.assertFalse(single._pending_clear_followups)
+            # Binding full Huber forks to ranking is independent of whether
+            # subsequent branches are enabled in the controlled comparison.
+            ranked = set(map(int, batch[3][:, 0]))
+            for anchors in single._clear_rank_anchors.values():
+                for mask in single.roots[0].packed(anchors)[:, 0]:
+                    self.assertTrue({s for _, s in successors(int(mask))}.issubset(ranked))
+            single.close()
             # Four ranks visit the same root together. Supply its first fork
             # once, retaining the other ranks' distinct downstream supervision.
             for rank in range(4):

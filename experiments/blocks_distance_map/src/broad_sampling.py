@@ -241,7 +241,7 @@ class BroadData(JointData):
                     anchors = anchors[np.sort(keep)]
             degree = sum(g.degrees(anchors[:, i]) for i, (g, _) in enumerate(root.parts))
             anchors = anchors[np.cumsum(degree + 1) <= budget]
-            if self.options.get("clear_branch_followups", False):
+            if self.options.get("clear_bind_huber_rank", self.options.get("clear_branch_followups", False)):
                 if self._clear_rank_slots is not None:
                     anchors = anchors[:self._clear_rank_slots]
                 self._clear_rank_anchors[board] = anchors.copy()
@@ -483,9 +483,12 @@ class BroadData(JointData):
                 paths.append(path)
             starts = [state] + [path[1] for path in paths]
             landmarks = [path[int(self.rng.integers(1, len(path) - 1))] for path in paths]
-            for start in starts:
-                for goal in landmarks:
-                    sources.append(start); goals.append(goal)
+            group_rows = [(start, goal) for start in starts for goal in landmarks]
+            # A small auxiliary quota may contain less than twelve rows. Avoid
+            # repeatedly selecting only the first source/goal roles on truncation.
+            for index in self.rng.permutation(12):
+                start, goal = group_rows[index]
+                sources.append(start); goals.append(goal)
         source_masks, goal_masks = sources[:count], goals[:count]
         def ids(masks):
             return np.stack([graph.rank(np.asarray([

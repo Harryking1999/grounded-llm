@@ -1,0 +1,14 @@
+{
+  "mode": "clear_sets",
+  "frozen_suite": "runs/five_task_sol_high_40/suite.json",
+  "seeds": [2026101901, 2026101902, 2026101903, 2026101904, 2026101905],
+  "boards_per_seed": 200,
+  "exclude_roots": [
+    "runs/qmap_dual_20261018/blocks12/baseline_cases.json",
+    "runs/qmap_dual_20261018/blocks12/graph_expansion/roots.json"
+  ],
+  "oracle_cache_limit": 4000000,
+  "oracle_seconds": 300,
+  "checkpoint": "tasks/blocks/Qmap/checkpoints/structured_1000_ffba71f.pt",
+  "purpose": "Read-only pure-greedy clearing evaluation on unchanged original40 text questions and five disjoint200-board cohorts. No training, checkpoint selection, model/loss changes or search in the agent. Seeded generator uses the same uniform-shape/uniform-nonoverlapping-placement rule as the original text suite. Original40 results must be reported separately from the new cohorts and the previous159/200 monitor."
+}

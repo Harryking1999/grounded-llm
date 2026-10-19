@@ -1,0 +1,15 @@
+{
+  "study": "blocks_distance_map",
+  "purpose": "Freeze independent final twelve-placement roots before opening any model evaluation; never use these cases for training or checkpoint selection.",
+  "boards": 200,
+  "construction_placements": 12,
+  "root_seed": 2026101891,
+  "path_seed": 2026101892,
+  "intermediate_path_positions": [1, 4, 7, "last"],
+  "scope": "Independent initial roots; intermediate goals are auxiliary. This does not replace fixed clear1000 acceptance or prove descendant states unseen.",
+  "oracle_cache_limit": 8000000,
+  "oracle_seconds": 14400,
+  "cpu_threads": 2,
+  "opening_policy": "Manual final evaluation of one explicitly named monitoring-selected checkpoint; no periodic evaluation, automatic opening at 10000 updates, checkpoint reselection, or training on final cases.",
+  "policy": "unchanged_pure_greedy_Q_all_legal_successors_no_search_or_oracle_filters"
+}

@@ -45,6 +45,10 @@ python -m experiments.blocks_distance_map.src.blocks12_eval \
 
 机器、环境与传输方法见[开发机手册](../../DEVELOPMENT_MACHINES.md)。数据、断点、逐题结果及曝光记录留在 Git 外运行目录；README 不保存启动时间线或另抄采样比例。
 
+## 独立最终评测
+
+独立最终评测的准备入口为 [blocks12_sealed.py](src/blocks12_sealed.py)，参数见[配置](configs/blocks12_sealed_final.json)。`prepare` 必须显式提供 `--excluded-training-roots` 和 `--excluded-monitoring-cases`（各可传多个文件，监测集包含 `clear1000.json`），只生成冻结题集，不读取模型。确定候选后，`final-evaluate` 再显式指定 `--checkpoint` 与 `--parent-checkpoint`。它排除所提供的训练／监测初盘，不保证中间状态全部未见；非空目标仅作辅助。代码已做本地检查，尚无该入口的最终能力结果。
+
 ## 历史结果与复现
 
 - [多棋盘与树关系结果](results/report.md)：保留旧地图的研究结论；历史 SFT 使用的地图来源也见任务 selection。

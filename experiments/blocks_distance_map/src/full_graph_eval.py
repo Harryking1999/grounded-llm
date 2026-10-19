@@ -60,7 +60,8 @@ def sections(rows):
                           ("intermediate", [r for r in rows if r["goal"] != "0"])):
         counts = Counter(r["outcome"] for r in selected)
         result[key] = {"tasks": len(selected), "success": counts["reached"],
-                       "outcomes": dict(counts), "success_rate": counts["reached"] / len(selected)}
+                       "outcomes": dict(counts),
+                       "success_rate": counts["reached"] / len(selected) if selected else None}
     return result
 
 

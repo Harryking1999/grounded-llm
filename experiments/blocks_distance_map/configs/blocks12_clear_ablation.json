@@ -8,10 +8,10 @@
   "expected_parent_clear_success": 880,
   "expected_parent_historical_success": 429,
   "parent_model_step": 94000,
-  "updates_per_variant": 300,
+  "updates_per_variant": 1000,
   "common_training_overrides": {
-    "steps": 300,
-    "checkpoint_every": 300,
+    "steps": 1000,
+    "checkpoint_every": 1000,
     "log_every": 100,
     "previous_sampler_root": "runs/blocks12_clear_ablation/parent",
     "previous_sampler_step": 0,
@@ -70,5 +70,7 @@
     "world_size": 4,
     "execution": "sequentialABC; each uses all four permitted idle cards, no overlap with live training"
   },
-  "constraints": "Original model, encoder, Huber, soft-rank/weight/temperature, lr0.0003 and fullAdam unchanged. Unreachable19; exact finite distances; puregreedy all legal actions, no oracle selection or search. Fixed test cases never enter training. Same sampler RNG/cursors and root schedule at start; only data organization/proportions differ. Original880 preserved; no lower-performing candidate replaces it. Diagnostic exposure counters reset in identical sampler clones without changing root_stars_seen, schedules, RNG or pair cursors."
+  "constraints": "Original model, encoder, Huber, soft-rank/weight/temperature, lr0.0003 and fullAdam unchanged. Unreachable19; exact finite distances; puregreedy all legal actions, no oracle selection or search. Fixed test cases never enter training. Same sampler RNG/cursors and root schedule at start; only data organization/proportions differ. Original880 preserved; no lower-performing candidate replaces it. Diagnostic exposure counters reset in identical sampler clones without changing root_stars_seen, schedules, RNG or pair cursors. User requires>=1000 actual updates before judging any data recipe. Existing300 checkpoints are intermediate observations; resume them with completeAdam/all four samplers, do not restart or count300 as a complete failed stage. Keep sampling implementation8f90c14 and original data ratios unchanged for this budget extension.",
+  "intermediate_observation_updates": 300,
+  "resume_existing_intermediate_states": true
 }

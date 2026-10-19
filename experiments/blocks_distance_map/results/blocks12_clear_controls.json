@@ -276,5 +276,89 @@
         "cosine_clear_huber_vs_original_ranking": 0.1981157809495926
       }
     }
+  },
+  "supervision_domain_control": {
+    "parent": {
+      "clear1000": 889,
+      "historical510": 433,
+      "full_model_Adam_step": 94300
+    },
+    "minimum_updates": 1000,
+    "original1000": {
+      "clear1000": 883,
+      "historical510": 425,
+      "lost_vs889": 58,
+      "gained_vs889": 52,
+      "11step": 76,
+      "12step": 807
+    },
+    "domain": "pending formal1000, no early300 judgement",
+    "source": "48fedad",
+    "config": "experiments/blocks_distance_map/configs/blocks12_clear_domain.json"
+  },
+  "disjoint_contexts_2000": {
+    "clear1000": 899,
+    "historical510": 417,
+    "lost_vs889": 66,
+    "gained_vs889": 76,
+    "distance_bins": {
+      "11": {
+        "count": 81,
+        "success": 78
+      },
+      "12": {
+        "count": 919,
+        "success": 821
+      }
+    },
+    "historical_lost_vs889": 42,
+    "historical_gained_vs889": 26,
+    "selected": false,
+    "reason": "historical below421 floor;889/433 full state retained"
+  },
+  "directed_algebra_audit": {
+    "actual_metric_identity_max_error": 8.881784197001252e-15,
+    "true_chain_forward": [
+      1,
+      1,
+      2
+    ],
+    "reverse_labels": [
+      19,
+      19,
+      19
+    ],
+    "impossible_cycle_residual": 19,
+    "replayed_completed_updates": 32,
+    "ranks": 4,
+    "actual_huber_rows": 2097152,
+    "distinct_exact_huber_pairs": 1690465,
+    "coexposed_finite_and_reverse_pairs": 130,
+    "coexposed_complete_six_relation_chains": 0,
+    "limitation": "Finite sampled prefix. Structural contradiction proven, prevalence of full contradictory chains over1000updates and causal contribution to clearing failure not established.",
+    "evidence": "runs\\qmap_dual_20261018\\blocks12\\clear_domain_028_support\\directed_sampling_audit.json"
+  },
+  "dynamic_labels_offline": {
+    "scope": "Offline small real legal removal graph only, not a formal task or training condition; no labels deployed",
+    "states": 200,
+    "finite_pairs": 1727,
+    "candidate": "Phi(S)=-9*occupied_cells; preserve finite d(S,G); comparable reverse=d(G,S)+Phi(S)-Phi(G); incomparable=19+max(Phi(S)-Phi(G),0)",
+    "finite_labels_changed": 0,
+    "antisymmetry_cycle_identity_max_error": 0.0,
+    "triangle_violations_over_all_triples": 0,
+    "maximum_triangle_gap": 0,
+    "negative_label_range": [
+      19.0,
+      94.0
+    ],
+    "phi_span": 90.0,
+    "existing128D_cap13_bound": 147.0782104868019,
+    "construction12_chain_min_phi_span_if_every_reverse_ge19": 216,
+    "finding": "This small probe passes necessary algebra and triangle checks, not a directed-L1 embedding proof. Across actual12-removal chains, any scheme keeping each reverse>=19 requires Phi span>=216, beyond147.078. Phi=-9*cells exceeds the bound even further. Dynamic labels cannot be assumed representable in the unchanged bounded encoder."
+  },
+  "unapproved_model_proposal": {
+    "status": "not implemented or trained; separate approval required",
+    "minimal_change": "Keep current encoder and original Huber/soft-rank/labels/greedy; replace constrained directed_sum with positive asymmetric ordered-pair score head f(z_source,z_goal).",
+    "purpose": "Remove compulsory potential-difference antisymmetry; must test same parent/task/data budget separately. This is not evidence it will improve clearing."
   }
 }

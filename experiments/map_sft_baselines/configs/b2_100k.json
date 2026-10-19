@@ -1,0 +1,113 @@
+{
+  "study": "blocks_b2_nested100k_10epochs",
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "seed": 20261013,
+  "maximum_sequence_tokens": 32768,
+  "data": {
+    "training_boards": 1000,
+    "ordinary_per_board": 98,
+    "samples_per_epoch": 100000,
+    "minimum_shortest_moves": 6,
+    "random_routes": [
+      128,
+      256,
+      512,
+      1024
+    ],
+    "coverage_target": 292758,
+    "coverage_per_board_target": 293,
+    "oracle_cache_limit": 2000000,
+    "oracle_seconds_per_board": 600,
+    "selection": "inherit_50k_add_length_matched_certified_routes",
+    "numbering": "shape_id_row_col_sorted",
+    "terminal_per_board": 2
+  },
+  "map": {
+    "memory_mode": "address_key_state_value",
+    "state_dim": 128,
+    "projection_dim": 256,
+    "role_and_id_dim": 32,
+    "attention_heads": 4,
+    "attention_head_dim": 64,
+    "cross_attention_every_n_layers": 1,
+    "maximum_candidates": 664
+  },
+  "training": {
+    "epochs": 10,
+    "world_size": 2,
+    "micro_batch": 1,
+    "gradient_accumulation_steps": 2,
+    "global_batch": 4,
+    "learning_rate": 2e-05,
+    "weight_decay": 0.01,
+    "warmup_fraction": 0.05,
+    "cosine_minimum_ratio": 0.1,
+    "gradient_clip_norm": 1.0,
+    "checkpoint_layers": true,
+    "loss_chunk_tokens": 128,
+    "loss": "global_assistant_token_mean_cross_entropy",
+    "save_steps": 50000,
+    "log_steps": 10,
+    "maximum_updates": 250000,
+    "scheduler_total_steps": 250000,
+    "warmup_steps": 12500,
+    "keep_resume_checkpoints": 1
+  },
+  "baselines": {
+    "B2_100k": {
+      "interface": true,
+      "real_map": true,
+      "full_llm": true,
+      "response_order": "ranking_first"
+    }
+  },
+  "execution": {
+    "initial_baselines": [
+      "B2_100k"
+    ],
+    "pending_baselines": [],
+    "retired_baselines": [],
+    "gpu_pairs": [
+      [
+        0,
+        1
+      ]
+    ],
+    "evaluation_gpus": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "poll_seconds": 60
+  },
+  "evaluation": {
+    "tasks": 510,
+    "modes": [
+      "TF",
+      "RO"
+    ],
+    "probe_tasks": 100,
+    "shard_tasks": 32,
+    "max_new_tokens": 256,
+    "action_budget": 32,
+    "main_metric": "arrival",
+    "first_turn_diagnosis": true
+  },
+  "early_stop": {
+    "mode": "flag_only",
+    "minimum_epochs": 5,
+    "patience_points": 6,
+    "minimum_gain_tasks": 5
+  },
+  "subset": {
+    "source_samples": 50000,
+    "method": "nested_physical_route_extension",
+    "per_board": 100,
+    "terminal_samples": 2000,
+    "inherit_all_source_routes": true,
+    "additional_nonterminal_length_histogram": "match_original_per_board",
+    "additional_terminal": "new_intermediate_training_state_equal_to_goal",
+    "exclude": "all_source_validation_and_test_initial_and_reference_pairs"
+  }
+}

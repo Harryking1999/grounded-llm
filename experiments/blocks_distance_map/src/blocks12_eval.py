@@ -9,7 +9,7 @@ import numpy as np
 import torch
 
 from experiments.gcml_counterexamples.src import blocks
-from .oracle import DistanceOracle, successors
+from .oracle import DistanceOracle, OracleBudgetExceeded, successors
 from .tree_supervision_eval import QScorer
 
 
@@ -172,19 +172,24 @@ def frozen_clear(config, checkpoint, out, source_commit, device):
             or any(int(c["goal"]) != 0 for c in cases)):
         raise ValueError("Fixed clearing benchmark identity/count/goal mismatch")
     scorer = QScorer(checkpoint, device)
-    rows = []
+    rows, failed_paths = [], []
     for case in cases:
         state, moves = int(case["source"]), 0
         budget = state.bit_count() // 2
+        path = []
         while state and moves < budget:
             candidates = successors(state)
             if not candidates:
                 break
             choice = int(np.argmin(scorer.scores([child for _, child in candidates], 0)))
+            if config.get("diagnose_failures"):
+                path.append((state, candidates[choice][0], candidates[choice][1]))
             state = candidates[choice][1]
             moves += 1
         rows.append({**case, "moves": moves, "outcome": "reached" if state == 0 else "no_candidate",
                      "final_state": str(state)})
+        if state and config.get("diagnose_failures"):
+            failed_paths.append((case, path))
     result = {"source_commit": source_commit, "checkpoint": str(checkpoint),
               "model_identity": scorer.identity, "cases": config["cases"], "count": len(rows),
               "success": sum(r["outcome"] == "reached" for r in rows),
@@ -215,6 +220,32 @@ def frozen_clear(config, checkpoint, out, source_commit, device):
         result["historical_510"] = historical_retention(config["historical_510_manifest"], checkpoint,
                                                        config.get("historical_510_reference"))
     out.mkdir(parents=True, exist_ok=False)
+    if config.get("diagnose_failures"):
+        # Offline diagnosis starts only after ALL greedy executions finish.
+        oracle = DistanceOracle(cache_limit=2000000, seconds=config.get("diagnostic_seconds", 90))
+        decisions, unknown = [], 0
+        for case, path in failed_paths:
+            try:
+                for depth, (state, action, child) in enumerate(path):
+                    if oracle.distance(child, 0) >= 0:
+                        continue
+                    candidates = successors(state)
+                    scores = scorer.scores([c for _, c in candidates], 0)
+                    truths = [oracle.distance(c, 0) for _, c in candidates]
+                    decisions.append({"id": case["id"], "initial_distance": case["true_distance"],
+                        "depth": depth, "state": str(state), "chosen_action": action,
+                        "remaining_distance": oracle.distance(state, 0), "fork_degree": len(candidates),
+                        "chosen_shape": blocks.PLACEMENTS[action][1]["shape_id"],
+                        "candidates": [{"action": a, "child": str(c), "distance": d, "score": float(v)}
+                                       for (a, c), d, v in zip(candidates, truths, scores)]})
+                    break
+            except OracleBudgetExceeded:
+                unknown += 1
+        result["failure_diagnosis"] = {"failed_cases": len(failed_paths), "analyzed": len(decisions),
+            "unknown_budget": unknown, "first_trap_remaining_distance": dict(Counter(
+                str(d["remaining_distance"]) for d in decisions)),
+            "first_trap_shape": dict(Counter(str(d["chosen_shape"]) for d in decisions))}
+        (out / "failure_decisions.json").write_text(json.dumps(decisions) + "\n")
     (out / "config.json").write_text(json.dumps(config, indent=2) + "\n")
     (out / "results.json").write_text(json.dumps(result, indent=2) + "\n")
     print(json.dumps({k: v for k, v in result.items() if k not in ("rows", "historical_510")}), flush=True)

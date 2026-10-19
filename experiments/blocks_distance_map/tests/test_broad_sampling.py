@@ -57,6 +57,26 @@ class BroadSamplingTest(unittest.TestCase):
             resumed.load_state_dict(state)
             for a, b in zip(data.batch(128, 32), resumed.batch(128, 32)):
                 np.testing.assert_array_equal(a, b)
+            # Splitting two live streams into four must preserve exactly the
+            # next disjoint relation set, rather than restarting sampling.
+            parents = [BroadData(path, path / "legacy.npz", options, rank, 2) for rank in range(2)]
+            for rank, parent in enumerate(parents):
+                parent.broad_rows(0, 3)
+                torch.save(parent.state_dict(), path / f"sampler_000002_rank{rank}.pt")
+            def pairs(sampler, count):
+                source, goal = sampler.broad_rows(0, count)
+                return set(zip(map(tuple, source.tolist()), map(tuple, goal.tolist())))
+            expected = set().union(*(pairs(parent, 8) for parent in parents))
+            split_options = {**options, "previous_sampler_root": str(path),
+                             "previous_sampler_step": 2, "previous_sampler_world": 2}
+            children = [BroadData(path, path / "legacy.npz", split_options, rank, 4)
+                        for rank in range(4)]
+            actual = [pairs(child, 4) for child in children]
+            self.assertEqual(sum(map(len, actual)), len(set().union(*actual)))
+            self.assertEqual(expected, set().union(*actual))
+            self.assertNotEqual(children[0].rng.bit_generator.state, children[2].rng.bit_generator.state)
+            for sampler in parents + children:
+                sampler.close()
             # Expand the domain while retaining old cursors and old affine factors.
             torch.save(state, path / "sampler_000001_rank0.pt")
             (path / "roots.json").write_text(json.dumps([root, root]))

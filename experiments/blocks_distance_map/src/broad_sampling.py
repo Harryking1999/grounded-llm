@@ -90,7 +90,11 @@ class BroadData(JointData):
                 self.clear_suffixes.append(suffix)
         previous = options.get("previous_sampler_root")
         if previous:
-            state = torch.load(Path(previous) / f"sampler_{options['previous_sampler_step']:06d}_rank{rank}.pt",
+            previous_world = int(options.get("previous_sampler_world", world))
+            if world % previous_world:
+                raise ValueError("Sampler expansion requires an integer multiple of the parent shards")
+            parent_rank, child_lane = rank % previous_world, rank // previous_world
+            state = torch.load(Path(previous) / f"sampler_{options['previous_sampler_step']:06d}_rank{parent_rank}.pt",
                                map_location="cpu", weights_only=False)
             # The graph builder verifies the previous root/component index prefix.
             old_count = len(state["broad"])
@@ -99,6 +103,16 @@ class BroadData(JointData):
             expanded = dict(state)
             for key in ("broad", "clear", "broad_rank", "clear_rank", "root_stars_seen"):
                 expanded[key] = np.pad(state[key], (0, len(self.roots) - old_count))
+            if world != previous_world:
+                # A cursor is a GLOBAL stream offset; split its future residue
+                # classes without resetting, skipping or replaying old pairs.
+                for key in ("broad", "clear", "broad_rank", "clear_rank"):
+                    cursor = expanded[key] + parent_rank - rank
+                    expanded[key] = ((cursor + world - 1) // world) * world
+                if child_lane:
+                    generator = np.random.PCG64()
+                    generator.state = expanded["rng"]
+                    expanded["rng"] = generator.jumped(child_lane).state
             if old_count != len(self.roots):
                 expanded["order"] = self.schedule_rng.permutation(len(self.roots))
                 expanded["position"] = 0
@@ -542,6 +556,8 @@ class BroadData(JointData):
 
     def report(self):
         result = super().report()
+        result["historical_draw_counters_additive_across_ranks"] = (
+            int(self.options.get("previous_sampler_world", self.world)) == self.world)
         result["stream_phase"] = {"roots": int(self.phase_roots.sum()), "local_distance_by_goal": self.phase_histograms,
             "requested_stream_distance_draws": self.requested_distances,
             "before_cross_branch_distance_draws": self.initial_distances,

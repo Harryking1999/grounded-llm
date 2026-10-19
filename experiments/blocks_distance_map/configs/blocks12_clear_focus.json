@@ -1,7 +1,7 @@
 {
   "study": "blocks_distance_map",
   "scope": "twelve-piece clearing from broad legal roots and intermediate states; exact complete forks, multistep/crossbranch landmark relations auxiliary",
-  "parent_checkpoint": "runs/blocks12_clear_focus/parent/step_001000.pt",
+  "parent_checkpoint": "runs/blocks12_clear_focus/parent/step_010000.pt",
   "graph_data": "data/blocks12_graphs_10000",
   "legacy_data": "data/blocks12_legacy_tree_132f5a1.npz",
   "baseline_cases": "runs/qmap_dual_20261018/blocks12/baseline_cases.json",
@@ -9,9 +9,9 @@
     "seed": 2026101851,
     "learning_rate": 0.0003,
     "steps": 1000,
-    "batch_size_per_rank": 65536,
-    "rank_contexts_per_rank": 8192,
-    "boards_per_batch": 32,
+    "batch_size_per_rank": 16384,
+    "rank_contexts_per_rank": 2048,
+    "boards_per_batch": 8,
     "legacy_fraction": 0.25,
     "broad_fraction": 0.1,
     "clear_fraction": 0.7,
@@ -20,7 +20,7 @@
     "original_cap": 13,
     "unreachable_label": 19,
     "previous_sampler_root": "runs/blocks12_clear_focus/parent",
-    "previous_sampler_step": 1000,
+    "previous_sampler_step": 10000,
     "cpu_threads": 4,
     "log_every": 100,
     "checkpoint_every": 1000,
@@ -73,7 +73,8 @@
     ],
     "branch_bundle_fraction": 0.5,
     "exact_layer_fraction": 0.5,
-    "sampler_shards": 2
+    "sampler_shards": 4,
+    "previous_sampler_world": 2
   },
   "evaluation": {
     "acceptance_config": "experiments/blocks_distance_map/configs/blocks12_clear_acceptance.json",
@@ -85,7 +86,7 @@
     "never_train_test_failures": true
   },
   "policy": "unchanged_greedy_all_legal_successors_no_search_no_oracle_action_selection",
-  "rationale": "Concentrate the unchanged original losses on clearing:25% legal historical replay; remaining75% consists of70% clearing,10% broad pairs and20% grouped landmark/full-fork continuations. Exact clearing-distance layers span intermediate starts, with every legal successor including traps retained. Reuse10000 exact root graphs/indexes. Continue user-selectedffba71f full Adam and both sampler states; preserve selected inference weight. One1000-update feedback window, same fixed1000 clearing tasks plus separate historical510. Use one idle permitted028 H100 card, alternating both retained sampler shards at the same global batch65536/ranking8192; existing tasks on GPUs0-3 remain untouched. No arbitrary-nonempty acceptance threshold. Legal historical replay reuses archived original132f5a1 training split; later extended legacy pool currently unavailable with platform SSH. No held-out rows are added.",
+  "rationale": "Continue first10000 9aa8498 full Adam and both parent samplers, baseline789/1000 and historical421/510. Four authorized idle028 H100 GPUs keep global Huber65536 and ranking8192 with unchanged lr/Adam. Split both parent future sampling streams into four nonoverlapping shards.25% legal historical replay; remaining75% is70% exact clearing layers,10% broad and20% grouped landmarks/full-fork continuations, retaining all legal successors including traps. Reuse10000 complete root graphs and clearing indexes. Fixed1000 clearing is primary; historical510 is separate protection; arbitrary nonempty is auxiliary. No held-out rows or failures enter training. One1000-update feedback window before data-driven continuation.",
   "resources": {
     "host": "grounded-028",
     "allowed_gpu_indices": [
@@ -100,7 +101,7 @@
       2,
       3
     ],
-    "world_size": 1,
+    "world_size": 4,
     "start_only_when_idle": true
   }
 }

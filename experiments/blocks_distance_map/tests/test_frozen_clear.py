@@ -43,5 +43,24 @@ class FrozenClearTest(unittest.TestCase):
                     frozen_clear(config, "test", root / "bad", "test", "cpu")
 
 
+    def test_offline_failure_diagnosis_retains_the_executed_trap_and_full_fork(self):
+        class BadScorer(ClearingScorer):
+            def scores(self, children, goal):
+                return np.asarray([-child.bit_count() for child in children])
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "cases.json").write_text(json.dumps({"cases": [
+                {"id": "trap", "source": "7", "goal": "0", "true_distance": 1}]}))
+            with patch("experiments.blocks_distance_map.src.blocks12_eval.QScorer", BadScorer):
+                result = frozen_clear({"cases": str(root / "cases.json"), "case_count": 1,
+                                       "diagnose_failures": True}, "test", root / "out", "test", "cpu")
+            self.assertEqual(result["success"], 0)
+            self.assertEqual(result["rows"][0]["final_state"], "4")
+            diagnosis = json.loads((root / "out/failure_decisions.json").read_text())[0]
+            self.assertEqual(diagnosis["remaining_distance"], 1)
+            self.assertEqual([c["distance"] for c in diagnosis["candidates"]], [-1, -1, 0])
+            self.assertEqual(diagnosis["depth"], 0)
+
+
 if __name__ == "__main__":
     unittest.main()

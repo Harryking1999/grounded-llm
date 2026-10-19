@@ -1,14 +1,14 @@
 {
   "study": "blocks_distance_map",
   "scope": "twelve-piece clearing from broad legal roots and intermediate states; exact complete forks, multistep/crossbranch landmark relations auxiliary",
-  "parent_checkpoint": "runs/blocks12_clear_focus/parent/step_010000.pt",
+  "parent_checkpoint": "runs/blocks12_clear_long/parent/checkpoint.pt",
   "graph_data": "data/blocks12_graphs_10000",
   "legacy_data": "data/blocks12_legacy_tree_132f5a1.npz",
   "baseline_cases": "runs/qmap_dual_20261018/blocks12/baseline_cases.json",
   "training": {
     "seed": 2026101851,
     "learning_rate": 0.0003,
-    "steps": 5000,
+    "steps": 10000,
     "batch_size_per_rank": 16384,
     "rank_contexts_per_rank": 2048,
     "boards_per_batch": 16,
@@ -19,8 +19,8 @@
     "temperature": 1.0,
     "original_cap": 13,
     "unreachable_label": 19,
-    "previous_sampler_root": "runs/blocks12_clear_focus/parent",
-    "previous_sampler_step": 10000,
+    "previous_sampler_root": "runs/blocks12_clear_long/parent",
+    "previous_sampler_step": 0,
     "cpu_threads": 4,
     "log_every": 100,
     "checkpoint_every": 1000,
@@ -74,8 +74,10 @@
     "branch_bundle_fraction": 0.5,
     "exact_layer_fraction": 0.5,
     "sampler_shards": 4,
-    "previous_sampler_world": 2,
-    "clear_fork_huber_fraction": 0.5
+    "previous_sampler_world": 4,
+    "clear_fork_huber_fraction": 0.5,
+    "clear_initial_fork_first": false,
+    "clear_branch_followups": false
   },
   "evaluation": {
     "acceptance_config": "experiments/blocks_distance_map/configs/blocks12_clear_acceptance.json",
@@ -89,7 +91,7 @@
     "comparison_checkpoint": "clear_forks_step001000_810"
   },
   "policy": "unchanged_greedy_all_legal_successors_no_search_no_oracle_action_selection",
-  "rationale": "Continue verified840/1000, historical435/510, from cumulative3000 fullAdam/four sampler states. Fixed810 reference retained; original789 and all best checkpoints protected. Identical complete-fork clearing recipe earned810->835->840. Evaluate at4000 then5000, stop/revise after two complete stages without a new best. Formal completion>=900/1000, historical no substantial regression. One unifiedQ, same model/loss/weights/lr/Adam and puregreedy;10000 exact roots; no test failures enter training.",
+  "rationale": "Additional10000-update budget authorized after880/1000. Start only after the existing5000 window completes, select its verified best (at least880), retain fullAdam and all four sampler streams. Preserve unchanged effective complete-fork recipe while both training loss and fixed clearing improve; evaluate each1000, stop for sampling revision after two consecutive stages without a new best. Formal completion>=900/1000 with historical510 no substantial degradation. Same singleQ/model/loss/weights/lr/Adam/greedy; original789,810,840,880 snapshots retained; no test failures enter training.",
   "resources": {
     "host": "grounded-028",
     "allowed_gpu_indices": [
@@ -107,5 +109,5 @@
     "world_size": 4,
     "start_only_when_idle": true
   },
-  "continuation_checkpoint": "runs/blocks12_clear_forks/run/checkpoints/step_003000.pt"
+  "continuation_checkpoint": "runs/blocks12_clear_long/run/checkpoints/step_000000.pt"
 }

@@ -1,0 +1,20 @@
+{
+  "study": "blocks_distance_map",
+  "purpose": "Complete the second original-sampling feedback window after same889 supervision-domain controls failed; no new recipe or method",
+  "base_config": "experiments/blocks_distance_map/configs/blocks12_decision_margins.json",
+  "resume_checkpoint": "runs/blocks12_decision_margins/run/checkpoints/step_001000.pt",
+  "resume_sampler_step": 1000,
+  "target_continuation_step": 2000,
+  "additional_updates": 1000,
+  "parent_model": "retained889 with complete Adam94300 and four original sampler states; original1000 checkpoint has Adam95300",
+  "sampling_overrides": {},
+  "evidence": "Original1000=883/425 is only one complete window. Same889 disjoint-root control rose881->899 between1000 and2000, with history regression; a second original window tests delayed improvement without sacrificing history sampling. Reduced-domain1000=861/274 and protected-history-domain1000=867/407 both rejected.",
+  "unchanged": ["original_shared16_sampling", "original25percent_legacy_finite_and_negative_strata", "same10000_graphs", "all_legal_candidates", "deep10-12_clear_forks", "multistep_followups", "small_landmark_stream", "encoder", "directed_sum", "Huber", "soft_rank", "weights", "temperature", "Adam", "learning_rate0.0003", "unreachable19", "global_batch65536", "rank_contexts8192", "pure_greedy", "fixed_test_rules_and_budgets"],
+  "evaluation_every_updates": 1000,
+  "reference_clear_success": 889,
+  "historical_floor": 421,
+  "minimum_formal_clear_success": 900,
+  "stop": "Evaluate2000 and stop for research decision; do not mechanically extend unchanged sampling after two complete windows without joint improvement",
+  "resources": {"host": "grounded-028", "allowed_gpus": [4, 5, 6, 7], "world_size": 4},
+  "metric_or_label_changes": "unapproved_offline_proposals_only"
+}

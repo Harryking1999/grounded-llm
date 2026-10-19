@@ -1,12 +1,55 @@
 {
   "task": "blocks",
-  "status": "selected",
-  "checkpoint": "checkpoints/best.pt",
-  "source_commit": "986cb4d",
-  "source_run": "runs/blocks_distance_map/tree_continue_986cb4d",
-  "source_checkpoint": "checkpoints/step_015000.pt",
-  "selection": "adopted_continued_map",
-  "config": "experiments/blocks_distance_map/configs/multiboard_1000_tree_continue.json",
-  "scope": "current_eight_shape_blocks_map_and_recent_map_sft",
-  "evidence": "experiments/map_sft_baselines/results/b2_10k_diagnosis.md"
+  "status": "selected_by_user_for_clear_and_near_clear",
+  "checkpoint": "checkpoints/structured_1000_ffba71f.pt",
+  "source_commit": "ffba71f",
+  "source_run": "runs/qmap_dual_20261018/blocks12/branch_coverage_replay/run",
+  "source_checkpoint": "checkpoints/step_001000.pt",
+  "selection": "user_adopted_structured1000_on_clear_and_construction_remainder_near_clear_distribution",
+  "config": "experiments/blocks_distance_map/configs/blocks12_branch_coverage.json",
+  "scope": "original_eight_shapes;twelve-placement_initial_roots;clear_or_certified_one_to_two_move_clearable_nonempty_targets;near-clear probe targets retain_original_construction_tiles;medium_sources_are_root_residuals",
+  "evaluation_distribution": "runs/qmap_dual_20261018/blocks12/near_clear_readonly_pilot.json",
+  "evidence": "runs/qmap_dual_20261018/blocks12/branch_coverage_replay/run/evaluation/step_001000.json",
+  "metrics": {
+    "clear": {
+      "success": 159,
+      "count": 200
+    },
+    "near_clear_medium": {
+      "success": 180,
+      "count": 200,
+      "actual_distances": [
+        7,
+        8
+      ]
+    },
+    "near_clear_long": {
+      "success": 137,
+      "count": 200,
+      "actual_distances": [
+        9,
+        10,
+        11
+      ]
+    },
+    "historical_510": {
+      "success": 421,
+      "count": 510
+    }
+  },
+  "limitations": "New selected scope, not arbitrary residual-goal85% acceptance or independent final generalization. Alternate-tiling near-clear targets remain harder. Prior fixed complex6-8 and9-13 results55/200 and49/200 are retained.",
+  "historical_reference": {
+    "task": "blocks",
+    "status": "selected",
+    "checkpoint": "checkpoints/best.pt",
+    "source_commit": "986cb4d",
+    "source_run": "runs/blocks_distance_map/tree_continue_986cb4d",
+    "source_checkpoint": "checkpoints/step_015000.pt",
+    "selection": "adopted_continued_map",
+    "config": "experiments/blocks_distance_map/configs/multiboard_1000_tree_continue.json",
+    "scope": "current_eight_shape_blocks_map_and_recent_map_sft",
+    "evidence": "experiments/map_sft_baselines/results/b2_10k_diagnosis.md"
+  },
+  "runtime_config": "runs/qmap_dual_20261018/blocks12/branch_coverage_replay/run/config.json",
+  "config_source_commit": "ffba71f"
 }

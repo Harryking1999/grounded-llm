@@ -1,8 +1,8 @@
 # 12块积木 Qmap：当前结论
 
-保留首轮10000步的421/510模型。后续广覆盖训练尚未让四项能力共同提高，未替换有效权重。
+用户现采用ffba71f结构化1000步候选，用于清空＋保留原构造块的近清空非空目标分布；保留首轮421父及原权重。原复杂目标四项联合验收仍未通过。
 
-| 固定同题 | 保留模型 | 最近完整候选（未采用） |
+| 固定同题 | 首轮父模型 | 当前采用候选 |
 |---|---:|---:|
 | 原地图SFT | 421/510 | 421/510 |
 | 12块清空 | 160/200 | 159/200 |
@@ -19,10 +19,10 @@
 精确数据覆盖10000个不同训练初盘、11540组件图、664种动作；每个选中初盘的完整图可精确查询。
 这是选中初盘的覆盖，不是整个任务全状态。最近阶段全rank独特关系估计4705万、完整结构组18.46万，仍未带来联合能力提高；详细曝光见运行索引。
 
-有效权重：[首轮模型](../../../runs/qmap_dual_20261018/blocks12/checkpoints/step_010000.pt)。
-训练合同：[结构化联合采样](../configs/blocks12_branch_coverage.json)，源码f90caab；原模型、Huber、soft-rank及权重、贪心不变，仅沿用已授权不可达19。
+有效权重：[采用入口](../../../tasks/blocks/Qmap/selection.json)、[结构化1000权重](../../../tasks/blocks/Qmap/checkpoints/structured_1000_ffba71f.pt)；[首轮父保留](../../../runs/qmap_dual_20261018/blocks12/checkpoints/step_010000.pt)。
+采用候选合同见selection的config，源码ffba71f；在途广覆盖合同为[结构化联合采样](../configs/blocks12_branch_coverage.json)，源码f90caab。模型、损失、贪心不变，仅沿用不可达19。
 复现：`experiments.blocks_distance_map.src.full_graph_run`；同题评测：`experiments.blocks_distance_map.src.full_graph_eval`。
 当前运行及原始断点、逐题结果、曝光和历史：[运行索引](../../../runs/qmap_dual_20261018/current_qmap_runtime.json)。
 
-下一步只看四项同题是否共同改善，再决定采样调整。目标均超过85%，当前未完成。
+当前采用分布的近清空成绩为180/200、137/200，实际距离仅7–8、9–11；新范围尚无对应1.5B接图结果。总览见[任务能力表](../../../tasks/README.md#任务能力总表)；后续训练策略另行确定。
 本页原位更新当前结论；不再追加训练流水或逐轮失败叙事。

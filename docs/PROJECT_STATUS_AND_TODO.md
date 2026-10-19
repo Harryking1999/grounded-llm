@@ -15,7 +15,7 @@
 
 | 任务 | 当前结论 | 下一步／依据 |
 |---|---|---|
-| [积木](../tasks/blocks/README.md) | 广覆盖独立关系尚未共同改善原510、清空及困难中间目标；保留原选用及首轮421/510能力保持权重 | 从首轮有效父联合训练同起点多目标、同目标多起点、完整候选及跨分支多步关系；按实际更新的结构组曝光和四项同题得失验收，保持独立未见初盘；仅沿用已授权不可达修正；[12块地图报告](../experiments/blocks_distance_map/results/blocks12_joint_report.md)、[历史地图](../experiments/blocks_distance_map/results/report.md)、[并行SFT诊断](../experiments/map_sft_baselines/results/b2_four_controls.md) |
+| [积木](../tasks/blocks/README.md) | 用户采用结构化1000步候选及清空／近清空监测分布，保留历史权重；原复杂目标联合验收仍未通过 | 当前候选的1.5B接图单训／统一训尚无对应结果；保持原510回归，近清空成绩不冒充任意目标泛化；[采用入口](../tasks/blocks/Qmap/selection.json)、[12块地图报告](../experiments/blocks_distance_map/results/blocks12_joint_report.md)、[任务能力表](../tasks/README.md#任务能力总表) |
 | [寻路](../tasks/path/README.md) | 采用统一方法 Q 和已选定权重，旧 Q/V 保留为历史对照 | 统一文字与新条件参数；[权重来源](../tasks/path/Qmap/selection.json) |
 | [汉诺塔](../tasks/hanoi/README.md) | 用户采用八盘整塔目标地图，正式评测仅考虑任意合法起点到指定柱的整塔终点 | 保留残留失败与中间目标补充结果，不追加训练；[权重及范围](../tasks/hanoi/Qmap/selection.json)、[实验报告](../experiments/hanoi_qmap/results/report.md) |
 | [二阶魔方](../tasks/cube2/README.md) | 采用用户指定的复原断点，保留二阶主条件，三阶探索停止 | 继续定位复原与关系泛化不足；[权重来源](../tasks/cube2/Qmap/selection.json) |
@@ -41,6 +41,7 @@
 ## 5. 权威入口
 
 - [任务工作区](../tasks/README.md)、[全部任务文字](../TASK_TEXTS.md)、[统一Qmap方法](../tasks/QMAP_METHOD.md)。任务内文字为原文，集中副本自动同步。
+- [任务能力总表](../tasks/README.md#任务能力总表)：纯文字基线、地图贪心、1.5B接图单任务／统一训练；未有对应结果处留空，计划任务单独占位。
 - [实验目录](../experiments/README.md)：正式合同、实现、检查和结果；原始数据、模型及运行产物不进入Git。
 - 各任务的`Qmap/selection.json`记录所选权重与适用范围，权重放忽略的`Qmap/checkpoints/`。
 - [开发机手册](../DEVELOPMENT_MACHINES.md)：连接、资源、存储与迁移；不承载研究进度。

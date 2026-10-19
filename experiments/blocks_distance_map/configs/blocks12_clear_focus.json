@@ -76,8 +76,10 @@
     "sampler_shards": 4,
     "previous_sampler_world": 4,
     "clear_fork_huber_fraction": 0.5,
-    "clear_initial_fork_first": false,
-    "clear_branch_followups": false
+    "clear_initial_fork_first": true,
+    "clear_branch_followups": true,
+    "clear_dead_followup_fraction": 0.25,
+    "clear_path_landmarks": true
   },
   "evaluation": {
     "acceptance_config": "experiments/blocks_distance_map/configs/blocks12_clear_acceptance.json",
@@ -91,7 +93,7 @@
     "comparison_checkpoint": "clear_forks_step001000_810"
   },
   "policy": "unchanged_greedy_all_legal_successors_no_search_no_oracle_action_selection",
-  "rationale": "Additional10000-update budget authorized after880/1000. Start only after the existing5000 window completes, select its verified best (at least880), retain fullAdam and all four sampler streams. Preserve unchanged effective complete-fork recipe while both training loss and fixed clearing improve; evaluate each1000, stop for sampling revision after two consecutive stages without a new best. Formal completion>=900/1000 with historical510 no substantial degradation. Same singleQ/model/loss/weights/lr/Adam/greedy; original789,810,840,880 snapshots retained; no test failures enter training.",
+  "rationale": "Additional10000-update budget; begin after the existing5000 window using its verified best (at least880), fullAdam and four sampler states. Three layers in one unchangedQ: distance-indexed10-12 complete clearing forks tied to the same soft-rank contexts; linked viable branch next-forks, with dead followups capped at25% of alternative selections; auxiliary4-source/3-goal landmarks on certified clearing paths plus25% history and broad relations. All distances remain exact, all legal candidates retained; no test failures used. Evaluate every1000, preserve best and revise sampling after two stagnant stages;>=900 required, no substantial historical510 regression. Same architecture/loss/weights/lr/Adam/greedy and unreachable19; no extra inference search.",
   "resources": {
     "host": "grounded-028",
     "allowed_gpu_indices": [

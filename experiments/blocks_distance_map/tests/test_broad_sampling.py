@@ -179,6 +179,29 @@ class BroadSamplingTest(unittest.TestCase):
             tree.record_update(batch, np.ones(len(batch[2]), bool), np.ones(len(batch[5]), bool))
             self.assertGreater(tree.phase_sketches["clear_branch_followup_huber_groups"].estimate(), 0)
             tree.close()
+            from experiments.gcml_counterexamples.src import blocks
+            current, witness = initial, []
+            while current:
+                action, child = next((a, s) for a, s in successors(current) if oracle.distance(s, 0) >= 0)
+                witness.append(blocks.PLACEMENTS[action][1])
+                current = child
+            (path / "roots.json").write_text(json.dumps([{**double, "construction": witness}]))
+            landmarks = BroadData(path, path / "legacy.npz", {**tree.options,
+                "clear_path_landmarks": True})
+            batch = landmarks.batch(1024, 128)
+            for source, goal, truth in ((batch[0], batch[1], batch[2]), (batch[3], batch[4], batch[5])):
+                np.testing.assert_array_equal(truth, [oracle.distance(int(s[0]), int(g[0]))
+                                                     for s, g in zip(source, goal)])
+            self.assertTrue(landmarks._pending_clear_landmarks)
+            for pairs, groups in landmarks._pending_clear_landmarks:
+                self.assertTrue(len(groups))
+                # Each auxiliary endpoint itself has a real path to empty;
+                # cross-branch reachability still receives exact negative labels.
+                self.assertTrue(all(oracle.distance(int(mask), 0) >= 0 for mask in pairs[:, 2]))
+            self.assertEqual(landmarks.phase_sketches["clear_path_landmark_huber_groups"].estimate(), 0)
+            landmarks.record_update(batch, np.ones(len(batch[2]), bool), np.ones(len(batch[5]), bool))
+            self.assertGreater(landmarks.phase_sketches["clear_path_landmark_huber_groups"].estimate(), 0)
+            landmarks.close()
             # Two independent identical components double every finite exact
             # distance, providing historical short AND6--10-step relations.
             old_rows = np.asarray(rows + [[int(graph.initial_id), int(graph.zero_id),

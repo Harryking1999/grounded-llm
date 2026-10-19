@@ -8,6 +8,7 @@ import torch
 
 from .full_graph_sampling import JointData
 from .clear_distance_index import ClearDistanceIndex
+from experiments.gcml_counterexamples.src import blocks
 
 
 class Cardinality:
@@ -62,7 +63,8 @@ class BroadData(JointData):
             "bundle_huber_relations", "bundle_rank_candidate_relations", "bundle_forks",
             "bundle_huber_groups", "bundle_shared_source_groups", "bundle_shared_goal_groups",
             "bundle_cross_branch_groups", "clear_fork_huber_relations", "clear_fork_huber_groups",
-            "clear_initial_fork_huber_groups", "clear_branch_followup_huber_groups")}
+            "clear_initial_fork_huber_groups", "clear_branch_followup_huber_groups",
+            "clear_path_landmark_huber_groups", "clear_path_landmark_huber_relations")}
         self.phase_roots = np.zeros(len(self.roots), dtype=bool)
         self.phase_histograms = {}
         self.requested_distances = {}
@@ -81,6 +83,8 @@ class BroadData(JointData):
         self._pending_clear_initial_forks = []
         self._pending_clear_followups = []
         self._clear_rank_anchors = {}
+        self._pending_clear_landmarks = []
+        self._clear_rank_slots = None
         self.layer_views, self.layer_suffixes = {}, {}
         index_path = options.get("clear_index_data")
         self.clear_indexes = ({gid: ClearDistanceIndex(Path(index_path) / str(gid)) for gid in self.graphs}
@@ -223,7 +227,9 @@ class BroadData(JointData):
                     if len(good):
                         best = good[distances[good] == distances[good].min()]
                         selected.append(int(self.rng.choice(best)))
-                    alternative = bad if len(bad) else np.setdiff1d(good, selected)
+                    alternative = np.setdiff1d(good, selected)
+                    if len(bad) and self.rng.random() < self.options.get("clear_dead_followup_fraction", .25):
+                        alternative = bad
                     if len(alternative):
                         selected.append(int(self.rng.choice(alternative)))
                     followups = children[selected]
@@ -235,6 +241,8 @@ class BroadData(JointData):
             degree = sum(g.degrees(anchors[:, i]) for i, (g, _) in enumerate(root.parts))
             anchors = anchors[np.cumsum(degree + 1) <= budget]
             if self.options.get("clear_branch_followups", False):
+                if self._clear_rank_slots is not None:
+                    anchors = anchors[:self._clear_rank_slots]
                 self._clear_rank_anchors[board] = anchors.copy()
             if len(anchors) and len(followups):
                 selected = (followups[:, None] == anchors[None]).all(-1).any(-1)
@@ -437,7 +445,61 @@ class BroadData(JointData):
         return (np.stack([g.rank(source[:, i]) for i, (g, _) in enumerate(root.parts)], -1),
                 np.stack([g.rank(goal[:, i]) for i, (g, _) in enumerate(root.parts)], -1))
 
+    def _clear_landmark_rows(self, board, count, cross):
+        """Exact cross-branch landmarks on certified paths to empty.
+
+        Random orders of the root's construction tiles supply legal clearing
+        paths cheaply. They are auxiliary only: distance-layer forks above still
+        sample the whole exact graph, including other tilings and dead ends.
+        """
+        root = self.roots[board]
+        witness = root.record["construction"]
+        tiles = [blocks.PLACEMENTS[blocks.BY_ACTION[(a["shape_id"], a["row"], a["col"]) ]][0]
+                 for a in witness]
+        if len(tiles) < 2:
+            raise ValueError("Clearing landmarks require a real multi-tile construction certificate")
+        sources, goals = [], []
+        for group in range((count + 11) // 12):
+            order = self.rng.permutation(len(tiles))
+            depth = int(self.rng.integers(min(10, len(tiles) - 2) + 1))
+            state = int(root.record["initial"])
+            for index in order[:depth]:
+                state ^= tiles[index]
+            remaining = order[depth:]
+            first = self.rng.permutation(len(remaining))
+            paths = []
+            for branch in range(3):
+                lead = remaining[first[branch % len(first)]]
+                rest = self.rng.permutation(remaining[remaining != lead])
+                path, current = [state], state
+                for index in np.r_[lead, rest]:
+                    if current & tiles[index] != tiles[index]:
+                        raise ValueError("Construction path contains an illegal removal")
+                    current ^= tiles[index]
+                    path.append(current)
+                if current:
+                    raise ValueError("Construction path does not reach empty")
+                paths.append(path)
+            starts = [state] + [path[1] for path in paths]
+            landmarks = [path[int(self.rng.integers(1, len(path) - 1))] for path in paths]
+            for start in starts:
+                for goal in landmarks:
+                    sources.append(start); goals.append(goal)
+        source_masks, goal_masks = sources[:count], goals[:count]
+        def ids(masks):
+            return np.stack([graph.rank(np.asarray([
+                sum(((mask >> cell) & 1) << bit for bit, cell in enumerate(cells)) for mask in masks],
+                dtype=np.uint64)) for graph, cells in root.parts], -1)
+        source, goal = ids(source_masks), ids(goal_masks)
+        if cross and count:
+            keys = np.column_stack((root.packed(source), root.packed(goal)))
+            complete = count // 12 * 12
+            self._pending_clear_landmarks.append((keys, keys[:complete].reshape(-1, 12, 4)))
+        return source, goal
+
     def structure_rows(self, board, count, cross):
+        if self.options.get("clear_path_landmarks", False):
+            return self._clear_landmark_rows(board, count, cross)
         # Twelve related contexts occupy existing structure slots, not extra loss
         # terms. Independent broad/clear/legacy streams remain in the batch.
         fraction = self.options.get("branch_bundle_fraction", 0)
@@ -550,6 +612,10 @@ class BroadData(JointData):
         self._pending_clear_initial_forks = []
         self._pending_clear_followups = []
         self._clear_rank_anchors = {}
+        self._pending_clear_landmarks = []
+        root_rank = (rank_count - round(rank_count * self.options["legacy_fraction"])) // self.options["boards_per_batch"]
+        clear_rank = round(root_rank * self.options["clear_fraction"])
+        self._clear_rank_slots = clear_rank - round(clear_rank * self.options.get("clear_broad_fraction", .15))
         return super().batch(pair_count, rank_count)
 
     def boards(self):
@@ -589,6 +655,9 @@ class BroadData(JointData):
         def canonical(groups):
             order = np.lexsort(tuple(groups[:, :, i] for i in reversed(range(4))))
             return np.take_along_axis(groups, order[:, :, None], axis=1).reshape(len(groups), -1)
+        for pairs, groups in self._pending_clear_landmarks:
+            self.phase_sketches["clear_path_landmark_huber_relations"].add(pairs)
+            self.phase_sketches["clear_path_landmark_huber_groups"].add(canonical(groups))
         for keys, truth, roles, wanted, complete in self._pending_bundle_huber:
             self.phase_sketches["bundle_huber_relations"].add(keys)
             self.add_hist(self.bundle_histograms.setdefault("huber_requested_anchor_distance", {}), wanted)

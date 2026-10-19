@@ -7,10 +7,10 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from experiments.gcml_counterexamples.src import blocks
+import grounded_llm.tasks.blocks.rules as blocks
 from .hardbranch_eval import load_values
 from .model import board_bits, distance
-from .oracle import DistanceOracle, successors
+from grounded_llm.tasks.blocks.oracle import DistanceOracle, successors
 
 
 class FrozenScorer:

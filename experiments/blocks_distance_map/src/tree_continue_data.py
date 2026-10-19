@@ -5,9 +5,9 @@ from pathlib import Path
 
 import numpy as np
 
-from experiments.gcml_counterexamples.src import blocks
-from .multiboard_data import official_boards, sample_paths
-from .oracle import DistanceOracle, successors
+import grounded_llm.tasks.blocks.rules as blocks
+from grounded_llm.tasks.blocks.multiboard_data import official_boards, sample_paths
+from grounded_llm.tasks.blocks.oracle import DistanceOracle, successors
 
 
 CLEAR_FORK = 64

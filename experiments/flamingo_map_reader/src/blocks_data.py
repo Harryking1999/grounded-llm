@@ -7,7 +7,7 @@ from pathlib import Path
 import numpy as np
 
 from experiments.blocks_distance_map.src.multiboard_data import official_boards, sample_paths
-from experiments.blocks_distance_map.src.oracle import DistanceOracle
+from grounded_llm.tasks.blocks.oracle import DistanceOracle
 from .blocks_sft import greedy_demonstration
 
 
@@ -131,7 +131,7 @@ def demonstration_from_record(qmap, record, max_actions, reported=None):
 
 def main():
     from argparse import ArgumentParser
-    from .blocks import FrozenBoardMap
+    from grounded_llm.tasks.blocks.qmap import FrozenBoardMap
     parser = ArgumentParser()
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--official-data", type=Path, required=True)

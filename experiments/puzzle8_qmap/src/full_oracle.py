@@ -7,7 +7,7 @@ import time
 import numpy as np
 from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import shortest_path
-from .environment import Puzzle8
+from grounded_llm.tasks.puzzle8.environment import Puzzle8
 
 
 def initialize(graph, path):

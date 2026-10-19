@@ -7,7 +7,7 @@ import subprocess
 import sys
 import time
 
-from .common import atomic_json
+from grounded_llm.tasks.blocks.sft import atomic_json
 from .contract import training_steps
 from .train import validate_resume_contract
 

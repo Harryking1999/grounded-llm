@@ -1,4 +1,11 @@
 """Standard HF Trainer SFT with a map-aware collator and adapter-only saves."""
+from grounded_llm.core.reader.batching import to_device, collate_examples
+from grounded_llm.tasks.blocks.qmap import FrozenBoardMap
+from grounded_llm.core.reader.fusion import MapReader
+from grounded_llm.core.reader.memory import (AddressedMapMemoryEncoder, JointFeatureMapMemoryEncoder,
+                     MapBatch, MapMemoryEncoder, MapTimeline)
+from grounded_llm.core.sft.transcript import encode_trajectory
+from grounded_llm.core.reader.build import build_reader
 
 from argparse import ArgumentParser
 from dataclasses import replace
@@ -14,77 +21,10 @@ from torch.nn import functional as F
 from torch.utils.data import Dataset
 from transformers import Trainer, TrainerCallback, TrainingArguments, set_seed
 
-from .blocks import FrozenBoardMap
 from .blocks_data import demonstration_from_record
 from .data import demonstration_from_record as graph_demonstration_from_record, load_graph
-from .fusion import MapReader
 from .graph import batch_maps
-from .memory import (AddressedMapMemoryEncoder, JointFeatureMapMemoryEncoder,
-                     MapBatch, MapMemoryEncoder, MapTimeline)
 from .readout_aux import CounterfactualFirstTurnDataset
-from .transcript import encode_trajectory
-
-
-def build_reader(base, config, *, sequence_mean_loss=False, cache_generation=False):
-    spec = config["map"]
-    mode = spec.get("memory_mode", "joint")
-    if mode == "joint":
-        # Deprecated fallback, reached only by configs that predate addressed memory
-        # or by a config that omits memory_mode. Current configs set it explicitly.
-        encoder = MapMemoryEncoder
-    elif mode == "address_key_state_value":
-        encoder = AddressedMapMemoryEncoder
-    elif mode == "joint_feature_kv":
-        encoder = JointFeatureMapMemoryEncoder
-    else:
-        raise ValueError(f"Unknown map memory mode: {mode}")
-    memory = encoder(spec["state_dim"], base.config.hidden_size,
-                     spec["maximum_candidates"], spec["projection_dim"],
-                     spec["role_and_id_dim"], **({"feature_ffn_hidden_dim":
-                         spec.get("feature_ffn_hidden_dim", 0)} if mode != "joint" else {}))
-    return MapReader(base, memory, spec["attention_heads"], spec["attention_head_dim"],
-                      spec["cross_attention_every_n_layers"],
-                      # Both deprecated; the current configs set neither. Read through
-                      # only so the archived runs that did stay reproducible.
-                      fixed_gate_tanh=spec.get("fixed_gate_tanh"),
-                      value_scale=spec.get("value_scale", 1.0),
-                      checkpoint_layers=config["training"].get("checkpoint_layers", False),
-                      loss_chunk_tokens=config["training"].get("loss_chunk_tokens", 0),
-                      sequence_mean_loss=sequence_mean_loss, cache_generation=cache_generation)
-
-
-def to_device(timeline, device):
-    maps = timeline.snapshots
-    return replace(timeline, snapshots=MapBatch(
-        maps.vectors.to(device), maps.roles.to(device),
-        maps.candidate_ids.to(device), maps.valid.to(device)),
-        token_map_ids=timeline.token_map_ids.to(device))
-
-
-def collate_examples(examples, pad_token_id):
-    """Pad complete SFT examples; keep each example's own map timeline."""
-    width = max(len(encoded.input_ids) for encoded, _ in examples)
-    input_ids, labels, attention_mask, map_ids, counts, steps = [], [], [], [], [], []
-    focused = []
-    for encoded, example_steps in examples:
-        padding = width - len(encoded.input_ids)
-        input_ids.append(encoded.input_ids + [pad_token_id] * padding)
-        labels.append(encoded.labels + [-100] * padding)
-        attention_mask.append([1] * len(encoded.input_ids) + [0] * padding)
-        map_ids.append(encoded.token_map_ids + [len(example_steps) - 1] * padding)
-        if encoded.focus_mask is not None:
-            focused.append(encoded.focus_mask + [False] * padding)
-        counts.append(len(example_steps))
-        steps.extend(example_steps)
-    timeline = MapTimeline(batch_maps(steps), torch.tensor(map_ids), tuple(counts))
-    timeline.validate(max(len(step.candidate_actions) for step in steps), width)
-    if focused and len(focused) != len(examples):
-        raise ValueError("Cannot mix focused and ordinary trajectories")
-    inputs = {"input_ids": torch.tensor(input_ids), "labels": torch.tensor(labels),
-              "attention_mask": torch.tensor(attention_mask)}
-    if focused:
-        inputs["focus_mask"] = torch.tensor(focused, dtype=torch.bool)
-    return timeline, inputs
 
 
 def decision_weighted_loss(ordinary_loss, logits, labels, focus_mask, weight):

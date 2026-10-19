@@ -1,7 +1,7 @@
 """Independent training lanes and latest-first four-GPU evaluation workers."""
 import argparse,json,os,subprocess,sys,time
 from pathlib import Path
-from experiments.llm_task_sft.src.files import atomic_json
+from grounded_llm.core.files import atomic_json
 from .metrics import summarize
 from .contract import steps_per_epoch,checkpoint_steps,cohort_size,evaluation_modes
 

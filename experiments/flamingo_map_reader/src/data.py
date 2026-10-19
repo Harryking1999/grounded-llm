@@ -8,7 +8,7 @@ import json
 import numpy as np
 
 from experiments.external_map_interface.src.q_map import GraphQMap
-from experiments.external_map_interface.src.transitions import GraphEnvironment
+from grounded_llm.tasks.path.environment import GraphEnvironment
 
 from .sft import Demonstration, greedy_demonstration
 

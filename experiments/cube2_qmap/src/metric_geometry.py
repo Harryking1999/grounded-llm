@@ -6,8 +6,8 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from .evaluate import encode
-from .model import MapReader
+from grounded_llm.tasks.cube2.evaluate import encode
+from grounded_llm.tasks.cube2.model import MapReader
 from .run import make_environment
 
 

@@ -9,9 +9,7 @@ import torch
 
 from .full_graph_sampling import JointData
 from .clear_distance_index import ClearDistanceIndex
-from experiments.gcml_counterexamples.src import blocks
-
-
+import grounded_llm.tasks.blocks.rules as blocks
 class Cardinality:
     """Mergeable HLL; identical packed state pairs deduplicate across roots/ranks."""
     def __init__(self, registers=None, precision=14):

@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone
 import json
 from pathlib import Path
 
-from .protocol import ROOT
+from grounded_llm.tasks.text import ROOT
 from .report import build, NAMES
 from .run import write_json
 from .budget import output_limit, rescore

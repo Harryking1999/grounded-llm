@@ -12,7 +12,7 @@ import time
 
 import numpy as np
 
-from .protocol import (atomic_json, encode_messages, oracle_for, route_messages,
+from grounded_llm.tasks.blocks.protocol import (atomic_json, encode_messages, oracle_for, route_messages,
                        sample_routes)
 
 WORK = {}

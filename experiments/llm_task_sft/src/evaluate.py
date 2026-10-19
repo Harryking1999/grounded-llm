@@ -8,9 +8,9 @@ import time
 
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
-from experiments.flamingo_map_reader.src.text import chat_ids
+from grounded_llm.core.sft.text import chat_ids
 
-from .protocol import (action_from_key, atomic_json, check_reason, legal_actions,
+from grounded_llm.tasks.blocks.protocol import (action_from_key, atomic_json, check_reason, legal_actions,
                        oracle_for, parse_control, response, rules, user_update)
 
 

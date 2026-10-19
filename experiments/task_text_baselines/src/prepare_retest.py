@@ -7,13 +7,13 @@ import subprocess
 import random
 
 from experiments.sol_dag_blocks.src.tasks import BlocksTask
-from experiments.gcml_counterexamples.src import blocks
+import grounded_llm.tasks.blocks.rules as blocks
 from .difficulty import blocks_case, harder_prompt
-from .protocol import ROOT, judge
+from grounded_llm.tasks.text import ROOT, judge
 from .run import write_json
 from .prepare import make_blocks
 from . import cube2
-from .protocol import prompt
+from grounded_llm.tasks.text import prompt
 import numpy as np
 
 

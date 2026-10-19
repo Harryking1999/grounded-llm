@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 from .hardbranch_failure import summarize, trace
-from .oracle import DistanceOracle
+from grounded_llm.tasks.blocks.oracle import DistanceOracle
 from .tree_supervision_eval import QScorer
 
 

@@ -5,7 +5,7 @@ from pathlib import Path
 
 import numpy as np
 
-from experiments.gcml_counterexamples.src import blocks
+import grounded_llm.tasks.blocks.rules as blocks
 from .full_graph_data import load_component, Root
 from .multiboard_eval import listwise_groups
 

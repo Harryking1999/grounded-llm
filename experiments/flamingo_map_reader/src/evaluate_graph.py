@@ -14,7 +14,7 @@ from .evaluate_blocks import parse_control
 from .graph import graph_step, timeline_maps
 from .prompt import initial_prompt, turn_prompt
 from .train import build_reader, to_device
-from .text import chat_ids
+from grounded_llm.core.sft.text import chat_ids
 
 
 def rollout(reader, tokenizer, environment, qmap, case, config, device):

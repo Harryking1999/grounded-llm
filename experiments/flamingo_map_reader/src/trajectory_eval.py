@@ -10,12 +10,12 @@ import time
 import numpy as np
 import torch
 
-from .blocks import FrozenBoardMap, blocks_step
+from grounded_llm.tasks.blocks.qmap import FrozenBoardMap, blocks_step
 from . import blocks_prompt, prompt, sft
 from .data import load_graph, shortest_move_counts
 from .evaluate_blocks import parse_control
 from .graph import graph_step, timeline_maps
-from .text import chat_ids
+from grounded_llm.core.sft.text import chat_ids
 from .train import build_reader, pinned_supervision, to_device
 from .trajectory_dataset import load_record
 from .trajectory_metrics import score_turn, summarize_turns
@@ -96,7 +96,7 @@ class TaskEnvironment:
             self.env, self.qmap, _ = load_graph(Path(manifest["source_root"]), config["data"]["graph_id"])
             self.distances = shortest_move_counts(self.env.adjacency)
         else:
-            from experiments.blocks_distance_map.src.oracle import DistanceOracle
+            from grounded_llm.tasks.blocks.oracle import DistanceOracle
             self.qmap = FrozenBoardMap.load(Path(manifest["q_checkpoint"]))
             self.oracle = DistanceOracle(cache_limit=1_000_000, seconds=1_000_000)
 

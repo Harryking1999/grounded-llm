@@ -7,9 +7,9 @@ import numpy as np
 import torch
 from torch.nn import functional as F
 
-from .model import MapReader, soft_rank_loss
-from .environment import Cube2
-from .local_graph import LocalGraphSampler
+from grounded_llm.tasks.cube2.model import MapReader, soft_rank_loss
+from grounded_llm.tasks.cube2.environment import Cube2
+from grounded_llm.tasks.cube2.local_graph import LocalGraphSampler
 from .structure_study import dense_upper_loss, load_contract, relation_values
 
 

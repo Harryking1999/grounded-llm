@@ -9,11 +9,11 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from grounded_llm.qmap_metrics import decisions, pair_metrics, rollout
-from grounded_llm.qmap_sampling import task_indices
-from .environment import Puzzle8
-from .model import MODEL_TYPE, QMap
-from .policy_audit import audit
+from grounded_llm.core.qmap.metrics import decisions, pair_metrics, rollout
+from grounded_llm.core.qmap.sampling import task_indices
+from grounded_llm.tasks.puzzle8.environment import Puzzle8
+from grounded_llm.tasks.puzzle8.model import MODEL_TYPE, QMap
+from grounded_llm.tasks.puzzle8.policy_audit import audit
 
 
 def same_tasks(before, after):
@@ -29,7 +29,7 @@ def same_tasks(before, after):
 def cycle_ranking(env, state):
     """All cycle stars and exact basin sizes, including errors outside short cycles."""
     pointer, height = state["pointer"], state["height"]
-    from .policy_audit import cycle_nodes
+    from grounded_llm.tasks.puzzle8.policy_audit import cycle_nodes
     cyclic = cycle_nodes(pointer)
     representatives = np.full(env.size, -1, dtype=np.int64)
     for start in np.flatnonzero(cyclic):

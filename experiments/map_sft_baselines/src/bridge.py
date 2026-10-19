@@ -8,7 +8,7 @@ from pathlib import Path
 from filelock import FileLock
 import paramiko
 from experiments.llm_task_sft.src.bridge import connect, execute
-from experiments.llm_task_sft.src.files import atomic_json
+from grounded_llm.core.files import atomic_json
 from .contract import plateau_status
 from .retention import prune_completed, has_capacity
 

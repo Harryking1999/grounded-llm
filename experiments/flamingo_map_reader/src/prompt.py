@@ -7,7 +7,7 @@ import numpy as np
 from .graph import GraphStep
 
 
-from .text import task_opening
+from grounded_llm.core.sft.text import task_opening
 
 
 INITIAL_TEMPLATE = """{opening}

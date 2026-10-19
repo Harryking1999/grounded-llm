@@ -16,8 +16,8 @@ def train_path(row):
 
 
 def reference_path(row):
-    from experiments.gcml_counterexamples.src import blocks as rules
-    from experiments.llm_task_sft.src.protocol import action_from_key
+    import grounded_llm.tasks.blocks.rules as rules
+    from grounded_llm.tasks.blocks.protocol import action_from_key
     states=[int(row['start'])]
     for key in row['reference_actions']:
         states.append(rules.apply(states[-1],action_from_key(key)))
@@ -27,7 +27,7 @@ def reference_path(row):
 
 
 def audit_exposure(rows,references):
-    from experiments.gcml_counterexamples.src import blocks as rules
+    import grounded_llm.tasks.blocks.rules as rules
     initial={(int(r['start']),int(r['goal'])) for r in rows}
     pairs={(int(s),int(g)) for r in rows for s,g in r['pairs']}
     terminal={(int(r['goal']),int(r['goal'])) for r in rows}
@@ -108,7 +108,7 @@ def main():
                         raise ValueError('Cached action differs from metadata')
                     actions+=1
         report['cache_replay']=dict(trajectories=len(chosen),actions=actions,passed=True)
-    from .common import atomic_json
+    from grounded_llm.tasks.blocks.sft import atomic_json
     args.out.mkdir(parents=True,exist_ok=True)
     atomic_json(args.out/'exposure.json',report)
     compact={k:v for k,v in report.items() if k!='cases'}

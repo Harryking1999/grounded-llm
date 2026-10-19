@@ -11,7 +11,7 @@ from .model import BoardEncoder, board_bits, distance, strata
 from .multiboard_eval import encoded_values, goal_rollouts, listwise_groups, pair_scores, split_metrics
 from .multiboard_post_eval import matched_supported_tasks
 from .multiboard_run import rank_loss, atomic_save
-from .oracle import DistanceOracle, successors
+from grounded_llm.tasks.blocks.oracle import DistanceOracle, successors
 from .train import draw
 
 

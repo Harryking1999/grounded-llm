@@ -9,8 +9,8 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from experiments.blocks_distance_map.src.oracle import DistanceOracle
-from .blocks import FrozenBoardMap
+from grounded_llm.tasks.blocks.oracle import DistanceOracle
+from grounded_llm.tasks.blocks.qmap import FrozenBoardMap
 from .blocks_sft import greedy_demonstration
 
 

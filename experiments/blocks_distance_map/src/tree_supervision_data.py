@@ -5,8 +5,8 @@ from pathlib import Path
 
 import numpy as np
 
-from .multiboard_data import official_boards, sample_paths
-from .oracle import DistanceOracle, successors
+from grounded_llm.tasks.blocks.multiboard_data import official_boards, sample_paths
+from grounded_llm.tasks.blocks.oracle import DistanceOracle, successors
 
 
 ANCESTOR = 1

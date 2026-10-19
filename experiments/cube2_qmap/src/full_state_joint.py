@@ -8,10 +8,10 @@ import numpy as np
 import torch
 from torch.nn import functional as F
 
-from .relation_data import pair_keys
-from .evaluate import decisions, pair_metrics, rollout
-from .model import MODEL_TYPE, QMap, soft_rank_loss
-from .environment import Cube2
+from grounded_llm.tasks.cube2.relation_data import pair_keys
+from grounded_llm.tasks.cube2.evaluate import decisions, pair_metrics, rollout
+from grounded_llm.tasks.cube2.model import MODEL_TYPE, QMap, soft_rank_loss
+from grounded_llm.tasks.cube2.environment import Cube2
 from .route_complete import losses, metrics
 
 

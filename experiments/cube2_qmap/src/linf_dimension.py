@@ -5,7 +5,7 @@ from pathlib import Path
 
 import numpy as np
 
-from .environment import Cube2
+from grounded_llm.tasks.cube2.environment import Cube2
 
 
 def construct(env, options, protected=()):

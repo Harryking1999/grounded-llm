@@ -6,7 +6,7 @@ import numpy as np
 import torch
 from torch.nn import functional as F
 
-from .model import soft_rank_loss
+from grounded_llm.tasks.puzzle8.model import soft_rank_loss
 
 
 class BatchParallel:

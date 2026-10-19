@@ -7,10 +7,10 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from experiments.gcml_counterexamples.src import blocks
+import grounded_llm.tasks.blocks.rules as blocks
 from .model import BoardEncoder, board_bits, distance
 from .multiboard_post_eval import matched_supported_tasks
-from .oracle import DistanceOracle, successors
+from grounded_llm.tasks.blocks.oracle import DistanceOracle, successors
 
 
 @torch.no_grad()

@@ -6,8 +6,8 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from experiments.gcml_counterexamples.src import blocks
-from .oracle import DistanceOracle
+import grounded_llm.tasks.blocks.rules as blocks
+from grounded_llm.tasks.blocks.oracle import DistanceOracle
 from .tree_supervision_eval import QScorer
 
 

@@ -19,7 +19,7 @@ from .readout_aux import paired_turns, renumber_turn
 from .relations import first_ranked_candidate, parse_ranking, score_relationships
 from .sft import Demonstration
 from .train import MapCollator, to_device
-from .transcript import encode_trajectory
+from grounded_llm.core.sft.transcript import encode_trajectory
 
 
 def diagnostic_records(records, config, final=False):

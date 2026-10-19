@@ -8,7 +8,7 @@ from pathlib import Path
 import subprocess
 
 from .difficulty import levels, prepare_level
-from .protocol import ROOT
+from grounded_llm.tasks.text import ROOT
 from .report import build
 from .run import call, summary, write_json
 

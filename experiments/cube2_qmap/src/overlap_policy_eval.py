@@ -6,9 +6,9 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from .evaluate import rollout
-from .model import MapReader
-from .environment import Cube2
+from grounded_llm.tasks.cube2.evaluate import rollout
+from grounded_llm.tasks.cube2.model import MapReader
+from grounded_llm.tasks.cube2.environment import Cube2
 
 
 def main():

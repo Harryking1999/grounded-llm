@@ -7,8 +7,8 @@ import json
 from pathlib import Path
 import time
 
-from experiments.gcml_counterexamples.src import blocks as rules
-from .files import atomic_json
+import grounded_llm.tasks.blocks.rules as rules
+from grounded_llm.core.files import atomic_json
 
 
 def exact_probabilities(start, goal, budget, placements=None, max_states=2000000, seconds=120,reference_tiles=()):

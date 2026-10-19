@@ -9,9 +9,9 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 
-from .model import MODEL_TYPE, QMap, soft_rank_loss
-from .data import pose_groups
-from .environment import Cube2
+from grounded_llm.tasks.cube2.model import MODEL_TYPE, QMap, soft_rank_loss
+from grounded_llm.tasks.cube2.data import pose_groups
+from grounded_llm.tasks.cube2.environment import Cube2
 
 
 def optimal_closure(env, initial):

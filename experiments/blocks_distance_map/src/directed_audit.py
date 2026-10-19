@@ -11,9 +11,7 @@ import torch
 from .broad_sampling import BroadData
 from .failure_diagnosis import RootOracle
 from .model import BoardEncoder, board_bits, distance
-from experiments.gcml_counterexamples.src import blocks
-
-
+import grounded_llm.tasks.blocks.rules as blocks
 def closed_chains(observed):
     """Six actually observed ordered relations, not merely queryable triples."""
     adjacent = defaultdict(list)

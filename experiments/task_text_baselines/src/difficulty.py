@@ -8,7 +8,7 @@ from experiments.qwen_path_blocks.src.prepare_path_suite import regular_connecte
 from experiments.sol_dag_blocks.src.tasks import BlocksTask
 from . import cube3, hanoi, sliding
 from .prepare import make_hanoi
-from .protocol import ROOT, prompt, section_text, judge
+from grounded_llm.tasks.text import ROOT, prompt, section_text, judge
 
 INVERSE = {"Up":"Down","Down":"Up","Left":"Right","Right":"Left"}
 

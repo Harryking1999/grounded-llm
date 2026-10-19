@@ -8,29 +8,11 @@ import torch
 from torch.nn.utils.rnn import pad_sequence
 
 from experiments.external_map_interface.src.q_map import GraphQMap
-from experiments.external_map_interface.src.transitions import GraphEnvironment
+from grounded_llm.tasks.path.environment import GraphEnvironment
 
-from .memory import CURRENT, GOAL, SUCCESSOR, MapBatch, MapTimeline
-from .blocks import BlocksStep
-
-
-@dataclass(frozen=True)
-class GraphStep:
-    current: int
-    goal: int
-    map_batch: MapBatch
-    candidate_actions: tuple[int, ...]  # local ID i maps to candidate_actions[i-1]
-    candidate_destinations: tuple[int, ...]
-    current_map_distance: float
-    candidate_map_distances: tuple[float, ...]
-    map_minimal_candidates: tuple[int, ...]
-    done: bool  # exact environment goal, never inferred from Q coordinates
-
-    def execute(self, environment: GraphEnvironment, local_id: int) -> tuple[int, int]:
-        if not isinstance(local_id, int) or not 1 <= local_id <= len(self.candidate_actions):
-            raise ValueError("candidate ID is not present in this step")
-        action_id = self.candidate_actions[local_id - 1]
-        return action_id, environment.execute(self.current, action_id)
+from grounded_llm.tasks.path.qmap import GraphStep
+from grounded_llm.core.reader.memory import CURRENT, GOAL, SUCCESSOR, MapBatch, MapTimeline
+from grounded_llm.tasks.blocks.qmap import BlocksStep
 
 
 def graph_step(
@@ -86,24 +68,4 @@ def graph_step(
     )
 
 
-def batch_maps(steps: list[GraphStep | BlocksStep]) -> MapBatch:
-    if not steps:
-        raise ValueError("cannot batch zero map steps")
-    return MapBatch(
-        vectors=pad_sequence([s.map_batch.vectors[0] for s in steps], batch_first=True),
-        roles=pad_sequence([s.map_batch.roles[0] for s in steps], batch_first=True),
-        candidate_ids=pad_sequence([s.map_batch.candidate_ids[0] for s in steps],
-                                   batch_first=True),
-        valid=pad_sequence([s.map_batch.valid[0] for s in steps], batch_first=True),
-    )
-
-
-def timeline_maps(steps: list[GraphStep | BlocksStep], token_map_ids: Sequence[int]) -> MapTimeline:
-    """Keep every turn's map; each text token reads only its assigned turn."""
-    timeline = MapTimeline(
-        snapshots=batch_maps(steps),
-        token_map_ids=torch.tensor([list(token_map_ids)], dtype=torch.long),
-    )
-    timeline.validate(max(len(step.candidate_actions) for step in steps),
-                      len(token_map_ids))
-    return timeline
+from grounded_llm.core.reader.batching import batch_maps, timeline_maps

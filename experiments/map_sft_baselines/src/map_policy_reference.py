@@ -7,9 +7,9 @@ import random
 import statistics
 import time
 import torch
-from experiments.blocks_distance_map.src.oracle import DistanceOracle
-from experiments.flamingo_map_reader.src.blocks import FrozenBoardMap
-from .common import sorted_step, atomic_json
+from grounded_llm.tasks.blocks.oracle import DistanceOracle
+from grounded_llm.tasks.blocks.qmap import FrozenBoardMap
+from grounded_llm.tasks.blocks.sft import sorted_step, atomic_json
 from .prepare import CachedMap
 
 

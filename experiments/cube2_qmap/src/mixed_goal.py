@@ -7,9 +7,9 @@ import time
 import numpy as np
 import torch
 
-from .evaluate import decisions, pair_metrics, rollout
-from .model import MODEL_TYPE, QMap
-from .environment import Cube2
+from grounded_llm.tasks.cube2.evaluate import decisions, pair_metrics, rollout
+from grounded_llm.tasks.cube2.model import MODEL_TYPE, QMap
+from grounded_llm.tasks.cube2.environment import Cube2
 from .fixed_goal import balanced_parents, evaluate as restoration_metrics, make_batch, prepare
 from .full_state_joint import FullStateSampler, batch_losses
 

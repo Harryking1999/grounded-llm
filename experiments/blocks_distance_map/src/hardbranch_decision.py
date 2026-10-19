@@ -7,11 +7,11 @@ import numpy as np
 import torch
 from torch.nn import functional as F
 
-from experiments.gcml_counterexamples.src import blocks
+import grounded_llm.tasks.blocks.rules as blocks
 from .model import BoardEncoder, board_bits, distance, strata
 from .multiboard_eval import goal_rollouts, listwise_groups
 from .multiboard_run import atomic_save, rank_loss
-from .oracle import successors
+from grounded_llm.tasks.blocks.oracle import successors
 from .train import draw
 
 

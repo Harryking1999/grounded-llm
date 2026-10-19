@@ -10,7 +10,7 @@ import time
 
 import paramiko
 
-from .files import atomic_json
+from grounded_llm.core.files import atomic_json
 
 
 def connect(profile, credentials):

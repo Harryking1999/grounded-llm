@@ -7,8 +7,8 @@ from pathlib import Path
 import shutil
 import torch
 from transformers import AutoTokenizer
-from .common import demonstration, atomic_json
-from experiments.flamingo_map_reader.src.transcript import encode_trajectory
+from grounded_llm.tasks.blocks.sft import demonstration, atomic_json
+from grounded_llm.core.sft.transcript import encode_trajectory
 
 
 def initialize(source, destination, model_path, order, maximum):

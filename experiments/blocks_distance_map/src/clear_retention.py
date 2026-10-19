@@ -6,7 +6,7 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from .oracle import successors
+from grounded_llm.tasks.blocks.oracle import successors
 from .tree_supervision_eval import QScorer
 
 

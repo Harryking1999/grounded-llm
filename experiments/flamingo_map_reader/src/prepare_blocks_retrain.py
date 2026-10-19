@@ -10,8 +10,8 @@ import numpy as np
 import torch
 
 from experiments.blocks_distance_map.src.multiboard_data import official_boards
-from experiments.blocks_distance_map.src.oracle import DistanceOracle
-from .blocks import FrozenBoardMap
+from grounded_llm.tasks.blocks.oracle import DistanceOracle
+from grounded_llm.tasks.blocks.qmap import FrozenBoardMap
 from .blocks_data import reachable_pairs, demonstration_from_record
 from .blocks_failure import failure_demonstration
 from .trajectory_dataset import prepare_record, unpack_demo

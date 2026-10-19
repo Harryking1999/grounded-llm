@@ -8,11 +8,9 @@ import random
 import torch
 
 from .full_graph_eval import evaluate_rows
-from .oracle import DistanceOracle, successors
+from grounded_llm.tasks.blocks.oracle import DistanceOracle, successors
 from .tree_supervision_eval import QScorer
-from experiments.gcml_counterexamples.src import blocks
-
-
+import grounded_llm.tasks.blocks.rules as blocks
 def make_clear_cases(monitor, seed):
     """Residual starts, exact6/7/8 to zero, same unseen root boards; no Q filtering."""
     rng = random.Random(seed)

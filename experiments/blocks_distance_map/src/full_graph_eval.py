@@ -10,7 +10,7 @@ import numpy as np
 import torch
 
 from .blocks12_eval import trace
-from .oracle import DistanceOracle, successors
+from grounded_llm.tasks.blocks.oracle import DistanceOracle, successors
 from .tree_supervision_eval import QScorer
 
 
@@ -25,7 +25,7 @@ def distance_goal_success(rows):
 
 
 def historical_retention(manifest, checkpoint, reference=None):
-    from experiments.flamingo_map_reader.src.blocks import FrozenBoardMap
+    from grounded_llm.tasks.blocks.qmap import FrozenBoardMap
     from experiments.flamingo_map_reader.src.blocks_sft import greedy_demonstration
     data = json.loads(Path(manifest).read_text())
     records = [r for r in data["records"] if r["split"] == "test"]

@@ -21,16 +21,16 @@
 
 | 内容 | 实现 |
 |---|---|
-| 数据准备与监督顺序 | [prepare.py](src/prepare.py)、[common.py](src/common.py)、[reorder_supervision.py](src/reorder_supervision.py) |
+| 数据准备与监督顺序 | [prepare.py](src/prepare.py)、[积木 SFT 适配](../../grounded_llm/tasks/blocks/sft.py)、[重编号数据集](../../grounded_llm/tasks/blocks/dataset.py) |
 | 覆盖选样、嵌套扩充与曝光审计 | [coverage_subset.py](src/coverage_subset.py)、[extend_data.py](src/extend_data.py)、[leakage_audit.py](src/leakage_audit.py) |
-| 参数解释、reader 与训练 | [contract.py](src/contract.py)、[modeling.py](src/modeling.py)、[train.py](src/train.py) |
+| 参数解释、reader 与训练 | [公共 SFT](../../grounded_llm/core/sft)、[reader](../../grounded_llm/core/reader)、[实验训练入口](src/train.py) |
 | 参考状态、自主 rollout 与内容干预 | [evaluate.py](src/evaluate.py)、[metrics.py](src/metrics.py)、[decision_audit.py](src/decision_audit.py) |
 | 固定题集地图贪心参照 | [map_policy_reference.py](src/map_policy_reference.py) |
 | 训练及评测队列 | [queue.py](src/queue.py)、[evaluation_queue.py](src/evaluation_queue.py)、[shard_pool.py](src/shard_pool.py) |
 | 跨机传输与结果回传 | [bridge.py](src/bridge.py) |
 | 已有训练的预算延长 | [extend_run.py](src/extend_run.py)；需对应配置与完整恢复状态 |
 
-规则与精确裁判复用 `blocks_distance_map` 和 `gcml_counterexamples`；reader、地图槽位与排序评分复用 `flamingo_map_reader`；动作协议和传输基础复用 `llm_task_sft`。新条件从这些入口修改，不复制一套训练／评测脚本。
+规则、提示、数据变换与单步裁判位于 `grounded_llm/tasks/blocks/`；reader、地图槽位、排序评分与 SFT 训练位于 `grounded_llm/core/`。本目录选择配置、准备数据并编排运行；`common.py`、`modeling.py` 等旧路径只作兼容转发。修改任务规则进入任务层，修改公共训练进入 core，不复制一套训练／评测脚本。
 
 ## 运行入口
 

@@ -4,6 +4,7 @@ Q and V are stored transposed (node/action x dimension) for contiguous updates.
 Local updates implement equations 2-3 of Stoeckl et al. (2024), not full MSE
 backpropagation. The random graph procedure follows the MIT-licensed GCML code.
 """
+from grounded_llm.tasks.path.environment import action_catalog, shortest_distances
 from collections import deque
 
 import numpy as np
@@ -22,33 +23,8 @@ def random_graph(n, seed, min_edges=2, max_edges=5):
     return directed | directed.T
 
 
-def action_catalog(adj):
-    if not np.array_equal(adj, adj.T) or np.any(np.diag(adj)):
-        raise ValueError("Expected a simple undirected graph")
-    edges = [(int(i), int(j)) for i, j in zip(*np.nonzero(np.triu(adj, 1)))]
-    actions = np.array([edge for i, j in edges for edge in [(i, j), (j, i)]])
-    outgoing = [np.flatnonzero(actions[:, 0] == i) for i in range(len(adj))]
-    if any(len(x) == 0 for x in outgoing):
-        raise ValueError("Isolated node")
-    return actions, outgoing
 
 
-def shortest_distances(adj):
-    n = len(adj)
-    distances = np.full((n, n), -1, dtype=np.int32)
-    neighbors = [np.flatnonzero(row) for row in adj]
-    for start in range(n):
-        distances[start, start] = 0
-        queue = deque([start])
-        while queue:
-            node = queue.popleft()
-            for other in neighbors[node]:
-                if distances[start, other] < 0:
-                    distances[start, other] = distances[start, node] + 1
-                    queue.append(other)
-    if np.any(distances < 0):
-        raise ValueError("Disconnected graph")
-    return distances
 
 
 def sample_walks(actions, outgoing, count, steps, seed):

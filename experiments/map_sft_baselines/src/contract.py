@@ -1,12 +1,8 @@
 """Shared interpretation of training and evaluation budgets."""
 
-def steps_per_epoch(config):
-    samples = config['data']['samples_per_epoch']
-    batch = config['training']['global_batch']
-    if samples <= 0 or batch <= 0 or samples % batch:
-        raise ValueError('Samples must divide into complete positive global batches')
-    return samples // batch
 
+
+from grounded_llm.core.sft.schedule import steps_per_epoch, training_steps
 
 def checkpoint_steps(config):
     interval = config['training']['save_steps']
@@ -16,12 +12,6 @@ def checkpoint_steps(config):
     return range(interval, total + 1, interval)
 
 
-def training_steps(config):
-    horizon = steps_per_epoch(config) * config['training']['epochs']
-    total = config['training'].get('maximum_updates', horizon)
-    if not isinstance(total, int) or not 0 < total <= horizon:
-        raise ValueError('Update limit must be positive and within the epoch horizon')
-    return total
 
 
 def cohort_size(config, mode):

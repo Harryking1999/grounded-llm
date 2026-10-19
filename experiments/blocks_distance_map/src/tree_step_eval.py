@@ -6,7 +6,7 @@ from pathlib import Path
 
 import numpy as np
 
-from .oracle import DistanceOracle, successors
+from grounded_llm.tasks.blocks.oracle import DistanceOracle, successors
 from .tree_supervision_eval import QScorer
 
 

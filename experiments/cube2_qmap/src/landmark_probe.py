@@ -7,8 +7,8 @@ import time
 import numpy as np
 import torch
 
-from .model import QMap
-from .environment import Cube2
+from grounded_llm.tasks.cube2.model import QMap
+from grounded_llm.tasks.cube2.environment import Cube2
 from .fixed_goal import balanced_parents, evaluate, make_batch, prepare
 from .full_state_joint import batch_losses
 from .landmarks import diagnostics, landmark_batch

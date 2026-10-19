@@ -11,11 +11,11 @@ import time
 import numpy as np
 import torch
 
-from experiments.blocks_distance_map.src.multiboard_data import sample_paths
-from experiments.blocks_distance_map.src.oracle import DistanceOracle, OracleBudgetExceeded
-from experiments.flamingo_map_reader.src.blocks import FrozenBoardMap
-from experiments.flamingo_map_reader.src.transcript import encode_trajectory
-from .common import atomic_json, demonstration, sorted_step
+from grounded_llm.tasks.blocks.multiboard_data import sample_paths
+from grounded_llm.tasks.blocks.oracle import DistanceOracle, OracleBudgetExceeded
+from grounded_llm.tasks.blocks.qmap import FrozenBoardMap
+from grounded_llm.core.sft.transcript import encode_trajectory
+from grounded_llm.tasks.blocks.sft import atomic_json, demonstration, sorted_step
 from .prepare import CachedMap, choose
 from .leakage_audit import reference_path
 

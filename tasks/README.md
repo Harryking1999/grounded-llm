@@ -68,6 +68,6 @@ tasks/<task>/
 
 ## 代码和权重怎么维护
 
-`tasks/` 是日常任务入口；已有可复用实现与正式合同继续放在 `experiments/`。每个任务独立维护数据、训练与评测，基础 MLP、距离和排序组件共用，见 [Qmap 方法](QMAP_METHOD.md)。新训练仍写入 Git 外的 `runs/`；确认采用的模型才放入该任务的 `Qmap/checkpoints/`，来源写入 `selection.json`。整理入口不意味着清除旧产物或改变运行。
+`tasks/` 是日常阅读入口；公共实现放在 `grounded_llm/core/`，规则、数据适配与裁判放在 `grounded_llm/tasks/`，正式合同与运行编排放在 `experiments/`。任务独立编排 Qmap 训练与评测，SFT 使用公共训练基础，见 [Qmap 方法](QMAP_METHOD.md)和[源码结构](../README.md#代码依赖与接入)。新训练写入 Git 外的 `runs/`；确认采用的模型才放入该任务的 `Qmap/checkpoints/`，来源写入 `selection.json`。
 
 项目进展与下一步只维护在 [状态页](../docs/PROJECT_STATUS_AND_TODO.md)。历史结果仍按原合同解释。

@@ -12,7 +12,7 @@ import time
 import urllib.error
 import urllib.request
 
-from .protocol import ROOT, judge
+from grounded_llm.tasks.text import ROOT, judge
 from .budget import output_limit, rescore
 
 

@@ -6,10 +6,10 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from grounded_llm.qmap_metrics import rollout
-from grounded_llm.qmap_sampling import task_indices
-from .environment import Puzzle8
-from .model import QMap, MODEL_TYPE
+from grounded_llm.core.qmap.metrics import rollout
+from grounded_llm.core.qmap.sampling import task_indices
+from grounded_llm.tasks.puzzle8.environment import Puzzle8
+from grounded_llm.tasks.puzzle8.model import QMap, MODEL_TYPE
 
 
 def progress_rows(path, after_step=0):

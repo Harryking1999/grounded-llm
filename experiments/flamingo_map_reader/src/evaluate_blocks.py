@@ -10,12 +10,12 @@ import re
 import numpy as np
 import torch
 
-from .blocks import FrozenBoardMap, blocks_step
+from grounded_llm.tasks.blocks.qmap import FrozenBoardMap, blocks_step
 from .blocks_data import coverage_group
-from .blocks_prompt import initial_prompt, turn_prompt
+from grounded_llm.tasks.blocks.prompts import initial_prompt, turn_prompt
 from .graph import timeline_maps
 from .train import build_reader, to_device
-from .text import chat_ids
+from grounded_llm.core.sft.text import chat_ids
 
 
 def parse_control(answer):

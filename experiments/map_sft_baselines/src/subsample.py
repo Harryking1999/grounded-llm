@@ -4,7 +4,7 @@ from collections import Counter, defaultdict
 import json
 from pathlib import Path
 import random
-from .common import atomic_json
+from grounded_llm.tasks.blocks.sft import atomic_json
 
 
 def select_rows(rows, seed):

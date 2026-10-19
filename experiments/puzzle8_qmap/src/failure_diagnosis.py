@@ -7,10 +7,10 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from grounded_llm.qmap_sampling import task_indices
+from grounded_llm.core.qmap.sampling import task_indices
 from .checkpoint_audit import load_model
-from .environment import Puzzle8
-from .policy_audit import audit
+from grounded_llm.tasks.puzzle8.environment import Puzzle8
+from grounded_llm.tasks.puzzle8.policy_audit import audit
 
 
 @torch.no_grad()

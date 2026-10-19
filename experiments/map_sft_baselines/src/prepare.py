@@ -8,22 +8,14 @@ from pathlib import Path
 import time
 import numpy as np
 import torch
-from experiments.blocks_distance_map.src.multiboard_data import sample_paths
-from experiments.blocks_distance_map.src.oracle import DistanceOracle, OracleBudgetExceeded
-from experiments.flamingo_map_reader.src.blocks import FrozenBoardMap
-from experiments.flamingo_map_reader.src.transcript import encode_trajectory
-from experiments.flamingo_map_reader.src.trajectory_dataset import pack_demo
-from .common import atomic_json, sorted_step, demonstration
+from grounded_llm.core.qmap.reader import CachedQMap as CachedMap
+from grounded_llm.tasks.blocks.multiboard_data import sample_paths
+from grounded_llm.tasks.blocks.oracle import DistanceOracle, OracleBudgetExceeded
+from grounded_llm.tasks.blocks.qmap import FrozenBoardMap
+from grounded_llm.core.sft.transcript import encode_trajectory
+from grounded_llm.core.sft.dataset import pack_demo
+from grounded_llm.tasks.blocks.sft import atomic_json, sorted_step, demonstration
 
-class CachedMap:
-    def __init__(self,qmap):
-        self.qmap,self.cache,self.metric=qmap,{},qmap.metric
-    def encode(self,states):
-        missing=list(dict.fromkeys(s for s in states if s not in self.cache))
-        if missing:
-            vectors=self.qmap.encode(missing)
-            self.cache.update(zip(missing,vectors))
-        return torch.stack([self.cache[s] for s in states])
 
 def init_worker(config,q_path,model_path,excluded,out):
     global CFG,QMAP,TOKENIZER,EXCLUDED,OUT
@@ -110,8 +102,8 @@ def main():
     if len(test)!=cfg['evaluation']['tasks']:raise ValueError('Evaluation cohort differs from configuration')
     if len(boards)!=cfg['data']['training_boards']:raise ValueError('Source board count differs from configuration')
     excluded={(int(r['start']),int(r['goal'])) for r in source['records'] if r['split']!='train'}
-    from experiments.llm_task_sft.src.protocol import action_from_key
-    from experiments.gcml_counterexamples.src import blocks as rules
+    from grounded_llm.tasks.blocks.protocol import action_from_key
+    import grounded_llm.tasks.blocks.rules as rules
     for record in refs:
         state,goal=int(record['start']),int(record['goal'])
         for key in record['reference_actions']:

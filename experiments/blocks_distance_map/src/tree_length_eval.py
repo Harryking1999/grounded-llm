@@ -6,8 +6,8 @@ from pathlib import Path
 import numpy as np
 
 from .hardbranch_failure import summarize, trace
-from .multiboard_data import official_boards, sample_paths
-from .oracle import DistanceOracle
+from grounded_llm.tasks.blocks.multiboard_data import official_boards, sample_paths
+from grounded_llm.tasks.blocks.oracle import DistanceOracle
 from .tree_step_eval import inspect_tasks
 from .tree_supervision_eval import QScorer
 

@@ -7,10 +7,10 @@ from pathlib import Path
 import numpy as np
 import torch
 from .analyze_blocks_ranking import ndcg
-from experiments.flamingo_map_reader.src.blocks import FrozenBoardMap, blocks_step
+from grounded_llm.tasks.blocks.qmap import FrozenBoardMap, blocks_step
 from experiments.flamingo_map_reader.src.trajectory_dataset import load_record
 from experiments.flamingo_map_reader.src.relations import parse_ranking, first_ranked_candidate
-from experiments.blocks_distance_map.src.oracle import DistanceOracle
+from grounded_llm.tasks.blocks.oracle import DistanceOracle
 
 
 def summary(rows):

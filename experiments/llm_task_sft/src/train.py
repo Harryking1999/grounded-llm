@@ -5,6 +5,7 @@ from collections import deque
 from datetime import datetime, timezone
 import json
 import math
+from grounded_llm.core.sft.schedule import scheduler_factor
 import os
 from pathlib import Path
 import random
@@ -17,15 +18,10 @@ from torch.nn.parallel import DistributedDataParallel
 from torch.utils.data import DataLoader, DistributedSampler
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-from .protocol import atomic_json
+from grounded_llm.tasks.blocks.protocol import atomic_json
 from .training import Collator, RouteDataset, SupervisedLM
 
 
-def scheduler_factor(step, total, warmup, floor):
-    if step < warmup:
-        return step / max(1, warmup)
-    progress = min(1., (step - warmup) / max(1, total - warmup))
-    return floor + (1 - floor) * (1 + math.cos(math.pi * progress)) / 2
 
 
 def resume_position(step, steps_epoch):

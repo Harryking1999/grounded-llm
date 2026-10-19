@@ -8,10 +8,10 @@ import time
 import numpy as np
 import torch
 
-from .relation_data import pair_keys
-from .model import MODEL_TYPE, QMap
-from .data import pose_groups
-from .environment import Cube2
+from grounded_llm.tasks.cube2.relation_data import pair_keys
+from grounded_llm.tasks.cube2.model import MODEL_TYPE, QMap
+from grounded_llm.tasks.cube2.data import pose_groups
+from grounded_llm.tasks.cube2.environment import Cube2
 from .route_complete import actual_update, losses, metrics, run_model
 from .structure_study import load_contract
 

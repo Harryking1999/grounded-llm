@@ -5,7 +5,7 @@ from dataclasses import replace
 import numpy as np
 import torch
 
-from .memory import MapBatch
+from grounded_llm.core.reader.memory import MapBatch
 
 
 def reorder_candidates(step, order):
@@ -31,7 +31,7 @@ def reorder_candidates(step, order):
 
 def renumbered_prompt(task, step, original_text):
     """Rebuild only the first-turn candidate listing after consistent renumbering."""
-    from .blocks_prompt import turn_prompt as blocks_turn_prompt
+    from grounded_llm.tasks.blocks.prompts import turn_prompt as blocks_turn_prompt
     from .prompt import turn_prompt as graph_turn_prompt
 
     marker = "\n\n[Environment update]"

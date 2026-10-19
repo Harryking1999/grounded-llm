@@ -4,102 +4,18 @@ from collections import Counter, defaultdict
 from datetime import datetime, timezone
 import json
 import math
+from grounded_llm.core.sft.ranking import rank_grade_gains, inverse_rank_gains, ndcg, meeting_ranking_scores, MEETING_METRICS
 from pathlib import Path
 
 
-def rank_grade_gains(distances, k=10):
-    """Top-K ordinal grades K..1, others zero; true ties share mean slot grade."""
-    k = min(k, len(distances))
-    groups = []
-    for i in sorted(range(len(distances)), key=lambda j: (distances[j], j)):
-        if groups and math.isclose(distances[i], distances[groups[-1][0]], rel_tol=1e-10, abs_tol=1e-12):
-            groups[-1].append(i)
-        else:
-            groups.append([i])
-    gains = [0.0] * len(distances)
-    position = 1
-    for group in groups:
-        grade = sum(max(k + 1 - p, 0) for p in range(position, position + len(group))) / len(group)
-        for i in group:
-            gains[i] = grade
-        position += len(group)
-    return gains
 
 
-def inverse_rank_gains(distances):
-    """Reciprocal true positions; equal distances share mean occupied gain."""
-    ordered = sorted(range(len(distances)), key=lambda i: distances[i])
-    gains = [0.0] * len(distances)
-    offset = 0
-    while offset < len(ordered):
-        stop = offset + 1
-        while stop < len(ordered) and math.isclose(distances[ordered[offset]],
-                distances[ordered[stop]], rel_tol=1e-10, abs_tol=1e-12):
-            stop += 1
-        value = sum(1.0 / (i + 1) for i in range(offset, stop)) / (stop - offset)
-        for i in ordered[offset:stop]:
-            gains[i] = value
-        offset = stop
-    return gains
 
 
-def ndcg(distances, ranks, k=10, gain='inverse_distance', discount='log2'):
-    """Linear gains, average predicted ties, and zero gain for missing slots."""
-    assert all(math.isfinite(d) and d >= 0 for d in distances)
-    assert gain in ('inverse_distance', 'rank_grade', 'inverse_rank', 'reciprocal_distance',
-                    'minmax_distance')
-    if gain == 'rank_grade':
-        gains = rank_grade_gains(distances, k)
-    elif gain == 'inverse_rank':
-        gains = inverse_rank_gains(distances)
-    elif gain == 'reciprocal_distance':
-        gains = [1.0 / max(d, 1e-12) for d in distances]
-    elif gain == 'minmax_distance':
-        if not distances:
-            return None, None
-        nearest, farthest = min(distances), max(distances)
-        # Equal distances carry no ordering information; count these states
-        # separately when reporting and give every candidate equal gain.
-        gains = ([1.0] * len(distances) if math.isclose(nearest, farthest,
-                 rel_tol=1e-10, abs_tol=1e-12) else
-                 [(farthest - d) / (farthest - nearest) for d in distances])
-    else:
-        gains = [1.0 / (1.0 + d) for d in distances]
-    k = min(k, len(gains))
-    if not k:
-        return None, None
-    assert discount in ('log2', 'reciprocal_rank')
-    weights = [1 / (i + 1) if discount == 'reciprocal_rank' else 1 / math.log2(i + 2) for i in range(k)]
-    ideal = sum(g * w for g, w in zip(sorted(gains, reverse=True), weights))
-    chance = sum(gains) / len(gains) * sum(weights) / ideal
-    if ranks is None:
-        return 0.0, chance
-    groups = defaultdict(list)
-    for candidate, rank in ranks.items():
-        if candidate:
-            assert 1 <= candidate <= len(gains)
-            groups[rank].append(gains[candidate - 1])
-    dcg, position = 0.0, 0
-    for rank in sorted(groups):
-        values = groups[rank]
-        dcg += sum(values) / len(values) * sum(weights[position:min(position+len(values), k)])
-        position += len(values)
-        if position >= k:
-            break
-    value = dcg / ideal
-    assert -1e-12 <= value <= 1+1e-12
-    return min(1.0, max(0.0, value)), chance
 
 
-MEETING_METRICS = ('ndcg_inverse_rank_at_10', 'ndcg_minmax_distance_at_10',
-                   'ndcg_inverse_rank_at_1', 'ndcg_minmax_distance_at_1')
 
 
-def meeting_ranking_scores(distances, ranks):
-    """Official gains: reciprocal true position and per-state normalized distance."""
-    return {name: ndcg(distances, ranks, k=k, gain=gain)[0]
-            for name, k, gain in zip(MEETING_METRICS, (10, 10, 1, 1),
-                ('inverse_rank', 'minmax_distance', 'inverse_rank', 'minmax_distance'))}
 
 
 def check_metric():
@@ -170,7 +86,7 @@ def main():
     check_metric()
     import numpy as np
     import torch
-    from experiments.flamingo_map_reader.src.blocks import FrozenBoardMap, blocks_step
+    from grounded_llm.tasks.blocks.qmap import FrozenBoardMap, blocks_step
     from experiments.flamingo_map_reader.src.trajectory_dataset import load_record
     from experiments.flamingo_map_reader.src.relations import parse_ranking, score_relationships
     torch.set_num_threads(1)

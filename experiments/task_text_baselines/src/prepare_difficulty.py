@@ -6,7 +6,7 @@ from pathlib import Path
 import subprocess
 
 from .difficulty import prepare_level
-from .protocol import ROOT, judge
+from grounded_llm.tasks.text import ROOT, judge
 from .run import summary, write_json
 
 

@@ -13,11 +13,11 @@ import numpy as np
 import torch
 from torch.nn import functional as F
 
-from .evaluate import pair_metrics, rollout
-from .model import MODEL_TYPE, QMap, soft_rank_loss
+from grounded_llm.tasks.cube2.evaluate import pair_metrics, rollout
+from grounded_llm.tasks.cube2.model import MODEL_TYPE, QMap, soft_rank_loss
 from .cycle_supervision import cycle_pack
 from .cycle_trial import close_axis_mask
-from .environment import Cube2
+from grounded_llm.tasks.cube2.environment import Cube2
 from .fixed_goal import balanced_parents, evaluate, make_batch, prepare
 from .full_state_joint import FullStateSampler, batch_losses
 from .mixed_goal import HeldoutStates

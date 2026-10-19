@@ -6,9 +6,9 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from experiments.gcml_counterexamples.src import blocks
+import grounded_llm.tasks.blocks.rules as blocks
 from .model import BoardEncoder, board_bits, distance
-from .oracle import successors
+from grounded_llm.tasks.blocks.oracle import successors
 
 
 def main():

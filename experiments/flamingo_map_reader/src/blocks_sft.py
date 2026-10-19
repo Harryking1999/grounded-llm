@@ -1,7 +1,7 @@
 """Complete blocks trajectories supervised with frozen-map rankings."""
 
-from .blocks import blocks_step
-from .blocks_prompt import initial_prompt, turn_prompt, terminal_text
+from grounded_llm.tasks.blocks.qmap import blocks_step
+from grounded_llm.tasks.blocks.prompts import initial_prompt, turn_prompt, terminal_text
 from .sft import Demonstration, SupervisedTurn, decision_text
 
 

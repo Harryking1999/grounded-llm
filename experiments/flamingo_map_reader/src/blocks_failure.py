@@ -3,8 +3,8 @@
 import re
 import numpy as np
 
-from .blocks import blocks_step
-from .blocks_prompt import initial_prompt, turn_prompt
+from grounded_llm.tasks.blocks.qmap import blocks_step
+from grounded_llm.tasks.blocks.prompts import initial_prompt, turn_prompt
 from .sft import Demonstration, SupervisedTurn, decision_text
 
 

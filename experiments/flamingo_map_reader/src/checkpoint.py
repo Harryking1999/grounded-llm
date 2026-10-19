@@ -7,7 +7,7 @@ import random
 import numpy as np
 import torch
 
-from .fusion import MapReader
+from grounded_llm.core.reader.fusion import MapReader
 
 
 def save_checkpoint(

@@ -12,7 +12,7 @@ from .counterfactual import (swap_best_worst_q, swap_candidate_q,
 from .data import demonstration_from_record as graph_demonstration, first_turn_from_record, load_graph
 from .sft import Demonstration, decision_text
 from .short_readout import correct_ids, diagnostic_prompt
-from .transcript import encode_trajectory
+from grounded_llm.core.sft.transcript import encode_trajectory
 
 
 def paired_turns(turn, style="full_ranking", pair=None):

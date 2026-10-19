@@ -1,2 +1,2 @@
-"""Compatibility imports for the existing 4x4 evaluation condition."""
-from .sliding import manhattan, render, step
+"""Compatibility imports for grounded_llm.tasks.puzzle15."""
+from grounded_llm.tasks.puzzle15 import manhattan, render, step

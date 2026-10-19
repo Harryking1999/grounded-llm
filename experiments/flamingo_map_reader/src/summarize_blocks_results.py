@@ -11,7 +11,7 @@ import torch
 
 from experiments.flamingo_map_reader.src.analyze_blocks_ranking import (
     ndcg, meeting_ranking_scores, MEETING_METRICS)
-from experiments.flamingo_map_reader.src.blocks import FrozenBoardMap, blocks_step
+from grounded_llm.tasks.blocks.qmap import FrozenBoardMap, blocks_step
 from experiments.flamingo_map_reader.src.blocks_checkpoint_queue import checkpoints
 from experiments.flamingo_map_reader.src.relations import parse_ranking
 from experiments.flamingo_map_reader.src.evaluate_blocks import parse_control

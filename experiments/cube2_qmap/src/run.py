@@ -9,11 +9,11 @@ import numpy as np
 import torch
 from torch.nn import functional as F
 
-from .relation_data import build
-from .evaluate import decisions, encode, evaluate, pair_metrics, ranking_loss, task_indices
-from .model import MODEL_TYPE, QMap, soft_rank_loss
-from grounded_llm.qmap_sampling import CoverageSampler, StratifiedEpochSampler
-from .environment import Cube2
+from grounded_llm.tasks.cube2.relation_data import build
+from grounded_llm.tasks.cube2.evaluate import decisions, encode, evaluate, pair_metrics, ranking_loss, task_indices
+from grounded_llm.tasks.cube2.model import MODEL_TYPE, QMap, soft_rank_loss
+from grounded_llm.core.qmap.sampling import CoverageSampler, StratifiedEpochSampler
+from grounded_llm.tasks.cube2.environment import Cube2
 
 def make_environment(task, oracle_path=None):
     if task not in ("cube2", "cube2_qtm"):
@@ -51,7 +51,7 @@ def train(env, config, data, out, device, source_commit, checkpoint=None):
     online = None
     pair_sampler = rank_sampler = None
     if config["data"].get("builder") == "local_graph":
-        from experiments.cube2_qmap.src.local_graph import LocalGraphSampler
+        from grounded_llm.tasks.cube2.local_graph import LocalGraphSampler
         online = LocalGraphSampler(env, data, config, rng)
         if online.sampler.steps_for_passes(options["graph_batch_size"], config["sampling"]["minimum_full_passes"]) > options["steps"]:
             raise ValueError("Training budget cannot traverse the contracted relative layers")

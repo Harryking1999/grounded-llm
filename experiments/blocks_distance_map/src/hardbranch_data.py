@@ -6,8 +6,8 @@ from pathlib import Path
 
 import numpy as np
 
-from experiments.gcml_counterexamples.src import blocks
-from .oracle import DistanceOracle, successors
+import grounded_llm.tasks.blocks.rules as blocks
+from grounded_llm.tasks.blocks.oracle import DistanceOracle, successors
 
 
 def find_cases(data, split, max_pairs, max_cases, seed, oracle):

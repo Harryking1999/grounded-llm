@@ -10,7 +10,7 @@ import subprocess
 import time
 
 from .epoch_queue import collect_model, pending_jobs
-from .files import atomic_json
+from grounded_llm.core.files import atomic_json
 
 
 def read(path):

@@ -6,6 +6,7 @@ import time
 
 import numpy as np
 import torch
+from grounded_llm.core.files import atomic_save
 from torch.nn import functional as F
 
 from .model import BoardEncoder, board_bits, distance, strata, soft_rank_loss
@@ -22,14 +23,10 @@ def rank_loss(model, bits, pairs, groups, cap, count, temperature):
     return soft_rank_loss(predicted, truth, torch.ones_like(truth, dtype=torch.bool), temperature)
 
 
-def atomic_save(payload, path):
-    temporary = path.with_suffix(".tmp")
-    torch.save(payload, temporary)
-    temporary.replace(path)
 
 
 def run(config, out, source_commit, device):
-    from .multiboard_data import prepare
+    from grounded_llm.tasks.blocks.multiboard_data import prepare
 
     out = Path(out)
     out.mkdir(parents=True, exist_ok=False)

@@ -6,10 +6,10 @@ from pathlib import Path
 
 import numpy as np
 
-from experiments.gcml_counterexamples.src import blocks
+import grounded_llm.tasks.blocks.rules as blocks
 from .hardbranch_failure import trace
-from .multiboard_data import official_boards, sample_paths
-from .oracle import DistanceOracle, successors
+from grounded_llm.tasks.blocks.multiboard_data import official_boards, sample_paths
+from grounded_llm.tasks.blocks.oracle import DistanceOracle, successors
 from .tree_supervision_eval import QScorer
 
 

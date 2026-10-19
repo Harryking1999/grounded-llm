@@ -9,7 +9,7 @@ import subprocess
 import time
 
 from .evaluate import summarize
-from .protocol import atomic_json
+from grounded_llm.tasks.blocks.protocol import atomic_json
 
 
 def collect_model(root, label, split, modes, counts, size):

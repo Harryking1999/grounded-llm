@@ -6,7 +6,7 @@ import subprocess
 import sys
 import time
 from filelock import FileLock
-from experiments.llm_task_sft.src.files import atomic_json
+from grounded_llm.core.files import atomic_json
 from .shard_pool import ShardPool
 
 MODULE = 'experiments.map_sft_baselines.src.evaluate'

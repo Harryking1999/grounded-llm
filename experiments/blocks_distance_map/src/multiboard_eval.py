@@ -6,7 +6,7 @@ import torch
 
 from .evaluate import auc
 from .model import distance, strata
-from .oracle import successors
+from grounded_llm.tasks.blocks.oracle import successors
 
 
 def listwise_groups(pairs, seed, width=4, per_anchor=8):

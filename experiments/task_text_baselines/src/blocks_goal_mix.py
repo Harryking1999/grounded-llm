@@ -5,9 +5,9 @@ import io
 import json
 import random
 
-from experiments.gcml_counterexamples.src import blocks
+import grounded_llm.tasks.blocks.rules as blocks
 from .prepare import make_blocks
-from .protocol import ROOT, judge, prompt
+from grounded_llm.tasks.text import ROOT, judge, prompt
 
 
 def isolated_cells(mask):

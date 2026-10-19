@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 import time
 
-from .data import prepare
+from grounded_llm.tasks.blocks.data import prepare
 from .train import train
 
 

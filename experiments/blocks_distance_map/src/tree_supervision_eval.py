@@ -7,11 +7,11 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from experiments.gcml_counterexamples.src import blocks
+import grounded_llm.tasks.blocks.rules as blocks
 from .hardbranch_failure import summarize, trace
 from .model import BoardEncoder, board_bits, distance
-from .multiboard_data import official_boards, sample_paths
-from .oracle import DistanceOracle
+from grounded_llm.tasks.blocks.multiboard_data import official_boards, sample_paths
+from grounded_llm.tasks.blocks.oracle import DistanceOracle
 
 
 def fresh_tasks(data, contract, official_path, board_count, tasks_per_board, seed,

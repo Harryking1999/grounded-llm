@@ -14,7 +14,7 @@ from .graph import graph_step, timeline_maps
 from .prompt import initial_prompt, turn_prompt
 from .relations import score_relationships
 from .summarize_graph_eval import add_relation, relation_summary
-from .text import chat_ids
+from grounded_llm.core.sft.text import chat_ids
 from .train import build_reader, to_device
 
 

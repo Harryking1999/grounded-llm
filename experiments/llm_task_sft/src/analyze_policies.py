@@ -6,9 +6,9 @@ from datetime import datetime, timezone
 import json
 from pathlib import Path
 
-from experiments.blocks_distance_map.src.oracle import DistanceOracle
-from experiments.gcml_counterexamples.src import blocks as rules
-from .files import atomic_json
+from grounded_llm.tasks.blocks.oracle import DistanceOracle
+import grounded_llm.tasks.blocks.rules as rules
+from grounded_llm.core.files import atomic_json
 
 
 def read_cases(root):

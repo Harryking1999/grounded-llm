@@ -8,13 +8,15 @@ import numpy as np
 import torch
 from torch.nn import functional as F
 
-from experiments.blocks_distance_map.src.model import StateEncoder, strata, soft_rank_loss
-from experiments.blocks_distance_map.src.multiboard_run import atomic_save
-from experiments.blocks_distance_map.src.train import draw
-from experiments.external_map_interface.src.transitions import environment_from_suite
+from grounded_llm.core.qmap.model import StateEncoder
+from grounded_llm.tasks.blocks.sampling import strata
+from grounded_llm.core.qmap.model import soft_rank_loss
+from grounded_llm.core.files import atomic_save
+from grounded_llm.core.qmap.sampling import draw
+from grounded_llm.tasks.path.environment import environment_from_suite
 
-from .data import prepare
-from .evaluate import distance_table, final_metrics, relation_metrics, rank_objective
+from grounded_llm.tasks.path.data import prepare
+from grounded_llm.tasks.path.evaluate import distance_table, final_metrics, relation_metrics, rank_objective
 
 
 def train(config, out, source_commit, device="cpu"):

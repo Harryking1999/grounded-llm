@@ -8,7 +8,7 @@ import numpy as np
 from transformers import AutoTokenizer
 
 from .data import demonstration_from_record, load_graph
-from .transcript import encode_trajectory
+from grounded_llm.core.sft.transcript import encode_trajectory
 
 
 def _summary(values: list[int]) -> dict:

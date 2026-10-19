@@ -6,10 +6,10 @@ import random
 
 import torch
 
-from experiments.gcml_counterexamples.src import blocks
+import grounded_llm.tasks.blocks.rules as blocks
 from .blocks12_eval import construct
 from .full_graph_eval import evaluate_rows, matched, sections
-from .oracle import DistanceOracle, successors
+from grounded_llm.tasks.blocks.oracle import DistanceOracle, successors
 from .tree_supervision_eval import QScorer
 
 

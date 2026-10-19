@@ -6,19 +6,19 @@ import time
 import numpy as np
 import torch
 from torch.nn import functional as F
-from grounded_llm.qmap_sampling import CoverageSampler, task_indices
-from grounded_llm.qmap_metrics import pair_metrics, decisions, ranking_loss
-from .environment import Puzzle8
-from .data import build
-from .model import QMap, MODEL_TYPE, soft_rank_loss
-from .evaluate import evaluate
-from .policy_audit import audit
-from .data_sampling import DataMix
-from .branch_data import BranchData
-from .graph_data import GraphData
+from grounded_llm.core.qmap.sampling import CoverageSampler, task_indices
+from grounded_llm.core.qmap.metrics import pair_metrics, decisions, ranking_loss
+from grounded_llm.tasks.puzzle8.environment import Puzzle8
+from grounded_llm.tasks.puzzle8.data import build
+from grounded_llm.tasks.puzzle8.model import QMap, MODEL_TYPE, soft_rank_loss
+from grounded_llm.tasks.puzzle8.evaluate import evaluate
+from grounded_llm.tasks.puzzle8.policy_audit import audit
+from grounded_llm.tasks.puzzle8.data_sampling import DataMix
+from grounded_llm.tasks.puzzle8.branch_data import BranchData
+from grounded_llm.tasks.puzzle8.graph_data import GraphData
 from .failure_sampling import FailureGraphData
 from .checkpoint_audit import same_tasks, cycle_ranking
-from grounded_llm.qmap_metrics import rollout
+from grounded_llm.core.qmap.metrics import rollout
 from .batch_parallel import BatchParallel
 
 

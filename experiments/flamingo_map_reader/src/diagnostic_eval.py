@@ -10,7 +10,7 @@ import torch
 
 from .counterfactual import reverse_candidate_q
 from . import blocks_prompt
-from .text import chat_ids
+from grounded_llm.core.sft.text import chat_ids
 from .train import build_reader, pinned_supervision
 from .trajectory_dataset import load_record
 from .trajectory_eval import GenerationSession, TaskEnvironment, closed_loop, aggregate

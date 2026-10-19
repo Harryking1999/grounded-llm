@@ -7,7 +7,7 @@ import numpy as np
 import torch
 
 from .model import BoardEncoder, QMap, board_bits, distance
-from .oracle import successors
+from grounded_llm.tasks.blocks.oracle import successors
 
 
 def rollout(data_path, checkpoint, seed, training_data_path=None):

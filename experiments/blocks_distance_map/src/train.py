@@ -10,16 +10,10 @@ import torch
 from torch.nn import functional as F
 
 from .evaluate import evaluate_split, final_metrics, predict_pairs
+from grounded_llm.core.qmap.sampling import draw
 from .model import QMap, strata
 
 
-def draw(groups, size, device):
-    parts, remaining = [], size
-    for i, (ids, weight) in enumerate(groups):
-        count = remaining if i == len(groups) - 1 else round(size * weight)
-        remaining -= count
-        parts.append(ids[torch.randint(len(ids), (count,), device=device)])
-    return torch.cat(parts)
 
 
 def train(config, data_path, out, metric, seed, device, source_commit):

@@ -9,7 +9,7 @@ import torch
 from .hardbranch_data import find_cases
 from .model import BoardEncoder, board_bits, distance
 from .multiboard_eval import encoded_values, goal_rollouts
-from .oracle import DistanceOracle
+from grounded_llm.tasks.blocks.oracle import DistanceOracle
 
 
 @torch.no_grad()

@@ -8,8 +8,8 @@ import random
 import numpy as np
 import torch
 
-from experiments.gcml_counterexamples.src import blocks
-from .oracle import DistanceOracle, OracleBudgetExceeded, successors
+import grounded_llm.tasks.blocks.rules as blocks
+from grounded_llm.tasks.blocks.oracle import DistanceOracle, OracleBudgetExceeded, successors
 from .tree_supervision_eval import QScorer
 
 

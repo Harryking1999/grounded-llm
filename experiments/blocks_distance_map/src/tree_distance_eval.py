@@ -8,9 +8,9 @@ import numpy as np
 import torch
 
 from .model import BoardEncoder, board_bits
-from .multiboard_data import official_boards, sample_paths
+from grounded_llm.tasks.blocks.multiboard_data import official_boards, sample_paths
 from .multiboard_eval import encoded_values, listwise_groups, pair_scores, split_metrics
-from .oracle import DistanceOracle
+from grounded_llm.tasks.blocks.oracle import DistanceOracle
 
 
 def build(data_path, config_path, official_path, comparison_path, output_path):

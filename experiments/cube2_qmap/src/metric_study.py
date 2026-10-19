@@ -26,8 +26,8 @@ def validation_gate(control, candidate, contract):
 def summarize(root, names, device, source_commit):
     import numpy as np
     import torch
-    from .evaluate import evaluate
-    from .model import MapReader
+    from grounded_llm.tasks.cube2.evaluate import evaluate
+    from grounded_llm.tasks.cube2.model import MapReader
     from .run import make_environment
 
     torch.set_num_threads(4)

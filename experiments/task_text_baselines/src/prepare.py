@@ -8,10 +8,10 @@ import subprocess
 
 import numpy as np
 
-from experiments.gcml_counterexamples.src import blocks
+import grounded_llm.tasks.blocks.rules as blocks
 from experiments.qwen_path_blocks.src.prepare_path_suite import regular_connected_graph, shortest
 from . import cube2, hanoi, puzzle8
-from .protocol import ROOT, prompt, judge
+from grounded_llm.tasks.text import ROOT, prompt, judge
 
 
 def choose_by_depth(table, depths, count, rng):

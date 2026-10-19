@@ -67,12 +67,12 @@ def summarize(rows):
 def main():
     import torch
     from transformers import AutoTokenizer, StoppingCriteriaList
-    from experiments.blocks_distance_map.src.oracle import DistanceOracle
-    from experiments.flamingo_map_reader.src.blocks import FrozenBoardMap
+    from grounded_llm.tasks.blocks.oracle import DistanceOracle
+    from grounded_llm.tasks.blocks.qmap import FrozenBoardMap
     from experiments.flamingo_map_reader.src.graph import timeline_maps
-    from experiments.flamingo_map_reader.src.train import to_device
-    from experiments.llm_task_sft.src.protocol import legal_actions, action_key
-    from .common import prompt, sorted_step, atomic_json
+    from grounded_llm.core.reader.batching import to_device
+    from grounded_llm.tasks.blocks.protocol import legal_actions, action_key
+    from grounded_llm.tasks.blocks.sft import prompt, sorted_step, atomic_json
     from .evaluate import score, Boundary
     from .modeling import build
     from .prepare import CachedMap

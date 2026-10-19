@@ -11,7 +11,7 @@ import torch
 
 from . import data as graph_data
 from . import blocks_data
-from .blocks import FrozenBoardMap
+from grounded_llm.tasks.blocks.qmap import FrozenBoardMap
 from .trajectory_dataset import prepare_record
 
 
@@ -64,7 +64,7 @@ def select_graph(config, source):
 def select_blocks(config, source_manifest, official, q_checkpoint):
     """Reuse certified long physical pairs, never reuse old reader weights/targets."""
     from experiments.blocks_distance_map.src.multiboard_data import official_boards
-    from experiments.blocks_distance_map.src.oracle import DistanceOracle
+    from grounded_llm.tasks.blocks.oracle import DistanceOracle
     options = config["data"]
     old = json.loads(source_manifest.read_text())
     if Path(old["q_checkpoint"]).resolve() != q_checkpoint.resolve():

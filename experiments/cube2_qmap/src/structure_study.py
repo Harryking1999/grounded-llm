@@ -8,10 +8,10 @@ import numpy as np
 import torch
 from torch.nn import functional as F
 
-from .evaluate import encode, rollout, task_indices
-from .model import MODEL_TYPE, MapReader, QMap, soft_rank_loss
-from .data import pose_groups
-from .environment import Cube2
+from grounded_llm.tasks.cube2.evaluate import encode, rollout, task_indices
+from grounded_llm.tasks.cube2.model import MODEL_TYPE, MapReader, QMap, soft_rank_loss
+from grounded_llm.tasks.cube2.data import pose_groups
+from grounded_llm.tasks.cube2.environment import Cube2
 
 
 def load_contract(path):

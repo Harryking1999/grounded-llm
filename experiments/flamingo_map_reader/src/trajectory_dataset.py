@@ -1,31 +1,19 @@
 """Prepared trajectories: maps stored once, fixed numbered variants reused each epoch."""
 
-from dataclasses import fields
+from grounded_llm.core.sft.dataset import pack_demo
 from pathlib import Path
 
 import torch
 from torch.utils.data import Dataset
 
-from .blocks import BlocksStep
+from grounded_llm.tasks.blocks.qmap import BlocksStep
 from .graph import GraphStep
-from .memory import MapBatch
+from grounded_llm.core.reader.memory import MapBatch
 from .sft import Demonstration, SupervisedTurn
-from .transcript import EncodedTrajectory, encode_trajectory
+from grounded_llm.core.sft.transcript import EncodedTrajectory, encode_trajectory
 from .trajectory_protocol import numbering_plans, renumber_demonstration
 
 
-def pack_demo(demo):
-    rows = []
-    for turn in demo.turns:
-        step = {field.name: getattr(turn.step, field.name) for field in fields(turn.step)
-                if field.name != "map_batch"}
-        step["map_batch"] = {field.name: getattr(turn.step.map_batch, field.name).cpu()
-                             for field in fields(turn.step.map_batch)}
-        rows.append(dict(user_text=turn.user_text, answer_text=turn.answer_text,
-                         executed_path=turn.executed_path, chosen_id=turn.chosen_id,
-                         supervise=turn.supervise, step=step))
-    return dict(turns=rows, executed_path=demo.executed_path, success=demo.success,
-                no_solution=demo.no_solution)
 
 
 def unpack_demo(value, task):

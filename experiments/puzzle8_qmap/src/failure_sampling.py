@@ -3,7 +3,7 @@ import json
 import numpy as np
 import torch
 
-from .graph_data import GraphData
+from grounded_llm.tasks.puzzle8.graph_data import GraphData
 from .checkpoint_audit import cycle_ranking
 
 

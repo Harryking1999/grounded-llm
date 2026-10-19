@@ -9,11 +9,11 @@ from statistics import median
 
 import torch
 
-from .blocks import FrozenBoardMap
+from grounded_llm.tasks.blocks.qmap import FrozenBoardMap
 from .blocks_data import demonstration_from_record as blocks_demonstration
 from .data import demonstration_from_record as graph_demonstration, load_graph
 from .graph import timeline_maps
-from .text import chat_ids
+from grounded_llm.core.sft.text import chat_ids
 from .train import build_reader, to_device
 
 

@@ -118,7 +118,8 @@ class DistanceMapTests(unittest.TestCase):
                               subset_pair_attempts=3000, decision_parents=8)
         with tempfile.TemporaryDirectory() as work:
             summary = prepare(config, Path(work) / "data")
-            data = np.load(Path(work) / "data/data.npz")
+            with np.load(Path(work) / "data/data.npz") as saved:
+                data = dict(saved)
             pairs, split = data["pairs"], data["split"]
             goal = int(data["goal_id"])
             self.assertGreater(summary["landmark_training_groups"], 0)

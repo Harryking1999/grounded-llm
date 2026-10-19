@@ -9,12 +9,12 @@ import numpy as np
 import torch
 from torch.nn import functional as F
 
-from .data import build
-from .evaluate import decisions, encode, evaluate, pair_metrics, ranking_loss, task_indices, tower_policy
-from .model import MODEL_TYPE, QMap, soft_rank_loss
-from grounded_llm.qmap_sampling import CoverageSampler, StratifiedEpochSampler
-from .environment import Hanoi
-from .tower_data import TowerData
+from grounded_llm.tasks.hanoi.data import build
+from grounded_llm.tasks.hanoi.evaluate import decisions, encode, evaluate, pair_metrics, ranking_loss, task_indices, tower_policy
+from grounded_llm.tasks.hanoi.model import MODEL_TYPE, QMap, soft_rank_loss
+from grounded_llm.core.qmap.sampling import CoverageSampler, StratifiedEpochSampler
+from grounded_llm.tasks.hanoi.environment import Hanoi
+from grounded_llm.tasks.hanoi.tower_data import TowerData
 
 def make_environment(task, oracle_path=None):
     if not task.startswith("hanoi") or not task[5:].isdigit():

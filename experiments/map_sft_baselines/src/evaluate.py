@@ -4,17 +4,16 @@ from dataclasses import replace
 from pathlib import Path
 import torch
 from transformers import AutoTokenizer,StoppingCriteria,StoppingCriteriaList
-from experiments.llm_task_sft.src.protocol import parse_control,action_from_key,legal_actions,action_key
-from experiments.blocks_distance_map.src.oracle import DistanceOracle
-from experiments.flamingo_map_reader.src.train import to_device
-from experiments.flamingo_map_reader.src.graph import timeline_maps
-from experiments.flamingo_map_reader.src.relations import parse_ranking
-from experiments.flamingo_map_reader.src.analyze_blocks_ranking import meeting_ranking_scores
+from grounded_llm.tasks.blocks.protocol import parse_control,action_from_key,legal_actions,action_key
+from grounded_llm.tasks.blocks.oracle import DistanceOracle
+from grounded_llm.core.reader.batching import to_device
+from grounded_llm.core.reader.batching import timeline_maps
+from grounded_llm.tasks.blocks.evaluation import score
 from experiments.flamingo_map_reader.src.counterfactual import reverse_candidate_q
-from experiments.flamingo_map_reader.src.blocks import FrozenBoardMap
-from experiments.gcml_counterexamples.src import blocks as rules
-from .common import prompt,sorted_step,pseudo_timeline,atomic_json
-from .prepare import CachedMap
+from grounded_llm.tasks.blocks.qmap import FrozenBoardMap
+import grounded_llm.tasks.blocks.rules as rules
+from grounded_llm.tasks.blocks.sft import prompt,sorted_step,pseudo_timeline,atomic_json
+from grounded_llm.core.qmap.reader import CachedQMap as CachedMap
 from .modeling import build
 from .metrics import summarize
 
@@ -24,15 +23,6 @@ class Boundary(StoppingCriteria):
         text=self.tokenizer.decode(input_ids[0,self.prefix:],skip_special_tokens=True)
         return '</action>' in text or '<done/>' in text
 
-def score(text,step,oracle,with_map):
-    before=oracle.distance(step.current,step.goal);candidate,error=parse_control(text,len(step.candidate_actions))
-    row=dict(current=str(step.current),goal=str(step.goal),answer=text,candidate=candidate,error=error,live=before>0,rank_eligible=not step.done and bool(step.candidate_actions),safe=False,optimal=False,map_optimal=False)
-    if candidate is not None and error is None:
-        _,after=step.execute(candidate);remaining=oracle.distance(after,step.goal)
-        row.update(after=str(after),safe=before>0 and remaining>=0,optimal=before>0 and remaining==before-1,map_optimal=candidate in step.map_minimal_candidates)
-    if with_map and row['rank_eligible']:
-        row.update(meeting_ranking_scores(step.candidate_map_distances,parse_ranking(text,len(step.candidate_actions),10)))
-    return row
 
 def main():
     p=argparse.ArgumentParser()
@@ -78,7 +68,7 @@ def main():
                     altered,_=reverse_candidate_q(step);other=generate(messages,[altered],[0]*len(ids));row['reverse']=score(other,step,oracle,True);row['changed_action']=row['candidate']!=row['reverse']['candidate']
                     if index==0 and cfg['evaluation'].get('first_turn_diagnosis',False):
                         from experiments.flamingo_map_reader.src.trajectory_protocol import numbered_step
-                        from experiments.flamingo_map_reader.src.blocks_prompt import turn_prompt
+                        from grounded_llm.tasks.blocks.prompts import turn_prompt
                         zero=replace(step,map_batch=replace(step.map_batch,vectors=torch.zeros_like(step.map_batch.vectors)))
                         zero_score=score(generate(messages,[zero],[0]*len(ids)),step,oracle,True)
                         row['map_zero']=zero_score

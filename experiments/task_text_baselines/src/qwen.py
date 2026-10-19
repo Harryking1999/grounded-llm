@@ -8,7 +8,7 @@ import os
 from pathlib import Path
 import time
 
-from .protocol import judge
+from grounded_llm.tasks.text import judge
 from .run import write_json, summary
 
 

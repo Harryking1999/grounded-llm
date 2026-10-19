@@ -8,7 +8,7 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from .blocks import FrozenBoardMap
+from grounded_llm.tasks.blocks.qmap import FrozenBoardMap
 from .blocks_data import demonstration_from_record
 from .counterfactual import swap_best_worst_q
 from .data import demonstration_from_record as graph_demonstration, load_graph

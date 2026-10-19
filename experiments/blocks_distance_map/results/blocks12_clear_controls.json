@@ -24,7 +24,8 @@
       "historical510": 434,
       "historical_lost": 15,
       "historical_gained": 20,
-      "results": "runs/qmap_dual_20261018/blocks12/clear_ablation_028_A/A/evaluation/results.json"
+      "results": "runs/qmap_dual_20261018/blocks12/clear_ablation_028_A/A/evaluation/results.json",
+      "interpretation": "Intermediate300 observation; insufficient to judge recipe. Resume retained state to>=1000 under updated user requirement."
     },
     "B": {
       "updates": 300,
@@ -44,7 +45,8 @@
       "historical510": 434,
       "historical_lost": 22,
       "historical_gained": 27,
-      "results": "runs/qmap_dual_20261018/blocks12/clear_ablation_028_B/B/evaluation/results.json"
+      "results": "runs/qmap_dual_20261018/blocks12/clear_ablation_028_B/B/evaluation/results.json",
+      "interpretation": "Intermediate300 observation; insufficient to judge recipe. Resume retained state to>=1000 under updated user requirement."
     },
     "C": {
       "updates": 300,
@@ -64,7 +66,8 @@
       "historical510": 428,
       "historical_lost": 24,
       "historical_gained": 23,
-      "results": "runs/qmap_dual_20261018/blocks12/clear_ablation_028_C/C/evaluation/results.json"
+      "results": "runs/qmap_dual_20261018/blocks12/clear_ablation_028_C/C/evaluation/results.json",
+      "interpretation": "Intermediate300 observation; insufficient to judge recipe. Resume retained state to>=1000 under updated user requirement."
     }
   },
   "diagnosis": {
@@ -82,7 +85,7 @@
     "full_cases": "runs/qmap_dual_20261018/blocks12/lost101_gained43_diagnosis.json",
     "gradients": "runs/qmap_dual_20261018/blocks12/granular_gradient_audit.json"
   },
-  "decision": "ABC300 stopped854/862/869. Decision-context sampling300 produced889/1000 and433/510, lost48/gained57 vs880. Continue this effective recipe to1000 evaluation; not yet900. Original880 remains fully protected.",
+  "decision": "Selected889 checkpoint remains protected; same recipe later876/875 at1000/2000 did not improve. User now requires all recipe comparisons>=1000. Preserve exploratory300 checkpoints, complete matched budgets, do not reject recipe from300 alone. No loss/model/optimizer/label change.",
   "decision_context_validation": {
     "source_commit": "4f413b5",
     "parent": "same880_full_Adam_and_four_samplers",
@@ -174,6 +177,17 @@
       "gained_vs880": 62,
       "11step": 75,
       "12step": 801
+    },
+    {
+      "updates": 2000,
+      "clear1000": 875,
+      "historical510": 423,
+      "lost_vs880": 71,
+      "gained_vs880": 66,
+      "lost_vs889": 73,
+      "gained_vs889": 59,
+      "11step": 72,
+      "12step": 803
     }
   ],
   "selected_candidate": {
@@ -183,5 +197,25 @@
     "complete": false,
     "target_clear1000": 900,
     "parent880_full_state_preserved": true
+  },
+  "minimum_recipe_evaluation_updates": 1000,
+  "current_comparison": {
+    "scope": "Same889 full state, same proportions/priority pool/global batch, only shared16 versus disjoint64 roots per update",
+    "minimum_updates": 1000,
+    "300_intermediate": {
+      "shared16": {
+        "clear": 886,
+        "history": 422,
+        "lost_vs889": 47,
+        "gained_vs889": 44
+      },
+      "disjoint64": {
+        "clear": 883,
+        "history": 433,
+        "lost_vs889": 45,
+        "gained_vs889": 39
+      }
+    },
+    "status": "Disjoint preserved300 resumed toward>=1000 without resettingAdam/samplers; shared16 and originalABC queued to complete>=1000 after active continuation ends.300 cannot establish that a recipe is ineffective."
   }
 }

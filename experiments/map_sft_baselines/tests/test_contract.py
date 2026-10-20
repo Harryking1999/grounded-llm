@@ -13,6 +13,14 @@ from experiments.map_sft_baselines.src.train import validate_resume_contract
 from experiments.map_sft_baselines.src.contract import steps_per_epoch,checkpoint_steps,plateau_status
 
 class ContractTests(unittest.TestCase):
+    def test_full_epochs_precede_half_epochs_without_dropping_either(self):
+        from experiments.map_sft_baselines.src.contract import checkpoint_priority
+        cfg=dict(data={'samples_per_epoch':50000},training={'global_batch':4},
+                 evaluation={'priority_step_interval':50000,'prioritize_full_epochs':True})
+        steps=[6250,12500,50000,56250,75000,81250,100000]
+        self.assertEqual(sorted(steps,key=lambda s:checkpoint_priority(s,cfg)),
+                         [100000,50000,75000,12500,81250,56250,6250])
+
     def test_ranking_first_preserves_reason_action_and_terminal(self):
         from experiments.map_sft_baselines.src.common import answer,prompt
         from experiments.gcml_counterexamples.src import blocks as rules

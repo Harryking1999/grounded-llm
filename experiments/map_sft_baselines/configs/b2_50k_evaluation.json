@@ -1,5 +1,5 @@
 {
-  "study": "original_50k_B2_update50000_full_evaluation",
+  "study": "original_50k_B2_matched_update_evaluation",
   "model": "Qwen/Qwen2.5-1.5B-Instruct",
   "seed": 20261013,
   "maximum_sequence_tokens": 32768,
@@ -57,12 +57,8 @@
   },
   "execution": {
     "evaluation_gpus": [
-      0,
-      1,
-      4,
-      5,
-      6,
-      7
+      2,
+      3
     ],
     "poll_seconds": 30,
     "retired_baselines": []
@@ -78,9 +74,8 @@
     "max_new_tokens": 256,
     "action_budget": 32,
     "main_metric": "arrival",
-    "checkpoint_step": 50000,
-    "checkpoint_epoch": 4,
-    "purpose": "Full matched-update reference for B2 four-control diagnosis"
+    "checkpoint_steps": [50000, 100000],
+    "purpose": "Full matched-update reference for B2 data-size diagnosis"
   },
   "early_stop": {
     "mode": "flag_only",

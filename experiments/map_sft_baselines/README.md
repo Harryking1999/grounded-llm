@@ -11,6 +11,7 @@
 | 10k 地图全参与7B无地图 SFT | [b2_10k.json](configs/b2_10k.json)、[qwen7b_ra_10k.json](configs/qwen7b_ra_10k.json) | [主报告](results/report.md)、[首步诊断](results/b2_10k_diagnosis.md) |
 | 学习率、覆盖、重编号、内容 MLP 四组诊断 | [b2_lr_match.json](configs/b2_lr_match.json)、[b2_coverage.json](configs/b2_coverage.json)、[b2_renumber.json](configs/b2_renumber.json)、[b2_mlp.json](configs/b2_mlp.json) | [同预算比较](results/b2_four_controls.md) |
 | 100k 嵌套数据对照 | [b2_100k.json](configs/b2_100k.json) | [诊断报告中的证据边界](results/b2_four_controls.md) |
+| 原50k B2 同更新预算补评 | [b2_50k_evaluation.json](configs/b2_50k_evaluation.json) | [诊断比较](results/b2_four_controls.md)；逐题结果在已有补评 runtime |
 | 缓存与权重保留 | [bridge_retention.json](configs/bridge_retention.json) | 具体运行状态在各 runtime |
 
 地图组现行监督为“排序 → Reason → Action”；旧 reason-first 条件单列历史。7B 使用简短 Reason＋Action，不能称为长 CoT。不同数据量、主干大小或训练预算的结果分别解释；不拼接曲线。

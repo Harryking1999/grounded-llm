@@ -3,7 +3,7 @@ import argparse,json,os,subprocess,sys,time
 from pathlib import Path
 from grounded_llm.core.files import atomic_json
 from .metrics import summarize
-from .contract import steps_per_epoch,checkpoint_steps,cohort_size,evaluation_modes
+from .contract import steps_per_epoch,checkpoint_steps,cohort_size,evaluation_modes,checkpoint_priority
 
 def evaluation_jobs(root,config,records=None):
     jobs=[]
@@ -19,7 +19,8 @@ def evaluation_jobs(root,config,records=None):
             for start in range(0,total,config['evaluation']['shard_tasks']):
                 stop=min(start+config['evaluation']['shard_tasks'],total);out=Path(root)/'evaluation'/base/f'checkpoint-{step}'/f'{mode}_{start:04d}_{stop:04d}'
                 if not (out/'summary.json').exists():jobs.append((step,meta['epoch'],base,mode,start,stop,checkpoint,out))
-    return sorted(jobs,key=lambda j:(-j[1],j[2],{'RO':0,'TF':1,'probe':2}[j[3]],j[4]))
+    return sorted(jobs,key=lambda j:(checkpoint_priority(j[0],config),
+        {'RO':0,'TF':1,'probe':2}[j[3]],j[2],j[4]))
 
 def collect(root,config):
     for base in config['baselines']:

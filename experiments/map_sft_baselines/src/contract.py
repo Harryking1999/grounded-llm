@@ -4,6 +4,11 @@
 
 from grounded_llm.core.sft.schedule import steps_per_epoch, training_steps
 
+def checkpoint_priority(step, config):
+    """Milestone checkpoints first, newest first within either group."""
+    interval = config.get('evaluation', {}).get('priority_step_interval', 0)
+    return (0 if interval and step > 0 and step % interval == 0 else 1, -step)
+
 def checkpoint_steps(config):
     interval = config['training']['save_steps']
     total = training_steps(config)

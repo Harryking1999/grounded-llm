@@ -77,6 +77,11 @@ class ShardPool:
                 return None
             raise
         try:
+            priority_path = self.root / 'evaluation_priority.json'
+            if self.exists(priority_path):
+                preferred = self.read(priority_path).get('preferred_steps', {})
+                jobs = [job for job in jobs if job[2] not in preferred
+                        or job[0] == preferred[job[2]]]
             cursor = self.root / 'evaluation_dispatch.json'
             previous = self.read(cursor).get('baseline') if self.exists(cursor) else None
             baselines = sorted({job[2] for job in jobs})

@@ -9,8 +9,8 @@ from filelock import FileLock
 import paramiko
 from experiments.llm_task_sft.src.bridge import connect, execute
 from grounded_llm.core.files import atomic_json
-from .contract import plateau_status
-from .retention import prune_completed, has_capacity
+from .contract import plateau_status, checkpoint_priority
+from .retention import prune_completed, has_capacity, prioritize_pending
 
 
 def publish(files, source, destination):
@@ -70,12 +70,18 @@ def cycle(files, target, profile, config, policy, progress):
     progress['returned'] = return_scores(files, profile, config)
     progress['scores_synced_at'] = time.time()
     ready = sorted((profile['run_path'] / 'training').glob('B*/checkpoint-*/evaluation_ready.json'),
-                   key=lambda p: -json.loads(p.read_text())['epoch'])
+                   key=lambda p: checkpoint_priority(json.loads(p.read_text())['step'], config))
     archived = {(p.parent.parent.name, p.parent.name): p.parent / 'weights.pt' for p in ready}
     record_progress(profile, progress, phase='retention')
     progress['deleted'] = prune_completed(files, profile, config, archived)
     if profile.get('source_retention') == 'latest_and_best':
         progress['source_deleted'] = prune_source(profile, config, ready)
+    if config.get('evaluation', {}).get('priority_step_interval'):
+        preferred, deferred = prioritize_pending(files, profile, config, ready, archived)
+        progress['preferred_steps'] = preferred
+        progress['deferred_cache'] = deferred
+        ready = [p for p in ready if json.loads(p.read_text())['step'] ==
+                 preferred.get(p.parent.parent.name)]
     record_progress(profile, progress, phase='weights')
     published, blocked, seen = [], [], set()
     for marker in ready:

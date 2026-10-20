@@ -6,6 +6,55 @@ from .contract import evaluation_modes, cohort_size
 from .shard_pool import ShardPool
 
 
+def prioritize_pending(files, profile, config, ready, archived):
+    """Yield disposable cache to the preferred source checkpoint, between shards.
+
+    Keep source weights and every score. Removing readiness under the dispatch
+    lock prevents new claims; existing claims always finish before eviction.
+    """
+    from .contract import checkpoint_priority
+    pool = ShardPool(profile['target_run'], files)
+    preferred, deleted = {}, []
+    for base in profile.get('publish_baselines', profile['baselines']):
+        if base in config['execution'].get('retired_baselines', []):
+            continue
+        curve = profile['run_path'] / 'results' / base / 'curve.json'
+        rows = json.loads(curve.read_text()) if curve.exists() else []
+        complete = {r['step'] for r in rows if all(
+            r.get('metrics', {}).get(m, {}).get('tasks') == cohort_size(config, m)
+            for m in evaluation_modes(config, base))}
+        candidates = [json.loads(p.read_text())['step'] for p in ready
+                      if p.parent.parent.name == base and
+                      (p.parent / 'weights.pt').is_file()]
+        candidates = [step for step in candidates if step not in complete]
+        if candidates:
+            preferred[base] = min(candidates, key=lambda step: checkpoint_priority(step, config))
+    with dispatch_lock(pool) as locked:
+        if not locked:
+            return preferred, deleted
+        pool.write(pool.root / 'evaluation_priority.json', dict(preferred_steps=preferred))
+        for base, name, path, size in cache_entries(pool):
+            if not size or base not in preferred or int(name[11:]) == preferred[base]:
+                continue
+            source = archived.get((base, name))
+            if not source or not source.is_file() or source.stat().st_size <= 0:
+                continue
+            marker = path / 'evaluation_ready.json'
+            if not pool.exists(marker) or pool.exists(path / 'weights_retired.json'):
+                continue
+            if pool.read(marker) != json.loads(source.with_name('evaluation_ready.json').read_text()):
+                continue
+            evaluation = pool.root / 'evaluation' / base / name
+            if pool.exists(evaluation) and any(x.endswith('.worker.claim') for x in files.listdir(str(evaluation))):
+                continue
+            files.remove(str(marker))
+            for filename in ('weights.pt', 'weights.pt.part'):
+                if pool.exists(path / filename):
+                    files.remove(str(path / filename))
+            deleted.append(dict(baseline=base, checkpoint=name, bytes=size))
+    return preferred, deleted
+
+
 @contextmanager
 def dispatch_lock(pool):
     path = pool.root / 'evaluation_dispatch.lock'

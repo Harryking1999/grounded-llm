@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from unittest.mock import Mock, patch
 from experiments.map_sft_baselines.src import bridge
-from experiments.map_sft_baselines.src.retention import dispatch_lock, prune_completed, has_capacity
+from experiments.map_sft_baselines.src.retention import dispatch_lock, prune_completed, has_capacity, prioritize_pending
 from experiments.map_sft_baselines.src.shard_pool import ShardPool
 from experiments.map_sft_baselines.tests.test_shard_pool import LocalSFTP
 
@@ -66,6 +66,45 @@ class BridgeTests(unittest.TestCase):
         self.assertEqual(json.loads((self.local / 'results/B0/curve.json').read_text()), [old, self.row])
         self.assertEqual(progress['phase'], 'weights')
         self.assertIn('scores_synced_at', progress)
+
+    def test_priority_waits_for_claim_then_evicts_only_cache_and_resumes_old_work(self):
+        from experiments.map_sft_baselines.src.queue import evaluation_jobs
+        self.config['evaluation']['priority_step_interval'] = 50000
+        ready, archived, records = [], {}, []
+        for step in (6250, 50000, 56250, 100000):
+            meta = dict(baseline='B0', step=step, epoch=step / 12500)
+            source = self.local / 'training/B0' / f'checkpoint-{step}'
+            self.dump(source / 'evaluation_ready.json', meta)
+            (source / 'weights.pt').write_bytes(b'archive')
+            ready.append(source / 'evaluation_ready.json')
+            archived[('B0', source.name)] = source / 'weights.pt'
+            records.append(meta)
+        jobs = evaluation_jobs(self.remote, self.config, records)
+        self.assertEqual(list(dict.fromkeys(j[0] for j in jobs)), [100000, 50000, 56250, 6250])
+        self.assertEqual(jobs[0][3], 'RO')
+        old = self.remote / 'models/B0/checkpoint-6250'
+        self.dump(old / 'evaluation_ready.json', records[0])
+        (old / 'weights.pt').write_bytes(b'cache')
+        old_job = next(j for j in jobs if j[0] == 6250)
+        pool = ShardPool(self.remote)
+        owner = pool.acquire(old_job, 'worker', 123)
+        preferred, deleted = prioritize_pending(self.files, self.profile, self.config, ready, archived)
+        self.assertEqual(preferred, {'B0': 100000})
+        self.assertEqual(deleted, [])
+        self.assertIsNone(pool.acquire_next([j for j in jobs if j[0] == 6250], 'other'))
+        old_job[-1].mkdir(exist_ok=True)
+        (old_job[-1] / 'cases.jsonl').write_text('saved-answer\n')
+        pool.release(old_job, owner)
+        preferred, deleted = prioritize_pending(self.files, self.profile, self.config, ready, archived)
+        self.assertEqual(len(deleted), 1)
+        self.assertFalse((old / 'weights.pt').exists())
+        self.assertFalse((old / 'evaluation_ready.json').exists())
+        self.assertTrue(archived[('B0', 'checkpoint-6250')].exists())
+        self.assertEqual((old_job[-1] / 'cases.jsonl').read_text(), 'saved-answer\n')
+        self.dump(self.local / 'results/B0/curve.json',
+                  [dict(self.row, step=step) for step in (50000, 100000, 56250)])
+        preferred, _ = prioritize_pending(self.files, self.profile, self.config, ready, archived)
+        self.assertEqual(preferred, {'B0': 6250})
 
     def test_delete_only_after_complete_scores_mirrored_and_no_claim(self):
         self.publish_ready()

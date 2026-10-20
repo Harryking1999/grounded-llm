@@ -19,8 +19,12 @@ def main():
     args = parser.parse_args()
     config = json.loads(args.config.read_text())
     spec = config['baselines'][args.baseline]
+    dataset_class = Routes
+    if config.get('task') in ('cube2', 'puzzle8'):
+        from grounded_llm.tasks.restoration_sft import Routes as RestorationRoutes
+        dataset_class = RestorationRoutes
     tokenizer = AutoTokenizer.from_pretrained(args.model_path, local_files_only=True)
-    data = Routes(args.data, spec['real_map'], config=config,
+    data = dataset_class(args.data, spec['real_map'], config=config,
                   baseline=args.baseline, tokenizer=tokenizer)
     if spec['real_map'] and data.meta.get('response_order', 'reason_first') != spec.get('response_order', 'reason_first'):
         raise ValueError('Prepared assistant order differs from baseline configuration')

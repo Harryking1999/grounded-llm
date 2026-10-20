@@ -12,6 +12,8 @@
 | 学习率、覆盖、重编号、内容 MLP 四组诊断 | [b2_lr_match.json](configs/b2_lr_match.json)、[b2_coverage.json](configs/b2_coverage.json)、[b2_renumber.json](configs/b2_renumber.json)、[b2_mlp.json](configs/b2_mlp.json) | [同预算比较](results/b2_four_controls.md) |
 | 100k 嵌套数据对照 | [b2_100k.json](configs/b2_100k.json) | [诊断报告中的证据边界](results/b2_four_controls.md) |
 | 原50k B2 同更新预算补评 | [b2_50k_evaluation.json](configs/b2_50k_evaluation.json) | [诊断比较](results/b2_four_controls.md)；逐题结果在已有补评 runtime |
+| 50k 内容 MLP：有／无逐轮重编号 | [b2_50k_mlp.json](configs/b2_50k_mlp.json) | 共用原50k积木轨迹、冻结图与510题 |
+| 二阶魔方、8-Puzzle 的50k地图 SFT | [cube2](configs/cube2_50k_mlp_renumber.json)、[puzzle8](configs/puzzle8_50k_mlp_renumber.json) | 各任务采用图，MLP＋逐轮重编号；固定目标复原 |
 | 缓存与权重保留 | [bridge_retention.json](configs/bridge_retention.json) | 具体运行状态在各 runtime |
 
 地图组现行监督为“排序 → Reason → Action”；旧 reason-first 条件单列历史。7B 使用简短 Reason＋Action，不能称为长 CoT。不同数据量、主干大小或训练预算的结果分别解释；不拼接曲线。
@@ -45,6 +47,12 @@ python -m experiments.map_sft_baselines.src.bridge --profile PRIVATE_RUNTIME_PRO
 ```
 
 runtime profile 保存路径、节点、known_hosts 与传输映射；凭据仅通过 stdin 进入内存。模型与机器入口见[开发机手册](../../DEVELOPMENT_MACHINES.md)。正式参数从配置读取，不在队列或说明中另抄。
+
+二阶魔方与8-Puzzle用 `src.restoration_prepare` 准备数据，训练、评测分片、桥接和缓存清理仍用上述入口。任务文字、物理动作、重编号和裁判位于 [restoration_sft.py](../../grounded_llm/tasks/restoration_sft.py)，复用已有任务规则和提示原文。魔方沿用QTM六动作与复原目标；8-Puzzle沿用所选地图的标准目标 `1 2 3 / 4 5 6 / 7 8 0`。
+
+新任务各取50,000个不同非终止起点，不单独加入初始即终止样本；完整轨迹保留到达后的停止监督。先从全部可达状态锁定统一随机留出题，再用冻结Q选动作，只保留每步真实最短距离减少一且最终复原的路线。按最短路长度递减选择，同长度优先增加未见状态—目标覆盖；任何训练轮次均排除留出题初始状态。固定目标、有限状态空间下不沿用积木的绝对覆盖门槛；真实覆盖、长度分布、筛选比例和最长token数保存在数据 `acceptance.json`。题集不按Q成败筛选；Q本身的训练曝光不因此被排除。
+
+四组从同一基座初始化，沿用原B2的优化器、学习率时程、batch、训练预算、生成和动作预算。内容MLP沿用既有诊断实现；重编号每个epoch重绑候选ID，不新增物理样本。028每组两卡；4090使用1–4号卡，评完且结果回传后删除推理缓存。028保留最新完整恢复状态及已评最佳模型；未评权重保留等待队列。
 
 ## 多节点评测
 

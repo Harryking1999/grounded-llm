@@ -13,6 +13,7 @@
 | 100k 嵌套数据对照 | [b2_100k.json](configs/b2_100k.json) | [诊断报告中的证据边界](results/b2_four_controls.md) |
 | 原50k B2 同更新预算补评 | [b2_50k_evaluation.json](configs/b2_50k_evaluation.json) | [诊断比较](results/b2_four_controls.md)；逐题结果在已有补评 runtime |
 | 50k 内容 MLP：有／无逐轮重编号 | [b2_50k_mlp.json](configs/b2_50k_mlp.json) | 共用原50k积木轨迹、冻结图与510题 |
+| 12块清空50k：新地图、3B与7B全参对照 | [地图](configs/blocks12_50k_map.json)、[3B](configs/blocks12_50k_3b.json)、[7B](configs/blocks12_50k_7b.json) | 新地图＋MLP＋逐轮重编号；同批新轨迹，固定clear1000评测 |
 | 二阶魔方、8-Puzzle 的50k地图 SFT | [cube2](configs/cube2_50k_mlp_renumber.json)、[puzzle8](configs/puzzle8_50k_mlp_renumber.json) | 各任务采用图，MLP＋逐轮重编号；固定目标复原 |
 | 缓存与权重保留 | [bridge_retention.json](configs/bridge_retention.json) | 具体运行状态在各 runtime |
 
@@ -55,6 +56,14 @@ runtime profile 保存路径、节点、known_hosts 与传输映射；凭据仅�
 这四组的评测按配置 `evaluation.priority_step_interval` 优先选择整 5 万步断点；`evaluation.prioritize_full_epochs` 将其余整数 epoch（每 12,500 步）排在半 epoch 前，同类中新断点优先，每个断点先 RO、再 TF、最后 probe。整数 epoch 必须补齐，半 epoch 在容量允许时补评。传输与评测使用同一优先级；在跑分片完成后才让出旧缓存，源权重与已完成答卷保留。低优先级断点暂缓而非取消，训练保存频率与评测题集不变。
 
 四组从同一基座初始化，沿用原B2的优化器、学习率时程、batch、训练预算、生成和动作预算。内容MLP沿用既有诊断实现；重编号每个epoch重绑候选ID，不新增物理样本。028每组两卡；4090使用1–4号卡，评完且结果回传后删除推理缓存。028保留最新完整恢复状态及已评最佳模型；未评权重保留等待队列。
+
+### 12块清空的三组对照
+
+`src.blocks12_prepare` 从新种子生成原八形状、12次非重叠构造的候选棋盘，使用新地图，保留地图贪心成功且由精确求解器认证最短的清空轨迹。先按最短解长度降序，再按新增状态—目标覆盖选出50,000个不同起点；覆盖下限沿用原设计，不通过重复编号凑样本。三组共用物理动作、短Reason监督和题集；地图组另有地图与排序监督。没有初始即终止样本，轨迹末尾保留停止监督。采样数量、种子、覆盖下限和预算只维护于配置。
+
+正式评测使用完整 `tasks/blocks/data/clear1000.json`，不按地图成功筛选；其非终止参考状态全部从SFT轨迹排除。该题集曾用于Qmap选模，不能称为对Qmap独立未见的验收集。数据覆盖、长度与token统计保存于数据目录的 `acceptance.json`。模型权重身份见配置的 `map_source` 与任务selection。
+
+地图组沿用1.5B；3B、7B都是无地图全参SFT，采用已有FSDP训练实现。global batch均为4；保存与评测至少每整数epoch一次，整5万步和新断点优先。沿用现有训练、评测与按需传输入口，数据验收通过后队列才启动训练。
 
 ## 多节点评测
 

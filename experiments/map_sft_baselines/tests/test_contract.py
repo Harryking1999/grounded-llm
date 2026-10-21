@@ -13,6 +13,27 @@ from experiments.map_sft_baselines.src.train import validate_resume_contract
 from experiments.map_sft_baselines.src.contract import steps_per_epoch,checkpoint_steps,plateau_status
 
 class ContractTests(unittest.TestCase):
+    def test_clear12_reference_and_coverage(self):
+        from grounded_llm.tasks.blocks.construction import construct
+        from grounded_llm.tasks.blocks.clear_sft import reference_route, select_coverage
+        from grounded_llm.tasks.blocks.oracle import DistanceOracle
+        from grounded_llm.tasks.blocks.protocol import action_from_key
+        from grounded_llm.tasks.blocks import rules
+        root = construct(1, 12, 2026102101)[0]
+        self.assertEqual(len(root['construction']), 12)
+        state = int(root['initial'])
+        actions, states = reference_route(state, DistanceOracle())
+        for action in actions:
+            state = rules.apply(state, action_from_key(action))
+        self.assertEqual(state, 0)
+        self.assertEqual(len(states), len(actions))
+        rows = [dict(start=str(i), shortest_moves=d, pairs=pairs) for i,d,pairs in
+                [(1,3,[(1,0),(2,0),(3,0)]), (2,3,[(1,0),(2,0),(3,0)]),
+                 (3,3,[(4,0),(5,0),(6,0)]), (4,2,[(7,0),(8,0)])]]
+        selected, covered = select_coverage(rows, 2, 1)
+        self.assertEqual(len(covered), 6)
+        self.assertTrue(all(r['shortest_moves']==3 for r in selected))
+
     def test_full_epochs_precede_half_epochs_without_dropping_either(self):
         from experiments.map_sft_baselines.src.contract import checkpoint_priority
         cfg=dict(data={'samples_per_epoch':50000},training={'global_batch':4},

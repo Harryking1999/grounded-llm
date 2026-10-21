@@ -13,24 +13,7 @@ from grounded_llm.tasks.blocks.oracle import DistanceOracle, OracleBudgetExceede
 from .tree_supervision_eval import QScorer
 
 
-def construct(count, placements, seed):
-    rng = random.Random(seed)
-    roots, seen = [], set()
-    while len(roots) < count:
-        state, witness = 0, []
-        for _ in range(placements):
-            shape = rng.randrange(len(blocks.SHAPES))
-            legal = [(tile, action) for tile, action in blocks.PLACEMENTS
-                     if action["shape_id"] == shape and not tile & state]
-            if not legal:
-                break
-            tile, action = rng.choice(legal)
-            state |= tile
-            witness.append(action)
-        if len(witness) == placements and state not in seen:
-            seen.add(state)
-            roots.append({"initial": str(state), "construction": witness})
-    return roots
+from grounded_llm.tasks.blocks.construction import construct
 
 
 def trace(scorer, source, goal, oracle):

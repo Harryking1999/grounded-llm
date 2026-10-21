@@ -1,0 +1,102 @@
+{
+  "study": "blocks12_50k_7b",
+  "model": "Qwen/Qwen2.5-7B-Instruct",
+  "seed": 20261013,
+  "maximum_sequence_tokens": 32768,
+  "data": {
+    "samples_per_epoch": 50000,
+    "candidate_boards": 80000,
+    "construction_placements": 12,
+    "construction_seed": 2026102101,
+    "minimum_shortest_moves": 6,
+    "coverage_target": 292758,
+    "oracle_cache_limit": 2000000,
+    "oracle_seconds_per_board": 60,
+    "selection": "longest_then_new_state_goal_coverage_distinct_roots",
+    "target": "empty",
+    "numbering": "shape_id_row_col_sorted"
+  },
+  "map": {
+    "memory_mode": "address_key_state_value",
+    "state_dim": 128,
+    "projection_dim": 256,
+    "role_and_id_dim": 32,
+    "attention_heads": 4,
+    "attention_head_dim": 64,
+    "cross_attention_every_n_layers": 1,
+    "maximum_candidates": 664,
+    "feature_ffn_hidden_dim": 512
+  },
+  "training": {
+    "epochs": 20,
+    "world_size": 4,
+    "micro_batch": 1,
+    "gradient_accumulation_steps": 1,
+    "global_batch": 4,
+    "learning_rate": 2e-05,
+    "weight_decay": 0.01,
+    "warmup_fraction": 0.05,
+    "cosine_minimum_ratio": 0.1,
+    "gradient_clip_norm": 1.0,
+    "checkpoint_layers": true,
+    "loss_chunk_tokens": 128,
+    "loss": "global_assistant_token_mean_cross_entropy",
+    "save_steps": 12500,
+    "log_steps": 10,
+    "keep_resume_checkpoints": 1,
+    "distributed_strategy": "fsdp"
+  },
+  "baselines": {
+    "B0_blocks12_7b": {
+      "interface": false,
+      "real_map": false,
+      "full_llm": true
+    }
+  },
+  "execution": {
+    "initial_baselines": [
+      "B0_blocks12_7b"
+    ],
+    "pending_baselines": [],
+    "retired_baselines": [],
+    "gpu_pairs": [
+      [
+        4,
+        5,
+        6,
+        7
+      ]
+    ],
+    "evaluation_gpus": [
+      3,
+      4
+    ],
+    "poll_seconds": 60
+  },
+  "evaluation": {
+    "priority_step_interval": 50000,
+    "prioritize_full_epochs": true,
+    "tasks": 1000,
+    "modes": [
+      "TF",
+      "RO"
+    ],
+    "probe_tasks": 100,
+    "shard_tasks": 32,
+    "max_new_tokens": 256,
+    "action_budget": 32,
+    "main_metric": "arrival"
+  },
+  "early_stop": {
+    "mode": "flag_only",
+    "minimum_epochs": 5,
+    "patience_points": 6,
+    "minimum_gain_tasks": 5
+  },
+  "map_source": {
+    "selection": "tasks/blocks/Qmap/selection.json",
+    "checkpoint": "runs/blocks12_decision_clear/run/checkpoints/step_000300.pt",
+    "source_commit": "4f413b5",
+    "clear1000": 889
+  }
+}

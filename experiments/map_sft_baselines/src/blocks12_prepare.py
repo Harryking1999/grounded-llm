@@ -64,13 +64,17 @@ def main():
         raise ValueError('Accepted dataset already exists')
     evaluation, excluded = [], set()
     oracle = DistanceOracle(cache_limit=2000000, seconds=86400)
-    for case in json.loads(args.evaluation.read_text())['cases']:
+    all_cases = json.loads(args.evaluation.read_text())['cases']
+    evaluation_indices = set(map(int, np.random.default_rng(cfg['evaluation']['subset_seed']).choice(
+        len(all_cases), cfg['evaluation']['tasks'], replace=False)))
+    for case_index, case in enumerate(all_cases):
         start = int(case['source'])
         actions, states = reference_route(start, oracle)
         assert len(actions) == case['true_distance']
         excluded.update(states)
-        evaluation.append(dict(trajectory_id=case['id'], split='test', start=str(start),
-                               goal='0', reference_actions=actions, shortest_moves=len(actions)))
+        if case_index in evaluation_indices:
+            evaluation.append(dict(trajectory_id=case['id'], split='test', start=str(start),
+                                   goal='0', reference_actions=actions, shortest_moves=len(actions)))
     assert len(evaluation) == cfg['evaluation']['tasks']
     atomic_json(args.out/'evaluation.json', evaluation)
     rng = np.random.default_rng(cfg['seed'])
@@ -119,7 +123,7 @@ def main():
         maximum_map_tokens=max(r['map_tokens'] for r in rows),
         maximum_plain_tokens=max(r['plain_tokens'] for r in rows),
         excluded_evaluation_reference_states=len(excluded), initial_terminal_samples=0,
-        evaluation='fixed_clear1000_without_Q_success_filter',
+        evaluation='fixed_seeded_500_subset_of_clear1000_without_Q_success_filter',
         limitation='Fixed1000 was used for Qmap selection; it is not an independent unseen Qmap acceptance set.'))
     atomic_json(args.out/'ready.json', dict(samples=len(rows), unique_pairs=len(coverage), smoke=False))
 

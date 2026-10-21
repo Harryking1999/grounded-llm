@@ -76,7 +76,7 @@
   "evaluation": {
     "priority_step_interval": 50000,
     "prioritize_full_epochs": true,
-    "tasks": 1000,
+    "tasks": 500,
     "modes": [
       "TF",
       "RO"
@@ -85,7 +85,8 @@
     "shard_tasks": 32,
     "max_new_tokens": 256,
     "action_budget": 32,
-    "main_metric": "arrival"
+    "main_metric": "arrival",
+    "subset_seed": 2026102102
   },
   "early_stop": {
     "mode": "flag_only",

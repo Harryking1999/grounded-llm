@@ -5,6 +5,12 @@ from grounded_llm.core.qmap.metrics import correlation, encode, average_ranks
 from grounded_llm.core.qmap.model import soft_rank_loss
 
 
+def distance_strata(values):
+    for low,high in ((1,1),(2,2),(3,5),(6,10),(11,20),(21,40),(41,80),(81,np.inf)):
+        yield f'{low}_{high}',np.isfinite(values)&(values>=low)&(values<=high)
+    yield 'proven_unreachable',~np.isfinite(values)
+
+
 class QCache:
     def __init__(self,model,corpus,device):
         self.model,self.corpus,self.device=model,corpus,device
@@ -116,6 +122,8 @@ def rollout(corpus,cache,rows,horizon,policy):
     descent=[[] for _ in rows]; progress_counts=dict(executed_edges=0,predicted_decrease=0,predicted_plateau=0,
         predicted_increase=0,true_finite_edges=0,true_optimal_edges=0,predicted_decrease_but_not_true_optimal=0,
         entered_dead_edges=0,non_goal_predicted_zero=0)
+    progress_layers={name:dict(executed_edges=0,true_optimal_edges=0,predicted_decrease=0,entered_dead_edges=0)
+                     for name,_ in distance_strata(np.array([],dtype=float))}
     for _ in range(horizon):
         ids=np.flatnonzero(active)
         if not len(ids): break
@@ -149,6 +157,11 @@ def rollout(corpus,cache,rows,horizon,policy):
             progress_counts['predicted_decrease_but_not_true_optimal']+=int((decreasing & ~optimal).sum())
             progress_counts['entered_dead_edges']+=int((np.isfinite(before_truth)&~np.isfinite(after_truth)).sum())
             progress_counts['non_goal_predicted_zero']+=int((before<=1e-6).sum())
+            for name,mask in distance_strata(before_truth):
+                progress_layers[name]['executed_edges']+=int(mask.sum())
+                progress_layers[name]['true_optimal_edges']+=int((optimal&mask).sum())
+                progress_layers[name]['predicted_decrease']+=int((decreasing&mask).sum())
+                progress_layers[name]['entered_dead_edges']+=int((mask&np.isfinite(before_truth)&~np.isfinite(after_truth)).sum())
             for j,margin in zip(ids,drop): descent[j].append(float(margin))
         for j,slot in zip(ids,choices): traces[j].append(corpus.action(int(current[j]),int(slot)))
         current[ids]=next_states; steps[ids]+=1
@@ -181,6 +194,7 @@ def rollout(corpus,cache,rows,horizon,policy):
             mean_abs_unit_descent_residual=float(np.abs(drops-1).mean()) if len(drops) else None,
             executed_edge_optimal_rate=progress_counts['true_optimal_edges']/len(drops) if len(drops) else None,
             predicted_strict_descent_edge_rate=progress_counts['predicted_decrease']/len(drops) if len(drops) else None,
+            executed_edges_by_true_distance=progress_layers,
             note='Observed policy trajectories only, after action selection. A nondecreasing chosen edge also means no legal successor has a strictly lower predicted distance under this greedy policy. Strict predicted descent alone does not prove goal completion or true optimality; full rollouts remain the acceptance metric.')
     return dict(count=len(rows),unique_state_goal_pairs=len(np.unique(rows,axis=0)),
                 solved=int(solved.sum()),success_rate=float(solved.mean()) if len(rows) else None,
@@ -273,12 +287,17 @@ def evaluate(model,corpus,data,config,cohorts=None,exposure=None,planning=True,t
                     unreachable=reachability(pred,truth,threshold,config['training']['unreachable_target']))
         result['coordinate_statistics']=coordinate_statistics(cache.q(rows[:,0]).cpu().numpy(),cache.q(rows[:,1]).cpu().numpy(),
             truth,pred,model.cap,getattr(model,'output_activation','sigmoid'))
+        result['bellman']['by_true_distance']={name:dict(count=int(mask.sum()),
+            shortest_action_rate=float(optimal[mask,chosen[mask]].mean()),
+            **unit_cost_consistency(pred[ids][mask],scores[ids][mask],optimal[mask],valid[ids][mask]))
+            for name,mask in distance_strata(truth[ids]) if mask.any()}
         if exposure is not None:
             seen_source=exposure[rows[:,0]]>0; seen_goal=exposure[rows[:,1]]>0
             result['actual_gradient_endpoint_exposure']=dict(both_seen=int((seen_source & seen_goal).sum()),
                 one_unseen=int((seen_source ^ seen_goal).sum()),both_unseen=int((~seen_source & ~seen_goal).sum()),
                 both_seen_finite_mae=float(np.abs(pred[finite & seen_source & seen_goal]-truth[finite & seen_source & seen_goal]).mean()) if (finite & seen_source & seen_goal).any() else None,
-                any_unseen_finite_mae=float(np.abs(pred[finite & ~(seen_source & seen_goal)]-truth[finite & ~(seen_source & seen_goal)]).mean()) if (finite & ~(seen_source & seen_goal)).any() else None)
+                any_unseen_finite_mae=float(np.abs(pred[finite & ~(seen_source & seen_goal)]-truth[finite & ~(seen_source & seen_goal)]).mean()) if (finite & ~(seen_source & seen_goal)).any() else None,
+                counter_semantics='Legacy field name: exposure counts state inputs participating in loss computation, not proven nonzero parameter gradients. Identity pairs, one-candidate ranking or saturation may have zero gradient.')
         if planning:
             rng=np.random.default_rng(config['seed']+len(name))
             selected=rows[planning_ids(corpus,rows,truth,config['evaluation']['rollout_count'],rng)]

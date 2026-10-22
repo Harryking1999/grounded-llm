@@ -196,6 +196,9 @@ class ExactPairTests(unittest.TestCase):
             self.assertEqual(result['optimal_rate'],1)
             self.assertEqual(result['predicted_progress']['predicted_strict_descent_edge_rate'],1)
             self.assertEqual(result['predicted_progress']['strict_descent_trajectory_count'],len(rows))
+            layers=result['predicted_progress']['executed_edges_by_true_distance']
+            self.assertEqual(sum(v['executed_edges'] for v in layers.values()),result['predicted_progress']['counts']['executed_edges'])
+            self.assertTrue(all(v['true_optimal_edges']==v['executed_edges'] for v in layers.values()))
             flat=SimpleNamespace(scores=lambda s,g:np.zeros(np.broadcast_arrays(s,g)[0].shape,dtype=np.float32))
             result=rollout(corpus,flat,rows,32,'q')
             self.assertGreater(result['cycles'],0)

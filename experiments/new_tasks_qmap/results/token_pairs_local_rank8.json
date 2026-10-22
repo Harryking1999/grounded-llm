@@ -1,0 +1,3003 @@
+{
+  "task": "token_swapping",
+  "source_commit": "b5cb21f",
+  "best_step": 10000,
+  "last_step": 60000,
+  "preparation_seconds": 0.5126523626968265,
+  "training_seconds": 3102.331299559213,
+  "initial_evaluation_seconds": 8.232810351997614,
+  "final_evaluation_seconds": 6.02479431219399,
+  "raw_feature_cache_seconds": 1.803975572809577,
+  "peak_gpu_allocated_bytes": 802970624,
+  "peak_gpu_reserved_bytes": 819986432,
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "data": {
+    "task": "token_swapping",
+    "states": 3628800,
+    "input_dim": 100,
+    "max_candidates": 9,
+    "seed": 2026102304,
+    "finite_max": 25.0,
+    "unknown_training_labels": 0,
+    "pair_count": 3084480,
+    "decision_count": 714835,
+    "reserved_relations": 33500,
+    "cohorts": {
+      "validation": {
+        "count": 2048,
+        "reachable": 2048
+      },
+      "test": {
+        "count": 2048,
+        "reachable": 2048
+      },
+      "unseen_endpoint_validation": {
+        "count": 2048,
+        "reachable": 2048
+      },
+      "unseen_both_validation": {
+        "count": 2048,
+        "reachable": 2048
+      },
+      "unseen_endpoint_test": {
+        "count": 2048,
+        "reachable": 2048
+      },
+      "unseen_both_test": {
+        "count": 2048,
+        "reachable": 2048
+      },
+      "diagnostic": {
+        "count": 5,
+        "reachable": 5
+      }
+    },
+    "selected_train_states": 3084480,
+    "all_selected_sources_in_training": true
+  },
+  "model_parameters": 124544,
+  "actual_exposure": {
+    "unique_gradient_states": 3084480,
+    "available_states": 3628800,
+    "unique_pair_rows": 3084480,
+    "pair_rows": 3084480,
+    "unique_decision_rows": 714835,
+    "decision_rows": 714835,
+    "minimum_pair_layer_passes": 19.919078742608153,
+    "minimum_decision_layer_passes": 42.97495226171075,
+    "counter_semantics": "State inputs participating in loss computation, not proven nonzero parameter gradients. Source-row coverage is a draw count."
+  },
+  "metrics": {
+    "planning_protocol": "unique_ordered_state_goal_pairs_v2",
+    "reachability_threshold": null,
+    "cohorts": {
+      "validation": {
+        "count": 2048,
+        "finite_count": 2048,
+        "finite_mae": 1.40146803855896,
+        "finite_huber": 0.9742009043693542,
+        "finite_bias": -0.5771808624267578,
+        "spearman": 0.9249138136592171,
+        "absolute_error_quantiles": {
+          "0": 0.00081634521484375,
+          "0.5": 1.171285629272461,
+          "0.9": 2.8852767944335938,
+          "0.95": 3.543109893798828,
+          "1": 6.506214141845703
+        },
+        "within_half_step": 0.2177734375,
+        "decision_count": 2048,
+        "shortest_action_rate": 0.87939453125,
+        "top_k_optimal_hit": {
+          "1": 0.87939453125,
+          "3": 0.9765625,
+          "5": 0.9921875
+        },
+        "strict_candidate_order_accuracy": 0.7652377144965865,
+        "dead_end_choice_rate": 0.0,
+        "candidate_soft_rank_loss": 2.1632132530212402,
+        "bellman": {
+          "mae": 0.4604295790195465,
+          "upper_violation_rate": 0.67333984375,
+          "lower_violation_rate": 0.326171875,
+          "chosen_non_descent_rate": 0.00146484375,
+          "chosen_predicted_drop_quantiles": {
+            "0": -0.08532333374023438,
+            "0.1": 0.30736637115478516,
+            "0.5": 1.2721023559570312,
+            "0.9": 1.690470814704895,
+            "1": 2.217195510864258
+          },
+          "chosen_true_optimal_count": 1801,
+          "chosen_true_optimal_but_non_descent_count": 2,
+          "teacher_optimal_edge_count": 9228,
+          "teacher_optimal_drop_mae_to_one": 0.865737795829773,
+          "teacher_optimal_non_descent_rate": 0.3554399653229302,
+          "teacher_optimal_predicted_drop_quantiles": {
+            "0": -1.8847732543945312,
+            "0.1": -0.22378043830394745,
+            "0.5": 0.08536911010742188,
+            "0.9": 1.3848289251327515,
+            "1": 2.217195510864258
+          },
+          "note": "Reference decisions, not whole trajectories. Unit-cost teacher-optimal edges should have a true remaining-distance drop of1. Candidate order can be correct even when the parent-to-child predicted drop is wrong. No oracle is used to change model action selection.",
+          "by_true_distance": {
+            "3_5": {
+              "count": 105,
+              "shortest_action_rate": 1.0,
+              "mae": 0.6672760248184204,
+              "upper_violation_rate": 0.6190476190476191,
+              "lower_violation_rate": 0.38095238095238093,
+              "chosen_non_descent_rate": 0.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": 0.07889175415039062,
+                "0.1": 0.07889175415039062,
+                "0.5": 1.5115928649902344,
+                "0.9": 1.8553657531738281,
+                "1": 1.8553657531738281
+              },
+              "chosen_true_optimal_count": 105,
+              "chosen_true_optimal_but_non_descent_count": 0,
+              "teacher_optimal_edge_count": 212,
+              "teacher_optimal_drop_mae_to_one": 0.7199991941452026,
+              "teacher_optimal_non_descent_rate": 0.07075471698113207,
+              "teacher_optimal_predicted_drop_quantiles": {
+                "0": -0.7099227905273438,
+                "0.1": 0.035558898001909256,
+                "0.5": 1.0201683044433594,
+                "0.9": 1.8553657531738281,
+                "1": 1.8553657531738281
+              },
+              "note": "Reference decisions, not whole trajectories. Unit-cost teacher-optimal edges should have a true remaining-distance drop of1. Candidate order can be correct even when the parent-to-child predicted drop is wrong. No oracle is used to change model action selection."
+            },
+            "6_10": {
+              "count": 283,
+              "shortest_action_rate": 0.911660777385159,
+              "mae": 0.551618218421936,
+              "upper_violation_rate": 0.7173144876325088,
+              "lower_violation_rate": 0.2826855123674912,
+              "chosen_non_descent_rate": 0.0035335689045936395,
+              "chosen_predicted_drop_quantiles": {
+                "0": -0.08532333374023438,
+                "0.1": 0.3336029052734375,
+                "0.5": 1.4156227111816406,
+                "0.9": 1.8232024908065796,
+                "1": 2.012298583984375
+              },
+              "chosen_true_optimal_count": 258,
+              "chosen_true_optimal_but_non_descent_count": 1,
+              "teacher_optimal_edge_count": 797,
+              "teacher_optimal_drop_mae_to_one": 0.7227407693862915,
+              "teacher_optimal_non_descent_rate": 0.19949811794228356,
+              "teacher_optimal_predicted_drop_quantiles": {
+                "0": -1.58721923828125,
+                "0.1": -0.1195220947265625,
+                "0.5": 0.39667510986328125,
+                "0.9": 1.6315321922302246,
+                "1": 2.012298583984375
+              },
+              "note": "Reference decisions, not whole trajectories. Unit-cost teacher-optimal edges should have a true remaining-distance drop of1. Candidate order can be correct even when the parent-to-child predicted drop is wrong. No oracle is used to change model action selection."
+            },
+            "11_20": {
+              "count": 1506,
+              "shortest_action_rate": 0.8565737051792829,
+              "mae": 0.44074952602386475,
+              "upper_violation_rate": 0.6666666666666666,
+              "lower_violation_rate": 0.33266932270916333,
+              "chosen_non_descent_rate": 0.0013280212483399733,
+              "chosen_predicted_drop_quantiles": {
+                "0": -0.0334930419921875,
+                "0.1": 0.31729650497436523,
+                "0.5": 1.2635688781738281,
+                "0.9": 1.6443142890930176,
+                "1": 2.217195510864258
+              },
+              "chosen_true_optimal_count": 1290,
+              "chosen_true_optimal_but_non_descent_count": 1,
+              "teacher_optimal_edge_count": 7015,
+              "teacher_optimal_drop_mae_to_one": 0.8739187717437744,
+              "teacher_optimal_non_descent_rate": 0.3690662865288667,
+              "teacher_optimal_predicted_drop_quantiles": {
+                "0": -1.8847732543945312,
+                "0.1": -0.23978346586227417,
+                "0.5": 0.07793045043945312,
+                "0.9": 1.3509551286697388,
+                "1": 2.217195510864258
+              },
+              "note": "Reference decisions, not whole trajectories. Unit-cost teacher-optimal edges should have a true remaining-distance drop of1. Candidate order can be correct even when the parent-to-child predicted drop is wrong. No oracle is used to change model action selection."
+            },
+            "21_40": {
+              "count": 154,
+              "shortest_action_rate": 0.961038961038961,
+              "mae": 0.344279408454895,
+              "upper_violation_rate": 0.6948051948051948,
+              "lower_violation_rate": 0.3051948051948052,
+              "chosen_non_descent_rate": 0.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": 0.04128265380859375,
+                "0.1": 0.3271980285644531,
+                "0.5": 1.1468276977539062,
+                "0.9": 1.4374518394470215,
+                "1": 1.5303573608398438
+              },
+              "chosen_true_optimal_count": 148,
+              "chosen_true_optimal_but_non_descent_count": 0,
+              "teacher_optimal_edge_count": 1204,
+              "teacher_optimal_drop_mae_to_one": 0.9383924007415771,
+              "teacher_optimal_non_descent_rate": 0.42940199335548174,
+              "teacher_optimal_predicted_drop_quantiles": {
+                "0": -1.5651130676269531,
+                "0.1": -0.19490814208984375,
+                "0.5": 0.0263824462890625,
+                "0.9": 0.6708335876464844,
+                "1": 1.5303573608398438
+              },
+              "note": "Reference decisions, not whole trajectories. Unit-cost teacher-optimal edges should have a true remaining-distance drop of1. Candidate order can be correct even when the parent-to-child predicted drop is wrong. No oracle is used to change model action selection."
+            }
+          }
+        },
+        "directionality": {
+          "predicted_mean_absolute_asymmetry": 0.0,
+          "both_reachable": 2048,
+          "forward_only": 0,
+          "reverse_finite_mae": 1.40146803855896,
+          "reverse_scope": "reverse target may lie outside the successful-terminal training target domain"
+        },
+        "unreachable": {
+          "proven_unreachable": 0,
+          "finite": 2048,
+          "unknown": 0,
+          "auroc": null,
+          "validation_threshold": null,
+          "recall": null,
+          "finite_false_positive": null,
+          "recall_at_training_proxy": null,
+          "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+        },
+        "coordinate_statistics": {
+          "output_activation": "sigmoid",
+          "coordinate_divisor_for_diagnostics_only": 64,
+          "labels": "physical unit-cost steps, without normalization or inverse normalization",
+          "boundary_tolerance_relative_to_cap": 0.0001,
+          "derivative_tolerance_relative_to_cap": 0.0001,
+          "all": {
+            "count": 2048,
+            "finite_mae": 1.40146803855896,
+            "finite_bias": -0.5771808624267578,
+            "predicted_mean": 13.722623825073242,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.0,
+            "low_output_derivative_fraction": 0.0,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "by_true_distance": {
+            "(2,5]": {
+              "count": 105,
+              "finite_mae": 1.073832392692566,
+              "finite_bias": 1.0412226915359497,
+              "predicted_mean": 5.488841533660889,
+              "positive_finite_predicted_zero_fraction": 0.0,
+              "boundary_fraction": 0.0,
+              "low_output_derivative_fraction": 0.0,
+              "outside_sigmoid_range_fraction": 0.0
+            },
+            "(5,10]": {
+              "count": 283,
+              "finite_mae": 1.1573007106781006,
+              "finite_bias": 0.6183815598487854,
+              "predicted_mean": 8.766791343688965,
+              "positive_finite_predicted_zero_fraction": 0.0,
+              "boundary_fraction": 0.0,
+              "low_output_derivative_fraction": 0.0,
+              "outside_sigmoid_range_fraction": 0.0
+            },
+            "(10,20]": {
+              "count": 1506,
+              "finite_mae": 1.2945051193237305,
+              "finite_bias": -0.6547034978866577,
+              "predicted_mean": 14.705853462219238,
+              "positive_finite_predicted_zero_fraction": 0.0,
+              "boundary_fraction": 0.0,
+              "low_output_derivative_fraction": 0.0,
+              "outside_sigmoid_range_fraction": 0.0
+            },
+            "(20,40]": {
+              "count": 154,
+              "finite_mae": 3.1195666790008545,
+              "finite_bias": -3.1195666790008545,
+              "predicted_mean": 18.828487396240234,
+              "positive_finite_predicted_zero_fraction": 0.0,
+              "boundary_fraction": 0.0,
+              "low_output_derivative_fraction": 0.0,
+              "outside_sigmoid_range_fraction": 0.0
+            }
+          }
+        },
+        "actual_gradient_endpoint_exposure": {
+          "both_seen": 2048,
+          "one_unseen": 0,
+          "both_unseen": 0,
+          "both_seen_finite_mae": 1.40146803855896,
+          "any_unseen_finite_mae": null,
+          "counter_semantics": "Legacy field name: exposure counts state inputs participating in loss computation, not proven nonzero parameter gradients. Identity pairs, one-candidate ranking or saturation may have zero gradient."
+        },
+        "planning_query_selection": {
+          "protocol": "unique_ordered_state_goal_pairs_v2",
+          "eligible_rows": 2048,
+          "unique_eligible_pairs": 1680,
+          "maximum_queries": 1024,
+          "selected_queries": 1024,
+          "unique_selected_pairs": 1024,
+          "scope": "Exact ordered(S,G) duplicates removed before scene/distance allocation. Different complete goals at one source remain distinct. Regression/ranking row weights and validation checkpoint selection are unchanged."
+        },
+        "planning": {
+          "q": {
+            "count": 1024,
+            "unique_state_goal_pairs": 1024,
+            "solved": 611,
+            "success_rate": 0.5966796875,
+            "optimal": 168,
+            "optimal_rate": 0.1640625,
+            "cycles": 413,
+            "entered_unreachable": 0,
+            "no_legal_action": 0,
+            "budget_exhausted": 0,
+            "horizon": 128,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": 3.09328968903437,
+            "mean_cost_ratio_on_success": 1.2140818256015886,
+            "predicted_progress": {
+              "counts": {
+                "executed_edges": 15953,
+                "predicted_decrease": 15040,
+                "predicted_plateau": 0,
+                "predicted_increase": 913,
+                "true_finite_edges": 15953,
+                "true_optimal_edges": 13745,
+                "predicted_decrease_but_not_true_optimal": 1900,
+                "entered_dead_edges": 0,
+                "non_goal_predicted_zero": 0
+              },
+              "strict_descent_trajectory_count": 348,
+              "strict_descent_success_count": 348,
+              "non_descent_trajectory_count": 676,
+              "predicted_drop_quantiles": {
+                "0": -0.6680889129638672,
+                "0.1": 0.05120716094970703,
+                "0.5": 0.6259765625,
+                "0.9": 1.5369308471679695,
+                "1": 2.3150768280029297
+              },
+              "mean_abs_unit_descent_residual": 0.559801183643292,
+              "executed_edge_optimal_rate": 0.8615934307026891,
+              "predicted_strict_descent_edge_rate": 0.9427693850686392,
+              "executed_edges_by_true_distance": {
+                "1_1": {
+                  "executed_edges": 611,
+                  "true_optimal_edges": 611,
+                  "predicted_decrease": 611,
+                  "entered_dead_edges": 0
+                },
+                "2_2": {
+                  "executed_edges": 634,
+                  "true_optimal_edges": 611,
+                  "predicted_decrease": 611,
+                  "entered_dead_edges": 0
+                },
+                "3_5": {
+                  "executed_edges": 2639,
+                  "true_optimal_edges": 2243,
+                  "predicted_decrease": 2339,
+                  "entered_dead_edges": 0
+                },
+                "6_10": {
+                  "executed_edges": 5659,
+                  "true_optimal_edges": 4805,
+                  "predicted_decrease": 5297,
+                  "entered_dead_edges": 0
+                },
+                "11_20": {
+                  "executed_edges": 6287,
+                  "true_optimal_edges": 5367,
+                  "predicted_decrease": 6060,
+                  "entered_dead_edges": 0
+                },
+                "21_40": {
+                  "executed_edges": 123,
+                  "true_optimal_edges": 108,
+                  "predicted_decrease": 122,
+                  "entered_dead_edges": 0
+                },
+                "41_80": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "81_inf": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "proven_unreachable": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                }
+              },
+              "note": "Observed policy trajectories only, after action selection. A nondecreasing chosen edge also means no legal successor has a strictly lower predicted distance under this greedy policy. Strict predicted descent alone does not prove goal completion or true optimality; full rollouts remain the acceptance metric."
+            },
+            "by_true_distance_interval": {
+              "3_5": {
+                "count": 12,
+                "solved": 12,
+                "optimal": 9
+              },
+              "6_10": {
+                "count": 197,
+                "solved": 139,
+                "optimal": 68
+              },
+              "11_20": {
+                "count": 760,
+                "solved": 434,
+                "optimal": 89
+              },
+              "21_40": {
+                "count": 55,
+                "solved": 26,
+                "optimal": 2
+              }
+            }
+          },
+          "oracle": {
+            "count": 1024,
+            "unique_state_goal_pairs": 1024,
+            "solved": 1024,
+            "success_rate": 1.0,
+            "optimal": 1024,
+            "optimal_rate": 1.0,
+            "cycles": 0,
+            "entered_unreachable": 0,
+            "no_legal_action": 0,
+            "budget_exhausted": 0,
+            "horizon": 128,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": 0.0,
+            "mean_cost_ratio_on_success": 1.0,
+            "predicted_progress": null
+          },
+          "heuristic": {
+            "count": 1024,
+            "unique_state_goal_pairs": 1024,
+            "solved": 328,
+            "success_rate": 0.3203125,
+            "optimal": 311,
+            "optimal_rate": 0.3037109375,
+            "cycles": 696,
+            "entered_unreachable": 0,
+            "no_legal_action": 0,
+            "budget_exhausted": 0,
+            "horizon": 128,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": 0.10365853658536585,
+            "mean_cost_ratio_on_success": 1.0082142645135828,
+            "predicted_progress": null
+          },
+          "immediate_cost_only": {
+            "count": 1024,
+            "unique_state_goal_pairs": 1024,
+            "solved": 0,
+            "success_rate": 0.0,
+            "optimal": 0,
+            "optimal_rate": 0.0,
+            "cycles": 1024,
+            "entered_unreachable": 0,
+            "no_legal_action": 0,
+            "budget_exhausted": 0,
+            "horizon": 128,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": null,
+            "mean_cost_ratio_on_success": null,
+            "predicted_progress": null
+          }
+        }
+      },
+      "test": {
+        "count": 2048,
+        "finite_count": 2048,
+        "finite_mae": 1.349226713180542,
+        "finite_huber": 0.9318392872810364,
+        "finite_bias": -0.566578209400177,
+        "spearman": 0.9312707245229329,
+        "absolute_error_quantiles": {
+          "0": 7.62939453125e-05,
+          "0.5": 1.1037540435791016,
+          "0.9": 2.8779780864715576,
+          "0.95": 3.7177107334136963,
+          "1": 5.939239501953125
+        },
+        "within_half_step": 0.255859375,
+        "decision_count": 2048,
+        "shortest_action_rate": 0.86474609375,
+        "top_k_optimal_hit": {
+          "1": 0.86474609375,
+          "3": 0.966796875,
+          "5": 0.99072265625
+        },
+        "strict_candidate_order_accuracy": 0.7676201159095158,
+        "dead_end_choice_rate": 0.0,
+        "candidate_soft_rank_loss": 2.158092498779297,
+        "bellman": {
+          "mae": 0.433793306350708,
+          "upper_violation_rate": 0.685546875,
+          "lower_violation_rate": 0.314453125,
+          "chosen_non_descent_rate": 0.00146484375,
+          "chosen_predicted_drop_quantiles": {
+            "0": -0.20866012573242188,
+            "0.1": 0.37156715989112854,
+            "0.5": 1.2784843444824219,
+            "0.9": 1.6892389059066772,
+            "1": 2.277994155883789
+          },
+          "chosen_true_optimal_count": 1771,
+          "chosen_true_optimal_but_non_descent_count": 2,
+          "teacher_optimal_edge_count": 9019,
+          "teacher_optimal_drop_mae_to_one": 0.8627099394798279,
+          "teacher_optimal_non_descent_rate": 0.3676682559042022,
+          "teacher_optimal_predicted_drop_quantiles": {
+            "0": -2.0647239685058594,
+            "0.1": -0.21873855590820312,
+            "0.5": 0.07703971862792969,
+            "0.9": 1.3692145347595215,
+            "1": 2.138195037841797
+          },
+          "note": "Reference decisions, not whole trajectories. Unit-cost teacher-optimal edges should have a true remaining-distance drop of1. Candidate order can be correct even when the parent-to-child predicted drop is wrong. No oracle is used to change model action selection.",
+          "by_true_distance": {
+            "3_5": {
+              "count": 96,
+              "shortest_action_rate": 1.0,
+              "mae": 0.5294651389122009,
+              "upper_violation_rate": 0.78125,
+              "lower_violation_rate": 0.21875,
+              "chosen_non_descent_rate": 0.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": 0.46727752685546875,
+                "0.1": 0.8933506011962891,
+                "0.5": 1.4086809158325195,
+                "0.9": 1.9379043579101562,
+                "1": 1.9379043579101562
+              },
+              "chosen_true_optimal_count": 96,
+              "chosen_true_optimal_but_non_descent_count": 0,
+              "teacher_optimal_edge_count": 162,
+              "teacher_optimal_drop_mae_to_one": 0.6200636029243469,
+              "teacher_optimal_non_descent_rate": 0.06790123456790123,
+              "teacher_optimal_predicted_drop_quantiles": {
+                "0": -0.3147315979003906,
+                "0.1": 0.185577392578125,
+                "0.5": 1.292886734008789,
+                "0.9": 1.9379043579101562,
+                "1": 1.9379043579101562
+              },
+              "note": "Reference decisions, not whole trajectories. Unit-cost teacher-optimal edges should have a true remaining-distance drop of1. Candidate order can be correct even when the parent-to-child predicted drop is wrong. No oracle is used to change model action selection."
+            },
+            "6_10": {
+              "count": 334,
+              "shortest_action_rate": 0.9011976047904192,
+              "mae": 0.5081007480621338,
+              "upper_violation_rate": 0.7664670658682635,
+              "lower_violation_rate": 0.23353293413173654,
+              "chosen_non_descent_rate": 0.0029940119760479044,
+              "chosen_predicted_drop_quantiles": {
+                "0": -0.20866012573242188,
+                "0.1": 0.4965782165527344,
+                "0.5": 1.4151859283447266,
+                "0.9": 1.8053267002105713,
+                "1": 2.0579261779785156
+              },
+              "chosen_true_optimal_count": 301,
+              "chosen_true_optimal_but_non_descent_count": 1,
+              "teacher_optimal_edge_count": 1001,
+              "teacher_optimal_drop_mae_to_one": 0.7375601530075073,
+              "teacher_optimal_non_descent_rate": 0.23776223776223776,
+              "teacher_optimal_predicted_drop_quantiles": {
+                "0": -1.9157295227050781,
+                "0.1": -0.14670181274414062,
+                "0.5": 0.3359870910644531,
+                "0.9": 1.6706657409667969,
+                "1": 2.0579261779785156
+              },
+              "note": "Reference decisions, not whole trajectories. Unit-cost teacher-optimal edges should have a true remaining-distance drop of1. Candidate order can be correct even when the parent-to-child predicted drop is wrong. No oracle is used to change model action selection."
+            },
+            "11_20": {
+              "count": 1466,
+              "shortest_action_rate": 0.839699863574352,
+              "mae": 0.4245929419994354,
+              "upper_violation_rate": 0.7005457025920873,
+              "lower_violation_rate": 0.2994542974079127,
+              "chosen_non_descent_rate": 0.001364256480218281,
+              "chosen_predicted_drop_quantiles": {
+                "0": -0.04888153076171875,
+                "0.1": 0.32371997833251953,
+                "0.5": 1.2697792053222656,
+                "0.9": 1.6274008750915527,
+                "1": 2.277994155883789
+              },
+              "chosen_true_optimal_count": 1231,
+              "chosen_true_optimal_but_non_descent_count": 1,
+              "teacher_optimal_edge_count": 6618,
+              "teacher_optimal_drop_mae_to_one": 0.8721432089805603,
+              "teacher_optimal_non_descent_rate": 0.37700211544273193,
+              "teacher_optimal_predicted_drop_quantiles": {
+                "0": -2.0647239685058594,
+                "0.1": -0.23924025893211365,
+                "0.5": 0.07373237609863281,
+                "0.9": 1.3374122381210327,
+                "1": 2.138195037841797
+              },
+              "note": "Reference decisions, not whole trajectories. Unit-cost teacher-optimal edges should have a true remaining-distance drop of1. Candidate order can be correct even when the parent-to-child predicted drop is wrong. No oracle is used to change model action selection."
+            },
+            "21_40": {
+              "count": 152,
+              "shortest_action_rate": 0.9407894736842105,
+              "mae": 0.29882335662841797,
+              "upper_violation_rate": 0.3026315789473684,
+              "lower_violation_rate": 0.6973684210526315,
+              "chosen_non_descent_rate": 0.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": 0.03917694091796875,
+                "0.1": 0.27939605712890625,
+                "0.5": 0.9487991333007812,
+                "0.9": 1.3508872985839844,
+                "1": 1.6040077209472656
+              },
+              "chosen_true_optimal_count": 143,
+              "chosen_true_optimal_but_non_descent_count": 0,
+              "teacher_optimal_edge_count": 1238,
+              "teacher_optimal_drop_mae_to_one": 0.945224940776825,
+              "teacher_optimal_non_descent_rate": 0.4620355411954766,
+              "teacher_optimal_predicted_drop_quantiles": {
+                "0": -1.50189208984375,
+                "0.1": -0.19494056701660156,
+                "0.5": 0.007970809936523438,
+                "0.9": 0.5691675543785095,
+                "1": 1.6040077209472656
+              },
+              "note": "Reference decisions, not whole trajectories. Unit-cost teacher-optimal edges should have a true remaining-distance drop of1. Candidate order can be correct even when the parent-to-child predicted drop is wrong. No oracle is used to change model action selection."
+            }
+          }
+        },
+        "directionality": {
+          "predicted_mean_absolute_asymmetry": 0.0,
+          "both_reachable": 2048,
+          "forward_only": 0,
+          "reverse_finite_mae": 1.349226713180542,
+          "reverse_scope": "reverse target may lie outside the successful-terminal training target domain"
+        },
+        "unreachable": {
+          "proven_unreachable": 0,
+          "finite": 2048,
+          "unknown": 0,
+          "auroc": null,
+          "validation_threshold": null,
+          "recall": null,
+          "finite_false_positive": null,
+          "recall_at_training_proxy": null,
+          "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+        },
+        "coordinate_statistics": {
+          "output_activation": "sigmoid",
+          "coordinate_divisor_for_diagnostics_only": 64,
+          "labels": "physical unit-cost steps, without normalization or inverse normalization",
+          "boundary_tolerance_relative_to_cap": 0.0001,
+          "derivative_tolerance_relative_to_cap": 0.0001,
+          "all": {
+            "count": 2048,
+            "finite_mae": 1.349226713180542,
+            "finite_bias": -0.566578209400177,
+            "predicted_mean": 13.65656566619873,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.0,
+            "low_output_derivative_fraction": 0.0,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "by_true_distance": {
+            "(2,5]": {
+              "count": 96,
+              "finite_mae": 0.47260430455207825,
+              "finite_bias": 0.45147621631622314,
+              "predicted_mean": 4.972309589385986,
+              "positive_finite_predicted_zero_fraction": 0.0,
+              "boundary_fraction": 0.0,
+              "low_output_derivative_fraction": 0.0,
+              "outside_sigmoid_range_fraction": 0.0
+            },
+            "(5,10]": {
+              "count": 334,
+              "finite_mae": 1.078892469406128,
+              "finite_bias": 0.3742760717868805,
+              "predicted_mean": 8.574874877929688,
+              "positive_finite_predicted_zero_fraction": 0.0,
+              "boundary_fraction": 0.0,
+              "low_output_derivative_fraction": 0.0,
+              "outside_sigmoid_range_fraction": 0.0
+            },
+            "(10,20]": {
+              "count": 1466,
+              "finite_mae": 1.274613380432129,
+              "finite_bias": -0.5728436708450317,
+              "predicted_mean": 14.856897354125977,
+              "positive_finite_predicted_zero_fraction": 0.0,
+              "boundary_fraction": 0.0,
+              "low_output_derivative_fraction": 0.0,
+              "outside_sigmoid_range_fraction": 0.0
+            },
+            "(20,40]": {
+              "count": 152,
+              "finite_mae": 3.216534376144409,
+              "finite_bias": -3.216534376144409,
+              "predicted_mean": 18.730833053588867,
+              "positive_finite_predicted_zero_fraction": 0.0,
+              "boundary_fraction": 0.0,
+              "low_output_derivative_fraction": 0.0,
+              "outside_sigmoid_range_fraction": 0.0
+            }
+          }
+        },
+        "actual_gradient_endpoint_exposure": {
+          "both_seen": 2048,
+          "one_unseen": 0,
+          "both_unseen": 0,
+          "both_seen_finite_mae": 1.349226713180542,
+          "any_unseen_finite_mae": null,
+          "counter_semantics": "Legacy field name: exposure counts state inputs participating in loss computation, not proven nonzero parameter gradients. Identity pairs, one-candidate ranking or saturation may have zero gradient."
+        },
+        "planning_query_selection": {
+          "protocol": "unique_ordered_state_goal_pairs_v2",
+          "eligible_rows": 2048,
+          "unique_eligible_pairs": 1665,
+          "maximum_queries": 1024,
+          "selected_queries": 1024,
+          "unique_selected_pairs": 1024,
+          "scope": "Exact ordered(S,G) duplicates removed before scene/distance allocation. Different complete goals at one source remain distinct. Regression/ranking row weights and validation checkpoint selection are unchanged."
+        },
+        "planning": {
+          "q": {
+            "count": 1024,
+            "unique_state_goal_pairs": 1024,
+            "solved": 625,
+            "success_rate": 0.6103515625,
+            "optimal": 180,
+            "optimal_rate": 0.17578125,
+            "cycles": 399,
+            "entered_unreachable": 0,
+            "no_legal_action": 0,
+            "budget_exhausted": 0,
+            "horizon": 128,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": 2.9728,
+            "mean_cost_ratio_on_success": 1.1995952435730763,
+            "predicted_progress": {
+              "counts": {
+                "executed_edges": 16017,
+                "predicted_decrease": 15124,
+                "predicted_plateau": 0,
+                "predicted_increase": 893,
+                "true_finite_edges": 16017,
+                "true_optimal_edges": 13872,
+                "predicted_decrease_but_not_true_optimal": 1878,
+                "entered_dead_edges": 0,
+                "non_goal_predicted_zero": 0
+              },
+              "strict_descent_trajectory_count": 366,
+              "strict_descent_success_count": 366,
+              "non_descent_trajectory_count": 658,
+              "predicted_drop_quantiles": {
+                "0": -0.5254592895507812,
+                "0.1": 0.05474472045898438,
+                "0.5": 0.6543693542480469,
+                "0.9": 1.5413825988769532,
+                "1": 2.3498306274414062
+              },
+              "mean_abs_unit_descent_residual": 0.5541684099549754,
+              "executed_edge_optimal_rate": 0.8660797902228882,
+              "predicted_strict_descent_edge_rate": 0.9442467378410438,
+              "executed_edges_by_true_distance": {
+                "1_1": {
+                  "executed_edges": 625,
+                  "true_optimal_edges": 625,
+                  "predicted_decrease": 625,
+                  "entered_dead_edges": 0
+                },
+                "2_2": {
+                  "executed_edges": 647,
+                  "true_optimal_edges": 625,
+                  "predicted_decrease": 628,
+                  "entered_dead_edges": 0
+                },
+                "3_5": {
+                  "executed_edges": 2694,
+                  "true_optimal_edges": 2283,
+                  "predicted_decrease": 2380,
+                  "entered_dead_edges": 0
+                },
+                "6_10": {
+                  "executed_edges": 5585,
+                  "true_optimal_edges": 4848,
+                  "predicted_decrease": 5238,
+                  "entered_dead_edges": 0
+                },
+                "11_20": {
+                  "executed_edges": 6339,
+                  "true_optimal_edges": 5377,
+                  "predicted_decrease": 6129,
+                  "entered_dead_edges": 0
+                },
+                "21_40": {
+                  "executed_edges": 127,
+                  "true_optimal_edges": 114,
+                  "predicted_decrease": 124,
+                  "entered_dead_edges": 0
+                },
+                "41_80": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "81_inf": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "proven_unreachable": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                }
+              },
+              "note": "Observed policy trajectories only, after action selection. A nondecreasing chosen edge also means no legal successor has a strictly lower predicted distance under this greedy policy. Strict predicted descent alone does not prove goal completion or true optimality; full rollouts remain the acceptance metric."
+            },
+            "by_true_distance_interval": {
+              "3_5": {
+                "count": 9,
+                "solved": 9,
+                "optimal": 8
+              },
+              "6_10": {
+                "count": 205,
+                "solved": 143,
+                "optimal": 76
+              },
+              "11_20": {
+                "count": 750,
+                "solved": 440,
+                "optimal": 92
+              },
+              "21_40": {
+                "count": 60,
+                "solved": 33,
+                "optimal": 4
+              }
+            }
+          },
+          "oracle": {
+            "count": 1024,
+            "unique_state_goal_pairs": 1024,
+            "solved": 1024,
+            "success_rate": 1.0,
+            "optimal": 1024,
+            "optimal_rate": 1.0,
+            "cycles": 0,
+            "entered_unreachable": 0,
+            "no_legal_action": 0,
+            "budget_exhausted": 0,
+            "horizon": 128,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": 0.0,
+            "mean_cost_ratio_on_success": 1.0,
+            "predicted_progress": null
+          },
+          "heuristic": {
+            "count": 1024,
+            "unique_state_goal_pairs": 1024,
+            "solved": 342,
+            "success_rate": 0.333984375,
+            "optimal": 320,
+            "optimal_rate": 0.3125,
+            "cycles": 682,
+            "entered_unreachable": 0,
+            "no_legal_action": 0,
+            "budget_exhausted": 0,
+            "horizon": 128,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": 0.1286549707602339,
+            "mean_cost_ratio_on_success": 1.009647383412388,
+            "predicted_progress": null
+          },
+          "immediate_cost_only": {
+            "count": 1024,
+            "unique_state_goal_pairs": 1024,
+            "solved": 0,
+            "success_rate": 0.0,
+            "optimal": 0,
+            "optimal_rate": 0.0,
+            "cycles": 1024,
+            "entered_unreachable": 0,
+            "no_legal_action": 0,
+            "budget_exhausted": 0,
+            "horizon": 128,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": null,
+            "mean_cost_ratio_on_success": null,
+            "predicted_progress": null
+          }
+        }
+      },
+      "unseen_endpoint_validation": {
+        "count": 2048,
+        "finite_count": 2048,
+        "finite_mae": 1.2725639343261719,
+        "finite_huber": 0.8543481826782227,
+        "finite_bias": -0.5649711489677429,
+        "spearman": 0.8409159051246274,
+        "absolute_error_quantiles": {
+          "0": 0.00048828125,
+          "0.5": 1.0871906280517578,
+          "0.9": 2.5790045261383057,
+          "0.95": 3.0771596431732178,
+          "1": 5.545228958129883
+        },
+        "within_half_step": 0.25,
+        "decision_count": 2048,
+        "shortest_action_rate": 0.8525390625,
+        "top_k_optimal_hit": {
+          "1": 0.8525390625,
+          "3": 0.97265625,
+          "5": 0.99462890625
+        },
+        "strict_candidate_order_accuracy": 0.7415246895755125,
+        "dead_end_choice_rate": 0.0,
+        "candidate_soft_rank_loss": 2.183350086212158,
+        "bellman": {
+          "mae": 0.44279778003692627,
+          "upper_violation_rate": 0.7060546875,
+          "lower_violation_rate": 0.29345703125,
+          "chosen_non_descent_rate": 0.00244140625,
+          "chosen_predicted_drop_quantiles": {
+            "0": -0.17478561401367188,
+            "0.1": 0.3259761929512024,
+            "0.5": 1.2900819778442383,
+            "0.9": 1.6440545320510864,
+            "1": 2.416168212890625
+          },
+          "chosen_true_optimal_count": 1746,
+          "chosen_true_optimal_but_non_descent_count": 3,
+          "teacher_optimal_edge_count": 9140,
+          "teacher_optimal_drop_mae_to_one": 0.870512843132019,
+          "teacher_optimal_non_descent_rate": 0.36542669584245074,
+          "teacher_optimal_predicted_drop_quantiles": {
+            "0": -1.9621086120605469,
+            "0.1": -0.25095367431640625,
+            "0.5": 0.08405303955078125,
+            "0.9": 1.3696775436401367,
+            "1": 2.416168212890625
+          },
+          "note": "Reference decisions, not whole trajectories. Unit-cost teacher-optimal edges should have a true remaining-distance drop of1. Candidate order can be correct even when the parent-to-child predicted drop is wrong. No oracle is used to change model action selection.",
+          "by_true_distance": {
+            "3_5": {
+              "count": 1,
+              "shortest_action_rate": 1.0,
+              "mae": 0.5787372589111328,
+              "upper_violation_rate": 1.0,
+              "lower_violation_rate": 0.0,
+              "chosen_non_descent_rate": 0.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": 1.5787372589111328,
+                "0.1": 1.5787372589111328,
+                "0.5": 1.5787372589111328,
+                "0.9": 1.5787372589111328,
+                "1": 1.5787372589111328
+              },
+              "chosen_true_optimal_count": 1,
+              "chosen_true_optimal_but_non_descent_count": 0,
+              "teacher_optimal_edge_count": 1,
+              "teacher_optimal_drop_mae_to_one": 0.5787372589111328,
+              "teacher_optimal_non_descent_rate": 0.0,
+              "teacher_optimal_predicted_drop_quantiles": {
+                "0": 1.5787372589111328,
+                "0.1": 1.5787372589111328,
+                "0.5": 1.5787372589111328,
+                "0.9": 1.5787372589111328,
+                "1": 1.5787372589111328
+              },
+              "note": "Reference decisions, not whole trajectories. Unit-cost teacher-optimal edges should have a true remaining-distance drop of1. Candidate order can be correct even when the parent-to-child predicted drop is wrong. No oracle is used to change model action selection."
+            },
+            "6_10": {
+              "count": 125,
+              "shortest_action_rate": 0.888,
+              "mae": 0.4980222284793854,
+              "upper_violation_rate": 0.72,
+              "lower_violation_rate": 0.28,
+              "chosen_non_descent_rate": 0.016,
+              "chosen_predicted_drop_quantiles": {
+                "0": -0.05108642578125,
+                "0.1": 0.32808417081832886,
+                "0.5": 1.410654067993164,
+                "0.9": 1.7162928581237793,
+                "1": 1.9098739624023438
+              },
+              "chosen_true_optimal_count": 111,
+              "chosen_true_optimal_but_non_descent_count": 2,
+              "teacher_optimal_edge_count": 373,
+              "teacher_optimal_drop_mae_to_one": 0.7605153918266296,
+              "teacher_optimal_non_descent_rate": 0.2680965147453083,
+              "teacher_optimal_predicted_drop_quantiles": {
+                "0": -1.4564571380615234,
+                "0.1": -0.20946502685546875,
+                "0.5": 0.28137779235839844,
+                "0.9": 1.5688140392303467,
+                "1": 1.9098739624023438
+              },
+              "note": "Reference decisions, not whole trajectories. Unit-cost teacher-optimal edges should have a true remaining-distance drop of1. Candidate order can be correct even when the parent-to-child predicted drop is wrong. No oracle is used to change model action selection."
+            },
+            "11_20": {
+              "count": 1899,
+              "shortest_action_rate": 0.8493944181147972,
+              "mae": 0.4393456280231476,
+              "upper_violation_rate": 0.7056345444971037,
+              "lower_violation_rate": 0.2938388625592417,
+              "chosen_non_descent_rate": 0.001579778830963665,
+              "chosen_predicted_drop_quantiles": {
+                "0": -0.17478561401367188,
+                "0.1": 0.32894134521484375,
+                "0.5": 1.2861061096191406,
+                "0.9": 1.6406642198562622,
+                "1": 2.416168212890625
+              },
+              "chosen_true_optimal_count": 1613,
+              "chosen_true_optimal_but_non_descent_count": 1,
+              "teacher_optimal_edge_count": 8600,
+              "teacher_optimal_drop_mae_to_one": 0.8731481432914734,
+              "teacher_optimal_non_descent_rate": 0.3681395348837209,
+              "teacher_optimal_predicted_drop_quantiles": {
+                "0": -1.9621086120605469,
+                "0.1": -0.2513992190361023,
+                "0.5": 0.0801849365234375,
+                "0.9": 1.358306646347046,
+                "1": 2.416168212890625
+              },
+              "note": "Reference decisions, not whole trajectories. Unit-cost teacher-optimal edges should have a true remaining-distance drop of1. Candidate order can be correct even when the parent-to-child predicted drop is wrong. No oracle is used to change model action selection."
+            },
+            "21_40": {
+              "count": 23,
+              "shortest_action_rate": 0.9130434782608695,
+              "mae": 0.42178452014923096,
+              "upper_violation_rate": 0.6521739130434783,
+              "lower_violation_rate": 0.34782608695652173,
+              "chosen_non_descent_rate": 0.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": 0.14652633666992188,
+                "0.1": 0.16352196037769318,
+                "0.5": 1.120443344116211,
+                "0.9": 1.4974608421325684,
+                "1": 1.581573486328125
+              },
+              "chosen_true_optimal_count": 21,
+              "chosen_true_optimal_but_non_descent_count": 0,
+              "teacher_optimal_edge_count": 166,
+              "teacher_optimal_drop_mae_to_one": 0.9829054474830627,
+              "teacher_optimal_non_descent_rate": 0.4457831325301205,
+              "teacher_optimal_predicted_drop_quantiles": {
+                "0": -1.4244956970214844,
+                "0.1": -0.29539012908935547,
+                "0.5": 0.02923297882080078,
+                "0.9": 0.851099967956543,
+                "1": 1.5397987365722656
+              },
+              "note": "Reference decisions, not whole trajectories. Unit-cost teacher-optimal edges should have a true remaining-distance drop of1. Candidate order can be correct even when the parent-to-child predicted drop is wrong. No oracle is used to change model action selection."
+            }
+          }
+        },
+        "directionality": {
+          "predicted_mean_absolute_asymmetry": 0.0,
+          "both_reachable": 2048,
+          "forward_only": 0,
+          "reverse_finite_mae": 1.2725639343261719,
+          "reverse_scope": "reverse target may lie outside the successful-terminal training target domain"
+        },
+        "unreachable": {
+          "proven_unreachable": 0,
+          "finite": 2048,
+          "unknown": 0,
+          "auroc": null,
+          "validation_threshold": null,
+          "recall": null,
+          "finite_false_positive": null,
+          "recall_at_training_proxy": null,
+          "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+        },
+        "coordinate_statistics": {
+          "output_activation": "sigmoid",
+          "coordinate_divisor_for_diagnostics_only": 64,
+          "labels": "physical unit-cost steps, without normalization or inverse normalization",
+          "boundary_tolerance_relative_to_cap": 0.0001,
+          "derivative_tolerance_relative_to_cap": 0.0001,
+          "all": {
+            "count": 2048,
+            "finite_mae": 1.2725639343261719,
+            "finite_bias": -0.5649711489677429,
+            "predicted_mean": 14.504853248596191,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.0,
+            "low_output_derivative_fraction": 0.0,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "by_true_distance": {
+            "(2,5]": {
+              "count": 1,
+              "finite_mae": 0.9590549468994141,
+              "finite_bias": 0.9590549468994141,
+              "predicted_mean": 5.959054946899414,
+              "positive_finite_predicted_zero_fraction": 0.0,
+              "boundary_fraction": 0.0,
+              "low_output_derivative_fraction": 0.0,
+              "outside_sigmoid_range_fraction": 0.0
+            },
+            "(5,10]": {
+              "count": 125,
+              "finite_mae": 1.059607744216919,
+              "finite_bias": 0.34150010347366333,
+              "predicted_mean": 9.525500297546387,
+              "positive_finite_predicted_zero_fraction": 0.0,
+              "boundary_fraction": 0.0,
+              "low_output_derivative_fraction": 0.0,
+              "outside_sigmoid_range_fraction": 0.0
+            },
+            "(10,20]": {
+              "count": 1899,
+              "finite_mae": 1.268399715423584,
+              "finite_bias": -0.5985243916511536,
+              "predicted_mean": 14.788521766662598,
+              "positive_finite_predicted_zero_fraction": 0.0,
+              "boundary_fraction": 0.0,
+              "low_output_derivative_fraction": 0.0,
+              "outside_sigmoid_range_fraction": 0.0
+            },
+            "(20,40]": {
+              "count": 23,
+              "finite_mae": 2.787379503250122,
+              "finite_bias": -2.787379503250122,
+              "predicted_mean": 18.5169677734375,
+              "positive_finite_predicted_zero_fraction": 0.0,
+              "boundary_fraction": 0.0,
+              "low_output_derivative_fraction": 0.0,
+              "outside_sigmoid_range_fraction": 0.0
+            }
+          }
+        },
+        "actual_gradient_endpoint_exposure": {
+          "both_seen": 0,
+          "one_unseen": 2048,
+          "both_unseen": 0,
+          "both_seen_finite_mae": null,
+          "any_unseen_finite_mae": 1.2725639343261719,
+          "counter_semantics": "Legacy field name: exposure counts state inputs participating in loss computation, not proven nonzero parameter gradients. Identity pairs, one-candidate ranking or saturation may have zero gradient."
+        },
+        "planning_query_selection": {
+          "protocol": "unique_ordered_state_goal_pairs_v2",
+          "eligible_rows": 2048,
+          "unique_eligible_pairs": 2048,
+          "maximum_queries": 1024,
+          "selected_queries": 1024,
+          "unique_selected_pairs": 1024,
+          "scope": "Exact ordered(S,G) duplicates removed before scene/distance allocation. Different complete goals at one source remain distinct. Regression/ranking row weights and validation checkpoint selection are unchanged."
+        },
+        "planning": {
+          "q": {
+            "count": 1024,
+            "unique_state_goal_pairs": 1024,
+            "solved": 618,
+            "success_rate": 0.603515625,
+            "optimal": 143,
+            "optimal_rate": 0.1396484375,
+            "cycles": 406,
+            "entered_unreachable": 0,
+            "no_legal_action": 0,
+            "budget_exhausted": 0,
+            "horizon": 128,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": 3.1553398058252426,
+            "mean_cost_ratio_on_success": 1.216023407138259,
+            "predicted_progress": {
+              "counts": {
+                "executed_edges": 16581,
+                "predicted_decrease": 15667,
+                "predicted_plateau": 0,
+                "predicted_increase": 914,
+                "true_finite_edges": 16581,
+                "true_optimal_edges": 14308,
+                "predicted_decrease_but_not_true_optimal": 1992,
+                "entered_dead_edges": 0,
+                "non_goal_predicted_zero": 0
+              },
+              "strict_descent_trajectory_count": 355,
+              "strict_descent_success_count": 355,
+              "non_descent_trajectory_count": 669,
+              "predicted_drop_quantiles": {
+                "0": -0.5175094604492188,
+                "0.1": 0.05480766296386719,
+                "0.5": 0.6391830444335938,
+                "0.9": 1.535928726196289,
+                "1": 2.416168212890625
+              },
+              "mean_abs_unit_descent_residual": 0.5554824588339202,
+              "executed_edge_optimal_rate": 0.8629153850793077,
+              "predicted_strict_descent_edge_rate": 0.9448766660635667,
+              "executed_edges_by_true_distance": {
+                "1_1": {
+                  "executed_edges": 618,
+                  "true_optimal_edges": 618,
+                  "predicted_decrease": 618,
+                  "entered_dead_edges": 0
+                },
+                "2_2": {
+                  "executed_edges": 629,
+                  "true_optimal_edges": 618,
+                  "predicted_decrease": 612,
+                  "entered_dead_edges": 0
+                },
+                "3_5": {
+                  "executed_edges": 2610,
+                  "true_optimal_edges": 2210,
+                  "predicted_decrease": 2315,
+                  "entered_dead_edges": 0
+                },
+                "6_10": {
+                  "executed_edges": 5979,
+                  "true_optimal_edges": 5071,
+                  "predicted_decrease": 5587,
+                  "entered_dead_edges": 0
+                },
+                "11_20": {
+                  "executed_edges": 6692,
+                  "true_optimal_edges": 5740,
+                  "predicted_decrease": 6482,
+                  "entered_dead_edges": 0
+                },
+                "21_40": {
+                  "executed_edges": 53,
+                  "true_optimal_edges": 51,
+                  "predicted_decrease": 53,
+                  "entered_dead_edges": 0
+                },
+                "41_80": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "81_inf": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "proven_unreachable": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                }
+              },
+              "note": "Observed policy trajectories only, after action selection. A nondecreasing chosen edge also means no legal successor has a strictly lower predicted distance under this greedy policy. Strict predicted descent alone does not prove goal completion or true optimality; full rollouts remain the acceptance metric."
+            },
+            "by_true_distance_interval": {
+              "3_5": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "6_10": {
+                "count": 125,
+                "solved": 100,
+                "optimal": 44
+              },
+              "11_20": {
+                "count": 875,
+                "solved": 505,
+                "optimal": 97
+              },
+              "21_40": {
+                "count": 23,
+                "solved": 12,
+                "optimal": 1
+              }
+            }
+          },
+          "oracle": {
+            "count": 1024,
+            "unique_state_goal_pairs": 1024,
+            "solved": 1024,
+            "success_rate": 1.0,
+            "optimal": 1024,
+            "optimal_rate": 1.0,
+            "cycles": 0,
+            "entered_unreachable": 0,
+            "no_legal_action": 0,
+            "budget_exhausted": 0,
+            "horizon": 128,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": 0.0,
+            "mean_cost_ratio_on_success": 1.0,
+            "predicted_progress": null
+          },
+          "heuristic": {
+            "count": 1024,
+            "unique_state_goal_pairs": 1024,
+            "solved": 297,
+            "success_rate": 0.2900390625,
+            "optimal": 281,
+            "optimal_rate": 0.2744140625,
+            "cycles": 727,
+            "entered_unreachable": 0,
+            "no_legal_action": 0,
+            "budget_exhausted": 0,
+            "horizon": 128,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": 0.10774410774410774,
+            "mean_cost_ratio_on_success": 1.0081337507808095,
+            "predicted_progress": null
+          },
+          "immediate_cost_only": {
+            "count": 1024,
+            "unique_state_goal_pairs": 1024,
+            "solved": 0,
+            "success_rate": 0.0,
+            "optimal": 0,
+            "optimal_rate": 0.0,
+            "cycles": 1024,
+            "entered_unreachable": 0,
+            "no_legal_action": 0,
+            "budget_exhausted": 0,
+            "horizon": 128,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": null,
+            "mean_cost_ratio_on_success": null,
+            "predicted_progress": null
+          }
+        }
+      },
+      "unseen_both_validation": {
+        "count": 2048,
+        "finite_count": 2048,
+        "finite_mae": 1.2898104190826416,
+        "finite_huber": 0.8686311841011047,
+        "finite_bias": -0.5858364701271057,
+        "spearman": 0.8356633914650321,
+        "absolute_error_quantiles": {
+          "0": 0.00206756591796875,
+          "0.5": 1.0886378288269043,
+          "0.9": 2.6340606212615967,
+          "0.95": 3.0915651321411133,
+          "1": 7.243740081787109
+        },
+        "within_half_step": 0.23583984375,
+        "decision_count": 2048,
+        "shortest_action_rate": 0.8564453125,
+        "top_k_optimal_hit": {
+          "1": 0.8564453125,
+          "3": 0.966796875,
+          "5": 0.99072265625
+        },
+        "strict_candidate_order_accuracy": 0.7432323232323232,
+        "dead_end_choice_rate": 0.0,
+        "candidate_soft_rank_loss": 2.1831374168395996,
+        "bellman": {
+          "mae": 0.438351571559906,
+          "upper_violation_rate": 0.6787109375,
+          "lower_violation_rate": 0.32080078125,
+          "chosen_non_descent_rate": 0.00341796875,
+          "chosen_predicted_drop_quantiles": {
+            "0": -0.07813644409179688,
+            "0.1": 0.3307240307331085,
+            "0.5": 1.2772517204284668,
+            "0.9": 1.6487033367156982,
+            "1": 2.181173324584961
+          },
+          "chosen_true_optimal_count": 1754,
+          "chosen_true_optimal_but_non_descent_count": 5,
+          "teacher_optimal_edge_count": 9191,
+          "teacher_optimal_drop_mae_to_one": 0.8645772933959961,
+          "teacher_optimal_non_descent_rate": 0.3637253835273637,
+          "teacher_optimal_predicted_drop_quantiles": {
+            "0": -2.1840133666992188,
+            "0.1": -0.23238754272460938,
+            "0.5": 0.08257865905761719,
+            "0.9": 1.3623952865600586,
+            "1": 2.181173324584961
+          },
+          "note": "Reference decisions, not whole trajectories. Unit-cost teacher-optimal edges should have a true remaining-distance drop of1. Candidate order can be correct even when the parent-to-child predicted drop is wrong. No oracle is used to change model action selection.",
+          "by_true_distance": {
+            "3_5": {
+              "count": 3,
+              "shortest_action_rate": 1.0,
+              "mae": 0.8066844940185547,
+              "upper_violation_rate": 1.0,
+              "lower_violation_rate": 0.0,
+              "chosen_non_descent_rate": 0.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": 1.5600509643554688,
+                "0.1": 1.5838066339492798,
+                "0.5": 1.6788291931152344,
+                "0.9": 2.0807044506073,
+                "1": 2.181173324584961
+              },
+              "chosen_true_optimal_count": 3,
+              "chosen_true_optimal_but_non_descent_count": 0,
+              "teacher_optimal_edge_count": 5,
+              "teacher_optimal_drop_mae_to_one": 0.6396549344062805,
+              "teacher_optimal_non_descent_rate": 0.0,
+              "teacher_optimal_predicted_drop_quantiles": {
+                "0": 0.6439037322998047,
+                "0.1": 0.9551922082901001,
+                "0.5": 1.5600509643554688,
+                "0.9": 1.9802355766296387,
+                "1": 2.181173324584961
+              },
+              "note": "Reference decisions, not whole trajectories. Unit-cost teacher-optimal edges should have a true remaining-distance drop of1. Candidate order can be correct even when the parent-to-child predicted drop is wrong. No oracle is used to change model action selection."
+            },
+            "6_10": {
+              "count": 120,
+              "shortest_action_rate": 0.85,
+              "mae": 0.5006391406059265,
+              "upper_violation_rate": 0.7,
+              "lower_violation_rate": 0.3,
+              "chosen_non_descent_rate": 0.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": 0.04134178161621094,
+                "0.1": 0.3739454448223114,
+                "0.5": 1.4104795455932617,
+                "0.9": 1.7769492864608765,
+                "1": 2.0103683471679688
+              },
+              "chosen_true_optimal_count": 102,
+              "chosen_true_optimal_but_non_descent_count": 0,
+              "teacher_optimal_edge_count": 363,
+              "teacher_optimal_drop_mae_to_one": 0.7582157254219055,
+              "teacher_optimal_non_descent_rate": 0.26721763085399447,
+              "teacher_optimal_predicted_drop_quantiles": {
+                "0": -1.4325485229492188,
+                "0.1": -0.18210582435131073,
+                "0.5": 0.2861003875732422,
+                "0.9": 1.5396898984909058,
+                "1": 2.0103683471679688
+              },
+              "note": "Reference decisions, not whole trajectories. Unit-cost teacher-optimal edges should have a true remaining-distance drop of1. Candidate order can be correct even when the parent-to-child predicted drop is wrong. No oracle is used to change model action selection."
+            },
+            "11_20": {
+              "count": 1896,
+              "shortest_action_rate": 0.8570675105485233,
+              "mae": 0.43413299322128296,
+              "upper_violation_rate": 0.680379746835443,
+              "lower_violation_rate": 0.3190928270042194,
+              "chosen_non_descent_rate": 0.003691983122362869,
+              "chosen_predicted_drop_quantiles": {
+                "0": -0.07813644409179688,
+                "0.1": 0.33208656311035156,
+                "0.5": 1.2737751007080078,
+                "0.9": 1.6429471969604492,
+                "1": 2.110118865966797
+              },
+              "chosen_true_optimal_count": 1625,
+              "chosen_true_optimal_but_non_descent_count": 5,
+              "teacher_optimal_edge_count": 8622,
+              "teacher_optimal_drop_mae_to_one": 0.8668451905250549,
+              "teacher_optimal_non_descent_rate": 0.3658083971236372,
+              "teacher_optimal_predicted_drop_quantiles": {
+                "0": -2.1840133666992188,
+                "0.1": -0.23386190831661224,
+                "0.5": 0.08059978485107422,
+                "0.9": 1.3534266948699951,
+                "1": 2.110118865966797
+              },
+              "note": "Reference decisions, not whole trajectories. Unit-cost teacher-optimal edges should have a true remaining-distance drop of1. Candidate order can be correct even when the parent-to-child predicted drop is wrong. No oracle is used to change model action selection."
+            },
+            "21_40": {
+              "count": 29,
+              "shortest_action_rate": 0.8275862068965517,
+              "mae": 0.4183170199394226,
+              "upper_violation_rate": 0.4482758620689655,
+              "lower_violation_rate": 0.5517241379310345,
+              "chosen_non_descent_rate": 0.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": 0.018739700317382812,
+                "0.1": 0.13363036513328552,
+                "0.5": 0.9352073669433594,
+                "0.9": 1.4247993230819702,
+                "1": 1.5292587280273438
+              },
+              "chosen_true_optimal_count": 24,
+              "chosen_true_optimal_but_non_descent_count": 0,
+              "teacher_optimal_edge_count": 201,
+              "teacher_optimal_drop_mae_to_one": 0.9649743437767029,
+              "teacher_optimal_non_descent_rate": 0.4577114427860697,
+              "teacher_optimal_predicted_drop_quantiles": {
+                "0": -1.3194923400878906,
+                "0.1": -0.2344036102294922,
+                "0.5": 0.014904022216796875,
+                "0.9": 0.6542015075683594,
+                "1": 1.5292587280273438
+              },
+              "note": "Reference decisions, not whole trajectories. Unit-cost teacher-optimal edges should have a true remaining-distance drop of1. Candidate order can be correct even when the parent-to-child predicted drop is wrong. No oracle is used to change model action selection."
+            }
+          }
+        },
+        "directionality": {
+          "predicted_mean_absolute_asymmetry": 0.0,
+          "both_reachable": 2048,
+          "forward_only": 0,
+          "reverse_finite_mae": 1.2898104190826416,
+          "reverse_scope": "reverse target may lie outside the successful-terminal training target domain"
+        },
+        "unreachable": {
+          "proven_unreachable": 0,
+          "finite": 2048,
+          "unknown": 0,
+          "auroc": null,
+          "validation_threshold": null,
+          "recall": null,
+          "finite_false_positive": null,
+          "recall_at_training_proxy": null,
+          "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+        },
+        "coordinate_statistics": {
+          "output_activation": "sigmoid",
+          "coordinate_divisor_for_diagnostics_only": 64,
+          "labels": "physical unit-cost steps, without normalization or inverse normalization",
+          "boundary_tolerance_relative_to_cap": 0.0001,
+          "derivative_tolerance_relative_to_cap": 0.0001,
+          "all": {
+            "count": 2048,
+            "finite_mae": 1.2898104190826416,
+            "finite_bias": -0.5858364701271057,
+            "predicted_mean": 14.419534683227539,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.0,
+            "low_output_derivative_fraction": 0.0,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "by_true_distance": {
+            "(2,5]": {
+              "count": 3,
+              "finite_mae": 1.8069082498550415,
+              "finite_bias": 1.8069082498550415,
+              "predicted_mean": 6.473575115203857,
+              "positive_finite_predicted_zero_fraction": 0.0,
+              "boundary_fraction": 0.0,
+              "low_output_derivative_fraction": 0.0,
+              "outside_sigmoid_range_fraction": 0.0
+            },
+            "(5,10]": {
+              "count": 120,
+              "finite_mae": 0.9831930994987488,
+              "finite_bias": 0.30988508462905884,
+              "predicted_mean": 9.459884643554688,
+              "positive_finite_predicted_zero_fraction": 0.0,
+              "boundary_fraction": 0.0,
+              "low_output_derivative_fraction": 0.0,
+              "outside_sigmoid_range_fraction": 0.0
+            },
+            "(10,20]": {
+              "count": 1896,
+              "finite_mae": 1.2862541675567627,
+              "finite_bias": -0.6139523983001709,
+              "predicted_mean": 14.681406021118164,
+              "positive_finite_predicted_zero_fraction": 0.0,
+              "boundary_fraction": 0.0,
+              "low_output_derivative_fraction": 0.0,
+              "outside_sigmoid_range_fraction": 0.0
+            },
+            "(20,40]": {
+              "count": 29,
+              "finite_mae": 2.737579822540283,
+              "finite_bias": -2.7015974521636963,
+              "predicted_mean": 18.643230438232422,
+              "positive_finite_predicted_zero_fraction": 0.0,
+              "boundary_fraction": 0.0,
+              "low_output_derivative_fraction": 0.0,
+              "outside_sigmoid_range_fraction": 0.0
+            }
+          }
+        },
+        "actual_gradient_endpoint_exposure": {
+          "both_seen": 0,
+          "one_unseen": 0,
+          "both_unseen": 2048,
+          "both_seen_finite_mae": null,
+          "any_unseen_finite_mae": 1.2898104190826416,
+          "counter_semantics": "Legacy field name: exposure counts state inputs participating in loss computation, not proven nonzero parameter gradients. Identity pairs, one-candidate ranking or saturation may have zero gradient."
+        },
+        "planning_query_selection": {
+          "protocol": "unique_ordered_state_goal_pairs_v2",
+          "eligible_rows": 2048,
+          "unique_eligible_pairs": 2048,
+          "maximum_queries": 1024,
+          "selected_queries": 1024,
+          "unique_selected_pairs": 1024,
+          "scope": "Exact ordered(S,G) duplicates removed before scene/distance allocation. Different complete goals at one source remain distinct. Regression/ranking row weights and validation checkpoint selection are unchanged."
+        },
+        "planning": {
+          "q": {
+            "count": 1024,
+            "unique_state_goal_pairs": 1024,
+            "solved": 611,
+            "success_rate": 0.5966796875,
+            "optimal": 169,
+            "optimal_rate": 0.1650390625,
+            "cycles": 413,
+            "entered_unreachable": 0,
+            "no_legal_action": 0,
+            "budget_exhausted": 0,
+            "horizon": 128,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": 3.165302782324059,
+            "mean_cost_ratio_on_success": 1.2112625110853623,
+            "predicted_progress": {
+              "counts": {
+                "executed_edges": 16632,
+                "predicted_decrease": 15655,
+                "predicted_plateau": 0,
+                "predicted_increase": 977,
+                "true_finite_edges": 16632,
+                "true_optimal_edges": 14327,
+                "predicted_decrease_but_not_true_optimal": 1993,
+                "entered_dead_edges": 0,
+                "non_goal_predicted_zero": 0
+              },
+              "strict_descent_trajectory_count": 341,
+              "strict_descent_success_count": 341,
+              "non_descent_trajectory_count": 683,
+              "predicted_drop_quantiles": {
+                "0": -0.6653060913085938,
+                "0.1": 0.04927616119384766,
+                "0.5": 0.6304349899291992,
+                "0.9": 1.5395042419433593,
+                "1": 2.339517593383789
+              },
+              "mean_abs_unit_descent_residual": 0.5589717740677709,
+              "executed_edge_optimal_rate": 0.8614117364117364,
+              "predicted_strict_descent_edge_rate": 0.9412578162578162,
+              "executed_edges_by_true_distance": {
+                "1_1": {
+                  "executed_edges": 611,
+                  "true_optimal_edges": 611,
+                  "predicted_decrease": 611,
+                  "entered_dead_edges": 0
+                },
+                "2_2": {
+                  "executed_edges": 630,
+                  "true_optimal_edges": 611,
+                  "predicted_decrease": 599,
+                  "entered_dead_edges": 0
+                },
+                "3_5": {
+                  "executed_edges": 2691,
+                  "true_optimal_edges": 2257,
+                  "predicted_decrease": 2374,
+                  "entered_dead_edges": 0
+                },
+                "6_10": {
+                  "executed_edges": 6003,
+                  "true_optimal_edges": 5110,
+                  "predicted_decrease": 5586,
+                  "entered_dead_edges": 0
+                },
+                "11_20": {
+                  "executed_edges": 6631,
+                  "true_optimal_edges": 5681,
+                  "predicted_decrease": 6422,
+                  "entered_dead_edges": 0
+                },
+                "21_40": {
+                  "executed_edges": 66,
+                  "true_optimal_edges": 57,
+                  "predicted_decrease": 63,
+                  "entered_dead_edges": 0
+                },
+                "41_80": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "81_inf": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "proven_unreachable": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                }
+              },
+              "note": "Observed policy trajectories only, after action selection. A nondecreasing chosen edge also means no legal successor has a strictly lower predicted distance under this greedy policy. Strict predicted descent alone does not prove goal completion or true optimality; full rollouts remain the acceptance metric."
+            },
+            "by_true_distance_interval": {
+              "3_5": {
+                "count": 3,
+                "solved": 3,
+                "optimal": 3
+              },
+              "6_10": {
+                "count": 120,
+                "solved": 87,
+                "optimal": 46
+              },
+              "11_20": {
+                "count": 872,
+                "solved": 501,
+                "optimal": 120
+              },
+              "21_40": {
+                "count": 29,
+                "solved": 20,
+                "optimal": 0
+              }
+            }
+          },
+          "oracle": {
+            "count": 1024,
+            "unique_state_goal_pairs": 1024,
+            "solved": 1024,
+            "success_rate": 1.0,
+            "optimal": 1024,
+            "optimal_rate": 1.0,
+            "cycles": 0,
+            "entered_unreachable": 0,
+            "no_legal_action": 0,
+            "budget_exhausted": 0,
+            "horizon": 128,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": 0.0,
+            "mean_cost_ratio_on_success": 1.0,
+            "predicted_progress": null
+          },
+          "heuristic": {
+            "count": 1024,
+            "unique_state_goal_pairs": 1024,
+            "solved": 303,
+            "success_rate": 0.2958984375,
+            "optimal": 284,
+            "optimal_rate": 0.27734375,
+            "cycles": 721,
+            "entered_unreachable": 0,
+            "no_legal_action": 0,
+            "budget_exhausted": 0,
+            "horizon": 128,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": 0.1254125412541254,
+            "mean_cost_ratio_on_success": 1.0100239538067144,
+            "predicted_progress": null
+          },
+          "immediate_cost_only": {
+            "count": 1024,
+            "unique_state_goal_pairs": 1024,
+            "solved": 0,
+            "success_rate": 0.0,
+            "optimal": 0,
+            "optimal_rate": 0.0,
+            "cycles": 1024,
+            "entered_unreachable": 0,
+            "no_legal_action": 0,
+            "budget_exhausted": 0,
+            "horizon": 128,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": null,
+            "mean_cost_ratio_on_success": null,
+            "predicted_progress": null
+          }
+        }
+      },
+      "unseen_endpoint_test": {
+        "count": 2048,
+        "finite_count": 2048,
+        "finite_mae": 1.3141838312149048,
+        "finite_huber": 0.8935929536819458,
+        "finite_bias": -0.6192009449005127,
+        "spearman": 0.8427887548976531,
+        "absolute_error_quantiles": {
+          "0": 0.000148773193359375,
+          "0.5": 1.1772375106811523,
+          "0.9": 2.6594412326812744,
+          "0.95": 3.0560367107391357,
+          "1": 4.934955596923828
+        },
+        "within_half_step": 0.2314453125,
+        "decision_count": 2048,
+        "shortest_action_rate": 0.87548828125,
+        "top_k_optimal_hit": {
+          "1": 0.87548828125,
+          "3": 0.974609375,
+          "5": 0.99462890625
+        },
+        "strict_candidate_order_accuracy": 0.7531882970742686,
+        "dead_end_choice_rate": 0.0,
+        "candidate_soft_rank_loss": 2.1788952350616455,
+        "bellman": {
+          "mae": 0.440106064081192,
+          "upper_violation_rate": 0.69873046875,
+          "lower_violation_rate": 0.30029296875,
+          "chosen_non_descent_rate": 0.00439453125,
+          "chosen_predicted_drop_quantiles": {
+            "0": -0.096832275390625,
+            "0.1": 0.3253728747367859,
+            "0.5": 1.2947187423706055,
+            "0.9": 1.6504427194595337,
+            "1": 2.285374641418457
+          },
+          "chosen_true_optimal_count": 1793,
+          "chosen_true_optimal_but_non_descent_count": 7,
+          "teacher_optimal_edge_count": 9252,
+          "teacher_optimal_drop_mae_to_one": 0.8597105741500854,
+          "teacher_optimal_non_descent_rate": 0.3614353653264159,
+          "teacher_optimal_predicted_drop_quantiles": {
+            "0": -1.986368179321289,
+            "0.1": -0.23438243567943573,
+            "0.5": 0.08944320678710938,
+            "0.9": 1.3761636018753052,
+            "1": 2.2321090698242188
+          },
+          "note": "Reference decisions, not whole trajectories. Unit-cost teacher-optimal edges should have a true remaining-distance drop of1. Candidate order can be correct even when the parent-to-child predicted drop is wrong. No oracle is used to change model action selection.",
+          "by_true_distance": {
+            "3_5": {
+              "count": 3,
+              "shortest_action_rate": 1.0,
+              "mae": 0.28942298889160156,
+              "upper_violation_rate": 1.0,
+              "lower_violation_rate": 0.0,
+              "chosen_non_descent_rate": 0.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": 1.1815662384033203,
+                "0.1": 1.1919891834259033,
+                "0.5": 1.2336807250976562,
+                "0.9": 1.409153699874878,
+                "1": 1.4530220031738281
+              },
+              "chosen_true_optimal_count": 3,
+              "chosen_true_optimal_but_non_descent_count": 0,
+              "teacher_optimal_edge_count": 8,
+              "teacher_optimal_drop_mae_to_one": 0.7385752201080322,
+              "teacher_optimal_non_descent_rate": 0.375,
+              "teacher_optimal_predicted_drop_quantiles": {
+                "0": -0.16623306274414062,
+                "0.1": -0.13385315239429474,
+                "0.5": 0.1391124725341797,
+                "0.9": 1.299483060836792,
+                "1": 1.4530220031738281
+              },
+              "note": "Reference decisions, not whole trajectories. Unit-cost teacher-optimal edges should have a true remaining-distance drop of1. Candidate order can be correct even when the parent-to-child predicted drop is wrong. No oracle is used to change model action selection."
+            },
+            "6_10": {
+              "count": 125,
+              "shortest_action_rate": 0.912,
+              "mae": 0.46164315938949585,
+              "upper_violation_rate": 0.68,
+              "lower_violation_rate": 0.32,
+              "chosen_non_descent_rate": 0.008,
+              "chosen_predicted_drop_quantiles": {
+                "0": -0.008281707763671875,
+                "0.1": 0.3335041403770447,
+                "0.5": 1.3579292297363281,
+                "0.9": 1.6738414764404297,
+                "1": 1.990692138671875
+              },
+              "chosen_true_optimal_count": 114,
+              "chosen_true_optimal_but_non_descent_count": 0,
+              "teacher_optimal_edge_count": 381,
+              "teacher_optimal_drop_mae_to_one": 0.7647433280944824,
+              "teacher_optimal_non_descent_rate": 0.27034120734908135,
+              "teacher_optimal_predicted_drop_quantiles": {
+                "0": -1.6792240142822266,
+                "0.1": -0.2033710479736328,
+                "0.5": 0.2076416015625,
+                "0.9": 1.5337038040161133,
+                "1": 1.990692138671875
+              },
+              "note": "Reference decisions, not whole trajectories. Unit-cost teacher-optimal edges should have a true remaining-distance drop of1. Candidate order can be correct even when the parent-to-child predicted drop is wrong. No oracle is used to change model action selection."
+            },
+            "11_20": {
+              "count": 1894,
+              "shortest_action_rate": 0.8717001055966209,
+              "mae": 0.44010138511657715,
+              "upper_violation_rate": 0.7011615628299894,
+              "lower_violation_rate": 0.29778247096092925,
+              "chosen_non_descent_rate": 0.004223864836325237,
+              "chosen_predicted_drop_quantiles": {
+                "0": -0.096832275390625,
+                "0.1": 0.3221357464790344,
+                "0.5": 1.294102668762207,
+                "0.9": 1.648452877998352,
+                "1": 2.285374641418457
+              },
+              "chosen_true_optimal_count": 1651,
+              "chosen_true_optimal_but_non_descent_count": 7,
+              "teacher_optimal_edge_count": 8673,
+              "teacher_optimal_drop_mae_to_one": 0.8625333905220032,
+              "teacher_optimal_non_descent_rate": 0.36469503055459473,
+              "teacher_optimal_predicted_drop_quantiles": {
+                "0": -1.986368179321289,
+                "0.1": -0.23705081641674042,
+                "0.5": 0.088134765625,
+                "0.9": 1.3730586767196655,
+                "1": 2.2321090698242188
+              },
+              "note": "Reference decisions, not whole trajectories. Unit-cost teacher-optimal edges should have a true remaining-distance drop of1. Candidate order can be correct even when the parent-to-child predicted drop is wrong. No oracle is used to change model action selection."
+            },
+            "21_40": {
+              "count": 26,
+              "shortest_action_rate": 0.9615384615384616,
+              "mae": 0.3542914092540741,
+              "upper_violation_rate": 0.5769230769230769,
+              "lower_violation_rate": 0.4230769230769231,
+              "chosen_non_descent_rate": 0.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": 0.0660552978515625,
+                "0.1": 0.49921512603759766,
+                "0.5": 1.0763168334960938,
+                "0.9": 1.5083084106445312,
+                "1": 1.8857917785644531
+              },
+              "chosen_true_optimal_count": 25,
+              "chosen_true_optimal_but_non_descent_count": 0,
+              "teacher_optimal_edge_count": 190,
+              "teacher_optimal_drop_mae_to_one": 0.9263922572135925,
+              "teacher_optimal_non_descent_rate": 0.39473684210526316,
+              "teacher_optimal_predicted_drop_quantiles": {
+                "0": -1.319305419921875,
+                "0.1": -0.24847030639648438,
+                "0.5": 0.05154609680175781,
+                "0.9": 0.8229397535324097,
+                "1": 1.8857917785644531
+              },
+              "note": "Reference decisions, not whole trajectories. Unit-cost teacher-optimal edges should have a true remaining-distance drop of1. Candidate order can be correct even when the parent-to-child predicted drop is wrong. No oracle is used to change model action selection."
+            }
+          }
+        },
+        "directionality": {
+          "predicted_mean_absolute_asymmetry": 0.0,
+          "both_reachable": 2048,
+          "forward_only": 0,
+          "reverse_finite_mae": 1.3141838312149048,
+          "reverse_scope": "reverse target may lie outside the successful-terminal training target domain"
+        },
+        "unreachable": {
+          "proven_unreachable": 0,
+          "finite": 2048,
+          "unknown": 0,
+          "auroc": null,
+          "validation_threshold": null,
+          "recall": null,
+          "finite_false_positive": null,
+          "recall_at_training_proxy": null,
+          "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+        },
+        "coordinate_statistics": {
+          "output_activation": "sigmoid",
+          "coordinate_divisor_for_diagnostics_only": 64,
+          "labels": "physical unit-cost steps, without normalization or inverse normalization",
+          "boundary_tolerance_relative_to_cap": 0.0001,
+          "derivative_tolerance_relative_to_cap": 0.0001,
+          "all": {
+            "count": 2048,
+            "finite_mae": 1.3141838312149048,
+            "finite_bias": -0.6192009449005127,
+            "predicted_mean": 14.41790771484375,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.0,
+            "low_output_derivative_fraction": 0.0,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "by_true_distance": {
+            "(2,5]": {
+              "count": 3,
+              "finite_mae": 0.5366630554199219,
+              "finite_bias": 0.31849798560142517,
+              "predicted_mean": 4.985164642333984,
+              "positive_finite_predicted_zero_fraction": 0.0,
+              "boundary_fraction": 0.0,
+              "low_output_derivative_fraction": 0.0,
+              "outside_sigmoid_range_fraction": 0.0
+            },
+            "(5,10]": {
+              "count": 125,
+              "finite_mae": 0.9757376909255981,
+              "finite_bias": 0.3010152280330658,
+              "predicted_mean": 9.485015869140625,
+              "positive_finite_predicted_zero_fraction": 0.0,
+              "boundary_fraction": 0.0,
+              "low_output_derivative_fraction": 0.0,
+              "outside_sigmoid_range_fraction": 0.0
+            },
+            "(10,20]": {
+              "count": 1894,
+              "finite_mae": 1.321643590927124,
+              "finite_bias": -0.6557694673538208,
+              "predicted_mean": 14.695867538452148,
+              "positive_finite_predicted_zero_fraction": 0.0,
+              "boundary_fraction": 0.0,
+              "low_output_derivative_fraction": 0.0,
+              "outside_sigmoid_range_fraction": 0.0
+            },
+            "(20,40]": {
+              "count": 26,
+              "finite_mae": 2.487637758255005,
+              "finite_bias": -2.487637758255005,
+              "predicted_mean": 18.973899841308594,
+              "positive_finite_predicted_zero_fraction": 0.0,
+              "boundary_fraction": 0.0,
+              "low_output_derivative_fraction": 0.0,
+              "outside_sigmoid_range_fraction": 0.0
+            }
+          }
+        },
+        "actual_gradient_endpoint_exposure": {
+          "both_seen": 0,
+          "one_unseen": 2048,
+          "both_unseen": 0,
+          "both_seen_finite_mae": null,
+          "any_unseen_finite_mae": 1.3141838312149048,
+          "counter_semantics": "Legacy field name: exposure counts state inputs participating in loss computation, not proven nonzero parameter gradients. Identity pairs, one-candidate ranking or saturation may have zero gradient."
+        },
+        "planning_query_selection": {
+          "protocol": "unique_ordered_state_goal_pairs_v2",
+          "eligible_rows": 2048,
+          "unique_eligible_pairs": 2048,
+          "maximum_queries": 1024,
+          "selected_queries": 1024,
+          "unique_selected_pairs": 1024,
+          "scope": "Exact ordered(S,G) duplicates removed before scene/distance allocation. Different complete goals at one source remain distinct. Regression/ranking row weights and validation checkpoint selection are unchanged."
+        },
+        "planning": {
+          "q": {
+            "count": 1024,
+            "unique_state_goal_pairs": 1024,
+            "solved": 603,
+            "success_rate": 0.5888671875,
+            "optimal": 151,
+            "optimal_rate": 0.1474609375,
+            "cycles": 421,
+            "entered_unreachable": 0,
+            "no_legal_action": 0,
+            "budget_exhausted": 0,
+            "horizon": 128,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": 3.1674958540630183,
+            "mean_cost_ratio_on_success": 1.2164916514559134,
+            "predicted_progress": {
+              "counts": {
+                "executed_edges": 16353,
+                "predicted_decrease": 15415,
+                "predicted_plateau": 0,
+                "predicted_increase": 938,
+                "true_finite_edges": 16353,
+                "true_optimal_edges": 14105,
+                "predicted_decrease_but_not_true_optimal": 1966,
+                "entered_dead_edges": 0,
+                "non_goal_predicted_zero": 0
+              },
+              "strict_descent_trajectory_count": 331,
+              "strict_descent_success_count": 331,
+              "non_descent_trajectory_count": 693,
+              "predicted_drop_quantiles": {
+                "0": -0.4910850524902344,
+                "0.1": 0.053592681884765625,
+                "0.5": 0.6275424957275391,
+                "0.9": 1.540654754638672,
+                "1": 2.3925247192382812
+              },
+              "mean_abs_unit_descent_residual": 0.5593555905086611,
+              "executed_edge_optimal_rate": 0.8625328685868037,
+              "predicted_strict_descent_edge_rate": 0.9426404940989421,
+              "executed_edges_by_true_distance": {
+                "1_1": {
+                  "executed_edges": 603,
+                  "true_optimal_edges": 603,
+                  "predicted_decrease": 603,
+                  "entered_dead_edges": 0
+                },
+                "2_2": {
+                  "executed_edges": 619,
+                  "true_optimal_edges": 603,
+                  "predicted_decrease": 598,
+                  "entered_dead_edges": 0
+                },
+                "3_5": {
+                  "executed_edges": 2630,
+                  "true_optimal_edges": 2204,
+                  "predicted_decrease": 2301,
+                  "entered_dead_edges": 0
+                },
+                "6_10": {
+                  "executed_edges": 5900,
+                  "true_optimal_edges": 5029,
+                  "predicted_decrease": 5522,
+                  "entered_dead_edges": 0
+                },
+                "11_20": {
+                  "executed_edges": 6537,
+                  "true_optimal_edges": 5606,
+                  "predicted_decrease": 6329,
+                  "entered_dead_edges": 0
+                },
+                "21_40": {
+                  "executed_edges": 64,
+                  "true_optimal_edges": 60,
+                  "predicted_decrease": 62,
+                  "entered_dead_edges": 0
+                },
+                "41_80": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "81_inf": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "proven_unreachable": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                }
+              },
+              "note": "Observed policy trajectories only, after action selection. A nondecreasing chosen edge also means no legal successor has a strictly lower predicted distance under this greedy policy. Strict predicted descent alone does not prove goal completion or true optimality; full rollouts remain the acceptance metric."
+            },
+            "by_true_distance_interval": {
+              "3_5": {
+                "count": 3,
+                "solved": 3,
+                "optimal": 3
+              },
+              "6_10": {
+                "count": 125,
+                "solved": 91,
+                "optimal": 41
+              },
+              "11_20": {
+                "count": 870,
+                "solved": 496,
+                "optimal": 107
+              },
+              "21_40": {
+                "count": 26,
+                "solved": 13,
+                "optimal": 0
+              }
+            }
+          },
+          "oracle": {
+            "count": 1024,
+            "unique_state_goal_pairs": 1024,
+            "solved": 1024,
+            "success_rate": 1.0,
+            "optimal": 1024,
+            "optimal_rate": 1.0,
+            "cycles": 0,
+            "entered_unreachable": 0,
+            "no_legal_action": 0,
+            "budget_exhausted": 0,
+            "horizon": 128,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": 0.0,
+            "mean_cost_ratio_on_success": 1.0,
+            "predicted_progress": null
+          },
+          "heuristic": {
+            "count": 1024,
+            "unique_state_goal_pairs": 1024,
+            "solved": 298,
+            "success_rate": 0.291015625,
+            "optimal": 279,
+            "optimal_rate": 0.2724609375,
+            "cycles": 726,
+            "entered_unreachable": 0,
+            "no_legal_action": 0,
+            "budget_exhausted": 0,
+            "horizon": 128,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": 0.12751677852348994,
+            "mean_cost_ratio_on_success": 1.0095823721613297,
+            "predicted_progress": null
+          },
+          "immediate_cost_only": {
+            "count": 1024,
+            "unique_state_goal_pairs": 1024,
+            "solved": 0,
+            "success_rate": 0.0,
+            "optimal": 0,
+            "optimal_rate": 0.0,
+            "cycles": 1024,
+            "entered_unreachable": 0,
+            "no_legal_action": 0,
+            "budget_exhausted": 0,
+            "horizon": 128,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": null,
+            "mean_cost_ratio_on_success": null,
+            "predicted_progress": null
+          }
+        }
+      },
+      "unseen_both_test": {
+        "count": 2048,
+        "finite_count": 2048,
+        "finite_mae": 1.2713162899017334,
+        "finite_huber": 0.8554486036300659,
+        "finite_bias": -0.614494800567627,
+        "spearman": 0.8371153212043488,
+        "absolute_error_quantiles": {
+          "0": 0.000804901123046875,
+          "0.5": 1.069178581237793,
+          "0.9": 2.6739113330841064,
+          "0.95": 3.1069259643554688,
+          "1": 6.464164733886719
+        },
+        "within_half_step": 0.25537109375,
+        "decision_count": 2048,
+        "shortest_action_rate": 0.8466796875,
+        "top_k_optimal_hit": {
+          "1": 0.8466796875,
+          "3": 0.9677734375,
+          "5": 0.990234375
+        },
+        "strict_candidate_order_accuracy": 0.742103738046943,
+        "dead_end_choice_rate": 0.0,
+        "candidate_soft_rank_loss": 2.1862130165100098,
+        "bellman": {
+          "mae": 0.44198155403137207,
+          "upper_violation_rate": 0.697265625,
+          "lower_violation_rate": 0.3017578125,
+          "chosen_non_descent_rate": 0.0009765625,
+          "chosen_predicted_drop_quantiles": {
+            "0": -0.11155891418457031,
+            "0.1": 0.32363393902778625,
+            "0.5": 1.2904653549194336,
+            "0.9": 1.653723955154419,
+            "1": 2.295146942138672
+          },
+          "chosen_true_optimal_count": 1734,
+          "chosen_true_optimal_but_non_descent_count": 1,
+          "teacher_optimal_edge_count": 9176,
+          "teacher_optimal_drop_mae_to_one": 0.869368851184845,
+          "teacher_optimal_non_descent_rate": 0.3659546643417611,
+          "teacher_optimal_predicted_drop_quantiles": {
+            "0": -1.9160213470458984,
+            "0.1": -0.24768733978271484,
+            "0.5": 0.08235359191894531,
+            "0.9": 1.3661174774169922,
+            "1": 2.295146942138672
+          },
+          "note": "Reference decisions, not whole trajectories. Unit-cost teacher-optimal edges should have a true remaining-distance drop of1. Candidate order can be correct even when the parent-to-child predicted drop is wrong. No oracle is used to change model action selection.",
+          "by_true_distance": {
+            "3_5": {
+              "count": 1,
+              "shortest_action_rate": 1.0,
+              "mae": 0.14544677734375,
+              "upper_violation_rate": 1.0,
+              "lower_violation_rate": 0.0,
+              "chosen_non_descent_rate": 0.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": 1.14544677734375,
+                "0.1": 1.14544677734375,
+                "0.5": 1.14544677734375,
+                "0.9": 1.14544677734375,
+                "1": 1.14544677734375
+              },
+              "chosen_true_optimal_count": 1,
+              "chosen_true_optimal_but_non_descent_count": 0,
+              "teacher_optimal_edge_count": 2,
+              "teacher_optimal_drop_mae_to_one": 0.07363224029541016,
+              "teacher_optimal_non_descent_rate": 0.0,
+              "teacher_optimal_predicted_drop_quantiles": {
+                "0": 0.9981822967529297,
+                "0.1": 1.012908697128296,
+                "0.5": 1.0718145370483398,
+                "0.9": 1.1307203769683838,
+                "1": 1.14544677734375
+              },
+              "note": "Reference decisions, not whole trajectories. Unit-cost teacher-optimal edges should have a true remaining-distance drop of1. Candidate order can be correct even when the parent-to-child predicted drop is wrong. No oracle is used to change model action selection."
+            },
+            "6_10": {
+              "count": 114,
+              "shortest_action_rate": 0.8771929824561403,
+              "mae": 0.4730052053928375,
+              "upper_violation_rate": 0.7631578947368421,
+              "lower_violation_rate": 0.23684210526315788,
+              "chosen_non_descent_rate": 0.008771929824561403,
+              "chosen_predicted_drop_quantiles": {
+                "0": -0.11155891418457031,
+                "0.1": 0.34083014726638794,
+                "0.5": 1.3803377151489258,
+                "0.9": 1.6412204504013062,
+                "1": 2.239206314086914
+              },
+              "chosen_true_optimal_count": 100,
+              "chosen_true_optimal_but_non_descent_count": 0,
+              "teacher_optimal_edge_count": 353,
+              "teacher_optimal_drop_mae_to_one": 0.751801073551178,
+              "teacher_optimal_non_descent_rate": 0.2577903682719547,
+              "teacher_optimal_predicted_drop_quantiles": {
+                "0": -1.8268165588378906,
+                "0.1": -0.22879141569137573,
+                "0.5": 0.26926231384277344,
+                "0.9": 1.5335266590118408,
+                "1": 2.239206314086914
+              },
+              "note": "Reference decisions, not whole trajectories. Unit-cost teacher-optimal edges should have a true remaining-distance drop of1. Candidate order can be correct even when the parent-to-child predicted drop is wrong. No oracle is used to change model action selection."
+            },
+            "11_20": {
+              "count": 1908,
+              "shortest_action_rate": 0.8448637316561844,
+              "mae": 0.4406674802303314,
+              "upper_violation_rate": 0.6933962264150944,
+              "lower_violation_rate": 0.3055555555555556,
+              "chosen_non_descent_rate": 0.0005241090146750524,
+              "chosen_predicted_drop_quantiles": {
+                "0": -0.00386810302734375,
+                "0.1": 0.3294139802455902,
+                "0.5": 1.2859058380126953,
+                "0.9": 1.6583127975463867,
+                "1": 2.295146942138672
+              },
+              "chosen_true_optimal_count": 1612,
+              "chosen_true_optimal_but_non_descent_count": 1,
+              "teacher_optimal_edge_count": 8651,
+              "teacher_optimal_drop_mae_to_one": 0.8721752166748047,
+              "teacher_optimal_non_descent_rate": 0.3679343428505375,
+              "teacher_optimal_predicted_drop_quantiles": {
+                "0": -1.9160213470458984,
+                "0.1": -0.24904632568359375,
+                "0.5": 0.08036422729492188,
+                "0.9": 1.3583850860595703,
+                "1": 2.295146942138672
+              },
+              "note": "Reference decisions, not whole trajectories. Unit-cost teacher-optimal edges should have a true remaining-distance drop of1. Candidate order can be correct even when the parent-to-child predicted drop is wrong. No oracle is used to change model action selection."
+            },
+            "21_40": {
+              "count": 25,
+              "shortest_action_rate": 0.84,
+              "mae": 0.4126649498939514,
+              "upper_violation_rate": 0.68,
+              "lower_violation_rate": 0.32,
+              "chosen_non_descent_rate": 0.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": 0.00128936767578125,
+                "0.1": 0.1974174678325653,
+                "0.5": 1.2490959167480469,
+                "0.9": 1.5249873399734497,
+                "1": 1.6009292602539062
+              },
+              "chosen_true_optimal_count": 21,
+              "chosen_true_optimal_but_non_descent_count": 0,
+              "teacher_optimal_edge_count": 170,
+              "teacher_optimal_drop_mae_to_one": 0.9800434708595276,
+              "teacher_optimal_non_descent_rate": 0.49411764705882355,
+              "teacher_optimal_predicted_drop_quantiles": {
+                "0": -1.4936676025390625,
+                "0.1": -0.28937721252441406,
+                "0.5": 0.001163482666015625,
+                "0.9": 0.9003618955612183,
+                "1": 1.6009292602539062
+              },
+              "note": "Reference decisions, not whole trajectories. Unit-cost teacher-optimal edges should have a true remaining-distance drop of1. Candidate order can be correct even when the parent-to-child predicted drop is wrong. No oracle is used to change model action selection."
+            }
+          }
+        },
+        "directionality": {
+          "predicted_mean_absolute_asymmetry": 0.0,
+          "both_reachable": 2048,
+          "forward_only": 0,
+          "reverse_finite_mae": 1.2713162899017334,
+          "reverse_scope": "reverse target may lie outside the successful-terminal training target domain"
+        },
+        "unreachable": {
+          "proven_unreachable": 0,
+          "finite": 2048,
+          "unknown": 0,
+          "auroc": null,
+          "validation_threshold": null,
+          "recall": null,
+          "finite_false_positive": null,
+          "recall_at_training_proxy": null,
+          "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+        },
+        "coordinate_statistics": {
+          "output_activation": "sigmoid",
+          "coordinate_divisor_for_diagnostics_only": 64,
+          "labels": "physical unit-cost steps, without normalization or inverse normalization",
+          "boundary_tolerance_relative_to_cap": 0.0001,
+          "derivative_tolerance_relative_to_cap": 0.0001,
+          "all": {
+            "count": 2048,
+            "finite_mae": 1.2713162899017334,
+            "finite_bias": -0.614494800567627,
+            "predicted_mean": 14.475837707519531,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.0,
+            "low_output_derivative_fraction": 0.0,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "by_true_distance": {
+            "(2,5]": {
+              "count": 1,
+              "finite_mae": 2.6649703979492188,
+              "finite_bias": 2.6649703979492188,
+              "predicted_mean": 7.664970397949219,
+              "positive_finite_predicted_zero_fraction": 0.0,
+              "boundary_fraction": 0.0,
+              "low_output_derivative_fraction": 0.0,
+              "outside_sigmoid_range_fraction": 0.0
+            },
+            "(5,10]": {
+              "count": 114,
+              "finite_mae": 0.9779962301254272,
+              "finite_bias": 0.4031113088130951,
+              "predicted_mean": 9.543460845947266,
+              "positive_finite_predicted_zero_fraction": 0.0,
+              "boundary_fraction": 0.0,
+              "low_output_derivative_fraction": 0.0,
+              "outside_sigmoid_range_fraction": 0.0
+            },
+            "(10,20]": {
+              "count": 1908,
+              "finite_mae": 1.267655611038208,
+              "finite_bias": -0.647952139377594,
+              "predicted_mean": 14.723116874694824,
+              "positive_finite_predicted_zero_fraction": 0.0,
+              "boundary_fraction": 0.0,
+              "low_output_derivative_fraction": 0.0,
+              "outside_sigmoid_range_fraction": 0.0
+            },
+            "(20,40]": {
+              "count": 25,
+              "finite_mae": 2.832496404647827,
+              "finite_bias": -2.832496404647827,
+              "predicted_mean": 18.367504119873047,
+              "positive_finite_predicted_zero_fraction": 0.0,
+              "boundary_fraction": 0.0,
+              "low_output_derivative_fraction": 0.0,
+              "outside_sigmoid_range_fraction": 0.0
+            }
+          }
+        },
+        "actual_gradient_endpoint_exposure": {
+          "both_seen": 0,
+          "one_unseen": 0,
+          "both_unseen": 2048,
+          "both_seen_finite_mae": null,
+          "any_unseen_finite_mae": 1.2713162899017334,
+          "counter_semantics": "Legacy field name: exposure counts state inputs participating in loss computation, not proven nonzero parameter gradients. Identity pairs, one-candidate ranking or saturation may have zero gradient."
+        },
+        "planning_query_selection": {
+          "protocol": "unique_ordered_state_goal_pairs_v2",
+          "eligible_rows": 2048,
+          "unique_eligible_pairs": 2048,
+          "maximum_queries": 1024,
+          "selected_queries": 1024,
+          "unique_selected_pairs": 1024,
+          "scope": "Exact ordered(S,G) duplicates removed before scene/distance allocation. Different complete goals at one source remain distinct. Regression/ranking row weights and validation checkpoint selection are unchanged."
+        },
+        "planning": {
+          "q": {
+            "count": 1024,
+            "unique_state_goal_pairs": 1024,
+            "solved": 584,
+            "success_rate": 0.5703125,
+            "optimal": 137,
+            "optimal_rate": 0.1337890625,
+            "cycles": 440,
+            "entered_unreachable": 0,
+            "no_legal_action": 0,
+            "budget_exhausted": 0,
+            "horizon": 128,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": 3.287671232876712,
+            "mean_cost_ratio_on_success": 1.2187401415699106,
+            "predicted_progress": {
+              "counts": {
+                "executed_edges": 16460,
+                "predicted_decrease": 15519,
+                "predicted_plateau": 0,
+                "predicted_increase": 941,
+                "true_finite_edges": 16460,
+                "true_optimal_edges": 14157,
+                "predicted_decrease_but_not_true_optimal": 1981,
+                "entered_dead_edges": 0,
+                "non_goal_predicted_zero": 0
+              },
+              "strict_descent_trajectory_count": 335,
+              "strict_descent_success_count": 335,
+              "non_descent_trajectory_count": 689,
+              "predicted_drop_quantiles": {
+                "0": -0.3931751251220703,
+                "0.1": 0.04990348815917969,
+                "0.5": 0.6124153137207031,
+                "0.9": 1.5329051971435548,
+                "1": 2.345104217529297
+              },
+              "mean_abs_unit_descent_residual": 0.559456414469537,
+              "executed_edge_optimal_rate": 0.8600850546780073,
+              "predicted_strict_descent_edge_rate": 0.9428311057108141,
+              "executed_edges_by_true_distance": {
+                "1_1": {
+                  "executed_edges": 584,
+                  "true_optimal_edges": 584,
+                  "predicted_decrease": 584,
+                  "entered_dead_edges": 0
+                },
+                "2_2": {
+                  "executed_edges": 595,
+                  "true_optimal_edges": 584,
+                  "predicted_decrease": 568,
+                  "entered_dead_edges": 0
+                },
+                "3_5": {
+                  "executed_edges": 2538,
+                  "true_optimal_edges": 2154,
+                  "predicted_decrease": 2242,
+                  "entered_dead_edges": 0
+                },
+                "6_10": {
+                  "executed_edges": 5916,
+                  "true_optimal_edges": 5011,
+                  "predicted_decrease": 5522,
+                  "entered_dead_edges": 0
+                },
+                "11_20": {
+                  "executed_edges": 6774,
+                  "true_optimal_edges": 5775,
+                  "predicted_decrease": 6551,
+                  "entered_dead_edges": 0
+                },
+                "21_40": {
+                  "executed_edges": 53,
+                  "true_optimal_edges": 49,
+                  "predicted_decrease": 52,
+                  "entered_dead_edges": 0
+                },
+                "41_80": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "81_inf": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "proven_unreachable": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                }
+              },
+              "note": "Observed policy trajectories only, after action selection. A nondecreasing chosen edge also means no legal successor has a strictly lower predicted distance under this greedy policy. Strict predicted descent alone does not prove goal completion or true optimality; full rollouts remain the acceptance metric."
+            },
+            "by_true_distance_interval": {
+              "3_5": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "6_10": {
+                "count": 114,
+                "solved": 76,
+                "optimal": 40
+              },
+              "11_20": {
+                "count": 884,
+                "solved": 493,
+                "optimal": 95
+              },
+              "21_40": {
+                "count": 25,
+                "solved": 14,
+                "optimal": 1
+              }
+            }
+          },
+          "oracle": {
+            "count": 1024,
+            "unique_state_goal_pairs": 1024,
+            "solved": 1024,
+            "success_rate": 1.0,
+            "optimal": 1024,
+            "optimal_rate": 1.0,
+            "cycles": 0,
+            "entered_unreachable": 0,
+            "no_legal_action": 0,
+            "budget_exhausted": 0,
+            "horizon": 128,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": 0.0,
+            "mean_cost_ratio_on_success": 1.0,
+            "predicted_progress": null
+          },
+          "heuristic": {
+            "count": 1024,
+            "unique_state_goal_pairs": 1024,
+            "solved": 300,
+            "success_rate": 0.29296875,
+            "optimal": 277,
+            "optimal_rate": 0.2705078125,
+            "cycles": 724,
+            "entered_unreachable": 0,
+            "no_legal_action": 0,
+            "budget_exhausted": 0,
+            "horizon": 128,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": 0.15333333333333332,
+            "mean_cost_ratio_on_success": 1.012301657492834,
+            "predicted_progress": null
+          },
+          "immediate_cost_only": {
+            "count": 1024,
+            "unique_state_goal_pairs": 1024,
+            "solved": 0,
+            "success_rate": 0.0,
+            "optimal": 0,
+            "optimal_rate": 0.0,
+            "cycles": 1024,
+            "entered_unreachable": 0,
+            "no_legal_action": 0,
+            "budget_exhausted": 0,
+            "horizon": 128,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": null,
+            "mean_cost_ratio_on_success": null,
+            "predicted_progress": null
+          }
+        }
+      },
+      "diagnostic": {
+        "count": 5,
+        "finite_count": 5,
+        "finite_mae": 1.1635551452636719,
+        "finite_huber": 0.7414073348045349,
+        "finite_bias": 0.4358009397983551,
+        "spearman": 0.11180339887498948,
+        "absolute_error_quantiles": {
+          "0": 0.3677845001220703,
+          "0.5": 1.0670890808105469,
+          "0.9": 2.1772427558898926,
+          "0.95": 2.533338785171509,
+          "1": 2.889434814453125
+        },
+        "within_half_step": 0.4,
+        "decision_count": 5,
+        "shortest_action_rate": 0.8,
+        "top_k_optimal_hit": {
+          "1": 0.8,
+          "3": 0.8,
+          "5": 1.0
+        },
+        "strict_candidate_order_accuracy": 0.6666666666666666,
+        "dead_end_choice_rate": 0.0,
+        "candidate_soft_rank_loss": 2.204099655151367,
+        "bellman": {
+          "mae": 0.6144668459892273,
+          "upper_violation_rate": 0.8,
+          "lower_violation_rate": 0.2,
+          "chosen_non_descent_rate": 0.0,
+          "chosen_predicted_drop_quantiles": {
+            "0": 0.09130287170410156,
+            "0.1": 0.5417873859405518,
+            "0.5": 1.4380836486816406,
+            "0.9": 1.8093771934509277,
+            "1": 2.0308074951171875
+          },
+          "chosen_true_optimal_count": 4,
+          "chosen_true_optimal_but_non_descent_count": 0,
+          "teacher_optimal_edge_count": 17,
+          "teacher_optimal_drop_mae_to_one": 0.91411292552948,
+          "teacher_optimal_non_descent_rate": 0.4117647058823529,
+          "teacher_optimal_predicted_drop_quantiles": {
+            "0": -0.23481178283691406,
+            "0.1": -0.18001747131347656,
+            "0.5": 0.06626510620117188,
+            "0.9": 1.305741786956787,
+            "1": 2.0308074951171875
+          },
+          "note": "Reference decisions, not whole trajectories. Unit-cost teacher-optimal edges should have a true remaining-distance drop of1. Candidate order can be correct even when the parent-to-child predicted drop is wrong. No oracle is used to change model action selection.",
+          "by_true_distance": {
+            "11_20": {
+              "count": 5,
+              "shortest_action_rate": 0.8,
+              "mae": 0.6144668459892273,
+              "upper_violation_rate": 0.8,
+              "lower_violation_rate": 0.2,
+              "chosen_non_descent_rate": 0.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": 0.09130287170410156,
+                "0.1": 0.5417873859405518,
+                "0.5": 1.4380836486816406,
+                "0.9": 1.8093771934509277,
+                "1": 2.0308074951171875
+              },
+              "chosen_true_optimal_count": 4,
+              "chosen_true_optimal_but_non_descent_count": 0,
+              "teacher_optimal_edge_count": 17,
+              "teacher_optimal_drop_mae_to_one": 0.91411292552948,
+              "teacher_optimal_non_descent_rate": 0.4117647058823529,
+              "teacher_optimal_predicted_drop_quantiles": {
+                "0": -0.23481178283691406,
+                "0.1": -0.18001747131347656,
+                "0.5": 0.06626510620117188,
+                "0.9": 1.305741786956787,
+                "1": 2.0308074951171875
+              },
+              "note": "Reference decisions, not whole trajectories. Unit-cost teacher-optimal edges should have a true remaining-distance drop of1. Candidate order can be correct even when the parent-to-child predicted drop is wrong. No oracle is used to change model action selection."
+            }
+          }
+        },
+        "directionality": {
+          "predicted_mean_absolute_asymmetry": 0.0,
+          "both_reachable": 5,
+          "forward_only": 0,
+          "reverse_finite_mae": 1.1635551452636719,
+          "reverse_scope": "reverse target may lie outside the successful-terminal training target domain"
+        },
+        "unreachable": {
+          "proven_unreachable": 0,
+          "finite": 5,
+          "unknown": 0,
+          "auroc": null,
+          "validation_threshold": null,
+          "recall": null,
+          "finite_false_positive": null,
+          "recall_at_training_proxy": null,
+          "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+        },
+        "coordinate_statistics": {
+          "output_activation": "sigmoid",
+          "coordinate_divisor_for_diagnostics_only": 64,
+          "labels": "physical unit-cost steps, without normalization or inverse normalization",
+          "boundary_tolerance_relative_to_cap": 0.0001,
+          "derivative_tolerance_relative_to_cap": 0.0001,
+          "all": {
+            "count": 5,
+            "finite_mae": 1.1635551452636719,
+            "finite_bias": 0.4358009397983551,
+            "predicted_mean": 14.635801315307617,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.0,
+            "low_output_derivative_fraction": 0.0,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "by_true_distance": {
+            "(10,20]": {
+              "count": 5,
+              "finite_mae": 1.1635551452636719,
+              "finite_bias": 0.4358009397983551,
+              "predicted_mean": 14.635801315307617,
+              "positive_finite_predicted_zero_fraction": 0.0,
+              "boundary_fraction": 0.0,
+              "low_output_derivative_fraction": 0.0,
+              "outside_sigmoid_range_fraction": 0.0
+            }
+          }
+        },
+        "actual_gradient_endpoint_exposure": {
+          "both_seen": 4,
+          "one_unseen": 1,
+          "both_unseen": 0,
+          "both_seen_finite_mae": 1.1876716613769531,
+          "any_unseen_finite_mae": 1.0670890808105469,
+          "counter_semantics": "Legacy field name: exposure counts state inputs participating in loss computation, not proven nonzero parameter gradients. Identity pairs, one-candidate ranking or saturation may have zero gradient."
+        },
+        "planning_query_selection": {
+          "protocol": "unique_ordered_state_goal_pairs_v2",
+          "eligible_rows": 5,
+          "unique_eligible_pairs": 5,
+          "maximum_queries": 1024,
+          "selected_queries": 5,
+          "unique_selected_pairs": 5,
+          "scope": "Exact ordered(S,G) duplicates removed before scene/distance allocation. Different complete goals at one source remain distinct. Regression/ranking row weights and validation checkpoint selection are unchanged."
+        },
+        "planning": {
+          "q": {
+            "count": 5,
+            "unique_state_goal_pairs": 5,
+            "solved": 3,
+            "success_rate": 0.6,
+            "optimal": 1,
+            "optimal_rate": 0.2,
+            "cycles": 2,
+            "entered_unreachable": 0,
+            "no_legal_action": 0,
+            "budget_exhausted": 0,
+            "horizon": 128,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": 2.0,
+            "mean_cost_ratio_on_success": 1.1333333333333333,
+            "predicted_progress": {
+              "counts": {
+                "executed_edges": 78,
+                "predicted_decrease": 73,
+                "predicted_plateau": 0,
+                "predicted_increase": 5,
+                "true_finite_edges": 78,
+                "true_optimal_edges": 65,
+                "predicted_decrease_but_not_true_optimal": 12,
+                "entered_dead_edges": 0,
+                "non_goal_predicted_zero": 0
+              },
+              "strict_descent_trajectory_count": 1,
+              "strict_descent_success_count": 1,
+              "non_descent_trajectory_count": 4,
+              "predicted_drop_quantiles": {
+                "0": -0.1655731201171875,
+                "0.1": 0.022070693969726562,
+                "0.5": 0.6753959655761719,
+                "0.9": 1.6820551872253418,
+                "1": 2.0773963928222656
+              },
+              "mean_abs_unit_descent_residual": 0.5827294618655474,
+              "executed_edge_optimal_rate": 0.8333333333333334,
+              "predicted_strict_descent_edge_rate": 0.9358974358974359,
+              "executed_edges_by_true_distance": {
+                "1_1": {
+                  "executed_edges": 3,
+                  "true_optimal_edges": 3,
+                  "predicted_decrease": 3,
+                  "entered_dead_edges": 0
+                },
+                "2_2": {
+                  "executed_edges": 3,
+                  "true_optimal_edges": 3,
+                  "predicted_decrease": 3,
+                  "entered_dead_edges": 0
+                },
+                "3_5": {
+                  "executed_edges": 10,
+                  "true_optimal_edges": 9,
+                  "predicted_decrease": 9,
+                  "entered_dead_edges": 0
+                },
+                "6_10": {
+                  "executed_edges": 26,
+                  "true_optimal_edges": 22,
+                  "predicted_decrease": 24,
+                  "entered_dead_edges": 0
+                },
+                "11_20": {
+                  "executed_edges": 36,
+                  "true_optimal_edges": 28,
+                  "predicted_decrease": 34,
+                  "entered_dead_edges": 0
+                },
+                "21_40": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "41_80": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "81_inf": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "proven_unreachable": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                }
+              },
+              "note": "Observed policy trajectories only, after action selection. A nondecreasing chosen edge also means no legal successor has a strictly lower predicted distance under this greedy policy. Strict predicted descent alone does not prove goal completion or true optimality; full rollouts remain the acceptance metric."
+            },
+            "by_true_distance_interval": {
+              "11_20": {
+                "count": 5,
+                "solved": 3,
+                "optimal": 1
+              }
+            }
+          },
+          "oracle": {
+            "count": 5,
+            "unique_state_goal_pairs": 5,
+            "solved": 5,
+            "success_rate": 1.0,
+            "optimal": 5,
+            "optimal_rate": 1.0,
+            "cycles": 0,
+            "entered_unreachable": 0,
+            "no_legal_action": 0,
+            "budget_exhausted": 0,
+            "horizon": 128,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": 0.0,
+            "mean_cost_ratio_on_success": 1.0,
+            "predicted_progress": null
+          },
+          "heuristic": {
+            "count": 5,
+            "unique_state_goal_pairs": 5,
+            "solved": 2,
+            "success_rate": 0.4,
+            "optimal": 2,
+            "optimal_rate": 0.4,
+            "cycles": 3,
+            "entered_unreachable": 0,
+            "no_legal_action": 0,
+            "budget_exhausted": 0,
+            "horizon": 128,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": 0.0,
+            "mean_cost_ratio_on_success": 1.0,
+            "predicted_progress": null
+          },
+          "immediate_cost_only": {
+            "count": 5,
+            "unique_state_goal_pairs": 5,
+            "solved": 0,
+            "success_rate": 0.0,
+            "optimal": 0,
+            "optimal_rate": 0.0,
+            "cycles": 5,
+            "entered_unreachable": 0,
+            "no_legal_action": 0,
+            "budget_exhausted": 0,
+            "horizon": 128,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": null,
+            "mean_cost_ratio_on_success": null,
+            "predicted_progress": null
+          }
+        }
+      }
+    }
+  },
+  "acceptance": {
+    "minimum": 0.8,
+    "target": 0.9,
+    "rates": {
+      "test": 0.6103515625,
+      "unseen_endpoint_test": 0.5888671875,
+      "unseen_both_test": 0.5703125,
+      "diagnostic": 0.6
+    },
+    "full_training_source_coverage": true,
+    "passed": false,
+    "target_reached": false,
+    "planning_protocol": "unique_ordered_state_goal_pairs_v2"
+  },
+  "frozen_evaluator_source_commit": "290cc8c",
+  "frozen_raw_result": "runs\\new_tasks_qmap\\exact_pairs\\token_local_rank8_frozen_unique_v2.json",
+  "raw_training_summary": "runs\\new_tasks_qmap\\exact_pairs\\token_local_rank8_summary_full.json",
+  "config": "experiments/new_tasks_qmap/configs/token_swapping_local_rank8_pairs.json"
+}

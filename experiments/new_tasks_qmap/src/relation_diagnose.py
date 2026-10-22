@@ -14,6 +14,77 @@ def _popcount(values):
     return int(table[values.view(np.uint8)].sum(dtype=np.int64))
 
 
+def isometry_feature_view(corpus,task,variant,seed):
+    """One query-independent input isometry, with transported candidate order."""
+    from types import SimpleNamespace
+    if not 0<=variant<8: raise ValueError('Expected one of eight fixed diagnostic variants')
+    mapping={}
+    if task=='rush_hour':
+        for sid,scene in enumerate(corpus.scenes):
+            used=np.array([ord(piece[0])-ord('A') for piece in scene.env.pieces[1:]])
+            permutation=np.arange(26)
+            if variant and len(used)>1:
+                shuffled=np.random.default_rng(seed+104729*variant+sid).permutation(used)
+                if np.array_equal(shuffled,used): shuffled=np.roll(shuffled,1)
+                permutation[used]=shuffled
+            mapping[sid]=permutation
+    elif task=='token_swapping':
+        permutation=np.arange(corpus.n)
+        if variant:
+            permutation=np.random.default_rng(seed+104729*variant).permutation(corpus.n)
+            if np.array_equal(permutation,np.arange(corpus.n)): permutation=np.roll(permutation,1)
+        mapping[0]=permutation
+    elif task!='sokoban': raise ValueError('Unsupported exact-pair task')
+    def features(ids):
+        ids=np.asarray(ids,dtype=np.int64); original=corpus.features(ids)
+        if task=='sokoban':
+            values=original.reshape(len(ids),4,10,10)
+            values=np.rot90(values,variant%4,axes=(-2,-1))
+            if variant//4: values=np.flip(values,axis=-1)
+            return np.ascontiguousarray(values).reshape(len(ids),-1)
+        if task=='token_swapping':
+            values=original.reshape(len(ids),corpus.n,corpus.n); result=np.empty_like(values)
+            result[:,:,mapping[0]]=values
+        else:
+            values=original.reshape(len(ids),26,36); result=np.empty_like(values)
+            scenes=corpus.locate(ids)
+            for sid in np.unique(scenes):
+                mask=scenes==sid
+                result[mask]=values[mask][:,np.argsort(mapping[int(sid)]),:]
+        return result.reshape(len(ids),-1)
+    return SimpleNamespace(features=features),{str(sid):permutation.tolist() for sid,permutation in mapping.items()}
+
+
+def isometry_probe(model,corpus,data,config,cohorts,count):
+    from .relation_evaluate import QCache,planning_ids,rollout,safe_scores
+    result={}; archive={}; mappings={}
+    for name in cohorts:
+        rows=data['tasks_'+name]; truth=corpus.distance(rows[:,0],rows[:,1])
+        rows=rows[planning_ids(corpus,rows,truth,count,np.random.default_rng(config['seed']+len(name)))]; archive['queries_'+name]=rows
+        truth=corpus.distance(rows[:,0],rows[:,1]); children=corpus.successors(rows[:,0]); valid=children>=0
+        child_truth=np.full(children.shape,np.inf,dtype=np.float32)
+        child_truth[valid]=corpus.distance(children[valid],np.broadcast_to(rows[:,1,None],children.shape)[valid])
+        optimal=valid & (child_truth+1==truth[:,None]); index=np.arange(len(rows)); result[name]={}
+        base_prediction=base_choice=None
+        for variant in range(8):
+            view,mapping=isometry_feature_view(corpus,config['task'],variant,config['seed'])
+            mappings[str(variant)]=mapping
+            cache=QCache(model,view,'cpu'); predicted=cache.scores(rows[:,0],rows[:,1]); scores=safe_scores(cache,children,rows[:,1])
+            choice=scores.argmin(axis=1)
+            if variant==0: base_prediction,base_choice=predicted,choice
+            plan=rollout(corpus,cache,rows,config['evaluation']['horizon'],'q')
+            result[name][str(variant)]=dict(finite_mae=float(np.abs(predicted-truth).mean()),
+                prediction_shift_mae_from_identity=float(np.abs(predicted-base_prediction).mean()),
+                prediction_shift_max_from_identity=float(np.abs(predicted-base_prediction).max()),
+                chosen_action_agreement_with_identity=float((choice==base_choice).mean()),
+                true_optimal_action_rate=float(optimal[index,choice].mean()),
+                planning={key:plan[key] for key in ('count','unique_state_goal_pairs','solved','success_rate','optimal','optimal_rate','cycles','entered_unreachable')})
+            archive['predictions_'+name+'_'+str(variant)]=predicted
+            archive['choices_'+name+'_'+str(variant)]=choice
+    return dict(cohorts=result,channel_mappings=mappings,
+        condition=('Validation-only input-isometry diagnosis. Sokoban variant k rotates the complete board90*(k mod4) degrees counterclockwise, then reflects columns for k>=4; all four channels move together. Rush Hour variants jointly rename only existing ordinary vehicle labels, preserving A. Token variants jointly rename token identities on the fixed labelled tree. Variant0 is identity. Each feature transform is independent of query goal. Physics, oracle distances, complete targets and candidate multiplicity are preserved. Candidate order is transported from the original query to isolate encoding; this need not match a freshly enumerated transformed board tie order. These are diagnostic variations, not acceptance results or training augmentation.')),archive
+
+
 def near_endpoint_cases(corpus,partition,seed,count):
     """Fixed positive-distance validation cases, never extra training rows."""
     from grounded_llm.tasks.token_swapping.relation_data import rank
@@ -413,9 +484,24 @@ def main():
     parser.add_argument('--linf-witness-count',type=int,default=0)
     parser.add_argument('--near-endpoint-count',type=int,default=0)
     parser.add_argument('--policy-boundary-count',type=int,default=0)
+    parser.add_argument('--isometry-count',type=int,default=0)
     args=parser.parse_args(); config=json.loads(args.config.read_text())
     if args.out.exists(): raise FileExistsError('Keep previous diagnostics; choose a new output')
     corpus,data,_=load(config,args.run/'data')
+    if args.isometry_count:
+        if args.isometry_count<1 or not args.checkpoint: raise ValueError('Positive query count and checkpoint required')
+        if any('validation' not in name for name in args.cohorts): raise ValueError('Isometry diagnosis uses validation cohorts only')
+        import torch
+        from grounded_llm.core.qmap.model import StateEncoder
+        torch.set_num_threads(config['training']['cpu_threads'])
+        saved=torch.load(args.checkpoint,map_location='cpu',weights_only=False)
+        if saved['config']!=config: raise ValueError('Isometry checkpoint configuration mismatch')
+        model=StateEncoder(input_dim=corpus.input_dim,**config['model']); model.load_state_dict(saved['model']); model.requires_grad_(False); model.eval()
+        result,archive=isometry_probe(model,corpus,data,config,args.cohorts,args.isometry_count)
+        target=args.out.with_suffix('.queries.npz'); temporary=target.with_suffix('.tmp'); target.parent.mkdir(parents=True,exist_ok=True)
+        with temporary.open('wb') as stream: np.savez_compressed(stream,**archive)
+        temporary.replace(target)
+        atomic_json(args.out,dict(checkpoint_step=saved['step'],training_source_commit=saved['source_commit'],queries_archive=str(target),**result)); return
     if args.policy_boundary_count:
         if args.policy_boundary_count<1 or not args.checkpoint: raise ValueError('Positive query count and checkpoint required')
         if any('validation' not in name for name in args.cohorts): raise ValueError('Policy diagnosis uses validation cohorts only')

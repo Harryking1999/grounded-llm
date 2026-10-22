@@ -43,6 +43,50 @@ def small_oracle(path,n,edges):
 
 
 class ExactPairTests(unittest.TestCase):
+    def test_input_isometries_preserve_physics_and_complete_state_identity(self):
+        from experiments.new_tasks_qmap.src.relation_diagnose import isometry_feature_view
+        board=np.full((10,10),'#')
+        board[1:4,1:4]=' '; board[1,3]='.'; board[2,2]='$'; board[2,1]='@'
+        env=Sokoban([''.join(row) for row in board])
+        states,_,_=enumerate_component(env,env.start,1000)
+        corpus=SimpleNamespace(features=lambda ids:env.features([states[i] for i in ids]))
+        for variant in range(8):
+            grid=np.rot90(np.arange(100).reshape(10,10),variant%4)
+            transformed=np.rot90(board,variant%4)
+            if variant//4: grid=np.flip(grid,-1); transformed=np.flip(transformed,-1)
+            cell=np.empty(100,dtype=np.int64); cell[grid.ravel()]=np.arange(100)
+            def transform(state): return int(cell[state[0]]),tuple(sorted(map(int,cell[list(state[1])])) )
+            target=Sokoban([''.join(row) for row in transformed])
+            mapped=[transform(state) for state in states]
+            view,_=isometry_feature_view(corpus,'sokoban',variant,31)
+            np.testing.assert_array_equal(view.features(np.arange(len(states))),target.features(mapped))
+            self.assertEqual(len(set(mapped)),len(states))
+            for source,dest in zip(states,mapped):
+                self.assertEqual({transform(child) for _,child,cost in env.transitions(source) if cost==1},
+                                 {child for _,child,cost in target.transitions(dest) if cost==1})
+        env=RushHour(''.join(['..B...','..B...','AAB.C.','....C.','......','......']))
+        states,_,_=enumerate_component(env,env.start,1000)
+        corpus=SimpleNamespace(features=lambda ids:env.features([states[i] for i in ids]),
+            scenes=[SimpleNamespace(env=env)],locate=lambda ids:np.zeros(len(ids),dtype=int))
+        for variant in range(8):
+            view,mapping=isometry_feature_view(corpus,'rush_hour',variant,31)
+            names=str.maketrans({chr(65+i):chr(65+j) for i,j in enumerate(mapping['0'])})
+            def transform(state): return RushHour(''.join(env.render(state)).translate(names)).start
+            target=RushHour(''.join(env.render(env.start)).translate(names)); mapped=[transform(state) for state in states]
+            np.testing.assert_array_equal(view.features(np.arange(len(states))),target.features(mapped))
+            self.assertEqual(len(set(mapped)),len(states))
+            for source,dest in zip(states,mapped):
+                self.assertEqual({transform(child) for _,child,_ in env.transitions(source)},
+                                 {child for _,child,_ in target.transitions(dest)})
+        with tempfile.TemporaryDirectory() as tmp,ExitStack() as stack:
+            path=Path(tmp); small_oracle(path,3,[[0,1],[1,2]])
+            corpus=TokenCorpus(path); stack.callback(corpus.close); ids=np.arange(corpus.size)
+            for variant in range(8):
+                view,mapping=isometry_feature_view(corpus,'token_swapping',variant,31)
+                mapped=rank(np.array(mapping['0'])[corpus.states])
+                np.testing.assert_array_equal(view.features(ids),corpus.features(mapped))
+                np.testing.assert_array_equal(corpus.distance(ids[:,None],ids[None,:]),corpus.distance(mapped[:,None],mapped[None,:]))
+
     def test_fixed_near_validation_pairs_have_exact_distances_and_held_endpoints(self):
         from experiments.new_tasks_qmap.src.relation_diagnose import near_endpoint_cases
         with tempfile.TemporaryDirectory() as tmp, ExitStack() as stack:

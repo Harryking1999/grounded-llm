@@ -7,6 +7,34 @@ from grounded_llm.core.files import atomic_json
 from .relation_data import load
 
 
+def encoder_axes(model,corpus,data,config,cohorts):
+    """Observed max-coordinate usage is diagnostic, not an impossibility proof."""
+    import torch
+    from .relation_evaluate import QCache
+    model.eval(); cache=QCache(model,corpus,next(model.parameters()).device)
+    rng=np.random.default_rng(config['seed']+219); result={}
+    for name in cohorts:
+        rows=data['tasks_'+name]
+        if len(rows)>config['evaluation']['decision_count']:
+            rows=rows[rng.choice(len(rows),config['evaluation']['decision_count'],replace=False)]
+        rows=rows[rows[:,0]!=rows[:,1]]
+        with torch.no_grad():
+            source=cache.q(rows[:,0]).cpu().numpy(); goal=cache.q(rows[:,1]).cpu().numpy()
+        difference=source-goal
+        if config['model']['metric']=='linf': difference=np.abs(difference)
+        elif config['model']['metric']!='directed_max': raise ValueError('Axis probe requires max-coordinate metric')
+        counts=np.bincount(difference.argmax(axis=1),minlength=source.shape[1]); weights=counts[counts>0]/counts.sum()
+        endpoints=np.concatenate([source,goal]); std=endpoints.std(axis=0)
+        result[name]=dict(pairs=len(rows),winning_dimension_counts=counts.tolist(),
+            active_winning_dimensions=int((counts>0).sum()),
+            effective_winning_dimensions=float(np.exp(-(weights*np.log(weights)).sum())),
+            top_four_winner_fraction=float(np.sort(counts)[-4:].sum()/counts.sum()),
+            coordinate_standard_deviation_quantiles={str(q):float(np.quantile(std,q)) for q in (0,.5,.9,1)},
+            fraction_near_sigmoid_boundary=float(((endpoints<model.cap*1e-4)|(endpoints>model.cap*(1-1e-4))).mean()),
+            interpretation='Winning-coordinate counts across these queries do not measure full network capacity or prove a dimension limit. They can reveal sparse use or saturation of the max-distance readout.')
+    return result
+
+
 def geometry(corpus,data,config,cohorts):
     """Compare exact shortest-path landmark coordinates to the model's metric.
 
@@ -76,10 +104,20 @@ def main():
     parser.add_argument('--run',type=Path,required=True)
     parser.add_argument('--out',type=Path,required=True)
     parser.add_argument('--cohorts',nargs='+',default=['validation'])
+    parser.add_argument('--checkpoint',type=Path)
     args=parser.parse_args(); config=json.loads(args.config.read_text())
     corpus,data,_=load(config,args.run/'data')
-    atomic_json(args.out,dict(teacher_only=True,used_by_encoder_or_planner=False,
-        geometry=geometry(corpus,data,config,args.cohorts)))
+    result=dict(teacher_only=True,used_by_encoder_or_planner=False,geometry=geometry(corpus,data,config,args.cohorts))
+    if args.checkpoint:
+        import torch
+        from grounded_llm.core.qmap.model import StateEncoder
+        saved=torch.load(args.checkpoint,map_location='cpu',weights_only=False)
+        if saved['config']!=config: raise ValueError('Diagnostic checkpoint configuration mismatch')
+        torch.set_num_threads(config['training']['cpu_threads'])
+        model=StateEncoder(input_dim=corpus.input_dim,**config['model']); model.load_state_dict(saved['model'])
+        model.requires_grad_(False)
+        result.update(checkpoint_step=saved['step'],encoder_axes=encoder_axes(model,corpus,data,config,args.cohorts))
+    atomic_json(args.out,result)
 
 
 if __name__=='__main__': main()

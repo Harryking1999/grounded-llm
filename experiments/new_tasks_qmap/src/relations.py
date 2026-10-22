@@ -36,7 +36,7 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
             raise ValueError('Prepared relation reference changes task, seed or fixed splits')
         if {k:v for k,v in previous['data'].items() if k!='prepared_from'}!={k:v for k,v in config['data'].items() if k!='prepared_from'}:
             raise ValueError('Prepared relation reference changes physical data scope')
-        (out/'data').symlink_to(source,target_is_directory=True)
+        (out/'data').symlink_to(reference,target_is_directory=True)
     prepared=time.monotonic()
     corpus,data,description=(load(config,out/'data') if (out/'data'/'relations.npz').exists() else prepare(config,out/'data'))
     preparation_seconds=time.monotonic()-prepared

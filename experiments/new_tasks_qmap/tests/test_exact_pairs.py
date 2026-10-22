@@ -142,7 +142,7 @@ class ExactPairTests(unittest.TestCase):
             np.testing.assert_array_equal(corpus.distance(np.arange(24),np.arange(24)),np.zeros(24))
 
     def test_teacher_landmark_probe_is_exact_with_complete_bank(self):
-        from experiments.new_tasks_qmap.src.relation_diagnose import geometry
+        from experiments.new_tasks_qmap.src.relation_diagnose import geometry,encoder_axes
         with tempfile.TemporaryDirectory() as tmp, ExitStack() as stack:
             path=Path(tmp); small_oracle(path,4,[[0,1],[1,2],[1,3]])
             corpus=TokenCorpus(path); stack.callback(corpus.close)
@@ -153,6 +153,10 @@ class ExactPairTests(unittest.TestCase):
             result=geometry(corpus,data,config,['validation'])['validation']
             self.assertEqual(result['finite_mae'],0)
             self.assertEqual(result['shortest_action_rate'],1)
+            model=StateEncoder(128,16,64,'linf',input_dim=16)
+            axes=encoder_axes(model,corpus,data,config,['validation'])['validation']
+            self.assertEqual(sum(axes['winning_dimension_counts']),24*23)
+            self.assertTrue(1<=axes['effective_winning_dimensions']<=128)
             config['evaluation']['landmarks']=2
             self.assertLess(geometry(corpus,data,config,['validation'])['validation']['query_goal_in_landmarks'],len(rows))
 

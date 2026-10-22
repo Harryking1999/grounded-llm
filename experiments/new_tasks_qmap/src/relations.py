@@ -39,8 +39,8 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
     options=config['training']
     torch.set_num_threads(options['cpu_threads']); torch.manual_seed(config['seed'])
     rng=np.random.default_rng(config['seed']+2)
-    if torch.device(device).type=='cuda': torch.cuda.reset_peak_memory_stats(device)
     model=StateEncoder(input_dim=corpus.input_dim,**config['model']).to(device)
+    if torch.device(device).type=='cuda': torch.cuda.reset_peak_memory_stats(device)
     optimizer=torch.optim.Adam(model.parameters(),lr=options['learning_rate'])
     point_truth=data['pair_distances_train']
     point_labels=np.where(np.isfinite(point_truth),point_truth,options['unreachable_target']).astype(np.float32)

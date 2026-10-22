@@ -1,5 +1,6 @@
 """Capacity-two bridge and torch; cost is the slower traveller's time."""
 from itertools import combinations
+from functools import cached_property
 import numpy as np
 from grounded_llm.core.qmap.exact_graph import goal_distances
 
@@ -10,17 +11,30 @@ class Bridge:
             raise ValueError("Crossing times must be positive")
         self.times = tuple(times)
         self.n = len(times)
-        self.actions = tuple(combinations(range(self.n), 1)) + tuple(combinations(range(self.n), 2))
         self.goal = ((1 << self.n) - 1) * 2 + 1
+
+    @cached_property
+    def actions(self):
+        return tuple(combinations(range(self.n), 1)) + tuple(combinations(range(self.n), 2))
+
+    def apply(self, state, people):
+        """Replay a supplied crossing without enumerating all O(n^2) candidates."""
+        if (not 1 <= len(people) <= 2 or len(set(people)) != len(people)
+                or any(type(p) is not int or not 0 <= p < self.n for p in people)):
+            raise ValueError('Expected one or two distinct valid person IDs')
+        mask, side = divmod(state, 2)
+        if not all(((mask >> p) & 1) == side for p in people):
+            raise ValueError('Travellers must be on the torch bank')
+        for p in people:
+            mask ^= 1 << p
+        return mask * 2 + 1 - side, max(self.times[p] for p in people)
 
     def transitions(self, state):
         mask, side = divmod(state, 2)
         for a, people in enumerate(self.actions):
             if all(((mask >> p) & 1) == side for p in people):
-                moved = mask
-                for p in people:
-                    moved ^= 1 << p
-                yield a, moved * 2 + 1 - side, max(self.times[p] for p in people)
+                target, cost = self.apply(state, people)
+                yield a, target, cost
 
     def features(self, states):
         return np.asarray([[*self.times, *[(s // 2 >> p) & 1 for p in range(self.n)], s % 2]

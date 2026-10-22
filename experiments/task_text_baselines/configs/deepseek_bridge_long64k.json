@@ -1,0 +1,28 @@
+{
+  "study": "adaptive_complete_plan_difficulty",
+  "policy": "first_valid_model_error_per_task",
+  "seed": 2026102205,
+  "api_config": "experiments/task_text_baselines/configs/deepseek_new_tasks_64k.json",
+  "baseline_run": "runs/deepseek_new_tasks_64k",
+  "source_cache": "tmp/new_tasks_harder_sources",
+  "cases_per_level": 3,
+  "confirmation_cases": 3,
+  "concurrency": 1,
+  "initial_levels": {
+    "bridge": 0
+  },
+  "tasks": {
+    "bridge": {
+      "people_counts": [
+        256,
+        512,
+        1024,
+        2048,
+        4096
+      ],
+      "max_time": 100000
+    }
+  },
+  "comparison": "Continuation after21/21 bridge cases through128 people were completed optimally. Same all-left/capacity-two/positive-time rules, complete plan, no tools or feedback, Flash high and64k output cap. Increase only people count and retain shuffled distinct positive times. This is explicitly a long-plan stress test, not a tractable full-state Qmap dataset. Stop at the first valid failure; distinguish illegal execution, incomplete goal and budget truncation. Each level has at most3 sequential cases. Reference optimum follows the verified capacity-two recurrence. Preserve all prior results; no valid answer resampling.",
+  "prior_completed_run": "runs/deepseek_new_tasks_harder64k"
+}

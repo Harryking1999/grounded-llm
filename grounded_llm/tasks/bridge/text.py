@@ -26,12 +26,8 @@ def initial(case):
 def step(case, state, action):
     if not isinstance(action, list) or not 1 <= len(action) <= 2 or any(type(x) is not int for x in action):
         raise ValueError('Expected one or two integer person IDs')
-    key = tuple(sorted(action))
     env = environment(tuple(case['times']))
-    for index, target, cost in env.transitions(state):
-        if env.actions[index] == key:
-            return target, cost
-    raise ValueError('Travellers must be distinct people on the torch bank')
+    return env.apply(state, action)
 
 
 def solved(case, state):

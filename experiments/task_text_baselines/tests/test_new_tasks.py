@@ -27,6 +27,12 @@ class NewTaskTextTest(unittest.TestCase):
                 self.assertEqual(env.graph()['distances'][0], cost)
                 self.assertTrue(env.judge(actions)['optimal'])
 
+    def test_direct_bridge_replay_matches_enumerated_transitions(self):
+        env = Bridge([3, 1, 8, 2, 5])
+        for state in range(2 ** (env.n + 1)):
+            for action, target, cost in env.transitions(state):
+                self.assertEqual(env.apply(state, env.actions[action]), (target, cost))
+
     def test_push_solver_witness_and_unknown_move_optimum(self):
         board = ['######', '# .  #', '# $$ #', '# @. #', '#    #', '######']
         env = Sokoban(board)

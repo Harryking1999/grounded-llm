@@ -116,7 +116,10 @@ class BoardRelationSampler:
             for j,g in enumerate(scene.goals[:scene.metadata['training_goals']]):
                 source=np.flatnonzero(np.isfinite(scene.distances[j]))+offset; goal=np.full(len(source),g+offset)
                 labels=scene.distances[j,source-offset]
-                safe=(self.point_index[source]>=0) & ~forbidden(keys(source,goal,corpus.size))
+                # Q(s) versus itself is identically zero under the distance
+                # readout; do not spend the supplemental quota on zero-gradient
+                # identity pairs. Incidental zeros remain in broad traversal.
+                safe=(self.point_index[source]>=0) & (labels>0) & ~forbidden(keys(source,goal,corpus.size))
                 points.append(np.column_stack([source[safe],goal[safe]])); point_labels.append(labels[safe])
                 safe=(self.rank_index[source]>=0) & (labels>0) & ~forbidden(keys(source,goal,corpus.size))
                 source,goal,labels=source[safe],goal[safe],labels[safe]
@@ -145,6 +148,7 @@ class BoardRelationSampler:
             point_stratum_counts=counts(point_labels,np.ones(len(point_labels),bool)),boundary_stratum_counts=counts(rank_labels,boundary),
             nonboundary_stratum_counts=counts(rank_labels,~boundary),options=options,
             broad_source_fraction=1-self.finite_fraction,all_legal_candidates_preserved=True,
+            finite_supplement_excludes_identity_pairs=True,
             holdout_closure_excluded=True,banks_use_only_original_training_source_rows=True)
 
     @staticmethod

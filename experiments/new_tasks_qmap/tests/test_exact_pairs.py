@@ -64,6 +64,7 @@ class ExactPairTests(unittest.TestCase):
         data=dict(pairs_train=pairs,tasks_train=rank['tasks'],reserved_relations=np.array([],dtype=np.int64))
         options=dict(finite_point_fraction=.75,boundary_rank_fraction=.5,distance_bin_upper_bounds=[0,1,2,5,10,20,40,80,128])
         sampler=BoardRelationSampler(corpus,data,options); rng=np.random.default_rng(7)
+        self.assertTrue((corpus.distance(sampler.points[:,0],sampler.points[:,1])>0).all())
         source_sampler=CoverageSampler(truth,rng,len(pairs),1.)
         for _ in range(10):
             p,r,point,task=sampler.draw(source_sampler,64,32,rng)

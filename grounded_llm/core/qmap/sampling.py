@@ -77,6 +77,14 @@ class StratifiedEpochSampler:
         self.rng.shuffle(result)
         return result
 
+    def state_dict(self):
+        return {key: value for key, value in self.__dict__.items() if key != 'rng'}
+
+    def load_state_dict(self, state):
+        if not np.array_equal(state['levels'], self.levels):
+            raise ValueError('Sampler distance layers changed during resume')
+        self.__dict__.update(state)
+
 
 class CoverageSampler:
     def __init__(self, labels, rng, broad_count, broad_fraction, context_start=None, context_fraction=0):
@@ -117,6 +125,15 @@ class CoverageSampler:
         result = np.concatenate(pieces)
         self.rng.shuffle(result)
         return result
+
+    def state_dict(self):
+        return {key: value for key, value in self.__dict__.items() if key != 'rng'}
+
+    def load_state_dict(self, state):
+        for key in ('count','broad_count','broad_fraction','context_fraction','context_start'):
+            if state[key] != getattr(self,key):
+                raise ValueError('Coverage sampler configuration changed during resume')
+        self.__dict__.update(state)
 
 
 def draw(groups, size, device):

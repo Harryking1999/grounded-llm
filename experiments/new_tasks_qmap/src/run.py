@@ -100,8 +100,16 @@ def main():
     parser.add_argument('--out', required=True, type=Path)
     parser.add_argument('--source-commit', required=True)
     parser.add_argument('--device', default='cpu')
+    parser.add_argument('--resume', action='store_true')
+    parser.add_argument('--prepare-only', action='store_true')
     args = parser.parse_args()
-    train(json.loads(args.config.read_text()), args.out, args.source_commit, args.device)
+    config=json.loads(args.config.read_text())
+    if config.get('schema')=='exact_state_pairs':
+        from .relations import train as train_pairs
+        train_pairs(config,args.out,args.source_commit,args.device,args.resume,args.prepare_only)
+    else:
+        if args.resume or args.prepare_only: raise ValueError('Legacy fixed-goal pilot does not support these options')
+        train(config, args.out, args.source_commit, args.device)
 
 
 if __name__ == '__main__': main()

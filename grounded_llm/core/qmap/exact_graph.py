@@ -27,3 +27,22 @@ def goal_distances(children, costs, terminal):
                 distances[source] = candidate
                 heapq.heappush(queue, (candidate, source))
     return distances
+
+
+class UnitGraphOracle:
+    """Complete unit-cost graph; infinity means exhausted graph, never timeout."""
+    def __init__(self, children):
+        from scipy.sparse import csr_matrix
+        children = np.asarray(children)
+        rows, columns = np.nonzero(children >= 0)
+        self.forward = csr_matrix((np.ones(len(rows), dtype=np.int8),
+                                   (rows, children[rows, columns])), shape=(len(children), len(children)))
+        self.reverse = self.forward.transpose().tocsr()
+
+    def to_goal(self, goal):
+        from scipy.sparse.csgraph import shortest_path
+        return shortest_path(self.reverse, directed=True, unweighted=True, indices=int(goal)).astype(np.float32)
+
+    def from_goal(self, goal):
+        from scipy.sparse.csgraph import shortest_path
+        return shortest_path(self.forward, directed=True, unweighted=True, indices=int(goal)).astype(np.float32)

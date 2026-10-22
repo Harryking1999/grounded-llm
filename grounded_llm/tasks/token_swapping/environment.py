@@ -1,5 +1,6 @@
 """Unit-cost sequential adjacent swaps; complete labelled permutations only."""
 import time
+import numpy as np
 
 
 class TokenSwapping:
@@ -12,6 +13,19 @@ class TokenSwapping:
             raise ValueError('Invalid graph edge')
         self.edge_set = set(self.edges)
         self.goal = tuple(range(self.n))
+
+    def validate(self, state):
+        if any(type(v) is not int for v in state) or sorted(state) != list(self.goal):
+            raise ValueError('Expected a complete integer token permutation')
+
+    def features(self, states):
+        return np.eye(self.n, dtype=np.float32)[np.asarray(states, dtype=np.int64)].reshape(len(states), -1)
+
+    def transitions(self, state):
+        for edge in self.edges:
+            action = list(edge)
+            child, cost = self.apply(state, action)
+            yield action, child, cost
 
     def relative_permutation(self, source, goal):
         """Relabel tokens so the specified goal becomes the canonical home state."""

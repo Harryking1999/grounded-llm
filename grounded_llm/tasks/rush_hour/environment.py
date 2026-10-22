@@ -1,5 +1,6 @@
 """Fogleman six-by-six Rush Hour; a slide of any legal length costs one move."""
 from collections import deque
+import numpy as np
 
 
 class RushHour:
@@ -28,6 +29,29 @@ class RushHour:
         for i, position in enumerate(state):
             occupied |= self.masks[i][position]
         return occupied
+
+    def validate(self, state):
+        if len(state) != len(self.pieces):
+            raise ValueError('Vehicle count differs from the scene catalogue')
+        occupied = self.walls
+        for i, position in enumerate(state):
+            if type(position) is not int or not 0 <= position < len(self.masks[i]):
+                raise ValueError('Vehicle position outside its lane')
+            mask = self.masks[i][position]
+            if occupied & mask:
+                raise ValueError('Vehicles overlap another vehicle or wall')
+            occupied |= mask
+
+    def features(self, states):
+        """A-Z identity channels, with full geometry and no query-goal conditioning."""
+        out = np.zeros((len(states), 26, 36), dtype=np.float32)
+        if len(states):
+            positions=np.asarray(states,dtype=np.int64)
+            for i,(label,horizontal,size,lane) in enumerate(self.pieces):
+                axis=positions[:,i,None]+np.arange(size)[None,:]
+                cells=lane*6+axis if horizontal else axis*6+lane
+                out[np.arange(len(states))[:,None],ord(label)-ord('A'),cells]=1
+        return out.reshape(len(states), -1)
 
     def transitions(self, state):
         occupied = self.occupancy(state)

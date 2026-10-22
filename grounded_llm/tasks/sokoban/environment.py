@@ -47,15 +47,26 @@ class Sokoban:
     def terminal(self, state):
         return set(state[1]) == self.goals
 
+    def validate(self, state):
+        player, boxes = state
+        if (type(player) is not int or player not in self.floor or player in boxes
+                or len(boxes) != len(self.goals) or len(set(boxes)) != len(boxes)
+                or any(type(b) is not int or b not in self.floor for b in boxes)
+                or tuple(boxes) != tuple(sorted(boxes))):
+            raise ValueError('Expected one player and a sorted box set on distinct floor cells')
+
     def features(self, states):
         area = self.height * self.width
         out = np.zeros((len(states), 4, area), dtype=np.float32)
         walls = list(set(range(area)) - self.floor)
         out[:, 0, walls] = 1
         out[:, 1, list(self.goals)] = 1
-        for i, (player, boxes) in enumerate(states):
-            out[i, 2, list(boxes)] = 1
-            if player >= 0: out[i, 3, player] = 1
+        if len(states):
+            players=np.fromiter((s[0] for s in states),dtype=np.int64,count=len(states))
+            boxes=np.asarray([s[1] for s in states],dtype=np.int64)
+            out[np.arange(len(states))[:,None],2,boxes]=1
+            valid=players>=0
+            out[np.flatnonzero(valid),3,players[valid]]=1
         return out.reshape(len(states), -1)
 
     def graph(self):

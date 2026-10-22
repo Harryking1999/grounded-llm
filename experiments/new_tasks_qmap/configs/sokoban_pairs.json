@@ -1,0 +1,77 @@
+{
+  "task": "sokoban",
+  "seed": 2026102302,
+  "data": {
+    "source_url": "https://raw.githubusercontent.com/google-deepmind/boxoban-levels/78011d8c86ad423bfb2e1005012393b4c3c24409/hard/000.txt",
+    "source_commit": "78011d8c86ad423bfb2e1005012393b4c3c24409",
+    "source_cache": "tmp/new_tasks_harder_sources",
+    "max_states": 500000,
+    "minimum_reachable_per_goal": 1,
+    "scenes": {
+      "train": 64,
+      "validation": 16,
+      "test": 16
+    },
+    "goals_per_scene": "all",
+    "training_goals": "all_except_heldout",
+    "diagnostic_goals": {
+      "359": [
+        75
+      ],
+      "362": [
+        77
+      ]
+    },
+    "heldout_goals": 2,
+    "split_fractions": [
+      0.7,
+      0.15,
+      0.15
+    ],
+    "diagnostic_suite": "runs/deepseek_exact_goals64k/suite.json",
+    "source_files": [
+      "hard/000.txt",
+      "hard/001.txt",
+      "hard/002.txt",
+      "hard/003.txt"
+    ]
+  },
+  "model": {
+    "dimension": 128,
+    "hidden": 256,
+    "cap": 256,
+    "metric": "directed_max"
+  },
+  "training": {
+    "steps": 60000,
+    "batch_size": 2048,
+    "decision_batch_size": 1024,
+    "learning_rate": 0.001,
+    "rank_weight": 1.0,
+    "rank_temperature": 1.0,
+    "eval_every": 5000,
+    "cpu_threads": 4,
+    "unreachable_target": 240.0,
+    "features_on_device": true,
+    "broad_fraction": 0.5,
+    "online_goals": true,
+    "record_training_samples": true
+  },
+  "relations": {
+    "holdout_per_goal": 16,
+    "evaluation_per_goal": 64,
+    "unreachable_eval_per_goal": 24,
+    "complete_training_sources": true,
+    "evaluation_training_goals": 8
+  },
+  "evaluation": {
+    "decision_count": 2048,
+    "rollout_count": 1024,
+    "horizon": 256,
+    "landmarks": 128
+  },
+  "schema": "exact_state_pairs",
+  "selection": "Lowest validation finite Huber plus candidate soft-rank CE, equally averaging predeclared validation cohorts; no test checkpoint selection.",
+  "scope": "Independent Q(S), Q(G); exact complete goals only; no oracle in inference features, no pruning, no search, no LLM retraining.",
+  "acceptance": "experiments/new_tasks_qmap/configs/exact_pair_acceptance.json"
+}

@@ -7,6 +7,7 @@ from pathlib import Path
 import tempfile
 import shutil
 import unittest
+from types import SimpleNamespace
 from unittest.mock import patch
 import numpy as np
 import torch
@@ -42,6 +43,50 @@ def small_oracle(path,n,edges):
 
 
 class ExactPairTests(unittest.TestCase):
+    def test_actual_batch_stream_counts_and_full_legal_boundary_coverage(self):
+        from experiments.new_tasks_qmap.src.relation_diagnose import stream_statistics,batch_gradient_probe
+        env=Sokoban(['#####','#@$.#','#   #','#####'])
+        states=[(p,b) for b in combinations(sorted(env.floor),1) for p in sorted(env.floor) if p not in b]
+        index={s:i for i,s in enumerate(states)}
+        children=np.full((len(states),4),-1,dtype=np.int32)
+        for i,s in enumerate(states):
+            for a,t,_ in env.transitions(s): children[i,a]=index[t]
+        goal=index[(7,(8,))]; truth=UnitGraphOracle(children).to_goal(goal)
+        scene=SimpleNamespace(states=np.arange(len(states)),goals=np.array([goal]),children=children,
+            distances=truth[None],metadata=dict(split='train',training_goals=1),
+            features=lambda ids:np.eye(len(states),dtype=np.float32)[ids],
+            distance=lambda s,g:truth[s])
+        corpus=PhysicalCorpus([scene]); parents=np.flatnonzero(np.isfinite(truth)&(truth>0))
+        pairs=np.column_stack([np.arange(len(states)),np.full(len(states),goal)])
+        rank=materialize(corpus,np.column_stack([parents,np.full(len(parents),goal)]))
+        row=dict(pairs=pairs,point_distance=truth,tasks=rank['tasks'],children=rank['children'],
+            child_distance=rank['child_distances'],parent_distance=rank['distances'],optimal=rank['optimal'])
+        with tempfile.TemporaryDirectory() as tmp:
+            path=Path(tmp); shard=path/'samples/attempt_000'; shard.mkdir(parents=True)
+            packed={key:np.concatenate([value,value]) for key,value in row.items()}
+            packed.update(point_step=np.repeat([1,2],len(pairs)),rank_step=np.repeat([1,2],len(parents)))
+            np.savez(shard/'00000.npz',**packed)
+            result=stream_statistics(corpus,dict(reserved_relations=np.array([],dtype=np.int64)),path,path/'audit.json')
+            self.assertEqual(result['actual_batches'],2)
+            self.assertEqual(result['point_finite_fraction'],np.isfinite(truth).mean())
+            self.assertEqual(result['ranking_relation_coverage'],1)
+            self.assertGreater(result['totals']['boundary_decisions'],0)
+            self.assertEqual(result['totals']['rows_without_optimal'],0)
+            packed['children']=packed['children'].copy(); packed['children'][0,:]=-1
+            np.savez(shard/'00000.npz',**packed)
+            with self.assertRaisesRegex(ValueError,'Missing legal'): stream_statistics(corpus,dict(reserved_relations=np.array([],dtype=np.int64)),path,path/'bad.json')
+        model=StateEncoder(128,16,32,'directed_max',input_dim=len(states))
+        config=dict(training=dict(unreachable_target=30.,rank_temperature=1.,rank_weight=1.))
+        result=batch_gradient_probe(model,corpus,row,config)
+        self.assertGreater(result['components']['finite_point']['gradient_l2'],0)
+        self.assertGreater(result['components']['unreachable_point']['gradient_l2'],0)
+        self.assertAlmostEqual(sum(v['projection_on_total'] for v in result['components'].values()),1,places=5)
+        self.assertLessEqual(result['point_huber_abs_derivative_mean']['unreachable'],1)
+        qa=model.encode(torch.as_tensor(corpus.features(pairs[:,0])))
+        qg=model.encode(torch.as_tensor(corpus.features(pairs[:,1])))
+        loss=torch.nn.functional.smooth_l1_loss(model.distance(qa,qg),torch.as_tensor(np.where(np.isfinite(truth),truth,30.)))
+        self.assertAlmostEqual(float(loss.detach()),sum(result['components'][k]['weighted_loss'] for k in ('finite_point','unreachable_point')),places=5)
+
     def test_output_scale_and_interval_diagnostics_keep_physical_units(self):
         from experiments.new_tasks_qmap.src.relation_evaluate import coordinate_statistics
         outputs=[]; slopes=[]

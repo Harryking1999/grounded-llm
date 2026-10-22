@@ -1,10 +1,168 @@
 """Teacher-only geometry probes; these vectors are never inference features."""
 import argparse
+import csv
+import gzip
 import json
 from pathlib import Path
 import numpy as np
 from grounded_llm.core.files import atomic_json
 from .relation_data import load
+
+
+def _popcount(values):
+    table=np.asarray([i.bit_count() for i in range(256)],dtype=np.uint8)
+    return int(table[values.view(np.uint8)].sum(dtype=np.int64))
+
+
+def stream_statistics(corpus,data,run,out):
+    """Actual saved batches, not proposed sampler quotas or whole-graph priors."""
+    if not hasattr(corpus,'scenes') or any(len(s.goals)>32 for s in corpus.scenes):
+        raise ValueError('This exact goal-bit coverage probe is for the Sokoban goal bank')
+    from .relation_data import keys
+    reserved=data['reserved_relations']
+    def forbidden(values):
+        if not len(reserved): return np.zeros(values.shape,dtype=bool)
+        at=np.searchsorted(reserved,values)
+        return (at<len(reserved)) & (reserved[np.minimum(at,len(reserved)-1)]==values)
+    columns=np.full(corpus.size,-1,dtype=np.int8)
+    eligible=np.zeros(corpus.size,dtype=np.uint32); seen=np.zeros_like(eligible)
+    for sid,scene in enumerate(corpus.scenes):
+        offset=corpus.offsets[sid]; columns[scene.goals+offset]=np.arange(len(scene.goals))
+        if scene.metadata['split']!='train': continue
+        nt=scene.metadata['training_goals']; blocked=scene.goals[nt:]
+        safe=~np.isin(np.arange(len(scene.states)),blocked) & ~np.isin(scene.children,blocked).any(axis=1)
+        for j,g in enumerate(scene.goals[:nt]):
+            s=np.flatnonzero(safe & np.isfinite(scene.distances[j]) & (scene.distances[j]>0))+offset
+            children=corpus.successors(s); valid=children>=0; target=np.full(len(s),g+offset)
+            bad=forbidden(keys(s,target,corpus.size))
+            relation=np.full(children.shape,-1,dtype=np.int64)
+            relation[valid]=keys(children[valid],np.broadcast_to(target[:,None],children.shape)[valid],corpus.size)
+            bad|=forbidden(relation).any(axis=1)
+            eligible[s[~bad]]|=np.uint32(1)<<np.uint32(j)
+    files=sorted(Path(run).glob('samples/attempt_*/*.npz'))
+    if not files: raise ValueError('No actual saved training sample shards')
+    csv_path=Path(out).with_suffix('.csv.gz'); csv_path.parent.mkdir(parents=True,exist_ok=True)
+    fields=['attempt','step','point_rows','point_finite','point_infinite','rank_rows','legal_candidates',
+            'candidate_finite','candidate_infinite','boundary_decisions','optimal_candidates','rows_without_optimal']
+    intervals=[(0,0),(1,1),(2,2),(3,5),(6,10),(11,20),(21,40),(41,80),(81,np.inf)]
+    bin_names=[f'{a}_{b}' for a,b in intervals]
+    fields += ['point_distance_'+name for name in bin_names]+['rank_distance_'+name for name in bin_names]
+    totals={key:0 for key in fields if key not in ('attempt','step')}
+    proportions={'point_finite':[],'boundary_decisions':[],'candidate_infinite':[]}
+    steps=[]; attempts=set()
+    with gzip.open(csv_path,'wt',newline='',compresslevel=1) as stream:
+        writer=csv.DictWriter(stream,fieldnames=fields); writer.writeheader()
+        for path in files:
+            with np.load(path) as archive: x={key:archive[key] for key in ('point_step','point_distance','pairs','rank_step','tasks','children','child_distance','parent_distance','optimal')}
+            children=x['children']; valid=children>=0
+            if not np.array_equal(children,corpus.successors(x['tasks'][:,0])): raise ValueError(('Missing legal training candidate',path))
+            if not np.array_equal(x['point_distance'],corpus.distance(x['pairs'][:,0],x['pairs'][:,1])): raise ValueError(('Point labels changed scale or identity',path))
+            if not np.array_equal(x['child_distance'][valid],corpus.distance(children[valid],np.broadcast_to(x['tasks'][:,1,None],children.shape)[valid])): raise ValueError(('Child labels changed scale or identity',path))
+            parent=corpus.distance(x['tasks'][:,0],x['tasks'][:,1])
+            if not np.array_equal(x['parent_distance'],parent): raise ValueError(('Parent labels changed scale or identity',path))
+            if not np.array_equal(x['optimal'],valid & np.isfinite(x['child_distance']) & (x['child_distance']+1==parent[:,None])):
+                raise ValueError(('Optimal candidate mask changed',path))
+            goals=columns[x['tasks'][:,1]]
+            if (goals<0).any(): raise ValueError('Unknown complete training goal')
+            np.bitwise_or.at(seen,x['tasks'][:,0],np.left_shift(np.uint32(1),goals.astype(np.uint32)))
+            p_steps,p_start,p_count=np.unique(x['point_step'],return_index=True,return_counts=True)
+            r_steps,r_start,r_count=np.unique(x['rank_step'],return_index=True,return_counts=True)
+            if not np.array_equal(p_steps,r_steps): raise ValueError('Point and ranking batch identities differ')
+            for step,p0,np_,r0,nr in zip(p_steps,p_start,p_count,r_start,r_count):
+                pd=x['point_distance'][p0:p0+np_]; cd=x['child_distance'][r0:r0+nr]; mask=valid[r0:r0+nr]
+                rd=x['parent_distance'][r0:r0+nr]; optimum=x['optimal'][r0:r0+nr] & mask
+                finite=np.isfinite(cd) & mask; dead=~np.isfinite(cd) & mask
+                row=dict(attempt=path.parent.name,step=int(step),point_rows=int(np_),point_finite=int(np.isfinite(pd).sum()),
+                    point_infinite=int((~np.isfinite(pd)).sum()),rank_rows=int(nr),legal_candidates=int(mask.sum()),
+                    candidate_finite=int(finite.sum()),candidate_infinite=int(dead.sum()),
+                    boundary_decisions=int((finite.any(axis=1)&dead.any(axis=1)).sum()),
+                    optimal_candidates=int(optimum.sum()),rows_without_optimal=int((~optimum.any(axis=1)).sum()))
+                for name,(a,b) in zip(bin_names,intervals):
+                    row['point_distance_'+name]=int((np.isfinite(pd)&(pd>=a)&(pd<=b)).sum())
+                    row['rank_distance_'+name]=int((np.isfinite(rd)&(rd>=a)&(rd<=b)).sum())
+                writer.writerow(row)
+                for key in totals: totals[key]+=row[key]
+                proportions['point_finite'].append(row['point_finite']/row['point_rows'])
+                proportions['boundary_decisions'].append(row['boundary_decisions']/row['rank_rows'])
+                proportions['candidate_infinite'].append(row['candidate_infinite']/row['legal_candidates'])
+                steps.append(int(step)); attempts.add(path.parent.name)
+    if np.bitwise_and(seen,np.bitwise_not(eligible)).any(): raise ValueError('Ranking relation outside the declared training closure')
+    available=_popcount(eligible); actual=_popcount(seen)
+    return dict(actual_batches=len(steps),first_step=min(steps),last_step=max(steps),attempts=sorted(attempts),
+        per_batch_csv=str(csv_path),totals=totals,
+        point_finite_fraction=totals['point_finite']/totals['point_rows'],
+        boundary_decision_fraction=totals['boundary_decisions']/totals['rank_rows'],
+        unique_ranking_source_goal_pairs=actual,eligible_ranking_source_goal_pairs=available,
+        ranking_relation_coverage=actual/available,
+        all_actual_point_and_child_labels_equal_physical_oracle=True,all_legal_candidates_preserved=True,
+        per_batch_fractions={key:dict(mean=float(np.mean(values)),quantiles={str(q):float(np.quantile(values,q)) for q in (0,.1,.5,.9,1)}) for key,values in proportions.items()},
+        note='Each CSV row is one saved actual optimizer batch. Repeated steps across attempts are retained explicitly. No historical per-step gradient was recorded or reconstructed here.')
+
+
+def batch_gradient_probe(model,corpus,batch,config):
+    """Loss components on one actual batch at fixed weights, without an update."""
+    import torch
+    from torch.nn import functional as F
+    from grounded_llm.core.qmap.model import soft_rank_loss
+    device=next(model.parameters()).device; model.eval()
+    pairs=batch['pairs']; tasks=batch['tasks']; children=batch['children']; valid=children>=0
+    ids=np.concatenate([pairs[:,0],pairs[:,1],children[valid],tasks[:,1]])
+    unique,inverse=np.unique(ids,return_inverse=True)
+    vectors=model.encode(torch.as_tensor(corpus.features(unique),device=device))
+    b=len(pairs); nchild=int(valid.sum()); options=config['training']
+    predictions=model.distance(vectors[inverse[:b]],vectors[inverse[b:2*b]])
+    finite=np.isfinite(batch['point_distance']); mask=torch.as_tensor(finite,device=device)
+    targets=np.where(finite,batch['point_distance'],options['unreachable_target']).astype(np.float32)
+    per_point=F.smooth_l1_loss(predictions,torch.as_tensor(targets,device=device),reduction='none')
+    child=vectors[inverse[2*b:2*b+nchild]]; goal=vectors[inverse[2*b+nchild:]]
+    legal=torch.as_tensor(valid,device=device); scores=torch.zeros(children.shape,device=device)
+    scores[legal]=1+model.distance(child,goal[:,None].expand(-1,children.shape[1],-1)[legal])
+    truth=np.where(np.isfinite(batch['child_distance']),batch['child_distance'],options['unreachable_target'])
+    rank=soft_rank_loss(scores,torch.as_tensor(1+truth,device=device),legal,options['rank_temperature'])
+    losses=dict(finite_point=per_point[mask].sum()/b,unreachable_point=per_point[~mask].sum()/b,
+                ranking=options['rank_weight']*rank)
+    parameters=list(model.parameters()); gradients={}
+    for name,loss in losses.items():
+        parts=torch.autograd.grad(loss,parameters,retain_graph=True,allow_unused=True)
+        gradients[name]=torch.cat([(torch.zeros_like(p) if g is None else g).reshape(-1) for p,g in zip(parameters,parts)]).detach()
+    total=sum(gradients.values()); squared=float(total.square().sum())
+    metrics={}
+    for name,g in gradients.items():
+        norm=float(g.norm()); dot=float((g*total).sum())
+        metrics[name]=dict(weighted_loss=float(losses[name].detach()),gradient_l2=norm,
+            cosine_to_total=dot/(norm*squared**.5) if norm and squared else None,
+            projection_on_total=dot/squared if squared else None)
+    result=dict(point_count=b,finite_count=int(finite.sum()),components=metrics,total_gradient_l2=squared**.5,
+        component_cosines={a+':'+b:float(torch.nn.functional.cosine_similarity(gradients[a],gradients[b],dim=0))
+                           for a,b in (('finite_point','unreachable_point'),('finite_point','ranking'),('unreachable_point','ranking'))})
+    with torch.no_grad():
+        residual=(predictions-torch.as_tensor(targets,device=device)).abs()
+        derivative=residual.clamp_max(1)
+        result['point_huber_abs_derivative_mean']={name:float(derivative[m].mean()) if m.any() else None
+            for name,m in (('finite',mask),('unreachable',~mask))}
+        positive=mask & (torch.as_tensor(targets,device=device)>0)
+        result['positive_finite_predicted_zero_fraction']=float((predictions[positive]<=1e-6).float().mean()) if positive.any() else None
+    return result
+
+
+def gradient_probe(model,corpus,run,config,checkpoint_step,count):
+    # Frozen checkpoint on recorded batches ending at its step. This is not a
+    # reconstruction of optimizer-time gradients and never changes weights.
+    rows=[]; first=max(1,checkpoint_step-count+1)
+    for path in sorted(Path(run).glob('samples/attempt_*/*.npz')):
+        with np.load(path) as archive:
+            steps=archive['point_step']; selected=np.unique(steps[(steps>=first)&(steps<=checkpoint_step)])
+            if not len(selected): continue
+            x={key:archive[key] for key in ('pairs','tasks','children','point_distance','child_distance','rank_step')}
+        for step in selected:
+            point=steps==step; rank=x['rank_step']==step
+            batch={key:x[key][point if key in ('pairs','point_distance') else rank]
+                   for key in ('pairs','tasks','children','point_distance','child_distance')}
+            rows.append(dict(attempt=path.parent.name,batch_step=int(step),
+                             **batch_gradient_probe(model,corpus,batch,config)))
+    if len(rows)!=count: raise ValueError(('Expected unique contiguous actual batches',first,checkpoint_step,len(rows)))
+    return dict(checkpoint_step=checkpoint_step,actual_batches=rows,
+        note='Frozen weights on the specified recorded actual batches; no optimizer step. Components use the original full-batch denominator and rank weight. Gradient norms are not additive shares; signed projections onto the total sum to one and may be negative. Historical optimizer-time gradients were not recorded.')
 
 
 def encoder_axes(model,corpus,data,config,cohorts):
@@ -107,8 +265,21 @@ def main():
     parser.add_argument('--out',type=Path,required=True)
     parser.add_argument('--cohorts',nargs='+',default=['validation'])
     parser.add_argument('--checkpoint',type=Path)
+    parser.add_argument('--stream-statistics',action='store_true')
+    parser.add_argument('--gradient-batches',type=int,default=0)
     args=parser.parse_args(); config=json.loads(args.config.read_text())
     corpus,data,_=load(config,args.run/'data')
+    if args.stream_statistics:
+        atomic_json(args.out,stream_statistics(corpus,data,args.run,args.out)); return
+    if args.gradient_batches:
+        if not args.checkpoint or args.gradient_batches<1: raise ValueError('Positive batch count and checkpoint required')
+        import torch
+        from grounded_llm.core.qmap.model import StateEncoder
+        torch.set_num_threads(config['training']['cpu_threads'])
+        saved=torch.load(args.checkpoint,map_location='cpu',weights_only=False)
+        if saved['config']!=config: raise ValueError('Gradient probe checkpoint configuration mismatch')
+        model=StateEncoder(input_dim=corpus.input_dim,**config['model']); model.load_state_dict(saved['model'])
+        atomic_json(args.out,gradient_probe(model,corpus,args.run,config,saved['step'],args.gradient_batches)); return
     result=dict(teacher_only=True,used_by_encoder_or_planner=False,geometry=geometry(corpus,data,config,args.cohorts))
     if args.checkpoint:
         import torch

@@ -82,11 +82,11 @@ def build(config, out):
     if any((selected[name]!=target if target!='all' else selected[name]==0) for name,target in spec['scenes'].items()):
         raise RuntimeError(('Insufficient grouped public layouts',selected))
     atomic_json(out/'corpus.json',dict(task='rush_hour',scenes=records,rejections=rejected,seed=config['seed'],selection=selected))
-    return load(out)
+    return load(out,feature_encoding=config.get('input_encoding','identity'))
 
 
-def load(out):
+def load(out,feature_encoding='identity'):
     out=Path(out)
     manifest=json.loads((out/'corpus.json').read_text(encoding='utf-8'))
-    return PhysicalCorpus([PhysicalScene(out/scene['path'],RushHour(scene['initial_board']),decode,baseline)
+    return PhysicalCorpus([PhysicalScene(out/scene['path'],RushHour(scene['initial_board'],feature_encoding),decode,baseline)
                            for scene in manifest['scenes']])

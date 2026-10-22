@@ -4,7 +4,9 @@ import numpy as np
 
 
 class RushHour:
-    def __init__(self, board):
+    def __init__(self, board, feature_encoding='identity'):
+        if feature_encoding not in ('identity','lane_order'): raise ValueError('Expected identity or lane_order vehicle features')
+        self.feature_encoding=feature_encoding
         if len(board) != 36 or any(c not in 'ox.ABCDEFGHIJKLMNOPQRSTUVWXYZ' for c in board):
             raise ValueError('Expected a 36-cell Rush Hour board')
         self.walls = sum(1 << i for i, c in enumerate(board) if c == 'x')
@@ -42,15 +44,26 @@ class RushHour:
                 raise ValueError('Vehicles overlap another vehicle or wall')
             occupied |= mask
 
-    def features(self, states):
-        """A-Z identity channels, with full geometry and no query-goal conditioning."""
+    def features(self, states, encoding=None):
+        """Separate vehicle channels; lane_order preserves identity within a component."""
+        encoding=self.feature_encoding if encoding is None else encoding
+        if encoding not in ('identity','lane_order'): raise ValueError('Unsupported vehicle feature encoding')
         out = np.zeros((len(states), 26, 36), dtype=np.float32)
         if len(states):
             positions=np.asarray(states,dtype=np.int64)
+            if encoding=='lane_order':
+                # Axis and lane never change. Vehicles on the same lane cannot
+                # pass each other, so this is a fixed identity map throughout
+                # a reachable component, computed from each state alone.
+                base=np.array([(0 if horizontal else 36)+6*lane for _,horizontal,_,lane in self.pieces])
+                order=np.argsort((positions+base)[:,1:],axis=1,kind='stable')+1
+                channels=np.zeros(positions.shape,dtype=np.int64)
+                channels[np.arange(len(states))[:,None],order]=np.arange(1,len(self.pieces))
             for i,(label,horizontal,size,lane) in enumerate(self.pieces):
                 axis=positions[:,i,None]+np.arange(size)[None,:]
                 cells=lane*6+axis if horizontal else axis*6+lane
-                out[np.arange(len(states))[:,None],ord(label)-ord('A'),cells]=1
+                channel=ord(label)-ord('A') if encoding=='identity' else channels[:,i,None]
+                out[np.arange(len(states))[:,None],channel,cells]=1
         return out.reshape(len(states), -1)
 
     def transitions(self, state):

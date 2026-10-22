@@ -43,6 +43,44 @@ def small_oracle(path,n,edges):
 
 
 class ExactPairTests(unittest.TestCase):
+    def test_lane_order_encoding_keeps_each_vehicle_and_reader_goal_independence(self):
+        from grounded_llm.tasks.rush_hour.qmap import MapReader
+        from experiments.new_tasks_qmap.src.relation_diagnose import vehicle_encoding_check
+        boards=[''.join(['BBCC..','......','AA....','......','......','......']),
+                ''.join(['..B...','..B...','AAB.C.','....C.','......','......'])]
+        for board in boards:
+            env=RushHour(board); states,_,_=enumerate_component(env,env.start,1000)
+            proof=vehicle_encoding_check(SimpleNamespace(scenes=[SimpleNamespace(env=env,states=np.array(states,dtype=np.uint8),goals=np.array([0]))]),31)
+            self.assertEqual(proof['physical_states'],len(states))
+            self.assertTrue(proof['all_component_vehicle_orders_constant'])
+            canonical=env.features(states,encoding='lane_order')
+            self.assertEqual(len(np.unique(canonical,axis=0)),len(states))
+            self.assertTrue((canonical.reshape(len(states),26,36).sum(axis=2)>0).sum(axis=1).tolist()==[len(env.pieces)]*len(states))
+            fixed_channels=[]
+            for i,(_,horizontal,_,lane) in enumerate(env.pieces):
+                cells=np.array([lane*6+s[i] if horizontal else s[i]*6+lane for s in states])
+                channel=canonical.reshape(len(states),26,36)[np.arange(len(states)),:,cells].argmax(axis=1)
+                self.assertTrue((channel==channel[0]).all())
+                fixed_channels.append(int(channel[0]))
+            self.assertEqual(fixed_channels[0],0); self.assertEqual(len(set(fixed_channels)),len(env.pieces))
+            rename=str.maketrans({'B':'C','C':'B'})
+            other=RushHour(board.translate(rename),feature_encoding='lane_order')
+            mapped=[RushHour(''.join(env.render(s)).translate(rename)).start for s in states]
+            np.testing.assert_array_equal(canonical,other.features(mapped))
+            with tempfile.TemporaryDirectory() as tmp:
+                config=dict(model=dict(dimension=128,hidden=16,cap=256,metric='linf'),input_encoding='lane_order')
+                model=StateEncoder(input_dim=936,**config['model'])
+                path=Path(tmp)/'map.pt'
+                torch.save(dict(model_type='exact_state_pairs',task='rush_hour',scope={},input_dim=936,
+                    config=config,model=model.state_dict(),step=0),path)
+                reader=MapReader(env,path)
+                expected=model.encode(torch.as_tensor(canonical[:2]))
+                torch.testing.assert_close(reader.encode(states[:2]),expected)
+                before=reader.encode([states[0]])
+                reader.map_batch(states[0],states[-1])
+                torch.testing.assert_close(before,reader.encode([states[0]]))
+                self.assertTrue(all(not parameter.requires_grad for parameter in reader.encoder.parameters()))
+
     def test_input_isometries_preserve_physics_and_complete_state_identity(self):
         from experiments.new_tasks_qmap.src.relation_diagnose import isometry_feature_view
         board=np.full((10,10),'#')

@@ -43,6 +43,8 @@ Token Swapping的短距离关系诊断对应[局部目标训练配置](configs/t
 
 [不可达代理尺度对照](configs/sokoban_proxy128_pairs.json)从头保持原Sigmoid基线与原采样，仅改变已证明不可达关系的有限训练代理。新代理仍严格高于接纳的最大有限真距离；实际无穷标签、物理有限标签、输出cap和推理策略不变。它检验代理强迫的大坐标跨度是否影响所学距离场，不把较低MAE当作跨布局导航成功，不与Linear或空间编码混改。
 
+[Rush Hour车辆槽位编码](configs/rush_hour_lane_order_pairs.json)从头保持原MLP基线的图、划分、采样、128维、距离、损失和预算，仅把普通车辆的任意字母通道变为分量内固定的身份通道：A保持0，其余按方向、所在行／列和同车道先后排序。车不能越过同车道的另一车，所以该映射在可达分量内不变；每辆车仍单独一通道，完整目标位置和原动作字母均保留。输入转换只读取当前完整状态，不依赖目标或oracle。配置的`input_encoding`由数据加载、冻结评测及任务reader共同读取，旧权重默认仍为原字母编码。它检验命名敏感性，不预先宣称跨布局已经改善。
+
 推箱子的[可达与边界采样配置](configs/sokoban_balanced_relations_pairs.json)是独立的数据分布实验，从头训练并保持Sigmoid、同一精确数据／划分、128维、损失、预算及选权重规则。点监督的有限关系与全源遍历配额、边界排序配额及距离分层只由该配置定义；分层内随机抽样。边界指同一状态与目标下同时存在有限和不可达的合法后继。全源配额逐个遍历原训练物理源，因此死路仍进入监督；其余点从精确有限关系银行抽样。排序在边界／非边界关系银行内分层，保留所有合法动作。银行只含原训练源、训练完整目标并排除既有留出关系闭包，能由原数据确定性重建，完整恢复沿用已保存RNG与源遍历状态。该实验不改变正在运行的激活函数对照。
 
 ## 冻结评测与信息条件
@@ -66,6 +68,7 @@ python -m experiments.new_tasks_qmap.src.relation_diagnose --config experiments/
 python -m experiments.new_tasks_qmap.src.relation_diagnose --config experiments/new_tasks_qmap/configs/token_swapping_local_rank4_pairs.json --run runs/new_tasks_pairs/token_local_rank4 --checkpoint runs/new_tasks_pairs/token_local_rank4/best.pt --out tmp/token_near_endpoint_validation.json --near-endpoint-count 1024
 python -m experiments.new_tasks_qmap.src.relation_diagnose --config experiments/new_tasks_qmap/configs/token_swapping_local_rank4_pairs.json --run runs/new_tasks_pairs/token_local_rank4 --checkpoint runs/new_tasks_pairs/token_local_rank4/best.pt --out tmp/token_policy_boundaries.json --policy-boundary-count 1024 --cohorts validation unseen_endpoint_validation unseen_both_validation
 python -m experiments.new_tasks_qmap.src.relation_diagnose --config experiments/new_tasks_qmap/configs/sokoban_pairs.json --run runs/new_tasks_pairs/sokoban --checkpoint runs/new_tasks_pairs/sokoban/best.pt --out tmp/sokoban_isometries.json --isometry-count 512 --cohorts validation unseen_layout_validation
+python -m experiments.new_tasks_qmap.src.relation_diagnose --config experiments/new_tasks_qmap/configs/rush_hour_pairs.json --run runs/new_tasks_pairs/rush_hour --out tmp/rush_vehicle_encoding_check.json --vehicle-encoding-check
 ```
 
 `relation_diagnose`默认用精确距离坐标检查表示能力：当某布局的全部查询目标可放入坐标时，有向max／对称L∞能精确表示到这些目标的距离。这不证明共享MLP已学会地图。目标多于维度时仅检查一组landmark，下界误差不能证明不可表示。这些oracle坐标不用于训练输入、贪心策略或验收成绩。
@@ -81,6 +84,8 @@ python -m experiments.new_tasks_qmap.src.relation_diagnose --config experiments/
 `--policy-boundary-count`只回放指定验证组的冻结贪心，保存每条实际执行边的源／目标、全部合法候选及其预测与真值、所选动作和回环标记，写入`.edges.npz`。汇总分别统计全部访问、首次无严格下降后继、所有非下降访问、闭环动作，并按真实距离分层。分母是实际执行边，同时报告独特状态目标对数量；这些统计不修改动作、剪枝或终止条件，不将验证失败样本加入训练。
 
 `--isometry-count`固定验证查询，检查保持物理距离的八种输入变换：推箱子四通道一起旋转／镜像，Rush Hour同时重命名当前／目标／所有后继的普通车辆且保留A，Token Swapping同时重命名token且固定底图。每个变换对单个状态独立计算，不依赖查询目标。记录距离预测变化、动作一致性及完整贪心；候选顺序沿原查询映射，排除重新枚举造成的平分顺序差异。查询与逐变换预测保存为`.queries.npz`，标签和原验收不变，也不将这些诊断样本加入训练。
+
+`--vehicle-encoding-check`在原Rush Hour图上核对全部物理状态的车道次序恒定，验证新通道在分量内始终对应固定车辆；另抽样比较原身份通道的固定置换与同时重命名后的特征。它不训练、不读模型分数，也不以结构正确替代导航验收。
 
 三个任务的`grounded_llm/tasks/<task>/qmap.py:MapReader`直接加载冻结权重，接公共CURRENT/GOAL/CANDIDATES结构。环境提供真实后继，地图不因此被解释为学会状态转移。Flash指定目标结果见[15题固定诊断](../task_text_baselines/results/exact_goals_flash64k.json)，历史目标条件结果不混算。
 

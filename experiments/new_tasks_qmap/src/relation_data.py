@@ -336,6 +336,7 @@ def prepare(config,out):
 
 def load(config,out):
     out=Path(out)
-    corpus=importlib.import_module(f'grounded_llm.tasks.{config["task"]}.relation_data').load(out/'graphs')
+    extra=dict(feature_encoding=config.get('input_encoding','identity')) if config['task']=='rush_hour' else {}
+    corpus=importlib.import_module(f'grounded_llm.tasks.{config["task"]}.relation_data').load(out/'graphs',**extra)
     data=dict(np.load(out/'relations.npz'))
     return corpus,data,json.loads((out/'summary.json').read_text())

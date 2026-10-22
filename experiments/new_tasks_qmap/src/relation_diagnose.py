@@ -14,6 +14,37 @@ def _popcount(values):
     return int(table[values.view(np.uint8)].sum(dtype=np.int64))
 
 
+def vehicle_encoding_check(corpus,seed):
+    """Verify the fixed component identity bijection before using lane_order."""
+    from grounded_llm.tasks.rush_hour.environment import RushHour
+    rng=np.random.default_rng(seed+701); counts=[]
+    for sid,scene in enumerate(corpus.scenes):
+        env=scene.env; states=scene.states
+        base=np.array([(0 if horizontal else 36)+6*lane for _,horizontal,_,lane in env.pieces])
+        order=np.argsort((states.astype(np.int64)+base)[:,1:],axis=1,kind='stable')+1
+        if not (order==order[0]).all(): raise ValueError(('Vehicle order changed within a component',sid))
+        ids=np.unique(np.concatenate([[0,len(states)-1],scene.goals[:2],rng.choice(len(states),min(16,len(states)),replace=False)]))
+        selected=[tuple(map(int,states[i])) for i in ids]
+        canonical=env.features(selected,encoding='lane_order')
+        channels=np.zeros(len(env.pieces),dtype=int); channels[order[0]]=np.arange(1,len(env.pieces))
+        identity=env.features(selected).reshape(len(selected),26,36)
+        expected=np.zeros_like(identity)
+        for i,(label,_,_,_) in enumerate(env.pieces): expected[:,channels[i]]=identity[:,ord(label)-65]
+        if not np.array_equal(canonical,expected.reshape(len(selected),-1)): raise ValueError('Canonical features lost vehicle identity')
+        labels=[piece[0] for piece in env.pieces[1:]]; renamed=rng.permutation(labels).tolist()
+        if len(labels)>1 and labels==renamed: renamed=renamed[1:]+renamed[:1]
+        translation=str.maketrans(dict(zip(labels,renamed)))
+        other=RushHour(''.join(env.render(env.start)).translate(translation),feature_encoding='lane_order')
+        mapped=[RushHour(''.join(env.render(s)).translate(translation)).start for s in selected]
+        if not np.array_equal(canonical,other.features(mapped)): raise ValueError('Canonical encoding depends on arbitrary names')
+        counts.append(dict(scene=sid,physical_states=len(states),sampled_feature_rows=len(selected),
+            ordinary_vehicle_order=order[0].tolist()))
+    return dict(physical_states=sum(row['physical_states'] for row in counts),scenes=len(counts),
+        sampled_features_checked=sum(row['sampled_feature_rows'] for row in counts),all_component_vehicle_orders_constant=True,
+        sampled_features_equal_fixed_identity_channel_permutation=True,sampled_joint_renaming_invariant=True,
+        per_scene=counts,interpretation='All physical states were checked for constant ordinary-vehicle order. Thus channel assignment is a fixed identity bijection within each reachable component; separate identity planes preserve complete-state distinctions. Feature equality under arbitrary spelling changes was checked on the listed sample. This is structural validation, not evidence of learned navigation success.')
+
+
 def isometry_feature_view(corpus,task,variant,seed):
     """One query-independent input isometry, with transported candidate order."""
     from types import SimpleNamespace
@@ -485,12 +516,18 @@ def main():
     parser.add_argument('--near-endpoint-count',type=int,default=0)
     parser.add_argument('--policy-boundary-count',type=int,default=0)
     parser.add_argument('--isometry-count',type=int,default=0)
+    parser.add_argument('--vehicle-encoding-check',action='store_true')
     args=parser.parse_args(); config=json.loads(args.config.read_text())
     if args.out.exists(): raise FileExistsError('Keep previous diagnostics; choose a new output')
     corpus,data,_=load(config,args.run/'data')
+    if args.vehicle_encoding_check:
+        if config['task']!='rush_hour' or config.get('input_encoding','identity')!='identity': raise ValueError('Use the original raw-identity Rush corpus')
+        atomic_json(args.out,vehicle_encoding_check(corpus,config['seed'])); return
     if args.isometry_count:
         if args.isometry_count<1 or not args.checkpoint: raise ValueError('Positive query count and checkpoint required')
         if any('validation' not in name for name in args.cohorts): raise ValueError('Isometry diagnosis uses validation cohorts only')
+        if config['task']=='rush_hour' and config.get('input_encoding','identity')!='identity':
+            raise ValueError('Channel-permutation probe applies to raw identity-channel encoders only')
         import torch
         from grounded_llm.core.qmap.model import StateEncoder
         torch.set_num_threads(config['training']['cpu_threads'])

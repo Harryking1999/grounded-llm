@@ -13,6 +13,7 @@ class TransitionQMap(FrozenQMap):
         model = StateEncoder(input_dim=saved['input_dim'], **saved['config']['model']).to(device)
         model.load_state_dict(saved['model'])
         self.env, self.action_name, self.scope = env, action_name, saved['scope']
+        self.config=saved['config']
         self.step = saved['step']
         super().__init__(model, env.features, device)
 

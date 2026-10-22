@@ -83,7 +83,8 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
         if initial_checkpoint:
             initial_path=(out/initial_checkpoint).resolve()
             saved=torch.load(initial_path,map_location=device,weights_only=False)
-            if saved['task']!=config['task'] or saved['scope']!=scope(config,corpus) or saved['config']['model']!=config['model']:
+            if (saved['task']!=config['task'] or saved['scope']!=scope(config,corpus) or saved['config']['model']!=config['model']
+                    or saved['config'].get('input_encoding','identity')!=config.get('input_encoding','identity')):
                 raise ValueError('Warm-start model scope mismatch')
             model.load_state_dict(saved['model']); exposure=saved['exposure'].copy()
             atomic_json(out/'initialization.json',dict(checkpoint=str(initial_path),source_commit=saved['source_commit'],

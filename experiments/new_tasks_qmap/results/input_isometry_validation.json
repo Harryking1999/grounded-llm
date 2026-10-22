@@ -1,0 +1,1144 @@
+{
+  "evaluator_source_commit": "fb89aa4",
+  "sample_scope": "512 unique validation queries per cohort, held fixed across8 input isometries. This smaller scene/distance allocation differs from the primary1024-query acceptance; identity success rates must not be substituted into primary tables.",
+  "models": {
+    "sokoban": {
+      "checkpoint_step": 30000,
+      "training_source_commit": "bffe9d237499e6cf0b0e81ebc0fa95053cc9097d",
+      "raw_result": "runs\\new_tasks_qmap\\exact_pairs\\sokoban_input_isometry_validation.json",
+      "queries_archive": "runs\\new_tasks_qmap\\exact_pairs\\sokoban_input_isometry_validation.queries.npz",
+      "cohorts": {
+        "validation": {
+          "0": {
+            "finite_mae": 16.39468765258789,
+            "prediction_shift_mae_from_identity": 0.0,
+            "prediction_shift_max_from_identity": 0.0,
+            "chosen_action_agreement_with_identity": 1.0,
+            "true_optimal_action_rate": 0.767578125,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 171,
+              "success_rate": 0.333984375,
+              "optimal": 169,
+              "optimal_rate": 0.330078125,
+              "cycles": 341,
+              "entered_unreachable": 3
+            }
+          },
+          "1": {
+            "finite_mae": 66.56258392333984,
+            "prediction_shift_mae_from_identity": 62.98506546020508,
+            "prediction_shift_max_from_identity": 248.78726196289062,
+            "chosen_action_agreement_with_identity": 0.5703125,
+            "true_optimal_action_rate": 0.64453125,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 139,
+              "success_rate": 0.271484375,
+              "optimal": 139,
+              "optimal_rate": 0.271484375,
+              "cycles": 373,
+              "entered_unreachable": 37
+            }
+          },
+          "2": {
+            "finite_mae": 55.396484375,
+            "prediction_shift_mae_from_identity": 58.52861404418945,
+            "prediction_shift_max_from_identity": 246.05897521972656,
+            "chosen_action_agreement_with_identity": 0.548828125,
+            "true_optimal_action_rate": 0.646484375,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 131,
+              "success_rate": 0.255859375,
+              "optimal": 129,
+              "optimal_rate": 0.251953125,
+              "cycles": 381,
+              "entered_unreachable": 44
+            }
+          },
+          "3": {
+            "finite_mae": 55.75949478149414,
+            "prediction_shift_mae_from_identity": 59.12065124511719,
+            "prediction_shift_max_from_identity": 244.78152465820312,
+            "chosen_action_agreement_with_identity": 0.52734375,
+            "true_optimal_action_rate": 0.587890625,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 131,
+              "success_rate": 0.255859375,
+              "optimal": 129,
+              "optimal_rate": 0.251953125,
+              "cycles": 381,
+              "entered_unreachable": 42
+            }
+          },
+          "4": {
+            "finite_mae": 66.70767211914062,
+            "prediction_shift_mae_from_identity": 66.41107177734375,
+            "prediction_shift_max_from_identity": 247.44586181640625,
+            "chosen_action_agreement_with_identity": 0.59375,
+            "true_optimal_action_rate": 0.666015625,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 148,
+              "success_rate": 0.2890625,
+              "optimal": 145,
+              "optimal_rate": 0.283203125,
+              "cycles": 364,
+              "entered_unreachable": 55
+            }
+          },
+          "5": {
+            "finite_mae": 64.54564666748047,
+            "prediction_shift_mae_from_identity": 61.66102600097656,
+            "prediction_shift_max_from_identity": 246.9510498046875,
+            "chosen_action_agreement_with_identity": 0.568359375,
+            "true_optimal_action_rate": 0.634765625,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 121,
+              "success_rate": 0.236328125,
+              "optimal": 118,
+              "optimal_rate": 0.23046875,
+              "cycles": 391,
+              "entered_unreachable": 50
+            }
+          },
+          "6": {
+            "finite_mae": 66.25647735595703,
+            "prediction_shift_mae_from_identity": 65.58111572265625,
+            "prediction_shift_max_from_identity": 238.6912841796875,
+            "chosen_action_agreement_with_identity": 0.5546875,
+            "true_optimal_action_rate": 0.640625,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 128,
+              "success_rate": 0.25,
+              "optimal": 128,
+              "optimal_rate": 0.25,
+              "cycles": 384,
+              "entered_unreachable": 46
+            }
+          },
+          "7": {
+            "finite_mae": 62.401763916015625,
+            "prediction_shift_mae_from_identity": 65.71290588378906,
+            "prediction_shift_max_from_identity": 248.6507110595703,
+            "chosen_action_agreement_with_identity": 0.55078125,
+            "true_optimal_action_rate": 0.62890625,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 136,
+              "success_rate": 0.265625,
+              "optimal": 136,
+              "optimal_rate": 0.265625,
+              "cycles": 376,
+              "entered_unreachable": 42
+            }
+          }
+        },
+        "unseen_layout_validation": {
+          "0": {
+            "finite_mae": 65.19634246826172,
+            "prediction_shift_mae_from_identity": 0.0,
+            "prediction_shift_max_from_identity": 0.0,
+            "chosen_action_agreement_with_identity": 1.0,
+            "true_optimal_action_rate": 0.55859375,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 43,
+              "success_rate": 0.083984375,
+              "optimal": 43,
+              "optimal_rate": 0.083984375,
+              "cycles": 469,
+              "entered_unreachable": 94
+            }
+          },
+          "1": {
+            "finite_mae": 79.55447387695312,
+            "prediction_shift_mae_from_identity": 81.37985229492188,
+            "prediction_shift_max_from_identity": 251.101806640625,
+            "chosen_action_agreement_with_identity": 0.513671875,
+            "true_optimal_action_rate": 0.59375,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 39,
+              "success_rate": 0.076171875,
+              "optimal": 39,
+              "optimal_rate": 0.076171875,
+              "cycles": 473,
+              "entered_unreachable": 103
+            }
+          },
+          "2": {
+            "finite_mae": 82.83419036865234,
+            "prediction_shift_mae_from_identity": 101.35408782958984,
+            "prediction_shift_max_from_identity": 243.37957763671875,
+            "chosen_action_agreement_with_identity": 0.490234375,
+            "true_optimal_action_rate": 0.58203125,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 45,
+              "success_rate": 0.087890625,
+              "optimal": 45,
+              "optimal_rate": 0.087890625,
+              "cycles": 467,
+              "entered_unreachable": 111
+            }
+          },
+          "3": {
+            "finite_mae": 70.83805847167969,
+            "prediction_shift_mae_from_identity": 85.53282165527344,
+            "prediction_shift_max_from_identity": 249.795654296875,
+            "chosen_action_agreement_with_identity": 0.490234375,
+            "true_optimal_action_rate": 0.623046875,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 47,
+              "success_rate": 0.091796875,
+              "optimal": 47,
+              "optimal_rate": 0.091796875,
+              "cycles": 465,
+              "entered_unreachable": 103
+            }
+          },
+          "4": {
+            "finite_mae": 95.19778442382812,
+            "prediction_shift_mae_from_identity": 87.66104888916016,
+            "prediction_shift_max_from_identity": 248.4822998046875,
+            "chosen_action_agreement_with_identity": 0.4765625,
+            "true_optimal_action_rate": 0.595703125,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 49,
+              "success_rate": 0.095703125,
+              "optimal": 48,
+              "optimal_rate": 0.09375,
+              "cycles": 463,
+              "entered_unreachable": 89
+            }
+          },
+          "5": {
+            "finite_mae": 56.34979248046875,
+            "prediction_shift_mae_from_identity": 81.2564697265625,
+            "prediction_shift_max_from_identity": 248.65750122070312,
+            "chosen_action_agreement_with_identity": 0.5234375,
+            "true_optimal_action_rate": 0.580078125,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 45,
+              "success_rate": 0.087890625,
+              "optimal": 45,
+              "optimal_rate": 0.087890625,
+              "cycles": 467,
+              "entered_unreachable": 104
+            }
+          },
+          "6": {
+            "finite_mae": 90.97943115234375,
+            "prediction_shift_mae_from_identity": 79.57623291015625,
+            "prediction_shift_max_from_identity": 242.50762939453125,
+            "chosen_action_agreement_with_identity": 0.517578125,
+            "true_optimal_action_rate": 0.61328125,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 55,
+              "success_rate": 0.107421875,
+              "optimal": 55,
+              "optimal_rate": 0.107421875,
+              "cycles": 457,
+              "entered_unreachable": 109
+            }
+          },
+          "7": {
+            "finite_mae": 88.94194030761719,
+            "prediction_shift_mae_from_identity": 91.14155578613281,
+            "prediction_shift_max_from_identity": 248.3818359375,
+            "chosen_action_agreement_with_identity": 0.482421875,
+            "true_optimal_action_rate": 0.591796875,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 48,
+              "success_rate": 0.09375,
+              "optimal": 48,
+              "optimal_rate": 0.09375,
+              "cycles": 464,
+              "entered_unreachable": 116
+            }
+          }
+        }
+      }
+    },
+    "sokoban_spatial": {
+      "checkpoint_step": 25000,
+      "training_source_commit": "4b72240",
+      "raw_result": "runs\\new_tasks_qmap\\exact_pairs\\sokoban_spatial_input_isometry_validation.json",
+      "queries_archive": "runs\\new_tasks_qmap\\exact_pairs\\sokoban_spatial_input_isometry_validation.queries.npz",
+      "cohorts": {
+        "validation": {
+          "0": {
+            "finite_mae": 12.39216423034668,
+            "prediction_shift_mae_from_identity": 0.0,
+            "prediction_shift_max_from_identity": 0.0,
+            "chosen_action_agreement_with_identity": 1.0,
+            "true_optimal_action_rate": 0.78515625,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 174,
+              "success_rate": 0.33984375,
+              "optimal": 169,
+              "optimal_rate": 0.330078125,
+              "cycles": 338,
+              "entered_unreachable": 2
+            }
+          },
+          "1": {
+            "finite_mae": 78.13321685791016,
+            "prediction_shift_mae_from_identity": 78.2227783203125,
+            "prediction_shift_max_from_identity": 244.15643310546875,
+            "chosen_action_agreement_with_identity": 0.578125,
+            "true_optimal_action_rate": 0.650390625,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 131,
+              "success_rate": 0.255859375,
+              "optimal": 130,
+              "optimal_rate": 0.25390625,
+              "cycles": 381,
+              "entered_unreachable": 36
+            }
+          },
+          "2": {
+            "finite_mae": 75.97744750976562,
+            "prediction_shift_mae_from_identity": 74.28789520263672,
+            "prediction_shift_max_from_identity": 248.10122680664062,
+            "chosen_action_agreement_with_identity": 0.591796875,
+            "true_optimal_action_rate": 0.693359375,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 149,
+              "success_rate": 0.291015625,
+              "optimal": 149,
+              "optimal_rate": 0.291015625,
+              "cycles": 363,
+              "entered_unreachable": 22
+            }
+          },
+          "3": {
+            "finite_mae": 75.57078552246094,
+            "prediction_shift_mae_from_identity": 74.44009399414062,
+            "prediction_shift_max_from_identity": 247.72816467285156,
+            "chosen_action_agreement_with_identity": 0.5625,
+            "true_optimal_action_rate": 0.6640625,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 143,
+              "success_rate": 0.279296875,
+              "optimal": 143,
+              "optimal_rate": 0.279296875,
+              "cycles": 369,
+              "entered_unreachable": 33
+            }
+          },
+          "4": {
+            "finite_mae": 73.89389038085938,
+            "prediction_shift_mae_from_identity": 71.14802551269531,
+            "prediction_shift_max_from_identity": 245.4861297607422,
+            "chosen_action_agreement_with_identity": 0.591796875,
+            "true_optimal_action_rate": 0.68359375,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 143,
+              "success_rate": 0.279296875,
+              "optimal": 143,
+              "optimal_rate": 0.279296875,
+              "cycles": 369,
+              "entered_unreachable": 26
+            }
+          },
+          "5": {
+            "finite_mae": 65.55120086669922,
+            "prediction_shift_mae_from_identity": 65.16853332519531,
+            "prediction_shift_max_from_identity": 238.9779815673828,
+            "chosen_action_agreement_with_identity": 0.615234375,
+            "true_optimal_action_rate": 0.70703125,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 141,
+              "success_rate": 0.275390625,
+              "optimal": 139,
+              "optimal_rate": 0.271484375,
+              "cycles": 371,
+              "entered_unreachable": 25
+            }
+          },
+          "6": {
+            "finite_mae": 74.322998046875,
+            "prediction_shift_mae_from_identity": 74.3510971069336,
+            "prediction_shift_max_from_identity": 245.26531982421875,
+            "chosen_action_agreement_with_identity": 0.5703125,
+            "true_optimal_action_rate": 0.666015625,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 135,
+              "success_rate": 0.263671875,
+              "optimal": 133,
+              "optimal_rate": 0.259765625,
+              "cycles": 377,
+              "entered_unreachable": 25
+            }
+          },
+          "7": {
+            "finite_mae": 80.64862060546875,
+            "prediction_shift_mae_from_identity": 80.64640808105469,
+            "prediction_shift_max_from_identity": 247.0859375,
+            "chosen_action_agreement_with_identity": 0.525390625,
+            "true_optimal_action_rate": 0.68359375,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 152,
+              "success_rate": 0.296875,
+              "optimal": 149,
+              "optimal_rate": 0.291015625,
+              "cycles": 360,
+              "entered_unreachable": 26
+            }
+          }
+        },
+        "unseen_layout_validation": {
+          "0": {
+            "finite_mae": 104.65394592285156,
+            "prediction_shift_mae_from_identity": 0.0,
+            "prediction_shift_max_from_identity": 0.0,
+            "chosen_action_agreement_with_identity": 1.0,
+            "true_optimal_action_rate": 0.599609375,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 49,
+              "success_rate": 0.095703125,
+              "optimal": 48,
+              "optimal_rate": 0.09375,
+              "cycles": 463,
+              "entered_unreachable": 62
+            }
+          },
+          "1": {
+            "finite_mae": 94.64204406738281,
+            "prediction_shift_mae_from_identity": 76.1776351928711,
+            "prediction_shift_max_from_identity": 235.78221130371094,
+            "chosen_action_agreement_with_identity": 0.529296875,
+            "true_optimal_action_rate": 0.626953125,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 48,
+              "success_rate": 0.09375,
+              "optimal": 47,
+              "optimal_rate": 0.091796875,
+              "cycles": 464,
+              "entered_unreachable": 74
+            }
+          },
+          "2": {
+            "finite_mae": 90.96107482910156,
+            "prediction_shift_mae_from_identity": 70.64279174804688,
+            "prediction_shift_max_from_identity": 228.51031494140625,
+            "chosen_action_agreement_with_identity": 0.544921875,
+            "true_optimal_action_rate": 0.611328125,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 51,
+              "success_rate": 0.099609375,
+              "optimal": 51,
+              "optimal_rate": 0.099609375,
+              "cycles": 461,
+              "entered_unreachable": 70
+            }
+          },
+          "3": {
+            "finite_mae": 93.64105224609375,
+            "prediction_shift_mae_from_identity": 77.58876037597656,
+            "prediction_shift_max_from_identity": 237.11825561523438,
+            "chosen_action_agreement_with_identity": 0.51953125,
+            "true_optimal_action_rate": 0.623046875,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 47,
+              "success_rate": 0.091796875,
+              "optimal": 46,
+              "optimal_rate": 0.08984375,
+              "cycles": 465,
+              "entered_unreachable": 62
+            }
+          },
+          "4": {
+            "finite_mae": 79.47319030761719,
+            "prediction_shift_mae_from_identity": 80.98526000976562,
+            "prediction_shift_max_from_identity": 235.80636596679688,
+            "chosen_action_agreement_with_identity": 0.56640625,
+            "true_optimal_action_rate": 0.654296875,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 57,
+              "success_rate": 0.111328125,
+              "optimal": 57,
+              "optimal_rate": 0.111328125,
+              "cycles": 455,
+              "entered_unreachable": 49
+            }
+          },
+          "5": {
+            "finite_mae": 88.54352569580078,
+            "prediction_shift_mae_from_identity": 71.09298706054688,
+            "prediction_shift_max_from_identity": 248.7289581298828,
+            "chosen_action_agreement_with_identity": 0.54296875,
+            "true_optimal_action_rate": 0.64453125,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 52,
+              "success_rate": 0.1015625,
+              "optimal": 52,
+              "optimal_rate": 0.1015625,
+              "cycles": 460,
+              "entered_unreachable": 79
+            }
+          },
+          "6": {
+            "finite_mae": 92.95468139648438,
+            "prediction_shift_mae_from_identity": 72.87060546875,
+            "prediction_shift_max_from_identity": 234.22425842285156,
+            "chosen_action_agreement_with_identity": 0.533203125,
+            "true_optimal_action_rate": 0.60546875,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 46,
+              "success_rate": 0.08984375,
+              "optimal": 46,
+              "optimal_rate": 0.08984375,
+              "cycles": 466,
+              "entered_unreachable": 56
+            }
+          },
+          "7": {
+            "finite_mae": 99.14326477050781,
+            "prediction_shift_mae_from_identity": 83.58746337890625,
+            "prediction_shift_max_from_identity": 234.61289978027344,
+            "chosen_action_agreement_with_identity": 0.515625,
+            "true_optimal_action_rate": 0.634765625,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 50,
+              "success_rate": 0.09765625,
+              "optimal": 50,
+              "optimal_rate": 0.09765625,
+              "cycles": 462,
+              "entered_unreachable": 83
+            }
+          }
+        }
+      }
+    },
+    "rush_hour": {
+      "checkpoint_step": 20000,
+      "training_source_commit": "bffe9d237499e6cf0b0e81ebc0fa95053cc9097d",
+      "raw_result": "runs\\new_tasks_qmap\\exact_pairs\\rush_hour_input_isometry_validation.json",
+      "queries_archive": "runs\\new_tasks_qmap\\exact_pairs\\rush_hour_input_isometry_validation.queries.npz",
+      "cohorts": {
+        "validation": {
+          "0": {
+            "finite_mae": 0.6145458817481995,
+            "prediction_shift_mae_from_identity": 0.0,
+            "prediction_shift_max_from_identity": 0.0,
+            "chosen_action_agreement_with_identity": 1.0,
+            "true_optimal_action_rate": 0.95703125,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 505,
+              "success_rate": 0.986328125,
+              "optimal": 468,
+              "optimal_rate": 0.9140625,
+              "cycles": 7,
+              "entered_unreachable": 0
+            }
+          },
+          "1": {
+            "finite_mae": 2.8877272605895996,
+            "prediction_shift_mae_from_identity": 2.6158697605133057,
+            "prediction_shift_max_from_identity": 25.507293701171875,
+            "chosen_action_agreement_with_identity": 0.546875,
+            "true_optimal_action_rate": 0.765625,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 396,
+              "success_rate": 0.7734375,
+              "optimal": 337,
+              "optimal_rate": 0.658203125,
+              "cycles": 116,
+              "entered_unreachable": 0
+            }
+          },
+          "2": {
+            "finite_mae": 2.7196850776672363,
+            "prediction_shift_mae_from_identity": 2.489288568496704,
+            "prediction_shift_max_from_identity": 16.31195068359375,
+            "chosen_action_agreement_with_identity": 0.50390625,
+            "true_optimal_action_rate": 0.787109375,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 394,
+              "success_rate": 0.76953125,
+              "optimal": 339,
+              "optimal_rate": 0.662109375,
+              "cycles": 118,
+              "entered_unreachable": 0
+            }
+          },
+          "3": {
+            "finite_mae": 2.7757699489593506,
+            "prediction_shift_mae_from_identity": 2.5014777183532715,
+            "prediction_shift_max_from_identity": 20.611793518066406,
+            "chosen_action_agreement_with_identity": 0.541015625,
+            "true_optimal_action_rate": 0.755859375,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 387,
+              "success_rate": 0.755859375,
+              "optimal": 330,
+              "optimal_rate": 0.64453125,
+              "cycles": 125,
+              "entered_unreachable": 0
+            }
+          },
+          "4": {
+            "finite_mae": 2.984787702560425,
+            "prediction_shift_mae_from_identity": 2.7390856742858887,
+            "prediction_shift_max_from_identity": 26.93273162841797,
+            "chosen_action_agreement_with_identity": 0.51953125,
+            "true_optimal_action_rate": 0.763671875,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 400,
+              "success_rate": 0.78125,
+              "optimal": 339,
+              "optimal_rate": 0.662109375,
+              "cycles": 112,
+              "entered_unreachable": 0
+            }
+          },
+          "5": {
+            "finite_mae": 2.6817426681518555,
+            "prediction_shift_mae_from_identity": 2.410876512527466,
+            "prediction_shift_max_from_identity": 21.219100952148438,
+            "chosen_action_agreement_with_identity": 0.49609375,
+            "true_optimal_action_rate": 0.771484375,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 396,
+              "success_rate": 0.7734375,
+              "optimal": 340,
+              "optimal_rate": 0.6640625,
+              "cycles": 116,
+              "entered_unreachable": 0
+            }
+          },
+          "6": {
+            "finite_mae": 2.7980000972747803,
+            "prediction_shift_mae_from_identity": 2.497405767440796,
+            "prediction_shift_max_from_identity": 27.91101837158203,
+            "chosen_action_agreement_with_identity": 0.486328125,
+            "true_optimal_action_rate": 0.7734375,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 385,
+              "success_rate": 0.751953125,
+              "optimal": 331,
+              "optimal_rate": 0.646484375,
+              "cycles": 127,
+              "entered_unreachable": 0
+            }
+          },
+          "7": {
+            "finite_mae": 3.153428554534912,
+            "prediction_shift_mae_from_identity": 2.8707895278930664,
+            "prediction_shift_max_from_identity": 30.63703155517578,
+            "chosen_action_agreement_with_identity": 0.515625,
+            "true_optimal_action_rate": 0.78125,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 392,
+              "success_rate": 0.765625,
+              "optimal": 333,
+              "optimal_rate": 0.650390625,
+              "cycles": 120,
+              "entered_unreachable": 0
+            }
+          }
+        },
+        "unseen_layout_validation": {
+          "0": {
+            "finite_mae": 2.2354719638824463,
+            "prediction_shift_mae_from_identity": 0.0,
+            "prediction_shift_max_from_identity": 0.0,
+            "chosen_action_agreement_with_identity": 1.0,
+            "true_optimal_action_rate": 0.802734375,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 371,
+              "success_rate": 0.724609375,
+              "optimal": 256,
+              "optimal_rate": 0.5,
+              "cycles": 141,
+              "entered_unreachable": 0
+            }
+          },
+          "1": {
+            "finite_mae": 3.7416982650756836,
+            "prediction_shift_mae_from_identity": 3.9697933197021484,
+            "prediction_shift_max_from_identity": 24.45099639892578,
+            "chosen_action_agreement_with_identity": 0.298828125,
+            "true_optimal_action_rate": 0.5234375,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 151,
+              "success_rate": 0.294921875,
+              "optimal": 118,
+              "optimal_rate": 0.23046875,
+              "cycles": 361,
+              "entered_unreachable": 0
+            }
+          },
+          "2": {
+            "finite_mae": 4.031452655792236,
+            "prediction_shift_mae_from_identity": 4.199651718139648,
+            "prediction_shift_max_from_identity": 21.702720642089844,
+            "chosen_action_agreement_with_identity": 0.310546875,
+            "true_optimal_action_rate": 0.55078125,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 147,
+              "success_rate": 0.287109375,
+              "optimal": 120,
+              "optimal_rate": 0.234375,
+              "cycles": 365,
+              "entered_unreachable": 0
+            }
+          },
+          "3": {
+            "finite_mae": 3.4458987712860107,
+            "prediction_shift_mae_from_identity": 3.886481523513794,
+            "prediction_shift_max_from_identity": 24.842788696289062,
+            "chosen_action_agreement_with_identity": 0.302734375,
+            "true_optimal_action_rate": 0.5078125,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 142,
+              "success_rate": 0.27734375,
+              "optimal": 114,
+              "optimal_rate": 0.22265625,
+              "cycles": 370,
+              "entered_unreachable": 0
+            }
+          },
+          "4": {
+            "finite_mae": 3.2440195083618164,
+            "prediction_shift_mae_from_identity": 3.443547248840332,
+            "prediction_shift_max_from_identity": 18.99622344970703,
+            "chosen_action_agreement_with_identity": 0.30078125,
+            "true_optimal_action_rate": 0.533203125,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 161,
+              "success_rate": 0.314453125,
+              "optimal": 130,
+              "optimal_rate": 0.25390625,
+              "cycles": 351,
+              "entered_unreachable": 0
+            }
+          },
+          "5": {
+            "finite_mae": 3.6168177127838135,
+            "prediction_shift_mae_from_identity": 3.8652477264404297,
+            "prediction_shift_max_from_identity": 22.948204040527344,
+            "chosen_action_agreement_with_identity": 0.287109375,
+            "true_optimal_action_rate": 0.5234375,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 151,
+              "success_rate": 0.294921875,
+              "optimal": 130,
+              "optimal_rate": 0.25390625,
+              "cycles": 361,
+              "entered_unreachable": 0
+            }
+          },
+          "6": {
+            "finite_mae": 3.3115673065185547,
+            "prediction_shift_mae_from_identity": 3.538708209991455,
+            "prediction_shift_max_from_identity": 22.756790161132812,
+            "chosen_action_agreement_with_identity": 0.259765625,
+            "true_optimal_action_rate": 0.5546875,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 148,
+              "success_rate": 0.2890625,
+              "optimal": 118,
+              "optimal_rate": 0.23046875,
+              "cycles": 364,
+              "entered_unreachable": 0
+            }
+          },
+          "7": {
+            "finite_mae": 3.861006259918213,
+            "prediction_shift_mae_from_identity": 4.028225421905518,
+            "prediction_shift_max_from_identity": 26.310218811035156,
+            "chosen_action_agreement_with_identity": 0.294921875,
+            "true_optimal_action_rate": 0.544921875,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 165,
+              "success_rate": 0.322265625,
+              "optimal": 126,
+              "optimal_rate": 0.24609375,
+              "cycles": 347,
+              "entered_unreachable": 0
+            }
+          }
+        }
+      }
+    },
+    "rush_hour_spatial": {
+      "checkpoint_step": 60000,
+      "training_source_commit": "43cdb24",
+      "raw_result": "runs\\new_tasks_qmap\\exact_pairs\\rush_hour_spatial_input_isometry_validation.json",
+      "queries_archive": "runs\\new_tasks_qmap\\exact_pairs\\rush_hour_spatial_input_isometry_validation.queries.npz",
+      "cohorts": {
+        "validation": {
+          "0": {
+            "finite_mae": 0.627309262752533,
+            "prediction_shift_mae_from_identity": 0.0,
+            "prediction_shift_max_from_identity": 0.0,
+            "chosen_action_agreement_with_identity": 1.0,
+            "true_optimal_action_rate": 0.96484375,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 506,
+              "success_rate": 0.98828125,
+              "optimal": 475,
+              "optimal_rate": 0.927734375,
+              "cycles": 6,
+              "entered_unreachable": 0
+            }
+          },
+          "1": {
+            "finite_mae": 3.0442142486572266,
+            "prediction_shift_mae_from_identity": 2.6377339363098145,
+            "prediction_shift_max_from_identity": 19.68890380859375,
+            "chosen_action_agreement_with_identity": 0.4765625,
+            "true_optimal_action_rate": 0.759765625,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 369,
+              "success_rate": 0.720703125,
+              "optimal": 325,
+              "optimal_rate": 0.634765625,
+              "cycles": 143,
+              "entered_unreachable": 0
+            }
+          },
+          "2": {
+            "finite_mae": 3.240055799484253,
+            "prediction_shift_mae_from_identity": 2.7990076541900635,
+            "prediction_shift_max_from_identity": 15.801036834716797,
+            "chosen_action_agreement_with_identity": 0.48828125,
+            "true_optimal_action_rate": 0.73046875,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 364,
+              "success_rate": 0.7109375,
+              "optimal": 314,
+              "optimal_rate": 0.61328125,
+              "cycles": 148,
+              "entered_unreachable": 0
+            }
+          },
+          "3": {
+            "finite_mae": 2.8623523712158203,
+            "prediction_shift_mae_from_identity": 2.445465564727783,
+            "prediction_shift_max_from_identity": 16.27252197265625,
+            "chosen_action_agreement_with_identity": 0.5078125,
+            "true_optimal_action_rate": 0.7578125,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 369,
+              "success_rate": 0.720703125,
+              "optimal": 324,
+              "optimal_rate": 0.6328125,
+              "cycles": 143,
+              "entered_unreachable": 0
+            }
+          },
+          "4": {
+            "finite_mae": 3.446695327758789,
+            "prediction_shift_mae_from_identity": 3.040405750274658,
+            "prediction_shift_max_from_identity": 23.183332443237305,
+            "chosen_action_agreement_with_identity": 0.470703125,
+            "true_optimal_action_rate": 0.73828125,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 384,
+              "success_rate": 0.75,
+              "optimal": 313,
+              "optimal_rate": 0.611328125,
+              "cycles": 128,
+              "entered_unreachable": 0
+            }
+          },
+          "5": {
+            "finite_mae": 3.126023292541504,
+            "prediction_shift_mae_from_identity": 2.7012829780578613,
+            "prediction_shift_max_from_identity": 16.10521697998047,
+            "chosen_action_agreement_with_identity": 0.47265625,
+            "true_optimal_action_rate": 0.779296875,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 373,
+              "success_rate": 0.728515625,
+              "optimal": 325,
+              "optimal_rate": 0.634765625,
+              "cycles": 139,
+              "entered_unreachable": 0
+            }
+          },
+          "6": {
+            "finite_mae": 2.983590602874756,
+            "prediction_shift_mae_from_identity": 2.554629325866699,
+            "prediction_shift_max_from_identity": 19.190902709960938,
+            "chosen_action_agreement_with_identity": 0.490234375,
+            "true_optimal_action_rate": 0.740234375,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 375,
+              "success_rate": 0.732421875,
+              "optimal": 323,
+              "optimal_rate": 0.630859375,
+              "cycles": 137,
+              "entered_unreachable": 0
+            }
+          },
+          "7": {
+            "finite_mae": 3.2324113845825195,
+            "prediction_shift_mae_from_identity": 2.793266773223877,
+            "prediction_shift_max_from_identity": 17.634780883789062,
+            "chosen_action_agreement_with_identity": 0.48828125,
+            "true_optimal_action_rate": 0.732421875,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 376,
+              "success_rate": 0.734375,
+              "optimal": 321,
+              "optimal_rate": 0.626953125,
+              "cycles": 136,
+              "entered_unreachable": 0
+            }
+          }
+        },
+        "unseen_layout_validation": {
+          "0": {
+            "finite_mae": 1.5652090311050415,
+            "prediction_shift_mae_from_identity": 0.0,
+            "prediction_shift_max_from_identity": 0.0,
+            "chosen_action_agreement_with_identity": 1.0,
+            "true_optimal_action_rate": 0.80078125,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 376,
+              "success_rate": 0.734375,
+              "optimal": 254,
+              "optimal_rate": 0.49609375,
+              "cycles": 136,
+              "entered_unreachable": 0
+            }
+          },
+          "1": {
+            "finite_mae": 3.1649649143218994,
+            "prediction_shift_mae_from_identity": 3.0101819038391113,
+            "prediction_shift_max_from_identity": 17.398406982421875,
+            "chosen_action_agreement_with_identity": 0.3125,
+            "true_optimal_action_rate": 0.51171875,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 137,
+              "success_rate": 0.267578125,
+              "optimal": 102,
+              "optimal_rate": 0.19921875,
+              "cycles": 375,
+              "entered_unreachable": 0
+            }
+          },
+          "2": {
+            "finite_mae": 3.521226406097412,
+            "prediction_shift_mae_from_identity": 3.2454185485839844,
+            "prediction_shift_max_from_identity": 18.045196533203125,
+            "chosen_action_agreement_with_identity": 0.279296875,
+            "true_optimal_action_rate": 0.4921875,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 132,
+              "success_rate": 0.2578125,
+              "optimal": 103,
+              "optimal_rate": 0.201171875,
+              "cycles": 380,
+              "entered_unreachable": 0
+            }
+          },
+          "3": {
+            "finite_mae": 3.4369726181030273,
+            "prediction_shift_mae_from_identity": 3.442012071609497,
+            "prediction_shift_max_from_identity": 13.4566650390625,
+            "chosen_action_agreement_with_identity": 0.283203125,
+            "true_optimal_action_rate": 0.5234375,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 143,
+              "success_rate": 0.279296875,
+              "optimal": 115,
+              "optimal_rate": 0.224609375,
+              "cycles": 369,
+              "entered_unreachable": 0
+            }
+          },
+          "4": {
+            "finite_mae": 3.755732536315918,
+            "prediction_shift_mae_from_identity": 3.737020492553711,
+            "prediction_shift_max_from_identity": 18.806228637695312,
+            "chosen_action_agreement_with_identity": 0.287109375,
+            "true_optimal_action_rate": 0.521484375,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 156,
+              "success_rate": 0.3046875,
+              "optimal": 112,
+              "optimal_rate": 0.21875,
+              "cycles": 356,
+              "entered_unreachable": 0
+            }
+          },
+          "5": {
+            "finite_mae": 3.5937767028808594,
+            "prediction_shift_mae_from_identity": 3.5866031646728516,
+            "prediction_shift_max_from_identity": 22.491241455078125,
+            "chosen_action_agreement_with_identity": 0.2734375,
+            "true_optimal_action_rate": 0.501953125,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 145,
+              "success_rate": 0.283203125,
+              "optimal": 115,
+              "optimal_rate": 0.224609375,
+              "cycles": 367,
+              "entered_unreachable": 0
+            }
+          },
+          "6": {
+            "finite_mae": 3.291195869445801,
+            "prediction_shift_mae_from_identity": 3.185466766357422,
+            "prediction_shift_max_from_identity": 15.194732666015625,
+            "chosen_action_agreement_with_identity": 0.271484375,
+            "true_optimal_action_rate": 0.498046875,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 139,
+              "success_rate": 0.271484375,
+              "optimal": 106,
+              "optimal_rate": 0.20703125,
+              "cycles": 373,
+              "entered_unreachable": 0
+            }
+          },
+          "7": {
+            "finite_mae": 3.4124369621276855,
+            "prediction_shift_mae_from_identity": 3.2817022800445557,
+            "prediction_shift_max_from_identity": 14.267074584960938,
+            "chosen_action_agreement_with_identity": 0.2578125,
+            "true_optimal_action_rate": 0.515625,
+            "planning": {
+              "count": 512,
+              "unique_state_goal_pairs": 512,
+              "solved": 148,
+              "success_rate": 0.2890625,
+              "optimal": 118,
+              "optimal_rate": 0.23046875,
+              "cycles": 364,
+              "entered_unreachable": 0
+            }
+          }
+        }
+      }
+    }
+  },
+  "condition": "Validation-only input-isometry diagnosis. Sokoban variant k rotates the complete board90*(k mod4) degrees counterclockwise, then reflects columns for k>=4; all four channels move together. Rush Hour variants jointly rename only existing ordinary vehicle labels, preserving A. Token variants jointly rename token identities on the fixed labelled tree. Variant0 is identity. Each feature transform is independent of query goal. Physics, oracle distances, complete targets and candidate multiplicity are preserved. Candidate order is transported from the original query to isolate encoding; this need not match a freshly enumerated transformed board tie order. These are diagnostic variations, not acceptance results or training augmentation.",
+  "interpretation": "Predictions and transported greedy policies are not invariant under valid input isometries. This identifies representation sensitivity but does not prove that correcting it alone will solve cross-layout generalization. All variants remain separate; no test-time ensemble or selection is used. Label spelling is normalized only in a separately declared training condition."
+}

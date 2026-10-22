@@ -1,0 +1,92 @@
+{
+  "source_commit": "437779b",
+  "condition": "CPU sampler verification only, no gradients",
+  "sampling": {
+    "finite_point_bank": 9622109,
+    "ranking_bank": 9566448,
+    "boundary_ranking_bank": 1374406,
+    "point_stratum_counts": {
+      "(-1,0.0]": 0,
+      "(0.0,1.0]": 2086,
+      "(1.0,2.0]": 3229,
+      "(2.0,5.0]": 26569,
+      "(5.0,10.0]": 205169,
+      "(10.0,20.0]": 1945707,
+      "(20.0,40.0]": 5585542,
+      "(40.0,80.0]": 1815258,
+      "(80.0,128.0]": 38549
+    },
+    "boundary_stratum_counts": {
+      "(-1,0.0]": 0,
+      "(0.0,1.0]": 180,
+      "(1.0,2.0]": 269,
+      "(2.0,5.0]": 3206,
+      "(5.0,10.0]": 29743,
+      "(10.0,20.0]": 264191,
+      "(20.0,40.0]": 774942,
+      "(40.0,80.0]": 294778,
+      "(80.0,128.0]": 7097
+    },
+    "nonboundary_stratum_counts": {
+      "(-1,0.0]": 0,
+      "(0.0,1.0]": 1120,
+      "(1.0,2.0]": 1852,
+      "(2.0,5.0]": 19681,
+      "(5.0,10.0]": 170414,
+      "(10.0,20.0]": 1670126,
+      "(20.0,40.0]": 4789356,
+      "(40.0,80.0]": 1508500,
+      "(80.0,128.0]": 30993
+    },
+    "options": {
+      "finite_point_fraction": 0.75,
+      "boundary_rank_fraction": 0.5,
+      "distance_bin_upper_bounds": [
+        0,
+        1,
+        2,
+        5,
+        10,
+        20,
+        40,
+        80,
+        128
+      ]
+    },
+    "broad_source_fraction": 0.25,
+    "all_legal_candidates_preserved": true,
+    "finite_supplement_excludes_identity_pairs": true,
+    "holdout_closure_excluded": true,
+    "banks_use_only_original_training_source_rows": true
+  },
+  "batches": 100,
+  "counts_per_batch": {
+    "point": 2048,
+    "rank": 1024
+  },
+  "actual_fraction_ranges": {
+    "point_finite": {
+      "mean": 0.7583251953125,
+      "minimum": 0.75341796875,
+      "maximum": 0.76416015625
+    },
+    "point_positive_near": {
+      "mean": 0.2815234375,
+      "minimum": 0.26123046875,
+      "maximum": 0.30615234375
+    },
+    "rank_positive_near": {
+      "mean": 0.375068359375,
+      "minimum": 0.3427734375,
+      "maximum": 0.4052734375
+    },
+    "boundary": {
+      "mean": 0.5,
+      "minimum": 0.5,
+      "maximum": 0.5
+    }
+  },
+  "all_sampled_relations_exclude_holdout_closure": true,
+  "all_legal_candidates_preserved": true,
+  "exact_source_sampler_rng_restore": true
+}

@@ -25,6 +25,8 @@ python -m experiments.new_tasks_qmap.src.run --config experiments/new_tasks_qmap
 
 Token Swapping的短距离关系诊断对应[局部目标训练配置](configs/token_swapping_local_goals_pairs.json)：复用完全相同的精确图与固定留出；保留全部训练源遍历，只混入从当前状态随机游走得到的近目标提案。所有提案仍排除留出端点及关系。它从完整预算基线的best权重开始新优化阶段，优化器与采样器重置，`initialization.json`明确记录身份，不能称作原训练的精确恢复。实际到达率仍按原固定查询验收；增加训练与改变采样的效果不作孤立因果归因。
 
+[Token排序权重对照](configs/token_swapping_local_rank4_pairs.json)复用局部目标阶段相同的基线初始化、种子、数据、采样及预算，仅改变rank权重。保留原验证选择口径，不因训练rank权重改变而重新定义最佳模型；输出、距离函数和推理策略不变。
+
 推箱子的[线性输出诊断配置](configs/sokoban_linear_output_pairs.json)仅替换末端sigmoid，保留两层隐藏MLP、128维Q、有向max、全部数据与监督。此时`cap`仅是输出尺度，向量不再受它约束；不可达仍用配置中的有限代理，不能把线性坐标解释为无穷。其他既有配置默认继续用sigmoid，旧checkpoint不变。
 
 [Softsign候选配置](configs/sokoban_softsign_output_pairs.json)匹配Sigmoid的中心、中心斜率与范围，先保留为后续对照，未启动。尺度定义、局限及当前结果见[报告](results/report.md#输出与距离尺度)。

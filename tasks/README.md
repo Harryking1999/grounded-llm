@@ -31,10 +31,19 @@
 | Token Swapping：固定10顶点树，完整目标留出关系1024题，地图未采用 | - | - | - | - | - | 35.55%（364/1024）；最优84/1024 | - | - |
 | Token Swapping：未见起点端点1024题，地图未采用 | - | - | - | - | - | 27.73%（284/1024）；最优75/1024 | - | - |
 | Token Swapping：两端均未见1024题，地图未采用 | - | - | - | - | - | 27.25%（279/1024）；最优57/1024 | - | - |
+| 推箱子：hard指定完整目标，留出关系1024题，基线未采用 | - | - | - | - | - | 14.75%（151/1024）；最优146/1024 | - | - |
+| 推箱子：hard指定完整目标，未见布局1024题，基线未采用 | - | - | - | - | - | 7.71%（79/1024）；最优78/1024 | - | - |
+| Rush Hour：指定完整目标，已见布局留出关系1024题，基线未采用 | - | - | - | - | - | 97.27%（996/1024）；最优844/1024 | - | - |
+| Rush Hour：指定完整目标，未见布局1024题，基线未采用 | - | - | - | - | - | 51.37%（526/1024）；最优297/1024 | - | - |
+| Token Swapping：补近阶段，留出关系1024题，未采用 | - | - | - | - | - | 57.52%（589/1024）；最优229/1024 | - | - |
+| Token Swapping：补近阶段，未见起点1024题，未采用 | - | - | - | - | - | 47.85%（490/1024）；最优123/1024 | - | - |
+| Token Swapping：补近阶段，两端均未见1024题，未采用 | - | - | - | - | - | 44.63%（457/1024）；最优127/1024 | - | - |
 
 过桥、推箱子、24点的地图列为[首轮固定目标可行性结果](../experiments/new_tasks_qmap/results/report.md)，不是正式采用图；Rush Hour与Token Swapping的完整状态对数据、训练与冻结reader已实现，尚无通过验收的地图。Flash筛查规则与结果见[基线报告](../experiments/task_text_baselines/results/report.md)；完整计划与逐轮环境反馈条件不同，不据差值直接归因。24点起题留出但部分中间状态与训练重叠；推箱子地图及固定40题使用自生成小棋盘，不是标准Boxoban题集。Rush Hour的40起点相关于8个分量，Token Swapping成本／最优性与完成率分别计分。
 
 指定目标Flash三行来自[15题定向诊断](../experiments/task_text_baselines/results/exact_goals_flash64k.json)，沿用已知起点或等价重标问题，不是独立总体成绩。11份失败全为64k思考耗尽、最终答案为空；新条件下没有可回放的非法动作或非最优成功答案。后续只按精确目标训练与评测，旧目标成绩仅保留历史。Token Swapping地图数字为[完整预算冻结基线](../experiments/new_tasks_qmap/results/token_pairs_baseline.json)，尚未达到80%最低验收线；环境提供后继，不能与无反馈完整计划直接相减归因。
+
+新增完整目标地图的完整预算结果：[推箱子](../experiments/new_tasks_qmap/results/sokoban_pairs_baseline.json)、[Rush Hour](../experiments/new_tasks_qmap/results/rush_hour_pairs_baseline.json)、[Token补近阶段](../experiments/new_tasks_qmap/results/token_pairs_local_goals.json)。各任务必需测试组尚未全部通过80%最低线，权重不登记采用；补近阶段与原基线分行保留，不能把增加训练与改变采样解释为单一因果。完整距离、循环、死锁、成本与资源见[报告](../experiments/new_tasks_qmap/results/report.md)。
 
 **积木历史回归（单独题集，非12块清空1000题）：**
 

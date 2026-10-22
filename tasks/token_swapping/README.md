@@ -13,3 +13,5 @@ Flash high、64k在公开40题上完成36/40，全部成功计划最优；4份�
 - [Flash筛查合同](../../experiments/task_text_baselines/configs/deepseek_rush_token64k.json)、[统一结果](../../experiments/task_text_baselines/results/report.md)
 
 连通底图上所有完整排列均可达；NP-hard目标是最少交换数，不是任意完成。评测须保留完成、最优率和超额交换数，不能只比较完成率。
+
+保留的10顶点树上，指定非归位目标的[Flash64k诊断](../../experiments/task_text_baselines/results/exact_goals_flash64k.json)为4/5完成且全部最优，1题耗尽思考预算。题目由此前5个精确问题同时重标起终点棋子得到，成本12至15步；不是新的独立总体样本，不据此声称任意目标已普遍通过。

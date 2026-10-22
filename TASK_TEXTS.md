@@ -1292,6 +1292,24 @@ Initial board:
 
 方向指玩家移动方向，行走与推动均为一步。合法但进入死路的动作仍需列为合法候选。指定目标必须同时匹配箱子与玩家，输入保留目标格。
 
+#### 指定完整目标文字
+
+上方`task_objective`与`goal_rule`依次取下方两行；规则原文在此维护，不在代码中另存。
+
+```text
+Find a valid sequence of moves that exactly matches the specified goal board, as short as you can.
+The goal is to match the specified goal board exactly, including the player and all box positions. Boxes are indistinguishable.
+```
+
+#### 历史目标文字：仅回放
+
+仅用于没有`goal_board`的历史题目兼容；不作为新评测安排。
+
+```text
+Find a valid sequence of moves that puts every box on a target, as short as you can.
+The goal is that every box is on a target; the player's final position does not matter.
+```
+
 #### 地图组／CoT 组：每轮环境更新
 
 两组共享规则、真实当前状态、实际动作历史与全部合法动作。地图组额外获得当前／完整目标状态／合法真实后继的Q槽位；精确距离、参考解和死路标签不进入模型文字。指定目标棋盘在两组任务描述中相同。
@@ -1360,16 +1378,22 @@ Reason: The required goal is already reached; no further move is needed.
 
 ```json
 {
-  "board": [
+  "initial": [
     "#####",
     "#@$.#",
+    "#####"
+  ],
+  "goal_board": [
+    "#####",
+    "# @*#",
     "#####"
   ],
   "actions": [
     "R"
   ],
   "success": true,
-  "move_cost": 1
+  "move_cost": 1,
+  "role": "small format illustration only; retained experiments use10x10 four-box hard layouts"
 }
 ```
 
@@ -1569,6 +1593,22 @@ Initial board, top row first:
 {initial_board}{goal_board_section}
 ```
 
+#### 指定完整目标文字
+
+上方`goal_rule`取下方原文；规则只在本页维护。
+
+```text
+The goal is to match the specified goal board exactly, including the positions of every vehicle. Do not move A outside the board or remove it.
+```
+
+#### 历史目标文字：仅回放
+
+仅用于没有`goal_board`的历史题目兼容；不作为新评测安排。
+
+```text
+The goal is to place the horizontal target vehicle A at the rightmost position in its row, occupying columns 4 and 5 (zero-based). Other vehicles may end anywhere legal. Do not move A outside the board or remove it.
+```
+
 #### 地图组／CoT 组：每轮环境更新
 
 两组共享真实状态、指定的完整目标棋盘和合法动作；地图额外提供当前、完整目标状态及合法真实后继的向量。参考成本与解序列不进入文字。
@@ -1633,6 +1673,7 @@ Reason: The required goal is already reached; no further move is needed.
 ```json
 {
   "initial": "............AA......................",
+  "goal_board": "................AA..................",
   "actions": [
     {
       "vehicle": "A",

@@ -50,7 +50,8 @@ def build(run, limit=None):
     adaptive = suite["config"].get("study") == "adaptive_complete_plan_difficulty"
     new_tasks = suite["config"].get("study") == "new_tasks_flash_fixed_setting_screening"
     rush_token = suite['config'].get('study') == 'rush_token_flash_fixed_screening'
-    if rush_token:
+    exact_goals = suite['config'].get('study') == 'specified_complete_goal_flash_screening'
+    if rush_token or exact_goals:
         by_id = {c['id']:c for c in suite['cases']}
         for task, values in results.items():
             solved_rows = [r for r in valid if r['task'] == task and r['verdict'].get('solved')]
@@ -67,7 +68,7 @@ def build(run, limit=None):
     first_error = suite['config'].get('policy') == 'first_valid_model_error_per_task'
     policy = suite.get('current_policy',suite['config'])
     screening,confirmation = policy.get('cases_per_level',5),policy.get('confirmation_cases',10)
-    lines = ["# Rush Hour与Token Swapping纯文字筛查" if rush_token else "# 三个新任务首次错误探索" if first_error else "# 逐项加难试验" if adaptive else "# 三个新任务纯文字筛查" if new_tasks else "# 五任务纯文字完整规划基线", "",
+    lines = ["# 指定完整目标纯文字筛查" if exact_goals else "# Rush Hour与Token Swapping纯文字筛查" if rush_token else "# 三个新任务首次错误探索" if first_error else "# 逐项加难试验" if adaptive else "# 三个新任务纯文字筛查" if new_tasks else "# 五任务纯文字完整规划基线", "",
              f"状态：{progress['status']}。模型请求：`{progress['api']['model']}`；推理设置：`{progress['api']['reasoning_effort']}`。",
              "", f"每档至多{screening}题；每任务出现首个有效未完成即停止，不以单个失败估计成功率。服务错误不算模型失败。" if first_error else f"每档先测 {screening} 题，成功率不高于一半时用同档 {confirmation} 道独立新题确认；仍不高于一半才标记找到困难条件。格式问题单列，打乱步数不等于最短距离。" if adaptive else f"冻结题集共 {len(suite['cases'])} 题，一次输出完整计划，无工具、无中途反馈。主指标为环境回放到达目标，最优解和输出格式另计。",
              "", "| 任务 | 有效答卷／计划 | 待补服务失败 | 解出 | 严格合同通过 | 最优解 |", "|---|---:|---:|---:|---:|---:|"]
@@ -111,7 +112,7 @@ def build(run, limit=None):
               f"- 最新答卷中 {result['exceeded_output_limit']} 份超出请求的输出 token 上限；保留执行结果，但不能视为严格预算内成功。",
               f"- 已记录输出 token 总数：{sum((r.get('usage') or {}).get('output_tokens') or 0 for r in attempts):,}。",
               "- 第三方接口未提供返回模型名称与 reasoning 配置时，只能确认提交了请求参数，不能独立核验后台身份或强度。",
-              "- Rush Hour为8个公开无墙分量各5个起点，包含最短轨迹中间状态；Token Swapping为tket公开完整映射实例，精确最优值由本地搜索重算，上游交换序列仅为上界。不是代表性总体成功率。" if rush_token else "- 本轮加难是寻找失败点的适应性小样本试验，不估计整体成功率；完整计划，无工具、无中途反馈。" if adaptive else "- 复用既定Qmap留出条件；推箱子按布局等额并覆盖距离范围抽取，24点来自XoT测试源。结果只描述本批筛查题，不代表标准Boxoban或全部任务分布。" if new_tasks else "- 积木按 12 次不重叠放置构造，最短移除数可能更少；其余按精确距离分层。结果只描述本轮题集。",
+              "- 仅评指定完整目标。推箱子和Rush Hour沿用已测原始起点并明确见证终局，Token Swapping在固定树上同时重标起终点棋子。已核对精确成本；这批定向诊断不估计独立总体成功率，也不把旧完成规则成绩混入。" if exact_goals else "- Rush Hour为8个公开无墙分量各5个起点，包含最短轨迹中间状态；Token Swapping为tket公开完整映射实例，精确最优值由本地搜索重算，上游交换序列仅为上界。不是代表性总体成功率。" if rush_token else "- 本轮加难是寻找失败点的适应性小样本试验，不估计整体成功率；完整计划，无工具、无中途反馈。" if adaptive else "- 复用既定Qmap留出条件；推箱子按布局等额并覆盖距离范围抽取，24点来自XoT测试源。结果只描述本批筛查题，不代表标准Boxoban或全部任务分布。" if new_tasks else "- 积木按 12 次不重叠放置构造，最短移除数可能更少；其余按精确距离分层。结果只描述本轮题集。",
               "- 配置与原始逐题结果保留在运行目录；研究参数见本实验 configs/，不从本表反推全部运行设置。", ""]
     return result,"\n".join(lines)
 

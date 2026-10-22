@@ -4,6 +4,8 @@
 
 原题362曾使Flash high在64k预算内耗尽思考、最终答案为空，本地已有52次合法走／推动作的见证；52不是精确最短走动距离。它证明该实例在此预算下出现失败，不证明整个hard子集的模型成功率，也不表示任务本身无解。来源与结果见[文字基线报告](../../experiments/task_text_baselines/results/report.md)。
 
+指定完整目标的Flash64k诊断沿用原题359、362，两题均思考耗尽、最终答案为空；精确最少走／推次数分别80、44，完整目标和成本已独立核对。见[指定目标结果](../../experiments/task_text_baselines/results/exact_goals_flash64k.json)，不作为整个hard子集成功率估计。
+
 历史首轮Qmap为6×6两箱诊断，见[原配置](../../experiments/new_tasks_qmap/configs/sokoban.json)与[原报告](../../experiments/new_tasks_qmap/results/report.md)；不能用于声称已有10×10四箱地图。
 
 - [规则与输出](prompts/README.md)

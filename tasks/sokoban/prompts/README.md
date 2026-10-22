@@ -27,6 +27,24 @@ Initial board:
 
 方向指玩家移动方向，行走与推动均为一步。合法但进入死路的动作仍需列为合法候选。指定目标必须同时匹配箱子与玩家，输入保留目标格。
 
+## 指定完整目标文字
+
+上方`task_objective`与`goal_rule`依次取下方两行；规则原文在此维护，不在代码中另存。
+
+```text
+Find a valid sequence of moves that exactly matches the specified goal board, as short as you can.
+The goal is to match the specified goal board exactly, including the player and all box positions. Boxes are indistinguishable.
+```
+
+## 历史目标文字：仅回放
+
+仅用于没有`goal_board`的历史题目兼容；不作为新评测安排。
+
+```text
+Find a valid sequence of moves that puts every box on a target, as short as you can.
+The goal is that every box is on a target; the player's final position does not matter.
+```
+
 ## 地图组／CoT 组：每轮环境更新
 
 两组共享规则、真实当前状态、实际动作历史与全部合法动作。地图组额外获得当前／完整目标状态／合法真实后继的Q槽位；精确距离、参考解和死路标签不进入模型文字。指定目标棋盘在两组任务描述中相同。

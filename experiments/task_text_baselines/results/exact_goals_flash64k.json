@@ -1,0 +1,559 @@
+{
+  "status": "completed",
+  "source_commit": "2dbec42d45e23a17b957249aac02418a5257fde0",
+  "config": "experiments/task_text_baselines/configs/deepseek_exact_goals64k.json",
+  "raw_results": "runs/deepseek_exact_goals64k",
+  "valid_responses": 15,
+  "service_error_attempts": 0,
+  "verification": {
+    "reference_replays": 15,
+    "frozen_prompts_verified": 15,
+    "valid_records_verified": 15,
+    "completed_response_replays": 4,
+    "truncation_metadata_verified": 11,
+    "empty_final_truncations": 11,
+    "planned": 15
+  },
+  "tasks": {
+    "sokoban": {
+      "planned": 2,
+      "finished": 2,
+      "valid_responses": 2,
+      "service_errors": 0,
+      "solved": 0,
+      "contract_pass": 0,
+      "optimal": 0,
+      "optimal_evaluated": 0,
+      "failures": {
+        "truncated": 2
+      },
+      "output_tokens": 128000,
+      "input_tokens": 931,
+      "strata": {
+        "specified_goal_boxoban_hard": {
+          "finished": 2,
+          "valid_responses": 2,
+          "service_errors": 0,
+          "solved": 0
+        }
+      },
+      "execution_solved": 0,
+      "budget_exceeded": 0,
+      "budget_unknown": 0,
+      "cost_quality": {
+        "scope": "successful answers only",
+        "count": 0,
+        "mean_cost": null,
+        "mean_reference_cost": null,
+        "mean_excess": null,
+        "max_excess": null,
+        "mean_cost_ratio": null
+      }
+    },
+    "rush_hour": {
+      "planned": 8,
+      "finished": 8,
+      "valid_responses": 8,
+      "service_errors": 0,
+      "solved": 0,
+      "contract_pass": 0,
+      "optimal": 0,
+      "optimal_evaluated": 0,
+      "failures": {
+        "truncated": 8
+      },
+      "output_tokens": 512000,
+      "input_tokens": 4488,
+      "strata": {
+        "specified_goal_distance_51": {
+          "finished": 1,
+          "valid_responses": 1,
+          "service_errors": 0,
+          "solved": 0
+        },
+        "specified_goal_distance_41": {
+          "finished": 1,
+          "valid_responses": 1,
+          "service_errors": 0,
+          "solved": 0
+        },
+        "specified_goal_distance_46": {
+          "finished": 1,
+          "valid_responses": 1,
+          "service_errors": 0,
+          "solved": 0
+        },
+        "specified_goal_distance_38": {
+          "finished": 3,
+          "valid_responses": 3,
+          "service_errors": 0,
+          "solved": 0
+        },
+        "specified_goal_distance_47": {
+          "finished": 1,
+          "valid_responses": 1,
+          "service_errors": 0,
+          "solved": 0
+        },
+        "specified_goal_distance_44": {
+          "finished": 1,
+          "valid_responses": 1,
+          "service_errors": 0,
+          "solved": 0
+        }
+      },
+      "execution_solved": 0,
+      "budget_exceeded": 0,
+      "budget_unknown": 0,
+      "cost_quality": {
+        "scope": "successful answers only",
+        "count": 0,
+        "mean_cost": null,
+        "mean_reference_cost": null,
+        "mean_excess": null,
+        "max_excess": null,
+        "mean_cost_ratio": null
+      }
+    },
+    "token_swapping": {
+      "planned": 5,
+      "finished": 5,
+      "valid_responses": 5,
+      "service_errors": 0,
+      "solved": 4,
+      "contract_pass": 4,
+      "optimal": 4,
+      "optimal_evaluated": 4,
+      "failures": {
+        "truncated": 1,
+        "success": 4
+      },
+      "output_tokens": 209758,
+      "input_tokens": 2490,
+      "strata": {
+        "specified_goal_Medium random tree 1": {
+          "finished": 5,
+          "valid_responses": 5,
+          "service_errors": 0,
+          "solved": 4
+        }
+      },
+      "execution_solved": 4,
+      "budget_exceeded": 0,
+      "budget_unknown": 0,
+      "cost_quality": {
+        "scope": "successful answers only",
+        "count": 4,
+        "mean_cost": 14,
+        "mean_reference_cost": 14,
+        "mean_excess": 0,
+        "max_excess": 0,
+        "mean_cost_ratio": 1.0
+      }
+    }
+  },
+  "returned_model_counts": {
+    "deepseek-flash": 15
+  },
+  "response_metadata_coverage": {
+    "valid_answers": 15,
+    "model_reported": 15,
+    "effort_counts": {
+      "high": 15
+    },
+    "effort_reported_on_reused_answers": 0
+  },
+  "exceeded_output_limit": 0,
+  "scope": "Specified complete goals only;15 previously seen starts or label-equivalent source pairs; not an independent population accuracy estimate.",
+  "cases": [
+    {
+      "id": "exact_sokoban_level2_00",
+      "task": "sokoban",
+      "matched_source": {
+        "run": "runs/deepseek_new_tasks_harder64k",
+        "case_id": "sokoban_level2_00"
+      },
+      "source": {
+        "file": "hard/000.txt",
+        "puzzle_id": "359",
+        "commit": "78011d8c86ad423bfb2e1005012393b4c3c24409"
+      },
+      "minimum_cost": 80,
+      "verdict": {
+        "solved": false,
+        "contract_pass": false,
+        "failure": "truncated",
+        "cost": null,
+        "optimal": null,
+        "excess_cost": null
+      },
+      "output_tokens": 64000,
+      "elapsed_seconds": 333.891
+    },
+    {
+      "id": "exact_sokoban_level2_01",
+      "task": "sokoban",
+      "matched_source": {
+        "run": "runs/deepseek_new_tasks_harder64k",
+        "case_id": "sokoban_level2_01"
+      },
+      "source": {
+        "file": "hard/000.txt",
+        "puzzle_id": "362",
+        "commit": "78011d8c86ad423bfb2e1005012393b4c3c24409"
+      },
+      "minimum_cost": 44,
+      "verdict": {
+        "solved": false,
+        "contract_pass": false,
+        "failure": "truncated",
+        "cost": null,
+        "optimal": null,
+        "excess_cost": null
+      },
+      "output_tokens": 64000,
+      "elapsed_seconds": 328.547
+    },
+    {
+      "id": "exact_rush_hour_004",
+      "task": "rush_hour",
+      "matched_source": {
+        "run": "runs/deepseek_rush_token64k",
+        "case_id": "rush_hour_004"
+      },
+      "source": {
+        "row": 15,
+        "original_board": "GBBoLoGHIoLMGHIAAMCCCKoMooJKDDEEJFFo",
+        "original_minimum_moves": 51,
+        "component_states": 4780,
+        "scene": 0,
+        "derivation": "original"
+      },
+      "minimum_cost": 51,
+      "verdict": {
+        "solved": false,
+        "contract_pass": false,
+        "failure": "truncated",
+        "cost": null,
+        "optimal": null,
+        "excess_cost": null
+      },
+      "output_tokens": 64000,
+      "elapsed_seconds": 322.25
+    },
+    {
+      "id": "exact_rush_hour_009",
+      "task": "rush_hour",
+      "matched_source": {
+        "run": "runs/deepseek_rush_token64k",
+        "case_id": "rush_hour_009"
+      },
+      "source": {
+        "row": 343,
+        "original_board": "oGBBKLoGHIKLAAHIoLooHJCCFDDJooFEEEoo",
+        "original_minimum_moves": 41,
+        "component_states": 10066,
+        "scene": 1,
+        "derivation": "original"
+      },
+      "minimum_cost": 41,
+      "verdict": {
+        "solved": false,
+        "contract_pass": false,
+        "failure": "truncated",
+        "cost": null,
+        "optimal": null,
+        "excess_cost": null
+      },
+      "output_tokens": 64000,
+      "elapsed_seconds": 326.125
+    },
+    {
+      "id": "exact_rush_hour_014",
+      "task": "rush_hour",
+      "matched_source": {
+        "run": "runs/deepseek_rush_token64k",
+        "case_id": "rush_hour_014"
+      },
+      "source": {
+        "row": 83,
+        "original_board": "BBBCCMDDoooMIAAooMIJEEFFIJKLGGHHKLoo",
+        "original_minimum_moves": 46,
+        "component_states": 1239,
+        "scene": 2,
+        "derivation": "original"
+      },
+      "minimum_cost": 46,
+      "verdict": {
+        "solved": false,
+        "contract_pass": false,
+        "failure": "truncated",
+        "cost": null,
+        "optimal": null,
+        "excess_cost": null
+      },
+      "output_tokens": 64000,
+      "elapsed_seconds": 325.922
+    },
+    {
+      "id": "exact_rush_hour_019",
+      "task": "rush_hour",
+      "matched_source": {
+        "run": "runs/deepseek_rush_token64k",
+        "case_id": "rush_hour_019"
+      },
+      "source": {
+        "row": 795,
+        "original_board": "BBBJKLGCCJKLGoAAKLDDIooooHIooooHEEFF",
+        "original_minimum_moves": 38,
+        "component_states": 18559,
+        "scene": 3,
+        "derivation": "original"
+      },
+      "minimum_cost": 38,
+      "verdict": {
+        "solved": false,
+        "contract_pass": false,
+        "failure": "truncated",
+        "cost": null,
+        "optimal": null,
+        "excess_cost": null
+      },
+      "output_tokens": 64000,
+      "elapsed_seconds": 326.469
+    },
+    {
+      "id": "exact_rush_hour_024",
+      "task": "rush_hour",
+      "matched_source": {
+        "run": "runs/deepseek_rush_token64k",
+        "case_id": "rush_hour_024"
+      },
+      "source": {
+        "row": 906,
+        "original_board": "BBoJooHooJCCHAAJoKooIDDKEEIooLFFIGGL",
+        "original_minimum_moves": 38,
+        "component_states": 3612,
+        "scene": 4,
+        "derivation": "original"
+      },
+      "minimum_cost": 38,
+      "verdict": {
+        "solved": false,
+        "contract_pass": false,
+        "failure": "truncated",
+        "cost": null,
+        "optimal": null,
+        "excess_cost": null
+      },
+      "output_tokens": 64000,
+      "elapsed_seconds": 321.531
+    },
+    {
+      "id": "exact_rush_hour_029",
+      "task": "rush_hour",
+      "matched_source": {
+        "run": "runs/deepseek_rush_token64k",
+        "case_id": "rush_hour_029"
+      },
+      "source": {
+        "row": 850,
+        "original_board": "oooIBBooHICCAAHJKLDDoJKLGEEEKMGoFFoM",
+        "original_minimum_moves": 38,
+        "component_states": 7034,
+        "scene": 5,
+        "derivation": "original"
+      },
+      "minimum_cost": 38,
+      "verdict": {
+        "solved": false,
+        "contract_pass": false,
+        "failure": "truncated",
+        "cost": null,
+        "optimal": null,
+        "excess_cost": null
+      },
+      "output_tokens": 64000,
+      "elapsed_seconds": 339.266
+    },
+    {
+      "id": "exact_rush_hour_034",
+      "task": "rush_hour",
+      "matched_source": {
+        "run": "runs/deepseek_rush_token64k",
+        "case_id": "rush_hour_034"
+      },
+      "source": {
+        "row": 51,
+        "original_board": "BBCCLoooJoLMIoJAAMIDDEEMoFFKooGGGKHH",
+        "original_minimum_moves": 47,
+        "component_states": 4968,
+        "scene": 6,
+        "derivation": "original"
+      },
+      "minimum_cost": 47,
+      "verdict": {
+        "solved": false,
+        "contract_pass": false,
+        "failure": "truncated",
+        "cost": null,
+        "optimal": null,
+        "excess_cost": null
+      },
+      "output_tokens": 64000,
+      "elapsed_seconds": 334.297
+    },
+    {
+      "id": "exact_rush_hour_039",
+      "task": "rush_hour",
+      "matched_source": {
+        "run": "runs/deepseek_rush_token64k",
+        "case_id": "rush_hour_039"
+      },
+      "source": {
+        "row": 143,
+        "original_board": "IBBCCCIoDDLMAAJoLMEEJFFMoGGKooHHHKoo",
+        "original_minimum_moves": 44,
+        "component_states": 3913,
+        "scene": 7,
+        "derivation": "original"
+      },
+      "minimum_cost": 44,
+      "verdict": {
+        "solved": false,
+        "contract_pass": false,
+        "failure": "truncated",
+        "cost": null,
+        "optimal": null,
+        "excess_cost": null
+      },
+      "output_tokens": 64000,
+      "elapsed_seconds": 316.859
+    },
+    {
+      "id": "exact_token_swapping_030",
+      "task": "token_swapping",
+      "matched_source": {
+        "run": "runs/deepseek_rush_token64k",
+        "case_id": "token_swapping_030"
+      },
+      "source": {
+        "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+        "architecture": "Medium random tree 1",
+        "entry_index": 25,
+        "upstream_cost": 17
+      },
+      "minimum_cost": 15,
+      "verdict": {
+        "solved": false,
+        "contract_pass": false,
+        "failure": "truncated",
+        "cost": null,
+        "optimal": null,
+        "excess_cost": null
+      },
+      "output_tokens": 64000,
+      "elapsed_seconds": 322.234
+    },
+    {
+      "id": "exact_token_swapping_031",
+      "task": "token_swapping",
+      "matched_source": {
+        "run": "runs/deepseek_rush_token64k",
+        "case_id": "token_swapping_031"
+      },
+      "source": {
+        "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+        "architecture": "Medium random tree 1",
+        "entry_index": 13,
+        "upstream_cost": 15
+      },
+      "minimum_cost": 15,
+      "verdict": {
+        "solved": true,
+        "contract_pass": true,
+        "failure": null,
+        "cost": 15,
+        "optimal": true,
+        "excess_cost": 0
+      },
+      "output_tokens": 24246,
+      "elapsed_seconds": 119.5
+    },
+    {
+      "id": "exact_token_swapping_032",
+      "task": "token_swapping",
+      "matched_source": {
+        "run": "runs/deepseek_rush_token64k",
+        "case_id": "token_swapping_032"
+      },
+      "source": {
+        "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+        "architecture": "Medium random tree 1",
+        "entry_index": 27,
+        "upstream_cost": 12
+      },
+      "minimum_cost": 12,
+      "verdict": {
+        "solved": true,
+        "contract_pass": true,
+        "failure": null,
+        "cost": 12,
+        "optimal": true,
+        "excess_cost": 0
+      },
+      "output_tokens": 19966,
+      "elapsed_seconds": 97.078
+    },
+    {
+      "id": "exact_token_swapping_033",
+      "task": "token_swapping",
+      "matched_source": {
+        "run": "runs/deepseek_rush_token64k",
+        "case_id": "token_swapping_033"
+      },
+      "source": {
+        "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+        "architecture": "Medium random tree 1",
+        "entry_index": 14,
+        "upstream_cost": 15
+      },
+      "minimum_cost": 15,
+      "verdict": {
+        "solved": true,
+        "contract_pass": true,
+        "failure": null,
+        "cost": 15,
+        "optimal": true,
+        "excess_cost": 0
+      },
+      "output_tokens": 54951,
+      "elapsed_seconds": 282.235
+    },
+    {
+      "id": "exact_token_swapping_034",
+      "task": "token_swapping",
+      "matched_source": {
+        "run": "runs/deepseek_rush_token64k",
+        "case_id": "token_swapping_034"
+      },
+      "source": {
+        "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+        "architecture": "Medium random tree 1",
+        "entry_index": 11,
+        "upstream_cost": 14
+      },
+      "minimum_cost": 14,
+      "verdict": {
+        "solved": true,
+        "contract_pass": true,
+        "failure": null,
+        "cost": 14,
+        "optimal": true,
+        "excess_cost": 0
+      },
+      "output_tokens": 46595,
+      "elapsed_seconds": 233.703
+    }
+  ]
+}

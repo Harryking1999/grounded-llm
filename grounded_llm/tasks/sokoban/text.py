@@ -9,15 +9,13 @@ def environment(lines):
 
 
 def fields(case):
+    from grounded_llm.tasks.text import section_text
     target = goal(case)
+    objective, rule = section_text('sokoban', '指定完整目标文字' if target is not None else '历史目标文字：仅回放').splitlines()
     return {'board_height': len(case['initial']), 'board_width': len(case['initial'][0]),
             'initial_board': '\n'.join(case['initial']),
-            'task_objective': ('Find a valid sequence of moves that exactly matches the specified goal board, as short as you can.'
-                               if target is not None else
-                               'Find a valid sequence of moves that puts every box on a target, as short as you can.'),
-            'goal_rule': ('The goal is to match the specified goal board exactly, including the player and all box positions. Boxes are indistinguishable.'
-                          if target is not None else
-                          "The goal is that every box is on a target; the player's final position does not matter."),
+            'task_objective': objective,
+            'goal_rule': rule,
             'goal_board_section': '\n\nGoal board:\n'+'\n'.join(case['goal_board']) if target is not None else ''}
 
 

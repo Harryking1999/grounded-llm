@@ -9,12 +9,11 @@ def environment(board):
 
 
 def fields(case):
+    from grounded_llm.tasks.text import section_text
     env = environment(case['initial'])
     target = goal(case)
     return {'initial_board': '\n'.join(env.render(env.start)),
-            'goal_rule': ('The goal is to match the specified goal board exactly, including the positions of every vehicle. Do not move A outside the board or remove it.'
-                          if target is not None else
-                          'The goal is to place the horizontal target vehicle A at the rightmost position in its row, occupying columns 4 and 5 (zero-based). Other vehicles may end anywhere legal. Do not move A outside the board or remove it.'),
+            'goal_rule': section_text('rush_hour', '指定完整目标文字' if target is not None else '历史目标文字：仅回放'),
             'goal_board_section': '\n\nGoal board, top row first:\n'+'\n'.join(env.render(target)) if target is not None else '',
             'vehicle_catalogue': '\n'.join(f'{label}: {"horizontal" if h else "vertical"}, length {size}'
                                           for label, h, size, _ in env.pieces)}

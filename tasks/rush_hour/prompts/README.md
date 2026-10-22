@@ -26,6 +26,22 @@ Initial board, top row first:
 {initial_board}{goal_board_section}
 ```
 
+## 指定完整目标文字
+
+上方`goal_rule`取下方原文；规则只在本页维护。
+
+```text
+The goal is to match the specified goal board exactly, including the positions of every vehicle. Do not move A outside the board or remove it.
+```
+
+## 历史目标文字：仅回放
+
+仅用于没有`goal_board`的历史题目兼容；不作为新评测安排。
+
+```text
+The goal is to place the horizontal target vehicle A at the rightmost position in its row, occupying columns 4 and 5 (zero-based). Other vehicles may end anywhere legal. Do not move A outside the board or remove it.
+```
+
 ## 地图组／CoT 组：每轮环境更新
 
 两组共享真实状态、指定的完整目标棋盘和合法动作；地图额外提供当前、完整目标状态及合法真实后继的向量。参考成本与解序列不进入文字。

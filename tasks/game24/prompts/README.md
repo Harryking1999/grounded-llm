@@ -1,15 +1,105 @@
-# 24点任务文字
+# 24点：任务文字与监督格式
 
-## 共用规则
+参考 [XoT的两数合并规则](https://github.com/microsoft/Everything-of-Thoughts-XoT/blob/d69d3b8ddb75f888732e893394e8e5e5df4f4e6f/xot_all_in_one/xot/prompter/prompts/prompts_game24.py)及[公开环境](https://github.com/microsoft/Everything-of-Thoughts-XoT/blob/d69d3b8ddb75f888732e893394e8e5e5df4f4e6f/xot_mcts/game24/Game24Game.py)。保留题目及运算规则；完整计划采用本项目统一JSON，不引入上游few-shot、MCTS或多次求解。
 
-给定四个正整数，每个数恰好使用一次，只允许加、减、乘、除及括号。每步从当前数值列表选择两个不同位置，用一次二元运算替换成结果，其余数保留，然后按数值升序排序。允许负数、零和分数中间值，禁止除以零；最终只剩一个数且精确等于24才成功。恰好三步；不能拼接、乘方或添加常数。
+以下定义可复用的文字协议。完整计划的提示与裁判已接入；逐轮地图／CoT部分是协议模板，尚无本任务LLM训练或已采用Qmap权重。
 
-动作是 [i,op,j]，i<j，为当前排序后的0基位置。op 为 +、-、r-、*、/、r/；r-表示右数减左数，r/表示右数除左数。重复数字是不同位置。环境用最简分数字符串显示中间状态，保留原始数与动作历史供裁判复核。
+## 共享任务描述与规则
 
-## 每轮输入和输出
+```text
+Find a valid sequence of arithmetic operations that uses all four initial numbers exactly once and produces 24.
+Reaching the goal is the first priority.
 
-环境提供真实当前状态、目标条件、合法动作编号及后继状态；不提供精确剩余成本或死路标签。地图组另收到冻结Q向量；无地图组收到相同文字。环境执行所选动作并更新状态，完成由裁判判断。
+Rules: At each step, choose two different slots in the current sorted list, combine their numbers with one binary operation, remove both operands, and insert the result.
+Sort the remaining list in ascending numerical order after every step. Slot indices are zero-based and refer to this newly sorted list, not to the initial numbers.
+An action is [i, op, j], where i < j. Let x be the number at slot i and y the number at slot j.
+The allowed op strings are "+" (x+y), "-" (x-y), "r-" (y-x), "*" (x*y), "/" (x/y), and "r/" (y/x).
+Division by zero is illegal. Negative, zero, and fractional intermediate values are allowed; use exact arithmetic.
+Equal numbers occupy distinct slots. Do not concatenate numbers, use powers, add constants, or split one number into two.
+After exactly three operations, the list must contain the single exact value 24.
 
-逐轮输出 Reason 与 Action；地图组可以另输出候选排序。一次性完整计划输出 JSON：`{"actions": [...]}`。示例中的人员列表、方向字符串或运算三元组作为 actions 的元素。非法动作判失败，预算由实验配置指定，不由oracle距离逐题调整。
+Initial sorted list:
+{initial_numbers}
 
-当前只实现环境、数据和Qmap探测，尚未接入LLM训练或运行文字基线；本页为可复用协议。
+Goal list:
+24
+```
+
+列表中的分数用最简分数字符串显示，排序按实际数值。动作只引用当前槽位，不能把表达式当动作提交。全部可解状态到[24]的距离恒为剩余数字个数减1；这里主要检验可解分支。
+
+## 地图组／CoT 组：每轮环境更新
+
+两组共享规则、真实当前状态、实际动作历史与全部合法动作。地图组额外获得当前／目标条件／合法真实后继的Q槽位；精确距离、参考解和死路标签不进入模型文字。
+
+```text
+[Environment update]
+Current sorted list:
+{current_numbers}
+Actual executed actions: {executed_actions_or_none}
+Legal next moves:
+{local_id}: [{i}, "{operation}", {j}]
+...
+Candidate numbers may change between turns; use only the numbers above.
+[/Environment update]
+```
+
+## SOTA 组／32B 组：输出格式
+
+```text
+Plan the complete remaining sequence from the current state and output it once. There is no intermediate feedback; the judge stops at the first illegal action.
+Return JSON with "actions" (an array of exactly three arrays [i, op, j], using the current sorted slot indices and the allowed operation strings) and "final_status" ("solved", "no_solution", or "unsolved").
+Use "solved" when your sequence reaches the goal; if already at the goal, output an empty actions array. Use "no_solution" only when the goal is unreachable, not merely because you could not find a plan; otherwise use "unsolved".
+```
+
+沿用既有完整计划条件：无工具和中途反馈，不要求逐步状态报告。模型自报状态不替代动作回放；完成、最优成本与格式分别记录。模型和token预算以实验配置为准。
+
+## 监督答案：排序／Reason／Action
+
+```text
+Map-distance ranking to the goal, closest to farthest: {ranking}.
+Reason: Combining the numbers in slots {i} and {j} with {operation} is legal and leaves a solvable list with one fewer operation needed.
+<action>{local_id}</action>
+```
+
+排序包含最近的至多10个候选及`current`，用`<`、`=`表示远近和并列。排序由实际冻结Q生成，不能把精确距离填入排序冒充Q输出。上述Reason仅在裁判已验证相应事实时作为监督模板；尚未生成本任务SFT数据。无地图CoT组只删除排序行，保留相同Reason和控制标签。
+
+直接到达目标时：
+
+```text
+Reason: Combining the numbers in slots {i} and {j} with {operation} is legal and leaves the single exact value 24.
+<action>{local_id}</action>
+```
+
+已经完成时：
+
+```text
+Reason: The current list contains only 24; no further operation is needed.
+<done/>
+```
+
+## 完整计划结构说明例
+
+下例对应本任务[data/example.json](../data/example.json)，只说明格式，不作为测试题提示中的few-shot。
+
+```json
+{
+  "actions": [
+    [
+      0,
+      "r/",
+      2
+    ],
+    [
+      0,
+      "r-",
+      1
+    ],
+    [
+      0,
+      "r/",
+      1
+    ]
+  ],
+  "final_status": "solved"
+}
+```

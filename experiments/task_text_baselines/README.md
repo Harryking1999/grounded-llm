@@ -4,6 +4,8 @@
 
 DeepSeek 积木／二阶魔方新题复测见 [64k 合同](configs/deepseek_blocks_cube100_64k.json)与[结果表](results/report.md)。原始答卷、进度与失败记录仅存 Git 外 `runs/deepseek_blocks_cube_fresh100_64k/`。
 
+手电过桥、推箱子、24点的固定设置Flash筛查见[64k合同](configs/deepseek_new_tasks_64k.json)。沿用共享规则、完整动作JSON和独立回放；完成与最优成本分别计分。来源为既有Qmap留出题，不调整任务或地图超参数；推箱子是小棋盘诊断条件，不冒充Boxoban题集。
+
 ## 实验合同与答卷来源
 
 所有条件一次输出完整计划，无工具、无中途反馈。裁判独立回放真实动作，模型自报棋盘不覆盖环境状态。每题一次有效答案，服务错误按配置有限重试；正常错误、截断和超限不重抽。历史 medium 每题八次，单列比较。
@@ -39,6 +41,7 @@ S/Z 仅动作两组只删除冻结提示词末尾的逐步状态指令，保留�
 主评分为 [16k 合同](configs/budget_16k.json)，附加 [8k 合同](configs/budget_8k.json)，都包含思考与最终答案；超限即错，用量缺失不计预算内成功。原执行分保留。请求上限阶段、第三方接口强度缺失与其他比较限制统一写在结果表中。
 
 - `src/prepare.py`、`src/prepare_retest.py`：准备冻结题集并回放参考解。
+- `src/prepare_new_tasks.py`：从新三任务既定留出条件抽取筛查题并回放参考解；原始题集和答卷在 `runs/deepseek_new_tasks_64k/`。
 - `src/blocks_goal_mix.py`：清空／非空目标混合题；用差集精确覆盖核验非空目标最短步数，孤立格按上下左右邻接判断。
 - `src/run.py`：API 调用、断点续跑和有限服务重试；凭据只从进程环境传入。
 - `src/qwen.py`：完整 BF16 Qwen3-32B、TP4、thinking，依赖见 [requirements-qwen.txt](requirements-qwen.txt)。

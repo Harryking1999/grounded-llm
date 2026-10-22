@@ -2,6 +2,7 @@
 import json
 from pathlib import Path
 import re
+import importlib
 
 import grounded_llm.tasks.blocks.rules as blocks
 from . import cube3, puzzle15, sliding
@@ -21,7 +22,10 @@ def section_text(task, heading):
 def prompt(case):
     task = case["task"]
     text = section_text(task, "共享任务描述与规则")
-    if task == "blocks":
+    if task in ('bridge', 'sokoban', 'game24'):
+        fields = importlib.import_module(f'grounded_llm.tasks.{task}.text').fields(case)
+        fields['action_limit'] = case['action_limit']
+    elif task == "blocks":
         if case.get('shape_options'):
             from grounded_llm.tasks.blocks.variants import BlocksTask
             rules = BlocksTask(case['shape_options'])
@@ -64,6 +68,8 @@ def judge(case, raw):
     if not isinstance(output, dict) or not isinstance(output.get("actions"), list):
         return {"solved": False, "contract_pass": False, "failure": "parse_error", "strict_json": strict}
     task, actions = case["task"], output["actions"]
+    if task in ('bridge', 'sokoban', 'game24'):
+        return judge_plan(case, output, strict)
     state = tuple(case["initial"]) if task in ("hanoi", "puzzle8", "puzzle15", "puzzle24", "cube3") else case["initial"]
     goal = tuple(case["goal"]) if task in ("hanoi", "puzzle8", "puzzle15", "puzzle24", "cube3") else case["goal"]
     shape_rules = None
@@ -111,3 +117,31 @@ def judge(case, raw):
                       state_reports_correct=reports_correct)
         result['contract_pass'] = result['contract_pass'] and reports_correct == executed
     return result
+
+
+def judge_plan(case, output, strict):
+    """Use task-owned transitions with the same completion/format split as older tasks."""
+    adapter = importlib.import_module(f'grounded_llm.tasks.{case["task"]}.text')
+    state, total, executed, illegal, detail = adapter.initial(case), 0, 0, None, None
+    actions = output['actions']
+    for index, action in enumerate(actions):
+        try:
+            state, cost = adapter.step(case, state, action)
+            total += cost
+            executed += 1
+        except (ValueError, TypeError, KeyError, IndexError) as error:
+            illegal, detail = index, str(error)
+            break
+    length_valid = len(actions) <= case['action_limit']
+    if case['task'] == 'game24':
+        length_valid = len(actions) == 3
+    solved = illegal is None and length_valid and adapter.solved(case, state)
+    status = output.get('final_status')
+    status_correct = status == ('solved' if solved else 'unsolved')
+    optimum = case['reference']['cost']
+    return {'solved': solved, 'contract_pass': solved and strict and status_correct,
+            'strict_json': strict, 'status_correct': status_correct, 'reported_status': status,
+            'failure': 'illegal_action' if illegal is not None else 'action_limit' if not length_valid else None if solved else 'unsolved',
+            'first_illegal_index': illegal, 'illegal_detail': detail, 'executed': executed,
+            'plan_length': len(actions), 'cost': total, 'optimal': solved and total == optimum,
+            'excess_cost': total - optimum if solved else None}

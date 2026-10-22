@@ -81,7 +81,7 @@ Return JSON with "actions" (an array of objects with integer shape_id, row, col)
 Use "solved" when your sequence reaches the goal; if already at the goal, output an empty actions array. Use "no_solution" only when the goal is unreachable, not merely because you could not find a plan; otherwise use "unsolved".
 ```
 
-动作使用物理参数而非本轮候选 ID；不要求 `board_after`。已在目标时使用 `{"actions":[],"final_status":"solved"}`。输出预算待正式配置确认。与地图／CoT 逐轮条件的反馈方式不同，报告时注明。旧 SOTA／32B 整段计划条件还使用过不同形状目录与空目标，不能直接移用为本轮匹配结果。
+动作使用物理参数而非本轮候选 ID；不要求 `board_after`。已在目标时使用 `{"actions":[],"final_status":"solved"}`。输出预算以对应实验正式配置为准。与地图／CoT 逐轮条件的反馈方式不同，报告时注明。旧 SOTA／32B 整段计划条件还使用过不同形状目录与空目标，不能直接移用为本轮匹配结果。
 
 
 ### 数据说明例
@@ -916,7 +916,7 @@ Goal board:
 6 7 8
 ```
 
-文字支持显式给定目标；首轮题集先按上述复原目标拟定，任意目标是否纳入正式比较另定。九个数的合法排列不保证与目标连通，准备数据时必须区分合法棋盘与可达任务。默认成功率题集使用可达状态，不把不可达题混入同一分母；若评测无解识别，单独列条件与指标。
+文字支持显式给定目标，实例按冻结题集显示具体棋盘；目标说明例不代替Qmap的[采用范围](tasks/puzzle8/Qmap/selection.json)。九个数的合法排列不保证与目标连通，准备数据时必须区分合法棋盘与可达任务。默认成功率题集使用可达状态，不把不可达题混入同一分母；若评测无解识别，单独列条件与指标。
 
 #### 地图组／CoT 组：每轮环境更新
 
@@ -1101,21 +1101,122 @@ Reason: The current board exactly matches the goal; no further move is needed.
 
 来源：`tasks/bridge/prompts/README.md`
 
-### 手电过桥任务文字
+### 手电过桥：任务文字与监督格式
 
-#### 共用规则
+规则采用 [Backhouse 与 Truong 的手电过桥问题](https://people.cs.nott.ac.uk/psarb2/papers/abstract.html)的容量2情形。当前六人时间组合是本项目诊断场景，不称为论文原题集。
 
-人员各自位于左岸或右岸，另有手电所在岸。每人有固定正整数过桥时间。每次一人或两人必须与手电同岸并一起移动；耗时取同行者中较大值。允许一人或两人返回。所有人和手电到达右岸即完成；评价总耗时及是否最优。
+以下定义可复用的文字协议。完整计划的提示与裁判已接入；逐轮地图／CoT部分是协议模板，尚无本任务LLM训练或已采用Qmap权重。
 
-动作是人员编号列表，编号从0开始，例如 [0,1]。同一人的身份在全程不变。
+#### 共享任务描述与规则
 
-#### 每轮输入和输出
+```text
+Find a valid sequence of crossings from the initial configuration to the goal configuration, with as little total crossing time as you can.
+Reaching the goal is the first priority; among valid solutions, prefer less total crossing time.
 
-环境提供真实当前状态、目标条件、合法动作编号及后继状态；不提供精确剩余成本或死路标签。地图组另收到冻结Q向量；无地图组收到相同文字。环境执行所选动作并更新状态，完成由裁判判断。
+Rules: There are {people_count} people, numbered from 0 to {max_person_id}, two banks (left and right), and one torch.
+Each person has a fixed crossing time. In one action, one or two distinct people cross together with the torch.
+All travellers must start on the same bank as the torch. After crossing, the travellers and the torch are on the opposite bank.
+A crossing costs the maximum crossing time among its travellers. The same rules apply in both directions.
+Reach the goal with every person and the torch on the right bank.
+Use at most {action_limit} actions.
 
-逐轮输出 Reason 与 Action；地图组可以另输出候选排序。一次性完整计划输出 JSON：`{"actions": [...]}`。示例中的人员列表、方向字符串或运算三元组作为 actions 的元素。非法动作判失败，预算由实验配置指定，不由oracle距离逐题调整。
+Crossing times (person ID: time units):
+{crossing_times}
 
-当前只实现环境、数据和Qmap探测，尚未接入LLM训练或运行文字基线；本页为可复用协议。
+Initial configuration:
+Left bank: {initial_left}
+Right bank: {initial_right}
+Torch bank: {initial_torch}
+
+Goal configuration:
+Left bank: []
+Right bank: {all_people}
+Torch bank: right
+```
+
+过桥以总时间为成本，不能用最少动作替代。地图距离排序仍表示后继到目标的剩余成本；选动作需加上本次过桥耗时，不能直接把后继距离最小的动作作为标签。
+
+#### 地图组／CoT 组：每轮环境更新
+
+两组共享规则、真实当前状态、实际动作历史与全部合法动作。地图组额外获得当前／目标条件／合法真实后继的Q槽位；精确距离、参考解和死路标签不进入模型文字。
+
+```text
+[Environment update]
+Current configuration:
+Left bank: {current_left}
+Right bank: {current_right}
+Torch bank: {current_torch}
+Actual executed actions: {executed_actions_or_none}
+Legal next moves:
+{local_id}: cross({person_ids}); crossing time: {immediate_cost}
+...
+Candidate numbers may change between turns; use only the numbers above.
+[/Environment update]
+```
+
+#### SOTA 组／32B 组：输出格式
+
+```text
+Plan the complete remaining sequence from the current state and output it once. There is no intermediate feedback; the judge stops at the first illegal action.
+Return JSON with "actions" (an array of arrays; each action contains one or two distinct integer person IDs) and "final_status" ("solved", "no_solution", or "unsolved").
+Use "solved" when your sequence reaches the goal; if already at the goal, output an empty actions array. Use "no_solution" only when the goal is unreachable, not merely because you could not find a plan; otherwise use "unsolved".
+```
+
+沿用既有完整计划条件：无工具和中途反馈，不要求逐步状态报告。模型自报状态不替代动作回放；完成、最优成本与格式分别记录。模型和token预算以实验配置为准。
+
+#### 监督答案：排序／Reason／Action
+
+```text
+Map-distance ranking to the goal, closest to farthest: {ranking}.
+Reason: Crossing with people {person_ids} is legal and preserves a minimum-total-time route to the goal.
+<action>{local_id}</action>
+```
+
+排序包含最近的至多10个候选及`current`，用`<`、`=`表示远近和并列。排序由实际冻结Q生成，不能把精确距离填入排序冒充Q输出。上述Reason仅在裁判已验证相应事实时作为监督模板；尚未生成本任务SFT数据。无地图CoT组只删除排序行，保留相同Reason和控制标签。
+
+直接到达目标时：
+
+```text
+Reason: Crossing with people {person_ids} is legal and reaches the goal configuration.
+<action>{local_id}</action>
+```
+
+已经完成时：
+
+```text
+Reason: The current configuration exactly matches the goal; no further crossing is needed.
+<done/>
+```
+
+#### 完整计划结构说明例
+
+下例对应本任务[data/example.json](tasks/bridge/data/example.json)，只说明格式，不作为测试题提示中的few-shot。
+
+```json
+{
+  "actions": [
+    [
+      0,
+      1
+    ],
+    [
+      0
+    ],
+    [
+      2,
+      3
+    ],
+    [
+      1
+    ],
+    [
+      0,
+      1
+    ]
+  ],
+  "final_status": "solved"
+}
+```
 
 
 ### 数据说明例
@@ -1162,21 +1263,95 @@ Reason: The current board exactly matches the goal; no further move is needed.
 
 来源：`tasks/sokoban/prompts/README.md`
 
-### 推箱子任务文字
+### 推箱子：任务文字与监督格式
 
-#### 共用规则
+推动与行走规则参考 [gym-sokoban](https://github.com/mpSchrader/gym-sokoban/blob/8e06e44e8bf3bb8bc73eeb1e7f0354508ce3fc89/gym_sokoban/envs/sokoban_env.py)，ASCII参考 [DeepMind Boxoban](https://github.com/google-deepmind/boxoban-levels/blob/78011d8c86ad423bfb2e1005012393b4c3c24409/README.md)。当前小棋盘是诊断条件，不是标准10×10四箱Boxoban题集。
 
-地图包含墙、地面、目标格、箱子和玩家。每次向上、下、左、右移动一格。相邻格是箱子时，仅当箱子后面一格是空地或目标格才可推；不能拉箱子或推两个箱子。墙和箱子不能穿越。所有箱子占据目标格即完成，玩家最终位置不限。每次合法行走或推箱子成本均为1。合法但导致无解的动作仍保留。
+以下定义可复用的文字协议。完整计划的提示与裁判已接入；逐轮地图／CoT部分是协议模板，尚无本任务LLM训练或已采用Qmap权重。
 
-动作使用 U、D、L、R。ASCII中 # 是墙、空格是地面、. 是目标、$ 是箱子、@ 是玩家、* 是目标上的箱子、+ 是目标上的玩家。非法移动返回错误，不消耗一个伪造的自环动作。
+#### 共享任务描述与规则
 
-#### 每轮输入和输出
+```text
+Find a valid sequence of moves that puts every box on a target, as short as you can.
+Reaching the goal is the first priority; among valid solutions, prefer fewer moves.
 
-环境提供真实当前状态、目标条件、合法动作编号及后继状态；不提供精确剩余成本或死路标签。地图组另收到冻结Q向量；无地图组收到相同文字。环境执行所选动作并更新状态，完成由裁判判断。
+Rules: The board is a {board_height}x{board_width} grid with walls, floor, targets, boxes, and one player.
+ASCII symbols: # = wall, space = floor, . = target, $ = box, @ = player, * = box on target, + = player on target.
+An action U, D, L, or R moves the player one cell up, down, left, or right.
+If the adjacent cell contains a box, the action pushes that box one cell in the same direction, only if the cell beyond is empty floor or an unoccupied target.
+The player cannot pass through walls or boxes, pull a box, or push more than one box at a time.
+Each legal walk or push costs one step. A blocked move is illegal.
+The goal is that every box is on a target; the player's final position does not matter.
+Use at most {action_limit} actions.
 
-逐轮输出 Reason 与 Action；地图组可以另输出候选排序。一次性完整计划输出 JSON：`{"actions": [...]}`。示例中的人员列表、方向字符串或运算三元组作为 actions 的元素。非法动作判失败，预算由实验配置指定，不由oracle距离逐题调整。
+Initial board:
+{initial_board}
+```
 
-当前只实现环境、数据和Qmap探测，尚未接入LLM训练或运行文字基线；本页为可复用协议。
+方向指玩家移动方向，行走与推动均为一步。合法但进入死路的动作仍需列为合法候选。目标是状态集合，不显示唯一玩家终点；当前Q输入含目标格。
+
+#### 地图组／CoT 组：每轮环境更新
+
+两组共享规则、真实当前状态、实际动作历史与全部合法动作。地图组额外获得当前／目标条件／合法真实后继的Q槽位；精确距离、参考解和死路标签不进入模型文字。
+
+```text
+[Environment update]
+Current board:
+{current_board}
+Actual executed actions: {executed_actions_or_none}
+Legal next moves:
+{local_id}: {direction}
+...
+Candidate numbers may change between turns; use only the numbers above.
+[/Environment update]
+```
+
+#### SOTA 组／32B 组：输出格式
+
+```text
+Plan the complete remaining sequence from the current state and output it once. There is no intermediate feedback; the judge stops at the first illegal action.
+Return JSON with "actions" (an array of strings, each one of "U", "D", "L", or "R") and "final_status" ("solved", "no_solution", or "unsolved").
+Use "solved" when your sequence reaches the goal; if already at the goal, output an empty actions array. Use "no_solution" only when the goal is unreachable, not merely because you could not find a plan; otherwise use "unsolved".
+```
+
+沿用既有完整计划条件：无工具和中途反馈，不要求逐步状态报告。模型自报状态不替代动作回放；完成、最优成本与格式分别记录。模型和token预算以实验配置为准。
+
+#### 监督答案：排序／Reason／Action
+
+```text
+Map-distance ranking to the goal, closest to farthest: {ranking}.
+Reason: Moving {direction} is legal and leaves a solvable board with one fewer move needed to reach the goal.
+<action>{local_id}</action>
+```
+
+排序包含最近的至多10个候选及`current`，用`<`、`=`表示远近和并列。排序由实际冻结Q生成，不能把精确距离填入排序冒充Q输出。上述Reason仅在裁判已验证相应事实时作为监督模板；尚未生成本任务SFT数据。无地图CoT组只删除排序行，保留相同Reason和控制标签。
+
+直接到达目标时：
+
+```text
+Reason: Moving {direction} is legal and puts every box on a target.
+<action>{local_id}</action>
+```
+
+已经完成时：
+
+```text
+Reason: Every box is on a target; no further move is needed.
+<done/>
+```
+
+#### 完整计划结构说明例
+
+下例对应本任务[data/example.json](tasks/sokoban/data/example.json)，只说明格式，不作为测试题提示中的few-shot。
+
+```json
+{
+  "actions": [
+    "R"
+  ],
+  "final_status": "solved"
+}
+```
 
 
 ### 数据说明例
@@ -1201,21 +1376,111 @@ Reason: The current board exactly matches the goal; no further move is needed.
 
 来源：`tasks/game24/prompts/README.md`
 
-### 24点任务文字
+### 24点：任务文字与监督格式
 
-#### 共用规则
+参考 [XoT的两数合并规则](https://github.com/microsoft/Everything-of-Thoughts-XoT/blob/d69d3b8ddb75f888732e893394e8e5e5df4f4e6f/xot_all_in_one/xot/prompter/prompts/prompts_game24.py)及[公开环境](https://github.com/microsoft/Everything-of-Thoughts-XoT/blob/d69d3b8ddb75f888732e893394e8e5e5df4f4e6f/xot_mcts/game24/Game24Game.py)。保留题目及运算规则；完整计划采用本项目统一JSON，不引入上游few-shot、MCTS或多次求解。
 
-给定四个正整数，每个数恰好使用一次，只允许加、减、乘、除及括号。每步从当前数值列表选择两个不同位置，用一次二元运算替换成结果，其余数保留，然后按数值升序排序。允许负数、零和分数中间值，禁止除以零；最终只剩一个数且精确等于24才成功。恰好三步；不能拼接、乘方或添加常数。
+以下定义可复用的文字协议。完整计划的提示与裁判已接入；逐轮地图／CoT部分是协议模板，尚无本任务LLM训练或已采用Qmap权重。
 
-动作是 [i,op,j]，i<j，为当前排序后的0基位置。op 为 +、-、r-、*、/、r/；r-表示右数减左数，r/表示右数除左数。重复数字是不同位置。环境用最简分数字符串显示中间状态，保留原始数与动作历史供裁判复核。
+#### 共享任务描述与规则
 
-#### 每轮输入和输出
+```text
+Find a valid sequence of arithmetic operations that uses all four initial numbers exactly once and produces 24.
+Reaching the goal is the first priority.
 
-环境提供真实当前状态、目标条件、合法动作编号及后继状态；不提供精确剩余成本或死路标签。地图组另收到冻结Q向量；无地图组收到相同文字。环境执行所选动作并更新状态，完成由裁判判断。
+Rules: At each step, choose two different slots in the current sorted list, combine their numbers with one binary operation, remove both operands, and insert the result.
+Sort the remaining list in ascending numerical order after every step. Slot indices are zero-based and refer to this newly sorted list, not to the initial numbers.
+An action is [i, op, j], where i < j. Let x be the number at slot i and y the number at slot j.
+The allowed op strings are "+" (x+y), "-" (x-y), "r-" (y-x), "*" (x*y), "/" (x/y), and "r/" (y/x).
+Division by zero is illegal. Negative, zero, and fractional intermediate values are allowed; use exact arithmetic.
+Equal numbers occupy distinct slots. Do not concatenate numbers, use powers, add constants, or split one number into two.
+After exactly three operations, the list must contain the single exact value 24.
 
-逐轮输出 Reason 与 Action；地图组可以另输出候选排序。一次性完整计划输出 JSON：`{"actions": [...]}`。示例中的人员列表、方向字符串或运算三元组作为 actions 的元素。非法动作判失败，预算由实验配置指定，不由oracle距离逐题调整。
+Initial sorted list:
+{initial_numbers}
 
-当前只实现环境、数据和Qmap探测，尚未接入LLM训练或运行文字基线；本页为可复用协议。
+Goal list:
+24
+```
+
+列表中的分数用最简分数字符串显示，排序按实际数值。动作只引用当前槽位，不能把表达式当动作提交。全部可解状态到[24]的距离恒为剩余数字个数减1；这里主要检验可解分支。
+
+#### 地图组／CoT 组：每轮环境更新
+
+两组共享规则、真实当前状态、实际动作历史与全部合法动作。地图组额外获得当前／目标条件／合法真实后继的Q槽位；精确距离、参考解和死路标签不进入模型文字。
+
+```text
+[Environment update]
+Current sorted list:
+{current_numbers}
+Actual executed actions: {executed_actions_or_none}
+Legal next moves:
+{local_id}: [{i}, "{operation}", {j}]
+...
+Candidate numbers may change between turns; use only the numbers above.
+[/Environment update]
+```
+
+#### SOTA 组／32B 组：输出格式
+
+```text
+Plan the complete remaining sequence from the current state and output it once. There is no intermediate feedback; the judge stops at the first illegal action.
+Return JSON with "actions" (an array of exactly three arrays [i, op, j], using the current sorted slot indices and the allowed operation strings) and "final_status" ("solved", "no_solution", or "unsolved").
+Use "solved" when your sequence reaches the goal; if already at the goal, output an empty actions array. Use "no_solution" only when the goal is unreachable, not merely because you could not find a plan; otherwise use "unsolved".
+```
+
+沿用既有完整计划条件：无工具和中途反馈，不要求逐步状态报告。模型自报状态不替代动作回放；完成、最优成本与格式分别记录。模型和token预算以实验配置为准。
+
+#### 监督答案：排序／Reason／Action
+
+```text
+Map-distance ranking to the goal, closest to farthest: {ranking}.
+Reason: Combining the numbers in slots {i} and {j} with {operation} is legal and leaves a solvable list with one fewer operation needed.
+<action>{local_id}</action>
+```
+
+排序包含最近的至多10个候选及`current`，用`<`、`=`表示远近和并列。排序由实际冻结Q生成，不能把精确距离填入排序冒充Q输出。上述Reason仅在裁判已验证相应事实时作为监督模板；尚未生成本任务SFT数据。无地图CoT组只删除排序行，保留相同Reason和控制标签。
+
+直接到达目标时：
+
+```text
+Reason: Combining the numbers in slots {i} and {j} with {operation} is legal and leaves the single exact value 24.
+<action>{local_id}</action>
+```
+
+已经完成时：
+
+```text
+Reason: The current list contains only 24; no further operation is needed.
+<done/>
+```
+
+#### 完整计划结构说明例
+
+下例对应本任务[data/example.json](tasks/game24/data/example.json)，只说明格式，不作为测试题提示中的few-shot。
+
+```json
+{
+  "actions": [
+    [
+      0,
+      "r/",
+      2
+    ],
+    [
+      0,
+      "r-",
+      1
+    ],
+    [
+      0,
+      "r/",
+      1
+    ]
+  ],
+  "final_status": "solved"
+}
+```
 
 
 ### 数据说明例

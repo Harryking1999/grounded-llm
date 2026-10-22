@@ -1,0 +1,40 @@
+{
+  "study": "new_tasks_flash_fixed_setting_screening",
+  "seed": 2026102203,
+  "source_runs": "runs/new_tasks_qmap/pilot_27893ea",
+  "expected_cases": 112,
+  "samples_per_case": 1,
+  "tasks": {
+    "bridge": {
+      "count": null,
+      "action_limit": 128
+    },
+    "sokoban": {
+      "per_scene": 5,
+      "action_limit": 128
+    },
+    "game24": {
+      "count": 40,
+      "action_limit": 3
+    }
+  },
+  "api": {
+    "base_url": "https://api.deepseek.com",
+    "model": "deepseek-flash",
+    "reasoning_effort": "high",
+    "max_output_tokens": 64000,
+    "scoring_output_limit": 64000,
+    "timeout_seconds": 2400,
+    "concurrency": 16,
+    "max_service_retries": 3,
+    "max_total_service_retries": 30,
+    "service_retry_delay_seconds": 15
+  },
+  "comparison": "Screen the existing frozen Qmap test conditions before choosing further task or Qmap hyperparameters. Bridge uses all32 held-out six-person time scenarios. Sokoban uses five existing test starts per each of8 held-out6x6/two-box layouts, spread across within-layout exact distances; it is a diagnostic subset, not Boxoban benchmark data or a representative success-rate estimate. Game24 uses40 seeded cases from the137 XoT test puzzles. No new task difficulty, tools, candidate successor lists, oracle costs or reference plans are shown to the model. Shared rules and one full physical-action plan follow existing task_text_baselines. One valid response per case; service failures only retry. Thinking and answer share64,000 output tokens. Compare completion and optimum separately; preserve returned model/effort, usage and truncation.",
+  "references": {
+    "bridge": "https://people.cs.nott.ac.uk/psarb2/papers/abstract.html",
+    "sokoban_rules": "https://github.com/mpSchrader/gym-sokoban/blob/8e06e44e8bf3bb8bc73eeb1e7f0354508ce3fc89/gym_sokoban/envs/sokoban_env.py",
+    "sokoban_reference_benchmark": "https://github.com/google-deepmind/boxoban-levels/blob/78011d8c86ad423bfb2e1005012393b4c3c24409/README.md",
+    "game24": "https://github.com/microsoft/Everything-of-Thoughts-XoT/blob/d69d3b8ddb75f888732e893394e8e5e5df4f4e6f/xot_mcts/game24/data/test.csv"
+  }
+}

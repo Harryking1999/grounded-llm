@@ -1,4 +1,4 @@
-# 五任务纯文字完整规划基线
+# 纯文字完整规划基线
 
 **结果只看[模型、设置与预算对照表](results/report.md)。**初始五任务、DeepSeek Flash 同题 200 题、旧积木复测、逐步状态、S/Z 八形状仅动作及完整十形状 100 题双模型对照均已完成。服务失败已补齐，定时跟进已暂停。此前加难探索均已停止，不再派题。
 
@@ -8,7 +8,7 @@ DeepSeek 积木／二阶魔方新题复测见 [64k 合同](configs/deepseek_bloc
 
 ## 实验合同与答卷来源
 
-Rush Hour／Token Swapping两项筛查见[64k合同](configs/deepseek_rush_token64k.json)：各40题，共80题；前者为8个公开无墙分量各5个距离起点，后者为tket公开固定问题的8种架构各5题。完整计划、精确最优值重算、完成与成本分开评分，复用`src.run`。准备入口为`src.prepare_rush_token`，原始题目与响应在`runs/deepseek_rush_token64k/`；不训练地图。
+Rush Hour／Token Swapping两项筛查见[64k合同](configs/deepseek_rush_token64k.json)与[结果表](results/report.md)：各40题，共80题，分别完成17/40、36/40，完成答案均最优；25题思考耗尽，Rush Hour另2题误报无解。前者为8个公开无墙分量各5个距离起点，后者为tket公开固定问题的8种架构各5题。精确最优值重算、完成与成本分开评分，复用`src.run`。准备入口为`src.prepare_rush_token`，原始题目与响应在`runs/deepseek_rush_token64k/`；未训练地图。
 
 所有条件一次输出完整计划，无工具、无中途反馈。裁判独立回放真实动作，模型自报棋盘不覆盖环境状态。每题一次有效答案，服务错误按配置有限重试；正常错误、截断和超限不重抽。历史 medium 每题八次，单列比较。
 

@@ -30,7 +30,8 @@
 ## 后续研究
 
 - 任务内OOD与多任务训练分别核对地图和接口的训练信息范围；跨任务迁移只在对应规则、地图和未见题集准备后评测。
-- 手电过桥、推箱子、24点已完成首轮固定目标Qmap可行性试验：过桥成本表示较有希望但未稳定最优；推箱子未见布局泛化不足；24点主要检验可解性，第一步仍易失败。[Flash64k固定筛查与加难探索](../experiments/task_text_baselines/results/report.md)中，Boxoban hard原题362耗尽64k且最终答案为空；24点加难21题全部完成，保留结果并停止加难。原过桥8至128人21题全部最优；256至4096人的15题全部完成、仅2题最优，长人数作为计划压力诊断单列。多岛多手电与Rush Hour的具体小实例已核对精确真值，连同Token Swapping及冲突图渡河的[候选比较](../tasks/README.md#新任务候选难度与地图关系)尚不构成采用或启动模型实验。三者尚无采用图，不进入多任务SFT；地图限制见[报告](../experiments/new_tasks_qmap/results/report.md)。
+- 手电过桥、推箱子、24点已完成首轮固定目标Qmap可行性试验：过桥成本表示较有希望但未稳定最优；推箱子未见布局泛化不足；24点主要检验可解性，第一步仍易失败。[Flash64k固定筛查与加难探索](../experiments/task_text_baselines/results/report.md)中，Boxoban hard原题362耗尽64k且最终答案为空；24点加难21题全部完成，保留结果并停止加难。原过桥8至128人21题全部最优；256至4096人的15题全部完成、仅2题最优，长人数作为计划压力诊断单列。三者尚无采用图，不进入多任务SFT；地图限制见[报告](../experiments/new_tasks_qmap/results/report.md)。
+- Rush Hour与Token Swapping的[Flash64k筛查](../experiments/task_text_baselines/results/report.md)已完成，各40题，分别17/40、36/40，成功答案均最优。25题思考耗尽，Rush Hour另2题误报无解；完成、最优成本和预算失败单列。Rush Hour真值分量较小、本批较难，适合作为后续地图可行性候选；两项尚无Qmap或LLM训练，不能按文字筛查结果登记采用图。其余过桥／渡河[候选](../tasks/README.md#新任务候选难度与地图关系)保留调查结论。
 - 在贪心之外比较采样与 pass@k 时，明确总预算、独立采样与整题裁判口径。
 
 入口：[任务工作区](../tasks/README.md)、[Qmap 方法](../tasks/QMAP_METHOD.md)、[实验实现](../experiments/README.md)、[开发机手册](../DEVELOPMENT_MACHINES.md)。文献与旧会议不维护当前计划。

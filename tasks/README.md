@@ -23,8 +23,10 @@
 | 推箱子：Flash64k筛查40题，同题地图未采用 | 100%（40/40） | - | - | - | - | 27.5%（11/40） | - | - |
 | 24点：首轮XoT留出137题，未采用 | - | - | - | - | - | 51.09%（70/137） | - | - |
 | 24点：Flash64k筛查40题，同题地图未采用 | 100%（40/40） | - | - | - | - | 55%（22/40） | - | - |
+| Rush Hour：Flash64k，8个公开无墙分量40个起点，最短2–51步 | 42.5%（17/40）；最优17/40 | - | - | - | - | - | - | - |
+| Token Swapping：Flash64k，公开8种架构40题，最优3–17步 | 90%（36/40）；最优36/40 | - | - | - | - | - | - | - |
 
-新任务均为[首轮固定目标可行性结果](../experiments/new_tasks_qmap/results/report.md)，不是正式采用图。Flash筛查规则与结果见[基线报告](../experiments/task_text_baselines/results/report.md)；完整计划与逐轮环境反馈条件不同，不据差值直接归因。24点起题留出但部分中间状态与训练重叠；推箱子使用自生成小棋盘，不是标准Boxoban题集。
+过桥、推箱子、24点的地图列为[首轮固定目标可行性结果](../experiments/new_tasks_qmap/results/report.md)，不是正式采用图；Rush Hour与Token Swapping尚无地图训练。Flash筛查规则与结果见[基线报告](../experiments/task_text_baselines/results/report.md)；完整计划与逐轮环境反馈条件不同，不据差值直接归因。24点起题留出但部分中间状态与训练重叠；推箱子地图及固定40题使用自生成小棋盘，不是标准Boxoban题集。Rush Hour的40起点相关于8个分量，Token Swapping成本／最优性与完成率分别计分。
 
 **积木历史回归（单独题集，非12块清空1000题）：**
 
@@ -57,7 +59,7 @@
 
 ## 新任务候选：难度与地图关系
 
-复杂度结论针对规模可增长的任务族，不是固定6×6或10×10棋盘，也不保证随机小实例能难住Flash。当前需要同时有可复用题目、清晰动作、可核对真值和可训练规模。Rush Hour与Token Swapping已接入文字筛查规则与裁判，[合同](../experiments/task_text_baselines/configs/deepseek_rush_token64k.json)分别考察完成与最优成本；两者尚无Qmap或LLM训练。其余候选尚未采用。
+复杂度结论针对规模可增长的任务族，不是固定6×6或10×10棋盘，也不保证随机小实例能难住Flash。当前需要同时有可复用题目、清晰动作、可核对真值和可训练规模。Rush Hour与Token Swapping已接入文字规则与裁判，[Flash64k筛查](../experiments/task_text_baselines/results/report.md)分别完成17/40、36/40，所有成功答案均最优；[合同](../experiments/task_text_baselines/configs/deepseek_rush_token64k.json)将完成与最优成本分开。两者尚无Qmap或LLM训练，其余候选尚未采用。
 
 | 候选／来源 | 难在什么目标 | 对本项目的价值与限制 |
 |---|---|---|

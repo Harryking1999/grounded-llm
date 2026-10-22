@@ -1,0 +1,3708 @@
+{
+  "status": "completed",
+  "config": "experiments/task_text_baselines/configs/deepseek_rush_token64k.json",
+  "raw_results": "runs/deepseek_rush_token64k",
+  "source_commit": "3d480c71ba7b7db1e064df854e9d17b432f4995d",
+  "run_source_commit": "3d480c71ba7b7db1e064df854e9d17b432f4995d",
+  "valid_responses": 80,
+  "service_error_attempts": 1,
+  "returned_models": {
+    "deepseek-flash": 80
+  },
+  "returned_efforts": {
+    "high": 80
+  },
+  "verification": {
+    "verdicts_checked": 80,
+    "physical_answer_replays": 55,
+    "truncation_metadata_checked": 25,
+    "parse_failures_checked": 0,
+    "reference_replays": 80
+  },
+  "tasks": {
+    "rush_hour": {
+      "count": 40,
+      "solved": 17,
+      "optimal": 17,
+      "failures": {
+        "success": 17,
+        "truncated": 21,
+        "unsolved": 2
+      },
+      "contract_pass": 17,
+      "min_reference_cost": 2,
+      "max_reference_cost": 51,
+      "mean_output_tokens": 41896,
+      "max_output_tokens": 64000,
+      "cost_quality": {
+        "scope": "successful answers only",
+        "count": 17,
+        "mean_cost": 7.117647058823529,
+        "mean_reference_cost": 7.117647058823529,
+        "mean_excess": 0,
+        "max_excess": 0,
+        "mean_cost_ratio": 1.0
+      },
+      "strata": {
+        "02-09": {
+          "count": 11,
+          "solved": 11,
+          "optimal": 11,
+          "failures": {
+            "success": 11
+          }
+        },
+        "10-19": {
+          "count": 8,
+          "solved": 5,
+          "optimal": 5,
+          "failures": {
+            "success": 5,
+            "truncated": 2,
+            "unsolved": 1
+          }
+        },
+        "20-29": {
+          "count": 8,
+          "solved": 1,
+          "optimal": 1,
+          "failures": {
+            "truncated": 7,
+            "success": 1
+          }
+        },
+        "30-39": {
+          "count": 8,
+          "solved": 0,
+          "optimal": 0,
+          "failures": {
+            "unsolved": 1,
+            "truncated": 7
+          }
+        },
+        "40-51": {
+          "count": 5,
+          "solved": 0,
+          "optimal": 0,
+          "failures": {
+            "truncated": 5
+          }
+        }
+      },
+      "cases": [
+        {
+          "case_id": "rush_hour_000",
+          "reference_cost": 2,
+          "source": {
+            "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+            "row": 15,
+            "original_board": "GBBoLoGHIoLMGHIAAMCCCKoMooJKDDEEJFFo",
+            "original_minimum_moves": 51,
+            "component_states": 4780,
+            "scene": 0,
+            "derivation": "shortest-plan intermediate state"
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 2,
+            "plan_length": 2,
+            "cost": 2,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 1898
+        },
+        {
+          "case_id": "rush_hour_001",
+          "reference_cost": 12,
+          "source": {
+            "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+            "row": 15,
+            "original_board": "GBBoLoGHIoLMGHIAAMCCCKoMooJKDDEEJFFo",
+            "original_minimum_moves": 51,
+            "component_states": 4780,
+            "scene": 0,
+            "derivation": "shortest-plan intermediate state"
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 12,
+            "plan_length": 12,
+            "cost": 12,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 22371
+        },
+        {
+          "case_id": "rush_hour_002",
+          "reference_cost": 25,
+          "source": {
+            "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+            "row": 15,
+            "original_board": "GBBoLoGHIoLMGHIAAMCCCKoMooJKDDEEJFFo",
+            "original_minimum_moves": 51,
+            "component_states": 4780,
+            "scene": 0,
+            "derivation": "shortest-plan intermediate state"
+          },
+          "verdict": {
+            "solved": false,
+            "contract_pass": false,
+            "failure": "truncated"
+          },
+          "response_status": "incomplete",
+          "output_tokens": 64000,
+          "initial": "GHIKBBGHIKLMG.AALMCCC..M..J.DDEEJ.FF",
+          "incomplete_details": {
+            "reason": "max_output_tokens"
+          },
+          "final_output_characters": 0,
+          "reasoning_tokens": 64000
+        },
+        {
+          "case_id": "rush_hour_003",
+          "reference_cost": 38,
+          "source": {
+            "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+            "row": 15,
+            "original_board": "GBBoLoGHIoLMGHIAAMCCCKoMooJKDDEEJFFo",
+            "original_minimum_moves": 51,
+            "component_states": 4780,
+            "scene": 0,
+            "derivation": "shortest-plan intermediate state"
+          },
+          "verdict": {
+            "solved": false,
+            "contract_pass": false,
+            "strict_json": true,
+            "status_correct": false,
+            "reported_status": "no_solution",
+            "failure": "unsolved",
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 0,
+            "plan_length": 0,
+            "cost": 0,
+            "optimal": false,
+            "excess_cost": null
+          },
+          "response_status": "completed",
+          "output_tokens": 56372,
+          "initial": "BB...M..I.LMAAI.LMGHJCCCGHJKDDGEEKFF",
+          "incomplete_details": null,
+          "final_output_characters": 43,
+          "reasoning_tokens": 56359
+        },
+        {
+          "case_id": "rush_hour_004",
+          "reference_cost": 51,
+          "source": {
+            "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+            "row": 15,
+            "original_board": "GBBoLoGHIoLMGHIAAMCCCKoMooJKDDEEJFFo",
+            "original_minimum_moves": 51,
+            "component_states": 4780,
+            "scene": 0,
+            "derivation": "original"
+          },
+          "verdict": {
+            "solved": false,
+            "contract_pass": false,
+            "failure": "truncated"
+          },
+          "response_status": "incomplete",
+          "output_tokens": 64000,
+          "initial": "GBB.L.GHI.LMGHIAAMCCCK.M..JKDDEEJFF.",
+          "incomplete_details": {
+            "reason": "max_output_tokens"
+          },
+          "final_output_characters": 0,
+          "reasoning_tokens": 64000
+        },
+        {
+          "case_id": "rush_hour_005",
+          "reference_cost": 2,
+          "source": {
+            "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+            "row": 343,
+            "original_board": "oGBBKLoGHIKLAAHIoLooHJCCFDDJooFEEEoo",
+            "original_minimum_moves": 41,
+            "component_states": 10066,
+            "scene": 1,
+            "derivation": "shortest-plan intermediate state"
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 2,
+            "plan_length": 2,
+            "cost": 2,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 1468
+        },
+        {
+          "case_id": "rush_hour_006",
+          "reference_cost": 10,
+          "source": {
+            "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+            "row": 343,
+            "original_board": "oGBBKLoGHIKLAAHIoLooHJCCFDDJooFEEEoo",
+            "original_minimum_moves": 41,
+            "component_states": 10066,
+            "scene": 1,
+            "derivation": "shortest-plan intermediate state"
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 10,
+            "plan_length": 10,
+            "cost": 10,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 16834
+        },
+        {
+          "case_id": "rush_hour_007",
+          "reference_cost": 20,
+          "source": {
+            "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+            "row": 343,
+            "original_board": "oGBBKLoGHIKLAAHIoLooHJCCFDDJooFEEEoo",
+            "original_minimum_moves": 41,
+            "component_states": 10066,
+            "scene": 1,
+            "derivation": "shortest-plan intermediate state"
+          },
+          "verdict": {
+            "solved": false,
+            "contract_pass": false,
+            "failure": "truncated"
+          },
+          "response_status": "incomplete",
+          "output_tokens": 64000,
+          "initial": ".G.BBL.G.IKL.AAIKLF.HJCCF.HJDD..HEEE",
+          "incomplete_details": {
+            "reason": "max_output_tokens"
+          },
+          "final_output_characters": 0,
+          "reasoning_tokens": 64000
+        },
+        {
+          "case_id": "rush_hour_008",
+          "reference_cost": 30,
+          "source": {
+            "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+            "row": 343,
+            "original_board": "oGBBKLoGHIKLAAHIoLooHJCCFDDJooFEEEoo",
+            "original_minimum_moves": 41,
+            "component_states": 10066,
+            "scene": 1,
+            "derivation": "shortest-plan intermediate state"
+          },
+          "verdict": {
+            "solved": false,
+            "contract_pass": false,
+            "failure": "truncated"
+          },
+          "response_status": "incomplete",
+          "output_tokens": 64000,
+          "initial": ".GHIBB.GHIKLAAHJKLFCCJ.LFDD...EEE...",
+          "incomplete_details": {
+            "reason": "max_output_tokens"
+          },
+          "final_output_characters": 0,
+          "reasoning_tokens": 64000
+        },
+        {
+          "case_id": "rush_hour_009",
+          "reference_cost": 41,
+          "source": {
+            "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+            "row": 343,
+            "original_board": "oGBBKLoGHIKLAAHIoLooHJCCFDDJooFEEEoo",
+            "original_minimum_moves": 41,
+            "component_states": 10066,
+            "scene": 1,
+            "derivation": "original"
+          },
+          "verdict": {
+            "solved": false,
+            "contract_pass": false,
+            "failure": "truncated"
+          },
+          "response_status": "incomplete",
+          "output_tokens": 64000,
+          "initial": ".GBBKL.GHIKLAAHI.L..HJCCFDDJ..FEEE..",
+          "incomplete_details": {
+            "reason": "max_output_tokens"
+          },
+          "final_output_characters": 0,
+          "reasoning_tokens": 64000
+        },
+        {
+          "case_id": "rush_hour_010",
+          "reference_cost": 2,
+          "source": {
+            "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+            "row": 83,
+            "original_board": "BBBCCMDDoooMIAAooMIJEEFFIJKLGGHHKLoo",
+            "original_minimum_moves": 46,
+            "component_states": 1239,
+            "scene": 2,
+            "derivation": "shortest-plan intermediate state"
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 2,
+            "plan_length": 2,
+            "cost": 2,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 1232
+        },
+        {
+          "case_id": "rush_hour_011",
+          "reference_cost": 11,
+          "source": {
+            "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+            "row": 83,
+            "original_board": "BBBCCMDDoooMIAAooMIJEEFFIJKLGGHHKLoo",
+            "original_minimum_moves": 46,
+            "component_states": 1239,
+            "scene": 2,
+            "derivation": "shortest-plan intermediate state"
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 11,
+            "plan_length": 11,
+            "cost": 11,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 24452
+        },
+        {
+          "case_id": "rush_hour_012",
+          "reference_cost": 23,
+          "source": {
+            "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+            "row": 83,
+            "original_board": "BBBCCMDDoooMIAAooMIJEEFFIJKLGGHHKLoo",
+            "original_minimum_moves": 46,
+            "component_states": 1239,
+            "scene": 2,
+            "derivation": "shortest-plan intermediate state"
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 23,
+            "plan_length": 23,
+            "cost": 23,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 45716
+        },
+        {
+          "case_id": "rush_hour_013",
+          "reference_cost": 34,
+          "source": {
+            "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+            "row": 83,
+            "original_board": "BBBCCMDDoooMIAAooMIJEEFFIJKLGGHHKLoo",
+            "original_minimum_moves": 46,
+            "component_states": 1239,
+            "scene": 2,
+            "derivation": "shortest-plan intermediate state"
+          },
+          "verdict": {
+            "solved": false,
+            "contract_pass": false,
+            "failure": "truncated"
+          },
+          "response_status": "incomplete",
+          "output_tokens": 64000,
+          "initial": "IBBBCCIJKDDMIJKAAM.EEFFM...LGGHH.L..",
+          "incomplete_details": {
+            "reason": "max_output_tokens"
+          },
+          "final_output_characters": 0,
+          "reasoning_tokens": 64000
+        },
+        {
+          "case_id": "rush_hour_014",
+          "reference_cost": 46,
+          "source": {
+            "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+            "row": 83,
+            "original_board": "BBBCCMDDoooMIAAooMIJEEFFIJKLGGHHKLoo",
+            "original_minimum_moves": 46,
+            "component_states": 1239,
+            "scene": 2,
+            "derivation": "original"
+          },
+          "verdict": {
+            "solved": false,
+            "contract_pass": false,
+            "failure": "truncated"
+          },
+          "response_status": "incomplete",
+          "output_tokens": 64000,
+          "initial": "BBBCCMDD...MIAA..MIJEEFFIJKLGGHHKL..",
+          "incomplete_details": {
+            "reason": "max_output_tokens"
+          },
+          "final_output_characters": 0,
+          "reasoning_tokens": 64000
+        },
+        {
+          "case_id": "rush_hour_015",
+          "reference_cost": 2,
+          "source": {
+            "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+            "row": 795,
+            "original_board": "BBBJKLGCCJKLGoAAKLDDIooooHIooooHEEFF",
+            "original_minimum_moves": 38,
+            "component_states": 18559,
+            "scene": 3,
+            "derivation": "shortest-plan intermediate state"
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 2,
+            "plan_length": 2,
+            "cost": 2,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 1030
+        },
+        {
+          "case_id": "rush_hour_016",
+          "reference_cost": 9,
+          "source": {
+            "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+            "row": 795,
+            "original_board": "BBBJKLGCCJKLGoAAKLDDIooooHIooooHEEFF",
+            "original_minimum_moves": 38,
+            "component_states": 18559,
+            "scene": 3,
+            "derivation": "shortest-plan intermediate state"
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 9,
+            "plan_length": 9,
+            "cost": 9,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 17662
+        },
+        {
+          "case_id": "rush_hour_017",
+          "reference_cost": 19,
+          "source": {
+            "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+            "row": 795,
+            "original_board": "BBBJKLGCCJKLGoAAKLDDIooooHIooooHEEFF",
+            "original_minimum_moves": 38,
+            "component_states": 18559,
+            "scene": 3,
+            "derivation": "shortest-plan intermediate state"
+          },
+          "verdict": {
+            "solved": false,
+            "contract_pass": false,
+            "failure": "truncated"
+          },
+          "response_status": "incomplete",
+          "output_tokens": 64000,
+          "initial": ".BBB..CCIJ.LAAIJKLDD..KLGH..K.GHEEFF",
+          "incomplete_details": {
+            "reason": "max_output_tokens"
+          },
+          "final_output_characters": 0,
+          "reasoning_tokens": 64000
+        },
+        {
+          "case_id": "rush_hour_018",
+          "reference_cost": 28,
+          "source": {
+            "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+            "row": 795,
+            "original_board": "BBBJKLGCCJKLGoAAKLDDIooooHIooooHEEFF",
+            "original_minimum_moves": 38,
+            "component_states": 18559,
+            "scene": 3,
+            "derivation": "shortest-plan intermediate state"
+          },
+          "verdict": {
+            "solved": false,
+            "contract_pass": false,
+            "failure": "truncated"
+          },
+          "response_status": "incomplete",
+          "output_tokens": 64000,
+          "initial": "G.IBBBG.ICCL.AAJKLDD.JKL.H..K..HEEFF",
+          "incomplete_details": {
+            "reason": "max_output_tokens"
+          },
+          "final_output_characters": 0,
+          "reasoning_tokens": 64000
+        },
+        {
+          "case_id": "rush_hour_019",
+          "reference_cost": 38,
+          "source": {
+            "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+            "row": 795,
+            "original_board": "BBBJKLGCCJKLGoAAKLDDIooooHIooooHEEFF",
+            "original_minimum_moves": 38,
+            "component_states": 18559,
+            "scene": 3,
+            "derivation": "original"
+          },
+          "verdict": {
+            "solved": false,
+            "contract_pass": false,
+            "failure": "truncated"
+          },
+          "response_status": "incomplete",
+          "output_tokens": 64000,
+          "initial": "BBBJKLGCCJKLG.AAKLDDI....HI....HEEFF",
+          "incomplete_details": {
+            "reason": "max_output_tokens"
+          },
+          "final_output_characters": 0,
+          "reasoning_tokens": 64000
+        },
+        {
+          "case_id": "rush_hour_020",
+          "reference_cost": 2,
+          "source": {
+            "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+            "row": 906,
+            "original_board": "BBoJooHooJCCHAAJoKooIDDKEEIooLFFIGGL",
+            "original_minimum_moves": 38,
+            "component_states": 3612,
+            "scene": 4,
+            "derivation": "shortest-plan intermediate state"
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 2,
+            "plan_length": 2,
+            "cost": 2,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 1479
+        },
+        {
+          "case_id": "rush_hour_021",
+          "reference_cost": 9,
+          "source": {
+            "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+            "row": 906,
+            "original_board": "BBoJooHooJCCHAAJoKooIDDKEEIooLFFIGGL",
+            "original_minimum_moves": 38,
+            "component_states": 3612,
+            "scene": 4,
+            "derivation": "shortest-plan intermediate state"
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 9,
+            "plan_length": 9,
+            "cost": 9,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 11944
+        },
+        {
+          "case_id": "rush_hour_022",
+          "reference_cost": 19,
+          "source": {
+            "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+            "row": 906,
+            "original_board": "BBoJooHooJCCHAAJoKooIDDKEEIooLFFIGGL",
+            "original_minimum_moves": 38,
+            "component_states": 3612,
+            "scene": 4,
+            "derivation": "shortest-plan intermediate state"
+          },
+          "verdict": {
+            "solved": false,
+            "contract_pass": false,
+            "failure": "truncated"
+          },
+          "response_status": "incomplete",
+          "output_tokens": 64000,
+          "initial": "..IJBB..IJCCAAIJ.KDD...KH..EELHFFGGL",
+          "incomplete_details": {
+            "reason": "max_output_tokens"
+          },
+          "final_output_characters": 0,
+          "reasoning_tokens": 64000
+        },
+        {
+          "case_id": "rush_hour_023",
+          "reference_cost": 28,
+          "source": {
+            "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+            "row": 906,
+            "original_board": "BBoJooHooJCCHAAJoKooIDDKEEIooLFFIGGL",
+            "original_minimum_moves": 38,
+            "component_states": 3612,
+            "scene": 4,
+            "derivation": "shortest-plan intermediate state"
+          },
+          "verdict": {
+            "solved": false,
+            "contract_pass": false,
+            "failure": "truncated"
+          },
+          "response_status": "incomplete",
+          "output_tokens": 64000,
+          "initial": "BB.J.....JCCAA.J.KH.IDDKH.IEELFFIGGL",
+          "incomplete_details": {
+            "reason": "max_output_tokens"
+          },
+          "final_output_characters": 0,
+          "reasoning_tokens": 64000
+        },
+        {
+          "case_id": "rush_hour_024",
+          "reference_cost": 38,
+          "source": {
+            "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+            "row": 906,
+            "original_board": "BBoJooHooJCCHAAJoKooIDDKEEIooLFFIGGL",
+            "original_minimum_moves": 38,
+            "component_states": 3612,
+            "scene": 4,
+            "derivation": "original"
+          },
+          "verdict": {
+            "solved": false,
+            "contract_pass": false,
+            "failure": "truncated"
+          },
+          "response_status": "incomplete",
+          "output_tokens": 64000,
+          "initial": "BB.J..H..JCCHAAJ.K..IDDKEEI..LFFIGGL",
+          "incomplete_details": {
+            "reason": "max_output_tokens"
+          },
+          "final_output_characters": 0,
+          "reasoning_tokens": 64000
+        },
+        {
+          "case_id": "rush_hour_025",
+          "reference_cost": 2,
+          "source": {
+            "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+            "row": 850,
+            "original_board": "oooIBBooHICCAAHJKLDDoJKLGEEEKMGoFFoM",
+            "original_minimum_moves": 38,
+            "component_states": 7034,
+            "scene": 5,
+            "derivation": "shortest-plan intermediate state"
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 2,
+            "plan_length": 2,
+            "cost": 2,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 1286
+        },
+        {
+          "case_id": "rush_hour_026",
+          "reference_cost": 9,
+          "source": {
+            "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+            "row": 850,
+            "original_board": "oooIBBooHICCAAHJKLDDoJKLGEEEKMGoFFoM",
+            "original_minimum_moves": 38,
+            "component_states": 7034,
+            "scene": 5,
+            "derivation": "shortest-plan intermediate state"
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 9,
+            "plan_length": 9,
+            "cost": 9,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 8935
+        },
+        {
+          "case_id": "rush_hour_027",
+          "reference_cost": 19,
+          "source": {
+            "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+            "row": 850,
+            "original_board": "oooIBBooHICCAAHJKLDDoJKLGEEEKMGoFFoM",
+            "original_minimum_moves": 38,
+            "component_states": 7034,
+            "scene": 5,
+            "derivation": "shortest-plan intermediate state"
+          },
+          "verdict": {
+            "solved": false,
+            "contract_pass": false,
+            "strict_json": true,
+            "status_correct": false,
+            "reported_status": "no_solution",
+            "failure": "unsolved",
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 0,
+            "plan_length": 0,
+            "cost": 0,
+            "optimal": false,
+            "excess_cost": null
+          },
+          "response_status": "completed",
+          "output_tokens": 47388,
+          "initial": "GBBI.LGCCIKLAAHJKMDDHJKMEEE......FF.",
+          "incomplete_details": null,
+          "final_output_characters": 43,
+          "reasoning_tokens": 47375
+        },
+        {
+          "case_id": "rush_hour_028",
+          "reference_cost": 28,
+          "source": {
+            "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+            "row": 850,
+            "original_board": "oooIBBooHICCAAHJKLDDoJKLGEEEKMGoFFoM",
+            "original_minimum_moves": 38,
+            "component_states": 7034,
+            "scene": 5,
+            "derivation": "shortest-plan intermediate state"
+          },
+          "verdict": {
+            "solved": false,
+            "contract_pass": false,
+            "failure": "truncated"
+          },
+          "response_status": "incomplete",
+          "output_tokens": 64000,
+          "initial": "G..IBBG..ICCAAH.KLDDH.KLEEEJKM.FFJ.M",
+          "incomplete_details": {
+            "reason": "max_output_tokens"
+          },
+          "final_output_characters": 0,
+          "reasoning_tokens": 64000
+        },
+        {
+          "case_id": "rush_hour_029",
+          "reference_cost": 38,
+          "source": {
+            "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+            "row": 850,
+            "original_board": "oooIBBooHICCAAHJKLDDoJKLGEEEKMGoFFoM",
+            "original_minimum_moves": 38,
+            "component_states": 7034,
+            "scene": 5,
+            "derivation": "original"
+          },
+          "verdict": {
+            "solved": false,
+            "contract_pass": false,
+            "failure": "truncated"
+          },
+          "response_status": "incomplete",
+          "output_tokens": 64000,
+          "initial": "...IBB..HICCAAHJKLDD.JKLGEEEKMG.FF.M",
+          "incomplete_details": {
+            "reason": "max_output_tokens"
+          },
+          "final_output_characters": 0,
+          "reasoning_tokens": 64000
+        },
+        {
+          "case_id": "rush_hour_030",
+          "reference_cost": 2,
+          "source": {
+            "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+            "row": 51,
+            "original_board": "BBCCLoooJoLMIoJAAMIDDEEMoFFKooGGGKHH",
+            "original_minimum_moves": 47,
+            "component_states": 4968,
+            "scene": 6,
+            "derivation": "shortest-plan intermediate state"
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 2,
+            "plan_length": 2,
+            "cost": 2,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 2014
+        },
+        {
+          "case_id": "rush_hour_031",
+          "reference_cost": 11,
+          "source": {
+            "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+            "row": 51,
+            "original_board": "BBCCLoooJoLMIoJAAMIDDEEMoFFKooGGGKHH",
+            "original_minimum_moves": 47,
+            "component_states": 4968,
+            "scene": 6,
+            "derivation": "shortest-plan intermediate state"
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 11,
+            "plan_length": 11,
+            "cost": 11,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 32669
+        },
+        {
+          "case_id": "rush_hour_032",
+          "reference_cost": 23,
+          "source": {
+            "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+            "row": 51,
+            "original_board": "BBCCLoooJoLMIoJAAMIDDEEMoFFKooGGGKHH",
+            "original_minimum_moves": 47,
+            "component_states": 4968,
+            "scene": 6,
+            "derivation": "shortest-plan intermediate state"
+          },
+          "verdict": {
+            "solved": false,
+            "contract_pass": false,
+            "failure": "truncated"
+          },
+          "response_status": "incomplete",
+          "output_tokens": 64000,
+          "initial": "BBCCLMI...LMI..AAMDDJKEE..JKFF.GGGHH",
+          "incomplete_details": {
+            "reason": "max_output_tokens"
+          },
+          "final_output_characters": 0,
+          "reasoning_tokens": 64000
+        },
+        {
+          "case_id": "rush_hour_033",
+          "reference_cost": 35,
+          "source": {
+            "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+            "row": 51,
+            "original_board": "BBCCLoooJoLMIoJAAMIDDEEMoFFKooGGGKHH",
+            "original_minimum_moves": 47,
+            "component_states": 4968,
+            "scene": 6,
+            "derivation": "shortest-plan intermediate state"
+          },
+          "verdict": {
+            "solved": false,
+            "contract_pass": false,
+            "failure": "truncated"
+          },
+          "response_status": "incomplete",
+          "output_tokens": 64000,
+          "initial": "IBBCCMI...LMAAJ.LMDDJEE.FF.K..GGGKHH",
+          "incomplete_details": {
+            "reason": "max_output_tokens"
+          },
+          "final_output_characters": 0,
+          "reasoning_tokens": 64000
+        },
+        {
+          "case_id": "rush_hour_034",
+          "reference_cost": 47,
+          "source": {
+            "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+            "row": 51,
+            "original_board": "BBCCLoooJoLMIoJAAMIDDEEMoFFKooGGGKHH",
+            "original_minimum_moves": 47,
+            "component_states": 4968,
+            "scene": 6,
+            "derivation": "original"
+          },
+          "verdict": {
+            "solved": false,
+            "contract_pass": false,
+            "failure": "truncated"
+          },
+          "response_status": "incomplete",
+          "output_tokens": 64000,
+          "initial": "BBCCL...J.LMI.JAAMIDDEEM.FFK..GGGKHH",
+          "incomplete_details": {
+            "reason": "max_output_tokens"
+          },
+          "final_output_characters": 0,
+          "reasoning_tokens": 64000
+        },
+        {
+          "case_id": "rush_hour_035",
+          "reference_cost": 2,
+          "source": {
+            "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+            "row": 143,
+            "original_board": "IBBCCCIoDDLMAAJoLMEEJFFMoGGKooHHHKoo",
+            "original_minimum_moves": 44,
+            "component_states": 3913,
+            "scene": 7,
+            "derivation": "shortest-plan intermediate state"
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 2,
+            "plan_length": 2,
+            "cost": 2,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 1168
+        },
+        {
+          "case_id": "rush_hour_036",
+          "reference_cost": 11,
+          "source": {
+            "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+            "row": 143,
+            "original_board": "IBBCCCIoDDLMAAJoLMEEJFFMoGGKooHHHKoo",
+            "original_minimum_moves": 44,
+            "component_states": 3913,
+            "scene": 7,
+            "derivation": "shortest-plan intermediate state"
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 11,
+            "plan_length": 11,
+            "cost": 11,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 35922
+        },
+        {
+          "case_id": "rush_hour_037",
+          "reference_cost": 22,
+          "source": {
+            "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+            "row": 143,
+            "original_board": "IBBCCCIoDDLMAAJoLMEEJFFMoGGKooHHHKoo",
+            "original_minimum_moves": 44,
+            "component_states": 3913,
+            "scene": 7,
+            "derivation": "shortest-plan intermediate state"
+          },
+          "verdict": {
+            "solved": false,
+            "contract_pass": false,
+            "failure": "truncated"
+          },
+          "response_status": "incomplete",
+          "output_tokens": 64000,
+          "initial": "IBBCCCIDDKLM.AAKLM.EEFFM..JGG...JHHH",
+          "incomplete_details": {
+            "reason": "max_output_tokens"
+          },
+          "final_output_characters": 0,
+          "reasoning_tokens": 64000
+        },
+        {
+          "case_id": "rush_hour_038",
+          "reference_cost": 33,
+          "source": {
+            "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+            "row": 143,
+            "original_board": "IBBCCCIoDDLMAAJoLMEEJFFMoGGKooHHHKoo",
+            "original_minimum_moves": 44,
+            "component_states": 3913,
+            "scene": 7,
+            "derivation": "shortest-plan intermediate state"
+          },
+          "verdict": {
+            "solved": false,
+            "contract_pass": false,
+            "failure": "truncated"
+          },
+          "response_status": "incomplete",
+          "output_tokens": 64000,
+          "initial": "BBCCCMIDDKLMIAAKLMEEJFF.GGJ...HHH...",
+          "incomplete_details": {
+            "reason": "max_output_tokens"
+          },
+          "final_output_characters": 0,
+          "reasoning_tokens": 64000
+        },
+        {
+          "case_id": "rush_hour_039",
+          "reference_cost": 44,
+          "source": {
+            "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+            "row": 143,
+            "original_board": "IBBCCCIoDDLMAAJoLMEEJFFMoGGKooHHHKoo",
+            "original_minimum_moves": 44,
+            "component_states": 3913,
+            "scene": 7,
+            "derivation": "original"
+          },
+          "verdict": {
+            "solved": false,
+            "contract_pass": false,
+            "failure": "truncated"
+          },
+          "response_status": "incomplete",
+          "output_tokens": 64000,
+          "initial": "IBBCCCI.DDLMAAJ.LMEEJFFM.GGK..HHHK..",
+          "incomplete_details": {
+            "reason": "max_output_tokens"
+          },
+          "final_output_characters": 0,
+          "reasoning_tokens": 64000
+        }
+      ],
+      "dependence": "eight public no-wall source components, five shortest-trajectory starts per component"
+    },
+    "token_swapping": {
+      "count": 40,
+      "solved": 36,
+      "optimal": 36,
+      "failures": {
+        "success": 36,
+        "truncated": 4
+      },
+      "contract_pass": 36,
+      "min_reference_cost": 3,
+      "max_reference_cost": 17,
+      "mean_output_tokens": 14077.65,
+      "max_output_tokens": 64000,
+      "cost_quality": {
+        "scope": "successful answers only",
+        "count": 36,
+        "mean_cost": 6.111111111111111,
+        "mean_reference_cost": 6.111111111111111,
+        "mean_excess": 0,
+        "max_excess": 0,
+        "mean_cost_ratio": 1.0
+      },
+      "strata": {
+        "IBM q7 Jakarta": {
+          "count": 5,
+          "solved": 5,
+          "optimal": 5,
+          "failures": {
+            "success": 5
+          }
+        },
+        "Medium random tree 1": {
+          "count": 5,
+          "solved": 3,
+          "optimal": 3,
+          "failures": {
+            "truncated": 2,
+            "success": 3
+          }
+        },
+        "Medium random tree 2": {
+          "count": 5,
+          "solved": 3,
+          "optimal": 3,
+          "failures": {
+            "truncated": 2,
+            "success": 3
+          }
+        },
+        "Path, N=5": {
+          "count": 5,
+          "solved": 5,
+          "optimal": 5,
+          "failures": {
+            "success": 5
+          }
+        },
+        "Ring, N=5": {
+          "count": 5,
+          "solved": 5,
+          "optimal": 5,
+          "failures": {
+            "success": 5
+          }
+        },
+        "Small random tree 1": {
+          "count": 5,
+          "solved": 5,
+          "optimal": 5,
+          "failures": {
+            "success": 5
+          }
+        },
+        "Small random tree 2": {
+          "count": 5,
+          "solved": 5,
+          "optimal": 5,
+          "failures": {
+            "success": 5
+          }
+        },
+        "Wheel, 5 spokes": {
+          "count": 5,
+          "solved": 5,
+          "optimal": 5,
+          "failures": {
+            "success": 5
+          }
+        }
+      },
+      "cases": [
+        {
+          "case_id": "token_swapping_000",
+          "reference_cost": 6,
+          "source": {
+            "url": "https://raw.githubusercontent.com/Quantinuum/tket/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+            "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+            "architecture": "Path, N=5",
+            "entry_index": 17,
+            "upstream_cost": 6,
+            "upstream_actions": [
+              [
+                2,
+                3
+              ],
+              [
+                3,
+                4
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                2,
+                3
+              ],
+              [
+                1,
+                2
+              ],
+              [
+                2,
+                3
+              ]
+            ]
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 6,
+            "plan_length": 6,
+            "cost": 6,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 817
+        },
+        {
+          "case_id": "token_swapping_001",
+          "reference_cost": 4,
+          "source": {
+            "url": "https://raw.githubusercontent.com/Quantinuum/tket/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+            "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+            "architecture": "Path, N=5",
+            "entry_index": 25,
+            "upstream_cost": 4,
+            "upstream_actions": [
+              [
+                1,
+                2
+              ],
+              [
+                2,
+                3
+              ],
+              [
+                1,
+                2
+              ],
+              [
+                0,
+                1
+              ]
+            ]
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 4,
+            "plan_length": 4,
+            "cost": 4,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 852
+        },
+        {
+          "case_id": "token_swapping_002",
+          "reference_cost": 8,
+          "source": {
+            "url": "https://raw.githubusercontent.com/Quantinuum/tket/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+            "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+            "architecture": "Path, N=5",
+            "entry_index": 31,
+            "upstream_cost": 8,
+            "upstream_actions": [
+              [
+                2,
+                3
+              ],
+              [
+                1,
+                2
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                1,
+                2
+              ],
+              [
+                3,
+                4
+              ],
+              [
+                2,
+                3
+              ],
+              [
+                1,
+                2
+              ],
+              [
+                0,
+                1
+              ]
+            ]
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 8,
+            "plan_length": 8,
+            "cost": 8,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 889
+        },
+        {
+          "case_id": "token_swapping_003",
+          "reference_cost": 6,
+          "source": {
+            "url": "https://raw.githubusercontent.com/Quantinuum/tket/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+            "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+            "architecture": "Path, N=5",
+            "entry_index": 19,
+            "upstream_cost": 6,
+            "upstream_actions": [
+              [
+                3,
+                4
+              ],
+              [
+                1,
+                2
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                2,
+                3
+              ],
+              [
+                1,
+                2
+              ],
+              [
+                3,
+                4
+              ]
+            ]
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 6,
+            "plan_length": 6,
+            "cost": 6,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 1074
+        },
+        {
+          "case_id": "token_swapping_004",
+          "reference_cost": 6,
+          "source": {
+            "url": "https://raw.githubusercontent.com/Quantinuum/tket/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+            "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+            "architecture": "Path, N=5",
+            "entry_index": 18,
+            "upstream_cost": 6,
+            "upstream_actions": [
+              [
+                3,
+                4
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                2,
+                3
+              ],
+              [
+                1,
+                2
+              ],
+              [
+                2,
+                3
+              ],
+              [
+                0,
+                1
+              ]
+            ]
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 6,
+            "plan_length": 6,
+            "cost": 6,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 874
+        },
+        {
+          "case_id": "token_swapping_005",
+          "reference_cost": 3,
+          "source": {
+            "url": "https://raw.githubusercontent.com/Quantinuum/tket/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+            "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+            "architecture": "Ring, N=5",
+            "entry_index": 1,
+            "upstream_cost": 3,
+            "upstream_actions": [
+              [
+                0,
+                4
+              ],
+              [
+                2,
+                3
+              ],
+              [
+                1,
+                2
+              ]
+            ]
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 3,
+            "plan_length": 3,
+            "cost": 3,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 1645
+        },
+        {
+          "case_id": "token_swapping_006",
+          "reference_cost": 3,
+          "source": {
+            "url": "https://raw.githubusercontent.com/Quantinuum/tket/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+            "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+            "architecture": "Ring, N=5",
+            "entry_index": 8,
+            "upstream_cost": 5,
+            "upstream_actions": [
+              [
+                3,
+                4
+              ],
+              [
+                0,
+                4
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                1,
+                2
+              ],
+              [
+                2,
+                3
+              ]
+            ]
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 3,
+            "plan_length": 3,
+            "cost": 3,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 3795
+        },
+        {
+          "case_id": "token_swapping_007",
+          "reference_cost": 4,
+          "source": {
+            "url": "https://raw.githubusercontent.com/Quantinuum/tket/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+            "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+            "architecture": "Ring, N=5",
+            "entry_index": 19,
+            "upstream_cost": 6,
+            "upstream_actions": [
+              [
+                3,
+                4
+              ],
+              [
+                1,
+                2
+              ],
+              [
+                3,
+                4
+              ],
+              [
+                2,
+                3
+              ],
+              [
+                1,
+                2
+              ],
+              [
+                0,
+                1
+              ]
+            ]
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 4,
+            "plan_length": 4,
+            "cost": 4,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 4207
+        },
+        {
+          "case_id": "token_swapping_008",
+          "reference_cost": 3,
+          "source": {
+            "url": "https://raw.githubusercontent.com/Quantinuum/tket/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+            "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+            "architecture": "Ring, N=5",
+            "entry_index": 2,
+            "upstream_cost": 3,
+            "upstream_actions": [
+              [
+                1,
+                2
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                3,
+                4
+              ]
+            ]
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 3,
+            "plan_length": 3,
+            "cost": 3,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 2391
+        },
+        {
+          "case_id": "token_swapping_009",
+          "reference_cost": 3,
+          "source": {
+            "url": "https://raw.githubusercontent.com/Quantinuum/tket/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+            "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+            "architecture": "Ring, N=5",
+            "entry_index": 5,
+            "upstream_cost": 5,
+            "upstream_actions": [
+              [
+                0,
+                1
+              ],
+              [
+                0,
+                4
+              ],
+              [
+                3,
+                4
+              ],
+              [
+                2,
+                3
+              ],
+              [
+                1,
+                2
+              ]
+            ]
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 3,
+            "plan_length": 3,
+            "cost": 3,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 1767
+        },
+        {
+          "case_id": "token_swapping_010",
+          "reference_cost": 4,
+          "source": {
+            "url": "https://raw.githubusercontent.com/Quantinuum/tket/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+            "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+            "architecture": "Wheel, 5 spokes",
+            "entry_index": 34,
+            "upstream_cost": 4,
+            "upstream_actions": [
+              [
+                3,
+                4
+              ],
+              [
+                2,
+                5
+              ],
+              [
+                0,
+                5
+              ],
+              [
+                0,
+                4
+              ]
+            ]
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 4,
+            "plan_length": 4,
+            "cost": 4,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 1960
+        },
+        {
+          "case_id": "token_swapping_011",
+          "reference_cost": 4,
+          "source": {
+            "url": "https://raw.githubusercontent.com/Quantinuum/tket/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+            "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+            "architecture": "Wheel, 5 spokes",
+            "entry_index": 32,
+            "upstream_cost": 4,
+            "upstream_actions": [
+              [
+                2,
+                5
+              ],
+              [
+                0,
+                5
+              ],
+              [
+                3,
+                5
+              ],
+              [
+                4,
+                5
+              ]
+            ]
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 4,
+            "plan_length": 4,
+            "cost": 4,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 6381
+        },
+        {
+          "case_id": "token_swapping_012",
+          "reference_cost": 4,
+          "source": {
+            "url": "https://raw.githubusercontent.com/Quantinuum/tket/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+            "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+            "architecture": "Wheel, 5 spokes",
+            "entry_index": 26,
+            "upstream_cost": 4,
+            "upstream_actions": [
+              [
+                0,
+                4
+              ],
+              [
+                3,
+                5
+              ],
+              [
+                1,
+                5
+              ],
+              [
+                0,
+                1
+              ]
+            ]
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 4,
+            "plan_length": 4,
+            "cost": 4,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 4701
+        },
+        {
+          "case_id": "token_swapping_013",
+          "reference_cost": 4,
+          "source": {
+            "url": "https://raw.githubusercontent.com/Quantinuum/tket/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+            "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+            "architecture": "Wheel, 5 spokes",
+            "entry_index": 29,
+            "upstream_cost": 4,
+            "upstream_actions": [
+              [
+                1,
+                2
+              ],
+              [
+                4,
+                5
+              ],
+              [
+                3,
+                4
+              ],
+              [
+                2,
+                3
+              ]
+            ]
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 4,
+            "plan_length": 4,
+            "cost": 4,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 1801
+        },
+        {
+          "case_id": "token_swapping_014",
+          "reference_cost": 3,
+          "source": {
+            "url": "https://raw.githubusercontent.com/Quantinuum/tket/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+            "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+            "architecture": "Wheel, 5 spokes",
+            "entry_index": 19,
+            "upstream_cost": 3,
+            "upstream_actions": [
+              [
+                4,
+                5
+              ],
+              [
+                2,
+                5
+              ],
+              [
+                1,
+                2
+              ]
+            ]
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 3,
+            "plan_length": 3,
+            "cost": 3,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 5665
+        },
+        {
+          "case_id": "token_swapping_015",
+          "reference_cost": 8,
+          "source": {
+            "url": "https://raw.githubusercontent.com/Quantinuum/tket/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+            "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+            "architecture": "IBM q7 Jakarta",
+            "entry_index": 77,
+            "upstream_cost": 8,
+            "upstream_actions": [
+              [
+                1,
+                3
+              ],
+              [
+                1,
+                2
+              ],
+              [
+                4,
+                5
+              ],
+              [
+                3,
+                5
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                1,
+                3
+              ],
+              [
+                3,
+                5
+              ],
+              [
+                0,
+                1
+              ]
+            ]
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 8,
+            "plan_length": 8,
+            "cost": 8,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 7348
+        },
+        {
+          "case_id": "token_swapping_016",
+          "reference_cost": 8,
+          "source": {
+            "url": "https://raw.githubusercontent.com/Quantinuum/tket/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+            "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+            "architecture": "IBM q7 Jakarta",
+            "entry_index": 20,
+            "upstream_cost": 8,
+            "upstream_actions": [
+              [
+                1,
+                3
+              ],
+              [
+                1,
+                2
+              ],
+              [
+                3,
+                5
+              ],
+              [
+                4,
+                5
+              ],
+              [
+                5,
+                6
+              ],
+              [
+                1,
+                3
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                3,
+                5
+              ]
+            ]
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 8,
+            "plan_length": 8,
+            "cost": 8,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 4548
+        },
+        {
+          "case_id": "token_swapping_017",
+          "reference_cost": 7,
+          "source": {
+            "url": "https://raw.githubusercontent.com/Quantinuum/tket/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+            "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+            "architecture": "IBM q7 Jakarta",
+            "entry_index": 68,
+            "upstream_cost": 7,
+            "upstream_actions": [
+              [
+                1,
+                2
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                4,
+                5
+              ],
+              [
+                1,
+                3
+              ],
+              [
+                3,
+                5
+              ],
+              [
+                4,
+                5
+              ],
+              [
+                0,
+                1
+              ]
+            ]
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 7,
+            "plan_length": 7,
+            "cost": 7,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 12650
+        },
+        {
+          "case_id": "token_swapping_018",
+          "reference_cost": 10,
+          "source": {
+            "url": "https://raw.githubusercontent.com/Quantinuum/tket/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+            "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+            "architecture": "IBM q7 Jakarta",
+            "entry_index": 87,
+            "upstream_cost": 10,
+            "upstream_actions": [
+              [
+                1,
+                3
+              ],
+              [
+                3,
+                5
+              ],
+              [
+                4,
+                5
+              ],
+              [
+                5,
+                6
+              ],
+              [
+                1,
+                3
+              ],
+              [
+                3,
+                5
+              ],
+              [
+                1,
+                2
+              ],
+              [
+                1,
+                3
+              ],
+              [
+                1,
+                2
+              ],
+              [
+                3,
+                5
+              ]
+            ]
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 10,
+            "plan_length": 10,
+            "cost": 10,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 27859
+        },
+        {
+          "case_id": "token_swapping_019",
+          "reference_cost": 8,
+          "source": {
+            "url": "https://raw.githubusercontent.com/Quantinuum/tket/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+            "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+            "architecture": "IBM q7 Jakarta",
+            "entry_index": 24,
+            "upstream_cost": 8,
+            "upstream_actions": [
+              [
+                4,
+                5
+              ],
+              [
+                5,
+                6
+              ],
+              [
+                1,
+                3
+              ],
+              [
+                3,
+                5
+              ],
+              [
+                1,
+                3
+              ],
+              [
+                1,
+                2
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                5,
+                6
+              ]
+            ]
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 8,
+            "plan_length": 8,
+            "cost": 8,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 10964
+        },
+        {
+          "case_id": "token_swapping_020",
+          "reference_cost": 5,
+          "source": {
+            "url": "https://raw.githubusercontent.com/Quantinuum/tket/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+            "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+            "architecture": "Small random tree 1",
+            "entry_index": 5,
+            "upstream_cost": 5,
+            "upstream_actions": [
+              [
+                1,
+                3
+              ],
+              [
+                0,
+                2
+              ],
+              [
+                1,
+                4
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                1,
+                3
+              ]
+            ]
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 5,
+            "plan_length": 5,
+            "cost": 5,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 6295
+        },
+        {
+          "case_id": "token_swapping_021",
+          "reference_cost": 5,
+          "source": {
+            "url": "https://raw.githubusercontent.com/Quantinuum/tket/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+            "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+            "architecture": "Small random tree 1",
+            "entry_index": 18,
+            "upstream_cost": 5,
+            "upstream_actions": [
+              [
+                0,
+                1
+              ],
+              [
+                1,
+                3
+              ],
+              [
+                0,
+                2
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                0,
+                2
+              ]
+            ]
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 5,
+            "plan_length": 5,
+            "cost": 5,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 5551
+        },
+        {
+          "case_id": "token_swapping_022",
+          "reference_cost": 4,
+          "source": {
+            "url": "https://raw.githubusercontent.com/Quantinuum/tket/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+            "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+            "architecture": "Small random tree 1",
+            "entry_index": 16,
+            "upstream_cost": 4,
+            "upstream_actions": [
+              [
+                1,
+                4
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                1,
+                3
+              ],
+              [
+                0,
+                1
+              ]
+            ]
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 4,
+            "plan_length": 4,
+            "cost": 4,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 2747
+        },
+        {
+          "case_id": "token_swapping_023",
+          "reference_cost": 5,
+          "source": {
+            "url": "https://raw.githubusercontent.com/Quantinuum/tket/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+            "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+            "architecture": "Small random tree 1",
+            "entry_index": 3,
+            "upstream_cost": 5,
+            "upstream_actions": [
+              [
+                0,
+                2
+              ],
+              [
+                1,
+                4
+              ],
+              [
+                1,
+                3
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                1,
+                3
+              ]
+            ]
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 5,
+            "plan_length": 5,
+            "cost": 5,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 3292
+        },
+        {
+          "case_id": "token_swapping_024",
+          "reference_cost": 3,
+          "source": {
+            "url": "https://raw.githubusercontent.com/Quantinuum/tket/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+            "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+            "architecture": "Small random tree 1",
+            "entry_index": 9,
+            "upstream_cost": 3,
+            "upstream_actions": [
+              [
+                1,
+                3
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                1,
+                4
+              ]
+            ]
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 3,
+            "plan_length": 3,
+            "cost": 3,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 4259
+        },
+        {
+          "case_id": "token_swapping_025",
+          "reference_cost": 3,
+          "source": {
+            "url": "https://raw.githubusercontent.com/Quantinuum/tket/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+            "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+            "architecture": "Small random tree 2",
+            "entry_index": 18,
+            "upstream_cost": 3,
+            "upstream_actions": [
+              [
+                1,
+                4
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                1,
+                2
+              ]
+            ]
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 3,
+            "plan_length": 3,
+            "cost": 3,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 2094
+        },
+        {
+          "case_id": "token_swapping_026",
+          "reference_cost": 4,
+          "source": {
+            "url": "https://raw.githubusercontent.com/Quantinuum/tket/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+            "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+            "architecture": "Small random tree 2",
+            "entry_index": 1,
+            "upstream_cost": 4,
+            "upstream_actions": [
+              [
+                0,
+                1
+              ],
+              [
+                1,
+                2
+              ],
+              [
+                1,
+                4
+              ],
+              [
+                1,
+                3
+              ]
+            ]
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 4,
+            "plan_length": 4,
+            "cost": 4,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 7219
+        },
+        {
+          "case_id": "token_swapping_027",
+          "reference_cost": 5,
+          "source": {
+            "url": "https://raw.githubusercontent.com/Quantinuum/tket/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+            "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+            "architecture": "Small random tree 2",
+            "entry_index": 8,
+            "upstream_cost": 5,
+            "upstream_actions": [
+              [
+                1,
+                2
+              ],
+              [
+                1,
+                4
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                1,
+                3
+              ],
+              [
+                0,
+                1
+              ]
+            ]
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 5,
+            "plan_length": 5,
+            "cost": 5,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 4773
+        },
+        {
+          "case_id": "token_swapping_028",
+          "reference_cost": 3,
+          "source": {
+            "url": "https://raw.githubusercontent.com/Quantinuum/tket/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+            "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+            "architecture": "Small random tree 2",
+            "entry_index": 21,
+            "upstream_cost": 3,
+            "upstream_actions": [
+              [
+                1,
+                4
+              ],
+              [
+                1,
+                2
+              ],
+              [
+                0,
+                1
+              ]
+            ]
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 3,
+            "plan_length": 3,
+            "cost": 3,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 2128
+        },
+        {
+          "case_id": "token_swapping_029",
+          "reference_cost": 4,
+          "source": {
+            "url": "https://raw.githubusercontent.com/Quantinuum/tket/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+            "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+            "architecture": "Small random tree 2",
+            "entry_index": 3,
+            "upstream_cost": 4,
+            "upstream_actions": [
+              [
+                1,
+                2
+              ],
+              [
+                1,
+                4
+              ],
+              [
+                1,
+                3
+              ],
+              [
+                0,
+                1
+              ]
+            ]
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 4,
+            "plan_length": 4,
+            "cost": 4,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 6055
+        },
+        {
+          "case_id": "token_swapping_030",
+          "reference_cost": 15,
+          "source": {
+            "url": "https://raw.githubusercontent.com/Quantinuum/tket/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+            "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+            "architecture": "Medium random tree 1",
+            "entry_index": 25,
+            "upstream_cost": 17,
+            "upstream_actions": [
+              [
+                1,
+                6
+              ],
+              [
+                1,
+                4
+              ],
+              [
+                6,
+                7
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                1,
+                6
+              ],
+              [
+                6,
+                7
+              ],
+              [
+                0,
+                2
+              ],
+              [
+                6,
+                8
+              ],
+              [
+                7,
+                9
+              ],
+              [
+                6,
+                7
+              ],
+              [
+                1,
+                5
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                1,
+                6
+              ],
+              [
+                0,
+                2
+              ],
+              [
+                2,
+                3
+              ],
+              [
+                6,
+                8
+              ],
+              [
+                1,
+                5
+              ]
+            ]
+          },
+          "verdict": {
+            "solved": false,
+            "contract_pass": false,
+            "failure": "truncated"
+          },
+          "response_status": "incomplete",
+          "output_tokens": 64000,
+          "initial": [
+            9,
+            6,
+            8,
+            2,
+            0,
+            3,
+            4,
+            1,
+            7,
+            5
+          ],
+          "incomplete_details": {
+            "reason": "max_output_tokens"
+          },
+          "final_output_characters": 0,
+          "reasoning_tokens": 64000
+        },
+        {
+          "case_id": "token_swapping_031",
+          "reference_cost": 15,
+          "source": {
+            "url": "https://raw.githubusercontent.com/Quantinuum/tket/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+            "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+            "architecture": "Medium random tree 1",
+            "entry_index": 13,
+            "upstream_cost": 15,
+            "upstream_actions": [
+              [
+                0,
+                1
+              ],
+              [
+                0,
+                2
+              ],
+              [
+                1,
+                6
+              ],
+              [
+                1,
+                5
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                7,
+                9
+              ],
+              [
+                2,
+                3
+              ],
+              [
+                6,
+                7
+              ],
+              [
+                1,
+                6
+              ],
+              [
+                0,
+                2
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                0,
+                2
+              ],
+              [
+                6,
+                8
+              ],
+              [
+                1,
+                6
+              ],
+              [
+                1,
+                4
+              ]
+            ]
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 15,
+            "plan_length": 15,
+            "cost": 15,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 40370
+        },
+        {
+          "case_id": "token_swapping_032",
+          "reference_cost": 12,
+          "source": {
+            "url": "https://raw.githubusercontent.com/Quantinuum/tket/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+            "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+            "architecture": "Medium random tree 1",
+            "entry_index": 27,
+            "upstream_cost": 12,
+            "upstream_actions": [
+              [
+                0,
+                1
+              ],
+              [
+                0,
+                2
+              ],
+              [
+                1,
+                6
+              ],
+              [
+                1,
+                5
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                6,
+                7
+              ],
+              [
+                2,
+                3
+              ],
+              [
+                0,
+                2
+              ],
+              [
+                2,
+                3
+              ],
+              [
+                1,
+                6
+              ],
+              [
+                1,
+                4
+              ],
+              [
+                0,
+                1
+              ]
+            ]
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 12,
+            "plan_length": 12,
+            "cost": 12,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 21460
+        },
+        {
+          "case_id": "token_swapping_033",
+          "reference_cost": 15,
+          "source": {
+            "url": "https://raw.githubusercontent.com/Quantinuum/tket/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+            "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+            "architecture": "Medium random tree 1",
+            "entry_index": 14,
+            "upstream_cost": 15,
+            "upstream_actions": [
+              [
+                1,
+                6
+              ],
+              [
+                0,
+                2
+              ],
+              [
+                7,
+                9
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                6,
+                7
+              ],
+              [
+                2,
+                3
+              ],
+              [
+                0,
+                2
+              ],
+              [
+                2,
+                3
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                1,
+                6
+              ],
+              [
+                1,
+                4
+              ],
+              [
+                6,
+                8
+              ],
+              [
+                1,
+                5
+              ],
+              [
+                1,
+                6
+              ],
+              [
+                1,
+                5
+              ]
+            ]
+          },
+          "verdict": {
+            "solved": false,
+            "contract_pass": false,
+            "failure": "truncated"
+          },
+          "response_status": "incomplete",
+          "output_tokens": 64000,
+          "initial": [
+            2,
+            7,
+            0,
+            8,
+            1,
+            6,
+            3,
+            9,
+            5,
+            4
+          ],
+          "incomplete_details": {
+            "reason": "max_output_tokens"
+          },
+          "final_output_characters": 0,
+          "reasoning_tokens": 64000
+        },
+        {
+          "case_id": "token_swapping_034",
+          "reference_cost": 14,
+          "source": {
+            "url": "https://raw.githubusercontent.com/Quantinuum/tket/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+            "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+            "architecture": "Medium random tree 1",
+            "entry_index": 11,
+            "upstream_cost": 14,
+            "upstream_actions": [
+              [
+                1,
+                4
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                0,
+                2
+              ],
+              [
+                1,
+                5
+              ],
+              [
+                1,
+                6
+              ],
+              [
+                6,
+                8
+              ],
+              [
+                1,
+                5
+              ],
+              [
+                2,
+                3
+              ],
+              [
+                6,
+                7
+              ],
+              [
+                7,
+                9
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                1,
+                6
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                6,
+                7
+              ]
+            ]
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 14,
+            "plan_length": 14,
+            "cost": 14,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 56572
+        },
+        {
+          "case_id": "token_swapping_035",
+          "reference_cost": 17,
+          "source": {
+            "url": "https://raw.githubusercontent.com/Quantinuum/tket/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+            "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+            "architecture": "Medium random tree 2",
+            "entry_index": 25,
+            "upstream_cost": 17,
+            "upstream_actions": [
+              [
+                3,
+                5
+              ],
+              [
+                5,
+                8
+              ],
+              [
+                5,
+                6
+              ],
+              [
+                6,
+                9
+              ],
+              [
+                5,
+                7
+              ],
+              [
+                0,
+                3
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                3,
+                4
+              ],
+              [
+                0,
+                3
+              ],
+              [
+                3,
+                5
+              ],
+              [
+                5,
+                6
+              ],
+              [
+                0,
+                2
+              ],
+              [
+                6,
+                9
+              ],
+              [
+                0,
+                3
+              ],
+              [
+                3,
+                5
+              ],
+              [
+                0,
+                2
+              ],
+              [
+                3,
+                4
+              ]
+            ]
+          },
+          "verdict": {
+            "solved": false,
+            "contract_pass": false,
+            "failure": "truncated"
+          },
+          "response_status": "incomplete",
+          "output_tokens": 64000,
+          "initial": [
+            3,
+            9,
+            5,
+            8,
+            0,
+            1,
+            7,
+            2,
+            6,
+            4
+          ],
+          "incomplete_details": {
+            "reason": "max_output_tokens"
+          },
+          "final_output_characters": 0,
+          "reasoning_tokens": 64000
+        },
+        {
+          "case_id": "token_swapping_036",
+          "reference_cost": 16,
+          "source": {
+            "url": "https://raw.githubusercontent.com/Quantinuum/tket/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+            "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+            "architecture": "Medium random tree 2",
+            "entry_index": 24,
+            "upstream_cost": 16,
+            "upstream_actions": [
+              [
+                0,
+                3
+              ],
+              [
+                3,
+                5
+              ],
+              [
+                5,
+                8
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                6,
+                9
+              ],
+              [
+                3,
+                4
+              ],
+              [
+                0,
+                3
+              ],
+              [
+                5,
+                7
+              ],
+              [
+                5,
+                6
+              ],
+              [
+                3,
+                5
+              ],
+              [
+                5,
+                6
+              ],
+              [
+                0,
+                2
+              ],
+              [
+                0,
+                3
+              ],
+              [
+                3,
+                4
+              ],
+              [
+                6,
+                9
+              ],
+              [
+                0,
+                2
+              ]
+            ]
+          },
+          "verdict": {
+            "solved": false,
+            "contract_pass": false,
+            "failure": "truncated"
+          },
+          "response_status": "incomplete",
+          "output_tokens": 64000,
+          "initial": [
+            8,
+            9,
+            4,
+            1,
+            0,
+            3,
+            6,
+            5,
+            7,
+            2
+          ],
+          "incomplete_details": {
+            "reason": "max_output_tokens"
+          },
+          "final_output_characters": 0,
+          "reasoning_tokens": 64000
+        },
+        {
+          "case_id": "token_swapping_037",
+          "reference_cost": 11,
+          "source": {
+            "url": "https://raw.githubusercontent.com/Quantinuum/tket/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+            "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+            "architecture": "Medium random tree 2",
+            "entry_index": 9,
+            "upstream_cost": 11,
+            "upstream_actions": [
+              [
+                0,
+                1
+              ],
+              [
+                3,
+                5
+              ],
+              [
+                5,
+                6
+              ],
+              [
+                0,
+                3
+              ],
+              [
+                0,
+                2
+              ],
+              [
+                3,
+                5
+              ],
+              [
+                6,
+                9
+              ],
+              [
+                5,
+                7
+              ],
+              [
+                5,
+                8
+              ],
+              [
+                3,
+                4
+              ],
+              [
+                3,
+                5
+              ]
+            ]
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 11,
+            "plan_length": 11,
+            "cost": 11,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 8375
+        },
+        {
+          "case_id": "token_swapping_038",
+          "reference_cost": 9,
+          "source": {
+            "url": "https://raw.githubusercontent.com/Quantinuum/tket/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+            "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+            "architecture": "Medium random tree 2",
+            "entry_index": 17,
+            "upstream_cost": 9,
+            "upstream_actions": [
+              [
+                3,
+                5
+              ],
+              [
+                0,
+                2
+              ],
+              [
+                0,
+                3
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                5,
+                6
+              ],
+              [
+                5,
+                8
+              ],
+              [
+                6,
+                9
+              ],
+              [
+                5,
+                6
+              ],
+              [
+                5,
+                7
+              ]
+            ]
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 9,
+            "plan_length": 9,
+            "cost": 9,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 6911
+        },
+        {
+          "case_id": "token_swapping_039",
+          "reference_cost": 12,
+          "source": {
+            "url": "https://raw.githubusercontent.com/Quantinuum/tket/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+            "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+            "architecture": "Medium random tree 2",
+            "entry_index": 10,
+            "upstream_cost": 12,
+            "upstream_actions": [
+              [
+                0,
+                3
+              ],
+              [
+                3,
+                4
+              ],
+              [
+                3,
+                5
+              ],
+              [
+                0,
+                2
+              ],
+              [
+                5,
+                7
+              ],
+              [
+                5,
+                6
+              ],
+              [
+                6,
+                9
+              ],
+              [
+                3,
+                5
+              ],
+              [
+                0,
+                1
+              ],
+              [
+                0,
+                3
+              ],
+              [
+                3,
+                5
+              ],
+              [
+                5,
+                8
+              ]
+            ]
+          },
+          "verdict": {
+            "solved": true,
+            "contract_pass": true,
+            "strict_json": true,
+            "status_correct": true,
+            "reported_status": "solved",
+            "failure": null,
+            "first_illegal_index": null,
+            "illegal_detail": null,
+            "executed": 12,
+            "plan_length": 12,
+            "cost": 12,
+            "optimal": true,
+            "excess_cost": 0
+          },
+          "response_status": "completed",
+          "output_tokens": 26817
+        }
+      ],
+      "source_sequences_longer_than_optimum": 4,
+      "exact_search_bound_rejections": 0
+    }
+  }
+}

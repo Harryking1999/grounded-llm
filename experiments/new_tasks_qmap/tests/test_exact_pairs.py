@@ -1,7 +1,7 @@
 """Independent graph checks, leakage boundaries and oracle-free reader loading."""
 from collections import deque
 from contextlib import ExitStack
-from itertools import combinations,permutations
+from itertools import combinations,permutations,product
 import json
 from pathlib import Path
 import tempfile
@@ -43,6 +43,44 @@ def small_oracle(path,n,edges):
 
 
 class ExactPairTests(unittest.TestCase):
+    def test_spatial_encoder_preserves_raw_board_and_checkpoint_interface(self):
+        options=dict(dimension=128,hidden=256,cap=256,metric='directed_max',input_dim=400)
+        mlp=StateEncoder(**options)
+        spatial=StateEncoder(**options,architecture='spatial_cnn',spatial_shape=[4,10,10],conv_channels=16,spatial_hidden=112)
+        self.assertLess(abs(sum(p.numel() for p in mlp.parameters())-sum(p.numel() for p in spatial.parameters()))/sum(p.numel() for p in mlp.parameters()),.02)
+        bits=torch.randint(0,2,(3,400)).float(); q=spatial.encode(bits)
+        self.assertEqual(tuple(q.shape),(3,128)); self.assertTrue(((q>0)&(q<256)).all())
+        torch.testing.assert_close(q[0],spatial.encode(bits[:1])[0])
+        torch.testing.assert_close(spatial.distance(q,q),torch.zeros(3))
+        with self.assertRaises(ValueError): StateEncoder(**options,architecture='spatial_cnn',spatial_shape=[4,9,10])
+        env=Sokoban(['##########','#@ $ .   #','# $ .    #','# $ .    #','# $ .    #']+['#        #']*4+['##########'])
+        from grounded_llm.tasks.sokoban.qmap import MapReader
+        config=dict(model={k:v for k,v in options.items() if k!='input_dim'})
+        config['model'].update(architecture='spatial_cnn',spatial_shape=[4,10,10],conv_channels=16,spatial_hidden=112)
+        with tempfile.TemporaryDirectory() as tmp:
+            path=Path(tmp)/'map.pt'
+            torch.save(dict(model_type='exact_state_pairs',task='sokoban',input_dim=400,config=config,
+                model=spatial.state_dict(),scope={},step=0),path)
+            reader=MapReader(env,path); expected=spatial.encode(torch.as_tensor(env.features([env.start])))
+            torch.testing.assert_close(reader.encode([env.start]),expected)
+            batch,actions=reader.map_batch(env.start,env.start)
+            self.assertEqual(batch.vectors.shape[-1],128); self.assertGreater(len(actions),0)
+            self.assertFalse(any(p.requires_grad for p in reader.encoder.parameters()))
+
+    def test_linf_incompatibility_witness_and_axis_orientation(self):
+        from experiments.new_tasks_qmap.src.relation_diagnose import pair_incompatibility_gaps
+        cube=np.asarray(list(product((0,1),repeat=3)))
+        hamming=SimpleNamespace(distance=lambda a,b:np.abs(cube[a]-cube[b]).sum(axis=-1))
+        gaps=pair_incompatibility_gaps(hamming,np.array([[0,7],[1,6],[2,5],[3,4]]))
+        np.testing.assert_array_equal(gaps[~np.eye(4,dtype=bool)],np.full(12,2))
+        # An exact existing3D Linf embedding must never require incompatible
+        # tight pairs to share an axis, even when their signs differ.
+        q=np.random.default_rng(7).integers(-10,11,size=(12,3))
+        corpus=SimpleNamespace(distance=lambda a,b:np.abs(q[a]-q[b]).max(axis=-1))
+        rows=np.asarray(list(combinations(range(12),2))); axes=np.abs(q[rows[:,0]]-q[rows[:,1]]).argmax(axis=-1)
+        gaps=pair_incompatibility_gaps(corpus,rows)
+        for axis in range(3): self.assertTrue((gaps[np.ix_(axes==axis,axes==axis)]<=0).all())
+
     def test_actual_batch_stream_counts_and_full_legal_boundary_coverage(self):
         from experiments.new_tasks_qmap.src.relation_diagnose import stream_statistics,batch_gradient_probe
         env=Sokoban(['#####','#@$.#','#   #','#####'])

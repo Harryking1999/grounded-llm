@@ -1,5 +1,6 @@
 """State encoder, fixed distances and candidate ranking objective."""
 import torch
+from math import prod
 from torch import nn
 
 def distance(source, target, metric, group_size=8):
@@ -30,8 +31,9 @@ def soft_rank_loss(scores, truth, valid, temperature):
 
 
 class StateEncoder(nn.Module):
-    """The same two-hidden-layer Q encoder; only input encoding and metric vary."""
-    def __init__(self, dimension, hidden, cap, metric, input_dim=100, group_size=8, output_activation='sigmoid'):
+    """Independent state encoder; existing checkpoints default to the same MLP."""
+    def __init__(self, dimension, hidden, cap, metric, input_dim=100, group_size=8, output_activation='sigmoid',
+                 architecture='mlp',spatial_shape=None,conv_channels=16,spatial_hidden=112):
         super().__init__()
         self.cap = cap
         self.metric = metric
@@ -39,9 +41,23 @@ class StateEncoder(nn.Module):
         if output_activation not in ('sigmoid','linear','softsign'):
             raise ValueError('Expected sigmoid, linear or softsign Q output')
         self.output_activation = output_activation
-        self.network = nn.Sequential(nn.Linear(input_dim, hidden), nn.ReLU(),
-                                     nn.Linear(hidden, hidden), nn.ReLU(),
-                                     nn.Linear(hidden, dimension))
+        if architecture=='mlp':
+            if spatial_shape is not None: raise ValueError('Spatial shape requires a spatial encoder')
+            self.network = nn.Sequential(nn.Linear(input_dim, hidden), nn.ReLU(),
+                                         nn.Linear(hidden, hidden), nn.ReLU(),
+                                         nn.Linear(hidden, dimension))
+        elif architecture=='spatial_cnn':
+            if spatial_shape is None or len(spatial_shape)!=3 or min(spatial_shape)<1 or prod(spatial_shape)!=input_dim:
+                raise ValueError('Spatial shape must be channels, height, width matching the raw input')
+            if conv_channels<1 or spatial_hidden<1: raise ValueError('Positive spatial widths required')
+            channels,height,width=spatial_shape
+            self.network=nn.Sequential(nn.Unflatten(-1,tuple(spatial_shape)),
+                nn.Conv2d(channels,conv_channels,3,padding=1),nn.ReLU(),
+                nn.Conv2d(conv_channels,conv_channels,3,padding=1),nn.ReLU(),
+                nn.Conv2d(conv_channels,conv_channels,3,padding=1),nn.ReLU(),
+                nn.Flatten(start_dim=-3),nn.Linear(conv_channels*height*width,spatial_hidden),nn.ReLU(),
+                nn.Linear(spatial_hidden,dimension))
+        else: raise ValueError('Expected mlp or spatial_cnn architecture')
         nn.init.normal_(self.network[-1].weight, std=.01)
         nn.init.zeros_(self.network[-1].bias)
 

@@ -29,6 +29,10 @@ Token Swapping的短距离关系诊断对应[局部目标训练配置](configs/t
 
 推箱子的[线性输出诊断配置](configs/sokoban_linear_output_pairs.json)仅替换末端sigmoid，保留两层隐藏MLP、128维Q、有向max、全部数据与监督。此时`cap`仅是输出尺度，向量不再受它约束；不可达仍用配置中的有限代理，不能把线性坐标解释为无穷。其他既有配置默认继续用sigmoid，旧checkpoint不变。
 
+[空间编码器对照](configs/sokoban_spatial_pairs.json)针对输出控制未解决的跨布局失败：从头训练，复用原基线的全部实际数据和采样口径、128维、有向max、Sigmoid、损失、预算及验证选择，只替换状态编码结构。原始四通道棋盘经局部卷积及保留位置的全连接输出Q，不输入目标条件、oracle、死锁规则或路径特征。参数量接近原MLP，精确结构与宽度只维护在配置；这不是激活函数消融，也不混用可达／边界采样实验。旧模型默认结构及state_dict兼容。
+
+[Token分组L1读出对照](configs/token_swapping_grouped_l1_pairs.json)从头复用原L∞基线数据、初始化种子、采样、损失及预算，保留128维独立Q，调用core已有`max_l1`，只改变距离组合。其动机是离线精确L∞不相容状态对见证；不同距离也会改变初始距离与梯度尺度，不能把潜在改善只解释为容量提升。
+
 [Softsign候选配置](configs/sokoban_softsign_output_pairs.json)匹配Sigmoid的中心、中心斜率与范围，先保留为后续对照，未启动。尺度定义、局限及当前结果见[报告](results/report.md#输出与距离尺度)。
 
 推箱子的[可达与边界采样配置](configs/sokoban_balanced_relations_pairs.json)是独立的数据分布实验，从头训练并保持Sigmoid、同一精确数据／划分、128维、损失、预算及选权重规则。点监督的有限关系与全源遍历配额、边界排序配额及距离分层只由该配置定义；分层内随机抽样。边界指同一状态与目标下同时存在有限和不可达的合法后继。全源配额逐个遍历原训练物理源，因此死路仍进入监督；其余点从精确有限关系银行抽样。排序在边界／非边界关系银行内分层，保留所有合法动作。银行只含原训练源、训练完整目标并排除既有留出关系闭包，能由原数据确定性重建，完整恢复沿用已保存RNG与源遍历状态。该实验不改变正在运行的激活函数对照。
@@ -46,11 +50,14 @@ python -m experiments.new_tasks_qmap.src.relation_evaluate --checkpoint runs/new
 python -m experiments.new_tasks_qmap.src.relation_diagnose --config experiments/new_tasks_qmap/configs/sokoban_pairs.json --run runs/new_tasks_pairs/sokoban --out tmp/sokoban_geometry.json --cohorts validation unseen_goal_validation
 python -m experiments.new_tasks_qmap.src.relation_diagnose --config experiments/new_tasks_qmap/configs/sokoban_pairs.json --run runs/new_tasks_pairs/sokoban --out tmp/sokoban_actual_batches.json --stream-statistics
 python -m experiments.new_tasks_qmap.src.relation_diagnose --config experiments/new_tasks_qmap/configs/sokoban_pairs.json --run runs/new_tasks_pairs/sokoban --out tmp/sokoban_gradient_probe.json --checkpoint runs/new_tasks_pairs/sokoban/best.pt --gradient-batches 8
+python -m experiments.new_tasks_qmap.src.relation_diagnose --config experiments/new_tasks_qmap/configs/token_swapping_pairs.json --run runs/new_tasks_pairs/token_swapping --out tmp/token_linf_witness.json --linf-witness-count 1024
 ```
 
 `relation_diagnose`默认用精确距离坐标检查表示能力：当某布局的全部查询目标可放入坐标时，有向max／对称L∞能精确表示到这些目标的距离。这不证明共享MLP已学会地图。目标多于维度时仅检查一组landmark，下界误差不能证明不可表示。这些oracle坐标不用于训练输入、贪心策略或验收成绩。
 
 `--stream-statistics`核对全部实际训练分片，输出逐batch的压缩CSV及汇总：点监督可达／不可达与真实距离层、全合法候选、死锁边界、最优动作、可训练关系覆盖。`--gradient-batches`在固定权重上重放指定checkpoint步之前的实际batch，分别求可达Huber、不可达Huber和排序梯度，不更新模型；保留原总batch分母及rank权重。它不重建未保存的历史逐步梯度。梯度范数不可相加当作贡献百分比，带符号的总梯度方向投影需连同梯度夹角解释。
+
+`--linf-witness-count`在固定Token精确图上提出直径状态对，并逐项重算全部交叉距离，验证哪些状态对不能共用一个达到其真距离的L∞坐标。正间隙团给出精确嵌入维数下界及一致绝对误差下界；它不证明平均误差下界或80%贪心不可能，也不用于模型推理。见证保留端点ID和证明，不依赖学习器权重。
 
 三个任务的`grounded_llm/tasks/<task>/qmap.py:MapReader`直接加载冻结权重，接公共CURRENT/GOAL/CANDIDATES结构。环境提供真实后继，地图不因此被解释为学会状态转移。Flash指定目标结果见[15题固定诊断](../task_text_baselines/results/exact_goals_flash64k.json)，历史目标条件结果不混算。
 

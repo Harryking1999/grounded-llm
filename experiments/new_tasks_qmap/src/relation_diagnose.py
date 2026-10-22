@@ -14,6 +14,46 @@ def _popcount(values):
     return int(table[values.view(np.uint8)].sum(dtype=np.int64))
 
 
+def pair_incompatibility_gaps(corpus,rows):
+    """Positive gap means two undirected pairs cannot share a tight Linf axis."""
+    a,b=rows[:,0],rows[:,1]; length=corpus.distance(a,b)
+    cross_same=corpus.distance(a[:,None],a[None,:])+corpus.distance(b[:,None],b[None,:])
+    cross_opposite=corpus.distance(a[:,None],b[None,:])+corpus.distance(b[:,None],a[None,:])
+    return length[:,None]+length[None,:]-np.maximum(cross_same,cross_opposite)
+
+
+def linf_witness(corpus,config,count):
+    """Exact finite metric obstruction, independent of learned encoder weights."""
+    if config['task']!='token_swapping' or count<2: raise ValueError('At least two fixed-tree Token pairs required')
+    from grounded_llm.tasks.token_swapping.relation_data import rank
+    seed=config['seed']+721; rng=np.random.default_rng(seed)
+    diameter=int(corpus.distances.max()); far=np.flatnonzero(corpus.distances==diameter)
+    source=rng.choice(corpus.size,count,replace=False)
+    relative=corpus.states[rng.choice(far,count)]
+    goals=rank(np.take_along_axis(corpus.states[source],np.argsort(relative,axis=1),axis=1))
+    rows=np.column_stack([source,goals])
+    if not (corpus.distance(source,goals)==diameter).all(): raise ValueError('Witness is not at the exact diameter')
+    gap=pair_incompatibility_gaps(corpus,rows); results={}
+    for margin in (1,2,4,6,8):
+        adjacent=gap>=margin; np.fill_diagonal(adjacent,False); best=[]
+        for trial in range(16):
+            candidates=rng.permutation(count); selected=[]
+            if trial==0: candidates=candidates[np.argsort(-adjacent[candidates].sum(axis=1),kind='stable')]
+            while len(candidates):
+                chosen=int(candidates[0]); selected.append(chosen); candidates=candidates[adjacent[chosen,candidates]]
+            if len(selected)>len(best): best=selected
+        if len(best)<2: continue
+        verified=gap[np.ix_(best,best)].copy(); np.fill_diagonal(verified,np.inf)
+        minimum=float(verified.min())
+        if minimum<margin: raise ValueError('Witness clique failed exact recheck')
+        results[str(margin)]=dict(pairs=len(best),minimum_verified_gap=minimum,
+            uniform_absolute_error_lower_bound_for_fewer_dimensions=minimum/4,
+            witness_pair_ids=rows[best].tolist())
+    return dict(seed=seed,diameter=diameter,proposed_pairs=count,results=results,
+        proof='For pairs (a,b),(c,d) with lengths D1,D2, a shared tight absolute-max coordinate requires D1+D2 <= max(d(a,c)+d(b,d),d(a,d)+d(b,c)). Otherwise each orientation contradicts a cross-distance bound. With uniform additive error epsilon, the right side can gain at most4epsilon. A positive-gap clique of M pairs requires at least M coordinates for an exact fit; with fewer dimensions its minimum gap/4 bounds the uniform absolute error below.',
+        scope='Exact finite lower-bound witness for independent Q and L-infinity only. Not an average-error bound, not a learned-map result, and not a proof that greedy80 percent is impossible. Oracle is used offline only; all witness endpoints and their cross-distances are part of the bounded domain.')
+
+
 def stream_statistics(corpus,data,run,out):
     """Actual saved batches, not proposed sampler quotas or whole-graph priors."""
     if not hasattr(corpus,'scenes') or any(len(s.goals)>32 for s in corpus.scenes):
@@ -203,6 +243,8 @@ def geometry(corpus,data,config,cohorts):
     existence check for a scene's target domain, not an oracle-free encoder.
     A 128-landmark subset gives only a lower-bound probe when goals exceed it.
     """
+    if config['model']['metric'] not in ('linf','directed_max'):
+        raise ValueError('Landmark geometry probe is defined for Linf or directed max only')
     budget=config['evaluation'].get('landmarks',config['model']['dimension'])
     rng=np.random.default_rng(config['seed']+211)
     landmarks={}
@@ -267,8 +309,11 @@ def main():
     parser.add_argument('--checkpoint',type=Path)
     parser.add_argument('--stream-statistics',action='store_true')
     parser.add_argument('--gradient-batches',type=int,default=0)
+    parser.add_argument('--linf-witness-count',type=int,default=0)
     args=parser.parse_args(); config=json.loads(args.config.read_text())
     corpus,data,_=load(config,args.run/'data')
+    if args.linf_witness_count:
+        atomic_json(args.out,linf_witness(corpus,config,args.linf_witness_count)); return
     if args.stream_statistics:
         atomic_json(args.out,stream_statistics(corpus,data,args.run,args.out)); return
     if args.gradient_batches:

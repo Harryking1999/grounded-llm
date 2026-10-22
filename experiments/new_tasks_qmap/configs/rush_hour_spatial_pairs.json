@@ -1,0 +1,82 @@
+{
+  "task": "rush_hour",
+  "seed": 2026102303,
+  "data": {
+    "source_url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+    "source_code_commit": "3e3b8396891d1802b30cb3129ae31fdedb319480",
+    "source_cache": "tmp/planning_task_sources/rush1000.txt",
+    "max_states": 50000,
+    "scenes": {
+      "train": "all",
+      "validation": "all",
+      "test": "all"
+    },
+    "goals_per_scene": "all",
+    "training_goals": "all_except_heldout",
+    "diagnostic_rows": [
+      15,
+      51,
+      83,
+      143,
+      343,
+      795,
+      850,
+      906
+    ],
+    "heldout_goals": 8,
+    "split_fractions": [
+      0.7,
+      0.15,
+      0.15
+    ],
+    "diagnostic_suite": "runs/deepseek_exact_goals64k/suite.json",
+    "prepared_from": "../rush_hour/data"
+  },
+  "model": {
+    "dimension": 128,
+    "hidden": 256,
+    "cap": 256,
+    "metric": "linf",
+    "architecture": "spatial_cnn",
+    "spatial_shape": [
+      26,
+      6,
+      6
+    ],
+    "conv_channels": 32,
+    "spatial_hidden": 244
+  },
+  "training": {
+    "steps": 60000,
+    "batch_size": 2048,
+    "decision_batch_size": 1024,
+    "learning_rate": 0.001,
+    "rank_weight": 1.0,
+    "rank_temperature": 1.0,
+    "eval_every": 5000,
+    "cpu_threads": 4,
+    "unreachable_target": 240.0,
+    "features_on_device": true,
+    "broad_fraction": 0.5,
+    "online_goals": true,
+    "record_training_samples": true
+  },
+  "relations": {
+    "holdout_per_goal": 16,
+    "evaluation_per_goal": 64,
+    "unreachable_eval_per_goal": 24,
+    "complete_training_sources": true,
+    "evaluation_training_goals": 8
+  },
+  "evaluation": {
+    "decision_count": 2048,
+    "rollout_count": 1024,
+    "horizon": 256,
+    "landmarks": 128
+  },
+  "schema": "exact_state_pairs",
+  "selection": "Lowest validation finite Huber plus candidate soft-rank CE, equally averaging predeclared validation cohorts; no test checkpoint selection.",
+  "scope": "Independent Q(S), Q(G); exact complete goals only; no oracle in inference features, no pruning, no search, no LLM retraining.",
+  "acceptance": "experiments/new_tasks_qmap/configs/exact_pair_acceptance.json",
+  "hypothesis": "Single state-encoder structure control against the original Sigmoid MLP, from scratch with the same raw A-Z identity occupancy channels, exact data, immutable scene/goal/relationship holds, sampling,128D Linf, losses, budget and selector. The MLP solves over96 percent within seen layouts but only51.37 percent on unseen layouts. Three local3x3 convolutions plus a position-preserving head test transfer of vehicle obstruction geometry without dropping identity or introducing query-goal conditioning.338708 parameters vs338560 MLP. No oracle features, action pruning or search."
+}

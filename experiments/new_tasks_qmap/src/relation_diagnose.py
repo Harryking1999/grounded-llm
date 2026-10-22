@@ -65,6 +65,8 @@ def stream_statistics(corpus,data,run,out):
         at=np.searchsorted(reserved,values)
         return (at<len(reserved)) & (reserved[np.minimum(at,len(reserved)-1)]==values)
     columns=np.full(corpus.size,-1,dtype=np.int8)
+    point_index=np.full(corpus.size,-1,dtype=np.int32)
+    point_index[data['pairs_train'][:,0]]=np.arange(len(data['pairs_train']))
     eligible=np.zeros(corpus.size,dtype=np.uint32); seen=np.zeros_like(eligible)
     for sid,scene in enumerate(corpus.scenes):
         offset=corpus.offsets[sid]; columns[scene.goals+offset]=np.arange(len(scene.goals))
@@ -83,7 +85,9 @@ def stream_statistics(corpus,data,run,out):
     if not files: raise ValueError('No actual saved training sample shards')
     csv_path=Path(out).with_suffix('.csv.gz'); csv_path.parent.mkdir(parents=True,exist_ok=True)
     fields=['attempt','step','point_rows','point_finite','point_infinite','rank_rows','legal_candidates',
-            'candidate_finite','candidate_infinite','boundary_decisions','optimal_candidates','rows_without_optimal']
+            'candidate_finite','candidate_infinite','boundary_decisions','optimal_candidates','rows_without_optimal',
+            'point_initial_row_finite','initial_finite_to_actual_unreachable','initial_unreachable_to_actual_finite',
+            'point_initial_row_near_1_5','initial_near_to_actual_zero','initial_near_to_actual_near_1_5','initial_near_to_actual_far','initial_near_to_actual_unreachable']
     intervals=[(0,0),(1,1),(2,2),(3,5),(6,10),(11,20),(21,40),(41,80),(81,np.inf)]
     bin_names=[f'{a}_{b}' for a,b in intervals]
     fields += ['point_distance_'+name for name in bin_names]+['rank_distance_'+name for name in bin_names]
@@ -95,6 +99,9 @@ def stream_statistics(corpus,data,run,out):
         for path in files:
             with np.load(path) as archive: x={key:archive[key] for key in ('point_step','point_distance','pairs','rank_step','tasks','children','child_distance','parent_distance','optimal')}
             children=x['children']; valid=children>=0
+            source_rows=point_index[x['pairs'][:,0]]
+            if (source_rows<0).any(): raise ValueError(('Point source outside original training rows',path))
+            initial=data['pair_distances_train'][source_rows]
             if not np.array_equal(children,corpus.successors(x['tasks'][:,0])): raise ValueError(('Missing legal training candidate',path))
             if not np.array_equal(x['point_distance'],corpus.distance(x['pairs'][:,0],x['pairs'][:,1])): raise ValueError(('Point labels changed scale or identity',path))
             if not np.array_equal(x['child_distance'][valid],corpus.distance(children[valid],np.broadcast_to(x['tasks'][:,1,None],children.shape)[valid])): raise ValueError(('Child labels changed scale or identity',path))
@@ -111,12 +118,22 @@ def stream_statistics(corpus,data,run,out):
             for step,p0,np_,r0,nr in zip(p_steps,p_start,p_count,r_start,r_count):
                 pd=x['point_distance'][p0:p0+np_]; cd=x['child_distance'][r0:r0+nr]; mask=valid[r0:r0+nr]
                 rd=x['parent_distance'][r0:r0+nr]; optimum=x['optimal'][r0:r0+nr] & mask
+                initial_pd=initial[p0:p0+np_]; initial_finite=np.isfinite(initial_pd)
+                initial_near=initial_finite & (initial_pd>=1) & (initial_pd<=5)
                 finite=np.isfinite(cd) & mask; dead=~np.isfinite(cd) & mask
                 row=dict(attempt=path.parent.name,step=int(step),point_rows=int(np_),point_finite=int(np.isfinite(pd).sum()),
                     point_infinite=int((~np.isfinite(pd)).sum()),rank_rows=int(nr),legal_candidates=int(mask.sum()),
                     candidate_finite=int(finite.sum()),candidate_infinite=int(dead.sum()),
                     boundary_decisions=int((finite.any(axis=1)&dead.any(axis=1)).sum()),
-                    optimal_candidates=int(optimum.sum()),rows_without_optimal=int((~optimum.any(axis=1)).sum()))
+                    optimal_candidates=int(optimum.sum()),rows_without_optimal=int((~optimum.any(axis=1)).sum()),
+                    point_initial_row_finite=int(initial_finite.sum()),
+                    initial_finite_to_actual_unreachable=int((initial_finite & ~np.isfinite(pd)).sum()),
+                    initial_unreachable_to_actual_finite=int((~initial_finite & np.isfinite(pd)).sum()),
+                    point_initial_row_near_1_5=int(initial_near.sum()),
+                    initial_near_to_actual_zero=int((initial_near & (pd==0)).sum()),
+                    initial_near_to_actual_near_1_5=int((initial_near & (pd>=1) & (pd<=5)).sum()),
+                    initial_near_to_actual_far=int((initial_near & np.isfinite(pd) & (pd>5)).sum()),
+                    initial_near_to_actual_unreachable=int((initial_near & ~np.isfinite(pd)).sum()))
                 for name,(a,b) in zip(bin_names,intervals):
                     row['point_distance_'+name]=int((np.isfinite(pd)&(pd>=a)&(pd<=b)).sum())
                     row['rank_distance_'+name]=int((np.isfinite(rd)&(rd>=a)&(rd<=b)).sum())
@@ -134,6 +151,7 @@ def stream_statistics(corpus,data,run,out):
         boundary_decision_fraction=totals['boundary_decisions']/totals['rank_rows'],
         unique_ranking_source_goal_pairs=actual,eligible_ranking_source_goal_pairs=available,
         ranking_relation_coverage=actual/available,
+        initial_row_label_comparison='Initial labels belong to the saved source-row placeholder goals used by the baseline strata, not necessarily to the online-resampled actual goal. These transition counts quantify that mismatch without inferring which source draws came from the broad branch.',
         all_actual_point_and_child_labels_equal_physical_oracle=True,all_legal_candidates_preserved=True,
         per_batch_fractions={key:dict(mean=float(np.mean(values)),quantiles={str(q):float(np.quantile(values,q)) for q in (0,.1,.5,.9,1)}) for key,values in proportions.items()},
         note='Each CSV row is one saved actual optimizer batch. Repeated steps across attempts are retained explicitly. No historical per-step gradient was recorded or reconstructed here.')
@@ -246,6 +264,7 @@ def geometry(corpus,data,config,cohorts):
     if config['model']['metric'] not in ('linf','directed_max'):
         raise ValueError('Landmark geometry probe is defined for Linf or directed max only')
     budget=config['evaluation'].get('landmarks',config['model']['dimension'])
+    canonical=config.get('task')=='sokoban' and budget>=100
     rng=np.random.default_rng(config['seed']+211)
     landmarks={}
     if hasattr(corpus,'scenes'):
@@ -271,16 +290,18 @@ def geometry(corpus,data,config,cohorts):
             children=data['children_'+name][take[ids]]; valid=children>=0
             states=np.concatenate([rows[ids].ravel(),children[valid]])
             unique,inverse=np.unique(states,return_inverse=True)
-            profiles=np.empty((len(unique),len(bank)),dtype=np.float32)
+            width=100 if canonical else len(bank)
+            profiles=np.zeros((len(unique),width),dtype=np.float32)
             for j,g in enumerate(bank):
                 d=corpus.distance(unique,np.full(len(unique),g,dtype=np.int64))
-                profiles[:,j]=np.where(np.isfinite(d),d,config['training']['unreachable_target'])
+                axis=int(corpus.scenes[int(sid)].states[g-corpus.offsets[int(sid)],0]) if canonical else j
+                profiles[:,axis]=np.where(np.isfinite(d),d,config['training']['unreachable_target'])
             b=len(ids); parent=profiles[inverse[:2*b]].reshape(b,2,-1)
             difference=parent[:,0]-parent[:,1]
             pred[ids]=(np.maximum(difference.max(axis=1),0) if config['model']['metric']=='directed_max'
                        else np.abs(difference).max(axis=1))
             child=profiles[inverse[2*b:]]
-            goals=np.broadcast_to(parent[:,1,None],(*children.shape,len(bank)))[valid]
+            goals=np.broadcast_to(parent[:,1,None],(*children.shape,width))[valid]
             difference=child-goals
             scores=np.full(children.shape,np.inf,dtype=np.float32)
             scores[valid]=(np.maximum(difference.max(axis=1),0) if config['model']['metric']=='directed_max'
@@ -295,8 +316,10 @@ def geometry(corpus,data,config,cohorts):
             finite_exact_fraction=float((np.abs(pred[finite]-truth[finite])<1e-5).mean()),
             query_goal_in_landmarks=int(query_in_bank.sum()),
             shortest_action_rate=float(optimal[np.flatnonzero(decision),chosen[decision]].mean()) if decision.any() else None,
-            dimensions_per_scene={str(sid):len(landmarks[int(sid)]) for sid in np.unique(scene_ids)},
-            interpretation='Oracle distance profiles only. Exact fit with all query goals in the bank establishes within-scene representability; it does not establish that the shared MLP learned or can generalize this map. Subset error is not an impossibility proof.')
+            dimensions_per_scene={str(sid):100 if canonical else len(landmarks[int(sid)]) for sid in np.unique(scene_ids)},
+            coordinate_assignment='Common100-cell player-position axes across every layout' if canonical else 'Per-scene landmark order',
+            interpretation=('Oracle profiles only. In Sokoban a complete success goal is uniquely determined within a layout by its player cell, so100 globally shared axes suffice for the capped labels, without a query-goal-conditioned state vector. Padding to128 and a common coordinate shift fit the open Sigmoid output range. This does not establish that the fixed-width MLP or CNN can compute or learn those profiles, nor cover arbitrary intermediate goals or true infinity.' if canonical else
+                'Oracle distance profiles only. Exact fit with all query goals in the bank establishes within-scene representability; it does not establish that the shared MLP learned or can generalize this map. Subset error is not an impossibility proof.'))
     return result
 
 

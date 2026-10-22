@@ -90,16 +90,23 @@ class ExactPairTests(unittest.TestCase):
         for i,s in enumerate(states):
             for a,t,_ in env.transitions(s): children[i,a]=index[t]
         goal=index[(7,(8,))]; truth=UnitGraphOracle(children).to_goal(goal)
-        scene=SimpleNamespace(states=np.arange(len(states)),goals=np.array([goal]),children=children,
+        scene=SimpleNamespace(states=np.array([[p,*boxes] for p,boxes in states]),goals=np.array([goal]),children=children,
             distances=truth[None],metadata=dict(split='train',training_goals=1),
             features=lambda ids:np.eye(len(states),dtype=np.float32)[ids],
             distance=lambda s,g:truth[s])
         corpus=PhysicalCorpus([scene]); parents=np.flatnonzero(np.isfinite(truth)&(truth>0))
         pairs=np.column_stack([np.arange(len(states)),np.full(len(states),goal)])
+        from experiments.new_tasks_qmap.src.relation_diagnose import geometry
+        probe=geometry(corpus,{k+'_validation':v for k,v in materialize(corpus,pairs).items()},
+            dict(task='sokoban',seed=0,model=dict(dimension=128,metric='directed_max'),
+                 training=dict(unreachable_target=30),evaluation=dict(decision_count=1000)),['validation'])['validation']
+        self.assertEqual(probe['finite_mae'],0); self.assertEqual(probe['shortest_action_rate'],1)
+        self.assertEqual(probe['dimensions_per_scene'],{'0':100})
+        self.assertIn('Common100-cell',probe['coordinate_assignment'])
         rank=materialize(corpus,np.column_stack([parents,np.full(len(parents),goal)]))
         from experiments.new_tasks_qmap.src.relation_data import BoardRelationSampler
         from grounded_llm.core.qmap.sampling import CoverageSampler
-        data=dict(pairs_train=pairs,tasks_train=rank['tasks'],reserved_relations=np.array([],dtype=np.int64))
+        data=dict(pairs_train=pairs,pair_distances_train=truth,tasks_train=rank['tasks'],reserved_relations=np.array([],dtype=np.int64))
         options=dict(finite_point_fraction=.75,boundary_rank_fraction=.5,distance_bin_upper_bounds=[0,1,2,5,10,20,40,80,128])
         sampler=BoardRelationSampler(corpus,data,options); rng=np.random.default_rng(7)
         self.assertTrue((corpus.distance(sampler.points[:,0],sampler.points[:,1])>0).all())
@@ -123,15 +130,18 @@ class ExactPairTests(unittest.TestCase):
             packed={key:np.concatenate([value,value]) for key,value in row.items()}
             packed.update(point_step=np.repeat([1,2],len(pairs)),rank_step=np.repeat([1,2],len(parents)))
             np.savez(shard/'00000.npz',**packed)
-            result=stream_statistics(corpus,dict(reserved_relations=np.array([],dtype=np.int64)),path,path/'audit.json')
+            result=stream_statistics(corpus,data,path,path/'audit.json')
             self.assertEqual(result['actual_batches'],2)
             self.assertEqual(result['point_finite_fraction'],np.isfinite(truth).mean())
             self.assertEqual(result['ranking_relation_coverage'],1)
             self.assertGreater(result['totals']['boundary_decisions'],0)
             self.assertEqual(result['totals']['rows_without_optimal'],0)
+            self.assertEqual(result['totals']['initial_finite_to_actual_unreachable'],0)
+            self.assertEqual(result['totals']['initial_near_to_actual_far'],0)
+            self.assertEqual(result['totals']['point_initial_row_finite'],result['totals']['point_finite'])
             packed['children']=packed['children'].copy(); packed['children'][0,:]=-1
             np.savez(shard/'00000.npz',**packed)
-            with self.assertRaisesRegex(ValueError,'Missing legal'): stream_statistics(corpus,dict(reserved_relations=np.array([],dtype=np.int64)),path,path/'bad.json')
+            with self.assertRaisesRegex(ValueError,'Missing legal'): stream_statistics(corpus,data,path,path/'bad.json')
         model=StateEncoder(128,16,32,'directed_max',input_dim=len(states))
         config=dict(training=dict(unreachable_target=30.,rank_temperature=1.,rank_weight=1.))
         result=batch_gradient_probe(model,corpus,row,config)
@@ -355,6 +365,8 @@ class ExactPairTests(unittest.TestCase):
                 env.validate(start)
                 options=dict(dimension=128,hidden=16,cap=32,metric='linf')
                 if task=='token_swapping': options['output_activation']='linear'
+                if task=='token_swapping': options.update(metric='max_l1',group_size=8)
+                if task=='rush_hour': options.update(hidden=256,architecture='spatial_cnn',spatial_shape=[26,6,6],conv_channels=32,spatial_hidden=244)
                 model=StateEncoder(input_dim=dimension,**options)
                 path=Path(tmp)/(task+'.pt')
                 torch.save(dict(model_type='exact_state_pairs',task=task,input_dim=dimension,

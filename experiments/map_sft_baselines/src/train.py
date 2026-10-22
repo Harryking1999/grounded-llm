@@ -20,6 +20,9 @@ def main():
     config = json.loads(args.config.read_text())
     spec = config['baselines'][args.baseline]
     dataset_class = Routes
+    if config.get('task') == 'multitask':
+        from .multitask_data import Routes as MultitaskRoutes
+        dataset_class = MultitaskRoutes
     if config.get('task') in ('cube2', 'puzzle8'):
         from grounded_llm.tasks.restoration_sft import Routes as RestorationRoutes
         dataset_class = RestorationRoutes

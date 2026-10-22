@@ -30,7 +30,10 @@ def main():
     p.add_argument('--baseline',required=True);p.add_argument('--mode',choices=['TF','RO','probe'],required=True)
     p.add_argument('--start',type=int,default=0);p.add_argument('--stop',type=int)
     a=p.parse_args();cfg=json.loads(a.config.read_text());spec=cfg['baselines'][a.baseline];torch.set_num_threads(1)
-    if cfg.get('task') in ('cube2', 'puzzle8'):
+    if cfg.get('task') == 'multitask':
+        from .multitask_evaluate import evaluate
+        return evaluate(a, cfg)
+    if cfg.get('task') in ('cube2', 'puzzle8', 'path'):
         from .restoration_evaluate import evaluate
         return evaluate(a, cfg)
     records=json.loads((a.data/'evaluation.json').read_text())

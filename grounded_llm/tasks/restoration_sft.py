@@ -16,6 +16,9 @@ from grounded_llm.core.sft.ranking import parse_ranking, meeting_ranking_scores
 
 
 def environment(task, oracle_path=None):
+    if task == 'path':
+        from .path.sft import Environment
+        return Environment(oracle_path.with_name('graph.npz'))
     if task == "cube2":
         from .cube2.environment import Cube2
         return Cube2(oracle_path, metric="QTM_URF_6")
@@ -28,6 +31,9 @@ def environment(task, oracle_path=None):
 
 
 def load_map(task, env, checkpoint, device="cpu"):
+    if task == 'path':
+        from .path.reader import FrozenPathMap
+        return FrozenPathMap.load(checkpoint, device)
     if task == "cube2":
         from .cube2.model import MapReader
     elif task == "puzzle8":
@@ -86,7 +92,13 @@ def render(task, env, state):
     return board_render(tuple(map(int, env.positions[state])))
 
 
-def prompt(task, env, step, executed, start, first):
+def prompt(task, env, step, executed, start, first, with_map=True):
+    if task == 'path':
+        from .path.sft import prompt as path_prompt
+        path = [start]
+        for action in executed:
+            path.append(env.step(path[-1], action))
+        return path_prompt(env, step, path, start, first, with_map)
     initial, update = templates(task)
     if task == "cube2":
         initial = initial.replace("{initial_cube_state}", render(task, env, start)).replace(
@@ -103,15 +115,20 @@ def prompt(task, env, step, executed, start, first):
         f"{i}: {action}" for i, action in enumerate(step.candidate_actions, 1)))
     if not first:
         return update
-    return initial + "\n\n" + (
+    formatting = (
         'First output "Map-distance ranking to the goal, closest to farthest: RANKING." '
         'Rank the nearest 10 candidates plus current using < and =. '
         'Next output a short factual line beginning with "Reason:". '
         'Finally output <action>ID</action>. At the goal, output only a short '
-        'Reason and <done/>.\n\n') + update
+        'Reason and <done/>.\n\n')
+    if not with_map:
+        formatting = ('Output a short factual line beginning with "Reason:", then '
+                      '<action>ID</action>. At the goal, output a short Reason and '
+                      '<done/>. Do not output candidate rankings.\n\n')
+    return initial + "\n\n" + formatting + update
 
 
-def answer(task, step, chosen):
+def answer(task, step, chosen, with_map=True):
     cube = task == "cube2"
     noun, move = ("cube state", "turn") if cube else ("board", "move")
     if chosen is None:
@@ -120,18 +137,22 @@ def answer(task, step, chosen):
     verb = f"Turning {action}" if cube else f"Moving the blank {action.lower()}"
     ending = (f"reaches the goal {noun}" if destination == step.goal else
               f"leaves a {noun} with one fewer {move} needed to reach the goal")
-    return (f"Map-distance ranking to the goal, closest to farthest: {_ranking(step, 10)}.\n"
-            f"Reason: {verb} is legal and {ending}.\n<action>{chosen}</action>")
+    ranking = (f"Map-distance ranking to the goal, closest to farthest: {_ranking(step, 10)}.\n"
+               if with_map else "")
+    return ranking + f"Reason: {verb} is legal and {ending}.\n<action>{chosen}</action>"
 
 
-def demonstration(task, env, record, steps, rng=None):
+def demonstration(task, env, record, steps, rng=None, with_map=True):
+    if task == 'path':
+        from .path.sft import demonstration as path_demo
+        return path_demo(env, record, steps, rng, with_map)
     turns, path, executed = [], [record["start"]], []
     for original, action in zip(steps, [*record["reference_actions"], None]):
         step = (numbered_step(original, tuple(map(int, rng.permutation(len(original.candidate_actions)))))
                 if rng is not None else original)
         chosen = step.candidate_actions.index(action) + 1 if action is not None else None
-        turns.append(SupervisedTurn(prompt(task, env, step, executed, record["start"], not turns),
-                                    answer(task, step, chosen), step, tuple(path), chosen))
+        turns.append(SupervisedTurn(prompt(task, env, step, executed, record["start"], not turns, with_map),
+                                    answer(task, step, chosen, with_map), step, tuple(path), chosen))
         if chosen is not None:
             physical, state = step.execute(chosen)
             executed.append(physical)

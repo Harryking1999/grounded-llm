@@ -27,7 +27,7 @@ def collect(root,config):
         curve=[]
         for checkpoint in sorted((Path(root)/'evaluation'/base).glob('checkpoint-*'),key=lambda p:int(p.name.split('-')[-1])):
             modes=evaluation_modes(config,base)
-            all_metrics={};valid=True
+            all_metrics={};by_task={};valid=True
             for mode in modes:
                 cases=[];total=cohort_size(config,mode)
                 for start in range(0,total,config['evaluation']['shard_tasks']):
@@ -37,8 +37,12 @@ def collect(root,config):
                 if not valid:break
                 if len(cases)!=total or len({c['trajectory_id'] for c in cases})!=total:raise ValueError('Evaluation missing/duplicate IDs')
                 all_metrics[mode]=summarize(cases)
+                if config.get('task')=='multitask':
+                    for task in config['data']['tasks']:
+                        by_task.setdefault(task,{})[mode]=summarize([c for c in cases if c['task']==task])
             if valid:
                 step=int(checkpoint.name.split('-')[-1]);row=dict(step=step,epoch=step/steps_per_epoch(config),metrics=all_metrics)
+                if by_task:row['by_task']=by_task
                 atomic_json(checkpoint/'summary.json',row);curve.append(row)
         if curve:
             destination=Path(root)/'results'/base

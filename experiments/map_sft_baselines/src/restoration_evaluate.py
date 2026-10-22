@@ -14,6 +14,7 @@ from .metrics import summarize
 def evaluate(args, config):
     from .evaluate import Boundary
     task = config["task"]
+    spec = config['baselines'][args.baseline]
     env = environment(task, args.data / "oracle.npy")
     qmap = load_map(task, env, args.q_checkpoint)
     records = json.loads((args.data / "evaluation.json").read_text())
@@ -32,11 +33,13 @@ def evaluate(args, config):
             return "<context_overflow/>"
         inputs = torch.tensor([ids], device="cuda")
         with torch.inference_mode(), torch.autocast("cuda", dtype=torch.bfloat16):
-            output = model.generate(input_ids=inputs, attention_mask=torch.ones_like(inputs),
+            kwargs = dict(input_ids=inputs, attention_mask=torch.ones_like(inputs),
                 max_new_tokens=config["evaluation"]["max_new_tokens"], do_sample=False,
                 use_cache=True, pad_token_id=tokenizer.eos_token_id,
-                stopping_criteria=StoppingCriteriaList([Boundary(tokenizer, len(ids))]),
-                map_batch=to_device(timeline_maps(steps, map_ids), torch.device("cuda")))
+                stopping_criteria=StoppingCriteriaList([Boundary(tokenizer, len(ids))]))
+            if spec['interface']:
+                kwargs['map_batch'] = to_device(timeline_maps(steps, map_ids), torch.device('cuda'))
+            output = model.generate(**kwargs)
         return tokenizer.decode(output[0, len(ids):], skip_special_tokens=True).strip()
 
     cases = []
@@ -51,7 +54,7 @@ def evaluate(args, config):
                 step = make_step(env, qmap, state, goal)
                 if args.mode != "RO":
                     messages, steps, previous_ids = [], [], []
-                update = prompt(task, env, step, executed, record["start"], not messages)
+                update = prompt(task, env, step, executed, record["start"], not messages, spec['real_map'])
                 messages.append(dict(role="user", content=update))
                 steps.append(step)
                 ids = tokenizer.apply_chat_template(messages, tokenize=True, add_generation_prompt=True)

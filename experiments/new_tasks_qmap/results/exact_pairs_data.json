@@ -1,0 +1,282 @@
+{
+  "data_source_commit": "20f45f471dced08d130babdb961f9d34ab3d2167",
+  "tasks": {
+    "sokoban": {
+      "summary": {
+        "task": "sokoban",
+        "states": 23275115,
+        "input_dim": 400,
+        "max_candidates": 4,
+        "seed": 2026102302,
+        "finite_max": 118.0,
+        "unknown_training_labels": 0,
+        "pair_count": 15456557,
+        "decision_count": 548663,
+        "reserved_relations": 52487,
+        "cohorts": {
+          "validation": {
+            "count": 8096,
+            "reachable": 8096
+          },
+          "test": {
+            "count": 7792,
+            "reachable": 7792
+          },
+          "unseen_goal_validation": {
+            "count": 5632,
+            "reachable": 4096
+          },
+          "unseen_goal_test": {
+            "count": 5632,
+            "reachable": 4096
+          },
+          "unseen_layout_validation": {
+            "count": 11264,
+            "reachable": 8192
+          },
+          "unseen_layout_test": {
+            "count": 11264,
+            "reachable": 8192
+          },
+          "original_layout_test": {
+            "count": 320,
+            "reachable": 302
+          },
+          "original_layout_validation": {
+            "count": 308,
+            "reachable": 278
+          },
+          "diagnostic": {
+            "count": 1408,
+            "reachable": 1024
+          },
+          "diagnostic_original": {
+            "count": 2,
+            "reachable": 2
+          }
+        },
+        "selected_train_states": 15456557,
+        "all_selected_sources_in_training": true
+      },
+      "physical_scenes": 98,
+      "scenes_by_split": {
+        "train": 64,
+        "validation": 16,
+        "test": 16,
+        "diagnostic": 2
+      },
+      "states_by_split": {
+        "train": 15456685,
+        "validation": 3393595,
+        "test": 3808665,
+        "diagnostic": 616170
+      },
+      "complete_goal_states": 1944,
+      "proven_unreachable_relations": 482933500,
+      "selection_exclusions": {
+        "unknown_resource": 1930,
+        "equivalent_wall_group": 12
+      }
+    },
+    "rush_hour": {
+      "summary": {
+        "task": "rush_hour",
+        "states": 1348182,
+        "input_dim": 936,
+        "max_candidates": 20,
+        "seed": 2026102303,
+        "finite_max": 75.0,
+        "unknown_training_labels": 0,
+        "pair_count": 843575,
+        "decision_count": 836409,
+        "reserved_relations": 305662,
+        "cohorts": {
+          "validation": {
+            "count": 18272,
+            "reachable": 18272
+          },
+          "test": {
+            "count": 18272,
+            "reachable": 18272
+          },
+          "unseen_goal_validation": {
+            "count": 36864,
+            "reachable": 36864
+          },
+          "unseen_goal_test": {
+            "count": 36864,
+            "reachable": 36864
+          },
+          "unseen_layout_validation": {
+            "count": 17920,
+            "reachable": 17920
+          },
+          "unseen_layout_test": {
+            "count": 18944,
+            "reachable": 18944
+          },
+          "original_layout_test": {
+            "count": 16135,
+            "reachable": 16135
+          },
+          "original_layout_validation": {
+            "count": 22208,
+            "reachable": 22208
+          },
+          "diagnostic": {
+            "count": 4096,
+            "reachable": 4096
+          },
+          "diagnostic_original": {
+            "count": 8,
+            "reachable": 8
+          }
+        },
+        "selected_train_states": 843575,
+        "all_selected_sources_in_training": true
+      },
+      "physical_scenes": 224,
+      "scenes_by_split": {
+        "train": 144,
+        "diagnostic": 8,
+        "test": 37,
+        "validation": 35
+      },
+      "states_by_split": {
+        "train": 844748,
+        "diagnostic": 54171,
+        "test": 166781,
+        "validation": 282482
+      },
+      "complete_goal_states": 120475,
+      "proven_unreachable_relations": 0,
+      "selection_exclusions": {
+        "equivalent_catalogue_group": 1
+      }
+    },
+    "token_swapping": {
+      "summary": {
+        "task": "token_swapping",
+        "states": 3628800,
+        "input_dim": 100,
+        "max_candidates": 9,
+        "seed": 2026102304,
+        "finite_max": 25.0,
+        "unknown_training_labels": 0,
+        "pair_count": 3084480,
+        "decision_count": 714835,
+        "reserved_relations": 33500,
+        "cohorts": {
+          "validation": {
+            "count": 2048,
+            "reachable": 2048
+          },
+          "test": {
+            "count": 2048,
+            "reachable": 2048
+          },
+          "unseen_endpoint_validation": {
+            "count": 2048,
+            "reachable": 2048
+          },
+          "unseen_both_validation": {
+            "count": 2048,
+            "reachable": 2048
+          },
+          "unseen_endpoint_test": {
+            "count": 2048,
+            "reachable": 2048
+          },
+          "unseen_both_test": {
+            "count": 2048,
+            "reachable": 2048
+          },
+          "diagnostic": {
+            "count": 5,
+            "reachable": 5
+          }
+        },
+        "selected_train_states": 3084480,
+        "all_selected_sources_in_training": true
+      },
+      "oracle": {
+        "scope": {
+          "scene_id": "tket_medium_random_tree_1_n10",
+          "source": {
+            "repository": "https://github.com/Quantinuum/tket",
+            "commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+            "file": "libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+            "architecture": "Medium random tree 1"
+          },
+          "vertex_count": 10,
+          "edges": [
+            [
+              0,
+              1
+            ],
+            [
+              0,
+              2
+            ],
+            [
+              1,
+              4
+            ],
+            [
+              1,
+              5
+            ],
+            [
+              1,
+              6
+            ],
+            [
+              2,
+              3
+            ],
+            [
+              6,
+              7
+            ],
+            [
+              6,
+              8
+            ],
+            [
+              7,
+              9
+            ]
+          ],
+          "token_placement": "entry at vertex v is the token currently on v; one distinct token per vertex",
+          "canonical_goal": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "qmap_scope": "one fixed tree, arbitrary complete initial and goal permutations"
+        },
+        "statistics": {
+          "states": 3628800,
+          "edges": 9,
+          "visited": 3628800,
+          "diameter": 25
+        },
+        "seconds": 1.7373622078448534,
+        "rule": "one sequential adjacent swap costs1; canonical identity BFS",
+        "seed": 2026102304,
+        "verification": {
+          "bellman_states": 3628800,
+          "involution_transitions": 32659200,
+          "physical_swap_samples": 36864
+        }
+      }
+    }
+  }
+}

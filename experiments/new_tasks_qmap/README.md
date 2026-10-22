@@ -23,6 +23,8 @@ python -m experiments.new_tasks_qmap.src.run --config experiments/new_tasks_qmap
 
 保存`data/graphs/`、固定`relations.npz`、端点划分、实际训练样本分片、`progress.jsonl`、完整`best.pt`/`last.pt`、初始与最终评测、曝光及资源统计。达到完整训练源覆盖后才选正式候选最佳断点；此前断点只供恢复。验证按配置指标选权重，测试不参与选权重。
 
+Token Swapping的短距离关系诊断对应[局部目标训练配置](configs/token_swapping_local_goals_pairs.json)：复用完全相同的精确图与固定留出；保留全部训练源遍历，只混入从当前状态随机游走得到的近目标提案。所有提案仍排除留出端点及关系。它从完整预算基线的best权重开始新优化阶段，优化器与采样器重置，`initialization.json`明确记录身份，不能称作原训练的精确恢复。实际到达率仍按原固定查询验收；增加训练与改变采样的效果不作孤立因果归因。
+
 ## 冻结评测与信息条件
 
 `src/relation_evaluate.py`报告距离MAE与分层误差、最优候选top-k、方向性、Bellman一致性、不可达识别、贪心到达与最优率、超额成本、循环及具体案例。贪心只比较全部合法后继的`1 + distance(Q(child), Q(goal))`，到精确目标才完成。同一批查询比较oracle、简单任务启发式和仅即时成本。规划查询不重复抽样，并分配布局与距离层预算。

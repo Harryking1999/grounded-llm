@@ -29,7 +29,7 @@
 | Rush Hour：指定完整目标，8个公开无墙6×6原始深起点，最短38–51步 | 0%（0/8），Flash64k；8题截断 | - | - | - | - | - | - | - |
 | Token Swapping：指定非归位目标，固定10顶点树，最优12–15步 | 80%（4/5），Flash64k；最优4/5 | - | - | - | - | - | - | - |
 
-过桥、推箱子、24点的地图列为[首轮固定目标可行性结果](../experiments/new_tasks_qmap/results/report.md)，不是正式采用图；Rush Hour与Token Swapping尚无地图训练。Flash筛查规则与结果见[基线报告](../experiments/task_text_baselines/results/report.md)；完整计划与逐轮环境反馈条件不同，不据差值直接归因。24点起题留出但部分中间状态与训练重叠；推箱子地图及固定40题使用自生成小棋盘，不是标准Boxoban题集。Rush Hour的40起点相关于8个分量，Token Swapping成本／最优性与完成率分别计分。
+过桥、推箱子、24点的地图列为[首轮固定目标可行性结果](../experiments/new_tasks_qmap/results/report.md)，不是正式采用图；Rush Hour与Token Swapping的完整状态对数据、训练与冻结reader已实现，尚无通过验收的地图。Flash筛查规则与结果见[基线报告](../experiments/task_text_baselines/results/report.md)；完整计划与逐轮环境反馈条件不同，不据差值直接归因。24点起题留出但部分中间状态与训练重叠；推箱子地图及固定40题使用自生成小棋盘，不是标准Boxoban题集。Rush Hour的40起点相关于8个分量，Token Swapping成本／最优性与完成率分别计分。
 
 指定目标三行来自[15题定向诊断](../experiments/task_text_baselines/results/exact_goals_flash64k.json)，沿用已知起点或等价重标问题，不是独立总体成绩。11份失败全为64k思考耗尽、最终答案为空；新条件下没有可回放的非法动作或非最优成功答案。后续只按精确目标训练与评测，旧目标成绩仅保留历史。
 
@@ -66,7 +66,7 @@
 
 已保留的下一批地图范围为：推箱子Boxoban hard的10×10四箱、Rush Hour无墙6×6、Token Swapping固定10顶点树。前两项都由同一个任务Qmap读取完整棋盘并覆盖多布局，按未见布局检验；每题指定一个完整成功目标棋盘，学习到指定目标的状态对最小成本。Token Swapping先做固定树上的任意完整状态对距离，验收后再考虑12–15顶点。三项都保持当前＋单目标＋合法候选的读取接口；具体输入及实施边界见[统一Q方法](QMAP_METHOD.md#保留的新任务范围)和各任务Qmap，这些条件尚无采用权重。
 
-复杂度结论针对规模可增长的任务族，不是固定6×6或10×10棋盘，也不保证随机小实例能难住Flash。当前需要同时有可复用题目、清晰动作、可核对真值和可训练规模。Rush Hour与Token Swapping已接入文字规则与裁判，[Flash64k筛查](../experiments/task_text_baselines/results/report.md)分别完成17/40、36/40，所有成功答案均最优；[合同](../experiments/task_text_baselines/configs/deepseek_rush_token64k.json)将完成与最优成本分开。两者尚无Qmap或LLM训练，其余候选尚未采用。
+复杂度结论针对规模可增长的任务族，不是固定6×6或10×10棋盘，也不保证随机小实例能难住Flash。当前需要同时有可复用题目、清晰动作、可核对真值和可训练规模。Rush Hour与Token Swapping已接入文字规则与裁判，[Flash64k筛查](../experiments/task_text_baselines/results/report.md)分别完成17/40、36/40，所有成功答案均最优；[合同](../experiments/task_text_baselines/configs/deepseek_rush_token64k.json)将完成与最优成本分开。两者已具备Qmap训练与冻结评测入口，尚无采用图或本条件LLM训练，其余候选尚未采用。
 
 | 候选／来源 | 难在什么目标 | 对本项目的价值与限制 |
 |---|---|---|
@@ -75,7 +75,7 @@
 | 冲突图渡河／[Csorba等，SIAM](https://doi.org/10.1137/080736661) | 狼羊菜推广成任意冲突图，求可完成运输的最小船容量NP-hard | 保留为过桥邻近候选。冲突关系改变可行状态与连通性，输入需有位置、船／管理者位置、冲突图与容量。不能把最小容量的复杂度直接套在固定容量、保证可解的子集；一般冲突图规则尚无本地实现 |
 | 多岛多手电／[原题及本地核对](bridge/README.md#变体与适用性) | 维护人员与手电分布，人员有不同目的地；已核对的具体规则没有NP-hard结论 | 保留过桥语义、精确状态规模小，但现有来源为教学任务，不能标为已有论文benchmark |
 
-Rush Hour现有题库由作者公开了距离、棋盘和可达分量大小。本项目独立完整BFS核对了两题：含一堵固定墙的60-move题所在分量只有2,332个状态、12辆车；无墙51-move题示例有4,780个状态、13辆车，最短距离与分量大小均和来源一致。[数据定义与条目](https://www.michaelfogleman.com/rush/)、[棋盘与见证](../experiments/task_text_baselines/results/new_tasks_harder_flash64k.json)。这里一次move是同一辆车沿固定方向滑动任意合法格数，成本均为1；改成逐格移动会改变距离，不能沿用原标签。文字筛查采用无墙原题及分量内的最短轨迹中间状态，见[实际数据口径](rush_hour/data/README.md)。输入编码需保留车辆身份、长度、方向、位置、墙与目标条件。出口任务终点是集合，不能把它的标签冒充完整排列之间的距离；地图训练与分量划分仍待准备。
+Rush Hour现有题库由作者公开了距离、棋盘和可达分量大小。本项目独立完整BFS核对了两题：含一堵固定墙的60-move题所在分量只有2,332个状态、12辆车；无墙51-move题示例有4,780个状态、13辆车，最短距离与分量大小均和来源一致。[数据定义与条目](https://www.michaelfogleman.com/rush/)、[棋盘与见证](../experiments/task_text_baselines/results/new_tasks_harder_flash64k.json)。这里一次move是同一辆车沿固定方向滑动任意合法格数，成本均为1；改成逐格移动会改变距离，不能沿用原标签。文字筛查采用无墙原题及分量内的最短轨迹中间状态，见[实际数据口径](rush_hour/data/README.md)。输入编码需保留车辆身份、长度、方向、位置、墙与目标条件。出口任务终点是集合，不能把它的标签冒充完整排列之间的距离；完整状态对地图已按静态车辆配置分组准备，实际覆盖见[数据证据](../experiments/new_tasks_qmap/results/exact_pairs_data.json)。
 
 现有推箱子本身在可变棋盘／箱数的推广下已为PSPACE完全，见[原始文献入口](https://webdocs.cs.ualberta.ca/~games/Sokoban/papers.html)；Boxoban四箱10×10只是其中有限的经验题集。它有不可逆推动与死路，而当前对称地图距离不能同时精确等于所有有向状态对距离。因而固定目标价值排序与任意状态对关系必须分别验收，不能因题目复杂就假定现有Qmap编码足够。
 

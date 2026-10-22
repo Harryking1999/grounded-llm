@@ -55,6 +55,13 @@ class ExactPairTests(unittest.TestCase):
             self.assertFalse(np.intersect1d(closure(corpus,fresh),reserved).size)
             self.assertTrue((partition[fresh]==0).all())
             self.assertFalse(np.array_equal(fresh[:,1],tasks[:,1]))
+            local=sample_goals(corpus,tasks[:,0],np.random.default_rng(8),reserved,ranking=True,allowed=allowed,
+                               local_fraction=.5,walk_max=4)
+            self.assertFalse(np.intersect1d(closure(corpus,local),reserved).size)
+            self.assertTrue((partition[local]==0).all())
+            near=sample_goals(corpus,np.tile(np.arange(corpus.size),10),np.random.default_rng(4),np.array([],dtype=np.int64),
+                              allowed=np.arange(corpus.size),local_fraction=1.,walk_max=2)
+            self.assertTrue((corpus.distance(near[:,0],near[:,1])<=2).all())
             rng=np.random.default_rng(9); sampler=CoverageSampler(corpus.distance(pairs[:,0],pairs[:,1]),rng,len(pairs),.5)
             selected=np.concatenate([sampler.draw(20) for _ in range(12)])
             self.assertEqual(len(np.unique(selected)),len(pairs))
@@ -233,8 +240,8 @@ class ExactPairTests(unittest.TestCase):
             small_oracle(graphs,5,[[0,1],[1,2],[1,3],[3,4]])
             corpus=TokenCorpus(graphs); stack.callback(corpus.close)
             cohort_config=dict(relations=dict(endpoint_holdout_fraction=.05,evaluation_count=4,point_count=40,decision_count=30))
-            groups,pairs,tasks,_,_=token_cohorts(corpus,cohort_config,np.random.default_rng(7))
-            data=dict(pairs_train=pairs,pair_distances_train=corpus.distance(pairs[:,0],pairs[:,1]))
+            groups,pairs,tasks,reserved,partition=token_cohorts(corpus,cohort_config,np.random.default_rng(7))
+            data=dict(pairs_train=pairs,pair_distances_train=corpus.distance(pairs[:,0],pairs[:,1]),reserved_relations=reserved)
             for name,rows in [('train',tasks),*groups.items()]:
                 for key,value in materialize(corpus,rows).items(): data[key+'_'+name]=value
             config=dict(task='token_swapping',seed=7,model=dict(dimension=128,hidden=16,cap=32,metric='linf'),
@@ -255,6 +262,25 @@ class ExactPairTests(unittest.TestCase):
             summary=json.loads((out/'summary.json').read_text())
             for cohort in summary['metrics']['cohorts'].values():
                 self.assertEqual(cohort['planning']['oracle']['optimal_rate'],1)
+            warm_config=json.loads(json.dumps(config))
+            warm_config['training'].update(initialize_from='../run/last.pt',features_on_device=True,
+                record_training_samples=True,online_goals=True,local_goal_fraction=.5,goal_walk_max=4)
+            phase=root/'phase2'
+            def prepare_fixture(config,path):
+                path.mkdir(); np.save(path/'endpoint_partition.npy',partition)
+                return prepared
+            with patch('experiments.new_tasks_qmap.src.relations.prepare',side_effect=prepare_fixture):
+                train(warm_config,phase,'warm-fixture','cpu')
+            initialization=json.loads((phase/'initialization.json').read_text())
+            self.assertFalse(initialization['optimizer_restored'])
+            self.assertFalse(initialization['sampler_restored'])
+            initial=json.loads((phase/'initial.json').read_text())
+            self.assertEqual(initial['cohorts']['validation']['finite_mae'],summary['metrics']['cohorts']['validation']['finite_mae'])
+            for shard in (phase/'samples/attempt_000').glob('*.npz'):
+                with np.load(shard) as trace:
+                    self.assertTrue((partition[trace['pairs']]==0).all())
+                    self.assertFalse(np.intersect1d(closure(corpus,trace['tasks']),reserved).size)
+                    np.testing.assert_array_equal(trace['point_distance'],corpus.distance(trace['pairs'][:,0],trace['pairs'][:,1]))
 
 
 if __name__=='__main__': unittest.main()

@@ -42,9 +42,12 @@ def materialize(corpus, rows):
                 reachability=np.isfinite(distances).astype(np.int8),optimal=optimal)
 
 
-def sample_goals(corpus,sources,rng,reserved,*,ranking=False,allowed=None,fallback=None,allow_missing=False):
+def sample_goals(corpus,sources,rng,reserved,*,ranking=False,allowed=None,fallback=None,allow_missing=False,
+                 local_fraction=0.,walk_max=None):
     """Fresh complete goals, using teacher labels only in the training sampler."""
     sources=np.asarray(sources,dtype=np.int64)
+    if not 0<=local_fraction<=1 or (local_fraction and (hasattr(corpus,'scenes') or walk_max is None or walk_max<0)):
+        raise ValueError('Local-goal proposals require a permutation graph and nonnegative walk bound')
     goals=np.empty(len(sources),dtype=np.int64); bad=np.ones(len(sources),dtype=bool)
     def forbidden(values):
         if not len(reserved): return np.zeros(values.shape,dtype=bool)
@@ -56,12 +59,22 @@ def sample_goals(corpus,sources,rng,reserved,*,ranking=False,allowed=None,fallba
         if not bad.any(): break
         if scene_ids is None:
             goals[bad]=rng.choice(allowed,int(bad.sum()))
+            if local_fraction:
+                local=np.flatnonzero(bad & (rng.random(len(sources))<local_fraction))
+                goals[local]=sources[local]
+                lengths=rng.integers(0,walk_max+1,len(local))
+                for step in range(int(lengths.max(initial=0))):
+                    ids=local[lengths>step]
+                    goals[ids]=corpus.children[goals[ids],rng.integers(corpus.max_candidates,size=len(ids))]
         else:
             for sid in np.unique(scene_ids[bad]):
                 mask=bad & (scene_ids==sid); scene=corpus.scenes[sid]
                 pool=scene.goals[:scene.metadata['training_goals']]+corpus.offsets[sid]
                 goals[mask]=rng.choice(pool,int(mask.sum()))
         bad=forbidden(keys(sources,goals,corpus.size))
+        if local_fraction:
+            at=np.searchsorted(allowed,goals)
+            bad|=(at==len(allowed)) | (allowed[np.minimum(at,len(allowed)-1)]!=goals)
         if ranking:
             labels=corpus.distance(sources,goals)
             bad|=~np.isfinite(labels) | (labels==0)

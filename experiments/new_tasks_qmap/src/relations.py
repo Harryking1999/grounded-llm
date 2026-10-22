@@ -28,6 +28,15 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
     if resume and json.loads((out/'config.json').read_text())!=config:
         raise ValueError('Resume requires the unchanged formal configuration')
     atomic_json(out/'config.json',config)
+    reference=config.get('data',{}).get('prepared_from')
+    if reference and not (out/'data').exists():
+        source=(out/reference).resolve()
+        previous=json.loads((source.parent/'config.json').read_text())
+        if any(previous[key]!=config[key] for key in ('task','seed','relations')):
+            raise ValueError('Prepared relation reference changes task, seed or fixed splits')
+        if {k:v for k,v in previous['data'].items() if k!='prepared_from'}!={k:v for k,v in config['data'].items() if k!='prepared_from'}:
+            raise ValueError('Prepared relation reference changes physical data scope')
+        (out/'data').symlink_to(source,target_is_directory=True)
     prepared=time.monotonic()
     corpus,data,description=(load(config,out/'data') if (out/'data'/'relations.npz').exists() else prepare(config,out/'data'))
     preparation_seconds=time.monotonic()-prepared
@@ -37,6 +46,8 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
         print(json.dumps(dict(prepared=str(out),data=description)),flush=True)
         return
     options=config['training']
+    if description.get('finite_max',0)>=min(config['model']['cap'],options['unreachable_target']):
+        raise ValueError('Prepared finite oracle costs exceed the configured encoding scale')
     torch.set_num_threads(options['cpu_threads']); torch.manual_seed(config['seed'])
     rng=np.random.default_rng(config['seed']+2)
     model=StateEncoder(input_dim=corpus.input_dim,**config['model']).to(device)
@@ -65,7 +76,18 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
         if saved['cuda_rng'] is not None and torch.cuda.is_available(): torch.cuda.set_rng_state_all([r.cpu() for r in saved['cuda_rng']])
         exposure,pair_draws,rank_draws=saved['exposure'],saved['pair_draws'],saved['rank_draws']
         start_step,best,best_step,prior_seconds=saved['step'],saved['best_score'],saved['best_step'],saved['seconds']
-    elif not (out/'initial.json').exists():
+    else:
+        initial_checkpoint=options.get('initialize_from')
+        if initial_checkpoint:
+            initial_path=(out/initial_checkpoint).resolve()
+            saved=torch.load(initial_path,map_location=device,weights_only=False)
+            if saved['task']!=config['task'] or saved['scope']!=scope(config,corpus) or saved['config']['model']!=config['model']:
+                raise ValueError('Warm-start model scope mismatch')
+            model.load_state_dict(saved['model']); exposure=saved['exposure'].copy()
+            atomic_json(out/'initialization.json',dict(checkpoint=str(initial_path),source_commit=saved['source_commit'],
+                step=saved['step'],optimizer_restored=False,sampler_restored=False,
+                meaning='Weights warm start; fresh optimizer and sampling phase, not an exact continuation. Prior gradient endpoint exposure retained separately from fresh source-row coverage.'))
+    if not (out/'initial.json').exists():
         initial_started=time.monotonic()
         initial=evaluate(model,corpus,data,config)
         for name,row in initial['cohorts'].items():
@@ -92,7 +114,9 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
         nonlocal trace_number
         if not trace: return
         packed={key:np.concatenate([row[key] for row in trace]) for key in trace[0]}
-        np.savez_compressed(trace_path/f'{trace_number:05d}.npz',**packed)
+        target=trace_path/f'{trace_number:05d}.npz'; temporary=target.with_suffix('.tmp')
+        with temporary.open('wb') as stream: np.savez_compressed(stream,**packed)
+        temporary.replace(target)
         trace.clear(); trace_number+=1
     def save(step,path):
         flush_trace()
@@ -112,8 +136,9 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
         point_target=point_labels[p]
         child_truth=data['child_distances_train'][r]
         if options.get('online_goals'):
-            pair=sample_goals(corpus,pair[:,0],rng,data['reserved_relations'],allowed=allowed,fallback=pair[:,1])
-            tasks=sample_goals(corpus,tasks[:,0],rng,data['reserved_relations'],ranking=True,allowed=allowed,fallback=tasks[:,1])
+            extra=dict(local_fraction=options.get('local_goal_fraction',0.),walk_max=options.get('goal_walk_max'))
+            pair=sample_goals(corpus,pair[:,0],rng,data['reserved_relations'],allowed=allowed,fallback=pair[:,1],**extra)
+            tasks=sample_goals(corpus,tasks[:,0],rng,data['reserved_relations'],ranking=True,allowed=allowed,fallback=tasks[:,1],**extra)
             point_true=corpus.distance(pair[:,0],pair[:,1])
             point_target=np.where(np.isfinite(point_true),point_true,options['unreachable_target'])
             child_truth=np.full(children.shape,np.inf,dtype=np.float32)

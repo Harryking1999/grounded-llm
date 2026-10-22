@@ -27,7 +27,7 @@
 | 多基线训练、评测与跨机传输 | [map_sft_baselines](map_sft_baselines/README.md#运行入口) |
 | 寻路环境与距离标签 | [tasks/path](../grounded_llm/tasks/path)；既有题集入口 [prepare_path_suite.py](qwen_path_blocks/src/prepare_path_suite.py) |
 
-任务训练独立编排，具体适配见 [QMAP_METHOD](../tasks/QMAP_METHOD.md)，层次与接入方式见[根目录说明](../README.md#代码依赖与接入)。复用组件不等于复用其旧实验条件。
+任务训练独立编排，具体适配见 [QMAP_METHOD](../tasks/QMAP_METHOD.md)，层次与接入方式见[根目录说明](../README.md#代码依赖与接入)。复用组件不等于复用其旧实验条件。Boxoban hard跨布局、Rush Hour跨布局和Token Swapping固定10顶点树的构建范围见[新任务说明](../tasks/QMAP_METHOD.md#保留的新任务范围)；尚未建立正式训练合同或新训练入口，历史new_tasks_qmap不冒充这些条件的实现。
 
 ## 历史实验与仍在使用的依赖
 

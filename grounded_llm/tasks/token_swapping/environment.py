@@ -13,6 +13,16 @@ class TokenSwapping:
         self.edge_set = set(self.edges)
         self.goal = tuple(range(self.n))
 
+    def relative_permutation(self, source, goal):
+        """Relabel tokens so the specified goal becomes the canonical home state."""
+        source, goal = tuple(source), tuple(goal)
+        for state in (source, goal):
+            if (any(type(v) is not int for v in state)
+                    or sorted(state) != list(self.goal)):
+                raise ValueError('Source and goal must be complete integer permutations')
+        inverse = {token: vertex for vertex, token in enumerate(goal)}
+        return tuple(inverse[token] for token in source)
+
     def apply(self, state, action):
         if (not isinstance(action, list) or len(action) != 2
                 or any(type(v) is not int for v in action) or tuple(sorted(action)) not in self.edge_set):

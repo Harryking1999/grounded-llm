@@ -16,7 +16,14 @@ def fields(case):
     n = len(case['initial'])
     return {'vertex_count': n, 'max_vertex_id': n-1,
             'edges': str(case['edges']),
-            'initial_tokens': str(case['initial']), 'goal_tokens': str(list(range(n)))}
+            'initial_tokens': str(case['initial']), 'goal_tokens': str(list(goal(case)))}
+
+
+def goal(case):
+    environment = env(case)
+    specified = tuple(case.get('goal', environment.goal))
+    environment.relative_permutation(case['initial'], specified)
+    return specified
 
 
 def initial(case):
@@ -28,4 +35,4 @@ def step(case, state, action):
 
 
 def solved(case, state):
-    return state == env(case).goal
+    return state == goal(case)

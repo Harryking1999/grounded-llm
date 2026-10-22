@@ -1265,14 +1265,16 @@ Reason: The current configuration exactly matches the goal; no further crossing 
 
 ### 推箱子：任务文字与监督格式
 
-推动与行走规则参考 [gym-sokoban](https://github.com/mpSchrader/gym-sokoban/blob/8e06e44e8bf3bb8bc73eeb1e7f0354508ce3fc89/gym_sokoban/envs/sokoban_env.py)，ASCII参考 [DeepMind Boxoban](https://github.com/google-deepmind/boxoban-levels/blob/78011d8c86ad423bfb2e1005012393b4c3c24409/README.md)。当前小棋盘是诊断条件，不是标准10×10四箱Boxoban题集。
+推动与行走规则参考 [gym-sokoban](https://github.com/mpSchrader/gym-sokoban/blob/8e06e44e8bf3bb8bc73eeb1e7f0354508ce3fc89/gym_sokoban/envs/sokoban_env.py)，ASCII参考 [DeepMind Boxoban](https://github.com/google-deepmind/boxoban-levels/blob/78011d8c86ad423bfb2e1005012393b4c3c24409/README.md)。保留的新增条件为Boxoban hard原题：10×10、四箱四目标；历史6×6两箱仅为诊断。下方规则模板按实际棋盘尺寸渲染，行走／推动成本与输出合同不变，具体题集及预算由实验配置维护。
 
 以下定义可复用的文字协议。完整计划的提示与裁判已接入；逐轮地图／CoT部分是协议模板，尚无本任务LLM训练或已采用Qmap权重。
+
+新训练与评测每题指定一张完整成功目标棋盘，包含玩家终点，字段为`goal_board`。没有该字段的适配仅为历史题目回放兼容，不安排原规则对照，不能沿用旧Flash成绩冒充指定目标表现。
 
 #### 共享任务描述与规则
 
 ```text
-Find a valid sequence of moves that puts every box on a target, as short as you can.
+{task_objective}
 Reaching the goal is the first priority; among valid solutions, prefer fewer moves.
 
 Rules: The board is a {board_height}x{board_width} grid with walls, floor, targets, boxes, and one player.
@@ -1281,18 +1283,18 @@ An action U, D, L, or R moves the player one cell up, down, left, or right.
 If the adjacent cell contains a box, the action pushes that box one cell in the same direction, only if the cell beyond is empty floor or an unoccupied target.
 The player cannot pass through walls or boxes, pull a box, or push more than one box at a time.
 Each legal walk or push costs one step. A blocked move is illegal.
-The goal is that every box is on a target; the player's final position does not matter.
+{goal_rule}
 Use at most {action_limit} actions.
 
 Initial board:
-{initial_board}
+{initial_board}{goal_board_section}
 ```
 
-方向指玩家移动方向，行走与推动均为一步。合法但进入死路的动作仍需列为合法候选。目标是状态集合，不显示唯一玩家终点；当前Q输入含目标格。
+方向指玩家移动方向，行走与推动均为一步。合法但进入死路的动作仍需列为合法候选。指定目标必须同时匹配箱子与玩家，输入保留目标格。
 
 #### 地图组／CoT 组：每轮环境更新
 
-两组共享规则、真实当前状态、实际动作历史与全部合法动作。地图组额外获得当前／目标条件／合法真实后继的Q槽位；精确距离、参考解和死路标签不进入模型文字。
+两组共享规则、真实当前状态、实际动作历史与全部合法动作。地图组额外获得当前／完整目标状态／合法真实后继的Q槽位；精确距离、参考解和死路标签不进入模型文字。指定目标棋盘在两组任务描述中相同。
 
 ```text
 [Environment update]
@@ -1329,14 +1331,14 @@ Reason: Moving {direction} is legal and leaves a solvable board with one fewer m
 直接到达目标时：
 
 ```text
-Reason: Moving {direction} is legal and puts every box on a target.
+Reason: Moving {direction} is legal and reaches the required goal.
 <action>{local_id}</action>
 ```
 
 已经完成时：
 
 ```text
-Reason: Every box is on a target; no further move is needed.
+Reason: The required goal is already reached; no further move is needed.
 <done/>
 ```
 
@@ -1543,6 +1545,8 @@ Reason: The current list contains only 24; no further operation is needed.
 
 规则对齐[Fogleman公开实现](https://github.com/fogleman/rush/tree/3e3b8396891d1802b30cb3129ae31fdedb319480)；当前使用无墙6×6原题。一次滑动任意合法距离计一个move，不能使用逐格step标签。完整计划已接入；逐轮部分为协议，尚未训练或采用地图。
 
+新训练与评测每题指定一张A已到最右端的完整目标棋盘，所有车的位置均需匹配，字段为`goal_board`。未指定该字段的适配仅为历史题目回放兼容，不安排原规则对照。历史Flash只评过出口目标，不能改称指定终局成绩。
+
 #### 共享任务描述与规则
 
 ```text
@@ -1555,19 +1559,19 @@ A horizontal vehicle can slide left or right; a vertical vehicle can slide up or
 An action slides exactly one vehicle by a nonzero integer displacement. Positive means right for a horizontal vehicle or down for a vertical vehicle; negative means left or up.
 Every traversed cell must be clear of other vehicles and walls. Vehicles must stay inside the board.
 A slide of any legal distance costs exactly one move. Minimize the total number of moves, not the number of cells travelled.
-The goal is to place the horizontal target vehicle A at the rightmost position in its row, occupying columns 4 and 5 (zero-based). Other vehicles may end anywhere legal. Do not move A outside the board or remove it.
+{goal_rule}
 Use at most {action_limit} actions.
 
 Vehicle catalogue:
 {vehicle_catalogue}
 
 Initial board, top row first:
-{initial_board}
+{initial_board}{goal_board_section}
 ```
 
 #### 地图组／CoT 组：每轮环境更新
 
-两组共享真实状态和合法动作；地图额外提供当前、目标条件及合法真实后继的向量。参考成本与解序列不进入文字。
+两组共享真实状态、指定的完整目标棋盘和合法动作；地图额外提供当前、完整目标状态及合法真实后继的向量。参考成本与解序列不进入文字。
 
 ```text
 [Environment update]
@@ -1604,14 +1608,14 @@ Reason: Sliding vehicle {vehicle} by {displacement} is legal and preserves a min
 直接完成：
 
 ```text
-Reason: Sliding vehicle A to the rightmost position reaches the goal.
+Reason: This slide reaches the required goal.
 <action>{local_id}</action>
 ```
 
 已经完成：
 
 ```text
-Reason: Vehicle A already occupies the rightmost position in its row; no further move is needed.
+Reason: The required goal is already reached; no further move is needed.
 <done/>
 ```
 
@@ -1647,7 +1651,7 @@ Reason: Vehicle A already occupies the rightmost position in its row; no further
 
 ### Token Swapping：任务文字与监督格式
 
-采用[顺序Token Swapping](https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.ESA.2016.66)，公开实例来源为[tket固定问题](https://github.com/Quantinuum/tket/blob/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.hpp)。每点恰有一个不同棋子，目标为棋子归位。一次只交换一条边的两端，不使用并行轮数、部分映射或颜色等价规则。完整计划已接入；逐轮部分为协议，尚无地图训练或采用权重。
+采用[顺序Token Swapping](https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.ESA.2016.66)，公开实例来源为[tket固定问题](https://github.com/Quantinuum/tket/blob/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.hpp)。每点恰有一个不同棋子，目标为题目指定的完整排列；归位是其中一种目标。一次只交换一条边的两端，不使用并行轮数、部分映射或颜色等价规则。完整计划与指定目标裁判已接入；逐轮部分为协议，尚无地图训练或采用权重。历史Flash筛查的归位提示冻结在原suite中，不能将其成绩改称任意目标评测。
 
 #### 共享任务描述与规则
 
@@ -1659,7 +1663,7 @@ Rules: The graph has {vertex_count} vertices, numbered from 0 to {max_vertex_id}
 In one action, choose two distinct vertices joined by an undirected edge and exchange the tokens on those two vertices.
 Specify vertex IDs in each action, not token labels. The graph stays fixed. Tokens cannot jump along multiple edges in one action.
 Swaps are sequential: one edge swap costs one move. Swaps cannot be combined into parallel rounds.
-The goal is token i on vertex i for every i. Minimize the total number of edge swaps.
+The goal is to match the specified goal placement exactly: for every vertex v, its token must equal entry v of the goal list. Minimize the total number of edge swaps.
 Use at most {action_limit} actions.
 
 Undirected edges (each edge listed once):
@@ -1710,14 +1714,14 @@ Reason: Swapping vertices {vertex_a} and {vertex_b} is legal and preserves a min
 直接完成：
 
 ```text
-Reason: Swapping vertices {vertex_a} and {vertex_b} places every token on its destination vertex.
+Reason: Swapping vertices {vertex_a} and {vertex_b} makes the placement match the specified goal.
 <action>{local_id}</action>
 ```
 
 已经完成：
 
 ```text
-Reason: Every token is already on its destination vertex; no further swap is needed.
+Reason: The placement already matches the specified goal; no further swap is needed.
 <done/>
 ```
 

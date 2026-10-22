@@ -10,6 +10,8 @@ DeepSeek 积木／二阶魔方新题复测见 [64k 合同](configs/deepseek_bloc
 
 Rush Hour／Token Swapping两项筛查见[64k合同](configs/deepseek_rush_token64k.json)与[结果表](results/report.md)：各40题，共80题，分别完成17/40、36/40，完成答案均最优；25题思考耗尽，Rush Hour另2题误报无解。前者为8个公开无墙分量各5个距离起点，后者为tket公开固定问题的8种架构各5题。精确最优值重算、完成与成本分开评分，复用`src.run`。准备入口为`src.prepare_rush_token`，原始题目与响应在`runs/deepseek_rush_token64k/`；未训练地图。
 
+指定完整目标的Flash筛查采用[独立64k合同](configs/deepseek_exact_goals64k.json)，准备入口`src.prepare_exact_goals`，执行复用`src.run`，输出`runs/deepseek_exact_goals64k/`。只测试指定目标：两道已测hard推箱子、8个Rush Hour原始起点、固定10顶点树的5个非归位目标题。前两项取冻结见证终局并重新核对精确成本；后者对起终点同时重标棋子，保持原精确成本。题集是15题定向诊断，不是独立总体benchmark；旧目标结果仅保留历史，不安排原规则对照。采用地图和LLM训练不在本筛查范围内。
+
 所有条件一次输出完整计划，无工具、无中途反馈。裁判独立回放真实动作，模型自报棋盘不覆盖环境状态。每题一次有效答案，服务错误按配置有限重试；正常错误、截断和超限不重抽。历史 medium 每题八次，单列比较。
 
 | 条件 | 正式配置 | 原始答卷目录（Git 外） |

@@ -1,13 +1,15 @@
 # 推箱子：任务文字与监督格式
 
-推动与行走规则参考 [gym-sokoban](https://github.com/mpSchrader/gym-sokoban/blob/8e06e44e8bf3bb8bc73eeb1e7f0354508ce3fc89/gym_sokoban/envs/sokoban_env.py)，ASCII参考 [DeepMind Boxoban](https://github.com/google-deepmind/boxoban-levels/blob/78011d8c86ad423bfb2e1005012393b4c3c24409/README.md)。当前小棋盘是诊断条件，不是标准10×10四箱Boxoban题集。
+推动与行走规则参考 [gym-sokoban](https://github.com/mpSchrader/gym-sokoban/blob/8e06e44e8bf3bb8bc73eeb1e7f0354508ce3fc89/gym_sokoban/envs/sokoban_env.py)，ASCII参考 [DeepMind Boxoban](https://github.com/google-deepmind/boxoban-levels/blob/78011d8c86ad423bfb2e1005012393b4c3c24409/README.md)。保留的新增条件为Boxoban hard原题：10×10、四箱四目标；历史6×6两箱仅为诊断。下方规则模板按实际棋盘尺寸渲染，行走／推动成本与输出合同不变，具体题集及预算由实验配置维护。
 
 以下定义可复用的文字协议。完整计划的提示与裁判已接入；逐轮地图／CoT部分是协议模板，尚无本任务LLM训练或已采用Qmap权重。
+
+新训练与评测每题指定一张完整成功目标棋盘，包含玩家终点，字段为`goal_board`。没有该字段的适配仅为历史题目回放兼容，不安排原规则对照，不能沿用旧Flash成绩冒充指定目标表现。
 
 ## 共享任务描述与规则
 
 ```text
-Find a valid sequence of moves that puts every box on a target, as short as you can.
+{task_objective}
 Reaching the goal is the first priority; among valid solutions, prefer fewer moves.
 
 Rules: The board is a {board_height}x{board_width} grid with walls, floor, targets, boxes, and one player.
@@ -16,18 +18,18 @@ An action U, D, L, or R moves the player one cell up, down, left, or right.
 If the adjacent cell contains a box, the action pushes that box one cell in the same direction, only if the cell beyond is empty floor or an unoccupied target.
 The player cannot pass through walls or boxes, pull a box, or push more than one box at a time.
 Each legal walk or push costs one step. A blocked move is illegal.
-The goal is that every box is on a target; the player's final position does not matter.
+{goal_rule}
 Use at most {action_limit} actions.
 
 Initial board:
-{initial_board}
+{initial_board}{goal_board_section}
 ```
 
-方向指玩家移动方向，行走与推动均为一步。合法但进入死路的动作仍需列为合法候选。目标是状态集合，不显示唯一玩家终点；当前Q输入含目标格。
+方向指玩家移动方向，行走与推动均为一步。合法但进入死路的动作仍需列为合法候选。指定目标必须同时匹配箱子与玩家，输入保留目标格。
 
 ## 地图组／CoT 组：每轮环境更新
 
-两组共享规则、真实当前状态、实际动作历史与全部合法动作。地图组额外获得当前／目标条件／合法真实后继的Q槽位；精确距离、参考解和死路标签不进入模型文字。
+两组共享规则、真实当前状态、实际动作历史与全部合法动作。地图组额外获得当前／完整目标状态／合法真实后继的Q槽位；精确距离、参考解和死路标签不进入模型文字。指定目标棋盘在两组任务描述中相同。
 
 ```text
 [Environment update]
@@ -64,14 +66,14 @@ Reason: Moving {direction} is legal and leaves a solvable board with one fewer m
 直接到达目标时：
 
 ```text
-Reason: Moving {direction} is legal and puts every box on a target.
+Reason: Moving {direction} is legal and reaches the required goal.
 <action>{local_id}</action>
 ```
 
 已经完成时：
 
 ```text
-Reason: Every box is on a target; no further move is needed.
+Reason: The required goal is already reached; no further move is needed.
 <done/>
 ```
 

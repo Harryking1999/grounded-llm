@@ -7,6 +7,8 @@ from grounded_llm.tasks.rush_hour.environment import RushHour
 from grounded_llm.tasks.token_swapping.environment import TokenSwapping
 from grounded_llm.tasks.text import judge, prompt, section_text
 from experiments.task_text_baselines.src.prepare_rush_token import decode_public_tokens
+from experiments.task_text_baselines.src.prepare_exact_goals import exact_plan, sokoban_board
+from grounded_llm.tasks.sokoban.environment import Sokoban
 
 
 class RulesTests(unittest.TestCase):
@@ -86,6 +88,71 @@ class RulesTests(unittest.TestCase):
             self.assertNotIn('{action_limit}',prompt(case))
             for heading in ('共享任务描述与规则','地图组／CoT 组','SOTA 组／32B 组','监督答案'):
                 self.assertTrue(section_text(case['task'],heading))
+
+    def test_token_arbitrary_goal_and_distance_relabelling(self):
+        case=dict(task='token_swapping',edges=[[0,1],[1,2]],initial=[0,1,2],
+                  goal=[1,0,2],action_limit=256,reference={'cost':1})
+        self.assertTrue(judge(case,json.dumps({'actions':[[0,1]],'final_status':'solved'}))['optimal'])
+        self.assertFalse(judge(case,json.dumps({'actions':[],'final_status':'solved'}))['solved'])
+        self.assertIn('[1, 0, 2]',prompt(case))
+        env=TokenSwapping(3,case['edges'])
+        for target in itertools.permutations(range(3)):
+            direct,queue={target:0},deque([target])
+            while queue:
+                state=queue.popleft()
+                for edge in case['edges']:
+                    child,_=env.apply(state,edge)
+                    if child not in direct:
+                        direct[child]=direct[state]+1
+                        queue.append(child)
+            for source in itertools.permutations(range(3)):
+                relative=env.relative_permutation(source,target)
+                actions,_=env.solve(relative)
+                self.assertEqual(len(actions),direct[source])
+        with self.assertRaises(ValueError):
+            env.relative_permutation([False,1,2],env.goal)
+
+    def test_sokoban_exact_goal_requires_player_position(self):
+        case=dict(task='sokoban',initial=['#####','#@$.#','#   #','#####'],
+                  goal_board=['#####','#  *#','# @ #','#####'],action_limit=256,
+                  reference={'cost':2})
+        output={'actions':['R'],'final_status':'solved'}
+        self.assertFalse(judge(case,json.dumps(output))['solved'])
+        original={key:value for key,value in case.items() if key!='goal_board'}
+        original['reference']={'cost':1}
+        self.assertTrue(judge(original,json.dumps(output))['optimal'])
+        output['actions'].append('D')
+        self.assertTrue(judge(case,json.dumps(output))['optimal'])
+        self.assertIn('Goal board:',prompt(case))
+        self.assertIn('including the player',prompt(case))
+        env=Sokoban(case['initial'])
+        target=Sokoban(case['goal_board']).start
+        actions,_=exact_plan(env,env.start,target,dict(max_search_states=100,solver_timeout_seconds=2))
+        self.assertEqual(actions,['R','D'])
+        self.assertEqual(sokoban_board(env,target),case['goal_board'])
+        case['goal_board']=['#####','#@* #','#   #','#####']
+        with self.assertRaises(ValueError):
+            prompt(case)
+
+    def test_rush_exact_goal_requires_all_vehicle_positions(self):
+        case=dict(task='rush_hour',initial=''.join(['......','BB....','AA....']+['......']*3),
+                  goal_board=''.join(['......','.BB...','....AA']+['......']*3),
+                  action_limit=256,reference={'cost':2})
+        output={'actions':[{'vehicle':'A','displacement':4}],'final_status':'solved'}
+        self.assertFalse(judge(case,json.dumps(output))['solved'])
+        original={key:value for key,value in case.items() if key!='goal_board'}
+        original['reference']={'cost':1}
+        self.assertTrue(judge(original,json.dumps(output))['optimal'])
+        output['actions'].append({'vehicle':'B','displacement':1})
+        self.assertTrue(judge(case,json.dumps(output))['optimal'])
+        self.assertIn('Goal board, top row first:',prompt(case))
+        env=RushHour(case['initial'])
+        actions,_=exact_plan(env,env.start,RushHour(case['goal_board']).start,
+                             dict(max_search_states=100,solver_timeout_seconds=2))
+        self.assertEqual(len(actions),2)
+        case['goal_board']=''.join(['......','......','....AA','BB....','......','......'])
+        with self.assertRaises(ValueError):
+            prompt(case)
 
 
 if __name__=='__main__':

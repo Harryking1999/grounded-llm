@@ -59,6 +59,8 @@
 
 ## 新任务候选：难度与地图关系
 
+已保留的下一批地图范围为：推箱子Boxoban hard的10×10四箱、Rush Hour无墙6×6、Token Swapping固定10顶点树。前两项都由同一个任务Qmap读取完整棋盘并覆盖多布局，按未见布局检验；每题指定一个完整成功目标棋盘，学习到指定目标的状态对最小成本。Token Swapping先做固定树上的任意完整状态对距离，验收后再考虑12–15顶点。三项都保持当前＋单目标＋合法候选的读取接口；具体输入及实施边界见[统一Q方法](QMAP_METHOD.md#保留的新任务范围)和各任务Qmap，这些条件尚无采用权重。
+
 复杂度结论针对规模可增长的任务族，不是固定6×6或10×10棋盘，也不保证随机小实例能难住Flash。当前需要同时有可复用题目、清晰动作、可核对真值和可训练规模。Rush Hour与Token Swapping已接入文字规则与裁判，[Flash64k筛查](../experiments/task_text_baselines/results/report.md)分别完成17/40、36/40，所有成功答案均最优；[合同](../experiments/task_text_baselines/configs/deepseek_rush_token64k.json)将完成与最优成本分开。两者尚无Qmap或LLM训练，其余候选尚未采用。
 
 | 候选／来源 | 难在什么目标 | 对本项目的价值与限制 |

@@ -1,0 +1,38 @@
+{
+  "study": "specified_complete_goal_flash_screening",
+  "seed": 2026102301,
+  "expected_cases": 15,
+  "tasks": {
+    "sokoban": {
+      "source_run": "runs/deepseek_new_tasks_harder64k",
+      "case_ids": ["sokoban_level2_00", "sokoban_level2_01"],
+      "max_search_states": 500000,
+      "solver_timeout_seconds": 180,
+      "selection": "Keep the two previously tested hard original starts,359 and362. Set the exact goal to the physical endpoint of the frozen legal witness, including the player. Recompute minimum physical walk/push cost by unit-cost BFS to this one state. No new original-goal evaluation."
+    },
+    "rush_hour": {
+      "source_run": "runs/deepseek_rush_token64k",
+      "max_search_states": 50000,
+      "solver_timeout_seconds": 60,
+      "selection": "Use the eight previously tested original starts, not their intermediate starts. Specify all vehicle positions at the endpoint of each frozen shortest witness. Independently BFS to that exact state and verify the cost."
+    },
+    "token_swapping": {
+      "source_run": "runs/deepseek_rush_token64k",
+      "architecture": "Medium random tree 1",
+      "selection": "Use the five previously tested complete placements on the retained10-vertex tree. Apply one seeded token-label permutation to both source and canonical goal per case, making the goal nonidentity while preserving the verified optimal edge-swap cost and witness. Graph and token labels remain explicit in the prompt."
+    }
+  },
+  "api": {
+    "base_url": "https://api.deepseek.com",
+    "model": "deepseek-flash",
+    "reasoning_effort": "high",
+    "max_output_tokens": 64000,
+    "scoring_output_limit": 64000,
+    "timeout_seconds": 2400,
+    "concurrency": 8,
+    "max_service_retries": 3,
+    "max_total_service_retries": 30,
+    "service_retry_delay_seconds": 15
+  },
+  "comparison": "Only specified complete goals are evaluated. One valid answer per frozen case, no tools or intermediate feedback. Score physical completion, strict JSON, exact cost, excess cost and truncation separately. This15-case targeted diagnostic reuses known starts and is not an independent benchmark accuracy estimate. Historical original-goal results remain historical only. No Qmap or LLM training."
+}

@@ -2,6 +2,8 @@
 
 规则对齐[Fogleman公开实现](https://github.com/fogleman/rush/tree/3e3b8396891d1802b30cb3129ae31fdedb319480)；当前使用无墙6×6原题。一次滑动任意合法距离计一个move，不能使用逐格step标签。完整计划已接入；逐轮部分为协议，尚未训练或采用地图。
 
+新训练与评测每题指定一张A已到最右端的完整目标棋盘，所有车的位置均需匹配，字段为`goal_board`。未指定该字段的适配仅为历史题目回放兼容，不安排原规则对照。历史Flash只评过出口目标，不能改称指定终局成绩。
+
 ## 共享任务描述与规则
 
 ```text
@@ -14,19 +16,19 @@ A horizontal vehicle can slide left or right; a vertical vehicle can slide up or
 An action slides exactly one vehicle by a nonzero integer displacement. Positive means right for a horizontal vehicle or down for a vertical vehicle; negative means left or up.
 Every traversed cell must be clear of other vehicles and walls. Vehicles must stay inside the board.
 A slide of any legal distance costs exactly one move. Minimize the total number of moves, not the number of cells travelled.
-The goal is to place the horizontal target vehicle A at the rightmost position in its row, occupying columns 4 and 5 (zero-based). Other vehicles may end anywhere legal. Do not move A outside the board or remove it.
+{goal_rule}
 Use at most {action_limit} actions.
 
 Vehicle catalogue:
 {vehicle_catalogue}
 
 Initial board, top row first:
-{initial_board}
+{initial_board}{goal_board_section}
 ```
 
 ## 地图组／CoT 组：每轮环境更新
 
-两组共享真实状态和合法动作；地图额外提供当前、目标条件及合法真实后继的向量。参考成本与解序列不进入文字。
+两组共享真实状态、指定的完整目标棋盘和合法动作；地图额外提供当前、完整目标状态及合法真实后继的向量。参考成本与解序列不进入文字。
 
 ```text
 [Environment update]
@@ -63,14 +65,14 @@ Reason: Sliding vehicle {vehicle} by {displacement} is legal and preserves a min
 直接完成：
 
 ```text
-Reason: Sliding vehicle A to the rightmost position reaches the goal.
+Reason: This slide reaches the required goal.
 <action>{local_id}</action>
 ```
 
 已经完成：
 
 ```text
-Reason: Vehicle A already occupies the rightmost position in its row; no further move is needed.
+Reason: The required goal is already reached; no further move is needed.
 <done/>
 ```
 

@@ -18,8 +18,9 @@
 | 二阶魔方：全状态复原，3674160题 | - | - | - | - | - | **77.47%（2846397/3674160）** | - | - |
 | 8-Puzzle：原文字40题，复原 | 22.5%（9/40） | 15%（6/40） | 82.5%（33/40） | 90%（36/40） | - | - | - | - |
 | 8-Puzzle：全状态复原，181439题 | - | - | - | - | - | **98.28%（178326/181439）** | - | - |
-| 过桥：计划，规则及题集待定 | - | - | - | - | - | - | - | - |
-| 推箱子：计划，规则及题集待定 | - | - | - | - | - | - | - | - |
+| 手电过桥：固定目标Qmap可行性试验，未采用 | - | - | - | - | - | - | - | - |
+| 推箱子：小棋盘Qmap可行性试验，未采用 | - | - | - | - | - | - | - | - |
+| 24点：XoT题目Qmap可行性试验，未采用 | - | - | - | - | - | - | - | - |
 
 **积木历史回归（单独题集，非12块清空1000题）：**
 
@@ -44,6 +45,9 @@
 | 汉诺塔 | [hanoi](hanoi/README.md) | [prompts](hanoi/prompts/README.md) | [data](hanoi/data/README.md) | [Qmap](hanoi/Qmap/README.md) |
 | 二阶魔方 | [cube2](cube2/README.md) | [prompts](cube2/prompts/README.md) | [data](cube2/data/README.md) | [Qmap](cube2/Qmap/README.md) |
 | 8-Puzzle（数字华容道） | [puzzle8](puzzle8/README.md) | [prompts](puzzle8/prompts/README.md) | [data](puzzle8/data/README.md) | [Qmap](puzzle8/Qmap/README.md) |
+| 手电过桥 | [bridge](bridge/README.md) | [prompts](bridge/prompts/README.md) | [data](bridge/data/README.md) | [Qmap](bridge/Qmap/README.md) |
+| 推箱子 | [sokoban](sokoban/README.md) | [prompts](sokoban/prompts/README.md) | [data](sokoban/data/README.md) | [Qmap](sokoban/Qmap/README.md) |
+| 24点 | [game24](game24/README.md) | [prompts](game24/prompts/README.md) | [data](game24/data/README.md) | [Qmap](game24/Qmap/README.md) |
 
 ## 每个任务采用相同布局
 

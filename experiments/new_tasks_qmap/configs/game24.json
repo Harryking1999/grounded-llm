@@ -1,0 +1,33 @@
+{
+  "task": "game24",
+  "seed": 20261022,
+  "data": {
+    "source_commit": "d69d3b8ddb75f888732e893394e8e5e5df4f4e6f",
+    "scenes": {
+      "train": 96,
+      "validation": 24,
+      "test": 137
+    }
+  },
+  "model": {
+    "dimension": 128,
+    "hidden": 256,
+    "cap": 8,
+    "metric": "directed_max"
+  },
+  "training": {
+    "steps": 3000,
+    "batch_size": 256,
+    "decision_batch_size": 128,
+    "learning_rate": 0.001,
+    "rank_weight": 1.0,
+    "rank_temperature": 1.0,
+    "eval_every": 1000,
+    "cpu_threads": 2,
+    "unreachable_target": 4
+  },
+  "evaluation": {
+    "starts_per_scene": 64,
+    "horizon": 3
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "task": "bridge",
+  "seed": 20261022,
+  "data": {
+    "people": 6,
+    "max_time": 20,
+    "scenes": {
+      "train": 64,
+      "validation": 16,
+      "test": 32
+    }
+  },
+  "model": {
+    "dimension": 128,
+    "hidden": 256,
+    "cap": 256,
+    "metric": "linf"
+  },
+  "training": {
+    "steps": 3000,
+    "batch_size": 256,
+    "decision_batch_size": 128,
+    "learning_rate": 0.001,
+    "rank_weight": 1.0,
+    "rank_temperature": 1.0,
+    "eval_every": 1000,
+    "cpu_threads": 2,
+    "unreachable_target": 240
+  },
+  "evaluation": {
+    "starts_per_scene": 64,
+    "horizon": 128
+  }
+}

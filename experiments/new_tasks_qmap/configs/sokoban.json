@@ -1,0 +1,40 @@
+{
+  "task": "sokoban",
+  "seed": 20261022,
+  "data": {
+    "shape": [
+      6,
+      6
+    ],
+    "boxes": 2,
+    "max_internal_walls": 3,
+    "minimum_solvable_states": 30,
+    "max_generation_attempts": 3000,
+    "scenes": {
+      "train": 24,
+      "validation": 8,
+      "test": 8
+    }
+  },
+  "model": {
+    "dimension": 128,
+    "hidden": 256,
+    "cap": 128,
+    "metric": "directed_max"
+  },
+  "training": {
+    "steps": 3000,
+    "batch_size": 256,
+    "decision_batch_size": 128,
+    "learning_rate": 0.001,
+    "rank_weight": 1.0,
+    "rank_temperature": 1.0,
+    "eval_every": 1000,
+    "cpu_threads": 2,
+    "unreachable_target": 120
+  },
+  "evaluation": {
+    "starts_per_scene": 64,
+    "horizon": 128
+  }
+}

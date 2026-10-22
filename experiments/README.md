@@ -11,6 +11,7 @@
 | 汉诺塔 Qmap | [hanoi_qmap](hanoi_qmap/README.md) | [报告](hanoi_qmap/results/report.md) |
 | 二阶魔方 Qmap | [cube2_qmap](cube2_qmap/README.md) | [报告](cube2_qmap/results/report.md) |
 | 8-Puzzle Qmap | [puzzle8_qmap](puzzle8_qmap/README.md) | [报告](puzzle8_qmap/results/report.md) |
+| 手电过桥／推箱子／24点Qmap可行性 | [new_tasks_qmap](new_tasks_qmap/README.md) | [报告](new_tasks_qmap/results/report.md) |
 | 地图接入 LLM 与同数据 SFT | [map_sft_baselines](map_sft_baselines/README.md) | [主比较](map_sft_baselines/results/report.md)、[小数据诊断](map_sft_baselines/results/b2_four_controls.md) |
 | 五任务纯文字基线 | [task_text_baselines](task_text_baselines/README.md) | [模型与预算比较](task_text_baselines/results/report.md) |
 

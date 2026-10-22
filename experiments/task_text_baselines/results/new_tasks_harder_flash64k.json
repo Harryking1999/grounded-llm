@@ -1,0 +1,1153 @@
+{
+  "status": "completed_breakpoints_or_ranges",
+  "source_commit": "d7127195fd9b9c1062127c2cbbb20bb6220f895f",
+  "config": "experiments/task_text_baselines/configs/deepseek_new_tasks_harder64k.json",
+  "raw_results": "runs/deepseek_new_tasks_harder64k",
+  "valid_responses": 50,
+  "service_error_attempts": 0,
+  "verdicts_verified": 50,
+  "completed_plan_replays": 49,
+  "truncation_metadata_verified": 1,
+  "reference_replay_verified": 50,
+  "policy": "first valid completion failure per task; not an accuracy estimate",
+  "tasks": {
+    "bridge": {
+      "status": "range_exhausted",
+      "count": 21,
+      "solved": 21,
+      "contract_pass": 21,
+      "stages": {
+        "8": {
+          "count": 3,
+          "solved": 3,
+          "optimal": 3,
+          "optimal_evaluated": 3,
+          "failures": {
+            "success": 3
+          }
+        },
+        "12": {
+          "count": 3,
+          "solved": 3,
+          "optimal": 3,
+          "optimal_evaluated": 3,
+          "failures": {
+            "success": 3
+          }
+        },
+        "16": {
+          "count": 3,
+          "solved": 3,
+          "optimal": 3,
+          "optimal_evaluated": 3,
+          "failures": {
+            "success": 3
+          }
+        },
+        "24": {
+          "count": 3,
+          "solved": 3,
+          "optimal": 3,
+          "optimal_evaluated": 3,
+          "failures": {
+            "success": 3
+          }
+        },
+        "32": {
+          "count": 3,
+          "solved": 3,
+          "optimal": 3,
+          "optimal_evaluated": 3,
+          "failures": {
+            "success": 3
+          }
+        },
+        "64": {
+          "count": 3,
+          "solved": 3,
+          "optimal": 3,
+          "optimal_evaluated": 3,
+          "failures": {
+            "success": 3
+          }
+        },
+        "128": {
+          "count": 3,
+          "solved": 3,
+          "optimal": 3,
+          "optimal_evaluated": 3,
+          "failures": {
+            "success": 3
+          }
+        }
+      },
+      "mean_output_tokens": 9090.904761904761,
+      "max_output_tokens": 14574,
+      "failures": {
+        "success": 21
+      },
+      "failure_cases": [],
+      "nonoptimal_cases": []
+    },
+    "sokoban": {
+      "status": "model_error_found",
+      "count": 8,
+      "solved": 7,
+      "contract_pass": 7,
+      "stages": {
+        "unfiltered_test": {
+          "count": 3,
+          "solved": 3,
+          "optimal": 0,
+          "optimal_evaluated": 0,
+          "failures": {
+            "success": 3
+          }
+        },
+        "medium_validation": {
+          "count": 3,
+          "solved": 3,
+          "optimal": 0,
+          "optimal_evaluated": 0,
+          "failures": {
+            "success": 3
+          }
+        },
+        "hard": {
+          "count": 2,
+          "solved": 1,
+          "optimal": 0,
+          "optimal_evaluated": 0,
+          "failures": {
+            "success": 1,
+            "truncated": 1
+          }
+        }
+      },
+      "mean_output_tokens": 29405.75,
+      "max_output_tokens": 64000,
+      "failures": {
+        "success": 7,
+        "truncated": 1
+      },
+      "failure_cases": [
+        {
+          "case_id": "sokoban_level2_01",
+          "source": {
+            "file": "hard/000.txt",
+            "puzzle_id": "362",
+            "commit": "78011d8c86ad423bfb2e1005012393b4c3c24409"
+          },
+          "initial": [
+            "##########",
+            "##########",
+            "##########",
+            "##########",
+            "#####  ###",
+            "##### . ##",
+            "## ## $###",
+            "# $  $.$ #",
+            "#  . .  @#",
+            "##########"
+          ],
+          "reference_upper_bound": 52,
+          "preparation": {
+            "solver": {
+              "expanded": 268,
+              "pushes": 11,
+              "seconds": 0.0470000000204891
+            },
+            "candidates_examined": 2
+          },
+          "response_status": "incomplete",
+          "incomplete_details": {
+            "reason": "max_output_tokens"
+          },
+          "output_tokens": 64000,
+          "reasoning_tokens": 64000,
+          "final_output_characters": 0,
+          "verdict": {
+            "solved": false,
+            "contract_pass": false,
+            "failure": "truncated"
+          }
+        }
+      ],
+      "nonoptimal_cases": []
+    },
+    "game24": {
+      "status": "range_exhausted",
+      "count": 21,
+      "solved": 21,
+      "contract_pass": 21,
+      "stages": {
+        "13": {
+          "count": 3,
+          "solved": 3,
+          "optimal": 3,
+          "optimal_evaluated": 3,
+          "failures": {
+            "success": 3
+          }
+        },
+        "25": {
+          "count": 3,
+          "solved": 3,
+          "optimal": 3,
+          "optimal_evaluated": 3,
+          "failures": {
+            "success": 3
+          }
+        },
+        "50": {
+          "count": 3,
+          "solved": 3,
+          "optimal": 3,
+          "optimal_evaluated": 3,
+          "failures": {
+            "success": 3
+          }
+        },
+        "100": {
+          "count": 3,
+          "solved": 3,
+          "optimal": 3,
+          "optimal_evaluated": 3,
+          "failures": {
+            "success": 3
+          }
+        },
+        "1000": {
+          "count": 3,
+          "solved": 3,
+          "optimal": 3,
+          "optimal_evaluated": 3,
+          "failures": {
+            "success": 3
+          }
+        },
+        "1000000": {
+          "count": 3,
+          "solved": 3,
+          "optimal": 3,
+          "optimal_evaluated": 3,
+          "failures": {
+            "success": 3
+          }
+        },
+        "1000000000": {
+          "count": 3,
+          "solved": 3,
+          "optimal": 3,
+          "optimal_evaluated": 3,
+          "failures": {
+            "success": 3
+          }
+        }
+      },
+      "mean_output_tokens": 8289.142857142857,
+      "max_output_tokens": 29292,
+      "failures": {
+        "success": 21
+      },
+      "failure_cases": [],
+      "nonoptimal_cases": [],
+      "disposition": "retain results; user ended further hardening"
+    }
+  },
+  "candidate_multi_island_verification": {
+    "source": "https://cw.fel.cvut.cz/wiki/courses/pui/assignments/assignment1-1",
+    "method": "independent Dijkstra; interchangeable torches, holders explicit, zero-cost handover; no parallel crossing",
+    "formal_task_implemented": false,
+    "llm_tested": false,
+    "qmap_trained": false,
+    "cases": [
+      {
+        "cost": 15,
+        "expanded": 57,
+        "discovered": 60,
+        "actions": [
+          [
+            "handover",
+            0,
+            1
+          ],
+          [
+            "cross",
+            [
+              0,
+              1
+            ],
+            0,
+            1
+          ],
+          [
+            "cross",
+            [
+              1
+            ],
+            1,
+            0
+          ],
+          [
+            "handover",
+            1,
+            2
+          ],
+          [
+            "cross",
+            [
+              2,
+              3
+            ],
+            0,
+            1
+          ],
+          [
+            "handover",
+            2,
+            0
+          ],
+          [
+            "cross",
+            [
+              0
+            ],
+            1,
+            0
+          ],
+          [
+            "cross",
+            [
+              0,
+              1
+            ],
+            0,
+            1
+          ]
+        ],
+        "elapsed_seconds": 0.0
+      },
+      {
+        "cost": 16,
+        "expanded": 917,
+        "discovered": 957,
+        "actions": [
+          [
+            "handover",
+            1,
+            4
+          ],
+          [
+            "cross",
+            [
+              0,
+              1
+            ],
+            0,
+            1
+          ],
+          [
+            "cross",
+            [
+              4,
+              5
+            ],
+            0,
+            1
+          ],
+          [
+            "handover",
+            4,
+            1
+          ],
+          [
+            "cross",
+            [
+              0,
+              1
+            ],
+            1,
+            0
+          ],
+          [
+            "handover",
+            1,
+            2
+          ],
+          [
+            "cross",
+            [
+              0,
+              1
+            ],
+            0,
+            1
+          ],
+          [
+            "cross",
+            [
+              2,
+              3
+            ],
+            0,
+            1
+          ]
+        ],
+        "elapsed_seconds": 0.01600000000325963
+      },
+      {
+        "cost": 33,
+        "expanded": 57231,
+        "discovered": 60706,
+        "actions": [
+          [
+            "handover",
+            5,
+            2
+          ],
+          [
+            "cross",
+            [
+              0,
+              1
+            ],
+            0,
+            1
+          ],
+          [
+            "cross",
+            [
+              2,
+              3
+            ],
+            0,
+            1
+          ],
+          [
+            "handover",
+            2,
+            1
+          ],
+          [
+            "cross",
+            [
+              0,
+              3
+            ],
+            1,
+            3
+          ],
+          [
+            "cross",
+            [
+              0
+            ],
+            3,
+            1
+          ],
+          [
+            "cross",
+            [
+              0,
+              1
+            ],
+            1,
+            0
+          ],
+          [
+            "handover",
+            1,
+            4
+          ],
+          [
+            "cross",
+            [
+              4,
+              5
+            ],
+            0,
+            1
+          ],
+          [
+            "cross",
+            [
+              4,
+              5
+            ],
+            1,
+            3
+          ],
+          [
+            "handover",
+            4,
+            3
+          ],
+          [
+            "cross",
+            [
+              0,
+              1
+            ],
+            0,
+            1
+          ],
+          [
+            "cross",
+            [
+              0,
+              1
+            ],
+            1,
+            2
+          ],
+          [
+            "cross",
+            [
+              0
+            ],
+            2,
+            1
+          ],
+          [
+            "cross",
+            [
+              0,
+              2
+            ],
+            1,
+            2
+          ]
+        ],
+        "elapsed_seconds": 1.1089999999967404
+      }
+    ]
+  },
+  "candidate_rush_hour_verification": {
+    "source": "https://www.michaelfogleman.com/rush/",
+    "method": "independent complete reachable-component BFS; arbitrary-distance car slide costs one move",
+    "formal_task_implemented": false,
+    "llm_tested": false,
+    "qmap_trained": false,
+    "cases": [
+      {
+        "board": "IBBxooIooLDDJAALooJoKEEMFFKooMGGHHHM",
+        "cluster_size": 2332,
+        "minimum_moves": 60,
+        "piece_count": 12,
+        "actions": [
+          [
+            "M",
+            -1
+          ],
+          [
+            "H",
+            1
+          ],
+          [
+            "K",
+            1
+          ],
+          [
+            "E",
+            -2
+          ],
+          [
+            "L",
+            1
+          ],
+          [
+            "D",
+            -3
+          ],
+          [
+            "L",
+            -1
+          ],
+          [
+            "M",
+            -2
+          ],
+          [
+            "E",
+            3
+          ],
+          [
+            "L",
+            2
+          ],
+          [
+            "A",
+            2
+          ],
+          [
+            "D",
+            2
+          ],
+          [
+            "K",
+            -2
+          ],
+          [
+            "F",
+            1
+          ],
+          [
+            "J",
+            1
+          ],
+          [
+            "I",
+            1
+          ],
+          [
+            "B",
+            -1
+          ],
+          [
+            "K",
+            -2
+          ],
+          [
+            "A",
+            -2
+          ],
+          [
+            "L",
+            -1
+          ],
+          [
+            "F",
+            3
+          ],
+          [
+            "L",
+            1
+          ],
+          [
+            "A",
+            2
+          ],
+          [
+            "K",
+            4
+          ],
+          [
+            "B",
+            1
+          ],
+          [
+            "D",
+            -2
+          ],
+          [
+            "I",
+            -1
+          ],
+          [
+            "A",
+            -3
+          ],
+          [
+            "L",
+            -2
+          ],
+          [
+            "E",
+            -3
+          ],
+          [
+            "F",
+            -1
+          ],
+          [
+            "L",
+            1
+          ],
+          [
+            "M",
+            2
+          ],
+          [
+            "D",
+            3
+          ],
+          [
+            "L",
+            -1
+          ],
+          [
+            "E",
+            2
+          ],
+          [
+            "K",
+            -3
+          ],
+          [
+            "G",
+            1
+          ],
+          [
+            "J",
+            1
+          ],
+          [
+            "E",
+            -3
+          ],
+          [
+            "K",
+            2
+          ],
+          [
+            "L",
+            1
+          ],
+          [
+            "D",
+            -1
+          ],
+          [
+            "M",
+            -1
+          ],
+          [
+            "F",
+            1
+          ],
+          [
+            "L",
+            1
+          ],
+          [
+            "A",
+            3
+          ],
+          [
+            "I",
+            1
+          ],
+          [
+            "B",
+            -1
+          ],
+          [
+            "K",
+            -3
+          ],
+          [
+            "A",
+            -2
+          ],
+          [
+            "E",
+            1
+          ],
+          [
+            "J",
+            -1
+          ],
+          [
+            "G",
+            -1
+          ],
+          [
+            "H",
+            -1
+          ],
+          [
+            "L",
+            -1
+          ],
+          [
+            "F",
+            -3
+          ],
+          [
+            "L",
+            1
+          ],
+          [
+            "M",
+            2
+          ],
+          [
+            "A",
+            3
+          ]
+        ],
+        "action_cost": "one arbitrary-distance slide of one car costs one move",
+        "goal": "primary car A at rightmost in-board position; do not remove it"
+      },
+      {
+        "board": "GBBoLoGHIoLMGHIAAMCCCKoMooJKDDEEJFFo",
+        "cluster_size": 4780,
+        "minimum_moves": 51,
+        "piece_count": 13,
+        "actions": [
+          [
+            "F",
+            1
+          ],
+          [
+            "K",
+            1
+          ],
+          [
+            "M",
+            -1
+          ],
+          [
+            "C",
+            3
+          ],
+          [
+            "H",
+            2
+          ],
+          [
+            "J",
+            -1
+          ],
+          [
+            "E",
+            1
+          ],
+          [
+            "G",
+            3
+          ],
+          [
+            "B",
+            -1
+          ],
+          [
+            "I",
+            -1
+          ],
+          [
+            "A",
+            -3
+          ],
+          [
+            "I",
+            1
+          ],
+          [
+            "L",
+            1
+          ],
+          [
+            "B",
+            3
+          ],
+          [
+            "I",
+            -1
+          ],
+          [
+            "A",
+            2
+          ],
+          [
+            "G",
+            -3
+          ],
+          [
+            "E",
+            -1
+          ],
+          [
+            "H",
+            -3
+          ],
+          [
+            "A",
+            -1
+          ],
+          [
+            "J",
+            1
+          ],
+          [
+            "C",
+            -3
+          ],
+          [
+            "M",
+            1
+          ],
+          [
+            "B",
+            1
+          ],
+          [
+            "K",
+            -4
+          ],
+          [
+            "A",
+            1
+          ],
+          [
+            "C",
+            2
+          ],
+          [
+            "D",
+            -1
+          ],
+          [
+            "F",
+            -1
+          ],
+          [
+            "H",
+            3
+          ],
+          [
+            "A",
+            -1
+          ],
+          [
+            "K",
+            1
+          ],
+          [
+            "B",
+            -1
+          ],
+          [
+            "M",
+            -1
+          ],
+          [
+            "C",
+            1
+          ],
+          [
+            "J",
+            -1
+          ],
+          [
+            "E",
+            1
+          ],
+          [
+            "G",
+            3
+          ],
+          [
+            "A",
+            -1
+          ],
+          [
+            "I",
+            1
+          ],
+          [
+            "B",
+            -3
+          ],
+          [
+            "I",
+            -1
+          ],
+          [
+            "A",
+            1
+          ],
+          [
+            "G",
+            -1
+          ],
+          [
+            "E",
+            -1
+          ],
+          [
+            "J",
+            1
+          ],
+          [
+            "C",
+            -1
+          ],
+          [
+            "K",
+            -1
+          ],
+          [
+            "L",
+            -1
+          ],
+          [
+            "M",
+            3
+          ],
+          [
+            "A",
+            3
+          ]
+        ],
+        "action_cost": "one arbitrary-distance slide of one car costs one move",
+        "goal": "primary car A at rightmost in-board position; do not remove it"
+      }
+    ]
+  },
+  "bridge_long_plan_stress_test": {
+    "status": "completed_breakpoints_or_ranges",
+    "source_commit": "8cebb0456c74f794ebec2b2c873e354193d585b9",
+    "config": "experiments/task_text_baselines/configs/deepseek_bridge_long64k.json",
+    "raw_results": "runs/deepseek_bridge_long64k",
+    "valid_responses": 15,
+    "service_error_attempts": 0,
+    "verdicts_verified": 15,
+    "completed_plan_replays": 15,
+    "truncation_metadata_verified": 0,
+    "reference_replay_verified": 15,
+    "policy": "first valid completion failure per task; not an accuracy estimate",
+    "tasks": {
+      "bridge": {
+        "status": "range_exhausted",
+        "count": 15,
+        "solved": 15,
+        "contract_pass": 15,
+        "stages": {
+          "256": {
+            "count": 3,
+            "solved": 3,
+            "optimal": 2,
+            "optimal_evaluated": 3,
+            "failures": {
+              "success": 3
+            }
+          },
+          "512": {
+            "count": 3,
+            "solved": 3,
+            "optimal": 0,
+            "optimal_evaluated": 3,
+            "failures": {
+              "success": 3
+            }
+          },
+          "1024": {
+            "count": 3,
+            "solved": 3,
+            "optimal": 0,
+            "optimal_evaluated": 3,
+            "failures": {
+              "success": 3
+            }
+          },
+          "2048": {
+            "count": 3,
+            "solved": 3,
+            "optimal": 0,
+            "optimal_evaluated": 3,
+            "failures": {
+              "success": 3
+            }
+          },
+          "4096": {
+            "count": 3,
+            "solved": 3,
+            "optimal": 0,
+            "optimal_evaluated": 3,
+            "failures": {
+              "success": 3
+            }
+          }
+        },
+        "mean_output_tokens": 23037.2,
+        "max_output_tokens": 45113,
+        "failures": {
+          "success": 15
+        },
+        "failure_cases": [],
+        "nonoptimal_cases": [
+          {
+            "case_id": "bridge_level0_00",
+            "plan_length": 509,
+            "submitted_cost": 8860844,
+            "reference_optimal_cost": 6741927
+          },
+          {
+            "case_id": "bridge_level1_00",
+            "plan_length": 1021,
+            "submitted_cost": 16631290,
+            "reference_optimal_cost": 12796509
+          },
+          {
+            "case_id": "bridge_level1_01",
+            "plan_length": 1021,
+            "submitted_cost": 16997902,
+            "reference_optimal_cost": 13065145
+          },
+          {
+            "case_id": "bridge_level1_02",
+            "plan_length": 1021,
+            "submitted_cost": 16368119,
+            "reference_optimal_cost": 12244547
+          },
+          {
+            "case_id": "bridge_level2_00",
+            "plan_length": 2045,
+            "submitted_cost": 33530296,
+            "reference_optimal_cost": 25220436
+          },
+          {
+            "case_id": "bridge_level2_01",
+            "plan_length": 2045,
+            "submitted_cost": 34706390,
+            "reference_optimal_cost": 26291301
+          },
+          {
+            "case_id": "bridge_level2_02",
+            "plan_length": 2045,
+            "submitted_cost": 34523343,
+            "reference_optimal_cost": 25990826
+          },
+          {
+            "case_id": "bridge_level3_00",
+            "plan_length": 4093,
+            "submitted_cost": 68806430,
+            "reference_optimal_cost": 52005720
+          },
+          {
+            "case_id": "bridge_level3_01",
+            "plan_length": 4093,
+            "submitted_cost": 67525243,
+            "reference_optimal_cost": 50626788
+          },
+          {
+            "case_id": "bridge_level3_02",
+            "plan_length": 4093,
+            "submitted_cost": 67195594,
+            "reference_optimal_cost": 50176353
+          },
+          {
+            "case_id": "bridge_level4_00",
+            "plan_length": 8189,
+            "submitted_cost": 137416938,
+            "reference_optimal_cost": 103583910
+          },
+          {
+            "case_id": "bridge_level4_01",
+            "plan_length": 8189,
+            "submitted_cost": 135621908,
+            "reference_optimal_cost": 102109844
+          },
+          {
+            "case_id": "bridge_level4_02",
+            "plan_length": 8189,
+            "submitted_cost": 203494689,
+            "reference_optimal_cost": 101820635
+          }
+        ]
+      }
+    }
+  }
+}

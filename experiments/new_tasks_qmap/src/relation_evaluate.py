@@ -193,3 +193,31 @@ def evaluate(model,corpus,data,config,cohorts=None,exposure=None,planning=True,t
             result['planning']={policy:rollout(corpus,cache,selected,config['evaluation']['horizon'],policy) for policy in ('q','oracle','heuristic','immediate_cost_only')}
         results[name]=result
     return dict(reachability_threshold=threshold,cohorts=results)
+
+
+def main():
+    import argparse
+    import json
+    from pathlib import Path
+    from grounded_llm.core.files import atomic_json
+    from grounded_llm.core.qmap.model import StateEncoder
+    from .relation_data import load
+    parser=argparse.ArgumentParser(__doc__)
+    parser.add_argument('--checkpoint',required=True,type=Path)
+    parser.add_argument('--run',required=True,type=Path)
+    parser.add_argument('--out',required=True,type=Path)
+    parser.add_argument('--device',default='cpu')
+    parser.add_argument('--cohorts',nargs='+')
+    args=parser.parse_args()
+    if args.out.exists(): raise FileExistsError('Keep previous frozen evaluations; choose a new output')
+    saved=torch.load(args.checkpoint,map_location=args.device,weights_only=False)
+    config=saved['config']; torch.set_num_threads(config['training']['cpu_threads'])
+    corpus,data,_=load(config,args.run/'data')
+    model=StateEncoder(input_dim=saved['input_dim'],**config['model']).to(args.device)
+    model.load_state_dict(saved['model']); model.requires_grad_(False)
+    result=evaluate(model,corpus,data,config,cohorts=args.cohorts,exposure=saved['exposure'])
+    atomic_json(args.out,dict(checkpoint=str(args.checkpoint),step=saved['step'],source_commit=saved['source_commit'],metrics=result))
+    print(json.dumps(dict(step=saved['step'],cohorts={name:row['planning']['q']['success_rate'] for name,row in result['cohorts'].items()})),flush=True)
+
+
+if __name__=='__main__': main()

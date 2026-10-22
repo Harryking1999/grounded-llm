@@ -29,6 +29,15 @@ python -m experiments.new_tasks_qmap.src.run --config experiments/new_tasks_qmap
 
 推箱子的合法死路仍保留。精确穷举图证明的不可达记为无穷；训练的有限代理单独标识，不声称有限向量等于无穷。资源界导致未完成枚举的场景只记unknown并报告排除原因，不能标作无解。Rush Hour和Token Swapping采用对称距离，跨不同物理场景不定义最短路。
 
+冻结断点可独立复评：
+
+```bash
+python -m experiments.new_tasks_qmap.src.relation_evaluate --checkpoint runs/new_tasks_pairs/token_swapping/best.pt --run runs/new_tasks_pairs/token_swapping --out tmp/token_validation.json --cohorts validation unseen_endpoint_validation unseen_both_validation
+python -m experiments.new_tasks_qmap.src.relation_diagnose --config experiments/new_tasks_qmap/configs/sokoban_pairs.json --run runs/new_tasks_pairs/sokoban --out tmp/sokoban_geometry.json --cohorts validation unseen_goal_validation
+```
+
+`relation_diagnose`只用精确距离坐标检查表示能力：当某布局的全部查询目标可放入坐标时，有向max／对称L∞能精确表示到这些目标的距离。这不证明共享MLP已学会地图。目标多于维度时仅检查一组landmark，下界误差不能证明不可表示。这些oracle坐标不用于训练输入、贪心策略或验收成绩。
+
 三个任务的`grounded_llm/tasks/<task>/qmap.py:MapReader`直接加载冻结权重，接公共CURRENT/GOAL/CANDIDATES结构。环境提供真实后继，地图不因此被解释为学会状态转移。Flash指定目标结果见[15题固定诊断](../task_text_baselines/results/exact_goals_flash64k.json)，历史目标条件结果不混算。
 
 验证：`python -m unittest discover -s experiments/new_tasks_qmap/tests -v`。包含小图独立BFS、任意目标等价、不可逆死锁、候选／关系泄漏、reader冻结与完整恢复检查。C++ oracle在Linux运行时额外验证。

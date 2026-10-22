@@ -134,6 +134,21 @@ class ExactPairTests(unittest.TestCase):
             self.assertEqual(corpus.features(np.array([0,1])).shape,(2,16))
             np.testing.assert_array_equal(corpus.distance(np.arange(24),np.arange(24)),np.zeros(24))
 
+    def test_teacher_landmark_probe_is_exact_with_complete_bank(self):
+        from experiments.new_tasks_qmap.src.relation_diagnose import geometry
+        with tempfile.TemporaryDirectory() as tmp, ExitStack() as stack:
+            path=Path(tmp); small_oracle(path,4,[[0,1],[1,2],[1,3]])
+            corpus=TokenCorpus(path); stack.callback(corpus.close)
+            rows=np.array([[a,b] for a in range(24) for b in range(24)])
+            data={k+'_validation':v for k,v in materialize(corpus,rows).items()}
+            config=dict(seed=0,evaluation=dict(landmarks=128,decision_count=1000),
+                        model=dict(dimension=128,metric='linf'),training=dict(unreachable_target=30))
+            result=geometry(corpus,data,config,['validation'])['validation']
+            self.assertEqual(result['finite_mae'],0)
+            self.assertEqual(result['shortest_action_rate'],1)
+            config['evaluation']['landmarks']=2
+            self.assertLess(geometry(corpus,data,config,['validation'])['validation']['query_goal_in_landmarks'],len(rows))
+
     def test_multilayout_corpus_padding_and_undefined_cross_scene_distance(self):
         from grounded_llm.tasks.rush_hour.relation_data import decode,baseline
         with tempfile.TemporaryDirectory() as tmp, ExitStack() as stack:

@@ -1,0 +1,2550 @@
+{
+  "task": "sokoban",
+  "source_commit": "437779b",
+  "best_step": 35000,
+  "last_step": 60000,
+  "preparation_seconds": 0.975688018836081,
+  "training_seconds": 1506.5578725067899,
+  "initial_evaluation_seconds": 6.128726522438228,
+  "final_evaluation_seconds": 5.607763290405273,
+  "raw_feature_cache_seconds": 79.09457363095134,
+  "peak_gpu_allocated_bytes": 9474669568,
+  "peak_gpu_reserved_bytes": 9542041600,
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "data": {
+    "task": "sokoban",
+    "states": 23275115,
+    "input_dim": 400,
+    "max_candidates": 4,
+    "seed": 2026102302,
+    "finite_max": 118.0,
+    "unknown_training_labels": 0,
+    "pair_count": 15456557,
+    "decision_count": 548663,
+    "reserved_relations": 52487,
+    "cohorts": {
+      "validation": {
+        "count": 8096,
+        "reachable": 8096
+      },
+      "test": {
+        "count": 7792,
+        "reachable": 7792
+      },
+      "unseen_goal_validation": {
+        "count": 5632,
+        "reachable": 4096
+      },
+      "unseen_goal_test": {
+        "count": 5632,
+        "reachable": 4096
+      },
+      "unseen_layout_validation": {
+        "count": 11264,
+        "reachable": 8192
+      },
+      "unseen_layout_test": {
+        "count": 11264,
+        "reachable": 8192
+      },
+      "original_layout_test": {
+        "count": 320,
+        "reachable": 302
+      },
+      "original_layout_validation": {
+        "count": 308,
+        "reachable": 278
+      },
+      "diagnostic": {
+        "count": 1408,
+        "reachable": 1024
+      },
+      "diagnostic_original": {
+        "count": 2,
+        "reachable": 2
+      }
+    },
+    "selected_train_states": 15456557,
+    "all_selected_sources_in_training": true
+  },
+  "model_parameters": 201344,
+  "actual_exposure": {
+    "unique_gradient_states": 15456557,
+    "available_states": 23275115,
+    "unique_pair_rows": 15456557,
+    "pair_rows": 15456557,
+    "unique_decision_rows": 548657,
+    "decision_rows": 548663,
+    "minimum_pair_layer_passes": 1.987506014437756,
+    "minimum_decision_layer_passes": null
+  },
+  "acceptance": {
+    "minimum": 0.8,
+    "target": 0.9,
+    "rates": {
+      "test": 0.3623046875,
+      "unseen_goal_test": 0.21875,
+      "unseen_layout_test": 0.0654296875,
+      "diagnostic_original": 0.0,
+      "original_layout_test": 0.0
+    },
+    "full_training_source_coverage": true,
+    "passed": false,
+    "target_reached": false
+  },
+  "config": "experiments/new_tasks_qmap/configs/sokoban_balanced_relations_pairs.json",
+  "cohorts": {
+    "validation": {
+      "count": 8096,
+      "finite_count": 8096,
+      "finite_mae": 5.362298011779785,
+      "finite_bias": 1.014587640762329,
+      "shortest_action_rate": 0.806640625,
+      "bellman": {
+        "mae": 1.7493207454681396,
+        "upper_violation_rate": 0.44970703125
+      },
+      "coordinate_statistics": {
+        "output_activation": "sigmoid",
+        "coordinate_divisor_for_diagnostics_only": 256,
+        "labels": "physical unit-cost steps, without normalization or inverse normalization",
+        "boundary_tolerance_relative_to_cap": 0.0001,
+        "derivative_tolerance_relative_to_cap": 0.0001,
+        "all": {
+          "count": 8096,
+          "finite_mae": 5.362298011779785,
+          "finite_bias": 1.014587640762329,
+          "predicted_mean": 30.85438346862793,
+          "positive_finite_predicted_zero_fraction": 0.0,
+          "boundary_fraction": 0.5085984784152668,
+          "low_output_derivative_fraction": 0.508601855854743,
+          "outside_sigmoid_range_fraction": 0.0
+        },
+        "by_true_distance": {
+          "(0,1]": {
+            "count": 199,
+            "finite_mae": 2.7108681201934814,
+            "finite_bias": 2.632936954498291,
+            "predicted_mean": 3.632936954498291,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.48313834798994976,
+            "low_output_derivative_fraction": 0.48313834798994976,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(1,2]": {
+            "count": 157,
+            "finite_mae": 1.7104387283325195,
+            "finite_bias": 1.4386614561080933,
+            "predicted_mean": 3.4386613368988037,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.5060957404458599,
+            "low_output_derivative_fraction": 0.5060957404458599,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(2,5]": {
+            "count": 297,
+            "finite_mae": 20.183176040649414,
+            "finite_bias": 19.6085205078125,
+            "predicted_mean": 23.541179656982422,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.48320444023569026,
+            "low_output_derivative_fraction": 0.48320444023569026,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(5,10]": {
+            "count": 579,
+            "finite_mae": 1.872136116027832,
+            "finite_bias": 0.5184474587440491,
+            "predicted_mean": 8.651434898376465,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.48361938687392053,
+            "low_output_derivative_fraction": 0.48361938687392053,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(10,20]": {
+            "count": 1599,
+            "finite_mae": 3.6322343349456787,
+            "finite_bias": 0.9482038617134094,
+            "predicted_mean": 16.79185676574707,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.5076414946841776,
+            "low_output_derivative_fraction": 0.507646380550344,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(20,40]": {
+            "count": 3127,
+            "finite_mae": 5.1994428634643555,
+            "finite_bias": 0.617077648639679,
+            "predicted_mean": 30.103487014770508,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.5244755856251999,
+            "low_output_derivative_fraction": 0.5244780840262232,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(40,80]": {
+            "count": 2039,
+            "finite_mae": 6.515154838562012,
+            "finite_bias": -1.0226365327835083,
+            "predicted_mean": 52.34322738647461,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.5057070714811182,
+            "low_output_derivative_fraction": 0.5057128187837175,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(80,160]": {
+            "count": 99,
+            "finite_mae": 1.7756438255310059,
+            "finite_bias": -0.20462660491466522,
+            "predicted_mean": 89.1084976196289,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.3595328282828283,
+            "low_output_derivative_fraction": 0.3595328282828283,
+            "outside_sigmoid_range_fraction": 0.0
+          }
+        }
+      },
+      "unreachable": {
+        "proven_unreachable": 0,
+        "finite": 8096,
+        "unknown": 0,
+        "auroc": null,
+        "validation_threshold": 79.59747314453125,
+        "recall": null,
+        "finite_false_positive": 0.024209486166007904,
+        "recall_at_training_proxy": null,
+        "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+      },
+      "planning": {
+        "q": {
+          "count": 1024,
+          "solved": 369,
+          "success_rate": 0.3603515625,
+          "optimal": 352,
+          "optimal_rate": 0.34375,
+          "cycles": 655,
+          "entered_unreachable": 14,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0975609756097561,
+          "mean_cost_ratio_on_success": 1.0108686148858317,
+          "predicted_progress": {
+            "counts": {
+              "executed_edges": 5666,
+              "predicted_decrease": 4533,
+              "predicted_plateau": 0,
+              "predicted_increase": 1133,
+              "true_finite_edges": 5608,
+              "true_optimal_edges": 4663,
+              "predicted_decrease_but_not_true_optimal": 609,
+              "entered_dead_edges": 14,
+              "non_goal_predicted_zero": 0
+            },
+            "strict_descent_trajectory_count": 227,
+            "strict_descent_success_count": 227,
+            "non_descent_trajectory_count": 797,
+            "predicted_drop_quantiles": {
+              "0": -35.9302978515625,
+              "0.1": -0.43607330322265625,
+              "0.5": 0.8009815216064453,
+              "0.9": 2.2873125076293945,
+              "1": 213.35279846191406
+            },
+            "mean_abs_unit_descent_residual": 1.078417474121918,
+            "executed_edge_optimal_rate": 0.822979174020473,
+            "predicted_strict_descent_edge_rate": 0.8000352982703848,
+            "note": "Observed policy trajectories only, after action selection. A nondecreasing chosen edge also means no legal successor has a strictly lower predicted distance under this greedy policy. Strict predicted descent alone does not prove goal completion or true optimality; full rollouts remain the acceptance metric."
+          }
+        },
+        "oracle": {
+          "count": 1024,
+          "solved": 1024,
+          "success_rate": 1.0,
+          "optimal": 1024,
+          "optimal_rate": 1.0,
+          "cycles": 0,
+          "entered_unreachable": 0,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0,
+          "predicted_progress": null
+        },
+        "heuristic": {
+          "count": 1024,
+          "solved": 147,
+          "success_rate": 0.1435546875,
+          "optimal": 147,
+          "optimal_rate": 0.1435546875,
+          "cycles": 877,
+          "entered_unreachable": 115,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0,
+          "predicted_progress": null
+        },
+        "immediate_cost_only": {
+          "count": 1024,
+          "solved": 34,
+          "success_rate": 0.033203125,
+          "optimal": 34,
+          "optimal_rate": 0.033203125,
+          "cycles": 990,
+          "entered_unreachable": 189,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0,
+          "predicted_progress": null
+        }
+      }
+    },
+    "test": {
+      "count": 7792,
+      "finite_count": 7792,
+      "finite_mae": 4.969062805175781,
+      "finite_bias": 0.2063295841217041,
+      "shortest_action_rate": 0.79443359375,
+      "bellman": {
+        "mae": 1.7603909969329834,
+        "upper_violation_rate": 0.47314453125
+      },
+      "coordinate_statistics": {
+        "output_activation": "sigmoid",
+        "coordinate_divisor_for_diagnostics_only": 256,
+        "labels": "physical unit-cost steps, without normalization or inverse normalization",
+        "boundary_tolerance_relative_to_cap": 0.0001,
+        "derivative_tolerance_relative_to_cap": 0.0001,
+        "all": {
+          "count": 7792,
+          "finite_mae": 4.969062805175781,
+          "finite_bias": 0.2063295841217041,
+          "predicted_mean": 31.177196502685547,
+          "positive_finite_predicted_zero_fraction": 0.0,
+          "boundary_fraction": 0.5090296939168378,
+          "low_output_derivative_fraction": 0.509033203125,
+          "outside_sigmoid_range_fraction": 0.0
+        },
+        "by_true_distance": {
+          "(0,1]": {
+            "count": 64,
+            "finite_mae": 1.3847811222076416,
+            "finite_bias": 1.3622723817825317,
+            "predicted_mean": 2.362272262573242,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.46343994140625,
+            "low_output_derivative_fraction": 0.46343994140625,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(1,2]": {
+            "count": 67,
+            "finite_mae": 1.2508108615875244,
+            "finite_bias": 1.133085012435913,
+            "predicted_mean": 3.133084535598755,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.4661847014925373,
+            "low_output_derivative_fraction": 0.4661847014925373,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(2,5]": {
+            "count": 247,
+            "finite_mae": 1.025038719177246,
+            "finite_bias": 0.3604193329811096,
+            "predicted_mean": 4.392808437347412,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.45372596153846156,
+            "low_output_derivative_fraction": 0.45372596153846156,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(5,10]": {
+            "count": 534,
+            "finite_mae": 2.0571508407592773,
+            "finite_bias": 0.5223214030265808,
+            "predicted_mean": 8.61220932006836,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.47878628277153557,
+            "low_output_derivative_fraction": 0.47878628277153557,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(10,20]": {
+            "count": 1569,
+            "finite_mae": 4.024018287658691,
+            "finite_bias": 1.5306007862091064,
+            "predicted_mean": 17.42798614501953,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.5051112372530274,
+            "low_output_derivative_fraction": 0.5051112372530274,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(20,40]": {
+            "count": 3213,
+            "finite_mae": 5.322939872741699,
+            "finite_bias": 0.19691556692123413,
+            "predicted_mean": 29.980606079101562,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.528464684484905,
+            "low_output_derivative_fraction": 0.528467116013072,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(40,80]": {
+            "count": 1996,
+            "finite_mae": 6.819983005523682,
+            "finite_bias": -0.9625186920166016,
+            "predicted_mean": 52.27846145629883,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.5068359375,
+            "low_output_derivative_fraction": 0.5068457226953907,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(80,160]": {
+            "count": 102,
+            "finite_mae": 1.6257400512695312,
+            "finite_bias": -0.3562777638435364,
+            "predicted_mean": 86.93782806396484,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.34903492647058826,
+            "low_output_derivative_fraction": 0.34903492647058826,
+            "outside_sigmoid_range_fraction": 0.0
+          }
+        }
+      },
+      "unreachable": {
+        "proven_unreachable": 0,
+        "finite": 7792,
+        "unknown": 0,
+        "auroc": null,
+        "validation_threshold": 79.59747314453125,
+        "recall": null,
+        "finite_false_positive": 0.022202258726899383,
+        "recall_at_training_proxy": null,
+        "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+      },
+      "planning": {
+        "q": {
+          "count": 1024,
+          "solved": 371,
+          "success_rate": 0.3623046875,
+          "optimal": 353,
+          "optimal_rate": 0.3447265625,
+          "cycles": 653,
+          "entered_unreachable": 15,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.11320754716981132,
+          "mean_cost_ratio_on_success": 1.0120465532388792,
+          "predicted_progress": {
+            "counts": {
+              "executed_edges": 5860,
+              "predicted_decrease": 4709,
+              "predicted_plateau": 0,
+              "predicted_increase": 1151,
+              "true_finite_edges": 5788,
+              "true_optimal_edges": 4822,
+              "predicted_decrease_but_not_true_optimal": 655,
+              "entered_dead_edges": 15,
+              "non_goal_predicted_zero": 0
+            },
+            "strict_descent_trajectory_count": 217,
+            "strict_descent_success_count": 217,
+            "non_descent_trajectory_count": 807,
+            "predicted_drop_quantiles": {
+              "0": -18.47283172607422,
+              "0.1": -0.42704010009765625,
+              "0.5": 0.8049240112304688,
+              "0.9": 2.3951560974121096,
+              "1": 96.32682800292969
+            },
+            "mean_abs_unit_descent_residual": 1.0368849153811615,
+            "executed_edge_optimal_rate": 0.8228668941979522,
+            "predicted_strict_descent_edge_rate": 0.8035836177474402,
+            "note": "Observed policy trajectories only, after action selection. A nondecreasing chosen edge also means no legal successor has a strictly lower predicted distance under this greedy policy. Strict predicted descent alone does not prove goal completion or true optimality; full rollouts remain the acceptance metric."
+          }
+        },
+        "oracle": {
+          "count": 1024,
+          "solved": 1024,
+          "success_rate": 1.0,
+          "optimal": 1024,
+          "optimal_rate": 1.0,
+          "cycles": 0,
+          "entered_unreachable": 0,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0,
+          "predicted_progress": null
+        },
+        "heuristic": {
+          "count": 1024,
+          "solved": 136,
+          "success_rate": 0.1328125,
+          "optimal": 135,
+          "optimal_rate": 0.1318359375,
+          "cycles": 888,
+          "entered_unreachable": 117,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.014705882352941176,
+          "mean_cost_ratio_on_success": 1.0021008403361344,
+          "predicted_progress": null
+        },
+        "immediate_cost_only": {
+          "count": 1024,
+          "solved": 29,
+          "success_rate": 0.0283203125,
+          "optimal": 29,
+          "optimal_rate": 0.0283203125,
+          "cycles": 995,
+          "entered_unreachable": 186,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0,
+          "predicted_progress": null
+        }
+      }
+    },
+    "unseen_goal_validation": {
+      "count": 5632,
+      "finite_count": 4096,
+      "finite_mae": 5.709217071533203,
+      "finite_bias": 1.6494965553283691,
+      "shortest_action_rate": 0.791015625,
+      "bellman": {
+        "mae": 2.323181629180908,
+        "upper_violation_rate": 0.4638671875
+      },
+      "coordinate_statistics": {
+        "output_activation": "sigmoid",
+        "coordinate_divisor_for_diagnostics_only": 256,
+        "labels": "physical unit-cost steps, without normalization or inverse normalization",
+        "boundary_tolerance_relative_to_cap": 0.0001,
+        "derivative_tolerance_relative_to_cap": 0.0001,
+        "all": {
+          "count": 5632,
+          "finite_mae": 5.709217071533203,
+          "finite_bias": 1.6494965553283691,
+          "predicted_mean": 85.84555053710938,
+          "positive_finite_predicted_zero_fraction": 0.0,
+          "boundary_fraction": 0.5250937721946023,
+          "low_output_derivative_fraction": 0.5250944657759233,
+          "outside_sigmoid_range_fraction": 0.0
+        },
+        "by_true_distance": {
+          "(-1,0]": {
+            "count": 122,
+            "finite_mae": 0.0,
+            "finite_bias": 0.0,
+            "predicted_mean": 0.0,
+            "positive_finite_predicted_zero_fraction": null,
+            "boundary_fraction": 0.5528304303278688,
+            "low_output_derivative_fraction": 0.5528304303278688,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(0,1]": {
+            "count": 78,
+            "finite_mae": 44.86902618408203,
+            "finite_bias": 44.8527946472168,
+            "predicted_mean": 45.8527946472168,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.48046875,
+            "low_output_derivative_fraction": 0.48046875,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(1,2]": {
+            "count": 73,
+            "finite_mae": 27.891042709350586,
+            "finite_bias": 27.85970687866211,
+            "predicted_mean": 29.85970687866211,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.4119220890410959,
+            "low_output_derivative_fraction": 0.4119220890410959,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(2,5]": {
+            "count": 160,
+            "finite_mae": 1.502640962600708,
+            "finite_bias": 0.9657803773880005,
+            "predicted_mean": 4.903280258178711,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.412158203125,
+            "low_output_derivative_fraction": 0.412158203125,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(5,10]": {
+            "count": 278,
+            "finite_mae": 2.1704330444335938,
+            "finite_bias": 0.49938493967056274,
+            "predicted_mean": 8.740391731262207,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.442347684352518,
+            "low_output_derivative_fraction": 0.442347684352518,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(10,20]": {
+            "count": 842,
+            "finite_mae": 4.5975341796875,
+            "finite_bias": 2.0127317905426025,
+            "predicted_mean": 17.87734031677246,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.5154023159144893,
+            "low_output_derivative_fraction": 0.5154023159144893,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(20,40]": {
+            "count": 1559,
+            "finite_mae": 5.1442413330078125,
+            "finite_bias": 0.3939583897590637,
+            "predicted_mean": 29.94046401977539,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.5281731077613855,
+            "low_output_derivative_fraction": 0.5281756133739577,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(40,80]": {
+            "count": 935,
+            "finite_mae": 5.3237738609313965,
+            "finite_bias": -1.5674948692321777,
+            "predicted_mean": 51.43999099731445,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.5133856951871658,
+            "low_output_derivative_fraction": 0.5133856951871658,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(80,160]": {
+            "count": 49,
+            "finite_mae": 2.7876617908477783,
+            "finite_bias": 1.7839560508728027,
+            "predicted_mean": 90.49824523925781,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.3778698979591837,
+            "low_output_derivative_fraction": 0.3778698979591837,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "proven_unreachable": {
+            "count": 1536,
+            "finite_mae": null,
+            "finite_bias": null,
+            "predicted_mean": 234.5382843017578,
+            "positive_finite_predicted_zero_fraction": null,
+            "boundary_fraction": 0.5712865193684896,
+            "low_output_derivative_fraction": 0.5712865193684896,
+            "outside_sigmoid_range_fraction": 0.0
+          }
+        }
+      },
+      "unreachable": {
+        "proven_unreachable": 1536,
+        "finite": 4096,
+        "unknown": 0,
+        "auroc": 0.9903914133707682,
+        "validation_threshold": 79.59747314453125,
+        "recall": 0.9778645833333334,
+        "finite_false_positive": 0.026611328125,
+        "recall_at_training_proxy": 0.642578125,
+        "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+      },
+      "planning": {
+        "q": {
+          "count": 1024,
+          "solved": 197,
+          "success_rate": 0.1923828125,
+          "optimal": 184,
+          "optimal_rate": 0.1796875,
+          "cycles": 827,
+          "entered_unreachable": 28,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.14213197969543148,
+          "mean_cost_ratio_on_success": 1.0157153900808722,
+          "predicted_progress": {
+            "counts": {
+              "executed_edges": 5568,
+              "predicted_decrease": 4241,
+              "predicted_plateau": 0,
+              "predicted_increase": 1327,
+              "true_finite_edges": 5457,
+              "true_optimal_edges": 4236,
+              "predicted_decrease_but_not_true_optimal": 821,
+              "entered_dead_edges": 28,
+              "non_goal_predicted_zero": 0
+            },
+            "strict_descent_trajectory_count": 115,
+            "strict_descent_success_count": 115,
+            "non_descent_trajectory_count": 909,
+            "predicted_drop_quantiles": {
+              "0": -37.485042572021484,
+              "0.1": -0.5780448913574219,
+              "0.5": 0.7010955810546875,
+              "0.9": 2.5172386169433594,
+              "1": 239.12937927246094
+            },
+            "mean_abs_unit_descent_residual": 1.4427192609800004,
+            "executed_edge_optimal_rate": 0.7607758620689655,
+            "predicted_strict_descent_edge_rate": 0.7616738505747126,
+            "note": "Observed policy trajectories only, after action selection. A nondecreasing chosen edge also means no legal successor has a strictly lower predicted distance under this greedy policy. Strict predicted descent alone does not prove goal completion or true optimality; full rollouts remain the acceptance metric."
+          }
+        },
+        "oracle": {
+          "count": 1024,
+          "solved": 1024,
+          "success_rate": 1.0,
+          "optimal": 1024,
+          "optimal_rate": 1.0,
+          "cycles": 0,
+          "entered_unreachable": 0,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0,
+          "predicted_progress": null
+        },
+        "heuristic": {
+          "count": 1024,
+          "solved": 114,
+          "success_rate": 0.111328125,
+          "optimal": 114,
+          "optimal_rate": 0.111328125,
+          "cycles": 910,
+          "entered_unreachable": 132,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0,
+          "predicted_progress": null
+        },
+        "immediate_cost_only": {
+          "count": 1024,
+          "solved": 20,
+          "success_rate": 0.01953125,
+          "optimal": 20,
+          "optimal_rate": 0.01953125,
+          "cycles": 1004,
+          "entered_unreachable": 221,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0,
+          "predicted_progress": null
+        }
+      }
+    },
+    "unseen_goal_test": {
+      "count": 5632,
+      "finite_count": 4096,
+      "finite_mae": 4.847681045532227,
+      "finite_bias": 0.9159111976623535,
+      "shortest_action_rate": 0.79931640625,
+      "bellman": {
+        "mae": 1.5251803398132324,
+        "upper_violation_rate": 0.46533203125
+      },
+      "coordinate_statistics": {
+        "output_activation": "sigmoid",
+        "coordinate_divisor_for_diagnostics_only": 256,
+        "labels": "physical unit-cost steps, without normalization or inverse normalization",
+        "boundary_tolerance_relative_to_cap": 0.0001,
+        "derivative_tolerance_relative_to_cap": 0.0001,
+        "all": {
+          "count": 5632,
+          "finite_mae": 4.847681045532227,
+          "finite_bias": 0.9159111976623535,
+          "predicted_mean": 86.62425994873047,
+          "positive_finite_predicted_zero_fraction": 0.0,
+          "boundary_fraction": 0.5283459750088778,
+          "low_output_derivative_fraction": 0.5283480557528409,
+          "outside_sigmoid_range_fraction": 0.0
+        },
+        "by_true_distance": {
+          "(-1,0]": {
+            "count": 79,
+            "finite_mae": 0.0,
+            "finite_bias": 0.0,
+            "predicted_mean": 0.0,
+            "positive_finite_predicted_zero_fraction": null,
+            "boundary_fraction": 0.48249604430379744,
+            "low_output_derivative_fraction": 0.48249604430379744,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(0,1]": {
+            "count": 92,
+            "finite_mae": 7.38594388961792,
+            "finite_bias": 7.3691725730896,
+            "predicted_mean": 8.369172096252441,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.5041185461956522,
+            "low_output_derivative_fraction": 0.5041185461956522,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(1,2]": {
+            "count": 67,
+            "finite_mae": 5.714846611022949,
+            "finite_bias": 5.714846611022949,
+            "predicted_mean": 7.714846611022949,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.5109608208955224,
+            "low_output_derivative_fraction": 0.5109608208955224,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(2,5]": {
+            "count": 183,
+            "finite_mae": 1.968141794204712,
+            "finite_bias": 1.1750603914260864,
+            "predicted_mean": 5.218776702880859,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.5266820355191257,
+            "low_output_derivative_fraction": 0.5266820355191257,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(5,10]": {
+            "count": 249,
+            "finite_mae": 2.797117233276367,
+            "finite_bias": 1.668434739112854,
+            "predicted_mean": 9.784900665283203,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.5477692018072289,
+            "low_output_derivative_fraction": 0.5477692018072289,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(10,20]": {
+            "count": 718,
+            "finite_mae": 2.9642181396484375,
+            "finite_bias": 0.4466571807861328,
+            "predicted_mean": 16.392337799072266,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.5198467966573816,
+            "low_output_derivative_fraction": 0.5198467966573816,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(20,40]": {
+            "count": 1572,
+            "finite_mae": 5.039466857910156,
+            "finite_bias": 1.0191901922225952,
+            "predicted_mean": 30.64387321472168,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.5241556337468194,
+            "low_output_derivative_fraction": 0.5241606035305344,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(40,80]": {
+            "count": 1068,
+            "finite_mae": 7.067598819732666,
+            "finite_bias": 0.0974123403429985,
+            "predicted_mean": 54.02250671386719,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.4945758719569288,
+            "low_output_derivative_fraction": 0.4945758719569288,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(80,160]": {
+            "count": 68,
+            "finite_mae": 2.0367982387542725,
+            "finite_bias": 0.49020475149154663,
+            "predicted_mean": 90.35785675048828,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.3687959558823529,
+            "low_output_derivative_fraction": 0.3687959558823529,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "proven_unreachable": {
+            "count": 1536,
+            "finite_mae": null,
+            "finite_bias": null,
+            "predicted_mean": 233.98912048339844,
+            "positive_finite_predicted_zero_fraction": null,
+            "boundary_fraction": 0.5687688191731771,
+            "low_output_derivative_fraction": 0.5687713623046875,
+            "outside_sigmoid_range_fraction": 0.0
+          }
+        }
+      },
+      "unreachable": {
+        "proven_unreachable": 1536,
+        "finite": 4096,
+        "unknown": 0,
+        "auroc": 0.989570140838623,
+        "validation_threshold": 79.59747314453125,
+        "recall": 0.9772135416666666,
+        "finite_false_positive": 0.029296875,
+        "recall_at_training_proxy": 0.6861979166666666,
+        "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+      },
+      "planning": {
+        "q": {
+          "count": 1024,
+          "solved": 224,
+          "success_rate": 0.21875,
+          "optimal": 212,
+          "optimal_rate": 0.20703125,
+          "cycles": 800,
+          "entered_unreachable": 16,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.11607142857142858,
+          "mean_cost_ratio_on_success": 1.0108815911271267,
+          "predicted_progress": {
+            "counts": {
+              "executed_edges": 5329,
+              "predicted_decrease": 4030,
+              "predicted_plateau": 0,
+              "predicted_increase": 1299,
+              "true_finite_edges": 5274,
+              "true_optimal_edges": 4093,
+              "predicted_decrease_but_not_true_optimal": 765,
+              "entered_dead_edges": 16,
+              "non_goal_predicted_zero": 0
+            },
+            "strict_descent_trajectory_count": 121,
+            "strict_descent_success_count": 121,
+            "non_descent_trajectory_count": 903,
+            "predicted_drop_quantiles": {
+              "0": -50.999420166015625,
+              "0.1": -0.5841033935546874,
+              "0.5": 0.706451416015625,
+              "0.9": 2.5625396728515617,
+              "1": 75.26439666748047
+            },
+            "mean_abs_unit_descent_residual": 1.2389686060658671,
+            "executed_edge_optimal_rate": 0.7680615500093826,
+            "predicted_strict_descent_edge_rate": 0.7562394445486958,
+            "note": "Observed policy trajectories only, after action selection. A nondecreasing chosen edge also means no legal successor has a strictly lower predicted distance under this greedy policy. Strict predicted descent alone does not prove goal completion or true optimality; full rollouts remain the acceptance metric."
+          }
+        },
+        "oracle": {
+          "count": 1024,
+          "solved": 1024,
+          "success_rate": 1.0,
+          "optimal": 1024,
+          "optimal_rate": 1.0,
+          "cycles": 0,
+          "entered_unreachable": 0,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0,
+          "predicted_progress": null
+        },
+        "heuristic": {
+          "count": 1024,
+          "solved": 114,
+          "success_rate": 0.111328125,
+          "optimal": 114,
+          "optimal_rate": 0.111328125,
+          "cycles": 910,
+          "entered_unreachable": 119,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0,
+          "predicted_progress": null
+        },
+        "immediate_cost_only": {
+          "count": 1024,
+          "solved": 21,
+          "success_rate": 0.0205078125,
+          "optimal": 21,
+          "optimal_rate": 0.0205078125,
+          "cycles": 1003,
+          "entered_unreachable": 211,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0,
+          "predicted_progress": null
+        }
+      }
+    },
+    "unseen_layout_validation": {
+      "count": 11264,
+      "finite_count": 8192,
+      "finite_mae": 52.64813995361328,
+      "finite_bias": 40.19457244873047,
+      "shortest_action_rate": 0.58056640625,
+      "bellman": {
+        "mae": 12.773246765136719,
+        "upper_violation_rate": 0.55615234375
+      },
+      "coordinate_statistics": {
+        "output_activation": "sigmoid",
+        "coordinate_divisor_for_diagnostics_only": 256,
+        "labels": "physical unit-cost steps, without normalization or inverse normalization",
+        "boundary_tolerance_relative_to_cap": 0.0001,
+        "derivative_tolerance_relative_to_cap": 0.0001,
+        "all": {
+          "count": 11264,
+          "finite_mae": 52.64813995361328,
+          "finite_bias": 40.19457244873047,
+          "predicted_mean": 87.9266357421875,
+          "positive_finite_predicted_zero_fraction": 0.0,
+          "boundary_fraction": 0.567110235040838,
+          "low_output_derivative_fraction": 0.5671126625754617,
+          "outside_sigmoid_range_fraction": 0.0
+        },
+        "by_true_distance": {
+          "(-1,0]": {
+            "count": 251,
+            "finite_mae": 0.0,
+            "finite_bias": 0.0,
+            "predicted_mean": 0.0,
+            "positive_finite_predicted_zero_fraction": null,
+            "boundary_fraction": 0.5271414342629482,
+            "low_output_derivative_fraction": 0.5271414342629482,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(0,1]": {
+            "count": 188,
+            "finite_mae": 13.22070026397705,
+            "finite_bias": 13.21882152557373,
+            "predicted_mean": 14.21882152557373,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.5687333776595744,
+            "low_output_derivative_fraction": 0.5687333776595744,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(1,2]": {
+            "count": 201,
+            "finite_mae": 19.028308868408203,
+            "finite_bias": 18.988582611083984,
+            "predicted_mean": 20.988582611083984,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.537177394278607,
+            "low_output_derivative_fraction": 0.537177394278607,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(2,5]": {
+            "count": 421,
+            "finite_mae": 36.47736358642578,
+            "finite_bias": 36.28800582885742,
+            "predicted_mean": 40.13836669921875,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.5566174287410927,
+            "low_output_derivative_fraction": 0.5566174287410927,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(5,10]": {
+            "count": 697,
+            "finite_mae": 45.96480178833008,
+            "finite_bias": 45.39165496826172,
+            "predicted_mean": 53.36726760864258,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.5921695659971306,
+            "low_output_derivative_fraction": 0.5921695659971306,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(10,20]": {
+            "count": 1699,
+            "finite_mae": 54.60515213012695,
+            "finite_bias": 52.020957946777344,
+            "predicted_mean": 67.84909057617188,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.5434331776044732,
+            "low_output_derivative_fraction": 0.54343547675103,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(20,40]": {
+            "count": 2889,
+            "finite_mae": 59.356937408447266,
+            "finite_bias": 48.29310989379883,
+            "predicted_mean": 77.98504638671875,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.5540222611630322,
+            "low_output_derivative_fraction": 0.5540290217203184,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(40,80]": {
+            "count": 1801,
+            "finite_mae": 61.483543395996094,
+            "finite_bias": 27.705184936523438,
+            "predicted_mean": 80.552490234375,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.5605696488062187,
+            "low_output_derivative_fraction": 0.5605718177401444,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(80,160]": {
+            "count": 45,
+            "finite_mae": 57.794189453125,
+            "finite_bias": -38.724342346191406,
+            "predicted_mean": 49.36454391479492,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.5539930555555556,
+            "low_output_derivative_fraction": 0.5539930555555556,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "proven_unreachable": {
+            "count": 3072,
+            "finite_mae": null,
+            "finite_bias": null,
+            "predicted_mean": 143.7329559326172,
+            "positive_finite_predicted_zero_fraction": null,
+            "boundary_fraction": 0.5974171956380209,
+            "low_output_derivative_fraction": 0.5974171956380209,
+            "outside_sigmoid_range_fraction": 0.0
+          }
+        }
+      },
+      "unreachable": {
+        "proven_unreachable": 3072,
+        "finite": 8192,
+        "unknown": 0,
+        "auroc": 0.7578487992286682,
+        "validation_threshold": 79.59747314453125,
+        "recall": 0.6591796875,
+        "finite_false_positive": 0.2772216796875,
+        "recall_at_training_proxy": 0.2662760416666667,
+        "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+      },
+      "planning": {
+        "q": {
+          "count": 1024,
+          "solved": 87,
+          "success_rate": 0.0849609375,
+          "optimal": 87,
+          "optimal_rate": 0.0849609375,
+          "cycles": 937,
+          "entered_unreachable": 200,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0,
+          "predicted_progress": {
+            "counts": {
+              "executed_edges": 4144,
+              "predicted_decrease": 2849,
+              "predicted_plateau": 16,
+              "predicted_increase": 1279,
+              "true_finite_edges": 3251,
+              "true_optimal_edges": 1852,
+              "predicted_decrease_but_not_true_optimal": 1582,
+              "entered_dead_edges": 200,
+              "non_goal_predicted_zero": 0
+            },
+            "strict_descent_trajectory_count": 65,
+            "strict_descent_success_count": 65,
+            "non_descent_trajectory_count": 959,
+            "predicted_drop_quantiles": {
+              "0": -153.5078582763672,
+              "0.1": -2.1199264526367188,
+              "0.5": 0.7981033325195312,
+              "0.9": 18.099621582031254,
+              "1": 234.26641845703125
+            },
+            "mean_abs_unit_descent_residual": 8.824203734922593,
+            "executed_edge_optimal_rate": 0.4469111969111969,
+            "predicted_strict_descent_edge_rate": 0.6875,
+            "note": "Observed policy trajectories only, after action selection. A nondecreasing chosen edge also means no legal successor has a strictly lower predicted distance under this greedy policy. Strict predicted descent alone does not prove goal completion or true optimality; full rollouts remain the acceptance metric."
+          }
+        },
+        "oracle": {
+          "count": 1024,
+          "solved": 1024,
+          "success_rate": 1.0,
+          "optimal": 1024,
+          "optimal_rate": 1.0,
+          "cycles": 0,
+          "entered_unreachable": 0,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0,
+          "predicted_progress": null
+        },
+        "heuristic": {
+          "count": 1024,
+          "solved": 97,
+          "success_rate": 0.0947265625,
+          "optimal": 97,
+          "optimal_rate": 0.0947265625,
+          "cycles": 927,
+          "entered_unreachable": 188,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0,
+          "predicted_progress": null
+        },
+        "immediate_cost_only": {
+          "count": 1024,
+          "solved": 27,
+          "success_rate": 0.0263671875,
+          "optimal": 27,
+          "optimal_rate": 0.0263671875,
+          "cycles": 997,
+          "entered_unreachable": 175,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0,
+          "predicted_progress": null
+        }
+      }
+    },
+    "unseen_layout_test": {
+      "count": 11264,
+      "finite_count": 8192,
+      "finite_mae": 64.64053344726562,
+      "finite_bias": 52.52706527709961,
+      "shortest_action_rate": 0.6015625,
+      "bellman": {
+        "mae": 14.815179824829102,
+        "upper_violation_rate": 0.55419921875
+      },
+      "coordinate_statistics": {
+        "output_activation": "sigmoid",
+        "coordinate_divisor_for_diagnostics_only": 256,
+        "labels": "physical unit-cost steps, without normalization or inverse normalization",
+        "boundary_tolerance_relative_to_cap": 0.0001,
+        "derivative_tolerance_relative_to_cap": 0.0001,
+        "all": {
+          "count": 11264,
+          "finite_mae": 64.64053344726562,
+          "finite_bias": 52.52706527709961,
+          "predicted_mean": 108.09414672851562,
+          "positive_finite_predicted_zero_fraction": 0.0,
+          "boundary_fraction": 0.5605236400257457,
+          "low_output_derivative_fraction": 0.5605555447665128,
+          "outside_sigmoid_range_fraction": 0.0
+        },
+        "by_true_distance": {
+          "(-1,0]": {
+            "count": 145,
+            "finite_mae": 0.0,
+            "finite_bias": 0.0,
+            "predicted_mean": 0.0,
+            "positive_finite_predicted_zero_fraction": null,
+            "boundary_fraction": 0.5617456896551725,
+            "low_output_derivative_fraction": 0.5617995689655172,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(0,1]": {
+            "count": 106,
+            "finite_mae": 13.26392936706543,
+            "finite_bias": 13.26339340209961,
+            "predicted_mean": 14.26339340209961,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.5430424528301887,
+            "low_output_derivative_fraction": 0.5430424528301887,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(1,2]": {
+            "count": 127,
+            "finite_mae": 13.179458618164062,
+            "finite_bias": 13.142472267150879,
+            "predicted_mean": 15.142472267150879,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.5419844980314961,
+            "low_output_derivative_fraction": 0.5420152559055118,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(2,5]": {
+            "count": 343,
+            "finite_mae": 34.50571060180664,
+            "finite_bias": 34.410736083984375,
+            "predicted_mean": 38.410736083984375,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.5400419096209913,
+            "low_output_derivative_fraction": 0.5400419096209913,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(5,10]": {
+            "count": 560,
+            "finite_mae": 56.814552307128906,
+            "finite_bias": 56.37333297729492,
+            "predicted_mean": 64.44119262695312,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.5629255022321429,
+            "low_output_derivative_fraction": 0.5629324776785715,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(10,20]": {
+            "count": 1531,
+            "finite_mae": 63.00857925415039,
+            "finite_bias": 59.66847229003906,
+            "predicted_mean": 75.57441711425781,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.5724684642390594,
+            "low_output_derivative_fraction": 0.572499081482691,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(20,40]": {
+            "count": 3256,
+            "finite_mae": 67.03192138671875,
+            "finite_bias": 56.34185028076172,
+            "predicted_mean": 85.91525268554688,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.562585179284398,
+            "low_output_derivative_fraction": 0.5626115728654791,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(40,80]": {
+            "count": 2005,
+            "finite_mae": 79.4810791015625,
+            "finite_bias": 51.70888137817383,
+            "predicted_mean": 104.99466705322266,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.5214288497506234,
+            "low_output_derivative_fraction": 0.5214795043640897,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(80,160]": {
+            "count": 119,
+            "finite_mae": 73.29647064208984,
+            "finite_bias": 45.184539794921875,
+            "predicted_mean": 136.26016235351562,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.36465992647058826,
+            "low_output_derivative_fraction": 0.3647584033613445,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "proven_unreachable": {
+            "count": 3072,
+            "finite_mae": null,
+            "finite_bias": null,
+            "predicted_mean": 176.6607208251953,
+            "positive_finite_predicted_zero_fraction": null,
+            "boundary_fraction": 0.5886497497558594,
+            "low_output_derivative_fraction": 0.5886815388997396,
+            "outside_sigmoid_range_fraction": 0.0
+          }
+        }
+      },
+      "unreachable": {
+        "proven_unreachable": 3072,
+        "finite": 8192,
+        "unknown": 0,
+        "auroc": 0.7919766505559286,
+        "validation_threshold": 79.59747314453125,
+        "recall": 0.7574869791666666,
+        "finite_false_positive": 0.347900390625,
+        "recall_at_training_proxy": 0.4326171875,
+        "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+      },
+      "planning": {
+        "q": {
+          "count": 1024,
+          "solved": 67,
+          "success_rate": 0.0654296875,
+          "optimal": 66,
+          "optimal_rate": 0.064453125,
+          "cycles": 957,
+          "entered_unreachable": 196,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.029850746268656716,
+          "mean_cost_ratio_on_success": 1.007462686567164,
+          "predicted_progress": {
+            "counts": {
+              "executed_edges": 4250,
+              "predicted_decrease": 2876,
+              "predicted_plateau": 80,
+              "predicted_increase": 1294,
+              "true_finite_edges": 3347,
+              "true_optimal_edges": 1952,
+              "predicted_decrease_but_not_true_optimal": 1533,
+              "entered_dead_edges": 196,
+              "non_goal_predicted_zero": 0
+            },
+            "strict_descent_trajectory_count": 54,
+            "strict_descent_success_count": 54,
+            "non_descent_trajectory_count": 970,
+            "predicted_drop_quantiles": {
+              "0": -229.72787475585938,
+              "0.1": -2.801903438568114,
+              "0.5": 0.716705322265625,
+              "0.9": 21.82300109863281,
+              "1": 229.9557647705078
+            },
+            "mean_abs_unit_descent_residual": 9.785755626397973,
+            "executed_edge_optimal_rate": 0.4592941176470588,
+            "predicted_strict_descent_edge_rate": 0.6767058823529412,
+            "note": "Observed policy trajectories only, after action selection. A nondecreasing chosen edge also means no legal successor has a strictly lower predicted distance under this greedy policy. Strict predicted descent alone does not prove goal completion or true optimality; full rollouts remain the acceptance metric."
+          }
+        },
+        "oracle": {
+          "count": 1024,
+          "solved": 1024,
+          "success_rate": 1.0,
+          "optimal": 1024,
+          "optimal_rate": 1.0,
+          "cycles": 0,
+          "entered_unreachable": 0,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0,
+          "predicted_progress": null
+        },
+        "heuristic": {
+          "count": 1024,
+          "solved": 75,
+          "success_rate": 0.0732421875,
+          "optimal": 75,
+          "optimal_rate": 0.0732421875,
+          "cycles": 949,
+          "entered_unreachable": 186,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0,
+          "predicted_progress": null
+        },
+        "immediate_cost_only": {
+          "count": 1024,
+          "solved": 13,
+          "success_rate": 0.0126953125,
+          "optimal": 13,
+          "optimal_rate": 0.0126953125,
+          "cycles": 1011,
+          "entered_unreachable": 181,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0,
+          "predicted_progress": null
+        }
+      }
+    },
+    "original_layout_test": {
+      "count": 320,
+      "finite_count": 302,
+      "finite_mae": 65.23487854003906,
+      "finite_bias": 50.20105743408203,
+      "shortest_action_rate": 0.4337748344370861,
+      "bellman": {
+        "mae": 36.13869094848633,
+        "upper_violation_rate": 0.49337748344370863
+      },
+      "coordinate_statistics": {
+        "output_activation": "sigmoid",
+        "coordinate_divisor_for_diagnostics_only": 256,
+        "labels": "physical unit-cost steps, without normalization or inverse normalization",
+        "boundary_tolerance_relative_to_cap": 0.0001,
+        "derivative_tolerance_relative_to_cap": 0.0001,
+        "all": {
+          "count": 320,
+          "finite_mae": 65.23487854003906,
+          "finite_bias": 50.20105743408203,
+          "predicted_mean": 102.71417236328125,
+          "positive_finite_predicted_zero_fraction": 0.0,
+          "boundary_fraction": 0.5328369140625,
+          "low_output_derivative_fraction": 0.53284912109375,
+          "outside_sigmoid_range_fraction": 0.0
+        },
+        "by_true_distance": {
+          "(20,40]": {
+            "count": 37,
+            "finite_mae": 65.8202896118164,
+            "finite_bias": 65.17868041992188,
+            "predicted_mean": 102.90840911865234,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.5040118243243243,
+            "low_output_derivative_fraction": 0.5040118243243243,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(40,80]": {
+            "count": 260,
+            "finite_mae": 65.08899688720703,
+            "finite_bias": 47.71794128417969,
+            "predicted_mean": 101.36026000976562,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.5404146634615384,
+            "low_output_derivative_fraction": 0.5404296875,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(80,160]": {
+            "count": 5,
+            "finite_mae": 68.48858642578125,
+            "finite_bias": 68.48858642578125,
+            "predicted_mean": 150.68858337402344,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.44453125,
+            "low_output_derivative_fraction": 0.44453125,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "proven_unreachable": {
+            "count": 18,
+            "finite_mae": null,
+            "finite_bias": null,
+            "predicted_mean": 108.54528045654297,
+            "positive_finite_predicted_zero_fraction": null,
+            "boundary_fraction": 0.5071614583333334,
+            "low_output_derivative_fraction": 0.5071614583333334,
+            "outside_sigmoid_range_fraction": 0.0
+          }
+        }
+      },
+      "unreachable": {
+        "proven_unreachable": 18,
+        "finite": 302,
+        "unknown": 0,
+        "auroc": 0.5291574687270052,
+        "validation_threshold": 79.59747314453125,
+        "recall": 0.5555555555555556,
+        "finite_false_positive": 0.5463576158940397,
+        "recall_at_training_proxy": 0.05555555555555555,
+        "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+      },
+      "planning": {
+        "q": {
+          "count": 302,
+          "solved": 0,
+          "success_rate": 0.0,
+          "optimal": 0,
+          "optimal_rate": 0.0,
+          "cycles": 302,
+          "entered_unreachable": 119,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": null,
+          "mean_cost_ratio_on_success": null,
+          "predicted_progress": {
+            "counts": {
+              "executed_edges": 1240,
+              "predicted_decrease": 764,
+              "predicted_plateau": 0,
+              "predicted_increase": 476,
+              "true_finite_edges": 793,
+              "true_optimal_edges": 451,
+              "predicted_decrease_but_not_true_optimal": 521,
+              "entered_dead_edges": 119,
+              "non_goal_predicted_zero": 0
+            },
+            "strict_descent_trajectory_count": 0,
+            "strict_descent_success_count": 0,
+            "non_descent_trajectory_count": 302,
+            "predicted_drop_quantiles": {
+              "0": -92.54569244384766,
+              "0.1": -22.96626281738281,
+              "0.5": 0.53741455078125,
+              "0.9": 57.781822204589844,
+              "1": 163.97361755371094
+            },
+            "mean_abs_unit_descent_residual": 19.62536249622222,
+            "executed_edge_optimal_rate": 0.36370967741935484,
+            "predicted_strict_descent_edge_rate": 0.6161290322580645,
+            "note": "Observed policy trajectories only, after action selection. A nondecreasing chosen edge also means no legal successor has a strictly lower predicted distance under this greedy policy. Strict predicted descent alone does not prove goal completion or true optimality; full rollouts remain the acceptance metric."
+          }
+        },
+        "oracle": {
+          "count": 302,
+          "solved": 302,
+          "success_rate": 1.0,
+          "optimal": 302,
+          "optimal_rate": 1.0,
+          "cycles": 0,
+          "entered_unreachable": 0,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0,
+          "predicted_progress": null
+        },
+        "heuristic": {
+          "count": 302,
+          "solved": 0,
+          "success_rate": 0.0,
+          "optimal": 0,
+          "optimal_rate": 0.0,
+          "cycles": 302,
+          "entered_unreachable": 125,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": null,
+          "mean_cost_ratio_on_success": null,
+          "predicted_progress": null
+        },
+        "immediate_cost_only": {
+          "count": 302,
+          "solved": 0,
+          "success_rate": 0.0,
+          "optimal": 0,
+          "optimal_rate": 0.0,
+          "cycles": 302,
+          "entered_unreachable": 27,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": null,
+          "mean_cost_ratio_on_success": null,
+          "predicted_progress": null
+        }
+      }
+    },
+    "original_layout_validation": {
+      "count": 308,
+      "finite_count": 278,
+      "finite_mae": 61.32136535644531,
+      "finite_bias": 32.85847473144531,
+      "shortest_action_rate": 0.8884892086330936,
+      "bellman": {
+        "mae": 10.809991836547852,
+        "upper_violation_rate": 0.30935251798561153
+      },
+      "coordinate_statistics": {
+        "output_activation": "sigmoid",
+        "coordinate_divisor_for_diagnostics_only": 256,
+        "labels": "physical unit-cost steps, without normalization or inverse normalization",
+        "boundary_tolerance_relative_to_cap": 0.0001,
+        "derivative_tolerance_relative_to_cap": 0.0001,
+        "all": {
+          "count": 308,
+          "finite_mae": 61.32136535644531,
+          "finite_bias": 32.85847473144531,
+          "predicted_mean": 86.67095947265625,
+          "positive_finite_predicted_zero_fraction": 0.0,
+          "boundary_fraction": 0.5567040381493507,
+          "low_output_derivative_fraction": 0.5567040381493507,
+          "outside_sigmoid_range_fraction": 0.0
+        },
+        "by_true_distance": {
+          "(20,40]": {
+            "count": 77,
+            "finite_mae": 65.11896514892578,
+            "finite_bias": 58.290870666503906,
+            "predicted_mean": 92.40775299072266,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.5474330357142857,
+            "low_output_derivative_fraction": 0.5474330357142857,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(40,80]": {
+            "count": 201,
+            "finite_mae": 59.8665771484375,
+            "finite_bias": 23.11571502685547,
+            "predicted_mean": 78.12567138671875,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.5594488495024875,
+            "low_output_derivative_fraction": 0.5594488495024875,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "proven_unreachable": {
+            "count": 30,
+            "finite_mae": null,
+            "finite_bias": null,
+            "predicted_mean": 129.2000274658203,
+            "positive_finite_predicted_zero_fraction": null,
+            "boundary_fraction": 0.562109375,
+            "low_output_derivative_fraction": 0.562109375,
+            "outside_sigmoid_range_fraction": 0.0
+          }
+        }
+      },
+      "unreachable": {
+        "proven_unreachable": 30,
+        "finite": 278,
+        "unknown": 0,
+        "auroc": 0.6139088729016786,
+        "validation_threshold": 79.59747314453125,
+        "recall": 0.6,
+        "finite_false_positive": 0.3345323741007194,
+        "recall_at_training_proxy": 0.3,
+        "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+      },
+      "planning": {
+        "q": {
+          "count": 278,
+          "solved": 0,
+          "success_rate": 0.0,
+          "optimal": 0,
+          "optimal_rate": 0.0,
+          "cycles": 278,
+          "entered_unreachable": 70,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": null,
+          "mean_cost_ratio_on_success": null,
+          "predicted_progress": {
+            "counts": {
+              "executed_edges": 1318,
+              "predicted_decrease": 883,
+              "predicted_plateau": 0,
+              "predicted_increase": 435,
+              "true_finite_edges": 1002,
+              "true_optimal_edges": 616,
+              "predicted_decrease_but_not_true_optimal": 547,
+              "entered_dead_edges": 70,
+              "non_goal_predicted_zero": 0
+            },
+            "strict_descent_trajectory_count": 0,
+            "strict_descent_success_count": 0,
+            "non_descent_trajectory_count": 278,
+            "predicted_drop_quantiles": {
+              "0": -100.9434814453125,
+              "0.1": -4.433724498748777,
+              "0.5": 0.9593276977539062,
+              "0.9": 14.4608154296875,
+              "1": 87.01943969726562
+            },
+            "mean_abs_unit_descent_residual": 7.641571805039378,
+            "executed_edge_optimal_rate": 0.4673748103186646,
+            "predicted_strict_descent_edge_rate": 0.6699544764795144,
+            "note": "Observed policy trajectories only, after action selection. A nondecreasing chosen edge also means no legal successor has a strictly lower predicted distance under this greedy policy. Strict predicted descent alone does not prove goal completion or true optimality; full rollouts remain the acceptance metric."
+          }
+        },
+        "oracle": {
+          "count": 278,
+          "solved": 278,
+          "success_rate": 1.0,
+          "optimal": 278,
+          "optimal_rate": 1.0,
+          "cycles": 0,
+          "entered_unreachable": 0,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0,
+          "predicted_progress": null
+        },
+        "heuristic": {
+          "count": 278,
+          "solved": 0,
+          "success_rate": 0.0,
+          "optimal": 0,
+          "optimal_rate": 0.0,
+          "cycles": 278,
+          "entered_unreachable": 117,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": null,
+          "mean_cost_ratio_on_success": null,
+          "predicted_progress": null
+        },
+        "immediate_cost_only": {
+          "count": 278,
+          "solved": 0,
+          "success_rate": 0.0,
+          "optimal": 0,
+          "optimal_rate": 0.0,
+          "cycles": 278,
+          "entered_unreachable": 53,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": null,
+          "mean_cost_ratio_on_success": null,
+          "predicted_progress": null
+        }
+      }
+    },
+    "diagnostic": {
+      "count": 1408,
+      "finite_count": 1024,
+      "finite_mae": 72.127685546875,
+      "finite_bias": 55.718021392822266,
+      "shortest_action_rate": 0.5680705190989226,
+      "bellman": {
+        "mae": 7.410423278808594,
+        "upper_violation_rate": 0.40646425073457393
+      },
+      "coordinate_statistics": {
+        "output_activation": "sigmoid",
+        "coordinate_divisor_for_diagnostics_only": 256,
+        "labels": "physical unit-cost steps, without normalization or inverse normalization",
+        "boundary_tolerance_relative_to_cap": 0.0001,
+        "derivative_tolerance_relative_to_cap": 0.0001,
+        "all": {
+          "count": 1408,
+          "finite_mae": 72.127685546875,
+          "finite_bias": 55.718021392822266,
+          "predicted_mean": 115.76846313476562,
+          "positive_finite_predicted_zero_fraction": 0.0,
+          "boundary_fraction": 0.46024669300426135,
+          "low_output_derivative_fraction": 0.46024669300426135,
+          "outside_sigmoid_range_fraction": 0.0
+        },
+        "by_true_distance": {
+          "(-1,0]": {
+            "count": 3,
+            "finite_mae": 0.0,
+            "finite_bias": 0.0,
+            "predicted_mean": 0.0,
+            "positive_finite_predicted_zero_fraction": null,
+            "boundary_fraction": 0.3333333333333333,
+            "low_output_derivative_fraction": 0.3333333333333333,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(0,1]": {
+            "count": 9,
+            "finite_mae": 19.4549503326416,
+            "finite_bias": 19.4549503326416,
+            "predicted_mean": 20.45494842529297,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.4296875,
+            "low_output_derivative_fraction": 0.4296875,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(1,2]": {
+            "count": 7,
+            "finite_mae": 54.79627227783203,
+            "finite_bias": 54.79627227783203,
+            "predicted_mean": 56.79627227783203,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.5267857142857143,
+            "low_output_derivative_fraction": 0.5267857142857143,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(2,5]": {
+            "count": 30,
+            "finite_mae": 65.11067962646484,
+            "finite_bias": 65.08714294433594,
+            "predicted_mean": 68.82047271728516,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.4236979166666667,
+            "low_output_derivative_fraction": 0.4236979166666667,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(5,10]": {
+            "count": 57,
+            "finite_mae": 66.5863037109375,
+            "finite_bias": 66.25772857666016,
+            "predicted_mean": 74.5208969116211,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.40515350877192985,
+            "low_output_derivative_fraction": 0.40515350877192985,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(10,20]": {
+            "count": 138,
+            "finite_mae": 83.36302947998047,
+            "finite_bias": 81.4017105102539,
+            "predicted_mean": 97.14083099365234,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.458786231884058,
+            "low_output_derivative_fraction": 0.458786231884058,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(20,40]": {
+            "count": 503,
+            "finite_mae": 78.75604248046875,
+            "finite_bias": 65.38472747802734,
+            "predicted_mean": 96.69884490966797,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.42915165258449306,
+            "low_output_derivative_fraction": 0.42915165258449306,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(40,80]": {
+            "count": 256,
+            "finite_mae": 59.87548828125,
+            "finite_bias": 21.642593383789062,
+            "predicted_mean": 75.05665588378906,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.4205169677734375,
+            "low_output_derivative_fraction": 0.4205169677734375,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "(80,160]": {
+            "count": 21,
+            "finite_mae": 52.610565185546875,
+            "finite_bias": 52.610565185546875,
+            "predicted_mean": 136.61056518554688,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.5829613095238095,
+            "low_output_derivative_fraction": 0.5829613095238095,
+            "outside_sigmoid_range_fraction": 0.0
+          },
+          "proven_unreachable": {
+            "count": 384,
+            "finite_mae": null,
+            "finite_bias": null,
+            "predicted_mean": 187.4472198486328,
+            "positive_finite_predicted_zero_fraction": null,
+            "boundary_fraction": 0.532806396484375,
+            "low_output_derivative_fraction": 0.532806396484375,
+            "outside_sigmoid_range_fraction": 0.0
+          }
+        }
+      },
+      "unreachable": {
+        "proven_unreachable": 384,
+        "finite": 1024,
+        "unknown": 0,
+        "auroc": 0.8277206420898438,
+        "validation_threshold": 79.59747314453125,
+        "recall": 0.9036458333333334,
+        "finite_false_positive": 0.4609375,
+        "recall_at_training_proxy": 0.23697916666666666,
+        "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+      },
+      "planning": {
+        "q": {
+          "count": 1021,
+          "solved": 27,
+          "success_rate": 0.02644466209598433,
+          "optimal": 26,
+          "optimal_rate": 0.025465230166503428,
+          "cycles": 994,
+          "entered_unreachable": 177,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.07407407407407407,
+          "mean_cost_ratio_on_success": 1.0185185185185186,
+          "predicted_progress": {
+            "counts": {
+              "executed_edges": 4139,
+              "predicted_decrease": 2657,
+              "predicted_plateau": 257,
+              "predicted_increase": 1225,
+              "true_finite_edges": 3396,
+              "true_optimal_edges": 1899,
+              "predicted_decrease_but_not_true_optimal": 1447,
+              "entered_dead_edges": 177,
+              "non_goal_predicted_zero": 0
+            },
+            "strict_descent_trajectory_count": 23,
+            "strict_descent_success_count": 23,
+            "non_descent_trajectory_count": 998,
+            "predicted_drop_quantiles": {
+              "0": -104.14834594726562,
+              "0.1": -1.493675994873047,
+              "0.5": 0.1652984619140625,
+              "0.9": 12.454097747802734,
+              "1": 218.73838806152344
+            },
+            "mean_abs_unit_descent_residual": 6.862316196913533,
+            "executed_edge_optimal_rate": 0.4588064749939599,
+            "predicted_strict_descent_edge_rate": 0.6419424981879681,
+            "note": "Observed policy trajectories only, after action selection. A nondecreasing chosen edge also means no legal successor has a strictly lower predicted distance under this greedy policy. Strict predicted descent alone does not prove goal completion or true optimality; full rollouts remain the acceptance metric."
+          }
+        },
+        "oracle": {
+          "count": 1021,
+          "solved": 1021,
+          "success_rate": 1.0,
+          "optimal": 1021,
+          "optimal_rate": 1.0,
+          "cycles": 0,
+          "entered_unreachable": 0,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0,
+          "predicted_progress": null
+        },
+        "heuristic": {
+          "count": 1021,
+          "solved": 28,
+          "success_rate": 0.02742409402546523,
+          "optimal": 28,
+          "optimal_rate": 0.02742409402546523,
+          "cycles": 993,
+          "entered_unreachable": 191,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0,
+          "predicted_progress": null
+        },
+        "immediate_cost_only": {
+          "count": 1021,
+          "solved": 2,
+          "success_rate": 0.0019588638589618022,
+          "optimal": 2,
+          "optimal_rate": 0.0019588638589618022,
+          "cycles": 1019,
+          "entered_unreachable": 195,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0,
+          "predicted_progress": null
+        }
+      }
+    },
+    "diagnostic_original": {
+      "count": 2,
+      "finite_count": 2,
+      "finite_mae": 27.436119079589844,
+      "finite_bias": 4.022941589355469,
+      "shortest_action_rate": 0.0,
+      "bellman": {
+        "mae": 0.6981582641601562,
+        "upper_violation_rate": 0.0
+      },
+      "coordinate_statistics": {
+        "output_activation": "sigmoid",
+        "coordinate_divisor_for_diagnostics_only": 256,
+        "labels": "physical unit-cost steps, without normalization or inverse normalization",
+        "boundary_tolerance_relative_to_cap": 0.0001,
+        "derivative_tolerance_relative_to_cap": 0.0001,
+        "all": {
+          "count": 2,
+          "finite_mae": 27.436119079589844,
+          "finite_bias": 4.022941589355469,
+          "predicted_mean": 66.02294158935547,
+          "positive_finite_predicted_zero_fraction": 0.0,
+          "boundary_fraction": 0.44140625,
+          "low_output_derivative_fraction": 0.44140625,
+          "outside_sigmoid_range_fraction": 0.0
+        },
+        "by_true_distance": {
+          "(40,80]": {
+            "count": 2,
+            "finite_mae": 27.436119079589844,
+            "finite_bias": 4.022941589355469,
+            "predicted_mean": 66.02294158935547,
+            "positive_finite_predicted_zero_fraction": 0.0,
+            "boundary_fraction": 0.44140625,
+            "low_output_derivative_fraction": 0.44140625,
+            "outside_sigmoid_range_fraction": 0.0
+          }
+        }
+      },
+      "unreachable": {
+        "proven_unreachable": 0,
+        "finite": 2,
+        "unknown": 0,
+        "auroc": null,
+        "validation_threshold": 79.59747314453125,
+        "recall": null,
+        "finite_false_positive": 0.5,
+        "recall_at_training_proxy": null,
+        "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+      },
+      "planning": {
+        "q": {
+          "count": 2,
+          "solved": 0,
+          "success_rate": 0.0,
+          "optimal": 0,
+          "optimal_rate": 0.0,
+          "cycles": 2,
+          "entered_unreachable": 1,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": null,
+          "mean_cost_ratio_on_success": null,
+          "predicted_progress": {
+            "counts": {
+              "executed_edges": 6,
+              "predicted_decrease": 3,
+              "predicted_plateau": 0,
+              "predicted_increase": 3,
+              "true_finite_edges": 3,
+              "true_optimal_edges": 1,
+              "predicted_decrease_but_not_true_optimal": 3,
+              "entered_dead_edges": 1,
+              "non_goal_predicted_zero": 0
+            },
+            "strict_descent_trajectory_count": 0,
+            "strict_descent_success_count": 0,
+            "non_descent_trajectory_count": 2,
+            "predicted_drop_quantiles": {
+              "0": -0.72845458984375,
+              "0.1": -0.5586090087890625,
+              "0.5": 0.0017852783203125,
+              "0.9": 0.5586090087890625,
+              "1": 0.72845458984375
+            },
+            "mean_abs_unit_descent_residual": 0.9994049072265625,
+            "executed_edge_optimal_rate": 0.16666666666666666,
+            "predicted_strict_descent_edge_rate": 0.5,
+            "note": "Observed policy trajectories only, after action selection. A nondecreasing chosen edge also means no legal successor has a strictly lower predicted distance under this greedy policy. Strict predicted descent alone does not prove goal completion or true optimality; full rollouts remain the acceptance metric."
+          }
+        },
+        "oracle": {
+          "count": 2,
+          "solved": 2,
+          "success_rate": 1.0,
+          "optimal": 2,
+          "optimal_rate": 1.0,
+          "cycles": 0,
+          "entered_unreachable": 0,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0,
+          "predicted_progress": null
+        },
+        "heuristic": {
+          "count": 2,
+          "solved": 0,
+          "success_rate": 0.0,
+          "optimal": 0,
+          "optimal_rate": 0.0,
+          "cycles": 2,
+          "entered_unreachable": 1,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": null,
+          "mean_cost_ratio_on_success": null,
+          "predicted_progress": null
+        },
+        "immediate_cost_only": {
+          "count": 2,
+          "solved": 0,
+          "success_rate": 0.0,
+          "optimal": 0,
+          "optimal_rate": 0.0,
+          "cycles": 2,
+          "entered_unreachable": 0,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": null,
+          "mean_cost_ratio_on_success": null,
+          "predicted_progress": null
+        }
+      }
+    }
+  },
+  "actual_training_stream": {
+    "actual_batches": 60000,
+    "first_step": 1,
+    "last_step": 60000,
+    "attempts": [
+      "attempt_000"
+    ],
+    "per_batch_csv": "runs\\new_tasks_qmap\\exact_pairs\\sokoban_balanced_actual_batch_statistics.csv.gz",
+    "totals": {
+      "point_rows": 122880000,
+      "point_finite": 93159104,
+      "point_infinite": 29720896,
+      "rank_rows": 61440000,
+      "legal_candidates": 165886770,
+      "candidate_finite": 134002980,
+      "candidate_infinite": 31883790,
+      "boundary_decisions": 30720000,
+      "optimal_candidates": 68164967,
+      "rows_without_optimal": 0,
+      "point_distance_0_0": 136,
+      "point_distance_1_1": 11522727,
+      "point_distance_2_2": 11522819,
+      "point_distance_3_5": 11524852,
+      "point_distance_6_10": 11539625,
+      "point_distance_11_20": 11727876,
+      "point_distance_21_40": 12094959,
+      "point_distance_41_80": 11704913,
+      "point_distance_81_inf": 11521197,
+      "rank_distance_0_0": 0,
+      "rank_distance_1_1": 7681688,
+      "rank_distance_2_2": 7682782,
+      "rank_distance_3_5": 7677690,
+      "rank_distance_6_10": 7676969,
+      "rank_distance_11_20": 7676750,
+      "rank_distance_21_40": 7682732,
+      "rank_distance_41_80": 7680161,
+      "rank_distance_81_inf": 7681228
+    },
+    "point_finite_fraction": 0.7581307291666667,
+    "boundary_decision_fraction": 0.5,
+    "unique_ranking_source_goal_pairs": 7128101,
+    "eligible_ranking_source_goal_pairs": 9566449,
+    "ranking_relation_coverage": 0.7451146188099681,
+    "all_actual_point_and_child_labels_equal_physical_oracle": true,
+    "all_legal_candidates_preserved": true,
+    "per_batch_fractions": {
+      "point_finite": {
+        "mean": 0.7581307291666667,
+        "quantiles": {
+          "0": 0.75146484375,
+          "0.1": 0.755859375,
+          "0.5": 0.7578125,
+          "0.9": 0.7607421875,
+          "1": 0.76708984375
+        }
+      },
+      "boundary_decisions": {
+        "mean": 0.5,
+        "quantiles": {
+          "0": 0.5,
+          "0.1": 0.5,
+          "0.5": 0.5,
+          "0.9": 0.5,
+          "1": 0.5
+        }
+      },
+      "candidate_infinite": {
+        "mean": 0.1922140393514156,
+        "quantiles": {
+          "0": 0.18408134642356241,
+          "0.1": 0.1894927536231884,
+          "0.5": 0.19218241042345277,
+          "0.9": 0.1949616648411829,
+          "1": 0.2011173184357542
+        }
+      }
+    },
+    "note": "Each CSV row is one saved actual optimizer batch. Repeated steps across attempts are retained explicitly. No historical per-step gradient was recorded or reconstructed here."
+  },
+  "frozen_gradient_probe": {
+    "checkpoint_step": 35000,
+    "actual_batches": [
+      {
+        "attempt": "attempt_000",
+        "batch_step": 34993,
+        "point_count": 2048,
+        "finite_count": 1554,
+        "components": {
+          "finite_point": {
+            "weighted_loss": 1.0755962133407593,
+            "gradient_l2": 18.716285705566406,
+            "cosine_to_total": 0.49487540508409206,
+            "projection_on_total": 0.30108556103723594
+          },
+          "unreachable_point": {
+            "weighted_loss": 1.293797492980957,
+            "gradient_l2": 26.982454299926758,
+            "cosine_to_total": 0.790662273396133,
+            "projection_on_total": 0.69350062928177
+          },
+          "ranking": {
+            "weighted_loss": 0.584781289100647,
+            "gradient_l2": 2.323118209838867,
+            "cosine_to_total": 0.07169051308650382,
+            "projection_on_total": 0.005413864602871413
+          }
+        },
+        "total_gradient_l2": 30.762781975673338,
+        "component_cosines": {
+          "finite_point:unreachable_point": -0.1355038583278656,
+          "finite_point:ranking": 0.07042969763278961,
+          "unreachable_point:ranking": -0.053216248750686646
+        },
+        "point_huber_abs_derivative_mean": {
+          "finite": 0.7079495191574097,
+          "unreachable": 0.8325740098953247
+        },
+        "positive_finite_predicted_zero_fraction": 0.0
+      },
+      {
+        "attempt": "attempt_000",
+        "batch_step": 34994,
+        "point_count": 2048,
+        "finite_count": 1552,
+        "components": {
+          "finite_point": {
+            "weighted_loss": 0.9861676692962646,
+            "gradient_l2": 19.248233795166016,
+            "cosine_to_total": 0.593572525285967,
+            "projection_on_total": 0.40836839345771686
+          },
+          "unreachable_point": {
+            "weighted_loss": 2.0856964588165283,
+            "gradient_l2": 24.2197265625,
+            "cosine_to_total": 0.6643808237170055,
+            "projection_on_total": 0.5751402612908467
+          },
+          "ranking": {
+            "weighted_loss": 0.6671665906906128,
+            "gradient_l2": 5.609331130981445,
+            "cosine_to_total": 0.08225403410649158,
+            "projection_on_total": 0.016491331849496547
+          }
+        },
+        "total_gradient_l2": 27.977735114004044,
+        "component_cosines": {
+          "finite_point:unreachable_point": -0.18093019723892212,
+          "finite_point:ranking": 0.31030312180519104,
+          "unreachable_point:ranking": -0.3831949532032013
+        },
+        "point_huber_abs_derivative_mean": {
+          "finite": 0.6954471468925476,
+          "unreachable": 0.8158214688301086
+        },
+        "positive_finite_predicted_zero_fraction": 0.0
+      },
+      {
+        "attempt": "attempt_000",
+        "batch_step": 34995,
+        "point_count": 2048,
+        "finite_count": 1546,
+        "components": {
+          "finite_point": {
+            "weighted_loss": 0.989447832107544,
+            "gradient_l2": 16.720056533813477,
+            "cosine_to_total": 0.6095616757577016,
+            "projection_on_total": 0.3618357130405576
+          },
+          "unreachable_point": {
+            "weighted_loss": 1.1680943965911865,
+            "gradient_l2": 21.16381072998047,
+            "cosine_to_total": 0.6544718679204213,
+            "projection_on_total": 0.4917460564855375
+          },
+          "ranking": {
+            "weighted_loss": 0.6154255867004395,
+            "gradient_l2": 10.116751670837402,
+            "cosine_to_total": 0.40766009541276604,
+            "projection_on_total": 0.14641828817092598
+          }
+        },
+        "total_gradient_l2": 28.167218746515648,
+        "component_cosines": {
+          "finite_point:unreachable_point": -0.09052209556102753,
+          "finite_point:ranking": 0.23380637168884277,
+          "unreachable_point:ranking": -0.12018024176359177
+        },
+        "point_huber_abs_derivative_mean": {
+          "finite": 0.698901891708374,
+          "unreachable": 0.8243032693862915
+        },
+        "positive_finite_predicted_zero_fraction": 0.0
+      },
+      {
+        "attempt": "attempt_000",
+        "batch_step": 34996,
+        "point_count": 2048,
+        "finite_count": 1555,
+        "components": {
+          "finite_point": {
+            "weighted_loss": 0.9524766206741333,
+            "gradient_l2": 14.277070999145508,
+            "cosine_to_total": 0.4682554719516552,
+            "projection_on_total": 0.2687487196007196
+          },
+          "unreachable_point": {
+            "weighted_loss": 1.6599173545837402,
+            "gradient_l2": 21.895357131958008,
+            "cosine_to_total": 0.7734655888992096,
+            "projection_on_total": 0.6807967183113692
+          },
+          "ranking": {
+            "weighted_loss": 0.6472237706184387,
+            "gradient_l2": 5.231524467468262,
+            "cosine_to_total": 0.23990943745977553,
+            "projection_on_total": 0.05045451277065434
+          }
+        },
+        "total_gradient_l2": 24.87571523586998,
+        "component_cosines": {
+          "finite_point:unreachable_point": -0.159175843000412,
+          "finite_point:ranking": 0.16367846727371216,
+          "unreachable_point:ranking": -0.07309690862894058
+        },
+        "point_huber_abs_derivative_mean": {
+          "finite": 0.7062514424324036,
+          "unreachable": 0.8313496112823486
+        },
+        "positive_finite_predicted_zero_fraction": 0.0
+      },
+      {
+        "attempt": "attempt_000",
+        "batch_step": 34997,
+        "point_count": 2048,
+        "finite_count": 1553,
+        "components": {
+          "finite_point": {
+            "weighted_loss": 1.0526200532913208,
+            "gradient_l2": 18.78288459777832,
+            "cosine_to_total": 0.5661913044333409,
+            "projection_on_total": 0.37440383915329956
+          },
+          "unreachable_point": {
+            "weighted_loss": 1.4215115308761597,
+            "gradient_l2": 24.472949981689453,
+            "cosine_to_total": 0.6542120860430569,
+            "projection_on_total": 0.5636632153060184
+          },
+          "ranking": {
+            "weighted_loss": 0.6065786480903625,
+            "gradient_l2": 7.687631607055664,
+            "cosine_to_total": 0.22883082678580738,
+            "projection_on_total": 0.06193296918134758
+          }
+        },
+        "total_gradient_l2": 28.404372015754458,
+        "component_cosines": {
+          "finite_point:unreachable_point": -0.20205266773700714,
+          "finite_point:ranking": 0.2919187843799591,
+          "unreachable_point:ranking": -0.27258631587028503
+        },
+        "point_huber_abs_derivative_mean": {
+          "finite": 0.7007775902748108,
+          "unreachable": 0.8029134273529053
+        },
+        "positive_finite_predicted_zero_fraction": 0.0
+      },
+      {
+        "attempt": "attempt_000",
+        "batch_step": 34998,
+        "point_count": 2048,
+        "finite_count": 1550,
+        "components": {
+          "finite_point": {
+            "weighted_loss": 1.0625231266021729,
+            "gradient_l2": 20.160058975219727,
+            "cosine_to_total": 0.7286368754669814,
+            "projection_on_total": 0.5112652419142327
+          },
+          "unreachable_point": {
+            "weighted_loss": 1.2648236751556396,
+            "gradient_l2": 18.698101043701172,
+            "cosine_to_total": 0.5598417085082968,
+            "projection_on_total": 0.3643393477322823
+          },
+          "ranking": {
+            "weighted_loss": 0.6974926590919495,
+            "gradient_l2": 8.350401878356934,
+            "cosine_to_total": 0.4280100938578458,
+            "projection_on_total": 0.12439551201800297
+          }
+        },
+        "total_gradient_l2": 28.73139258584371,
+        "component_cosines": {
+          "finite_point:unreachable_point": -0.0878121629357338,
+          "finite_point:ranking": 0.28939089179039,
+          "unreachable_point:ranking": -0.10093508660793304
+        },
+        "point_huber_abs_derivative_mean": {
+          "finite": 0.713211178779602,
+          "unreachable": 0.7903838157653809
+        },
+        "positive_finite_predicted_zero_fraction": 0.0
+      },
+      {
+        "attempt": "attempt_000",
+        "batch_step": 34999,
+        "point_count": 2048,
+        "finite_count": 1547,
+        "components": {
+          "finite_point": {
+            "weighted_loss": 0.9868460893630981,
+            "gradient_l2": 18.973283767700195,
+            "cosine_to_total": 0.67626097320104,
+            "projection_on_total": 0.46105513005187004
+          },
+          "unreachable_point": {
+            "weighted_loss": 1.532041311264038,
+            "gradient_l2": 21.06913185119629,
+            "cosine_to_total": 0.7123908300183706,
+            "projection_on_total": 0.5393379658971138
+          },
+          "ranking": {
+            "weighted_loss": 0.6411082148551941,
+            "gradient_l2": 3.148463726043701,
+            "cosine_to_total": -0.0034746575246190903,
+            "projection_on_total": -0.0003931033372648182
+          }
+        },
+        "total_gradient_l2": 27.829408045239436,
+        "component_cosines": {
+          "finite_point:unreachable_point": -0.023640159517526627,
+          "finite_point:ranking": 0.10946746915578842,
+          "unreachable_point:ranking": -0.252603143453598
+        },
+        "point_huber_abs_derivative_mean": {
+          "finite": 0.68802410364151,
+          "unreachable": 0.8306117057800293
+        },
+        "positive_finite_predicted_zero_fraction": 0.0
+      },
+      {
+        "attempt": "attempt_000",
+        "batch_step": 35000,
+        "point_count": 2048,
+        "finite_count": 1548,
+        "components": {
+          "finite_point": {
+            "weighted_loss": 1.0969021320343018,
+            "gradient_l2": 19.931594848632812,
+            "cosine_to_total": 0.6559268966294703,
+            "projection_on_total": 0.5333046654623994
+          },
+          "unreachable_point": {
+            "weighted_loss": 1.4320920705795288,
+            "gradient_l2": 20.40007972717285,
+            "cosine_to_total": 0.44928537885441683,
+            "projection_on_total": 0.37387983544344167
+          },
+          "ranking": {
+            "weighted_loss": 0.5911782383918762,
+            "gradient_l2": 8.897821426391602,
+            "cosine_to_total": 0.2557164629179616,
+            "projection_on_total": 0.0928154483126209
+          }
+        },
+        "total_gradient_l2": 24.514447370536676,
+        "component_cosines": {
+          "finite_point:unreachable_point": -0.3011060059070587,
+          "finite_point:ranking": 0.25742965936660767,
+          "unreachable_point:ranking": -0.38040030002593994
+        },
+        "point_huber_abs_derivative_mean": {
+          "finite": 0.7169608473777771,
+          "unreachable": 0.7963957190513611
+        },
+        "positive_finite_predicted_zero_fraction": 0.0
+      }
+    ],
+    "note": "Frozen weights on the specified recorded actual batches; no optimizer step. Components use the original full-batch denominator and rank weight. Gradient norms are not additive shares; signed projections onto the total sum to one and may be negative. Historical optimizer-time gradients were not recorded."
+  },
+  "meaning": "From-scratch sampling-distribution control only: same raw exact corpus, held-out queries, model, Sigmoid, physical distance, Huber/soft-rank losses, budget and validation selector as the original Sokoban baseline. Improves within-layout completion, but does not solve unseen layouts."
+}

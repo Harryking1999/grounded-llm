@@ -5,7 +5,7 @@
   "attempts": [
     "attempt_000"
   ],
-  "per_batch_csv": "runs/new_tasks_qmap/exact_pairs/sokoban_actual_batch_statistics.csv.gz",
+  "per_batch_csv": "runs\\new_tasks_qmap\\exact_pairs\\sokoban_actual_batch_statistics_with_initial_labels.csv.gz",
   "totals": {
     "point_rows": 122880000,
     "point_finite": 55497636,
@@ -17,6 +17,14 @@
     "boundary_decisions": 9592544,
     "optimal_candidates": 72550048,
     "rows_without_optimal": 0,
+    "point_initial_row_finite": 62909241,
+    "initial_finite_to_actual_unreachable": 7543569,
+    "initial_unreachable_to_actual_finite": 131964,
+    "point_initial_row_near_1_5": 2653752,
+    "initial_near_to_actual_zero": 70788,
+    "initial_near_to_actual_near_1_5": 1311260,
+    "initial_near_to_actual_far": 999523,
+    "initial_near_to_actual_unreachable": 272181,
     "point_distance_0_0": 75428,
     "point_distance_1_1": 170636,
     "point_distance_2_2": 235152,
@@ -41,6 +49,7 @@
   "unique_ranking_source_goal_pairs": 9425680,
   "eligible_ranking_source_goal_pairs": 9566449,
   "ranking_relation_coverage": 0.9852851355816563,
+  "initial_row_label_comparison": "Initial labels belong to the saved source-row placeholder goals used by the baseline strata, not necessarily to the online-resampled actual goal. These transition counts quantify that mismatch without inferring which source draws came from the broad branch.",
   "all_actual_point_and_child_labels_equal_physical_oracle": true,
   "all_legal_candidates_preserved": true,
   "per_batch_fractions": {
@@ -77,6 +86,6 @@
   },
   "note": "Each CSV row is one saved actual optimizer batch. Repeated steps across attempts are retained explicitly. No historical per-step gradient was recorded or reconstructed here.",
   "training_source_commit": "bffe9d237499e6cf0b0e81ebc0fa95053cc9097d",
-  "diagnostic_source_commit": "2b12147",
+  "diagnostic_source_commit": "43cdb24",
   "config": "experiments/new_tasks_qmap/configs/sokoban_pairs.json"
 }

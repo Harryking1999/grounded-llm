@@ -64,6 +64,7 @@ python -m experiments.new_tasks_qmap.src.relation_diagnose --config experiments/
 python -m experiments.new_tasks_qmap.src.relation_diagnose --config experiments/new_tasks_qmap/configs/sokoban_pairs.json --run runs/new_tasks_pairs/sokoban --out tmp/sokoban_gradient_probe.json --checkpoint runs/new_tasks_pairs/sokoban/best.pt --gradient-batches 8
 python -m experiments.new_tasks_qmap.src.relation_diagnose --config experiments/new_tasks_qmap/configs/token_swapping_pairs.json --run runs/new_tasks_pairs/token_swapping --out tmp/token_linf_witness.json --linf-witness-count 1024
 python -m experiments.new_tasks_qmap.src.relation_diagnose --config experiments/new_tasks_qmap/configs/token_swapping_local_rank4_pairs.json --run runs/new_tasks_pairs/token_local_rank4 --checkpoint runs/new_tasks_pairs/token_local_rank4/best.pt --out tmp/token_near_endpoint_validation.json --near-endpoint-count 1024
+python -m experiments.new_tasks_qmap.src.relation_diagnose --config experiments/new_tasks_qmap/configs/token_swapping_local_rank4_pairs.json --run runs/new_tasks_pairs/token_local_rank4 --checkpoint runs/new_tasks_pairs/token_local_rank4/best.pt --out tmp/token_policy_boundaries.json --policy-boundary-count 1024 --cohorts validation unseen_endpoint_validation unseen_both_validation
 ```
 
 `relation_diagnose`默认用精确距离坐标检查表示能力：当某布局的全部查询目标可放入坐标时，有向max／对称L∞能精确表示到这些目标的距离。这不证明共享MLP已学会地图。目标多于维度时仅检查一组landmark，下界误差不能证明不可表示。这些oracle坐标不用于训练输入、贪心策略或验收成绩。
@@ -74,7 +75,9 @@ python -m experiments.new_tasks_qmap.src.relation_diagnose --config experiments/
 
 `--linf-witness-count`在固定Token精确图上提出直径状态对，并逐项重算全部交叉距离，验证哪些状态对不能共用一个达到其真距离的L∞坐标。正间隙团给出精确嵌入维数下界及一致绝对误差下界；它不证明平均误差下界或80%贪心不可能，也不用于模型推理。见证保留端点ID和证明，不依赖学习器权重。
 
-`--near-endpoint-count`只生成固定近距验证诊断：真实距离1–5等配额，分别为未见起点、未见目标、两端未见，每对至少一个端点在validation fold，端点不使用test fold。所有模型按同种子重建同一组独特查询，候选仍包含全部合法后继；这不更改主验收题集，也不把诊断题写回训练或原固定关系表。
+`--near-endpoint-count`只生成固定近距验证诊断：真实距离1–5等配额，分别为未见起点、未见目标、两端未见，每对至少一个端点在validation fold，端点不使用test fold。所有模型按同种子重建同一组独特查询，候选仍包含全部合法后继；查询、标签、候选和端点fold保存在旁边的`.queries.npz`。这不更改主验收题集，也不把诊断题写回训练或原固定关系表。
+
+`--policy-boundary-count`只回放指定验证组的冻结贪心，保存每条实际执行边的源／目标、全部合法候选及其预测与真值、所选动作和回环标记，写入`.edges.npz`。汇总分别统计全部访问、首次无严格下降后继、所有非下降访问、闭环动作，并按真实距离分层。分母是实际执行边，同时报告独特状态目标对数量；这些统计不修改动作、剪枝或终止条件，不将验证失败样本加入训练。
 
 三个任务的`grounded_llm/tasks/<task>/qmap.py:MapReader`直接加载冻结权重，接公共CURRENT/GOAL/CANDIDATES结构。环境提供真实后继，地图不因此被解释为学会状态转移。Flash指定目标结果见[15题固定诊断](../task_text_baselines/results/exact_goals_flash64k.json)，历史目标条件结果不混算。
 

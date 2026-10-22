@@ -112,7 +112,7 @@ def unit_cost_consistency(parent,children,optimal,valid):
         note='Reference decisions, not whole trajectories. Unit-cost teacher-optimal edges should have a true remaining-distance drop of1. Candidate order can be correct even when the parent-to-child predicted drop is wrong. No oracle is used to change model action selection.')
 
 
-def rollout(corpus,cache,rows,horizon,policy):
+def rollout(corpus,cache,rows,horizon,policy,edge_records=None):
     current,goal=rows[:,0].copy(),rows[:,1].copy()
     exact=corpus.distance(current,goal)
     if not np.isfinite(exact).all(): raise ValueError('Rollout starts must have exact finite labels')
@@ -163,6 +163,15 @@ def rollout(corpus,cache,rows,horizon,policy):
                 progress_layers[name]['predicted_decrease']+=int((decreasing&mask).sum())
                 progress_layers[name]['entered_dead_edges']+=int((mask&np.isfinite(before_truth)&~np.isfinite(after_truth)).sum())
             for j,margin in zip(ids,drop): descent[j].append(float(margin))
+            if edge_records is not None:
+                child_truth=np.full(children.shape,np.inf,dtype=np.float32)
+                child_truth[valid]=corpus.distance(children[valid],np.broadcast_to(goal[ids,None],children.shape)[valid])
+                edge_records.append(dict(query_index=ids.copy(),step=steps[ids].copy(),
+                    source=current[ids].copy(),goal=goal[ids].copy(),children=children.copy(),choice=choices.copy(),
+                    parent_prediction=before.copy(),child_predictions=scores.copy(),
+                    parent_distance=before_truth.copy(),child_distances=child_truth,
+                    next_is_goal=next_states==goal[ids],
+                    next_repeated=np.asarray([int(s) in seen[j] for j,s in zip(ids,next_states)])))
         for j,slot in zip(ids,choices): traces[j].append(corpus.action(int(current[j]),int(slot)))
         current[ids]=next_states; steps[ids]+=1
         for j in ids:

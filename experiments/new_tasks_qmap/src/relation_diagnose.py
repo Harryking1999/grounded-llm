@@ -47,6 +47,51 @@ def near_endpoint_cases(corpus,partition,seed,count):
     return groups
 
 
+def policy_boundaries(records):
+    """Actual policy occupancy and cycle entrances; labels never select actions."""
+    if not records: return {},{}
+    edges={key:np.concatenate([batch[key] for batch in records]) for key in records[0]}
+    valid=edges['children']>=0; index=np.arange(len(valid)); chosen=edges['choice']
+    truth=edges['parent_distance']; child_truth=edges['child_distances']
+    optimal=valid & np.isfinite(child_truth) & (child_truth+1==truth[:,None])
+    optimal&=np.isfinite(truth)[:,None]
+    score=edges['child_predictions']; predicted=edges['parent_prediction']
+    drop=predicted-score[index,chosen]; selected_optimal=optimal[index,chosen]
+    best_optimal=np.where(optimal,score,np.inf).min(axis=1)
+    best_other=np.where(valid & ~optimal,score,np.inf).min(axis=1)
+    margin=np.full(len(truth),np.nan,dtype=np.float32)
+    np.subtract(best_other,best_optimal,out=margin,where=np.isfinite(best_other)&np.isfinite(best_optimal))
+    non_descent=drop<=1e-6
+    first=np.zeros(len(truth),dtype=bool)
+    # Records are generated in execution order, interleaved across queries.
+    _,first_ids=np.unique(edges['query_index'][non_descent],return_index=True)
+    first[np.flatnonzero(non_descent)[first_ids]]=True
+    def quantiles(values):
+        return {str(q):float(np.quantile(values,q)) for q in (0,.1,.5,.9,1)} if len(values) else {}
+    def describe(mask):
+        finite=mask & np.isfinite(truth); comparable=finite & np.isfinite(margin)
+        return dict(executed_edges=int(mask.sum()),
+            unique_state_goal_pairs=len(np.unique(np.column_stack([edges['source'][mask],edges['goal'][mask]]),axis=0)),
+            represented_queries=len(np.unique(edges['query_index'][mask])),
+            true_distance_quantiles=quantiles(truth[finite]),
+            finite_distance_mae=float(np.abs(predicted[finite]-truth[finite]).mean()) if finite.any() else None,
+            true_optimal_action_rate=float(selected_optimal[mask].mean()) if mask.any() else None,
+            predicted_non_descent_rate=float(non_descent[mask].mean()) if mask.any() else None,
+            chosen_predicted_drop_quantiles=quantiles(drop[mask]),
+            comparable_optimal_vs_other_edges=int(comparable.sum()),
+            optimal_prediction_margin_quantiles=quantiles(margin[comparable]),
+            optimal_prediction_margin_nonpositive_rate=float((margin[comparable]<=1e-6).mean()) if comparable.any() else None,
+            optimal_prediction_margin_abs_le_half_rate=float((np.abs(margin[comparable])<=.5).mean()) if comparable.any() else None,
+            entered_proven_unreachable=int((mask & np.isfinite(truth) & ~np.isfinite(child_truth[index,chosen])).sum()))
+    from .relation_evaluate import distance_strata
+    subsets=dict(all_executed=np.ones(len(truth),dtype=bool),first_non_descent=first,
+        all_non_descent=non_descent,cycle_closing=edges['next_repeated'] & ~edges['next_is_goal'])
+    result={name:dict(**describe(mask),by_true_distance={layer:describe(mask & layer_mask)
+        for layer,layer_mask in distance_strata(truth) if (mask & layer_mask).any()}) for name,mask in subsets.items()}
+    result['interpretation']='Execution-weighted records include repeated visits across queries; unique pair counts are also reported. First non-descent is the first visited state with no strictly lower predicted legal successor. A cycle-closing action is inspected after selection. Positive optimal-vs-other margin favors the best teacher-optimal child; ties depend on the unchanged candidate order. No evaluation record is added to training.'
+    return result,edges
+
+
 def pair_incompatibility_gaps(corpus,rows):
     """Positive gap means two undirected pairs cannot share a tight Linf axis."""
     a,b=rows[:,0],rows[:,1]; length=corpus.distance(a,b)
@@ -367,8 +412,34 @@ def main():
     parser.add_argument('--gradient-batches',type=int,default=0)
     parser.add_argument('--linf-witness-count',type=int,default=0)
     parser.add_argument('--near-endpoint-count',type=int,default=0)
+    parser.add_argument('--policy-boundary-count',type=int,default=0)
     args=parser.parse_args(); config=json.loads(args.config.read_text())
+    if args.out.exists(): raise FileExistsError('Keep previous diagnostics; choose a new output')
     corpus,data,_=load(config,args.run/'data')
+    if args.policy_boundary_count:
+        if args.policy_boundary_count<1 or not args.checkpoint: raise ValueError('Positive query count and checkpoint required')
+        if any('validation' not in name for name in args.cohorts): raise ValueError('Policy diagnosis uses validation cohorts only')
+        import torch
+        from grounded_llm.core.qmap.model import StateEncoder
+        from .relation_evaluate import QCache,planning_ids,rollout
+        torch.set_num_threads(config['training']['cpu_threads'])
+        saved=torch.load(args.checkpoint,map_location='cpu',weights_only=False)
+        if saved['config']!=config: raise ValueError('Policy diagnostic checkpoint configuration mismatch')
+        model=StateEncoder(input_dim=corpus.input_dim,**config['model']); model.load_state_dict(saved['model']); model.requires_grad_(False); model.eval()
+        cache=QCache(model,corpus,'cpu'); groups={}; archive={}
+        for name in args.cohorts:
+            rows=data['tasks_'+name]; truth=corpus.distance(rows[:,0],rows[:,1])
+            rows=rows[planning_ids(corpus,rows,truth,args.policy_boundary_count,np.random.default_rng(config['seed']+len(name)))]
+            records=[]; metrics=rollout(corpus,cache,rows,config['evaluation']['horizon'],'q',edge_records=records)
+            summary,edges=policy_boundaries(records)
+            groups[name]=dict(planning=metrics,boundaries=summary)
+            archive['queries_'+name]=rows
+            archive.update({key+'_'+name:value for key,value in edges.items()})
+        target=args.out.with_suffix('.edges.npz'); temporary=target.with_suffix('.tmp'); target.parent.mkdir(parents=True,exist_ok=True)
+        with temporary.open('wb') as stream: np.savez_compressed(stream,**archive)
+        temporary.replace(target)
+        atomic_json(args.out,dict(checkpoint_step=saved['step'],training_source_commit=saved['source_commit'],
+            planning_protocol='unique_ordered_state_goal_pairs_v2',edges_archive=str(target),cohorts=groups)); return
     if args.near_endpoint_count:
         if config['task']!='token_swapping' or not args.checkpoint: raise ValueError('Token checkpoint required for near endpoint diagnosis')
         import torch
@@ -381,9 +452,15 @@ def main():
         partition=np.load(args.run/'data'/'endpoint_partition.npy')
         groups=near_endpoint_cases(corpus,partition,config['seed'],args.near_endpoint_count)
         diagnostic={key+'_'+name:value for name,rows in groups.items() for key,value in materialize(corpus,rows).items()}
+        queries=args.out.with_suffix('.queries.npz'); temporary=queries.with_suffix('.tmp')
+        queries.parent.mkdir(parents=True,exist_ok=True)
+        with temporary.open('wb') as stream:
+            np.savez_compressed(stream,**diagnostic,**{'endpoint_folds_'+name:partition[rows] for name,rows in groups.items()})
+        temporary.replace(queries)
         model=StateEncoder(input_dim=corpus.input_dim,**config['model']); model.load_state_dict(saved['model']); model.requires_grad_(False)
         metrics=evaluate(model,corpus,diagnostic,config,cohorts=list(groups),exposure=saved['exposure'])
         atomic_json(args.out,dict(checkpoint_step=saved['step'],training_source_commit=saved['source_commit'],seed=config['seed']+1009,
+            queries_archive=str(queries),
             condition='Validation-only near endpoints: exact distances1-5 with equal quotas; same deterministic cases for every model. At least one endpoint is validation fold, none is test fold. Full legal successors remain available, as in the original endpoint cohorts. Not a replacement acceptance set or training supervision.',
             cases={name:dict(count=len(rows),unique_pairs=len(np.unique(rows,axis=0)),
                 by_true_distance={str(d):int((diagnostic['distances_'+name]==d).sum()) for d in range(1,6)}) for name,rows in groups.items()},

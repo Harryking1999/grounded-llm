@@ -38,7 +38,7 @@
   },
   "models": {
     "token_swapping": {
-      "raw_result": "runs\\new_tasks_qmap\\exact_pairs\\token_swapping_near_endpoint_validation.json",
+      "raw_result": "runs\\new_tasks_qmap\\exact_pairs\\token_swapping_near_endpoint_validation_archived.json",
       "checkpoint_step": 60000,
       "training_source_commit": "bffe9d237499e6cf0b0e81ebc0fa95053cc9097d",
       "cohorts": {
@@ -426,10 +426,11 @@
             "mean_cost_ratio_on_success": 1.0598513011152415
           }
         }
-      }
+      },
+      "queries_archive": "runs\\new_tasks_qmap\\exact_pairs\\token_swapping_near_endpoint_validation_archived.queries.npz"
     },
     "token_local_goals": {
-      "raw_result": "runs\\new_tasks_qmap\\exact_pairs\\token_local_goals_near_endpoint_validation.json",
+      "raw_result": "runs\\new_tasks_qmap\\exact_pairs\\token_local_goals_near_endpoint_validation_archived.json",
       "checkpoint_step": 10000,
       "training_source_commit": "ed462d4b75e6a493fb89a89475055d0f74d57c05",
       "cohorts": {
@@ -817,10 +818,11 @@
             "mean_cost_ratio_on_success": 1.041144708423326
           }
         }
-      }
+      },
+      "queries_archive": "runs\\new_tasks_qmap\\exact_pairs\\token_local_goals_near_endpoint_validation_archived.queries.npz"
     },
     "token_local_rank4": {
-      "raw_result": "runs\\new_tasks_qmap\\exact_pairs\\token_local_rank4_near_endpoint_validation.json",
+      "raw_result": "runs\\new_tasks_qmap\\exact_pairs\\token_local_rank4_near_endpoint_validation_archived.json",
       "checkpoint_step": 30000,
       "training_source_commit": "5ac758f",
       "cohorts": {
@@ -1208,10 +1210,11 @@
             "mean_cost_ratio_on_success": 1.0271129141311697
           }
         }
-      }
+      },
+      "queries_archive": "runs\\new_tasks_qmap\\exact_pairs\\token_local_rank4_near_endpoint_validation_archived.queries.npz"
     },
     "token_grouped_l1": {
-      "raw_result": "runs\\new_tasks_qmap\\exact_pairs\\token_grouped_l1_near_endpoint_validation.json",
+      "raw_result": "runs\\new_tasks_qmap\\exact_pairs\\token_grouped_l1_near_endpoint_validation_archived.json",
       "checkpoint_step": 55000,
       "training_source_commit": "4b72240",
       "cohorts": {
@@ -1599,8 +1602,60 @@
             "mean_cost_ratio_on_success": 1.009821767159651
           }
         }
-      }
+      },
+      "queries_archive": "runs\\new_tasks_qmap\\exact_pairs\\token_grouped_l1_near_endpoint_validation_archived.queries.npz"
     }
   },
-  "interpretation": "Validation-only diagnostic, not a replacement acceptance set. Rank4 succeeds on about96% of random exact1-5-step queries but only about63-66% of the original complete long-query evaluation. Uniform shortage of near queries alone does not explain the remaining failures; actual policy occupancy and difficult local minima need separate checks. Short-walk training control is a hypothesis under test."
+  "interpretation": "Validation-only diagnostic, not a replacement acceptance set. Rank4 succeeds on about96% of random exact1-5-step queries but only about63-66% of the original complete long-query evaluation. Uniform shortage of near queries alone does not explain the remaining failures; actual policy occupancy and difficult local minima need separate checks. Short-walk training control is a hypothesis under test.",
+  "frozen_evaluator_source_commit": "290cc8c",
+  "archived_queries_identical_across_models": true,
+  "short_walk_control_early_sampling": {
+    "scope": "Actual steps2-101 only; verifies sampling, not completed training quality",
+    "comparisons": {
+      "token_local_rank4": {
+        "raw_samples": "/tmp/grounded_pairs_20f45f4/runs/token_local_rank4/samples/attempt_000/00001.npz",
+        "first_step": 2,
+        "last_step": 101,
+        "point_rows": 204800,
+        "ranking_rows": 102400,
+        "point_identity_fraction": 0.0235302734375,
+        "point_positive1_5_fraction": 0.1859716796875,
+        "rank_positive1_5_fraction": 0.19216796875,
+        "rank_identity_fraction": 0.0,
+        "per_batch_positive1_5_fraction_quantiles": {
+          "0": 0.158203125,
+          "0.1": 0.1748046875,
+          "0.5": 0.18603515625,
+          "0.9": 0.19677734375,
+          "1": 0.20947265625
+        },
+        "actual_labels_equal_oracle": true,
+        "all_legal_candidates_preserved": true,
+        "all_loss_endpoints_in_training_fold": true,
+        "held_relation_closure_excluded": true
+      },
+      "token_local_walk8_rank4": {
+        "raw_samples": "/tmp/grounded_pairs_20f45f4/runs/token_local_walk8_rank4/samples/attempt_000/00001.npz",
+        "first_step": 2,
+        "last_step": 101,
+        "point_rows": 204800,
+        "ranking_rows": 102400,
+        "point_identity_fraction": 0.068486328125,
+        "point_positive1_5_fraction": 0.3456494140625,
+        "rank_positive1_5_fraction": 0.38107421875,
+        "rank_identity_fraction": 0.0,
+        "per_batch_positive1_5_fraction_quantiles": {
+          "0": 0.318359375,
+          "0.1": 0.332958984375,
+          "0.5": 0.344970703125,
+          "0.9": 0.360888671875,
+          "1": 0.36962890625
+        },
+        "actual_labels_equal_oracle": true,
+        "all_legal_candidates_preserved": true,
+        "all_loss_endpoints_in_training_fold": true,
+        "held_relation_closure_excluded": true
+      }
+    }
+  }
 }

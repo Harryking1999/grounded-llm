@@ -1,0 +1,3352 @@
+{
+  "checkpoint_step": 35000,
+  "training_source_commit": "437779b",
+  "planning_protocol": "unique_ordered_state_goal_pairs_v2",
+  "edges_archive": "runs\\new_tasks_qmap\\exact_pairs\\sokoban_balanced_relations_policy_boundaries_validation.edges.npz",
+  "cohorts": {
+    "validation": {
+      "planning": {
+        "count": 1024,
+        "unique_state_goal_pairs": 1024,
+        "solved": 374,
+        "success_rate": 0.365234375,
+        "optimal": 355,
+        "optimal_rate": 0.3466796875,
+        "cycles": 650,
+        "entered_unreachable": 14,
+        "no_legal_action": 0,
+        "budget_exhausted": 0,
+        "horizon": 256,
+        "illegal_actions": 0,
+        "mean_excess_cost_on_success": 0.11764705882352941,
+        "mean_cost_ratio_on_success": 1.0113923234676616,
+        "predicted_progress": {
+          "counts": {
+            "executed_edges": 5743,
+            "predicted_decrease": 4577,
+            "predicted_plateau": 0,
+            "predicted_increase": 1166,
+            "true_finite_edges": 5685,
+            "true_optimal_edges": 4726,
+            "predicted_decrease_but_not_true_optimal": 613,
+            "entered_dead_edges": 14,
+            "non_goal_predicted_zero": 0
+          },
+          "strict_descent_trajectory_count": 224,
+          "strict_descent_success_count": 224,
+          "non_descent_trajectory_count": 800,
+          "predicted_drop_quantiles": {
+            "0": -35.930301666259766,
+            "0.1": -0.4214721679687499,
+            "0.5": 0.7785491943359375,
+            "0.9": 2.273454284667969,
+            "1": 213.35275268554688
+          },
+          "mean_abs_unit_descent_residual": 1.0710308718262038,
+          "executed_edge_optimal_rate": 0.8229148528643566,
+          "predicted_strict_descent_edge_rate": 0.7969702246212781,
+          "executed_edges_by_true_distance": {
+            "1_1": {
+              "executed_edges": 374,
+              "true_optimal_edges": 374,
+              "predicted_decrease": 374,
+              "entered_dead_edges": 0
+            },
+            "2_2": {
+              "executed_edges": 358,
+              "true_optimal_edges": 327,
+              "predicted_decrease": 307,
+              "entered_dead_edges": 0
+            },
+            "3_5": {
+              "executed_edges": 1078,
+              "true_optimal_edges": 958,
+              "predicted_decrease": 890,
+              "entered_dead_edges": 2
+            },
+            "6_10": {
+              "executed_edges": 1525,
+              "true_optimal_edges": 1300,
+              "predicted_decrease": 1226,
+              "entered_dead_edges": 0
+            },
+            "11_20": {
+              "executed_edges": 2163,
+              "true_optimal_edges": 1632,
+              "predicted_decrease": 1612,
+              "entered_dead_edges": 9
+            },
+            "21_40": {
+              "executed_edges": 201,
+              "true_optimal_edges": 135,
+              "predicted_decrease": 140,
+              "entered_dead_edges": 3
+            },
+            "41_80": {
+              "executed_edges": 0,
+              "true_optimal_edges": 0,
+              "predicted_decrease": 0,
+              "entered_dead_edges": 0
+            },
+            "81_inf": {
+              "executed_edges": 0,
+              "true_optimal_edges": 0,
+              "predicted_decrease": 0,
+              "entered_dead_edges": 0
+            },
+            "proven_unreachable": {
+              "executed_edges": 44,
+              "true_optimal_edges": 0,
+              "predicted_decrease": 28,
+              "entered_dead_edges": 0
+            }
+          },
+          "note": "Observed policy trajectories only, after action selection. A nondecreasing chosen edge also means no legal successor has a strictly lower predicted distance under this greedy policy. Strict predicted descent alone does not prove goal completion or true optimality; full rollouts remain the acceptance metric."
+        }
+      },
+      "boundaries": {
+        "all_executed": {
+          "executed_edges": 5743,
+          "unique_state_goal_pairs": 5443,
+          "represented_queries": 1024,
+          "true_distance_quantiles": {
+            "0": 1.0,
+            "0.1": 2.0,
+            "0.5": 9.0,
+            "0.9": 17.0,
+            "1": 33.0
+          },
+          "finite_distance_mae": 2.0061094760894775,
+          "true_optimal_action_rate": 0.8229148528643566,
+          "predicted_non_descent_rate": 0.2030297753787219,
+          "chosen_predicted_drop_quantiles": {
+            "0": -35.930301666259766,
+            "0.1": -0.4214721620082855,
+            "0.5": 0.7785491943359375,
+            "0.9": 2.273454189300537,
+            "1": 213.35275268554688
+          },
+          "comparable_optimal_vs_other_edges": 5421,
+          "optimal_prediction_margin_quantiles": {
+            "0": -130.95196533203125,
+            "0.1": -0.6049041748046875,
+            "0.5": 1.3018646240234375,
+            "0.9": 3.2822952270507812,
+            "1": 241.17356872558594
+          },
+          "optimal_prediction_margin_nonpositive_rate": 0.1794871794871795,
+          "optimal_prediction_margin_abs_le_half_rate": 0.16749677181331857,
+          "entered_proven_unreachable": 14,
+          "by_true_distance": {
+            "1_1": {
+              "executed_edges": 374,
+              "unique_state_goal_pairs": 305,
+              "represented_queries": 374,
+              "true_distance_quantiles": {
+                "0": 1.0,
+                "0.1": 1.0,
+                "0.5": 1.0,
+                "0.9": 1.0,
+                "1": 1.0
+              },
+              "finite_distance_mae": 0.9053092002868652,
+              "true_optimal_action_rate": 1.0,
+              "predicted_non_descent_rate": 0.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": 0.7258243560791016,
+                "0.1": 1.1375519037246704,
+                "0.5": 1.6050710678100586,
+                "0.9": 2.706110715866089,
+                "1": 18.647653579711914
+              },
+              "comparable_optimal_vs_other_edges": 372,
+              "optimal_prediction_margin_quantiles": {
+                "0": 0.7620086669921875,
+                "0.1": 1.544077754020691,
+                "0.5": 2.2040815353393555,
+                "0.9": 3.1557159423828125,
+                "1": 241.17356872558594
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.0,
+              "optimal_prediction_margin_abs_le_half_rate": 0.0,
+              "entered_proven_unreachable": 0
+            },
+            "2_2": {
+              "executed_edges": 358,
+              "unique_state_goal_pairs": 309,
+              "represented_queries": 357,
+              "true_distance_quantiles": {
+                "0": 2.0,
+                "0.1": 2.0,
+                "0.5": 2.0,
+                "0.9": 2.0,
+                "1": 2.0
+              },
+              "finite_distance_mae": 0.7554164528846741,
+              "true_optimal_action_rate": 0.9134078212290503,
+              "predicted_non_descent_rate": 0.1424581005586592,
+              "chosen_predicted_drop_quantiles": {
+                "0": -2.5008163452148438,
+                "0.1": -0.16199034452438354,
+                "0.5": 0.739314079284668,
+                "0.9": 1.4464420080184937,
+                "1": 8.726692199707031
+              },
+              "comparable_optimal_vs_other_edges": 340,
+              "optimal_prediction_margin_quantiles": {
+                "0": -7.072872161865234,
+                "0.1": 0.10495306551456451,
+                "0.5": 1.337374210357666,
+                "0.9": 2.4930787086486816,
+                "1": 240.1998291015625
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.09117647058823529,
+              "optimal_prediction_margin_abs_le_half_rate": 0.10882352941176471,
+              "entered_proven_unreachable": 0
+            },
+            "3_5": {
+              "executed_edges": 1078,
+              "unique_state_goal_pairs": 967,
+              "represented_queries": 409,
+              "true_distance_quantiles": {
+                "0": 3.0,
+                "0.1": 3.0,
+                "0.5": 4.0,
+                "0.9": 5.0,
+                "1": 5.0
+              },
+              "finite_distance_mae": 1.2210055589675903,
+              "true_optimal_action_rate": 0.8886827458256029,
+              "predicted_non_descent_rate": 0.17439703153988867,
+              "chosen_predicted_drop_quantiles": {
+                "0": -3.6948184967041016,
+                "0.1": -0.3033526539802551,
+                "0.5": 0.7297134399414062,
+                "0.9": 1.7614171504974365,
+                "1": 213.35275268554688
+              },
+              "comparable_optimal_vs_other_edges": 1044,
+              "optimal_prediction_margin_quantiles": {
+                "0": -10.263996124267578,
+                "0.1": -0.14915569126605988,
+                "0.5": 1.30401611328125,
+                "0.9": 2.5817785263061523,
+                "1": 240.81356811523438
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.11494252873563218,
+              "optimal_prediction_margin_abs_le_half_rate": 0.1475095785440613,
+              "entered_proven_unreachable": 2
+            },
+            "6_10": {
+              "executed_edges": 1525,
+              "unique_state_goal_pairs": 1475,
+              "represented_queries": 447,
+              "true_distance_quantiles": {
+                "0": 6.0,
+                "0.1": 6.0,
+                "0.5": 8.0,
+                "0.9": 10.0,
+                "1": 10.0
+              },
+              "finite_distance_mae": 1.3893253803253174,
+              "true_optimal_action_rate": 0.8524590163934426,
+              "predicted_non_descent_rate": 0.1960655737704918,
+              "chosen_predicted_drop_quantiles": {
+                "0": -3.2345104217529297,
+                "0.1": -0.37416380643844604,
+                "0.5": 0.7676544189453125,
+                "0.9": 2.3391780853271484,
+                "1": 21.126888275146484
+              },
+              "comparable_optimal_vs_other_edges": 1466,
+              "optimal_prediction_margin_quantiles": {
+                "0": -24.82398223876953,
+                "0.1": -0.32775115966796875,
+                "0.5": 1.2995872497558594,
+                "0.9": 3.1589584350585938,
+                "1": 238.95933532714844
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.1534788540245566,
+              "optimal_prediction_margin_abs_le_half_rate": 0.18417462482946795,
+              "entered_proven_unreachable": 0
+            },
+            "11_20": {
+              "executed_edges": 2163,
+              "unique_state_goal_pairs": 2147,
+              "represented_queries": 526,
+              "true_distance_quantiles": {
+                "0": 11.0,
+                "0.1": 11.0,
+                "0.5": 14.0,
+                "0.9": 18.0,
+                "1": 20.0
+              },
+              "finite_distance_mae": 2.9925708770751953,
+              "true_optimal_action_rate": 0.7545076282940361,
+              "predicted_non_descent_rate": 0.2547387887193712,
+              "chosen_predicted_drop_quantiles": {
+                "0": -35.930301666259766,
+                "0.1": -0.5977951288223267,
+                "0.5": 0.6157073974609375,
+                "0.9": 2.535592555999756,
+                "1": 96.32675170898438
+              },
+              "comparable_optimal_vs_other_edges": 2023,
+              "optimal_prediction_margin_quantiles": {
+                "0": -72.4845199584961,
+                "0.1": -1.139825463294983,
+                "0.5": 0.9749908447265625,
+                "0.9": 4.237123966217041,
+                "1": 236.5550079345703
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.2624814631735047,
+              "optimal_prediction_margin_abs_le_half_rate": 0.20217498764211567,
+              "entered_proven_unreachable": 9
+            },
+            "21_40": {
+              "executed_edges": 201,
+              "unique_state_goal_pairs": 201,
+              "represented_queries": 75,
+              "true_distance_quantiles": {
+                "0": 21.0,
+                "0.1": 21.0,
+                "0.5": 22.0,
+                "0.9": 26.0,
+                "1": 33.0
+              },
+              "finite_distance_mae": 4.556702613830566,
+              "true_optimal_action_rate": 0.6716417910447762,
+              "predicted_non_descent_rate": 0.3034825870646766,
+              "chosen_predicted_drop_quantiles": {
+                "0": -5.691192626953125,
+                "0.1": -0.8610076904296875,
+                "0.5": 0.666351318359375,
+                "0.9": 3.1156005859375,
+                "1": 16.51836395263672
+              },
+              "comparable_optimal_vs_other_edges": 176,
+              "optimal_prediction_margin_quantiles": {
+                "0": -130.95196533203125,
+                "0.1": -2.0096282958984375,
+                "0.5": 0.63043212890625,
+                "0.9": 6.4013519287109375,
+                "1": 227.5183563232422
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.375,
+              "optimal_prediction_margin_abs_le_half_rate": 0.2159090909090909,
+              "entered_proven_unreachable": 3
+            },
+            "proven_unreachable": {
+              "executed_edges": 44,
+              "unique_state_goal_pairs": 39,
+              "represented_queries": 14,
+              "true_distance_quantiles": {},
+              "finite_distance_mae": null,
+              "true_optimal_action_rate": 0.0,
+              "predicted_non_descent_rate": 0.36363636363636365,
+              "chosen_predicted_drop_quantiles": {
+                "0": -8.092767715454102,
+                "0.1": -1.2921316623687744,
+                "0.5": 0.2155904769897461,
+                "0.9": 1.6198049783706665,
+                "1": 8.092767715454102
+              },
+              "comparable_optimal_vs_other_edges": 0,
+              "optimal_prediction_margin_quantiles": {},
+              "optimal_prediction_margin_nonpositive_rate": null,
+              "optimal_prediction_margin_abs_le_half_rate": null,
+              "entered_proven_unreachable": 0
+            }
+          }
+        },
+        "first_non_descent": {
+          "executed_edges": 800,
+          "unique_state_goal_pairs": 780,
+          "represented_queries": 800,
+          "true_distance_quantiles": {
+            "0": 2.0,
+            "0.1": 4.0,
+            "0.5": 12.0,
+            "0.9": 19.0,
+            "1": 29.0
+          },
+          "finite_distance_mae": 2.472029685974121,
+          "true_optimal_action_rate": 0.66125,
+          "predicted_non_descent_rate": 1.0,
+          "chosen_predicted_drop_quantiles": {
+            "0": -35.930301666259766,
+            "0.1": -1.2442408800125122,
+            "0.5": -0.39771270751953125,
+            "0.9": -0.06921136379241943,
+            "1": -0.00030517578125
+          },
+          "comparable_optimal_vs_other_edges": 729,
+          "optimal_prediction_margin_quantiles": {
+            "0": -130.95196533203125,
+            "0.1": -1.0092192888259888,
+            "0.5": 0.33135986328125,
+            "0.9": 2.0410892963409424,
+            "1": 236.5550079345703
+          },
+          "optimal_prediction_margin_nonpositive_rate": 0.35939643347050754,
+          "optimal_prediction_margin_abs_le_half_rate": 0.37585733882030176,
+          "entered_proven_unreachable": 1,
+          "by_true_distance": {
+            "2_2": {
+              "executed_edges": 32,
+              "unique_state_goal_pairs": 30,
+              "represented_queries": 32,
+              "true_distance_quantiles": {
+                "0": 2.0,
+                "0.1": 2.0,
+                "0.5": 2.0,
+                "0.9": 2.0,
+                "1": 2.0
+              },
+              "finite_distance_mae": 0.5450195074081421,
+              "true_optimal_action_rate": 0.71875,
+              "predicted_non_descent_rate": 1.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": -1.431295394897461,
+                "0.1": -1.0405478477478027,
+                "0.5": -0.30458736419677734,
+                "0.9": -0.04040031507611275,
+                "1": -0.028900146484375
+              },
+              "comparable_optimal_vs_other_edges": 24,
+              "optimal_prediction_margin_quantiles": {
+                "0": -6.215686798095703,
+                "0.1": -2.595085620880127,
+                "0.5": 0.2657794952392578,
+                "0.9": 1.0393511056900024,
+                "1": 215.57476806640625
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.375,
+              "optimal_prediction_margin_abs_le_half_rate": 0.5416666666666666,
+              "entered_proven_unreachable": 0
+            },
+            "3_5": {
+              "executed_edges": 112,
+              "unique_state_goal_pairs": 102,
+              "represented_queries": 112,
+              "true_distance_quantiles": {
+                "0": 3.0,
+                "0.1": 3.0,
+                "0.5": 4.0,
+                "0.9": 5.0,
+                "1": 5.0
+              },
+              "finite_distance_mae": 0.9084717035293579,
+              "true_optimal_action_rate": 0.7410714285714286,
+              "predicted_non_descent_rate": 1.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": -3.6948184967041016,
+                "0.1": -0.9066985845565796,
+                "0.5": -0.3607358932495117,
+                "0.9": -0.08670102059841156,
+                "1": -0.011749267578125
+              },
+              "comparable_optimal_vs_other_edges": 108,
+              "optimal_prediction_margin_quantiles": {
+                "0": -8.347095489501953,
+                "0.1": -0.5117431879043579,
+                "0.5": 0.5118160247802734,
+                "0.9": 1.4964884519577026,
+                "1": 233.01620483398438
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.26851851851851855,
+              "optimal_prediction_margin_abs_le_half_rate": 0.37037037037037035,
+              "entered_proven_unreachable": 0
+            },
+            "6_10": {
+              "executed_edges": 198,
+              "unique_state_goal_pairs": 194,
+              "represented_queries": 198,
+              "true_distance_quantiles": {
+                "0": 6.0,
+                "0.1": 6.0,
+                "0.5": 8.0,
+                "0.9": 10.0,
+                "1": 10.0
+              },
+              "finite_distance_mae": 1.7865173816680908,
+              "true_optimal_action_rate": 0.6616161616161617,
+              "predicted_non_descent_rate": 1.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": -3.2345104217529297,
+                "0.1": -1.1030395030975342,
+                "0.5": -0.36162567138671875,
+                "0.9": -0.0511062853038311,
+                "1": -0.00543212890625
+              },
+              "comparable_optimal_vs_other_edges": 188,
+              "optimal_prediction_margin_quantiles": {
+                "0": -21.517093658447266,
+                "0.1": -0.6258441805839539,
+                "0.5": 0.29163360595703125,
+                "0.9": 1.8455307483673096,
+                "1": 234.17391967773438
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.35638297872340424,
+              "optimal_prediction_margin_abs_le_half_rate": 0.44148936170212766,
+              "entered_proven_unreachable": 0
+            },
+            "11_20": {
+              "executed_edges": 408,
+              "unique_state_goal_pairs": 404,
+              "represented_queries": 408,
+              "true_distance_quantiles": {
+                "0": 11.0,
+                "0.1": 11.0,
+                "0.5": 15.0,
+                "0.9": 19.0,
+                "1": 20.0
+              },
+              "finite_distance_mae": 3.2244112491607666,
+              "true_optimal_action_rate": 0.6519607843137255,
+              "predicted_non_descent_rate": 1.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": -35.930301666259766,
+                "0.1": -1.4482804536819458,
+                "0.5": -0.4266376495361328,
+                "0.9": -0.07820969074964523,
+                "1": -0.00030517578125
+              },
+              "comparable_optimal_vs_other_edges": 374,
+              "optimal_prediction_margin_quantiles": {
+                "0": -55.782928466796875,
+                "0.1": -1.2128633260726929,
+                "0.5": 0.32900238037109375,
+                "0.9": 2.5824499130249023,
+                "1": 236.5550079345703
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.37967914438502676,
+              "optimal_prediction_margin_abs_le_half_rate": 0.33689839572192515,
+              "entered_proven_unreachable": 0
+            },
+            "21_40": {
+              "executed_edges": 41,
+              "unique_state_goal_pairs": 41,
+              "represented_queries": 41,
+              "true_distance_quantiles": {
+                "0": 21.0,
+                "0.1": 21.0,
+                "0.5": 23.0,
+                "0.9": 26.0,
+                "1": 29.0
+              },
+              "finite_distance_mae": 4.070625305175781,
+              "true_optimal_action_rate": 0.6341463414634146,
+              "predicted_non_descent_rate": 1.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": -2.0805816650390625,
+                "0.1": -1.1920700073242188,
+                "0.5": -0.4248199462890625,
+                "0.9": -0.148895263671875,
+                "1": -0.003215789794921875
+              },
+              "comparable_optimal_vs_other_edges": 35,
+              "optimal_prediction_margin_quantiles": {
+                "0": -130.95196533203125,
+                "0.1": -1.6120071411132812,
+                "0.5": 0.2776336669921875,
+                "0.9": 2.0950913429260254,
+                "1": 211.47718811035156
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.42857142857142855,
+              "optimal_prediction_margin_abs_le_half_rate": 0.34285714285714286,
+              "entered_proven_unreachable": 1
+            },
+            "proven_unreachable": {
+              "executed_edges": 9,
+              "unique_state_goal_pairs": 9,
+              "represented_queries": 9,
+              "true_distance_quantiles": {},
+              "finite_distance_mae": null,
+              "true_optimal_action_rate": 0.0,
+              "predicted_non_descent_rate": 1.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": -1.65509033203125,
+                "0.1": -1.64306640625,
+                "0.5": -0.8500442504882812,
+                "0.9": -0.07611046731472015,
+                "1": -0.0226593017578125
+              },
+              "comparable_optimal_vs_other_edges": 0,
+              "optimal_prediction_margin_quantiles": {},
+              "optimal_prediction_margin_nonpositive_rate": null,
+              "optimal_prediction_margin_abs_le_half_rate": null,
+              "entered_proven_unreachable": 0
+            }
+          }
+        },
+        "all_non_descent": {
+          "executed_edges": 1166,
+          "unique_state_goal_pairs": 1111,
+          "represented_queries": 800,
+          "true_distance_quantiles": {
+            "0": 2.0,
+            "0.1": 4.0,
+            "0.5": 11.0,
+            "0.9": 19.0,
+            "1": 33.0
+          },
+          "finite_distance_mae": 2.449218988418579,
+          "true_optimal_action_rate": 0.6535162950257289,
+          "predicted_non_descent_rate": 1.0,
+          "chosen_predicted_drop_quantiles": {
+            "0": -35.930301666259766,
+            "0.1": -1.2971439361572266,
+            "0.5": -0.4131326675415039,
+            "0.9": -0.0817255973815918,
+            "1": -0.00030517578125
+          },
+          "comparable_optimal_vs_other_edges": 1060,
+          "optimal_prediction_margin_quantiles": {
+            "0": -130.95196533203125,
+            "0.1": -1.1222807168960571,
+            "0.5": 0.31469154357910156,
+            "0.9": 2.067871570587158,
+            "1": 236.5550079345703
+          },
+          "optimal_prediction_margin_nonpositive_rate": 0.3660377358490566,
+          "optimal_prediction_margin_abs_le_half_rate": 0.3660377358490566,
+          "entered_proven_unreachable": 1,
+          "by_true_distance": {
+            "2_2": {
+              "executed_edges": 51,
+              "unique_state_goal_pairs": 46,
+              "represented_queries": 50,
+              "true_distance_quantiles": {
+                "0": 2.0,
+                "0.1": 2.0,
+                "0.5": 2.0,
+                "0.9": 2.0,
+                "1": 2.0
+              },
+              "finite_distance_mae": 0.5437732934951782,
+              "true_optimal_action_rate": 0.5882352941176471,
+              "predicted_non_descent_rate": 1.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": -2.5008163452148438,
+                "0.1": -1.1161117553710938,
+                "0.5": -0.44012451171875,
+                "0.9": -0.0399932861328125,
+                "1": -0.021810531616210938
+              },
+              "comparable_optimal_vs_other_edges": 42,
+              "optimal_prediction_margin_quantiles": {
+                "0": -6.215686798095703,
+                "0.1": -2.66937255859375,
+                "0.5": 0.023595809936523438,
+                "0.9": 1.1337110996246338,
+                "1": 215.57476806640625
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.5,
+              "optimal_prediction_margin_abs_le_half_rate": 0.4523809523809524,
+              "entered_proven_unreachable": 0
+            },
+            "3_5": {
+              "executed_edges": 188,
+              "unique_state_goal_pairs": 160,
+              "represented_queries": 167,
+              "true_distance_quantiles": {
+                "0": 3.0,
+                "0.1": 3.0,
+                "0.5": 4.0,
+                "0.9": 5.0,
+                "1": 5.0
+              },
+              "finite_distance_mae": 0.8471711277961731,
+              "true_optimal_action_rate": 0.6648936170212766,
+              "predicted_non_descent_rate": 1.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": -3.6948184967041016,
+                "0.1": -0.9133887887001038,
+                "0.5": -0.3606395721435547,
+                "0.9": -0.11742229014635086,
+                "1": -0.0057373046875
+              },
+              "comparable_optimal_vs_other_edges": 181,
+              "optimal_prediction_margin_quantiles": {
+                "0": -8.347095489501953,
+                "0.1": -1.2233772277832031,
+                "0.5": 0.39992809295654297,
+                "0.9": 1.49200439453125,
+                "1": 233.01620483398438
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.34806629834254144,
+              "optimal_prediction_margin_abs_le_half_rate": 0.35359116022099446,
+              "entered_proven_unreachable": 0
+            },
+            "6_10": {
+              "executed_edges": 299,
+              "unique_state_goal_pairs": 288,
+              "represented_queries": 256,
+              "true_distance_quantiles": {
+                "0": 6.0,
+                "0.1": 6.0,
+                "0.5": 8.0,
+                "0.9": 10.0,
+                "1": 10.0
+              },
+              "finite_distance_mae": 1.8035616874694824,
+              "true_optimal_action_rate": 0.6789297658862876,
+              "predicted_non_descent_rate": 1.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": -3.2345104217529297,
+                "0.1": -1.1466217041015625,
+                "0.5": -0.3815622329711914,
+                "0.9": -0.06023258715867996,
+                "1": -0.0012969970703125
+              },
+              "comparable_optimal_vs_other_edges": 282,
+              "optimal_prediction_margin_quantiles": {
+                "0": -24.82398223876953,
+                "0.1": -0.809887707233429,
+                "0.5": 0.3064107894897461,
+                "0.9": 1.7882195711135864,
+                "1": 234.17391967773438
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.3404255319148936,
+              "optimal_prediction_margin_abs_le_half_rate": 0.4078014184397163,
+              "entered_proven_unreachable": 0
+            },
+            "11_20": {
+              "executed_edges": 551,
+              "unique_state_goal_pairs": 541,
+              "represented_queries": 416,
+              "true_distance_quantiles": {
+                "0": 11.0,
+                "0.1": 11.0,
+                "0.5": 15.0,
+                "0.9": 19.0,
+                "1": 20.0
+              },
+              "finite_distance_mae": 3.2671310901641846,
+              "true_optimal_action_rate": 0.6606170598911071,
+              "predicted_non_descent_rate": 1.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": -35.930301666259766,
+                "0.1": -1.5035629272460938,
+                "0.5": -0.4377479553222656,
+                "0.9": -0.0804901123046875,
+                "1": -0.00030517578125
+              },
+              "comparable_optimal_vs_other_edges": 503,
+              "optimal_prediction_margin_quantiles": {
+                "0": -61.07569885253906,
+                "0.1": -1.0954864025115967,
+                "0.5": 0.3148231506347656,
+                "0.9": 2.5445854663848877,
+                "1": 236.5550079345703
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.3717693836978131,
+              "optimal_prediction_margin_abs_le_half_rate": 0.34592445328031807,
+              "entered_proven_unreachable": 0
+            },
+            "21_40": {
+              "executed_edges": 61,
+              "unique_state_goal_pairs": 61,
+              "represented_queries": 48,
+              "true_distance_quantiles": {
+                "0": 21.0,
+                "0.1": 21.0,
+                "0.5": 23.0,
+                "0.9": 26.0,
+                "1": 33.0
+              },
+              "finite_distance_mae": 4.756506443023682,
+              "true_optimal_action_rate": 0.6557377049180327,
+              "predicted_non_descent_rate": 1.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": -5.691192626953125,
+                "0.1": -1.9884033203125,
+                "0.5": -0.570159912109375,
+                "0.9": -0.16986083984375,
+                "1": -0.003215789794921875
+              },
+              "comparable_optimal_vs_other_edges": 52,
+              "optimal_prediction_margin_quantiles": {
+                "0": -130.95196533203125,
+                "0.1": -1.5888183116912842,
+                "0.5": 0.38722991943359375,
+                "0.9": 71.16699981689453,
+                "1": 227.5183563232422
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.40384615384615385,
+              "optimal_prediction_margin_abs_le_half_rate": 0.3076923076923077,
+              "entered_proven_unreachable": 1
+            },
+            "proven_unreachable": {
+              "executed_edges": 16,
+              "unique_state_goal_pairs": 15,
+              "represented_queries": 14,
+              "true_distance_quantiles": {},
+              "finite_distance_mae": null,
+              "true_optimal_action_rate": 0.0,
+              "predicted_non_descent_rate": 1.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": -8.092767715454102,
+                "0.1": -1.6475753784179688,
+                "0.5": -0.3384113311767578,
+                "0.9": -0.08947324752807617,
+                "1": -0.0226593017578125
+              },
+              "comparable_optimal_vs_other_edges": 0,
+              "optimal_prediction_margin_quantiles": {},
+              "optimal_prediction_margin_nonpositive_rate": null,
+              "optimal_prediction_margin_abs_le_half_rate": null,
+              "entered_proven_unreachable": 0
+            }
+          }
+        },
+        "cycle_closing": {
+          "executed_edges": 650,
+          "unique_state_goal_pairs": 623,
+          "represented_queries": 650,
+          "true_distance_quantiles": {
+            "0": 2.0,
+            "0.1": 4.0,
+            "0.5": 12.0,
+            "0.9": 19.0,
+            "1": 32.0
+          },
+          "finite_distance_mae": 2.659301280975342,
+          "true_optimal_action_rate": 0.5538461538461539,
+          "predicted_non_descent_rate": 0.4876923076923077,
+          "chosen_predicted_drop_quantiles": {
+            "0": -8.424507141113281,
+            "0.1": -1.0278297662734985,
+            "0.5": 0.016457080841064453,
+            "0.9": 0.9957809448242188,
+            "1": 8.092767715454102
+          },
+          "comparable_optimal_vs_other_edges": 577,
+          "optimal_prediction_margin_quantiles": {
+            "0": -130.95196533203125,
+            "0.1": -1.4021613597869873,
+            "0.5": 0.0792236328125,
+            "0.9": 2.743171453475952,
+            "1": 234.17391967773438
+          },
+          "optimal_prediction_margin_nonpositive_rate": 0.4783362218370884,
+          "optimal_prediction_margin_abs_le_half_rate": 0.317157712305026,
+          "entered_proven_unreachable": 0,
+          "by_true_distance": {
+            "2_2": {
+              "executed_edges": 18,
+              "unique_state_goal_pairs": 14,
+              "represented_queries": 18,
+              "true_distance_quantiles": {
+                "0": 2.0,
+                "0.1": 2.0,
+                "0.5": 2.0,
+                "0.9": 2.0,
+                "1": 2.0
+              },
+              "finite_distance_mae": 0.6946298480033875,
+              "true_optimal_action_rate": 0.0,
+              "predicted_non_descent_rate": 0.7777777777777778,
+              "chosen_predicted_drop_quantiles": {
+                "0": -1.3760032653808594,
+                "0.1": -1.1916968822479248,
+                "0.5": -0.1896209716796875,
+                "0.9": 0.35352256894111633,
+                "1": 0.9789218902587891
+              },
+              "comparable_optimal_vs_other_edges": 18,
+              "optimal_prediction_margin_quantiles": {
+                "0": -3.6193695068359375,
+                "0.1": -2.954371690750122,
+                "0.5": -0.6207518577575684,
+                "0.9": -0.1571684032678604,
+                "1": -0.05288124084472656
+              },
+              "optimal_prediction_margin_nonpositive_rate": 1.0,
+              "optimal_prediction_margin_abs_le_half_rate": 0.5,
+              "entered_proven_unreachable": 0
+            },
+            "3_5": {
+              "executed_edges": 85,
+              "unique_state_goal_pairs": 72,
+              "represented_queries": 85,
+              "true_distance_quantiles": {
+                "0": 3.0,
+                "0.1": 3.0,
+                "0.5": 4.0,
+                "0.9": 5.0,
+                "1": 5.0
+              },
+              "finite_distance_mae": 0.9577040076255798,
+              "true_optimal_action_rate": 0.5764705882352941,
+              "predicted_non_descent_rate": 0.4470588235294118,
+              "chosen_predicted_drop_quantiles": {
+                "0": -1.83331298828125,
+                "0.1": -0.5851439833641052,
+                "0.5": 0.13001251220703125,
+                "0.9": 0.807580828666687,
+                "1": 3.6948184967041016
+              },
+              "comparable_optimal_vs_other_edges": 80,
+              "optimal_prediction_margin_quantiles": {
+                "0": -7.1447601318359375,
+                "0.1": -1.1373285055160522,
+                "0.5": 0.2369842529296875,
+                "0.9": 2.351930856704712,
+                "1": 233.01620483398438
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.45,
+              "optimal_prediction_margin_abs_le_half_rate": 0.3,
+              "entered_proven_unreachable": 0
+            },
+            "6_10": {
+              "executed_edges": 163,
+              "unique_state_goal_pairs": 158,
+              "represented_queries": 163,
+              "true_distance_quantiles": {
+                "0": 6.0,
+                "0.1": 6.0,
+                "0.5": 8.0,
+                "0.9": 10.0,
+                "1": 10.0
+              },
+              "finite_distance_mae": 1.9545164108276367,
+              "true_optimal_action_rate": 0.5214723926380368,
+              "predicted_non_descent_rate": 0.5214723926380368,
+              "chosen_predicted_drop_quantiles": {
+                "0": -2.5953311920166016,
+                "0.1": -0.8489071130752563,
+                "0.5": -0.0231475830078125,
+                "0.9": 0.9172421097755432,
+                "1": 1.9774093627929688
+              },
+              "comparable_optimal_vs_other_edges": 151,
+              "optimal_prediction_margin_quantiles": {
+                "0": -24.82398223876953,
+                "0.1": -1.1024551391601562,
+                "0.5": -0.0073394775390625,
+                "0.9": 2.03558349609375,
+                "1": 234.17391967773438
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.5165562913907285,
+              "optimal_prediction_margin_abs_le_half_rate": 0.3443708609271523,
+              "entered_proven_unreachable": 0
+            },
+            "11_20": {
+              "executed_edges": 330,
+              "unique_state_goal_pairs": 326,
+              "represented_queries": 330,
+              "true_distance_quantiles": {
+                "0": 11.0,
+                "0.1": 11.0,
+                "0.5": 15.0,
+                "0.9": 19.0,
+                "1": 20.0
+              },
+              "finite_distance_mae": 3.2634077072143555,
+              "true_optimal_action_rate": 0.593939393939394,
+              "predicted_non_descent_rate": 0.4727272727272727,
+              "chosen_predicted_drop_quantiles": {
+                "0": -8.424507141113281,
+                "0.1": -1.1112213134765625,
+                "0.5": 0.025726318359375,
+                "0.9": 1.0271621942520142,
+                "1": 4.900054931640625
+              },
+              "comparable_optimal_vs_other_edges": 298,
+              "optimal_prediction_margin_quantiles": {
+                "0": -8.403644561767578,
+                "0.1": -1.4654710292816162,
+                "0.5": 0.18348264694213867,
+                "0.9": 4.142518043518066,
+                "1": 233.8223876953125
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.44966442953020136,
+              "optimal_prediction_margin_abs_le_half_rate": 0.30201342281879195,
+              "entered_proven_unreachable": 0
+            },
+            "21_40": {
+              "executed_edges": 40,
+              "unique_state_goal_pairs": 40,
+              "represented_queries": 40,
+              "true_distance_quantiles": {
+                "0": 21.0,
+                "0.1": 21.0,
+                "0.5": 23.0,
+                "0.9": 26.0,
+                "1": 32.0
+              },
+              "finite_distance_mae": 5.04741907119751,
+              "true_optimal_action_rate": 0.75,
+              "predicted_non_descent_rate": 0.425,
+              "chosen_predicted_drop_quantiles": {
+                "0": -2.104400634765625,
+                "0.1": -1.2314040660858154,
+                "0.5": 0.19945526123046875,
+                "0.9": 0.9988734722137451,
+                "1": 5.691192626953125
+              },
+              "comparable_optimal_vs_other_edges": 30,
+              "optimal_prediction_margin_quantiles": {
+                "0": -130.95196533203125,
+                "0.1": -3.257200002670288,
+                "0.5": 0.6793365478515625,
+                "0.9": 75.99577331542969,
+                "1": 213.77452087402344
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.3333333333333333,
+              "optimal_prediction_margin_abs_le_half_rate": 0.26666666666666666,
+              "entered_proven_unreachable": 0
+            },
+            "proven_unreachable": {
+              "executed_edges": 14,
+              "unique_state_goal_pairs": 13,
+              "represented_queries": 14,
+              "true_distance_quantiles": {},
+              "finite_distance_mae": null,
+              "true_optimal_action_rate": 0.0,
+              "predicted_non_descent_rate": 0.5,
+              "chosen_predicted_drop_quantiles": {
+                "0": -1.65509033203125,
+                "0.1": -1.481597900390625,
+                "0.5": 0.033406972885131836,
+                "0.9": 1.3307539224624634,
+                "1": 8.092767715454102
+              },
+              "comparable_optimal_vs_other_edges": 0,
+              "optimal_prediction_margin_quantiles": {},
+              "optimal_prediction_margin_nonpositive_rate": null,
+              "optimal_prediction_margin_abs_le_half_rate": null,
+              "entered_proven_unreachable": 0
+            }
+          }
+        },
+        "interpretation": "Execution-weighted records include repeated visits across queries; unique pair counts are also reported. First non-descent is the first visited state with no strictly lower predicted legal successor. A cycle-closing action is inspected after selection. Positive optimal-vs-other margin favors the best teacher-optimal child; ties depend on the unchanged candidate order. No evaluation record is added to training."
+      },
+      "cycle_length_counts": {
+        "2": 650
+      },
+      "cycle_closing_at_distance1_5": 103,
+      "cycle_closing_at_distance_gt5_finite": 533
+    },
+    "unseen_goal_validation": {
+      "planning": {
+        "count": 1024,
+        "unique_state_goal_pairs": 1024,
+        "solved": 184,
+        "success_rate": 0.1796875,
+        "optimal": 170,
+        "optimal_rate": 0.166015625,
+        "cycles": 840,
+        "entered_unreachable": 29,
+        "no_legal_action": 0,
+        "budget_exhausted": 0,
+        "horizon": 256,
+        "illegal_actions": 0,
+        "mean_excess_cost_on_success": 0.16304347826086957,
+        "mean_cost_ratio_on_success": 1.0206300643800643,
+        "predicted_progress": {
+          "counts": {
+            "executed_edges": 5719,
+            "predicted_decrease": 4362,
+            "predicted_plateau": 0,
+            "predicted_increase": 1357,
+            "true_finite_edges": 5585,
+            "true_optimal_edges": 4331,
+            "predicted_decrease_but_not_true_optimal": 859,
+            "entered_dead_edges": 29,
+            "non_goal_predicted_zero": 0
+          },
+          "strict_descent_trajectory_count": 105,
+          "strict_descent_success_count": 105,
+          "non_descent_trajectory_count": 919,
+          "predicted_drop_quantiles": {
+            "0": -37.48509216308594,
+            "0.1": -0.5780242919921874,
+            "0.5": 0.7015380859375,
+            "0.9": 2.4795532226562496,
+            "1": 239.12939453125
+          },
+          "mean_abs_unit_descent_residual": 1.2317927473177963,
+          "executed_edge_optimal_rate": 0.7573002273124673,
+          "predicted_strict_descent_edge_rate": 0.7627207553768142,
+          "executed_edges_by_true_distance": {
+            "1_1": {
+              "executed_edges": 184,
+              "true_optimal_edges": 184,
+              "predicted_decrease": 184,
+              "entered_dead_edges": 0
+            },
+            "2_2": {
+              "executed_edges": 182,
+              "true_optimal_edges": 155,
+              "predicted_decrease": 144,
+              "entered_dead_edges": 0
+            },
+            "3_5": {
+              "executed_edges": 778,
+              "true_optimal_edges": 613,
+              "predicted_decrease": 611,
+              "entered_dead_edges": 0
+            },
+            "6_10": {
+              "executed_edges": 1201,
+              "true_optimal_edges": 1033,
+              "predicted_decrease": 950,
+              "entered_dead_edges": 0
+            },
+            "11_20": {
+              "executed_edges": 2115,
+              "true_optimal_edges": 1572,
+              "predicted_decrease": 1588,
+              "entered_dead_edges": 12
+            },
+            "21_40": {
+              "executed_edges": 1146,
+              "true_optimal_edges": 771,
+              "predicted_decrease": 810,
+              "entered_dead_edges": 16
+            },
+            "41_80": {
+              "executed_edges": 8,
+              "true_optimal_edges": 3,
+              "predicted_decrease": 5,
+              "entered_dead_edges": 1
+            },
+            "81_inf": {
+              "executed_edges": 0,
+              "true_optimal_edges": 0,
+              "predicted_decrease": 0,
+              "entered_dead_edges": 0
+            },
+            "proven_unreachable": {
+              "executed_edges": 105,
+              "true_optimal_edges": 0,
+              "predicted_decrease": 70,
+              "entered_dead_edges": 0
+            }
+          },
+          "note": "Observed policy trajectories only, after action selection. A nondecreasing chosen edge also means no legal successor has a strictly lower predicted distance under this greedy policy. Strict predicted descent alone does not prove goal completion or true optimality; full rollouts remain the acceptance metric."
+        }
+      },
+      "boundaries": {
+        "all_executed": {
+          "executed_edges": 5719,
+          "unique_state_goal_pairs": 4890,
+          "represented_queries": 1024,
+          "true_distance_quantiles": {
+            "0": 1.0,
+            "0.1": 3.0,
+            "0.5": 13.0,
+            "0.9": 24.0,
+            "1": 44.0
+          },
+          "finite_distance_mae": 2.6887404918670654,
+          "true_optimal_action_rate": 0.7573002273124673,
+          "predicted_non_descent_rate": 0.23727924462318586,
+          "chosen_predicted_drop_quantiles": {
+            "0": -37.48509216308594,
+            "0.1": -0.5780243277549744,
+            "0.5": 0.7015380859375,
+            "0.9": 2.4795522689819336,
+            "1": 239.12939453125
+          },
+          "comparable_optimal_vs_other_edges": 5280,
+          "optimal_prediction_margin_quantiles": {
+            "0": -101.17628479003906,
+            "0.1": -1.0792509317398071,
+            "0.5": 1.092921257019043,
+            "0.9": 3.721463441848755,
+            "1": 240.8191375732422
+          },
+          "optimal_prediction_margin_nonpositive_rate": 0.24299242424242423,
+          "optimal_prediction_margin_abs_le_half_rate": 0.1884469696969697,
+          "entered_proven_unreachable": 29,
+          "by_true_distance": {
+            "1_1": {
+              "executed_edges": 184,
+              "unique_state_goal_pairs": 85,
+              "represented_queries": 184,
+              "true_distance_quantiles": {
+                "0": 1.0,
+                "0.1": 1.0,
+                "0.5": 1.0,
+                "0.9": 1.0,
+                "1": 1.0
+              },
+              "finite_distance_mae": 3.848010778427124,
+              "true_optimal_action_rate": 1.0,
+              "predicted_non_descent_rate": 0.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": 0.36700439453125,
+                "0.1": 1.187922716140747,
+                "0.5": 2.050990104675293,
+                "0.9": 3.154937744140625,
+                "1": 239.12939453125
+              },
+              "comparable_optimal_vs_other_edges": 180,
+              "optimal_prediction_margin_quantiles": {
+                "0": 0.6817779541015625,
+                "0.1": 1.3567962646484375,
+                "0.5": 2.40386962890625,
+                "0.9": 3.9071004390716553,
+                "1": 239.13531494140625
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.0,
+              "optimal_prediction_margin_abs_le_half_rate": 0.0,
+              "entered_proven_unreachable": 0
+            },
+            "2_2": {
+              "executed_edges": 182,
+              "unique_state_goal_pairs": 97,
+              "represented_queries": 178,
+              "true_distance_quantiles": {
+                "0": 2.0,
+                "0.1": 2.0,
+                "0.5": 2.0,
+                "0.9": 2.0,
+                "1": 2.0
+              },
+              "finite_distance_mae": 2.537308931350708,
+              "true_optimal_action_rate": 0.8516483516483516,
+              "predicted_non_descent_rate": 0.2087912087912088,
+              "chosen_predicted_drop_quantiles": {
+                "0": -1.1683673858642578,
+                "0.1": -0.28334540128707886,
+                "0.5": 0.670581579208374,
+                "0.9": 1.7890030145645142,
+                "1": 12.316510200500488
+              },
+              "comparable_optimal_vs_other_edges": 179,
+              "optimal_prediction_margin_quantiles": {
+                "0": -4.318180084228516,
+                "0.1": -0.29108667373657227,
+                "0.5": 1.2263102531433105,
+                "0.9": 2.582942008972168,
+                "1": 237.52056884765625
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.15083798882681565,
+              "optimal_prediction_margin_abs_le_half_rate": 0.18435754189944134,
+              "entered_proven_unreachable": 0
+            },
+            "3_5": {
+              "executed_edges": 778,
+              "unique_state_goal_pairs": 469,
+              "represented_queries": 292,
+              "true_distance_quantiles": {
+                "0": 3.0,
+                "0.1": 3.0,
+                "0.5": 4.0,
+                "0.9": 5.0,
+                "1": 5.0
+              },
+              "finite_distance_mae": 1.119600534439087,
+              "true_optimal_action_rate": 0.787917737789203,
+              "predicted_non_descent_rate": 0.21465295629820053,
+              "chosen_predicted_drop_quantiles": {
+                "0": -2.8669166564941406,
+                "0.1": -0.451873779296875,
+                "0.5": 0.604248046875,
+                "0.9": 1.6145141124725342,
+                "1": 4.911975860595703
+              },
+              "comparable_optimal_vs_other_edges": 747,
+              "optimal_prediction_margin_quantiles": {
+                "0": -14.883808135986328,
+                "0.1": -0.5662475824356079,
+                "0.5": 1.0039691925048828,
+                "0.9": 2.4963738918304443,
+                "1": 234.128173828125
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.22088353413654618,
+              "optimal_prediction_margin_abs_le_half_rate": 0.20080321285140562,
+              "entered_proven_unreachable": 0
+            },
+            "6_10": {
+              "executed_edges": 1201,
+              "unique_state_goal_pairs": 981,
+              "represented_queries": 325,
+              "true_distance_quantiles": {
+                "0": 6.0,
+                "0.1": 6.0,
+                "0.5": 8.0,
+                "0.9": 10.0,
+                "1": 10.0
+              },
+              "finite_distance_mae": 1.5829588174819946,
+              "true_optimal_action_rate": 0.8601165695253955,
+              "predicted_non_descent_rate": 0.208992506244796,
+              "chosen_predicted_drop_quantiles": {
+                "0": -2.157938003540039,
+                "0.1": -0.3378891944885254,
+                "0.5": 0.74652099609375,
+                "0.9": 2.0422821044921875,
+                "1": 5.2431182861328125
+              },
+              "comparable_optimal_vs_other_edges": 1150,
+              "optimal_prediction_margin_quantiles": {
+                "0": -25.668949127197266,
+                "0.1": -0.2691802978515625,
+                "0.5": 1.2539396286010742,
+                "0.9": 3.1793205738067627,
+                "1": 240.8191375732422
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.14608695652173914,
+              "optimal_prediction_margin_abs_le_half_rate": 0.18956521739130436,
+              "entered_proven_unreachable": 0
+            },
+            "11_20": {
+              "executed_edges": 2115,
+              "unique_state_goal_pairs": 2016,
+              "represented_queries": 518,
+              "true_distance_quantiles": {
+                "0": 11.0,
+                "0.1": 11.0,
+                "0.5": 15.0,
+                "0.9": 19.0,
+                "1": 20.0
+              },
+              "finite_distance_mae": 3.030568838119507,
+              "true_optimal_action_rate": 0.7432624113475177,
+              "predicted_non_descent_rate": 0.2491725768321513,
+              "chosen_predicted_drop_quantiles": {
+                "0": -35.9302978515625,
+                "0.1": -0.6202682256698608,
+                "0.5": 0.6658706665039062,
+                "0.9": 2.7121548652648926,
+                "1": 63.05841827392578
+              },
+              "comparable_optimal_vs_other_edges": 1970,
+              "optimal_prediction_margin_quantiles": {
+                "0": -101.17628479003906,
+                "0.1": -1.1660627126693726,
+                "0.5": 1.0087566375732422,
+                "0.9": 4.229029655456543,
+                "1": 236.43727111816406
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.27563451776649744,
+              "optimal_prediction_margin_abs_le_half_rate": 0.19898477157360406,
+              "entered_proven_unreachable": 12
+            },
+            "21_40": {
+              "executed_edges": 1146,
+              "unique_state_goal_pairs": 1131,
+              "represented_queries": 322,
+              "true_distance_quantiles": {
+                "0": 21.0,
+                "0.1": 21.0,
+                "0.5": 24.0,
+                "0.9": 32.0,
+                "1": 40.0
+              },
+              "finite_distance_mae": 4.072393894195557,
+              "true_optimal_action_rate": 0.6727748691099477,
+              "predicted_non_descent_rate": 0.2931937172774869,
+              "chosen_predicted_drop_quantiles": {
+                "0": -37.48509216308594,
+                "0.1": -0.9565887451171875,
+                "0.5": 0.6545639038085938,
+                "0.9": 3.1189632415771484,
+                "1": 37.48509216308594
+              },
+              "comparable_optimal_vs_other_edges": 1046,
+              "optimal_prediction_margin_quantiles": {
+                "0": -65.60272216796875,
+                "0.1": -2.228607177734375,
+                "0.5": 0.7283668518066406,
+                "0.9": 4.961261749267578,
+                "1": 233.3557891845703
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.35850860420650094,
+              "optimal_prediction_margin_abs_le_half_rate": 0.1931166347992352,
+              "entered_proven_unreachable": 16
+            },
+            "41_80": {
+              "executed_edges": 8,
+              "unique_state_goal_pairs": 8,
+              "represented_queries": 3,
+              "true_distance_quantiles": {
+                "0": 41.0,
+                "0.1": 41.0,
+                "0.5": 41.5,
+                "0.9": 43.29999923706055,
+                "1": 44.0
+              },
+              "finite_distance_mae": 9.495548248291016,
+              "true_optimal_action_rate": 0.375,
+              "predicted_non_descent_rate": 0.375,
+              "chosen_predicted_drop_quantiles": {
+                "0": -1.39825439453125,
+                "0.1": -0.6324478387832642,
+                "0.5": 0.6224021911621094,
+                "0.9": 3.5733518600463867,
+                "1": 3.99700927734375
+              },
+              "comparable_optimal_vs_other_edges": 8,
+              "optimal_prediction_margin_quantiles": {
+                "0": -3.1414947509765625,
+                "0.1": -2.3379197120666504,
+                "0.5": -1.0693473815917969,
+                "0.9": 5.476313591003418,
+                "1": 10.397720336914062
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.625,
+              "optimal_prediction_margin_abs_le_half_rate": 0.0,
+              "entered_proven_unreachable": 1
+            },
+            "proven_unreachable": {
+              "executed_edges": 105,
+              "unique_state_goal_pairs": 103,
+              "represented_queries": 29,
+              "true_distance_quantiles": {},
+              "finite_distance_mae": null,
+              "true_optimal_action_rate": 0.0,
+              "predicted_non_descent_rate": 0.3333333333333333,
+              "chosen_predicted_drop_quantiles": {
+                "0": -12.93027400970459,
+                "0.1": -0.9796676635742188,
+                "0.5": 0.3795623779296875,
+                "0.9": 1.6720763444900513,
+                "1": 15.120609283447266
+              },
+              "comparable_optimal_vs_other_edges": 0,
+              "optimal_prediction_margin_quantiles": {},
+              "optimal_prediction_margin_nonpositive_rate": null,
+              "optimal_prediction_margin_abs_le_half_rate": null,
+              "entered_proven_unreachable": 0
+            }
+          }
+        },
+        "first_non_descent": {
+          "executed_edges": 919,
+          "unique_state_goal_pairs": 850,
+          "represented_queries": 919,
+          "true_distance_quantiles": {
+            "0": 2.0,
+            "0.1": 4.0,
+            "0.5": 15.5,
+            "0.9": 26.0,
+            "1": 41.0
+          },
+          "finite_distance_mae": 2.994586706161499,
+          "true_optimal_action_rate": 0.6180631120783461,
+          "predicted_non_descent_rate": 1.0,
+          "chosen_predicted_drop_quantiles": {
+            "0": -35.9302978515625,
+            "0.1": -1.4943145513534546,
+            "0.5": -0.4817047119140625,
+            "0.9": -0.08133552968502045,
+            "1": -0.0021514892578125
+          },
+          "comparable_optimal_vs_other_edges": 821,
+          "optimal_prediction_margin_quantiles": {
+            "0": -65.60272216796875,
+            "0.1": -1.287689208984375,
+            "0.5": 0.2143402099609375,
+            "0.9": 2.4425048828125,
+            "1": 236.43727111816406
+          },
+          "optimal_prediction_margin_nonpositive_rate": 0.4043848964677223,
+          "optimal_prediction_margin_abs_le_half_rate": 0.3909866017052375,
+          "entered_proven_unreachable": 4,
+          "by_true_distance": {
+            "2_2": {
+              "executed_edges": 27,
+              "unique_state_goal_pairs": 16,
+              "represented_queries": 27,
+              "true_distance_quantiles": {
+                "0": 2.0,
+                "0.1": 2.0,
+                "0.5": 2.0,
+                "0.9": 2.0,
+                "1": 2.0
+              },
+              "finite_distance_mae": 0.8943331241607666,
+              "true_optimal_action_rate": 0.5925925925925926,
+              "predicted_non_descent_rate": 1.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": -1.1683673858642578,
+                "0.1": -0.809897243976593,
+                "0.5": -0.2834491729736328,
+                "0.9": -0.04953862354159355,
+                "1": -0.015106201171875
+              },
+              "comparable_optimal_vs_other_edges": 27,
+              "optimal_prediction_margin_quantiles": {
+                "0": -1.2030763626098633,
+                "0.1": -0.7952654957771301,
+                "0.5": 0.3309917449951172,
+                "0.9": 2.879873275756836,
+                "1": 116.07281494140625
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.4074074074074074,
+              "optimal_prediction_margin_abs_le_half_rate": 0.37037037037037035,
+              "entered_proven_unreachable": 0
+            },
+            "3_5": {
+              "executed_edges": 98,
+              "unique_state_goal_pairs": 75,
+              "represented_queries": 98,
+              "true_distance_quantiles": {
+                "0": 3.0,
+                "0.1": 3.0,
+                "0.5": 4.0,
+                "0.9": 5.0,
+                "1": 5.0
+              },
+              "finite_distance_mae": 1.0996781587600708,
+              "true_optimal_action_rate": 0.5408163265306123,
+              "predicted_non_descent_rate": 1.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": -2.8669166564941406,
+                "0.1": -0.94244384765625,
+                "0.5": -0.4312019348144531,
+                "0.9": -0.02801990509033203,
+                "1": -0.0049896240234375
+              },
+              "comparable_optimal_vs_other_edges": 94,
+              "optimal_prediction_margin_quantiles": {
+                "0": -14.883808135986328,
+                "0.1": -1.9643765687942505,
+                "0.5": 0.03920269012451172,
+                "0.9": 1.2118362188339233,
+                "1": 5.983303070068359
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.4787234042553192,
+              "optimal_prediction_margin_abs_le_half_rate": 0.40425531914893614,
+              "entered_proven_unreachable": 0
+            },
+            "6_10": {
+              "executed_edges": 159,
+              "unique_state_goal_pairs": 134,
+              "represented_queries": 159,
+              "true_distance_quantiles": {
+                "0": 6.0,
+                "0.1": 6.0,
+                "0.5": 8.0,
+                "0.9": 10.0,
+                "1": 10.0
+              },
+              "finite_distance_mae": 1.9554849863052368,
+              "true_optimal_action_rate": 0.7169811320754716,
+              "predicted_non_descent_rate": 1.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": -1.7233953475952148,
+                "0.1": -1.0658867359161377,
+                "0.5": -0.2999420166015625,
+                "0.9": -0.05231628566980362,
+                "1": -0.0023651123046875
+              },
+              "comparable_optimal_vs_other_edges": 150,
+              "optimal_prediction_margin_quantiles": {
+                "0": -4.705270767211914,
+                "0.1": -0.5904674530029297,
+                "0.5": 0.34194183349609375,
+                "0.9": 2.2063169479370117,
+                "1": 230.71884155273438
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.3,
+              "optimal_prediction_margin_abs_le_half_rate": 0.4533333333333333,
+              "entered_proven_unreachable": 0
+            },
+            "11_20": {
+              "executed_edges": 370,
+              "unique_state_goal_pairs": 362,
+              "represented_queries": 370,
+              "true_distance_quantiles": {
+                "0": 11.0,
+                "0.1": 12.0,
+                "0.5": 16.0,
+                "0.9": 20.0,
+                "1": 20.0
+              },
+              "finite_distance_mae": 3.260047435760498,
+              "true_optimal_action_rate": 0.6108108108108108,
+              "predicted_non_descent_rate": 1.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": -35.9302978515625,
+                "0.1": -1.494268774986267,
+                "0.5": -0.5034523010253906,
+                "0.9": -0.09627988189458847,
+                "1": -0.0021514892578125
+              },
+              "comparable_optimal_vs_other_edges": 335,
+              "optimal_prediction_margin_quantiles": {
+                "0": -11.599190711975098,
+                "0.1": -1.3249167203903198,
+                "0.5": 0.1545562744140625,
+                "0.9": 2.489032506942749,
+                "1": 236.43727111816406
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.4298507462686567,
+              "optimal_prediction_margin_abs_le_half_rate": 0.3850746268656716,
+              "entered_proven_unreachable": 3
+            },
+            "21_40": {
+              "executed_edges": 245,
+              "unique_state_goal_pairs": 244,
+              "represented_queries": 245,
+              "true_distance_quantiles": {
+                "0": 21.0,
+                "0.1": 21.0,
+                "0.5": 24.0,
+                "0.9": 31.0,
+                "1": 40.0
+              },
+              "finite_distance_mae": 4.229752063751221,
+              "true_optimal_action_rate": 0.6448979591836734,
+              "predicted_non_descent_rate": 1.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": -13.981895446777344,
+                "0.1": -2.1900315284729004,
+                "0.5": -0.60076904296875,
+                "0.9": -0.07914132624864578,
+                "1": -0.0023345947265625
+              },
+              "comparable_optimal_vs_other_edges": 214,
+              "optimal_prediction_margin_quantiles": {
+                "0": -65.60272216796875,
+                "0.1": -1.6291000843048096,
+                "0.5": 0.24879837036132812,
+                "0.9": 3.451326847076416,
+                "1": 233.3557891845703
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.40654205607476634,
+              "optimal_prediction_margin_abs_le_half_rate": 0.35514018691588783,
+              "entered_proven_unreachable": 1
+            },
+            "41_80": {
+              "executed_edges": 1,
+              "unique_state_goal_pairs": 1,
+              "represented_queries": 1,
+              "true_distance_quantiles": {
+                "0": 41.0,
+                "0.1": 41.0,
+                "0.5": 41.0,
+                "0.9": 41.0,
+                "1": 41.0
+              },
+              "finite_distance_mae": 9.783782958984375,
+              "true_optimal_action_rate": 1.0,
+              "predicted_non_descent_rate": 1.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": -0.3042449951171875,
+                "0.1": -0.3042449951171875,
+                "0.5": -0.3042449951171875,
+                "0.9": -0.3042449951171875,
+                "1": -0.3042449951171875
+              },
+              "comparable_optimal_vs_other_edges": 1,
+              "optimal_prediction_margin_quantiles": {
+                "0": 1.70880126953125,
+                "0.1": 1.70880126953125,
+                "0.5": 1.70880126953125,
+                "0.9": 1.70880126953125,
+                "1": 1.70880126953125
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.0,
+              "optimal_prediction_margin_abs_le_half_rate": 0.0,
+              "entered_proven_unreachable": 0
+            },
+            "proven_unreachable": {
+              "executed_edges": 19,
+              "unique_state_goal_pairs": 18,
+              "represented_queries": 19,
+              "true_distance_quantiles": {},
+              "finite_distance_mae": null,
+              "true_optimal_action_rate": 0.0,
+              "predicted_non_descent_rate": 1.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": -2.8819580078125,
+                "0.1": -1.7626861333847046,
+                "0.5": -0.814788818359375,
+                "0.9": -0.12121889740228653,
+                "1": -0.08327484130859375
+              },
+              "comparable_optimal_vs_other_edges": 0,
+              "optimal_prediction_margin_quantiles": {},
+              "optimal_prediction_margin_nonpositive_rate": null,
+              "optimal_prediction_margin_abs_le_half_rate": null,
+              "entered_proven_unreachable": 0
+            }
+          }
+        },
+        "all_non_descent": {
+          "executed_edges": 1357,
+          "unique_state_goal_pairs": 1176,
+          "represented_queries": 919,
+          "true_distance_quantiles": {
+            "0": 2.0,
+            "0.1": 4.0,
+            "0.5": 15.0,
+            "0.9": 26.0,
+            "1": 43.0
+          },
+          "finite_distance_mae": 2.9095184803009033,
+          "true_optimal_action_rate": 0.6101694915254238,
+          "predicted_non_descent_rate": 1.0,
+          "chosen_predicted_drop_quantiles": {
+            "0": -37.48509216308594,
+            "0.1": -1.4946563243865967,
+            "0.5": -0.4837799072265625,
+            "0.9": -0.0708160400390625,
+            "1": -0.0005979537963867188
+          },
+          "comparable_optimal_vs_other_edges": 1216,
+          "optimal_prediction_margin_quantiles": {
+            "0": -65.60272216796875,
+            "0.1": -1.2878408432006836,
+            "0.5": 0.2047863006591797,
+            "0.9": 2.185699462890625,
+            "1": 236.43727111816406
+          },
+          "optimal_prediction_margin_nonpositive_rate": 0.40625,
+          "optimal_prediction_margin_abs_le_half_rate": 0.4004934210526316,
+          "entered_proven_unreachable": 4,
+          "by_true_distance": {
+            "2_2": {
+              "executed_edges": 38,
+              "unique_state_goal_pairs": 19,
+              "represented_queries": 38,
+              "true_distance_quantiles": {
+                "0": 2.0,
+                "0.1": 2.0,
+                "0.5": 2.0,
+                "0.9": 2.0,
+                "1": 2.0
+              },
+              "finite_distance_mae": 0.8355908393859863,
+              "true_optimal_action_rate": 0.6052631578947368,
+              "predicted_non_descent_rate": 1.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": -1.1683673858642578,
+                "0.1": -0.8732643127441406,
+                "0.5": -0.2829303741455078,
+                "0.9": -0.03244829177856445,
+                "1": -0.010814666748046875
+              },
+              "comparable_optimal_vs_other_edges": 38,
+              "optimal_prediction_margin_quantiles": {
+                "0": -1.2030763626098633,
+                "0.1": -0.5925878286361694,
+                "0.5": 0.3037290573120117,
+                "0.9": 1.2263102531433105,
+                "1": 116.07281494140625
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.39473684210526316,
+              "optimal_prediction_margin_abs_le_half_rate": 0.39473684210526316,
+              "entered_proven_unreachable": 0
+            },
+            "3_5": {
+              "executed_edges": 167,
+              "unique_state_goal_pairs": 93,
+              "represented_queries": 152,
+              "true_distance_quantiles": {
+                "0": 3.0,
+                "0.1": 3.0,
+                "0.5": 4.0,
+                "0.9": 5.0,
+                "1": 5.0
+              },
+              "finite_distance_mae": 1.0296318531036377,
+              "true_optimal_action_rate": 0.5029940119760479,
+              "predicted_non_descent_rate": 1.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": -2.8669166564941406,
+                "0.1": -0.94244384765625,
+                "0.5": -0.44683074951171875,
+                "0.9": -0.055935896933078766,
+                "1": -0.0005979537963867188
+              },
+              "comparable_optimal_vs_other_edges": 163,
+              "optimal_prediction_margin_quantiles": {
+                "0": -14.883808135986328,
+                "0.1": -1.7119065523147583,
+                "0.5": -0.03830718994140625,
+                "0.9": 1.200653076171875,
+                "1": 5.983303070068359
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.50920245398773,
+              "optimal_prediction_margin_abs_le_half_rate": 0.4110429447852761,
+              "entered_proven_unreachable": 0
+            },
+            "6_10": {
+              "executed_edges": 251,
+              "unique_state_goal_pairs": 195,
+              "represented_queries": 213,
+              "true_distance_quantiles": {
+                "0": 6.0,
+                "0.1": 6.0,
+                "0.5": 8.0,
+                "0.9": 10.0,
+                "1": 10.0
+              },
+              "finite_distance_mae": 1.9745981693267822,
+              "true_optimal_action_rate": 0.7250996015936255,
+              "predicted_non_descent_rate": 1.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": -2.157938003540039,
+                "0.1": -1.0677490234375,
+                "0.5": -0.3228607177734375,
+                "0.9": -0.0520477294921875,
+                "1": -0.0023651123046875
+              },
+              "comparable_optimal_vs_other_edges": 238,
+              "optimal_prediction_margin_quantiles": {
+                "0": -4.705270767211914,
+                "0.1": -0.557490348815918,
+                "0.5": 0.4056987762451172,
+                "0.9": 2.545604705810547,
+                "1": 230.71884155273438
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.28991596638655465,
+              "optimal_prediction_margin_abs_le_half_rate": 0.453781512605042,
+              "entered_proven_unreachable": 0
+            },
+            "11_20": {
+              "executed_edges": 527,
+              "unique_state_goal_pairs": 500,
+              "represented_queries": 392,
+              "true_distance_quantiles": {
+                "0": 11.0,
+                "0.1": 12.0,
+                "0.5": 16.0,
+                "0.9": 19.0,
+                "1": 20.0
+              },
+              "finite_distance_mae": 3.267781972885132,
+              "true_optimal_action_rate": 0.6129032258064516,
+              "predicted_non_descent_rate": 1.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": -35.9302978515625,
+                "0.1": -1.4838676452636719,
+                "0.5": -0.485565185546875,
+                "0.9": -0.09119492024183273,
+                "1": -0.0021514892578125
+              },
+              "comparable_optimal_vs_other_edges": 478,
+              "optimal_prediction_margin_quantiles": {
+                "0": -62.88671112060547,
+                "0.1": -1.3133511543273926,
+                "0.5": 0.13965606689453125,
+                "0.9": 2.155416250228882,
+                "1": 236.43727111816406
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.42677824267782427,
+              "optimal_prediction_margin_abs_le_half_rate": 0.39330543933054396,
+              "entered_proven_unreachable": 3
+            },
+            "21_40": {
+              "executed_edges": 336,
+              "unique_state_goal_pairs": 332,
+              "represented_queries": 253,
+              "true_distance_quantiles": {
+                "0": 21.0,
+                "0.1": 21.0,
+                "0.5": 24.0,
+                "0.9": 32.0,
+                "1": 40.0
+              },
+              "finite_distance_mae": 4.1903839111328125,
+              "true_optimal_action_rate": 0.6398809523809523,
+              "predicted_non_descent_rate": 1.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": -37.48509216308594,
+                "0.1": -2.130950927734375,
+                "0.5": -0.6490898132324219,
+                "0.9": -0.09108734130859375,
+                "1": -0.0023345947265625
+              },
+              "comparable_optimal_vs_other_edges": 296,
+              "optimal_prediction_margin_quantiles": {
+                "0": -65.60272216796875,
+                "0.1": -1.627044677734375,
+                "0.5": 0.22370147705078125,
+                "0.9": 3.8095664978027344,
+                "1": 233.3557891845703
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.40878378378378377,
+              "optimal_prediction_margin_abs_le_half_rate": 0.36824324324324326,
+              "entered_proven_unreachable": 1
+            },
+            "41_80": {
+              "executed_edges": 3,
+              "unique_state_goal_pairs": 3,
+              "represented_queries": 2,
+              "true_distance_quantiles": {
+                "0": 41.0,
+                "0.1": 41.0,
+                "0.5": 41.0,
+                "0.9": 42.599998474121094,
+                "1": 43.0
+              },
+              "finite_distance_mae": 5.6561737060546875,
+              "true_optimal_action_rate": 0.3333333333333333,
+              "predicted_non_descent_rate": 1.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": -1.39825439453125,
+                "0.1": -1.1794525384902954,
+                "0.5": -0.3042449951171875,
+                "0.9": -0.26108092069625854,
+                "1": -0.2502899169921875
+              },
+              "comparable_optimal_vs_other_edges": 3,
+              "optimal_prediction_margin_quantiles": {
+                "0": -1.9935302734375,
+                "0.1": -1.9553619623184204,
+                "0.5": -1.8026885986328125,
+                "0.9": 1.0065031051635742,
+                "1": 1.70880126953125
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.6666666666666666,
+              "optimal_prediction_margin_abs_le_half_rate": 0.0,
+              "entered_proven_unreachable": 0
+            },
+            "proven_unreachable": {
+              "executed_edges": 35,
+              "unique_state_goal_pairs": 34,
+              "represented_queries": 29,
+              "true_distance_quantiles": {},
+              "finite_distance_mae": null,
+              "true_optimal_action_rate": 0.0,
+              "predicted_non_descent_rate": 1.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": -12.93027400970459,
+                "0.1": -2.7885146141052246,
+                "0.5": -0.814788818359375,
+                "0.9": -0.13283388316631317,
+                "1": -0.002166748046875
+              },
+              "comparable_optimal_vs_other_edges": 0,
+              "optimal_prediction_margin_quantiles": {},
+              "optimal_prediction_margin_nonpositive_rate": null,
+              "optimal_prediction_margin_abs_le_half_rate": null,
+              "entered_proven_unreachable": 0
+            }
+          }
+        },
+        "cycle_closing": {
+          "executed_edges": 840,
+          "unique_state_goal_pairs": 746,
+          "represented_queries": 840,
+          "true_distance_quantiles": {
+            "0": 2.0,
+            "0.1": 4.0,
+            "0.5": 15.0,
+            "0.9": 26.0,
+            "1": 44.0
+          },
+          "finite_distance_mae": 3.06880259513855,
+          "true_optimal_action_rate": 0.5416666666666666,
+          "predicted_non_descent_rate": 0.5202380952380953,
+          "chosen_predicted_drop_quantiles": {
+            "0": -37.48509216308594,
+            "0.1": -1.1414306163787842,
+            "0.5": -0.021087646484375,
+            "0.9": 1.0478003025054932,
+            "1": 14.325313568115234
+          },
+          "comparable_optimal_vs_other_edges": 727,
+          "optimal_prediction_margin_quantiles": {
+            "0": -30.309246063232422,
+            "0.1": -1.5852394104003906,
+            "0.5": 0.0413818359375,
+            "0.9": 2.766277313232422,
+            "1": 236.43727111816406
+          },
+          "optimal_prediction_margin_nonpositive_rate": 0.4896836313617607,
+          "optimal_prediction_margin_abs_le_half_rate": 0.31911966987620355,
+          "entered_proven_unreachable": 0,
+          "by_true_distance": {
+            "2_2": {
+              "executed_edges": 9,
+              "unique_state_goal_pairs": 7,
+              "represented_queries": 9,
+              "true_distance_quantiles": {
+                "0": 2.0,
+                "0.1": 2.0,
+                "0.5": 2.0,
+                "0.9": 2.0,
+                "1": 2.0
+              },
+              "finite_distance_mae": 1.4796572923660278,
+              "true_optimal_action_rate": 0.0,
+              "predicted_non_descent_rate": 0.8888888888888888,
+              "chosen_predicted_drop_quantiles": {
+                "0": -1.1683673858642578,
+                "0.1": -1.1683673858642578,
+                "0.5": -0.5749969482421875,
+                "0.9": 0.06569457054138184,
+                "1": 1.046895980834961
+              },
+              "comparable_optimal_vs_other_edges": 9,
+              "optimal_prediction_margin_quantiles": {
+                "0": -1.2030763626098633,
+                "0.1": -0.6620584726333618,
+                "0.5": -0.29108667373657227,
+                "0.9": -0.1449146270751953,
+                "1": -0.1449146270751953
+              },
+              "optimal_prediction_margin_nonpositive_rate": 1.0,
+              "optimal_prediction_margin_abs_le_half_rate": 0.6666666666666666,
+              "entered_proven_unreachable": 0
+            },
+            "3_5": {
+              "executed_edges": 123,
+              "unique_state_goal_pairs": 73,
+              "represented_queries": 123,
+              "true_distance_quantiles": {
+                "0": 3.0,
+                "0.1": 3.0,
+                "0.5": 4.0,
+                "0.9": 5.0,
+                "1": 5.0
+              },
+              "finite_distance_mae": 1.0537012815475464,
+              "true_optimal_action_rate": 0.6097560975609756,
+              "predicted_non_descent_rate": 0.5691056910569106,
+              "chosen_predicted_drop_quantiles": {
+                "0": -2.8669166564941406,
+                "0.1": -0.8174009323120117,
+                "0.5": -0.1278839111328125,
+                "0.9": 0.8413143157958984,
+                "1": 1.4371328353881836
+              },
+              "comparable_optimal_vs_other_edges": 119,
+              "optimal_prediction_margin_quantiles": {
+                "0": -14.883808135986328,
+                "0.1": -0.711875319480896,
+                "0.5": 0.4647188186645508,
+                "0.9": 2.017812728881836,
+                "1": 234.1077880859375
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.40336134453781514,
+              "optimal_prediction_margin_abs_le_half_rate": 0.3277310924369748,
+              "entered_proven_unreachable": 0
+            },
+            "6_10": {
+              "executed_edges": 138,
+              "unique_state_goal_pairs": 114,
+              "represented_queries": 138,
+              "true_distance_quantiles": {
+                "0": 6.0,
+                "0.1": 6.0,
+                "0.5": 8.0,
+                "0.9": 10.0,
+                "1": 10.0
+              },
+              "finite_distance_mae": 2.00242280960083,
+              "true_optimal_action_rate": 0.5942028985507246,
+              "predicted_non_descent_rate": 0.5,
+              "chosen_predicted_drop_quantiles": {
+                "0": -2.157938003540039,
+                "0.1": -0.8607769012451172,
+                "0.5": 0.0,
+                "0.9": 0.7891738414764404,
+                "1": 1.9274206161499023
+              },
+              "comparable_optimal_vs_other_edges": 128,
+              "optimal_prediction_margin_quantiles": {
+                "0": -4.705270767211914,
+                "0.1": -1.2656924724578857,
+                "0.5": 0.14775705337524414,
+                "0.9": 5.22767448425293,
+                "1": 231.4735870361328
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.4375,
+              "optimal_prediction_margin_abs_le_half_rate": 0.296875,
+              "entered_proven_unreachable": 0
+            },
+            "11_20": {
+              "executed_edges": 319,
+              "unique_state_goal_pairs": 305,
+              "represented_queries": 319,
+              "true_distance_quantiles": {
+                "0": 11.0,
+                "0.1": 12.0,
+                "0.5": 16.0,
+                "0.9": 20.0,
+                "1": 20.0
+              },
+              "finite_distance_mae": 3.4492149353027344,
+              "true_optimal_action_rate": 0.48589341692789967,
+              "predicted_non_descent_rate": 0.5078369905956113,
+              "chosen_predicted_drop_quantiles": {
+                "0": -3.80838680267334,
+                "0.1": -1.1278572082519531,
+                "0.5": -0.0042877197265625,
+                "0.9": 1.0493680238723755,
+                "1": 14.325313568115234
+              },
+              "comparable_optimal_vs_other_edges": 283,
+              "optimal_prediction_margin_quantiles": {
+                "0": -30.309246063232422,
+                "0.1": -1.771714687347412,
+                "0.5": -0.168609619140625,
+                "0.9": 1.9202141761779785,
+                "1": 236.43727111816406
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.5795053003533569,
+              "optimal_prediction_margin_abs_le_half_rate": 0.33568904593639576,
+              "entered_proven_unreachable": 0
+            },
+            "21_40": {
+              "executed_edges": 221,
+              "unique_state_goal_pairs": 218,
+              "represented_queries": 221,
+              "true_distance_quantiles": {
+                "0": 21.0,
+                "0.1": 21.0,
+                "0.5": 25.0,
+                "0.9": 32.0,
+                "1": 40.0
+              },
+              "finite_distance_mae": 4.359627723693848,
+              "true_optimal_action_rate": 0.6425339366515838,
+              "predicted_non_descent_rate": 0.5113122171945701,
+              "chosen_predicted_drop_quantiles": {
+                "0": -37.48509216308594,
+                "0.1": -1.5321121215820312,
+                "0.5": -0.0172576904296875,
+                "0.9": 1.5109786987304688,
+                "1": 13.981895446777344
+              },
+              "comparable_optimal_vs_other_edges": 187,
+              "optimal_prediction_margin_quantiles": {
+                "0": -6.6474609375,
+                "0.1": -1.747406005859375,
+                "0.5": 0.2503204345703125,
+                "0.9": 5.788433074951172,
+                "1": 233.3557891845703
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.42245989304812837,
+              "optimal_prediction_margin_abs_le_half_rate": 0.2887700534759358,
+              "entered_proven_unreachable": 0
+            },
+            "41_80": {
+              "executed_edges": 1,
+              "unique_state_goal_pairs": 1,
+              "represented_queries": 1,
+              "true_distance_quantiles": {
+                "0": 44.0,
+                "0.1": 44.0,
+                "0.5": 44.0,
+                "0.9": 44.0,
+                "1": 44.0
+              },
+              "finite_distance_mae": 5.764862060546875,
+              "true_optimal_action_rate": 1.0,
+              "predicted_non_descent_rate": 0.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": 1.39825439453125,
+                "0.1": 1.39825439453125,
+                "0.5": 1.39825439453125,
+                "0.9": 1.39825439453125,
+                "1": 1.39825439453125
+              },
+              "comparable_optimal_vs_other_edges": 1,
+              "optimal_prediction_margin_quantiles": {
+                "0": 3.3671417236328125,
+                "0.1": 3.3671417236328125,
+                "0.5": 3.3671417236328125,
+                "0.9": 3.3671417236328125,
+                "1": 3.3671417236328125
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.0,
+              "optimal_prediction_margin_abs_le_half_rate": 0.0,
+              "entered_proven_unreachable": 0
+            },
+            "proven_unreachable": {
+              "executed_edges": 29,
+              "unique_state_goal_pairs": 28,
+              "represented_queries": 29,
+              "true_distance_quantiles": {},
+              "finite_distance_mae": null,
+              "true_optimal_action_rate": 0.0,
+              "predicted_non_descent_rate": 0.5172413793103449,
+              "chosen_predicted_drop_quantiles": {
+                "0": -2.8424758911132812,
+                "0.1": -1.7626861333847046,
+                "0.5": -0.002166748046875,
+                "0.9": 1.191726565361023,
+                "1": 2.8819580078125
+              },
+              "comparable_optimal_vs_other_edges": 0,
+              "optimal_prediction_margin_quantiles": {},
+              "optimal_prediction_margin_nonpositive_rate": null,
+              "optimal_prediction_margin_abs_le_half_rate": null,
+              "entered_proven_unreachable": 0
+            }
+          }
+        },
+        "interpretation": "Execution-weighted records include repeated visits across queries; unique pair counts are also reported. First non-descent is the first visited state with no strictly lower predicted legal successor. A cycle-closing action is inspected after selection. Positive optimal-vs-other margin favors the best teacher-optimal child; ties depend on the unchanged candidate order. No evaluation record is added to training."
+      },
+      "cycle_length_counts": {
+        "2": 840
+      },
+      "cycle_closing_at_distance1_5": 132,
+      "cycle_closing_at_distance_gt5_finite": 679
+    },
+    "unseen_layout_validation": {
+      "planning": {
+        "count": 1024,
+        "unique_state_goal_pairs": 1024,
+        "solved": 84,
+        "success_rate": 0.08203125,
+        "optimal": 84,
+        "optimal_rate": 0.08203125,
+        "cycles": 940,
+        "entered_unreachable": 204,
+        "no_legal_action": 0,
+        "budget_exhausted": 0,
+        "horizon": 256,
+        "illegal_actions": 0,
+        "mean_excess_cost_on_success": 0.0,
+        "mean_cost_ratio_on_success": 1.0,
+        "predicted_progress": {
+          "counts": {
+            "executed_edges": 4188,
+            "predicted_decrease": 2902,
+            "predicted_plateau": 7,
+            "predicted_increase": 1279,
+            "true_finite_edges": 3300,
+            "true_optimal_edges": 1909,
+            "predicted_decrease_but_not_true_optimal": 1590,
+            "entered_dead_edges": 204,
+            "non_goal_predicted_zero": 0
+          },
+          "strict_descent_trajectory_count": 61,
+          "strict_descent_success_count": 61,
+          "non_descent_trajectory_count": 963,
+          "predicted_drop_quantiles": {
+            "0": -145.80502319335938,
+            "0.1": -1.857742595672607,
+            "0.5": 0.7430458068847656,
+            "0.9": 16.772460937500014,
+            "1": 239.77352905273438
+          },
+          "mean_abs_unit_descent_residual": 8.437248604003884,
+          "executed_edge_optimal_rate": 0.4558261700095511,
+          "predicted_strict_descent_edge_rate": 0.6929321872015282,
+          "executed_edges_by_true_distance": {
+            "1_1": {
+              "executed_edges": 84,
+              "true_optimal_edges": 84,
+              "predicted_decrease": 84,
+              "entered_dead_edges": 0
+            },
+            "2_2": {
+              "executed_edges": 78,
+              "true_optimal_edges": 58,
+              "predicted_decrease": 64,
+              "entered_dead_edges": 0
+            },
+            "3_5": {
+              "executed_edges": 254,
+              "true_optimal_edges": 161,
+              "predicted_decrease": 178,
+              "entered_dead_edges": 6
+            },
+            "6_10": {
+              "executed_edges": 413,
+              "true_optimal_edges": 238,
+              "predicted_decrease": 286,
+              "entered_dead_edges": 18
+            },
+            "11_20": {
+              "executed_edges": 646,
+              "true_optimal_edges": 337,
+              "predicted_decrease": 443,
+              "entered_dead_edges": 35
+            },
+            "21_40": {
+              "executed_edges": 1120,
+              "true_optimal_edges": 584,
+              "predicted_decrease": 756,
+              "entered_dead_edges": 69
+            },
+            "41_80": {
+              "executed_edges": 909,
+              "true_optimal_edges": 447,
+              "predicted_decrease": 656,
+              "entered_dead_edges": 76
+            },
+            "81_inf": {
+              "executed_edges": 0,
+              "true_optimal_edges": 0,
+              "predicted_decrease": 0,
+              "entered_dead_edges": 0
+            },
+            "proven_unreachable": {
+              "executed_edges": 684,
+              "true_optimal_edges": 0,
+              "predicted_decrease": 435,
+              "entered_dead_edges": 0
+            }
+          },
+          "note": "Observed policy trajectories only, after action selection. A nondecreasing chosen edge also means no legal successor has a strictly lower predicted distance under this greedy policy. Strict predicted descent alone does not prove goal completion or true optimality; full rollouts remain the acceptance metric."
+        }
+      },
+      "boundaries": {
+        "all_executed": {
+          "executed_edges": 4188,
+          "unique_state_goal_pairs": 4056,
+          "represented_queries": 1024,
+          "true_distance_quantiles": {
+            "0": 1.0,
+            "0.1": 5.0,
+            "0.5": 26.0,
+            "0.9": 53.0,
+            "1": 79.0
+          },
+          "finite_distance_mae": 43.97747039794922,
+          "true_optimal_action_rate": 0.4558261700095511,
+          "predicted_non_descent_rate": 0.30706781279847184,
+          "chosen_predicted_drop_quantiles": {
+            "0": -145.80502319335938,
+            "0.1": -1.8577425479888916,
+            "0.5": 0.7430458068847656,
+            "0.9": 16.772443771362305,
+            "1": 239.77352905273438
+          },
+          "comparable_optimal_vs_other_edges": 3119,
+          "optimal_prediction_margin_quantiles": {
+            "0": -229.36477661132812,
+            "0.1": -17.83540916442871,
+            "0.5": -0.006103515625,
+            "0.9": 13.865750312805176,
+            "1": 238.82154846191406
+          },
+          "optimal_prediction_margin_nonpositive_rate": 0.5129849310676499,
+          "optimal_prediction_margin_abs_le_half_rate": 0.1564604039756332,
+          "entered_proven_unreachable": 204,
+          "by_true_distance": {
+            "1_1": {
+              "executed_edges": 84,
+              "unique_state_goal_pairs": 61,
+              "represented_queries": 84,
+              "true_distance_quantiles": {
+                "0": 1.0,
+                "0.1": 1.0,
+                "0.5": 1.0,
+                "0.9": 1.0,
+                "1": 1.0
+              },
+              "finite_distance_mae": 7.450783729553223,
+              "true_optimal_action_rate": 1.0,
+              "predicted_non_descent_rate": 0.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": 0.26365184783935547,
+                "0.1": 1.436279296875,
+                "0.5": 3.8032989501953125,
+                "0.9": 18.366758346557617,
+                "1": 63.026031494140625
+              },
+              "comparable_optimal_vs_other_edges": 80,
+              "optimal_prediction_margin_quantiles": {
+                "0": 0.8910102844238281,
+                "0.1": 1.890878677368164,
+                "0.5": 4.210666656494141,
+                "0.9": 19.078683853149414,
+                "1": 80.598388671875
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.0,
+              "optimal_prediction_margin_abs_le_half_rate": 0.0,
+              "entered_proven_unreachable": 0
+            },
+            "2_2": {
+              "executed_edges": 78,
+              "unique_state_goal_pairs": 66,
+              "represented_queries": 77,
+              "true_distance_quantiles": {
+                "0": 2.0,
+                "0.1": 2.0,
+                "0.5": 2.0,
+                "0.9": 2.0,
+                "1": 2.0
+              },
+              "finite_distance_mae": 11.604066848754883,
+              "true_optimal_action_rate": 0.7435897435897436,
+              "predicted_non_descent_rate": 0.1794871794871795,
+              "chosen_predicted_drop_quantiles": {
+                "0": -12.256156921386719,
+                "0.1": -0.5677481889724731,
+                "0.5": 1.8702425956726074,
+                "0.9": 20.191490173339844,
+                "1": 70.21399688720703
+              },
+              "comparable_optimal_vs_other_edges": 76,
+              "optimal_prediction_margin_quantiles": {
+                "0": -65.60801696777344,
+                "0.1": -4.23838996887207,
+                "0.5": 2.85137939453125,
+                "0.9": 24.556903839111328,
+                "1": 105.58568572998047
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.2631578947368421,
+              "optimal_prediction_margin_abs_le_half_rate": 0.09210526315789473,
+              "entered_proven_unreachable": 0
+            },
+            "3_5": {
+              "executed_edges": 254,
+              "unique_state_goal_pairs": 228,
+              "represented_queries": 118,
+              "true_distance_quantiles": {
+                "0": 3.0,
+                "0.1": 3.0,
+                "0.5": 4.0,
+                "0.9": 5.0,
+                "1": 5.0
+              },
+              "finite_distance_mae": 22.87563133239746,
+              "true_optimal_action_rate": 0.6338582677165354,
+              "predicted_non_descent_rate": 0.2992125984251969,
+              "chosen_predicted_drop_quantiles": {
+                "0": -30.863208770751953,
+                "0.1": -1.5865631103515625,
+                "0.5": 0.9393510818481445,
+                "0.9": 16.291728973388672,
+                "1": 135.73684692382812
+              },
+              "comparable_optimal_vs_other_edges": 231,
+              "optimal_prediction_margin_quantiles": {
+                "0": -78.88633728027344,
+                "0.1": -5.4953765869140625,
+                "0.5": 0.9857978820800781,
+                "0.9": 28.469215393066406,
+                "1": 125.38723754882812
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.4025974025974026,
+              "optimal_prediction_margin_abs_le_half_rate": 0.09956709956709957,
+              "entered_proven_unreachable": 6
+            },
+            "6_10": {
+              "executed_edges": 413,
+              "unique_state_goal_pairs": 395,
+              "represented_queries": 159,
+              "true_distance_quantiles": {
+                "0": 6.0,
+                "0.1": 6.0,
+                "0.5": 8.0,
+                "0.9": 10.0,
+                "1": 10.0
+              },
+              "finite_distance_mae": 33.447410583496094,
+              "true_optimal_action_rate": 0.576271186440678,
+              "predicted_non_descent_rate": 0.3075060532687651,
+              "chosen_predicted_drop_quantiles": {
+                "0": -110.5850830078125,
+                "0.1": -1.7274260520935059,
+                "0.5": 0.7518439292907715,
+                "0.9": 12.817553520202637,
+                "1": 170.81155395507812
+              },
+              "comparable_optimal_vs_other_edges": 372,
+              "optimal_prediction_margin_quantiles": {
+                "0": -227.83615112304688,
+                "0.1": -21.74136734008789,
+                "0.5": 0.18886280059814453,
+                "0.9": 11.179239273071289,
+                "1": 176.5045623779297
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.47043010752688175,
+              "optimal_prediction_margin_abs_le_half_rate": 0.1478494623655914,
+              "entered_proven_unreachable": 18
+            },
+            "11_20": {
+              "executed_edges": 646,
+              "unique_state_goal_pairs": 643,
+              "represented_queries": 237,
+              "true_distance_quantiles": {
+                "0": 11.0,
+                "0.1": 11.0,
+                "0.5": 15.0,
+                "0.9": 20.0,
+                "1": 20.0
+              },
+              "finite_distance_mae": 38.69563293457031,
+              "true_optimal_action_rate": 0.521671826625387,
+              "predicted_non_descent_rate": 0.3142414860681115,
+              "chosen_predicted_drop_quantiles": {
+                "0": -62.6353759765625,
+                "0.1": -2.6303253173828125,
+                "0.5": 0.882598876953125,
+                "0.9": 16.39110565185547,
+                "1": 222.27304077148438
+              },
+              "comparable_optimal_vs_other_edges": 569,
+              "optimal_prediction_margin_quantiles": {
+                "0": -229.36477661132812,
+                "0.1": -22.69280242919922,
+                "0.5": -0.1757354736328125,
+                "0.9": 11.473382949829102,
+                "1": 222.7126007080078
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.5483304042179262,
+              "optimal_prediction_margin_abs_le_half_rate": 0.13181019332161686,
+              "entered_proven_unreachable": 35
+            },
+            "21_40": {
+              "executed_edges": 1120,
+              "unique_state_goal_pairs": 1112,
+              "represented_queries": 363,
+              "true_distance_quantiles": {
+                "0": 21.0,
+                "0.1": 22.0,
+                "0.5": 31.0,
+                "0.9": 38.0,
+                "1": 40.0
+              },
+              "finite_distance_mae": 51.99318313598633,
+              "true_optimal_action_rate": 0.5214285714285715,
+              "predicted_non_descent_rate": 0.325,
+              "chosen_predicted_drop_quantiles": {
+                "0": -145.80502319335938,
+                "0.1": -2.0155930519104004,
+                "0.5": 0.673248291015625,
+                "0.9": 16.975448608398438,
+                "1": 232.53298950195312
+              },
+              "comparable_optimal_vs_other_edges": 967,
+              "optimal_prediction_margin_quantiles": {
+                "0": -187.96963500976562,
+                "0.1": -19.900819778442383,
+                "0.5": -0.1890411376953125,
+                "0.9": 10.478700637817383,
+                "1": 232.88026428222656
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.5553257497414684,
+              "optimal_prediction_margin_abs_le_half_rate": 0.18614270941054809,
+              "entered_proven_unreachable": 69
+            },
+            "41_80": {
+              "executed_edges": 909,
+              "unique_state_goal_pairs": 890,
+              "represented_queries": 272,
+              "true_distance_quantiles": {
+                "0": 41.0,
+                "0.1": 42.0,
+                "0.5": 50.0,
+                "0.9": 61.0,
+                "1": 79.0
+              },
+              "finite_distance_mae": 54.6888313293457,
+              "true_optimal_action_rate": 0.49174917491749176,
+              "predicted_non_descent_rate": 0.27832783278327833,
+              "chosen_predicted_drop_quantiles": {
+                "0": -103.15339660644531,
+                "0.1": -1.7472959756851196,
+                "0.5": 0.8439178466796875,
+                "0.9": 26.330360412597656,
+                "1": 239.77352905273438
+              },
+              "comparable_optimal_vs_other_edges": 824,
+              "optimal_prediction_margin_quantiles": {
+                "0": -150.82974243164062,
+                "0.1": -21.15650749206543,
+                "0.5": -0.1642608642578125,
+                "0.9": 12.509312629699707,
+                "1": 238.82154846191406
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.5618932038834952,
+              "optimal_prediction_margin_abs_le_half_rate": 0.1796116504854369,
+              "entered_proven_unreachable": 76
+            },
+            "proven_unreachable": {
+              "executed_edges": 684,
+              "unique_state_goal_pairs": 661,
+              "represented_queries": 204,
+              "true_distance_quantiles": {},
+              "finite_distance_mae": null,
+              "true_optimal_action_rate": 0.0,
+              "predicted_non_descent_rate": 0.36403508771929827,
+              "chosen_predicted_drop_quantiles": {
+                "0": -85.87655639648438,
+                "0.1": -2.1560990810394287,
+                "0.5": 0.38309621810913086,
+                "0.9": 7.678599834442139,
+                "1": 114.19757843017578
+              },
+              "comparable_optimal_vs_other_edges": 0,
+              "optimal_prediction_margin_quantiles": {},
+              "optimal_prediction_margin_nonpositive_rate": null,
+              "optimal_prediction_margin_abs_le_half_rate": null,
+              "entered_proven_unreachable": 0
+            }
+          }
+        },
+        "first_non_descent": {
+          "executed_edges": 963,
+          "unique_state_goal_pairs": 942,
+          "represented_queries": 963,
+          "true_distance_quantiles": {
+            "0": 2.0,
+            "0.1": 6.0,
+            "0.5": 26.0,
+            "0.9": 52.0999755859375,
+            "1": 73.0
+          },
+          "finite_distance_mae": 41.86298751831055,
+          "true_optimal_action_rate": 0.48909657320872274,
+          "predicted_non_descent_rate": 1.0,
+          "chosen_predicted_drop_quantiles": {
+            "0": -145.80502319335938,
+            "0.1": -13.909159660339355,
+            "0.5": -0.944000244140625,
+            "0.9": -0.10108184814453125,
+            "1": 0.0
+          },
+          "comparable_optimal_vs_other_edges": 655,
+          "optimal_prediction_margin_quantiles": {
+            "0": -187.1935577392578,
+            "0.1": -9.229522705078125,
+            "0.5": -0.014312744140625,
+            "0.9": 10.442639350891113,
+            "1": 235.43702697753906
+          },
+          "optimal_prediction_margin_nonpositive_rate": 0.5374045801526718,
+          "optimal_prediction_margin_abs_le_half_rate": 0.2381679389312977,
+          "entered_proven_unreachable": 16,
+          "by_true_distance": {
+            "2_2": {
+              "executed_edges": 12,
+              "unique_state_goal_pairs": 11,
+              "represented_queries": 12,
+              "true_distance_quantiles": {
+                "0": 2.0,
+                "0.1": 2.0,
+                "0.5": 2.0,
+                "0.9": 2.0,
+                "1": 2.0
+              },
+              "finite_distance_mae": 3.680004835128784,
+              "true_optimal_action_rate": 0.6666666666666666,
+              "predicted_non_descent_rate": 1.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": -12.256156921386719,
+                "0.1": -5.1227898597717285,
+                "0.5": -1.0091781616210938,
+                "0.9": -0.06051761656999588,
+                "1": -0.029796600341796875
+              },
+              "comparable_optimal_vs_other_edges": 11,
+              "optimal_prediction_margin_quantiles": {
+                "0": -15.531051635742188,
+                "0.1": -15.34144401550293,
+                "0.5": 0.388336181640625,
+                "0.9": 3.2813568115234375,
+                "1": 4.1129150390625
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.36363636363636365,
+              "optimal_prediction_margin_abs_le_half_rate": 0.2727272727272727,
+              "entered_proven_unreachable": 0
+            },
+            "3_5": {
+              "executed_edges": 62,
+              "unique_state_goal_pairs": 55,
+              "represented_queries": 62,
+              "true_distance_quantiles": {
+                "0": 3.0,
+                "0.1": 3.0,
+                "0.5": 4.0,
+                "0.9": 5.0,
+                "1": 5.0
+              },
+              "finite_distance_mae": 17.648319244384766,
+              "true_optimal_action_rate": 0.6451612903225806,
+              "predicted_non_descent_rate": 1.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": -30.863208770751953,
+                "0.1": -10.909318923950195,
+                "0.5": -0.69854736328125,
+                "0.9": -0.1859114170074463,
+                "1": -0.007781982421875
+              },
+              "comparable_optimal_vs_other_edges": 48,
+              "optimal_prediction_margin_quantiles": {
+                "0": -78.88633728027344,
+                "0.1": -7.578461647033691,
+                "0.5": 0.41159820556640625,
+                "0.9": 27.78632354736328,
+                "1": 54.571014404296875
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.4583333333333333,
+              "optimal_prediction_margin_abs_le_half_rate": 0.125,
+              "entered_proven_unreachable": 0
+            },
+            "6_10": {
+              "executed_edges": 98,
+              "unique_state_goal_pairs": 95,
+              "represented_queries": 98,
+              "true_distance_quantiles": {
+                "0": 6.0,
+                "0.1": 6.0,
+                "0.5": 8.0,
+                "0.9": 10.0,
+                "1": 10.0
+              },
+              "finite_distance_mae": 31.34188461303711,
+              "true_optimal_action_rate": 0.6428571428571429,
+              "predicted_non_descent_rate": 1.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": -110.5850830078125,
+                "0.1": -12.1626558303833,
+                "0.5": -0.71173095703125,
+                "0.9": -0.11413963884115219,
+                "1": -0.00030517578125
+              },
+              "comparable_optimal_vs_other_edges": 78,
+              "optimal_prediction_margin_quantiles": {
+                "0": -97.31913757324219,
+                "0.1": -10.584534645080566,
+                "0.5": 0.18248844146728516,
+                "0.9": 7.987445831298828,
+                "1": 76.01924133300781
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.44871794871794873,
+              "optimal_prediction_margin_abs_le_half_rate": 0.20512820512820512,
+              "entered_proven_unreachable": 1
+            },
+            "11_20": {
+              "executed_edges": 158,
+              "unique_state_goal_pairs": 157,
+              "represented_queries": 158,
+              "true_distance_quantiles": {
+                "0": 11.0,
+                "0.1": 12.0,
+                "0.5": 15.0,
+                "0.9": 19.0,
+                "1": 20.0
+              },
+              "finite_distance_mae": 34.548091888427734,
+              "true_optimal_action_rate": 0.569620253164557,
+              "predicted_non_descent_rate": 1.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": -62.6353759765625,
+                "0.1": -12.907849311828613,
+                "0.5": -1.0195317268371582,
+                "0.9": -0.09226683527231216,
+                "1": -3.0517578125e-05
+              },
+              "comparable_optimal_vs_other_edges": 124,
+              "optimal_prediction_margin_quantiles": {
+                "0": -87.75155639648438,
+                "0.1": -10.43249797821045,
+                "0.5": -0.28955841064453125,
+                "0.9": 6.440834999084473,
+                "1": 193.52838134765625
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.5645161290322581,
+              "optimal_prediction_margin_abs_le_half_rate": 0.1935483870967742,
+              "entered_proven_unreachable": 2
+            },
+            "21_40": {
+              "executed_edges": 290,
+              "unique_state_goal_pairs": 288,
+              "represented_queries": 290,
+              "true_distance_quantiles": {
+                "0": 21.0,
+                "0.1": 22.0,
+                "0.5": 30.0,
+                "0.9": 38.0,
+                "1": 40.0
+              },
+              "finite_distance_mae": 50.00888442993164,
+              "true_optimal_action_rate": 0.5379310344827586,
+              "predicted_non_descent_rate": 1.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": -145.80502319335938,
+                "0.1": -14.085488319396973,
+                "0.5": -0.9423274993896484,
+                "0.9": -0.10337522625923157,
+                "1": 0.0
+              },
+              "comparable_optimal_vs_other_edges": 229,
+              "optimal_prediction_margin_quantiles": {
+                "0": -187.1935577392578,
+                "0.1": -9.076507568359375,
+                "0.5": -0.13766193389892578,
+                "0.9": 7.841518878936768,
+                "1": 229.92799377441406
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.5851528384279476,
+              "optimal_prediction_margin_abs_le_half_rate": 0.2576419213973799,
+              "entered_proven_unreachable": 6
+            },
+            "41_80": {
+              "executed_edges": 200,
+              "unique_state_goal_pairs": 197,
+              "represented_queries": 200,
+              "true_distance_quantiles": {
+                "0": 41.0,
+                "0.1": 42.0,
+                "0.5": 50.0,
+                "0.9": 61.0,
+                "1": 73.0
+              },
+              "finite_distance_mae": 50.783077239990234,
+              "true_optimal_action_rate": 0.57,
+              "predicted_non_descent_rate": 1.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": -103.15339660644531,
+                "0.1": -21.53392791748047,
+                "0.5": -0.93701171875,
+                "0.9": -0.0689544826745987,
+                "1": 0.0
+              },
+              "comparable_optimal_vs_other_edges": 165,
+              "optimal_prediction_margin_quantiles": {
+                "0": -64.8218994140625,
+                "0.1": -5.231898307800293,
+                "0.5": -0.005523681640625,
+                "0.9": 23.466581344604492,
+                "1": 235.43702697753906
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.5272727272727272,
+              "optimal_prediction_margin_abs_le_half_rate": 0.2909090909090909,
+              "entered_proven_unreachable": 7
+            },
+            "proven_unreachable": {
+              "executed_edges": 143,
+              "unique_state_goal_pairs": 139,
+              "represented_queries": 143,
+              "true_distance_quantiles": {},
+              "finite_distance_mae": null,
+              "true_optimal_action_rate": 0.0,
+              "predicted_non_descent_rate": 1.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": -85.87655639648438,
+                "0.1": -17.602447509765625,
+                "0.5": -1.0212249755859375,
+                "0.9": -0.13294453918933868,
+                "1": -0.0291900634765625
+              },
+              "comparable_optimal_vs_other_edges": 0,
+              "optimal_prediction_margin_quantiles": {},
+              "optimal_prediction_margin_nonpositive_rate": null,
+              "optimal_prediction_margin_abs_le_half_rate": null,
+              "entered_proven_unreachable": 0
+            }
+          }
+        },
+        "all_non_descent": {
+          "executed_edges": 1286,
+          "unique_state_goal_pairs": 1247,
+          "represented_queries": 963,
+          "true_distance_quantiles": {
+            "0": 2.0,
+            "0.1": 6.0,
+            "0.5": 26.0,
+            "0.9": 53.0,
+            "1": 78.0
+          },
+          "finite_distance_mae": 39.98434829711914,
+          "true_optimal_action_rate": 0.4642301710730949,
+          "predicted_non_descent_rate": 1.0,
+          "chosen_predicted_drop_quantiles": {
+            "0": -145.80502319335938,
+            "0.1": -12.68551254272461,
+            "0.5": -0.9306793212890625,
+            "0.9": -0.1035003662109375,
+            "1": 0.0
+          },
+          "comparable_optimal_vs_other_edges": 838,
+          "optimal_prediction_margin_quantiles": {
+            "0": -187.1935577392578,
+            "0.1": -9.1651611328125,
+            "0.5": -0.01195526123046875,
+            "0.9": 10.89127254486084,
+            "1": 235.43702697753906
+          },
+          "optimal_prediction_margin_nonpositive_rate": 0.5298329355608592,
+          "optimal_prediction_margin_abs_le_half_rate": 0.2577565632458234,
+          "entered_proven_unreachable": 17,
+          "by_true_distance": {
+            "2_2": {
+              "executed_edges": 14,
+              "unique_state_goal_pairs": 11,
+              "represented_queries": 14,
+              "true_distance_quantiles": {
+                "0": 2.0,
+                "0.1": 2.0,
+                "0.5": 2.0,
+                "0.9": 2.0,
+                "1": 2.0
+              },
+              "finite_distance_mae": 3.5381715297698975,
+              "true_optimal_action_rate": 0.6428571428571429,
+              "predicted_non_descent_rate": 1.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": -12.256156921386719,
+                "0.1": -4.487098693847656,
+                "0.5": -1.0091781616210938,
+                "0.9": -0.12195936590433121,
+                "1": -0.029796600341796875
+              },
+              "comparable_optimal_vs_other_edges": 13,
+              "optimal_prediction_margin_quantiles": {
+                "0": -15.531051635742188,
+                "0.1": -15.49312973022461,
+                "0.5": 0.388336181640625,
+                "0.9": 3.9466028213500977,
+                "1": 4.1129150390625
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.38461538461538464,
+              "optimal_prediction_margin_abs_le_half_rate": 0.23076923076923078,
+              "entered_proven_unreachable": 0
+            },
+            "3_5": {
+              "executed_edges": 76,
+              "unique_state_goal_pairs": 66,
+              "represented_queries": 66,
+              "true_distance_quantiles": {
+                "0": 3.0,
+                "0.1": 3.0,
+                "0.5": 4.0,
+                "0.9": 5.0,
+                "1": 5.0
+              },
+              "finite_distance_mae": 16.61592674255371,
+              "true_optimal_action_rate": 0.5789473684210527,
+              "predicted_non_descent_rate": 1.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": -30.863208770751953,
+                "0.1": -9.732295989990234,
+                "0.5": -0.69854736328125,
+                "0.9": -0.2070331573486328,
+                "1": -0.007781982421875
+              },
+              "comparable_optimal_vs_other_edges": 60,
+              "optimal_prediction_margin_quantiles": {
+                "0": -78.88633728027344,
+                "0.1": -7.1653852462768555,
+                "0.5": -0.13008403778076172,
+                "0.9": 14.465357780456543,
+                "1": 54.571014404296875
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.5333333333333333,
+              "optimal_prediction_margin_abs_le_half_rate": 0.15,
+              "entered_proven_unreachable": 1
+            },
+            "6_10": {
+              "executed_edges": 127,
+              "unique_state_goal_pairs": 118,
+              "represented_queries": 109,
+              "true_distance_quantiles": {
+                "0": 6.0,
+                "0.1": 6.0,
+                "0.5": 8.0,
+                "0.9": 10.0,
+                "1": 10.0
+              },
+              "finite_distance_mae": 31.366531372070312,
+              "true_optimal_action_rate": 0.6141732283464567,
+              "predicted_non_descent_rate": 1.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": -110.5850830078125,
+                "0.1": -10.988853454589844,
+                "0.5": -0.7585287094116211,
+                "0.9": -0.11914978921413422,
+                "1": -0.00030517578125
+              },
+              "comparable_optimal_vs_other_edges": 103,
+              "optimal_prediction_margin_quantiles": {
+                "0": -118.24076080322266,
+                "0.1": -11.677206039428711,
+                "0.5": 0.096221923828125,
+                "0.9": 6.447099685668945,
+                "1": 76.01924133300781
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.47572815533980584,
+              "optimal_prediction_margin_abs_le_half_rate": 0.2621359223300971,
+              "entered_proven_unreachable": 1
+            },
+            "11_20": {
+              "executed_edges": 203,
+              "unique_state_goal_pairs": 201,
+              "represented_queries": 168,
+              "true_distance_quantiles": {
+                "0": 11.0,
+                "0.1": 12.0,
+                "0.5": 15.0,
+                "0.9": 19.0,
+                "1": 20.0
+              },
+              "finite_distance_mae": 31.317686080932617,
+              "true_optimal_action_rate": 0.5812807881773399,
+              "predicted_non_descent_rate": 1.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": -62.6353759765625,
+                "0.1": -13.531692504882812,
+                "0.5": -1.0101594924926758,
+                "0.9": -0.0961339920759201,
+                "1": 0.0
+              },
+              "comparable_optimal_vs_other_edges": 161,
+              "optimal_prediction_margin_quantiles": {
+                "0": -87.75155639648438,
+                "0.1": -12.014816284179688,
+                "0.5": -0.0471343994140625,
+                "0.9": 13.109146118164062,
+                "1": 193.52838134765625
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.5403726708074534,
+              "optimal_prediction_margin_abs_le_half_rate": 0.20496894409937888,
+              "entered_proven_unreachable": 2
+            },
+            "21_40": {
+              "executed_edges": 364,
+              "unique_state_goal_pairs": 361,
+              "represented_queries": 299,
+              "true_distance_quantiles": {
+                "0": 21.0,
+                "0.1": 22.0,
+                "0.5": 30.0,
+                "0.9": 38.0,
+                "1": 40.0
+              },
+              "finite_distance_mae": 46.466793060302734,
+              "true_optimal_action_rate": 0.5576923076923077,
+              "predicted_non_descent_rate": 1.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": -145.80502319335938,
+                "0.1": -12.080026626586914,
+                "0.5": -0.9124593734741211,
+                "0.9": -0.10566876083612442,
+                "1": 0.0
+              },
+              "comparable_optimal_vs_other_edges": 292,
+              "optimal_prediction_margin_quantiles": {
+                "0": -187.1935577392578,
+                "0.1": -9.007706642150879,
+                "0.5": -0.0809173583984375,
+                "0.9": 8.685824394226074,
+                "1": 230.71710205078125
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.5547945205479452,
+              "optimal_prediction_margin_abs_le_half_rate": 0.2910958904109589,
+              "entered_proven_unreachable": 6
+            },
+            "41_80": {
+              "executed_edges": 253,
+              "unique_state_goal_pairs": 249,
+              "represented_queries": 203,
+              "true_distance_quantiles": {
+                "0": 41.0,
+                "0.1": 42.20000076293945,
+                "0.5": 50.0,
+                "0.9": 61.0,
+                "1": 78.0
+              },
+              "finite_distance_mae": 50.97420120239258,
+              "true_optimal_action_rate": 0.5731225296442688,
+              "predicted_non_descent_rate": 1.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": -103.15339660644531,
+                "0.1": -12.863814353942871,
+                "0.5": -0.93701171875,
+                "0.9": -0.0835205540060997,
+                "1": 0.0
+              },
+              "comparable_optimal_vs_other_edges": 209,
+              "optimal_prediction_margin_quantiles": {
+                "0": -64.8218994140625,
+                "0.1": -3.9287590980529785,
+                "0.5": -0.005523681640625,
+                "0.9": 18.747568130493164,
+                "1": 235.43702697753906
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.5215311004784688,
+              "optimal_prediction_margin_abs_le_half_rate": 0.2822966507177033,
+              "entered_proven_unreachable": 7
+            },
+            "proven_unreachable": {
+              "executed_edges": 249,
+              "unique_state_goal_pairs": 241,
+              "represented_queries": 204,
+              "true_distance_quantiles": {},
+              "finite_distance_mae": null,
+              "true_optimal_action_rate": 0.0,
+              "predicted_non_descent_rate": 1.0,
+              "chosen_predicted_drop_quantiles": {
+                "0": -85.87655639648438,
+                "0.1": -14.71029281616211,
+                "0.5": -0.9306793212890625,
+                "0.9": -0.10896305739879608,
+                "1": -0.000152587890625
+              },
+              "comparable_optimal_vs_other_edges": 0,
+              "optimal_prediction_margin_quantiles": {},
+              "optimal_prediction_margin_nonpositive_rate": null,
+              "optimal_prediction_margin_abs_le_half_rate": null,
+              "entered_proven_unreachable": 0
+            }
+          }
+        },
+        "cycle_closing": {
+          "executed_edges": 940,
+          "unique_state_goal_pairs": 919,
+          "represented_queries": 940,
+          "true_distance_quantiles": {
+            "0": 2.0,
+            "0.1": 7.0,
+            "0.5": 26.0,
+            "0.9": 52.5,
+            "1": 78.0
+          },
+          "finite_distance_mae": 43.33930969238281,
+          "true_optimal_action_rate": 0.4553191489361702,
+          "predicted_non_descent_rate": 0.5117021276595745,
+          "chosen_predicted_drop_quantiles": {
+            "0": -103.15339660644531,
+            "0.1": -4.263755798339844,
+            "0.5": -0.0027313232421875,
+            "0.9": 5.170257091522217,
+            "1": 125.31370544433594
+          },
+          "comparable_optimal_vs_other_edges": 582,
+          "optimal_prediction_margin_quantiles": {
+            "0": -228.14047241210938,
+            "0.1": -21.750455856323242,
+            "0.5": -0.04100620746612549,
+            "0.9": 7.9656758308410645,
+            "1": 230.71710205078125
+          },
+          "optimal_prediction_margin_nonpositive_rate": 0.5309278350515464,
+          "optimal_prediction_margin_abs_le_half_rate": 0.18900343642611683,
+          "entered_proven_unreachable": 0,
+          "by_true_distance": {
+            "2_2": {
+              "executed_edges": 8,
+              "unique_state_goal_pairs": 7,
+              "represented_queries": 8,
+              "true_distance_quantiles": {
+                "0": 2.0,
+                "0.1": 2.0,
+                "0.5": 2.0,
+                "0.9": 2.0,
+                "1": 2.0
+              },
+              "finite_distance_mae": 2.632298707962036,
+              "true_optimal_action_rate": 0.0,
+              "predicted_non_descent_rate": 0.375,
+              "chosen_predicted_drop_quantiles": {
+                "0": -1.2704010009765625,
+                "0.1": -0.6985748410224915,
+                "0.5": 0.1942892074584961,
+                "0.9": 0.34332767128944397,
+                "1": 0.34668588638305664
+              },
+              "comparable_optimal_vs_other_edges": 8,
+              "optimal_prediction_margin_quantiles": {
+                "0": -65.60801696777344,
+                "0.1": -30.554141998291016,
+                "0.5": -3.5923233032226562,
+                "0.9": -0.2258329689502716,
+                "1": -0.14434242248535156
+              },
+              "optimal_prediction_margin_nonpositive_rate": 1.0,
+              "optimal_prediction_margin_abs_le_half_rate": 0.25,
+              "entered_proven_unreachable": 0
+            },
+            "3_5": {
+              "executed_edges": 40,
+              "unique_state_goal_pairs": 34,
+              "represented_queries": 40,
+              "true_distance_quantiles": {
+                "0": 3.0,
+                "0.1": 3.0,
+                "0.5": 4.0,
+                "0.9": 5.0,
+                "1": 5.0
+              },
+              "finite_distance_mae": 18.86064910888672,
+              "true_optimal_action_rate": 0.6,
+              "predicted_non_descent_rate": 0.525,
+              "chosen_predicted_drop_quantiles": {
+                "0": -24.674842834472656,
+                "0.1": -5.1162943840026855,
+                "0.5": -0.32947850227355957,
+                "0.9": 7.97376012802124,
+                "1": 25.854873657226562
+              },
+              "comparable_optimal_vs_other_edges": 32,
+              "optimal_prediction_margin_quantiles": {
+                "0": -67.5974349975586,
+                "0.1": -9.793380737304688,
+                "0.5": 0.051239967346191406,
+                "0.9": 3.5139031410217285,
+                "1": 29.628448486328125
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.5,
+              "optimal_prediction_margin_abs_le_half_rate": 0.15625,
+              "entered_proven_unreachable": 0
+            },
+            "6_10": {
+              "executed_edges": 97,
+              "unique_state_goal_pairs": 93,
+              "represented_queries": 97,
+              "true_distance_quantiles": {
+                "0": 6.0,
+                "0.1": 6.0,
+                "0.5": 8.0,
+                "0.9": 10.0,
+                "1": 10.0
+              },
+              "finite_distance_mae": 34.108882904052734,
+              "true_optimal_action_rate": 0.6288659793814433,
+              "predicted_non_descent_rate": 0.5051546391752577,
+              "chosen_predicted_drop_quantiles": {
+                "0": -60.721099853515625,
+                "0.1": -3.2075252532958984,
+                "0.5": -0.00499725341796875,
+                "0.9": 5.059462070465088,
+                "1": 29.09356689453125
+              },
+              "comparable_optimal_vs_other_edges": 82,
+              "optimal_prediction_margin_quantiles": {
+                "0": -134.18450927734375,
+                "0.1": -28.823078155517578,
+                "0.5": 0.3125801086425781,
+                "0.9": 5.966492652893066,
+                "1": 87.72819519042969
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.43902439024390244,
+              "optimal_prediction_margin_abs_le_half_rate": 0.15853658536585366,
+              "entered_proven_unreachable": 0
+            },
+            "11_20": {
+              "executed_edges": 153,
+              "unique_state_goal_pairs": 152,
+              "represented_queries": 153,
+              "true_distance_quantiles": {
+                "0": 11.0,
+                "0.1": 12.0,
+                "0.5": 15.0,
+                "0.9": 20.0,
+                "1": 20.0
+              },
+              "finite_distance_mae": 34.73203659057617,
+              "true_optimal_action_rate": 0.6339869281045751,
+              "predicted_non_descent_rate": 0.4444444444444444,
+              "chosen_predicted_drop_quantiles": {
+                "0": -54.74806213378906,
+                "0.1": -5.1303391456604,
+                "0.5": 0.088409423828125,
+                "0.9": 4.4258341789245605,
+                "1": 30.206356048583984
+              },
+              "comparable_optimal_vs_other_edges": 118,
+              "optimal_prediction_margin_quantiles": {
+                "0": -228.14047241210938,
+                "0.1": -18.593257904052734,
+                "0.5": 0.040615081787109375,
+                "0.9": 24.212133407592773,
+                "1": 89.07778930664062
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.4830508474576271,
+              "optimal_prediction_margin_abs_le_half_rate": 0.1694915254237288,
+              "entered_proven_unreachable": 0
+            },
+            "21_40": {
+              "executed_edges": 259,
+              "unique_state_goal_pairs": 258,
+              "represented_queries": 259,
+              "true_distance_quantiles": {
+                "0": 21.0,
+                "0.1": 22.0,
+                "0.5": 31.0,
+                "0.9": 38.0,
+                "1": 40.0
+              },
+              "finite_distance_mae": 49.99663162231445,
+              "true_optimal_action_rate": 0.5675675675675675,
+              "predicted_non_descent_rate": 0.5752895752895753,
+              "chosen_predicted_drop_quantiles": {
+                "0": -75.75536346435547,
+                "0.1": -5.010051727294922,
+                "0.5": -0.23004913330078125,
+                "0.9": 4.37355375289917,
+                "1": 125.31370544433594
+              },
+              "comparable_optimal_vs_other_edges": 190,
+              "optimal_prediction_margin_quantiles": {
+                "0": -116.43136596679688,
+                "0.1": -24.88157844543457,
+                "0.5": -0.41974639892578125,
+                "0.9": 7.704490661621094,
+                "1": 230.71710205078125
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.5894736842105263,
+              "optimal_prediction_margin_abs_le_half_rate": 0.2,
+              "entered_proven_unreachable": 0
+            },
+            "41_80": {
+              "executed_edges": 179,
+              "unique_state_goal_pairs": 179,
+              "represented_queries": 179,
+              "true_distance_quantiles": {
+                "0": 41.0,
+                "0.1": 42.0,
+                "0.5": 50.0,
+                "0.9": 61.0,
+                "1": 78.0
+              },
+              "finite_distance_mae": 53.355064392089844,
+              "true_optimal_action_rate": 0.553072625698324,
+              "predicted_non_descent_rate": 0.4692737430167598,
+              "chosen_predicted_drop_quantiles": {
+                "0": -103.15339660644531,
+                "0.1": -3.4809672832489014,
+                "0.5": 0.06915283203125,
+                "0.9": 5.781120300292969,
+                "1": 103.15339660644531
+              },
+              "comparable_optimal_vs_other_edges": 152,
+              "optimal_prediction_margin_quantiles": {
+                "0": -123.91255187988281,
+                "0.1": -11.012014389038086,
+                "0.5": -0.0351104736328125,
+                "0.9": 9.05263900756836,
+                "1": 225.9994354248047
+              },
+              "optimal_prediction_margin_nonpositive_rate": 0.5263157894736842,
+              "optimal_prediction_margin_abs_le_half_rate": 0.21052631578947367,
+              "entered_proven_unreachable": 0
+            },
+            "proven_unreachable": {
+              "executed_edges": 204,
+              "unique_state_goal_pairs": 196,
+              "represented_queries": 204,
+              "true_distance_quantiles": {},
+              "finite_distance_mae": null,
+              "true_optimal_action_rate": 0.0,
+              "predicted_non_descent_rate": 0.5245098039215687,
+              "chosen_predicted_drop_quantiles": {
+                "0": -71.55040740966797,
+                "0.1": -3.7682504653930664,
+                "0.5": -0.02594757080078125,
+                "0.9": 4.189983367919922,
+                "1": 85.87655639648438
+              },
+              "comparable_optimal_vs_other_edges": 0,
+              "optimal_prediction_margin_quantiles": {},
+              "optimal_prediction_margin_nonpositive_rate": null,
+              "optimal_prediction_margin_abs_le_half_rate": null,
+              "entered_proven_unreachable": 0
+            }
+          }
+        },
+        "interpretation": "Execution-weighted records include repeated visits across queries; unique pair counts are also reported. First non-descent is the first visited state with no strictly lower predicted legal successor. A cycle-closing action is inspected after selection. Positive optimal-vs-other margin favors the best teacher-optimal child; ties depend on the unchanged candidate order. No evaluation record is added to training."
+      },
+      "cycle_length_counts": {
+        "2": 940
+      },
+      "cycle_closing_at_distance1_5": 48,
+      "cycle_closing_at_distance_gt5_finite": 688
+    }
+  },
+  "frozen_evaluator_source_commit": "290cc8c",
+  "raw_result": "runs\\new_tasks_qmap\\exact_pairs\\sokoban_balanced_relations_policy_boundaries_validation.json"
+}

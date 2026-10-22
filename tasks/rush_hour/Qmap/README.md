@@ -6,6 +6,8 @@
 
 精确分量数据、状态对训练、冻结评测与任务reader入口已实现，见[正式实验](../../../experiments/new_tasks_qmap/README.md)。[完整预算基线](../../../experiments/new_tasks_qmap/results/rush_hour_pairs_baseline.json)在v2独特状态对评测中，已见布局留出关系993/1024、未见目标990/1024完成，但未见布局520/1024、已知原始困难题0/8，尚未通过全部必需组，[selection](selection.json)不登记采用权重。现有[公开数据与精确求解](../data/README.md)、[文字和裁判](../prompts/README.md)可复用；Flash筛查不证明Qmap已能准确表示。
 
+[局部CNN完整预算对照](../../../experiments/new_tasks_qmap/results/rush_hour_pairs_spatial.json)保持同数据、划分、采样、128维、损失与预算，未见布局提高至559/1024（54.59%），已知原始困难题1/8，仍未达到验收要求。布局内与未见布局分别报告，不以平均成绩代替泛化。
+
 ## 棋盘编码
 
 编码器读取完整棋盘，必须分辨每辆车的身份及其占据格，不能把所有车辆合成一个占用通道。同一场景内每辆车的长度、方向、所在行／列固定，轴向位置随动作变化。只有空地、没有固定墙；环境仍禁止穿过其他车或出界。

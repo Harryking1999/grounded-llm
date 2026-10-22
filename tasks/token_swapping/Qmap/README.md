@@ -6,6 +6,8 @@
 
 [完整预算基线](../../../experiments/new_tasks_qmap/results/token_pairs_baseline.json)在v2独特状态对评测中的留出关系／未见起点／两端未见到达率为30.47%／27.73%／27.25%，[补近阶段](../../../experiments/new_tasks_qmap/results/token_pairs_local_goals.json)为48.54%／47.85%／44.63%，[补近rank4](../../../experiments/new_tasks_qmap/results/token_pairs_local_rank4.json)为65.92%／62.50%／64.36%，均未达到全部必需组最低验收线。局部最优动作率较高仍会在整题执行中循环，不能宣称已正确学到全域状态对地图。
 
+[独立近距验证](../../../experiments/new_tasks_qmap/results/token_pairs_near_validation.json)中，rank4对真实1–5步、至少一个未见验证端点的三组随机查询已有约96%到达；[实际执行诊断](../../../experiments/new_tasks_qmap/results/token_pairs_policy_boundaries.json)的剩余验证失败均为两步循环，多数闭环动作仍距目标超过5步。随机近距覆盖与执行中困难位置分开报告，不以近距成绩替代完整验收。
+
 ## 状态、动作与目标
 
 | 项目 | 构建约定 |

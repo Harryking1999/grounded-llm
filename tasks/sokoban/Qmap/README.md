@@ -6,6 +6,8 @@
 
 该条件的精确图、完整状态对训练、冻结评测与reader入口已实现，见[正式实验](../../../experiments/new_tasks_qmap/README.md)。[完整预算基线](../../../experiments/new_tasks_qmap/results/sokoban_pairs_baseline.json)在v2独特状态对评测中未见布局到达70/1024，[Sigmoid／Linear完整对照](../../../experiments/new_tasks_qmap/results/sokoban_pairs_activation_final.json)没有恢复可靠规划，均未通过验收。[selection](selection.json)不登记采用权重。历史六乘六两箱试验见[首轮入口](../../../experiments/new_tasks_qmap/README.md)，不能用于hard条件。
 
+[局部CNN完整预算对照](../../../experiments/new_tasks_qmap/results/sokoban_pairs_spatial.json)未见布局到达69/1024，尚未解决跨布局泛化。[可达／边界采样](../../../experiments/new_tasks_qmap/results/sokoban_pairs_balanced_relations.json)改善布局内到达，但未见布局仍68/1024；[实际执行边界](../../../experiments/new_tasks_qmap/results/sokoban_pairs_policy_boundaries.json)显示其未见验证布局首次无下降位置的有限真距离中位数为26步，不能只靠最后几步的随机近距成绩判断地图可靠。
+
 ## 规则、状态与输入
 
 墙是不能进入的格子，目标格是箱子的指定停放位置。玩家每次上、下、左、右移动一格；若前方是箱子，且箱子前方为空，便同时把箱子向前推一格。不能拉箱子、穿墙或同时推动两箱。走动和推动每次均成本1。原规则以全部四箱到位为完成；首版指定的成功目标还要求玩家到给定格。箱子没有身份，不必指定哪只箱子去哪个目标。

@@ -14,6 +14,7 @@
 | 原50k B2 同更新预算补评 | [b2_50k_evaluation.json](configs/b2_50k_evaluation.json) | [诊断比较](results/b2_four_controls.md)；逐题结果在已有补评 runtime |
 | 50k 内容 MLP：有／无逐轮重编号 | [b2_50k_mlp.json](configs/b2_50k_mlp.json) | 共用原50k积木轨迹、冻结图与510题 |
 | 12块清空50k：新地图、3B与7B全参对照 | [地图](configs/blocks12_50k_map.json)、[3B](configs/blocks12_50k_3b.json)、[7B](configs/blocks12_50k_7b.json) | 新地图＋MLP＋逐轮重编号；同批新轨迹，固定500题评测 |
+| 12块清空50k：1.5B文字全参对照 | [1.5B文字](configs/blocks12_50k_1p5b_text.json) | 复用三组共同数据与固定500题；两卡，global batch为4 |
 | 二阶魔方、8-Puzzle 的50k地图 SFT | [cube2](configs/cube2_50k_mlp_renumber.json)、[puzzle8](configs/puzzle8_50k_mlp_renumber.json) | 各任务采用图，MLP＋逐轮重编号；固定目标复原 |
 | 缓存与权重保留 | [bridge_retention.json](configs/bridge_retention.json) | 具体运行状态在各 runtime |
 

@@ -67,6 +67,8 @@ def coordinate_statistics(source,goal,truth,predictions,cap,activation):
             finite_mae=float(np.abs(predictions[finite]-truth[finite]).mean()) if finite.any() else None,
             finite_bias=float((predictions[finite]-truth[finite]).mean()) if finite.any() else None,
             predicted_mean=float(predictions[mask].mean()),
+            positive_finite_predicted_zero_fraction=(float((predictions[finite & (truth>0)]<=1e-6).mean())
+                if (finite & (truth>0)).any() else None),
             boundary_fraction=float(boundary[mask].mean()) if boundary is not None else None,
             low_output_derivative_fraction=float(low_gradient[mask].mean()),
             outside_sigmoid_range_fraction=float(outside[mask].mean()))
@@ -89,6 +91,9 @@ def rollout(corpus,cache,rows,horizon,policy):
     steps=np.zeros(len(rows),dtype=int); active=current!=goal
     seen=[{int(s)} for s in current]; cycles=np.zeros(len(rows),bool); dead=np.zeros(len(rows),bool)
     no_action=np.zeros(len(rows),bool); traces=[[] for _ in rows]
+    descent=[[] for _ in rows]; progress_counts=dict(executed_edges=0,predicted_decrease=0,predicted_plateau=0,
+        predicted_increase=0,true_finite_edges=0,true_optimal_edges=0,predicted_decrease_but_not_true_optimal=0,
+        entered_dead_edges=0,non_goal_predicted_zero=0)
     for _ in range(horizon):
         ids=np.flatnonzero(active)
         if not len(ids): break
@@ -107,7 +112,22 @@ def rollout(corpus,cache,rows,horizon,policy):
         choices=np.argmin(1+scores,axis=1)
         next_states=children[np.arange(len(ids)),choices]
         # Oracle inspection occurs AFTER action selection and cannot prune/stop Q.
-        dead[ids]|=~np.isfinite(corpus.distance(next_states,goal[ids]))
+        after_truth=corpus.distance(next_states,goal[ids])
+        dead[ids]|=~np.isfinite(after_truth)
+        if policy=='q':
+            before=cache.scores(current[ids],goal[ids]); drop=before-scores[np.arange(len(ids)),choices]
+            before_truth=corpus.distance(current[ids],goal[ids]); finite=np.isfinite(before_truth)&np.isfinite(after_truth)
+            optimal=finite & (before_truth==1+after_truth); decreasing=drop>1e-6
+            progress_counts['executed_edges']+=len(ids)
+            progress_counts['predicted_decrease']+=int(decreasing.sum())
+            progress_counts['predicted_plateau']+=int((np.abs(drop)<=1e-6).sum())
+            progress_counts['predicted_increase']+=int((drop < -1e-6).sum())
+            progress_counts['true_finite_edges']+=int(finite.sum())
+            progress_counts['true_optimal_edges']+=int(optimal.sum())
+            progress_counts['predicted_decrease_but_not_true_optimal']+=int((decreasing & ~optimal).sum())
+            progress_counts['entered_dead_edges']+=int((np.isfinite(before_truth)&~np.isfinite(after_truth)).sum())
+            progress_counts['non_goal_predicted_zero']+=int((before<=1e-6).sum())
+            for j,margin in zip(ids,drop): descent[j].append(float(margin))
         for j,slot in zip(ids,choices): traces[j].append(corpus.action(int(current[j]),int(slot)))
         current[ids]=next_states; steps[ids]+=1
         for j in ids:
@@ -121,12 +141,25 @@ def rollout(corpus,cache,rows,horizon,policy):
             examples.append(dict(start=corpus.describe(int(rows[i,0])),goal=corpus.describe(int(goal[i])),
                                  end=corpus.describe(int(current[i])),solved=bool(solved[i]),
                                  optimum=float(exact[i]),cost=int(steps[i]),cycle=bool(cycles[i]),
-                                 entered_unreachable=bool(dead[i]),actions=traces[i]))
+                                 entered_unreachable=bool(dead[i]),actions=traces[i],
+                                 predicted_distance_drops=descent[i] if policy=='q' else None))
     per_scene={}
     if hasattr(corpus,'scenes'):
         scene_ids=corpus.locate(rows[:,0])
         per_scene={str(sid):dict(count=int((scene_ids==sid).sum()),solved=int(solved[scene_ids==sid].sum()),
                     success_rate=float(solved[scene_ids==sid].mean())) for sid in np.unique(scene_ids)}
+    progress=None
+    if policy=='q':
+        drops=np.asarray([d for path in descent for d in path])
+        all_down=np.asarray([all(d>1e-6 for d in path) for path in descent])
+        progress=dict(counts=progress_counts,strict_descent_trajectory_count=int(all_down.sum()),
+            strict_descent_success_count=int((all_down&solved).sum()),
+            non_descent_trajectory_count=int((~all_down).sum()),
+            predicted_drop_quantiles={str(q):float(np.quantile(drops,q)) for q in (0,.1,.5,.9,1)} if len(drops) else {},
+            mean_abs_unit_descent_residual=float(np.abs(drops-1).mean()) if len(drops) else None,
+            executed_edge_optimal_rate=progress_counts['true_optimal_edges']/len(drops) if len(drops) else None,
+            predicted_strict_descent_edge_rate=progress_counts['predicted_decrease']/len(drops) if len(drops) else None,
+            note='Observed policy trajectories only, after action selection. A nondecreasing chosen edge also means no legal successor has a strictly lower predicted distance under this greedy policy. Strict predicted descent alone does not prove goal completion or true optimality; full rollouts remain the acceptance metric.')
     return dict(count=len(rows),solved=int(solved.sum()),success_rate=float(solved.mean()) if len(rows) else None,
                 optimal=int(optimum.sum()),optimal_rate=float(optimum.mean()) if len(rows) else None,cycles=int(cycles.sum()),
                 entered_unreachable=int(dead.sum()),no_legal_action=int(no_action.sum()),
@@ -134,7 +167,7 @@ def rollout(corpus,cache,rows,horizon,policy):
                 mean_excess_cost_on_success=float((steps[solved]-exact[solved]).mean()) if solved.any() else None,
                 mean_cost_ratio_on_success=float((steps[solved]/np.maximum(exact[solved],1)).mean()) if solved.any() else None,
                 by_distance={str(d):dict(count=int((exact==d).sum()),solved=int(solved[exact==d].sum()),optimal=int(optimum[exact==d].sum())) for d in np.unique(exact)},
-                by_scene=per_scene,examples=examples)
+                by_scene=per_scene,examples=examples,predicted_progress=progress)
 
 
 def planning_ids(corpus,rows,truth,count,rng):

@@ -1,0 +1,828 @@
+{
+  "task": "sokoban",
+  "source_commit": "bffe9d237499e6cf0b0e81ebc0fa95053cc9097d",
+  "best_step": 30000,
+  "last_step": 60000,
+  "preparation_seconds": 174.01363013125956,
+  "training_seconds": 3927.2907510614023,
+  "initial_evaluation_seconds": 5.833310594782233,
+  "final_evaluation_seconds": 5.143259508535266,
+  "raw_feature_cache_seconds": 75.40670842211694,
+  "peak_gpu_allocated_bytes": 9473484288,
+  "peak_gpu_reserved_bytes": 9542041600,
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "data": {
+    "task": "sokoban",
+    "states": 23275115,
+    "input_dim": 400,
+    "max_candidates": 4,
+    "seed": 2026102302,
+    "finite_max": 118.0,
+    "unknown_training_labels": 0,
+    "pair_count": 15456557,
+    "decision_count": 548663,
+    "reserved_relations": 52487,
+    "cohorts": {
+      "validation": {
+        "count": 8096,
+        "reachable": 8096
+      },
+      "test": {
+        "count": 7792,
+        "reachable": 7792
+      },
+      "unseen_goal_validation": {
+        "count": 5632,
+        "reachable": 4096
+      },
+      "unseen_goal_test": {
+        "count": 5632,
+        "reachable": 4096
+      },
+      "unseen_layout_validation": {
+        "count": 11264,
+        "reachable": 8192
+      },
+      "unseen_layout_test": {
+        "count": 11264,
+        "reachable": 8192
+      },
+      "original_layout_test": {
+        "count": 320,
+        "reachable": 302
+      },
+      "original_layout_validation": {
+        "count": 308,
+        "reachable": 278
+      },
+      "diagnostic": {
+        "count": 1408,
+        "reachable": 1024
+      },
+      "diagnostic_original": {
+        "count": 2,
+        "reachable": 2
+      }
+    },
+    "selected_train_states": 15456557,
+    "all_selected_sources_in_training": true
+  },
+  "model_parameters": 201344,
+  "actual_exposure": {
+    "unique_gradient_states": 15456557,
+    "available_states": 23275115,
+    "unique_pair_rows": 15456557,
+    "pair_rows": 15456557,
+    "unique_decision_rows": 548663,
+    "decision_rows": 548663,
+    "minimum_pair_layer_passes": 3.975012028875512,
+    "minimum_decision_layer_passes": 55.99065364349337
+  },
+  "acceptance": {
+    "minimum": 0.8,
+    "target": 0.9,
+    "rates": {
+      "test": 0.1474609375,
+      "unseen_goal_test": 0.1240234375,
+      "unseen_layout_test": 0.0771484375,
+      "diagnostic_original": 0.0,
+      "original_layout_test": 0.0
+    },
+    "full_training_source_coverage": true,
+    "passed": false,
+    "target_reached": false
+  },
+  "cohorts": {
+    "validation": {
+      "count": 8096,
+      "finite_count": 8096,
+      "finite_mae": 18.79749298095703,
+      "finite_bias": 15.209638595581055,
+      "shortest_action_rate": 0.77783203125,
+      "bellman": {
+        "mae": 3.9906458854675293,
+        "upper_violation_rate": 0.4326171875
+      },
+      "planning": {
+        "q": {
+          "count": 1024,
+          "solved": 166,
+          "success_rate": 0.162109375,
+          "optimal": 163,
+          "optimal_rate": 0.1591796875,
+          "cycles": 858,
+          "entered_unreachable": 14,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.03614457831325301,
+          "mean_cost_ratio_on_success": 1.005828508840557
+        },
+        "oracle": {
+          "count": 1024,
+          "solved": 1024,
+          "success_rate": 1.0,
+          "optimal": 1024,
+          "optimal_rate": 1.0,
+          "cycles": 0,
+          "entered_unreachable": 0,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0
+        },
+        "heuristic": {
+          "count": 1024,
+          "solved": 147,
+          "success_rate": 0.1435546875,
+          "optimal": 147,
+          "optimal_rate": 0.1435546875,
+          "cycles": 877,
+          "entered_unreachable": 115,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0
+        },
+        "immediate_cost_only": {
+          "count": 1024,
+          "solved": 34,
+          "success_rate": 0.033203125,
+          "optimal": 34,
+          "optimal_rate": 0.033203125,
+          "cycles": 990,
+          "entered_unreachable": 189,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0
+        }
+      }
+    },
+    "test": {
+      "count": 7792,
+      "finite_count": 7792,
+      "finite_mae": 16.544572830200195,
+      "finite_bias": 12.902485847473145,
+      "shortest_action_rate": 0.77587890625,
+      "bellman": {
+        "mae": 2.525068521499634,
+        "upper_violation_rate": 0.41064453125
+      },
+      "planning": {
+        "q": {
+          "count": 1024,
+          "solved": 151,
+          "success_rate": 0.1474609375,
+          "optimal": 146,
+          "optimal_rate": 0.142578125,
+          "cycles": 873,
+          "entered_unreachable": 22,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.07947019867549669,
+          "mean_cost_ratio_on_success": 1.0243351203616105
+        },
+        "oracle": {
+          "count": 1024,
+          "solved": 1024,
+          "success_rate": 1.0,
+          "optimal": 1024,
+          "optimal_rate": 1.0,
+          "cycles": 0,
+          "entered_unreachable": 0,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0
+        },
+        "heuristic": {
+          "count": 1024,
+          "solved": 136,
+          "success_rate": 0.1328125,
+          "optimal": 135,
+          "optimal_rate": 0.1318359375,
+          "cycles": 888,
+          "entered_unreachable": 117,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.014705882352941176,
+          "mean_cost_ratio_on_success": 1.0021008403361344
+        },
+        "immediate_cost_only": {
+          "count": 1024,
+          "solved": 29,
+          "success_rate": 0.0283203125,
+          "optimal": 29,
+          "optimal_rate": 0.0283203125,
+          "cycles": 995,
+          "entered_unreachable": 186,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0
+        }
+      }
+    },
+    "unseen_goal_validation": {
+      "count": 5632,
+      "finite_count": 4096,
+      "finite_mae": 19.461315155029297,
+      "finite_bias": 16.390684127807617,
+      "shortest_action_rate": 0.78857421875,
+      "bellman": {
+        "mae": 5.095864295959473,
+        "upper_violation_rate": 0.43505859375
+      },
+      "planning": {
+        "q": {
+          "count": 1024,
+          "solved": 131,
+          "success_rate": 0.1279296875,
+          "optimal": 128,
+          "optimal_rate": 0.125,
+          "cycles": 893,
+          "entered_unreachable": 16,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0916030534351145,
+          "mean_cost_ratio_on_success": 1.0104625056129322
+        },
+        "oracle": {
+          "count": 1024,
+          "solved": 1024,
+          "success_rate": 1.0,
+          "optimal": 1024,
+          "optimal_rate": 1.0,
+          "cycles": 0,
+          "entered_unreachable": 0,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0
+        },
+        "heuristic": {
+          "count": 1024,
+          "solved": 114,
+          "success_rate": 0.111328125,
+          "optimal": 114,
+          "optimal_rate": 0.111328125,
+          "cycles": 910,
+          "entered_unreachable": 132,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0
+        },
+        "immediate_cost_only": {
+          "count": 1024,
+          "solved": 20,
+          "success_rate": 0.01953125,
+          "optimal": 20,
+          "optimal_rate": 0.01953125,
+          "cycles": 1004,
+          "entered_unreachable": 221,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0
+        }
+      }
+    },
+    "unseen_goal_test": {
+      "count": 5632,
+      "finite_count": 4096,
+      "finite_mae": 20.14864158630371,
+      "finite_bias": 16.884056091308594,
+      "shortest_action_rate": 0.78662109375,
+      "bellman": {
+        "mae": 4.681628227233887,
+        "upper_violation_rate": 0.451171875
+      },
+      "planning": {
+        "q": {
+          "count": 1024,
+          "solved": 127,
+          "success_rate": 0.1240234375,
+          "optimal": 126,
+          "optimal_rate": 0.123046875,
+          "cycles": 897,
+          "entered_unreachable": 20,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.015748031496062992,
+          "mean_cost_ratio_on_success": 1.0078740157480315
+        },
+        "oracle": {
+          "count": 1024,
+          "solved": 1024,
+          "success_rate": 1.0,
+          "optimal": 1024,
+          "optimal_rate": 1.0,
+          "cycles": 0,
+          "entered_unreachable": 0,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0
+        },
+        "heuristic": {
+          "count": 1024,
+          "solved": 114,
+          "success_rate": 0.111328125,
+          "optimal": 114,
+          "optimal_rate": 0.111328125,
+          "cycles": 910,
+          "entered_unreachable": 119,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0
+        },
+        "immediate_cost_only": {
+          "count": 1024,
+          "solved": 21,
+          "success_rate": 0.0205078125,
+          "optimal": 21,
+          "optimal_rate": 0.0205078125,
+          "cycles": 1003,
+          "entered_unreachable": 211,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0
+        }
+      }
+    },
+    "unseen_layout_validation": {
+      "count": 11264,
+      "finite_count": 8192,
+      "finite_mae": 72.97769165039062,
+      "finite_bias": 61.36402130126953,
+      "shortest_action_rate": 0.5830078125,
+      "bellman": {
+        "mae": 8.221384048461914,
+        "upper_violation_rate": 0.43212890625
+      },
+      "planning": {
+        "q": {
+          "count": 1024,
+          "solved": 79,
+          "success_rate": 0.0771484375,
+          "optimal": 79,
+          "optimal_rate": 0.0771484375,
+          "cycles": 945,
+          "entered_unreachable": 242,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0
+        },
+        "oracle": {
+          "count": 1024,
+          "solved": 1024,
+          "success_rate": 1.0,
+          "optimal": 1024,
+          "optimal_rate": 1.0,
+          "cycles": 0,
+          "entered_unreachable": 0,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0
+        },
+        "heuristic": {
+          "count": 1024,
+          "solved": 97,
+          "success_rate": 0.0947265625,
+          "optimal": 97,
+          "optimal_rate": 0.0947265625,
+          "cycles": 927,
+          "entered_unreachable": 188,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0
+        },
+        "immediate_cost_only": {
+          "count": 1024,
+          "solved": 27,
+          "success_rate": 0.0263671875,
+          "optimal": 27,
+          "optimal_rate": 0.0263671875,
+          "cycles": 997,
+          "entered_unreachable": 175,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0
+        }
+      }
+    },
+    "unseen_layout_test": {
+      "count": 11264,
+      "finite_count": 8192,
+      "finite_mae": 85.16322326660156,
+      "finite_bias": 77.17498779296875,
+      "shortest_action_rate": 0.5634765625,
+      "bellman": {
+        "mae": 12.61575698852539,
+        "upper_violation_rate": 0.466796875
+      },
+      "planning": {
+        "q": {
+          "count": 1024,
+          "solved": 79,
+          "success_rate": 0.0771484375,
+          "optimal": 78,
+          "optimal_rate": 0.076171875,
+          "cycles": 945,
+          "entered_unreachable": 239,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.02531645569620253,
+          "mean_cost_ratio_on_success": 1.0126582278481013
+        },
+        "oracle": {
+          "count": 1024,
+          "solved": 1024,
+          "success_rate": 1.0,
+          "optimal": 1024,
+          "optimal_rate": 1.0,
+          "cycles": 0,
+          "entered_unreachable": 0,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0
+        },
+        "heuristic": {
+          "count": 1024,
+          "solved": 75,
+          "success_rate": 0.0732421875,
+          "optimal": 75,
+          "optimal_rate": 0.0732421875,
+          "cycles": 949,
+          "entered_unreachable": 186,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0
+        },
+        "immediate_cost_only": {
+          "count": 1024,
+          "solved": 13,
+          "success_rate": 0.0126953125,
+          "optimal": 13,
+          "optimal_rate": 0.0126953125,
+          "cycles": 1011,
+          "entered_unreachable": 181,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0
+        }
+      }
+    },
+    "original_layout_test": {
+      "count": 320,
+      "finite_count": 302,
+      "finite_mae": 89.06275939941406,
+      "finite_bias": 66.800048828125,
+      "shortest_action_rate": 0.6390728476821192,
+      "bellman": {
+        "mae": 15.670970916748047,
+        "upper_violation_rate": 0.5397350993377483
+      },
+      "planning": {
+        "q": {
+          "count": 302,
+          "solved": 0,
+          "success_rate": 0.0,
+          "optimal": 0,
+          "optimal_rate": 0.0,
+          "cycles": 302,
+          "entered_unreachable": 129,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": null,
+          "mean_cost_ratio_on_success": null
+        },
+        "oracle": {
+          "count": 302,
+          "solved": 302,
+          "success_rate": 1.0,
+          "optimal": 302,
+          "optimal_rate": 1.0,
+          "cycles": 0,
+          "entered_unreachable": 0,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0
+        },
+        "heuristic": {
+          "count": 302,
+          "solved": 0,
+          "success_rate": 0.0,
+          "optimal": 0,
+          "optimal_rate": 0.0,
+          "cycles": 302,
+          "entered_unreachable": 125,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": null,
+          "mean_cost_ratio_on_success": null
+        },
+        "immediate_cost_only": {
+          "count": 302,
+          "solved": 0,
+          "success_rate": 0.0,
+          "optimal": 0,
+          "optimal_rate": 0.0,
+          "cycles": 302,
+          "entered_unreachable": 27,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": null,
+          "mean_cost_ratio_on_success": null
+        }
+      }
+    },
+    "original_layout_validation": {
+      "count": 308,
+      "finite_count": 278,
+      "finite_mae": 72.44868469238281,
+      "finite_bias": 44.4074592590332,
+      "shortest_action_rate": 0.7086330935251799,
+      "bellman": {
+        "mae": 5.104804992675781,
+        "upper_violation_rate": 0.2589928057553957
+      },
+      "planning": {
+        "q": {
+          "count": 278,
+          "solved": 0,
+          "success_rate": 0.0,
+          "optimal": 0,
+          "optimal_rate": 0.0,
+          "cycles": 278,
+          "entered_unreachable": 143,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": null,
+          "mean_cost_ratio_on_success": null
+        },
+        "oracle": {
+          "count": 278,
+          "solved": 278,
+          "success_rate": 1.0,
+          "optimal": 278,
+          "optimal_rate": 1.0,
+          "cycles": 0,
+          "entered_unreachable": 0,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0
+        },
+        "heuristic": {
+          "count": 278,
+          "solved": 0,
+          "success_rate": 0.0,
+          "optimal": 0,
+          "optimal_rate": 0.0,
+          "cycles": 278,
+          "entered_unreachable": 117,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": null,
+          "mean_cost_ratio_on_success": null
+        },
+        "immediate_cost_only": {
+          "count": 278,
+          "solved": 0,
+          "success_rate": 0.0,
+          "optimal": 0,
+          "optimal_rate": 0.0,
+          "cycles": 278,
+          "entered_unreachable": 53,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": null,
+          "mean_cost_ratio_on_success": null
+        }
+      }
+    },
+    "diagnostic": {
+      "count": 1408,
+      "finite_count": 1024,
+      "finite_mae": 83.1972427368164,
+      "finite_bias": 75.37690734863281,
+      "shortest_action_rate": 0.5514201762977473,
+      "bellman": {
+        "mae": 20.469898223876953,
+        "upper_violation_rate": 0.5925563173359452
+      },
+      "planning": {
+        "q": {
+          "count": 1021,
+          "solved": 26,
+          "success_rate": 0.025465230166503428,
+          "optimal": 26,
+          "optimal_rate": 0.025465230166503428,
+          "cycles": 995,
+          "entered_unreachable": 193,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0
+        },
+        "oracle": {
+          "count": 1021,
+          "solved": 1021,
+          "success_rate": 1.0,
+          "optimal": 1021,
+          "optimal_rate": 1.0,
+          "cycles": 0,
+          "entered_unreachable": 0,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0
+        },
+        "heuristic": {
+          "count": 1021,
+          "solved": 28,
+          "success_rate": 0.02742409402546523,
+          "optimal": 28,
+          "optimal_rate": 0.02742409402546523,
+          "cycles": 993,
+          "entered_unreachable": 191,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0
+        },
+        "immediate_cost_only": {
+          "count": 1021,
+          "solved": 2,
+          "success_rate": 0.0019588638589618022,
+          "optimal": 2,
+          "optimal_rate": 0.0019588638589618022,
+          "cycles": 1019,
+          "entered_unreachable": 195,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0
+        }
+      }
+    },
+    "diagnostic_original": {
+      "count": 2,
+      "finite_count": 2,
+      "finite_mae": 122.9450454711914,
+      "finite_bias": 88.47809600830078,
+      "shortest_action_rate": 0.0,
+      "bellman": {
+        "mae": 0.4877777099609375,
+        "upper_violation_rate": 0.5
+      },
+      "planning": {
+        "q": {
+          "count": 2,
+          "solved": 0,
+          "success_rate": 0.0,
+          "optimal": 0,
+          "optimal_rate": 0.0,
+          "cycles": 2,
+          "entered_unreachable": 0,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": null,
+          "mean_cost_ratio_on_success": null
+        },
+        "oracle": {
+          "count": 2,
+          "solved": 2,
+          "success_rate": 1.0,
+          "optimal": 2,
+          "optimal_rate": 1.0,
+          "cycles": 0,
+          "entered_unreachable": 0,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0
+        },
+        "heuristic": {
+          "count": 2,
+          "solved": 0,
+          "success_rate": 0.0,
+          "optimal": 0,
+          "optimal_rate": 0.0,
+          "cycles": 2,
+          "entered_unreachable": 1,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": null,
+          "mean_cost_ratio_on_success": null
+        },
+        "immediate_cost_only": {
+          "count": 2,
+          "solved": 0,
+          "success_rate": 0.0,
+          "optimal": 0,
+          "optimal_rate": 0.0,
+          "cycles": 2,
+          "entered_unreachable": 0,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": null,
+          "mean_cost_ratio_on_success": null
+        }
+      }
+    }
+  },
+  "raw_result": "runs/new_tasks_qmap/exact_pairs/sokoban_baseline_summary_full.json"
+}

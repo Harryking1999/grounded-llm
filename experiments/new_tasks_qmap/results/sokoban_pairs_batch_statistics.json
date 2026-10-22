@@ -1,0 +1,82 @@
+{
+  "actual_batches": 60000,
+  "first_step": 1,
+  "last_step": 60000,
+  "attempts": [
+    "attempt_000"
+  ],
+  "per_batch_csv": "runs/new_tasks_qmap/exact_pairs/sokoban_actual_batch_statistics.csv.gz",
+  "totals": {
+    "point_rows": 122880000,
+    "point_finite": 55497636,
+    "point_infinite": 67382364,
+    "rank_rows": 61440000,
+    "legal_candidates": 149659739,
+    "candidate_finite": 139549364,
+    "candidate_infinite": 10110375,
+    "boundary_decisions": 9592544,
+    "optimal_candidates": 72550048,
+    "rows_without_optimal": 0,
+    "point_distance_0_0": 75428,
+    "point_distance_1_1": 170636,
+    "point_distance_2_2": 235152,
+    "point_distance_3_5": 1147653,
+    "point_distance_6_10": 2637581,
+    "point_distance_11_20": 5791001,
+    "point_distance_21_40": 11446536,
+    "point_distance_41_80": 19440192,
+    "point_distance_81_inf": 14553457,
+    "rank_distance_0_0": 0,
+    "rank_distance_1_1": 140202,
+    "rank_distance_2_2": 153658,
+    "rank_distance_3_5": 742180,
+    "rank_distance_6_10": 2222451,
+    "rank_distance_11_20": 9280580,
+    "rank_distance_21_40": 22988243,
+    "rank_distance_41_80": 16827182,
+    "rank_distance_81_inf": 9085504
+  },
+  "point_finite_fraction": 0.45164091796875,
+  "boundary_decision_fraction": 0.15612864583333333,
+  "unique_ranking_source_goal_pairs": 9425680,
+  "eligible_ranking_source_goal_pairs": 9566449,
+  "ranking_relation_coverage": 0.9852851355816563,
+  "all_actual_point_and_child_labels_equal_physical_oracle": true,
+  "all_legal_candidates_preserved": true,
+  "per_batch_fractions": {
+    "point_finite": {
+      "mean": 0.45164091796875,
+      "quantiles": {
+        "0": 0.427734375,
+        "0.1": 0.44384765625,
+        "0.5": 0.45166015625,
+        "0.9": 0.45947265625,
+        "1": 0.478515625
+      }
+    },
+    "boundary_decisions": {
+      "mean": 0.15612864583333333,
+      "quantiles": {
+        "0": 0.111328125,
+        "0.1": 0.1416015625,
+        "0.5": 0.15625,
+        "0.9": 0.1708984375,
+        "1": 0.212890625
+      }
+    },
+    "candidate_infinite": {
+      "mean": 0.06754704018713995,
+      "quantiles": {
+        "0": 0.048217179902755265,
+        "0.1": 0.06135458167330677,
+        "0.5": 0.06750711671411143,
+        "0.9": 0.0738255033557047,
+        "1": 0.09112709832134293
+      }
+    }
+  },
+  "note": "Each CSV row is one saved actual optimizer batch. Repeated steps across attempts are retained explicitly. No historical per-step gradient was recorded or reconstructed here.",
+  "training_source_commit": "bffe9d237499e6cf0b0e81ebc0fa95053cc9097d",
+  "diagnostic_source_commit": "2b12147",
+  "config": "experiments/new_tasks_qmap/configs/sokoban_pairs.json"
+}

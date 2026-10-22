@@ -9,7 +9,7 @@ from torch.nn import functional as F
 from grounded_llm.core.files import atomic_json, atomic_save
 from grounded_llm.core.qmap.model import StateEncoder, soft_rank_loss
 from grounded_llm.core.qmap.sampling import StratifiedEpochSampler, CoverageSampler
-from .relation_data import prepare, load, sample_goals
+from .relation_data import prepare, load, sample_goals, BoardRelationSampler
 from .relation_evaluate import evaluate
 
 
@@ -55,11 +55,13 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
     optimizer=torch.optim.Adam(model.parameters(),lr=options['learning_rate'])
     point_truth=data['pair_distances_train']
     point_labels=np.where(np.isfinite(point_truth),point_truth,options['unreachable_target']).astype(np.float32)
-    def sampler(labels):
-        if options.get('broad_fraction'):
-            return CoverageSampler(labels,rng,len(labels),options['broad_fraction'])
+    relation_sampler=(BoardRelationSampler(corpus,data,options['relation_sampling']) if options.get('relation_sampling') else None)
+    if relation_sampler: atomic_json(out/'sampling_summary.json',relation_sampler.summary)
+    def sampler(labels,broad_only=False):
+        if options.get('broad_fraction') or broad_only:
+            return CoverageSampler(labels,rng,len(labels),1. if broad_only else options['broad_fraction'])
         return StratifiedEpochSampler(labels,rng)
-    pair_sampler=sampler(point_labels); rank_sampler=sampler(data['distances_train'])
+    pair_sampler=sampler(point_labels,broad_only=bool(relation_sampler)); rank_sampler=sampler(data['distances_train'])
     exposure=np.zeros(corpus.size,dtype=np.uint32)
     pair_draws=np.zeros(len(point_truth),dtype=np.uint32); rank_draws=np.zeros(len(data['tasks_train']),dtype=np.uint32)
     allowed=None
@@ -130,15 +132,21 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
     step=start_step
     for step in range(start_step+1,options['steps']+1):
         model.train()
-        p=pair_sampler.draw(options['batch_size']); r=rank_sampler.draw(options['decision_batch_size'])
-        pair=data['pairs_train'][p]; tasks=data['tasks_train'][r]
-        children=data['children_train'][r]; valid=children>=0
+        if relation_sampler:
+            p,r,pair,tasks=relation_sampler.draw(pair_sampler,options['batch_size'],options['decision_batch_size'],rng)
+            children=corpus.successors(tasks[:,0])
+        else:
+            p=pair_sampler.draw(options['batch_size']); r=rank_sampler.draw(options['decision_batch_size'])
+            pair=data['pairs_train'][p]; tasks=data['tasks_train'][r]
+            children=data['children_train'][r]
+        valid=children>=0
         point_target=point_labels[p]
         child_truth=data['child_distances_train'][r]
-        if options.get('online_goals'):
+        if options.get('online_goals') or relation_sampler:
             extra=dict(local_fraction=options.get('local_goal_fraction',0.),walk_max=options.get('goal_walk_max'))
-            pair=sample_goals(corpus,pair[:,0],rng,data['reserved_relations'],allowed=allowed,fallback=pair[:,1],**extra)
-            tasks=sample_goals(corpus,tasks[:,0],rng,data['reserved_relations'],ranking=True,allowed=allowed,fallback=tasks[:,1],**extra)
+            if not relation_sampler:
+                pair=sample_goals(corpus,pair[:,0],rng,data['reserved_relations'],allowed=allowed,fallback=pair[:,1],**extra)
+                tasks=sample_goals(corpus,tasks[:,0],rng,data['reserved_relations'],ranking=True,allowed=allowed,fallback=tasks[:,1],**extra)
             point_true=corpus.distance(pair[:,0],pair[:,1])
             point_target=np.where(np.isfinite(point_true),point_true,options['unreachable_target'])
             child_truth=np.full(children.shape,np.inf,dtype=np.float32)
@@ -206,7 +214,8 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
                  actual_exposure=dict(unique_gradient_states=int((exposure>0).sum()),available_states=corpus.size,
                                       unique_pair_rows=int((pair_draws>0).sum()),pair_rows=len(pair_draws),
                                       unique_decision_rows=int((rank_draws>0).sum()),decision_rows=len(rank_draws),
-                                      minimum_pair_layer_passes=pair_sampler.passes,minimum_decision_layer_passes=rank_sampler.passes),
+                                      minimum_pair_layer_passes=pair_sampler.passes,
+                                      minimum_decision_layer_passes=None if relation_sampler else rank_sampler.passes),
                  metrics=final)
     if config.get('acceptance'):
         criteria=json.loads(Path(config['acceptance']).read_text())

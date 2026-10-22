@@ -59,6 +59,24 @@ class ExactPairTests(unittest.TestCase):
         corpus=PhysicalCorpus([scene]); parents=np.flatnonzero(np.isfinite(truth)&(truth>0))
         pairs=np.column_stack([np.arange(len(states)),np.full(len(states),goal)])
         rank=materialize(corpus,np.column_stack([parents,np.full(len(parents),goal)]))
+        from experiments.new_tasks_qmap.src.relation_data import BoardRelationSampler
+        from grounded_llm.core.qmap.sampling import CoverageSampler
+        data=dict(pairs_train=pairs,tasks_train=rank['tasks'],reserved_relations=np.array([],dtype=np.int64))
+        options=dict(finite_point_fraction=.75,boundary_rank_fraction=.5,distance_bin_upper_bounds=[0,1,2,5,10,20,40,80,128])
+        sampler=BoardRelationSampler(corpus,data,options); rng=np.random.default_rng(7)
+        source_sampler=CoverageSampler(truth,rng,len(pairs),1.)
+        for _ in range(10):
+            p,r,point,task=sampler.draw(source_sampler,64,32,rng)
+            self.assertGreaterEqual(np.isfinite(corpus.distance(point[:,0],point[:,1])).mean(),.75)
+            decision=materialize(corpus,task); legal=decision['children']>=0
+            boundary=(legal & np.isfinite(decision['child_distances'])).any(axis=1) & (legal & ~np.isfinite(decision['child_distances'])).any(axis=1)
+            self.assertEqual(boundary.sum(),16)
+            np.testing.assert_array_equal(pairs[p,0],point[:,0]); np.testing.assert_array_equal(rank['tasks'][r,0],task[:,0])
+        saved=source_sampler.state_dict(); rng_state=rng.bit_generator.state
+        expected=sampler.draw(source_sampler,64,32,rng)
+        source_sampler.load_state_dict(saved); rng.bit_generator.state=rng_state
+        actual=sampler.draw(source_sampler,64,32,rng)
+        for a,b in zip(expected,actual): np.testing.assert_array_equal(a,b)
         row=dict(pairs=pairs,point_distance=truth,tasks=rank['tasks'],children=rank['children'],
             child_distance=rank['child_distances'],parent_distance=rank['distances'],optimal=rank['optimal'])
         with tempfile.TemporaryDirectory() as tmp:
@@ -86,6 +104,22 @@ class ExactPairTests(unittest.TestCase):
         qg=model.encode(torch.as_tensor(corpus.features(pairs[:,1])))
         loss=torch.nn.functional.smooth_l1_loss(model.distance(qa,qg),torch.as_tensor(np.where(np.isfinite(truth),truth,30.)))
         self.assertAlmostEqual(float(loss.detach()),sum(result['components'][k]['weighted_loss'] for k in ('finite_point','unreachable_point')),places=5)
+
+    def test_trajectory_progress_checks_do_not_change_greedy_selection(self):
+        with tempfile.TemporaryDirectory() as tmp, ExitStack() as stack:
+            path=Path(tmp); small_oracle(path,3,[[0,1],[1,2]])
+            corpus=TokenCorpus(path); stack.callback(corpus.close)
+            rows=np.array([[i,0] for i in range(1,corpus.size)])
+            teacher=SimpleNamespace(scores=lambda s,g:corpus.distance(s,g))
+            result=rollout(corpus,teacher,rows,32,'q')
+            self.assertEqual(result['optimal_rate'],1)
+            self.assertEqual(result['predicted_progress']['predicted_strict_descent_edge_rate'],1)
+            self.assertEqual(result['predicted_progress']['strict_descent_trajectory_count'],len(rows))
+            flat=SimpleNamespace(scores=lambda s,g:np.zeros(np.broadcast_arrays(s,g)[0].shape,dtype=np.float32))
+            result=rollout(corpus,flat,rows,32,'q')
+            self.assertGreater(result['cycles'],0)
+            self.assertEqual(result['predicted_progress']['predicted_strict_descent_edge_rate'],0)
+            self.assertEqual(result['predicted_progress']['counts']['predicted_plateau'],result['predicted_progress']['counts']['executed_edges'])
 
     def test_output_scale_and_interval_diagnostics_keep_physical_units(self):
         from experiments.new_tasks_qmap.src.relation_evaluate import coordinate_statistics

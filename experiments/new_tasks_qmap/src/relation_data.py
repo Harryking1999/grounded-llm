@@ -89,6 +89,81 @@ def sample_goals(corpus,sources,rng,reserved,*,ranking=False,allowed=None,fallba
     return (rows[~bad],~bad) if allow_missing else rows
 
 
+class BoardRelationSampler:
+    """Finite-distance strata and exact dead-boundary strata for one board run.
+
+    Banks are deterministic functions of the existing training sources, goals
+    and held-out closure. Only the caller's checkpointed RNG advances at draw.
+    All physical point sources remain in the independent coverage traversal.
+    """
+    def __init__(self,corpus,data,options):
+        if not hasattr(corpus,'scenes'): raise ValueError('Board relation sampling requires exact board scenes')
+        self.corpus,self.data,self.options=corpus,data,options
+        self.finite_fraction=options['finite_point_fraction']; self.boundary_fraction=options['boundary_rank_fraction']
+        if not 0<self.finite_fraction<1 or not 0<self.boundary_fraction<1: raise ValueError('Nonempty broad, finite and boundary quotas required')
+        self.point_index=np.full(corpus.size,-1,dtype=np.int32); self.rank_index=self.point_index.copy()
+        self.point_index[data['pairs_train'][:,0]]=np.arange(len(data['pairs_train']))
+        self.rank_index[data['tasks_train'][:,0]]=np.arange(len(data['tasks_train']))
+        reserved=data['reserved_relations']
+        def forbidden(values):
+            if not len(reserved): return np.zeros(values.shape,dtype=bool)
+            at=np.searchsorted(reserved,values)
+            return (at<len(reserved)) & (reserved[np.minimum(at,len(reserved)-1)]==values)
+        points=[]; ranks=[]; point_labels=[]; rank_labels=[]; boundaries=[]
+        for sid,scene in enumerate(corpus.scenes):
+            if scene.metadata['split']!='train': continue
+            offset=corpus.offsets[sid]
+            for j,g in enumerate(scene.goals[:scene.metadata['training_goals']]):
+                source=np.flatnonzero(np.isfinite(scene.distances[j]))+offset; goal=np.full(len(source),g+offset)
+                labels=scene.distances[j,source-offset]
+                safe=(self.point_index[source]>=0) & ~forbidden(keys(source,goal,corpus.size))
+                points.append(np.column_stack([source[safe],goal[safe]])); point_labels.append(labels[safe])
+                safe=(self.rank_index[source]>=0) & (labels>0) & ~forbidden(keys(source,goal,corpus.size))
+                source,goal,labels=source[safe],goal[safe],labels[safe]
+                child=corpus.successors(source); valid=child>=0
+                related=np.full(child.shape,-1,dtype=np.int64)
+                related[valid]=keys(child[valid],np.broadcast_to(goal[:,None],child.shape)[valid],corpus.size)
+                safe=~forbidden(related).any(axis=1)
+                child_truth=np.full(child.shape,np.inf,dtype=np.float32)
+                child_truth[valid]=scene.distances[j,child[valid]-offset]
+                boundary=(valid & np.isfinite(child_truth)).any(axis=1) & (valid & ~np.isfinite(child_truth)).any(axis=1)
+                ranks.append(np.column_stack([source[safe],goal[safe]])); rank_labels.append(labels[safe]); boundaries.append(boundary[safe])
+        self.points=np.concatenate(points); self.ranks=np.concatenate(ranks)
+        point_labels=np.concatenate(point_labels); rank_labels=np.concatenate(rank_labels); boundary=np.concatenate(boundaries)
+        edges=np.asarray(options['distance_bin_upper_bounds'],dtype=np.float32)
+        if np.any(np.diff(edges)<=0) or edges[-1]<max(point_labels.max(),rank_labels.max()): raise ValueError('Distance strata do not cover exact finite labels')
+        def groups(labels,allowed):
+            bins=np.searchsorted(edges,labels)
+            return [ids for j in range(len(edges)) if len(ids:=np.flatnonzero(allowed & (bins==j)))]
+        def counts(labels,allowed):
+            return {f'({-1 if j==0 else float(edges[j-1])},{float(upper)}]':int((allowed & (np.searchsorted(edges,labels)==j)).sum())
+                    for j,upper in enumerate(edges)}
+        self.point_groups=groups(point_labels,np.ones(len(point_labels),bool))
+        self.boundary_groups=groups(rank_labels,boundary); self.other_groups=groups(rank_labels,~boundary)
+        if not self.boundary_groups or not self.other_groups: raise ValueError('Both exact boundary and nonboundary training relations required')
+        self.summary=dict(finite_point_bank=len(self.points),ranking_bank=len(self.ranks),boundary_ranking_bank=int(boundary.sum()),
+            point_stratum_counts=counts(point_labels,np.ones(len(point_labels),bool)),boundary_stratum_counts=counts(rank_labels,boundary),
+            nonboundary_stratum_counts=counts(rank_labels,~boundary),options=options,
+            broad_source_fraction=1-self.finite_fraction,all_legal_candidates_preserved=True,
+            holdout_closure_excluded=True,banks_use_only_original_training_source_rows=True)
+
+    @staticmethod
+    def _draw(groups,count,rng):
+        which=rng.integers(len(groups),size=count)
+        selected=np.concatenate([rng.choice(group,int((which==j).sum())) for j,group in enumerate(groups)])
+        rng.shuffle(selected); return selected
+
+    def draw(self,source_sampler,point_count,rank_count,rng):
+        nf=round(point_count*self.finite_fraction); nb=round(rank_count*self.boundary_fraction)
+        p=source_sampler.draw(point_count-nf); broad=self.data['pairs_train'][p]
+        broad=sample_goals(self.corpus,broad[:,0],rng,self.data['reserved_relations'],fallback=broad[:,1])
+        finite=self.points[self._draw(self.point_groups,nf,rng)]
+        pair=np.concatenate([broad,finite]); p=np.concatenate([p,self.point_index[finite[:,0]]])
+        selected=np.concatenate([self._draw(self.boundary_groups,nb,rng),self._draw(self.other_groups,rank_count-nb,rng)])
+        rng.shuffle(selected); tasks=self.ranks[selected]
+        return p,self.rank_index[tasks[:,0]],pair,tasks
+
+
 def board_cohorts(corpus,config,rng):
     from grounded_llm.core.qmap.physical_data import group_seed
     spec=config['relations']

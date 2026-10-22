@@ -29,9 +29,11 @@ Token Swapping的短距离关系诊断对应[局部目标训练配置](configs/t
 
 [Softsign候选配置](configs/sokoban_softsign_output_pairs.json)匹配Sigmoid的中心、中心斜率与范围，先保留为后续对照，未启动。尺度定义、局限及当前结果见[报告](results/report.md#输出与距离尺度)。
 
+推箱子的[可达与边界采样配置](configs/sokoban_balanced_relations_pairs.json)是独立的数据分布实验，从头训练并保持Sigmoid、同一精确数据／划分、128维、损失、预算及选权重规则。点监督的有限关系与全源遍历配额、边界排序配额及距离分层只由该配置定义；分层内随机抽样。边界指同一状态与目标下同时存在有限和不可达的合法后继。全源配额逐个遍历原训练物理源，因此死路仍进入监督；其余点从精确有限关系银行抽样。排序在边界／非边界关系银行内分层，保留所有合法动作。银行只含原训练源、训练完整目标并排除既有留出关系闭包，能由原数据确定性重建，完整恢复沿用已保存RNG与源遍历状态。该实验不改变正在运行的激活函数对照。
+
 ## 冻结评测与信息条件
 
-`src/relation_evaluate.py`报告距离MAE与分层误差、最优候选top-k、方向性、Bellman一致性、不可达识别、贪心到达与最优率、超额成本、循环及具体案例。贪心只比较全部合法后继的`1 + distance(Q(child), Q(goal))`，到精确目标才完成。同一批查询比较oracle、简单任务启发式和仅即时成本。规划查询不重复抽样，并分配布局与距离层预算。
+`src/relation_evaluate.py`报告距离MAE与分层误差、最优候选top-k、方向性、Bellman一致性、不可达识别、贪心到达与最优率、超额成本、循环及具体案例。实际执行轨迹另报预测距离下降／持平／上升、下降余量、非目标零距离及真实最优边比例，检查抽样动作率能否转化为执行中的持续进展。贪心只比较全部合法后继的`1 + distance(Q(child), Q(goal))`，到精确目标才完成；这些诊断在选动作之后计算，不改变策略。同一批查询比较oracle、简单任务启发式和仅即时成本。规划查询不重复抽样，并分配布局与距离层预算。
 
 推箱子的合法死路仍保留。精确穷举图证明的不可达记为无穷；训练的有限代理单独标识，不声称有限向量等于无穷。资源界导致未完成枚举的场景只记unknown并报告排除原因，不能标作无解。Rush Hour和Token Swapping采用对称距离，跨不同物理场景不定义最短路。
 
@@ -40,9 +42,13 @@ Token Swapping的短距离关系诊断对应[局部目标训练配置](configs/t
 ```bash
 python -m experiments.new_tasks_qmap.src.relation_evaluate --checkpoint runs/new_tasks_pairs/token_swapping/best.pt --run runs/new_tasks_pairs/token_swapping --out tmp/token_validation.json --cohorts validation unseen_endpoint_validation unseen_both_validation
 python -m experiments.new_tasks_qmap.src.relation_diagnose --config experiments/new_tasks_qmap/configs/sokoban_pairs.json --run runs/new_tasks_pairs/sokoban --out tmp/sokoban_geometry.json --cohorts validation unseen_goal_validation
+python -m experiments.new_tasks_qmap.src.relation_diagnose --config experiments/new_tasks_qmap/configs/sokoban_pairs.json --run runs/new_tasks_pairs/sokoban --out tmp/sokoban_actual_batches.json --stream-statistics
+python -m experiments.new_tasks_qmap.src.relation_diagnose --config experiments/new_tasks_qmap/configs/sokoban_pairs.json --run runs/new_tasks_pairs/sokoban --out tmp/sokoban_gradient_probe.json --checkpoint runs/new_tasks_pairs/sokoban/best.pt --gradient-batches 8
 ```
 
-`relation_diagnose`只用精确距离坐标检查表示能力：当某布局的全部查询目标可放入坐标时，有向max／对称L∞能精确表示到这些目标的距离。这不证明共享MLP已学会地图。目标多于维度时仅检查一组landmark，下界误差不能证明不可表示。这些oracle坐标不用于训练输入、贪心策略或验收成绩。
+`relation_diagnose`默认用精确距离坐标检查表示能力：当某布局的全部查询目标可放入坐标时，有向max／对称L∞能精确表示到这些目标的距离。这不证明共享MLP已学会地图。目标多于维度时仅检查一组landmark，下界误差不能证明不可表示。这些oracle坐标不用于训练输入、贪心策略或验收成绩。
+
+`--stream-statistics`核对全部实际训练分片，输出逐batch的压缩CSV及汇总：点监督可达／不可达与真实距离层、全合法候选、死锁边界、最优动作、可训练关系覆盖。`--gradient-batches`在固定权重上重放指定checkpoint步之前的实际batch，分别求可达Huber、不可达Huber和排序梯度，不更新模型；保留原总batch分母及rank权重。它不重建未保存的历史逐步梯度。梯度范数不可相加当作贡献百分比，带符号的总梯度方向投影需连同梯度夹角解释。
 
 三个任务的`grounded_llm/tasks/<task>/qmap.py:MapReader`直接加载冻结权重，接公共CURRENT/GOAL/CANDIDATES结构。环境提供真实后继，地图不因此被解释为学会状态转移。Flash指定目标结果见[15题固定诊断](../task_text_baselines/results/exact_goals_flash64k.json)，历史目标条件结果不混算。
 

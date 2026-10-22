@@ -54,6 +54,34 @@ def reachability(predictions,truth,threshold,proxy):
                 note='Finite surrogate is not infinity; classification never filters planning candidates.')
 
 
+def coordinate_statistics(source,goal,truth,predictions,cap,activation):
+    """Diagnostic scaling only; physical distance labels remain unnormalized."""
+    q=np.stack([source,goal],axis=1)/cap
+    outside=((q<0)|(q>1)).mean(axis=(1,2))
+    boundary=((q<1e-4)|(q>1-1e-4)).mean(axis=(1,2)) if activation!='linear' else None
+    derivative=(q*(1-q) if activation=='sigmoid' else np.minimum(q,1-q)**2 if activation=='softsign' else np.ones_like(q))
+    low_gradient=(derivative<1e-4).mean(axis=(1,2))
+    def describe(mask):
+        finite=mask & np.isfinite(truth)
+        return dict(count=int(mask.sum()),
+            finite_mae=float(np.abs(predictions[finite]-truth[finite]).mean()) if finite.any() else None,
+            finite_bias=float((predictions[finite]-truth[finite]).mean()) if finite.any() else None,
+            predicted_mean=float(predictions[mask].mean()),
+            boundary_fraction=float(boundary[mask].mean()) if boundary is not None else None,
+            low_output_derivative_fraction=float(low_gradient[mask].mean()),
+            outside_sigmoid_range_fraction=float(outside[mask].mean()))
+    bins={}; lower=-1
+    for upper in (0,1,2,5,10,20,40,80,160,np.inf):
+        mask=np.isfinite(truth) & (truth>lower) & (truth<=upper)
+        if mask.any(): bins[f'({lower},{upper}]']=describe(mask)
+        lower=upper
+    if (~np.isfinite(truth)).any(): bins['proven_unreachable']=describe(~np.isfinite(truth))
+    return dict(output_activation=activation,coordinate_divisor_for_diagnostics_only=cap,
+        labels='physical unit-cost steps, without normalization or inverse normalization',
+        boundary_tolerance_relative_to_cap=1e-4,derivative_tolerance_relative_to_cap=1e-4,
+        all=describe(np.ones(len(truth),dtype=bool)),by_true_distance=bins)
+
+
 def rollout(corpus,cache,rows,horizon,policy):
     current,goal=rows[:,0].copy(),rows[:,1].copy()
     exact=corpus.distance(current,goal)
@@ -181,6 +209,8 @@ def evaluate(model,corpus,data,config,cohorts=None,exposure=None,planning=True,t
                         reverse_finite_mae=float(np.abs(reverse[np.isfinite(reverse_truth)]-reverse_truth[np.isfinite(reverse_truth)]).mean()) if np.isfinite(reverse_truth).any() else None,
                         reverse_scope='reverse target may lie outside the successful-terminal training target domain'),
                     unreachable=reachability(pred,truth,threshold,config['training']['unreachable_target']))
+        result['coordinate_statistics']=coordinate_statistics(cache.q(rows[:,0]).cpu().numpy(),cache.q(rows[:,1]).cpu().numpy(),
+            truth,pred,model.cap,getattr(model,'output_activation','sigmoid'))
         if exposure is not None:
             seen_source=exposure[rows[:,0]]>0; seen_goal=exposure[rows[:,1]]>0
             result['actual_gradient_endpoint_exposure']=dict(both_seen=int((seen_source & seen_goal).sum()),

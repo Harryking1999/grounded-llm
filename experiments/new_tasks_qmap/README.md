@@ -27,6 +27,8 @@ Token Swapping的短距离关系诊断对应[局部目标训练配置](configs/t
 
 推箱子的[线性输出诊断配置](configs/sokoban_linear_output_pairs.json)仅替换末端sigmoid，保留两层隐藏MLP、128维Q、有向max、全部数据与监督。此时`cap`仅是输出尺度，向量不再受它约束；不可达仍用配置中的有限代理，不能把线性坐标解释为无穷。其他既有配置默认继续用sigmoid，旧checkpoint不变。
 
+[Softsign候选配置](configs/sokoban_softsign_output_pairs.json)匹配Sigmoid的中心、中心斜率与范围，先保留为后续对照，未启动。尺度定义、局限及当前结果见[报告](results/report.md#输出与距离尺度)。
+
 ## 冻结评测与信息条件
 
 `src/relation_evaluate.py`报告距离MAE与分层误差、最优候选top-k、方向性、Bellman一致性、不可达识别、贪心到达与最优率、超额成本、循环及具体案例。贪心只比较全部合法后继的`1 + distance(Q(child), Q(goal))`，到精确目标才完成。同一批查询比较oracle、简单任务启发式和仅即时成本。规划查询不重复抽样，并分配布局与距离层预算。

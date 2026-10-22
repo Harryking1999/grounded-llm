@@ -36,8 +36,8 @@ class StateEncoder(nn.Module):
         self.cap = cap
         self.metric = metric
         self.group_size = group_size
-        if output_activation not in ('sigmoid','linear'):
-            raise ValueError('Expected sigmoid or linear Q output')
+        if output_activation not in ('sigmoid','linear','softsign'):
+            raise ValueError('Expected sigmoid, linear or softsign Q output')
         self.output_activation = output_activation
         self.network = nn.Sequential(nn.Linear(input_dim, hidden), nn.ReLU(),
                                      nn.Linear(hidden, hidden), nn.ReLU(),
@@ -47,7 +47,11 @@ class StateEncoder(nn.Module):
 
     def encode(self, bits):
         values=self.network(bits)
-        return self.cap * (torch.sigmoid(values) if self.output_activation=='sigmoid' else values)
+        if self.output_activation=='sigmoid': values=torch.sigmoid(values)
+        elif self.output_activation=='softsign':
+            # Same range, centre and derivative at zero as sigmoid; slower tails.
+            values=.5*(1+torch.nn.functional.softsign(values/2))
+        return self.cap * values
 
     def forward(self, bit_table, pairs):
         return self.distance(self.encode(bit_table[pairs[:, 0]]),

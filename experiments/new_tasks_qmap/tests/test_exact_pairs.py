@@ -42,6 +42,23 @@ def small_oracle(path,n,edges):
 
 
 class ExactPairTests(unittest.TestCase):
+    def test_output_scale_and_interval_diagnostics_keep_physical_units(self):
+        from experiments.new_tasks_qmap.src.relation_evaluate import coordinate_statistics
+        outputs=[]; slopes=[]
+        for activation in ('sigmoid','softsign','linear'):
+            model=StateEncoder(1,2,256,'directed_max',input_dim=1,output_activation=activation)
+            model.network=torch.nn.Identity()
+            raw=torch.tensor([[0.]],requires_grad=True); q=model.encode(raw)
+            outputs.append(float(q.detach())); slopes.append(float(torch.autograd.grad(q,raw)[0]))
+            high=model.encode(torch.tensor([[1.]])); low=model.encode(torch.tensor([[0.]]))
+            self.assertEqual(float(model.distance(high,low)),float((high-low).clamp_min(0)))
+        self.assertEqual(outputs,[128.,128.,0.]); self.assertEqual(slopes,[64.,64.,256.])
+        source=np.array([[10.,0.],[0.,0.]],dtype=np.float32); goal=np.zeros_like(source)
+        values=coordinate_statistics(source,goal,np.array([2.,np.inf]),np.array([3.,8.]),10,'linear')
+        self.assertEqual(values['all']['finite_mae'],1)
+        self.assertIsNone(values['all']['boundary_fraction'])
+        self.assertEqual(values['all']['low_output_derivative_fraction'],0)
+        self.assertEqual(values['by_true_distance']['proven_unreachable']['count'],1)
     def test_broad_sources_fresh_goals_and_sampler_resume(self):
         from grounded_llm.core.qmap.sampling import CoverageSampler
         with tempfile.TemporaryDirectory() as tmp, ExitStack() as stack:

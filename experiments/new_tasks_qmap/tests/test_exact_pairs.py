@@ -218,12 +218,15 @@ class ExactPairTests(unittest.TestCase):
             for task,env,reader_type,dimension,scope in envs:
                 start=env.goal if task=='token_swapping' else env.start
                 env.validate(start)
-                model=StateEncoder(128,16,32,'linf',input_dim=dimension)
+                options=dict(dimension=128,hidden=16,cap=32,metric='linf')
+                if task=='token_swapping': options['output_activation']='linear'
+                model=StateEncoder(input_dim=dimension,**options)
                 path=Path(tmp)/(task+'.pt')
                 torch.save(dict(model_type='exact_state_pairs',task=task,input_dim=dimension,
-                    config=dict(model=dict(dimension=128,hidden=16,cap=32,metric='linf')),
+                    config=dict(model=options),
                     model=model.state_dict(),scope=scope,step=0),path)
                 reader=reader_type(env,path)
+                torch.testing.assert_close(reader.encode([start]),model.encode(torch.as_tensor(env.features([start]))))
                 batch,actions=reader.map_batch(start,start)
                 batch.validate(max(1,len(actions)))
                 self.assertEqual(int((batch.roles==CURRENT).sum()),1)

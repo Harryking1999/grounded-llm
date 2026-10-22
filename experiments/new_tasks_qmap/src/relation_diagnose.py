@@ -30,7 +30,9 @@ def encoder_axes(model,corpus,data,config,cohorts):
             effective_winning_dimensions=float(np.exp(-(weights*np.log(weights)).sum())),
             top_four_winner_fraction=float(np.sort(counts)[-4:].sum()/counts.sum()),
             coordinate_standard_deviation_quantiles={str(q):float(np.quantile(std,q)) for q in (0,.5,.9,1)},
-            fraction_near_sigmoid_boundary=float(((endpoints<model.cap*1e-4)|(endpoints>model.cap*(1-1e-4))).mean()),
+            output_activation=model.output_activation,
+            fraction_near_sigmoid_boundary=(float(((endpoints<model.cap*1e-4)|(endpoints>model.cap*(1-1e-4))).mean())
+                                           if model.output_activation=='sigmoid' else None),
             interpretation='Winning-coordinate counts across these queries do not measure full network capacity or prove a dimension limit. They can reveal sparse use or saturation of the max-distance readout.')
     return result
 

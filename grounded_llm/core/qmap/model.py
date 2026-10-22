@@ -31,11 +31,14 @@ def soft_rank_loss(scores, truth, valid, temperature):
 
 class StateEncoder(nn.Module):
     """The same two-hidden-layer Q encoder; only input encoding and metric vary."""
-    def __init__(self, dimension, hidden, cap, metric, input_dim=100, group_size=8):
+    def __init__(self, dimension, hidden, cap, metric, input_dim=100, group_size=8, output_activation='sigmoid'):
         super().__init__()
         self.cap = cap
         self.metric = metric
         self.group_size = group_size
+        if output_activation not in ('sigmoid','linear'):
+            raise ValueError('Expected sigmoid or linear Q output')
+        self.output_activation = output_activation
         self.network = nn.Sequential(nn.Linear(input_dim, hidden), nn.ReLU(),
                                      nn.Linear(hidden, hidden), nn.ReLU(),
                                      nn.Linear(hidden, dimension))
@@ -43,7 +46,8 @@ class StateEncoder(nn.Module):
         nn.init.zeros_(self.network[-1].bias)
 
     def encode(self, bits):
-        return self.cap * torch.sigmoid(self.network(bits))
+        values=self.network(bits)
+        return self.cap * (torch.sigmoid(values) if self.output_activation=='sigmoid' else values)
 
     def forward(self, bit_table, pairs):
         return self.distance(self.encode(bit_table[pairs[:, 0]]),

@@ -119,10 +119,14 @@ def harder_prompt(case):
 
 
 def levels(task,options):
-    return next(options[key] for key in ("construction_counts","scramble_lengths","disk_counts","node_counts") if key in options)
+    return next(options[key] for key in ("construction_counts","scramble_lengths","disk_counts","node_counts",
+                                         "people_counts", "boxoban_sets", "number_limits") if key in options)
 
 
 def prepare_level(task,level,options,config):
+    if task in ('bridge', 'sokoban', 'game24'):
+        from .new_task_difficulty import prepare_level as prepare_new
+        return prepare_new(task, level, options, config)
     rng = random.Random(config["seed"]+100000*list(config["tasks"]).index(task)+level*1000)
     count = config["cases_per_level"]
     cases,seen = [],set()

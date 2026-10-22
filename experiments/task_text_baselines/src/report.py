@@ -47,11 +47,12 @@ def build(run, limit=None):
             'request_limit_counts':dict(Counter(str(r.get('requested_max_output_tokens',suite['config'].get('api',{}).get('max_output_tokens',progress['api'].get('max_output_tokens')))) for r in valid))}
     adaptive = suite["config"].get("study") == "adaptive_complete_plan_difficulty"
     new_tasks = suite["config"].get("study") == "new_tasks_flash_fixed_setting_screening"
+    first_error = suite['config'].get('policy') == 'first_valid_model_error_per_task'
     policy = suite.get('current_policy',suite['config'])
     screening,confirmation = policy.get('cases_per_level',5),policy.get('confirmation_cases',10)
-    lines = ["# 逐项加难试验" if adaptive else "# 三个新任务纯文字筛查" if new_tasks else "# 五任务纯文字完整规划基线", "",
+    lines = ["# 三个新任务首次错误探索" if first_error else "# 逐项加难试验" if adaptive else "# 三个新任务纯文字筛查" if new_tasks else "# 五任务纯文字完整规划基线", "",
              f"状态：{progress['status']}。模型请求：`{progress['api']['model']}`；推理设置：`{progress['api']['reasoning_effort']}`。",
-             "", f"每档先测 {screening} 题，成功率不高于一半时用同档 {confirmation} 道独立新题确认；仍不高于一半才标记找到困难条件。格式问题单列，打乱步数不等于最短距离。" if adaptive else f"冻结题集共 {len(suite['cases'])} 题，一次输出完整计划，无工具、无中途反馈。主指标为环境回放到达目标，最优解和输出格式另计。",
+             "", f"每档至多{screening}题；每任务出现首个有效未完成即停止，不以单个失败估计成功率。服务错误不算模型失败。" if first_error else f"每档先测 {screening} 题，成功率不高于一半时用同档 {confirmation} 道独立新题确认；仍不高于一半才标记找到困难条件。格式问题单列，打乱步数不等于最短距离。" if adaptive else f"冻结题集共 {len(suite['cases'])} 题，一次输出完整计划，无工具、无中途反馈。主指标为环境回放到达目标，最优解和输出格式另计。",
              "", "| 任务 | 有效答卷／计划 | 待补服务失败 | 解出 | 严格合同通过 | 最优解 |", "|---|---:|---:|---:|---:|---:|"]
     for task, values in results.items():
         optimal = str(values['optimal']) if values['optimal_evaluated'] else '—'
@@ -59,6 +60,10 @@ def build(run, limit=None):
     if adaptive:
         lines += ["", "## 当前难度与独立确认", ""]
         for task,row in progress.get("tasks",{}).items():
+            if first_error and row['status'] == 'model_error_found':
+                found = row['first_error']
+                lines.append(f"- {NAMES[task]}：在{found['level_value']}档发现首个失败 `{found['case_id']}`；{found['verdict'].get('failure')}。")
+                continue
             if 'level_results' in row:
                 label = {'active':'继续加难／确认','difficulty_confirmed':'已找到困难条件','range_exhausted':'当前档位耗尽，尚未确认困难条件','service_blocked':'服务失败待补'}.get(row['status'],row['status'])
                 done = '；'.join(f"{r['level_value']} 档 {'确认' if r['phase']=='confirm' else '初测'} {r['solved']}/{r['valid']}" for r in row['level_results'])

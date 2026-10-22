@@ -33,10 +33,11 @@ def main():
     config = json.loads(Path(args.config).read_text(encoding="utf-8"))
     if config.get('retired'):
         raise ValueError('This queue was retired; see the experiment README for the current scope')
-    if min(config['cases_per_level'],config['confirmation_cases']) < 20:
+    first_error = config.get('policy') == 'first_valid_model_error_per_task'
+    if not first_error and min(config['cases_per_level'],config['confirmation_cases']) < 20:
         raise ValueError('Current evaluation requires at least twenty cases per condition and confirmation')
     api = json.loads((ROOT/config["api_config"]).read_text())["api"]
-    recovery = json.loads((ROOT/config["service_recovery"]).read_text())
+    recovery = json.loads((ROOT/config["service_recovery"]).read_text()) if config.get('service_recovery') else api
     api.update({key:recovery[key] for key in ("max_service_retries","max_total_service_retries","service_retry_delay_seconds")})
     api["concurrency"] = config["concurrency"]
     out = Path(args.out)
@@ -52,7 +53,7 @@ def main():
                                                      'policy':state.get('stop_policy'),'tasks':json.loads(json.dumps(state['tasks']))})
     latest = latest_records(out)
     for item in state['tasks'].values():
-        if item['status'] == 'model_error_found':
+        if item['status'] == 'model_error_found' and not first_error:
             item['status'] = 'active'
             item.setdefault('historical_first_errors',[]).append(item.pop('first_error'))
         item.setdefault('phase','screen')
@@ -88,8 +89,8 @@ def main():
                     generation.update(cases_per_level=config['confirmation_cases'],seed=config['seed']+10000000)
                 for retry in range(100):
                     generated = prepare_level(task,level,options,generation)
-                    prior = {json.dumps([case['initial'],case['goal']]) for case in suite['cases'] if case['task'] == task}
-                    if all(json.dumps([case['initial'],case['goal']]) not in prior for case in generated):
+                    prior = {json.dumps([case['initial'],case['goal'],case.get('times')]) for case in suite['cases'] if case['task'] == task}
+                    if all(json.dumps([case['initial'],case['goal'],case.get('times')]) not in prior for case in generated):
                         break
                     generation['seed'] += 1000000
                 else:
@@ -101,6 +102,14 @@ def main():
                 suite['cases'].extend(generated)
                 cases = generated
                 save()
+            if first_error:
+                failed = next((latest[c['id']] for c in cases if c['id'] in latest
+                               and not latest[c['id']].get('service_error')
+                               and not latest[c['id']]['verdict'].get('solved')), None)
+                if failed is not None:
+                    item.update(status='model_error_found', first_error={'case_id': failed['case_id'],
+                                'level': level, 'level_value': cases[0]['level_value'], 'verdict': failed['verdict']})
+                    return None
             for case in cases:
                 record = latest.get(case['id'])
                 if record and not record.get('service_error'):
@@ -110,7 +119,7 @@ def main():
                     return None
                 return case
             rows = [latest[case['id']] for case in cases]
-            action = decision(rows,phase,config)
+            action = 'advance' if first_error else decision(rows,phase,config)
             result = {'level':level,'level_value':cases[0]['level_value'],'phase':phase,'valid':len(rows),
                       'solved':sum(bool(row['verdict'].get('solved')) for row in rows),'decision':action,
                       'failures':{name:sum(row['verdict'].get('failure') == name for row in rows)
@@ -161,7 +170,7 @@ def main():
                 record = future.result()
                 write_json(out/'records'/f"{case['id']}_attempt{record['attempt']}.json",record)
                 latest[case['id']] = record
-                fatal = fatal or record.get('http_status') in (400,401,403,404) or record.get('service_error') in ('returned_model_mismatch','unexpected_output_item')
+                fatal = fatal or record.get('http_status') in (400,401,402,403,404) or record.get('service_error') in ('returned_model_mismatch','unexpected_output_item')
                 print(json.dumps({'case':case['id'],'level_value':case['level_value'],'phase':case.get('phase','screen'),
                                   'attempt':record['attempt'],'verdict':record['verdict']}),flush=True)
                 save()

@@ -1,0 +1,61 @@
+{
+  "study": "adaptive_complete_plan_difficulty",
+  "policy": "first_valid_model_error_per_task",
+  "seed": 2026102204,
+  "api_config": "experiments/task_text_baselines/configs/deepseek_new_tasks_64k.json",
+  "baseline_run": "runs/deepseek_new_tasks_64k",
+  "source_cache": "tmp/new_tasks_harder_sources",
+  "cases_per_level": 3,
+  "confirmation_cases": 3,
+  "concurrency": 3,
+  "initial_levels": {
+    "bridge": 0,
+    "sokoban": 0,
+    "game24": 0
+  },
+  "tasks": {
+    "bridge": {
+      "people_counts": [
+        8,
+        12,
+        16,
+        24,
+        32,
+        64,
+        128
+      ],
+      "max_time": 10000
+    },
+    "sokoban": {
+      "boxoban_sets": [
+        "unfiltered_test",
+        "medium_validation",
+        "hard"
+      ],
+      "files": {
+        "unfiltered_test": "unfiltered/test/000.txt",
+        "medium_validation": "medium/valid/000.txt",
+        "hard": "hard/000.txt"
+      },
+      "source_commit": "78011d8c86ad423bfb2e1005012393b4c3c24409",
+      "solver_max_expanded": 200000,
+      "solver_timeout_seconds": 20,
+      "action_limit": 512,
+      "max_generation_attempts": 1000
+    },
+    "game24": {
+      "number_limits": [
+        13,
+        25,
+        50,
+        100,
+        1000,
+        1000000,
+        1000000000
+      ],
+      "source_commit": "d69d3b8ddb75f888732e893394e8e5e5df4f4e6f",
+      "max_generation_attempts": 100000
+    }
+  },
+  "comparison": "User-authorized first-error search after all112 fixed-setting Flash64k cases completed. Each task sends one case at a time and stops at its first non-service failure to complete within64k; suboptimal success is reported separately. At most3 cases per level; if all succeed, advance. No confirmation rate or population success claim. Bridge increases people and uses distinct shuffled positive times, with exact capacity-two recurrence and replayed plans. Sokoban uses pinned original10x10/four-box Boxoban sources; bounded push-space solver supplies legal walk/push witnesses, without claiming minimum walking distance. Unresolved preparation candidates are skipped and counts retained, never counted as model failures. Game24 remains four positive integers, target24 and three binary operations; first use XoT fraction-required cases not in prior112, then construct larger-integer fraction-required cases. Above13 is an explicit numeric-range extension, not the standard XoT distribution. Same shared wording and complete-plan protocol; generation changes only problem fields and nonbinding action limits. Do not expand beyond listed ranges or change rules if no failure occurs. Preserve raw answers, service attempts and exact first failure; do not resample valid mistakes."
+}

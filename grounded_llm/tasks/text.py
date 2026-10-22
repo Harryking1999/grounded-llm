@@ -143,5 +143,6 @@ def judge_plan(case, output, strict):
             'strict_json': strict, 'status_correct': status_correct, 'reported_status': status,
             'failure': 'illegal_action' if illegal is not None else 'action_limit' if not length_valid else None if solved else 'unsolved',
             'first_illegal_index': illegal, 'illegal_detail': detail, 'executed': executed,
-            'plan_length': len(actions), 'cost': total, 'optimal': solved and total == optimum,
-            'excess_cost': total - optimum if solved else None}
+            'plan_length': len(actions), 'cost': total,
+            'optimal': solved and total == optimum if optimum is not None else None,
+            'excess_cost': total - optimum if solved and optimum is not None else None}

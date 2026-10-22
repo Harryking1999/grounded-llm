@@ -4,7 +4,7 @@
 
 DeepSeek 积木／二阶魔方新题复测见 [64k 合同](configs/deepseek_blocks_cube100_64k.json)与[结果表](results/report.md)。原始答卷、进度与失败记录仅存 Git 外 `runs/deepseek_blocks_cube_fresh100_64k/`。
 
-手电过桥、推箱子、24点的固定设置Flash筛查见[64k合同](configs/deepseek_new_tasks_64k.json)。沿用共享规则、完整动作JSON和独立回放；完成与最优成本分别计分。来源为既有Qmap留出题，不调整任务或地图超参数；推箱子是小棋盘诊断条件，不冒充Boxoban题集。
+手电过桥、推箱子、24点的固定设置Flash筛查见[64k合同](configs/deepseek_new_tasks_64k.json)。112题已完成，三项全部成功；完成与最优成本分别计分，来源为既有Qmap留出题，推箱子是小棋盘诊断条件。后续按[首次错误合同](configs/deepseek_new_tasks_harder64k.json)使用现有`src.escalate`，每任务每档至多三题，出现首个有效未完成即停止。过桥增加人数与时间范围，推箱子改用固定提交的原Boxoban文件，24点先取XoT必须分数的四数题，再扩数值范围；参考轨迹先独立回放。只找失败位置，不据少量自适应题估计总体成功率。
 
 ## 实验合同与答卷来源
 

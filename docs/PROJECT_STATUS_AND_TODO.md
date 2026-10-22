@@ -30,7 +30,7 @@
 ## 后续研究
 
 - 任务内OOD与多任务训练分别核对地图和接口的训练信息范围；跨任务迁移只在对应规则、地图和未见题集准备后评测。
-- 手电过桥、推箱子、24点已完成首轮固定目标Qmap可行性试验：过桥成本表示较有希望但未稳定最优；推箱子未见布局泛化不足；24点主要检验可解性，第一步仍易失败。先按[Flash64k合同](../experiments/task_text_baselines/configs/deepseek_new_tasks_64k.json)筛查当前题目，再决定任务及地图超参数。三者尚无采用图，不进入多任务SFT；比较与限制见[报告](../experiments/new_tasks_qmap/results/report.md)。
+- 手电过桥、推箱子、24点已完成首轮固定目标Qmap可行性试验：过桥成本表示较有希望但未稳定最优；推箱子未见布局泛化不足；24点主要检验可解性，第一步仍易失败。[Flash64k固定筛查](../experiments/task_text_baselines/results/report.md)三项均全部完成；按[首次错误探索合同](../experiments/task_text_baselines/configs/deepseek_new_tasks_harder64k.json)加大设置，找到失败再讨论任务及地图超参数。三者尚无采用图，不进入多任务SFT；比较与限制见[报告](../experiments/new_tasks_qmap/results/report.md)。
 - 在贪心之外比较采样与 pass@k 时，明确总预算、独立采样与整题裁判口径。
 
 入口：[任务工作区](../tasks/README.md)、[Qmap 方法](../tasks/QMAP_METHOD.md)、[实验实现](../experiments/README.md)、[开发机手册](../DEVELOPMENT_MACHINES.md)。文献与旧会议不维护当前计划。

@@ -1,0 +1,174 @@
+{
+  "source_commit": "43cdb24",
+  "cohorts": {
+    "sokoban": {
+      "validation": {
+        "eligible_rows": 8096,
+        "unique_eligible_pairs": 7833,
+        "selected_rows": 1024,
+        "unique_selected_pairs": 1024
+      },
+      "test": {
+        "eligible_rows": 7792,
+        "unique_eligible_pairs": 7703,
+        "selected_rows": 1024,
+        "unique_selected_pairs": 1024
+      },
+      "unseen_goal_validation": {
+        "eligible_rows": 3974,
+        "unique_eligible_pairs": 3794,
+        "selected_rows": 1024,
+        "unique_selected_pairs": 1000
+      },
+      "unseen_goal_test": {
+        "eligible_rows": 4017,
+        "unique_eligible_pairs": 3821,
+        "selected_rows": 1024,
+        "unique_selected_pairs": 997
+      },
+      "unseen_layout_validation": {
+        "eligible_rows": 7941,
+        "unique_eligible_pairs": 7426,
+        "selected_rows": 1024,
+        "unique_selected_pairs": 1019
+      },
+      "unseen_layout_test": {
+        "eligible_rows": 8047,
+        "unique_eligible_pairs": 7764,
+        "selected_rows": 1024,
+        "unique_selected_pairs": 1023
+      },
+      "original_layout_test": {
+        "eligible_rows": 302,
+        "unique_eligible_pairs": 302,
+        "selected_rows": 302,
+        "unique_selected_pairs": 302
+      },
+      "original_layout_validation": {
+        "eligible_rows": 278,
+        "unique_eligible_pairs": 278,
+        "selected_rows": 278,
+        "unique_selected_pairs": 278
+      },
+      "diagnostic": {
+        "eligible_rows": 1021,
+        "unique_eligible_pairs": 1000,
+        "selected_rows": 1021,
+        "unique_selected_pairs": 1000
+      },
+      "diagnostic_original": {
+        "eligible_rows": 2,
+        "unique_eligible_pairs": 2,
+        "selected_rows": 2,
+        "unique_selected_pairs": 2
+      }
+    },
+    "rush_hour": {
+      "validation": {
+        "eligible_rows": 18272,
+        "unique_eligible_pairs": 18191,
+        "selected_rows": 1024,
+        "unique_selected_pairs": 1024
+      },
+      "test": {
+        "eligible_rows": 18272,
+        "unique_eligible_pairs": 18164,
+        "selected_rows": 1024,
+        "unique_selected_pairs": 1024
+      },
+      "unseen_goal_validation": {
+        "eligible_rows": 36475,
+        "unique_eligible_pairs": 35931,
+        "selected_rows": 1024,
+        "unique_selected_pairs": 1024
+      },
+      "unseen_goal_test": {
+        "eligible_rows": 36465,
+        "unique_eligible_pairs": 35853,
+        "selected_rows": 1024,
+        "unique_selected_pairs": 1024
+      },
+      "unseen_layout_validation": {
+        "eligible_rows": 17714,
+        "unique_eligible_pairs": 17509,
+        "selected_rows": 1024,
+        "unique_selected_pairs": 1024
+      },
+      "unseen_layout_test": {
+        "eligible_rows": 18708,
+        "unique_eligible_pairs": 18401,
+        "selected_rows": 1024,
+        "unique_selected_pairs": 1024
+      },
+      "original_layout_test": {
+        "eligible_rows": 16135,
+        "unique_eligible_pairs": 16135,
+        "selected_rows": 1024,
+        "unique_selected_pairs": 1024
+      },
+      "original_layout_validation": {
+        "eligible_rows": 22208,
+        "unique_eligible_pairs": 22208,
+        "selected_rows": 1024,
+        "unique_selected_pairs": 1024
+      },
+      "diagnostic": {
+        "eligible_rows": 4054,
+        "unique_eligible_pairs": 3982,
+        "selected_rows": 1024,
+        "unique_selected_pairs": 1017
+      },
+      "diagnostic_original": {
+        "eligible_rows": 8,
+        "unique_eligible_pairs": 8,
+        "selected_rows": 8,
+        "unique_selected_pairs": 8
+      }
+    },
+    "token_swapping": {
+      "validation": {
+        "eligible_rows": 2048,
+        "unique_eligible_pairs": 1680,
+        "selected_rows": 1024,
+        "unique_selected_pairs": 734
+      },
+      "test": {
+        "eligible_rows": 2048,
+        "unique_eligible_pairs": 1665,
+        "selected_rows": 1024,
+        "unique_selected_pairs": 741
+      },
+      "unseen_endpoint_validation": {
+        "eligible_rows": 2048,
+        "unique_eligible_pairs": 2048,
+        "selected_rows": 1024,
+        "unique_selected_pairs": 1024
+      },
+      "unseen_both_validation": {
+        "eligible_rows": 2048,
+        "unique_eligible_pairs": 2048,
+        "selected_rows": 1024,
+        "unique_selected_pairs": 1024
+      },
+      "unseen_endpoint_test": {
+        "eligible_rows": 2048,
+        "unique_eligible_pairs": 2048,
+        "selected_rows": 1024,
+        "unique_selected_pairs": 1024
+      },
+      "unseen_both_test": {
+        "eligible_rows": 2048,
+        "unique_eligible_pairs": 2048,
+        "selected_rows": 1024,
+        "unique_selected_pairs": 1024
+      },
+      "diagnostic": {
+        "eligible_rows": 5,
+        "unique_eligible_pairs": 5,
+        "selected_rows": 5,
+        "unique_selected_pairs": 5
+      }
+    }
+  },
+  "scope": "Read-only audit of the old exact planning selection on the immutable prepared data. Exact ordered(S,G) duplicates only; different goals at the same source remain distinct queries."
+}

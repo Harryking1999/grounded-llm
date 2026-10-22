@@ -84,6 +84,28 @@ def coordinate_statistics(source,goal,truth,predictions,cap,activation):
         all=describe(np.ones(len(truth),dtype=bool)),by_true_distance=bins)
 
 
+def unit_cost_consistency(parent,children,optimal,valid):
+    """Frozen distance-field diagnosis; never changes a candidate or its score."""
+    children=np.where(valid,children,np.inf)
+    chosen=children.argmin(axis=1); index=np.arange(len(parent))
+    drop=parent-children[index,chosen]; residual=drop-1
+    optimal=optimal & valid
+    teacher_drop=np.broadcast_to(parent[:,None],children.shape)[optimal]-children[optimal]
+    selected_optimal=optimal[index,chosen]
+    return dict(mae=float(np.abs(residual).mean()) if len(parent) else None,
+        upper_violation_rate=float((residual>1e-3).mean()) if len(parent) else None,
+        lower_violation_rate=float((residual < -1e-3).mean()) if len(parent) else None,
+        chosen_non_descent_rate=float((drop<=1e-6).mean()) if len(parent) else None,
+        chosen_predicted_drop_quantiles={str(q):float(np.quantile(drop,q)) for q in (0,.1,.5,.9,1)} if len(parent) else {},
+        chosen_true_optimal_count=int(selected_optimal.sum()),
+        chosen_true_optimal_but_non_descent_count=int((selected_optimal & (drop<=1e-6)).sum()),
+        teacher_optimal_edge_count=int(optimal.sum()),
+        teacher_optimal_drop_mae_to_one=float(np.abs(teacher_drop-1).mean()) if len(teacher_drop) else None,
+        teacher_optimal_non_descent_rate=float((teacher_drop<=1e-6).mean()) if len(teacher_drop) else None,
+        teacher_optimal_predicted_drop_quantiles={str(q):float(np.quantile(teacher_drop,q)) for q in (0,.1,.5,.9,1)} if len(teacher_drop) else {},
+        note='Reference decisions, not whole trajectories. Unit-cost teacher-optimal edges should have a true remaining-distance drop of1. Candidate order can be correct even when the parent-to-child predicted drop is wrong. No oracle is used to change model action selection.')
+
+
 def rollout(corpus,cache,rows,horizon,policy):
     current,goal=rows[:,0].copy(),rows[:,1].copy()
     exact=corpus.distance(current,goal)
@@ -160,7 +182,8 @@ def rollout(corpus,cache,rows,horizon,policy):
             executed_edge_optimal_rate=progress_counts['true_optimal_edges']/len(drops) if len(drops) else None,
             predicted_strict_descent_edge_rate=progress_counts['predicted_decrease']/len(drops) if len(drops) else None,
             note='Observed policy trajectories only, after action selection. A nondecreasing chosen edge also means no legal successor has a strictly lower predicted distance under this greedy policy. Strict predicted descent alone does not prove goal completion or true optimality; full rollouts remain the acceptance metric.')
-    return dict(count=len(rows),solved=int(solved.sum()),success_rate=float(solved.mean()) if len(rows) else None,
+    return dict(count=len(rows),unique_state_goal_pairs=len(np.unique(rows,axis=0)),
+                solved=int(solved.sum()),success_rate=float(solved.mean()) if len(rows) else None,
                 optimal=int(optimum.sum()),optimal_rate=float(optimum.mean()) if len(rows) else None,cycles=int(cycles.sum()),
                 entered_unreachable=int(dead.sum()),no_legal_action=int(no_action.sum()),
                 budget_exhausted=int(active.sum()),horizon=horizon,illegal_actions=0,
@@ -173,6 +196,13 @@ def rollout(corpus,cache,rows,horizon,policy):
 def planning_ids(corpus,rows,truth,count,rng):
     """Unique starts/queries; share the budget across scenes then distance layers."""
     pool=np.flatnonzero(np.isfinite(truth) & (truth>0))
+    # Prepared distance-stratified evaluation rows may repeat a physical pair.
+    # Keep their original weights for regression/checkpoint selection, but not
+    # for deterministic whole-plan trials. Preserve first-occurrence order so
+    # already unique cohorts retain their original planning queries.
+    if len(pool):
+        _,first=np.unique(rows[pool],axis=0,return_index=True)
+        pool=pool[np.sort(first)]
     if len(pool)<=count: return pool
     scene=corpus.locate(rows[pool,0]) if hasattr(corpus,'scenes') else np.zeros(len(pool),int)
     groups=[pool[scene==sid] for sid in np.unique(scene)]
@@ -223,7 +253,6 @@ def evaluate(model,corpus,data,config,cohorts=None,exposure=None,planning=True,t
             target=np.where(np.isfinite(child_truth[ids]),child_truth[ids],config['training']['unreachable_target'])
             rank_loss=float(soft_rank_loss(torch.as_tensor(np.where(valid[ids],1+scores[ids],0),device=device),
                 torch.as_tensor(1+target,device=device),torch.as_tensor(valid[ids],device=device),config['training']['rank_temperature']))
-        bellman=pred[ids]-np.min(1+scores[ids],axis=1)
         result=dict(count=len(rows),finite_count=int(finite.sum()),finite_mae=float(error.mean()),
                     finite_huber=float(np.where(error<1,.5*error**2,error-.5).mean()),
                     finite_bias=float(signed.mean()),spearman=correlation(pred[finite],truth[finite]),
@@ -235,7 +264,7 @@ def evaluate(model,corpus,data,config,cohorts=None,exposure=None,planning=True,t
                     strict_candidate_order_accuracy=float(strict[ordered].mean()) if ordered.any() else None,
                     dead_end_choice_rate=float((~np.isfinite(actual[np.arange(len(ids)),chosen])).mean()) if len(ids) else None,
                     candidate_soft_rank_loss=rank_loss,
-                    bellman=dict(mae=float(np.abs(bellman).mean()) if len(ids) else None,upper_violation_rate=float((bellman>1e-3).mean()) if len(ids) else None),
+                    bellman=unit_cost_consistency(pred[ids],scores[ids],optimal,valid[ids]),
                     directionality=dict(predicted_mean_absolute_asymmetry=float(np.abs(pred-reverse).mean()),
                         both_reachable=int((finite & np.isfinite(reverse_truth)).sum()),
                         forward_only=int((finite & ~np.isfinite(reverse_truth)).sum()),
@@ -253,9 +282,18 @@ def evaluate(model,corpus,data,config,cohorts=None,exposure=None,planning=True,t
         if planning:
             rng=np.random.default_rng(config['seed']+len(name))
             selected=rows[planning_ids(corpus,rows,truth,config['evaluation']['rollout_count'],rng)]
+            unique_selected=len(np.unique(selected,axis=0))
+            if unique_selected!=len(selected): raise ValueError('Duplicate physical planning query')
+            eligible=np.isfinite(truth)&(truth>0)
+            result['planning_query_selection']=dict(protocol='unique_ordered_state_goal_pairs_v2',
+                eligible_rows=int(eligible.sum()),unique_eligible_pairs=len(np.unique(rows[eligible],axis=0)),
+                maximum_queries=config['evaluation']['rollout_count'],selected_queries=len(selected),
+                unique_selected_pairs=unique_selected,
+                scope='Exact ordered(S,G) duplicates removed before scene/distance allocation. Different complete goals at one source remain distinct. Regression/ranking row weights and validation checkpoint selection are unchanged.')
             result['planning']={policy:rollout(corpus,cache,selected,config['evaluation']['horizon'],policy) for policy in ('q','oracle','heuristic','immediate_cost_only')}
         results[name]=result
-    return dict(reachability_threshold=threshold,cohorts=results)
+    return dict(reachability_threshold=threshold,cohorts=results,
+                planning_protocol='unique_ordered_state_goal_pairs_v2' if planning else None)
 
 
 def main():

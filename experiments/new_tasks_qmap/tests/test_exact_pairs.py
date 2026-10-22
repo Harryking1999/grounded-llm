@@ -43,6 +43,38 @@ def small_oracle(path,n,edges):
 
 
 class ExactPairTests(unittest.TestCase):
+    def test_planning_queries_deduplicate_pairs_before_distance_allocation(self):
+        from experiments.new_tasks_qmap.src.relation_evaluate import planning_ids
+        with tempfile.TemporaryDirectory() as tmp, ExitStack() as stack:
+            path=Path(tmp); small_oracle(path,4,[[0,1],[1,2],[1,3]])
+            corpus=TokenCorpus(path); stack.callback(corpus.close)
+            unique=np.array([[2,0],[2,1],[3,0],[4,0]])
+            repeated=np.concatenate([np.repeat(unique[:1],50,axis=0),np.repeat(unique[1:2],20,axis=0),unique[2:]])
+            truth=corpus.distance(repeated[:,0],repeated[:,1])
+            all_ids=planning_ids(corpus,repeated,truth,100,np.random.default_rng(4))
+            np.testing.assert_array_equal(repeated[all_ids],unique)
+            for count in (1,3):
+                ids=planning_ids(corpus,repeated,truth,count,np.random.default_rng(4))
+                expected=planning_ids(corpus,unique,corpus.distance(unique[:,0],unique[:,1]),count,np.random.default_rng(4))
+                self.assertEqual(len(np.unique(repeated[ids],axis=0)),count)
+                np.testing.assert_array_equal(repeated[ids],unique[expected])
+
+    def test_correct_candidate_order_does_not_force_unit_distance_descent(self):
+        from experiments.new_tasks_qmap.src.relation_evaluate import unit_cost_consistency
+        from grounded_llm.core.qmap.model import soft_rank_loss
+        parent=np.array([2.,2.]); children=np.array([[1.,3.,np.inf],[1.,1.,3.]])
+        valid=np.isfinite(children); optimal=valid & (children==1)
+        exact=unit_cost_consistency(parent,children,optimal,valid)
+        self.assertEqual(exact['mae'],0); self.assertEqual(exact['teacher_optimal_non_descent_rate'],0)
+        broken=unit_cost_consistency(np.array([.2,2.]),children,optimal,valid)
+        self.assertEqual(broken['chosen_true_optimal_count'],2)
+        self.assertEqual(broken['chosen_true_optimal_but_non_descent_count'],1)
+        self.assertEqual(broken['chosen_non_descent_rate'],.5)
+        self.assertAlmostEqual(broken['teacher_optimal_drop_mae_to_one'],.6)
+        mask=torch.as_tensor(valid); scores=torch.as_tensor(np.where(valid,children,0))
+        truth=torch.as_tensor(np.where(valid,children,30))
+        torch.testing.assert_close(soft_rank_loss(scores,truth,mask,1.),soft_rank_loss(scores+17,truth,mask,1.))
+
     def test_spatial_encoder_preserves_raw_board_and_checkpoint_interface(self):
         options=dict(dimension=128,hidden=256,cap=256,metric='directed_max',input_dim=400)
         mlp=StateEncoder(**options)

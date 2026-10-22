@@ -43,6 +43,21 @@ def small_oracle(path,n,edges):
 
 
 class ExactPairTests(unittest.TestCase):
+    def test_fixed_near_validation_pairs_have_exact_distances_and_held_endpoints(self):
+        from experiments.new_tasks_qmap.src.relation_diagnose import near_endpoint_cases
+        with tempfile.TemporaryDirectory() as tmp, ExitStack() as stack:
+            path=Path(tmp); small_oracle(path,5,[[0,1],[1,2],[1,3],[3,4]])
+            corpus=TokenCorpus(path); stack.callback(corpus.close)
+            partition=np.zeros(corpus.size,dtype=np.int8); order=np.random.default_rng(7).permutation(corpus.size)
+            partition[order[:20]]=1; partition[order[20:40]]=2
+            cases=near_endpoint_cases(corpus,partition,11,20)
+            repeated=near_endpoint_cases(corpus,partition,11,20)
+            for name,rows in cases.items():
+                np.testing.assert_array_equal(rows,repeated[name]); self.assertEqual(len(np.unique(rows,axis=0)),20)
+                self.assertFalse((partition[rows]==2).any()); self.assertTrue((partition[rows]==1).any(axis=1).all())
+                distances=corpus.distance(rows[:,0],rows[:,1])
+                self.assertEqual({d:int((distances==d).sum()) for d in range(1,6)},{d:4 for d in range(1,6)})
+
     def test_planning_queries_deduplicate_pairs_before_distance_allocation(self):
         from experiments.new_tasks_qmap.src.relation_evaluate import planning_ids
         with tempfile.TemporaryDirectory() as tmp, ExitStack() as stack:

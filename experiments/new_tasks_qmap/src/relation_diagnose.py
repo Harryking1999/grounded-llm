@@ -14,6 +14,39 @@ def _popcount(values):
     return int(table[values.view(np.uint8)].sum(dtype=np.int64))
 
 
+def near_endpoint_cases(corpus,partition,seed,count):
+    """Fixed positive-distance validation cases, never extra training rows."""
+    from grounded_llm.tasks.token_swapping.relation_data import rank
+    if hasattr(corpus,'scenes') or count<5 or len(partition)!=corpus.size:
+        raise ValueError('Token endpoint partition and at least five near queries required')
+    pools={fold:np.flatnonzero(partition==fold) for fold in (0,1)}
+    if any(not len(pool) for pool in pools.values()): raise ValueError('Both training and validation endpoint pools required')
+    rng=np.random.default_rng(seed+1009); groups={}
+    for name,source_fold,goal_fold in (('near_unseen_start_validation',1,0),('near_unseen_goal_validation',0,1),('near_unseen_both_validation',1,1)):
+        pieces=[]
+        for distance in range(1,6):
+            quota=count//5+(distance<=count%5); shell=np.flatnonzero(corpus.distances==distance)
+            if not len(shell): raise ValueError(('Missing exact near-distance shell',distance))
+            candidates=np.empty((0,2),dtype=np.int64)
+            for _ in range(64):
+                missing=quota-len(candidates)
+                if missing<=0: break
+                goal=rng.choice(pools[goal_fold],max(1024,missing*24))
+                relative=corpus.states[rng.choice(shell,len(goal))]
+                source=rank(np.take_along_axis(corpus.states[goal],relative,axis=1))
+                keep=partition[source]==source_fold
+                candidates=np.unique(np.concatenate([candidates,np.column_stack([source[keep],goal[keep]])]),axis=0)
+            if len(candidates)<quota: raise ValueError(('Insufficient unique held-endpoint near relations',name,distance))
+            rows=candidates[rng.choice(len(candidates),quota,replace=False)]
+            if not (corpus.distance(rows[:,0],rows[:,1])==distance).all(): raise ValueError('Relative near-distance proposal changed label')
+            pieces.append(rows)
+        rows=np.concatenate(pieces); rng.shuffle(rows)
+        if len(np.unique(rows,axis=0))!=count: raise ValueError('Repeated near validation query')
+        if not ((partition[rows[:,0]]==source_fold)&(partition[rows[:,1]]==goal_fold)).all(): raise ValueError('Near endpoint fold changed')
+        groups[name]=rows
+    return groups
+
+
 def pair_incompatibility_gaps(corpus,rows):
     """Positive gap means two undirected pairs cannot share a tight Linf axis."""
     a,b=rows[:,0],rows[:,1]; length=corpus.distance(a,b)
@@ -333,8 +366,28 @@ def main():
     parser.add_argument('--stream-statistics',action='store_true')
     parser.add_argument('--gradient-batches',type=int,default=0)
     parser.add_argument('--linf-witness-count',type=int,default=0)
+    parser.add_argument('--near-endpoint-count',type=int,default=0)
     args=parser.parse_args(); config=json.loads(args.config.read_text())
     corpus,data,_=load(config,args.run/'data')
+    if args.near_endpoint_count:
+        if config['task']!='token_swapping' or not args.checkpoint: raise ValueError('Token checkpoint required for near endpoint diagnosis')
+        import torch
+        from grounded_llm.core.qmap.model import StateEncoder
+        from .relation_data import materialize
+        from .relation_evaluate import evaluate
+        torch.set_num_threads(config['training']['cpu_threads'])
+        saved=torch.load(args.checkpoint,map_location='cpu',weights_only=False)
+        if saved['config']!=config: raise ValueError('Near endpoint checkpoint configuration mismatch')
+        partition=np.load(args.run/'data'/'endpoint_partition.npy')
+        groups=near_endpoint_cases(corpus,partition,config['seed'],args.near_endpoint_count)
+        diagnostic={key+'_'+name:value for name,rows in groups.items() for key,value in materialize(corpus,rows).items()}
+        model=StateEncoder(input_dim=corpus.input_dim,**config['model']); model.load_state_dict(saved['model']); model.requires_grad_(False)
+        metrics=evaluate(model,corpus,diagnostic,config,cohorts=list(groups),exposure=saved['exposure'])
+        atomic_json(args.out,dict(checkpoint_step=saved['step'],training_source_commit=saved['source_commit'],seed=config['seed']+1009,
+            condition='Validation-only near endpoints: exact distances1-5 with equal quotas; same deterministic cases for every model. At least one endpoint is validation fold, none is test fold. Full legal successors remain available, as in the original endpoint cohorts. Not a replacement acceptance set or training supervision.',
+            cases={name:dict(count=len(rows),unique_pairs=len(np.unique(rows,axis=0)),
+                by_true_distance={str(d):int((diagnostic['distances_'+name]==d).sum()) for d in range(1,6)}) for name,rows in groups.items()},
+            metrics=metrics)); return
     if args.linf_witness_count:
         atomic_json(args.out,linf_witness(corpus,config,args.linf_witness_count)); return
     if args.stream_statistics:

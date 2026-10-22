@@ -4,7 +4,7 @@
 
 同一个Qmap覆盖多种无墙6×6车辆布局，按整个布局／可达分量留出测试。**每题给出一张完整成功目标棋盘：A到右端，其他车辆也要到明确位置**；不同题可以使用不同目标。训练与评测均使用指定目标，不安排原出口目标的对照。一次滑动任意合法非零距离均成本1，不是逐格移动成本。
 
-精确分量数据、状态对训练、冻结评测与任务reader入口已实现，见[正式实验](../../../experiments/new_tasks_qmap/README.md)。[完整预算基线](../../../experiments/new_tasks_qmap/results/rush_hour_pairs_baseline.json)已见布局留出关系996/1024、未见目标987/1024完成，但未见布局526/1024、已知原始困难题0/8，尚未通过全部必需组，[selection](selection.json)不登记采用权重。现有[公开数据与精确求解](../data/README.md)、[文字和裁判](../prompts/README.md)可复用；Flash筛查不证明Qmap已能准确表示。
+精确分量数据、状态对训练、冻结评测与任务reader入口已实现，见[正式实验](../../../experiments/new_tasks_qmap/README.md)。[完整预算基线](../../../experiments/new_tasks_qmap/results/rush_hour_pairs_baseline.json)在v2独特状态对评测中，已见布局留出关系993/1024、未见目标990/1024完成，但未见布局520/1024、已知原始困难题0/8，尚未通过全部必需组，[selection](selection.json)不登记采用权重。现有[公开数据与精确求解](../data/README.md)、[文字和裁判](../prompts/README.md)可复用；Flash筛查不证明Qmap已能准确表示。
 
 ## 棋盘编码
 

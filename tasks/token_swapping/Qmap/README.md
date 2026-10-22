@@ -4,7 +4,7 @@
 
 第一版固定一棵10顶点树，学习并验证完整状态对距离；先验收，再考虑12–15顶点。沿用Flash已测的公开`Medium random tree 1`，边表与编号唯一维护在[tree10.json](../data/tree10.json)。不是跨树泛化实验。精确oracle生成、状态对训练、冻结评测与任务reader入口已实现，见[正式实验](../../../experiments/new_tasks_qmap/README.md)；尚无通过验收的权重；[selection](selection.json)保持空值。
 
-[完整预算基线](../../../experiments/new_tasks_qmap/results/token_pairs_baseline.json)的留出关系／未见起点／两端未见到达率为35.55%／27.73%／27.25%，[补近阶段](../../../experiments/new_tasks_qmap/results/token_pairs_local_goals.json)为57.52%／47.85%／44.63%，均未达到最低验收线。局部最优动作率较高仍会在整题执行中循环，不能宣称已正确学到全域状态对地图。
+[完整预算基线](../../../experiments/new_tasks_qmap/results/token_pairs_baseline.json)在v2独特状态对评测中的留出关系／未见起点／两端未见到达率为30.47%／27.73%／27.25%，[补近阶段](../../../experiments/new_tasks_qmap/results/token_pairs_local_goals.json)为48.54%／47.85%／44.63%，[补近rank4](../../../experiments/new_tasks_qmap/results/token_pairs_local_rank4.json)为65.92%／62.50%／64.36%，均未达到全部必需组最低验收线。局部最优动作率较高仍会在整题执行中循环，不能宣称已正确学到全域状态对地图。
 
 ## 状态、动作与目标
 

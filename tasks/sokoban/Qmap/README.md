@@ -4,7 +4,7 @@
 
 保留Boxoban hard的10×10、四箱四目标及逐格走／推动作。同一个Qmap覆盖多张hard棋盘，编码器输入完整棋盘，单独检验未见布局。**每题指定一张完整成功目标棋盘，箱子与玩家位置都要匹配**；不同题可以有不同目标。训练与评测均采用指定目标，不再安排原完成规则的对照。不是只为失败原题362训练。
 
-该条件的精确图、完整状态对训练、冻结评测与reader入口已实现，见[正式实验](../../../experiments/new_tasks_qmap/README.md)。[完整预算基线](../../../experiments/new_tasks_qmap/results/sokoban_pairs_baseline.json)未见布局到达79/1024，[Sigmoid／Linear完整对照](../../../experiments/new_tasks_qmap/results/sokoban_pairs_activation_final.json)没有恢复可靠规划，均未通过验收。[selection](selection.json)不登记采用权重。历史六乘六两箱试验见[首轮入口](../../../experiments/new_tasks_qmap/README.md)，不能用于hard条件。
+该条件的精确图、完整状态对训练、冻结评测与reader入口已实现，见[正式实验](../../../experiments/new_tasks_qmap/README.md)。[完整预算基线](../../../experiments/new_tasks_qmap/results/sokoban_pairs_baseline.json)在v2独特状态对评测中未见布局到达70/1024，[Sigmoid／Linear完整对照](../../../experiments/new_tasks_qmap/results/sokoban_pairs_activation_final.json)没有恢复可靠规划，均未通过验收。[selection](selection.json)不登记采用权重。历史六乘六两箱试验见[首轮入口](../../../experiments/new_tasks_qmap/README.md)，不能用于hard条件。
 
 ## 规则、状态与输入
 

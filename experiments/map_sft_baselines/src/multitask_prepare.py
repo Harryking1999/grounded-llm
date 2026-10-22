@@ -20,8 +20,14 @@ WORKER = None
 
 
 def encode_row(item):
-    task, index, record, steps = item
-    cfg, tokenizer, envs, out = WORKER
+    task, index, record, payload = item
+    cfg, tokenizer, envs, out, path_tables = WORKER
+    if isinstance(payload, str):
+        steps = torch.load(payload,map_location='cpu',weights_only=False)['map']['steps']
+    else:
+        vectors, distances = path_tables
+        steps = [make_step(envs[task],None,s,record['goal'],vectors=vectors,
+                          distances=distances[:,record['goal']]) for s in payload]
     name = f'{task}/{index:05d}.pt'
     packed, tokens = {}, {}
     for real_map, key in [(True, 'map'), (False, 'plain')]:
@@ -120,11 +126,10 @@ def main():
                            selection='uniform_without_replacement',source_indices=chosen)
         atomic_json(out/'progress.json',dict(stage='selected_existing',task=task))
         if task != 'blocks':
-            WORKER = cfg,tokenizer,envs,out
+            WORKER = cfg,tokenizer,envs,out,None
             def items():
                 for index,row in enumerate(selected):
-                    item = torch.load(source/'trajectories'/row['prepared_file'],map_location='cpu',weights_only=False)
-                    yield task,index,row,item['map']['steps']
+                    yield task,index,row,str(source/'trajectories'/row['prepared_file'])
             with ProcessPoolExecutor(args.workers,mp_context=multiprocessing.get_context('fork')) as pool:
                 for i,row in enumerate(pool.map(encode_row,items(),chunksize=8),1):
                     rows.append(row)
@@ -150,13 +155,11 @@ def main():
     all_eval.extend(evaluation)
     selected,covered,vectors,distances=path_records(env,qmap,count,heldout,cfg['data']['subset_seed'])
     assert not covered & heldout
-    WORKER=cfg,tokenizer,envs,out
+    WORKER=cfg,tokenizer,envs,out,(vectors.numpy(),distances)
     def items():
         for index,row in enumerate(selected):
             record=dict(row,trajectory_id=f'path_train_{index:05d}')
-            steps=[make_step(env,None,s,record['goal'],vectors=vectors.numpy(),distances=distances[:,record['goal']])
-                   for s in record['states']]
-            yield task,index,record,steps
+            yield task,index,record,record['states']
     with ProcessPoolExecutor(args.workers,mp_context=multiprocessing.get_context('fork')) as pool:
         for i,row in enumerate(pool.map(encode_row,items(),chunksize=8),1):
             rows.append(row)

@@ -27,3 +27,5 @@ Q(s)不接收目标为网络输入；本轮只监督同场景既定目标的距�
 数据公开源见各任务README；自行生成的过桥和小推箱子场景不宣称是标准benchmark。重复训练曝光保存在运行结果中；24点初题划分不保证中间状态独立。单种子、有限预算的首轮结果只用于定位可行性，不能替代正式模型验收、LLM读图增益或跨任务迁移。
 
 验证：`python -m unittest discover -s experiments/new_tasks_qmap/tests -v`；文字同步：`python -m tasks.export_texts --check`。结论和数值见[报告](results/report.md)。
+
+失败定位：`python -m experiments.new_tasks_qmap.src.diagnose --root runs/new_tasks_qmap/pilot_27893ea --out tmp/new_tasks_diagnosis.json`。该入口只读取保存的数据与预测，不训练或重新选择权重。

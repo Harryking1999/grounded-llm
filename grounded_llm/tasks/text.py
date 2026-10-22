@@ -22,7 +22,7 @@ def section_text(task, heading):
 def prompt(case):
     task = case["task"]
     text = section_text(task, "共享任务描述与规则")
-    if task in ('bridge', 'sokoban', 'game24'):
+    if task in ('bridge', 'sokoban', 'game24', 'rush_hour', 'token_swapping'):
         fields = importlib.import_module(f'grounded_llm.tasks.{task}.text').fields(case)
         fields['action_limit'] = case['action_limit']
     elif task == "blocks":
@@ -68,7 +68,7 @@ def judge(case, raw):
     if not isinstance(output, dict) or not isinstance(output.get("actions"), list):
         return {"solved": False, "contract_pass": False, "failure": "parse_error", "strict_json": strict}
     task, actions = case["task"], output["actions"]
-    if task in ('bridge', 'sokoban', 'game24'):
+    if task in ('bridge', 'sokoban', 'game24', 'rush_hour', 'token_swapping'):
         return judge_plan(case, output, strict)
     state = tuple(case["initial"]) if task in ("hanoi", "puzzle8", "puzzle15", "puzzle24", "cube3") else case["initial"]
     goal = tuple(case["goal"]) if task in ("hanoi", "puzzle8", "puzzle15", "puzzle24", "cube3") else case["goal"]

@@ -7,7 +7,8 @@ import re
 ROOT = Path(__file__).resolve().parents[1]
 TASKS = (("blocks", "积木"), ("path", "寻路"), ("hanoi", "汉诺塔"), ("cube2", "二阶魔方"),
          ("puzzle8", "8-Puzzle（数字华容道）"), ("bridge", "手电过桥"),
-         ("sokoban", "推箱子"), ("game24", "24点"))
+         ("sokoban", "推箱子"), ("game24", "24点"),
+         ("rush_hour", "Rush Hour（移车出库）"), ("token_swapping", "Token Swapping（图上交换棋子）"))
 
 
 def render():

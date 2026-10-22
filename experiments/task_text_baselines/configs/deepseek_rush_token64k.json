@@ -1,0 +1,41 @@
+{
+  "study": "rush_token_flash_fixed_screening",
+  "seed": 2026102206,
+  "expected_cases": 80,
+  "source_cache": "tmp/planning_task_sources",
+  "tasks": {
+    "rush_hour": {
+      "source_url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+      "source_code_commit": "3e3b8396891d1802b30cb3129ae31fdedb319480",
+      "wall_count": 0,
+      "scenes": 8,
+      "starts_per_scene": 5,
+      "max_component_states": 50000,
+      "action_limit": 256,
+      "selection": "Include the deepest no-wall original, then seed-select seven other no-wall originals from the public top1000 with bounded component size. For each source puzzle, use the original and four intermediate states on one independently verified shortest plan, with remaining distances2, floor(D/4), floor(D/2), floor(3D/4), D. These40 starts are dependent within8 source components; not40 independent benchmark originals."
+    },
+    "token_swapping": {
+      "source_commit": "4a554cbc2699de2f95da18eb3c30ff0961bcc536",
+      "source_file": "libs/tktokenswap/test/src/Data/FixedCompleteSolutions.cpp",
+      "architectures": ["Path, N=5", "Ring, N=5", "Wheel, 5 spokes", "IBM q7 Jakarta", "Small random tree 1", "Small random tree 2", "Medium random tree 1", "Medium random tree 2"],
+      "per_architecture": 5,
+      "max_search_states": 1000000,
+      "solver_timeout_seconds": 30,
+      "action_limit": 256,
+      "selection": "Seed-shuffle full-permutation public cases only, exclude duplicate initial permutations within an architecture, accept only independently proven exact optima within preparation bounds. Preserve rejection counts; source reference sequences are upper bounds, not optimal labels. Match upstream inverse-permutation decoding and preserve all architecture edges."
+    }
+  },
+  "api": {
+    "base_url": "https://api.deepseek.com",
+    "model": "deepseek-flash",
+    "reasoning_effort": "high",
+    "max_output_tokens": 64000,
+    "scoring_output_limit": 64000,
+    "timeout_seconds": 2400,
+    "concurrency": 8,
+    "max_service_retries": 3,
+    "max_total_service_retries": 30,
+    "service_retry_delay_seconds": 15
+  },
+  "comparison": "One valid answer per frozen case, shared full-plan text, no tools, feedback, oracle distances or reference plans. Assess valid completion, strict JSON, exact minimum unit-cost plan and excess moves separately for both tasks. Sequential swaps only. Retain suboptimal successes, illegal actions and truncations without resampling. No Qmap or LLM training. This is a task screening set, not a representative overall benchmark estimate."
+}

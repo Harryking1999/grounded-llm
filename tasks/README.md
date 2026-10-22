@@ -52,19 +52,21 @@
 | 手电过桥 | [bridge](bridge/README.md) | [prompts](bridge/prompts/README.md) | [data](bridge/data/README.md) | [Qmap](bridge/Qmap/README.md) |
 | 推箱子 | [sokoban](sokoban/README.md) | [prompts](sokoban/prompts/README.md) | [data](sokoban/data/README.md) | [Qmap](sokoban/Qmap/README.md) |
 | 24点 | [game24](game24/README.md) | [prompts](game24/prompts/README.md) | [data](game24/data/README.md) | [Qmap](game24/Qmap/README.md) |
+| Rush Hour | [rush_hour](rush_hour/README.md) | [prompts](rush_hour/prompts/README.md) | [data](rush_hour/data/README.md) | [Qmap](rush_hour/Qmap/README.md) |
+| Token Swapping | [token_swapping](token_swapping/README.md) | [prompts](token_swapping/prompts/README.md) | [data](token_swapping/data/README.md) | [Qmap](token_swapping/Qmap/README.md) |
 
 ## 新任务候选：难度与地图关系
 
-复杂度结论针对规模可增长的任务族，不是固定6×6或10×10棋盘，也不保证随机小实例能难住Flash。当前需要同时有可复用题目、清晰动作、可核对真值和可训练规模；候选未加入正式任务、未启动API评测或训练。
+复杂度结论针对规模可增长的任务族，不是固定6×6或10×10棋盘，也不保证随机小实例能难住Flash。当前需要同时有可复用题目、清晰动作、可核对真值和可训练规模。Rush Hour与Token Swapping已接入文字筛查规则与裁判，[合同](../experiments/task_text_baselines/configs/deepseek_rush_token64k.json)分别考察完成与最优成本；两者尚无Qmap或LLM训练。其余候选尚未采用。
 
 | 候选／来源 | 难在什么目标 | 对本项目的价值与限制 |
 |---|---|---|
 | Rush Hour／[复杂度与规则建模论文](https://air.uniud.it/retrieve/22b19a17-19a9-4b13-a1e2-3b9126cce139/paper_29.pdf)、[公开代码](https://github.com/fogleman/rush) | 可变棋盘推广版的目标可达性为PSPACE完全；车只能沿自身轴线移动 | 优先考虑。动作可逆，同一车辆布局的可达分量内有对称最短路；适合固定出口目标，也可另设完整排列目标考察任意状态对。需要区分两种目标及单格／多格动作口径 |
-| Token Swapping／[ESA2016](https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.ESA.2016.66)、[树上的困难性](https://arxiv.org/abs/2103.06707)、[rustworkx实现](https://www.rustworkx.org/apiref/rustworkx.graph_token_swapper.html) | 一步交换图上相邻节点的棋子，最少交换次数NP-hard，即使底图是树 | 最适合直接检验任意起终点的距离。连通底图上所有排列互达；仅要求最终完成时可由通用流程求解，必须把成本／最优性列为目标。现有实现是近似求解器，不能直接用作精确标签 |
+| Token Swapping／[ESA2016](https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.ESA.2016.66)、[树上的困难性](https://arxiv.org/abs/2103.06707)、[公开实例及适配](token_swapping/data/README.md) | 一步交换图上相邻节点的棋子，最少交换次数NP-hard，即使底图是树 | 最适合直接检验任意起终点的距离。连通底图上所有排列互达；仅要求最终完成时可由通用流程求解，必须把成本／最优性列为目标。tket固定问题的上游序列不保证最短，本地另用精确搜索标定 |
 | 冲突图渡河／[Csorba等，SIAM](https://doi.org/10.1137/080736661) | 狼羊菜推广成任意冲突图，求可完成运输的最小船容量NP-hard | 保留为过桥邻近候选。冲突关系改变可行状态与连通性，输入需有位置、船／管理者位置、冲突图与容量。不能把最小容量的复杂度直接套在固定容量、保证可解的子集；一般冲突图规则尚无本地实现 |
 | 多岛多手电／[原题及本地核对](bridge/README.md#变体与适用性) | 维护人员与手电分布，人员有不同目的地；已核对的具体规则没有NP-hard结论 | 保留过桥语义、精确状态规模小，但现有来源为教学任务，不能标为已有论文benchmark |
 
-Rush Hour现有题库由作者公开了距离、棋盘和可达分量大小。本项目独立完整BFS核对了两题：含一堵固定墙的60-move题所在分量只有2,332个状态、12辆车；无墙51-move题示例有4,780个状态、13辆车，最短距离与分量大小均和来源一致。[数据定义与条目](https://www.michaelfogleman.com/rush/)、[棋盘与见证](../experiments/task_text_baselines/results/new_tasks_harder_flash64k.json)。这里一次move是同一辆车沿固定方向滑动任意合法格数，成本均为1；改成逐格移动会改变距离，不能沿用原标签。优先从无墙标准规则及这种小分量核对地图可行性，按距离采样起点，并按整个分量划分曝光；输入编码需保留车辆身份、长度、方向、位置、墙与目标条件。出口任务终点是集合，不能把它的标签冒充完整排列之间的距离。两题核对只是规则与数据验证，未进行Flash或Qmap实验。
+Rush Hour现有题库由作者公开了距离、棋盘和可达分量大小。本项目独立完整BFS核对了两题：含一堵固定墙的60-move题所在分量只有2,332个状态、12辆车；无墙51-move题示例有4,780个状态、13辆车，最短距离与分量大小均和来源一致。[数据定义与条目](https://www.michaelfogleman.com/rush/)、[棋盘与见证](../experiments/task_text_baselines/results/new_tasks_harder_flash64k.json)。这里一次move是同一辆车沿固定方向滑动任意合法格数，成本均为1；改成逐格移动会改变距离，不能沿用原标签。文字筛查采用无墙原题及分量内的最短轨迹中间状态，见[实际数据口径](rush_hour/data/README.md)。输入编码需保留车辆身份、长度、方向、位置、墙与目标条件。出口任务终点是集合，不能把它的标签冒充完整排列之间的距离；地图训练与分量划分仍待准备。
 
 现有推箱子本身在可变棋盘／箱数的推广下已为PSPACE完全，见[原始文献入口](https://webdocs.cs.ualberta.ca/~games/Sokoban/papers.html)；Boxoban四箱10×10只是其中有限的经验题集。它有不可逆推动与死路，而当前对称地图距离不能同时精确等于所有有向状态对距离。因而固定目标价值排序与任意状态对关系必须分别验收，不能因题目复杂就假定现有Qmap编码足够。
 

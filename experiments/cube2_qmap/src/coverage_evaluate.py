@@ -14,6 +14,9 @@ from grounded_llm.tasks.cube2.evaluate import rollout
 from .coverage_data import model_from
 from .near_goal_continuation import inspect
 from .fixed_goal import exhaustive_policy
+from .full_state_joint import fixed_batch,batch_losses
+from .coverage_data import predicted_scores
+from .coverage_train import edge_loss
 
 
 def paired_change(before,after):
@@ -28,6 +31,62 @@ def paired_change(before,after):
         paired_bootstrap_95_percent_interval=np.quantile(samples,[.025,.975]).tolist(),
         exact_mcnemar_two_sided_p=p,
         gained_indices=np.flatnonzero(~a&b).tolist(),lost_indices=np.flatnonzero(a&~b).tolist())
+
+
+def diagnose(args):
+    """Training-only fitting, conditioning and gradient-conflict checks."""
+    torch.set_num_threads(2);args.out.mkdir(parents=True,exist_ok=False)
+    env=Cube2(args.oracle,metric='QTM_URF_6');rng=np.random.default_rng(2026102406)
+    pools={}
+    for name in ('Original','Cross','OriginalReplay'):
+        rows=np.load(args.data/(name+'.npy'))
+        if name=='Cross':
+            groups=rows.reshape(-1,8,2);pools[name]=groups[rng.choice(len(groups),64,replace=False)].reshape(-1,2)
+        else:pools[name]=rows[rng.choice(len(rows),512,replace=False)]
+    allowed=np.load(args.data/'edge_allowed.npy',mmap_mode='r');edge_parents=rng.choice(env.size,512,replace=False)
+    children=env.successors(edge_parents)
+    assert np.array_equal(allowed[edge_parents],allowed[children,np.arange(6)^1]),'Directed edge protection is not symmetric'
+    cfg=json.loads((args.run[0]/'config.json').read_text())['study']
+    checkpoints=[('initial',args.checkpoint2000)]
+    for directory in args.run:
+        assert (directory/'complete.json').exists(),str(directory)
+        paths=sorted(directory.glob('update_*.pt'))
+        checkpoints.append((directory.name,paths[-1]))
+    output=dict(source_commit=args.source_commit,training_only=True,models={},
+        one_step_edges=dict(directed=int(allowed.sum()),unique_undirected_distance_labels=int(allowed.sum())//2),
+        note='A gradient cosine is a local conflict diagnostic, not proof of an unavoidable global tradeoff. Training sample fitting is not independent generalization.')
+    for name,path in checkpoints:
+        model=model_from(path,env,args.device);gradients={};metrics={}
+        for pool,tasks in pools.items():
+            batch=fixed_batch(env,tasks);h,r=batch_losses(model,torch.as_tensor(env.features(batch['states']),device=args.device),batch,cfg)
+            gradients[pool]={}
+            for label,loss in [('huber',h),('rank',r),('total',h+r)]:
+                values=torch.autograd.grad(loss,list(model.parameters()),retain_graph=True)
+                gradients[pool][label]=torch.cat([v.ravel() for v in values]).detach()
+            scores=predicted_scores(model,env,tasks,args.device);truth=env.distance(env.successors(tasks[:,0]),tasks[:,1,None])
+            prob=np.exp(-(truth.astype(float)-truth.min(-1,keepdims=True)));prob/=prob.sum(-1,keepdims=True)
+            entropy=float(-(prob*np.log(prob)).sum(-1).mean())
+            metrics[pool]=dict(huber=float(h.detach()),rank=float(r.detach()),rank_target_entropy=entropy,
+                excess_rank_cross_entropy=float(r.detach())-entropy,
+                optimal_action_rate=float((truth[np.arange(len(tasks)),scores.argmin(-1)]==truth.min(-1)).mean()),
+                training_greedy=inspect(model,env,tasks[:128],args.device,32)['rollout'])
+            if pool=='Cross':
+                actions=scores.argmin(-1).reshape(-1,8)
+                metrics[pool]['parent_fraction_changing_predicted_action_across_goals']=float((actions!=actions[:,:1]).any(-1).mean())
+        el,count=edge_loss(model,env,edge_parents,allowed,args.device)
+        values=torch.autograd.grad(el,list(model.parameters()))
+        gradients['edge']={'total':torch.cat([v.ravel() for v in values]).detach()}
+        cosine={}
+        names=list(gradients)
+        for i,a in enumerate(names):
+            for b in names[i+1:]:
+                cosine[a+'__'+b]={label:float(torch.nn.functional.cosine_similarity(gradients[a][label],gradients[b][label],dim=0))
+                    for label in gradients[a].keys()&gradients[b].keys()}
+        output['models'][name]=dict(checkpoint=str(path),pools=metrics,edge_huber=float(el.detach()),
+            sampled_effective_edge_labels=count,gradient_cosine=cosine,
+            gradient_norms={n:{k:float(v.norm()) for k,v in g.items()} for n,g in gradients.items()})
+        atomic_json(args.out/'diagnostics.json',output)
+        print(json.dumps(dict(model=name,cross=metrics['Cross']['optimal_action_rate'],edge_huber=float(el.detach()))),flush=True)
 
 
 def run(args):
@@ -84,7 +143,10 @@ def main():
         p.add_argument('--'+name,type=Path,required=True)
     p.add_argument('--run',type=Path,action='append',required=True)
     p.add_argument('--device',default='cuda');p.add_argument('--source-commit',required=True)
-    run(p.parse_args())
+    p.add_argument('--diagnose',action='store_true')
+    args=p.parse_args()
+    if args.diagnose:diagnose(args)
+    else:run(args)
 
 
 if __name__=='__main__':main()

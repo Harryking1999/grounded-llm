@@ -534,8 +534,12 @@ class ExactPairTests(unittest.TestCase):
             records=[]
             recorded=rollout(corpus,teacher,rows,32,'q',edge_records=records)
             self.assertEqual(result,recorded)
-            from experiments.new_tasks_qmap.src.relation_diagnose import policy_boundaries
+            from experiments.new_tasks_qmap.src.relation_diagnose import policy_boundaries,trajectory_outcomes,paired_trajectory_summary
             boundaries,edges=policy_boundaries(records)
+            teacher_outcomes=trajectory_outcomes(corpus,rows,edges)
+            self.assertTrue(teacher_outcomes['solved'].all())
+            self.assertTrue((teacher_outcomes['cycle_length']==0).all())
+            self.assertTrue((teacher_outcomes['first_nonoptimal_step']==-1).all())
             self.assertEqual(boundaries['first_non_descent']['executed_edges'],0)
             self.assertEqual(boundaries['cycle_closing']['executed_edges'],0)
             self.assertEqual(boundaries['all_executed']['true_optimal_action_rate'],1)
@@ -550,6 +554,14 @@ class ExactPairTests(unittest.TestCase):
             flat=SimpleNamespace(scores=lambda s,g:np.zeros(np.broadcast_arrays(s,g)[0].shape,dtype=np.float32))
             records=[]; result=rollout(corpus,flat,rows,32,'q',edge_records=records)
             boundaries,edges=policy_boundaries(records)
+            flat_outcomes=trajectory_outcomes(corpus,rows,edges)
+            self.assertEqual(int((flat_outcomes['cycle_length']==2).sum()),result['cycles'])
+            self.assertEqual(int(flat_outcomes['solved'].sum()),result['solved'])
+            paired=paired_trajectory_summary(np.arange(len(rows))//2,flat_outcomes,teacher_outcomes,21,200)
+            self.assertGreater(paired['completion']['difference'],0)
+            self.assertLess(paired['two_step_cycle']['difference'],0)
+            self.assertGreater(paired['initial_margin']['initial_optimal_margin']['difference'],0)
+            self.assertEqual(paired,paired_trajectory_summary(np.arange(len(rows))//2,flat_outcomes,teacher_outcomes,21,200))
             self.assertEqual(boundaries['first_non_descent']['executed_edges'],len(rows))
             self.assertEqual(boundaries['cycle_closing']['executed_edges'],result['cycles'])
             self.assertEqual(boundaries['all_non_descent']['executed_edges'],len(edges['source']))

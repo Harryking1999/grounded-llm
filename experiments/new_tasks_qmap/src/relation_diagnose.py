@@ -194,6 +194,91 @@ def policy_boundaries(records):
     return result,edges
 
 
+def trajectory_outcomes(corpus,rows,edges):
+    """Per-query outcomes from complete frozen greedy records, with no updates."""
+    rows=np.asarray(rows);n=len(rows);index=np.arange(len(edges['source']))
+    chosen=edges['choice'];children=edges['children'];valid=children>=0
+    truth=edges['parent_distance'];child_truth=edges['child_distances']
+    selected_truth=child_truth[index,chosen]
+    nonoptimal=np.isfinite(truth)&(selected_truth+1!=truth)
+    entered_dead=np.isfinite(truth)&~np.isfinite(selected_truth)
+    non_descent=edges['parent_prediction']-edges['child_predictions'][index,chosen]<=1e-6
+    optimal=valid&np.isfinite(child_truth)&(child_truth+1==truth[:,None])&np.isfinite(truth)[:,None]
+    best_optimal=np.where(optimal,edges['child_predictions'],np.inf).min(axis=1)
+    def margins(other):
+        other_score=np.where(other,edges['child_predictions'],np.inf).min(axis=1)
+        result=np.full(len(truth),np.nan,dtype=np.float32)
+        np.subtract(other_score,best_optimal,out=result,where=np.isfinite(other_score)&np.isfinite(best_optimal))
+        return result
+    all_margins=margins(valid&~optimal)
+    finite_margins=margins(valid&~optimal&np.isfinite(child_truth))
+    dead_margins=margins(valid&~np.isfinite(child_truth))
+    result=dict(initial_distance=corpus.distance(rows[:,0],rows[:,1]),solved=np.zeros(n,dtype=bool),
+        cycle_length=np.zeros(n,dtype=np.int32),cycle_entry_step=np.full(n,-1,dtype=np.int32),
+        entered_dead=np.zeros(n,dtype=bool),initial_optimal_margin=np.full(n,np.nan,dtype=np.float32),
+        initial_finite_other_margin=np.full(n,np.nan,dtype=np.float32),initial_dead_margin=np.full(n,np.nan,dtype=np.float32))
+    for name in ['nonoptimal','dead','non_descent']:
+        result['first_'+name+'_step']=np.full(n,-1,dtype=np.int32)
+        result['first_'+name+'_distance']=np.full(n,np.nan,dtype=np.float32)
+    order=np.argsort(edges['query_index'],kind='stable')
+    queries,starts=np.unique(edges['query_index'][order],return_index=True)
+    if not np.array_equal(queries,np.arange(n)):raise ValueError('Every positive-distance query must have a complete trajectory')
+    for query,ids in zip(queries,np.split(order,starts[1:])):
+        ids=ids[np.argsort(edges['step'][ids],kind='stable')];first=ids[0]
+        if edges['step'][first]!=0 or edges['source'][first]!=rows[query,0] or not (edges['goal'][ids]==rows[query,1]).all():
+            raise ValueError('Trajectory identity differs from its fixed query')
+        result['solved'][query]=edges['next_is_goal'][ids].any();result['entered_dead'][query]=entered_dead[ids].any()
+        result['initial_optimal_margin'][query]=all_margins[first]
+        result['initial_finite_other_margin'][query]=finite_margins[first]
+        result['initial_dead_margin'][query]=dead_margins[first]
+        for name,mask in [('nonoptimal',nonoptimal),('dead',entered_dead),('non_descent',non_descent)]:
+            take=ids[mask[ids]]
+            if len(take):
+                at=take[0];result['first_'+name+'_step'][query]=edges['step'][at]
+                result['first_'+name+'_distance'][query]=truth[at]
+        closing=ids[edges['next_repeated'][ids]&~edges['next_is_goal'][ids]]
+        if len(closing):
+            at=closing[0];target=children[at,chosen[at]]
+            prior=ids[(edges['source'][ids]==target)&(edges['step'][ids]<=edges['step'][at])]
+            if not len(prior):raise ValueError('Missing cycle entry in complete trajectory')
+            begin=int(edges['step'][prior].min());result['cycle_entry_step'][query]=begin
+            result['cycle_length'][query]=int(edges['step'][at])+1-begin
+    return result
+
+
+def paired_trajectory_summary(scene_ids,left,right,seed,repetitions=2000):
+    """Paired differences and layout-cluster bootstrap; not training-seed CIs."""
+    if not np.array_equal(left['initial_distance'],right['initial_distance']):raise ValueError('Unmatched query distances')
+    if len(scene_ids)!=len(left['solved']) or repetitions<1:raise ValueError('Invalid paired comparison')
+    rng=np.random.default_rng(seed);levels,inverse=np.unique(scene_ids,return_inverse=True)
+    sizes=np.bincount(inverse);weights=rng.multinomial(len(levels),np.full(len(levels),1/len(levels)),size=repetitions)
+    def delta(a,b,mask=None):
+        mask=np.ones(len(a),dtype=bool) if mask is None else mask
+        if not mask.any():return dict(count=0,control=None,coupled=None,difference=None,layout_cluster_95ci=None)
+        sizes_=np.bincount(inverse[mask],minlength=len(levels))
+        sums=np.bincount(inverse[mask],weights=b[mask].astype(float)-a[mask].astype(float),minlength=len(levels))
+        denominator=weights@sizes_;keep=denominator>0
+        estimates=(weights@sums)[keep]/denominator[keep]
+        return dict(count=int(mask.sum()),control=float(a[mask].mean()),coupled=float(b[mask].mean()),
+            difference=float((b[mask].astype(float)-a[mask].astype(float)).mean()),
+            layout_cluster_95ci=np.quantile(estimates,[.025,.975]).tolist() if len(levels)>1 else None)
+    result=dict(layouts=len(levels),queries=len(scene_ids),bootstrap_repetitions=repetitions,
+        completion=delta(left['solved'],right['solved']),
+        two_step_cycle=delta(left['cycle_length']==2,right['cycle_length']==2),
+        entered_dead=delta(left['entered_dead'],right['entered_dead']),
+        completion_gained=int((~left['solved']&right['solved']).sum()),
+        completion_lost=int((left['solved']&~right['solved']).sum()),by_initial_distance={},initial_margin={})
+    for lo,hi in [(1,5),(6,20),(21,np.inf)]:
+        mask=(left['initial_distance']>=lo)&(left['initial_distance']<=hi)
+        result['by_initial_distance'][f'{lo}_{hi}']=dict(completion=delta(left['solved'],right['solved'],mask),
+            two_step_cycle=delta(left['cycle_length']==2,right['cycle_length']==2,mask))
+    for key in ['initial_optimal_margin','initial_finite_other_margin','initial_dead_margin']:
+        mask=np.isfinite(left[key])&np.isfinite(right[key])
+        result['initial_margin'][key]=delta(left[key],right[key],mask)
+    result['interpretation']='Differences are coupled minus control on identical queries. Bootstrap resamples whole layouts and is conditional on these two selected checkpoints, not independent training seeds. Nonoptimal steps may be recoverable detours; first dead entries are separate. Positive margin favors the best exact-optimal action.'
+    return result
+
+
 def pair_incompatibility_gaps(corpus,rows):
     """Positive gap means two undirected pairs cannot share a tight Linf axis."""
     a,b=rows[:,0],rows[:,1]; length=corpus.distance(a,b)

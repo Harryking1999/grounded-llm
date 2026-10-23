@@ -1,0 +1,11 @@
+{
+  "cohorts": ["validation", "unseen_goal_validation", "unseen_layout_validation", "original_layout_validation"],
+  "queries_per_cohort": 1024,
+  "maximum_steps": 256,
+  "planning_distance_bins": [1, 2, 5, 10, 20, 40, 80, 256],
+  "query_reference": "../analysis_37d3f66/shared_queries.npz",
+  "bootstrap_repetitions": 2000,
+  "bootstrap_seed": 2026102309,
+  "checkpoint_choice": "Each original run's validation-selected best checkpoint after its unchanged 30000-step budget; require full original point-source coverage. No re-selection by these rollout diagnostics.",
+  "scope": "Paired validation only. Compare exact two-step cycles, first nonoptimal and first dead-entry distance layers, 6-20 and 21+ completion, and optimal-vs-other prediction margins at identical initial states. Query identities, policies, candidate order and rollout budget are identical. Bootstrap resamples whole layouts and is conditional on one training seed."
+}

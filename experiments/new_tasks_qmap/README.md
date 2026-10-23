@@ -36,6 +36,8 @@
 
 下一步的[等量追加训练对照](configs/sokoban_neighborhood_control_pairs.json)和[同目标相邻采样](configs/sokoban_neighborhood_coupled_pairs.json)从同一权重开始新阶段。两组保留相同数据、模型、损失和主采样流，仅改变部分距离监督是否来自当前排序决策及其合法后继；新增随机数状态单独保存。它检验采样关系是否需要更连贯，尚无成绩。
 
+后续改进以各必需组完整到达率超过90%为目标。先分析实际失败，再改数据分布与覆盖，重点检查循环、错误分支、死锁及正确分支之后的连续状态。已有[训练轨迹诊断配置](configs/sokoban_training_failure_diagnosis.json)：仅使用训练允许的关系，保留全部合法候选，排除留出关系及其候选闭包。生成的数据还需经过有限预算的对照，不能视为训练收益。验证指导方案选择，测试只作阶段验收；已多次查看的题集只作回归，独立泛化另行留出。
+
 ## 运行入口
 
 以棋子交换为例，先准备数据，再训练：
@@ -51,6 +53,12 @@ python -m experiments.new_tasks_qmap.src.run --config experiments/new_tasks_qmap
 
 ```bash
 python -m experiments.new_tasks_qmap.src.relation_evaluate --checkpoint runs/new_tasks_pairs/token_swapping/best.pt --run runs/new_tasks_pairs/token_swapping --out runs/new_tasks_pairs/token_validation.json --cohorts validation unseen_endpoint_validation unseen_both_validation
+```
+
+推箱子训练失败诊断使用原训练配置与匹配权重，结果和候选训练数据写入忽略目录：
+
+```bash
+python -m experiments.new_tasks_qmap.src.relation_diagnose --config experiments/new_tasks_qmap/configs/sokoban_coverage1000_pairs.json --run RUN_ROOT/coverage1000 --checkpoint RUN_ROOT/coverage1000/best.pt --training-failures-config experiments/new_tasks_qmap/configs/sokoban_training_failure_diagnosis.json --device cuda:0 --out RUN_ROOT/analysis/training_failures.json
 ```
 
 ## 文件放在哪里

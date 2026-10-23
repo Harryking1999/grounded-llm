@@ -42,6 +42,42 @@ def materialize(corpus, rows):
                 reachability=np.isfinite(distances).astype(np.int8),optimal=optimal)
 
 
+def training_decision_mask(corpus,data,rows):
+    """Permit board decisions only inside the original training information set.
+
+    Mining may visit sources outside the prepared source bank. The original
+    layout, complete-goal and held-out relation-closure boundaries still apply.
+    This checks entire decisions; it never removes individual legal actions.
+    """
+    rows=np.asarray(rows,dtype=np.int64).reshape(-1,2)
+    if not hasattr(corpus,'scenes'): raise ValueError('Board corpus required')
+    result=np.zeros(len(rows),dtype=bool)
+    if not len(rows): return result
+    if ((rows<0)|(rows>=corpus.size)).any(): raise ValueError('State outside corpus')
+    source_scene=corpus.locate(rows[:,0]); goal_scene=corpus.locate(rows[:,1])
+    children=corpus.successors(rows[:,0]); legal=children>=0
+    reserved=data['reserved_relations']
+    def forbidden(values):
+        if not len(reserved): return np.zeros(values.shape,dtype=bool)
+        at=np.searchsorted(reserved,values)
+        return (at<len(reserved)) & (reserved[np.minimum(at,len(reserved)-1)]==values)
+    blocked=forbidden(keys(rows[:,0],rows[:,1],corpus.size))
+    related=np.full(children.shape,-1,dtype=np.int64)
+    related[legal]=keys(children[legal],np.broadcast_to(rows[:,1,None],children.shape)[legal],corpus.size)
+    blocked|=forbidden(related).any(axis=1)
+    for sid in np.unique(source_scene):
+        scene=corpus.scenes[int(sid)]
+        if scene.metadata['split']!='train': continue
+        ids=np.flatnonzero((source_scene==sid)&(goal_scene==sid)); offset=corpus.offsets[sid]
+        nt=scene.metadata['training_goals']; heldout=scene.goals[nt:]+offset
+        allowed=(np.isin(rows[ids,1],scene.goals[:nt]+offset)
+                 & ~np.isin(rows[ids,0],heldout) & ~np.isin(children[ids],heldout).any(axis=1)
+                 & ~blocked[ids] & legal[ids].any(axis=1))
+        truth=corpus.distance(rows[ids,0],rows[ids,1])
+        result[ids]=allowed & np.isfinite(truth) & (truth>0)
+    return result
+
+
 def sample_goals(corpus,sources,rng,reserved,*,ranking=False,allowed=None,fallback=None,allow_missing=False,
                  local_fraction=0.,walk_max=None):
     """Fresh complete goals, using teacher labels only in the training sampler."""

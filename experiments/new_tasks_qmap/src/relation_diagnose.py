@@ -202,6 +202,89 @@ def pair_incompatibility_gaps(corpus,rows):
     return length[:,None]+length[None,:]-np.maximum(cross_same,cross_opposite)
 
 
+def training_failure_bank(corpus,data,edges,*,continuation_seeds_per_layout=16,maximum_steps=256):
+    """Mine only permitted training decisions from an unchanged greedy rollout.
+
+    Keep cycle members and wrong/flat decisions, all their legal alternatives,
+    and a bounded set of teacher-optimal continuations. Teacher actions are
+    offline data construction, never a modification of the measured policy.
+    """
+    from .relation_data import training_decision_mask,materialize
+    if continuation_seeds_per_layout<1 or maximum_steps<1: raise ValueError('Positive mining bounds required')
+    rows=np.column_stack([edges['source'],edges['goal']]); count=len(rows)
+    children=corpus.successors(rows[:,0])
+    if not np.array_equal(children,edges['children']): raise ValueError('Missing or changed legal candidates')
+    truth=corpus.distance(rows[:,0],rows[:,1]); valid=children>=0
+    child_truth=np.full(children.shape,np.inf,dtype=np.float32)
+    child_truth[valid]=corpus.distance(children[valid],np.broadcast_to(rows[:,1,None],children.shape)[valid])
+    if not np.array_equal(truth,edges['parent_distance']) or not np.array_equal(child_truth,edges['child_distances']):
+        raise ValueError('Recorded labels differ from exact physical graph')
+    index=np.arange(count); choice=edges['choice']
+    if not valid[index,choice].all(): raise ValueError('Recorded action is illegal')
+    chosen_truth=child_truth[index,choice]
+    finite=np.isfinite(truth)
+    wrong=finite & (chosen_truth+1!=truth)
+    dead=finite & ~np.isfinite(chosen_truth)
+    non_descent=edges['parent_prediction']-edges['child_predictions'][index,choice]<=1e-6
+    closing=edges['next_repeated'] & ~edges['next_is_goal']
+    cycle=closing.copy()
+    query_order=np.argsort(edges['query_index'],kind='stable')
+    queries,starts=np.unique(edges['query_index'][query_order],return_index=True)
+    groups={int(q):ids for q,ids in zip(queries,np.split(query_order,starts[1:]))}
+    for at in np.flatnonzero(closing):
+        ids=groups[int(edges['query_index'][at])]
+        repeats=ids[(edges['source'][ids]==children[at,choice[at]]) & (edges['step'][ids]<=edges['step'][at])]
+        if not len(repeats): raise ValueError('Cycle entrance missing from complete trajectory')
+        begin=edges['step'][repeats].min()
+        cycle[ids[(edges['step'][ids]>=begin)&(edges['step'][ids]<=edges['step'][at])]]=True
+    allowed=training_decision_mask(corpus,data,rows)
+    selected=(wrong|non_descent|cycle)&allowed
+    critical=np.unique(rows[selected],axis=0)
+    # Give every represented training layout a bounded number of seeds. Avoid
+    # global truncation, which would silently privilege the first layouts.
+    seeds=[]
+    if len(critical):
+        scene_ids=corpus.locate(critical[:,0])
+        for sid in np.unique(scene_ids):
+            local=critical[scene_ids==sid]
+            take=np.linspace(0,len(local)-1,min(len(local),continuation_seeds_per_layout),dtype=int)
+            seeds.append(local[take])
+    current=np.concatenate(seeds) if seeds else np.empty((0,2),dtype=np.int64)
+    continuation=[]; stopped_at_boundary=0
+    for _ in range(maximum_steps):
+        if not len(current): break
+        positive=corpus.distance(current[:,0],current[:,1])>0
+        current=current[positive]
+        safe=training_decision_mask(corpus,data,current)
+        stopped_at_boundary+=int((~safe).sum()); current=current[safe]
+        if not len(current): break
+        continuation.append(current.copy())
+        teacher=materialize(corpus,current)
+        if not teacher['optimal'].any(axis=1).all(): raise ValueError('No exact optimal continuation')
+        slots=teacher['optimal'].argmax(axis=1)
+        current=np.column_stack([teacher['children'][np.arange(len(current)),slots],current[:,1]])
+    remaining=int((corpus.distance(current[:,0],current[:,1])>0).sum()) if len(current) else 0
+    extra=np.unique(np.concatenate(continuation),axis=0) if continuation else np.empty((0,2),dtype=np.int64)
+    bank=np.unique(np.concatenate([critical,extra]),axis=0)
+    if not training_decision_mask(corpus,data,bank).all(): raise ValueError('Protected relation in mining bank')
+    reason=np.zeros(len(bank),dtype=np.uint8)
+    # Bit flags preserve overlapping causes without pretending they are disjoint.
+    bank_keys=bank[:,0]*np.int64(corpus.size)+bank[:,1]
+    for bit,mask in [(1,wrong),(2,dead),(4,non_descent),(8,cycle)]:
+        selected_keys=rows[mask&allowed,0]*np.int64(corpus.size)+rows[mask&allowed,1]
+        reason[np.isin(bank_keys,selected_keys)]|=bit
+    if len(extra): reason[np.isin(bank_keys,extra[:,0]*np.int64(corpus.size)+extra[:,1])]|=16
+    summary=dict(visited_decisions=count,permitted_training_decisions=int(allowed.sum()),
+        excluded_protected_decisions=int((~allowed).sum()),wrong_decisions=int((wrong&allowed).sum()),
+        entered_dead_decisions=int((dead&allowed).sum()),non_descent_decisions=int((non_descent&allowed).sum()),
+        cycle_member_decisions=int((cycle&allowed).sum()),unique_critical_decisions=len(critical),
+        continuation_seeds=sum(map(len,seeds)),unique_continuation_decisions=len(extra),
+        continuation_stopped_at_protected_boundary=stopped_at_boundary,continuation_budget_remaining=remaining,
+        unique_bank_decisions=len(bank),all_legal_candidates_preserved=True,all_rows_training_allowed=True,
+        scope='Offline training-only candidate data; no optimizer update and no policy change. Causes overlap. Terminal anchors are not ranking decisions.')
+    return summary,dict(**materialize(corpus,bank),reason=reason)
+
+
 def linf_witness(corpus,config,count):
     """Exact finite metric obstruction, independent of learned encoder weights."""
     if config['task']!='token_swapping' or count<2: raise ValueError('At least two fixed-tree Token pairs required')
@@ -560,9 +643,52 @@ def main():
     parser.add_argument('--policy-boundary-count',type=int,default=0)
     parser.add_argument('--isometry-count',type=int,default=0)
     parser.add_argument('--vehicle-encoding-check',action='store_true')
+    parser.add_argument('--training-failures-config',type=Path)
+    parser.add_argument('--device',default='cpu')
     args=parser.parse_args(); config=json.loads(args.config.read_text())
     if args.out.exists(): raise FileExistsError('Keep previous diagnostics; choose a new output')
     corpus,data,_=load(config,args.run/'data')
+    if args.training_failures_config:
+        if config['task']!='sokoban' or not args.checkpoint: raise ValueError('Sokoban checkpoint required')
+        import torch
+        from grounded_llm.core.qmap.model import StateEncoder
+        from .relation_data import training_decision_mask
+        from .relation_evaluate import QCache,planning_ids,rollout,distance_strata
+        options=json.loads(args.training_failures_config.read_text())
+        torch.set_num_threads(config['training']['cpu_threads'])
+        saved=torch.load(args.checkpoint,map_location='cpu',weights_only=False)
+        if saved['config']!=config: raise ValueError('Training failure checkpoint configuration mismatch')
+        step,source_commit=saved['step'],saved['source_commit']
+        model=StateEncoder(input_dim=corpus.input_dim,**config['model'])
+        model.load_state_dict(saved['model']); model.to(args.device); model.requires_grad_(False); model.eval()
+        del saved
+        rows=data['tasks_train']; truth=data['distances_train']
+        selected=planning_ids(corpus,rows,truth,options['query_count'],
+            np.random.default_rng(config['seed']+options['query_seed_offset']),options['planning_distance_bins'])
+        rows=rows[selected]
+        if not training_decision_mask(corpus,data,rows).all(): raise ValueError('Protected starting relation')
+        records=[]; cache=QCache(model,corpus,args.device)
+        metrics=rollout(corpus,cache,rows,options['maximum_steps'],'q',edge_records=records)
+        boundaries,edges=policy_boundaries(records)
+        summary,bank=training_failure_bank(corpus,data,edges,
+            continuation_seeds_per_layout=options['continuation_seeds_per_layout'],maximum_steps=options['maximum_steps'])
+        args.out.parent.mkdir(parents=True,exist_ok=True)
+        archives={}
+        for suffix,packed in [('edges',dict(queries=rows,**edges)),('bank',bank)]:
+            target=args.out.with_suffix(f'.{suffix}.npz')
+            if target.exists(): raise FileExistsError(target)
+            temporary=target.with_suffix('.tmp')
+            with temporary.open('wb') as stream: np.savez_compressed(stream,**packed)
+            temporary.replace(target); archives[suffix]=str(target)
+        atomic_json(args.out,dict(checkpoint=str(args.checkpoint),checkpoint_step=step,training_source_commit=source_commit,
+            diagnostic_config=str(args.training_failures_config),options=options,archives=archives,
+            planning=metrics,boundaries=boundaries,mining=summary,
+            query_distance_counts={name:int(mask.sum()) for name,mask in distance_strata(truth[selected])},
+            bank_distance_counts={name:int(mask.sum()) for name,mask in distance_strata(bank['distances'])},
+            query_layouts=len(np.unique(corpus.locate(rows[:,0]))),
+            bank_layouts=len(np.unique(corpus.locate(bank['tasks'][:,0])))))
+        print(json.dumps(dict(training_only_diagnosis=str(args.out),completion=metrics['success_rate'],mining=summary)),flush=True)
+        return
     if args.vehicle_encoding_check:
         if config['task']!='rush_hour' or config.get('input_encoding','identity')!='identity': raise ValueError('Use the original raw-identity Rush corpus')
         atomic_json(args.out,vehicle_encoding_check(corpus,config['seed'])); return

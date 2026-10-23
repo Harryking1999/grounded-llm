@@ -428,6 +428,44 @@ class ExactPairTests(unittest.TestCase):
         loss=torch.nn.functional.smooth_l1_loss(model.distance(qa,qg),torch.as_tensor(np.where(np.isfinite(truth),truth,30.)))
         self.assertAlmostEqual(float(loss.detach()),sum(result['components'][k]['weighted_loss'] for k in ('finite_point','unreachable_point')),places=5)
 
+    def test_failure_mining_keeps_cycle_members_branches_and_training_boundaries(self):
+        from experiments.new_tasks_qmap.src.relation_data import training_decision_mask
+        from experiments.new_tasks_qmap.src.relation_diagnose import training_failure_bank
+        children=np.array([[1,2,-1],[0,2,-1],[3,-1,-1],[-1,-1,-1]])
+        truth=UnitGraphOracle(children).to_goal(3)
+        scene=SimpleNamespace(states=np.arange(4)[:,None],children=children,goals=np.array([3]),
+            metadata=dict(split='train',training_goals=1),features=lambda ids:np.eye(4)[ids],distance=lambda s,g:truth[s])
+        corpus=PhysicalCorpus([scene]); rows=np.array([[0,3],[1,3]])
+        packed=materialize(corpus,rows)
+        edges=dict(source=rows[:,0],goal=rows[:,1],children=packed['children'],choice=np.array([0,0]),
+            parent_distance=packed['distances'],child_distances=packed['child_distances'],
+            parent_prediction=np.ones(2),child_predictions=np.ones((2,3)),
+            query_index=np.zeros(2,dtype=int),step=np.array([0,1]),next_repeated=np.array([False,True]),next_is_goal=np.zeros(2,dtype=bool))
+        data=dict(reserved_relations=np.empty(0,dtype=np.int64))
+        result,bank=training_failure_bank(corpus,data,edges,continuation_seeds_per_layout=1)
+        self.assertEqual(result['cycle_member_decisions'],2)
+        self.assertEqual(result['wrong_decisions'],2)
+        np.testing.assert_array_equal(bank['tasks'],[[0,3],[1,3],[2,3]])
+        np.testing.assert_array_equal(bank['children'],children[:3])
+        self.assertTrue((bank['reason'][:2]&8).all())
+        self.assertTrue(bank['reason'][2]&16)
+        np.testing.assert_array_equal(bank['optimal'],[[False,True,False],[False,True,False],[True,False,False]])
+        protected=dict(reserved_relations=keys(np.array([2]),np.array([3]),corpus.size))
+        self.assertFalse(training_decision_mask(corpus,protected,bank['tasks']).any())
+        result,empty=training_failure_bank(corpus,protected,edges)
+        self.assertEqual(result['unique_bank_decisions'],0)
+        self.assertEqual(empty['tasks'].shape,(0,2))
+        scene.metadata['split']='test'
+        self.assertFalse(training_decision_mask(corpus,data,rows).any())
+        scene.metadata['split']='train';scene.goals=np.array([3,2])
+        self.assertFalse(training_decision_mask(corpus,data,rows).any())
+        self.assertFalse(training_decision_mask(corpus,data,np.array([[0,2]])).any())
+        scene.goals=np.array([3])
+        bad={**edges,'children':edges['children'].copy()};bad['children'][0,1]=-1
+        with self.assertRaisesRegex(ValueError,'legal candidates'): training_failure_bank(corpus,data,bad)
+        bad={**edges,'parent_distance':np.array([99,99])}
+        with self.assertRaisesRegex(ValueError,'labels differ'): training_failure_bank(corpus,data,bad)
+
     def test_trajectory_progress_checks_do_not_change_greedy_selection(self):
         with tempfile.TemporaryDirectory() as tmp, ExitStack() as stack:
             path=Path(tmp); small_oracle(path,3,[[0,1],[1,2]])

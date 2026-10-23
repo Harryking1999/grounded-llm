@@ -106,6 +106,9 @@ def prepare(config, out):
     out = Path(out); out.mkdir(parents=True, exist_ok=True)
     if (out / 'relations.npz').exists():
         return load_corpus(config, out), dict(np.load(out / 'relations.npz')), json.loads((out / 'summary.json').read_text())
+    if 'basin_source' in config['data']:
+        from .solution_basins import prepare_basins
+        return prepare_basins(config,out)
     if 'branch_source' in config['data']:
         from .solution_branches import prepare_branches
         return prepare_branches(config, out)
@@ -245,11 +248,15 @@ class SolutionSampler:
             raise ValueError('Unknown solution pilot condition')
         if options['mode'] == 'balanced_branches':
             tasks=data['tasks_train']; distances=data['distances_train']
-            self.strata=[]
+            self.strata=[];weights=[]
+            graph_weights=data.get('feedback_goal_weights',np.ones(len(tasks)))
             for goal in np.unique(tasks[:,1]):
                 for lo,hi in [(0,5),(5,10),(10,20),(20,32),(32,np.inf)]:
                     ids=np.flatnonzero((tasks[:,1]==goal)&(distances>lo)&(distances<=hi))
-                    if len(ids): self.strata.append(ids)
+                    if len(ids):
+                        self.strata.append(ids)
+                        weights.append(float(graph_weights[ids[0]]))
+            self.stratum_probabilities=np.asarray(weights)/sum(weights)
 
     def complete_groups(self, groups, count):
         selected = []
@@ -264,7 +271,8 @@ class SolutionSampler:
     def draw(self, point_count, rank_count):
         mode = self.options['mode']; data = self.data
         if mode == 'balanced_branches':
-            r=np.array([self.rng.choice(self.strata[i]) for i in self.rng.integers(len(self.strata),size=rank_count)])
+            strata=self.rng.choice(len(self.strata),size=rank_count,p=self.stratum_probabilities)
+            r=np.array([self.rng.choice(self.strata[i]) for i in strata])
             count=round(rank_count*self.options.get('hard_fraction',0))
             if count:
                 hard=data['hard_context_ids']

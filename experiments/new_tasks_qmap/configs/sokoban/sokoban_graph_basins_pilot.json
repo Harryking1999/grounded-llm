@@ -1,0 +1,68 @@
+{
+  "task": "sokoban",
+  "seed": 2026102401,
+  "data": {
+    "basin_source": "runs/new_tasks_qmap/graph_basins/input/data",
+    "condition": "A",
+    "structure_seed": 2026102407,
+    "additional_goals_per_layout": 8,
+    "minimum_goal_basin": 32,
+    "feedback_checkpoint": "runs/new_tasks_qmap/graph_basins/initial.pt",
+    "failed_graph_weight": 2.0
+  },
+  "model": {
+    "dimension": 128,
+    "hidden": 256,
+    "cap": 256,
+    "metric": "directed_max"
+  },
+  "training": {
+    "steps": 3000,
+    "batch_size": 1024,
+    "decision_batch_size": 128,
+    "learning_rate": 0.0001,
+    "rank_weight": 1.0,
+    "rank_temperature": 1.0,
+    "eval_every": 1500,
+    "cpu_threads": 4,
+    "unreachable_target": 240.0,
+    "features_on_device": "packed_bits",
+    "initialize_from": "../initial.pt",
+    "training_probe_batches": 8,
+    "validation_only_initial": true,
+    "evaluation_checkpoint": "last.pt",
+    "solution_structure": {
+      "mode": "balanced_branches"
+    }
+  },
+  "relations": {},
+  "evaluation": {
+    "decision_count": 512,
+    "rollout_count": 128,
+    "horizon": 32,
+    "planning_distance_bins": [
+      5,
+      10,
+      20,
+      32
+    ]
+  },
+  "schema": "exact_state_pairs",
+  "pilot": {
+    "seeds": [
+      2026102401,
+      2026102402
+    ],
+    "conditions": [
+      "A",
+      "B",
+      "C",
+      "D"
+    ],
+    "primary_comparison": "Same initial weights, optimizer parameters, loss weights, 3000 updates, point/rank counts and frozen evaluation queries. Two seeds on GPU0/1. Final checkpoints only. No budget extensions.",
+    "structure_criteria": "Improvement must include unseen-layout completion and complete teacher-path strict descent or branch correctness, with lower unit-drop residual, no material near-goal regression, and the same direction in both seeds. Report layout-bootstrap intervals. No scaling from training loss, a single seed, or a noisy point estimate alone.",
+    "information_difference": "A original accepted branch bank; B all allowed finite states for identical targets; C adds eight ordinary intermediate target basins per training layout; D additionally labels permitted policy-visited states and upweights whole failed target graphs across all layers by two. No isolated hard-edge replay.",
+    "final_test": "None in this development pilot. Previously used validation layouts are not an independent final generalization test."
+  },
+  "scope": "Same independent Q MLP and directed_max distance; original Huber plus complete-candidate soft rank; exact complete terminal goal at inference. No new loss, architecture, search, filtering, inference subgoals or extra inference budget."
+}

@@ -29,6 +29,25 @@ def fixture():
 
 
 class SolutionStructureTests(unittest.TestCase):
+    def test_full_basin_adds_recoverable_continuations_and_keeps_traps(self):
+        from experiments.new_tasks_qmap.src.solution_basins import prepare_basins
+        corpus=fixture();tasks=np.array([[0,3],[1,3]])
+        exact=materialize(corpus,tasks)
+        with tempfile.TemporaryDirectory() as tmp:
+            source=Path(tmp)/'source';source.mkdir()
+            (source/'scenes.json').write_text('{}')
+            np.savez(source/'relations.npz',reserved_relations=np.array([],dtype=np.int64),
+                **{k+'_train':v for k,v in exact.items()})
+            cfg=dict(model=dict(dimension=128,hidden=16,cap=256,metric='directed_max'),
+                training=dict(unreachable_target=240),data=dict(basin_source=str(source),condition='B',structure_seed=9))
+            out=Path(tmp)/'out';out.mkdir()
+            with patch('experiments.new_tasks_qmap.src.solution_basins.load_corpus',return_value=corpus):
+                _,data,summary=prepare_basins(cfg,out)
+            self.assertEqual(set(data['tasks_train'][:,0]),{0,1,2})
+            ids=np.flatnonzero((data['pairs_train']==[4,3]).all(axis=1))
+            self.assertEqual(len(ids),1);self.assertTrue(np.isinf(data['pair_distances_train'][ids[0]]))
+            self.assertEqual(summary['coverage'][0]['finite_edges'],summary['coverage'][0]['finite_edges_with_next_context'])
+
     def test_branch_closure_covers_alternatives_and_rejects_truncation(self):
         from experiments.new_tasks_qmap.src.solution_branches import continuation_closure
         corpus=fixture();scene=corpus.scenes[0]

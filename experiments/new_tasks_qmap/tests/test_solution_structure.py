@@ -29,6 +29,19 @@ def fixture():
 
 
 class SolutionStructureTests(unittest.TestCase):
+    def test_branch_closure_covers_alternatives_and_rejects_truncation(self):
+        from experiments.new_tasks_qmap.src.solution_branches import continuation_closure
+        corpus=fixture();scene=corpus.scenes[0]
+        scene.children=np.array([[1,2,-1],[3,-1,-1],[3,-1,-1],[-1,-1,-1],[4,-1,-1]])
+        truth=UnitGraphOracle(scene.children).to_goal(3)
+        scene.distance=lambda s,g:truth[s]
+        rows=np.array([[0,3]]);empty=np.array([],dtype=np.int64)
+        closed,reason=continuation_closure(corpus,empty,rows,10)
+        self.assertIsNone(reason);self.assertEqual(set(closed[:,0]),{0,1,2})
+        self.assertEqual(continuation_closure(corpus,empty,rows,2)[1],'size')
+        protected=keys(np.array([2]),np.array([3]),corpus.size)
+        self.assertEqual(continuation_closure(corpus,protected,rows,10)[1],'protected')
+
     def test_intermediate_labels_use_graph_shortcuts_and_direction(self):
         corpus = fixture()
         np.testing.assert_array_equal(exact_path(corpus, 0, 3, 32), [0, 1, 3])
@@ -54,7 +67,7 @@ class SolutionStructureTests(unittest.TestCase):
         data = dict(pairs_train=pairs, terminal_ids=np.array([1, 3]), auxiliary_ids=np.array([0, 2]),
             terminal_groups=np.array([[1, 3]]), auxiliary_groups=np.array([[0, 2]]))
         data.update({k+'_train':v for k,v in exact.items()})
-        for mode in ['flat_terminal', 'path_terminal', 'path_multiscale']:
+        for mode in ['flat_terminal', 'path_terminal', 'path_multiscale', 'balanced_branches']:
             rng = np.random.default_rng(4); sampler = SolutionSampler(corpus, data, dict(mode=mode), rng)
             state = deepcopy(rng.bit_generator.state); p,r = sampler.draw(64, 8)
             self.assertEqual(len(p), 64); self.assertEqual(len(r), 8)

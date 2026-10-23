@@ -106,6 +106,9 @@ def prepare(config, out):
     out = Path(out); out.mkdir(parents=True, exist_ok=True)
     if (out / 'relations.npz').exists():
         return load_corpus(config, out), dict(np.load(out / 'relations.npz')), json.loads((out / 'summary.json').read_text())
+    if 'branch_source' in config['data']:
+        from .solution_branches import prepare_branches
+        return prepare_branches(config, out)
     options = config['training']['solution_structure']
     source = (out.parent / config['data']['structure_source']).resolve()
     manifest = json.loads((source / 'graphs/corpus.json').read_text())
@@ -238,8 +241,15 @@ class SolutionSampler:
         self.pair_lookup = {tuple(row): i for i, row in enumerate(data['pairs_train'])}
         terminal_goals=np.unique(data['tasks_train'][data['terminal_ids'],1])
         self.terminal_point_ids=np.flatnonzero(np.isin(data['pairs_train'][:,1],terminal_goals))
-        if options['mode'] not in ('flat_terminal', 'path_terminal', 'path_multiscale'):
+        if options['mode'] not in ('flat_terminal', 'path_terminal', 'path_multiscale', 'balanced_branches'):
             raise ValueError('Unknown solution pilot condition')
+        if options['mode'] == 'balanced_branches':
+            tasks=data['tasks_train']; distances=data['distances_train']
+            self.strata=[]
+            for goal in np.unique(tasks[:,1]):
+                for lo,hi in [(0,5),(5,10),(10,20),(20,32),(32,np.inf)]:
+                    ids=np.flatnonzero((tasks[:,1]==goal)&(distances>lo)&(distances<=hi))
+                    if len(ids): self.strata.append(ids)
 
     def complete_groups(self, groups, count):
         selected = []
@@ -253,7 +263,9 @@ class SolutionSampler:
 
     def draw(self, point_count, rank_count):
         mode = self.options['mode']; data = self.data
-        if mode == 'flat_terminal':
+        if mode == 'balanced_branches':
+            r=np.array([self.rng.choice(self.strata[i]) for i in self.rng.integers(len(self.strata),size=rank_count)])
+        elif mode == 'flat_terminal':
             r = self.rng.choice(data['terminal_ids'], rank_count)
         else:
             terminal_quota = rank_count if mode == 'path_terminal' else rank_count // 2

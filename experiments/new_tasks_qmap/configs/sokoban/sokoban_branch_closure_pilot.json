@@ -1,0 +1,64 @@
+{
+  "task": "sokoban",
+  "seed": 2026102401,
+  "data": {
+    "branch_source": "runs/new_tasks_qmap/solution_structure_pilot/inputs/data",
+    "structure_seed": 2026102404,
+    "closure_limit": 2048,
+    "recover_one_step": true,
+    "branch_condition": "path_control"
+  },
+  "model": {
+    "dimension": 128,
+    "hidden": 256,
+    "cap": 256,
+    "metric": "directed_max"
+  },
+  "training": {
+    "steps": 3000,
+    "batch_size": 1024,
+    "decision_batch_size": 128,
+    "learning_rate": 0.0001,
+    "rank_weight": 1.0,
+    "rank_temperature": 1.0,
+    "eval_every": 1500,
+    "cpu_threads": 4,
+    "unreachable_target": 240.0,
+    "features_on_device": "packed_bits",
+    "initialize_from": "../../solution_structure_pilot/initial_weights.pt",
+    "training_probe_batches": 8,
+    "validation_only_initial": true,
+    "evaluation_checkpoint": "last.pt",
+    "solution_structure": {
+      "mode": "balanced_branches"
+    }
+  },
+  "relations": {},
+  "evaluation": {
+    "decision_count": 512,
+    "rollout_count": 128,
+    "horizon": 32,
+    "planning_distance_bins": [
+      5,
+      10,
+      20,
+      32
+    ]
+  },
+  "schema": "exact_state_pairs",
+  "pilot": {
+    "seeds": [
+      2026102401,
+      2026102402
+    ],
+    "conditions": [
+      "path_control",
+      "branch_closure"
+    ],
+    "primary_comparison": "Fixed final checkpoint, equal updates and point/ranking budgets; compare terminal, entirely held-out intermediate targets and unseen layouts. Fit cohort is diagnostic only.",
+    "structure_criteria": "Improvement must include unseen-layout completion and complete teacher-path strict descent or branch correctness, with lower unit-drop residual, no material near-goal regression, and the same direction in both seeds. Report layout-bootstrap intervals. No scaling from training loss, a single seed, or a noisy point estimate alone.",
+    "information_difference": "Same accepted roots and targets; branch_closure recursively adds all optimal continuations and recovery from one finite deviation at original path states. Both use identical goal-distance-stratified sampling and all-action point coupling.",
+    "final_test": "None in this development pilot. Previously used validation layouts are not an independent final generalization test."
+  },
+  "scope": "Same independent Q MLP and directed_max distance; original Huber plus complete-candidate soft rank; exact complete terminal goal at inference. No new loss, architecture, search, filtering, inference subgoals or extra inference budget."
+}

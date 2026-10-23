@@ -1,0 +1,4339 @@
+{
+  "evaluator_source_commit": "5ae9a4e37fa4a0546f0e01114eee2186100d48ed",
+  "specification": "experiments/new_tasks_qmap/configs/sokoban_neighborhood_validation.json",
+  "configs": {
+    "control": "experiments/new_tasks_qmap/configs/sokoban_local_path_control_pairs.json",
+    "shuffled": "experiments/new_tasks_qmap/configs/sokoban_local_path_shuffled_pairs.json",
+    "joint": "experiments/new_tasks_qmap/configs/sokoban_local_path_joint_pairs.json"
+  },
+  "training_steps_each": 30000,
+  "selected_steps": {
+    "control": 20000,
+    "shuffled": 25000,
+    "joint": 20000
+  },
+  "exact_same_queries": true,
+  "identical_pretraining_evaluations": true,
+  "identical_initialization": true,
+  "raw_result": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/sokoban_coverage_d365a4c/analysis_5ae9a4e/local_path_validation.json",
+  "raw_archive": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/sokoban_coverage_d365a4c/analysis_5ae9a4e/local_path_validation.edges.npz",
+  "comparisons": {
+    "control_to_shuffled": {
+      "validation": {
+        "left_condition": "control",
+        "right_condition": "shuffled",
+        "legacy_field_mapping": {
+          "control": "control",
+          "coupled": "shuffled"
+        },
+        "metrics": {
+          "layouts": 64,
+          "queries": 1024,
+          "bootstrap_repetitions": 2000,
+          "completion": {
+            "count": 1024,
+            "control": 0.240234375,
+            "coupled": 0.255859375,
+            "difference": 0.015625,
+            "layout_cluster_95ci": [
+              -0.001953125,
+              0.0341796875
+            ]
+          },
+          "two_step_cycle": {
+            "count": 1024,
+            "control": 0.759765625,
+            "coupled": 0.744140625,
+            "difference": -0.015625,
+            "layout_cluster_95ci": [
+              -0.0341796875,
+              0.001953125
+            ]
+          },
+          "entered_dead": {
+            "count": 1024,
+            "control": 0.10546875,
+            "coupled": 0.0791015625,
+            "difference": -0.0263671875,
+            "layout_cluster_95ci": [
+              -0.048828125,
+              -0.00390625
+            ]
+          },
+          "completion_gained": 46,
+          "completion_lost": 30,
+          "by_initial_distance": {
+            "1_5": {
+              "completion": {
+                "count": 294,
+                "control": 0.7482993197278912,
+                "coupled": 0.7482993197278912,
+                "difference": 0.0,
+                "layout_cluster_95ci": [
+                  -0.04304635761589404,
+                  0.04226101288582555
+                ]
+              },
+              "two_step_cycle": {
+                "count": 294,
+                "control": 0.25170068027210885,
+                "coupled": 0.25170068027210885,
+                "difference": 0.0,
+                "layout_cluster_95ci": [
+                  -0.042261012885825594,
+                  0.04304635761589404
+                ]
+              }
+            },
+            "6_20": {
+              "completion": {
+                "count": 354,
+                "control": 0.07344632768361582,
+                "coupled": 0.11864406779661017,
+                "difference": 0.04519774011299435,
+                "layout_cluster_95ci": [
+                  0.011204481792717087,
+                  0.08263888888888879
+                ]
+              },
+              "two_step_cycle": {
+                "count": 354,
+                "control": 0.9265536723163842,
+                "coupled": 0.8813559322033898,
+                "difference": -0.04519774011299435,
+                "layout_cluster_95ci": [
+                  -0.08263888888888889,
+                  -0.011204481792717087
+                ]
+              }
+            },
+            "21_inf": {
+              "completion": {
+                "count": 376,
+                "control": 0.0,
+                "coupled": 0.0,
+                "difference": 0.0,
+                "layout_cluster_95ci": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "two_step_cycle": {
+                "count": 376,
+                "control": 1.0,
+                "coupled": 1.0,
+                "difference": 0.0,
+                "layout_cluster_95ci": [
+                  0.0,
+                  0.0
+                ]
+              }
+            }
+          },
+          "initial_margin": {
+            "initial_optimal_margin": {
+              "count": 872,
+              "control": 3.74691104888916,
+              "coupled": 4.261048316955566,
+              "difference": 0.5141373692302529,
+              "layout_cluster_95ci": [
+                -0.6427439329227707,
+                1.666491461512638
+              ]
+            },
+            "initial_finite_other_margin": {
+              "count": 819,
+              "control": 1.1752816438674927,
+              "coupled": 1.021438717842102,
+              "difference": -0.1538428823589842,
+              "layout_cluster_95ci": [
+                -0.847201931001024,
+                0.5679758552158739
+              ]
+            },
+            "initial_dead_margin": {
+              "count": 175,
+              "control": 76.37258911132812,
+              "coupled": 96.73490905761719,
+              "difference": 20.362325777326312,
+              "layout_cluster_95ci": [
+                10.089554275444216,
+                31.525483333809028
+              ]
+            }
+          },
+          "interpretation": "Differences are coupled minus control on identical queries. Bootstrap resamples whole layouts and is conditional on these two selected checkpoints, not independent training seeds. Nonoptimal steps may be recoverable detours; first dead entries are separate. Positive margin favors the best exact-optimal action."
+        }
+      },
+      "unseen_goal_validation": {
+        "left_condition": "control",
+        "right_condition": "shuffled",
+        "legacy_field_mapping": {
+          "control": "control",
+          "coupled": "shuffled"
+        },
+        "metrics": {
+          "layouts": 63,
+          "queries": 1024,
+          "bootstrap_repetitions": 2000,
+          "completion": {
+            "count": 1024,
+            "control": 0.1474609375,
+            "coupled": 0.1435546875,
+            "difference": -0.00390625,
+            "layout_cluster_95ci": [
+              -0.01986302435656954,
+              0.012161286708304348
+            ]
+          },
+          "two_step_cycle": {
+            "count": 1024,
+            "control": 0.8525390625,
+            "coupled": 0.8564453125,
+            "difference": 0.00390625,
+            "layout_cluster_95ci": [
+              -0.012161286708304365,
+              0.01986302435656953
+            ]
+          },
+          "entered_dead": {
+            "count": 1024,
+            "control": 0.1318359375,
+            "coupled": 0.1103515625,
+            "difference": -0.021484375,
+            "layout_cluster_95ci": [
+              -0.045275590551181105,
+              0.0019924318789100604
+            ]
+          },
+          "completion_gained": 24,
+          "completion_lost": 28,
+          "by_initial_distance": {
+            "1_5": {
+              "completion": {
+                "count": 179,
+                "control": 0.664804469273743,
+                "coupled": 0.6871508379888268,
+                "difference": 0.0223463687150838,
+                "layout_cluster_95ci": [
+                  -0.03571428571428571,
+                  0.07926829268292683
+                ]
+              },
+              "two_step_cycle": {
+                "count": 179,
+                "control": 0.33519553072625696,
+                "coupled": 0.3128491620111732,
+                "difference": -0.0223463687150838,
+                "layout_cluster_95ci": [
+                  -0.07926829268292683,
+                  0.03571428571428571
+                ]
+              }
+            },
+            "6_20": {
+              "completion": {
+                "count": 388,
+                "control": 0.08247422680412371,
+                "coupled": 0.061855670103092786,
+                "difference": -0.020618556701030927,
+                "layout_cluster_95ci": [
+                  -0.05115417404419962,
+                  0.007939167624154204
+                ]
+              },
+              "two_step_cycle": {
+                "count": 388,
+                "control": 0.9175257731958762,
+                "coupled": 0.9381443298969072,
+                "difference": 0.020618556701030927,
+                "layout_cluster_95ci": [
+                  -0.007939167624154218,
+                  0.0511541740441996
+                ]
+              }
+            },
+            "21_inf": {
+              "completion": {
+                "count": 457,
+                "control": 0.0,
+                "coupled": 0.0,
+                "difference": 0.0,
+                "layout_cluster_95ci": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "two_step_cycle": {
+                "count": 457,
+                "control": 1.0,
+                "coupled": 1.0,
+                "difference": 0.0,
+                "layout_cluster_95ci": [
+                  0.0,
+                  0.0
+                ]
+              }
+            }
+          },
+          "initial_margin": {
+            "initial_optimal_margin": {
+              "count": 836,
+              "control": 3.5136544704437256,
+              "coupled": 4.82009744644165,
+              "difference": 1.306442710771515,
+              "layout_cluster_95ci": [
+                0.3137852682746837,
+                2.4398862086643844
+              ]
+            },
+            "initial_finite_other_margin": {
+              "count": 775,
+              "control": 1.4006671905517578,
+              "coupled": 1.6318225860595703,
+              "difference": 0.2311554576504615,
+              "layout_cluster_95ci": [
+                -0.20918081381252648,
+                0.8059504323739114
+              ]
+            },
+            "initial_dead_margin": {
+              "count": 167,
+              "control": 84.34513092041016,
+              "coupled": 111.05372619628906,
+              "difference": 26.70861085446295,
+              "layout_cluster_95ci": [
+                15.051936839956365,
+                39.59635725474793
+              ]
+            }
+          },
+          "interpretation": "Differences are coupled minus control on identical queries. Bootstrap resamples whole layouts and is conditional on these two selected checkpoints, not independent training seeds. Nonoptimal steps may be recoverable detours; first dead entries are separate. Positive margin favors the best exact-optimal action."
+        }
+      },
+      "unseen_layout_validation": {
+        "left_condition": "control",
+        "right_condition": "shuffled",
+        "legacy_field_mapping": {
+          "control": "control",
+          "coupled": "shuffled"
+        },
+        "metrics": {
+          "layouts": 100,
+          "queries": 1024,
+          "bootstrap_repetitions": 2000,
+          "completion": {
+            "count": 1024,
+            "control": 0.365234375,
+            "coupled": 0.3466796875,
+            "difference": -0.0185546875,
+            "layout_cluster_95ci": [
+              -0.03930170851177832,
+              0.00390625
+            ]
+          },
+          "two_step_cycle": {
+            "count": 1024,
+            "control": 0.634765625,
+            "coupled": 0.6533203125,
+            "difference": 0.0185546875,
+            "layout_cluster_95ci": [
+              -0.00390625,
+              0.03930170851177827
+            ]
+          },
+          "entered_dead": {
+            "count": 1024,
+            "control": 0.0859375,
+            "coupled": 0.0830078125,
+            "difference": -0.0029296875,
+            "layout_cluster_95ci": [
+              -0.01956995079839994,
+              0.013779866956285634
+            ]
+          },
+          "completion_gained": 42,
+          "completion_lost": 61,
+          "by_initial_distance": {
+            "1_5": {
+              "completion": {
+                "count": 420,
+                "control": 0.8285714285714286,
+                "coupled": 0.7952380952380952,
+                "difference": -0.03333333333333333,
+                "layout_cluster_95ci": [
+                  -0.07852786520198207,
+                  0.011710979473756709
+                ]
+              },
+              "two_step_cycle": {
+                "count": 420,
+                "control": 0.17142857142857143,
+                "coupled": 0.20476190476190476,
+                "difference": 0.03333333333333333,
+                "layout_cluster_95ci": [
+                  -0.011710979473756716,
+                  0.07852786520198203
+                ]
+              }
+            },
+            "6_20": {
+              "completion": {
+                "count": 288,
+                "control": 0.09027777777777778,
+                "coupled": 0.07291666666666667,
+                "difference": -0.017361111111111112,
+                "layout_cluster_95ci": [
+                  -0.05653710247349823,
+                  0.020202020202020204
+                ]
+              },
+              "two_step_cycle": {
+                "count": 288,
+                "control": 0.9097222222222222,
+                "coupled": 0.9270833333333334,
+                "difference": 0.017361111111111112,
+                "layout_cluster_95ci": [
+                  -0.020202020202020204,
+                  0.05653710247349823
+                ]
+              }
+            },
+            "21_inf": {
+              "completion": {
+                "count": 316,
+                "control": 0.0,
+                "coupled": 0.0,
+                "difference": 0.0,
+                "layout_cluster_95ci": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "two_step_cycle": {
+                "count": 316,
+                "control": 1.0,
+                "coupled": 1.0,
+                "difference": 0.0,
+                "layout_cluster_95ci": [
+                  0.0,
+                  0.0
+                ]
+              }
+            }
+          },
+          "initial_margin": {
+            "initial_optimal_margin": {
+              "count": 870,
+              "control": 3.052741050720215,
+              "coupled": 3.8439180850982666,
+              "difference": 0.7911767580043311,
+              "layout_cluster_95ci": [
+                -1.6276943958671655,
+                3.000686256139728
+              ]
+            },
+            "initial_finite_other_margin": {
+              "count": 828,
+              "control": 0.5800246000289917,
+              "coupled": 1.342820167541504,
+              "difference": 0.7627955811899065,
+              "layout_cluster_95ci": [
+                -1.516683890676013,
+                2.945739773527486
+              ]
+            },
+            "initial_dead_margin": {
+              "count": 172,
+              "control": 80.9942626953125,
+              "coupled": 83.20672607421875,
+              "difference": 2.21245038232138,
+              "layout_cluster_95ci": [
+                -9.58142351211954,
+                14.571598427470356
+              ]
+            }
+          },
+          "interpretation": "Differences are coupled minus control on identical queries. Bootstrap resamples whole layouts and is conditional on these two selected checkpoints, not independent training seeds. Nonoptimal steps may be recoverable detours; first dead entries are separate. Positive margin favors the best exact-optimal action."
+        }
+      },
+      "original_layout_validation": {
+        "left_condition": "control",
+        "right_condition": "shuffled",
+        "legacy_field_mapping": {
+          "control": "control",
+          "coupled": "shuffled"
+        },
+        "metrics": {
+          "layouts": 100,
+          "queries": 1024,
+          "bootstrap_repetitions": 2000,
+          "completion": {
+            "count": 1024,
+            "control": 0.0,
+            "coupled": 0.0,
+            "difference": 0.0,
+            "layout_cluster_95ci": [
+              0.0,
+              0.0
+            ]
+          },
+          "two_step_cycle": {
+            "count": 1024,
+            "control": 1.0,
+            "coupled": 1.0,
+            "difference": 0.0,
+            "layout_cluster_95ci": [
+              0.0,
+              0.0
+            ]
+          },
+          "entered_dead": {
+            "count": 1024,
+            "control": 0.4248046875,
+            "coupled": 0.330078125,
+            "difference": -0.0947265625,
+            "layout_cluster_95ci": [
+              -0.20281227336686902,
+              0.017346538841110922
+            ]
+          },
+          "completion_gained": 0,
+          "completion_lost": 0,
+          "by_initial_distance": {
+            "1_5": {
+              "completion": {
+                "count": 0,
+                "control": null,
+                "coupled": null,
+                "difference": null,
+                "layout_cluster_95ci": null
+              },
+              "two_step_cycle": {
+                "count": 0,
+                "control": null,
+                "coupled": null,
+                "difference": null,
+                "layout_cluster_95ci": null
+              }
+            },
+            "6_20": {
+              "completion": {
+                "count": 0,
+                "control": null,
+                "coupled": null,
+                "difference": null,
+                "layout_cluster_95ci": null
+              },
+              "two_step_cycle": {
+                "count": 0,
+                "control": null,
+                "coupled": null,
+                "difference": null,
+                "layout_cluster_95ci": null
+              }
+            },
+            "21_inf": {
+              "completion": {
+                "count": 1024,
+                "control": 0.0,
+                "coupled": 0.0,
+                "difference": 0.0,
+                "layout_cluster_95ci": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "two_step_cycle": {
+                "count": 1024,
+                "control": 1.0,
+                "coupled": 1.0,
+                "difference": 0.0,
+                "layout_cluster_95ci": [
+                  0.0,
+                  0.0
+                ]
+              }
+            }
+          },
+          "initial_margin": {
+            "initial_optimal_margin": {
+              "count": 553,
+              "control": 16.49066162109375,
+              "coupled": 23.515920639038086,
+              "difference": 7.025256767410913,
+              "layout_cluster_95ci": [
+                -9.537043727818675,
+                24.26830254670823
+              ]
+            },
+            "initial_finite_other_margin": {
+              "count": 423,
+              "control": 5.571291446685791,
+              "coupled": 18.815256118774414,
+              "difference": 13.243963942741953,
+              "layout_cluster_95ci": [
+                -6.3270226893495956,
+                34.14537752073069
+              ]
+            },
+            "initial_dead_margin": {
+              "count": 184,
+              "control": 70.66136932373047,
+              "coupled": 60.77085876464844,
+              "difference": -9.890504111414371,
+              "layout_cluster_95ci": [
+                -33.794348581422916,
+                7.599043742199038
+              ]
+            }
+          },
+          "interpretation": "Differences are coupled minus control on identical queries. Bootstrap resamples whole layouts and is conditional on these two selected checkpoints, not independent training seeds. Nonoptimal steps may be recoverable detours; first dead entries are separate. Positive margin favors the best exact-optimal action."
+        }
+      }
+    },
+    "shuffled_to_joint": {
+      "validation": {
+        "left_condition": "shuffled",
+        "right_condition": "joint",
+        "legacy_field_mapping": {
+          "control": "shuffled",
+          "coupled": "joint"
+        },
+        "metrics": {
+          "layouts": 64,
+          "queries": 1024,
+          "bootstrap_repetitions": 2000,
+          "completion": {
+            "count": 1024,
+            "control": 0.255859375,
+            "coupled": 0.23046875,
+            "difference": -0.025390625,
+            "layout_cluster_95ci": [
+              -0.04296875,
+              -0.0087890625
+            ]
+          },
+          "two_step_cycle": {
+            "count": 1024,
+            "control": 0.744140625,
+            "coupled": 0.76953125,
+            "difference": 0.025390625,
+            "layout_cluster_95ci": [
+              0.0087890625,
+              0.04296875
+            ]
+          },
+          "entered_dead": {
+            "count": 1024,
+            "control": 0.0791015625,
+            "coupled": 0.1142578125,
+            "difference": 0.03515625,
+            "layout_cluster_95ci": [
+              0.01171875,
+              0.0595703125
+            ]
+          },
+          "completion_gained": 28,
+          "completion_lost": 54,
+          "by_initial_distance": {
+            "1_5": {
+              "completion": {
+                "count": 294,
+                "control": 0.7482993197278912,
+                "coupled": 0.7380952380952381,
+                "difference": -0.01020408163265306,
+                "layout_cluster_95ci": [
+                  -0.061866371776121004,
+                  0.04028026348496141
+                ]
+              },
+              "two_step_cycle": {
+                "count": 294,
+                "control": 0.25170068027210885,
+                "coupled": 0.2619047619047619,
+                "difference": 0.01020408163265306,
+                "layout_cluster_95ci": [
+                  -0.04028026348496147,
+                  0.06186637177612094
+                ]
+              }
+            },
+            "6_20": {
+              "completion": {
+                "count": 354,
+                "control": 0.11864406779661017,
+                "coupled": 0.05367231638418079,
+                "difference": -0.06497175141242938,
+                "layout_cluster_95ci": [
+                  -0.09723069105691057,
+                  -0.03428571428571429
+                ]
+              },
+              "two_step_cycle": {
+                "count": 354,
+                "control": 0.8813559322033898,
+                "coupled": 0.9463276836158192,
+                "difference": 0.06497175141242938,
+                "layout_cluster_95ci": [
+                  0.03428571428571429,
+                  0.09723069105691053
+                ]
+              }
+            },
+            "21_inf": {
+              "completion": {
+                "count": 376,
+                "control": 0.0,
+                "coupled": 0.0,
+                "difference": 0.0,
+                "layout_cluster_95ci": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "two_step_cycle": {
+                "count": 376,
+                "control": 1.0,
+                "coupled": 1.0,
+                "difference": 0.0,
+                "layout_cluster_95ci": [
+                  0.0,
+                  0.0
+                ]
+              }
+            }
+          },
+          "initial_margin": {
+            "initial_optimal_margin": {
+              "count": 872,
+              "control": 4.261048316955566,
+              "coupled": 3.039383888244629,
+              "difference": -1.2216643987719071,
+              "layout_cluster_95ci": [
+                -2.3616422848528384,
+                -0.1663316663366079
+              ]
+            },
+            "initial_finite_other_margin": {
+              "count": 819,
+              "control": 1.021438717842102,
+              "coupled": 0.9854409694671631,
+              "difference": -0.03599779087690789,
+              "layout_cluster_95ci": [
+                -0.5020141680531259,
+                0.5045102850124239
+              ]
+            },
+            "initial_dead_margin": {
+              "count": 175,
+              "control": 96.73490905761719,
+              "coupled": 64.95903015136719,
+              "difference": -31.775882017953055,
+              "layout_cluster_95ci": [
+                -42.811247234093514,
+                -21.793689969248256
+              ]
+            }
+          },
+          "interpretation": "Differences are coupled minus control on identical queries. Bootstrap resamples whole layouts and is conditional on these two selected checkpoints, not independent training seeds. Nonoptimal steps may be recoverable detours; first dead entries are separate. Positive margin favors the best exact-optimal action."
+        }
+      },
+      "unseen_goal_validation": {
+        "left_condition": "shuffled",
+        "right_condition": "joint",
+        "legacy_field_mapping": {
+          "control": "shuffled",
+          "coupled": "joint"
+        },
+        "metrics": {
+          "layouts": 63,
+          "queries": 1024,
+          "bootstrap_repetitions": 2000,
+          "completion": {
+            "count": 1024,
+            "control": 0.1435546875,
+            "coupled": 0.1416015625,
+            "difference": -0.001953125,
+            "layout_cluster_95ci": [
+              -0.019689931278470907,
+              0.016178656354311146
+            ]
+          },
+          "two_step_cycle": {
+            "count": 1024,
+            "control": 0.8564453125,
+            "coupled": 0.8583984375,
+            "difference": 0.001953125,
+            "layout_cluster_95ci": [
+              -0.01617865635431115,
+              0.01968993127847088
+            ]
+          },
+          "entered_dead": {
+            "count": 1024,
+            "control": 0.1103515625,
+            "coupled": 0.1328125,
+            "difference": 0.0224609375,
+            "layout_cluster_95ci": [
+              0.0020039578656813124,
+              0.04179198850107439
+            ]
+          },
+          "completion_gained": 26,
+          "completion_lost": 28,
+          "by_initial_distance": {
+            "1_5": {
+              "completion": {
+                "count": 179,
+                "control": 0.6871508379888268,
+                "coupled": 0.6703910614525139,
+                "difference": -0.01675977653631285,
+                "layout_cluster_95ci": [
+                  -0.08333333333333333,
+                  0.053200987841945234
+                ]
+              },
+              "two_step_cycle": {
+                "count": 179,
+                "control": 0.3128491620111732,
+                "coupled": 0.329608938547486,
+                "difference": 0.01675977653631285,
+                "layout_cluster_95ci": [
+                  -0.05320098784194529,
+                  0.08333333333333333
+                ]
+              }
+            },
+            "6_20": {
+              "completion": {
+                "count": 388,
+                "control": 0.061855670103092786,
+                "coupled": 0.06443298969072164,
+                "difference": 0.002577319587628866,
+                "layout_cluster_95ci": [
+                  -0.023809523809523808,
+                  0.03047444739668719
+                ]
+              },
+              "two_step_cycle": {
+                "count": 388,
+                "control": 0.9381443298969072,
+                "coupled": 0.9355670103092784,
+                "difference": -0.002577319587628866,
+                "layout_cluster_95ci": [
+                  -0.030474447396687206,
+                  0.023809523809523808
+                ]
+              }
+            },
+            "21_inf": {
+              "completion": {
+                "count": 457,
+                "control": 0.0,
+                "coupled": 0.0,
+                "difference": 0.0,
+                "layout_cluster_95ci": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "two_step_cycle": {
+                "count": 457,
+                "control": 1.0,
+                "coupled": 1.0,
+                "difference": 0.0,
+                "layout_cluster_95ci": [
+                  0.0,
+                  0.0
+                ]
+              }
+            }
+          },
+          "initial_margin": {
+            "initial_optimal_margin": {
+              "count": 836,
+              "control": 4.82009744644165,
+              "coupled": 2.28068470954895,
+              "difference": -2.5394122697519914,
+              "layout_cluster_95ci": [
+                -4.284332587286933,
+                -1.1120672911572964
+              ]
+            },
+            "initial_finite_other_margin": {
+              "count": 775,
+              "control": 1.6318225860595703,
+              "coupled": 1.250143051147461,
+              "difference": -0.38167952383718184,
+              "layout_cluster_95ci": [
+                -0.9200302543707661,
+                0.011539604375316538
+              ]
+            },
+            "initial_dead_margin": {
+              "count": 167,
+              "control": 111.05372619628906,
+              "coupled": 71.30598449707031,
+              "difference": -39.74774813223742,
+              "layout_cluster_95ci": [
+                -53.60507506789902,
+                -27.292931732321332
+              ]
+            }
+          },
+          "interpretation": "Differences are coupled minus control on identical queries. Bootstrap resamples whole layouts and is conditional on these two selected checkpoints, not independent training seeds. Nonoptimal steps may be recoverable detours; first dead entries are separate. Positive margin favors the best exact-optimal action."
+        }
+      },
+      "unseen_layout_validation": {
+        "left_condition": "shuffled",
+        "right_condition": "joint",
+        "legacy_field_mapping": {
+          "control": "shuffled",
+          "coupled": "joint"
+        },
+        "metrics": {
+          "layouts": 100,
+          "queries": 1024,
+          "bootstrap_repetitions": 2000,
+          "completion": {
+            "count": 1024,
+            "control": 0.3466796875,
+            "coupled": 0.359375,
+            "difference": 0.0126953125,
+            "layout_cluster_95ci": [
+              -0.006822778490942804,
+              0.033044203479219575
+            ]
+          },
+          "two_step_cycle": {
+            "count": 1024,
+            "control": 0.6533203125,
+            "coupled": 0.640625,
+            "difference": -0.0126953125,
+            "layout_cluster_95ci": [
+              -0.03304420347921959,
+              0.006822778490942803
+            ]
+          },
+          "entered_dead": {
+            "count": 1024,
+            "control": 0.0830078125,
+            "coupled": 0.0859375,
+            "difference": 0.0029296875,
+            "layout_cluster_95ci": [
+              -0.01466275659824047,
+              0.02054794520547945
+            ]
+          },
+          "completion_gained": 50,
+          "completion_lost": 37,
+          "by_initial_distance": {
+            "1_5": {
+              "completion": {
+                "count": 420,
+                "control": 0.7952380952380952,
+                "coupled": 0.8261904761904761,
+                "difference": 0.030952380952380953,
+                "layout_cluster_95ci": [
+                  -0.006868597489253405,
+                  0.07076310024143785
+                ]
+              },
+              "two_step_cycle": {
+                "count": 420,
+                "control": 0.20476190476190476,
+                "coupled": 0.1738095238095238,
+                "difference": -0.030952380952380953,
+                "layout_cluster_95ci": [
+                  -0.07076310024143789,
+                  0.006868597489253386
+                ]
+              }
+            },
+            "6_20": {
+              "completion": {
+                "count": 288,
+                "control": 0.07291666666666667,
+                "coupled": 0.07291666666666667,
+                "difference": 0.0,
+                "layout_cluster_95ci": [
+                  -0.03546099290780142,
+                  0.037674469236925086
+                ]
+              },
+              "two_step_cycle": {
+                "count": 288,
+                "control": 0.9270833333333334,
+                "coupled": 0.9270833333333334,
+                "difference": 0.0,
+                "layout_cluster_95ci": [
+                  -0.0376744692369251,
+                  0.03546099290780142
+                ]
+              }
+            },
+            "21_inf": {
+              "completion": {
+                "count": 316,
+                "control": 0.0,
+                "coupled": 0.0,
+                "difference": 0.0,
+                "layout_cluster_95ci": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "two_step_cycle": {
+                "count": 316,
+                "control": 1.0,
+                "coupled": 1.0,
+                "difference": 0.0,
+                "layout_cluster_95ci": [
+                  0.0,
+                  0.0
+                ]
+              }
+            }
+          },
+          "initial_margin": {
+            "initial_optimal_margin": {
+              "count": 870,
+              "control": 3.8439180850982666,
+              "coupled": 2.270193576812744,
+              "difference": -1.573724106947581,
+              "layout_cluster_95ci": [
+                -3.5165463674000326,
+                0.37980667559363235
+              ]
+            },
+            "initial_finite_other_margin": {
+              "count": 828,
+              "control": 1.342820167541504,
+              "coupled": -0.03336459398269653,
+              "difference": -1.3761847322977683,
+              "layout_cluster_95ci": [
+                -3.2142929560196745,
+                0.42434423211681643
+              ]
+            },
+            "initial_dead_margin": {
+              "count": 172,
+              "control": 83.20672607421875,
+              "coupled": 72.414794921875,
+              "difference": -10.791927592698919,
+              "layout_cluster_95ci": [
+                -24.351794782738562,
+                1.7622142145186912
+              ]
+            }
+          },
+          "interpretation": "Differences are coupled minus control on identical queries. Bootstrap resamples whole layouts and is conditional on these two selected checkpoints, not independent training seeds. Nonoptimal steps may be recoverable detours; first dead entries are separate. Positive margin favors the best exact-optimal action."
+        }
+      },
+      "original_layout_validation": {
+        "left_condition": "shuffled",
+        "right_condition": "joint",
+        "legacy_field_mapping": {
+          "control": "shuffled",
+          "coupled": "joint"
+        },
+        "metrics": {
+          "layouts": 100,
+          "queries": 1024,
+          "bootstrap_repetitions": 2000,
+          "completion": {
+            "count": 1024,
+            "control": 0.0,
+            "coupled": 0.0,
+            "difference": 0.0,
+            "layout_cluster_95ci": [
+              0.0,
+              0.0
+            ]
+          },
+          "two_step_cycle": {
+            "count": 1024,
+            "control": 1.0,
+            "coupled": 1.0,
+            "difference": 0.0,
+            "layout_cluster_95ci": [
+              0.0,
+              0.0
+            ]
+          },
+          "entered_dead": {
+            "count": 1024,
+            "control": 0.330078125,
+            "coupled": 0.3701171875,
+            "difference": 0.0400390625,
+            "layout_cluster_95ci": [
+              -0.059399197283112076,
+              0.13709376863446623
+            ]
+          },
+          "completion_gained": 0,
+          "completion_lost": 0,
+          "by_initial_distance": {
+            "1_5": {
+              "completion": {
+                "count": 0,
+                "control": null,
+                "coupled": null,
+                "difference": null,
+                "layout_cluster_95ci": null
+              },
+              "two_step_cycle": {
+                "count": 0,
+                "control": null,
+                "coupled": null,
+                "difference": null,
+                "layout_cluster_95ci": null
+              }
+            },
+            "6_20": {
+              "completion": {
+                "count": 0,
+                "control": null,
+                "coupled": null,
+                "difference": null,
+                "layout_cluster_95ci": null
+              },
+              "two_step_cycle": {
+                "count": 0,
+                "control": null,
+                "coupled": null,
+                "difference": null,
+                "layout_cluster_95ci": null
+              }
+            },
+            "21_inf": {
+              "completion": {
+                "count": 1024,
+                "control": 0.0,
+                "coupled": 0.0,
+                "difference": 0.0,
+                "layout_cluster_95ci": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "two_step_cycle": {
+                "count": 1024,
+                "control": 1.0,
+                "coupled": 1.0,
+                "difference": 0.0,
+                "layout_cluster_95ci": [
+                  0.0,
+                  0.0
+                ]
+              }
+            }
+          },
+          "initial_margin": {
+            "initial_optimal_margin": {
+              "count": 553,
+              "control": 23.515920639038086,
+              "coupled": 14.656339645385742,
+              "difference": -8.859579455356702,
+              "layout_cluster_95ci": [
+                -26.218796787606784,
+                9.357148672241912
+              ]
+            },
+            "initial_finite_other_margin": {
+              "count": 423,
+              "control": 18.815256118774414,
+              "coupled": 10.008768081665039,
+              "difference": -8.806487545617648,
+              "layout_cluster_95ci": [
+                -27.677192807844037,
+                8.318117085157432
+              ]
+            },
+            "initial_dead_margin": {
+              "count": 184,
+              "control": 60.77085876464844,
+              "coupled": 28.28011703491211,
+              "difference": -32.49074350232663,
+              "layout_cluster_95ci": [
+                -78.73993771391739,
+                16.545850315031508
+              ]
+            }
+          },
+          "interpretation": "Differences are coupled minus control on identical queries. Bootstrap resamples whole layouts and is conditional on these two selected checkpoints, not independent training seeds. Nonoptimal steps may be recoverable detours; first dead entries are separate. Positive margin favors the best exact-optimal action."
+        }
+      }
+    }
+  },
+  "models": {
+    "control": {
+      "validation": {
+        "planning": {
+          "count": 1024,
+          "solved": 246,
+          "success_rate": 0.240234375,
+          "optimal": 244,
+          "optimal_rate": 0.23828125,
+          "cycles": 778,
+          "entered_unreachable": 108,
+          "budget_exhausted": 0
+        },
+        "two_step_cycles": 778,
+        "two_step_cycle_rate": 0.759765625,
+        "by_initial_distance": {
+          "1_5": {
+            "count": 294,
+            "solved": 220,
+            "optimal": 218
+          },
+          "6_20": {
+            "count": 354,
+            "solved": 26,
+            "optimal": 26
+          },
+          "21_inf": {
+            "count": 376,
+            "solved": 0,
+            "optimal": 0
+          }
+        },
+        "first_events": {
+          "nonoptimal": {
+            "queries_with_event": 780,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 20,
+              "3_5": 112,
+              "6_10": 126,
+              "11_20": 167,
+              "21_40": 181,
+              "41_80": 154,
+              "81_inf": 20,
+              "proven_unreachable": 0
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 1.0,
+              "0.9": 5.0,
+              "1": 11.0
+            }
+          },
+          "dead": {
+            "queries_with_event": 108,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 0,
+              "3_5": 1,
+              "6_10": 4,
+              "11_20": 17,
+              "21_40": 43,
+              "41_80": 36,
+              "81_inf": 7,
+              "proven_unreachable": 0
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 2.0,
+              "0.9": 5.299999999999997,
+              "1": 12.0
+            }
+          },
+          "non_descent": {
+            "queries_with_event": 823,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 21,
+              "3_5": 103,
+              "6_10": 145,
+              "11_20": 169,
+              "21_40": 155,
+              "41_80": 143,
+              "81_inf": 15,
+              "proven_unreachable": 72
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 2.0,
+              "0.9": 5.0,
+              "1": 14.0
+            }
+          }
+        },
+        "initial_margins": {
+          "initial_optimal_margin": {
+            "count": 872,
+            "positive_fraction": 0.7064220183486238,
+            "quantiles": {
+              "0": -171.4709014892578,
+              "0.1": -2.018338203430176,
+              "0.5": 1.1371307373046875,
+              "0.9": 4.480600357055664,
+              "1": 239.3975830078125
+            }
+          },
+          "initial_finite_other_margin": {
+            "count": 819,
+            "positive_fraction": 0.7057387057387058,
+            "quantiles": {
+              "0": -171.4709014892578,
+              "0.1": -1.9040985107421875,
+              "0.5": 1.02496337890625,
+              "0.9": 4.066995143890381,
+              "1": 137.72215270996094
+            }
+          },
+          "initial_dead_margin": {
+            "count": 175,
+            "positive_fraction": 0.88,
+            "quantiles": {
+              "0": -26.941162109375,
+              "0.1": -0.3764230012893677,
+              "0.5": 7.9085693359375,
+              "0.9": 233.17709350585938,
+              "1": 239.98220825195312
+            }
+          }
+        },
+        "predicted_progress": {
+          "counts": {
+            "executed_edges": 4436,
+            "predicted_decrease": 3303,
+            "predicted_plateau": 0,
+            "predicted_increase": 1133,
+            "true_finite_edges": 3906,
+            "true_optimal_edges": 2670,
+            "predicted_decrease_but_not_true_optimal": 1246,
+            "entered_dead_edges": 108,
+            "non_goal_predicted_zero": 0
+          },
+          "strict_descent_trajectory_count": 201,
+          "strict_descent_success_count": 201,
+          "non_descent_trajectory_count": 823,
+          "predicted_drop_quantiles": {
+            "0": -53.7681884765625,
+            "0.1": -0.7750930786132812,
+            "0.5": 0.8470535278320312,
+            "0.9": 3.0961151123046875,
+            "1": 209.58172607421875
+          },
+          "mean_abs_unit_descent_residual": 1.5526344731006674,
+          "executed_edge_optimal_rate": 0.6018935978358881,
+          "predicted_strict_descent_edge_rate": 0.7445897204688909,
+          "executed_edges_by_true_distance": {
+            "1_1": {
+              "executed_edges": 246,
+              "true_optimal_edges": 246,
+              "predicted_decrease": 246,
+              "entered_dead_edges": 0
+            },
+            "2_2": {
+              "executed_edges": 194,
+              "true_optimal_edges": 174,
+              "predicted_decrease": 170,
+              "entered_dead_edges": 0
+            },
+            "3_5": {
+              "executed_edges": 525,
+              "true_optimal_edges": 375,
+              "predicted_decrease": 399,
+              "entered_dead_edges": 1
+            },
+            "6_10": {
+              "executed_edges": 696,
+              "true_optimal_edges": 474,
+              "predicted_decrease": 511,
+              "entered_dead_edges": 4
+            },
+            "11_20": {
+              "executed_edges": 882,
+              "true_optimal_edges": 550,
+              "predicted_decrease": 648,
+              "entered_dead_edges": 17
+            },
+            "21_40": {
+              "executed_edges": 771,
+              "true_optimal_edges": 454,
+              "predicted_decrease": 556,
+              "entered_dead_edges": 43
+            },
+            "41_80": {
+              "executed_edges": 623,
+              "true_optimal_edges": 349,
+              "predicted_decrease": 436,
+              "entered_dead_edges": 36
+            },
+            "81_inf": {
+              "executed_edges": 77,
+              "true_optimal_edges": 48,
+              "predicted_decrease": 59,
+              "entered_dead_edges": 7
+            },
+            "proven_unreachable": {
+              "executed_edges": 422,
+              "true_optimal_edges": 0,
+              "predicted_decrease": 278,
+              "entered_dead_edges": 0
+            }
+          },
+          "note": "Observed policy trajectories only, after action selection. A nondecreasing chosen edge also means no legal successor has a strictly lower predicted distance under this greedy policy. Strict predicted descent alone does not prove goal completion or true optimality; full rollouts remain the acceptance metric."
+        }
+      },
+      "unseen_goal_validation": {
+        "planning": {
+          "count": 1024,
+          "solved": 151,
+          "success_rate": 0.1474609375,
+          "optimal": 151,
+          "optimal_rate": 0.1474609375,
+          "cycles": 873,
+          "entered_unreachable": 135,
+          "budget_exhausted": 0
+        },
+        "two_step_cycles": 873,
+        "two_step_cycle_rate": 0.8525390625,
+        "by_initial_distance": {
+          "1_5": {
+            "count": 179,
+            "solved": 119,
+            "optimal": 119
+          },
+          "6_20": {
+            "count": 388,
+            "solved": 32,
+            "optimal": 32
+          },
+          "21_inf": {
+            "count": 457,
+            "solved": 0,
+            "optimal": 0
+          }
+        },
+        "first_events": {
+          "nonoptimal": {
+            "queries_with_event": 873,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 19,
+              "3_5": 100,
+              "6_10": 123,
+              "11_20": 202,
+              "21_40": 222,
+              "41_80": 185,
+              "81_inf": 22,
+              "proven_unreachable": 0
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 1.0,
+              "0.9": 5.0,
+              "1": 17.0
+            }
+          },
+          "dead": {
+            "queries_with_event": 135,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 0,
+              "3_5": 1,
+              "6_10": 6,
+              "11_20": 18,
+              "21_40": 49,
+              "41_80": 51,
+              "81_inf": 10,
+              "proven_unreachable": 0
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 2.0,
+              "0.9": 5.6000000000000085,
+              "1": 10.0
+            }
+          },
+          "non_descent": {
+            "queries_with_event": 907,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 9,
+              "3_5": 98,
+              "6_10": 131,
+              "11_20": 210,
+              "21_40": 193,
+              "41_80": 170,
+              "81_inf": 14,
+              "proven_unreachable": 82
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 2.0,
+              "0.9": 5.0,
+              "1": 10.0
+            }
+          }
+        },
+        "initial_margins": {
+          "initial_optimal_margin": {
+            "count": 836,
+            "positive_fraction": 0.680622009569378,
+            "quantiles": {
+              "0": -32.786895751953125,
+              "0.1": -2.302734375,
+              "0.5": 1.0150909423828125,
+              "0.9": 5.0904083251953125,
+              "1": 238.32791137695312
+            }
+          },
+          "initial_finite_other_margin": {
+            "count": 775,
+            "positive_fraction": 0.6838709677419355,
+            "quantiles": {
+              "0": -30.695266723632812,
+              "0.1": -2.1799521446228027,
+              "0.5": 1.0061492919921875,
+              "0.9": 4.394763946533203,
+              "1": 102.9678955078125
+            }
+          },
+          "initial_dead_margin": {
+            "count": 167,
+            "positive_fraction": 0.844311377245509,
+            "quantiles": {
+              "0": -32.786895751953125,
+              "0.1": -1.3076251745224,
+              "0.5": 13.898178100585938,
+              "0.9": 230.8688201904297,
+              "1": 240.07736206054688
+            }
+          }
+        },
+        "predicted_progress": {
+          "counts": {
+            "executed_edges": 4895,
+            "predicted_decrease": 3666,
+            "predicted_plateau": 0,
+            "predicted_increase": 1229,
+            "true_finite_edges": 4256,
+            "true_optimal_edges": 2919,
+            "predicted_decrease_but_not_true_optimal": 1414,
+            "entered_dead_edges": 135,
+            "non_goal_predicted_zero": 0
+          },
+          "strict_descent_trajectory_count": 117,
+          "strict_descent_success_count": 117,
+          "non_descent_trajectory_count": 907,
+          "predicted_drop_quantiles": {
+            "0": -130.40359497070312,
+            "0.1": -0.8483093261718748,
+            "0.5": 0.8783226013183594,
+            "0.9": 3.3670013427734418,
+            "1": 130.40359497070312
+          },
+          "mean_abs_unit_descent_residual": 1.5167608413072846,
+          "executed_edge_optimal_rate": 0.5963227783452503,
+          "predicted_strict_descent_edge_rate": 0.7489274770173646,
+          "executed_edges_by_true_distance": {
+            "1_1": {
+              "executed_edges": 151,
+              "true_optimal_edges": 151,
+              "predicted_decrease": 151,
+              "entered_dead_edges": 0
+            },
+            "2_2": {
+              "executed_edges": 139,
+              "true_optimal_edges": 118,
+              "predicted_decrease": 126,
+              "entered_dead_edges": 0
+            },
+            "3_5": {
+              "executed_edges": 505,
+              "true_optimal_edges": 376,
+              "predicted_decrease": 389,
+              "entered_dead_edges": 1
+            },
+            "6_10": {
+              "executed_edges": 779,
+              "true_optimal_edges": 541,
+              "predicted_decrease": 614,
+              "entered_dead_edges": 6
+            },
+            "11_20": {
+              "executed_edges": 1104,
+              "true_optimal_edges": 709,
+              "predicted_decrease": 829,
+              "entered_dead_edges": 18
+            },
+            "21_40": {
+              "executed_edges": 938,
+              "true_optimal_edges": 561,
+              "predicted_decrease": 680,
+              "entered_dead_edges": 49
+            },
+            "41_80": {
+              "executed_edges": 704,
+              "true_optimal_edges": 422,
+              "predicted_decrease": 490,
+              "entered_dead_edges": 51
+            },
+            "81_inf": {
+              "executed_edges": 71,
+              "true_optimal_edges": 41,
+              "predicted_decrease": 54,
+              "entered_dead_edges": 10
+            },
+            "proven_unreachable": {
+              "executed_edges": 504,
+              "true_optimal_edges": 0,
+              "predicted_decrease": 333,
+              "entered_dead_edges": 0
+            }
+          },
+          "note": "Observed policy trajectories only, after action selection. A nondecreasing chosen edge also means no legal successor has a strictly lower predicted distance under this greedy policy. Strict predicted descent alone does not prove goal completion or true optimality; full rollouts remain the acceptance metric."
+        }
+      },
+      "unseen_layout_validation": {
+        "planning": {
+          "count": 1024,
+          "solved": 374,
+          "success_rate": 0.365234375,
+          "optimal": 370,
+          "optimal_rate": 0.361328125,
+          "cycles": 650,
+          "entered_unreachable": 88,
+          "budget_exhausted": 0
+        },
+        "two_step_cycles": 650,
+        "two_step_cycle_rate": 0.634765625,
+        "by_initial_distance": {
+          "1_5": {
+            "count": 420,
+            "solved": 348,
+            "optimal": 347
+          },
+          "6_20": {
+            "count": 288,
+            "solved": 26,
+            "optimal": 23
+          },
+          "21_inf": {
+            "count": 316,
+            "solved": 0,
+            "optimal": 0
+          }
+        },
+        "first_events": {
+          "nonoptimal": {
+            "queries_with_event": 654,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 23,
+              "3_5": 90,
+              "6_10": 113,
+              "11_20": 121,
+              "21_40": 157,
+              "41_80": 125,
+              "81_inf": 25,
+              "proven_unreachable": 0
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 1.0,
+              "0.9": 4.0,
+              "1": 10.0
+            }
+          },
+          "dead": {
+            "queries_with_event": 88,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 0,
+              "3_5": 1,
+              "6_10": 7,
+              "11_20": 13,
+              "21_40": 23,
+              "41_80": 37,
+              "81_inf": 7,
+              "proven_unreachable": 0
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 2.0,
+              "0.9": 4.299999999999997,
+              "1": 8.0
+            }
+          },
+          "non_descent": {
+            "queries_with_event": 694,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 23,
+              "3_5": 91,
+              "6_10": 128,
+              "11_20": 115,
+              "21_40": 153,
+              "41_80": 107,
+              "81_inf": 24,
+              "proven_unreachable": 53
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 1.0,
+              "0.9": 4.0,
+              "1": 11.0
+            }
+          }
+        },
+        "initial_margins": {
+          "initial_optimal_margin": {
+            "count": 870,
+            "positive_fraction": 0.6977011494252874,
+            "quantiles": {
+              "0": -205.3070526123047,
+              "0.1": -3.468736171722412,
+              "0.5": 1.5592269897460938,
+              "0.9": 6.2285871505737305,
+              "1": 237.3854217529297
+            }
+          },
+          "initial_finite_other_margin": {
+            "count": 828,
+            "positive_fraction": 0.7053140096618358,
+            "quantiles": {
+              "0": -205.3070526123047,
+              "0.1": -2.99001407623291,
+              "0.5": 1.5592269897460938,
+              "0.9": 5.3841776847839355,
+              "1": 234.2510223388672
+            }
+          },
+          "initial_dead_margin": {
+            "count": 172,
+            "positive_fraction": 0.8372093023255814,
+            "quantiles": {
+              "0": -198.0512237548828,
+              "0.1": -3.17698335647583,
+              "0.5": 12.090873718261719,
+              "0.9": 233.77957153320312,
+              "1": 243.44895935058594
+            }
+          }
+        },
+        "predicted_progress": {
+          "counts": {
+            "executed_edges": 3817,
+            "predicted_decrease": 2868,
+            "predicted_plateau": 54,
+            "predicted_increase": 895,
+            "true_finite_edges": 3433,
+            "true_optimal_edges": 2359,
+            "predicted_decrease_but_not_true_optimal": 1030,
+            "entered_dead_edges": 88,
+            "non_goal_predicted_zero": 0
+          },
+          "strict_descent_trajectory_count": 330,
+          "strict_descent_success_count": 330,
+          "non_descent_trajectory_count": 694,
+          "predicted_drop_quantiles": {
+            "0": -193.86253356933594,
+            "0.1": -0.98660888671875,
+            "0.5": 1.0187187194824219,
+            "0.9": 4.858825683593751,
+            "1": 231.97372436523438
+          },
+          "mean_abs_unit_descent_residual": 6.035882094345513,
+          "executed_edge_optimal_rate": 0.6180246266701598,
+          "predicted_strict_descent_edge_rate": 0.7513754257270108,
+          "executed_edges_by_true_distance": {
+            "1_1": {
+              "executed_edges": 374,
+              "true_optimal_edges": 374,
+              "predicted_decrease": 374,
+              "entered_dead_edges": 0
+            },
+            "2_2": {
+              "executed_edges": 264,
+              "true_optimal_edges": 240,
+              "predicted_decrease": 240,
+              "entered_dead_edges": 0
+            },
+            "3_5": {
+              "executed_edges": 477,
+              "true_optimal_edges": 346,
+              "predicted_decrease": 369,
+              "entered_dead_edges": 1
+            },
+            "6_10": {
+              "executed_edges": 572,
+              "true_optimal_edges": 378,
+              "predicted_decrease": 417,
+              "entered_dead_edges": 7
+            },
+            "11_20": {
+              "executed_edges": 568,
+              "true_optimal_edges": 324,
+              "predicted_decrease": 414,
+              "entered_dead_edges": 13
+            },
+            "21_40": {
+              "executed_edges": 672,
+              "true_optimal_edges": 375,
+              "predicted_decrease": 464,
+              "entered_dead_edges": 23
+            },
+            "41_80": {
+              "executed_edges": 507,
+              "true_optimal_edges": 280,
+              "predicted_decrease": 346,
+              "entered_dead_edges": 37
+            },
+            "81_inf": {
+              "executed_edges": 87,
+              "true_optimal_edges": 42,
+              "predicted_decrease": 55,
+              "entered_dead_edges": 7
+            },
+            "proven_unreachable": {
+              "executed_edges": 296,
+              "true_optimal_edges": 0,
+              "predicted_decrease": 189,
+              "entered_dead_edges": 0
+            }
+          },
+          "note": "Observed policy trajectories only, after action selection. A nondecreasing chosen edge also means no legal successor has a strictly lower predicted distance under this greedy policy. Strict predicted descent alone does not prove goal completion or true optimality; full rollouts remain the acceptance metric."
+        }
+      },
+      "original_layout_validation": {
+        "planning": {
+          "count": 1024,
+          "solved": 0,
+          "success_rate": 0.0,
+          "optimal": 0,
+          "optimal_rate": 0.0,
+          "cycles": 1024,
+          "entered_unreachable": 435,
+          "budget_exhausted": 0
+        },
+        "two_step_cycles": 1024,
+        "two_step_cycle_rate": 1.0,
+        "by_initial_distance": {
+          "1_5": {
+            "count": 0,
+            "solved": 0,
+            "optimal": 0
+          },
+          "6_20": {
+            "count": 0,
+            "solved": 0,
+            "optimal": 0
+          },
+          "21_inf": {
+            "count": 1024,
+            "solved": 0,
+            "optimal": 0
+          }
+        },
+        "first_events": {
+          "nonoptimal": {
+            "queries_with_event": 1024,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 0,
+              "3_5": 0,
+              "6_10": 0,
+              "11_20": 6,
+              "21_40": 264,
+              "41_80": 726,
+              "81_inf": 28,
+              "proven_unreachable": 0
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 1.0,
+              "0.9": 4.0,
+              "1": 6.0
+            }
+          },
+          "dead": {
+            "queries_with_event": 435,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 0,
+              "3_5": 0,
+              "6_10": 0,
+              "11_20": 0,
+              "21_40": 122,
+              "41_80": 309,
+              "81_inf": 4,
+              "proven_unreachable": 0
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 1.0,
+              "0.9": 4.600000000000023,
+              "1": 6.0
+            }
+          },
+          "non_descent": {
+            "queries_with_event": 1024,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 0,
+              "3_5": 0,
+              "6_10": 0,
+              "11_20": 0,
+              "21_40": 168,
+              "41_80": 548,
+              "81_inf": 34,
+              "proven_unreachable": 274
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 2.0,
+              "0.9": 5.0,
+              "1": 13.0
+            }
+          }
+        },
+        "initial_margins": {
+          "initial_optimal_margin": {
+            "count": 553,
+            "positive_fraction": 0.5370705244122965,
+            "quantiles": {
+              "0": -93.35179138183594,
+              "0.1": -5.39971923828125,
+              "0.5": 0.123748779296875,
+              "0.9": 68.10649871826172,
+              "1": 219.28964233398438
+            }
+          },
+          "initial_finite_other_margin": {
+            "count": 423,
+            "positive_fraction": 0.5059101654846335,
+            "quantiles": {
+              "0": -93.35179138183594,
+              "0.1": -5.340667724609375,
+              "0.5": 0.04095458984375,
+              "0.9": 11.85830020904541,
+              "1": 174.44216918945312
+            }
+          },
+          "initial_dead_margin": {
+            "count": 184,
+            "positive_fraction": 0.6847826086956522,
+            "quantiles": {
+              "0": -39.752845764160156,
+              "0.1": -5.39971923828125,
+              "0.5": 6.024925231933594,
+              "0.9": 205.21388244628906,
+              "1": 219.28964233398438
+            }
+          }
+        },
+        "predicted_progress": {
+          "counts": {
+            "executed_edges": 5627,
+            "predicted_decrease": 3969,
+            "predicted_plateau": 74,
+            "predicted_increase": 1584,
+            "true_finite_edges": 3349,
+            "true_optimal_edges": 2166,
+            "predicted_decrease_but_not_true_optimal": 2465,
+            "entered_dead_edges": 435,
+            "non_goal_predicted_zero": 0
+          },
+          "strict_descent_trajectory_count": 0,
+          "strict_descent_success_count": 0,
+          "non_descent_trajectory_count": 1024,
+          "predicted_drop_quantiles": {
+            "0": -195.3463134765625,
+            "0.1": -1.16473388671875,
+            "0.5": 0.7590103149414062,
+            "0.9": 8.584143066406261,
+            "1": 220.92955017089844
+          },
+          "mean_abs_unit_descent_residual": 11.28902868074614,
+          "executed_edge_optimal_rate": 0.3849298027368047,
+          "predicted_strict_descent_edge_rate": 0.7053492091700728,
+          "executed_edges_by_true_distance": {
+            "1_1": {
+              "executed_edges": 0,
+              "true_optimal_edges": 0,
+              "predicted_decrease": 0,
+              "entered_dead_edges": 0
+            },
+            "2_2": {
+              "executed_edges": 0,
+              "true_optimal_edges": 0,
+              "predicted_decrease": 0,
+              "entered_dead_edges": 0
+            },
+            "3_5": {
+              "executed_edges": 0,
+              "true_optimal_edges": 0,
+              "predicted_decrease": 0,
+              "entered_dead_edges": 0
+            },
+            "6_10": {
+              "executed_edges": 0,
+              "true_optimal_edges": 0,
+              "predicted_decrease": 0,
+              "entered_dead_edges": 0
+            },
+            "11_20": {
+              "executed_edges": 14,
+              "true_optimal_edges": 5,
+              "predicted_decrease": 8,
+              "entered_dead_edges": 0
+            },
+            "21_40": {
+              "executed_edges": 933,
+              "true_optimal_edges": 500,
+              "predicted_decrease": 695,
+              "entered_dead_edges": 122
+            },
+            "41_80": {
+              "executed_edges": 2721,
+              "true_optimal_edges": 1584,
+              "predicted_decrease": 1933,
+              "entered_dead_edges": 309
+            },
+            "81_inf": {
+              "executed_edges": 116,
+              "true_optimal_edges": 77,
+              "predicted_decrease": 75,
+              "entered_dead_edges": 4
+            },
+            "proven_unreachable": {
+              "executed_edges": 1843,
+              "true_optimal_edges": 0,
+              "predicted_decrease": 1258,
+              "entered_dead_edges": 0
+            }
+          },
+          "note": "Observed policy trajectories only, after action selection. A nondecreasing chosen edge also means no legal successor has a strictly lower predicted distance under this greedy policy. Strict predicted descent alone does not prove goal completion or true optimality; full rollouts remain the acceptance metric."
+        }
+      }
+    },
+    "shuffled": {
+      "validation": {
+        "planning": {
+          "count": 1024,
+          "solved": 262,
+          "success_rate": 0.255859375,
+          "optimal": 259,
+          "optimal_rate": 0.2529296875,
+          "cycles": 762,
+          "entered_unreachable": 81,
+          "budget_exhausted": 0
+        },
+        "two_step_cycles": 762,
+        "two_step_cycle_rate": 0.744140625,
+        "by_initial_distance": {
+          "1_5": {
+            "count": 294,
+            "solved": 220,
+            "optimal": 219
+          },
+          "6_20": {
+            "count": 354,
+            "solved": 42,
+            "optimal": 40
+          },
+          "21_inf": {
+            "count": 376,
+            "solved": 0,
+            "optimal": 0
+          }
+        },
+        "first_events": {
+          "nonoptimal": {
+            "queries_with_event": 765,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 24,
+              "3_5": 97,
+              "6_10": 119,
+              "11_20": 166,
+              "21_40": 185,
+              "41_80": 153,
+              "81_inf": 21,
+              "proven_unreachable": 0
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 1.0,
+              "0.9": 4.0,
+              "1": 10.0
+            }
+          },
+          "dead": {
+            "queries_with_event": 81,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 0,
+              "3_5": 0,
+              "6_10": 1,
+              "11_20": 18,
+              "21_40": 28,
+              "41_80": 27,
+              "81_inf": 7,
+              "proven_unreachable": 0
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 2.0,
+              "0.9": 5.0,
+              "1": 8.0
+            }
+          },
+          "non_descent": {
+            "queries_with_event": 814,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 21,
+              "3_5": 93,
+              "6_10": 146,
+              "11_20": 168,
+              "21_40": 173,
+              "41_80": 151,
+              "81_inf": 18,
+              "proven_unreachable": 44
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 1.0,
+              "0.9": 5.0,
+              "1": 13.0
+            }
+          }
+        },
+        "initial_margins": {
+          "initial_optimal_margin": {
+            "count": 872,
+            "positive_fraction": 0.6926605504587156,
+            "quantiles": {
+              "0": -154.04342651367188,
+              "0.1": -2.058821201324463,
+              "0.5": 0.9999160766601562,
+              "0.9": 4.229757308959961,
+              "1": 240.90179443359375
+            }
+          },
+          "initial_finite_other_margin": {
+            "count": 819,
+            "positive_fraction": 0.684981684981685,
+            "quantiles": {
+              "0": -154.04342651367188,
+              "0.1": -1.9889708757400513,
+              "0.5": 0.8808650970458984,
+              "0.9": 3.485515594482422,
+              "1": 87.49979400634766
+            }
+          },
+          "initial_dead_margin": {
+            "count": 175,
+            "positive_fraction": 0.9142857142857143,
+            "quantiles": {
+              "0": -20.510498046875,
+              "0.1": 0.6888381838798523,
+              "0.5": 11.89398193359375,
+              "0.9": 234.1002197265625,
+              "1": 240.90179443359375
+            }
+          }
+        },
+        "predicted_progress": {
+          "counts": {
+            "executed_edges": 4267,
+            "predicted_decrease": 3170,
+            "predicted_plateau": 0,
+            "predicted_increase": 1097,
+            "true_finite_edges": 3858,
+            "true_optimal_edges": 2660,
+            "predicted_decrease_but_not_true_optimal": 1116,
+            "entered_dead_edges": 81,
+            "non_goal_predicted_zero": 0
+          },
+          "strict_descent_trajectory_count": 210,
+          "strict_descent_success_count": 210,
+          "non_descent_trajectory_count": 814,
+          "predicted_drop_quantiles": {
+            "0": -173.7510528564453,
+            "0.1": -0.7399932861328123,
+            "0.5": 0.8084278106689453,
+            "0.9": 3.0713958740234375,
+            "1": 168.2393798828125
+          },
+          "mean_abs_unit_descent_residual": 1.7396243322026905,
+          "executed_edge_optimal_rate": 0.6233887977501757,
+          "predicted_strict_descent_edge_rate": 0.7429107101007734,
+          "executed_edges_by_true_distance": {
+            "1_1": {
+              "executed_edges": 262,
+              "true_optimal_edges": 262,
+              "predicted_decrease": 262,
+              "entered_dead_edges": 0
+            },
+            "2_2": {
+              "executed_edges": 216,
+              "true_optimal_edges": 190,
+              "predicted_decrease": 191,
+              "entered_dead_edges": 0
+            },
+            "3_5": {
+              "executed_edges": 540,
+              "true_optimal_edges": 406,
+              "predicted_decrease": 430,
+              "entered_dead_edges": 0
+            },
+            "6_10": {
+              "executed_edges": 694,
+              "true_optimal_edges": 485,
+              "predicted_decrease": 505,
+              "entered_dead_edges": 1
+            },
+            "11_20": {
+              "executed_edges": 763,
+              "true_optimal_edges": 458,
+              "predicted_decrease": 553,
+              "entered_dead_edges": 18
+            },
+            "21_40": {
+              "executed_edges": 788,
+              "true_optimal_edges": 468,
+              "predicted_decrease": 555,
+              "entered_dead_edges": 28
+            },
+            "41_80": {
+              "executed_edges": 600,
+              "true_optimal_edges": 346,
+              "predicted_decrease": 402,
+              "entered_dead_edges": 27
+            },
+            "81_inf": {
+              "executed_edges": 76,
+              "true_optimal_edges": 45,
+              "predicted_decrease": 50,
+              "entered_dead_edges": 7
+            },
+            "proven_unreachable": {
+              "executed_edges": 328,
+              "true_optimal_edges": 0,
+              "predicted_decrease": 222,
+              "entered_dead_edges": 0
+            }
+          },
+          "note": "Observed policy trajectories only, after action selection. A nondecreasing chosen edge also means no legal successor has a strictly lower predicted distance under this greedy policy. Strict predicted descent alone does not prove goal completion or true optimality; full rollouts remain the acceptance metric."
+        }
+      },
+      "unseen_goal_validation": {
+        "planning": {
+          "count": 1024,
+          "solved": 147,
+          "success_rate": 0.1435546875,
+          "optimal": 147,
+          "optimal_rate": 0.1435546875,
+          "cycles": 877,
+          "entered_unreachable": 113,
+          "budget_exhausted": 0
+        },
+        "two_step_cycles": 877,
+        "two_step_cycle_rate": 0.8564453125,
+        "by_initial_distance": {
+          "1_5": {
+            "count": 179,
+            "solved": 123,
+            "optimal": 123
+          },
+          "6_20": {
+            "count": 388,
+            "solved": 24,
+            "optimal": 24
+          },
+          "21_inf": {
+            "count": 457,
+            "solved": 0,
+            "optimal": 0
+          }
+        },
+        "first_events": {
+          "nonoptimal": {
+            "queries_with_event": 877,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 12,
+              "3_5": 96,
+              "6_10": 129,
+              "11_20": 205,
+              "21_40": 223,
+              "41_80": 188,
+              "81_inf": 24,
+              "proven_unreachable": 0
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 1.0,
+              "0.9": 4.0,
+              "1": 15.0
+            }
+          },
+          "dead": {
+            "queries_with_event": 113,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 0,
+              "3_5": 0,
+              "6_10": 3,
+              "11_20": 17,
+              "21_40": 43,
+              "41_80": 42,
+              "81_inf": 8,
+              "proven_unreachable": 0
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 1.0,
+              "0.9": 4.799999999999997,
+              "1": 15.0
+            }
+          },
+          "non_descent": {
+            "queries_with_event": 904,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 7,
+              "3_5": 80,
+              "6_10": 136,
+              "11_20": 218,
+              "21_40": 202,
+              "41_80": 175,
+              "81_inf": 20,
+              "proven_unreachable": 66
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 1.0,
+              "0.9": 5.0,
+              "1": 17.0
+            }
+          }
+        },
+        "initial_margins": {
+          "initial_optimal_margin": {
+            "count": 836,
+            "positive_fraction": 0.6674641148325359,
+            "quantiles": {
+              "0": -67.89933776855469,
+              "0.1": -1.9848403930664062,
+              "0.5": 0.9765090942382812,
+              "0.9": 5.7956695556640625,
+              "1": 238.6701202392578
+            }
+          },
+          "initial_finite_other_margin": {
+            "count": 775,
+            "positive_fraction": 0.6670967741935484,
+            "quantiles": {
+              "0": -67.89933776855469,
+              "0.1": -1.8879058361053467,
+              "0.5": 0.914276123046875,
+              "0.9": 4.367931365966797,
+              "1": 197.02325439453125
+            }
+          },
+          "initial_dead_margin": {
+            "count": 167,
+            "positive_fraction": 0.844311377245509,
+            "quantiles": {
+              "0": -40.08161926269531,
+              "0.1": -1.450842261314392,
+              "0.5": 158.28485107421875,
+              "0.9": 232.51602172851562,
+              "1": 239.80599975585938
+            }
+          }
+        },
+        "predicted_progress": {
+          "counts": {
+            "executed_edges": 4521,
+            "predicted_decrease": 3312,
+            "predicted_plateau": 1,
+            "predicted_increase": 1208,
+            "true_finite_edges": 3999,
+            "true_optimal_edges": 2677,
+            "predicted_decrease_but_not_true_optimal": 1288,
+            "entered_dead_edges": 113,
+            "non_goal_predicted_zero": 0
+          },
+          "strict_descent_trajectory_count": 120,
+          "strict_descent_success_count": 120,
+          "non_descent_trajectory_count": 904,
+          "predicted_drop_quantiles": {
+            "0": -195.94921875,
+            "0.1": -0.87359619140625,
+            "0.5": 0.807708740234375,
+            "0.9": 3.317413330078125,
+            "1": 205.899658203125
+          },
+          "mean_abs_unit_descent_residual": 1.8378491257176255,
+          "executed_edge_optimal_rate": 0.5921256359212563,
+          "predicted_strict_descent_edge_rate": 0.7325812873258128,
+          "executed_edges_by_true_distance": {
+            "1_1": {
+              "executed_edges": 147,
+              "true_optimal_edges": 147,
+              "predicted_decrease": 147,
+              "entered_dead_edges": 0
+            },
+            "2_2": {
+              "executed_edges": 126,
+              "true_optimal_edges": 114,
+              "predicted_decrease": 118,
+              "entered_dead_edges": 0
+            },
+            "3_5": {
+              "executed_edges": 437,
+              "true_optimal_edges": 309,
+              "predicted_decrease": 336,
+              "entered_dead_edges": 0
+            },
+            "6_10": {
+              "executed_edges": 659,
+              "true_optimal_edges": 434,
+              "predicted_decrease": 491,
+              "entered_dead_edges": 3
+            },
+            "11_20": {
+              "executed_edges": 1042,
+              "true_optimal_edges": 677,
+              "predicted_decrease": 756,
+              "entered_dead_edges": 17
+            },
+            "21_40": {
+              "executed_edges": 954,
+              "true_optimal_edges": 572,
+              "predicted_decrease": 693,
+              "entered_dead_edges": 43
+            },
+            "41_80": {
+              "executed_edges": 676,
+              "true_optimal_edges": 387,
+              "predicted_decrease": 456,
+              "entered_dead_edges": 42
+            },
+            "81_inf": {
+              "executed_edges": 71,
+              "true_optimal_edges": 37,
+              "predicted_decrease": 47,
+              "entered_dead_edges": 8
+            },
+            "proven_unreachable": {
+              "executed_edges": 409,
+              "true_optimal_edges": 0,
+              "predicted_decrease": 268,
+              "entered_dead_edges": 0
+            }
+          },
+          "note": "Observed policy trajectories only, after action selection. A nondecreasing chosen edge also means no legal successor has a strictly lower predicted distance under this greedy policy. Strict predicted descent alone does not prove goal completion or true optimality; full rollouts remain the acceptance metric."
+        }
+      },
+      "unseen_layout_validation": {
+        "planning": {
+          "count": 1024,
+          "solved": 355,
+          "success_rate": 0.3466796875,
+          "optimal": 355,
+          "optimal_rate": 0.3466796875,
+          "cycles": 669,
+          "entered_unreachable": 85,
+          "budget_exhausted": 0
+        },
+        "two_step_cycles": 669,
+        "two_step_cycle_rate": 0.6533203125,
+        "by_initial_distance": {
+          "1_5": {
+            "count": 420,
+            "solved": 334,
+            "optimal": 334
+          },
+          "6_20": {
+            "count": 288,
+            "solved": 21,
+            "optimal": 21
+          },
+          "21_inf": {
+            "count": 316,
+            "solved": 0,
+            "optimal": 0
+          }
+        },
+        "first_events": {
+          "nonoptimal": {
+            "queries_with_event": 669,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 37,
+              "3_5": 92,
+              "6_10": 109,
+              "11_20": 131,
+              "21_40": 147,
+              "41_80": 129,
+              "81_inf": 24,
+              "proven_unreachable": 0
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 1.0,
+              "0.9": 4.0,
+              "1": 12.0
+            }
+          },
+          "dead": {
+            "queries_with_event": 85,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 0,
+              "3_5": 6,
+              "6_10": 2,
+              "11_20": 12,
+              "21_40": 19,
+              "41_80": 39,
+              "81_inf": 7,
+              "proven_unreachable": 0
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 1.0,
+              "0.9": 3.6000000000000085,
+              "1": 8.0
+            }
+          },
+          "non_descent": {
+            "queries_with_event": 726,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 49,
+              "3_5": 88,
+              "6_10": 131,
+              "11_20": 128,
+              "21_40": 144,
+              "41_80": 108,
+              "81_inf": 22,
+              "proven_unreachable": 56
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 1.0,
+              "0.9": 4.0,
+              "1": 9.0
+            }
+          }
+        },
+        "initial_margins": {
+          "initial_optimal_margin": {
+            "count": 870,
+            "positive_fraction": 0.6804597701149425,
+            "quantiles": {
+              "0": -221.81077575683594,
+              "0.1": -3.2729592323303223,
+              "0.5": 1.3717164993286133,
+              "0.9": 6.098525047302246,
+              "1": 238.84747314453125
+            }
+          },
+          "initial_finite_other_margin": {
+            "count": 828,
+            "positive_fraction": 0.6896135265700483,
+            "quantiles": {
+              "0": -221.81077575683594,
+              "0.1": -2.876612424850464,
+              "0.5": 1.4214401245117188,
+              "0.9": 5.197494983673096,
+              "1": 222.91111755371094
+            }
+          },
+          "initial_dead_margin": {
+            "count": 172,
+            "positive_fraction": 0.813953488372093,
+            "quantiles": {
+              "0": -191.4230194091797,
+              "0.1": -2.9581174850463867,
+              "0.5": 12.4354248046875,
+              "0.9": 233.9036102294922,
+              "1": 242.492919921875
+            }
+          }
+        },
+        "predicted_progress": {
+          "counts": {
+            "executed_edges": 3660,
+            "predicted_decrease": 2668,
+            "predicted_plateau": 81,
+            "predicted_increase": 911,
+            "true_finite_edges": 3291,
+            "true_optimal_edges": 2283,
+            "predicted_decrease_but_not_true_optimal": 914,
+            "entered_dead_edges": 85,
+            "non_goal_predicted_zero": 0
+          },
+          "strict_descent_trajectory_count": 298,
+          "strict_descent_success_count": 298,
+          "non_descent_trajectory_count": 726,
+          "predicted_drop_quantiles": {
+            "0": -195.3033905029297,
+            "0.1": -0.9409770965576172,
+            "0.5": 0.9353585243225098,
+            "0.9": 4.4220123291015625,
+            "1": 229.07321166992188
+          },
+          "mean_abs_unit_descent_residual": 5.212943191736774,
+          "executed_edge_optimal_rate": 0.6237704918032787,
+          "predicted_strict_descent_edge_rate": 0.7289617486338797,
+          "executed_edges_by_true_distance": {
+            "1_1": {
+              "executed_edges": 355,
+              "true_optimal_edges": 355,
+              "predicted_decrease": 355,
+              "entered_dead_edges": 0
+            },
+            "2_2": {
+              "executed_edges": 261,
+              "true_optimal_edges": 221,
+              "predicted_decrease": 209,
+              "entered_dead_edges": 0
+            },
+            "3_5": {
+              "executed_edges": 487,
+              "true_optimal_edges": 354,
+              "predicted_decrease": 374,
+              "entered_dead_edges": 6
+            },
+            "6_10": {
+              "executed_edges": 578,
+              "true_optimal_edges": 392,
+              "predicted_decrease": 419,
+              "entered_dead_edges": 2
+            },
+            "11_20": {
+              "executed_edges": 566,
+              "true_optimal_edges": 343,
+              "predicted_decrease": 394,
+              "entered_dead_edges": 12
+            },
+            "21_40": {
+              "executed_edges": 584,
+              "true_optimal_edges": 326,
+              "predicted_decrease": 387,
+              "entered_dead_edges": 19
+            },
+            "41_80": {
+              "executed_edges": 460,
+              "true_optimal_edges": 245,
+              "predicted_decrease": 302,
+              "entered_dead_edges": 39
+            },
+            "81_inf": {
+              "executed_edges": 85,
+              "true_optimal_edges": 47,
+              "predicted_decrease": 59,
+              "entered_dead_edges": 7
+            },
+            "proven_unreachable": {
+              "executed_edges": 284,
+              "true_optimal_edges": 0,
+              "predicted_decrease": 169,
+              "entered_dead_edges": 0
+            }
+          },
+          "note": "Observed policy trajectories only, after action selection. A nondecreasing chosen edge also means no legal successor has a strictly lower predicted distance under this greedy policy. Strict predicted descent alone does not prove goal completion or true optimality; full rollouts remain the acceptance metric."
+        }
+      },
+      "original_layout_validation": {
+        "planning": {
+          "count": 1024,
+          "solved": 0,
+          "success_rate": 0.0,
+          "optimal": 0,
+          "optimal_rate": 0.0,
+          "cycles": 1024,
+          "entered_unreachable": 338,
+          "budget_exhausted": 0
+        },
+        "two_step_cycles": 1024,
+        "two_step_cycle_rate": 1.0,
+        "by_initial_distance": {
+          "1_5": {
+            "count": 0,
+            "solved": 0,
+            "optimal": 0
+          },
+          "6_20": {
+            "count": 0,
+            "solved": 0,
+            "optimal": 0
+          },
+          "21_inf": {
+            "count": 1024,
+            "solved": 0,
+            "optimal": 0
+          }
+        },
+        "first_events": {
+          "nonoptimal": {
+            "queries_with_event": 1024,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 0,
+              "3_5": 0,
+              "6_10": 0,
+              "11_20": 6,
+              "21_40": 262,
+              "41_80": 727,
+              "81_inf": 29,
+              "proven_unreachable": 0
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 1.0,
+              "0.9": 3.0,
+              "1": 7.0
+            }
+          },
+          "dead": {
+            "queries_with_event": 338,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 0,
+              "3_5": 0,
+              "6_10": 0,
+              "11_20": 0,
+              "21_40": 129,
+              "41_80": 209,
+              "81_inf": 0,
+              "proven_unreachable": 0
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 2.0,
+              "0.9": 5.0,
+              "1": 14.0
+            }
+          },
+          "non_descent": {
+            "queries_with_event": 1024,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 0,
+              "3_5": 0,
+              "6_10": 0,
+              "11_20": 0,
+              "21_40": 162,
+              "41_80": 605,
+              "81_inf": 37,
+              "proven_unreachable": 220
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 1.0,
+              "0.9": 4.0,
+              "1": 9.0
+            }
+          }
+        },
+        "initial_margins": {
+          "initial_optimal_margin": {
+            "count": 553,
+            "positive_fraction": 0.5913200723327305,
+            "quantiles": {
+              "0": -181.8652801513672,
+              "0.1": -4.207122802734375,
+              "0.5": 0.602752685546875,
+              "0.9": 160.36106872558594,
+              "1": 222.1359405517578
+            }
+          },
+          "initial_finite_other_margin": {
+            "count": 423,
+            "positive_fraction": 0.5650118203309693,
+            "quantiles": {
+              "0": -141.2515411376953,
+              "0.1": -1.5100889205932617,
+              "0.5": 0.0727386474609375,
+              "0.9": 142.7436981201172,
+              "1": 210.52154541015625
+            }
+          },
+          "initial_dead_margin": {
+            "count": 184,
+            "positive_fraction": 0.7717391304347826,
+            "quantiles": {
+              "0": -181.8652801513672,
+              "0.1": -6.8477020263671875,
+              "0.5": 7.6382598876953125,
+              "0.9": 200.05165100097656,
+              "1": 222.1359405517578
+            }
+          }
+        },
+        "predicted_progress": {
+          "counts": {
+            "executed_edges": 5117,
+            "predicted_decrease": 3544,
+            "predicted_plateau": 61,
+            "predicted_increase": 1512,
+            "true_finite_edges": 3518,
+            "true_optimal_edges": 2198,
+            "predicted_decrease_but_not_true_optimal": 2063,
+            "entered_dead_edges": 338,
+            "non_goal_predicted_zero": 0
+          },
+          "strict_descent_trajectory_count": 0,
+          "strict_descent_success_count": 0,
+          "non_descent_trajectory_count": 1024,
+          "predicted_drop_quantiles": {
+            "0": -193.24276733398438,
+            "0.1": -1.065582275390625,
+            "0.5": 0.58721923828125,
+            "0.9": 14.38829956054689,
+            "1": 222.72811889648438
+          },
+          "mean_abs_unit_descent_residual": 13.969532226150987,
+          "executed_edge_optimal_rate": 0.42954856361149113,
+          "predicted_strict_descent_edge_rate": 0.6925933163963259,
+          "executed_edges_by_true_distance": {
+            "1_1": {
+              "executed_edges": 0,
+              "true_optimal_edges": 0,
+              "predicted_decrease": 0,
+              "entered_dead_edges": 0
+            },
+            "2_2": {
+              "executed_edges": 0,
+              "true_optimal_edges": 0,
+              "predicted_decrease": 0,
+              "entered_dead_edges": 0
+            },
+            "3_5": {
+              "executed_edges": 0,
+              "true_optimal_edges": 0,
+              "predicted_decrease": 0,
+              "entered_dead_edges": 0
+            },
+            "6_10": {
+              "executed_edges": 0,
+              "true_optimal_edges": 0,
+              "predicted_decrease": 0,
+              "entered_dead_edges": 0
+            },
+            "11_20": {
+              "executed_edges": 22,
+              "true_optimal_edges": 12,
+              "predicted_decrease": 17,
+              "entered_dead_edges": 0
+            },
+            "21_40": {
+              "executed_edges": 929,
+              "true_optimal_edges": 492,
+              "predicted_decrease": 719,
+              "entered_dead_edges": 129
+            },
+            "41_80": {
+              "executed_edges": 2778,
+              "true_optimal_edges": 1612,
+              "predicted_decrease": 1931,
+              "entered_dead_edges": 209
+            },
+            "81_inf": {
+              "executed_edges": 127,
+              "true_optimal_edges": 82,
+              "predicted_decrease": 77,
+              "entered_dead_edges": 0
+            },
+            "proven_unreachable": {
+              "executed_edges": 1261,
+              "true_optimal_edges": 0,
+              "predicted_decrease": 800,
+              "entered_dead_edges": 0
+            }
+          },
+          "note": "Observed policy trajectories only, after action selection. A nondecreasing chosen edge also means no legal successor has a strictly lower predicted distance under this greedy policy. Strict predicted descent alone does not prove goal completion or true optimality; full rollouts remain the acceptance metric."
+        }
+      }
+    },
+    "joint": {
+      "validation": {
+        "planning": {
+          "count": 1024,
+          "solved": 236,
+          "success_rate": 0.23046875,
+          "optimal": 234,
+          "optimal_rate": 0.228515625,
+          "cycles": 788,
+          "entered_unreachable": 117,
+          "budget_exhausted": 0
+        },
+        "two_step_cycles": 788,
+        "two_step_cycle_rate": 0.76953125,
+        "by_initial_distance": {
+          "1_5": {
+            "count": 294,
+            "solved": 217,
+            "optimal": 215
+          },
+          "6_20": {
+            "count": 354,
+            "solved": 19,
+            "optimal": 19
+          },
+          "21_inf": {
+            "count": 376,
+            "solved": 0,
+            "optimal": 0
+          }
+        },
+        "first_events": {
+          "nonoptimal": {
+            "queries_with_event": 790,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 26,
+              "3_5": 115,
+              "6_10": 129,
+              "11_20": 163,
+              "21_40": 181,
+              "41_80": 152,
+              "81_inf": 24,
+              "proven_unreachable": 0
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 1.0,
+              "0.9": 5.0,
+              "1": 16.0
+            }
+          },
+          "dead": {
+            "queries_with_event": 117,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 0,
+              "3_5": 2,
+              "6_10": 4,
+              "11_20": 22,
+              "21_40": 38,
+              "41_80": 43,
+              "81_inf": 8,
+              "proven_unreachable": 0
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 2.0,
+              "0.9": 4.400000000000006,
+              "1": 8.0
+            }
+          },
+          "non_descent": {
+            "queries_with_event": 825,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 20,
+              "3_5": 96,
+              "6_10": 148,
+              "11_20": 164,
+              "21_40": 168,
+              "41_80": 142,
+              "81_inf": 19,
+              "proven_unreachable": 68
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 1.0,
+              "0.9": 5.0,
+              "1": 13.0
+            }
+          }
+        },
+        "initial_margins": {
+          "initial_optimal_margin": {
+            "count": 872,
+            "positive_fraction": 0.6915137614678899,
+            "quantiles": {
+              "0": -64.49177551269531,
+              "0.1": -1.9903427362442017,
+              "0.5": 1.0733261108398438,
+              "0.9": 4.117125034332275,
+              "1": 239.41934204101562
+            }
+          },
+          "initial_finite_other_margin": {
+            "count": 819,
+            "positive_fraction": 0.6923076923076923,
+            "quantiles": {
+              "0": -64.49177551269531,
+              "0.1": -1.9639008045196533,
+              "0.5": 1.0532379150390625,
+              "0.9": 3.7747251987457275,
+              "1": 58.0113525390625
+            }
+          },
+          "initial_dead_margin": {
+            "count": 175,
+            "positive_fraction": 0.8628571428571429,
+            "quantiles": {
+              "0": -13.642501831054688,
+              "0.1": -0.7512909173965454,
+              "0.5": 7.646820068359375,
+              "0.9": 232.64239501953125,
+              "1": 240.24481201171875
+            }
+          }
+        },
+        "predicted_progress": {
+          "counts": {
+            "executed_edges": 4535,
+            "predicted_decrease": 3385,
+            "predicted_plateau": 0,
+            "predicted_increase": 1150,
+            "true_finite_edges": 3933,
+            "true_optimal_edges": 2623,
+            "predicted_decrease_but_not_true_optimal": 1360,
+            "entered_dead_edges": 117,
+            "non_goal_predicted_zero": 0
+          },
+          "strict_descent_trajectory_count": 199,
+          "strict_descent_success_count": 199,
+          "non_descent_trajectory_count": 825,
+          "predicted_drop_quantiles": {
+            "0": -6.6313018798828125,
+            "0.1": -0.7598045349121094,
+            "0.5": 0.8540496826171875,
+            "0.9": 2.9691955566406247,
+            "1": 129.24363708496094
+          },
+          "mean_abs_unit_descent_residual": 1.3313392914116975,
+          "executed_edge_optimal_rate": 0.5783902976846748,
+          "predicted_strict_descent_edge_rate": 0.7464167585446527,
+          "executed_edges_by_true_distance": {
+            "1_1": {
+              "executed_edges": 236,
+              "true_optimal_edges": 236,
+              "predicted_decrease": 236,
+              "entered_dead_edges": 0
+            },
+            "2_2": {
+              "executed_edges": 190,
+              "true_optimal_edges": 164,
+              "predicted_decrease": 167,
+              "entered_dead_edges": 0
+            },
+            "3_5": {
+              "executed_edges": 505,
+              "true_optimal_edges": 351,
+              "predicted_decrease": 389,
+              "entered_dead_edges": 2
+            },
+            "6_10": {
+              "executed_edges": 761,
+              "true_optimal_edges": 498,
+              "predicted_decrease": 558,
+              "entered_dead_edges": 4
+            },
+            "11_20": {
+              "executed_edges": 890,
+              "true_optimal_edges": 544,
+              "predicted_decrease": 662,
+              "entered_dead_edges": 22
+            },
+            "21_40": {
+              "executed_edges": 747,
+              "true_optimal_edges": 420,
+              "predicted_decrease": 524,
+              "entered_dead_edges": 38
+            },
+            "41_80": {
+              "executed_edges": 654,
+              "true_optimal_edges": 378,
+              "predicted_decrease": 464,
+              "entered_dead_edges": 43
+            },
+            "81_inf": {
+              "executed_edges": 67,
+              "true_optimal_edges": 32,
+              "predicted_decrease": 48,
+              "entered_dead_edges": 8
+            },
+            "proven_unreachable": {
+              "executed_edges": 485,
+              "true_optimal_edges": 0,
+              "predicted_decrease": 337,
+              "entered_dead_edges": 0
+            }
+          },
+          "note": "Observed policy trajectories only, after action selection. A nondecreasing chosen edge also means no legal successor has a strictly lower predicted distance under this greedy policy. Strict predicted descent alone does not prove goal completion or true optimality; full rollouts remain the acceptance metric."
+        }
+      },
+      "unseen_goal_validation": {
+        "planning": {
+          "count": 1024,
+          "solved": 145,
+          "success_rate": 0.1416015625,
+          "optimal": 145,
+          "optimal_rate": 0.1416015625,
+          "cycles": 879,
+          "entered_unreachable": 136,
+          "budget_exhausted": 0
+        },
+        "two_step_cycles": 879,
+        "two_step_cycle_rate": 0.8583984375,
+        "by_initial_distance": {
+          "1_5": {
+            "count": 179,
+            "solved": 120,
+            "optimal": 120
+          },
+          "6_20": {
+            "count": 388,
+            "solved": 25,
+            "optimal": 25
+          },
+          "21_inf": {
+            "count": 457,
+            "solved": 0,
+            "optimal": 0
+          }
+        },
+        "first_events": {
+          "nonoptimal": {
+            "queries_with_event": 879,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 18,
+              "3_5": 82,
+              "6_10": 143,
+              "11_20": 202,
+              "21_40": 227,
+              "41_80": 184,
+              "81_inf": 23,
+              "proven_unreachable": 0
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 1.0,
+              "0.9": 4.0,
+              "1": 13.0
+            }
+          },
+          "dead": {
+            "queries_with_event": 136,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 0,
+              "3_5": 0,
+              "6_10": 8,
+              "11_20": 18,
+              "21_40": 43,
+              "41_80": 59,
+              "81_inf": 8,
+              "proven_unreachable": 0
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 2.0,
+              "0.9": 5.0,
+              "1": 12.0
+            }
+          },
+          "non_descent": {
+            "queries_with_event": 908,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 9,
+              "3_5": 86,
+              "6_10": 135,
+              "11_20": 209,
+              "21_40": 200,
+              "41_80": 169,
+              "81_inf": 19,
+              "proven_unreachable": 81
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 2.0,
+              "0.9": 5.0,
+              "1": 13.0
+            }
+          }
+        },
+        "initial_margins": {
+          "initial_optimal_margin": {
+            "count": 836,
+            "positive_fraction": 0.6614832535885168,
+            "quantiles": {
+              "0": -19.36126708984375,
+              "0.1": -2.4491424560546875,
+              "0.5": 0.9228897094726562,
+              "0.9": 4.723746299743652,
+              "1": 238.3125762939453
+            }
+          },
+          "initial_finite_other_margin": {
+            "count": 775,
+            "positive_fraction": 0.6632258064516129,
+            "quantiles": {
+              "0": -12.48834228515625,
+              "0.1": -2.1966865062713623,
+              "0.5": 0.85797119140625,
+              "0.9": 4.257214069366455,
+              "1": 90.85945129394531
+            }
+          },
+          "initial_dead_margin": {
+            "count": 167,
+            "positive_fraction": 0.8203592814371258,
+            "quantiles": {
+              "0": -19.36126708984375,
+              "0.1": -3.0794525146484375,
+              "0.5": 7.259368896484375,
+              "0.9": 228.90170288085938,
+              "1": 240.25071716308594
+            }
+          }
+        },
+        "predicted_progress": {
+          "counts": {
+            "executed_edges": 4842,
+            "predicted_decrease": 3560,
+            "predicted_plateau": 0,
+            "predicted_increase": 1282,
+            "true_finite_edges": 4114,
+            "true_optimal_edges": 2729,
+            "predicted_decrease_but_not_true_optimal": 1509,
+            "entered_dead_edges": 136,
+            "non_goal_predicted_zero": 0
+          },
+          "strict_descent_trajectory_count": 116,
+          "strict_descent_success_count": 116,
+          "non_descent_trajectory_count": 908,
+          "predicted_drop_quantiles": {
+            "0": -38.863182067871094,
+            "0.1": -0.8581130981445312,
+            "0.5": 0.8479561805725098,
+            "0.9": 3.0928695678710945,
+            "1": 112.51673889160156
+          },
+          "mean_abs_unit_descent_residual": 1.4433520809277578,
+          "executed_edge_optimal_rate": 0.5636100784799669,
+          "predicted_strict_descent_edge_rate": 0.7352333746385791,
+          "executed_edges_by_true_distance": {
+            "1_1": {
+              "executed_edges": 145,
+              "true_optimal_edges": 145,
+              "predicted_decrease": 145,
+              "entered_dead_edges": 0
+            },
+            "2_2": {
+              "executed_edges": 132,
+              "true_optimal_edges": 112,
+              "predicted_decrease": 121,
+              "entered_dead_edges": 0
+            },
+            "3_5": {
+              "executed_edges": 430,
+              "true_optimal_edges": 325,
+              "predicted_decrease": 326,
+              "entered_dead_edges": 0
+            },
+            "6_10": {
+              "executed_edges": 732,
+              "true_optimal_edges": 475,
+              "predicted_decrease": 564,
+              "entered_dead_edges": 8
+            },
+            "11_20": {
+              "executed_edges": 1072,
+              "true_optimal_edges": 667,
+              "predicted_decrease": 793,
+              "entered_dead_edges": 18
+            },
+            "21_40": {
+              "executed_edges": 950,
+              "true_optimal_edges": 552,
+              "predicted_decrease": 672,
+              "entered_dead_edges": 43
+            },
+            "41_80": {
+              "executed_edges": 723,
+              "true_optimal_edges": 418,
+              "predicted_decrease": 490,
+              "entered_dead_edges": 59
+            },
+            "81_inf": {
+              "executed_edges": 66,
+              "true_optimal_edges": 35,
+              "predicted_decrease": 43,
+              "entered_dead_edges": 8
+            },
+            "proven_unreachable": {
+              "executed_edges": 592,
+              "true_optimal_edges": 0,
+              "predicted_decrease": 406,
+              "entered_dead_edges": 0
+            }
+          },
+          "note": "Observed policy trajectories only, after action selection. A nondecreasing chosen edge also means no legal successor has a strictly lower predicted distance under this greedy policy. Strict predicted descent alone does not prove goal completion or true optimality; full rollouts remain the acceptance metric."
+        }
+      },
+      "unseen_layout_validation": {
+        "planning": {
+          "count": 1024,
+          "solved": 368,
+          "success_rate": 0.359375,
+          "optimal": 365,
+          "optimal_rate": 0.3564453125,
+          "cycles": 656,
+          "entered_unreachable": 88,
+          "budget_exhausted": 0
+        },
+        "two_step_cycles": 656,
+        "two_step_cycle_rate": 0.640625,
+        "by_initial_distance": {
+          "1_5": {
+            "count": 420,
+            "solved": 347,
+            "optimal": 345
+          },
+          "6_20": {
+            "count": 288,
+            "solved": 21,
+            "optimal": 20
+          },
+          "21_inf": {
+            "count": 316,
+            "solved": 0,
+            "optimal": 0
+          }
+        },
+        "first_events": {
+          "nonoptimal": {
+            "queries_with_event": 659,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 33,
+              "3_5": 81,
+              "6_10": 115,
+              "11_20": 130,
+              "21_40": 147,
+              "41_80": 129,
+              "81_inf": 24,
+              "proven_unreachable": 0
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 1.0,
+              "0.9": 4.0,
+              "1": 17.0
+            }
+          },
+          "dead": {
+            "queries_with_event": 88,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 1,
+              "3_5": 3,
+              "6_10": 7,
+              "11_20": 13,
+              "21_40": 23,
+              "41_80": 37,
+              "81_inf": 4,
+              "proven_unreachable": 0
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 1.0,
+              "0.9": 4.299999999999997,
+              "1": 16.0
+            }
+          },
+          "non_descent": {
+            "queries_with_event": 710,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 38,
+              "3_5": 91,
+              "6_10": 119,
+              "11_20": 138,
+              "21_40": 137,
+              "41_80": 107,
+              "81_inf": 25,
+              "proven_unreachable": 55
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 1.0,
+              "0.9": 4.0,
+              "1": 11.0
+            }
+          }
+        },
+        "initial_margins": {
+          "initial_optimal_margin": {
+            "count": 870,
+            "positive_fraction": 0.7,
+            "quantiles": {
+              "0": -196.8158721923828,
+              "0.1": -2.254163980484009,
+              "0.5": 1.2907943725585938,
+              "0.9": 4.1533613204956055,
+              "1": 237.9800567626953
+            }
+          },
+          "initial_finite_other_margin": {
+            "count": 828,
+            "positive_fraction": 0.7053140096618358,
+            "quantiles": {
+              "0": -196.8158721923828,
+              "0.1": -2.046656608581543,
+              "0.5": 1.322385311126709,
+              "0.9": 3.6721584796905518,
+              "1": 108.62625122070312
+            }
+          },
+          "initial_dead_margin": {
+            "count": 172,
+            "positive_fraction": 0.8604651162790697,
+            "quantiles": {
+              "0": -192.16871643066406,
+              "0.1": -2.0983030796051025,
+              "0.5": 6.959908485412598,
+              "0.9": 235.98580932617188,
+              "1": 240.7499542236328
+            }
+          }
+        },
+        "predicted_progress": {
+          "counts": {
+            "executed_edges": 3783,
+            "predicted_decrease": 2836,
+            "predicted_plateau": 27,
+            "predicted_increase": 920,
+            "true_finite_edges": 3389,
+            "true_optimal_edges": 2339,
+            "predicted_decrease_but_not_true_optimal": 1019,
+            "entered_dead_edges": 88,
+            "non_goal_predicted_zero": 0
+          },
+          "strict_descent_trajectory_count": 314,
+          "strict_descent_success_count": 314,
+          "non_descent_trajectory_count": 710,
+          "predicted_drop_quantiles": {
+            "0": -197.4405975341797,
+            "0.1": -0.7531860351562499,
+            "0.5": 0.9055328369140625,
+            "0.9": 3.3109252929687507,
+            "1": 218.73419189453125
+          },
+          "mean_abs_unit_descent_residual": 3.4532923973208534,
+          "executed_edge_optimal_rate": 0.6182923605604018,
+          "predicted_strict_descent_edge_rate": 0.7496695744118425,
+          "executed_edges_by_true_distance": {
+            "1_1": {
+              "executed_edges": 368,
+              "true_optimal_edges": 368,
+              "predicted_decrease": 368,
+              "entered_dead_edges": 0
+            },
+            "2_2": {
+              "executed_edges": 267,
+              "true_optimal_edges": 234,
+              "predicted_decrease": 222,
+              "entered_dead_edges": 1
+            },
+            "3_5": {
+              "executed_edges": 476,
+              "true_optimal_edges": 357,
+              "predicted_decrease": 365,
+              "entered_dead_edges": 3
+            },
+            "6_10": {
+              "executed_edges": 538,
+              "true_optimal_edges": 343,
+              "predicted_decrease": 399,
+              "entered_dead_edges": 7
+            },
+            "11_20": {
+              "executed_edges": 603,
+              "true_optimal_edges": 355,
+              "predicted_decrease": 425,
+              "entered_dead_edges": 13
+            },
+            "21_40": {
+              "executed_edges": 665,
+              "true_optimal_edges": 383,
+              "predicted_decrease": 480,
+              "entered_dead_edges": 23
+            },
+            "41_80": {
+              "executed_edges": 474,
+              "true_optimal_edges": 253,
+              "predicted_decrease": 319,
+              "entered_dead_edges": 37
+            },
+            "81_inf": {
+              "executed_edges": 86,
+              "true_optimal_edges": 46,
+              "predicted_decrease": 53,
+              "entered_dead_edges": 4
+            },
+            "proven_unreachable": {
+              "executed_edges": 306,
+              "true_optimal_edges": 0,
+              "predicted_decrease": 205,
+              "entered_dead_edges": 0
+            }
+          },
+          "note": "Observed policy trajectories only, after action selection. A nondecreasing chosen edge also means no legal successor has a strictly lower predicted distance under this greedy policy. Strict predicted descent alone does not prove goal completion or true optimality; full rollouts remain the acceptance metric."
+        }
+      },
+      "original_layout_validation": {
+        "planning": {
+          "count": 1024,
+          "solved": 0,
+          "success_rate": 0.0,
+          "optimal": 0,
+          "optimal_rate": 0.0,
+          "cycles": 1024,
+          "entered_unreachable": 379,
+          "budget_exhausted": 0
+        },
+        "two_step_cycles": 1024,
+        "two_step_cycle_rate": 1.0,
+        "by_initial_distance": {
+          "1_5": {
+            "count": 0,
+            "solved": 0,
+            "optimal": 0
+          },
+          "6_20": {
+            "count": 0,
+            "solved": 0,
+            "optimal": 0
+          },
+          "21_inf": {
+            "count": 1024,
+            "solved": 0,
+            "optimal": 0
+          }
+        },
+        "first_events": {
+          "nonoptimal": {
+            "queries_with_event": 1024,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 0,
+              "3_5": 0,
+              "6_10": 0,
+              "11_20": 6,
+              "21_40": 271,
+              "41_80": 721,
+              "81_inf": 26,
+              "proven_unreachable": 0
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 1.0,
+              "0.9": 3.0,
+              "1": 6.0
+            }
+          },
+          "dead": {
+            "queries_with_event": 379,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 0,
+              "3_5": 0,
+              "6_10": 0,
+              "11_20": 0,
+              "21_40": 111,
+              "41_80": 265,
+              "81_inf": 3,
+              "proven_unreachable": 0
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 1.0,
+              "0.9": 3.0,
+              "1": 9.0
+            }
+          },
+          "non_descent": {
+            "queries_with_event": 1024,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 0,
+              "3_5": 0,
+              "6_10": 0,
+              "11_20": 5,
+              "21_40": 162,
+              "41_80": 600,
+              "81_inf": 34,
+              "proven_unreachable": 223
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 2.0,
+              "0.9": 5.0,
+              "1": 12.0
+            }
+          }
+        },
+        "initial_margins": {
+          "initial_optimal_margin": {
+            "count": 553,
+            "positive_fraction": 0.5714285714285714,
+            "quantiles": {
+              "0": -39.036865234375,
+              "0.1": -6.8402557373046875,
+              "0.5": 0.57525634765625,
+              "0.9": 53.49501037597656,
+              "1": 198.06997680664062
+            }
+          },
+          "initial_finite_other_margin": {
+            "count": 423,
+            "positive_fraction": 0.5721040189125296,
+            "quantiles": {
+              "0": -39.036865234375,
+              "0.1": -4.2562103271484375,
+              "0.5": 0.57525634765625,
+              "0.9": 46.03245544433594,
+              "1": 180.7814178466797
+            }
+          },
+          "initial_dead_margin": {
+            "count": 184,
+            "positive_fraction": 0.6902173913043478,
+            "quantiles": {
+              "0": -20.864715576171875,
+              "0.1": -7.7299957275390625,
+              "0.5": 2.6870269775390625,
+              "0.9": 132.95672607421875,
+              "1": 198.06997680664062
+            }
+          }
+        },
+        "predicted_progress": {
+          "counts": {
+            "executed_edges": 5181,
+            "predicted_decrease": 3648,
+            "predicted_plateau": 55,
+            "predicted_increase": 1478,
+            "true_finite_edges": 3221,
+            "true_optimal_edges": 2125,
+            "predicted_decrease_but_not_true_optimal": 2121,
+            "entered_dead_edges": 379,
+            "non_goal_predicted_zero": 0
+          },
+          "strict_descent_trajectory_count": 0,
+          "strict_descent_success_count": 0,
+          "non_descent_trajectory_count": 1024,
+          "predicted_drop_quantiles": {
+            "0": -197.3759765625,
+            "0.1": -1.13616943359375,
+            "0.5": 0.759765625,
+            "0.9": 9.515121459960938,
+            "1": 208.498779296875
+          },
+          "mean_abs_unit_descent_residual": 10.925567090752915,
+          "executed_edge_optimal_rate": 0.4101524802161745,
+          "predicted_strict_descent_edge_rate": 0.704111175448755,
+          "executed_edges_by_true_distance": {
+            "1_1": {
+              "executed_edges": 0,
+              "true_optimal_edges": 0,
+              "predicted_decrease": 0,
+              "entered_dead_edges": 0
+            },
+            "2_2": {
+              "executed_edges": 0,
+              "true_optimal_edges": 0,
+              "predicted_decrease": 0,
+              "entered_dead_edges": 0
+            },
+            "3_5": {
+              "executed_edges": 0,
+              "true_optimal_edges": 0,
+              "predicted_decrease": 0,
+              "entered_dead_edges": 0
+            },
+            "6_10": {
+              "executed_edges": 0,
+              "true_optimal_edges": 0,
+              "predicted_decrease": 0,
+              "entered_dead_edges": 0
+            },
+            "11_20": {
+              "executed_edges": 21,
+              "true_optimal_edges": 14,
+              "predicted_decrease": 16,
+              "entered_dead_edges": 0
+            },
+            "21_40": {
+              "executed_edges": 840,
+              "true_optimal_edges": 490,
+              "predicted_decrease": 637,
+              "entered_dead_edges": 111
+            },
+            "41_80": {
+              "executed_edges": 2625,
+              "true_optimal_edges": 1541,
+              "predicted_decrease": 1837,
+              "entered_dead_edges": 265
+            },
+            "81_inf": {
+              "executed_edges": 114,
+              "true_optimal_edges": 80,
+              "predicted_decrease": 70,
+              "entered_dead_edges": 3
+            },
+            "proven_unreachable": {
+              "executed_edges": 1581,
+              "true_optimal_edges": 0,
+              "predicted_decrease": 1088,
+              "entered_dead_edges": 0
+            }
+          },
+          "note": "Observed policy trajectories only, after action selection. A nondecreasing chosen edge also means no legal successor has a strictly lower predicted distance under this greedy policy. Strict predicted descent alone does not prove goal completion or true optimality; full rollouts remain the acceptance metric."
+        }
+      }
+    }
+  },
+  "step_index_meaning": "Saved step index0 is the first action; a saved median1 means the second action.",
+  "interpretation": "Three fixed30k phases, one shared initial checkpoint, identical validation queries/horizon/candidate order/greedy rule and predeclared checkpoint selection. Control versus shuffled tests the full local-path data recipe; shuffled versus joint holds relation multisets per250 batches fixed and tests same-batch co-occurrence under the unchanged separable losses. No Bellman loss. First nonoptimal can be a recoverable detour; first dead entry is separate. Compare initial margins on identical states. Bootstrap intervals are conditional on one training seed.",
+  "optimization_diagnostics": {
+    "training_loss_logging": "Each progress loss is a single current batch, not a moving average or fixed training probe. Convergence is unestablished.",
+    "learning_rate": 0.001,
+    "learning_rate_schedule": "constant; no decay phase tested",
+    "limitations": [
+      "No fixed seen-training-relation probe across saved checkpoints yet.",
+      "Large absolute error alone does not identify insufficient updates, optimization instability, generalization failure or representation limits.",
+      "Last checkpoints have not received matched complete greedy validation; selected checkpoint results cannot establish the rollout trend."
+    ],
+    "progress": {
+      "control": [
+        {
+          "step": 1,
+          "seconds": 1374.543,
+          "distance_loss": 9.443281173706055,
+          "rank_loss": 0.9384611248970032,
+          "validation_score": 31.746591925621033,
+          "best_step": 1,
+          "full_source_coverage": false,
+          "source_rows_seen": 1647,
+          "source_rows_total": 8192000,
+          "validation": {
+            "validation": {
+              "mae": 8.191033363342285,
+              "shortest_action_rate": 0.67138671875
+            },
+            "unseen_goal_validation": {
+              "mae": 7.946599960327148,
+              "shortest_action_rate": 0.68310546875
+            },
+            "unseen_layout_validation": {
+              "mae": 36.40596008300781,
+              "shortest_action_rate": 0.64697265625
+            },
+            "original_layout_validation": {
+              "mae": 64.75132751464844,
+              "shortest_action_rate": 0.8124324324324325
+            }
+          }
+        },
+        {
+          "step": 5000,
+          "seconds": 1525.231,
+          "distance_loss": 8.111035346984863,
+          "rank_loss": 0.9667187929153442,
+          "validation_score": 29.83390212059021,
+          "best_step": 5000,
+          "full_source_coverage": false,
+          "source_rows_seen": 3803386,
+          "source_rows_total": 8192000,
+          "validation": {
+            "validation": {
+              "mae": 6.843143939971924,
+              "shortest_action_rate": 0.68212890625
+            },
+            "unseen_goal_validation": {
+              "mae": 6.65315580368042,
+              "shortest_action_rate": 0.6806640625
+            },
+            "unseen_layout_validation": {
+              "mae": 33.17903518676758,
+              "shortest_action_rate": 0.64404296875
+            },
+            "original_layout_validation": {
+              "mae": 65.10713195800781,
+              "shortest_action_rate": 0.7902702702702703
+            }
+          }
+        },
+        {
+          "step": 10000,
+          "seconds": 1673.39,
+          "distance_loss": 11.317378997802734,
+          "rank_loss": 1.1126487255096436,
+          "validation_score": 30.66349095106125,
+          "best_step": 5000,
+          "full_source_coverage": false,
+          "source_rows_seen": 6001212,
+          "source_rows_total": 8192000,
+          "validation": {
+            "validation": {
+              "mae": 6.63687801361084,
+              "shortest_action_rate": 0.68310546875
+            },
+            "unseen_goal_validation": {
+              "mae": 6.433590888977051,
+              "shortest_action_rate": 0.66943359375
+            },
+            "unseen_layout_validation": {
+              "mae": 35.38666915893555,
+              "shortest_action_rate": 0.65771484375
+            },
+            "original_layout_validation": {
+              "mae": 65.01881408691406,
+              "shortest_action_rate": 0.7464864864864865
+            }
+          }
+        },
+        {
+          "step": 15000,
+          "seconds": 1819.306,
+          "distance_loss": 9.001136779785156,
+          "rank_loss": 1.4358601570129395,
+          "validation_score": 28.0660138130188,
+          "best_step": 15000,
+          "full_source_coverage": false,
+          "source_rows_seen": 7816348,
+          "source_rows_total": 8192000,
+          "validation": {
+            "validation": {
+              "mae": 6.859112739562988,
+              "shortest_action_rate": 0.6708984375
+            },
+            "unseen_goal_validation": {
+              "mae": 6.617605209350586,
+              "shortest_action_rate": 0.68603515625
+            },
+            "unseen_layout_validation": {
+              "mae": 33.527587890625,
+              "shortest_action_rate": 0.65478515625
+            },
+            "original_layout_validation": {
+              "mae": 56.20293045043945,
+              "shortest_action_rate": 0.7367567567567568
+            }
+          }
+        },
+        {
+          "step": 20000,
+          "seconds": 1969.579,
+          "distance_loss": 7.8364386558532715,
+          "rank_loss": 1.1916210651397705,
+          "validation_score": 30.452738523483276,
+          "best_step": 20000,
+          "full_source_coverage": true,
+          "source_rows_seen": 8192000,
+          "source_rows_total": 8192000,
+          "validation": {
+            "validation": {
+              "mae": 6.748427391052246,
+              "shortest_action_rate": 0.66650390625
+            },
+            "unseen_goal_validation": {
+              "mae": 6.461148262023926,
+              "shortest_action_rate": 0.6806640625
+            },
+            "unseen_layout_validation": {
+              "mae": 38.01087951660156,
+              "shortest_action_rate": 0.65625
+            },
+            "original_layout_validation": {
+              "mae": 62.13444519042969,
+              "shortest_action_rate": 0.7837837837837838
+            }
+          }
+        },
+        {
+          "step": 25000,
+          "seconds": 2118.634,
+          "distance_loss": 8.552511215209961,
+          "rank_loss": 0.9494881629943848,
+          "validation_score": 31.712016254663467,
+          "best_step": 20000,
+          "full_source_coverage": true,
+          "source_rows_seen": 8192000,
+          "source_rows_total": 8192000,
+          "validation": {
+            "validation": {
+              "mae": 6.907402038574219,
+              "shortest_action_rate": 0.68359375
+            },
+            "unseen_goal_validation": {
+              "mae": 6.8639421463012695,
+              "shortest_action_rate": 0.68115234375
+            },
+            "unseen_layout_validation": {
+              "mae": 40.024051666259766,
+              "shortest_action_rate": 0.65380859375
+            },
+            "original_layout_validation": {
+              "mae": 63.67594528198242,
+              "shortest_action_rate": 0.8054054054054054
+            }
+          }
+        },
+        {
+          "step": 30000,
+          "seconds": 2267.033,
+          "distance_loss": 7.209360122680664,
+          "rank_loss": 1.2646875381469727,
+          "validation_score": 33.13875222206116,
+          "best_step": 20000,
+          "full_source_coverage": true,
+          "source_rows_seen": 8192000,
+          "source_rows_total": 8192000,
+          "validation": {
+            "validation": {
+              "mae": 6.9863152503967285,
+              "shortest_action_rate": 0.67138671875
+            },
+            "unseen_goal_validation": {
+              "mae": 6.908089637756348,
+              "shortest_action_rate": 0.7080078125
+            },
+            "unseen_layout_validation": {
+              "mae": 40.684783935546875,
+              "shortest_action_rate": 0.650390625
+            },
+            "original_layout_validation": {
+              "mae": 67.36274719238281,
+              "shortest_action_rate": 0.8362162162162162
+            }
+          }
+        }
+      ],
+      "shuffled": [
+        {
+          "step": 1,
+          "seconds": 1445.609,
+          "distance_loss": 11.58515739440918,
+          "rank_loss": 1.0463582277297974,
+          "validation_score": 41.08916878700256,
+          "best_step": 1,
+          "full_source_coverage": false,
+          "source_rows_seen": 1151,
+          "source_rows_total": 8192000,
+          "validation": {
+            "validation": {
+              "mae": 10.642984390258789,
+              "shortest_action_rate": 0.67236328125
+            },
+            "unseen_goal_validation": {
+              "mae": 10.361395835876465,
+              "shortest_action_rate": 0.67578125
+            },
+            "unseen_layout_validation": {
+              "mae": 44.595703125,
+              "shortest_action_rate": 0.64697265625
+            },
+            "original_layout_validation": {
+              "mae": 83.53440856933594,
+              "shortest_action_rate": 0.772972972972973
+            }
+          }
+        },
+        {
+          "step": 5000,
+          "seconds": 1641.577,
+          "distance_loss": 9.664429664611816,
+          "rank_loss": 1.5739893913269043,
+          "validation_score": 38.84831362962723,
+          "best_step": 5000,
+          "full_source_coverage": false,
+          "source_rows_seen": 2869116,
+          "source_rows_total": 8192000,
+          "validation": {
+            "validation": {
+              "mae": 9.910983085632324,
+              "shortest_action_rate": 0.6630859375
+            },
+            "unseen_goal_validation": {
+              "mae": 9.618819236755371,
+              "shortest_action_rate": 0.66796875
+            },
+            "unseen_layout_validation": {
+              "mae": 43.402408599853516,
+              "shortest_action_rate": 0.65625
+            },
+            "original_layout_validation": {
+              "mae": 82.55486297607422,
+              "shortest_action_rate": 0.7783783783783784
+            }
+          }
+        },
+        {
+          "step": 10000,
+          "seconds": 1871.97,
+          "distance_loss": 11.886474609375,
+          "rank_loss": 1.3877559900283813,
+          "validation_score": 39.40669357776642,
+          "best_step": 5000,
+          "full_source_coverage": false,
+          "source_rows_seen": 5372669,
+          "source_rows_total": 8192000,
+          "validation": {
+            "validation": {
+              "mae": 10.334519386291504,
+              "shortest_action_rate": 0.66552734375
+            },
+            "unseen_goal_validation": {
+              "mae": 9.912126541137695,
+              "shortest_action_rate": 0.67431640625
+            },
+            "unseen_layout_validation": {
+              "mae": 43.483070373535156,
+              "shortest_action_rate": 0.66015625
+            },
+            "original_layout_validation": {
+              "mae": 80.2794418334961,
+              "shortest_action_rate": 0.7794594594594595
+            }
+          }
+        },
+        {
+          "step": 15000,
+          "seconds": 2123.256,
+          "distance_loss": 9.684268951416016,
+          "rank_loss": 1.3409535884857178,
+          "validation_score": 35.98677596449852,
+          "best_step": 15000,
+          "full_source_coverage": false,
+          "source_rows_seen": 7701534,
+          "source_rows_total": 8192000,
+          "validation": {
+            "validation": {
+              "mae": 8.810450553894043,
+              "shortest_action_rate": 0.66455078125
+            },
+            "unseen_goal_validation": {
+              "mae": 8.576529502868652,
+              "shortest_action_rate": 0.66943359375
+            },
+            "unseen_layout_validation": {
+              "mae": 40.37384796142578,
+              "shortest_action_rate": 0.671875
+            },
+            "original_layout_validation": {
+              "mae": 74.92181396484375,
+              "shortest_action_rate": 0.8081081081081081
+            }
+          }
+        },
+        {
+          "step": 20000,
+          "seconds": 2329.58,
+          "distance_loss": 9.342693328857422,
+          "rank_loss": 1.6945154666900635,
+          "validation_score": 40.931705474853516,
+          "best_step": 20000,
+          "full_source_coverage": true,
+          "source_rows_seen": 8192000,
+          "source_rows_total": 8192000,
+          "validation": {
+            "validation": {
+              "mae": 10.490513801574707,
+              "shortest_action_rate": 0.6748046875
+            },
+            "unseen_goal_validation": {
+              "mae": 10.038250923156738,
+              "shortest_action_rate": 0.66845703125
+            },
+            "unseen_layout_validation": {
+              "mae": 45.8548583984375,
+              "shortest_action_rate": 0.64404296875
+            },
+            "original_layout_validation": {
+              "mae": 83.88404083251953,
+              "shortest_action_rate": 0.8032432432432433
+            }
+          }
+        },
+        {
+          "step": 25000,
+          "seconds": 2511.338,
+          "distance_loss": 8.743627548217773,
+          "rank_loss": 1.4084255695343018,
+          "validation_score": 35.651793748140335,
+          "best_step": 25000,
+          "full_source_coverage": true,
+          "source_rows_seen": 8192000,
+          "source_rows_total": 8192000,
+          "validation": {
+            "validation": {
+              "mae": 8.967646598815918,
+              "shortest_action_rate": 0.67919921875
+            },
+            "unseen_goal_validation": {
+              "mae": 8.604902267456055,
+              "shortest_action_rate": 0.662109375
+            },
+            "unseen_layout_validation": {
+              "mae": 38.362796783447266,
+              "shortest_action_rate": 0.66845703125
+            },
+            "original_layout_validation": {
+              "mae": 74.72645568847656,
+              "shortest_action_rate": 0.7951351351351351
+            }
+          }
+        },
+        {
+          "step": 30000,
+          "seconds": 2694.887,
+          "distance_loss": 8.35561752319336,
+          "rank_loss": 2.087143898010254,
+          "validation_score": 41.12045735120773,
+          "best_step": 25000,
+          "full_source_coverage": true,
+          "source_rows_seen": 8192000,
+          "source_rows_total": 8192000,
+          "validation": {
+            "validation": {
+              "mae": 11.282721519470215,
+              "shortest_action_rate": 0.65283203125
+            },
+            "unseen_goal_validation": {
+              "mae": 10.728816032409668,
+              "shortest_action_rate": 0.66259765625
+            },
+            "unseen_layout_validation": {
+              "mae": 44.426536560058594,
+              "shortest_action_rate": 0.64892578125
+            },
+            "original_layout_validation": {
+              "mae": 86.41018676757812,
+              "shortest_action_rate": 0.7913513513513514
+            }
+          }
+        }
+      ],
+      "joint": [
+        {
+          "step": 1,
+          "seconds": 1724.481,
+          "distance_loss": 11.556861877441406,
+          "rank_loss": 1.0964279174804688,
+          "validation_score": 38.99365961551666,
+          "best_step": 1,
+          "full_source_coverage": false,
+          "source_rows_seen": 1062,
+          "source_rows_total": 8192000,
+          "validation": {
+            "validation": {
+              "mae": 9.924267768859863,
+              "shortest_action_rate": 0.6728515625
+            },
+            "unseen_goal_validation": {
+              "mae": 9.640682220458984,
+              "shortest_action_rate": 0.67529296875
+            },
+            "unseen_layout_validation": {
+              "mae": 42.87022018432617,
+              "shortest_action_rate": 0.64990234375
+            },
+            "original_layout_validation": {
+              "mae": 79.92123413085938,
+              "shortest_action_rate": 0.778918918918919
+            }
+          }
+        },
+        {
+          "step": 5000,
+          "seconds": 1914.657,
+          "distance_loss": 10.43649959564209,
+          "rank_loss": 1.1297402381896973,
+          "validation_score": 33.35577803850174,
+          "best_step": 5000,
+          "full_source_coverage": false,
+          "source_rows_seen": 2869116,
+          "source_rows_total": 8192000,
+          "validation": {
+            "validation": {
+              "mae": 9.15550708770752,
+              "shortest_action_rate": 0.6591796875
+            },
+            "unseen_goal_validation": {
+              "mae": 8.834592819213867,
+              "shortest_action_rate": 0.64794921875
+            },
+            "unseen_layout_validation": {
+              "mae": 35.30326843261719,
+              "shortest_action_rate": 0.66357421875
+            },
+            "original_layout_validation": {
+              "mae": 71.00584411621094,
+              "shortest_action_rate": 0.7886486486486487
+            }
+          }
+        },
+        {
+          "step": 10000,
+          "seconds": 2096.948,
+          "distance_loss": 12.511655807495117,
+          "rank_loss": 1.4580118656158447,
+          "validation_score": 38.17192381620407,
+          "best_step": 5000,
+          "full_source_coverage": false,
+          "source_rows_seen": 5372669,
+          "source_rows_total": 8192000,
+          "validation": {
+            "validation": {
+              "mae": 9.796334266662598,
+              "shortest_action_rate": 0.65478515625
+            },
+            "unseen_goal_validation": {
+              "mae": 9.493206024169922,
+              "shortest_action_rate": 0.67529296875
+            },
+            "unseen_layout_validation": {
+              "mae": 43.81671905517578,
+              "shortest_action_rate": 0.646484375
+            },
+            "original_layout_validation": {
+              "mae": 78.53473663330078,
+              "shortest_action_rate": 0.7854054054054054
+            }
+          }
+        },
+        {
+          "step": 15000,
+          "seconds": 2271.565,
+          "distance_loss": 10.739540100097656,
+          "rank_loss": 1.2078275680541992,
+          "validation_score": 30.42761692404747,
+          "best_step": 15000,
+          "full_source_coverage": false,
+          "source_rows_seen": 7701534,
+          "source_rows_total": 8192000,
+          "validation": {
+            "validation": {
+              "mae": 8.505908966064453,
+              "shortest_action_rate": 0.6533203125
+            },
+            "unseen_goal_validation": {
+              "mae": 8.172249794006348,
+              "shortest_action_rate": 0.67138671875
+            },
+            "unseen_layout_validation": {
+              "mae": 31.642053604125977,
+              "shortest_action_rate": 0.669921875
+            },
+            "original_layout_validation": {
+              "mae": 64.00495910644531,
+              "shortest_action_rate": 0.7691891891891892
+            }
+          }
+        },
+        {
+          "step": 20000,
+          "seconds": 2446.837,
+          "distance_loss": 10.597322463989258,
+          "rank_loss": 1.3373746871948242,
+          "validation_score": 25.944170743227005,
+          "best_step": 20000,
+          "full_source_coverage": true,
+          "source_rows_seen": 8192000,
+          "source_rows_total": 8192000,
+          "validation": {
+            "validation": {
+              "mae": 7.8669047355651855,
+              "shortest_action_rate": 0.650390625
+            },
+            "unseen_goal_validation": {
+              "mae": 7.592583179473877,
+              "shortest_action_rate": 0.6728515625
+            },
+            "unseen_layout_validation": {
+              "mae": 24.088830947875977,
+              "shortest_action_rate": 0.66845703125
+            },
+            "original_layout_validation": {
+              "mae": 57.015625,
+              "shortest_action_rate": 0.7697297297297298
+            }
+          }
+        },
+        {
+          "step": 25000,
+          "seconds": 2627.352,
+          "distance_loss": 10.638887405395508,
+          "rank_loss": 1.2098684310913086,
+          "validation_score": 36.452938973903656,
+          "best_step": 20000,
+          "full_source_coverage": true,
+          "source_rows_seen": 8192000,
+          "source_rows_total": 8192000,
+          "validation": {
+            "validation": {
+              "mae": 9.853266716003418,
+              "shortest_action_rate": 0.65185546875
+            },
+            "unseen_goal_validation": {
+              "mae": 9.559556007385254,
+              "shortest_action_rate": 0.66357421875
+            },
+            "unseen_layout_validation": {
+              "mae": 39.24913024902344,
+              "shortest_action_rate": 0.66455078125
+            },
+            "original_layout_validation": {
+              "mae": 75.01130676269531,
+              "shortest_action_rate": 0.7848648648648648
+            }
+          }
+        },
+        {
+          "step": 30000,
+          "seconds": 2816.355,
+          "distance_loss": 9.018150329589844,
+          "rank_loss": 1.561710238456726,
+          "validation_score": 34.6701038479805,
+          "best_step": 20000,
+          "full_source_coverage": true,
+          "source_rows_seen": 8192000,
+          "source_rows_total": 8192000,
+          "validation": {
+            "validation": {
+              "mae": 9.265562057495117,
+              "shortest_action_rate": 0.65185546875
+            },
+            "unseen_goal_validation": {
+              "mae": 9.053589820861816,
+              "shortest_action_rate": 0.65380859375
+            },
+            "unseen_layout_validation": {
+              "mae": 38.3299674987793,
+              "shortest_action_rate": 0.654296875
+            },
+            "original_layout_validation": {
+              "mae": 69.46175384521484,
+              "shortest_action_rate": 0.7854054054054054
+            }
+          }
+        }
+      ]
+    }
+  }
+}

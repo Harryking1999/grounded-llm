@@ -44,7 +44,9 @@
 
 [完整路径数据](configs/sokoban_local_paths_data.json)从当前对照组的训练失败取样，保留路径编号、顺序、全部候选和精确距离。遇到留出边界时，至少5步的合法前缀可保留，不足5步的前缀拒绝；更短的路径只有到达精确目标才保留。已构造23,725组，覆盖全部1,000张训练棋盘；长度、拒绝原因和距离覆盖见[构造与采样统计](results/sokoban_local_paths_data.json)。
 
-当前比较[原采样对照](configs/sokoban_local_path_control_pairs.json)、[同路径数据打散](configs/sokoban_local_path_shuffled_pairs.json)和[完整路径成组](configs/sokoban_local_path_joint_pairs.json)。后两组在每个完整采样窗口中使用完全相同的关系及次数，每批的棋盘分布、合法分支数量和监督条数也匹配，仅改变连续路径是否在同批出现。原采样组用于区分新增数据内容的收益与成组方式的收益。三组保持同一起始权重、模型、损失与训练预算，尚无完成后的训练结果；实际状态以忽略的`local_path_runtime_40048.json`为准。
+已完成[原采样对照](configs/sokoban_local_path_control_pairs.json)、[同路径数据打散](configs/sokoban_local_path_shuffled_pairs.json)和[完整路径成组](configs/sokoban_local_path_joint_pairs.json)的训练与固定验证。后两组设计上在每个完整采样窗口中使用相同关系及次数，每批的棋盘分布、合法分支数量和监督条数匹配，仅改变连续路径是否在同批出现；实际批次审计仍在收尾。三组同起始权重、模型、损失与预算，未见布局完成率分别为36.52%、34.67%、35.94%，21步以上仍全失败，见[验证结果](results/sokoban_local_path_validation.json)。不能据此认为训练已经收敛：当前只有单batch训练loss与固定验证曲线，缺少固定已训练关系的拟合检查。运行状态以忽略的`local_path_runtime_40048.json`为准。
+
+核心验收是未见棋盘上的完整贪心泛化。训练布局中的留出关系只用于诊断，不能代替新棋盘成绩；覆盖需同时检查状态、目标、合法分支和连续路径。环境生成动作后继，地图学习距离及排序，动作转移本身没有作为学习任务。
 
 路径监督优先替换有限距离补充样本中较远的部分，保留原来的广域配额与近目标样本。远距位置不足时才使用较近位置，并最后保护1–2步关系。实际比例需在开训前核验，不能因为路径更长就再次挤掉近目标监督。
 

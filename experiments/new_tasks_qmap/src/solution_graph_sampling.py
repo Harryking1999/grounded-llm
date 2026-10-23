@@ -57,7 +57,9 @@ class ConnectedGraphSampler:
             goal=int(self.rng.choice(goals,p=weights));quota=rank_count//groups+int(group<rank_count%groups)
             rows=[];seen=set();layers=self.strata[goal]
             while len(rows)<quota:
-                layer=layers[len(rows)%len(layers)];eligible=layer[~np.isin(layer,list(seen))]
+                layer_index=(int(self.rng.integers(len(layers))) if self.options.get('root_layer_sampling')=='uniform'
+                             else len(rows)%len(layers))
+                layer=layers[layer_index];eligible=layer[~np.isin(layer,list(seen))]
                 if not len(eligible):eligible=self.rows[goal][~np.isin(self.rows[goal],list(seen))]
                 if not len(eligible):seen.clear();eligible=layer
                 root=int(self.rng.choice(eligible));pending=[root];local=0

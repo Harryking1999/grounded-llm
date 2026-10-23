@@ -97,8 +97,14 @@ def context_points(contexts, children):
 def load_corpus(config, out):
     description = json.loads((out / 'scenes.json').read_text())
     source = Path(description['graphs'])
-    scenes = [PhysicalScene(source / row['path'], Sokoban(row['initial_board']), decode, baseline)
-              for row in description['scenes']]
+    def scene(row):
+        return PhysicalScene(source / row['path'], Sokoban(row['initial_board']), decode, baseline)
+    workers=config.get('data',{}).get('scene_loader_workers',1)
+    if workers>1:
+        from concurrent.futures import ThreadPoolExecutor
+        with ThreadPoolExecutor(max_workers=workers) as executor:
+            scenes=list(executor.map(scene,description['scenes']))
+    else: scenes = [scene(row) for row in description['scenes']]
     return IntermediateGoals(PhysicalCorpus(scenes))
 
 
@@ -106,6 +112,9 @@ def prepare(config, out):
     out = Path(out); out.mkdir(parents=True, exist_ok=True)
     if (out / 'relations.npz').exists():
         return load_corpus(config, out), dict(np.load(out / 'relations.npz')), json.loads((out / 'summary.json').read_text())
+    if 'mixture_source' in config['data']:
+        from .solution_mixture import prepare_mixture
+        return prepare_mixture(config,out)
     if 'basin_source' in config['data']:
         from .solution_basins import prepare_basins
         return prepare_basins(config,out)

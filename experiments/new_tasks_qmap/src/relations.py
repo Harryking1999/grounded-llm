@@ -151,6 +151,9 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
         if structure_options['mode']=='connected_graphs':
             from .solution_graph_sampling import ConnectedGraphSampler
             SolutionSampler=ConnectedGraphSampler
+        elif structure_options['mode']=='broad_graph_mixture':
+            from .solution_mixture import MixtureSampler
+            SolutionSampler=MixtureSampler
         if relation_sampler or options.get('online_goals') or replay_sampler:
             raise ValueError('Solution pilot uses fixed exact banks and its own sampling, without online replacement')
         solution_sampler=SolutionSampler(corpus,data,structure_options,rng)
@@ -204,8 +207,16 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
         atomic_json(out/'initial.json',initial)
         atomic_json(out/'initial_timing.json',dict(seconds=time.monotonic()-initial_started))
     started=time.monotonic()
-    feature_cache=None; feature_started=time.monotonic(); packed_features=options.get('features_on_device')=='packed_bits'
-    if options.get('features_on_device'):
+    feature_cache=None; feature_ids=None; feature_started=time.monotonic()
+    packed_features=options.get('features_on_device') in ('packed_bits','prepared_packed_bits')
+    if options.get('features_on_device')=='prepared_packed_bits':
+        if not solution_sampler or options.get('online_goals'):
+            raise ValueError('Prepared feature cache requires a fixed exact relation bank')
+        feature_ids=torch.as_tensor(np.load(out/'data/feature_ids.npy'),device=device)
+        packed=np.load(out/'data/features_packed.npy',mmap_mode='r')
+        if packed.shape!=(len(feature_ids),(corpus.input_dim+7)//8):raise ValueError('Prepared feature shape mismatch')
+        feature_cache=torch.as_tensor(np.array(packed),dtype=torch.uint8,device=device)
+    elif options.get('features_on_device'):
         width=(corpus.input_dim+7)//8 if packed_features else corpus.input_dim
         feature_cache=torch.empty((corpus.size,width),dtype=torch.uint8,device=device)
         for start in range(0,corpus.size,65536):
@@ -294,7 +305,12 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
             if len(trace)>=100: flush_trace()
         ids=np.concatenate([pair[:,0],pair[:,1],children[valid],tasks[:,1]])
         unique,inverse=np.unique(ids,return_inverse=True)
-        features=(feature_cache[torch.as_tensor(unique,device=device)] if feature_cache is not None
+        cache_index=torch.as_tensor(unique,device=device)
+        if feature_ids is not None:
+            cache_index=torch.searchsorted(feature_ids,cache_index)
+            if bool((cache_index>=len(feature_ids)).any()) or not torch.equal(feature_ids[cache_index],torch.as_tensor(unique,device=device)):
+                raise ValueError('Training endpoint missing from exact prepared feature cache')
+        features=(feature_cache[cache_index] if feature_cache is not None
                   else torch.as_tensor(corpus.features(unique),device=device))
         if packed_features:
             shifts=torch.arange(8,device=device,dtype=torch.uint8)

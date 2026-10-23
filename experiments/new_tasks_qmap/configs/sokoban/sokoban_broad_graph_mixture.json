@@ -1,0 +1,58 @@
+{
+  "task": "sokoban",
+  "seed": 2026102401,
+  "data": {
+    "mixture_source": "runs/new_tasks_qmap/broad_graph_mixture/prepared",
+    "broad_source": "runs/new_tasks_qmap/sokoban_layout_coverage/coverage1000/data",
+    "graph_source": "runs/new_tasks_qmap/graph_basins/C_2026102401/data",
+    "dense_validation_bank": "runs/new_tasks_qmap/graph_basins/global_order/bank.npz",
+    "required_broad_layouts": 1000,
+    "validation_seed": 2026102411,
+    "scene_loader_workers": 8
+  },
+  "model": {"dimension": 128, "hidden": 256, "cap": 256, "metric": "directed_max"},
+  "training": {
+    "steps": 6000,
+    "batch_size": 1024,
+    "decision_batch_size": 128,
+    "learning_rate": 0.0001,
+    "rank_weight": 1.0,
+    "rank_temperature": 1.0,
+    "eval_every": 3000,
+    "cpu_threads": 4,
+    "unreachable_target": 240.0,
+    "features_on_device": "prepared_packed_bits",
+    "initialize_from": "../initial.pt",
+    "training_probe_batches": 8,
+    "validation_only_initial": true,
+    "evaluation_checkpoint": "last.pt",
+    "solution_structure": {
+      "mode": "broad_graph_mixture",
+      "graph_fraction": 0.2,
+      "graphs_per_batch": 4,
+      "neighborhood_size": 8,
+      "root_layer_sampling": "uniform",
+      "finite_point_fraction": 0.75,
+      "boundary_rank_fraction": 0.5,
+      "broad_layouts_per_batch": 16
+    }
+  },
+  "relations": {},
+  "evaluation": {
+    "decision_count": 512,
+    "rollout_count": 512,
+    "horizon": 32,
+    "planning_distance_bins": [5, 10, 20, 32]
+  },
+  "schema": "exact_state_pairs",
+  "pilot": {
+    "seeds": [2026102401, 2026102402],
+    "graph_fractions": [0.0, 0.2, 0.5, 1.0],
+    "initialization": "All arms use the original broad-distribution step-20000 chosen weights, fresh Adam and RNG; no small-layout phase optimizer or weights carry over.",
+    "primary_comparison": "Matched original prepared broad relationships only, full target graphs only, and 20%/50% graph mixtures. Identical updates, point and complete-candidate rank budgets and original losses; only data mixture changes.",
+    "information_boundary": "Union original holdouts, remapped target-graph holdouts, all evaluation candidate closures and dense diagnostic closures before filtering both pools. Reject whole decisions. No validation/test relation backfill or validation-based graph weights.",
+    "decision_rule": "Do not extend updates or graph coverage automatically. Require paired unseen-layout completion and same-target global/adjacent-layer order improvements, lower cycles and preserved broad-layout retention in both seeds; report layout uncertainty. Loss alone is not a scaling criterion.",
+    "evaluation_scope": "Existing small development cohorts stay identical after physical identity remapping. Add fixed 512 queries covering the original 100 validation layouts; all 32-step greedy. Dense fixed unseen-target bank is read-only. Original test layouts remain excluded from development comparisons. No independent final-test claim."
+  },
+  "scope": "Original shared Q MLP, directed_max, exact physical-step distance Huber plus complete-candidate soft-rank, unchanged weights and greedy32. Lossless packed feature lookup only avoids caching hundreds of millions of unused physical states. Original environment provides transitions."
+}

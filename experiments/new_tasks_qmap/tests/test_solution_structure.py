@@ -77,6 +77,12 @@ class SolutionStructureTests(unittest.TestCase):
             if mode == 'path_multiscale': self.assertEqual(np.isin(r, [0,2]).sum(), 4)
             rng.bit_generator.state = state
             a,b = sampler.draw(64,8);np.testing.assert_array_equal(a,p);np.testing.assert_array_equal(b,r)
+        data['hard_context_ids']=np.array([2])
+        sampler=SolutionSampler(corpus,data,dict(mode='balanced_branches',hard_fraction=.5),np.random.default_rng(8))
+        p,r=sampler.draw(64,8)
+        np.testing.assert_array_equal(r[:4],np.full(4,2))
+        for row in context_points(tasks[r],exact['children'][r]):
+            self.assertIn(tuple(row),set(map(tuple,pairs[p])))
 
     def test_structure_metric_detects_local_and_long_span_failure(self):
         corpus = fixture(); path = np.array([[0, 1, 3, -1]])

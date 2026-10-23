@@ -265,6 +265,11 @@ class SolutionSampler:
         mode = self.options['mode']; data = self.data
         if mode == 'balanced_branches':
             r=np.array([self.rng.choice(self.strata[i]) for i in self.rng.integers(len(self.strata),size=rank_count)])
+            count=round(rank_count*self.options.get('hard_fraction',0))
+            if count:
+                hard=data['hard_context_ids']
+                if not len(hard) or count>rank_count or count<0: raise ValueError('Invalid training-only hard replay')
+                r[:count]=self.rng.choice(hard,count)
         elif mode == 'flat_terminal':
             r = self.rng.choice(data['terminal_ids'], rank_count)
         else:

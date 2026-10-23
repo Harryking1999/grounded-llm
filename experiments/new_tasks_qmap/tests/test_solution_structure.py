@@ -29,6 +29,30 @@ def fixture():
 
 
 class SolutionStructureTests(unittest.TestCase):
+    def test_feedback_is_graded_per_training_target_with_background_mass(self):
+        from experiments.new_tasks_qmap.src.solution_graph_sampling import training_graph_feedback
+        from grounded_llm.core.qmap.model import StateEncoder
+        corpus=fixture();tasks=np.array([[0,2],[0,3],[1,2],[1,3],[2,3]])
+        exact=materialize(corpus,tasks);data={k+'_train':v for k,v in exact.items()}
+        torch.manual_seed(4);model=StateEncoder(input_dim=5,dimension=128,hidden=8,cap=256,metric='directed_max');model.eval()
+        weights,description,edges=training_graph_feedback(corpus,data,model,np.random.default_rng(5),1)
+        self.assertTrue(((weights>=1)&(weights<=4)).all())
+        for g in [2,3]:self.assertEqual(len(np.unique(weights[tasks[:,1]==g])),1)
+        self.assertTrue(edges)
+        for row in description['queries']:self.assertIn(tuple(row),set(map(tuple,tasks)))
+
+    def test_connected_graph_sampler_keeps_all_candidates_and_restores_rng(self):
+        from experiments.new_tasks_qmap.src.solution_graph_sampling import ConnectedGraphSampler
+        corpus=fixture();tasks=np.array([[0,2],[0,3],[1,2],[1,3],[2,3]])
+        exact=materialize(corpus,tasks);pairs=np.unique(context_points(tasks,exact['children']),axis=0)
+        data=dict(pairs_train=pairs,**{k+'_train':v for k,v in exact.items()})
+        rng=np.random.default_rng(22);sampler=ConnectedGraphSampler(corpus,data,dict(graphs_per_batch=2,neighborhood_size=4),rng)
+        state=deepcopy(rng.bit_generator.state);p,r=sampler.draw(64,8)
+        self.assertEqual(len(p),64);self.assertEqual(len(r),8)
+        for row in context_points(tasks[r],exact['children'][r]):self.assertIn(tuple(row),set(map(tuple,pairs[p])))
+        rng.bit_generator.state=state;a,b=sampler.draw(64,8)
+        np.testing.assert_array_equal(a,p);np.testing.assert_array_equal(b,r)
+
     def test_global_order_diagnostic_distinguishes_near_and_far_errors(self):
         from experiments.new_tasks_qmap.src.solution_global_order import global_order_metrics,prepare_order_bank
         corpus=fixture();rows=np.array([[0,3],[1,3],[2,3]])

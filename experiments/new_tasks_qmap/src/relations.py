@@ -148,6 +148,9 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
     solution_sampler=None
     if structure_options:
         from .solution_structure import SolutionSampler
+        if structure_options['mode']=='connected_graphs':
+            from .solution_graph_sampling import ConnectedGraphSampler
+            SolutionSampler=ConnectedGraphSampler
         if relation_sampler or options.get('online_goals') or replay_sampler:
             raise ValueError('Solution pilot uses fixed exact banks and its own sampling, without online replacement')
         solution_sampler=SolutionSampler(corpus,data,structure_options,rng)

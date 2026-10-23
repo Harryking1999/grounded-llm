@@ -46,6 +46,7 @@ tests/               规则、标签、留出边界、采样及恢复检查
 | 完整求解结构小验证 | [配置](configs/sokoban/sokoban_solution_structure_pilot.json) | 匹配比较零散终局关系、完整路径与分支、路径内不同跨度的中间目标关系 |
 | 分支连续覆盖与定向修复 | [分支](configs/sokoban/sokoban_branch_closure_pilot.json)、[优化](configs/sokoban/sokoban_branch_closure_refine.json)、[回放](configs/sokoban/sokoban_branch_failure_replay.json) | 补全替代最优后继及一步恢复，分别检查训练兼容性和未训练中间目标 |
 | 完整目标可达区域 | [短预算](configs/sokoban/sokoban_graph_basins_pilot.json)、[匹配拟合预算](configs/sokoban/sokoban_graph_basins_12000.json) | A原分支、B完整允许可达区域、C多目标、D整目标图的训练执行反馈 |
+| 连续图采样与分级反馈 | [配置](configs/sokoban/sokoban_connected_graph_sampling.json) | 固定C数据和匹配初始化，比较原采样、布局与目标均衡的连续邻域、分级整图反馈 |
 | 训练失败与路径构造 | [失败诊断](configs/sokoban/sokoban_training_failure_diagnosis.json)、[路径数据](configs/sokoban/sokoban_local_paths_data.json)、[固定验证](configs/sokoban/sokoban_neighborhood_validation.json) | 训练允许范围内的循环、分支、死锁和连续路径 |
 
 比较和限制见[推箱子报告](results/sokoban/report.md)。多轮条件从原采样路径对照的验证所选权重开始，新建优化器与采样阶段，不作为完整续训；epoch只指当前准备关系池的实际遍历，不代表穷尽物理状态。预算和学习率只维护在配置中。完整断点保存优化器、关系顺序和随机状态；实时状态见忽略的`coverage_epochs_runtime_40048.json`，旧路径三组见`local_path_runtime_40048.json`。
@@ -55,6 +56,10 @@ tests/               规则、标签、留出边界、采样及恢复检查
 该小验证已完成：教师训练路径拟合良好，未见布局的完整到达与距离连续性没有共同改善，长题仍全失败。训练失败还揭示了替代最优分支后续未连续覆盖的缺口；不据此扩量。逐布局指标及实际曝光见[结果](results/sokoban/sokoban_solution_structure_pilot.json)，解释与限制见推箱子报告。
 
 后续[分支补全](results/sokoban/sokoban_branch_closure_validation.json)修复了保留范围中的最优续程缺口；[定向回放](results/sokoban/sokoban_branch_failure_replay.json)修正原训练错误后仍引入新的错误，未训练目标与跨棋盘未可靠改善。训练起点达到72/73不能替代泛化地图验收；全部条件保持原共享编码器、距离、损失及32步贪心。
+
+完整可达区域的[较长预算](results/sokoban/sokoban_graph_basins_12000.json)和[稠密距离诊断](results/sokoban/sokoban_dense_goal_order.json)已完成：同布局新目标粗略远近性有所学习，跨布局与相邻距离层仍失败。稠密诊断只读固定留出目标，不替换正式评测或参与训练反馈；入口为`src.solution_global_order`。
+
+[连续邻域与分级整图反馈](results/sokoban/sokoban_connected_graph_sampling.json)同样未显示可靠泛化收益；逐条比较完整训练库后，局部修复仍伴随大量新错误。下一步先检查原训练分布的保持性，不能将这批有限布局上的拟合当作可扩量的成功方案。
 
 ## 运行入口
 

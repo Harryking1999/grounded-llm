@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import numpy as np
 from grounded_llm.core.files import atomic_json
+from grounded_llm.core.qmap.sampling import CoverageSampler
 
 
 def keys(source, goal, size):
@@ -196,6 +197,26 @@ class BoardRelationSampler:
             broad_source_fraction=1-self.finite_fraction,all_legal_candidates_preserved=True,
             finite_supplement_excludes_identity_pairs=True,
             holdout_closure_excluded=True,banks_use_only_original_training_source_rows=True)
+        self.coverage_fraction=options.get('ranking_coverage_fraction',0.)
+        if not 0<=self.coverage_fraction<1: raise ValueError('Ranking coverage must leave a stratified quota')
+        self.coverage_sampler=None
+        if self.coverage_fraction:
+            self.coverage_rng=np.random.default_rng(options['coverage_seed'])
+            self.coverage_sampler=CoverageSampler(np.zeros(len(self.ranks),dtype=np.uint8),self.coverage_rng,len(self.ranks),1.)
+            self.summary['ranking_coverage_fraction']=self.coverage_fraction
+
+    def coverage_state_dict(self):
+        if self.coverage_sampler is None: return None
+        return dict(sampler=self.coverage_sampler.state_dict(),rng=self.coverage_rng.bit_generator.state)
+
+    def load_coverage_state_dict(self,state):
+        if self.coverage_sampler is not None:
+            self.coverage_sampler.load_state_dict(state['sampler'])
+            self.coverage_rng.bit_generator.state=state['rng']
+
+    @property
+    def ranking_epochs(self):
+        return self.coverage_sampler.passes if self.coverage_sampler is not None else None
 
     @staticmethod
     def _draw(groups,count,rng,max_groups=None):
@@ -208,14 +229,17 @@ class BoardRelationSampler:
         rng.shuffle(selected); return selected
 
     def draw(self,source_sampler,point_count,rank_count,rng):
-        nf=round(point_count*self.finite_fraction); nb=round(rank_count*self.boundary_fraction)
+        nc=round(rank_count*self.coverage_fraction)
+        nf=round(point_count*self.finite_fraction); nb=round((rank_count-nc)*self.boundary_fraction)
         p=source_sampler.draw(point_count-nf); broad=self.data['pairs_train'][p]
         broad=sample_goals(self.corpus,broad[:,0],rng,self.data['reserved_relations'],fallback=broad[:,1])
         limit=self.options.get('layouts_per_batch') if self.options.get('balance_layouts') else None
         finite=self.points[self._draw(self.point_groups,nf,rng,limit)]
         pair=np.concatenate([broad,finite]); p=np.concatenate([p,self.point_index[finite[:,0]]])
-        selected=np.concatenate([self._draw(self.boundary_groups,nb,rng,limit),self._draw(self.other_groups,rank_count-nb,rng,limit)])
-        rng.shuffle(selected); tasks=self.ranks[selected]
+        selected=np.concatenate([self._draw(self.boundary_groups,nb,rng,limit),self._draw(self.other_groups,rank_count-nc-nb,rng,limit)])
+        rng.shuffle(selected)
+        if nc: selected=np.concatenate([self.coverage_sampler.draw(nc),selected])
+        tasks=self.ranks[selected]
         return p,self.rank_index[tasks[:,0]],pair,tasks
 
 

@@ -330,6 +330,20 @@ class ExactPairTests(unittest.TestCase):
         data=dict(pairs_train=pairs,pair_distances_train=truth,tasks_train=rank['tasks'],reserved_relations=np.array([],dtype=np.int64))
         options=dict(finite_point_fraction=.75,boundary_rank_fraction=.5,distance_bin_upper_bounds=[0,1,2,5,10,20,40,80,128])
         sampler=BoardRelationSampler(corpus,data,options); rng=np.random.default_rng(7)
+        # Exhaustive relation traversal complements the original strata and
+        # restores its own permutation and RNG across an interrupted epoch.
+        from copy import deepcopy
+        covered=BoardRelationSampler(corpus,data,dict(options,ranking_coverage_fraction=.5,coverage_seed=91))
+        selected=[];coverage_rng=np.random.default_rng(13)
+        for _ in range(int(np.ceil(len(covered.ranks)/4))):
+            _,_,_,batch=covered.draw(CoverageSampler(np.zeros(len(data['pairs_train'])),coverage_rng,len(data['pairs_train']),1.),8,8,coverage_rng)
+            selected.append(batch[:4])
+        visited=np.concatenate(selected)
+        self.assertEqual(len(np.unique(visited,axis=0)),len(covered.ranks))
+        self.assertEqual(set(map(tuple,visited)),set(map(tuple,covered.ranks)))
+        saved_coverage=deepcopy(covered.coverage_state_dict());expected=covered.coverage_sampler.draw(19)
+        covered.load_coverage_state_dict(saved_coverage)
+        np.testing.assert_array_equal(covered.coverage_sampler.draw(19),expected)
         self.assertTrue((corpus.distance(sampler.points[:,0],sampler.points[:,1])>0).all())
         source_sampler=CoverageSampler(truth,rng,len(pairs),1.)
         for _ in range(10):
@@ -416,6 +430,29 @@ class ExactPairTests(unittest.TestCase):
                 self.assertLess(counted,total);self.assertEqual(total,160)
                 train(training_config,path,'neighborhood-fixture','cpu',resume=True)
                 self.assertEqual(torch.load(path/'last.pt',weights_only=False)['neighborhood_rng'],saved['neighborhood_rng'])
+        epoch_config=deepcopy(training_config)
+        epoch_config['training'].update(decision_neighborhood_point_fraction=0.,training_probe_batches=3,
+            relation_sampling=dict(options,ranking_coverage_fraction=.5,coverage_seed=91),
+            learning_rate_schedule=[dict(start_epoch=1,learning_rate=.0003),dict(start_epoch=2,learning_rate=.0001)])
+        with tempfile.TemporaryDirectory() as tmp:
+            full=Path(tmp)/'full';interrupted=Path(tmp)/'interrupted'
+            original_save=__import__('experiments.new_tasks_qmap.src.relations',fromlist=['atomic_save']).atomic_save
+            def interrupt_after_checkpoint(value,path):
+                original_save(value,path)
+                if Path(path).name=='last.pt' and value['step']==1: raise RuntimeError('fixture interruption')
+            prepared=(corpus,training_data,dict(states=corpus.size))
+            with patch('experiments.new_tasks_qmap.src.relations.prepare',return_value=prepared):
+                train(epoch_config,full,'epochs-fixture','cpu')
+                with patch('experiments.new_tasks_qmap.src.relations.atomic_save',side_effect=interrupt_after_checkpoint):
+                    with self.assertRaisesRegex(RuntimeError,'fixture interruption'):
+                        train(epoch_config,interrupted,'epochs-fixture','cpu')
+                train(epoch_config,interrupted,'epochs-fixture','cpu',resume=True)
+            a=torch.load(full/'last.pt',weights_only=False);b=torch.load(interrupted/'last.pt',weights_only=False)
+            for key,value in a['model'].items(): torch.testing.assert_close(value,b['model'][key],rtol=0,atol=0)
+            np.testing.assert_array_equal(a['relation_coverage']['sampler']['order'],b['relation_coverage']['sampler']['order'])
+            self.assertEqual(a['optimizer']['param_groups'][0]['lr'],.0001)
+            self.assertEqual(len(b['training_probe_batches']),3)
+            np.testing.assert_array_equal(a['training_probe_batches'][1]['pairs'],b['training_probe_batches'][1]['pairs'])
         # Replay includes decisions whose sources are absent from both original
         # banks. Their counters must remain separate, and every legal branch
         # must appear in point supervision at that same batch goal.
@@ -929,7 +966,7 @@ class ExactPairTests(unittest.TestCase):
                 for key,value in materialize(corpus,rows).items(): data[key+'_'+name]=value
             config=dict(task='token_swapping',seed=7,model=dict(dimension=128,hidden=16,cap=32,metric='linf'),
                         training=dict(steps=2,batch_size=8,decision_batch_size=4,learning_rate=.001,
-                        rank_weight=1.,rank_temperature=1.,eval_every=1,cpu_threads=1,unreachable_target=30.,features_on_device='packed_bits'),
+                        rank_weight=1.,rank_temperature=1.,eval_every=1,cpu_threads=1,unreachable_target=30.,features_on_device='packed_bits',training_probe_batches=2),
                         evaluation=dict(horizon=32,decision_count=16,rollout_count=4))
             prepared=(corpus,data,dict(states=corpus.size))
             out=root/'run'
@@ -942,6 +979,11 @@ class ExactPairTests(unittest.TestCase):
             for key,value in before['model'].items(): torch.testing.assert_close(value,after['model'][key])
             self.assertTrue((after['exposure']>0).any())
             self.assertIn('optimizer',after); self.assertIn('pair_sampler',after)
+            self.assertEqual(len(after['training_probe_batches']),2)
+            progress=[json.loads(line) for line in (out/'progress.jsonl').read_text().splitlines()]
+            self.assertEqual(progress[-1]['training_probe']['point_count'],16)
+            self.assertEqual(progress[-1]['loss_window_batches'],1)
+            self.assertTrue(np.isfinite(progress[-1]['training_probe']['candidate_soft_rank_loss']))
             summary=json.loads((out/'summary.json').read_text())
             for cohort in summary['metrics']['cohorts'].values():
                 self.assertEqual(cohort['planning']['oracle']['optimal_rate'],1)

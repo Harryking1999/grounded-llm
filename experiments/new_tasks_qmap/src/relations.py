@@ -13,6 +13,44 @@ from .relation_data import prepare, load, sample_goals, BoardRelationSampler, de
 from .relation_evaluate import evaluate
 
 
+def learning_rate_at_epoch(options,epoch):
+    rate=options['learning_rate']
+    schedule=options.get('learning_rate_schedule',[])
+    if any(b['start_epoch']<=a['start_epoch'] for a,b in zip(schedule,schedule[1:])):
+        raise ValueError('Learning-rate stages must have increasing start epochs')
+    for stage in schedule:
+        if stage['learning_rate']<=0 or stage['start_epoch']<0: raise ValueError('Invalid learning-rate stage')
+        if epoch>=stage['start_epoch']: rate=stage['learning_rate']
+    return rate
+
+
+@torch.no_grad()
+def training_probe(model,corpus,batches,options):
+    """Fixed relations actually used by the optimizer; never select weights here."""
+    if not batches: return None
+    from .relation_evaluate import QCache,safe_scores
+    model.eval();cache=QCache(model,corpus,next(model.parameters()).device)
+    pairs=np.concatenate([b['pairs'] for b in batches]);truth=np.concatenate([b['point_truth'] for b in batches])
+    tasks=np.concatenate([b['tasks'] for b in batches]);children=np.concatenate([b['children'] for b in batches])
+    child_truth=np.concatenate([b['child_truth'] for b in batches]);valid=children>=0
+    predictions=cache.scores(pairs[:,0],pairs[:,1]);finite=np.isfinite(truth)
+    target=np.where(finite,truth,options['unreachable_target'])
+    scores=safe_scores(cache,children,tasks[:,1]);device=next(model.parameters()).device
+    ranking=soft_rank_loss(torch.as_tensor(np.where(valid,1+scores,0),device=device),
+        torch.as_tensor(1+np.where(np.isfinite(child_truth),child_truth,options['unreachable_target']),device=device),
+        torch.as_tensor(valid,device=device),options['rank_temperature'])
+    parent=corpus.distance(tasks[:,0],tasks[:,1]);eligible=np.isfinite(parent)&(parent>0)
+    optimal=child_truth[np.arange(len(tasks)),scores.argmin(axis=1)]+1==parent
+    error=np.abs(predictions-target)
+    return dict(batches=len(batches),point_count=len(pairs),decision_count=len(tasks),
+        finite_mae=float(np.abs(predictions[finite]-truth[finite]).mean()) if finite.any() else None,
+        distance_huber=float(np.where(error<1,.5*error**2,error-.5).mean()),candidate_soft_rank_loss=float(ranking),
+        shortest_action_rate=float(optimal[eligible].mean()) if eligible.any() else None,
+        by_distance={name:dict(count=int(mask.sum()),mae=float(np.abs(predictions[mask]-truth[mask]).mean()))
+            for name,mask in [('1_5',finite&(truth>=1)&(truth<=5)),('6_20',finite&(truth>=6)&(truth<=20)),('21_plus',finite&(truth>=21))] if mask.any()},
+        role='Fixed actual training batches; fitting diagnostic only, never checkpoint selection.')
+
+
 def scope(config,corpus):
     if config['task']=='token_swapping': return corpus.scope
     return dict(board=[10,10] if config['task']=='sokoban' else [6,6],
@@ -58,12 +96,22 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
     point_truth=data['pair_distances_train']
     point_labels=np.where(np.isfinite(point_truth),point_truth,options['unreachable_target']).astype(np.float32)
     relation_sampler=(BoardRelationSampler(corpus,data,options['relation_sampling']) if options.get('relation_sampling') else None)
+    if options.get('ranking_coverage_epochs'):
+        if relation_sampler is None or relation_sampler.coverage_sampler is None:
+            raise ValueError('Epoch budget requires an explicit ranking coverage traversal')
+        per_step=round(options['decision_batch_size']*relation_sampler.coverage_fraction)
+        expected=int(np.ceil(len(relation_sampler.ranks)*options['ranking_coverage_epochs']/per_step))
+        if options['steps']!=expected: raise ValueError(('Step budget does not match ranking epochs',expected))
+    if options.get('learning_rate_schedule') and (relation_sampler is None or relation_sampler.coverage_sampler is None):
+        raise ValueError('Epoch learning-rate schedule requires ranking coverage')
     neighborhood_fraction=options.get('decision_neighborhood_point_fraction',0.)
     if neighborhood_fraction and (relation_sampler is None or neighborhood_fraction>relation_sampler.finite_fraction):
         raise ValueError('Neighborhood points must replace the finite supplement, preserving broad coverage')
     if relation_sampler: atomic_json(out/'sampling_summary.json',relation_sampler.summary)
     replay_sampler=None;replay_draws=None
     if options.get('failure_replay'):
+        if relation_sampler is not None and relation_sampler.coverage_sampler is not None:
+            raise ValueError('Replay would overwrite coverage rows; use separate conditions')
         replay_options=options['failure_replay']
         if relation_sampler is None or neighborhood_fraction:
             raise ValueError('Failure replay requires board sampling and its own complete point neighborhoods')
@@ -99,11 +147,14 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
         allowed=np.flatnonzero(np.load(out/'data'/'endpoint_partition.npy')==0)
     validation=[k[6:] for k in data if k.startswith('tasks_') and (k=='tasks_validation' or k.endswith('_validation'))]
     start_step,best,best_step,prior_seconds=0,float('inf'),0,0.
+    probe_batches=[];loss_window=np.zeros(3,dtype=np.float64)
     if resume and (out/'last.pt').exists():
         saved=torch.load(out/'last.pt',map_location=device,weights_only=False)
         if saved['config']!=config or saved['input_dim']!=corpus.input_dim: raise ValueError('Checkpoint scope mismatch')
         model.load_state_dict(saved['model']); optimizer.load_state_dict(saved['optimizer'])
         rng.bit_generator.state=saved['rng']; pair_sampler.load_state_dict(saved['pair_sampler']); rank_sampler.load_state_dict(saved['rank_sampler'])
+        if relation_sampler: relation_sampler.load_coverage_state_dict(saved.get('relation_coverage'))
+        probe_batches=saved.get('training_probe_batches',[]);loss_window=saved.get('loss_window',loss_window)
         if neighborhood_fraction: neighborhood_rng.bit_generator.state=saved['neighborhood_rng']
         if replay_sampler:
             if not np.array_equal(saved['replay_tasks'],replay_sampler.tasks) or not np.array_equal(saved['replay_reasons'],replay_sampler.reason):
@@ -128,7 +179,7 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
                 meaning='Weights warm start; fresh optimizer and sampling phase, not an exact continuation. Prior gradient endpoint exposure retained separately from fresh source-row coverage.'))
     if not (out/'initial.json').exists():
         initial_started=time.monotonic()
-        initial=evaluate(model,corpus,data,config)
+        initial=evaluate(model,corpus,data,config,cohorts=validation if options.get('validation_only_initial') else None)
         for name,row in initial['cohorts'].items():
             if row['planning']['oracle']['count'] and row['planning']['oracle']['optimal_rate']!=1:
                 raise ValueError(('Oracle planning gate failed',name,row['planning']['oracle']))
@@ -170,11 +221,16 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
             replay_rng=replay_rng.bit_generator.state,replay_draws=replay_draws,
             replay_tasks=replay_sampler.tasks if replay_sampler else None,replay_reasons=replay_sampler.reason if replay_sampler else None,
             replay_sampler_state=replay_sampler.state_dict() if isinstance(replay_sampler,LocalPathSampler) else None,
+            relation_coverage=relation_sampler.coverage_state_dict() if relation_sampler else None,
+            training_probe_batches=probe_batches,loss_window=loss_window,
             best_score=best,best_step=best_step,
             seconds=prior_seconds+time.monotonic()-started),path)
     step=start_step
     for step in range(start_step+1,options['steps']+1):
         model.train()
+        epoch=relation_sampler.ranking_epochs if relation_sampler and relation_sampler.coverage_sampler is not None else 0.
+        rate=learning_rate_at_epoch(options,epoch)
+        for group in optimizer.param_groups: group['lr']=rate
         if relation_sampler:
             p,r,pair,tasks=relation_sampler.draw(pair_sampler,options['batch_size'],options['decision_batch_size'],rng)
             children=corpus.successors(tasks[:,0])
@@ -202,6 +258,9 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
             child_truth=np.full(children.shape,np.inf,dtype=np.float32)
             child_truth[valid]=corpus.distance(children[valid],np.broadcast_to(tasks[:,1,None],children.shape)[valid])
         else: point_true=point_truth[p]
+        if len(probe_batches)<options.get('training_probe_batches',0):
+            probe_batches.append(dict(pairs=pair.copy(),point_truth=point_true.copy(),tasks=tasks.copy(),
+                children=children.copy(),child_truth=child_truth.copy()))
         if trace_path is not None:
             parent_true=corpus.distance(tasks[:,0],tasks[:,1])
             row=dict(point_step=np.full(len(pair),step,dtype=np.int32),pairs=pair.copy(),point_distance=point_true.copy(),
@@ -233,10 +292,12 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
         ranking=soft_rank_loss(scores,torch.as_tensor(1+truth,device=device),mask,options['rank_temperature'])
         loss=pointwise+options['rank_weight']*ranking
         optimizer.zero_grad(set_to_none=True); loss.backward(); optimizer.step()
+        loss_window+=np.array([float(pointwise.detach()),float(ranking.detach()),1.])
         np.add.at(exposure,ids,1); np.add.at(pair_draws,p[p>=0],1); np.add.at(rank_draws,r[r>=0],1)
         if replay_sampler: np.add.at(replay_draws,replay_ids[replay_ids>=0],1)
         if step==1 or step%options['eval_every']==0 or step==options['steps']:
-            values=evaluate(model,corpus,data,config,cohorts=validation,exposure=exposure,planning=False)
+            planning=bool(options.get('rollout_eval_every') and (step%options['rollout_eval_every']==0 or step==options['steps']))
+            values=evaluate(model,corpus,data,config,cohorts=validation,exposure=exposure,planning=planning)
             objective=float(np.mean([row['finite_huber']+row['candidate_soft_rank_loss'] for row in values['cohorts'].values()]))
             covered=bool((pair_draws>0).all())
             relation_options=config.get('relations',{})
@@ -250,7 +311,12 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
                         distance_loss=float(pointwise.detach()),rank_loss=float(ranking.detach()),
                         validation_score=objective,best_step=best_step,full_source_coverage=covered,
                         source_rows_seen=int((pair_draws>0).sum()),source_rows_total=len(pair_draws),
-                        validation={name:dict(mae=row['finite_mae'],shortest_action_rate=row['shortest_action_rate']) for name,row in values['cohorts'].items()})
+                        learning_rate=rate,ranking_coverage_epochs=relation_sampler.ranking_epochs if relation_sampler else None,
+                        mean_distance_loss=float(loss_window[0]/loss_window[2]),mean_rank_loss=float(loss_window[1]/loss_window[2]),
+                        loss_window_batches=int(loss_window[2]),training_probe=training_probe(model,corpus,probe_batches,options),
+                        validation={name:dict(mae=row['finite_mae'],shortest_action_rate=row['shortest_action_rate'],
+                            **(dict(success_rate=row['planning']['q']['success_rate']) if planning else {})) for name,row in values['cohorts'].items()})
+            loss_window[:]=0
             with (out/'progress.jsonl').open('a') as stream: stream.write(json.dumps(record)+'\n')
             atomic_json(out/'validation_latest.json',values)
             if improved:
@@ -277,6 +343,10 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
                                       minimum_pair_layer_passes=pair_sampler.passes,
                                       minimum_decision_layer_passes=None if relation_sampler else rank_sampler.passes),
                  metrics=final)
+    if relation_sampler and relation_sampler.coverage_sampler is not None:
+        summary['actual_exposure']['ranking_bank_epochs']=relation_sampler.ranking_epochs
+        summary['actual_exposure']['ranking_bank_relations']=len(relation_sampler.ranks)
+        summary['actual_exposure']['epoch_scope']='Prepared finite training (state, goal) ranking bank; not all physical states or all Boxoban layouts.'
     if replay_sampler:
         summary['failure_replay']=dict(decisions=len(replay_draws),unique_decisions_drawn=int((replay_draws>0).sum()),
             total_context_draws=int(replay_draws.sum()),snapshot=str(out/'failure_replay_bank.npz'),

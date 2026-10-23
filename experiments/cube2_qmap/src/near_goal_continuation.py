@@ -159,7 +159,7 @@ def run(args):
     seen_goals, exposed = set(), {'near_stars':0, 'restoration_stars':0}
     relative_pools={d:np.flatnonzero(env.depth==d) for d in opts.get('local_distance_levels',[])}
     fixed_guard=None;accepted_scales=[]
-    if 'guard' in config:
+    if config.get('guard'):
         allowed=np.zeros(env.size,dtype=bool)
         for begin in range(0,env.size,32768):
             ids=np.arange(begin,min(begin+32768,env.size))

@@ -67,3 +67,5 @@ python -m experiments.cube2_qmap.src.near_goal_continuation --contract experimen
 该阶段保存每个评测点，以近目标验证成绩选择候选，约束原复原回归不低于起始1000步，并把初始断点纳入候选。旧小OOD与已查看测试均作为回归；新增最终监测题仅保证本阶段不监督，其早期曝光未审计。选定后再报告全部回归、新监测与全状态复原，不自动采用或追加。
 
 [方向修正配置](configs/near_goal_projected.json)保留上述数据、预算与保护集合，另启用已有`ExitGuard.project`，先修正损伤复原边界的Adam位移，再用相同尺度回退检查。报告实际接受更新数，不能把大量被拒绝的尝试视为有效训练。
+
+[无位移硬保护的局部重放对照](configs/near_goal_local_replay.json)保留同一初始化、Adam、数据与低学习率，仅去掉逐更新硬保护，以区分数据改动无效与保护导致停滞；仍保留阶段选择和原复原回归门槛。该门槛是监测集上的候选筛选，不保证全状态复原保持。

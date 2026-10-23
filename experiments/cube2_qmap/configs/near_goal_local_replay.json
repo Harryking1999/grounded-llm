@@ -1,0 +1,7 @@
+{
+  "parent_contract": "experiments/cube2_qmap/configs/near_goal_refinement.json",
+  "hypothesis": "Test local and distant target supervision at the lower learning rate without an update-level hard guard, separating poor learning from guard-induced stalling.",
+  "guard": null,
+  "comparison": "Same reproduced step-1000 weights and Adam, training stream, local/distant and restoration sampling, learning rate and attempted update budget as near_goal_refinement. Disable only the per-update displacement guard. Retain checkpoint selection by near validation with original restoration regression at least its starting score.",
+  "scope": "Bounded local-coverage baseline on an idle 4090 GPU; inspect all-state restoration after validation selection. No automatic extension or adoption."
+}

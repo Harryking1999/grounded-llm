@@ -1,0 +1,778 @@
+{
+  "policy": "unchanged shared Q Linf greedy, six legal actions, horizon 32",
+  "baseline_step1000": {
+    "scores": {
+      "original": {
+        "tasks": 500,
+        "solved": 383,
+        "by_goal_depth": {
+          "0": {
+            "count": 500,
+            "solved": 383
+          }
+        }
+      },
+      "small_ood": {
+        "tasks": 500,
+        "solved": 181,
+        "by_goal_depth": {
+          "1": {
+            "count": 167,
+            "solved": 125
+          },
+          "2": {
+            "count": 167,
+            "solved": 41
+          },
+          "3": {
+            "count": 166,
+            "solved": 15
+          }
+        }
+      },
+      "validation": {
+        "tasks": 500,
+        "solved": 168,
+        "by_goal_depth": {
+          "1": {
+            "count": 167,
+            "solved": 118
+          },
+          "2": {
+            "count": 167,
+            "solved": 37
+          },
+          "3": {
+            "count": 166,
+            "solved": 13
+          }
+        }
+      },
+      "test": {
+        "tasks": 500,
+        "solved": 165,
+        "by_goal_depth": {
+          "1": {
+            "count": 167,
+            "solved": 114
+          },
+          "2": {
+            "count": 167,
+            "solved": 34
+          },
+          "3": {
+            "count": 166,
+            "solved": 17
+          }
+        }
+      },
+      "final_test": {
+        "tasks": 500,
+        "solved": 159,
+        "by_goal_depth": {
+          "1": {
+            "count": 167,
+            "solved": 120
+          },
+          "2": {
+            "count": 167,
+            "solved": 28
+          },
+          "3": {
+            "count": 166,
+            "solved": 11
+          }
+        }
+      }
+    },
+    "full_restoration": {
+      "count": 3674160,
+      "solved": 2790312,
+      "success_rate": 0.7594421582075903,
+      "mae": 0.7769646048545837,
+      "shortest_action_rate": 0.7480650674072624
+    },
+    "checkpoint": "runs/model_retests/cube_near_goal_b4bbea4/reproduce_1000/last.pt"
+  },
+  "methods": {
+    "hard_guard": {
+      "config": "experiments/cube2_qmap/configs/near_goal_refinement.json",
+      "run": "/home/gongruochen/grounded_llm/runs/cube_near_refine_72068ee",
+      "source_commit": "72068ee",
+      "selected_step": 1500,
+      "scores": {
+        "original": {
+          "tasks": 500,
+          "solved": 385,
+          "by_goal_depth": {
+            "0": {
+              "count": 500,
+              "solved": 385
+            }
+          }
+        },
+        "small_ood": {
+          "tasks": 500,
+          "solved": 180,
+          "by_goal_depth": {
+            "1": {
+              "count": 167,
+              "solved": 127
+            },
+            "2": {
+              "count": 167,
+              "solved": 40
+            },
+            "3": {
+              "count": 166,
+              "solved": 13
+            }
+          }
+        },
+        "validation": {
+          "tasks": 500,
+          "solved": 168,
+          "by_goal_depth": {
+            "1": {
+              "count": 167,
+              "solved": 117
+            },
+            "2": {
+              "count": 167,
+              "solved": 38
+            },
+            "3": {
+              "count": 166,
+              "solved": 13
+            }
+          }
+        },
+        "test": {
+          "tasks": 500,
+          "solved": 165,
+          "by_goal_depth": {
+            "1": {
+              "count": 167,
+              "solved": 115
+            },
+            "2": {
+              "count": 167,
+              "solved": 33
+            },
+            "3": {
+              "count": 166,
+              "solved": 17
+            }
+          }
+        },
+        "final_test": {
+          "tasks": 500,
+          "solved": 159,
+          "by_goal_depth": {
+            "1": {
+              "count": 167,
+              "solved": 121
+            },
+            "2": {
+              "count": 167,
+              "solved": 27
+            },
+            "3": {
+              "count": 166,
+              "solved": 11
+            }
+          }
+        }
+      },
+      "full_restoration": {
+        "count": 3674160,
+        "solved": 2792949,
+        "success_rate": 0.7601598732771573,
+        "mae": 0.7768564224243164,
+        "shortest_action_rate": 0.7481241285420691
+      },
+      "attempted_updates": 4000,
+      "accepted_updates": 2,
+      "highest_new_validation_solved": 168,
+      "paired_small_ood": {
+        "gained": 2,
+        "lost": 3
+      },
+      "evidence": "runs\\model_retests\\cube_near_refine_72068ee\\summary.json",
+      "checkpoint": "runs\\model_retests\\cube_near_refine_72068ee\\best.pt"
+    },
+    "projected_guard": {
+      "config": "experiments/cube2_qmap/configs/near_goal_projected.json",
+      "run": "/home/gongruochen/grounded_llm/runs/cube_near_projected_04941d6",
+      "source_commit": "04941d6",
+      "selected_step": 1000,
+      "scores": {
+        "original": {
+          "tasks": 500,
+          "solved": 383,
+          "by_goal_depth": {
+            "0": {
+              "count": 500,
+              "solved": 383
+            }
+          }
+        },
+        "small_ood": {
+          "tasks": 500,
+          "solved": 181,
+          "by_goal_depth": {
+            "1": {
+              "count": 167,
+              "solved": 125
+            },
+            "2": {
+              "count": 167,
+              "solved": 41
+            },
+            "3": {
+              "count": 166,
+              "solved": 15
+            }
+          }
+        },
+        "validation": {
+          "tasks": 500,
+          "solved": 168,
+          "by_goal_depth": {
+            "1": {
+              "count": 167,
+              "solved": 118
+            },
+            "2": {
+              "count": 167,
+              "solved": 37
+            },
+            "3": {
+              "count": 166,
+              "solved": 13
+            }
+          }
+        },
+        "test": {
+          "tasks": 500,
+          "solved": 165,
+          "by_goal_depth": {
+            "1": {
+              "count": 167,
+              "solved": 114
+            },
+            "2": {
+              "count": 167,
+              "solved": 34
+            },
+            "3": {
+              "count": 166,
+              "solved": 17
+            }
+          }
+        },
+        "final_test": {
+          "tasks": 500,
+          "solved": 159,
+          "by_goal_depth": {
+            "1": {
+              "count": 167,
+              "solved": 120
+            },
+            "2": {
+              "count": 167,
+              "solved": 28
+            },
+            "3": {
+              "count": 166,
+              "solved": 11
+            }
+          }
+        }
+      },
+      "full_restoration": {
+        "count": 3674160,
+        "solved": 2790312,
+        "success_rate": 0.7594421582075903,
+        "mae": 0.7769646048545837,
+        "shortest_action_rate": 0.7480650674072624
+      },
+      "attempted_updates": 4000,
+      "accepted_updates": 10,
+      "highest_new_validation_solved": 165,
+      "paired_small_ood": {
+        "gained": 0,
+        "lost": 0
+      },
+      "evidence": "runs\\model_retests\\cube_near_projected_04941d6\\summary.json",
+      "checkpoint": "runs\\model_retests\\cube_near_projected_04941d6\\best.pt"
+    },
+    "local_replay": {
+      "config": "experiments/cube2_qmap/configs/near_goal_local_replay.json",
+      "run": "/home/gongruochen/grounded_llm/runs/cube_near_local_86b86e6",
+      "source_commit": "86b86e6",
+      "selected_step": 1000,
+      "scores": {
+        "original": {
+          "tasks": 500,
+          "solved": 383,
+          "by_goal_depth": {
+            "0": {
+              "count": 500,
+              "solved": 383
+            }
+          }
+        },
+        "small_ood": {
+          "tasks": 500,
+          "solved": 181,
+          "by_goal_depth": {
+            "1": {
+              "count": 167,
+              "solved": 125
+            },
+            "2": {
+              "count": 167,
+              "solved": 41
+            },
+            "3": {
+              "count": 166,
+              "solved": 15
+            }
+          }
+        },
+        "validation": {
+          "tasks": 500,
+          "solved": 168,
+          "by_goal_depth": {
+            "1": {
+              "count": 167,
+              "solved": 118
+            },
+            "2": {
+              "count": 167,
+              "solved": 37
+            },
+            "3": {
+              "count": 166,
+              "solved": 13
+            }
+          }
+        },
+        "test": {
+          "tasks": 500,
+          "solved": 165,
+          "by_goal_depth": {
+            "1": {
+              "count": 167,
+              "solved": 114
+            },
+            "2": {
+              "count": 167,
+              "solved": 34
+            },
+            "3": {
+              "count": 166,
+              "solved": 17
+            }
+          }
+        },
+        "final_test": {
+          "tasks": 500,
+          "solved": 159,
+          "by_goal_depth": {
+            "1": {
+              "count": 167,
+              "solved": 120
+            },
+            "2": {
+              "count": 167,
+              "solved": 28
+            },
+            "3": {
+              "count": 166,
+              "solved": 11
+            }
+          }
+        }
+      },
+      "full_restoration": {
+        "count": 3674160,
+        "solved": 2790312,
+        "success_rate": 0.7594421582075903,
+        "mae": 0.7769646048545837,
+        "shortest_action_rate": 0.7480650674072624
+      },
+      "attempted_updates": 4000,
+      "accepted_updates": 4000,
+      "highest_new_validation_solved": 133,
+      "paired_small_ood": {
+        "gained": 0,
+        "lost": 0
+      },
+      "evidence": "runs\\model_retests\\cube_near_local_86b86e6\\summary.json",
+      "checkpoint": "runs\\model_retests\\cube_near_local_86b86e6\\best.pt"
+    },
+    "low_lr": {
+      "config": "experiments/cube2_qmap/configs/near_goal_low_lr.json",
+      "run": "/home/gongruochen/grounded_llm/runs/cube_near_low_lr_ed21cd4",
+      "source_commit": "ed21cd4",
+      "selected_step": 2000,
+      "scores": {
+        "original": {
+          "tasks": 500,
+          "solved": 386,
+          "by_goal_depth": {
+            "0": {
+              "count": 500,
+              "solved": 386
+            }
+          }
+        },
+        "small_ood": {
+          "tasks": 500,
+          "solved": 183,
+          "by_goal_depth": {
+            "1": {
+              "count": 167,
+              "solved": 127
+            },
+            "2": {
+              "count": 167,
+              "solved": 41
+            },
+            "3": {
+              "count": 166,
+              "solved": 15
+            }
+          }
+        },
+        "validation": {
+          "tasks": 500,
+          "solved": 169,
+          "by_goal_depth": {
+            "1": {
+              "count": 167,
+              "solved": 118
+            },
+            "2": {
+              "count": 167,
+              "solved": 38
+            },
+            "3": {
+              "count": 166,
+              "solved": 13
+            }
+          }
+        },
+        "test": {
+          "tasks": 500,
+          "solved": 169,
+          "by_goal_depth": {
+            "1": {
+              "count": 167,
+              "solved": 118
+            },
+            "2": {
+              "count": 167,
+              "solved": 35
+            },
+            "3": {
+              "count": 166,
+              "solved": 16
+            }
+          }
+        },
+        "final_test": {
+          "tasks": 500,
+          "solved": 161,
+          "by_goal_depth": {
+            "1": {
+              "count": 167,
+              "solved": 119
+            },
+            "2": {
+              "count": 167,
+              "solved": 30
+            },
+            "3": {
+              "count": 166,
+              "solved": 12
+            }
+          }
+        }
+      },
+      "full_restoration": {
+        "count": 3674160,
+        "solved": 2799767,
+        "success_rate": 0.762015535523766,
+        "mae": 0.7765081524848938,
+        "shortest_action_rate": 0.7488178927477009
+      },
+      "attempted_updates": 2000,
+      "accepted_updates": 2000,
+      "highest_new_validation_solved": 169,
+      "paired_small_ood": {
+        "gained": 9,
+        "lost": 7
+      },
+      "evidence": "runs\\model_retests\\cube_near_low_lr_ed21cd4\\summary.json",
+      "checkpoint": "runs\\model_retests\\cube_near_low_lr_ed21cd4\\best.pt"
+    },
+    "near_huber_0p1": {
+      "config": "experiments/cube2_qmap/configs/near_goal_rank_refinement.json",
+      "run": "/home/gongruochen/grounded_llm/runs/cube_near_rank_ed21cd4",
+      "source_commit": "ed21cd4",
+      "selected_step": 2250,
+      "scores": {
+        "original": {
+          "tasks": 500,
+          "solved": 384,
+          "by_goal_depth": {
+            "0": {
+              "count": 500,
+              "solved": 384
+            }
+          }
+        },
+        "small_ood": {
+          "tasks": 500,
+          "solved": 185,
+          "by_goal_depth": {
+            "1": {
+              "count": 167,
+              "solved": 124
+            },
+            "2": {
+              "count": 167,
+              "solved": 46
+            },
+            "3": {
+              "count": 166,
+              "solved": 15
+            }
+          }
+        },
+        "validation": {
+          "tasks": 500,
+          "solved": 168,
+          "by_goal_depth": {
+            "1": {
+              "count": 167,
+              "solved": 119
+            },
+            "2": {
+              "count": 167,
+              "solved": 36
+            },
+            "3": {
+              "count": 166,
+              "solved": 13
+            }
+          }
+        },
+        "test": {
+          "tasks": 500,
+          "solved": 169,
+          "by_goal_depth": {
+            "1": {
+              "count": 167,
+              "solved": 123
+            },
+            "2": {
+              "count": 167,
+              "solved": 30
+            },
+            "3": {
+              "count": 166,
+              "solved": 16
+            }
+          }
+        },
+        "final_test": {
+          "tasks": 500,
+          "solved": 159,
+          "by_goal_depth": {
+            "1": {
+              "count": 167,
+              "solved": 118
+            },
+            "2": {
+              "count": 167,
+              "solved": 31
+            },
+            "3": {
+              "count": 166,
+              "solved": 10
+            }
+          }
+        }
+      },
+      "full_restoration": {
+        "count": 3674160,
+        "solved": 2807436,
+        "success_rate": 0.7641028153373832,
+        "mae": 0.7740398645401001,
+        "shortest_action_rate": 0.7499738035289164
+      },
+      "attempted_updates": 2000,
+      "accepted_updates": 2000,
+      "highest_new_validation_solved": 168,
+      "paired_small_ood": {
+        "gained": 16,
+        "lost": 12
+      },
+      "evidence": "runs\\model_retests\\cube_near_rank_ed21cd4\\summary.json",
+      "checkpoint": "runs\\model_retests\\cube_near_rank_ed21cd4\\best.pt"
+    },
+    "segments": {
+      "config": "experiments/cube2_qmap/configs/near_goal_segment_replay.json",
+      "run": "/home/gongruochen/grounded_llm/runs/cube_near_segments_dcc80f6",
+      "source_commit": "dcc80f6",
+      "selected_step": 1000,
+      "scores": {
+        "original": {
+          "tasks": 500,
+          "solved": 383,
+          "by_goal_depth": {
+            "0": {
+              "count": 500,
+              "solved": 383
+            }
+          }
+        },
+        "small_ood": {
+          "tasks": 500,
+          "solved": 181,
+          "by_goal_depth": {
+            "1": {
+              "count": 167,
+              "solved": 125
+            },
+            "2": {
+              "count": 167,
+              "solved": 41
+            },
+            "3": {
+              "count": 166,
+              "solved": 15
+            }
+          }
+        },
+        "validation": {
+          "tasks": 500,
+          "solved": 168,
+          "by_goal_depth": {
+            "1": {
+              "count": 167,
+              "solved": 118
+            },
+            "2": {
+              "count": 167,
+              "solved": 37
+            },
+            "3": {
+              "count": 166,
+              "solved": 13
+            }
+          }
+        },
+        "test": {
+          "tasks": 500,
+          "solved": 165,
+          "by_goal_depth": {
+            "1": {
+              "count": 167,
+              "solved": 114
+            },
+            "2": {
+              "count": 167,
+              "solved": 34
+            },
+            "3": {
+              "count": 166,
+              "solved": 17
+            }
+          }
+        },
+        "final_test": {
+          "tasks": 500,
+          "solved": 159,
+          "by_goal_depth": {
+            "1": {
+              "count": 167,
+              "solved": 120
+            },
+            "2": {
+              "count": 167,
+              "solved": 28
+            },
+            "3": {
+              "count": 166,
+              "solved": 11
+            }
+          }
+        }
+      },
+      "full_restoration": {
+        "count": 3674160,
+        "solved": 2790312,
+        "success_rate": 0.7594421582075903,
+        "mae": 0.7769646048545837,
+        "shortest_action_rate": 0.7480650674072624
+      },
+      "attempted_updates": 2000,
+      "accepted_updates": 2000,
+      "highest_new_validation_solved": 127,
+      "paired_small_ood": {
+        "gained": 0,
+        "lost": 0
+      },
+      "evidence": "runs\\model_retests\\cube_near_segments_dcc80f6\\summary.json",
+      "checkpoint": "runs\\model_retests\\cube_near_segments_dcc80f6\\best.pt",
+      "training_pool": {
+        "candidates": 30720,
+        "admissible": 3598,
+        "kind": "segments",
+        "routes": 3072,
+        "unique_goals": 153,
+        "lengths": {
+          "5": 1643,
+          "6": 794,
+          "7": 363,
+          "8": 155,
+          "9": 78,
+          "10": 39
+        }
+      }
+    }
+  },
+  "selected_candidate": "low_lr",
+  "adopted": false,
+  "selection": "Near-goal validation, require original restoration >=383/500; tie by original restoration then earlier checkpoint. No OOD/test-based checkpoint choice.",
+  "full_route_preparation": {
+    "config": "experiments/cube2_qmap/configs/near_goal_path_replay.json",
+    "run": "/home/gongruochen/grounded_llm/runs/cube_near_paths_3784be1",
+    "status": "insufficient_admissible_complete_routes",
+    "candidate_limit": 2097152,
+    "requested_routes": 3072,
+    "optimizer_updates": 0
+  },
+  "cpu_verification": {
+    "evidence": "runs/model_retests/cube_near_low_lr_ed21cd4/cpu_greedy_comparison.json",
+    "step1000": {
+      "original": 383,
+      "small_ood": 181
+    },
+    "selected": {
+      "original": 386,
+      "small_ood": 183
+    }
+  },
+  "limitations": [
+    "Validation reused across choices; the selected gain is tiny and not independent confirmation.",
+    "Previously inspected test/OOD cohorts are regression evidence; final monitor excludes only this continuation and earlier exposure is unaudited.",
+    "Selected full-state restoration remains below the originally adopted map (77.47%).",
+    "FLAN frozen maps and task selection are unchanged; no LLM gains are inferred."
+  ]
+}

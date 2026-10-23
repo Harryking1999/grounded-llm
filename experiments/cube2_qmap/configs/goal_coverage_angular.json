@@ -1,0 +1,7 @@
+{
+  "parent_contract": "experiments/cube2_qmap/configs/goal_coverage_factorial.json",
+  "seed": 2026102407,
+  "geometry": {"maximum_radial_depth_gap": 1, "pair_batch": 256, "pair_weight": 0.5},
+  "rationale": "A training-only channel diagnostic found that all sampled far candidate distances to the six depth-1 goals used invariant channel 126, despite distinct goal vectors; crossed goals therefore gave identical far actions. Densify legal pairs with similar solved depth but different angular relationships, including pairs whose stars contain protected candidates. The latter are distance-only labels and never incomplete ranking targets. Contrast uniform-source pairs with identical targets, unique-pair count, auxiliary weight and exposure budget. Core Original/replay complete stars, edge supervision, optimizer, model and inference stay matched.",
+  "budget": "Two matched 8192-update arms, geometry and geometry_uniform, each using the validated post-update best factorial recipe edges and the common step-2000 initialization. This is a data-region/weight control, not a network, distance, subgradient or inference change. Keep staged validation selection and sealed tests."
+}

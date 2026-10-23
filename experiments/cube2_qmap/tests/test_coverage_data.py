@@ -47,6 +47,7 @@ class CoverageTests(unittest.TestCase):
                                       np.zeros(env.size,dtype=bool),[5])
         self.assertTrue(guard.task_blocked(env,np.array([[20,5]]))[0])
         self.assertTrue(guard.task_blocked(env,np.array([[4,20]]))[0])
+        self.assertFalse(guard.contains(np.array([[4,20]]))[0])
         self.assertTrue(guard.task_blocked(env,np.array([[10,2]]))[0])
         self.assertFalse(guard.task_blocked(env,np.array([[20,8]]))[0])
 

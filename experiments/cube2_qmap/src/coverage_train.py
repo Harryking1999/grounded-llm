@@ -12,7 +12,7 @@ from torch.nn import functional as F
 from grounded_llm.core.files import atomic_json
 from grounded_llm.tasks.cube2.environment import Cube2
 from grounded_llm.tasks.cube2.model import MODEL_TYPE,QMap
-from .coverage_data import CoverageGuard,keys_to_pairs,coverage,unique_tasks,hist
+from .coverage_data import CoverageGuard,keys_to_pairs,coverage,unique_tasks,hist,load_coverage_config
 from .full_state_joint import fixed_batch,batch_losses
 from .near_goal_continuation import inspect
 
@@ -41,6 +41,12 @@ def edge_loss(model,env,parents,allowed,device):
     return F.smooth_l1_loss(predicted,torch.ones_like(predicted)),len(source)
 
 
+def pair_loss(model,env,pairs,device):
+    states=np.unique(pairs);q=model.encode(torch.as_tensor(env.features(states),device=device))
+    a,b=np.searchsorted(states,pairs).T
+    return F.smooth_l1_loss(model.distance(q[a],q[b]),torch.as_tensor(env.distance(*pairs.T),device=device,dtype=q.dtype))
+
+
 class Pool:
     def __init__(self,rows,seed,grouped=False):
         self.rows=rows;self.rng=np.random.default_rng(seed);self.grouped=grouped
@@ -62,7 +68,7 @@ class Pool:
 
 
 def run_factorial(args):
-    cfg=json.loads(args.config.read_text());options=cfg['training']
+    cfg=load_coverage_config(args.config);options=cfg['training']
     torch.set_num_threads(options['cpu_threads']);torch.manual_seed(cfg['seed'])
     env=Cube2(args.oracle,metric='QTM_URF_6');d=np.load(args.data/'cohorts.npz')
     saved=torch.load(args.checkpoint,map_location='cpu',weights_only=False)
@@ -74,15 +80,19 @@ def run_factorial(args):
     batches=dict(specification['batches'])
     if args.arm in ('hard','random_aux'):
         batches['AuxHard' if args.arm=='hard' else 'AuxRandom']=[cfg['hard_followup']['extra_batch'],cfg['hard_followup']['extra_weight']]
+    if args.arm in ('geometry','geometry_uniform'):
+        batches['PairAngular' if args.arm=='geometry' else 'PairUniform']=[cfg['geometry']['pair_batch'],cfg['geometry']['pair_weight']]
     names=sorted(batches);pools={}
     guard=CoverageGuard(env,keys_to_pairs(d['excluded_relation_keys'],env.size),d['state_mask'],d['heldout_goals'])
     for index,name in enumerate(names):
         filename={'AuxHard':'Hard','AuxRandom':'Original'}.get(name,name)
         rows=np.load(args.data/(filename+'.npy'))
-        if guard.task_blocked(env,rows).any():raise ValueError('Incomplete/protected ranking pool')
+        if name.startswith('Pair'):
+            if guard.contains(rows).any():raise ValueError('Protected auxiliary pair')
+        elif guard.task_blocked(env,rows).any():raise ValueError('Incomplete/protected ranking pool')
         # Role-specific fixed seeds keep the original, cross and replay streams
         # identical between their edge/no-edge and hard/random controls.
-        role_seed={'Original':0,'Cross':1,'OriginalReplay':2,'AuxHard':3,'AuxRandom':3}[name]
+        role_seed={'Original':0,'Cross':1,'OriginalReplay':2,'AuxHard':3,'AuxRandom':3,'PairAngular':3,'PairUniform':3}[name]
         pools[name]=Pool(rows,options['seed']+role_seed,name=='Cross')
     edge_rng=np.random.default_rng(options['seed']+4)
     allowed=np.load(args.data/'edge_allowed.npy',mmap_mode='r')
@@ -101,6 +111,9 @@ def run_factorial(args):
     with torch.no_grad():
         result['initial_train_monitor']={}
         for name,tasks in fit_tasks.items():
+            if name.startswith('Pair'):
+                result['initial_train_monitor'][name]=dict(huber=float(pair_loss(model,env,tasks,args.device)),rank=None)
+                continue
             batch=fixed_batch(env,tasks)
             h,r=batch_losses(model,torch.as_tensor(env.features(batch['states']),device=args.device),batch,cfg)
             result['initial_train_monitor'][name]=dict(huber=float(h),rank=float(r))
@@ -110,7 +123,11 @@ def run_factorial(args):
         for update in range(1,options['updates']+1):
             model.train();optimizer.zero_grad(set_to_none=True);terms={}
             for name in names:
-                count,weight=batches[name];tasks=pools[name].draw(count);batch=fixed_batch(env,tasks)
+                count,weight=batches[name];tasks=pools[name].draw(count)
+                if name.startswith('Pair'):
+                    h=pair_loss(model,env,tasks,args.device);(weight*h).backward();terms[name]=[float(h.detach()),None]
+                    continue
+                batch=fixed_batch(env,tasks)
                 h,r=batch_losses(model,torch.as_tensor(env.features(batch['states']),device=args.device),batch,cfg)
                 (weight*(h+options['rank_weight']*r)).backward();terms[name]=[float(h.detach()),float(r.detach())]
             edge_count=0
@@ -126,14 +143,19 @@ def run_factorial(args):
             fit={}
             with torch.no_grad():
                 for name,tasks in fit_tasks.items():
+                    if name.startswith('Pair'):
+                        fit[name]=dict(huber=float(pair_loss(model,env,tasks,args.device)),rank=None)
+                        continue
                     batch=fixed_batch(env,tasks)
                     h,r=batch_losses(model,torch.as_tensor(env.features(batch['states']),device=args.device),batch,cfg)
                     fit[name]=dict(huber=float(h),rank=float(r))
                 el,_=edge_loss(model,env,fixed_edge_parents,allowed,args.device)
                 fit['edge_huber']=float(el)
-            exposed=unique_tasks(np.concatenate([p.rows[p.seen>0] for p in pools.values()]),env.size)
+            exposed=unique_tasks(np.concatenate([p.rows[p.seen>0] for n,p in pools.items() if not n.startswith('Pair')]),env.size)
             record=dict(updates=update,metrics=metrics,train_monitor=fit,
-                roles={n:dict(exposures=int(p.seen.sum()),unique_decisions_exposed=int((p.seen>0).sum()),
+                roles={n:dict(exposures=int(p.seen.sum()),label_kind='distance_only' if n.startswith('Pair') else 'complete_star',
+                    unique_decisions_exposed=None if n.startswith('Pair') else int((p.seen>0).sum()),
+                    unique_distance_pairs_exposed=int((p.seen>0).sum()) if n.startswith('Pair') else None,
                     pool_rows=len(p.rows),minimum_exposure=int(p.seen.min()),maximum_exposure=int(p.seen.max())) for n,p in pools.items()},
                 unique_complete_decisions=len(exposed),unique_candidate_action_labels=len(exposed)*6,
                 unique_parents=len(np.unique(exposed[:,0])),unique_goals=len(np.unique(exposed[:,1])),
@@ -273,7 +295,7 @@ def main():
     p=argparse.ArgumentParser(__doc__)
     for name in ('config','data','oracle','checkpoint','out'):p.add_argument('--'+name,type=Path,required=True)
     p.add_argument('--version',choices=['V1','V2','V2_disjoint','V3'])
-    p.add_argument('--arm',choices=['original','edges','cross','both','hard','random_aux'])
+    p.add_argument('--arm',choices=['original','edges','cross','both','hard','random_aux','geometry','geometry_uniform'])
     p.add_argument('--base-arm',choices=['original','edges','cross','both'])
     p.add_argument('--source-commit',required=True);p.add_argument('--device',default='cuda')
     p.add_argument('--no-edges',action='store_true')

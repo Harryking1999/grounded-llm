@@ -20,6 +20,14 @@ def hist(values):
     return {str(int(k)):int(v) for k,v in zip(unique,counts)}
 
 
+def load_coverage_config(path):
+    cfg=json.loads(Path(path).read_text())
+    if 'parent_contract' not in cfg:return cfg
+    base=load_coverage_config(cfg['parent_contract'])
+    return {**base,**cfg,**{k:{**base.get(k,{}),**cfg.get(k,{})}
+        for k in ('data','training','geometry','arms','hard_followup')}}
+
+
 def unique_tasks(tasks, size):
     keys=np.unique(tasks[:,0].astype(np.int64)*size+tasks[:,1])
     return np.column_stack((keys//size,keys%size))
@@ -368,7 +376,7 @@ def prepare(args):
 
 
 def expand_cross(args):
-    cfg=json.loads(args.config.read_text());env=Cube2(args.oracle,metric='QTM_URF_6')
+    cfg=load_coverage_config(args.config);env=Cube2(args.oracle,metric='QTM_URF_6')
     rng=np.random.default_rng(cfg['seed']);source=args.audit_source;out=args.out
     out.mkdir(parents=True,exist_ok=False);d=np.load(source/'cohorts.npz')
     guard=CoverageGuard(env,keys_to_pairs(d['excluded_relation_keys'],env.size),d['state_mask'],d['heldout_goals'])
@@ -447,6 +455,43 @@ def mine_expanded(args):
     print(json.dumps(dict(stage='hard_pool_ready',actual_trajectory_decisions=trajectory_extra,total=len(extra))),flush=True)
 
 
+def angular_pairs(args):
+    cfg=load_coverage_config(args.config);env=Cube2(args.oracle,metric='QTM_URF_6')
+    out=args.out;rng=np.random.default_rng(cfg['seed']);d=np.load(out/'cohorts.npz')
+    assert not (out/'PairAngular.npy').exists() and not (out/'PairUniform.npy').exists()
+    guard=CoverageGuard(env,keys_to_pairs(d['excluded_relation_keys'],env.size),d['state_mask'],d['heldout_goals'])
+    rows=[]
+    for goal in np.r_[0,d['train_goals']]:
+        sources=np.flatnonzero(np.abs(env.depth.astype(int)-int(env.depth[goal]))<=cfg['geometry']['maximum_radial_depth_gap'])
+        pairs=np.column_stack((sources,np.full(len(sources),goal)))
+        pairs=pairs[(sources!=goal)&~guard.contains(pairs)]
+        rows.append(pairs)
+    angular=np.concatenate(rows)
+    keys=np.minimum(*angular.T)*env.size+np.maximum(*angular.T)
+    _,index=np.unique(keys,return_index=True);angular=angular[index]
+    # The uniform control matches each target exactly and the number of unique
+    # symmetric distance relations, changing only the source-distance region.
+    uniform=np.column_stack((rng.integers(env.size,size=len(angular)),angular[:,1]))
+    for _ in range(10000):
+        keys=np.minimum(*uniform.T)*env.size+np.maximum(*uniform.T)
+        _,first=np.unique(keys,return_index=True);duplicate=np.ones(len(keys),dtype=bool);duplicate[first]=False
+        bad=(uniform[:,0]==uniform[:,1])|guard.contains(uniform)|duplicate
+        if not bad.any():break
+        uniform[bad,0]=rng.integers(env.size,size=bad.sum())
+    else:raise ValueError('Pair control rejection did not terminate')
+    report={}
+    for name,pairs in [('PairAngular',angular),('PairUniform',uniform)]:
+        np.save(out/(name+'.npy'),pairs)
+        report[name]=dict(rows=len(pairs),unique_undirected_distance_relations=len(pairs),
+            source_depths=hist(env.depth[pairs[:,0]]),goal_depths=hist(env.depth[pairs[:,1]]),
+            true_distances=hist(env.distance(*pairs.T)),
+            complete_star_admissible=int((~guard.task_blocked(env,pairs)).sum()),
+            use='distance-only auxiliary; zero candidate-ranking labels counted')
+    atomic_json(out/'angular_pairs.json',dict(source_commit=args.source_commit,pools=report,
+        no_protected_endpoint_or_relation=True,sealed_tests_not_opened=True))
+    print(json.dumps(dict(stage='angular_pairs',rows=len(angular))),flush=True)
+
+
 def main():
     p=argparse.ArgumentParser(__doc__)
     for name in ('config','oracle','first-cohorts','second-cohorts','checkpoint1000','checkpoint2000','out'):
@@ -456,8 +501,10 @@ def main():
     p.add_argument('--expand-cross',action='store_true')
     p.add_argument('--mine-expanded',action='store_true')
     p.add_argument('--mining-checkpoint',type=Path)
+    p.add_argument('--angular-pairs',action='store_true')
     args=p.parse_args()
-    if args.mine_expanded:mine_expanded(args)
+    if args.angular_pairs:angular_pairs(args)
+    elif args.mine_expanded:mine_expanded(args)
     elif args.expand_cross:expand_cross(args)
     else:prepare(args)
 

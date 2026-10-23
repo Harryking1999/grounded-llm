@@ -33,6 +33,21 @@ def paired_change(before,after):
         gained_indices=np.flatnonzero(~a&b).tolist(),lost_indices=np.flatnonzero(a&~b).tolist())
 
 
+@torch.no_grad()
+def channel_diagnostic(model,env,parents,device):
+    goals=np.flatnonzero(env.depth==1);children=env.successors(parents)
+    qg=model.encode(torch.as_tensor(env.features(goals),device=device))
+    q=model.encode(torch.as_tensor(env.features(children.ravel()),device=device)).reshape(len(parents),6,-1)
+    delta=(q[:,:,None,:]-qg[None,None,:,:]).abs();maximum=delta.amax(-1,keepdim=True);mask=delta==maximum
+    invariant=(model.axis_output_action==torch.arange(q.shape[-1],device=device)).all(0)
+    actions=maximum.squeeze(-1).argmin(1)
+    return dict(parents=len(parents),max_goal1_vector_difference=float((qg-qg[:1]).abs().max()),
+        max_goal1_candidate_distance_difference=float((maximum-maximum[:,:,:1]).abs().max()),
+        active_max_channels=torch.nonzero(mask.any((0,1,2))).ravel().tolist(),
+        fraction_maxima_on_invariant_channels=float(mask[:,:,:,invariant].sum()/mask.sum()),
+        parent_fraction_changing_action_across_goal1=float((actions!=actions[:,:1]).any(-1).float().mean()))
+
+
 def diagnose(args):
     """Training-only fitting, conditioning and gradient-conflict checks."""
     torch.set_num_threads(2);args.out.mkdir(parents=True,exist_ok=False)
@@ -84,6 +99,7 @@ def diagnose(args):
                     for label in gradients[a].keys()&gradients[b].keys()}
         output['models'][name]=dict(checkpoint=str(path),pools=metrics,edge_huber=float(el.detach()),
             sampled_effective_edge_labels=count,gradient_cosine=cosine,
+            channels=channel_diagnostic(model,env,np.load(args.data/'Cross.npy').reshape(-1,8,2)[:512,0,0],args.device),
             gradient_norms={n:{k:float(v.norm()) for k,v in g.items()} for n,g in gradients.items()})
         atomic_json(args.out/'diagnostics.json',output)
         print(json.dumps(dict(model=name,cross=metrics['Cross']['optimal_action_rate'],edge_huber=float(el.detach()))),flush=True)

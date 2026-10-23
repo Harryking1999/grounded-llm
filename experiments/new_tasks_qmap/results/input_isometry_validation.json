@@ -1140,5 +1140,16 @@
     }
   },
   "condition": "Validation-only input-isometry diagnosis. Sokoban variant k rotates the complete board90*(k mod4) degrees counterclockwise, then reflects columns for k>=4; all four channels move together. Rush Hour variants jointly rename only existing ordinary vehicle labels, preserving A. Token variants jointly rename token identities on the fixed labelled tree. Variant0 is identity. Each feature transform is independent of query goal. Physics, oracle distances, complete targets and candidate multiplicity are preserved. Candidate order is transported from the original query to isolate encoding; this need not match a freshly enumerated transformed board tie order. These are diagnostic variations, not acceptance results or training augmentation.",
-  "interpretation": "Predictions and transported greedy policies are not invariant under valid input isometries. This identifies representation sensitivity but does not prove that correcting it alone will solve cross-layout generalization. All variants remain separate; no test-time ensemble or selection is used. Label spelling is normalized only in a separately declared training condition."
+  "interpretation": "Predictions and transported greedy policies are not invariant under valid input isometries. This identifies representation sensitivity but does not prove that correcting it alone will solve cross-layout generalization. All variants remain separate; no test-time ensemble or selection is used. Label spelling is normalized only in a separately declared training condition.",
+  "lane_order_structural_validation": {
+    "physical_states": 1348182,
+    "scenes": 224,
+    "sampled_features_checked": 4472,
+    "all_component_vehicle_orders_constant": true,
+    "sampled_features_equal_fixed_identity_channel_permutation": true,
+    "sampled_joint_renaming_invariant": true,
+    "interpretation": "All physical states were checked for constant ordinary-vehicle order. Thus channel assignment is a fixed identity bijection within each reachable component; separate identity planes preserve complete-state distinctions. Feature equality under arbitrary spelling changes was checked on the listed sample. This is structural validation, not evidence of learned navigation success.",
+    "source_commit": "9596e4a",
+    "raw_result": "runs\\new_tasks_qmap\\exact_pairs\\rush_vehicle_encoding_check.json"
+  }
 }

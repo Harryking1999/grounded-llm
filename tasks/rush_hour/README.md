@@ -1,15 +1,26 @@
 # Rush Hour（移车出库）
 
-采用[Fogleman公开题库与实现](https://github.com/fogleman/rush/tree/3e3b8396891d1802b30cb3129ae31fdedb319480)的6×6规则。车辆长2或3，只能沿自身轴线移动；一次滑动任意合法距离计1步，目标车A在棋盘内到达最右端即完成。完整计划文字与裁判已接入，尚无Qmap或LLM训练。
+在拥挤的停车场里移动车辆，让它们到达指定位置。当前使用 **无墙6×6棋盘**，每辆车长两格或三格。
 
-第一版采用同一个Qmap覆盖多种车辆布局，编码完整棋盘，按整个布局／可达分量留出测试。每题指定一张A到右端、其他车辆位置也明确的完整成功目标棋盘，训练与评测均要求精确匹配；这属于原出口目标的变体，不能用旧Flash成绩替代。构建与验收边界见[Qmap](Qmap/README.md)。
+## 怎么玩
 
-指定完整目标的Flash high、64k诊断使用8个已测原始深起点，精确成本38至51步，0/8完成，全部思考耗尽且最终答案为空。见[指定目标结果](../../experiments/task_text_baselines/results/exact_goals_flash64k.json)。这是已知起点定向诊断，不是独立总体成功率。
+- 横车只能左右滑动，竖车只能上下滑动，不能转弯或穿过其他车。
+- 一次只移动一辆车，沿自身方向滑动任意合法距离都算一步。
+- 每题给出一张完整目标棋盘：**所有车辆的位置都必须匹配，目标车A在最右端**。A到出口但其他车没到指定位置，仍未完成。
+- 车辆始终留在棋盘内，目标是用尽量少的滑动次数完成。
 
-历史原出口规则的Flash64k筛查完成17/40，全部成功计划最优；21题思考耗尽，2题对可解题误报无解。40起点来自8个公开无墙分量，最短2至51步，不能当作40道独立原题的总体成绩。证据与限制见下方统一结果。
+车辆移动可以撤销，但为一辆车让路，常常需要先移动多辆其他车。
 
-- [规则与文字](prompts/README.md)
-- [题目来源与精确标签](data/README.md)
-- [地图条件](Qmap/README.md)、[采用记录](Qmap/selection.json)
-- [规则实现](../../grounded_llm/tasks/rush_hour/environment.py)
-- [Flash筛查合同](../../experiments/task_text_baselines/configs/deepseek_rush_token64k.json)、[统一结果](../../experiments/task_text_baselines/results/report.md)
+## 在项目中怎么用
+
+编码器读取完整棋盘，区分每辆车。同一个Qmap覆盖多种车辆布局，学习到指定目标的最少滑动次数；测试单独检查训练时没见过的布局。
+
+**熟悉布局中的完成率约98%，未见布局为54.59%，尚未达标。** 数据准备和多组训练已完成，目前没有采用权重或本任务LLM训练。最新编码对照没有最终结果。完整比较见[三任务报告](../../experiments/new_tasks_qmap/results/report.md)。
+
+## 来源与阅读入口
+
+题目与规则来自[Fogleman公开题库](https://www.michaelfogleman.com/rush/)。原题只要求A到出口；本项目明确指定所有车辆的最终位置。
+
+- [数据来源与划分](data/README.md)
+- [Qmap输入、目标与评测](Qmap/README.md)
+- [正式任务文字](prompts/README.md)

@@ -1,31 +1,23 @@
 # 推箱子数据
 
-保留范围为公开Boxoban hard的10×10、四箱四目标，完整状态对Qmap数据已按[正式配置](../../../experiments/new_tasks_qmap/configs/sokoban_pairs.json)生成，范围与精确标签统计见[数据证据](../../../experiments/new_tasks_qmap/results/exact_pairs_data.json)。历史生成入口：[data.py](../../../grounded_llm/tasks/sokoban/data.py)，对应[6×6两箱诊断配置](../../../experiments/new_tasks_qmap/configs/sokoban.json)；不能把该数据或权重扩称为hard条件。历史运行输出为忽略目录中的 data.npz、scenes.jsonl.gz 和 data_summary.json，包含场景、状态编码、全部合法动作后继、动作成本、精确距离、终止掩码、起点及划分。不可达距离是正无穷，训练代理标签另存，不覆盖真值。
+当前使用[DeepMind Boxoban](https://github.com/google-deepmind/boxoban-levels/blob/78011d8c86ad423bfb2e1005012393b4c3c24409/README.md)的hard题目：10×10、四箱四目标。每题保留原始布局，并明确指定箱子和玩家的最终位置。
 
-历史小棋盘按完整墙体布局划分，三个集合墙体不重复；旋转和镜像同构尚未额外剔除。每个场景枚举玩家位置和箱子组合，保留死锁；从精确可解的非终止状态固定抽取rollout起点。随机ASCII种子仅用于构造静态布局，不保证其摆箱可解；实际评测起点在data.npz。
+## 难度等级是什么意思
 
-[example.json](example.json)仅为结构与规则说明，不作为独立评测题。
+三个等级来自同一个公开题库，棋盘大小和箱子数量相同，区别在于布局的筛选方式。
 
-## Boxoban 文字加难题
+| 等级 | 上游定义 |
+|---|---|
+| unfiltered | 原生成过程得到的题目，未按策略失败进一步筛选 |
+| medium | 较弱求解策略尝试10次仍未完成的题目 |
+| hard | 在medium候选中，较强策略尝试10次仍未完成的3,332题 |
 
-后续文字筛查使用[官方 Boxoban 固定提交](https://github.com/google-deepmind/boxoban-levels/blob/78011d8c86ad423bfb2e1005012393b4c3c24409/README.md)的不同题目，不复用首轮自生成小棋盘。三个子集规则均为10×10、四箱四目标，改变的是布局；难度名由上游给定，不是本项目按距离重新分档。
+筛选方法见[原论文附录第7节](https://proceedings.mlr.press/v97/guez19a/guez19a-supp.pdf)。这是相对原作者策略的难度，不保证每道hard题都比medium需要更多步。
 
-| 子集 | 上游筛选依据 | 本项目来源 |
-|---|---|---|
-| unfiltered | 按原生成过程产生，未按策略求解失败进一步筛选 | `unfiltered/test/000.txt` |
-| medium | 较弱 DRC 策略尝试10次仍未解出，来自新生成题 | `medium/valid/000.txt` |
-| hard | 在独立 medium 候选中，较强 DRC 策略尝试10次仍未解出的3332题 | `hard/000.txt` |
+## 本项目使用的范围
 
-筛选过程见 [Guez等，ICML2019，附录§7](https://proceedings.mlr.press/v97/guez19a/guez19a-supp.pdf)。这些是相对于原作者策略的经验难度，不保证对Flash单调变难，也不意味着hard题的最短解一定更长。
+已准备98个场景：64个训练、16个验证、16个测试，另有2个已知困难题。只接纳能完整计算精确距离的布局，不能代表全部hard题库。实际规模见[数据统计](../../../experiments/new_tasks_qmap/results/exact_pairs_data.json)，筛选条件见[配置](../../../experiments/new_tasks_qmap/configs/sokoban_pairs.json)。
 
-本项目每档最多顺序测3题，首次有效完成失败即停止；先由有界推空间搜索找到合法参考解才接纳题目，因此还带有本地求解器筛选，不能作为完整benchmark成绩。参考轨迹是合法走／推动作的上界，不冒充最短走动距离。当前结果与首轮小棋盘分开，见[文字基线报告](../../../experiments/task_text_baselines/results/report.md)。
+同一墙体及其旋转、镜像版本放在同一组。每个布局含多个完整目标，距离按玩家实际走动和推动的总步数计算。无解关系明确保留，不能把合法死路从候选中删除。
 
-## hard条件的Qmap数据边界
-
-一份地图场景包含固定墙体、固定目标格与四箱；物理状态为玩家位置和四个不可区分箱子的位置集合。目标格是环境上下文，不能省掉玩家位置；合并玩家可行走区域的推空间状态适合找推数参考，不等价于逐格走／推动作成本下的状态。
-
-若场景共有F个可占据格，完整物理状态上界为`C(F,4) × (F−4)`，与100格棋盘面积不是同一个数量。已测hard原题362有24个可占据格，共212,520个物理放置；原题359有27格，共403,650个。该计数包括死锁和不可达放置，不是可解状态数。这两题适合先核对精确图规模；不能由此推定整个3332题hard子集都可枚举。
-
-首版已确定为一个Qmap覆盖多张hard布局，输入完整棋盘，每题指定一个完整成功终局，监督到该终局的最小走／推成本。目标箱子集合和玩家位置均明确；同一布局可采多个目标样本。按墙体及其旋转、镜像等价类整组划分；同一墙体下换目标、箱子或玩家不跨组，测试单列未见布局。场景数量、起终点采样及预算需在精确图规模检查后确定，不沿用历史两箱代理距离或假定同一预算。
-
-数据保留公开原题ID、静态布局、指定完整目标、全部合法真实后继与精确距离；各选定目标分别单源反向最短路标注，目标从起点可达由精确图核对。只对指定目标评测，不复用原完成规则最优数。输入与目标见[Qmap说明](../Qmap/README.md)。已验证失败题362保留作开发诊断；若用于选设置，不能同时冒充独立最终泛化测试。
+原题359、362已用于开发和DeepSeek诊断，单列记录，不充当未曝光测试题。历史6×6两箱试验与当前hard数据不同，结果保留在[首轮记录](../../../experiments/new_tasks_qmap/results/summary.json)。[example.json](example.json)只是格式示例。

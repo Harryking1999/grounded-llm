@@ -1,17 +1,26 @@
 # Token Swapping（图上交换棋子）
 
-采用[顺序相邻交换问题](https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.ESA.2016.66)：每个顶点恰有一个不同棋子，一次交换一条无向边两端的棋子，目标全部归位，成本为总交换次数。完整计划已接入，尚无地图或LLM训练。
+图的每个顶点放一枚不同的棋子，通过相邻交换，把棋子移到指定位置。当前固定使用 **一棵10顶点树**。
 
-保留为新增任务。第一版Qmap已确认固定一棵10顶点树，训练与验证状态对距离，先验收再扩到12–15顶点；具体场景见[tree10.json](data/tree10.json)，目标范围和数据方案见[Qmap说明](Qmap/README.md)。现有Flash合同是归位目标，新地图的任意目标条件不能直接复用其成绩。
+## 怎么玩
 
-Flash high、64k在公开40题上完成36/40，全部成功计划最优；4份失败均在10顶点树上耗尽思考预算、最终答案为空。40题均由本地精确搜索重新标定最优成本；4条源序列本身不是最短，不能直接作最优标签。完整结果见下方统一结果。
+- 每个顶点始终恰好有一枚棋子。
+- 每次选一条边，交换它两端的棋子，计一步。
+- 不能跨越多条边直接交换，也不能同时执行多次交换。
+- 每题给出完整起始排列和目标排列，所有顶点都匹配才算完成；交换次数越少越好。
 
-- [规则与文字](prompts/README.md)
-- [公开实例、适配与真值](data/README.md)
-- [地图条件](Qmap/README.md)、[采用记录](Qmap/selection.json)
-- [规则实现与精确求解](../../grounded_llm/tasks/token_swapping/environment.py)
-- [Flash筛查合同](../../experiments/task_text_baselines/configs/deepseek_rush_token64k.json)、[统一结果](../../experiments/task_text_baselines/results/report.md)
+在这棵连通树上，任意两个排列都能互相到达。难点是找到短解，所以同时评估完成率、最优率和多走了多少步。
 
-连通底图上所有完整排列均可达；NP-hard目标是最少交换数，不是任意完成。评测须保留完成、最优率和超额交换数，不能只比较完成率。
+## 在项目中怎么用
 
-保留的10顶点树上，指定非归位目标的[Flash64k诊断](../../experiments/task_text_baselines/results/exact_goals_flash64k.json)为4/5完成且全部最优，1题耗尽思考预算。题目由此前5个精确问题同时重标起终点棋子得到，成本12至15步；不是新的独立总体样本，不据此声称任意目标已普遍通过。
+Qmap分别读取当前排列和目标排列，学习它们之间的最少交换次数。底图目前固定；换一棵树会改变合法动作和距离，现有结果不能直接用于其他树。
+
+**当前三个主要测试组完成率约68%–69%，尚未达到至少80%的要求。** 数据和多组训练已完成，仍有约三成题陷入循环；尚无采用权重或本任务LLM训练。12–15顶点的扩展尚未开展。完整比较见[三任务报告](../../experiments/new_tasks_qmap/results/report.md)。
+
+## 来源与阅读入口
+
+底图来自[tket公开测试实例](https://github.com/Quantinuum/tket/blob/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.hpp)。这是软件测试题集，上游交换序列不保证最短；本项目独立计算最优距离。
+
+- [数据来源与固定树](data/README.md)
+- [Qmap输入、目标与评测](Qmap/README.md)
+- [正式任务文字](prompts/README.md)

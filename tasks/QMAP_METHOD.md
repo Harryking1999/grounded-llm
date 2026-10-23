@@ -38,7 +38,7 @@
 
 三项GOAL槽位都放真实完整状态，各题只有一个目标，Q(s)与Q(g)独立编码；保持现有cross-attention读取当前、单目标与候选的条件，不增加多目标聚合。前两项同一布局可采多个完整成功终局作为不同题目的目标，但目标域仍限于原规则成功终局，不扩称任意中间目标。新训练与评测只采用指定目标，原Flash筛查仅为历史记录。Token Swapping允许任意完整排列目标；棋子重标号只用于精确教师标签查询。
 
-三项按任务独立编排，复用现有MLP、128维Q、距离Huber、原权重soft-rank及MapBatch。reader提供当前、一个完整目标、全部合法真实后继；环境转移不是编码器能力。先验收冻结Q本身的距离、动作和完整计划，再接公共SFT；指定目标文字与裁判已接入，训练、冻结reader与正式配置见[实验入口](../experiments/new_tasks_qmap/README.md)，复用公共编码与监督。必需组地图贪心至少80%、目标90%以上，未达标不采用。
+三项按任务独立编排，基线复用现有MLP、128维Q、距离Huber、soft-rank及MapBatch；编码与排序权重对照由各自配置明确。reader提供当前、一个完整目标、全部合法真实后继；环境转移不是编码器能力。先验收冻结Q本身的距离、动作和完整计划，再接公共SFT；指定目标文字与裁判已接入，训练、冻结reader与正式配置见[实验入口](../experiments/new_tasks_qmap/README.md)，复用公共编码与监督。必需组地图贪心至少80%、目标90%以上，未达标不采用。
 
 汉诺塔和魔方分别拥有训练、数据、模型适配与评测编排，不使用混合 `puzzle` 训练器作为当前入口。基础指标和批次采样放在 `grounded_llm/core/qmap/metrics.py`、`grounded_llm/core/qmap/sampling.py`；旧 `puzzle_qmap` 仅为历史复现与导入兼容保留。寻路采用 `path_qmap` 入口与 `grounded_llm/tasks/path/` 实现，不回退旧 Q/V。
 

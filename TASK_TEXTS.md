@@ -1567,9 +1567,9 @@ Reason: The current list contains only 24; no further operation is needed.
 
 ### Rush Hour：任务文字与监督格式
 
-规则对齐[Fogleman公开实现](https://github.com/fogleman/rush/tree/3e3b8396891d1802b30cb3129ae31fdedb319480)；当前使用无墙6×6原题。一次滑动任意合法距离计一个move，不能使用逐格step标签。完整计划已接入；逐轮部分为协议，尚未训练或采用地图。
+规则对齐[Fogleman公开实现](https://github.com/fogleman/rush/tree/3e3b8396891d1802b30cb3129ae31fdedb319480)；当前使用无墙6×6原题。一次滑动任意合法距离计一个move，不能使用逐格step标签。完整计划已接入；Qmap已完成多组训练但未通过验收，逐轮LLM训练尚未开展。
 
-新训练与评测每题指定一张A已到最右端的完整目标棋盘，所有车的位置均需匹配，字段为`goal_board`。未指定该字段的适配仅为历史题目回放兼容，不安排原规则对照。历史Flash只评过出口目标，不能改称指定终局成绩。
+新训练与评测每题指定一张A已到最右端的完整目标棋盘，所有车的位置均需匹配，字段为`goal_board`。未指定该字段的适配仅为历史题目回放兼容，不安排原规则对照。历史出口目标题与指定完整目标题的成绩分开记录。
 
 #### 共享任务描述与规则
 
@@ -1692,7 +1692,7 @@ Reason: The required goal is already reached; no further move is needed.
 
 ### Token Swapping：任务文字与监督格式
 
-采用[顺序Token Swapping](https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.ESA.2016.66)，公开实例来源为[tket固定问题](https://github.com/Quantinuum/tket/blob/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.hpp)。每点恰有一个不同棋子，目标为题目指定的完整排列；归位是其中一种目标。一次只交换一条边的两端，不使用并行轮数、部分映射或颜色等价规则。完整计划与指定目标裁判已接入；逐轮部分为协议，尚无地图训练或采用权重。历史Flash筛查的归位提示冻结在原suite中，不能将其成绩改称任意目标评测。
+采用[顺序Token Swapping](https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.ESA.2016.66)，公开实例来源为[tket固定问题](https://github.com/Quantinuum/tket/blob/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.hpp)。每点恰有一个不同棋子，目标为题目指定的完整排列；归位是其中一种目标。一次只交换一条边的两端，不使用并行轮数、部分映射或颜色等价规则。完整计划与指定目标裁判已接入；Qmap已完成多组训练但未通过验收，逐轮LLM训练尚未开展。历史Flash筛查的归位提示冻结在原suite中，不能将其成绩改称任意目标评测。
 
 #### 共享任务描述与规则
 

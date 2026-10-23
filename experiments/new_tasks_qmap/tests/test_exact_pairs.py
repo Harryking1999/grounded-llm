@@ -444,12 +444,24 @@ class ExactPairTests(unittest.TestCase):
         data=dict(reserved_relations=np.empty(0,dtype=np.int64))
         result,bank=training_failure_bank(corpus,data,edges,continuation_seeds_per_layout=1)
         self.assertEqual(result['cycle_member_decisions'],2)
-        self.assertEqual(result['wrong_decisions'],2)
+        self.assertEqual(result['nonoptimal_decisions'],2)
+        self.assertEqual(result['failed_queries'],1)
         np.testing.assert_array_equal(bank['tasks'],[[0,3],[1,3],[2,3]])
         np.testing.assert_array_equal(bank['children'],children[:3])
         self.assertTrue((bank['reason'][:2]&8).all())
         self.assertTrue(bank['reason'][2]&16)
         np.testing.assert_array_equal(bank['optimal'],[[False,True,False],[False,True,False],[True,False,False]])
+        # A nonoptimal step in a trajectory that eventually succeeds is not
+        # automatically a failure seed. Its detour must not be mislabeled.
+        successful_rows=np.array([[0,3],[1,3],[2,3]])
+        successful_truth=materialize(corpus,successful_rows)
+        success=dict(source=successful_rows[:,0],goal=successful_rows[:,1],children=successful_truth['children'],
+            choice=np.array([0,1,0]),parent_distance=successful_truth['distances'],child_distances=successful_truth['child_distances'],
+            parent_prediction=np.ones(3),child_predictions=np.ones((3,3)),query_index=np.zeros(3,dtype=int),
+            step=np.arange(3),next_repeated=np.zeros(3,dtype=bool),next_is_goal=np.array([False,False,True]))
+        result,empty=training_failure_bank(corpus,data,success)
+        self.assertEqual(result['failed_queries'],0)
+        self.assertEqual(result['unique_bank_decisions'],0)
         protected=dict(reserved_relations=keys(np.array([2]),np.array([3]),corpus.size))
         self.assertFalse(training_decision_mask(corpus,protected,bank['tasks']).any())
         result,empty=training_failure_bank(corpus,protected,edges)

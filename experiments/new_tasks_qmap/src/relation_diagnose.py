@@ -221,9 +221,11 @@ def training_failure_bank(corpus,data,edges,*,continuation_seeds_per_layout=16,m
         raise ValueError('Recorded labels differ from exact physical graph')
     index=np.arange(count); choice=edges['choice']
     if not valid[index,choice].all(): raise ValueError('Recorded action is illegal')
+    if not np.array_equal(edges['next_is_goal'],children[index,choice]==rows[:,1]):
+        raise ValueError('Recorded completion differs from exact complete goal')
     chosen_truth=child_truth[index,choice]
     finite=np.isfinite(truth)
-    wrong=finite & (chosen_truth+1!=truth)
+    nonoptimal=finite & (chosen_truth+1!=truth)
     dead=finite & ~np.isfinite(chosen_truth)
     non_descent=edges['parent_prediction']-edges['child_predictions'][index,choice]<=1e-6
     closing=edges['next_repeated'] & ~edges['next_is_goal']
@@ -231,6 +233,8 @@ def training_failure_bank(corpus,data,edges,*,continuation_seeds_per_layout=16,m
     query_order=np.argsort(edges['query_index'],kind='stable')
     queries,starts=np.unique(edges['query_index'][query_order],return_index=True)
     groups={int(q):ids for q,ids in zip(queries,np.split(query_order,starts[1:]))}
+    failed_query=np.zeros(count,dtype=bool)
+    for ids in groups.values(): failed_query[ids]=not edges['next_is_goal'][ids].any()
     for at in np.flatnonzero(closing):
         ids=groups[int(edges['query_index'][at])]
         repeats=ids[(edges['source'][ids]==children[at,choice[at]]) & (edges['step'][ids]<=edges['step'][at])]
@@ -238,7 +242,7 @@ def training_failure_bank(corpus,data,edges,*,continuation_seeds_per_layout=16,m
         begin=edges['step'][repeats].min()
         cycle[ids[(edges['step'][ids]>=begin)&(edges['step'][ids]<=edges['step'][at])]]=True
     allowed=training_decision_mask(corpus,data,rows)
-    selected=(wrong|non_descent|cycle)&allowed
+    selected=(nonoptimal|non_descent|cycle)&allowed&failed_query
     critical=np.unique(rows[selected],axis=0)
     # Give every represented training layout a bounded number of seeds. Avoid
     # global truncation, which would silently privilege the first layouts.
@@ -270,18 +274,20 @@ def training_failure_bank(corpus,data,edges,*,continuation_seeds_per_layout=16,m
     reason=np.zeros(len(bank),dtype=np.uint8)
     # Bit flags preserve overlapping causes without pretending they are disjoint.
     bank_keys=bank[:,0]*np.int64(corpus.size)+bank[:,1]
-    for bit,mask in [(1,wrong),(2,dead),(4,non_descent),(8,cycle)]:
-        selected_keys=rows[mask&allowed,0]*np.int64(corpus.size)+rows[mask&allowed,1]
+    for bit,mask in [(1,nonoptimal),(2,dead),(4,non_descent),(8,cycle)]:
+        selected_keys=rows[mask&allowed&failed_query,0]*np.int64(corpus.size)+rows[mask&allowed&failed_query,1]
         reason[np.isin(bank_keys,selected_keys)]|=bit
     if len(extra): reason[np.isin(bank_keys,extra[:,0]*np.int64(corpus.size)+extra[:,1])]|=16
     summary=dict(visited_decisions=count,permitted_training_decisions=int(allowed.sum()),
-        excluded_protected_decisions=int((~allowed).sum()),wrong_decisions=int((wrong&allowed).sum()),
+        excluded_protected_decisions=int((~allowed).sum()),nonoptimal_decisions=int((nonoptimal&allowed).sum()),
+        failed_queries=sum(not edges['next_is_goal'][ids].any() for ids in groups.values()),
+        nonoptimal_on_failed_queries=int((nonoptimal&allowed&failed_query).sum()),
         entered_dead_decisions=int((dead&allowed).sum()),non_descent_decisions=int((non_descent&allowed).sum()),
         cycle_member_decisions=int((cycle&allowed).sum()),unique_critical_decisions=len(critical),
         continuation_seeds=sum(map(len,seeds)),unique_continuation_decisions=len(extra),
         continuation_stopped_at_protected_boundary=stopped_at_boundary,continuation_budget_remaining=remaining,
         unique_bank_decisions=len(bank),all_legal_candidates_preserved=True,all_rows_training_allowed=True,
-        scope='Offline training-only candidate data; no optimizer update and no policy change. Causes overlap. Terminal anchors are not ranking decisions.')
+        scope='Offline training-only candidate data; no optimizer update or policy change. Critical seeds come only from failed trajectories. A nonoptimal action may be a recoverable detour, not an independently established cause of failure. Flags overlap. Terminal anchors are not ranking decisions.')
     return summary,dict(**materialize(corpus,bank),reason=reason)
 
 

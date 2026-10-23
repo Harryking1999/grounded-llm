@@ -244,6 +244,63 @@ def decision_neighborhood_points(pairs,indices,tasks,children,point_index,fracti
     return pairs,indices,origin
 
 
+class FailureReplaySampler:
+    """Replay fixed training failures and their permitted optimal continuations.
+
+    The caller supplies a separate checkpointed RNG. Every replayed decision
+    also supplies point labels for its parent and ALL legal children, so the
+    local branch is calibrated at one complete goal within the same batch.
+    """
+    def __init__(self,corpus,data,bank,options):
+        self.corpus,self.options=corpus,options
+        self.fraction=options['ranking_fraction']; self.critical_fraction=options['critical_fraction']
+        if not 0<self.fraction<=1 or not 0<self.critical_fraction<1: raise ValueError('Invalid replay quotas')
+        self.tasks=np.asarray(bank['tasks'],dtype=np.int64)
+        self.reason=np.asarray(bank['reason'],dtype=np.uint8)
+        if not len(self.tasks) or len(np.unique(self.tasks,axis=0))!=len(self.tasks): raise ValueError('Unique nonempty replay decisions required')
+        if self.reason.shape!=(len(self.tasks),) or (self.reason==0).any() or (self.reason & np.uint8(224)).any(): raise ValueError('Unknown replay reason')
+        if not training_decision_mask(corpus,data,self.tasks).all(): raise ValueError('Replay crosses protected training boundary')
+        exact=materialize(corpus,self.tasks)
+        for key in ('children','distances','child_distances','optimal','reachability'):
+            if not np.array_equal(bank[key],exact[key]): raise ValueError(('Replay labels or legal candidates changed',key))
+        self.children=exact['children']; labels=exact['distances']
+        edges=np.asarray(options['distance_bin_upper_bounds'],dtype=np.float32)
+        if np.any(np.diff(edges)<=0) or edges[0]<0 or edges[-1]<labels.max(): raise ValueError('Replay distance bins omit a label')
+        scenes=corpus.locate(self.tasks[:,0]); bins=np.searchsorted(edges,labels)
+        def groups(mask):
+            result=[]
+            for sid in np.unique(scenes[mask]):
+                take=(scenes==sid)&mask
+                result.append([np.flatnonzero(take&(bins==b)) for b in np.unique(bins[take])])
+            if not result: raise ValueError('Both critical and continuation replay contexts required')
+            return result
+        self.critical=groups((self.reason&15)>0);self.continuations=groups((self.reason&16)>0)
+        self.summary=dict(decisions=len(self.tasks),critical_decisions=int(((self.reason&15)>0).sum()),
+            continuation_decisions=int(((self.reason&16)>0).sum()),layouts=len(np.unique(scenes)),
+            all_labels_exact=True,all_legal_candidates_preserved=True,training_boundaries_checked=True,options=options)
+
+    def apply(self,pairs,point_indices,tasks,rank_indices,point_index,rank_index,rng):
+        n=round(len(tasks)*self.fraction);nc=round(n*self.critical_fraction)
+        origin=np.zeros(len(pairs),dtype=np.uint8);rank_origin=np.zeros(len(tasks),dtype=np.uint8)
+        replay_ids=np.full(len(tasks),-1,dtype=np.int64)
+        if not n: return pairs,point_indices,tasks,rank_indices,origin,rank_origin,replay_ids
+        limit=self.options.get('layouts_per_batch')
+        ids=np.concatenate([BoardRelationSampler._draw(self.critical,nc,rng,limit),
+                            BoardRelationSampler._draw(self.continuations,n-nc,rng,limit)])
+        roles=np.concatenate([np.ones(nc,dtype=np.uint8),np.full(n-nc,2,dtype=np.uint8)])
+        order=rng.permutation(n);ids,roles=ids[order],roles[order]
+        replay=self.tasks[ids];children=self.children[ids];valid=children>=0
+        child_pairs=np.column_stack([children[valid],np.broadcast_to(replay[:,1,None],children.shape)[valid]])
+        points=np.concatenate([replay,child_pairs]);np_=len(points)
+        if np_>len(pairs): raise ValueError('Replay branches exceed point batch budget')
+        pairs=pairs.copy();point_indices=point_indices.copy();tasks=tasks.copy();rank_indices=rank_indices.copy()
+        pairs[-np_:]=points;point_indices[-np_:]=point_index[points[:,0]]
+        origin[-np_:-np_+n]=1;origin[-np_+n:]=2
+        tasks[-n:]=replay;rank_indices[-n:]=rank_index[replay[:,0]]
+        rank_origin[-n:]=roles;replay_ids[-n:]=ids
+        return pairs,point_indices,tasks,rank_indices,origin,rank_origin,replay_ids
+
+
 def board_cohorts(corpus,config,rng):
     from grounded_llm.core.qmap.physical_data import group_seed
     spec=config['relations']

@@ -416,6 +416,52 @@ class ExactPairTests(unittest.TestCase):
                 self.assertLess(counted,total);self.assertEqual(total,160)
                 train(training_config,path,'neighborhood-fixture','cpu',resume=True)
                 self.assertEqual(torch.load(path/'last.pt',weights_only=False)['neighborhood_rng'],saved['neighborhood_rng'])
+        # Replay includes decisions whose sources are absent from both original
+        # banks. Their counters must remain separate, and every legal branch
+        # must appear in point supervision at that same batch goal.
+        from copy import deepcopy
+        replay_data=deepcopy(training_data)
+        legal=rank['children']>=0
+        boundary=(legal&np.isfinite(rank['child_distances'])).any(axis=1)&(legal&~np.isfinite(rank['child_distances'])).any(axis=1)
+        keep=np.array([np.flatnonzero(boundary)[0],np.flatnonzero(~boundary)[0]])
+        for key,value in rank.items(): replay_data[key+'_train']=value[keep]
+        replay_bank=dict(**rank,reason=np.full(len(rank['tasks']),17,dtype=np.uint8))
+        replay_config=deepcopy(training_config)
+        replay_config['training'].update(batch_size=16,decision_neighborhood_point_fraction=0.,
+            failure_replay=dict(bank='../replay.npz',ranking_fraction=.5,critical_fraction=.5,
+                distance_bin_upper_bounds=options['distance_bin_upper_bounds'],layouts_per_batch=1))
+        with tempfile.TemporaryDirectory() as tmp:
+            path=Path(tmp)/'run';np.savez(Path(tmp)/'replay.npz',**replay_bank)
+            with patch('experiments.new_tasks_qmap.src.relations.prepare',return_value=(corpus,replay_data,dict(states=corpus.size))):
+                train(replay_config,path,'replay-fixture','cpu')
+                saved=torch.load(path/'last.pt',weights_only=False)
+                self.assertEqual(int(saved['replay_draws'].sum()),40)
+                counted=0
+                for file in path.glob('samples/attempt_*/*.npz'):
+                    with np.load(file) as archive:
+                        counted+=int(np.isin(archive['tasks'][:,0],replay_data['tasks_train'][:,0]).sum())
+                        for step in np.unique(archive['rank_step']):
+                            rm=(archive['rank_step']==step)&(archive['rank_origin']>0)
+                            contexts=archive['tasks'][rm];kids=archive['children'][rm];valid=kids>=0
+                            parent_keys=contexts[:,0]*corpus.size+contexts[:,1]
+                            child_keys=kids[valid]*corpus.size+np.broadcast_to(contexts[:,1,None],kids.shape)[valid]
+                            pm=archive['point_step']==step;points=archive['pairs'][pm];origin=archive['point_origin'][pm]
+                            keys_=points[:,0]*corpus.size+points[:,1]
+                            self.assertTrue(np.isin(parent_keys,keys_[origin==1]).all())
+                            self.assertTrue(np.isin(child_keys,keys_[origin==2]).all())
+                self.assertEqual(int(saved['rank_draws'].sum()),counted);self.assertLess(counted,80)
+                audit=stream_statistics(corpus,replay_data,path,path/'audit.json')
+                self.assertEqual(audit['totals']['rank_replay_critical'],20)
+                self.assertEqual(audit['totals']['rank_replay_continuation'],20)
+                self.assertTrue(audit['all_actual_point_and_child_labels_equal_physical_oracle'])
+                train(replay_config,path,'replay-fixture','cpu',resume=True)
+                restored=torch.load(path/'last.pt',weights_only=False)
+                self.assertEqual(restored['replay_rng'],saved['replay_rng'])
+                np.testing.assert_array_equal(restored['replay_draws'],saved['replay_draws'])
+                bad=dict(replay_bank);bad['children']=bad['children'].copy();bad['children'][0,:]=-1
+                np.savez(path/'failure_replay_bank.npz',**bad)
+                with self.assertRaisesRegex(ValueError,'Replay labels or legal candidates changed'):
+                    train(replay_config,path,'replay-fixture','cpu',resume=True)
         model=StateEncoder(128,16,32,'directed_max',input_dim=len(states))
         config=dict(training=dict(unreachable_target=30.,rank_temperature=1.,rank_weight=1.))
         result=batch_gradient_probe(model,corpus,row,config)

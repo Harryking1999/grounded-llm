@@ -356,6 +356,14 @@ def stream_statistics(corpus,data,run,out):
             relation[valid]=keys(children[valid],np.broadcast_to(target[:,None],children.shape)[valid],corpus.size)
             bad|=forbidden(relation).any(axis=1)
             eligible[s[~bad]]|=np.uint32(1)<<np.uint32(j)
+    replay_tasks=None;replay_reason=None
+    snapshot=Path(run)/'failure_replay_bank.npz'
+    if snapshot.exists():
+        from .relation_data import training_decision_mask
+        with np.load(snapshot) as archive: replay_tasks,replay_reason=archive['tasks'],archive['reason']
+        if not training_decision_mask(corpus,data,replay_tasks).all(): raise ValueError('Protected replay bank in sample audit')
+        replay_goals=columns[replay_tasks[:,1]]
+        np.bitwise_or.at(eligible,replay_tasks[:,0],np.left_shift(np.uint32(1),replay_goals.astype(np.uint32)))
     files=sorted(Path(run).glob('samples/attempt_*/*.npz'))
     if not files: raise ValueError('No actual saved training sample shards')
     csv_path=Path(out).with_suffix('.csv.gz'); csv_path.parent.mkdir(parents=True,exist_ok=True)
@@ -364,6 +372,7 @@ def stream_statistics(corpus,data,run,out):
             'point_initial_row_finite','initial_finite_to_actual_unreachable','initial_unreachable_to_actual_finite',
             'point_initial_row_near_1_5','initial_near_to_actual_zero','initial_near_to_actual_near_1_5','initial_near_to_actual_far','initial_near_to_actual_unreachable']
     fields+=['point_initial_unavailable','point_neighborhood_parent','point_neighborhood_child']
+    fields+=['rank_replay_critical','rank_replay_continuation']
     intervals=[(0,0),(1,1),(2,2),(3,5),(6,10),(11,20),(21,40),(41,80),(81,np.inf)]
     bin_names=[f'{a}_{b}' for a,b in intervals]
     fields += ['point_distance_'+name for name in bin_names]+['rank_distance_'+name for name in bin_names]
@@ -378,7 +387,19 @@ def stream_statistics(corpus,data,run,out):
             with np.load(path) as archive:
                 x={key:archive[key] for key in ('point_step','point_distance','pairs','rank_step','tasks','children','child_distance','parent_distance','optimal')}
                 origin=archive['point_origin'] if 'point_origin' in archive else np.zeros(len(x['pairs']),dtype=np.uint8)
+                rank_origin=archive['rank_origin'] if 'rank_origin' in archive else np.zeros(len(x['tasks']),dtype=np.uint8)
+                replay_ids=archive['rank_replay_index'] if 'rank_replay_index' in archive else np.full(len(x['tasks']),-1,dtype=np.int64)
             if not np.isin(origin,[0,1,2]).all(): raise ValueError('Unknown point-supervision origin')
+            if not np.isin(rank_origin,[0,1,2]).all(): raise ValueError('Unknown ranking-supervision origin')
+            replay=rank_origin>0
+            if ((~replay)&~ranking_source[x['tasks'][:,0]]).any(): raise ValueError('Main ranking source outside original training rows')
+            if ((~replay)&(replay_ids!=-1)).any(): raise ValueError('Main ranking row has a replay index')
+            if replay.any():
+                if replay_tasks is None or (replay_ids[replay]<0).any() or (replay_ids[replay]>=len(replay_tasks)).any():
+                    raise ValueError('Replay identity outside fixed bank')
+                if not np.array_equal(x['tasks'][replay],replay_tasks[replay_ids[replay]]): raise ValueError('Replay decision identity changed')
+                if not ((replay_reason[replay_ids[rank_origin==1]]&15)>0).all() or not ((replay_reason[replay_ids[rank_origin==2]]&16)>0).all():
+                    raise ValueError('Replay reason quota does not match fixed bank')
             children=x['children']; valid=children>=0
             point_scenes=corpus.locate(x['pairs'][:,0]); rank_scenes=corpus.locate(x['tasks'][:,0])
             if not train_layouts[point_scenes].all() or not train_layouts[rank_scenes].all():
@@ -427,6 +448,8 @@ def stream_statistics(corpus,data,run,out):
                     initial_unreachable_to_actual_finite=int((initial_known & ~initial_finite & np.isfinite(pd)).sum()),
                     point_initial_unavailable=int((~initial_known).sum()),
                     point_neighborhood_parent=int((role==1).sum()),point_neighborhood_child=int((role==2).sum()),
+                    rank_replay_critical=int((rank_origin[r0:r0+nr]==1).sum()),
+                    rank_replay_continuation=int((rank_origin[r0:r0+nr]==2).sum()),
                     point_initial_row_near_1_5=int(initial_near.sum()),
                     initial_near_to_actual_zero=int((initial_near & (pd==0)).sum()),
                     initial_near_to_actual_near_1_5=int((initial_near & (pd>=1) & (pd<=5)).sum()),
@@ -459,7 +482,8 @@ def stream_statistics(corpus,data,run,out):
         boundary_decision_fraction=totals['boundary_decisions']/totals['rank_rows'],
         unique_ranking_source_goal_pairs=actual,eligible_ranking_source_goal_pairs=available,
         ranking_relation_coverage=actual/available,
-        ranking_coverage_scope='Allowed complete goals and held-out closure for the ranking sources selected in this run; sampled source banks do not imply coverage of every physical state.',
+        ranking_coverage_scope=('Original prepared ranking-source goal closure plus exact replay decisions; other goals at replay-only sources are not counted.' if replay_tasks is not None else
+            'Allowed complete goals and held-out closure for the ranking sources selected in this run; sampled source banks do not imply coverage of every physical state.'),
         layout_sampling=dict(point=layout_summary(point_layout_draws),ranking=layout_summary(rank_layout_draws),
             by_layout=[dict(scene=sid,source=s.metadata.get('source'),point_draws=int(point_layout_draws[sid]),rank_draws=int(rank_layout_draws[sid]))
                        for sid,s in enumerate(corpus.scenes) if train_layouts[sid]]),

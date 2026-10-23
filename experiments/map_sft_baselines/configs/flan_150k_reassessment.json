@@ -10,7 +10,16 @@
   "original_tasks": ["blocks", "cube2", "puzzle8", "path"],
   "small_ood": {
     "blocks": {"goal": "last_single_removable_block_of_original_shortest_route"},
-    "cube2": {"goal_distances_from_solved": [1, 2, 3]},
+    "cube2": {
+      "goal_distances_from_solved": [1, 2, 3],
+      "map_checkpoint": "qmap_near_goal_2000.pt",
+      "map_identity": {
+        "run": "cube_near_low_lr_ed21cd4",
+        "checkpoint": "train/best.pt",
+        "step": 2000,
+        "scope": "FLAN_small_ood_only"
+      }
+    },
     "puzzle8": {"goal_distances_from_solved": [1, 2, 3]}
   },
   "evaluation": {

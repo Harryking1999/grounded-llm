@@ -66,9 +66,12 @@ def restoration_goals(task, records, source, distances, rng):
     return [row for _, row in sorted(rows)]
 
 
-def prepare(config, source, out):
+def prepare(config, source, out, cube_small_ood_checkpoint=None):
     if out.exists():
         raise ValueError('Use a fresh evaluation data directory')
+    cube_map = config['small_ood'].get('cube2', {}).get('map_checkpoint')
+    if cube_map and (cube_small_ood_checkpoint is None or not cube_small_ood_checkpoint.is_file()):
+        raise ValueError('Configured cube small OOD map requires --cube-small-ood-checkpoint')
     rng = np.random.default_rng(config['seed'])
     all_rows, audit = [], {}
     for task in config['original_tasks']:
@@ -86,12 +89,18 @@ def prepare(config, source, out):
             rows.extend(dict(r, task=task, cohort='small_ood',
                 source_trajectory_id=r['trajectory_id'],
                 trajectory_id=r['trajectory_id']+'_small_ood') for r in new)
+            if task == 'cube2' and cube_map:
+                for row in rows[len(original):]:
+                    row['map_checkpoint'] = cube_map
+                    row['map_identity'] = config['small_ood'][task]['map_identity']
             audit[task] = dict(tasks=len(new), paired_starts=True,
                 unique_goals=len({r['goal'] for r in new}),
                 goal_depths=dict(Counter(r['goal_distance_from_solved'] for r in new)),
                 reference_lengths=dict(Counter(len(r['reference_actions']) for r in new)))
         destination = out/task
         destination.mkdir(parents=True)
+        if task == 'cube2' and cube_map:
+            shutil.copy2(cube_small_ood_checkpoint, destination/cube_map)
         atomic_json(destination/'evaluation.json', rows)
         atomic_json(destination/'probe_indices.json', [])
         for name in ('qmap.pt', 'oracle.npy', 'graph.npz'):
@@ -129,8 +138,13 @@ def map_reference(data, out, action_budget, source_commit):
             env = None if task == 'blocks' else environment(task, source/'oracle.npy')
             reader = (CachedQMap(FrozenBoardMap.load(source/'qmap.pt')) if task == 'blocks'
                       else load_map(task, env, source/'qmap.pt'))
+            readers = {'qmap.pt': reader}
             records = json.loads((source/'evaluation.json').read_text())
             for record in records:
+                checkpoint = record.get('map_checkpoint', 'qmap.pt')
+                if checkpoint not in readers:
+                    readers[checkpoint] = load_map(task, env, source/checkpoint)
+                reader = readers[checkpoint]
                 state, goal = int(record['start']), int(record['goal'])
                 actions = []
                 for _ in range(action_budget):
@@ -146,6 +160,9 @@ def map_reference(data, out, action_budget, source_commit):
                 row = dict(trajectory_id=record['trajectory_id'], task=task,
                     cohort=record['cohort'], arrived=state==goal, actions=actions,
                     steps=len(actions), final_state=str(state))
+                row['map_checkpoint'] = str(source/checkpoint)
+                if 'map_identity' in record:
+                    row['map_identity'] = record['map_identity']
                 rows.append(row);stream.write(json.dumps(row)+'\n');stream.flush()
             print(json.dumps(dict(task=task, completed=len(records))), flush=True)
             atomic_json(out/'progress.json', dict(completed=len(rows)))
@@ -168,9 +185,10 @@ def main():
         parser.add_argument('--'+name, required=True, type=Path)
     parser.add_argument('--map-reference-out', type=Path)
     parser.add_argument('--source-commit')
+    parser.add_argument('--cube-small-ood-checkpoint', type=Path)
     args = parser.parse_args()
     config=json.loads(args.config.read_text())
-    prepare(config, args.source, args.out)
+    prepare(config, args.source, args.out, args.cube_small_ood_checkpoint)
     if args.map_reference_out:
         configs=[json.loads((args.config.parent/name).read_text())
                  for name in config['model_configs'].values()]

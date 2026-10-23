@@ -17,6 +17,7 @@ def evaluate(args, config):
     spec = config['baselines'][args.baseline]
     env = environment(task, args.data / "oracle.npy")
     qmap = load_map(task, env, args.q_checkpoint)
+    maps = {args.q_checkpoint: qmap}
     records = json.loads((args.data / "evaluation.json").read_text())
     if len(records) != config["evaluation"]["tasks"]:
         raise ValueError("Evaluation cohort mismatch")
@@ -47,6 +48,11 @@ def evaluate(args, config):
     cases = []
     with (args.out / "cases.jsonl").open("w") as output:
         for record in records:
+            checkpoint = (args.data/record['map_checkpoint'] if 'map_checkpoint' in record
+                          else args.q_checkpoint)
+            if checkpoint not in maps:
+                maps[checkpoint] = load_map(task, env, checkpoint)
+            qmap = maps[checkpoint]
             state, goal = record["start"], record["goal"]
             executed, messages, steps, previous_ids, turns = [], [], [], [], []
             arrived, stopped = state == goal, False
@@ -89,6 +95,9 @@ def evaluate(args, config):
                 previous_ids = map_ids + [len(steps) - 1] * (len(complete) - len(map_ids))
             case = dict(trajectory_id=record["trajectory_id"], arrived=arrived,
                         arrived_and_stopped=arrived and stopped, turns=turns)
+            case['map_checkpoint'] = str(checkpoint)
+            if 'map_identity' in record:
+                case['map_identity'] = record['map_identity']
             output.write(json.dumps(case) + "\n")
             output.flush()
             cases.append(case)

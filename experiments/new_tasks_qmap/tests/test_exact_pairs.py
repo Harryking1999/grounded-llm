@@ -462,6 +462,45 @@ class ExactPairTests(unittest.TestCase):
                 np.savez(path/'failure_replay_bank.npz',**bad)
                 with self.assertRaisesRegex(ValueError,'Replay labels or legal candidates changed'):
                     train(replay_config,path,'replay-fixture','cpu',resume=True)
+        from experiments.new_tasks_qmap.src.relation_diagnose import policy_boundaries,training_local_paths
+        flat=SimpleNamespace(scores=lambda s,g:np.zeros(np.broadcast_arrays(s,g)[0].shape,dtype=np.float32))
+        records=[];rollout(corpus,flat,rank['tasks'],32,'q',edge_records=records)
+        _,edges=policy_boundaries(records)
+        _,path_bank=training_local_paths(corpus,replay_data,edges,minimum_steps=1,maximum_steps=3)
+        path_config=deepcopy(replay_config);path_config['training'].update(batch_size=32,
+            failure_replay=dict(bank='../paths.npz',sampler='local_paths',mode='joint',minimum_steps=1,maximum_steps=3,
+                groups_per_batch=1,block_batches=4,layouts_per_batch=1))
+        with tempfile.TemporaryDirectory() as tmp:
+            np.savez(Path(tmp)/'paths.npz',**path_bank)
+            complete=Path(tmp)/'complete';interrupted=Path(tmp)/'interrupted'
+            with patch('experiments.new_tasks_qmap.src.relations.prepare',return_value=(corpus,replay_data,dict(states=corpus.size))):
+                train(path_config,complete,'whole-path-fixture','cpu')
+                original_step=torch.optim.Adam.step;calls=[0]
+                def fail_second_update(optimizer,*args,**kwargs):
+                    calls[0]+=1
+                    if calls[0]==2:raise RuntimeError('fixture interruption')
+                    return original_step(optimizer,*args,**kwargs)
+                with patch('torch.optim.Adam.step',new=fail_second_update):
+                    with self.assertRaisesRegex(RuntimeError,'fixture interruption'):
+                        train(path_config,interrupted,'whole-path-fixture','cpu')
+                saved=torch.load(interrupted/'last.pt',weights_only=False)
+                self.assertEqual(saved['step'],1);self.assertEqual(saved['replay_sampler_state']['cursor'],1)
+                train(path_config,interrupted,'whole-path-fixture','cpu',resume=True)
+                expected=torch.load(complete/'last.pt',weights_only=False);actual=torch.load(interrupted/'last.pt',weights_only=False)
+                for key in expected['model']:self.assertTrue(torch.equal(expected['model'][key],actual['model'][key]))
+                np.testing.assert_array_equal(expected['replay_draws'],actual['replay_draws'])
+                np.testing.assert_array_equal(expected['replay_sampler_state']['actual_path_steps'],actual['replay_sampler_state']['actual_path_steps'])
+                self.assertEqual(expected['replay_rng'],actual['replay_rng'])
+                audit=stream_statistics(corpus,replay_data,interrupted,interrupted/'audit.json')
+                self.assertEqual(audit['actual_batches'],20)
+                self.assertEqual(audit['totals']['rank_replay_critical'],0)
+                self.assertGreater(audit['totals']['rank_replay_continuation'],0)
+                from experiments.new_tasks_qmap.src.relation_diagnose import local_path_stream_statistics
+                groups=local_path_stream_statistics(interrupted)
+                self.assertEqual(groups['optimizer_batches'],20)
+                self.assertEqual(groups['path_occurrences'],20)
+                self.assertEqual(groups['incomplete_occurrences'],0)
+                self.assertEqual(groups['same_batch_fraction'],1)
         model=StateEncoder(128,16,32,'directed_max',input_dim=len(states))
         config=dict(training=dict(unreachable_target=30.,rank_temperature=1.,rank_weight=1.))
         result=batch_gradient_probe(model,corpus,row,config)
@@ -587,6 +626,39 @@ class ExactPairTests(unittest.TestCase):
         summary,bank=training_local_paths(corpus,data,edges,minimum_steps=5,maximum_steps=10)
         self.assertEqual(summary['retained_paths'],2)
         np.testing.assert_array_equal(bank['path_lengths'],[10,9])
+        from copy import deepcopy
+        from experiments.new_tasks_qmap.src.relation_data import LocalPathSampler
+        opts=dict(minimum_steps=5,maximum_steps=10,groups_per_batch=1,block_batches=4,layouts_per_batch=1)
+        rngs=[np.random.default_rng(91),np.random.default_rng(91)]
+        samplers=[LocalPathSampler(corpus,data,bank,dict(opts,mode=mode),rng) for mode,rng in zip(['joint','shuffled'],rngs)]
+        pairs=np.column_stack([np.arange(64)%10,np.full(64,10)])
+        ranking=np.tile([[0,10],[1,10]],(16,1));lookup=np.arange(corpus.size)
+        actual=[[],[]];occurrences=[{},{}]
+        for batch in range(4):
+            outputs=[sampler.apply(pairs,np.arange(64),ranking,np.arange(32),lookup,lookup,rng) for sampler,rng in zip(samplers,rngs)]
+            self.assertEqual(rngs[0].bit_generator.state,rngs[1].bit_generator.state)
+            point_count=int((outputs[0][4]>0).sum());context_count=int((outputs[0][5]>0).sum())
+            self.assertEqual(point_count,int((outputs[1][4]>0).sum()))
+            np.testing.assert_array_equal(outputs[0][0][:-point_count],outputs[1][0][:-point_count])
+            np.testing.assert_array_equal(outputs[0][2][:-context_count],outputs[1][2][:-context_count])
+            left=(corpus.successors(outputs[0][2][-context_count:,0])>=0).sum(axis=1)
+            right=(corpus.successors(outputs[1][2][-context_count:,0])>=0).sum(axis=1)
+            np.testing.assert_array_equal(left,right)
+            for k,(sampler,output) in enumerate(zip(samplers,outputs)):
+                actual[k].append(output[6][output[6]>=0])
+                for occurrence in sampler.last_annotations['rank_path_occurrence']:
+                    if occurrence>=0:occurrences[k].setdefault(int(occurrence),set()).add(batch)
+            if batch==0:
+                saved=deepcopy(samplers[0].state_dict());saved_rng=deepcopy(rngs[0].bit_generator.state)
+            elif batch==1:
+                restored_rng=np.random.default_rng(999)
+                restored=LocalPathSampler(corpus,data,bank,dict(opts,mode='joint'),restored_rng)
+                restored.load_state_dict(saved);restored_rng.bit_generator.state=saved_rng
+                resumed=restored.apply(pairs,np.arange(64),ranking,np.arange(32),lookup,lookup,restored_rng)
+                for x,y in zip(outputs[0],resumed):np.testing.assert_array_equal(x,y)
+        np.testing.assert_array_equal(np.sort(np.concatenate(actual[0])),np.sort(np.concatenate(actual[1])))
+        self.assertTrue(all(len(batches)==1 for batches in occurrences[0].values()))
+        self.assertTrue(any(len(batches)>1 for batches in occurrences[1].values()))
         for path,length in enumerate(bank['path_lengths']):
             length=int(length);rows=bank['path_tasks'][path,:length];kids=bank['path_children'][path,:length]
             np.testing.assert_array_equal(kids,corpus.successors(rows[:,0]))

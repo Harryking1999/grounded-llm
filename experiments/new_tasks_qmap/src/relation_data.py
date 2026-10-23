@@ -255,14 +255,7 @@ class FailureReplaySampler:
         self.corpus,self.options=corpus,options
         self.fraction=options['ranking_fraction']; self.critical_fraction=options['critical_fraction']
         if not 0<self.fraction<=1 or not 0<self.critical_fraction<1: raise ValueError('Invalid replay quotas')
-        self.tasks=np.asarray(bank['tasks'],dtype=np.int64)
-        self.reason=np.asarray(bank['reason'],dtype=np.uint8)
-        if not len(self.tasks) or len(np.unique(self.tasks,axis=0))!=len(self.tasks): raise ValueError('Unique nonempty replay decisions required')
-        if self.reason.shape!=(len(self.tasks),) or (self.reason==0).any() or (self.reason & np.uint8(224)).any(): raise ValueError('Unknown replay reason')
-        if not training_decision_mask(corpus,data,self.tasks).all(): raise ValueError('Replay crosses protected training boundary')
-        exact=materialize(corpus,self.tasks)
-        for key in ('children','distances','child_distances','optimal','reachability'):
-            if not np.array_equal(bank[key],exact[key]): raise ValueError(('Replay labels or legal candidates changed',key))
+        self.tasks,self.reason,exact=self.validate(corpus,data,bank)
         self.children=exact['children']; labels=exact['distances']
         edges=np.asarray(options['distance_bin_upper_bounds'],dtype=np.float32)
         if np.any(np.diff(edges)<=0) or edges[0]<0 or edges[-1]<labels.max(): raise ValueError('Replay distance bins omit a label')
@@ -279,16 +272,30 @@ class FailureReplaySampler:
             continuation_decisions=int(((self.reason&16)>0).sum()),layouts=len(np.unique(scenes)),
             all_labels_exact=True,all_legal_candidates_preserved=True,training_boundaries_checked=True,options=options)
 
+    @staticmethod
+    def validate(corpus,data,bank):
+        tasks=np.asarray(bank['tasks'],dtype=np.int64);reason=np.asarray(bank['reason'],dtype=np.uint8)
+        if not len(tasks) or len(np.unique(tasks,axis=0))!=len(tasks):raise ValueError('Unique nonempty replay decisions required')
+        if reason.shape!=(len(tasks),) or (reason==0).any() or (reason&np.uint8(224)).any():raise ValueError('Unknown replay reason')
+        if not training_decision_mask(corpus,data,tasks).all():raise ValueError('Replay crosses protected training boundary')
+        exact=materialize(corpus,tasks)
+        for key in ('children','distances','child_distances','optimal','reachability'):
+            if not np.array_equal(bank[key],exact[key]):raise ValueError(('Replay labels or legal candidates changed',key))
+        return tasks,reason,exact
+
     def apply(self,pairs,point_indices,tasks,rank_indices,point_index,rank_index,rng):
         n=round(len(tasks)*self.fraction);nc=round(n*self.critical_fraction)
-        origin=np.zeros(len(pairs),dtype=np.uint8);rank_origin=np.zeros(len(tasks),dtype=np.uint8)
-        replay_ids=np.full(len(tasks),-1,dtype=np.int64)
-        if not n: return pairs,point_indices,tasks,rank_indices,origin,rank_origin,replay_ids
         limit=self.options.get('layouts_per_batch')
         ids=np.concatenate([BoardRelationSampler._draw(self.critical,nc,rng,limit),
                             BoardRelationSampler._draw(self.continuations,n-nc,rng,limit)])
         roles=np.concatenate([np.ones(nc,dtype=np.uint8),np.full(n-nc,2,dtype=np.uint8)])
         order=rng.permutation(n);ids,roles=ids[order],roles[order]
+        return self.replace(pairs,point_indices,tasks,rank_indices,point_index,rank_index,ids,roles)
+
+    def replace(self,pairs,point_indices,tasks,rank_indices,point_index,rank_index,ids,roles):
+        n=len(ids);origin=np.zeros(len(pairs),dtype=np.uint8);rank_origin=np.zeros(len(tasks),dtype=np.uint8)
+        replay_ids=np.full(len(tasks),-1,dtype=np.int64)
+        if not n:return pairs,point_indices,tasks,rank_indices,origin,rank_origin,replay_ids
         replay=self.tasks[ids];children=self.children[ids];valid=children>=0
         child_pairs=np.column_stack([children[valid],np.broadcast_to(replay[:,1,None],children.shape)[valid]])
         points=np.concatenate([replay,child_pairs]);np_=len(points)
@@ -299,6 +306,83 @@ class FailureReplaySampler:
         tasks[-n:]=replay;rank_indices[-n:]=rank_index[replay[:,0]]
         rank_origin[-n:]=roles;replay_ids[-n:]=ids
         return pairs,point_indices,tasks,rank_indices,origin,rank_origin,replay_ids
+
+
+class LocalPathSampler(FailureReplaySampler):
+    """Joint paths versus a degree/layout-matched shuffled control.
+
+    Each complete block uses the identical context multiset in both modes.
+    Shuffling only within layout and legal degree also preserves each batch's
+    replay count, number of point labels and independent proposal prefixes.
+    """
+    def __init__(self,corpus,data,bank,options,rng):
+        from grounded_llm.core.qmap.sampling import GroupCoverageSampler
+        self.corpus,self.options,self.rng=corpus,options,rng
+        self.tasks,self.reason,exact=self.validate(corpus,data,bank);self.children=exact['children']
+        self.paths=np.asarray(bank['path_context_index'],dtype=np.int64);self.lengths=np.asarray(bank['path_lengths'],dtype=np.int64)
+        if self.paths.ndim!=2 or self.paths.shape[1]!=options['maximum_steps'] or len(self.paths)!=len(self.lengths):raise ValueError('Path group shape changed')
+        if (self.lengths<1).any() or (self.lengths>self.paths.shape[1]).any():raise ValueError('Invalid path length')
+        valid=np.arange(self.paths.shape[1])[None,:]<self.lengths[:,None];ids=self.paths[valid]
+        if (ids<0).any() or (ids>=len(self.tasks)).any() or (self.paths[~valid]!=-1).any():raise ValueError('Invalid path context index')
+        for key,field in [('tasks','path_tasks'),('children','path_children'),('distances','path_distances'),('child_distances','path_child_distances'),('optimal','path_optimal')]:
+            if not np.array_equal(bank[field][valid],exact[key][ids]):raise ValueError(('Path group labels changed',field))
+        slots=bank['path_teacher_choice'][valid]
+        if (slots<0).any() or (slots>=self.children.shape[1]).any() or not exact['optimal'][ids,slots].all():raise ValueError('Invalid optimal path action')
+        for path,length in enumerate(self.lengths):
+            contexts=self.paths[path,:length];rows=self.tasks[contexts];actions=bank['path_teacher_choice'][path,:length]
+            following=self.children[contexts,actions]
+            if not (rows[:,1]==rows[0,1]).all() or not np.array_equal(following[:-1],rows[1:,0]):raise ValueError('Path is not consecutive at one complete goal')
+            reached=following[-1]==rows[0,1]
+            if reached!=bool(bank['path_reached_goal'][path]) or (length<options['minimum_steps'] and not reached):raise ValueError('Incomplete short path group')
+        if options['mode'] not in ('joint','shuffled') or options['groups_per_batch']<1 or options['block_batches']<1:raise ValueError('Invalid local path sampling options')
+        self.scene_ids=corpus.locate(self.tasks[:,0]);self.degrees=(self.children>=0).sum(axis=1)
+        path_scenes=self.scene_ids[self.paths[:,0]]
+        self.group_sampler=GroupCoverageSampler(path_scenes,rng,options.get('layouts_per_batch'))
+        self.queue=None;self.offsets=None;self.cursor=0;self.blocks=0;self.next_occurrence=0
+        self.actual_path_steps=np.zeros(len(self.paths),dtype=np.uint32);self.last_annotations={}
+        self.summary=dict(decisions=len(self.tasks),paths=len(self.paths),layouts=len(np.unique(path_scenes)),
+            minimum_length=int(self.lengths.min()),maximum_length=int(self.lengths.max()),options=options,
+            equal_context_multiset_per_complete_block=True,equal_layout_and_degree_per_batch=True,
+            all_legal_candidates_preserved=True,all_labels_exact=True,training_boundaries_checked=True)
+
+    def _plan(self):
+        pieces=[];sizes=[]
+        for _ in range(self.options['block_batches']):
+            groups=self.group_sampler.draw(self.options['groups_per_batch']);parts=[]
+            for group in groups:
+                length=int(self.lengths[group]);occurrence=self.next_occurrence;self.next_occurrence+=1
+                parts.append(np.column_stack([self.paths[group,:length],np.full(length,group),np.arange(length),np.full(length,occurrence)]))
+            batch=np.concatenate(parts);pieces.append(batch);sizes.append(len(batch))
+        planned=np.concatenate(pieces);contexts=planned[:,0]
+        key=self.scene_ids[contexts]*(self.corpus.max_candidates+1)+self.degrees[contexts]
+        order=np.argsort(key,kind='stable');_,start=np.unique(key[order],return_index=True)
+        permutation=np.arange(len(planned))
+        # Generate the same permutations even in joint mode, so the two modes
+        # consume exactly the same separate RNG stream and future path plans.
+        for positions in np.split(order,start[1:]):permutation[positions]=self.rng.permutation(positions)
+        self.queue=planned if self.options['mode']=='joint' else planned[permutation]
+        self.offsets=np.cumsum([0,*sizes]);self.cursor=0;self.blocks+=1
+
+    def apply(self,pairs,point_indices,tasks,rank_indices,point_index,rank_index,rng):
+        if rng is not self.rng:raise ValueError('Local path RNG identity changed')
+        if self.queue is None or self.cursor==self.options['block_batches']:self._plan()
+        start,stop=self.offsets[self.cursor:self.cursor+2];plan=self.queue[start:stop];self.cursor+=1
+        ids=plan[:,0];n=len(ids)
+        if n>len(tasks):raise ValueError('Whole path groups exceed ranking budget')
+        self.last_annotations={key:np.full(len(tasks),-1,dtype=np.int64) for key in ['rank_path_id','rank_path_step','rank_path_occurrence','rank_path_block']}
+        for column,key in enumerate(['rank_path_id','rank_path_step','rank_path_occurrence'],1):self.last_annotations[key][-n:]=plan[:,column]
+        self.last_annotations['rank_path_block'][-n:]=self.blocks-1
+        np.add.at(self.actual_path_steps,plan[:,1],1)
+        return self.replace(pairs,point_indices,tasks,rank_indices,point_index,rank_index,ids,np.full(n,2,dtype=np.uint8))
+
+    def state_dict(self):
+        return dict(paths=self.paths,group_sampler=self.group_sampler.state_dict(),queue=self.queue,offsets=self.offsets,
+            cursor=self.cursor,blocks=self.blocks,next_occurrence=self.next_occurrence,actual_path_steps=self.actual_path_steps)
+
+    def load_state_dict(self,state):
+        if not np.array_equal(state['paths'],self.paths):raise ValueError('Path group identity changed during resume')
+        self.group_sampler.load_state_dict(state['group_sampler'])
+        for key in ['queue','offsets','cursor','blocks','next_occurrence','actual_path_steps']:setattr(self,key,state[key])
 
 
 def board_cohorts(corpus,config,rng):

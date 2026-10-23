@@ -9,7 +9,7 @@ from torch.nn import functional as F
 from grounded_llm.core.files import atomic_json, atomic_save
 from grounded_llm.core.qmap.model import StateEncoder, soft_rank_loss
 from grounded_llm.core.qmap.sampling import StratifiedEpochSampler, CoverageSampler, GroupCoverageSampler
-from .relation_data import prepare, load, sample_goals, BoardRelationSampler, decision_neighborhood_points, FailureReplaySampler
+from .relation_data import prepare, load, sample_goals, BoardRelationSampler, decision_neighborhood_points, FailureReplaySampler, LocalPathSampler
 from .relation_evaluate import evaluate
 
 
@@ -67,7 +67,13 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
         replay_options=options['failure_replay']
         if relation_sampler is None or neighborhood_fraction:
             raise ValueError('Failure replay requires board sampling and its own complete point neighborhoods')
-        maximum_replay_points=round(options['decision_batch_size']*replay_options['ranking_fraction'])*(corpus.max_candidates+1)
+        local_paths=replay_options.get('sampler')=='local_paths'
+        if local_paths and options['steps']%replay_options['block_batches']:
+            raise ValueError('Matched local-path budget must contain complete sampling blocks')
+        maximum_contexts=(replay_options['groups_per_batch']*replay_options['maximum_steps'] if local_paths
+                          else round(options['decision_batch_size']*replay_options['ranking_fraction']))
+        maximum_replay_points=maximum_contexts*(corpus.max_candidates+1)
+        if maximum_contexts>options['decision_batch_size']:raise ValueError('Replay exceeds ranking budget')
         if maximum_replay_points>round(options['batch_size']*relation_sampler.finite_fraction):
             raise ValueError('Replay would replace broad point coverage')
         source=(out/replay_options['bank']).resolve();snapshot=out/'failure_replay_bank.npz'
@@ -75,7 +81,8 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
             import shutil
             temporary=snapshot.with_suffix('.tmp');shutil.copyfile(source,temporary);temporary.replace(snapshot)
         with np.load(snapshot) as archive: bank={key:archive[key] for key in archive.files}
-        replay_sampler=FailureReplaySampler(corpus,data,bank,replay_options)
+        replay_sampler=(LocalPathSampler(corpus,data,bank,replay_options,replay_rng) if local_paths
+                        else FailureReplaySampler(corpus,data,bank,replay_options))
         replay_draws=np.zeros(len(replay_sampler.tasks),dtype=np.uint32)
         atomic_json(out/'failure_replay_summary.json',replay_sampler.summary)
     def sampler(labels,broad_only=False):
@@ -102,6 +109,7 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
             if not np.array_equal(saved['replay_tasks'],replay_sampler.tasks) or not np.array_equal(saved['replay_reasons'],replay_sampler.reason):
                 raise ValueError('Replay bank identity changed during resume')
             replay_rng.bit_generator.state=saved['replay_rng'];replay_draws=saved['replay_draws']
+            if isinstance(replay_sampler,LocalPathSampler):replay_sampler.load_state_dict(saved['replay_sampler_state'])
         torch.set_rng_state(saved['torch_rng'].cpu())
         if saved['cuda_rng'] is not None and torch.cuda.is_available(): torch.cuda.set_rng_state_all([r.cpu() for r in saved['cuda_rng']])
         exposure,pair_draws,rank_draws=saved['exposure'],saved['pair_draws'],saved['rank_draws']
@@ -161,6 +169,7 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
             exposure=exposure,pair_draws=pair_draws,rank_draws=rank_draws,
             replay_rng=replay_rng.bit_generator.state,replay_draws=replay_draws,
             replay_tasks=replay_sampler.tasks if replay_sampler else None,replay_reasons=replay_sampler.reason if replay_sampler else None,
+            replay_sampler_state=replay_sampler.state_dict() if isinstance(replay_sampler,LocalPathSampler) else None,
             best_score=best,best_step=best_step,
             seconds=prior_seconds+time.monotonic()-started),path)
     step=start_step
@@ -195,11 +204,13 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
         else: point_true=point_truth[p]
         if trace_path is not None:
             parent_true=corpus.distance(tasks[:,0],tasks[:,1])
-            trace.append(dict(point_step=np.full(len(pair),step,dtype=np.int32),pairs=pair.copy(),point_distance=point_true.copy(),
+            row=dict(point_step=np.full(len(pair),step,dtype=np.int32),pairs=pair.copy(),point_distance=point_true.copy(),
                 rank_step=np.full(len(tasks),step,dtype=np.int32),tasks=tasks.copy(),children=children.copy(),
                 parent_distance=parent_true,child_distance=child_truth.copy(),
                 point_reachability=np.isfinite(point_true),point_origin=point_origin,rank_origin=rank_origin,rank_replay_index=replay_ids,
-                optimal=valid & (child_truth+1==parent_true[:,None])))
+                optimal=valid & (child_truth+1==parent_true[:,None]))
+            if isinstance(replay_sampler,LocalPathSampler):row.update({key:value.copy() for key,value in replay_sampler.last_annotations.items()})
+            trace.append(row)
             if len(trace)>=100: flush_trace()
         ids=np.concatenate([pair[:,0],pair[:,1],children[valid],tasks[:,1]])
         unique,inverse=np.unique(ids,return_inverse=True)
@@ -268,7 +279,11 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
                  metrics=final)
     if replay_sampler:
         summary['failure_replay']=dict(decisions=len(replay_draws),unique_decisions_drawn=int((replay_draws>0).sum()),
-            total_context_draws=int(replay_draws.sum()),snapshot=str(out/'failure_replay_bank.npz'))
+            total_context_draws=int(replay_draws.sum()),snapshot=str(out/'failure_replay_bank.npz'),
+            counter_scope='Full training budget; counters for the selected model are retained separately in best.pt.')
+        if isinstance(replay_sampler,LocalPathSampler):
+            summary['failure_replay']['local_paths']=dict(paths=len(replay_sampler.paths),actual_path_context_draws=int(replay_sampler.actual_path_steps.sum()),
+                paths_with_any_context_draw=int((replay_sampler.actual_path_steps>0).sum()),completed_sampling_blocks=replay_sampler.blocks-int(replay_sampler.cursor<replay_sampler.options['block_batches']))
     if config.get('acceptance'):
         criteria=json.loads(Path(config['acceptance']).read_text())
         required=criteria['required_test_cohorts'][config['task']]

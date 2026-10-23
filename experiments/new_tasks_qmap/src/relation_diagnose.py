@@ -751,6 +751,53 @@ def encoder_axes(model,corpus,data,config,cohorts):
     return result
 
 
+def local_path_stream_statistics(run):
+    """Verify actual path-token identity and co-occurrence from saved batches.
+
+    On recovery, the latest saved attempt for each optimizer step identifies
+    its final execution. Older abandoned attempts remain in the raw archive.
+    """
+    run=Path(run);config=json.loads((run/'config.json').read_text())
+    with np.load(run/'failure_replay_bank.npz') as bank:
+        paths,lengths=bank['path_context_index'],bank['path_lengths']
+    records=[];batch_attempts=[]
+    for attempt,directory in enumerate(sorted((run/'samples').glob('attempt_*'))):
+        for file in sorted(directory.glob('*.npz')):
+            with np.load(file) as archive:
+                step=archive['rank_step'];replay=archive['rank_origin']>0
+                ids=archive['rank_path_id'];position=archive['rank_path_step']
+                occurrence=archive['rank_path_occurrence'];block=archive['rank_path_block']
+                if (ids[~replay]!=-1).any() or (position[~replay]!=-1).any() or (occurrence[~replay]!=-1).any() or (block[~replay]!=-1).any():raise ValueError('Main decision has path annotations')
+                p,s=ids[replay],position[replay]
+                if (p<0).any() or (p>=len(paths)).any() or (s<0).any() or (s>=lengths[p]).any():raise ValueError('Actual path token outside fixed group')
+                if not np.array_equal(archive['rank_replay_index'][replay],paths[p,s]):raise ValueError('Actual path context does not match its step')
+                batch_attempts.append(np.column_stack([step,np.full(len(step),attempt)]))
+                records.append(np.column_stack([np.full(replay.sum(),attempt),occurrence[replay],p,s,step[replay],block[replay]]))
+    if not records:raise ValueError('No actual path samples')
+    attempts=np.concatenate(batch_attempts);last=np.full(config['training']['steps']+1,-1,dtype=np.int32)
+    if (attempts[:,0]<1).any() or (attempts[:,0]>=len(last)).any():raise ValueError('Actual optimizer step outside configured budget')
+    np.maximum.at(last,attempts[:,0],attempts[:,1])
+    if (last[1:]<0).any():raise ValueError('Missing final-lineage optimizer batch')
+    tokens=np.concatenate(records);tokens=tokens[tokens[:,0]==last[tokens[:,4]]]
+    tokens=tokens[np.lexsort((tokens[:,3],tokens[:,1]))]
+    starts=np.r_[0,np.flatnonzero(np.diff(tokens[:,1]))+1];counts=np.diff(np.r_[starts,len(tokens)])
+    same_occurrence=np.diff(tokens[:,1])==0
+    if ((np.diff(tokens[:,3])==0)&same_occurrence).any():raise ValueError('Duplicate path step in final execution')
+    path=np.minimum.reduceat(tokens[:,2],starts)
+    if not np.array_equal(path,np.maximum.reduceat(tokens[:,2],starts)):raise ValueError('Path occurrence changed identity')
+    if not np.array_equal(np.minimum.reduceat(tokens[:,5],starts),np.maximum.reduceat(tokens[:,5],starts)):raise ValueError('Path occurrence crosses sampling blocks')
+    complete=counts==lengths[path]
+    if (counts>lengths[path]).any():raise ValueError('Too many path tokens')
+    same_batch=np.minimum.reduceat(tokens[:,4],starts)==np.maximum.reduceat(tokens[:,4],starts)
+    return dict(optimizer_batches=config['training']['steps'],actual_context_tokens=len(tokens),
+        unique_dataset_paths=len(np.unique(path)),path_occurrences=len(path),complete_occurrences=int(complete.sum()),
+        incomplete_occurrences=int((~complete).sum()),complete_same_batch_occurrences=int((complete&same_batch).sum()),
+        same_batch_fraction=float(same_batch[complete].mean()) if complete.any() else None,
+        actual_sampling_blocks=len(np.unique(tokens[:,5])),all_context_identities_checked=True,
+        attempt_resolution='Latest saved attempt for each optimizer step; abandoned records are preserved but excluded here.',
+        scope='Actual loss-input exposure and same-batch path co-occurrence, not proven nonzero parameter gradients or learned navigation.')
+
+
 def geometry(corpus,data,config,cohorts):
     """Compare exact shortest-path landmark coordinates to the model's metric.
 

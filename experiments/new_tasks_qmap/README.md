@@ -42,10 +42,13 @@ tests/               规则、标签、留出边界、采样及恢复检查
 | 布局覆盖 | [64张](configs/sokoban/sokoban_coverage64_pairs.json)、[1,000张](configs/sokoban/sokoban_coverage1000_pairs.json) | 同题、同预算比较布局扩展 |
 | 相邻关系 | [原采样](configs/sokoban/sokoban_neighborhood_control_pairs.json)、[相邻成组](configs/sokoban/sokoban_neighborhood_coupled_pairs.json) | 同目标的当前状态与后继监督 |
 | 完整局部路径 | [原采样](configs/sokoban/sokoban_local_path_control_pairs.json)、[打散](configs/sokoban/sokoban_local_path_shuffled_pairs.json)、[成组](configs/sokoban/sokoban_local_path_joint_pairs.json) | 新路径数据及同批成组的作用 |
-| 关系覆盖与多轮训练 | [当前配置](configs/sokoban/sokoban_coverage_epochs_pairs.json) | 逐条遍历准备关系、降学习率、固定已训练样本与区间平均loss |
+| 关系覆盖与多轮训练（已停止） | [配置](configs/sokoban/sokoban_coverage_epochs_pairs.json) | 扩大曝光后跨布局误差仍变差，保留完整断点 |
+| 完整求解结构小验证 | [配置](configs/sokoban/sokoban_solution_structure_pilot.json) | 匹配比较零散终局关系、完整路径与分支、路径内不同跨度的中间目标关系 |
 | 训练失败与路径构造 | [失败诊断](configs/sokoban/sokoban_training_failure_diagnosis.json)、[路径数据](configs/sokoban/sokoban_local_paths_data.json)、[固定验证](configs/sokoban/sokoban_neighborhood_validation.json) | 训练允许范围内的循环、分支、死锁和连续路径 |
 
 比较和限制见[推箱子报告](results/sokoban/report.md)。多轮条件从原采样路径对照的验证所选权重开始，新建优化器与采样阶段，不作为完整续训；epoch只指当前准备关系池的实际遍历，不代表穷尽物理状态。预算和学习率只维护在配置中。完整断点保存优化器、关系顺序和随机状态；实时状态见忽略的`coverage_epochs_runtime_40048.json`，旧路径三组见`local_path_runtime_40048.json`。
+
+求解结构小验证复用原[训练器](src/relations.py)与[评测器](src/relation_evaluate.py)，[任务编排](src/solution_structure.py)只准备有限棋盘的完整最短路径、精确中间目标距离和采样。三组共享有向最大差、MLP、Huber、完整候选soft-rank、起始权重与预算，32步纯贪心；比较固定预算结束权重。中间目标属于新增辅助监督，不是推理子目标。以完整正确路径的连续下降、单位步长残差、全程分支正确性及未见开发棋盘完成率共同判断；数据量、种子、更新数只见配置。未见开发布局此前已用于选权重，不能充当独立最终测试；没有结构收益前不扩量。
 
 ## 运行入口
 

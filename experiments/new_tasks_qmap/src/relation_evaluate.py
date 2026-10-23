@@ -310,6 +310,9 @@ def evaluate(model,corpus,data,config,cohorts=None,exposure=None,planning=True,t
                     unreachable=reachability(pred,truth,threshold,config['training']['unreachable_target']))
         result['coordinate_statistics']=coordinate_statistics(cache.q(rows[:,0]).cpu().numpy(),cache.q(rows[:,1]).cpu().numpy(),
             truth,pred,model.cap,getattr(model,'output_activation','sigmoid'))
+        if 'solution_paths_'+name in data:
+            from .solution_structure import path_metrics
+            result['solution_paths']=path_metrics(cache,corpus,data['solution_paths_'+name])
         result['bellman']['by_true_distance']={name:dict(count=int(mask.sum()),
             shortest_action_rate=float(optimal[mask,chosen[mask]].mean()),
             **unit_cost_consistency(pred[ids][mask],scores[ids][mask],optimal[mask],valid[ids][mask]))
@@ -358,7 +361,11 @@ def main():
     config=saved['config']; torch.set_num_threads(config['training']['cpu_threads'])
     if args.planning_distance_bins is not None:
         config['evaluation']['planning_distance_bins']=args.planning_distance_bins
-    corpus,data,_=load(config,args.run/'data')
+    if config['training'].get('solution_structure'):
+        from .solution_structure import prepare as prepare_structure
+        corpus,data,_=prepare_structure(config,args.run/'data')
+    else:
+        corpus,data,_=load(config,args.run/'data')
     model=StateEncoder(input_dim=saved['input_dim'],**config['model']).to(args.device)
     model.load_state_dict(saved['model']); model.requires_grad_(False)
     result=evaluate(model,corpus,data,config,cohorts=args.cohorts,exposure=saved['exposure'])

@@ -66,7 +66,8 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
     if resume and json.loads((out/'config.json').read_text())!=config:
         raise ValueError('Resume requires the unchanged formal configuration')
     atomic_json(out/'config.json',config)
-    reference=config.get('data',{}).get('prepared_from')
+    structure_options=config['training'].get('solution_structure')
+    reference=config.get('data',{}).get('prepared_from') if not structure_options else None
     if reference and not (out/'data').exists():
         source=(out/reference).resolve()
         previous=json.loads((source.parent/'config.json').read_text())
@@ -76,7 +77,11 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
             raise ValueError('Prepared relation reference changes physical data scope')
         (out/'data').symlink_to(reference,target_is_directory=True)
     prepared=time.monotonic()
-    corpus,data,description=(load(config,out/'data') if (out/'data'/'relations.npz').exists() else prepare(config,out/'data'))
+    if structure_options:
+        from .solution_structure import prepare as prepare_structure
+        corpus,data,description=prepare_structure(config,out/'data')
+    else:
+        corpus,data,description=(load(config,out/'data') if (out/'data'/'relations.npz').exists() else prepare(config,out/'data'))
     preparation_seconds=time.monotonic()-prepared
     if not (out/'preparation.json').exists(): atomic_json(out/'preparation.json',dict(seconds=preparation_seconds,data=description))
     preparation_seconds=json.loads((out/'preparation.json').read_text())['seconds']
@@ -140,6 +145,12 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
     pair_sampler=(GroupCoverageSampler(corpus.locate(data['pairs_train'][:,0]),rng,options.get('layouts_per_batch'))
                   if options.get('balance_layouts') else sampler(point_labels,broad_only=bool(relation_sampler)))
     rank_sampler=sampler(data['distances_train'])
+    solution_sampler=None
+    if structure_options:
+        from .solution_structure import SolutionSampler
+        if relation_sampler or options.get('online_goals') or replay_sampler:
+            raise ValueError('Solution pilot uses fixed exact banks and its own sampling, without online replacement')
+        solution_sampler=SolutionSampler(corpus,data,structure_options,rng)
     exposure=np.zeros(corpus.size,dtype=np.uint32)
     pair_draws=np.zeros(len(point_truth),dtype=np.uint32); rank_draws=np.zeros(len(data['tasks_train']),dtype=np.uint32)
     allowed=None
@@ -173,10 +184,14 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
             if (saved['task']!=config['task'] or saved['scope']!=scope(config,corpus) or saved['config']['model']!=config['model']
                     or saved['config'].get('input_encoding','identity')!=config.get('input_encoding','identity')):
                 raise ValueError('Warm-start model scope mismatch')
-            model.load_state_dict(saved['model']); exposure=saved['exposure'].copy()
+            model.load_state_dict(saved['model'])
+            if not structure_options: exposure=saved['exposure'].copy()
             atomic_json(out/'initialization.json',dict(checkpoint=str(initial_path),source_commit=saved['source_commit'],
                 step=saved['step'],optimizer_restored=False,sampler_restored=False,
-                meaning='Weights warm start; fresh optimizer and sampling phase, not an exact continuation. Prior gradient endpoint exposure retained separately from fresh source-row coverage.'))
+                prior_exposure_transferred=not bool(structure_options),
+                meaning=('Weights warm start; fresh optimizer and sampling phase, not an exact continuation. '
+                    + ('Small corpus has remapped state IDs; prior endpoint counters are not transferable.' if structure_options
+                       else 'Prior gradient endpoint exposure retained separately from fresh source-row coverage.'))))
     if not (out/'initial.json').exists():
         initial_started=time.monotonic()
         initial=evaluate(model,corpus,data,config,cohorts=validation if options.get('validation_only_initial') else None)
@@ -231,7 +246,10 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
         epoch=relation_sampler.ranking_epochs if relation_sampler and relation_sampler.coverage_sampler is not None else 0.
         rate=learning_rate_at_epoch(options,epoch)
         for group in optimizer.param_groups: group['lr']=rate
-        if relation_sampler:
+        if solution_sampler:
+            p,r=solution_sampler.draw(options['batch_size'],options['decision_batch_size'])
+            pair=data['pairs_train'][p];tasks=data['tasks_train'][r];children=data['children_train'][r]
+        elif relation_sampler:
             p,r,pair,tasks=relation_sampler.draw(pair_sampler,options['batch_size'],options['decision_batch_size'],rng)
             children=corpus.successors(tasks[:,0])
         else:
@@ -324,11 +342,14 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
                 if eligible: atomic_json(out/'best_eligible.json',dict(step=step))
             save(step,out/'last.pt')
             print(json.dumps(record),flush=True)
-    saved=torch.load(out/'best.pt',map_location=device,weights_only=False)
+    final_checkpoint=options.get('evaluation_checkpoint','best.pt')
+    if final_checkpoint not in ('best.pt','last.pt'): raise ValueError('Unknown final evaluation checkpoint')
+    saved=torch.load(out/final_checkpoint,map_location=device,weights_only=False)
     model.load_state_dict(saved['model'])
     final_started=time.monotonic()
     final=evaluate(model,corpus,data,config,exposure=saved['exposure'])
-    summary=dict(task=config['task'],source_commit=source_commit,best_step=saved['step'],last_step=step,
+    summary=dict(task=config['task'],source_commit=source_commit,best_step=best_step,evaluated_step=saved['step'],
+                 evaluated_checkpoint=final_checkpoint,last_step=step,
                  preparation_seconds=preparation_seconds,training_seconds=prior_seconds+time.monotonic()-started,
                  initial_evaluation_seconds=json.loads((out/'initial_timing.json').read_text())['seconds'] if (out/'initial_timing.json').exists() else None,
                  final_evaluation_seconds=time.monotonic()-final_started,

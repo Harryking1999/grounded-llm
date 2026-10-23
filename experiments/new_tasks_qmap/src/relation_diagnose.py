@@ -376,6 +376,83 @@ def training_failure_bank(corpus,data,edges,*,continuation_seeds_per_layout=16,m
     return summary,dict(**materialize(corpus,bank),reason=reason)
 
 
+def training_local_paths(corpus,data,edges,*,minimum_steps=5,maximum_steps=10,seeds_per_layout=32,seed=0):
+    """Whole same-goal optimal path groups, with every legal branch at each step.
+
+    Shorter groups are retained only when they reach the exact goal. A protected
+    boundary can end a valid prefix of at least minimum_steps; shorter censored
+    prefixes are rejected, with their distance/layout coverage reported.
+    """
+    from .relation_data import training_decision_mask,materialize
+    from .relation_evaluate import distance_strata
+    if not 1<=minimum_steps<=maximum_steps or seeds_per_layout<1:raise ValueError('Invalid local path bounds')
+    _,critical=training_failure_bank(corpus,data,edges,continuation_seeds_per_layout=1,maximum_steps=1)
+    take=(critical['reason']&15)>0;pool=critical['tasks'][take];reasons=critical['reason'][take]&15
+    rng=np.random.default_rng(seed);scene_ids=corpus.locate(pool[:,0]);chosen=[]
+    distances=critical['distances'][take];bins=np.searchsorted([5,10,20,40,80,np.inf],distances)
+    for sid in np.unique(scene_ids):
+        local=np.flatnonzero(scene_ids==sid)
+        if len(local)<=seeds_per_layout:chosen.extend(local);continue
+        layers=[rng.permutation(local[bins[local]==b]).tolist() for b in np.unique(bins[local])]
+        rng.shuffle(layers);selected=[]
+        while len(selected)<seeds_per_layout:
+            for layer in layers:
+                if layer and len(selected)<seeds_per_layout:selected.append(layer.pop())
+        chosen.extend(selected)
+    chosen=np.asarray(chosen,dtype=np.int64);seeds=pool[chosen];seed_reason=reasons[chosen]
+    n=len(seeds);width=corpus.max_candidates
+    tasks=np.full((n,maximum_steps,2),-1,dtype=np.int64)
+    children=np.full((n,maximum_steps,width),-1,dtype=np.int64)
+    labels=np.full((n,maximum_steps),np.nan,dtype=np.float32)
+    child_labels=np.full((n,maximum_steps,width),np.inf,dtype=np.float32)
+    optimal=np.zeros((n,maximum_steps,width),dtype=bool)
+    teacher=np.full((n,maximum_steps),-1,dtype=np.int8)
+    lengths=np.zeros(n,dtype=np.int16);reached=np.zeros(n,dtype=bool);protected=np.zeros(n,dtype=bool)
+    active=np.ones(n,dtype=bool);current=seeds.copy()
+    for step in range(maximum_steps):
+        ids=np.flatnonzero(active)
+        if not len(ids):break
+        safe=training_decision_mask(corpus,data,current[ids])
+        blocked=ids[~safe];protected[blocked]=True;active[blocked]=False;ids=ids[safe]
+        if not len(ids):continue
+        exact=materialize(corpus,current[ids]);slots=exact['optimal'].argmax(axis=1)
+        if not exact['optimal'].any(axis=1).all():raise ValueError('No optimal path continuation')
+        tasks[ids,step]=current[ids];children[ids,step]=exact['children'];labels[ids,step]=exact['distances']
+        child_labels[ids,step]=exact['child_distances'];optimal[ids,step]=exact['optimal'];teacher[ids,step]=slots
+        next_state=exact['children'][np.arange(len(ids)),slots]
+        if not (exact['child_distances'][np.arange(len(ids)),slots]+1==exact['distances']).all():raise ValueError('Optimal step does not decrease exact distance by one')
+        lengths[ids]+=1;current[ids,0]=next_state;done=next_state==current[ids,1]
+        reached[ids[done]]=True;active[ids[done]]=False
+    keep=(lengths>=minimum_steps)|reached
+    kept_tasks=tasks[keep];kept_lengths=lengths[keep]
+    valid_step=np.arange(maximum_steps)[None,:]<kept_lengths[:,None]
+    flat_rows=np.unique(kept_tasks[valid_step],axis=0)
+    if not training_decision_mask(corpus,data,flat_rows).all():raise ValueError('Protected row in retained path group')
+    flat=materialize(corpus,flat_rows);flat_reason=np.full(len(flat_rows),16,dtype=np.uint8)
+    flat_keys=flat_rows[:,0]*np.int64(corpus.size)+flat_rows[:,1]
+    if keep.any():
+        seed_keys=seeds[keep,0]*np.int64(corpus.size)+seeds[keep,1]
+        np.bitwise_or.at(flat_reason,np.searchsorted(flat_keys,seed_keys),seed_reason[keep])
+    path_index=np.full(kept_tasks.shape[:2],-1,dtype=np.int64)
+    path_index[valid_step]=np.searchsorted(flat_keys,kept_tasks[valid_step,0]*np.int64(corpus.size)+kept_tasks[valid_step,1])
+    initial=distances[chosen]
+    def distribution(mask):
+        return {name:int((mask&layer).sum()) for name,layer in distance_strata(initial)}
+    summary=dict(minimum_steps=minimum_steps,maximum_steps=maximum_steps,seeds_per_layout=seeds_per_layout,
+        eligible_failure_seeds=len(pool),selected_seeds=n,retained_paths=int(keep.sum()),rejected_paths=int((~keep).sum()),
+        retained_layouts=len(np.unique(corpus.locate(seeds[keep,0]))),selected_layouts=len(np.unique(corpus.locate(seeds[:,0]))),
+        retained_lengths={str(i):int((kept_lengths==i).sum()) for i in np.unique(kept_lengths)},
+        selected_by_initial_distance=distribution(np.ones(n,dtype=bool)),retained_by_initial_distance=distribution(keep),
+        rejected_by_initial_distance=distribution(~keep),protected_boundary_paths=int(protected.sum()),
+        retained_protected_prefixes=int((protected&keep).sum()),short_paths_reaching_goal=int((reached&(lengths<minimum_steps)).sum()),
+        unique_decisions=len(flat_rows),all_legal_branches_preserved=True,exact_unit_descent=True,
+        scope='Candidate whole path groups only. No optimizer update. Protected prefixes shorter than the minimum are excluded, never silently treated as complete paths.')
+    return summary,dict(**flat,reason=flat_reason,path_tasks=kept_tasks,path_children=children[keep],
+        path_distances=labels[keep],path_child_distances=child_labels[keep],path_optimal=optimal[keep],
+        path_teacher_choice=teacher[keep],path_lengths=kept_lengths,path_context_index=path_index,
+        path_seed_reason=seed_reason[keep],path_reached_goal=reached[keep],path_protected_boundary=protected[keep])
+
+
 def linf_witness(corpus,config,count):
     """Exact finite metric obstruction, independent of learned encoder weights."""
     if config['task']!='token_swapping' or count<2: raise ValueError('At least two fixed-tree Token pairs required')
@@ -785,8 +862,11 @@ def main():
         records=[]; cache=QCache(model,corpus,args.device)
         metrics=rollout(corpus,cache,rows,options['maximum_steps'],'q',edge_records=records)
         boundaries,edges=policy_boundaries(records)
-        summary,bank=training_failure_bank(corpus,data,edges,
-            continuation_seeds_per_layout=options['continuation_seeds_per_layout'],maximum_steps=options['maximum_steps'])
+        if options.get('local_paths'):
+            summary,bank=training_local_paths(corpus,data,edges,**options['local_paths'])
+        else:
+            summary,bank=training_failure_bank(corpus,data,edges,
+                continuation_seeds_per_layout=options['continuation_seeds_per_layout'],maximum_steps=options['maximum_steps'])
         args.out.parent.mkdir(parents=True,exist_ok=True)
         archives={}
         for suffix,packed in [('edges',dict(queries=rows,**edges)),('bank',bank)]:

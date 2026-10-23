@@ -569,6 +569,54 @@ class ExactPairTests(unittest.TestCase):
             self.assertEqual(result['predicted_progress']['predicted_strict_descent_edge_rate'],0)
             self.assertEqual(result['predicted_progress']['counts']['predicted_plateau'],result['predicted_progress']['counts']['executed_edges'])
 
+    def test_whole_local_paths_preserve_branches_descent_and_protected_boundaries(self):
+        from experiments.new_tasks_qmap.src.relation_diagnose import policy_boundaries,training_local_paths
+        children=np.full((12,3),-1,dtype=np.int64)
+        for i in range(11):
+            if i:children[i,0]=i-1
+            if i<10:children[i,1]=i+1
+            children[i,2]=11
+        children[11,2]=11
+        truth=UnitGraphOracle(children).to_goal(10)
+        scene=SimpleNamespace(states=np.arange(12)[:,None],children=children,goals=np.array([10]),
+            metadata=dict(split='train',training_goals=1),features=lambda ids:np.eye(12)[ids],distance=lambda s,g:truth[s])
+        corpus=PhysicalCorpus([scene]);corpus.action=lambda s,a:int(a);corpus.describe=lambda s:dict(state=int(s))
+        flat=SimpleNamespace(scores=lambda s,g:np.zeros(np.broadcast_arrays(s,g)[0].shape,dtype=np.float32))
+        records=[];rollout(corpus,flat,np.array([[0,10]]),32,'q',edge_records=records)
+        _,edges=policy_boundaries(records);data=dict(reserved_relations=np.empty(0,dtype=np.int64))
+        summary,bank=training_local_paths(corpus,data,edges,minimum_steps=5,maximum_steps=10)
+        self.assertEqual(summary['retained_paths'],2)
+        np.testing.assert_array_equal(bank['path_lengths'],[10,9])
+        for path,length in enumerate(bank['path_lengths']):
+            length=int(length);rows=bank['path_tasks'][path,:length];kids=bank['path_children'][path,:length]
+            np.testing.assert_array_equal(kids,corpus.successors(rows[:,0]))
+            self.assertTrue((kids[:,2]==11).all())
+            self.assertTrue(np.isinf(bank['path_child_distances'][path,:length,2]).all())
+            choices=bank['path_teacher_choice'][path,:length];chosen=kids[np.arange(length),choices]
+            np.testing.assert_array_equal(chosen[:-1],rows[1:,0])
+            self.assertEqual(chosen[-1],10)
+            np.testing.assert_array_equal(bank['path_child_distances'][path,np.arange(length),choices],bank['path_distances'][path,:length]-1)
+            np.testing.assert_array_equal(bank['tasks'][bank['path_context_index'][path,:length]],rows)
+        protected=dict(reserved_relations=keys(np.array([8]),np.array([10]),corpus.size))
+        summary,bank=training_local_paths(corpus,protected,edges,minimum_steps=5,maximum_steps=10)
+        np.testing.assert_array_equal(bank['path_lengths'],[7,6])
+        self.assertEqual(summary['retained_protected_prefixes'],2)
+        self.assertFalse(bank['path_reached_goal'].any())
+        protected=dict(reserved_relations=keys(np.array([5]),np.array([10]),corpus.size))
+        summary,bank=training_local_paths(corpus,protected,edges,minimum_steps=5,maximum_steps=10)
+        self.assertEqual(summary['retained_paths'],0);self.assertEqual(summary['rejected_paths'],2)
+        self.assertEqual(bank['path_tasks'].shape,(0,10,2))
+        summary,bank=training_local_paths(corpus,data,edges,minimum_steps=5,maximum_steps=6)
+        np.testing.assert_array_equal(bank['path_lengths'],[6,6])
+        short_scene=SimpleNamespace(**scene.__dict__);short_scene.goals=np.array([2]);short_truth=UnitGraphOracle(children).to_goal(2)
+        short_scene.distance=lambda s,g:short_truth[s];short=PhysicalCorpus([short_scene])
+        short.action=corpus.action;short.describe=corpus.describe
+        records=[];rollout(short,flat,np.array([[0,2]]),32,'q',edge_records=records)
+        _,edges=policy_boundaries(records)
+        summary,bank=training_local_paths(short,data,edges,minimum_steps=5,maximum_steps=10)
+        self.assertEqual(summary['short_paths_reaching_goal'],2)
+        self.assertTrue(bank['path_reached_goal'].all())
+
     def test_output_scale_and_interval_diagnostics_keep_physical_units(self):
         from experiments.new_tasks_qmap.src.relation_evaluate import coordinate_statistics
         outputs=[]; slopes=[]

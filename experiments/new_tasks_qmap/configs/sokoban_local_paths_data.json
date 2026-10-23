@@ -1,0 +1,13 @@
+{
+  "query_count": 16384,
+  "query_seed_offset": 71003,
+  "planning_distance_bins": [1, 2, 5, 10, 20, 40, 80, 256],
+  "maximum_steps": 256,
+  "local_paths": {
+    "minimum_steps": 5,
+    "maximum_steps": 10,
+    "seeds_per_layout": 32,
+    "seed": 2026102310
+  },
+  "scope": "Mine the unchanged validation-selected neighborhood control checkpoint on permitted training relations only. Expand query coverage to16384 across1000 training layouts. Each accepted group keeps one complete goal and up to10 consecutive exact-optimal decisions with ALL legal candidates and exact labels. Accept5-10-step prefixes, or shorter paths only when the exact goal is reached. Reject shorter protected prefixes and report their distance/layout coverage. No Bellman loss or optimizer update."
+}

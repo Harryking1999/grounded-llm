@@ -34,5 +34,15 @@ class NearGoalTests(unittest.TestCase):
         self.assertFalse(guard.task_blocked(env,tasks).any())
         self.assertTrue(np.all(tasks[:,0]!=tasks[:,1]))
 
+    def test_local_sampling_covers_exact_entry_distances_without_oracle_actions(self):
+        env=Ring();mask=np.zeros(env.size,dtype=bool)
+        guard=ProtectedRelations(env,np.empty((0,2),dtype=int),mask)
+        relatives={d:np.array([d,env.size-d]) for d in range(1,7)}
+        tasks=training_tasks(env,{1:np.array([1,40]),2:np.array([2,39])},120,
+                             np.random.default_rng(10),guard,0,relatives,1.)
+        distances=env.distance(tasks[:,0],tasks[:,1])
+        self.assertEqual(set(distances),set(range(1,7)))
+        self.assertTrue(np.all((distances>=1)&(distances<=6)))
+
 
 if __name__=='__main__':unittest.main()

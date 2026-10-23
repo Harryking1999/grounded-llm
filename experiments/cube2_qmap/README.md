@@ -61,3 +61,7 @@ L∞、L2 的现有尝试都尚未带来可靠的长程求解进展。精确表�
 ```bash
 python -m experiments.cube2_qmap.src.near_goal_continuation --contract experiments/cube2_qmap/configs/near_goal_continuation.json --checkpoint SELECTED_Q --oracle EXISTING_QTM_ORACLE --evaluation-data PAIRED_CUBE_EVAL_DATA --out NEW_RUN --source-commit COMMIT --device cuda
 ```
+
+原均匀父节点续训的近目标验证先升后降，最终复原退化；比较与边界见[结果报告](results/report.md#复原附近目标的续训)。后续[从1000步改进的配置](configs/near_goal_refinement.json)保留同一编码器和目标，混合远处父节点与距近目标1–6步的入口邻域，降低学习率，并复用`cycle_repair.ExitGuard`检查Adam实际更新对训练区正确复原决策的影响。拒绝更新会恢复模型与Adam；有限保护集合不保证全空间保持。
+
+该阶段保存每个评测点，以近目标验证成绩选择候选，约束原复原回归不低于起始1000步，并把初始断点纳入候选。旧小OOD与已查看测试均作为回归；新增最终监测题仅保证本阶段不监督，其早期曝光未审计。选定后再报告全部回归、新监测与全状态复原，不自动采用或追加。

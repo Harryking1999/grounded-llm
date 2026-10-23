@@ -62,6 +62,25 @@ def paired_counts(before, after, mask=None):
                 still_wrong=int((~before & ~after).sum()), both_correct=int((before & after).sum()))
 
 
+def chosen_branch_categories(corpus, data, predictions):
+    """Disjoint chosen-action outcomes, unlike overlapping available branches."""
+    tasks=data['tasks_train'];children=data['children_train'];valid=children>=0
+    choice=np.where(valid,predictions,np.inf).argmin(axis=1)
+    selected=children[np.arange(len(children)),choice]
+    truth=data['child_distances_train'][np.arange(len(children)),choice]
+    optimal=truth+1==data['distances_train'];dead=~np.isfinite(truth)
+    pushed=np.zeros(len(tasks),bool);scenes=corpus.locate(tasks[:,0])
+    for sid in np.unique(scenes):
+        mask=scenes==sid;offset=corpus.offsets[sid];states=corpus.scenes[sid].states
+        pushed[mask]=(states[tasks[mask,0]-offset,1:]!=states[selected[mask]-offset,1:]).any(axis=1)
+    # First axis is optimal/recoverable/dead, second is walk/push.
+    codes=(np.where(optimal,0,np.where(dead,2,1))*2+pushed).astype(np.int8)
+    names=['optimal_walk','optimal_push','recoverable_suboptimal_walk',
+           'recoverable_suboptimal_push','dead_walk','dead_push']
+    counts={name:int((codes==i).sum()) for i,name in enumerate(names)}
+    return codes,names,counts
+
+
 def summarize_migration(before, after, groups):
     return {metric:dict(overall=paired_counts(before[metric], after[metric]),
                         **{kind:{key:paired_counts(before[metric], after[metric], mask)

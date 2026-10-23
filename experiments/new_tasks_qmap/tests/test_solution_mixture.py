@@ -10,7 +10,7 @@ from experiments.new_tasks_qmap.tests.test_solution_structure import fixture
 from experiments.new_tasks_qmap.src.relation_data import materialize,keys
 from experiments.new_tasks_qmap.src.solution_structure import context_points
 from experiments.new_tasks_qmap.src.solution_mixture import combine_banks,remap_ids,MixtureSampler
-from experiments.new_tasks_qmap.src.solution_migration import decision_outcomes,paired_counts
+from experiments.new_tasks_qmap.src.solution_migration import decision_outcomes,paired_counts,chosen_branch_categories
 
 
 def bank():
@@ -85,6 +85,18 @@ class MixtureTests(unittest.TestCase):
         outcomes=decision_outcomes(data,np.array([[1,3,2]]))
         self.assertTrue(outcomes['shortest_action'][0]);self.assertFalse(outcomes['complete_candidate_order'][0])
         self.assertEqual(paired_counts(np.array([True,False]),np.array([False,True]))['introduced'],1)
+
+    def test_chosen_branch_types_distinguish_finite_detour_from_dead_push(self):
+        corpus,data=bank()
+        # Fixture states use a one-column ID; append boxes so the irreversible
+        # child changes boxes while the reversible finite detour does not.
+        corpus.scenes[0].states=np.column_stack([np.arange(5),[0,0,0,0,1]])
+        predictions=np.array([[0,np.inf,np.inf],[0,1,2],[0,np.inf,np.inf]])
+        codes,names,counts=chosen_branch_categories(corpus,data,predictions)
+        self.assertEqual(names[codes[1]],'recoverable_suboptimal_walk')
+        predictions[1]=[2,1,0]
+        codes,names,counts=chosen_branch_categories(corpus,data,predictions)
+        self.assertEqual(names[codes[1]],'dead_push')
 
 
 if __name__=='__main__':unittest.main()

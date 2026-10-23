@@ -60,7 +60,7 @@ tests/               规则、标签、留出边界、采样及恢复检查
 
 完整可达区域的[较长预算](results/sokoban/sokoban_graph_basins_12000.json)和[稠密距离诊断](results/sokoban/sokoban_dense_goal_order.json)已完成：同布局新目标粗略远近性有所学习，跨布局与相邻距离层仍失败。稠密诊断只读固定留出目标，不替换正式评测或参与训练反馈；入口为`src.solution_global_order`。
 
-[连续邻域与分级整图反馈](results/sokoban/sokoban_connected_graph_sampling.json)同样未显示可靠泛化收益。[全量迁移和保持性诊断](results/sokoban/sokoban_error_migration.json)已比较原始及40个阶段结束权重：训练图中的错误下降，同时损害其他原训练布局。下一步用匹配混合对照检验布局多样性与完整求解结构能否共同保住泛化，不再在同一批8张布局上反复修补。
+[连续邻域与分级整图反馈](results/sokoban/sokoban_connected_graph_sampling.json)同样未显示可靠泛化收益。[全量迁移和保持性诊断](results/sokoban/sokoban_error_migration.json)已比较原始及48个阶段结束权重。[大分布与完整图混合对照](results/sokoban/sokoban_broad_graph_mixture.json)保留原1,000张布局，共用初始化、预算与原损失，在100张验证布局检查终局与200个中间目标：混合缓解纯图遗忘，未比原大分布单独训练获得可靠的近层排序、连续路径和求解增益。尚不扩图或追加训练，先核对目标与整层内部的有效遍历，不能将层身份被访问当作整层已充分曝光。
 
 ## 运行入口
 

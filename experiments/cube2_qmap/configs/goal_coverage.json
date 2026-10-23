@@ -18,6 +18,8 @@
   "training": {
     "near_batch": 256,
     "restoration_batch": 128,
+    "edge_parent_batch": 1024,
+    "edge_loss_weight": 0.1,
     "near_weight": 0.5,
     "rank_weight": 1.0,
     "temperature": 1.0,
@@ -25,11 +27,12 @@
     "clip_norm": 5.0,
     "epochs": 12,
     "evaluate_every_epochs": 2,
+    "matched_update_checkpoints": [512, 1024, 1536],
     "seed": 2026102402,
     "cpu_threads": 2
   },
   "comparison": "V1 and V2 are nested unique physical decision pools; same fixed epochs establish full exposure, matched-update curve points separate extra data from extra updates. V2 paired/disjoint controls share target counts, size, parent mixture, losses and updates, but differ in parent reuse across goals; report residual start-distribution differences. V3 nests V2 and adds novel full stars from training-only greedy failures and close/wrong rankings. No optimizer or model-form change.",
   "selection": "Fresh relation-heldout validation first, original restoration regression >=385/500; retain initialization fallback. At fixed phase end evaluate old small OOD and sealed tests once for the selected candidate; never mine or tune from them. Final all-state restoration must be reported even when retention fails.",
   "split": "Historical protected state mask and old evaluation relation keys retained with axis closure. Fresh validation and test stars are excluded symmetrically and chosen outside reconstructed initialization supervised relation closure. Additional depth-2/3 goal orbits withheld entirely from this continuation, including symmetry counterparts; depth-1 has only one orbit so unseen-goal claims there are impossible. Earlier inherited goal exposures remain a limitation. No transformed relative-state network input, search, new head or test-derived training labels.",
-  "budget": "One bounded 12-epoch pass for V1-2000, V2-paired-2000, V2-disjoint-2000, V3-2000 and V2-paired-1000. Optional next phase requires coverage/exposure and training-conflict diagnosis, not arbitrary learning-rate sweeps. Preserve all existing weights and FLAN maps."
+  "budget": "One bounded 12-epoch pass for V1-2000, V2-paired-2000, V2-disjoint-2000, V3-2000 and V2-paired-1000 with one-step edges; one matched V2-paired-2000 control without edges. The edge-enabled V2/V3 budgets visit every physical parent, supervising every admissible one-step edge at least once. Optional next phase requires coverage/exposure and training-conflict diagnosis, not arbitrary learning-rate sweeps. Preserve all existing weights and FLAN maps."
 }

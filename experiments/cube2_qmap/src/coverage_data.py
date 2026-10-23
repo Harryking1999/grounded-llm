@@ -3,6 +3,7 @@ import argparse
 from collections import Counter
 import json
 from pathlib import Path
+import shutil
 
 import numpy as np
 import torch
@@ -49,15 +50,16 @@ def coverage(env,tasks):
     output=dict(exposures=len(tasks),unique_goals=len(np.unique(unique[:,1])),
         unique_parents=len(starts),unique_state_goal_pairs=len(unique),
         unique_complete_decisions=len(unique),candidate_labels_exposed=len(tasks)*len(env.actions),
-        unique_candidate_labels=len(unique)*len(env.actions),parent_goals_histogram=hist(counts),
+        unique_state_goal_action_labels=len(unique)*len(env.actions),parent_goals_histogram=hist(counts),
         goal_depth_exposures=hist(env.depth[tasks[:,1]]),
         parent_depth_unique_decisions=hist(env.depth[unique[:,0]]),
         true_distance_unique_decisions=hist(env.distance(*unique.T)),
         per_goal={})
-    masks=[]
+    masks=[];unique_candidate_labels=0
     for goal in np.unique(unique[:,1]):
         rows=unique[unique[:,1]==goal];children=env.successors(rows[:,0])
         truth=env.distance(children,goal);d=env.distance(rows[:,0],goal)
+        unique_candidate_labels+=len(np.unique(children))
         optimal=truth==d[:,None]-1
         masks.extend((optimal*(1<<np.arange(len(env.actions)))).sum(-1).tolist())
         region=(rows[:,0]//729*8//5040)*9+(rows[:,0]%729*9//729)
@@ -68,6 +70,7 @@ def coverage(env,tasks):
             optimal_action_counts=optimal.sum(0).tolist(),
             best_action_ties=hist(optimal.sum(-1)),
             strict_order_constraints=int((truth[:,:,None]<truth[:,None,:]).sum()))
+    output['unique_candidate_labels']=unique_candidate_labels
     output['optimal_action_mask_histogram']=hist(masks)
     # Count parents with disjoint optimal sets across targets: start-only action
     # cannot satisfy these decisions simultaneously.
@@ -136,17 +139,18 @@ def keys_to_pairs(keys,size):
 
 
 def sample_cohort(env,goals,count,rng,guard,previous):
-    rows=[];used=set()
-    while len(rows)<count:
+    depths=sorted(np.unique(env.depth[goals]));rows={int(d):[] for d in depths};used=set()
+    quotas={int(d):count//len(depths)+int(i<count%len(depths)) for i,d in enumerate(depths)}
+    while sum(map(len,rows.values()))<count:
         starts=rng.integers(env.size,size=2048)
         targets=rng.choice(goals,size=len(starts))
         tasks=np.column_stack((starts,targets))
         keep=(starts!=targets)&~guard.task_blocked(env,tasks)&~previous.task_blocked(env,tasks)
         for s,g in tasks[keep]:
-            if (int(s),int(g)) not in used:
-                rows.append((int(s),int(g)));used.add((int(s),int(g)))
-            if len(rows)==count:break
-    return np.asarray(rows,dtype=np.int64)
+            depth=int(env.depth[g])
+            if len(rows[depth])<quotas[depth] and (int(s),int(g)) not in used:
+                rows[depth].append((int(s),int(g)));used.add((int(s),int(g)))
+    return np.asarray([row for depth in depths for row in rows[int(depth)]],dtype=np.int64)
 
 
 @torch.no_grad()
@@ -183,7 +187,14 @@ def prepare(args):
     cfg=json.loads(args.config.read_text());torch.set_num_threads(2)
     out=args.out;out.mkdir(parents=True,exist_ok=False)
     env=Cube2(args.oracle,metric='QTM_URF_6');rng=np.random.default_rng(cfg['seed'])
-    historical=reconstruct(env,args.first_cohorts,args.second_cohorts,args.checkpoint1000,out)
+    if args.audit_source:
+        for name in ('historical_tasks.npz','historical_coverage.json','historical_label_keys.npy'):
+            shutil.copy2(args.audit_source/name,out/name)
+        old_tasks=np.load(out/'historical_tasks.npz')
+        historical=np.r_[old_tasks['near'],old_tasks['restoration']]
+        atomic_json(out/'historical_coverage.json',coverage(env,historical))
+    else:
+        historical=reconstruct(env,args.first_cohorts,args.second_cohorts,args.checkpoint1000,out)
     old=np.load(args.second_cohorts);oldkeys=old['excluded_relation_keys'];mask=old['state_mask']
     goals,canonical=goal_orbits(env);reserved=[]
     for depth in (2,3):
@@ -196,11 +207,14 @@ def prepare(args):
             orbits=len(np.unique(canonical[env.depth[goals]==d])),train=int((env.depth[train_goals]==d).sum())) for d in (1,2,3)},
         limitation='One orbit at depth 1; unseen-goal testing is possible only at depth 2/3. Heldout goals may have inherited pretraining exposure.'))
     # Reconstructed historical labels exclude fresh initial decision labels.
-    historical_keys=[]
-    unique=unique_tasks(historical,env.size)
-    for start in range(0,len(unique),16384):historical_keys.append(closure_keys(env,unique[start:start+16384]))
-    previous_keys=np.unique(np.concatenate(historical_keys))
-    np.save(out/'historical_label_keys.npy',previous_keys)
+    if args.audit_source:
+        previous_keys=np.load(out/'historical_label_keys.npy')
+    else:
+        historical_keys=[]
+        unique=unique_tasks(historical,env.size)
+        for start in range(0,len(unique),16384):historical_keys.append(closure_keys(env,unique[start:start+16384]))
+        previous_keys=np.unique(np.concatenate(historical_keys))
+        np.save(out/'historical_label_keys.npy',previous_keys)
     guard=ProtectedRelations(env,keys_to_pairs(oldkeys,env.size),mask)
     previous=RelationGuard(env.size,keys_to_pairs(previous_keys,env.size))
     cohorts={}
@@ -212,6 +226,19 @@ def prepare(args):
     np.savez_compressed(out/'cohorts.npz',**cohorts,state_mask=mask,excluded_relation_keys=oldkeys,
         heldout_goals=heldout_goals,train_goals=train_goals,original=old['original'])
     guard=CoverageGuard(env,keys_to_pairs(oldkeys,env.size),mask,heldout_goals)
+    # One-step labels use the same endpoint/axis exclusions. Parents may have
+    # partially protected edges: record the exact mask, never fabricate labels.
+    edge_allowed=np.zeros((env.size,len(env.actions)),dtype=bool)
+    for begin in range(0,env.size,32768):
+        ids=np.arange(begin,min(begin+32768,env.size));children=env.successors(ids)
+        pairs=np.stack((np.broadcast_to(ids[:,None],children.shape),children),axis=-1)
+        edge_allowed[ids]=~guard.contains(pairs)
+    np.save(out/'edge_allowed.npy',edge_allowed)
+    atomic_json(out/'edge_inventory.json',dict(states=env.size,legal_directed_edges=env.size*len(env.actions),
+        allowed_directed_edges=int(edge_allowed.sum()),allowed_fraction=float(edge_allowed.mean()),
+        allowed_parents=int(edge_allowed.any(-1).sum()),
+        complete_six_edge_parents=int(edge_allowed.all(-1).sum()),
+        protected_labels=int((~edge_allowed).sum()),exclusion='historical state mask plus evaluation relation/axis closure and reserved goal endpoints'))
     # Absolute physical parents only; BFS near solved plus depth-stratified,
     # uniformly random states. No relative-state features or inference change.
     candidates=[]
@@ -258,22 +285,40 @@ def prepare(args):
     v1=paired[:cfg['data']['v1_parents']*cfg['data']['goals_per_parent']]
     # Disjoint control retains exact goal identities/marginals and (s,g)
     # distance/solved-depth bins, while replacing each repeated parent.
-    disjoint=[];used=set();layers={d:np.flatnonzero(env.depth==d) for d in range(15)}
+    disjoint=[];used=set();buckets={};fallbacks=0
+    # Cache physical parents by the two exact distance strata. Tiny solved
+    # layers cannot supply infinitely many disjoint parents; disclose reuse
+    # instead of spending thousands of rejection attempts on impossible bins.
+    control_candidates=np.unique(np.r_[candidates,rng.integers(env.size,size=262144)])
+    for goal in np.unique(paired[:,1]):
+        rows=np.column_stack((control_candidates,np.full(len(control_candidates),goal)))
+        keep=(control_candidates!=goal)&~guard.task_blocked(env,rows)
+        parents=control_candidates[keep];distances=env.distance(parents,goal)
+        bins=env.depth[parents].astype(int)*16+distances
+        for key in np.unique(bins):
+            pool=parents[bins==key].copy();rng.shuffle(pool)
+            buckets[(int(goal),int(key))]=list(map(int,pool))
     for row in paired:
         parent,goal=map(int,row);depth=int(env.depth[parent]);distance=int(env.distance(parent,goal))
-        layer=layers[depth]
-        for attempt in range(1000):
-            possible=rng.choice(layer,size=32)
-            tasks=np.column_stack((possible,np.full(len(possible),goal)))
-            keep=(possible!=goal)&(env.distance(possible,goal)==distance)&~guard.task_blocked(env,tasks)
-            found=[int(s) for s in possible[keep] if int(s) not in used]
-            if found:
-                disjoint.append((found[0],goal));used.add(found[0]);break
+        bucket=buckets.get((goal,depth*16+distance),[])
+        while bucket and bucket[-1] in used:bucket.pop()
+        if bucket:
+            source=bucket.pop();used.add(source);disjoint.append((source,goal))
         else:
-            # Near solved layers have fewer physical states than requested;
-            # retain them and disclose unavoidable parent reuse.
-            disjoint.append((parent,goal))
+            disjoint.append((parent,goal));fallbacks+=1
     disjoint=np.asarray(disjoint,dtype=np.int64)
+    atomic_json(out/'disjoint_matching.json',dict(rows=len(disjoint),fallback_reused_parents=fallbacks,
+        exact_matched_parent_depth=True,exact_matched_goal_distance=True,
+        unique_parents=len(np.unique(disjoint[:,0]))))
+    # Common restoration replay pool, including paired-goal training parents
+    # where solved-goal supervision is allowed. The pool is shared by all arms.
+    replay_parents=np.unique(paired[:,0])
+    replay_tasks=np.column_stack((replay_parents,np.zeros(len(replay_parents),dtype=int)))
+    replay_tasks=replay_tasks[(replay_parents!=0)&~guard.task_blocked(env,replay_tasks)]
+    rest=training_tasks(env,{0:np.array([0])},32768,rng,guard,0)
+    replay_tasks=unique_tasks(np.r_[replay_tasks,rest],env.size)
+    np.save(out/'restoration.npy',replay_tasks)
+    atomic_json(out/'restoration_coverage.json',coverage(env,replay_tasks))
     # Real greedy failures only from the admissible training root pool.
     mine_roots=[]
     for goal in train_goals:
@@ -295,10 +340,18 @@ def prepare(args):
     before=env.distance(*candidates_hard.T);wrong=truth[np.arange(len(truth)),scores.argmin(-1)]!=before-1
     gap=np.sort(scores,axis=1)[:,1]-scores.min(-1)
     difficult=candidates_hard[wrong|(gap<cfg['data']['hard_margin'])]
-    extra=unique_tasks(np.r_[extra,difficult],env.size)
-    extra=extra[~np.isin(extra[:,0]*env.size+extra[:,1],list(known))]
+    # Keep actual novel trajectory decisions first, then fill remaining slots
+    # with novel wrong/close-margin decisions from the same training pool.
     rng.shuffle(extra);extra=extra[:cfg['data']['v3_extra_decisions']]
+    trajectory_extra=len(extra)
+    difficult=unique_tasks(difficult,env.size)
+    existing=np.r_[list(known),extra[:,0]*env.size+extra[:,1]]
+    difficult=difficult[~np.isin(difficult[:,0]*env.size+difficult[:,1],existing)]
+    rng.shuffle(difficult)
+    extra=np.r_[extra,difficult[:cfg['data']['v3_extra_decisions']-len(extra)]]
     if len(extra)!=cfg['data']['v3_extra_decisions']:raise ValueError('Insufficient novel hard decisions')
+    atomic_json(out/'hard_pool_sources.json',dict(novel_actual_trajectory_decisions=trajectory_extra,
+        novel_training_wrong_or_close_decisions=len(extra)-trajectory_extra))
     versions=dict(V1=v1,V2=paired,V2_disjoint=disjoint,V3=np.r_[paired,extra])
     reports={}
     for name,tasks in versions.items():
@@ -319,6 +372,7 @@ def main():
     for name in ('config','oracle','first-cohorts','second-cohorts','checkpoint1000','checkpoint2000','out'):
         p.add_argument('--'+name,type=Path,required=True)
     p.add_argument('--source-commit',required=True);p.add_argument('--device',default='cuda')
+    p.add_argument('--audit-source',type=Path)
     prepare(p.parse_args())
 
 

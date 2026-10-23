@@ -3,9 +3,18 @@ import numpy as np
 from experiments.cube2_qmap.src.coverage_data import coverage,CoverageGuard
 from experiments.cube2_qmap.src.full_state_joint import task_pairs
 from experiments.cube2_qmap.tests.test_full_state_joint import Ring
+from experiments.cube2_qmap.src.coverage_train import take_cycle
 
 
 class CoverageTests(unittest.TestCase):
+    def test_cycle_boundary_never_drops_unseen_parents(self):
+        rng=np.random.default_rng(5);order=rng.permutation(10)
+        first,order,cursor,passed=take_cycle(order,0,6,rng)
+        second,new_order,cursor,passed=take_cycle(order,cursor,6,rng)
+        self.assertEqual(len(np.unique(np.r_[first,second[:4]])),10)
+        self.assertTrue(np.array_equal(second[4:],new_order[:2]))
+        self.assertEqual((cursor,passed),(2,1))
+
     def test_same_start_incompatible_goals_and_repeats_are_separate_counts(self):
         env=Ring();env.depth=env.distance(np.arange(env.size),0)
         rows=np.array([[10,1],[10,20],[10,1],[11,1]])

@@ -1,0 +1,7 @@
+{
+  "parent_contract": "experiments/cube2_qmap/configs/near_goal_low_lr.json",
+  "hypothesis": "Reduce near-target absolute-distance calibration pressure while retaining its complete-candidate soft ranking and unchanged restoration loss.",
+  "training": {"near_huber_weight": 0.1},
+  "comparison": "Same step-1000 Q, Adam and sampling RNG, uniform physical parents, goals, learning rate, rank weight, restoration loss and update budget as near_goal_low_lr. Only multiply the near-target Huber term by 0.1; soft-rank itself is unchanged.",
+  "scope": "Matched calibration-weight control; report tradeoffs and complete rollout rather than treating lower loss as success. No automatic extension or adoption."
+}

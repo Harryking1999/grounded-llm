@@ -156,6 +156,8 @@ def run(args):
     print(json.dumps({'stage':'initial_evaluation', 'cohorts':{
         name:row['rollout']['solved'] for name,row in result['initial'].items()}}), flush=True)
     training_rng = np.random.default_rng(options.get('seed',config['seed']+1))
+    if options.get('resume_sampler'):
+        training_rng.bit_generator.state=saved['rng']
     seen_goals, exposed = set(), {'near_stars':0, 'restoration_stars':0}
     relative_pools={d:np.flatnonzero(env.depth==d) for d in opts.get('local_distance_levels',[])}
     fixed_guard=None;accepted_scales=[]
@@ -186,20 +188,21 @@ def run(args):
         step=starting_step+phase_step
         model.train()
         near = training_tasks(env, pools, options['near_goal_batch_size'], training_rng,
-                              guard, (phase_step-1)*options['near_goal_batch_size'],
+                              guard, ((step if options.get('resume_sampler') else phase_step)-1)*options['near_goal_batch_size'],
                               relative_pools,opts.get('local_fraction',0.))
         restoration = training_tasks(env, {0:np.array([0])}, options['restoration_batch_size'],
                                      training_rng, guard, 0)
         terms = []
         optimizer.zero_grad(set_to_none=True)
-        for tasks,weight in ((near,options['near_goal_weight']),
-                             (restoration,1-options['near_goal_weight'])):
+        for index,(tasks,weight) in enumerate(((near,options['near_goal_weight']),
+                                              (restoration,1-options['near_goal_weight']))):
             batch = fixed_batch(env, tasks)
             if guard.contains(batch['states'][batch['pairs']]).any():
                 raise ValueError('Protected relation entered supervision')
             huber,rank = batch_losses(model, torch.as_tensor(env.features(batch['states']),
                                                           device=args.device), batch, config)
-            (weight*(huber+options['rank_weight']*rank)).backward()
+            huber_weight=options.get('near_huber_weight',1.) if index==0 else 1.
+            (weight*(huber_weight*huber+options['rank_weight']*rank)).backward()
             terms.append({'huber':float(huber.detach()), 'rank':float(rank.detach())})
         torch.nn.utils.clip_grad_norm_(model.parameters(), options['clip_norm'])
         if fixed_guard is None:

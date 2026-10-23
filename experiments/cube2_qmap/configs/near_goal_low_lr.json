@@ -1,0 +1,8 @@
+{
+  "parent_contract": "experiments/cube2_qmap/configs/near_goal_local_replay.json",
+  "hypothesis": "Continue the stronger step-1000 model with the original uniform-parent target sampling and a smaller update size, avoiding the harmful shift toward local-distance calibration.",
+  "data": {"local_distance_levels": [], "local_fraction": 0.0},
+  "training": {"steps": 2000, "learning_rate": 0.000003, "evaluate_every": 250, "resume_sampler": true},
+  "initialization": "Restore step-1000 Q, Adam and original training RNG; advance depth balancing from the cumulative step. Learning rate and additional final-monitor exclusions define the new phase, so this is not an unchanged historical run.",
+  "scope": "Bounded low-learning-rate uniform-sampling baseline from step 1000. Preserve all validation checkpoints, retain original-restoration selection constraint, no automatic extension or adoption."
+}

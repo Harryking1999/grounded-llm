@@ -29,6 +29,18 @@ def fixture():
 
 
 class SolutionStructureTests(unittest.TestCase):
+    def test_global_order_diagnostic_distinguishes_near_and_far_errors(self):
+        from experiments.new_tasks_qmap.src.solution_global_order import global_order_metrics,prepare_order_bank
+        corpus=fixture();rows=np.array([[0,3],[1,3],[2,3]])
+        truth=np.array([2,1,1]);pred=np.array([.5,1,0])
+        result=global_order_metrics(corpus,rows,truth,pred)['aggregate']
+        self.assertEqual(result['all']['comparable'],2)
+        self.assertEqual(result['all']['correct'],1)
+        self.assertEqual(result['gap_1']['accuracy'],.5)
+        self.assertIsNone(result['gap_2']['accuracy'])
+        data=dict(tasks_train=rows,tasks_new_goal_validation=rows,tasks_new_layout_goal_validation=rows)
+        with self.assertRaisesRegex(ValueError,'target is trained'):prepare_order_bank(corpus,data,32,1)
+
     def test_full_basin_adds_recoverable_continuations_and_keeps_traps(self):
         from experiments.new_tasks_qmap.src.solution_basins import prepare_basins
         corpus=fixture();tasks=np.array([[0,3],[1,3]])

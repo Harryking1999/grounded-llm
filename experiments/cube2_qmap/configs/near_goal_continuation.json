@@ -1,0 +1,32 @@
+{
+  "hypothesis": "Direct complete-star supervision to goals near solved can improve the retained restoration Q on nearby non-restoration targets.",
+  "initial_selection": "tasks/cube2/Qmap/selection.json",
+  "base_contract": "experiments/cube2_qmap/configs/fixed_goal.json",
+  "seed": 2026102302,
+  "data": {
+    "goal_depths": [1, 2, 3],
+    "validation_tasks": 500,
+    "test_tasks": 500,
+    "source_evaluation": "paired FLAN original and small_ood cube2 cohorts",
+    "protect_fixed_goal_state_mask": true,
+    "protect_axis_symmetry_orbits_of_evaluation_stars": true
+  },
+  "training": {
+    "steps": 5000,
+    "near_goal_batch_size": 256,
+    "restoration_batch_size": 128,
+    "learning_rate": 0.00003,
+    "near_goal_weight": 0.5,
+    "rank_weight": 1.0,
+    "temperature": 1.0,
+    "clip_norm": 5.0,
+    "log_every": 100,
+    "evaluate_every": 1000,
+    "cpu_threads": 2
+  },
+  "evaluation": {"horizon": 32, "final_exhaustive_restoration": true},
+  "initialization": "Continue the selected symmetric Q with its saved Adam moments and a lower learning rate. New sampling stream and supervision phase; not an exact resumption of the historical run.",
+  "supervision": "Uniform physical parents, depth-balanced absolute near-solved goals, and separate solved-goal replay. Reuse fixed_batch, Huber and the existing complete-candidate soft rank. No new head, changed norm, search or waypoint selection at inference.",
+  "split": "Protect the historical fixed-goal heldout state mask closed under axis symmetry. Exclude original FLAN regression, fresh validation and fresh test parent/candidate-to-goal relations, in both directions and all six axis presentations. Evaluation may contain pretraining exposures, so report continuation transfer rather than globally unseen relations.",
+  "selection": "Fixed 5000 updates, primary final checkpoint; validation every 1000, fresh test and original small OOD only before and after training. No automatic extension or adoption. Preserve the original selected Q and all FLAN evaluation maps."
+}

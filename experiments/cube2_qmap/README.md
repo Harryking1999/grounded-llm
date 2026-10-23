@@ -49,3 +49,15 @@ L∞、L2 的现有尝试都尚未带来可靠的长程求解进展。精确表�
 代价和参数见合同。留出状态按对称轨道保护；历史题用于检查保留能力，不声称从未监督过。详细训练结果留在运行目录。
 
 [当前策略循环修复对照](configs/cycle_repair.json)从保留的对称 Q 开始，定期重新挖掘当前死局，将复原出口与跨分支、多目标关系分别计权。对比普通续训、循环修复及带更新保护的修复；保护只使用训练区内已正确的完整动作邻域，检查并缩小 Adam 实际提出的参数变化，拒绝时恢复参数和优化器状态。[方向修正对照](configs/cycle_projection.json)进一步按受损出口的梯度调整提议，再经过相同的实际检查。验收关系误差、全状态复原、循环净变化与旧路线损伤；抽样保护不代表全空间保证。推理仍只用原有 Q 距离贪心。
+
+## 复原附近目标的续训
+
+[近目标续训配置](configs/near_goal_continuation.json)从当前采用的对称Q及其Adam状态开始，针对距复原态1–3步的绝对目标补完整候选关系，同时重放复原任务。复用`full_state_joint.fixed_batch`、Huber及既有soft-rank，保持共享编码器、L∞和六动作不变。固定更新预算后停止，最终断点单列；降低学习率及改变采样属于新的续训阶段，不能称为原历史采样流的精确恢复。
+
+原FLAN魔方500题复原与500题小OOD保留作配对回归；另采独立验证与测试关系。所有回归、验证、测试的父节点及六个候选到目标的关系均双向排除，并关闭其六种轴对称等价关系；同时保留原固定复原留出状态的对称闭包。新监测关系只保证不进入本次续训，不能追溯宣称原预训练未见。训练面向各层近目标及任意合法起点，不从原500题失败中挑训练题。
+
+验证用于报告进展，原小OOD与新测试只在续训前后评测，不据测试选断点或自动追加。原固定复原能力既检查同题500题，也在前后用相同动作预算核对全状态贪心；不得只报新目标改善。各目标深度分别报告。新的地图未经明确采用，不替换任务selection，也不替换正在进行的FLAN重评测中的冻结图。
+
+```bash
+python -m experiments.cube2_qmap.src.near_goal_continuation --contract experiments/cube2_qmap/configs/near_goal_continuation.json --checkpoint SELECTED_Q --oracle EXISTING_QTM_ORACLE --evaluation-data PAIRED_CUBE_EVAL_DATA --out NEW_RUN --source-commit COMMIT --device cuda
+```

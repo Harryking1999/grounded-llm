@@ -22,6 +22,15 @@ def axis_pairs(env, pairs):
     return np.concatenate([env.axis_symmetry(pairs, transform) for transform in range(6)])
 
 
+def load_config(path):
+    config=json.loads(Path(path).read_text())
+    if 'parent_contract' not in config:
+        return config
+    parent=load_config(config['parent_contract'])
+    return {**parent,**config,
+            **{key:{**parent[key],**config.get(key,{})} for key in ('data','training','evaluation')}}
+
+
 class ProtectedRelations(RelationGuard):
     def __init__(self, env, pairs, state_mask):
         super().__init__(env.size, pairs)
@@ -85,13 +94,7 @@ def inspect(model, env, tasks, device, horizon):
 
 
 def run(args):
-    config = json.loads(args.contract.read_text())
-    if 'parent_contract' in config:
-        parent=json.loads(Path(config['parent_contract']).read_text())
-        config={**parent,**config,
-                'data':{**parent['data'],**config.get('data',{})},
-                'training':{**parent['training'],**config.get('training',{})},
-                'evaluation':{**parent['evaluation'],**config.get('evaluation',{})}}
+    config=load_config(args.contract)
     options, opts = config['training'], config['data']
     torch.set_num_threads(options['cpu_threads']);torch.manual_seed(config['seed'])
     saved = torch.load(args.checkpoint, map_location='cpu', weights_only=False)
@@ -202,7 +205,11 @@ def run(args):
         if fixed_guard is None:
             optimizer.step();scale=1.
         else:
-            scale=guarded_adam_step(model,optimizer,fixed_guard.accepts,config['guard']['scales'])
+            projector=None
+            if 'projection' in config:
+                projector=lambda before,delta:fixed_guard.project(before,delta,
+                    config['projection']['max_corrections'],config['projection']['slack'])
+            scale=guarded_adam_step(model,optimizer,fixed_guard.accepts,config['guard']['scales'],projector)
         accepted_scales.append(scale)
         seen_goals.update(map(int,near[:, 1]))
         exposed['near_stars'] += len(near);exposed['restoration_stars'] += len(restoration)

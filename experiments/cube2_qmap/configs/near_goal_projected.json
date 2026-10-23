@@ -1,0 +1,7 @@
+{
+  "parent_contract": "experiments/cube2_qmap/configs/near_goal_refinement.json",
+  "hypothesis": "A restoration displacement guard can stall inherited Adam. Correct violated restoration margins before the same backtracking check, allowing local-target supervision to update the Q while retaining the fixed training guard.",
+  "projection": {"max_corrections": 8, "slack": 0.00001},
+  "comparison": "Same reproduced step-1000 weights, Adam, local/distant sampling, learning rate, finite restoration guard and attempted update budget as near_goal_refinement. Only the existing cycle-repair direction correction is enabled. Guard acceptance and effective updates must be reported.",
+  "scope": "Bounded projected continuation. Evaluation remains validation-selected with the original restoration constraint; previously inspected tests are regression evidence. No automatic extension or adoption."
+}

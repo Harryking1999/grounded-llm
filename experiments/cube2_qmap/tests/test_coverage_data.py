@@ -5,10 +5,15 @@ from experiments.cube2_qmap.src.full_state_joint import task_pairs
 from experiments.cube2_qmap.tests.test_full_state_joint import Ring
 from experiments.cube2_qmap.src.coverage_train import take_cycle,Pool,GoalPool
 from experiments.cube2_qmap.src.coverage_evaluate import paired_change
-from experiments.cube2_qmap.src.goal_layers import reverse_layers
+from experiments.cube2_qmap.src.goal_layers import reverse_layers,real_path_edges
 
 
 class CoverageTests(unittest.TestCase):
+    def test_path_metrics_exclude_terminal_and_padding_transitions(self):
+        mask=real_path_edges(np.array([1,3]),5)
+        self.assertTrue(np.array_equal(mask,np.array([[True,False,False,False],[True,True,True,False]])))
+        self.assertEqual(int(mask.sum()),4)
+
     def test_layer_sampler_balances_goals_and_layers_and_counts_repeats(self):
         env=Ring();rows=np.array([[3,1],[4,1],[20,1],[3,2],[15,2],[16,2]])
         pool=GoalPool(rows,env,5,True);drawn=pool.draw(30)

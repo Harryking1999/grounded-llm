@@ -35,6 +35,10 @@ def source_distances(model,env,tasks,device):
     return np.concatenate(result)
 
 
+def real_path_edges(lengths,width):
+    return np.arange(width-1)[None,:]<np.asarray(lengths)[:,None]
+
+
 @torch.no_grad()
 def switch_metrics(model,env,parents,device):
     goals=np.flatnonzero(env.depth==1);children=env.successors(parents)
@@ -108,7 +112,7 @@ def layer_report(model,env,data,role,device,full=False,final_paths=False):
     rows=np.column_stack((states[valid],np.broadcast_to(goals[:,None],states.shape)[valid]))
     predicted=np.full(states.shape,np.nan);predicted[valid]=source_distances(model,env,rows,device)
     pairs=p['pair_allowed'];stars=p['star_allowed']
-    edge_valid=valid[:,:-1]&valid[:,1:]&pairs[:,:-1]&pairs[:,1:]
+    edge_valid=real_path_edges(lengths,states.shape[1])&pairs[:,:-1]&pairs[:,1:]
     violation=(predicted[:,:-1]<=predicted[:,1:])&edge_valid
     first_wrong=[];complete_first_wrong=[];censored=0;fully=0
     for index,(goal,length) in enumerate(zip(goals,lengths)):
@@ -130,7 +134,8 @@ def layer_report(model,env,data,role,device,full=False,final_paths=False):
     if final_paths:
         # Final evaluation only, after model selection has been frozen. These
         # protected intermediate labels never fed training or adaptive mining.
-        live=valid[:,:-1];all_rows=np.column_stack((states[:,:-1][live],
+        live=real_path_edges(lengths,states.shape[1]);assert int(live.sum())==int(lengths.sum())
+        all_rows=np.column_stack((states[:,:-1][live],
             np.broadcast_to(goals[:,None],states[:,:-1].shape)[live]))
         scores=predicted_scores(model,env,all_rows,device)
         truth=env.distance(env.successors(all_rows[:,0]),all_rows[:,1,None])

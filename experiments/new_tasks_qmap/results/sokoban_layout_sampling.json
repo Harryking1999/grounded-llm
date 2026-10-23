@@ -1,0 +1,42 @@
+{
+  "condition": "Actual saved 60000-step draw counters, grouped by physical source layout using corpus offsets; no model inference or new training.",
+  "runs": {
+    "sokoban": {
+      "step": 60000,
+      "layouts": 64,
+      "point_draws": {
+        "minimum": 265021,
+        "maximum": 13085643,
+        "max_min_ratio": 49.37587210070146,
+        "top8_fraction": 0.35301435546875,
+        "total": 122880000
+      },
+      "rank_draws": {
+        "minimum": 113928,
+        "maximum": 6088824,
+        "max_min_ratio": 53.4444912576364,
+        "top8_fraction": 0.41825792643229165,
+        "total": 61440000
+      }
+    },
+    "sokoban_balanced_relations": {
+      "step": 60000,
+      "layouts": 64,
+      "point_draws": {
+        "minimum": 573832,
+        "maximum": 4893070,
+        "max_min_ratio": 8.52700790475261,
+        "top8_fraction": 0.2841047037760417,
+        "total": 122880000
+      },
+      "rank_draws": {
+        "minimum": 253782,
+        "maximum": 2746873,
+        "max_min_ratio": 10.823750305380209,
+        "top8_fraction": 0.2958634765625,
+        "total": 61440000
+      }
+    }
+  },
+  "raw_result": "runs/new_tasks_qmap/sokoban_layout_coverage/actual_layout_draws.json"
+}

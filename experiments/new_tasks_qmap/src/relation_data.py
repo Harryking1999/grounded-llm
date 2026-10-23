@@ -135,14 +135,24 @@ class BoardRelationSampler:
         point_labels=np.concatenate(point_labels); rank_labels=np.concatenate(rank_labels); boundary=np.concatenate(boundaries)
         edges=np.asarray(options['distance_bin_upper_bounds'],dtype=np.float32)
         if np.any(np.diff(edges)<=0) or edges[-1]<max(point_labels.max(),rank_labels.max()): raise ValueError('Distance strata do not cover exact finite labels')
-        def groups(labels,allowed):
+        def groups(labels,allowed,rows):
             bins=np.searchsorted(edges,labels)
+            if options.get('balance_layouts'):
+                scene_ids=corpus.locate(rows[:,0])
+                result=[]
+                # Banks are appended in corpus scene order; avoid rescanning
+                # the complete bank once for every layout.
+                for sid in np.unique(scene_ids[allowed]):
+                    a,b=np.searchsorted(scene_ids,[sid,sid+1])
+                    result.append([ids+a for j in range(len(edges))
+                                   if len(ids:=np.flatnonzero(allowed[a:b] & (bins[a:b]==j)))])
+                return result
             return [ids for j in range(len(edges)) if len(ids:=np.flatnonzero(allowed & (bins==j)))]
         def counts(labels,allowed):
             return {f'({-1 if j==0 else float(edges[j-1])},{float(upper)}]':int((allowed & (np.searchsorted(edges,labels)==j)).sum())
                     for j,upper in enumerate(edges)}
-        self.point_groups=groups(point_labels,np.ones(len(point_labels),bool))
-        self.boundary_groups=groups(rank_labels,boundary); self.other_groups=groups(rank_labels,~boundary)
+        self.point_groups=groups(point_labels,np.ones(len(point_labels),bool),self.points)
+        self.boundary_groups=groups(rank_labels,boundary,self.ranks); self.other_groups=groups(rank_labels,~boundary,self.ranks)
         if not self.boundary_groups or not self.other_groups: raise ValueError('Both exact boundary and nonboundary training relations required')
         self.summary=dict(finite_point_bank=len(self.points),ranking_bank=len(self.ranks),boundary_ranking_bank=int(boundary.sum()),
             point_stratum_counts=counts(point_labels,np.ones(len(point_labels),bool)),boundary_stratum_counts=counts(rank_labels,boundary),
@@ -152,18 +162,23 @@ class BoardRelationSampler:
             holdout_closure_excluded=True,banks_use_only_original_training_source_rows=True)
 
     @staticmethod
-    def _draw(groups,count,rng):
+    def _draw(groups,count,rng,max_groups=None):
+        if max_groups is not None and len(groups)>max_groups:
+            groups=[groups[i] for i in rng.choice(len(groups),max_groups,replace=False)]
         which=rng.integers(len(groups),size=count)
-        selected=np.concatenate([rng.choice(group,int((which==j).sum())) for j,group in enumerate(groups)])
+        selected=np.concatenate([(BoardRelationSampler._draw(group,int((which==j).sum()),rng) if isinstance(group,list)
+                                  else rng.choice(group,int((which==j).sum()))) for j,group in enumerate(groups)
+                                 if (which==j).any()]) if count else np.empty(0,dtype=np.int64)
         rng.shuffle(selected); return selected
 
     def draw(self,source_sampler,point_count,rank_count,rng):
         nf=round(point_count*self.finite_fraction); nb=round(rank_count*self.boundary_fraction)
         p=source_sampler.draw(point_count-nf); broad=self.data['pairs_train'][p]
         broad=sample_goals(self.corpus,broad[:,0],rng,self.data['reserved_relations'],fallback=broad[:,1])
-        finite=self.points[self._draw(self.point_groups,nf,rng)]
+        limit=self.options.get('layouts_per_batch') if self.options.get('balance_layouts') else None
+        finite=self.points[self._draw(self.point_groups,nf,rng,limit)]
         pair=np.concatenate([broad,finite]); p=np.concatenate([p,self.point_index[finite[:,0]]])
-        selected=np.concatenate([self._draw(self.boundary_groups,nb,rng),self._draw(self.other_groups,rank_count-nb,rng)])
+        selected=np.concatenate([self._draw(self.boundary_groups,nb,rng,limit),self._draw(self.other_groups,rank_count-nb,rng,limit)])
         rng.shuffle(selected); tasks=self.ranks[selected]
         return p,self.rank_index[tasks[:,0]],pair,tasks
 
@@ -236,11 +251,25 @@ def board_cohorts(corpus,config,rng):
     for sid,safe_parent,safe_rank in train_specs:
         scene=corpus.scenes[sid]; offset=corpus.offsets[sid]; nt=scene.metadata['training_goals']
         parents=np.flatnonzero(safe_parent)+offset
+        limit=spec.get('training_sources_per_scene')
+        local_rng=np.random.default_rng(group_seed(json.dumps(scene.metadata['source'],sort_keys=True),config['seed'],'training_sources')) if limit else rng
+        if limit and len(parents)>limit:
+            nearest=np.min(scene.distances[:nt],axis=0)
+            finite=np.flatnonzero(safe_parent & np.isfinite(nearest) & (nearest>0))+offset
+            near=balanced(np.column_stack([finite,np.zeros(len(finite),dtype=np.int64)]),limit//2,nearest[finite-offset],local_rng)[:,0]
+            chosen=np.unique(np.concatenate([local_rng.choice(parents,limit//2,replace=False),near]))
+            rest=np.setdiff1d(parents,chosen)
+            parents=np.sort(np.concatenate([chosen,local_rng.choice(rest,limit-len(chosen),replace=False)]))
         rows,_=sample_goals(corpus,parents,rng,reserved,allow_missing=True)
         pairs.append(rows)
         reachable=np.isfinite(scene.distances[:nt]).any(axis=0)
         positive=(scene.distances[:nt]>0).any(axis=0)
         parents=np.flatnonzero(safe_rank & reachable & positive)+offset
+        if limit and len(parents)>limit:
+            nearest=np.min(scene.distances[:nt],axis=0)
+            chosen=np.unique(balanced(np.column_stack([parents,np.zeros(len(parents),dtype=np.int64)]),limit,nearest[parents-offset],local_rng)[:,0])
+            rest=np.setdiff1d(parents,chosen)
+            parents=np.sort(np.concatenate([chosen,local_rng.choice(rest,limit-len(chosen),replace=False)]))
         rows,_=sample_goals(corpus,parents,rng,reserved,ranking=True,allow_missing=True)
         decisions.append(rows)
     return {k:np.concatenate(v) for k,v in groups.items() if v},np.concatenate(pairs),np.concatenate(decisions),reserved,None

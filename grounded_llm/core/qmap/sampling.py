@@ -136,6 +136,55 @@ class CoverageSampler:
         self.__dict__.update(state)
 
 
+class GroupCoverageSampler:
+    """Equal group quotas and a shuffled coverage pass within each group."""
+    def __init__(self, groups, rng, active_groups=None):
+        groups=np.asarray(groups)
+        if groups.ndim!=1 or not len(groups): raise ValueError('Nonempty row groups required')
+        self.rng=rng
+        self.levels=np.unique(groups)
+        self.orders=[rng.permutation(np.flatnonzero(groups==level)) for level in self.levels]
+        self.positions=np.zeros(len(self.levels),dtype=np.int64)
+        self.drawn=self.positions.copy()
+        self.offset=0
+        self.active_groups=active_groups
+        if active_groups is not None and active_groups<1: raise ValueError('Positive active group count required')
+
+    @property
+    def passes(self):
+        return min(n/len(order) for n,order in zip(self.drawn,self.orders))
+
+    def draw(self,count):
+        if count<=0: raise ValueError('Positive draw count required')
+        quotas=np.zeros(len(self.levels),dtype=np.int64)
+        if self.active_groups is not None:
+            ids=self.rng.choice(len(self.levels),min(self.active_groups,len(self.levels),count),replace=False)
+            quotas[ids]=count//len(ids); quotas[ids[:count%len(ids)]]+=1
+        else:
+            quotas[:]=count//len(self.levels)
+            quotas[(self.offset+np.arange(count%len(self.levels)))%len(self.levels)]+=1
+            self.offset=(self.offset+count)%len(self.levels)
+        pieces=[]
+        for i in np.flatnonzero(quotas):
+            quota=quotas[i]
+            while quota:
+                order=self.orders[i]; start=int(self.positions[i]); n=min(int(quota),len(order)-start)
+                pieces.append(order[start:start+n]); self.positions[i]+=n; self.drawn[i]+=n; quota-=n
+                if self.positions[i]==len(order):
+                    self.orders[i]=self.rng.permutation(order); self.positions[i]=0
+        result=np.concatenate(pieces); self.rng.shuffle(result)
+        return result
+
+    def state_dict(self):
+        return {k:v for k,v in self.__dict__.items() if k!='rng'}
+
+    def load_state_dict(self,state):
+        if (state['active_groups']!=self.active_groups or not np.array_equal(state['levels'],self.levels)
+                or [len(a) for a in state['orders']]!=[len(a) for a in self.orders]):
+            raise ValueError('Row groups changed during resume')
+        self.__dict__.update(state)
+
+
 def draw(groups, size, device):
     parts, remaining = [], size
     for i, (ids, weight) in enumerate(groups):

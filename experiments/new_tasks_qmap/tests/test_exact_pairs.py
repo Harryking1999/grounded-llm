@@ -43,6 +43,66 @@ def small_oracle(path,n,edges):
 
 
 class ExactPairTests(unittest.TestCase):
+    def test_vectorized_sokoban_graph_matches_every_physical_transition(self):
+        from grounded_llm.tasks.sokoban.relation_data import physical_graph,decode
+        env=Sokoban(['######','#@$$ #','# $$ #','#....#','######'])
+        packed,children,state_id=physical_graph(env)
+        states=[(p,b) for b in combinations(sorted(env.floor),4) for p in sorted(env.floor) if p not in b]
+        self.assertEqual(decode(packed),states)
+        for i,state in enumerate(states):
+            self.assertEqual(state_id(state),i)
+            expected={a:state_id(child) for a,child,cost in env.transitions(state) if cost==1}
+            self.assertEqual({a:int(t) for a,t in enumerate(children[i]) if t>=0},expected)
+
+    def test_group_sampling_balances_unequal_layout_sizes_and_restores(self):
+        from copy import deepcopy
+        from grounded_llm.core.qmap.sampling import GroupCoverageSampler
+        groups=np.array([0]+[1]*9+[2]*31)
+        rng=np.random.default_rng(9); sampler=GroupCoverageSampler(groups,rng)
+        selected=np.concatenate([sampler.draw(7) for _ in range(30)])
+        np.testing.assert_array_equal(np.bincount(groups[selected]),[70,70,70])
+        self.assertEqual(len(np.unique(selected)),len(groups))
+        saved=deepcopy(sampler.state_dict()); state=deepcopy(rng.bit_generator.state)
+        expected=sampler.draw(47)
+        sampler.load_state_dict(saved); rng.bit_generator.state=state
+        np.testing.assert_array_equal(sampler.draw(47),expected)
+
+    def test_relation_sampling_equal_layout_then_distance_stratum(self):
+        from experiments.new_tasks_qmap.src.relation_data import BoardRelationSampler
+        groups=[[np.arange(1),np.arange(1,10)],
+                [np.arange(10,1010),np.arange(1010,5010)]]
+        rows=BoardRelationSampler._draw(groups,40000,np.random.default_rng(18))
+        fractions=np.array([(rows<1).mean(),((rows>=1)&(rows<10)).mean(),
+                            ((rows>=10)&(rows<1010)).mean(),(rows>=1010).mean()])
+        np.testing.assert_allclose(fractions,.25,atol=.01)
+        limited=BoardRelationSampler._draw(groups,40000,np.random.default_rng(18),max_groups=1)
+        self.assertTrue((limited<10).all() or (limited>=10).all())
+
+    def test_sampled_board_sources_keep_caps_goals_and_holdout_closure(self):
+        from experiments.new_tasks_qmap.src.relation_data import board_cohorts
+        env=Sokoban(['######','#@$. #','#    #','######'])
+        states=[(p,b) for b in combinations(sorted(env.floor),1) for p in sorted(env.floor) if p not in b]
+        index={s:i for i,s in enumerate(states)}; children=np.full((len(states),4),-1,dtype=np.int32)
+        for i,state in enumerate(states):
+            for a,child,_ in env.transitions(state): children[i,a]=index[child]
+        goals=[index[(p,tuple(env.goals))] for p in sorted(env.floor-env.goals)]
+        with tempfile.TemporaryDirectory() as tmp,ExitStack() as stack:
+            path=Path(tmp)/'scene'
+            save_scene(path,[[p,*b] for p,b in states],children,goals,
+                       dict(split='train',training_goals=len(goals)-2,source=dict(puzzle_id='fixture')))
+            scene=PhysicalScene(path,env,lambda rows:[(int(row[0]),tuple(map(int,row[1:]))) for row in rows],lambda s,g:np.zeros(len(s)))
+            for name in ['states','children','distances','reverse_distances']: stack.callback(getattr(scene,name)._mmap.close)
+            corpus=PhysicalCorpus([scene])
+            config=dict(seed=17,relations=dict(training_sources_per_scene=12,holdout_per_goal=1,
+                        evaluation_per_goal=4,unreachable_eval_per_goal=2,evaluation_training_goals=1))
+            groups,pairs,tasks,reserved,_=board_cohorts(corpus,config,np.random.default_rng(18))
+            self.assertLessEqual(len(pairs),12); self.assertLessEqual(len(tasks),12)
+            self.assertGreater(len(pairs),0); self.assertGreater(len(tasks),0)
+            self.assertFalse(np.isin(pairs[:,0],scene.goals[-2:]).any())
+            self.assertFalse(np.isin(pairs[:,1],scene.goals[-2:]).any())
+            self.assertFalse(np.isin(keys(pairs[:,0],pairs[:,1],corpus.size),reserved).any())
+            self.assertEqual(len(np.intersect1d(closure(corpus,tasks),reserved)),0)
+
     def test_lane_order_encoding_keeps_each_vehicle_and_reader_goal_independence(self):
         from grounded_llm.tasks.rush_hour.qmap import MapReader
         from experiments.new_tasks_qmap.src.relation_diagnose import vehicle_encoding_check
@@ -546,7 +606,7 @@ class ExactPairTests(unittest.TestCase):
                 for key,value in materialize(corpus,rows).items(): data[key+'_'+name]=value
             config=dict(task='token_swapping',seed=7,model=dict(dimension=128,hidden=16,cap=32,metric='linf'),
                         training=dict(steps=2,batch_size=8,decision_batch_size=4,learning_rate=.001,
-                        rank_weight=1.,rank_temperature=1.,eval_every=1,cpu_threads=1,unreachable_target=30.),
+                        rank_weight=1.,rank_temperature=1.,eval_every=1,cpu_threads=1,unreachable_target=30.,features_on_device='packed_bits'),
                         evaluation=dict(horizon=32,decision_count=16,rollout_count=4))
             prepared=(corpus,data,dict(states=corpus.size))
             out=root/'run'

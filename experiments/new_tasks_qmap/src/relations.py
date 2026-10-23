@@ -8,7 +8,7 @@ import torch
 from torch.nn import functional as F
 from grounded_llm.core.files import atomic_json, atomic_save
 from grounded_llm.core.qmap.model import StateEncoder, soft_rank_loss
-from grounded_llm.core.qmap.sampling import StratifiedEpochSampler, CoverageSampler
+from grounded_llm.core.qmap.sampling import StratifiedEpochSampler, CoverageSampler, GroupCoverageSampler
 from .relation_data import prepare, load, sample_goals, BoardRelationSampler
 from .relation_evaluate import evaluate
 
@@ -61,7 +61,9 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
         if options.get('broad_fraction') or broad_only:
             return CoverageSampler(labels,rng,len(labels),1. if broad_only else options['broad_fraction'])
         return StratifiedEpochSampler(labels,rng)
-    pair_sampler=sampler(point_labels,broad_only=bool(relation_sampler)); rank_sampler=sampler(data['distances_train'])
+    pair_sampler=(GroupCoverageSampler(corpus.locate(data['pairs_train'][:,0]),rng,options.get('layouts_per_batch'))
+                  if options.get('balance_layouts') else sampler(point_labels,broad_only=bool(relation_sampler)))
+    rank_sampler=sampler(data['distances_train'])
     exposure=np.zeros(corpus.size,dtype=np.uint32)
     pair_draws=np.zeros(len(point_truth),dtype=np.uint32); rank_draws=np.zeros(len(data['tasks_train']),dtype=np.uint32)
     allowed=None
@@ -99,12 +101,14 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
         atomic_json(out/'initial.json',initial)
         atomic_json(out/'initial_timing.json',dict(seconds=time.monotonic()-initial_started))
     started=time.monotonic()
-    feature_cache=None; feature_started=time.monotonic()
+    feature_cache=None; feature_started=time.monotonic(); packed_features=options.get('features_on_device')=='packed_bits'
     if options.get('features_on_device'):
-        feature_cache=torch.empty((corpus.size,corpus.input_dim),dtype=torch.uint8,device=device)
+        width=(corpus.input_dim+7)//8 if packed_features else corpus.input_dim
+        feature_cache=torch.empty((corpus.size,width),dtype=torch.uint8,device=device)
         for start in range(0,corpus.size,65536):
             stop=min(start+65536,corpus.size); values=corpus.features(np.arange(start,stop))
             if not ((values==0)|(values==1)).all(): raise ValueError('Lossless bit-feature cache requires binary input')
+            values=np.packbits(values.astype(np.uint8),axis=1,bitorder='little') if packed_features else values
             feature_cache[start:stop]=torch.as_tensor(values,dtype=torch.uint8,device=device)
     feature_seconds=time.monotonic()-feature_started
     trace=[]; trace_number=0; trace_path=None
@@ -162,8 +166,12 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
             if len(trace)>=100: flush_trace()
         ids=np.concatenate([pair[:,0],pair[:,1],children[valid],tasks[:,1]])
         unique,inverse=np.unique(ids,return_inverse=True)
-        features=(feature_cache[torch.as_tensor(unique,device=device)].float() if feature_cache is not None
+        features=(feature_cache[torch.as_tensor(unique,device=device)] if feature_cache is not None
                   else torch.as_tensor(corpus.features(unique),device=device))
+        if packed_features:
+            shifts=torch.arange(8,device=device,dtype=torch.uint8)
+            features=((features[:,:,None]>>shifts)&1).flatten(1)[:,:corpus.input_dim]
+        features=features.float()
         vectors=model.encode(features)
         b,n=len(pair),len(tasks); nchild=int(valid.sum())
         qa,qg=vectors[inverse[:b]],vectors[inverse[b:2*b]]
@@ -182,7 +190,9 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
             values=evaluate(model,corpus,data,config,cohorts=validation,exposure=exposure,planning=False)
             objective=float(np.mean([row['finite_huber']+row['candidate_soft_rank_loss'] for row in values['cohorts'].values()]))
             covered=bool((pair_draws>0).all())
-            eligible=covered or not config.get('relations',{}).get('complete_training_sources',False)
+            relation_options=config.get('relations',{})
+            require_coverage=relation_options.get('complete_training_sources',False) or bool(relation_options.get('training_sources_per_scene'))
+            eligible=covered or not require_coverage
             # Before full coverage the recovery checkpoint is provisional only.
             previous_eligible=(out/'best_eligible.json').exists()
             improved=(eligible and (not previous_eligible or objective<best)) or (not previous_eligible and objective<best)

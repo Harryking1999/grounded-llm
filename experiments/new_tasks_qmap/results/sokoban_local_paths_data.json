@@ -76,5 +76,43 @@
     "edges": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/sokoban_coverage_d365a4c/analysis_8e1ce46/training_local_paths_control.edges.npz",
     "bank": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/sokoban_coverage_d365a4c/analysis_8e1ce46/training_local_paths_control.bank.npz"
   },
-  "uses_bellman_loss": false
+  "uses_bellman_loss": false,
+  "sampling_preflight": {
+    "passed": true,
+    "source_commit": "5ae9a4e37fa4a0546f0e01114eee2186100d48ed",
+    "batches": 1000,
+    "complete_blocks": 4,
+    "same_point_relation_multiset": true,
+    "same_rank_relation_multiset": true,
+    "same_replay_relation_multiset": true,
+    "unchanged_main_rng": true,
+    "same_path_rng": true,
+    "same_layout_degree_and_counts_per_batch": true,
+    "broad_point_quota_preserved": true,
+    "all_actual_local_branches_point_supervised": true,
+    "original_proposals": {
+      "point_rows": 2048000,
+      "finite": 1692709,
+      "near": 640325,
+      "near_removed": 294,
+      "near_retained": 640031
+    },
+    "original_near_retention": 0.9995408581579667,
+    "totals": {
+      "point_rows": 2048000,
+      "finite": 1641601,
+      "near": 716853,
+      "replay_contexts": 214122,
+      "replay_points": 819851
+    },
+    "finite_fraction": 0.80156298828125,
+    "near_fraction": 0.35002587890625,
+    "same_batch_occurrence_fraction": {
+      "shuffled": 0.022416666666666668,
+      "joint": 1.0
+    },
+    "seconds": 505.6253226939589,
+    "raw_result": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/sokoban_coverage_d365a4c/local_path_preflight_5ae9a4e.json",
+    "scope": "CPU sampling check only; not an optimizer update or evidence of learned navigation."
+  }
 }

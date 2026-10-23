@@ -216,6 +216,21 @@ class ExactPairTests(unittest.TestCase):
                 self.assertEqual(len(np.unique(repeated[ids],axis=0)),count)
                 np.testing.assert_array_equal(repeated[ids],unique[expected])
 
+    def test_many_layouts_small_quota_still_tests_long_distances(self):
+        from experiments.new_tasks_qmap.src.relation_evaluate import planning_ids
+        scene=np.repeat(np.arange(100),149); truth=np.tile(np.arange(1,150),100)
+        rows=np.column_stack([scene*150+truth,scene*150])
+        corpus=SimpleNamespace(scenes=[None]*100,locate=lambda ids:ids//150)
+        old=planning_ids(corpus,rows,truth,1024,np.random.default_rng(23))
+        self.assertLessEqual(truth[old].max(),11)
+        new=planning_ids(corpus,rows,truth,1024,np.random.default_rng(23),[1,2,5,10,20,40,80,256])
+        self.assertEqual(len(np.unique(rows[new],axis=0)),1024)
+        self.assertGreater((truth[new]>80).sum(),100)
+        self.assertGreater((truth[new]>20).sum(),300)
+        self.assertEqual(len(np.unique(scene[new])),100)
+        repeat=planning_ids(corpus,rows,truth,1024,np.random.default_rng(23),[1,2,5,10,20,40,80,256])
+        np.testing.assert_array_equal(new,repeat)
+
     def test_correct_candidate_order_does_not_force_unit_distance_descent(self):
         from experiments.new_tasks_qmap.src.relation_evaluate import unit_cost_consistency
         from grounded_llm.core.qmap.model import soft_rank_loss

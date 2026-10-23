@@ -247,12 +247,18 @@ def stream_statistics(corpus,data,run,out):
     columns=np.full(corpus.size,-1,dtype=np.int8)
     point_index=np.full(corpus.size,-1,dtype=np.int32)
     point_index[data['pairs_train'][:,0]]=np.arange(len(data['pairs_train']))
+    ranking_source=np.zeros(corpus.size,dtype=bool)
+    ranking_source[data['tasks_train'][:,0]]=True
     eligible=np.zeros(corpus.size,dtype=np.uint32); seen=np.zeros_like(eligible)
+    point_layout_draws=np.zeros(len(corpus.scenes),dtype=np.int64)
+    rank_layout_draws=np.zeros_like(point_layout_draws)
+    train_layouts=np.asarray([s.metadata['split']=='train' for s in corpus.scenes])
     for sid,scene in enumerate(corpus.scenes):
         offset=corpus.offsets[sid]; columns[scene.goals+offset]=np.arange(len(scene.goals))
         if scene.metadata['split']!='train': continue
         nt=scene.metadata['training_goals']; blocked=scene.goals[nt:]
-        safe=~np.isin(np.arange(len(scene.states)),blocked) & ~np.isin(scene.children,blocked).any(axis=1)
+        safe=(~np.isin(np.arange(len(scene.states)),blocked) & ~np.isin(scene.children,blocked).any(axis=1)
+              & ranking_source[offset:corpus.offsets[sid+1]])
         for j,g in enumerate(scene.goals[:nt]):
             s=np.flatnonzero(safe & np.isfinite(scene.distances[j]) & (scene.distances[j]>0))+offset
             children=corpus.successors(s); valid=children>=0; target=np.full(len(s),g+offset)
@@ -273,12 +279,19 @@ def stream_statistics(corpus,data,run,out):
     fields += ['point_distance_'+name for name in bin_names]+['rank_distance_'+name for name in bin_names]
     totals={key:0 for key in fields if key not in ('attempt','step')}
     proportions={'point_finite':[],'boundary_decisions':[],'candidate_infinite':[]}
+    fields+=['point_layouts','rank_layouts','point_max_layout_share','rank_max_layout_share']
+    proportions.update({key:[] for key in fields[-4:]})
     steps=[]; attempts=set()
     with gzip.open(csv_path,'wt',newline='',compresslevel=1) as stream:
         writer=csv.DictWriter(stream,fieldnames=fields); writer.writeheader()
         for path in files:
             with np.load(path) as archive: x={key:archive[key] for key in ('point_step','point_distance','pairs','rank_step','tasks','children','child_distance','parent_distance','optimal')}
             children=x['children']; valid=children>=0
+            point_scenes=corpus.locate(x['pairs'][:,0]); rank_scenes=corpus.locate(x['tasks'][:,0])
+            if not train_layouts[point_scenes].all() or not train_layouts[rank_scenes].all():
+                raise ValueError(('Held-out layout entered actual training stream',path))
+            point_layout_draws+=np.bincount(point_scenes,minlength=len(corpus.scenes))
+            rank_layout_draws+=np.bincount(rank_scenes,minlength=len(corpus.scenes))
             source_rows=point_index[x['pairs'][:,0]]
             if (source_rows<0).any(): raise ValueError(('Point source outside original training rows',path))
             initial=data['pair_distances_train'][source_rows]
@@ -317,20 +330,34 @@ def stream_statistics(corpus,data,run,out):
                 for name,(a,b) in zip(bin_names,intervals):
                     row['point_distance_'+name]=int((np.isfinite(pd)&(pd>=a)&(pd<=b)).sum())
                     row['rank_distance_'+name]=int((np.isfinite(rd)&(rd>=a)&(rd<=b)).sum())
+                p_layout,p_count_=np.unique(point_scenes[p0:p0+np_],return_counts=True)
+                r_layout,r_count_=np.unique(rank_scenes[r0:r0+nr],return_counts=True)
+                row.update(point_layouts=len(p_layout),rank_layouts=len(r_layout),
+                    point_max_layout_share=float(p_count_.max()/np_),rank_max_layout_share=float(r_count_.max()/nr))
                 writer.writerow(row)
                 for key in totals: totals[key]+=row[key]
                 proportions['point_finite'].append(row['point_finite']/row['point_rows'])
                 proportions['boundary_decisions'].append(row['boundary_decisions']/row['rank_rows'])
                 proportions['candidate_infinite'].append(row['candidate_infinite']/row['legal_candidates'])
+                for key in fields[-4:]: proportions[key].append(row[key])
                 steps.append(int(step)); attempts.add(path.parent.name)
     if np.bitwise_and(seen,np.bitwise_not(eligible)).any(): raise ValueError('Ranking relation outside the declared training closure')
     available=_popcount(eligible); actual=_popcount(seen)
+    def layout_summary(draws):
+        values=draws[train_layouts]
+        return dict(layouts=len(values),minimum=int(values.min()),maximum=int(values.max()),
+                    max_min_ratio=float(values.max()/values.min()) if values.min()>0 else None,
+                    top8_fraction=float(np.sort(values)[-8:].sum()/values.sum()),total=int(values.sum()))
     return dict(actual_batches=len(steps),first_step=min(steps),last_step=max(steps),attempts=sorted(attempts),
         per_batch_csv=str(csv_path),totals=totals,
         point_finite_fraction=totals['point_finite']/totals['point_rows'],
         boundary_decision_fraction=totals['boundary_decisions']/totals['rank_rows'],
         unique_ranking_source_goal_pairs=actual,eligible_ranking_source_goal_pairs=available,
         ranking_relation_coverage=actual/available,
+        ranking_coverage_scope='Allowed complete goals and held-out closure for the ranking sources selected in this run; sampled source banks do not imply coverage of every physical state.',
+        layout_sampling=dict(point=layout_summary(point_layout_draws),ranking=layout_summary(rank_layout_draws),
+            by_layout=[dict(scene=sid,source=s.metadata.get('source'),point_draws=int(point_layout_draws[sid]),rank_draws=int(rank_layout_draws[sid]))
+                       for sid,s in enumerate(corpus.scenes) if train_layouts[sid]]),
         initial_row_label_comparison='Initial labels belong to the saved source-row placeholder goals used by the baseline strata, not necessarily to the online-resampled actual goal. These transition counts quantify that mismatch without inferring which source draws came from the broad branch.',
         all_actual_point_and_child_labels_equal_physical_oracle=True,all_legal_candidates_preserved=True,
         per_batch_fractions={key:dict(mean=float(np.mean(values)),quantiles={str(q):float(np.quantile(values,q)) for q in (0,.1,.5,.9,1)}) for key,values in proportions.items()},

@@ -216,7 +216,7 @@ def rollout(corpus,cache,rows,horizon,policy,edge_records=None):
                 by_scene=per_scene,examples=examples,predicted_progress=progress)
 
 
-def planning_ids(corpus,rows,truth,count,rng):
+def planning_ids(corpus,rows,truth,count,rng,distance_bins=None):
     """Unique starts/queries; share the budget across scenes then distance layers."""
     pool=np.flatnonzero(np.isfinite(truth) & (truth>0))
     # Prepared distance-stratified evaluation rows may repeat a physical pair.
@@ -231,7 +231,18 @@ def planning_ids(corpus,rows,truth,count,rng):
     groups=[pool[scene==sid] for sid in np.unique(scene)]
     chosen=[]
     for group in groups:
-        layers=[rng.permutation(group[truth[group]==d]).tolist() for d in np.unique(truth[group])]
+        if distance_bins is None:
+            layers=[rng.permutation(group[truth[group]==d]).tolist() for d in np.unique(truth[group])]
+        else:
+            edges=np.asarray(distance_bins,dtype=float)
+            if edges.ndim!=1 or not len(edges) or not np.isfinite(edges).all() or (np.diff(edges)<=0).any() or edges[0]<=0:
+                raise ValueError('Positive increasing finite planning distance bounds required')
+            if truth[group].max()>edges[-1]: raise ValueError('Planning bins omit a finite distance')
+            bins=np.searchsorted(edges,truth[group])
+            layers=[rng.permutation(group[bins==b]).tolist() for b in np.unique(bins)]
+            # A small per-layout quota must sample all distance ranges across
+            # layouts, rather than always selecting each layout's nearest pair.
+            layers=[layers[i] for i in rng.permutation(len(layers))]
         order=[]
         while any(layers):
             for layer in layers:
@@ -254,6 +265,9 @@ def evaluate(model,corpus,data,config,cohorts=None,exposure=None,planning=True,t
         if validation:
             threshold=calibrate(np.concatenate([predictions[n] for n in validation]),np.concatenate([data['distances_'+n] for n in validation]))
     results={}
+    planning_bins=config['evaluation'].get('planning_distance_bins')
+    protocol=('unique_ordered_state_goal_pairs_distance_bins_v3' if planning_bins is not None
+              else 'unique_ordered_state_goal_pairs_v2')
     for name in names:
         rows=data['tasks_'+name]; truth=data['distances_'+name]; pred=predictions[name]
         finite=np.isfinite(truth); error=np.abs(pred[finite]-truth[finite]); signed=pred[finite]-truth[finite]
@@ -309,11 +323,11 @@ def evaluate(model,corpus,data,config,cohorts=None,exposure=None,planning=True,t
                 counter_semantics='Legacy field name: exposure counts state inputs participating in loss computation, not proven nonzero parameter gradients. Identity pairs, one-candidate ranking or saturation may have zero gradient.')
         if planning:
             rng=np.random.default_rng(config['seed']+len(name))
-            selected=rows[planning_ids(corpus,rows,truth,config['evaluation']['rollout_count'],rng)]
+            selected=rows[planning_ids(corpus,rows,truth,config['evaluation']['rollout_count'],rng,planning_bins)]
             unique_selected=len(np.unique(selected,axis=0))
             if unique_selected!=len(selected): raise ValueError('Duplicate physical planning query')
             eligible=np.isfinite(truth)&(truth>0)
-            result['planning_query_selection']=dict(protocol='unique_ordered_state_goal_pairs_v2',
+            result['planning_query_selection']=dict(protocol=protocol,distance_bin_upper_bounds=planning_bins,
                 eligible_rows=int(eligible.sum()),unique_eligible_pairs=len(np.unique(rows[eligible],axis=0)),
                 maximum_queries=config['evaluation']['rollout_count'],selected_queries=len(selected),
                 unique_selected_pairs=unique_selected,
@@ -321,7 +335,7 @@ def evaluate(model,corpus,data,config,cohorts=None,exposure=None,planning=True,t
             result['planning']={policy:rollout(corpus,cache,selected,config['evaluation']['horizon'],policy) for policy in ('q','oracle','heuristic','immediate_cost_only')}
         results[name]=result
     return dict(reachability_threshold=threshold,cohorts=results,
-                planning_protocol='unique_ordered_state_goal_pairs_v2' if planning else None)
+                planning_protocol=protocol if planning else None)
 
 
 def main():
@@ -337,15 +351,19 @@ def main():
     parser.add_argument('--out',required=True,type=Path)
     parser.add_argument('--device',default='cpu')
     parser.add_argument('--cohorts',nargs='+')
+    parser.add_argument('--planning-distance-bins',nargs='+',type=float)
     args=parser.parse_args()
     if args.out.exists(): raise FileExistsError('Keep previous frozen evaluations; choose a new output')
     saved=torch.load(args.checkpoint,map_location=args.device,weights_only=False)
     config=saved['config']; torch.set_num_threads(config['training']['cpu_threads'])
+    if args.planning_distance_bins is not None:
+        config['evaluation']['planning_distance_bins']=args.planning_distance_bins
     corpus,data,_=load(config,args.run/'data')
     model=StateEncoder(input_dim=saved['input_dim'],**config['model']).to(args.device)
     model.load_state_dict(saved['model']); model.requires_grad_(False)
     result=evaluate(model,corpus,data,config,cohorts=args.cohorts,exposure=saved['exposure'])
-    atomic_json(args.out,dict(checkpoint=str(args.checkpoint),step=saved['step'],source_commit=saved['source_commit'],metrics=result))
+    atomic_json(args.out,dict(checkpoint=str(args.checkpoint),step=saved['step'],source_commit=saved['source_commit'],
+                             evaluation_override=dict(planning_distance_bins=args.planning_distance_bins),metrics=result))
     print(json.dumps(dict(step=saved['step'],cohorts={name:row['planning']['q']['success_rate'] for name,row in result['cohorts'].items()})),flush=True)
 
 

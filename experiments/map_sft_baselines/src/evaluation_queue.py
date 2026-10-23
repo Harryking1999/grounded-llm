@@ -62,6 +62,10 @@ def existing_jobs(args, config):
             output = Path(value('--out'))
             if not output.is_relative_to(args.root / 'evaluation'):
                 continue
+            # Mixed-task shards spawn a task evaluator below their output.
+            # Only the outer process owns the GPU and the shard claim.
+            if len(output.relative_to(args.root / 'evaluation').parts) != 3:
+                continue
             checkpoint = Path(value('--checkpoint'))
             step = int(checkpoint.name.split('-')[-1])
             job = (step, step / steps_per_epoch(config), value('--baseline'), value('--mode'),

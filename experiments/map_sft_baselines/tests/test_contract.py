@@ -13,6 +13,27 @@ from experiments.map_sft_baselines.src.train import validate_resume_contract
 from experiments.map_sft_baselines.src.contract import steps_per_epoch,checkpoint_steps,plateau_status
 
 class ContractTests(unittest.TestCase):
+    def test_resume_mixed_shard_adopts_outer_worker_only(self):
+        from unittest.mock import patch
+        from experiments.map_sft_baselines.src.evaluation_queue import existing_jobs, MODULE
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder) / 'run'
+            output = root / 'evaluation/B2/checkpoint-100000/RO_0000_0032'
+            paths = []
+            for pid, destination in [(101, output), (102, output / 'blocks')]:
+                proc = Path(folder) / str(pid)
+                proc.mkdir()
+                args = ['python', '-m', MODULE, '--out', str(destination), '--checkpoint',
+                        str(root / 'models/B2/checkpoint-100000'), '--baseline', 'B2',
+                        '--mode', 'RO', '--start', '0', '--stop', '32']
+                (proc / 'cmdline').write_text('\0'.join(args))
+                (proc / 'environ').write_text('CUDA_VISIBLE_DEVICES=1\0')
+                paths.append(proc / 'cmdline')
+            cfg = dict(data=dict(samples_per_epoch=50000), training=dict(global_batch=4))
+            with patch.object(Path, 'glob', return_value=iter(paths)):
+                workers = list(existing_jobs(SimpleNamespace(root=root), cfg))
+            self.assertEqual([(gpu, pid) for gpu, pid, _ in workers], [(1, 101)])
+
     def test_requested_checkpoint_precedes_newer_milestones(self):
         from experiments.map_sft_baselines.src.contract import checkpoint_priority
         cfg = dict(evaluation=dict(priority_steps=[100000], priority_step_interval=50000))

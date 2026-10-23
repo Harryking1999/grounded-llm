@@ -47,12 +47,14 @@ def collect(root,config):
         if curve:
             destination=Path(root)/'results'/base
             atomic_json(destination/'curve.json',curve)
-            columns=['到达目标','保持可达 TF／RO']
+            report_modes=[mode for mode in ('TF','RO') if mode in evaluation_modes(config,base)]
+            mode_label='／'.join(report_modes)
+            columns=['到达目标','保持可达 '+mode_label]
             names=['safe']
             if config['baselines'][base]['real_map']:
-                columns+=['地图最优 TF／RO','位置 NDCG@1 TF／RO','位置 NDCG@10 TF／RO','距离 NDCG@1 TF／RO','距离 NDCG@10 TF／RO']
+                columns+=[name+' '+mode_label for name in ['地图最优','位置 NDCG@1','位置 NDCG@10','距离 NDCG@1','距离 NDCG@10']]
                 names+=['map_optimal','ndcg_inverse_rank_at_1','ndcg_inverse_rank_at_10','ndcg_minmax_distance_at_1','ndcg_minmax_distance_at_10']
-            else:columns+=['单步最优率 TF／RO'];names+=['optimal']
+            else:columns+=['单步最优率 '+mode_label];names+=['optimal']
             lines=[f'# {base} 半轮评测','', '| epoch | '+' | '.join(columns)+' |','|---|'+'---|'*len(columns)]
             lookup={r['step']:r for r in curve}
             def percent(x):return '—' if x is None else f'{100*x:.2f}%'
@@ -61,7 +63,7 @@ def collect(root,config):
                 row=lookup.get(step)
                 if row:
                     metrics=row['metrics'];cells=[f"{metrics['RO']['arrival']}/{tasks}（{percent(metrics['RO']['arrival']/tasks)}）"]
-                    for name in names:cells.append('／'.join(percent(metrics[mode][name]['value']) for mode in ['TF','RO']))
+                    for name in names:cells.append('／'.join(percent(metrics[mode][name]['value']) for mode in report_modes))
                 else:cells=['—']*len(columns)
                 lines.append(f'| {step/steps_per_epoch(config):g} | '+' | '.join(cells)+' |')
             (destination/'report.md').write_text('\n'.join(lines)+'\n')

@@ -13,6 +13,23 @@ from experiments.map_sft_baselines.src.train import validate_resume_contract
 from experiments.map_sft_baselines.src.contract import steps_per_epoch,checkpoint_steps,plateau_status
 
 class ContractTests(unittest.TestCase):
+    def test_collect_ro_only_keeps_completed_cases_and_renders_report(self):
+        cfg=dict(data=dict(samples_per_epoch=4),training=dict(global_batch=4,epochs=1,save_steps=1),
+                 baselines={'B0':dict(real_map=False)},
+                 evaluation=dict(tasks=1,shard_tasks=1,modes=['RO']))
+        with tempfile.TemporaryDirectory() as folder:
+            shard=Path(folder)/'evaluation/B0/checkpoint-1/RO_0000_0001'
+            shard.mkdir(parents=True)
+            (shard/'summary.json').write_text('{}')
+            case=dict(trajectory_id='heldout',arrived=True,arrived_and_stopped=True,turns=[])
+            (shard/'cases.jsonl').write_text(json.dumps(case)+'\n')
+            collect(folder,cfg)
+            result=Path(folder)/'results/B0'
+            curve=json.loads((result/'curve.json').read_text())
+            self.assertEqual(set(curve[0]['metrics']),{'RO'})
+            self.assertIn('1/1', (result/'report.md').read_text())
+            self.assertNotIn('TF', (result/'report.md').read_text())
+
     def test_resume_mixed_shard_adopts_outer_worker_only(self):
         from unittest.mock import patch
         from experiments.map_sft_baselines.src.evaluation_queue import existing_jobs, MODULE

@@ -1,0 +1,133 @@
+{
+  "task": "sokoban",
+  "scope": "Training-layout and permitted training-relation diagnosis only; not held-out generalization or a newly trained model.",
+  "checkpoint_source_commit": "d365a4c1f55691c0cb4ad2928cf420598d33f41e",
+  "checkpoint_run": "coverage1000",
+  "checkpoint_step": 25000,
+  "trajectory_source_commit": "a47bd5f5076ae60f1be2d1f1a2cbaa62e7f39a28",
+  "mining_source_commit": "eea42c55e9efe9a51717f56dfea5a27ae9dd0230",
+  "diagnostic_config": "experiments/new_tasks_qmap/configs/sokoban_training_failure_diagnosis.json",
+  "data": {
+    "training_layouts": 1000,
+    "query_distance_counts": {
+      "1_1": 495,
+      "2_2": 543,
+      "3_5": 598,
+      "6_10": 589,
+      "11_20": 596,
+      "21_40": 591,
+      "41_80": 549,
+      "81_inf": 135,
+      "proven_unreachable": 0
+    }
+  },
+  "planning": {
+    "count": 4096,
+    "solved": 1359,
+    "success_rate": 0.331787109375,
+    "optimal": 1355,
+    "optimal_rate": 0.330810546875,
+    "cycles": 2737,
+    "entered_unreachable": 306,
+    "budget_exhausted": 0
+  },
+  "by_initial_distance": {
+    "1_5": {
+      "count": 1636,
+      "solved": 1275,
+      "optimal": 1274
+    },
+    "6_20": {
+      "count": 1185,
+      "solved": 84,
+      "optimal": 81
+    },
+    "21_plus": {
+      "count": 1275,
+      "solved": 0,
+      "optimal": 0
+    }
+  },
+  "cycle_structure": {
+    "cycles": 2737,
+    "cycle_length_counts": {
+      "2": 2737
+    },
+    "cycle_entry_step_quantiles": {
+      "0": 0.0,
+      "0.5": 2.0,
+      "0.9": 7.0,
+      "1": 20.0
+    },
+    "first_nonoptimal_step_quantiles": {
+      "0": 0.0,
+      "0.5": 1.0,
+      "0.9": 5.0,
+      "1": 15.0
+    },
+    "first_dead_step_quantiles": {
+      "0": 0.0,
+      "0.5": 2.0,
+      "0.9": 6.0,
+      "1": 12.0
+    }
+  },
+  "mining": {
+    "visited_decisions": 16522,
+    "permitted_training_decisions": 14350,
+    "excluded_protected_decisions": 2172,
+    "nonoptimal_decisions": 4517,
+    "failed_queries": 2737,
+    "nonoptimal_on_failed_queries": 4515,
+    "entered_dead_decisions": 301,
+    "non_descent_decisions": 3403,
+    "cycle_member_decisions": 4689,
+    "unique_critical_decisions": 7485,
+    "continuation_seeds": 7465,
+    "unique_continuation_decisions": 64916,
+    "continuation_stopped_at_protected_boundary": 5095,
+    "continuation_budget_remaining": 0,
+    "unique_bank_decisions": 64927,
+    "all_legal_candidates_preserved": true,
+    "all_rows_training_allowed": true,
+    "scope": "Offline training-only candidate data; no optimizer update or policy change. Critical seeds come only from failed trajectories. A nonoptimal action may be a recoverable detour, not an independently established cause of failure. Flags overlap. Terminal anchors are not ranking decisions."
+  },
+  "candidate_bank": {
+    "layouts": 1000,
+    "distance_counts": {
+      "1_1": 872,
+      "2_2": 1151,
+      "3_5": 5486,
+      "6_10": 10246,
+      "11_20": 16611,
+      "21_40": 19021,
+      "41_80": 10685,
+      "81_256": 855
+    },
+    "reason_counts": {
+      "nonoptimal_on_failed_trajectory": 4513,
+      "entered_dead": 301,
+      "non_descent": 3217,
+      "cycle_member": 4685,
+      "optimal_continuation": 64916
+    },
+    "legal_candidates": 182848,
+    "finite_candidates": 168529,
+    "dead_candidates": 14319,
+    "boundary_decisions": 13746,
+    "all_rows_have_optimal_candidate": true,
+    "used_for_training": false
+  },
+  "raw_source": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/sokoban_coverage_d365a4c/analysis_a47bd5f/training_failures_coverage1000.json",
+  "raw_archives": {
+    "edges": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/sokoban_coverage_d365a4c/analysis_a47bd5f/training_failures_coverage1000.edges.npz",
+    "bank": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/sokoban_coverage_d365a4c/analysis_eea42c5/training_failures_coverage1000.bank.npz"
+  },
+  "limitations": [
+    "Single selected checkpoint and one fixed training-query draw.",
+    "Deadlock and cycles overlap; they cannot be added.",
+    "Nonoptimal choices alone can be harmless detours; critical seeds use failed trajectories only.",
+    "Many teacher paths stop at protected relation boundaries, so the bank does not provide complete training paths to every goal.",
+    "No causal improvement has been measured from this candidate bank."
+  ]
+}

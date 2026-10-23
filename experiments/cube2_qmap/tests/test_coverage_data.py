@@ -3,11 +3,24 @@ import numpy as np
 from experiments.cube2_qmap.src.coverage_data import coverage,CoverageGuard
 from experiments.cube2_qmap.src.full_state_joint import task_pairs
 from experiments.cube2_qmap.tests.test_full_state_joint import Ring
-from experiments.cube2_qmap.src.coverage_train import take_cycle,Pool
+from experiments.cube2_qmap.src.coverage_train import take_cycle,Pool,GoalPool
 from experiments.cube2_qmap.src.coverage_evaluate import paired_change
+from experiments.cube2_qmap.src.goal_layers import reverse_layers
 
 
 class CoverageTests(unittest.TestCase):
+    def test_layer_sampler_balances_goals_and_layers_and_counts_repeats(self):
+        env=Ring();rows=np.array([[3,1],[4,1],[20,1],[3,2],[15,2],[16,2]])
+        pool=GoalPool(rows,env,5,True);drawn=pool.draw(30)
+        self.assertEqual(int((drawn[:,1]==1).sum()),15)
+        self.assertTrue((pool.seen==5).all())
+
+    def test_reverse_bfs_matches_graph_distances_and_every_optimal_descent(self):
+        env=Ring();goal=10;distance=reverse_layers(env,goal)
+        self.assertTrue(np.array_equal(distance,env.distance(np.arange(env.size),goal)))
+        sources=np.flatnonzero(distance>0)
+        self.assertTrue((distance[env.successors(sources)]==distance[sources,None]-1).any(-1).all())
+
     def test_grouped_cross_batches_keep_all_targets_and_visit_every_group(self):
         rows=np.column_stack((np.repeat(np.arange(10),8),np.tile(np.arange(8),10)))
         pool=Pool(rows,42,True);drawn=np.r_[pool.draw(32),pool.draw(32),pool.draw(16)]

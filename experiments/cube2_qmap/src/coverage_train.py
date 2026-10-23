@@ -60,11 +60,41 @@ class Pool:
         else:
             tail=self.order[self.cursor:];self.order=ordering(self.rows,self.rng,self.grouped)
             ids=np.r_[tail,self.order[:count-remaining]];self.cursor=count-remaining
-        self.seen[ids]+=1
+        np.add.at(self.seen,ids,1)
         return self.rows[ids]
 
     def state_dict(self):
         return dict(order=self.order,cursor=self.cursor,seen=self.seen,rng=self.rng.bit_generator.state)
+
+
+class GoalPool:
+    """Match goal exposure; optionally balance exact BFS-equivalent layers."""
+    def __init__(self,rows,env,seed,by_layer):
+        self.rows=rows;self.rng=np.random.default_rng(seed);self.seen=np.zeros(len(rows),np.int32)
+        self.goals=np.unique(rows[:,1]);self.rng.shuffle(self.goals);self.drawn=0
+        distance=env.distance(*rows.T) if by_layer else np.zeros(len(rows),int)
+        self.layers={};self.cursors={};self.orders={};self.layer_cursors={}
+        for goal in self.goals:
+            layers=np.unique(distance[rows[:,1]==goal]);self.rng.shuffle(layers)
+            self.layers[int(goal)]=layers;self.layer_cursors[int(goal)]=0
+            for depth in layers:
+                key=(int(goal),int(depth));ids=np.flatnonzero((rows[:,1]==goal)&(distance==depth))
+                self.rng.shuffle(ids);self.orders[key]=ids;self.cursors[key]=0
+
+    def draw(self,count):
+        selected=[]
+        for _ in range(count):
+            goal=int(self.goals[self.drawn%len(self.goals)]);self.drawn+=1
+            layers=self.layers[goal];depth=int(layers[self.layer_cursors[goal]%len(layers)])
+            self.layer_cursors[goal]+=1;key=(goal,depth);order=self.orders[key];cursor=self.cursors[key]
+            if cursor==len(order):self.rng.shuffle(order);cursor=0
+            selected.append(order[cursor]);self.cursors[key]=cursor+1
+        ids=np.asarray(selected);np.add.at(self.seen,ids,1)
+        return self.rows[ids]
+
+    def state_dict(self):
+        return dict(goals=self.goals,drawn=self.drawn,layers=self.layers,layer_cursors=self.layer_cursors,
+            orders=self.orders,cursors=self.cursors,seen=self.seen,rng=self.rng.bit_generator.state)
 
 
 def run_factorial(args):
@@ -77,6 +107,7 @@ def run_factorial(args):
     optimizer.load_state_dict(saved['optimizer'])
     for group in optimizer.param_groups:group['lr']=options['learning_rate']
     specification=cfg['arms'][args.base_arm or args.arm]
+    options={**options,**{key:specification[key] for key in ('updates','evaluate_every') if key in specification}}
     batches=dict(specification['batches'])
     if args.arm in ('hard','random_aux'):
         batches['AuxHard' if args.arm=='hard' else 'AuxRandom']=[cfg['hard_followup']['extra_batch'],cfg['hard_followup']['extra_weight']]
@@ -92,21 +123,29 @@ def run_factorial(args):
         elif guard.task_blocked(env,rows).any():raise ValueError('Incomplete/protected ranking pool')
         # Role-specific fixed seeds keep the original, cross and replay streams
         # identical between their edge/no-edge and hard/random controls.
-        role_seed={'Original':0,'Cross':1,'OriginalReplay':2,'AuxHard':3,'AuxRandom':3,'PairAngular':3,'PairUniform':3}[name]
-        pools[name]=Pool(rows,options['seed']+role_seed,name=='Cross')
+        role_seed={'Original':0,'Cross':1,'OriginalReplay':2,'AuxHard':3,'AuxRandom':3,'PairAngular':3,'PairUniform':3,
+            'Micro':1,'Layered':1,'UniformLayers':1}[name]
+        pools[name]=(GoalPool(rows,env,options['seed']+role_seed,name=='Layered')
+            if name in ('Layered','UniformLayers') else Pool(rows,options['seed']+role_seed,name=='Cross'))
     edge_rng=np.random.default_rng(options['seed']+4)
     allowed=np.load(args.data/'edge_allowed.npy',mmap_mode='r')
-    edge_order=edge_rng.permutation(env.size);edge_cursor=0;edge_seen=np.zeros(env.size,dtype=bool);edge_passes=0
+    edge_order=edge_rng.permutation(env.size) if specification['edges'] else np.empty(0,dtype=np.int64)
+    edge_cursor=0;edge_seen=np.zeros(env.size,dtype=bool);edge_passes=0
     out=args.out;out.mkdir(parents=True,exist_ok=False)
     atomic_json(out/'config.json',dict(study=cfg,arm=args.arm,base_arm=args.base_arm,source_commit=args.source_commit))
     monitors={'validation':d['validation'],'restoration':d['original']}
     initial={k:inspect(model,env,tasks,args.device,32) for k,tasks in monitors.items()}
     best=(initial['validation']['rollout']['solved'],initial['restoration']['rollout']['solved'])
-    eligible=best[1]>=385;best_update=0;shutil.copy2(args.checkpoint,out/'best.pt')
+    eligible=best[1]>=385 and not specification.get('diagnostic_only',False)
+    best_update=0;shutil.copy2(args.checkpoint,out/'best.pt')
     result=dict(source_commit=args.source_commit,arm=args.arm,base_arm=args.base_arm,initial=initial,evaluations=[],
         best_eligible=eligible,best_update=0,best_validation_and_restoration=best,initial_step=saved['step'])
     atomic_json(out/'summary.json',result);started=time.monotonic()
     fit_tasks={n:p.rows[np.random.default_rng(cfg['seed']).choice(len(p.rows),min(512,len(p.rows)),replace=False)] for n,p in pools.items()}
+    if cfg.get('layer_pilot'):
+        from .goal_layers import layer_report
+        role=next(n for n in names if n!='OriginalReplay')
+        result['initial_layers']=layer_report(model,env,args.data,role,args.device)
     fixed_edge_parents=np.random.default_rng(cfg['seed']+1).choice(env.size,512,replace=False)
     with torch.no_grad():
         result['initial_train_monitor']={}
@@ -162,8 +201,11 @@ def run_factorial(args):
                 true_distance_unique_decisions=hist(env.distance(*exposed.T)),
                 unique_directed_edges_exposed=int(allowed[edge_seen].sum()),
                 allowed_directed_edges=int(allowed.sum()),edge_parent_passes=edge_passes)
+            if cfg.get('layer_pilot'):
+                record['layers']=layer_report(model,env,args.data,role,args.device,full=update==options['updates'])
             score=(metrics['validation']['rollout']['solved'],metrics['restoration']['rollout']['solved'])
-            record['eligible']=score[1]>=385;result['evaluations'].append(record)
+            record['eligible']=score[1]>=385 and not specification.get('diagnostic_only',False)
+            result['evaluations'].append(record)
             payload=dict(model_type=MODEL_TYPE,task=env.name,actions=list(env.actions),model_config=saved['model_config'],
                 cap=saved['cap'],model=model.state_dict(),optimizer=optimizer.state_dict(),config=cfg,
                 step=saved['step']+update,initial_step=saved['step'],updates=update,source_commit=args.source_commit,
@@ -295,7 +337,8 @@ def main():
     p=argparse.ArgumentParser(__doc__)
     for name in ('config','data','oracle','checkpoint','out'):p.add_argument('--'+name,type=Path,required=True)
     p.add_argument('--version',choices=['V1','V2','V2_disjoint','V3'])
-    p.add_argument('--arm',choices=['original','edges','cross','both','hard','random_aux','geometry','geometry_uniform'])
+    p.add_argument('--arm',choices=['original','edges','cross','both','hard','random_aux','geometry','geometry_uniform',
+        'micro','layers','uniform_layers'])
     p.add_argument('--base-arm',choices=['original','edges','cross','both'])
     p.add_argument('--source-commit',required=True);p.add_argument('--device',default='cuda')
     p.add_argument('--no-edges',action='store_true')

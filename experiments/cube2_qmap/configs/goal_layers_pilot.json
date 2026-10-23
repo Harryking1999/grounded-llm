@@ -1,0 +1,15 @@
+{
+  "parent_contract": "experiments/cube2_qmap/configs/goal_coverage_factorial.json",
+  "seed": 2026102408,
+  "data": {"layer_rows_per_goal_depth": 24, "micro_parents": 8, "micro_holdout_per_goal_depth": 2, "micro_holdout_minimum_layer": 6, "paths_per_goal_depth": 4, "path_root_depths": [4, 8, 12]},
+  "training": {"updates": 2048, "evaluate_every": 256},
+  "arms": {
+    "micro": {"edges": false, "diagnostic_only": true, "updates": 8192, "evaluate_every": 512, "batches": {"Micro": [128, 1.0]}},
+    "layers": {"edges": false, "batches": {"Layered": [128, 0.5], "OriginalReplay": [128, 0.5]}},
+    "uniform_layers": {"edges": false, "batches": {"UniformLayers": [128, 0.5], "OriginalReplay": [128, 0.5]}}
+  },
+  "layer_pilot": true,
+  "scope": "Small causal pilot from the retained step-2000 Q and Adam. All six depth-1 goals plus one allowed complete orbit each at depth 2 and 3. Reverse simulator BFS supplies exact labels; the existing distance adapter must agree. Main arms match unique decisions, exact goal exposure stream, loss weights, updates and replay. Layer sampling balances available distance strata within each goal; ordinary sampling balances goals but draws uniformly from its physical-parent pool. Micro contains shared hard parents plus one admissible seed per available near-to-far layer and is an overfitting diagnostic without replay, never a candidate. No auxiliary edge or geometry losses.",
+  "split": "Retain all old state/axis/goal-orbit exclusions. Micro development stars and their axis closures are excluded from every pilot pool; their start stars also avoid micro training start-star axis closure. Shortest-path diagnostics censor protected stars and exclude protected pair labels; report the available path coverage.",
+  "budget": "2048 updates per main arm, staged diagnostics every 256; separate micro fit diagnostic 8192 updates with checks every 512. Expand only after fitting and independent validation evidence. Sealed tests stay closed through development. Frozen FLAN map unchanged."
+}

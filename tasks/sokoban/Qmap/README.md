@@ -1,6 +1,6 @@
 # 推箱子 Qmap
 
-**当前还不能可靠求解新棋盘。** 已完成多组训练，未见布局的最好完整贪心完成率为8.79%。结果与问题见[三任务报告](../../../experiments/new_tasks_qmap/results/report.md)，采用状态见[selection](selection.json)。
+**当前还不能可靠求解新棋盘。** 已完成1,000张训练棋盘的覆盖量对照，在100张未见棋盘测试中完整贪心完成率为37.89%；21步及以上0/312。结果与问题见[三任务报告](../../../experiments/new_tasks_qmap/results/report.md)，采用状态见[selection](selection.json)。
 
 ## 输入和目标
 
@@ -25,4 +25,4 @@
 
 - [基线配置](../../../experiments/new_tasks_qmap/configs/sokoban_pairs.json)、[验收要求](../../../experiments/new_tasks_qmap/configs/exact_pair_acceptance.json)
 - [数据范围](../data/README.md)、[实验入口](../../../experiments/new_tasks_qmap/README.md)
-- [当前较好结果](../../../experiments/new_tasks_qmap/results/sokoban_pairs_proxy128.json)、[采样对照](../../../experiments/new_tasks_qmap/results/sokoban_pairs_balanced_relations.json)
+- [当前覆盖量对照](../../../experiments/new_tasks_qmap/results/sokoban_coverage_comparison.json)、[采样对照](../../../experiments/new_tasks_qmap/results/sokoban_pairs_balanced_relations.json)

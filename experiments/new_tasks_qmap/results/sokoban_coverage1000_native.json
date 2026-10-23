@@ -1,0 +1,343 @@
+{
+  "task": "sokoban",
+  "source_commit": "d365a4c1f55691c0cb4ad2928cf420598d33f41e",
+  "best_step": 25000,
+  "last_step": 60000,
+  "preparation_seconds": 4115.045567977242,
+  "training_seconds": 4701.00975823123,
+  "initial_evaluation_seconds": 474.186441577971,
+  "final_evaluation_seconds": 36.672282645478845,
+  "raw_feature_cache_seconds": 1362.9252236839384,
+  "peak_gpu_allocated_bytes": 20718717440,
+  "peak_gpu_reserved_bytes": 21380464640,
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "data": {
+    "task": "sokoban",
+    "states": 392342190,
+    "input_dim": 400,
+    "max_candidates": 4,
+    "seed": 2026102302,
+    "finite_max": 149.0,
+    "unknown_training_labels": 0,
+    "pair_count": 8192000,
+    "decision_count": 5294198,
+    "reserved_relations": 799690,
+    "cohorts": {
+      "validation": {
+        "count": 125936,
+        "reachable": 125936
+      },
+      "test": {
+        "count": 118944,
+        "reachable": 118944
+      },
+      "unseen_goal_validation": {
+        "count": 88000,
+        "reachable": 64000
+      },
+      "unseen_goal_test": {
+        "count": 88000,
+        "reachable": 64000
+      },
+      "unseen_layout_validation": {
+        "count": 70400,
+        "reachable": 51200
+      },
+      "unseen_layout_test": {
+        "count": 70400,
+        "reachable": 51200
+      },
+      "original_layout_test": {
+        "count": 2110,
+        "reachable": 1915
+      },
+      "original_layout_validation": {
+        "count": 2108,
+        "reachable": 1850
+      },
+      "diagnostic": {
+        "count": 1408,
+        "reachable": 1024
+      },
+      "diagnostic_original": {
+        "count": 2,
+        "reachable": 2
+      }
+    },
+    "selected_train_states": 8192000,
+    "all_selected_sources_in_training": false
+  },
+  "model_parameters": 201344,
+  "actual_exposure": {
+    "unique_gradient_states": 12457100,
+    "available_states": 392342190,
+    "unique_pair_rows": 8192000,
+    "pair_rows": 8192000,
+    "unique_decision_rows": 4561249,
+    "decision_rows": 5294198,
+    "minimum_pair_layer_passes": 3.328125,
+    "minimum_decision_layer_passes": null
+  },
+  "acceptance": {
+    "minimum": 0.8,
+    "target": 0.9,
+    "rates": {
+      "test": 0.8642578125,
+      "unseen_goal_test": 0.8134765625,
+      "unseen_layout_test": 0.41796875,
+      "diagnostic_original": 0.0,
+      "original_layout_test": 0.0
+    },
+    "full_training_source_coverage": true,
+    "passed": false,
+    "target_reached": false
+  },
+  "metrics": {
+    "reachability_threshold": 93.32786293029771,
+    "planning_protocol": "unique_ordered_state_goal_pairs_v2",
+    "cohorts": {
+      "validation": {
+        "count": 125936,
+        "finite_count": 125936,
+        "finite_mae": 7.330150604248047,
+        "shortest_action_rate": 0.66552734375,
+        "planning": {
+          "count": 1024,
+          "unique_state_goal_pairs": 1024,
+          "solved": 960,
+          "success_rate": 0.9375,
+          "optimal": 960,
+          "optimal_rate": 0.9375,
+          "cycles": 64,
+          "entered_unreachable": 4,
+          "budget_exhausted": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0,
+          "true_distance_counts": {
+            "1_5": 1020,
+            "6_20": 4,
+            "21_256": 0
+          }
+        }
+      },
+      "test": {
+        "count": 118944,
+        "finite_count": 118944,
+        "finite_mae": 7.701967716217041,
+        "shortest_action_rate": 0.63818359375,
+        "planning": {
+          "count": 1024,
+          "unique_state_goal_pairs": 1024,
+          "solved": 885,
+          "success_rate": 0.8642578125,
+          "optimal": 882,
+          "optimal_rate": 0.861328125,
+          "cycles": 139,
+          "entered_unreachable": 2,
+          "budget_exhausted": 0,
+          "mean_excess_cost_on_success": 0.006779661016949152,
+          "mean_cost_ratio_on_success": 1.0020338983050847,
+          "true_distance_counts": {
+            "1_5": 994,
+            "6_20": 30,
+            "21_256": 0
+          }
+        }
+      },
+      "unseen_goal_validation": {
+        "count": 88000,
+        "finite_count": 64000,
+        "finite_mae": 7.183016300201416,
+        "shortest_action_rate": 0.66015625,
+        "planning": {
+          "count": 1024,
+          "unique_state_goal_pairs": 1024,
+          "solved": 815,
+          "success_rate": 0.7958984375,
+          "optimal": 814,
+          "optimal_rate": 0.794921875,
+          "cycles": 209,
+          "entered_unreachable": 2,
+          "budget_exhausted": 0,
+          "mean_excess_cost_on_success": 0.00245398773006135,
+          "mean_cost_ratio_on_success": 1.0006134969325153,
+          "true_distance_counts": {
+            "1_5": 947,
+            "6_20": 77,
+            "21_256": 0
+          }
+        }
+      },
+      "unseen_goal_test": {
+        "count": 88000,
+        "finite_count": 64000,
+        "finite_mae": 7.214615821838379,
+        "shortest_action_rate": 0.65625,
+        "planning": {
+          "count": 1024,
+          "unique_state_goal_pairs": 1024,
+          "solved": 833,
+          "success_rate": 0.8134765625,
+          "optimal": 833,
+          "optimal_rate": 0.8134765625,
+          "cycles": 191,
+          "entered_unreachable": 1,
+          "budget_exhausted": 0,
+          "mean_excess_cost_on_success": 0.0,
+          "mean_cost_ratio_on_success": 1.0,
+          "true_distance_counts": {
+            "1_5": 936,
+            "6_20": 88,
+            "21_256": 0
+          }
+        }
+      },
+      "unseen_layout_validation": {
+        "count": 70400,
+        "finite_count": 51200,
+        "finite_mae": 24.66413116455078,
+        "shortest_action_rate": 0.65478515625,
+        "planning": {
+          "count": 1024,
+          "unique_state_goal_pairs": 1024,
+          "solved": 419,
+          "success_rate": 0.4091796875,
+          "optimal": 417,
+          "optimal_rate": 0.4072265625,
+          "cycles": 605,
+          "entered_unreachable": 20,
+          "budget_exhausted": 0,
+          "mean_excess_cost_on_success": 0.00954653937947494,
+          "mean_cost_ratio_on_success": 1.0022729855665418,
+          "true_distance_counts": {
+            "1_5": 493,
+            "6_20": 531,
+            "21_256": 0
+          }
+        }
+      },
+      "unseen_layout_test": {
+        "count": 70400,
+        "finite_count": 51200,
+        "finite_mae": 24.929035186767578,
+        "shortest_action_rate": 0.64404296875,
+        "planning": {
+          "count": 1024,
+          "unique_state_goal_pairs": 1024,
+          "solved": 428,
+          "success_rate": 0.41796875,
+          "optimal": 427,
+          "optimal_rate": 0.4169921875,
+          "cycles": 596,
+          "entered_unreachable": 28,
+          "budget_exhausted": 0,
+          "mean_excess_cost_on_success": 0.004672897196261682,
+          "mean_cost_ratio_on_success": 1.0011682242990654,
+          "true_distance_counts": {
+            "1_5": 487,
+            "6_20": 537,
+            "21_256": 0
+          }
+        }
+      },
+      "original_layout_test": {
+        "count": 2110,
+        "finite_count": 1915,
+        "finite_mae": 53.42110061645508,
+        "shortest_action_rate": 0.664751958224543,
+        "planning": {
+          "count": 1024,
+          "unique_state_goal_pairs": 1024,
+          "solved": 0,
+          "success_rate": 0.0,
+          "optimal": 0,
+          "optimal_rate": 0.0,
+          "cycles": 1024,
+          "entered_unreachable": 296,
+          "budget_exhausted": 0,
+          "mean_excess_cost_on_success": null,
+          "mean_cost_ratio_on_success": null,
+          "true_distance_counts": {
+            "1_5": 0,
+            "6_20": 15,
+            "21_256": 1009
+          }
+        }
+      },
+      "original_layout_validation": {
+        "count": 2108,
+        "finite_count": 1850,
+        "finite_mae": 42.43077850341797,
+        "shortest_action_rate": 0.7935135135135135,
+        "planning": {
+          "count": 1024,
+          "unique_state_goal_pairs": 1024,
+          "solved": 0,
+          "success_rate": 0.0,
+          "optimal": 0,
+          "optimal_rate": 0.0,
+          "cycles": 1024,
+          "entered_unreachable": 448,
+          "budget_exhausted": 0,
+          "mean_excess_cost_on_success": null,
+          "mean_cost_ratio_on_success": null,
+          "true_distance_counts": {
+            "1_5": 0,
+            "6_20": 0,
+            "21_256": 1024
+          }
+        }
+      },
+      "diagnostic": {
+        "count": 1408,
+        "finite_count": 1024,
+        "finite_mae": 20.71417999267578,
+        "shortest_action_rate": 0.6787463271302644,
+        "planning": {
+          "count": 1000,
+          "unique_state_goal_pairs": 1000,
+          "solved": 37,
+          "success_rate": 0.037,
+          "optimal": 36,
+          "optimal_rate": 0.036,
+          "cycles": 963,
+          "entered_unreachable": 133,
+          "budget_exhausted": 0,
+          "mean_excess_cost_on_success": 0.05405405405405406,
+          "mean_cost_ratio_on_success": 1.0135135135135136,
+          "true_distance_counts": {
+            "1_5": 45,
+            "6_20": 189,
+            "21_256": 766
+          }
+        }
+      },
+      "diagnostic_original": {
+        "count": 2,
+        "finite_count": 2,
+        "finite_mae": 9.6322021484375,
+        "shortest_action_rate": 0.5,
+        "planning": {
+          "count": 2,
+          "unique_state_goal_pairs": 2,
+          "solved": 0,
+          "success_rate": 0.0,
+          "optimal": 0,
+          "optimal_rate": 0.0,
+          "cycles": 2,
+          "entered_unreachable": 0,
+          "budget_exhausted": 0,
+          "mean_excess_cost_on_success": null,
+          "mean_cost_ratio_on_success": null,
+          "true_distance_counts": {
+            "1_5": 0,
+            "6_20": 0,
+            "21_256": 2
+          }
+        }
+      }
+    }
+  },
+  "raw_training_summary": "runs/new_tasks_qmap/sokoban_layout_coverage/coverage1000_summary_full.json",
+  "interpretation": "Native completed training output. At1024 queries, the v2 ascending exact-distance allocation favors short distances as layout count grows. Do not compare seen-layout rates across64 and1000 layouts; matched fixed-distance-bin reevaluation is reported separately."
+}

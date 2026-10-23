@@ -274,6 +274,7 @@ def stream_statistics(corpus,data,run,out):
             'candidate_finite','candidate_infinite','boundary_decisions','optimal_candidates','rows_without_optimal',
             'point_initial_row_finite','initial_finite_to_actual_unreachable','initial_unreachable_to_actual_finite',
             'point_initial_row_near_1_5','initial_near_to_actual_zero','initial_near_to_actual_near_1_5','initial_near_to_actual_far','initial_near_to_actual_unreachable']
+    fields+=['point_initial_unavailable','point_neighborhood_parent','point_neighborhood_child']
     intervals=[(0,0),(1,1),(2,2),(3,5),(6,10),(11,20),(21,40),(41,80),(81,np.inf)]
     bin_names=[f'{a}_{b}' for a,b in intervals]
     fields += ['point_distance_'+name for name in bin_names]+['rank_distance_'+name for name in bin_names]
@@ -285,7 +286,10 @@ def stream_statistics(corpus,data,run,out):
     with gzip.open(csv_path,'wt',newline='',compresslevel=1) as stream:
         writer=csv.DictWriter(stream,fieldnames=fields); writer.writeheader()
         for path in files:
-            with np.load(path) as archive: x={key:archive[key] for key in ('point_step','point_distance','pairs','rank_step','tasks','children','child_distance','parent_distance','optimal')}
+            with np.load(path) as archive:
+                x={key:archive[key] for key in ('point_step','point_distance','pairs','rank_step','tasks','children','child_distance','parent_distance','optimal')}
+                origin=archive['point_origin'] if 'point_origin' in archive else np.zeros(len(x['pairs']),dtype=np.uint8)
+            if not np.isin(origin,[0,1,2]).all(): raise ValueError('Unknown point-supervision origin')
             children=x['children']; valid=children>=0
             point_scenes=corpus.locate(x['pairs'][:,0]); rank_scenes=corpus.locate(x['tasks'][:,0])
             if not train_layouts[point_scenes].all() or not train_layouts[rank_scenes].all():
@@ -293,8 +297,10 @@ def stream_statistics(corpus,data,run,out):
             point_layout_draws+=np.bincount(point_scenes,minlength=len(corpus.scenes))
             rank_layout_draws+=np.bincount(rank_scenes,minlength=len(corpus.scenes))
             source_rows=point_index[x['pairs'][:,0]]
-            if (source_rows<0).any(): raise ValueError(('Point source outside original training rows',path))
-            initial=data['pair_distances_train'][source_rows]
+            if ((source_rows<0)&(origin==0)).any(): raise ValueError(('Main point source outside original training rows',path))
+            known_initial=source_rows>=0
+            initial=np.full(len(source_rows),np.nan,dtype=np.float32)
+            initial[known_initial]=data['pair_distances_train'][source_rows[known_initial]]
             if not np.array_equal(children,corpus.successors(x['tasks'][:,0])): raise ValueError(('Missing legal training candidate',path))
             if not np.array_equal(x['point_distance'],corpus.distance(x['pairs'][:,0],x['pairs'][:,1])): raise ValueError(('Point labels changed scale or identity',path))
             if not np.array_equal(x['child_distance'][valid],corpus.distance(children[valid],np.broadcast_to(x['tasks'][:,1,None],children.shape)[valid])): raise ValueError(('Child labels changed scale or identity',path))
@@ -312,6 +318,14 @@ def stream_statistics(corpus,data,run,out):
                 pd=x['point_distance'][p0:p0+np_]; cd=x['child_distance'][r0:r0+nr]; mask=valid[r0:r0+nr]
                 rd=x['parent_distance'][r0:r0+nr]; optimum=x['optimal'][r0:r0+nr] & mask
                 initial_pd=initial[p0:p0+np_]; initial_finite=np.isfinite(initial_pd)
+                initial_known=known_initial[p0:p0+np_]; role=origin[p0:p0+np_]
+                point=x['pairs'][p0:p0+np_]; ranking=x['tasks'][r0:r0+nr]
+                if (role>0).any():
+                    ordered=point[:,0]*corpus.size+point[:,1]
+                    parent_keys=ranking[:,0]*corpus.size+ranking[:,1]
+                    candidate_keys=children[r0:r0+nr][mask]*corpus.size+np.broadcast_to(ranking[:,1,None],mask.shape)[mask]
+                    if not np.isin(ordered[role==1],parent_keys).all() or not np.isin(ordered[role==2],candidate_keys).all():
+                        raise ValueError('Supplemental point is not a same-batch same-goal parent or legal child')
                 initial_near=initial_finite & (initial_pd>=1) & (initial_pd<=5)
                 finite=np.isfinite(cd) & mask; dead=~np.isfinite(cd) & mask
                 row=dict(attempt=path.parent.name,step=int(step),point_rows=int(np_),point_finite=int(np.isfinite(pd).sum()),
@@ -321,7 +335,9 @@ def stream_statistics(corpus,data,run,out):
                     optimal_candidates=int(optimum.sum()),rows_without_optimal=int((~optimum.any(axis=1)).sum()),
                     point_initial_row_finite=int(initial_finite.sum()),
                     initial_finite_to_actual_unreachable=int((initial_finite & ~np.isfinite(pd)).sum()),
-                    initial_unreachable_to_actual_finite=int((~initial_finite & np.isfinite(pd)).sum()),
+                    initial_unreachable_to_actual_finite=int((initial_known & ~initial_finite & np.isfinite(pd)).sum()),
+                    point_initial_unavailable=int((~initial_known).sum()),
+                    point_neighborhood_parent=int((role==1).sum()),point_neighborhood_child=int((role==2).sum()),
                     point_initial_row_near_1_5=int(initial_near.sum()),
                     initial_near_to_actual_zero=int((initial_near & (pd==0)).sum()),
                     initial_near_to_actual_near_1_5=int((initial_near & (pd>=1) & (pd<=5)).sum()),

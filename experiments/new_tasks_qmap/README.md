@@ -28,11 +28,13 @@
 
 ## 推箱子覆盖量对照
 
-先比较[64张训练棋盘](configs/sokoban_coverage64_pairs.json)与[1,000张训练棋盘](configs/sokoban_coverage1000_pairs.json)。两组使用相同模型、总训练步数和100张验证／100张测试棋盘，按棋盘均衡采样，并保留近距离与死锁边界监督。新增训练棋盘包含原来的64张，具体名单见[选题配置](configs/sokoban_coverage_layouts.json)。
+已完成[64张训练棋盘](configs/sokoban_coverage64_pairs.json)与[1,000张训练棋盘](configs/sokoban_coverage1000_pairs.json)。两组使用相同模型、总训练步数和100张验证／100张测试棋盘，按棋盘均衡采样，并保留近距离与死锁边界监督。新增训练棋盘包含原来的64张，具体名单见[选题配置](configs/sokoban_coverage_layouts.json)。
 
 每张棋盘限制训练起点数，精确距离仍来自完整物理图。这个对照回答扩大布局覆盖是否有用；与旧基线相比，采样方案也有变化。
 
 扩大棋盘数量后，原评测按精确步数从短到长分配，会使每张棋盘只测到很短的题。覆盖量比较因此使用同一批参考题，按固定距离区间重评两个冻结模型；原始成绩保留。训练与验证选权重不变，最终比较见报告。
+
+下一步的[等量追加训练对照](configs/sokoban_neighborhood_control_pairs.json)和[同目标相邻采样](configs/sokoban_neighborhood_coupled_pairs.json)从同一权重开始新阶段。两组保留相同数据、模型、损失和主采样流，仅改变部分距离监督是否来自当前排序决策及其合法后继；新增随机数状态单独保存。它检验采样关系是否需要更连贯，尚无成绩。
 
 ## 运行入口
 

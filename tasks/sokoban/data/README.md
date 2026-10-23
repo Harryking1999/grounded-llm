@@ -16,10 +16,10 @@
 
 ## 本项目使用的范围
 
-已准备98个场景：64个训练、16个验证、16个测试，另有2个已知困难题。只接纳能完整计算精确距离的布局，不能代表全部hard题库。实际规模见[数据统计](../../../experiments/new_tasks_qmap/results/exact_pairs_data.json)，筛选条件见[配置](../../../experiments/new_tasks_qmap/configs/sokoban_pairs.json)。
+当前已扩展到1,202个场景：1,000个训练、100个验证、100个测试，另有2个已知困难题。原来的64张训练及16张验证／测试棋盘均保留在各自划分中。只接纳能完整计算精确距离的布局，不能代表全部hard题库。实际规模和同题比较见[覆盖量结果](../../../experiments/new_tasks_qmap/results/sokoban_coverage_comparison.json)，选题与筛选条件见[配置](../../../experiments/new_tasks_qmap/configs/sokoban_coverage1000_pairs.json)。
 
 同一墙体及其旋转、镜像版本放在同一组。每个布局含多个完整目标，距离按玩家实际走动和推动的总步数计算。无解关系明确保留，不能把合法死路从候选中删除。
 
 原题359、362已用于开发和DeepSeek诊断，单列记录，不充当未曝光测试题。历史6×6两箱试验与当前hard数据不同，结果保留在[首轮记录](../../../experiments/new_tasks_qmap/results/summary.json)。[example.json](example.json)只是格式示例。
 
-已配置扩大覆盖的对照：1,000张训练棋盘，另留100张验证和100张测试棋盘；保留原有布局划分，按棋盘均衡抽样。数据准备与训练完成前，仍以上面的98个场景描述已完成结果。见[实验入口](../../../experiments/new_tasks_qmap/README.md#推箱子覆盖量对照)。
+64张／1,000张训练棋盘的两组对照已完成，按棋盘均衡抽样；全部实际训练批次的距离与合法候选已核对。见[实验入口](../../../experiments/new_tasks_qmap/README.md#推箱子覆盖量对照)。

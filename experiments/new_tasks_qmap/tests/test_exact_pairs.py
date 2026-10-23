@@ -78,6 +78,23 @@ class ExactPairTests(unittest.TestCase):
         limited=BoardRelationSampler._draw(groups,40000,np.random.default_rng(18),max_groups=1)
         self.assertTrue((limited<10).all() or (limited>=10).all())
 
+    def test_decision_neighborhood_uses_independent_rng_and_all_legal_children(self):
+        from copy import deepcopy
+        from experiments.new_tasks_qmap.src.relation_data import decision_neighborhood_points
+        point=np.array([[0,9],[1,9],[2,9],[3,9],[4,9],[5,9],[6,9],[7,9]])
+        tasks=np.array([[10,9],[11,9],[12,9]])
+        children=np.array([[20,-1,21],[22,23,24],[25,26,-1]])
+        lookup=np.full(27,-1);lookup[:8]=np.arange(8)
+        rng=np.random.default_rng(4);saved=deepcopy(rng.bit_generator.state)
+        same,index,role=decision_neighborhood_points(point,np.arange(8),tasks,children,None,0,rng)
+        np.testing.assert_array_equal(same,point);self.assertEqual(rng.bit_generator.state,saved)
+        coupled,index,role=decision_neighborhood_points(point,np.arange(8),tasks,children,lookup,.5,rng)
+        np.testing.assert_array_equal(coupled[:4],point[:4]);self.assertEqual((index==-1).sum(),4)
+        self.assertEqual(role.tolist(),[0,0,0,0,1,1,2,2])
+        for parent,child in zip(coupled[4:6],coupled[6:]):
+            i=int(np.flatnonzero(tasks[:,0]==parent[0])[0]);self.assertIn(child[0],children[i])
+            self.assertEqual(parent[1],child[1]);self.assertEqual(parent[1],9)
+
     def test_sampled_board_sources_keep_caps_goals_and_holdout_closure(self):
         from experiments.new_tasks_qmap.src.relation_data import board_cohorts
         env=Sokoban(['######','#@$. #','#    #','######'])
@@ -346,6 +363,59 @@ class ExactPairTests(unittest.TestCase):
             packed['children']=packed['children'].copy(); packed['children'][0,:]=-1
             np.savez(shard/'00000.npz',**packed)
             with self.assertRaisesRegex(ValueError,'Missing legal'): stream_statistics(corpus,data,path,path/'bad.json')
+        from experiments.new_tasks_qmap.src.relation_data import decision_neighborhood_points
+        ranking=materialize(corpus,rank['tasks'][rank['tasks'][:,0]>=6])
+        self.assertGreater(len(ranking['tasks']),0)
+        base=np.tile(pairs[:6],(2,1))[:8]
+        lookup=np.full(corpus.size,-1,dtype=np.int64);lookup[:6]=np.arange(6)
+        point,indices,origin=decision_neighborhood_points(base,lookup[base[:,0]],ranking['tasks'],ranking['children'],lookup,.5,np.random.default_rng(11))
+        self.assertTrue((indices[origin==1]==-1).all())
+        with tempfile.TemporaryDirectory() as tmp:
+            path=Path(tmp);shard=path/'samples/attempt_000';shard.mkdir(parents=True)
+            packed=dict(pairs=point,point_distance=corpus.distance(point[:,0],point[:,1]),point_origin=origin,
+                tasks=ranking['tasks'],children=ranking['children'],child_distance=ranking['child_distances'],
+                parent_distance=ranking['distances'],optimal=ranking['optimal'],
+                point_step=np.ones(len(point),dtype=np.int32),rank_step=np.ones(len(ranking['tasks']),dtype=np.int32))
+            np.savez(shard/'00000.npz',**packed)
+            sampled=dict(pairs_train=pairs[:6],pair_distances_train=truth[:6],tasks_train=ranking['tasks'],reserved_relations=np.array([],dtype=np.int64))
+            result=stream_statistics(corpus,sampled,path,path/'coupled.json')
+            self.assertEqual(result['totals']['point_neighborhood_parent'],2)
+            self.assertEqual(result['totals']['point_neighborhood_child'],2)
+            self.assertGreaterEqual(result['totals']['point_initial_unavailable'],2)
+            self.assertTrue(result['all_actual_point_and_child_labels_equal_physical_oracle'])
+            packed['pairs'][np.flatnonzero(origin==1)[0],0]=0
+            packed['point_distance']=corpus.distance(packed['pairs'][:,0],packed['pairs'][:,1])
+            np.savez(shard/'00000.npz',**packed)
+            with self.assertRaisesRegex(ValueError,'same-batch same-goal'):
+                stream_statistics(corpus,sampled,path,path/'bad_origin.json')
+        training_data=dict(pairs_train=pairs[::2],pair_distances_train=truth[::2],
+                           reserved_relations=np.array([],dtype=np.int64))
+        for name in ['train','validation']:
+            for key,value in rank.items(): training_data[key+'_'+name]=value
+        training_config=dict(task='sokoban',seed=19,model=dict(dimension=128,hidden=16,cap=32,metric='directed_max'),
+            training=dict(steps=20,batch_size=8,decision_batch_size=4,learning_rate=.001,rank_weight=1.,
+                rank_temperature=1.,eval_every=20,cpu_threads=1,unreachable_target=30.,online_goals=True,
+                relation_sampling=options,decision_neighborhood_point_fraction=.5,record_training_samples=True),
+            evaluation=dict(horizon=32,decision_count=16,rollout_count=4))
+        reverse=UnitGraphOracle(children).from_goal(goal)
+        scene.reverse=lambda s,g:reverse[s]
+        scene.heuristic=lambda s,g:np.zeros(len(s))
+        scene.decode=lambda rows:[(int(row[0]),tuple(map(int,row[1:]))) for row in rows]
+        scene.env=env;scene.metadata['source']=dict(puzzle_id='small-fixture')
+        with tempfile.TemporaryDirectory() as tmp:
+            path=Path(tmp)/'run'
+            with patch('experiments.new_tasks_qmap.src.relations.prepare',return_value=(corpus,training_data,dict(states=corpus.size))):
+                train(training_config,path,'neighborhood-fixture','cpu')
+                saved=torch.load(path/'last.pt',weights_only=False)
+                counted=total=0
+                for file in path.glob('samples/attempt_*/*.npz'):
+                    with np.load(file) as archive:
+                        sources=archive['pairs'][:,0];total+=len(sources)
+                        counted+=int(np.isin(sources,training_data['pairs_train'][:,0]).sum())
+                self.assertEqual(int(saved['pair_draws'].sum()),counted)
+                self.assertLess(counted,total);self.assertEqual(total,160)
+                train(training_config,path,'neighborhood-fixture','cpu',resume=True)
+                self.assertEqual(torch.load(path/'last.pt',weights_only=False)['neighborhood_rng'],saved['neighborhood_rng'])
         model=StateEncoder(128,16,32,'directed_max',input_dim=len(states))
         config=dict(training=dict(unreachable_target=30.,rank_temperature=1.,rank_weight=1.))
         result=batch_gradient_probe(model,corpus,row,config)

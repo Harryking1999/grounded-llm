@@ -9,7 +9,7 @@ from torch.nn import functional as F
 from grounded_llm.core.files import atomic_json, atomic_save
 from grounded_llm.core.qmap.model import StateEncoder, soft_rank_loss
 from grounded_llm.core.qmap.sampling import StratifiedEpochSampler, CoverageSampler, GroupCoverageSampler
-from .relation_data import prepare, load, sample_goals, BoardRelationSampler
+from .relation_data import prepare, load, sample_goals, BoardRelationSampler, decision_neighborhood_points
 from .relation_evaluate import evaluate
 
 
@@ -49,13 +49,17 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
     if description.get('finite_max',0)>=min(config['model']['cap'],options['unreachable_target']):
         raise ValueError('Prepared finite oracle costs exceed the configured encoding scale')
     torch.set_num_threads(options['cpu_threads']); torch.manual_seed(config['seed'])
-    rng=np.random.default_rng(config['seed']+2)
+    rng=np.random.default_rng(config['seed']+options.get('sampling_seed_offset',2))
+    neighborhood_rng=np.random.default_rng(config['seed']+2003)
     model=StateEncoder(input_dim=corpus.input_dim,**config['model']).to(device)
     if torch.device(device).type=='cuda': torch.cuda.reset_peak_memory_stats(device)
     optimizer=torch.optim.Adam(model.parameters(),lr=options['learning_rate'])
     point_truth=data['pair_distances_train']
     point_labels=np.where(np.isfinite(point_truth),point_truth,options['unreachable_target']).astype(np.float32)
     relation_sampler=(BoardRelationSampler(corpus,data,options['relation_sampling']) if options.get('relation_sampling') else None)
+    neighborhood_fraction=options.get('decision_neighborhood_point_fraction',0.)
+    if neighborhood_fraction and (relation_sampler is None or neighborhood_fraction>relation_sampler.finite_fraction):
+        raise ValueError('Neighborhood points must replace the finite supplement, preserving broad coverage')
     if relation_sampler: atomic_json(out/'sampling_summary.json',relation_sampler.summary)
     def sampler(labels,broad_only=False):
         if options.get('broad_fraction') or broad_only:
@@ -76,6 +80,7 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
         if saved['config']!=config or saved['input_dim']!=corpus.input_dim: raise ValueError('Checkpoint scope mismatch')
         model.load_state_dict(saved['model']); optimizer.load_state_dict(saved['optimizer'])
         rng.bit_generator.state=saved['rng']; pair_sampler.load_state_dict(saved['pair_sampler']); rank_sampler.load_state_dict(saved['rank_sampler'])
+        if neighborhood_fraction: neighborhood_rng.bit_generator.state=saved['neighborhood_rng']
         torch.set_rng_state(saved['torch_rng'].cpu())
         if saved['cuda_rng'] is not None and torch.cuda.is_available(): torch.cuda.set_rng_state_all([r.cpu() for r in saved['cuda_rng']])
         exposure,pair_draws,rank_draws=saved['exposure'],saved['pair_draws'],saved['rank_draws']
@@ -131,7 +136,7 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
             source_commit=source_commit,config=config,input_dim=corpus.input_dim,step=step,
             model=model.state_dict(),optimizer=optimizer.state_dict(),rng=rng.bit_generator.state,
             torch_rng=torch.get_rng_state(),cuda_rng=torch.cuda.get_rng_state_all() if torch.cuda.is_available() else None,
-            pair_sampler=pair_sampler.state_dict(),rank_sampler=rank_sampler.state_dict(),
+            pair_sampler=pair_sampler.state_dict(),rank_sampler=rank_sampler.state_dict(),neighborhood_rng=neighborhood_rng.bit_generator.state,
             exposure=exposure,pair_draws=pair_draws,rank_draws=rank_draws,best_score=best,best_step=best_step,
             seconds=prior_seconds+time.monotonic()-started),path)
     step=start_step
@@ -144,6 +149,8 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
             p=pair_sampler.draw(options['batch_size']); r=rank_sampler.draw(options['decision_batch_size'])
             pair=data['pairs_train'][p]; tasks=data['tasks_train'][r]
             children=data['children_train'][r]
+        pair,p,point_origin=decision_neighborhood_points(pair,p,tasks,children,
+            relation_sampler.point_index if neighborhood_fraction else None,neighborhood_fraction,neighborhood_rng)
         valid=children>=0
         point_target=point_labels[p]
         child_truth=data['child_distances_train'][r]
@@ -162,7 +169,8 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
             trace.append(dict(point_step=np.full(len(pair),step,dtype=np.int32),pairs=pair.copy(),point_distance=point_true.copy(),
                 rank_step=np.full(len(tasks),step,dtype=np.int32),tasks=tasks.copy(),children=children.copy(),
                 parent_distance=parent_true,child_distance=child_truth.copy(),
-                point_reachability=np.isfinite(point_true),optimal=valid & (child_truth+1==parent_true[:,None])))
+                point_reachability=np.isfinite(point_true),point_origin=point_origin,
+                optimal=valid & (child_truth+1==parent_true[:,None])))
             if len(trace)>=100: flush_trace()
         ids=np.concatenate([pair[:,0],pair[:,1],children[valid],tasks[:,1]])
         unique,inverse=np.unique(ids,return_inverse=True)
@@ -185,7 +193,7 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
         ranking=soft_rank_loss(scores,torch.as_tensor(1+truth,device=device),mask,options['rank_temperature'])
         loss=pointwise+options['rank_weight']*ranking
         optimizer.zero_grad(set_to_none=True); loss.backward(); optimizer.step()
-        np.add.at(exposure,ids,1); np.add.at(pair_draws,p,1); np.add.at(rank_draws,r,1)
+        np.add.at(exposure,ids,1); np.add.at(pair_draws,p[p>=0],1); np.add.at(rank_draws,r,1)
         if step==1 or step%options['eval_every']==0 or step==options['steps']:
             values=evaluate(model,corpus,data,config,cohorts=validation,exposure=exposure,planning=False)
             objective=float(np.mean([row['finite_huber']+row['candidate_soft_rank_loss'] for row in values['cohorts'].values()]))

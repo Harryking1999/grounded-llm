@@ -183,6 +183,31 @@ class BoardRelationSampler:
         return p,self.rank_index[tasks[:,0]],pair,tasks
 
 
+def decision_neighborhood_points(pairs,indices,tasks,children,point_index,fraction,rng):
+    """Replace part of point supervision by same-goal parent/child pairs.
+
+    Main sampler RNG and all ranking decisions stay unchanged. Supplemental
+    sources outside the original point bank use index -1 for its draw counter;
+    they still receive exact labels and normal endpoint-exposure accounting.
+    """
+    if not 0<=fraction<=1: raise ValueError('Invalid neighborhood point fraction')
+    count=round(len(pairs)*fraction/2)
+    origin=np.zeros(len(pairs),dtype=np.uint8)
+    if not count: return pairs,indices,origin
+    chosen=rng.choice(len(tasks),count,replace=count>len(tasks))
+    valid=children[chosen]>=0; lengths=valid.sum(axis=1)
+    if (lengths==0).any(): raise ValueError('Ranking parent has no legal child')
+    ordinal=rng.integers(lengths)
+    slots=(valid & (valid.cumsum(axis=1)==ordinal[:,None]+1)).argmax(axis=1)
+    parent=tasks[chosen]
+    child=np.column_stack([children[chosen,slots],parent[:,1]])
+    pairs=pairs.copy(); indices=indices.copy()
+    pairs[-2*count:]=np.concatenate([parent,child])
+    indices[-2*count:]=point_index[pairs[-2*count:,0]]
+    origin[-2*count:-count]=1; origin[-count:]=2
+    return pairs,indices,origin
+
+
 def board_cohorts(corpus,config,rng):
     from grounded_llm.core.qmap.physical_data import group_seed
     spec=config['relations']

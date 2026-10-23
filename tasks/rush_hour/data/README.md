@@ -4,7 +4,7 @@
 
 ## 当前数据
 
-共有224个场景：144个训练、35个验证、37个测试，另有8个已知题；总计1,348,182个状态。一个场景包含固定车辆配置及其可达局面，同一配置下的场景不会跨训练与测试组。具体范围见[数据统计](../../../experiments/new_tasks_qmap/results/exact_pairs_data.json)和[配置](../../../experiments/new_tasks_qmap/configs/rush_hour_pairs.json)。
+共有224个场景：144个训练、35个验证、37个测试，另有8个已知题；总计1,348,182个状态。一个场景包含固定车辆配置及其可达局面，同一配置下的场景不会跨训练与测试组。具体范围见[数据统计](../../../experiments/new_tasks_qmap/results/shared/exact_pairs_data.json)和[配置](../../../experiments/new_tasks_qmap/configs/rush_hour/rush_hour_pairs.json)。
 
 每题指定一张完整目标棋盘，所有车辆位置明确，A在最右端。距离重新计算到这个目标，一辆车滑动任意合法距离均计一步。
 

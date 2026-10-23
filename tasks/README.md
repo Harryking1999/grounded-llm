@@ -35,7 +35,7 @@
 
 各必需组分别至少80%，目标90%以上，困难原题也需单独验收。三个任务均无采用权重或LLM训练结果。指定目标的DeepSeek Flash 64k诊断为推箱子0/2、移车出库0/8、棋子交换4/5；这是已知困难题，不能与上表直接比较，见[文字结果](../experiments/task_text_baselines/results/exact_goals_flash64k.json)。
 
-早期手电过桥、小棋盘推箱子、24点的地图结果分别为31/32、92/475、70/137；规则和题集不同，只保留为[首轮试验](../experiments/new_tasks_qmap/results/summary.json)。历史文字筛查见[文字报告](../experiments/task_text_baselines/results/report.md)。
+早期手电过桥、小棋盘推箱子、24点的地图结果分别为31/32、92/475、70/137；规则和题集不同，只保留为[首轮试验](../experiments/new_tasks_qmap/results/pilot/summary.json)。历史文字筛查见[文字报告](../experiments/task_text_baselines/results/report.md)。
 
 **积木历史回归（单独题集，非12块清空1000题）：**
 

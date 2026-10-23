@@ -2,7 +2,7 @@
 
 **当前还不能可靠求解新棋盘。** 已完成1,000张训练棋盘的覆盖量对照，在100张未见棋盘测试中完整贪心完成率为37.89%；21步及以上0/312。结果与问题见[三任务报告](../../../experiments/new_tasks_qmap/results/report.md)，采用状态见[selection](selection.json)。
 
-同目标下连续5–10步完整局部路径的三组对照已完成固定验证：原采样、路径打散与路径成组的未见布局到达率分别为36.52%、34.67%、35.94%，21步以上仍未成功。尚不能认定训练充分收敛，需区分训练关系拟合不足与跨布局泛化不足；详见[配对验证](../../../experiments/new_tasks_qmap/results/sokoban_local_path_validation.json)。
+同目标下连续5–10步完整局部路径的三组对照已完成固定验证：原采样、路径打散与路径成组的未见布局到达率分别为36.52%、34.67%、35.94%，21步以上仍未成功。尚不能认定训练充分收敛，需区分训练关系拟合不足与跨布局泛化不足；详见[配对验证](../../../experiments/new_tasks_qmap/results/sokoban/sokoban_local_path_validation.json)。
 
 ## 输入和目标
 
@@ -25,6 +25,6 @@
 
 ## 配置与证据
 
-- [基线配置](../../../experiments/new_tasks_qmap/configs/sokoban_pairs.json)、[验收要求](../../../experiments/new_tasks_qmap/configs/exact_pair_acceptance.json)
+- [基线配置](../../../experiments/new_tasks_qmap/configs/sokoban/sokoban_pairs.json)、[验收要求](../../../experiments/new_tasks_qmap/configs/exact_pair_acceptance.json)
 - [数据范围](../data/README.md)、[实验入口](../../../experiments/new_tasks_qmap/README.md)
-- [当前覆盖量对照](../../../experiments/new_tasks_qmap/results/sokoban_coverage_comparison.json)、[采样对照](../../../experiments/new_tasks_qmap/results/sokoban_pairs_balanced_relations.json)
+- [当前覆盖量对照](../../../experiments/new_tasks_qmap/results/sokoban/sokoban_coverage_comparison.json)、[采样对照](../../../experiments/new_tasks_qmap/results/sokoban/sokoban_pairs_balanced_relations.json)

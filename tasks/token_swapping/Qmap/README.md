@@ -26,6 +26,6 @@
 
 ## 配置与证据
 
-- [基线配置](../../../experiments/new_tasks_qmap/configs/token_swapping_pairs.json)、[验收要求](../../../experiments/new_tasks_qmap/configs/exact_pair_acceptance.json)
+- [基线配置](../../../experiments/new_tasks_qmap/configs/token_swapping/token_swapping_pairs.json)、[验收要求](../../../experiments/new_tasks_qmap/configs/exact_pair_acceptance.json)
 - [数据来源](../data/README.md)、[实验入口](../../../experiments/new_tasks_qmap/README.md)
-- [当前较好结果](../../../experiments/new_tasks_qmap/results/token_pairs_local_walk8_rank4.json)、[对应配置](../../../experiments/new_tasks_qmap/configs/token_swapping_local_walk8_rank4_pairs.json)
+- [当前较好结果](../../../experiments/new_tasks_qmap/results/token_swapping/token_pairs_local_walk8_rank4.json)、[对应配置](../../../experiments/new_tasks_qmap/configs/token_swapping/token_swapping_local_walk8_rank4_pairs.json)

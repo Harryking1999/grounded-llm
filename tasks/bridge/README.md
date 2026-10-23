@@ -1,6 +1,6 @@
 # 手电过桥
 
-独立规则、数据适配和裁判已实现；首轮仅检验固定目标 Qmap 可行性。正式范围与预算见[配置](../../experiments/new_tasks_qmap/configs/bridge.json)，结果见[报告](../../experiments/new_tasks_qmap/results/report.md)。不作为多任务SFT已采用任务。纯文字Flash64k固定筛查已完成，来源、结果及后续加难见[基线报告](../../experiments/task_text_baselines/results/report.md)。
+独立规则、数据适配和裁判已实现；首轮仅检验固定目标 Qmap 可行性。正式范围与预算见[配置](../../experiments/new_tasks_qmap/configs/pilot/bridge.json)，结果见[报告](../../experiments/new_tasks_qmap/results/report.md)。不作为多任务SFT已采用任务。纯文字Flash64k固定筛查已完成，来源、结果及后续加难见[基线报告](../../experiments/task_text_baselines/results/report.md)。
 
 - [规则与输出](prompts/README.md)
 - [数据](data/README.md)与[示例](data/example.json)

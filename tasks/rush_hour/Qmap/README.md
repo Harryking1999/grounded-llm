@@ -23,6 +23,6 @@
 
 ## 配置与证据
 
-- [基线配置](../../../experiments/new_tasks_qmap/configs/rush_hour_pairs.json)、[验收要求](../../../experiments/new_tasks_qmap/configs/exact_pair_acceptance.json)
+- [基线配置](../../../experiments/new_tasks_qmap/configs/rush_hour/rush_hour_pairs.json)、[验收要求](../../../experiments/new_tasks_qmap/configs/exact_pair_acceptance.json)
 - [数据范围](../data/README.md)、[实验入口](../../../experiments/new_tasks_qmap/README.md)
-- [当前较好结果](../../../experiments/new_tasks_qmap/results/rush_hour_pairs_spatial.json)、[未完成的编码对照配置](../../../experiments/new_tasks_qmap/configs/rush_hour_lane_order_pairs.json)
+- [当前较好结果](../../../experiments/new_tasks_qmap/results/rush_hour/rush_hour_pairs_spatial.json)、[未完成的编码对照配置](../../../experiments/new_tasks_qmap/configs/rush_hour/rush_hour_lane_order_pairs.json)

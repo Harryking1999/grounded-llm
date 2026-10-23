@@ -13,6 +13,13 @@ from experiments.map_sft_baselines.src.train import validate_resume_contract
 from experiments.map_sft_baselines.src.contract import steps_per_epoch,checkpoint_steps,plateau_status
 
 class ContractTests(unittest.TestCase):
+    def test_requested_checkpoint_precedes_newer_milestones(self):
+        from experiments.map_sft_baselines.src.contract import checkpoint_priority
+        cfg = dict(evaluation=dict(priority_steps=[100000], priority_step_interval=50000))
+        self.assertEqual(sorted([50000, 200000, 100000, 150000],
+                                key=lambda step: checkpoint_priority(step, cfg)),
+                         [100000, 200000, 150000, 50000])
+
     def test_clear12_reference_and_coverage(self):
         from grounded_llm.tasks.blocks.construction import construct
         from grounded_llm.tasks.blocks.clear_sft import reference_route, select_coverage

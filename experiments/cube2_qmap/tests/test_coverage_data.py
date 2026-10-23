@@ -4,9 +4,17 @@ from experiments.cube2_qmap.src.coverage_data import coverage,CoverageGuard
 from experiments.cube2_qmap.src.full_state_joint import task_pairs
 from experiments.cube2_qmap.tests.test_full_state_joint import Ring
 from experiments.cube2_qmap.src.coverage_train import take_cycle
+from experiments.cube2_qmap.src.coverage_evaluate import paired_change
 
 
 class CoverageTests(unittest.TestCase):
+    def test_paired_counts_preserve_improvements_and_regressions(self):
+        r=paired_change([True,False,False,True],[True,True,False,False])
+        self.assertEqual((r['gained'],r['lost'],r['net']),(1,1,0))
+        self.assertEqual(r['gained_indices'],[1])
+        self.assertEqual(r['lost_indices'],[3])
+        self.assertEqual(r['exact_mcnemar_two_sided_p'],1.)
+
     def test_cycle_boundary_never_drops_unseen_parents(self):
         rng=np.random.default_rng(5);order=rng.permutation(10)
         first,order,cursor,passed=take_cycle(order,0,6,rng)

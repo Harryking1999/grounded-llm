@@ -71,3 +71,5 @@ python -m experiments.cube2_qmap.src.near_goal_continuation --contract experimen
 [无位移硬保护的局部重放对照](configs/near_goal_local_replay.json)保留同一初始化、Adam、数据与低学习率，仅去掉逐更新硬保护，以区分数据改动无效与保护导致停滞；仍保留阶段选择和原复原回归门槛。该门槛是监测集上的候选筛选，不保证全状态复原保持。
 
 [低学习率原采样对照](configs/near_goal_low_lr.json)恢复1000步的Adam及采样RNG，保留原均匀父节点，采用更小更新；[近目标距离校准权重对照](configs/near_goal_rank_refinement.json)只再降低近目标Huber权重，保留原soft-rank及复原损失。两者匹配采样流与预算，继续用验证和复原约束选阶段候选，所有已查看题集均按回归解释。
+
+[完整路线重放](configs/near_goal_path_replay.json)复用已有精确复原路径，以合法共同左乘得到通向近目标的完整路线；只接纳每个父节点及全部候选关系都不触及保护集合的路线。整批重放完整路线的所有候选监督，报告路线接纳比例、长度、目标覆盖与实际候选任务数。它同时改变采样与重复曝光，不能归因于仅改变分组；推理仍是原共享Q贪心。

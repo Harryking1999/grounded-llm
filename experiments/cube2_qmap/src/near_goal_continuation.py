@@ -160,6 +160,18 @@ def run(args):
         training_rng.bit_generator.state=saved['rng']
     seen_goals, exposed = set(), {'near_stars':0, 'restoration_stars':0}
     relative_pools={d:np.flatnonzero(env.depth==d) for d in opts.get('local_distance_levels',[])}
+    route_bank=None
+    if opts.get('route_pool'):
+        from .landmarks import near_route_bank
+        route_bank=near_route_bank(env,pools,guard,opts['route_pool'],
+                                  np.random.default_rng(config['seed']+40))
+        np.savez_compressed(args.out/'route_pool.npz',**route_bank)
+        result['route_pool']={k:int(route_bank[k]) for k in ('candidates','admissible')}
+        result['route_pool']['routes']=len(route_bank['goals'])
+        result['route_pool']['unique_goals']=len(np.unique(route_bank['goals']))
+        result['route_pool']['lengths']={str(n):int((route_bank['lengths']==n).sum())
+                                       for n in np.unique(route_bank['lengths'])}
+        atomic_json(args.out/'summary.json',result)
     fixed_guard=None;accepted_scales=[]
     if config.get('guard'):
         allowed=np.zeros(env.size,dtype=bool)
@@ -187,7 +199,11 @@ def run(args):
     for phase_step in range(1, options['steps']+1):
         step=starting_step+phase_step
         model.train()
-        near = training_tasks(env, pools, options['near_goal_batch_size'], training_rng,
+        if route_bank is not None:
+            from .landmarks import near_route_tasks
+            near=near_route_tasks(route_bank,opts['route_pool']['paths_per_batch'],training_rng)
+        else:
+            near = training_tasks(env, pools, options['near_goal_batch_size'], training_rng,
                               guard, ((step if options.get('resume_sampler') else phase_step)-1)*options['near_goal_batch_size'],
                               relative_pools,opts.get('local_fraction',0.))
         restoration = training_tasks(env, {0:np.array([0])}, options['restoration_batch_size'],

@@ -5,6 +5,50 @@ import torch
 from .fixed_goal import shortest_paths
 
 
+def near_route_bank(env, pools, guard, options, rng):
+    """Translate exact restoration routes to nearby goals; keep whole stars."""
+    depths=sorted(pools)
+    quotas={d:options['pool_size']//len(depths)+int(i<options['pool_size']%len(depths))
+            for i,d in enumerate(depths)}
+    banks={d:[] for d in depths};seen=set();attempts=accepted=0
+    for batch in range(options['maximum_candidate_batches']):
+        levels=np.asarray(depths)[(np.arange(options['candidate_batch_size'])+attempts)%len(depths)]
+        goals=np.array([rng.choice(pools[int(d)]) for d in levels])
+        roots=rng.integers(env.size,size=len(goals))
+        relative,lengths=shortest_paths(env,roots,rng)
+        paths=env.compose(goals[:,None],relative)
+        live=np.arange(env.diameter)[None]<lengths[:,None]
+        tasks=np.column_stack((paths[:,:-1][live],np.repeat(goals,lengths)))
+        blocked=guard.task_blocked(env,tasks)
+        owner=np.repeat(np.arange(len(goals)),lengths)
+        bad=np.bincount(owner[blocked],minlength=len(goals))>0
+        eligible=np.flatnonzero(~bad & (lengths>0))
+        attempts+=len(goals);accepted+=len(eligible)
+        for index in eligible:
+            depth=int(levels[index]);key=(int(paths[index,0]),int(goals[index]))
+            if len(banks[depth])<quotas[depth] and key not in seen:
+                banks[depth].append((paths[index],int(lengths[index]),int(goals[index])))
+                seen.add(key)
+        if all(len(banks[d])==quotas[d] for d in depths):
+            rows=[row for depth in depths for row in banks[depth]]
+            return dict(paths=np.stack([r[0] for r in rows]),lengths=np.array([r[1] for r in rows]),
+                        goals=np.array([r[2] for r in rows]),
+                        goal_depths=np.array([d for d in depths for _ in banks[d]]),
+                        candidates=np.array(attempts),admissible=np.array(accepted))
+    raise ValueError('Not enough complete routes outside protected candidate relations')
+
+
+def near_route_tasks(bank, count, rng):
+    depths=np.unique(bank['goal_depths'])
+    indices=[]
+    for index,depth in enumerate(depths):
+        pool=np.flatnonzero(bank['goal_depths']==depth)
+        indices.extend(rng.choice(pool,count//len(depths)+int(index<count%len(depths))).tolist())
+    lengths=bank['lengths'][indices];paths=bank['paths'][indices]
+    live=np.arange(paths.shape[1]-1)[None]<lengths[:,None]
+    return np.column_stack((paths[:,:-1][live],np.repeat(bank['goals'][indices],lengths)))
+
+
 def landmark_batch(env, roots, heldout, rng, goal_depth=7):
     """Link every pre-landmark path parent and all competitors to one target."""
     paths, lengths = shortest_paths(env, roots, rng)

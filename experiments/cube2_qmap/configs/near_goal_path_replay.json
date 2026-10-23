@@ -1,0 +1,10 @@
+{
+  "parent_contract": "experiments/cube2_qmap/configs/near_goal_low_lr.json",
+  "hypothesis": "Train complete linked shortest routes and all competitors toward near-solved goals, rather than isolated parent stars, to connect distant choices with goal-entry decisions.",
+  "data": {
+    "route_pool": {"pool_size": 3072, "candidate_batch_size": 1024, "maximum_candidate_batches": 2048, "paths_per_batch": 24}
+  },
+  "supervision": "Reuse fixed_goal.shortest_paths and exact common-left action-preserving translation to construct paths to absolute nearby goals. Admit a route only when every parent/candidate-to-goal relation is outside all protected sets. Use every route parent with its complete legal candidate star in a common batch; no oracle or route retrieval at inference.",
+  "comparison": "Same step-1000 Q and Adam, learning rate, Huber and rank weights, restoration replay, validation/retention selection and update budget as near_goal_low_lr. Near-goal stars are grouped into complete routes from a fixed admissible training pool. Actual star counts, pool acceptance and goal coverage must be reported; this changes sampling and repeated exposure, not only grouping.",
+  "scope": "One bounded route-supervision check from step 1000. Previously inspected evaluation sets remain regression evidence; no automatic extension or adoption."
+}

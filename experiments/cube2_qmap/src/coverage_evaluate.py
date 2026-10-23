@@ -130,15 +130,20 @@ def run(args):
     cohorts.update(original=fresh['original'],old_small_ood=old['small_ood'],old_validation=old['validation'])
     np.savez_compressed(args.out/'evaluated_tasks.npz',**cohorts)
     results={};oracle={}
-    for name,path in [('baseline1000',args.checkpoint1000),('baseline2000',args.checkpoint2000),
-                      ('selected',directory/'best.pt')]:
+    checkpoints=[('baseline1000',args.checkpoint1000),('baseline2000',args.checkpoint2000),
+                 ('selected',directory/'best.pt')]
+    if args.compare_final:
+        for run_directory in args.run:
+            paths=sorted(run_directory.glob('update_*.pt')) or sorted(run_directory.glob('epoch_*.pt'))
+            if paths:checkpoints.append(('final_'+run_directory.name,paths[-1]))
+    for name,path in checkpoints:
         model=model_from(path,env,args.device)
         results[name]=dict(checkpoint=str(path),scores={k:inspect(model,env,tasks,args.device,32)
             for k,tasks in cohorts.items()})
         if name=='selected':
             for cohort,tasks in cohorts.items():
                 oracle[cohort]=rollout(model,env,tasks,args.device,2,horizon=32,return_tasks=True)['oracle']
-        if name in ('baseline2000','selected'):
+        if name in ('baseline2000','selected') or name.startswith('final_'):
             results[name]['full_restoration']=exhaustive_policy(model,env,fresh['state_mask'],
                 {'evaluation':{'horizon':32}},args.device)
         atomic_json(args.out/(name+'.json'),results[name])
@@ -147,6 +152,10 @@ def run(args):
     paired={baseline:{name:paired_change(results[baseline]['scores'][name]['rollout']['per_task']['solved'],
         results['selected']['scores'][name]['rollout']['per_task']['solved']) for name in cohorts}
         for baseline in ('baseline1000','baseline2000')}
+    final_comparisons={model:{name:paired_change(results['baseline2000']['scores'][name]['rollout']['per_task']['solved'],
+        results[model]['scores'][name]['rollout']['per_task']['solved']) for name in cohorts}
+        for model in results if model.startswith('final_')}
+    atomic_json(args.out/'final_comparisons.json',final_comparisons)
     atomic_json(args.out/'paired.json',paired);atomic_json(args.out/'oracle_greedy.json',oracle)
     atomic_json(args.out/'complete.json',dict(source_commit=args.source_commit,seconds=time.monotonic()-started,
         horizon=32,selected_run=str(directory),frozen_flan_map_replaced=False,
@@ -160,6 +169,7 @@ def main():
     p.add_argument('--run',type=Path,action='append',required=True)
     p.add_argument('--device',default='cuda');p.add_argument('--source-commit',required=True)
     p.add_argument('--diagnose',action='store_true')
+    p.add_argument('--compare-final',action='store_true')
     args=p.parse_args()
     if args.diagnose:diagnose(args)
     else:run(args)

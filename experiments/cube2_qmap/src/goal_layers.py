@@ -73,7 +73,7 @@ def switch_metrics(model,env,parents,device):
 
 
 @torch.no_grad()
-def layer_report(model,env,data,role,device,full=False):
+def layer_report(model,env,data,role,device,full=False,final_paths=False):
     model.eval();tasks=np.load(data/(role+'.npy'))
     if len(tasks)>1024 and not full:
         rng=np.random.default_rng(2026102409);distance=env.distance(*tasks.T)
@@ -127,6 +127,23 @@ def layer_report(model,env,data,role,device,full=False):
         monotonic_violations=int(violation.sum()),strict_monotonic_rate=float(1-violation.sum()/edge_valid.sum()) if edge_valid.any() else None,
         first_wrong_layer_observed_prefix=hist(first_wrong),first_wrong_layer_fully_admissible=hist(complete_first_wrong),
         note='A -1 in censored prefixes is not a complete-path success. Protected labels never enter training or these ordering metrics.')
+    if final_paths:
+        # Final evaluation only, after model selection has been frozen. These
+        # protected intermediate labels never fed training or adaptive mining.
+        live=valid[:,:-1];all_rows=np.column_stack((states[:,:-1][live],
+            np.broadcast_to(goals[:,None],states[:,:-1].shape)[live]))
+        scores=predicted_scores(model,env,all_rows,device)
+        truth=env.distance(env.successors(all_rows[:,0]),all_rows[:,1,None])
+        wrong=np.zeros(live.shape,bool)
+        wrong[live]=truth[np.arange(len(scores)),scores.argmin(-1)]!=env.distance(*all_rows.T)-1
+        first=[]
+        for index,length in enumerate(lengths):
+            error=np.flatnonzero(wrong[index,:length]);first.append(-1 if not len(error) else int(length-error[0]))
+        violation=(predicted[:,:-1]<=predicted[:,1:])&live
+        result['final_full_shortest_path_evaluation']=dict(paths=len(lengths),edges=int(live.sum()),
+            strict_monotonic_rate=float(1-violation.sum()/live.sum()),monotonic_violations=int(violation.sum()),
+            first_wrong_layer=hist(first),paths_with_no_candidate_error=int((np.asarray(first)==-1).sum()),
+            note='Includes protected intermediate relations for final evaluation only, after freezing selection; never used to train, mine, or choose a checkpoint. Oracle path following is a diagnostic, not model search or free-rollout success.')
     return result
 
 
@@ -271,12 +288,14 @@ def main():
     p.add_argument('--source-commit',required=True)
     p.add_argument('--checkpoint',type=Path);p.add_argument('--role',default='Layered')
     p.add_argument('--device',default='cuda')
+    p.add_argument('--final-path-evaluation',action='store_true')
     args=p.parse_args()
     if args.checkpoint:
         torch.set_num_threads(2);env=Cube2(args.oracle,metric='QTM_URF_6')
         model=model_from(args.checkpoint,env,args.device);args.out.mkdir(parents=True,exist_ok=False)
         atomic_json(args.out/'metrics.json',dict(source_commit=args.source_commit,checkpoint=str(args.checkpoint),
-            role=args.role,metrics=layer_report(model,env,args.source,args.role,args.device,full=True)))
+            role=args.role,metrics=layer_report(model,env,args.source,args.role,args.device,full=True,
+                final_paths=args.final_path_evaluation)))
     else:prepare(args)
 
 

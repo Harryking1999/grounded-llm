@@ -2,6 +2,8 @@
 
 **当前还不能可靠求解新棋盘。** 已完成1,000张训练棋盘的覆盖量对照，在100张未见棋盘测试中完整贪心完成率为37.89%；21步及以上0/312。结果与问题见[三任务报告](../../../experiments/new_tasks_qmap/results/report.md)，采用状态见[selection](selection.json)。
 
+最新相邻成组采样对照在熟悉布局上减少了部分循环，未见布局与长题没有改善。下一步检验同目标下连续5–10步的完整局部路径组，每步保留所有合法分支；模型和损失先保持不变。详见[配对验证](../../../experiments/new_tasks_qmap/results/sokoban_neighborhood_validation.json)。
+
 ## 输入和目标
 
 | 内容 | 含义 |

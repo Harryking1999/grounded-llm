@@ -1,0 +1,1597 @@
+{
+  "evaluator_source_commit": "7c8d15d908e34f1b260b595ef0f7d2d5839ba27e",
+  "specification": "experiments/new_tasks_qmap/configs/sokoban_neighborhood_validation.json",
+  "configs": {
+    "control": "experiments/new_tasks_qmap/configs/sokoban_neighborhood_control_pairs.json",
+    "coupled": "experiments/new_tasks_qmap/configs/sokoban_neighborhood_coupled_pairs.json"
+  },
+  "training_steps_each": 30000,
+  "selected_steps": {
+    "control": 25000,
+    "coupled": 20000
+  },
+  "exact_same_queries": true,
+  "raw_result": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/sokoban_coverage_d365a4c/analysis_7c8d15d/neighbor_validation.json",
+  "raw_archive": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/sokoban_coverage_d365a4c/analysis_7c8d15d/neighbor_validation.edges.npz",
+  "paired": {
+    "validation": {
+      "layouts": 64,
+      "queries": 1024,
+      "bootstrap_repetitions": 2000,
+      "completion": {
+        "count": 1024,
+        "control": 0.2392578125,
+        "coupled": 0.2666015625,
+        "difference": 0.02734375,
+        "layout_cluster_95ci": [
+          0.0078125,
+          0.0478515625
+        ]
+      },
+      "two_step_cycle": {
+        "count": 1024,
+        "control": 0.7607421875,
+        "coupled": 0.7333984375,
+        "difference": -0.02734375,
+        "layout_cluster_95ci": [
+          -0.0478515625,
+          -0.0078125
+        ]
+      },
+      "entered_dead": {
+        "count": 1024,
+        "control": 0.11328125,
+        "coupled": 0.09375,
+        "difference": -0.01953125,
+        "layout_cluster_95ci": [
+          -0.0400390625,
+          0.0029296875
+        ]
+      },
+      "completion_gained": 56,
+      "completion_lost": 28,
+      "by_initial_distance": {
+        "1_5": {
+          "completion": {
+            "count": 294,
+            "control": 0.7517006802721088,
+            "coupled": 0.8129251700680272,
+            "difference": 0.061224489795918366,
+            "layout_cluster_95ci": [
+              0.010485004686035615,
+              0.11347517730496454
+            ]
+          },
+          "two_step_cycle": {
+            "count": 294,
+            "control": 0.24829931972789115,
+            "coupled": 0.1870748299319728,
+            "difference": -0.061224489795918366,
+            "layout_cluster_95ci": [
+              -0.11347517730496454,
+              -0.010485004686035639
+            ]
+          }
+        },
+        "6_20": {
+          "completion": {
+            "count": 354,
+            "control": 0.06779661016949153,
+            "coupled": 0.096045197740113,
+            "difference": 0.02824858757062147,
+            "layout_cluster_95ci": [
+              0.0,
+              0.057803468208092484
+            ]
+          },
+          "two_step_cycle": {
+            "count": 354,
+            "control": 0.9322033898305084,
+            "coupled": 0.903954802259887,
+            "difference": -0.02824858757062147,
+            "layout_cluster_95ci": [
+              -0.057803468208092484,
+              0.0
+            ]
+          }
+        },
+        "21_inf": {
+          "completion": {
+            "count": 376,
+            "control": 0.0,
+            "coupled": 0.0,
+            "difference": 0.0,
+            "layout_cluster_95ci": [
+              0.0,
+              0.0
+            ]
+          },
+          "two_step_cycle": {
+            "count": 376,
+            "control": 1.0,
+            "coupled": 1.0,
+            "difference": 0.0,
+            "layout_cluster_95ci": [
+              0.0,
+              0.0
+            ]
+          }
+        }
+      },
+      "initial_margin": {
+        "initial_optimal_margin": {
+          "count": 872,
+          "control": 3.593506336212158,
+          "coupled": 5.366564750671387,
+          "difference": 1.7730583001714233,
+          "layout_cluster_95ci": [
+            0.46935049659704686,
+            3.469803452911484
+          ]
+        },
+        "initial_finite_other_margin": {
+          "count": 819,
+          "control": 1.2920072078704834,
+          "coupled": 1.1343626976013184,
+          "difference": -0.15764449425814936,
+          "layout_cluster_95ci": [
+            -0.5120797424211205,
+            0.14633573356774915
+          ]
+        },
+        "initial_dead_margin": {
+          "count": 175,
+          "control": 70.72447204589844,
+          "coupled": 101.2635498046875,
+          "difference": 30.539074600764682,
+          "layout_cluster_95ci": [
+            20.04042917211544,
+            42.80924942213379
+          ]
+        }
+      },
+      "interpretation": "Differences are coupled minus control on identical queries. Bootstrap resamples whole layouts and is conditional on these two selected checkpoints, not independent training seeds. Nonoptimal steps may be recoverable detours; first dead entries are separate. Positive margin favors the best exact-optimal action."
+    },
+    "unseen_goal_validation": {
+      "layouts": 63,
+      "queries": 1024,
+      "bootstrap_repetitions": 2000,
+      "completion": {
+        "count": 1024,
+        "control": 0.1416015625,
+        "coupled": 0.154296875,
+        "difference": 0.0126953125,
+        "layout_cluster_95ci": [
+          -0.004979612248038159,
+          0.02995169082125604
+        ]
+      },
+      "two_step_cycle": {
+        "count": 1024,
+        "control": 0.8583984375,
+        "coupled": 0.845703125,
+        "difference": -0.0126953125,
+        "layout_cluster_95ci": [
+          -0.02995169082125604,
+          0.004979612248038135
+        ]
+      },
+      "entered_dead": {
+        "count": 1024,
+        "control": 0.1240234375,
+        "coupled": 0.0966796875,
+        "difference": -0.02734375,
+        "layout_cluster_95ci": [
+          -0.04961226535701411,
+          -0.005774783445620789
+        ]
+      },
+      "completion_gained": 36,
+      "completion_lost": 23,
+      "by_initial_distance": {
+        "1_5": {
+          "completion": {
+            "count": 179,
+            "control": 0.6703910614525139,
+            "coupled": 0.6927374301675978,
+            "difference": 0.0223463687150838,
+            "layout_cluster_95ci": [
+              -0.034149825783972125,
+              0.07954545454545454
+            ]
+          },
+          "two_step_cycle": {
+            "count": 179,
+            "control": 0.329608938547486,
+            "coupled": 0.30726256983240224,
+            "difference": -0.0223463687150838,
+            "layout_cluster_95ci": [
+              -0.07954545454545454,
+              0.03414982578397211
+            ]
+          }
+        },
+        "6_20": {
+          "completion": {
+            "count": 388,
+            "control": 0.06443298969072164,
+            "coupled": 0.08762886597938144,
+            "difference": 0.023195876288659795,
+            "layout_cluster_95ci": [
+              -0.012822997416020672,
+              0.05750229057591622
+            ]
+          },
+          "two_step_cycle": {
+            "count": 388,
+            "control": 0.9355670103092784,
+            "coupled": 0.9123711340206185,
+            "difference": -0.023195876288659795,
+            "layout_cluster_95ci": [
+              -0.057502290575916236,
+              0.012822997416020658
+            ]
+          }
+        },
+        "21_inf": {
+          "completion": {
+            "count": 457,
+            "control": 0.0,
+            "coupled": 0.0,
+            "difference": 0.0,
+            "layout_cluster_95ci": [
+              0.0,
+              0.0
+            ]
+          },
+          "two_step_cycle": {
+            "count": 457,
+            "control": 1.0,
+            "coupled": 1.0,
+            "difference": 0.0,
+            "layout_cluster_95ci": [
+              0.0,
+              0.0
+            ]
+          }
+        }
+      },
+      "initial_margin": {
+        "initial_optimal_margin": {
+          "count": 836,
+          "control": 3.0839831829071045,
+          "coupled": 5.019390106201172,
+          "difference": 1.9354061216258547,
+          "layout_cluster_95ci": [
+            0.5984082645585429,
+            3.5385953778896955
+          ]
+        },
+        "initial_finite_other_margin": {
+          "count": 775,
+          "control": 1.3433738946914673,
+          "coupled": 1.5150154829025269,
+          "difference": 0.1716416786563012,
+          "layout_cluster_95ci": [
+            -0.27528908006651576,
+            0.8782882160898279
+          ]
+        },
+        "initial_dead_margin": {
+          "count": 167,
+          "control": 76.64396667480469,
+          "coupled": 107.3363265991211,
+          "difference": 30.692363624801178,
+          "layout_cluster_95ci": [
+            18.070154975010798,
+            45.35524947737439
+          ]
+        }
+      },
+      "interpretation": "Differences are coupled minus control on identical queries. Bootstrap resamples whole layouts and is conditional on these two selected checkpoints, not independent training seeds. Nonoptimal steps may be recoverable detours; first dead entries are separate. Positive margin favors the best exact-optimal action."
+    },
+    "unseen_layout_validation": {
+      "layouts": 100,
+      "queries": 1024,
+      "bootstrap_repetitions": 2000,
+      "completion": {
+        "count": 1024,
+        "control": 0.361328125,
+        "coupled": 0.353515625,
+        "difference": -0.0078125,
+        "layout_cluster_95ci": [
+          -0.027371148515646967,
+          0.009700265479955833
+        ]
+      },
+      "two_step_cycle": {
+        "count": 1024,
+        "control": 0.638671875,
+        "coupled": 0.646484375,
+        "difference": 0.0078125,
+        "layout_cluster_95ci": [
+          -0.009700265479955839,
+          0.027371148515646964
+        ]
+      },
+      "entered_dead": {
+        "count": 1024,
+        "control": 0.0966796875,
+        "coupled": 0.078125,
+        "difference": -0.0185546875,
+        "layout_cluster_95ci": [
+          -0.03438283147440559,
+          -0.002909375417973396
+        ]
+      },
+      "completion_gained": 42,
+      "completion_lost": 50,
+      "by_initial_distance": {
+        "1_5": {
+          "completion": {
+            "count": 420,
+            "control": 0.8261904761904761,
+            "coupled": 0.819047619047619,
+            "difference": -0.007142857142857143,
+            "layout_cluster_95ci": [
+              -0.0464049886827132,
+              0.02784547239303618
+            ]
+          },
+          "two_step_cycle": {
+            "count": 420,
+            "control": 0.1738095238095238,
+            "coupled": 0.18095238095238095,
+            "difference": 0.007142857142857143,
+            "layout_cluster_95ci": [
+              -0.027845472393036197,
+              0.04640498868271319
+            ]
+          }
+        },
+        "6_20": {
+          "completion": {
+            "count": 288,
+            "control": 0.0798611111111111,
+            "coupled": 0.0625,
+            "difference": -0.017361111111111112,
+            "layout_cluster_95ci": [
+              -0.05536332179930796,
+              0.021203292985489803
+            ]
+          },
+          "two_step_cycle": {
+            "count": 288,
+            "control": 0.9201388888888888,
+            "coupled": 0.9375,
+            "difference": 0.017361111111111112,
+            "layout_cluster_95ci": [
+              -0.021203292985489813,
+              0.05536332179930796
+            ]
+          }
+        },
+        "21_inf": {
+          "completion": {
+            "count": 316,
+            "control": 0.0,
+            "coupled": 0.0,
+            "difference": 0.0,
+            "layout_cluster_95ci": [
+              0.0,
+              0.0
+            ]
+          },
+          "two_step_cycle": {
+            "count": 316,
+            "control": 1.0,
+            "coupled": 1.0,
+            "difference": 0.0,
+            "layout_cluster_95ci": [
+              0.0,
+              0.0
+            ]
+          }
+        }
+      },
+      "initial_margin": {
+        "initial_optimal_margin": {
+          "count": 870,
+          "control": 2.8211774826049805,
+          "coupled": 4.059070110321045,
+          "difference": 1.2378930853701187,
+          "layout_cluster_95ci": [
+            -1.6073732944014616,
+            3.979885704930011
+          ]
+        },
+        "initial_finite_other_margin": {
+          "count": 828,
+          "control": 0.7507281303405762,
+          "coupled": 1.0006269216537476,
+          "difference": 0.24989867613511385,
+          "layout_cluster_95ci": [
+            -2.3997914490818646,
+            2.83740660297364
+          ]
+        },
+        "initial_dead_margin": {
+          "count": 172,
+          "control": 62.899356842041016,
+          "coupled": 87.07520294189453,
+          "difference": 24.175854581733084,
+          "layout_cluster_95ci": [
+            14.210919124493257,
+            34.969167645088135
+          ]
+        }
+      },
+      "interpretation": "Differences are coupled minus control on identical queries. Bootstrap resamples whole layouts and is conditional on these two selected checkpoints, not independent training seeds. Nonoptimal steps may be recoverable detours; first dead entries are separate. Positive margin favors the best exact-optimal action."
+    },
+    "original_layout_validation": {
+      "layouts": 100,
+      "queries": 1024,
+      "bootstrap_repetitions": 2000,
+      "completion": {
+        "count": 1024,
+        "control": 0.0,
+        "coupled": 0.0,
+        "difference": 0.0,
+        "layout_cluster_95ci": [
+          0.0,
+          0.0
+        ]
+      },
+      "two_step_cycle": {
+        "count": 1024,
+        "control": 1.0,
+        "coupled": 1.0,
+        "difference": 0.0,
+        "layout_cluster_95ci": [
+          0.0,
+          0.0
+        ]
+      },
+      "entered_dead": {
+        "count": 1024,
+        "control": 0.388671875,
+        "coupled": 0.3671875,
+        "difference": -0.021484375,
+        "layout_cluster_95ci": [
+          -0.12171730773939231,
+          0.07557761076138723
+        ]
+      },
+      "completion_gained": 0,
+      "completion_lost": 0,
+      "by_initial_distance": {
+        "1_5": {
+          "completion": {
+            "count": 0,
+            "control": null,
+            "coupled": null,
+            "difference": null,
+            "layout_cluster_95ci": null
+          },
+          "two_step_cycle": {
+            "count": 0,
+            "control": null,
+            "coupled": null,
+            "difference": null,
+            "layout_cluster_95ci": null
+          }
+        },
+        "6_20": {
+          "completion": {
+            "count": 0,
+            "control": null,
+            "coupled": null,
+            "difference": null,
+            "layout_cluster_95ci": null
+          },
+          "two_step_cycle": {
+            "count": 0,
+            "control": null,
+            "coupled": null,
+            "difference": null,
+            "layout_cluster_95ci": null
+          }
+        },
+        "21_inf": {
+          "completion": {
+            "count": 1024,
+            "control": 0.0,
+            "coupled": 0.0,
+            "difference": 0.0,
+            "layout_cluster_95ci": [
+              0.0,
+              0.0
+            ]
+          },
+          "two_step_cycle": {
+            "count": 1024,
+            "control": 1.0,
+            "coupled": 1.0,
+            "difference": 0.0,
+            "layout_cluster_95ci": [
+              0.0,
+              0.0
+            ]
+          }
+        }
+      },
+      "initial_margin": {
+        "initial_optimal_margin": {
+          "count": 553,
+          "control": 7.473270893096924,
+          "coupled": 11.89617919921875,
+          "difference": 4.4229083621695935,
+          "layout_cluster_95ci": [
+            -10.15583212304891,
+            18.470579479532663
+          ]
+        },
+        "initial_finite_other_margin": {
+          "count": 423,
+          "control": 6.393014907836914,
+          "coupled": 6.407910346984863,
+          "difference": 0.014895184383888335,
+          "layout_cluster_95ci": [
+            -14.848467855012036,
+            14.051798207841877
+          ]
+        },
+        "initial_dead_margin": {
+          "count": 184,
+          "control": 30.53805923461914,
+          "coupled": 43.47307205200195,
+          "difference": 12.935015823530113,
+          "layout_cluster_95ci": [
+            -11.927771812559257,
+            41.15754564044441
+          ]
+        }
+      },
+      "interpretation": "Differences are coupled minus control on identical queries. Bootstrap resamples whole layouts and is conditional on these two selected checkpoints, not independent training seeds. Nonoptimal steps may be recoverable detours; first dead entries are separate. Positive margin favors the best exact-optimal action."
+    }
+  },
+  "models": {
+    "control": {
+      "validation": {
+        "planning": {
+          "count": 1024,
+          "solved": 245,
+          "success_rate": 0.2392578125,
+          "optimal": 244,
+          "optimal_rate": 0.23828125,
+          "cycles": 779,
+          "entered_unreachable": 116,
+          "budget_exhausted": 0
+        },
+        "two_step_cycles": 779,
+        "two_step_cycle_rate": 0.7607421875,
+        "by_initial_distance": {
+          "1_5": {
+            "count": 294,
+            "solved": 221,
+            "optimal": 221
+          },
+          "6_20": {
+            "count": 354,
+            "solved": 24,
+            "optimal": 23
+          },
+          "21_inf": {
+            "count": 376,
+            "solved": 0,
+            "optimal": 0
+          }
+        },
+        "first_events": {
+          "nonoptimal": {
+            "queries_with_event": 780,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 25,
+              "3_5": 104,
+              "6_10": 131,
+              "11_20": 165,
+              "21_40": 180,
+              "41_80": 152,
+              "81_inf": 23,
+              "proven_unreachable": 0
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 1.0,
+              "0.9": 5.0,
+              "1": 17.0
+            }
+          },
+          "dead": {
+            "queries_with_event": 116,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 0,
+              "3_5": 2,
+              "6_10": 7,
+              "11_20": 16,
+              "21_40": 44,
+              "41_80": 41,
+              "81_inf": 6,
+              "proven_unreachable": 0
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 2.0,
+              "0.9": 5.5,
+              "1": 10.0
+            }
+          },
+          "non_descent": {
+            "queries_with_event": 819,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 22,
+              "3_5": 89,
+              "6_10": 154,
+              "11_20": 170,
+              "21_40": 161,
+              "41_80": 137,
+              "81_inf": 20,
+              "proven_unreachable": 66
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 2.0,
+              "0.9": 5.0,
+              "1": 11.0
+            }
+          }
+        },
+        "initial_margins": {
+          "initial_optimal_margin": {
+            "count": 872,
+            "positive_fraction": 0.7075688073394495,
+            "quantiles": {
+              "0": -29.60809326171875,
+              "0.1": -2.0269839763641357,
+              "0.5": 1.1870498657226562,
+              "0.9": 3.8726789951324463,
+              "1": 240.20899963378906
+            }
+          },
+          "initial_finite_other_margin": {
+            "count": 819,
+            "positive_fraction": 0.7057387057387058,
+            "quantiles": {
+              "0": -12.3958740234375,
+              "0.1": -1.9232330322265625,
+              "0.5": 1.0845947265625,
+              "0.9": 3.6179962158203125,
+              "1": 190.8060302734375
+            }
+          },
+          "initial_dead_margin": {
+            "count": 175,
+            "positive_fraction": 0.8685714285714285,
+            "quantiles": {
+              "0": -29.60809326171875,
+              "0.1": -1.4782471656799316,
+              "0.5": 8.022750854492188,
+              "0.9": 231.7645263671875,
+              "1": 240.35997009277344
+            }
+          }
+        }
+      },
+      "unseen_goal_validation": {
+        "planning": {
+          "count": 1024,
+          "solved": 145,
+          "success_rate": 0.1416015625,
+          "optimal": 145,
+          "optimal_rate": 0.1416015625,
+          "cycles": 879,
+          "entered_unreachable": 127,
+          "budget_exhausted": 0
+        },
+        "two_step_cycles": 879,
+        "two_step_cycle_rate": 0.8583984375,
+        "by_initial_distance": {
+          "1_5": {
+            "count": 179,
+            "solved": 120,
+            "optimal": 120
+          },
+          "6_20": {
+            "count": 388,
+            "solved": 25,
+            "optimal": 25
+          },
+          "21_inf": {
+            "count": 457,
+            "solved": 0,
+            "optimal": 0
+          }
+        },
+        "first_events": {
+          "nonoptimal": {
+            "queries_with_event": 879,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 19,
+              "3_5": 99,
+              "6_10": 122,
+              "11_20": 208,
+              "21_40": 225,
+              "41_80": 184,
+              "81_inf": 22,
+              "proven_unreachable": 0
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 1.0,
+              "0.9": 5.0,
+              "1": 12.0
+            }
+          },
+          "dead": {
+            "queries_with_event": 127,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 0,
+              "3_5": 1,
+              "6_10": 6,
+              "11_20": 15,
+              "21_40": 38,
+              "41_80": 55,
+              "81_inf": 12,
+              "proven_unreachable": 0
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 2.0,
+              "0.9": 5.0,
+              "1": 8.0
+            }
+          },
+          "non_descent": {
+            "queries_with_event": 906,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 9,
+              "3_5": 83,
+              "6_10": 141,
+              "11_20": 208,
+              "21_40": 194,
+              "41_80": 171,
+              "81_inf": 20,
+              "proven_unreachable": 80
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 2.0,
+              "0.9": 5.0,
+              "1": 13.0
+            }
+          }
+        },
+        "initial_margins": {
+          "initial_optimal_margin": {
+            "count": 836,
+            "positive_fraction": 0.6925837320574163,
+            "quantiles": {
+              "0": -27.91632080078125,
+              "0.1": -2.2170181274414062,
+              "0.5": 1.1751632690429688,
+              "0.9": 5.4878997802734375,
+              "1": 238.93954467773438
+            }
+          },
+          "initial_finite_other_margin": {
+            "count": 775,
+            "positive_fraction": 0.6954838709677419,
+            "quantiles": {
+              "0": -16.200698852539062,
+              "0.1": -2.1228880882263184,
+              "0.5": 1.1317291259765625,
+              "0.9": 4.367937088012695,
+              "1": 35.23124694824219
+            }
+          },
+          "initial_dead_margin": {
+            "count": 167,
+            "positive_fraction": 0.8383233532934131,
+            "quantiles": {
+              "0": -27.91632080078125,
+              "0.1": -1.9195555448532104,
+              "0.5": 14.033432006835938,
+              "0.9": 229.33926391601562,
+              "1": 240.00875854492188
+            }
+          }
+        }
+      },
+      "unseen_layout_validation": {
+        "planning": {
+          "count": 1024,
+          "solved": 370,
+          "success_rate": 0.361328125,
+          "optimal": 369,
+          "optimal_rate": 0.3603515625,
+          "cycles": 654,
+          "entered_unreachable": 99,
+          "budget_exhausted": 0
+        },
+        "two_step_cycles": 654,
+        "two_step_cycle_rate": 0.638671875,
+        "by_initial_distance": {
+          "1_5": {
+            "count": 420,
+            "solved": 347,
+            "optimal": 347
+          },
+          "6_20": {
+            "count": 288,
+            "solved": 23,
+            "optimal": 22
+          },
+          "21_inf": {
+            "count": 316,
+            "solved": 0,
+            "optimal": 0
+          }
+        },
+        "first_events": {
+          "nonoptimal": {
+            "queries_with_event": 655,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 28,
+              "3_5": 85,
+              "6_10": 108,
+              "11_20": 137,
+              "21_40": 148,
+              "41_80": 125,
+              "81_inf": 24,
+              "proven_unreachable": 0
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 1.0,
+              "0.9": 4.0,
+              "1": 12.0
+            }
+          },
+          "dead": {
+            "queries_with_event": 99,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 0,
+              "3_5": 3,
+              "6_10": 7,
+              "11_20": 14,
+              "21_40": 22,
+              "41_80": 48,
+              "81_inf": 5,
+              "proven_unreachable": 0
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 1.0,
+              "0.9": 4.0,
+              "1": 9.0
+            }
+          },
+          "non_descent": {
+            "queries_with_event": 709,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 27,
+              "3_5": 85,
+              "6_10": 138,
+              "11_20": 138,
+              "21_40": 131,
+              "41_80": 101,
+              "81_inf": 24,
+              "proven_unreachable": 65
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 1.0,
+              "0.9": 5.0,
+              "1": 10.0
+            }
+          }
+        },
+        "initial_margins": {
+          "initial_optimal_margin": {
+            "count": 870,
+            "positive_fraction": 0.7034482758620689,
+            "quantiles": {
+              "0": -207.07208251953125,
+              "0.1": -3.1789002418518066,
+              "0.5": 1.4307804107666016,
+              "0.9": 5.714879989624023,
+              "1": 238.67176818847656
+            }
+          },
+          "initial_finite_other_margin": {
+            "count": 828,
+            "positive_fraction": 0.717391304347826,
+            "quantiles": {
+              "0": -199.0245361328125,
+              "0.1": -2.6833877563476562,
+              "0.5": 1.4382095336914062,
+              "0.9": 5.173287391662598,
+              "1": 221.03945922851562
+            }
+          },
+          "initial_dead_margin": {
+            "count": 172,
+            "positive_fraction": 0.813953488372093,
+            "quantiles": {
+              "0": -207.07208251953125,
+              "0.1": -4.673728942871094,
+              "0.5": 6.667579650878906,
+              "0.9": 235.1136932373047,
+              "1": 240.8029327392578
+            }
+          }
+        }
+      },
+      "original_layout_validation": {
+        "planning": {
+          "count": 1024,
+          "solved": 0,
+          "success_rate": 0.0,
+          "optimal": 0,
+          "optimal_rate": 0.0,
+          "cycles": 1024,
+          "entered_unreachable": 398,
+          "budget_exhausted": 0
+        },
+        "two_step_cycles": 1024,
+        "two_step_cycle_rate": 1.0,
+        "by_initial_distance": {
+          "1_5": {
+            "count": 0,
+            "solved": 0,
+            "optimal": 0
+          },
+          "6_20": {
+            "count": 0,
+            "solved": 0,
+            "optimal": 0
+          },
+          "21_inf": {
+            "count": 1024,
+            "solved": 0,
+            "optimal": 0
+          }
+        },
+        "first_events": {
+          "nonoptimal": {
+            "queries_with_event": 1024,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 0,
+              "3_5": 0,
+              "6_10": 0,
+              "11_20": 6,
+              "21_40": 265,
+              "41_80": 726,
+              "81_inf": 27,
+              "proven_unreachable": 0
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 1.0,
+              "0.9": 3.0,
+              "1": 8.0
+            }
+          },
+          "dead": {
+            "queries_with_event": 398,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 0,
+              "3_5": 0,
+              "6_10": 0,
+              "11_20": 0,
+              "21_40": 120,
+              "41_80": 275,
+              "81_inf": 3,
+              "proven_unreachable": 0
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 1.0,
+              "0.9": 5.0,
+              "1": 9.0
+            }
+          },
+          "non_descent": {
+            "queries_with_event": 1024,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 0,
+              "3_5": 0,
+              "6_10": 0,
+              "11_20": 2,
+              "21_40": 163,
+              "41_80": 593,
+              "81_inf": 36,
+              "proven_unreachable": 230
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 2.0,
+              "0.9": 5.0,
+              "1": 11.0
+            }
+          }
+        },
+        "initial_margins": {
+          "initial_optimal_margin": {
+            "count": 553,
+            "positive_fraction": 0.596745027124774,
+            "quantiles": {
+              "0": -33.339012145996094,
+              "0.1": -5.29046630859375,
+              "0.5": 0.6991729736328125,
+              "0.9": 11.79486083984375,
+              "1": 180.43455505371094
+            }
+          },
+          "initial_finite_other_margin": {
+            "count": 423,
+            "positive_fraction": 0.5839243498817966,
+            "quantiles": {
+              "0": -33.339012145996094,
+              "0.1": -5.117443084716797,
+              "0.5": 0.43719482421875,
+              "0.9": 9.659423828125,
+              "1": 180.43455505371094
+            }
+          },
+          "initial_dead_margin": {
+            "count": 184,
+            "positive_fraction": 0.7445652173913043,
+            "quantiles": {
+              "0": -6.3758697509765625,
+              "0.1": -4.9169921875,
+              "0.5": 2.8196945190429688,
+              "0.9": 182.5333709716797,
+              "1": 194.65338134765625
+            }
+          }
+        }
+      }
+    },
+    "coupled": {
+      "validation": {
+        "planning": {
+          "count": 1024,
+          "solved": 273,
+          "success_rate": 0.2666015625,
+          "optimal": 271,
+          "optimal_rate": 0.2646484375,
+          "cycles": 751,
+          "entered_unreachable": 96,
+          "budget_exhausted": 0
+        },
+        "two_step_cycles": 751,
+        "two_step_cycle_rate": 0.7333984375,
+        "by_initial_distance": {
+          "1_5": {
+            "count": 294,
+            "solved": 239,
+            "optimal": 237
+          },
+          "6_20": {
+            "count": 354,
+            "solved": 34,
+            "optimal": 34
+          },
+          "21_inf": {
+            "count": 376,
+            "solved": 0,
+            "optimal": 0
+          }
+        },
+        "first_events": {
+          "nonoptimal": {
+            "queries_with_event": 753,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 11,
+              "3_5": 95,
+              "6_10": 127,
+              "11_20": 163,
+              "21_40": 183,
+              "41_80": 152,
+              "81_inf": 22,
+              "proven_unreachable": 0
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 1.0,
+              "0.9": 5.0,
+              "1": 12.0
+            }
+          },
+          "dead": {
+            "queries_with_event": 96,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 0,
+              "3_5": 0,
+              "6_10": 0,
+              "11_20": 15,
+              "21_40": 35,
+              "41_80": 37,
+              "81_inf": 9,
+              "proven_unreachable": 0
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 2.0,
+              "0.9": 5.0,
+              "1": 9.0
+            }
+          },
+          "non_descent": {
+            "queries_with_event": 807,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 19,
+              "3_5": 96,
+              "6_10": 144,
+              "11_20": 167,
+              "21_40": 173,
+              "41_80": 141,
+              "81_inf": 15,
+              "proven_unreachable": 52
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 1.0,
+              "0.9": 5.0,
+              "1": 11.0
+            }
+          }
+        },
+        "initial_margins": {
+          "initial_optimal_margin": {
+            "count": 872,
+            "positive_fraction": 0.7006880733944955,
+            "quantiles": {
+              "0": -26.816070556640625,
+              "0.1": -1.963191270828247,
+              "0.5": 1.0683002471923828,
+              "0.9": 4.067255973815918,
+              "1": 240.07664489746094
+            }
+          },
+          "initial_finite_other_margin": {
+            "count": 819,
+            "positive_fraction": 0.6984126984126984,
+            "quantiles": {
+              "0": -19.151554107666016,
+              "0.1": -1.8810088634490967,
+              "0.5": 0.9313144683837891,
+              "0.9": 3.3454132080078125,
+              "1": 83.22499084472656
+            }
+          },
+          "initial_dead_margin": {
+            "count": 175,
+            "positive_fraction": 0.8857142857142857,
+            "quantiles": {
+              "0": -26.816070556640625,
+              "0.1": -0.4402771294116974,
+              "0.5": 22.95833969116211,
+              "0.9": 235.3001708984375,
+              "1": 241.84352111816406
+            }
+          }
+        }
+      },
+      "unseen_goal_validation": {
+        "planning": {
+          "count": 1024,
+          "solved": 158,
+          "success_rate": 0.154296875,
+          "optimal": 155,
+          "optimal_rate": 0.1513671875,
+          "cycles": 866,
+          "entered_unreachable": 99,
+          "budget_exhausted": 0
+        },
+        "two_step_cycles": 866,
+        "two_step_cycle_rate": 0.845703125,
+        "by_initial_distance": {
+          "1_5": {
+            "count": 179,
+            "solved": 124,
+            "optimal": 123
+          },
+          "6_20": {
+            "count": 388,
+            "solved": 34,
+            "optimal": 32
+          },
+          "21_inf": {
+            "count": 457,
+            "solved": 0,
+            "optimal": 0
+          }
+        },
+        "first_events": {
+          "nonoptimal": {
+            "queries_with_event": 869,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 22,
+              "3_5": 77,
+              "6_10": 130,
+              "11_20": 207,
+              "21_40": 221,
+              "41_80": 189,
+              "81_inf": 23,
+              "proven_unreachable": 0
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 1.0,
+              "0.9": 4.0,
+              "1": 14.0
+            }
+          },
+          "dead": {
+            "queries_with_event": 99,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 0,
+              "3_5": 0,
+              "6_10": 2,
+              "11_20": 15,
+              "21_40": 34,
+              "41_80": 40,
+              "81_inf": 8,
+              "proven_unreachable": 0
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 2.0,
+              "0.9": 5.0,
+              "1": 9.0
+            }
+          },
+          "non_descent": {
+            "queries_with_event": 908,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 23,
+              "3_5": 74,
+              "6_10": 132,
+              "11_20": 213,
+              "21_40": 208,
+              "41_80": 182,
+              "81_inf": 20,
+              "proven_unreachable": 56
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 1.0,
+              "0.9": 4.0,
+              "1": 15.0
+            }
+          }
+        },
+        "initial_margins": {
+          "initial_optimal_margin": {
+            "count": 836,
+            "positive_fraction": 0.6830143540669856,
+            "quantiles": {
+              "0": -186.28469848632812,
+              "0.1": -2.0858001708984375,
+              "0.5": 1.0424346923828125,
+              "0.9": 5.614652633666992,
+              "1": 239.27120971679688
+            }
+          },
+          "initial_finite_other_margin": {
+            "count": 775,
+            "positive_fraction": 0.68,
+            "quantiles": {
+              "0": -186.28469848632812,
+              "0.1": -1.9659178256988525,
+              "0.5": 0.944122314453125,
+              "0.9": 4.573057174682617,
+              "1": 206.69638061523438
+            }
+          },
+          "initial_dead_margin": {
+            "count": 167,
+            "positive_fraction": 0.874251497005988,
+            "quantiles": {
+              "0": -36.282928466796875,
+              "0.1": -1.3795652389526367,
+              "0.5": 36.93907165527344,
+              "0.9": 232.63206481933594,
+              "1": 241.28564453125
+            }
+          }
+        }
+      },
+      "unseen_layout_validation": {
+        "planning": {
+          "count": 1024,
+          "solved": 362,
+          "success_rate": 0.353515625,
+          "optimal": 360,
+          "optimal_rate": 0.3515625,
+          "cycles": 662,
+          "entered_unreachable": 80,
+          "budget_exhausted": 0
+        },
+        "two_step_cycles": 662,
+        "two_step_cycle_rate": 0.646484375,
+        "by_initial_distance": {
+          "1_5": {
+            "count": 420,
+            "solved": 344,
+            "optimal": 343
+          },
+          "6_20": {
+            "count": 288,
+            "solved": 18,
+            "optimal": 17
+          },
+          "21_inf": {
+            "count": 316,
+            "solved": 0,
+            "optimal": 0
+          }
+        },
+        "first_events": {
+          "nonoptimal": {
+            "queries_with_event": 664,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 31,
+              "3_5": 83,
+              "6_10": 122,
+              "11_20": 131,
+              "21_40": 147,
+              "41_80": 128,
+              "81_inf": 22,
+              "proven_unreachable": 0
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 1.0,
+              "0.9": 4.0,
+              "1": 12.0
+            }
+          },
+          "dead": {
+            "queries_with_event": 80,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 0,
+              "3_5": 4,
+              "6_10": 4,
+              "11_20": 11,
+              "21_40": 24,
+              "41_80": 32,
+              "81_inf": 5,
+              "proven_unreachable": 0
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 1.0,
+              "0.9": 4.0,
+              "1": 8.0
+            }
+          },
+          "non_descent": {
+            "queries_with_event": 708,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 32,
+              "3_5": 86,
+              "6_10": 136,
+              "11_20": 134,
+              "21_40": 139,
+              "41_80": 106,
+              "81_inf": 25,
+              "proven_unreachable": 50
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 1.0,
+              "0.9": 4.0,
+              "1": 12.0
+            }
+          }
+        },
+        "initial_margins": {
+          "initial_optimal_margin": {
+            "count": 870,
+            "positive_fraction": 0.6850574712643678,
+            "quantiles": {
+              "0": -237.3933868408203,
+              "0.1": -3.8609139919281006,
+              "0.5": 1.4667739868164062,
+              "0.9": 7.876033782958984,
+              "1": 241.2357177734375
+            }
+          },
+          "initial_finite_other_margin": {
+            "count": 828,
+            "positive_fraction": 0.6884057971014492,
+            "quantiles": {
+              "0": -237.3933868408203,
+              "0.1": -2.720405340194702,
+              "0.5": 1.39471435546875,
+              "0.9": 5.317578315734863,
+              "1": 241.2357177734375
+            }
+          },
+          "initial_dead_margin": {
+            "count": 172,
+            "positive_fraction": 0.8372093023255814,
+            "quantiles": {
+              "0": -209.43797302246094,
+              "0.1": -4.124926567077637,
+              "0.5": 16.943328857421875,
+              "0.9": 235.70523071289062,
+              "1": 243.29751586914062
+            }
+          }
+        }
+      },
+      "original_layout_validation": {
+        "planning": {
+          "count": 1024,
+          "solved": 0,
+          "success_rate": 0.0,
+          "optimal": 0,
+          "optimal_rate": 0.0,
+          "cycles": 1024,
+          "entered_unreachable": 376,
+          "budget_exhausted": 0
+        },
+        "two_step_cycles": 1024,
+        "two_step_cycle_rate": 1.0,
+        "by_initial_distance": {
+          "1_5": {
+            "count": 0,
+            "solved": 0,
+            "optimal": 0
+          },
+          "6_20": {
+            "count": 0,
+            "solved": 0,
+            "optimal": 0
+          },
+          "21_inf": {
+            "count": 1024,
+            "solved": 0,
+            "optimal": 0
+          }
+        },
+        "first_events": {
+          "nonoptimal": {
+            "queries_with_event": 1024,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 0,
+              "3_5": 0,
+              "6_10": 0,
+              "11_20": 0,
+              "21_40": 265,
+              "41_80": 732,
+              "81_inf": 27,
+              "proven_unreachable": 0
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 1.0,
+              "0.9": 3.0,
+              "1": 8.0
+            }
+          },
+          "dead": {
+            "queries_with_event": 376,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 0,
+              "3_5": 0,
+              "6_10": 0,
+              "11_20": 0,
+              "21_40": 120,
+              "41_80": 247,
+              "81_inf": 9,
+              "proven_unreachable": 0
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 1.0,
+              "0.9": 3.0,
+              "1": 6.0
+            }
+          },
+          "non_descent": {
+            "queries_with_event": 1024,
+            "true_distance_counts": {
+              "1_1": 0,
+              "2_2": 0,
+              "3_5": 0,
+              "6_10": 0,
+              "11_20": 0,
+              "21_40": 168,
+              "41_80": 603,
+              "81_inf": 28,
+              "proven_unreachable": 225
+            },
+            "step_quantiles": {
+              "0": 0.0,
+              "0.5": 2.0,
+              "0.9": 4.0,
+              "1": 10.0
+            }
+          }
+        },
+        "initial_margins": {
+          "initial_optimal_margin": {
+            "count": 553,
+            "positive_fraction": 0.49005424954792043,
+            "quantiles": {
+              "0": -112.53886413574219,
+              "0.1": -11.19232177734375,
+              "0.5": -6.103515625e-05,
+              "0.9": 64.8207778930664,
+              "1": 199.4801788330078
+            }
+          },
+          "initial_finite_other_margin": {
+            "count": 423,
+            "positive_fraction": 0.4562647754137116,
+            "quantiles": {
+              "0": -112.53886413574219,
+              "0.1": -11.279979705810547,
+              "0.5": -0.1749420166015625,
+              "0.9": 12.403762817382812,
+              "1": 199.4801788330078
+            }
+          },
+          "initial_dead_margin": {
+            "count": 184,
+            "positive_fraction": 0.7119565217391305,
+            "quantiles": {
+              "0": -89.91253662109375,
+              "0.1": -11.19232177734375,
+              "0.5": 3.523193359375,
+              "0.9": 189.4763946533203,
+              "1": 199.01686096191406
+            }
+          }
+        }
+      }
+    }
+  },
+  "conclusions": [
+    "Two-step cycles decrease in familiar layouts, with a paired layout-bootstrap interval excluding zero for this training seed.",
+    "No established improvement on unseen goals or layouts; unseen-layout point estimate is slightly worse.",
+    "Neither model solves any21+ query in these validation cohorts.",
+    "Larger optimal-vs-all gaps mainly reflect larger dead-successor separation; finite alternative gaps have no consistent improvement.",
+    "A first nonoptimal action may be a recoverable detour. First dead entry is reported separately.",
+    "No5-10-step joint path supervision or Bellman loss was used."
+  ],
+  "step_index_meaning": "First-event step is the number of moves already executed. Index0 means the first action; median index1 means the second action. First-event distance is true remaining distance at that visited state, not initial task distance."
+}

@@ -1,0 +1,44 @@
+{
+  "policy": "frozen_greedy_top1",
+  "source_commit": "53198b1",
+  "action_budget": 32,
+  "by_cohort": {
+    "original": {
+      "blocks": {
+        "tasks": 500,
+        "arrival": 440
+      },
+      "cube2": {
+        "tasks": 500,
+        "arrival": 385
+      },
+      "puzzle8": {
+        "tasks": 500,
+        "arrival": 498
+      },
+      "path": {
+        "tasks": 500,
+        "arrival": 491
+      }
+    },
+    "small_ood": {
+      "blocks": {
+        "tasks": 500,
+        "arrival": 390
+      },
+      "cube2": {
+        "tasks": 500,
+        "arrival": 62
+      },
+      "puzzle8": {
+        "tasks": 500,
+        "arrival": 330
+      }
+    }
+  },
+  "interpretation": "Empirical greedy reference, not a mathematical upper bound for LLMs.",
+  "config": "experiments/map_sft_baselines/configs/flan_150k_reassessment.json",
+  "original_flan_data": "/home/gongruochen/grounded_llm/runs/flan_four_fe77be1/data",
+  "raw_cases": "runs/model_retests/flan_150k_53198b1/map_reference_cases.jsonl",
+  "remote_run": "/home/gongruochen/grounded_llm/runs/flan_150k_53198b1"
+}

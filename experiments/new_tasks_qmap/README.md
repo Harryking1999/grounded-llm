@@ -45,6 +45,7 @@ tests/               规则、标签、留出边界、采样及恢复检查
 | 关系覆盖与多轮训练（已停止） | [配置](configs/sokoban/sokoban_coverage_epochs_pairs.json) | 扩大曝光后跨布局误差仍变差，保留完整断点 |
 | 完整求解结构小验证 | [配置](configs/sokoban/sokoban_solution_structure_pilot.json) | 匹配比较零散终局关系、完整路径与分支、路径内不同跨度的中间目标关系 |
 | 分支连续覆盖与定向修复 | [分支](configs/sokoban/sokoban_branch_closure_pilot.json)、[优化](configs/sokoban/sokoban_branch_closure_refine.json)、[回放](configs/sokoban/sokoban_branch_failure_replay.json) | 补全替代最优后继及一步恢复，分别检查训练兼容性和未训练中间目标 |
+| 完整目标可达区域 | [短预算](configs/sokoban/sokoban_graph_basins_pilot.json)、[匹配拟合预算](configs/sokoban/sokoban_graph_basins_12000.json) | A原分支、B完整允许可达区域、C多目标、D整目标图的训练执行反馈 |
 | 训练失败与路径构造 | [失败诊断](configs/sokoban/sokoban_training_failure_diagnosis.json)、[路径数据](configs/sokoban/sokoban_local_paths_data.json)、[固定验证](configs/sokoban/sokoban_neighborhood_validation.json) | 训练允许范围内的循环、分支、死锁和连续路径 |
 
 比较和限制见[推箱子报告](results/sokoban/report.md)。多轮条件从原采样路径对照的验证所选权重开始，新建优化器与采样阶段，不作为完整续训；epoch只指当前准备关系池的实际遍历，不代表穷尽物理状态。预算和学习率只维护在配置中。完整断点保存优化器、关系顺序和随机状态；实时状态见忽略的`coverage_epochs_runtime_40048.json`，旧路径三组见`local_path_runtime_40048.json`。

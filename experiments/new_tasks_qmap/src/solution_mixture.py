@@ -170,10 +170,42 @@ def prepare_mixture(config, out):
     return load_corpus(config,out),dict(np.load(out/'relations.npz')),json.loads((out/'summary.json').read_text())
 
 
+def broad_goal_bank(corpus, validation, options):
+    """Fixed ordinary targets on validation layouts, entirely read-only."""
+    from concurrent.futures import ThreadPoolExecutor
+    scene_ids=corpus.locate(validation['tasks'][:,0])
+    def prepare_scene(sid):
+        rng=np.random.default_rng(options['broad_diagnostic_seed']+int(sid))
+        scene=corpus.scenes[sid];offset=corpus.offsets[sid]
+        if scene.metadata['split']!='validation':raise ValueError('Diagnostic layout is not validation')
+        pool=np.unique(validation['tasks'][scene_ids==sid,0]);pool=pool[~np.isin(pool,scene.goals+offset)]
+        rows=[];truth=[];accepted=[]
+        states=np.arange(offset,corpus.offsets[sid+1])
+        for goal in rng.permutation(pool):
+            labels=corpus.distance(states,np.full(len(states),goal))
+            if (np.isfinite(labels)&(labels>0)).sum()<32:continue
+            accepted.append(int(goal))
+            for lo,hi in [(0,1),(1,2),(2,5),(5,10),(10,20),(20,32),(32,64),(64,np.inf)]:
+                candidates=np.flatnonzero(np.isfinite(labels)&(labels>lo)&(labels<=hi))
+                chosen=rng.choice(candidates,min(options['broad_diagnostic_per_layer'],len(candidates)),replace=False)
+                rows.extend((int(states[i]),int(goal)) for i in chosen);truth.extend(labels[chosen])
+            if len(accepted)==options['broad_diagnostic_goals']:break
+        if len(accepted)!=options['broad_diagnostic_goals']:raise ValueError(('Insufficient held-out ordinary targets',int(sid)))
+        return rows,truth,accepted
+    with ThreadPoolExecutor(max_workers=options['scene_loader_workers']) as executor:
+        parts=list(executor.map(prepare_scene,np.unique(scene_ids)))
+    rows=np.asarray([row for part in parts for row in part[0]],dtype=np.int64)
+    truth=np.asarray([d for part in parts for d in part[1]],dtype=np.float32)
+    return dict(tasks_broad_goal_validation=rows,distances_broad_goal_validation=truth),dict(
+        layouts=len(parts),targets=sum(len(p[2]) for p in parts),queries=len(rows),
+        scope='Fixed ordinary intermediate targets on the original 100 validation layouts. Geometry only, no model inspection. All exact labels and candidate closures remain outside both training pools.')
+
+
 def prepare_joint(config, out):
     """Prepare one immutable joint bank shared by every matched proportion."""
     from types import SimpleNamespace
-    from .solution_structure import load_corpus
+    from .solution_structure import load_corpus,exact_path
+    from .relation_data import materialize
     from .relation_evaluate import planning_ids
     options=config['data'];broad_source=Path(options['broad_source']).resolve()
     graph_source=Path(options['graph_source']).resolve();out=Path(out);out.mkdir(parents=True,exist_ok=False)
@@ -185,42 +217,53 @@ def prepare_joint(config, out):
                     ['tasks','distances','children','child_distances','reachability','optimal']}
     graph=dict(np.load(graph_source/'relations.npz'))
     dense=dict(np.load(options['dense_validation_bank']))
+    atomic_json(out/'scenes.json',dict(graphs=str(broad_source/'graphs'),scenes=full))
+    corpus=load_corpus(config,out)
+    broad_dense,broad_dense_scope=broad_goal_bank(corpus,validation,options)
     small_corpus=load_corpus(config,graph_source);extra=[]
     for name,rows in dense.items():
         if not name.startswith('tasks_'):continue
         children=small_corpus.successors(rows[:,0]);cp=context_points(rows,children)
         mapped=remap_ids(cp,small,full);extra.append(keys(mapped[:,0],mapped[:,1],int(offsets(full)[-1])))
-    data,audit=combine_banks(broad,graph,full,small,np.concatenate(extra))
-    if audit['broad']['training_layouts'] != options['required_broad_layouts']:
-        raise ValueError('Original layout distribution was narrowed')
     eligible=np.flatnonzero(np.isfinite(validation['distances'])&(validation['distances']>0)&(validation['distances']<=config['evaluation']['horizon']))
     validation={k:v[eligible] for k,v in validation.items()}
     ends=offsets(full)[1:]
     meta=SimpleNamespace(scenes=full,locate=lambda ids:np.searchsorted(ends,ids,side='right'))
     selected=planning_ids(meta,validation['tasks'],validation['distances'],config['evaluation']['rollout_count'],
                           np.random.default_rng(options['validation_seed']),config['evaluation']['planning_distance_bins'])
+    vr=validation['tasks'][selected];vc=validation['children'][selected]
+    # Unseen physical layouts were already disjoint. Include their relation
+    # closures explicitly as well before checking either training pool.
+    cp=context_points(vr,vc);extra.append(keys(cp[:,0],cp[:,1],int(ends[-1])))
+    br=broad_dense['tasks_broad_goal_validation'];cp=context_points(br,corpus.successors(br[:,0]))
+    extra.append(keys(cp[:,0],cp[:,1],int(ends[-1])))
+    data,audit=combine_banks(broad,graph,full,small,np.concatenate(extra))
+    if audit['broad']['training_layouts'] != options['required_broad_layouts']:
+        raise ValueError('Original layout distribution was narrowed')
     for name,values in validation.items():data[name+'_broad_layout_validation']=values[selected]
-    # Add the broad validation closure explicitly even though it is already in
-    # the original reserved bank. Every training pool is checked against it.
-    vr=data['tasks_broad_layout_validation'];vc=data['children_broad_layout_validation'];cp=context_points(vr,vc)
-    all_reserved=np.unique(np.r_[data['reserved_relations'],keys(cp[:,0],cp[:,1],int(ends[-1]))])
-    if not np.array_equal(all_reserved,data['reserved_relations']):
-        raise ValueError('Original broad validation closure was not protected')
+    keep=broad_dense['distances_broad_goal_validation']<=config['evaluation']['horizon']
+    gr=broad_dense['tasks_broad_goal_validation'][keep];gt=broad_dense['distances_broad_goal_validation'][keep]
+    gi=planning_ids(meta,gr,gt,config['evaluation']['rollout_count'],np.random.default_rng(options['broad_diagnostic_seed']),
+                    config['evaluation']['planning_distance_bins'])
+    for name,values in materialize(corpus,gr[gi]).items():data[name+'_broad_goal_validation']=values
+    paths=np.full((len(gi),config['evaluation']['horizon']+1),-1,np.int64)
+    for i,(start,goal) in enumerate(gr[gi]):
+        path=exact_path(corpus,start,goal,config['evaluation']['horizon']);paths[i,:len(path)]=path
+    data['solution_paths_broad_goal_validation']=paths
     audit['broad_validation']=dict(queries=len(vr),layouts=len(np.unique(meta.locate(vr[:,0]))),
         scope='Previously used development validation layouts, original exact relations, fixed queries; never added to training.')
-    atomic_json(out/'scenes.json',dict(graphs=str(broad_source/'graphs'),scenes=full))
     # Both relation pools and every legal child keep their original exact labels.
     np.savez_compressed(out/'relations.npz',**data)
     for name,values in dense.items():
         if name.startswith('tasks_'):dense[name]=remap_ids(values,small,full)
+    dense.update(broad_dense)
     np.savez_compressed(out/'dense_validation.npz',**dense)
     finite=np.r_[data['distances_train'],data['pair_distances_train']]
-    summary=dict(task='sokoban',finite_max=float(finite[np.isfinite(finite)].max()),audit=audit,
+    summary=dict(task='sokoban',finite_max=float(finite[np.isfinite(finite)].max()),audit=audit,broad_goal_diagnostic=broad_dense_scope,
         broad_source=str(broad_source),graph_source=str(graph_source),
         point_pairs=len(data['pairs_train']),contexts=len(data['tasks_train']),
         sampling_scope='Fixed original 1000-layout prepared relations plus permitted complete target basins. No online goal replacement, validation feedback, isolated error oversampling or loss change in any arm.')
     atomic_json(out/'summary.json',summary);print(json.dumps(dict(stage='joint_bank',**summary)),flush=True)
-    corpus=load_corpus(config,out)
     valid=data['children_train']>=0
     ids=np.unique(np.r_[data['pairs_train'].ravel(),data['tasks_train'][:,1],data['children_train'][valid]])
     np.save(out/'feature_ids.npy',ids)

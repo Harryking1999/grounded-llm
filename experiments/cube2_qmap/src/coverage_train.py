@@ -12,7 +12,7 @@ from torch.nn import functional as F
 from grounded_llm.core.files import atomic_json
 from grounded_llm.tasks.cube2.environment import Cube2
 from grounded_llm.tasks.cube2.model import MODEL_TYPE,QMap
-from .coverage_data import CoverageGuard,keys_to_pairs
+from .coverage_data import CoverageGuard,keys_to_pairs,coverage,unique_tasks,hist
 from .full_state_joint import fixed_batch,batch_losses
 from .near_goal_continuation import inspect
 
@@ -39,6 +39,128 @@ def edge_loss(model,env,parents,allowed,device):
     q=model.encode(torch.as_tensor(env.features(states),device=device))
     predicted=model.distance(q[np.searchsorted(states,source)],q[np.searchsorted(states,target)])
     return F.smooth_l1_loss(predicted,torch.ones_like(predicted)),len(source)
+
+
+class Pool:
+    def __init__(self,rows,seed,grouped=False):
+        self.rows=rows;self.rng=np.random.default_rng(seed);self.grouped=grouped
+        self.order=ordering(rows,self.rng,grouped);self.cursor=0
+        self.seen=np.zeros(len(rows),dtype=np.int32)
+
+    def draw(self,count):
+        remaining=len(self.order)-self.cursor
+        if count<=remaining:
+            ids=self.order[self.cursor:self.cursor+count];self.cursor+=count
+        else:
+            tail=self.order[self.cursor:];self.order=ordering(self.rows,self.rng,self.grouped)
+            ids=np.r_[tail,self.order[:count-remaining]];self.cursor=count-remaining
+        self.seen[ids]+=1
+        return self.rows[ids]
+
+    def state_dict(self):
+        return dict(order=self.order,cursor=self.cursor,seen=self.seen,rng=self.rng.bit_generator.state)
+
+
+def run_factorial(args):
+    cfg=json.loads(args.config.read_text());options=cfg['training']
+    torch.set_num_threads(options['cpu_threads']);torch.manual_seed(cfg['seed'])
+    env=Cube2(args.oracle,metric='QTM_URF_6');d=np.load(args.data/'cohorts.npz')
+    saved=torch.load(args.checkpoint,map_location='cpu',weights_only=False)
+    model=QMap(env.feature_dim,**saved['model_config'],cap=saved['cap']).to(args.device)
+    model.load_state_dict(saved['model']);optimizer=torch.optim.Adam(model.parameters())
+    optimizer.load_state_dict(saved['optimizer'])
+    for group in optimizer.param_groups:group['lr']=options['learning_rate']
+    specification=cfg['arms'][args.base_arm or args.arm]
+    batches=dict(specification['batches'])
+    if args.arm in ('hard','random_aux'):
+        batches['AuxHard' if args.arm=='hard' else 'AuxRandom']=[cfg['hard_followup']['extra_batch'],cfg['hard_followup']['extra_weight']]
+    names=sorted(batches);pools={}
+    guard=CoverageGuard(env,keys_to_pairs(d['excluded_relation_keys'],env.size),d['state_mask'],d['heldout_goals'])
+    for index,name in enumerate(names):
+        filename={'AuxHard':'Hard','AuxRandom':'Original'}.get(name,name)
+        rows=np.load(args.data/(filename+'.npy'))
+        if guard.task_blocked(env,rows).any():raise ValueError('Incomplete/protected ranking pool')
+        # Role-specific fixed seeds keep the original, cross and replay streams
+        # identical between their edge/no-edge and hard/random controls.
+        role_seed={'Original':0,'Cross':1,'OriginalReplay':2,'AuxHard':3,'AuxRandom':3}[name]
+        pools[name]=Pool(rows,options['seed']+role_seed,name=='Cross')
+    edge_rng=np.random.default_rng(options['seed']+4)
+    allowed=np.load(args.data/'edge_allowed.npy',mmap_mode='r')
+    edge_order=edge_rng.permutation(env.size);edge_cursor=0;edge_seen=np.zeros(env.size,dtype=bool);edge_passes=0
+    out=args.out;out.mkdir(parents=True,exist_ok=False)
+    atomic_json(out/'config.json',dict(study=cfg,arm=args.arm,base_arm=args.base_arm,source_commit=args.source_commit))
+    monitors={'validation':d['validation'],'restoration':d['original']}
+    initial={k:inspect(model,env,tasks,args.device,32) for k,tasks in monitors.items()}
+    best=(initial['validation']['rollout']['solved'],initial['restoration']['rollout']['solved'])
+    eligible=best[1]>=385;best_update=0;shutil.copy2(args.checkpoint,out/'best.pt')
+    result=dict(source_commit=args.source_commit,arm=args.arm,base_arm=args.base_arm,initial=initial,evaluations=[],
+        best_eligible=eligible,best_update=0,best_validation_and_restoration=best,initial_step=saved['step'])
+    atomic_json(out/'summary.json',result);started=time.monotonic()
+    fit_tasks={n:p.rows[np.random.default_rng(cfg['seed']).choice(len(p.rows),min(512,len(p.rows)),replace=False)] for n,p in pools.items()}
+    fixed_edge_parents=np.random.default_rng(cfg['seed']+1).choice(env.size,512,replace=False)
+    with torch.no_grad():
+        result['initial_train_monitor']={}
+        for name,tasks in fit_tasks.items():
+            batch=fixed_batch(env,tasks)
+            h,r=batch_losses(model,torch.as_tensor(env.features(batch['states']),device=args.device),batch,cfg)
+            result['initial_train_monitor'][name]=dict(huber=float(h),rank=float(r))
+        el,_=edge_loss(model,env,fixed_edge_parents,allowed,args.device)
+        result['initial_train_monitor']['edge_huber']=float(el)
+    with (out/'loss.jsonl').open('w') as log:
+        for update in range(1,options['updates']+1):
+            model.train();optimizer.zero_grad(set_to_none=True);terms={}
+            for name in names:
+                count,weight=batches[name];tasks=pools[name].draw(count);batch=fixed_batch(env,tasks)
+                h,r=batch_losses(model,torch.as_tensor(env.features(batch['states']),device=args.device),batch,cfg)
+                (weight*(h+options['rank_weight']*r)).backward();terms[name]=[float(h.detach()),float(r.detach())]
+            edge_count=0
+            if specification['edges']:
+                parents,edge_order,edge_cursor,passed=take_cycle(edge_order,edge_cursor,options['edge_parent_batch'],edge_rng)
+                edge_passes+=passed;el,edge_count=edge_loss(model,env,parents,allowed,args.device)
+                if el is not None:(options['edge_loss_weight']*el).backward()
+                edge_seen[parents]=True;terms['edge']=None if el is None else float(el.detach())
+            torch.nn.utils.clip_grad_norm_(model.parameters(),options['clip_norm']);optimizer.step()
+            log.write(json.dumps(dict(update=update,losses=terms,effective_edge_labels=edge_count))+'\n')
+            if update%options['evaluate_every'] and update!=options['updates']:continue
+            log.flush();metrics={k:inspect(model,env,tasks,args.device,32) for k,tasks in monitors.items()}
+            fit={}
+            with torch.no_grad():
+                for name,tasks in fit_tasks.items():
+                    batch=fixed_batch(env,tasks)
+                    h,r=batch_losses(model,torch.as_tensor(env.features(batch['states']),device=args.device),batch,cfg)
+                    fit[name]=dict(huber=float(h),rank=float(r))
+                el,_=edge_loss(model,env,fixed_edge_parents,allowed,args.device)
+                fit['edge_huber']=float(el)
+            exposed=unique_tasks(np.concatenate([p.rows[p.seen>0] for p in pools.values()]),env.size)
+            record=dict(updates=update,metrics=metrics,train_monitor=fit,
+                roles={n:dict(exposures=int(p.seen.sum()),unique_decisions_exposed=int((p.seen>0).sum()),
+                    pool_rows=len(p.rows),minimum_exposure=int(p.seen.min()),maximum_exposure=int(p.seen.max())) for n,p in pools.items()},
+                unique_complete_decisions=len(exposed),unique_candidate_action_labels=len(exposed)*6,
+                unique_parents=len(np.unique(exposed[:,0])),unique_goals=len(np.unique(exposed[:,1])),
+                true_distance_unique_decisions=hist(env.distance(*exposed.T)),
+                unique_directed_edges_exposed=int(allowed[edge_seen].sum()),
+                allowed_directed_edges=int(allowed.sum()),edge_parent_passes=edge_passes)
+            score=(metrics['validation']['rollout']['solved'],metrics['restoration']['rollout']['solved'])
+            record['eligible']=score[1]>=385;result['evaluations'].append(record)
+            payload=dict(model_type=MODEL_TYPE,task=env.name,actions=list(env.actions),model_config=saved['model_config'],
+                cap=saved['cap'],model=model.state_dict(),optimizer=optimizer.state_dict(),config=cfg,
+                step=saved['step']+update,initial_step=saved['step'],updates=update,source_commit=args.source_commit,
+                arm=args.arm,base_arm=args.base_arm,pools={n:p.state_dict() for n,p in pools.items()},
+                edge_order=edge_order,edge_cursor=edge_cursor,edge_seen=edge_seen,edge_passes=edge_passes,
+                edge_rng=edge_rng.bit_generator.state,torch_rng=torch.get_rng_state(),data_directory=str(args.data),
+                initial_checkpoint=str(args.checkpoint))
+            path=out/f'update_{update:06d}.pt';torch.save(payload,path)
+            if record['eligible'] and (not eligible or score>best):
+                shutil.copy2(path,out/'best.pt');best=score;best_update=update;eligible=True
+            result.update(best_update=best_update,best_validation_and_restoration=best,best_eligible=eligible,
+                seconds=time.monotonic()-started)
+            atomic_json(out/'summary.json',result)
+            print(json.dumps(dict(update=update,solved=score,best=best,seconds=time.monotonic()-started,
+                unique_decisions=len(exposed),unique_edges=record['unique_directed_edges_exposed'])),flush=True)
+    atomic_json(out/'actual_coverage.json',coverage(env,exposed))
+    atomic_json(out/'complete.json',dict(updates=update,source_commit=args.source_commit,best_update=best_update,
+        sealed_tests_not_opened=True,all_allowed_edges_exposed=bool(edge_seen.all()) if specification['edges'] else None,
+        unique_directed_edges_exposed=int(allowed[edge_seen].sum())))
 
 
 def run(args):
@@ -150,10 +272,15 @@ def run(args):
 def main():
     p=argparse.ArgumentParser(__doc__)
     for name in ('config','data','oracle','checkpoint','out'):p.add_argument('--'+name,type=Path,required=True)
-    p.add_argument('--version',choices=['V1','V2','V2_disjoint','V3'],required=True)
+    p.add_argument('--version',choices=['V1','V2','V2_disjoint','V3'])
+    p.add_argument('--arm',choices=['original','edges','cross','both','hard','random_aux'])
+    p.add_argument('--base-arm',choices=['original','edges','cross','both'])
     p.add_argument('--source-commit',required=True);p.add_argument('--device',default='cuda')
     p.add_argument('--no-edges',action='store_true')
-    run(p.parse_args())
+    args=p.parse_args()
+    if args.arm:run_factorial(args)
+    elif args.version:run(args)
+    else:p.error('Specify version or factorial arm')
 
 
 if __name__=='__main__':main()

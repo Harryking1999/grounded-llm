@@ -3,11 +3,20 @@ import numpy as np
 from experiments.cube2_qmap.src.coverage_data import coverage,CoverageGuard
 from experiments.cube2_qmap.src.full_state_joint import task_pairs
 from experiments.cube2_qmap.tests.test_full_state_joint import Ring
-from experiments.cube2_qmap.src.coverage_train import take_cycle
+from experiments.cube2_qmap.src.coverage_train import take_cycle,Pool
 from experiments.cube2_qmap.src.coverage_evaluate import paired_change
 
 
 class CoverageTests(unittest.TestCase):
+    def test_grouped_cross_batches_keep_all_targets_and_visit_every_group(self):
+        rows=np.column_stack((np.repeat(np.arange(10),8),np.tile(np.arange(8),10)))
+        pool=Pool(rows,42,True);drawn=np.r_[pool.draw(32),pool.draw(32),pool.draw(16)]
+        self.assertEqual(len(np.unique(drawn,axis=0)),80)
+        self.assertTrue((pool.seen==1).all())
+        for group in drawn.reshape(-1,8,2):
+            self.assertEqual(len(np.unique(group[:,0])),1)
+            self.assertEqual(len(np.unique(group[:,1])),8)
+
     def test_paired_counts_preserve_improvements_and_regressions(self):
         r=paired_change([True,False,False,True],[True,True,False,False])
         self.assertEqual((r['gained'],r['lost'],r['net']),(1,1,0))

@@ -367,13 +367,99 @@ def prepare(args):
     print(json.dumps({'stage':'ready','versions':{n:len(t) for n,t in versions.items()}}),flush=True)
 
 
+def expand_cross(args):
+    cfg=json.loads(args.config.read_text());env=Cube2(args.oracle,metric='QTM_URF_6')
+    rng=np.random.default_rng(cfg['seed']);source=args.audit_source;out=args.out
+    out.mkdir(parents=True,exist_ok=False);d=np.load(source/'cohorts.npz')
+    guard=CoverageGuard(env,keys_to_pairs(d['excluded_relation_keys'],env.size),d['state_mask'],d['heldout_goals'])
+    for name in ('cohorts.npz','edge_allowed.npy','edge_inventory.json','goal_inventory.json'):
+        shutil.copy2(source/name,out/name)
+    history=np.load(source/'historical_tasks.npz')
+    pools={}
+    for name,key in [('Original','near'),('OriginalReplay','restoration')]:
+        tasks=unique_tasks(history[key],env.size)
+        pools[name]=tasks[~guard.task_blocked(env,tasks)]
+    allowed=np.load(source/'edge_allowed.npy',mmap_mode='r')
+    parents=np.flatnonzero(allowed.all(-1));rng.shuffle(parents)
+    goals=d['train_goals'];g1=goals[env.depth[goals]==1]
+    assert len(g1)==cfg['data']['depth1_targets_per_parent']==6
+    g2=goals[env.depth[goals]==2];g3=goals[env.depth[goals]==3]
+    groups=[];count=0;needed=cfg['data']['cross_parents']
+    for begin in range(0,len(parents),4096):
+        s=parents[begin:begin+4096]
+        targets=np.column_stack((np.tile(g1,(len(s),1)),rng.choice(g2,len(s)),rng.choice(g3,len(s))))
+        tasks=np.stack((np.broadcast_to(s[:,None],targets.shape),targets),axis=-1)
+        keep=~((tasks[:,:,0]==tasks[:,:,1])|guard.task_blocked(env,tasks.reshape(-1,2)).reshape(-1,8)).any(-1)
+        selected=tasks[keep][:needed-count];groups.append(selected);count+=len(selected)
+        if count==needed:break
+    if count!=needed:raise ValueError('Insufficient guarded cross parents')
+    pools['Cross']=np.concatenate(groups).reshape(-1,2)
+    reports={}
+    oldkeys=np.unique(history['near'][:,0]*env.size+history['near'][:,1])
+    for name,tasks in pools.items():
+        np.save(out/(name+'.npy'),tasks)
+        reports[name]=coverage(env,tasks)
+        if name=='Cross':
+            reports[name]['new_decisions_vs_historical_near']=int((~np.isin(tasks[:,0]*env.size+tasks[:,1],oldkeys)).sum())
+        atomic_json(out/(name+'_coverage.json'),reports[name])
+    atomic_json(out/'ready.json',dict(source_commit=args.source_commit,source_data=str(source),
+        pools={k:len(v) for k,v in pools.items()},complete_candidates_only=True,sealed_tests_not_opened=True))
+    print(json.dumps(dict(stage='expanded',pools={k:len(v) for k,v in pools.items()})),flush=True)
+
+
+def mine_expanded(args):
+    cfg=json.loads(args.config.read_text());torch.set_num_threads(2)
+    env=Cube2(args.oracle,metric='QTM_URF_6');out=args.out
+    if (out/'Hard.npy').exists():raise ValueError('Do not overwrite frozen hard pool')
+    d=np.load(out/'cohorts.npz');rng=np.random.default_rng(cfg['seed']+10)
+    guard=CoverageGuard(env,keys_to_pairs(d['excluded_relation_keys'],env.size),d['state_mask'],d['heldout_goals'])
+    cross=np.load(out/'Cross.npy');original=np.load(out/'Original.npy')
+    known=np.unique(np.r_[cross[:,0]*env.size+cross[:,1],original[:,0]*env.size+original[:,1]])
+    roots=[]
+    for goal in d['train_goals']:
+        pool=cross[cross[:,1]==goal]
+        roots.extend(pool[rng.choice(len(pool),min(len(pool),cfg['hard_followup']['trajectories_per_goal']),replace=False)].tolist())
+    model=model_from(args.mining_checkpoint,env,args.device)
+    mined,trace=mine_trajectories(model,env,np.asarray(roots),guard,args.device,set(known.tolist()))
+    detail=trace.pop('per_decision')
+    np.savez_compressed(out/'hard_trajectories.npz',decisions=mined,detail=detail,
+        roots=trace.pop('roots'),final_states=trace.pop('final_states'))
+    extra=unique_tasks(mined,env.size)
+    extra=extra[~np.isin(extra[:,0]*env.size+extra[:,1],known)]
+    rng.shuffle(extra);extra=extra[:cfg['hard_followup']['hard_decisions']];trajectory_extra=len(extra)
+    parents=np.unique(cross[:,0]);candidates=np.column_stack((rng.choice(parents,262144),rng.choice(d['train_goals'],262144)))
+    candidates=unique_tasks(candidates,env.size)
+    keep=(candidates[:,0]!=candidates[:,1])&~guard.task_blocked(env,candidates)
+    keep&=~np.isin(candidates[:,0]*env.size+candidates[:,1],np.r_[known,extra[:,0]*env.size+extra[:,1]])
+    candidates=candidates[keep];scores=predicted_scores(model,env,candidates,args.device)
+    truth=env.distance(env.successors(candidates[:,0]),candidates[:,1,None]);before=env.distance(*candidates.T)
+    wrong=truth[np.arange(len(candidates)),scores.argmin(-1)]!=before-1
+    gap=np.sort(scores,axis=1)[:,1]-scores.min(-1)
+    difficult=candidates[wrong|(gap<cfg['hard_followup']['hard_margin'])];rng.shuffle(difficult)
+    extra=np.r_[extra,difficult[:cfg['hard_followup']['hard_decisions']-len(extra)]]
+    if len(extra)!=cfg['hard_followup']['hard_decisions']:raise ValueError('Insufficient novel hard decisions')
+    if guard.task_blocked(env,extra).any():raise ValueError('Protected hard decision')
+    np.save(out/'Hard.npy',extra)
+    atomic_json(out/'Hard_coverage.json',coverage(env,extra))
+    atomic_json(out/'hard_mining.json',dict(**trace,source_commit=args.source_commit,
+        checkpoint=str(args.mining_checkpoint),novel_actual_trajectory_decisions=trajectory_extra,
+        novel_other_hard_decisions=len(extra)-trajectory_extra,all_decisions_novel_vs_core=True))
+    print(json.dumps(dict(stage='hard_pool_ready',actual_trajectory_decisions=trajectory_extra,total=len(extra))),flush=True)
+
+
 def main():
     p=argparse.ArgumentParser(__doc__)
     for name in ('config','oracle','first-cohorts','second-cohorts','checkpoint1000','checkpoint2000','out'):
         p.add_argument('--'+name,type=Path,required=True)
     p.add_argument('--source-commit',required=True);p.add_argument('--device',default='cuda')
     p.add_argument('--audit-source',type=Path)
-    prepare(p.parse_args())
+    p.add_argument('--expand-cross',action='store_true')
+    p.add_argument('--mine-expanded',action='store_true')
+    p.add_argument('--mining-checkpoint',type=Path)
+    args=p.parse_args()
+    if args.mine_expanded:mine_expanded(args)
+    elif args.expand_cross:expand_cross(args)
+    else:prepare(args)
 
 
 if __name__=='__main__':main()

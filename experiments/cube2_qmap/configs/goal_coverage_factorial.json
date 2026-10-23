@@ -1,0 +1,97 @@
+{
+  "seed": 2026102404,
+  "data": {
+    "cross_parents": 131072,
+    "targets_per_parent": 8,
+    "depth1_targets_per_parent": 6,
+    "depth2_targets_per_parent": 1,
+    "depth3_targets_per_parent": 1
+  },
+  "training": {
+    "updates": 8192,
+    "evaluate_every": 512,
+    "learning_rate": 3e-06,
+    "rank_weight": 1.0,
+    "temperature": 1.0,
+    "clip_norm": 5.0,
+    "edge_parent_batch": 1024,
+    "edge_loss_weight": 0.1,
+    "seed": 2026102405,
+    "cpu_threads": 2
+  },
+  "arms": {
+    "original": {
+      "edges": false,
+      "batches": {
+        "Original": [
+          256,
+          0.5
+        ],
+        "OriginalReplay": [
+          128,
+          0.5
+        ]
+      }
+    },
+    "edges": {
+      "edges": true,
+      "batches": {
+        "Original": [
+          256,
+          0.5
+        ],
+        "OriginalReplay": [
+          128,
+          0.5
+        ]
+      }
+    },
+    "cross": {
+      "edges": false,
+      "batches": {
+        "Original": [
+          128,
+          0.25
+        ],
+        "Cross": [
+          128,
+          0.25
+        ],
+        "OriginalReplay": [
+          128,
+          0.5
+        ]
+      }
+    },
+    "both": {
+      "edges": true,
+      "batches": {
+        "Original": [
+          128,
+          0.25
+        ],
+        "Cross": [
+          128,
+          0.25
+        ],
+        "OriginalReplay": [
+          128,
+          0.5
+        ]
+      }
+    }
+  },
+  "hard_followup": {
+    "base": "Select the eligible best of the four arms using fresh validation and restoration only, before opening tests.",
+    "extra_batch": 64,
+    "extra_weight": 0.1,
+    "control": "Match extra supervision count and weight using Original instead of Hard; both start from the same step-2000 initialization, identical core sampling and 8192 updates.",
+    "trajectories_per_goal": 64,
+    "hard_decisions": 32768,
+    "hard_margin": 0.05
+  },
+  "rationale": "Initial V2/V3 replaced the broad original parent distribution and used a small replay pool; every unique decision received twelve exposures but validation and restoration declined. This factorial retains filtered reconstructed original near/replay pools in every arm and expands uniform physical-parent cross coverage eightfold. Each cross parent has all six one-step targets plus one depth-2 and one depth-3 training goal, with all six candidates supervised for each goal. Cross changes half of the near batches at fixed total decisions and optimizer updates; it does not keep original-pool exposure fixed. Edge loss is auxiliary distance-only, never a partial ranking target.",
+  "split": "Reuse exactly the previous protected state mask, evaluation/axis relation closures and depth-2/3 withheld goal orbits. All six depth-1 goals train. Reject incomplete stars, never mask a candidate within a rank target. Sealed tests stay closed until all development comparisons are complete.",
+  "selection": "Fresh validation first with original restoration >=385/500; initialization included. Keep checkpoints every 512 updates. Do not adopt or replace the FLAN frozen map. Report actual exposure for each role and their unique union, including complete candidate labels, per-start goal multiplicity, distance strata and edge masks separately.",
+  "budget": "Four matched 8192-update arms, then two matched 8192-update hard/random-auxiliary arms. Use only idle GPU3/4; existing FLAN reassessment has priority. Model, Linf and 32-step Q greedy unchanged."
+}

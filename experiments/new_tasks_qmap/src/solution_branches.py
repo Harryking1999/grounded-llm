@@ -63,8 +63,11 @@ def prepare_branches(config,out):
         for padded_path in old['solution_paths_'+source_cohort]:
             path=padded_path[padded_path>=0]
             if len(path)<4:continue
-            target=int(path[len(path)//2]);sid=int(corpus.locate(target))
-            if target in used_goals or target in targets:continue
+            sid=int(corpus.locate(path[0]));scene=corpus.scenes[sid];offset=corpus.offsets[sid]
+            original_goals=set(map(int,scene.goals+offset))
+            candidates=[int(t) for t in path[1:-1] if int(t) not in original_goals|used_goals|targets]
+            if not candidates:continue
+            target=candidates[len(candidates)//2]
             if sum(int(corpus.locate(t))==sid for t in targets)>=2:continue
             scene=corpus.scenes[sid];offset=corpus.offsets[sid]
             states=np.arange(len(scene.states))+offset

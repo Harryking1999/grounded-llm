@@ -20,6 +20,8 @@ def evaluate(args, config):
     records = json.loads((args.data / "evaluation.json").read_text())
     if len(records) != config["evaluation"]["tasks"]:
         raise ValueError("Evaluation cohort mismatch")
+    if task == 'puzzle8':
+        env.prepare_goals(sorted({int(r['goal']) for r in records}))
     if args.mode == "probe":
         records = [records[i] for i in json.loads((args.data / "probe_indices.json").read_text())]
     records = records[args.start:args.stop]

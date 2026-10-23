@@ -33,7 +33,7 @@ def cohort_size(config, mode):
 
 def evaluation_modes(config, baseline):
     modes = list(config['evaluation']['modes'])
-    if config['baselines'][baseline]['real_map']:
+    if config['baselines'][baseline]['real_map'] and config['evaluation'].get('probe_tasks', 0) > 0:
         modes.append('probe')
     return modes
 

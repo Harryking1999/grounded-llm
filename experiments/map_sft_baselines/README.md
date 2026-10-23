@@ -32,6 +32,20 @@
 
 固定评测每任务500题，按任务分别报告，联合2000题供已有停止判断使用。汉诺塔暂不处理；过桥、推箱子尚无本轮地图和题集，不伪造跨任务OOD成绩。
 
+### 150K RO重评测与类别内小OOD
+
+最优先在4090重评当前三组FLAN模型，范围由[重评配置](configs/flan_150k_reassessment.json)维护。每组使用准确的150K断点：原验证四任务各500题，另加积木、二阶魔方、8-Puzzle小OOD各500题。后两文字模型自然到达该断点后接续，不延长训练，不纳入历史诊断模型。只做RO，沿用各模型的上下文、生成和动作预算；独立重评目录不向原训练的自动停止曲线写入混合成绩。
+
+小OOD保持对应原验证起点，积木取原认证最短清空路线最后一步之前的非空状态作为目标，即留一个合法块；魔方与华容道分别在距复原态1–3步的目标中固定种子取样，距离层题数尽量均分。题集生成不按地图成败筛选，参考路线用原精确环境认证。近复原的是目标，起点到目标的路线仍可能较长；规则化非复原目标可作后续独立条件，本配置先采用复原邻域。
+
+这里的小OOD是类别内新目标任务，不等于地图未见状态或关系；FLAN大OOD是未训练的新任务类别，另行准备。寻路训练本就含任意终点，本轮不把换终点称为新任务小OOD。旧积木路线中段目标OOD保留原题集及结果，不与本轮留一块题集拼接。
+
+`src.small_ood_prepare`复用原FLAN评测数据与任务环境，生成带`original`／`small_ood`标签的固定题集，并可用`--map-reference-out`跑同题冻结地图Top-1贪心。模型评测复用`src.queue evaluate`，只领取配置中`only_steps`指定的断点。每组完整结果的`by_cohort`与`cohort_report.md`分别报告七项500题成绩，包括到达与到达且正确停止；汇总3500题仅用于核对完整性，不替代分项结论。地图贪心参照使用相同动作预算、合法候选与终止目标，保留逐题动作和失败；它是经验参照，不是LLM的数学上限。
+
+```bash
+python -m experiments.map_sft_baselines.src.small_ood_prepare --config experiments/map_sft_baselines/configs/flan_150k_reassessment.json --source ORIGINAL_FLAN_EVAL_DATA --out NEW_EVAL_DATA --map-reference-out MAP_REFERENCE_OUT --source-commit COMMIT
+```
+
 ## 代码归属
 
 | 内容 | 实现 |

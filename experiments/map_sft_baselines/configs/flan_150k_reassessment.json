@@ -1,0 +1,31 @@
+{
+  "checkpoint_step": 150000,
+  "model_configs": {
+    "map": "flan_four_50k_map.json",
+    "3b": "flan_four_50k_3b.json",
+    "7b": "flan_four_50k_7b.json"
+  },
+  "seed": 2026102301,
+  "tasks_per_cohort": 500,
+  "original_tasks": ["blocks", "cube2", "puzzle8", "path"],
+  "small_ood": {
+    "blocks": {"goal": "last_single_removable_block_of_original_shortest_route"},
+    "cube2": {"goal_distances_from_solved": [1, 2, 3]},
+    "puzzle8": {"goal_distances_from_solved": [1, 2, 3]}
+  },
+  "evaluation": {
+    "only_steps": [150000],
+    "priority_steps": [150000],
+    "tasks": 3500,
+    "modes": ["RO"],
+    "probe_tasks": 0
+  },
+  "execution": {
+    "evaluation_gpus": [1, 2, 3, 4]
+  },
+  "sampling": "paired_original_validation_starts_without_Q_success_filtering",
+  "budget": "inherit_generation_context_and_action_budgets_from_each_model_config",
+  "map_reference": "frozen_greedy_top1_same_cohorts_and_action_budget",
+  "scope": "currently_running_FLAN_models_only_no_training_extension",
+  "interpretation": "within_category_new_goal_task_not_unseen_Qmap_relations; FLAN_cross_category_OOD_is_separate"
+}

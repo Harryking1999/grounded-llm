@@ -13,6 +13,27 @@ from experiments.map_sft_baselines.src.train import validate_resume_contract
 from experiments.map_sft_baselines.src.contract import steps_per_epoch,checkpoint_steps,plateau_status
 
 class ContractTests(unittest.TestCase):
+    def test_milestone_ro_only_and_separate_ood_collection(self):
+        cfg=dict(task='multitask',data=dict(tasks=['blocks'],samples_per_epoch=4),
+                 training=dict(global_batch=4,epochs=2,save_steps=1),
+                 baselines={'B2':dict(real_map=True)},evaluation=dict(tasks=2,
+                 shard_tasks=2,modes=['RO'],probe_tasks=0,only_steps=[2]))
+        with tempfile.TemporaryDirectory() as folder:
+            records=[dict(step=s,epoch=s,baseline='B2') for s in [1,2]]
+            jobs=evaluation_jobs(folder,cfg,records)
+            self.assertEqual([(j[0],j[3]) for j in jobs],[(2,'RO')])
+            shard=jobs[0][-1];shard.mkdir(parents=True)
+            (shard/'summary.json').write_text('{}')
+            cases=[dict(trajectory_id=c,task='blocks',cohort=c,arrived=c=='original',
+                        arrived_and_stopped=c=='original',turns=[])
+                   for c in ['original','small_ood']]
+            (shard/'cases.jsonl').write_text(''.join(json.dumps(c)+'\n' for c in cases))
+            collect(folder,cfg)
+            row=json.loads((Path(folder)/'results/B2/curve.json').read_text())[0]
+            self.assertEqual(row['by_cohort']['small_ood']['blocks']['RO']['arrival'],0)
+            self.assertEqual(row['by_cohort']['original']['blocks']['RO']['arrival'],1)
+            self.assertTrue((Path(folder)/'results/B2/cohort_report.md').exists())
+
     def test_collect_ro_only_keeps_completed_cases_and_renders_report(self):
         cfg=dict(data=dict(samples_per_epoch=4),training=dict(global_batch=4,epochs=1,save_steps=1),
                  baselines={'B0':dict(real_map=False)},

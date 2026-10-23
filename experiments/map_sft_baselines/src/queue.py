@@ -12,6 +12,8 @@ def evaluation_jobs(root,config,records=None):
     for meta in records:
         base=meta['baseline'];step=meta['step']
         if base in config.get('execution',{}).get('retired_baselines',[]):continue
+        only_steps=config.get('evaluation',{}).get('only_steps')
+        if only_steps is not None and step not in only_steps:continue
         checkpoint=Path(root)/'models'/base/f'checkpoint-{step}'
         modes=evaluation_modes(config,base)
         for mode in modes:
@@ -27,7 +29,7 @@ def collect(root,config):
         curve=[]
         for checkpoint in sorted((Path(root)/'evaluation'/base).glob('checkpoint-*'),key=lambda p:int(p.name.split('-')[-1])):
             modes=evaluation_modes(config,base)
-            all_metrics={};by_task={};valid=True
+            all_metrics={};by_task={};by_cohort={};valid=True
             for mode in modes:
                 cases=[];total=cohort_size(config,mode)
                 for start in range(0,total,config['evaluation']['shard_tasks']):
@@ -40,9 +42,15 @@ def collect(root,config):
                 if config.get('task')=='multitask':
                     for task in config['data']['tasks']:
                         by_task.setdefault(task,{})[mode]=summarize([c for c in cases if c['task']==task])
+                    for cohort in sorted({c['cohort'] for c in cases if 'cohort' in c}):
+                        for task in config['data']['tasks']:
+                            selected=[c for c in cases if c.get('cohort')==cohort and c['task']==task]
+                            if selected:
+                                by_cohort.setdefault(cohort,{}).setdefault(task,{})[mode]=summarize(selected)
             if valid:
                 step=int(checkpoint.name.split('-')[-1]);row=dict(step=step,epoch=step/steps_per_epoch(config),metrics=all_metrics)
                 if by_task:row['by_task']=by_task
+                if by_cohort:row['by_cohort']=by_cohort
                 atomic_json(checkpoint/'summary.json',row);curve.append(row)
         if curve:
             destination=Path(root)/'results'/base
@@ -67,6 +75,16 @@ def collect(root,config):
                 else:cells=['—']*len(columns)
                 lines.append(f'| {step/steps_per_epoch(config):g} | '+' | '.join(cells)+' |')
             (destination/'report.md').write_text('\n'.join(lines)+'\n')
+            if any('by_cohort' in row for row in curve):
+                lines=['# 原验证与类别内小 OOD（分别报告）','',
+                       '| step | 题集 | 任务 | 到达目标 | 到达且正确停止 |',
+                       '|---|---|---|---|---|']
+                for row in curve:
+                    for cohort,tasks_by_cohort in row.get('by_cohort',{}).items():
+                        for task,metrics in tasks_by_cohort.items():
+                            metric=metrics['RO'];count=metric['tasks']
+                            lines.append(f"| {row['step']} | {cohort} | {task} | {metric['arrival']}/{count} | {metric['arrival_and_stop']}/{count} |")
+                (destination/'cohort_report.md').write_text('\n'.join(lines)+'\n')
 
 def main():
     p=argparse.ArgumentParser();p.add_argument('role',choices=['train','evaluate'])

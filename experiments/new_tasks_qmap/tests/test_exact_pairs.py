@@ -469,7 +469,7 @@ class ExactPairTests(unittest.TestCase):
         _,path_bank=training_local_paths(corpus,replay_data,edges,minimum_steps=1,maximum_steps=3)
         path_config=deepcopy(replay_config);path_config['training'].update(batch_size=32,
             failure_replay=dict(bank='../paths.npz',sampler='local_paths',mode='joint',minimum_steps=1,maximum_steps=3,
-                groups_per_batch=1,block_batches=4,layouts_per_batch=1))
+                groups_per_batch=1,block_batches=4,layouts_per_batch=1,preserve_point_distances_up_to=5))
         with tempfile.TemporaryDirectory() as tmp:
             np.savez(Path(tmp)/'paths.npz',**path_bank)
             complete=Path(tmp)/'complete';interrupted=Path(tmp)/'interrupted'
@@ -628,9 +628,9 @@ class ExactPairTests(unittest.TestCase):
         np.testing.assert_array_equal(bank['path_lengths'],[10,9])
         from copy import deepcopy
         from experiments.new_tasks_qmap.src.relation_data import LocalPathSampler
-        opts=dict(minimum_steps=5,maximum_steps=10,groups_per_batch=1,block_batches=4,layouts_per_batch=1)
+        opts=dict(minimum_steps=5,maximum_steps=10,groups_per_batch=1,block_batches=4,layouts_per_batch=1,preserve_point_distances_up_to=5)
         rngs=[np.random.default_rng(91),np.random.default_rng(91)]
-        samplers=[LocalPathSampler(corpus,data,bank,dict(opts,mode=mode),rng) for mode,rng in zip(['joint','shuffled'],rngs)]
+        samplers=[LocalPathSampler(corpus,data,bank,dict(opts,mode=mode),rng,.75) for mode,rng in zip(['joint','shuffled'],rngs)]
         pairs=np.column_stack([np.arange(64)%10,np.full(64,10)])
         ranking=np.tile([[0,10],[1,10]],(16,1));lookup=np.arange(corpus.size)
         actual=[[],[]];occurrences=[{},{}]
@@ -639,7 +639,10 @@ class ExactPairTests(unittest.TestCase):
             self.assertEqual(rngs[0].bit_generator.state,rngs[1].bit_generator.state)
             point_count=int((outputs[0][4]>0).sum());context_count=int((outputs[0][5]>0).sum())
             self.assertEqual(point_count,int((outputs[1][4]>0).sum()))
-            np.testing.assert_array_equal(outputs[0][0][:-point_count],outputs[1][0][:-point_count])
+            np.testing.assert_array_equal(outputs[0][4],outputs[1][4])
+            unchanged=outputs[0][4]==0
+            np.testing.assert_array_equal(outputs[0][0][unchanged],outputs[1][0][unchanged])
+            np.testing.assert_array_equal(outputs[0][0][:16],pairs[:16])
             np.testing.assert_array_equal(outputs[0][2][:-context_count],outputs[1][2][:-context_count])
             left=(corpus.successors(outputs[0][2][-context_count:,0])>=0).sum(axis=1)
             right=(corpus.successors(outputs[1][2][-context_count:,0])>=0).sum(axis=1)
@@ -652,13 +655,20 @@ class ExactPairTests(unittest.TestCase):
                 saved=deepcopy(samplers[0].state_dict());saved_rng=deepcopy(rngs[0].bit_generator.state)
             elif batch==1:
                 restored_rng=np.random.default_rng(999)
-                restored=LocalPathSampler(corpus,data,bank,dict(opts,mode='joint'),restored_rng)
+                restored=LocalPathSampler(corpus,data,bank,dict(opts,mode='joint'),restored_rng,.75)
                 restored.load_state_dict(saved);restored_rng.bit_generator.state=saved_rng
                 resumed=restored.apply(pairs,np.arange(64),ranking,np.arange(32),lookup,lookup,restored_rng)
                 for x,y in zip(outputs[0],resumed):np.testing.assert_array_equal(x,y)
         np.testing.assert_array_equal(np.sort(np.concatenate(actual[0])),np.sort(np.concatenate(actual[1])))
         self.assertTrue(all(len(batches)==1 for batches in occurrences[0].values()))
         self.assertTrue(any(len(batches)>1 for batches in occurrences[1].values()))
+        preserve_rng=np.random.default_rng(71)
+        preserve=LocalPathSampler(corpus,data,bank,dict(opts,mode='joint'),preserve_rng,.75)
+        near_anchors=np.tile([0,10],(64,1));near_anchors[50:55,0]=9
+        kept=preserve.apply(near_anchors,np.arange(64),ranking,np.arange(32),lookup,lookup,preserve_rng)
+        np.testing.assert_array_equal(kept[0][:16],near_anchors[:16])
+        np.testing.assert_array_equal(kept[0][50:55],near_anchors[50:55])
+        self.assertFalse(kept[4][50:55].any())
         for path,length in enumerate(bank['path_lengths']):
             length=int(length);rows=bank['path_tasks'][path,:length];kids=bank['path_children'][path,:length]
             np.testing.assert_array_equal(kids,corpus.successors(rows[:,0]))

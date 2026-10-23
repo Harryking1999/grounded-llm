@@ -292,7 +292,7 @@ class FailureReplaySampler:
         order=rng.permutation(n);ids,roles=ids[order],roles[order]
         return self.replace(pairs,point_indices,tasks,rank_indices,point_index,rank_index,ids,roles)
 
-    def replace(self,pairs,point_indices,tasks,rank_indices,point_index,rank_index,ids,roles):
+    def replace(self,pairs,point_indices,tasks,rank_indices,point_index,rank_index,ids,roles,point_positions=None):
         n=len(ids);origin=np.zeros(len(pairs),dtype=np.uint8);rank_origin=np.zeros(len(tasks),dtype=np.uint8)
         replay_ids=np.full(len(tasks),-1,dtype=np.int64)
         if not n:return pairs,point_indices,tasks,rank_indices,origin,rank_origin,replay_ids
@@ -300,9 +300,11 @@ class FailureReplaySampler:
         child_pairs=np.column_stack([children[valid],np.broadcast_to(replay[:,1,None],children.shape)[valid]])
         points=np.concatenate([replay,child_pairs]);np_=len(points)
         if np_>len(pairs): raise ValueError('Replay branches exceed point batch budget')
+        positions=np.arange(len(pairs)-np_,len(pairs)) if point_positions is None else np.asarray(point_positions)
+        if len(positions)!=np_ or len(np.unique(positions))!=np_ or (positions<0).any() or (positions>=len(pairs)).any():raise ValueError('Invalid replay point positions')
         pairs=pairs.copy();point_indices=point_indices.copy();tasks=tasks.copy();rank_indices=rank_indices.copy()
-        pairs[-np_:]=points;point_indices[-np_:]=point_index[points[:,0]]
-        origin[-np_:-np_+n]=1;origin[-np_+n:]=2
+        pairs[positions]=points;point_indices[positions]=point_index[points[:,0]]
+        origin[positions[:n]]=1;origin[positions[n:]]=2
         tasks[-n:]=replay;rank_indices[-n:]=rank_index[replay[:,0]]
         rank_origin[-n:]=roles;replay_ids[-n:]=ids
         return pairs,point_indices,tasks,rank_indices,origin,rank_origin,replay_ids
@@ -315,9 +317,11 @@ class LocalPathSampler(FailureReplaySampler):
     Shuffling only within layout and legal degree also preserves each batch's
     replay count, number of point labels and independent proposal prefixes.
     """
-    def __init__(self,corpus,data,bank,options,rng):
+    def __init__(self,corpus,data,bank,options,rng,finite_point_fraction):
         from grounded_llm.core.qmap.sampling import GroupCoverageSampler
         self.corpus,self.options,self.rng=corpus,options,rng
+        if not 0<finite_point_fraction<1:raise ValueError('Finite supplement fraction required')
+        self.finite_point_fraction=finite_point_fraction
         self.tasks,self.reason,exact=self.validate(corpus,data,bank);self.children=exact['children']
         self.paths=np.asarray(bank['path_context_index'],dtype=np.int64);self.lengths=np.asarray(bank['path_lengths'],dtype=np.int64)
         if self.paths.ndim!=2 or self.paths.shape[1]!=options['maximum_steps'] or len(self.paths)!=len(self.lengths):raise ValueError('Path group shape changed')
@@ -373,7 +377,19 @@ class LocalPathSampler(FailureReplaySampler):
         for column,key in enumerate(['rank_path_id','rank_path_step','rank_path_occurrence'],1):self.last_annotations[key][-n:]=plan[:,column]
         self.last_annotations['rank_path_block'][-n:]=self.blocks-1
         np.add.at(self.actual_path_steps,plan[:,1],1)
-        return self.replace(pairs,point_indices,tasks,rank_indices,point_index,rank_index,ids,np.full(n,2,dtype=np.uint8))
+        count=n+int((self.children[ids]>=0).sum())
+        prefix=len(pairs)-round(len(pairs)*self.finite_point_fraction)
+        positions=np.arange(prefix,len(pairs));truth=self.corpus.distance(pairs[positions,0],pairs[positions,1])
+        if not np.isfinite(truth).all():raise ValueError('Original finite supplement contains an unreachable pair')
+        cutoff=self.options['preserve_point_distances_up_to']
+        far=self.rng.permutation(positions[truth>cutoff])
+        # Retain original positive near labels whenever the finite far pool
+        # suffices. In a shortfall, protect distances1-2 until the last resort.
+        middle=self.rng.permutation(positions[(truth>2)&(truth<=cutoff)])
+        close=self.rng.permutation(positions[truth<=min(2,cutoff)])
+        replacement=np.concatenate([far,middle,close])[:count]
+        if len(replacement)!=count:raise ValueError('Whole paths exceed finite supplement budget')
+        return self.replace(pairs,point_indices,tasks,rank_indices,point_index,rank_index,ids,np.full(n,2,dtype=np.uint8),replacement)
 
     def state_dict(self):
         return dict(paths=self.paths,group_sampler=self.group_sampler.state_dict(),queue=self.queue,offsets=self.offsets,

@@ -1593,5 +1593,35 @@
     "A first nonoptimal action may be a recoverable detour. First dead entry is reported separately.",
     "No5-10-step joint path supervision or Bellman loss was used."
   ],
-  "step_index_meaning": "First-event step is the number of moves already executed. Index0 means the first action; median index1 means the second action. First-event distance is true remaining distance at that visited state, not initial task distance."
+  "step_index_meaning": "First-event step is the number of moves already executed. Index0 means the first action; median index1 means the second action. First-event distance is true remaining distance at that visited state, not initial task distance.",
+  "actual_sampling": {
+    "control": {
+      "batches": 30000,
+      "point_rows": 61440000,
+      "rank_rows": 30720000,
+      "finite_point_fraction": 0.8264104654947917,
+      "positive_point_distance_1_5_fraction": 0.31263046875,
+      "boundary_rank_fraction": 0.5,
+      "all_labels_exact": true,
+      "all_legal_candidates_preserved": true
+    },
+    "coupled": {
+      "batches": 30000,
+      "point_rows": 61440000,
+      "rank_rows": 30720000,
+      "finite_point_fraction": 0.78049248046875,
+      "positive_point_distance_1_5_fraction": 0.26823115234375,
+      "boundary_rank_fraction": 0.5,
+      "all_labels_exact": true,
+      "all_legal_candidates_preserved": true
+    },
+    "matched_main_stream": {
+      "passed": true,
+      "ranking_rows": 30720000,
+      "shards": 301,
+      "identical_all_ranking_proposals": true,
+      "identical_preserved_independent_points": true
+    },
+    "limitation": "Neighborhood resampling also changes finite and near-point proportions. This comparison alone does not isolate adjacency structure from these distribution shifts."
+  }
 }

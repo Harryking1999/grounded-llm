@@ -1,0 +1,80 @@
+{
+  "source_commit": "8e1ce4621c23c7a482351db2b703ad483757c94f",
+  "configuration": "experiments/new_tasks_qmap/configs/sokoban_local_paths_data.json",
+  "checkpoint_run": "neighborhood_control",
+  "checkpoint_step": 25000,
+  "training_query_count": 16384,
+  "query_layouts": 1000,
+  "construction": {
+    "minimum_steps": 5,
+    "maximum_steps": 10,
+    "seeds_per_layout": 32,
+    "eligible_failure_seeds": 30420,
+    "selected_seeds": 28576,
+    "retained_paths": 23725,
+    "rejected_paths": 4851,
+    "retained_layouts": 1000,
+    "selected_layouts": 1000,
+    "retained_lengths": {
+      "2": 229,
+      "3": 452,
+      "4": 483,
+      "5": 1432,
+      "6": 1176,
+      "7": 1013,
+      "8": 895,
+      "9": 876,
+      "10": 17169
+    },
+    "selected_by_initial_distance": {
+      "1_1": 0,
+      "2_2": 358,
+      "3_5": 3415,
+      "6_10": 5214,
+      "11_20": 6599,
+      "21_40": 6798,
+      "41_80": 5304,
+      "81_inf": 888,
+      "proven_unreachable": 0
+    },
+    "retained_by_initial_distance": {
+      "1_1": 0,
+      "2_2": 229,
+      "3_5": 1417,
+      "6_10": 3393,
+      "11_20": 6186,
+      "21_40": 6541,
+      "41_80": 5110,
+      "81_inf": 849,
+      "proven_unreachable": 0
+    },
+    "rejected_by_initial_distance": {
+      "1_1": 0,
+      "2_2": 129,
+      "3_5": 1998,
+      "6_10": 1821,
+      "11_20": 413,
+      "21_40": 257,
+      "41_80": 194,
+      "81_inf": 39,
+      "proven_unreachable": 0
+    },
+    "protected_boundary_paths": 8393,
+    "retained_protected_prefixes": 3542,
+    "short_paths_reaching_goal": 1164,
+    "unique_decisions": 111117,
+    "all_legal_branches_preserved": true,
+    "exact_unit_descent": true,
+    "scope": "Candidate whole path groups only. No optimizer update. Protected prefixes shorter than the minimum are excluded, never silently treated as complete paths."
+  },
+  "path_context_occurrences": 211787,
+  "unique_contexts": 111117,
+  "legal_candidate_occurrences": 599735,
+  "optimizer_updates": 0,
+  "raw_result": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/sokoban_coverage_d365a4c/analysis_8e1ce46/training_local_paths_control.json",
+  "archives": {
+    "edges": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/sokoban_coverage_d365a4c/analysis_8e1ce46/training_local_paths_control.edges.npz",
+    "bank": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/sokoban_coverage_d365a4c/analysis_8e1ce46/training_local_paths_control.bank.npz"
+  },
+  "uses_bellman_loss": false
+}

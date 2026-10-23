@@ -89,7 +89,8 @@
       "maximum_steps": 10,
       "groups_per_batch": 24,
       "block_batches": 250,
-      "layouts_per_batch": 16
+      "layouts_per_batch": 16,
+      "preserve_point_distances_up_to": 5
     }
   },
   "relations": {
@@ -120,5 +121,5 @@
   "selection": "Lowest validation finite Huber plus candidate soft-rank CE, equally averaging predeclared validation cohorts; no test checkpoint selection.",
   "scope": "Independent Q(S), Q(G); exact complete goals only; no oracle in inference features, no pruning, no search, no LLM retraining.",
   "acceptance": "experiments/new_tasks_qmap/configs/exact_pair_acceptance.json",
-  "hypothesis": "Matched fresh30k phases from the same validation-selected neighborhood control checkpoint, with identical1000-layout data splits,128D Sigmoid, original distance Huber plus soft-rank loss, main proposal seed and evaluation. Original control diagnoses the new data effect. The shuffled and joint local-path arms use the same fixed5-10-step bank. Every complete250-batch block has exactly the same replay context multiset; shuffling within layout and legal-child count also preserves each batch replay count, point-label count, layout/degree profile and untouched main prefixes. The only difference between these two arms is whether consecutive path contexts co-occur. Parent and ALL legal children are point-supervised in either arm. Separate planned groups, actual context exposure and same-batch path completion are recorded. No Bellman term, model change, inference search or filtering."
+  "hypothesis": "Matched fresh30k phases from the same validation-selected neighborhood control checkpoint, with identical1000-layout data splits,128D Sigmoid, original distance Huber plus soft-rank loss, main proposal seed and evaluation. Original control diagnoses the new data effect. The shuffled and joint local-path arms use the same fixed5-10-step bank. Every complete250-batch block has exactly the same replay context multiset; shuffling within layout and legal-child count also preserves each batch replay count, point-label count, layout/degree profile and untouched main supervision. The only difference between these two arms is whether consecutive path contexts co-occur. Parent and ALL legal children are point-supervised in either arm. Separate planned groups, actual context exposure and same-batch path completion are recorded. No Bellman term, model change, inference search or filtering. Local-path labels replace the finite far supplement first, retaining the broad prefix and original1-5 labels whenever far slots suffice. Shared randomized replacement positions prevent batch degree/layout matching from changing the independent point multiset between the two path arms."
 }

@@ -81,7 +81,7 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
             import shutil
             temporary=snapshot.with_suffix('.tmp');shutil.copyfile(source,temporary);temporary.replace(snapshot)
         with np.load(snapshot) as archive: bank={key:archive[key] for key in archive.files}
-        replay_sampler=(LocalPathSampler(corpus,data,bank,replay_options,replay_rng) if local_paths
+        replay_sampler=(LocalPathSampler(corpus,data,bank,replay_options,replay_rng,relation_sampler.finite_fraction) if local_paths
                         else FailureReplaySampler(corpus,data,bank,replay_options))
         replay_draws=np.zeros(len(replay_sampler.tasks),dtype=np.uint32)
         atomic_json(out/'failure_replay_summary.json',replay_sampler.summary)

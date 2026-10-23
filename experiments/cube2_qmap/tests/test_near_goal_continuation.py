@@ -5,7 +5,7 @@ import numpy as np
 from experiments.cube2_qmap.src.near_goal_continuation import ProtectedRelations, sample_tasks, training_tasks
 from experiments.cube2_qmap.src.full_state_joint import fixed_batch, task_pairs
 from experiments.cube2_qmap.tests.test_full_state_joint import Ring
-from experiments.cube2_qmap.src.landmarks import near_route_bank,near_route_tasks
+from experiments.cube2_qmap.src.landmarks import near_route_bank,near_route_tasks,near_segment_bank
 
 
 class NearGoalTests(unittest.TestCase):
@@ -58,6 +58,19 @@ class NearGoalTests(unittest.TestCase):
             for index in range(length):
                 self.assertIn(path[index+1],env.successors(path[index]))
                 self.assertEqual(env.distance(path[index+1],goal),length-index-1)
+
+    def test_segment_bank_keeps_contiguous_exact_stars_without_claiming_target_arrival(self):
+        env=Ring();env.depth=env.distance(np.arange(env.size),0)
+        guard=ProtectedRelations(env,task_pairs(env,np.array([[20,2]])),np.zeros(env.size,dtype=bool))
+        bank=near_segment_bank(env,{1:np.array([1,40]),2:np.array([2,39])},guard,
+            dict(pool_size=12,candidate_batch_size=32,maximum_candidate_batches=20,
+                 minimum_segment_parents=3,maximum_segment_parents=5),np.random.default_rng(5))
+        self.assertTrue(np.all((bank['lengths']>=3)&(bank['lengths']<=5)))
+        self.assertFalse(guard.task_blocked(env,near_route_tasks(bank,4,np.random.default_rng(4))).any())
+        for path,length,goal in zip(bank['paths'],bank['lengths'],bank['goals']):
+            for index in range(length):
+                self.assertIn(path[index+1],env.successors(path[index]))
+                self.assertEqual(env.distance(path[index+1],goal),env.distance(path[index],goal)-1)
 
 
 if __name__=='__main__':unittest.main()

@@ -1,0 +1,10 @@
+{
+  "parent_contract": "experiments/cube2_qmap/configs/near_goal_path_replay.json",
+  "hypothesis": "Where whole routes are too constrained by the protected state mask, test contiguous admissible 5-10-parent segments linking near-target decisions without exposing protected stars.",
+  "data": {
+    "route_pool": {"pool_size": 3072, "candidate_batch_size": 1024, "maximum_candidate_batches": 2048, "paths_per_batch": 24, "minimum_segment_parents": 5, "maximum_segment_parents": 10}
+  },
+  "supervision": "Exact shortest-path segments translated toward absolute near-solved targets. Every parent and all candidates in every segment satisfy the original relation and state exclusions. A segment can end before the target; report it as segment supervision, not a complete-route success.",
+  "comparison": "Keep the low-learning-rate baseline's Q, Adam, losses, restoration replay, update budget and candidate-selection rule. Change only near-target sampling to a fixed admissible segment pool, including repeated exposure; report its actual support and sampled star counts.",
+  "scope": "Bounded segment-data continuation from step 1000, with all stage checkpoints retained. No automatic extension, loosening of heldout exclusions or adoption."
+}

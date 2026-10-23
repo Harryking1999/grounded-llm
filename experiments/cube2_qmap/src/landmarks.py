@@ -49,6 +49,43 @@ def near_route_tasks(bank, count, rng):
     return np.column_stack((paths[:,:-1][live],np.repeat(bank['goals'][indices],lengths)))
 
 
+def near_segment_bank(env,pools,guard,options,rng):
+    """Keep contiguous admissible windows, without calling them whole routes."""
+    depths=sorted(pools);banks={d:[] for d in depths};seen=set();attempts=accepted=0
+    quotas={d:options['pool_size']//len(depths)+int(i<options['pool_size']%len(depths))
+            for i,d in enumerate(depths)}
+    for _ in range(options['maximum_candidate_batches']):
+        levels=np.asarray(depths)[(np.arange(options['candidate_batch_size'])+attempts)%len(depths)]
+        goals=np.array([rng.choice(pools[int(d)]) for d in levels])
+        relative,lengths=shortest_paths(env,rng.integers(env.size,size=len(goals)),rng)
+        paths=env.compose(goals[:,None],relative)
+        live=np.arange(env.diameter)[None]<lengths[:,None]
+        tasks=np.column_stack((paths[:,:-1][live],np.repeat(goals,lengths)))
+        allowed=np.zeros_like(live);allowed[live]=~guard.task_blocked(env,tasks)
+        attempts+=len(goals)
+        for row in range(len(goals)):
+            boundaries=np.diff(np.r_[False,allowed[row],False].astype(int))
+            for first,last in zip(np.flatnonzero(boundaries==1),np.flatnonzero(boundaries==-1)):
+                if last-first<options['minimum_segment_parents']:
+                    continue
+                length=min(last-first,options['maximum_segment_parents'])
+                first+=int(rng.integers(last-first-length+1))
+                accepted+=1;depth=int(levels[row])
+                key=(int(paths[row,first]),int(goals[row]),int(length))
+                if len(banks[depth])>=quotas[depth] or key in seen:
+                    continue
+                window=np.full(options['maximum_segment_parents']+1,goals[row],dtype=np.int64)
+                window[:length+1]=paths[row,first:first+length+1]
+                banks[depth].append((window,int(length),int(goals[row])));seen.add(key)
+        if all(len(banks[d])==quotas[d] for d in depths):
+            rows=[row for depth in depths for row in banks[depth]]
+            return dict(paths=np.stack([r[0] for r in rows]),lengths=np.array([r[1] for r in rows]),
+                        goals=np.array([r[2] for r in rows]),
+                        goal_depths=np.array([d for d in depths for _ in banks[d]]),
+                        candidates=np.array(attempts),admissible=np.array(accepted))
+    raise ValueError('Not enough admissible contiguous training segments')
+
+
 def landmark_batch(env, roots, heldout, rng, goal_depth=7):
     """Link every pre-landmark path parent and all competitors to one target."""
     paths, lengths = shortest_paths(env, roots, rng)

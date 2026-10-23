@@ -162,11 +162,13 @@ def run(args):
     relative_pools={d:np.flatnonzero(env.depth==d) for d in opts.get('local_distance_levels',[])}
     route_bank=None
     if opts.get('route_pool'):
-        from .landmarks import near_route_bank
-        route_bank=near_route_bank(env,pools,guard,opts['route_pool'],
+        from .landmarks import near_route_bank,near_segment_bank
+        builder=near_segment_bank if 'minimum_segment_parents' in opts['route_pool'] else near_route_bank
+        route_bank=builder(env,pools,guard,opts['route_pool'],
                                   np.random.default_rng(config['seed']+40))
         np.savez_compressed(args.out/'route_pool.npz',**route_bank)
         result['route_pool']={k:int(route_bank[k]) for k in ('candidates','admissible')}
+        result['route_pool']['kind']='segments' if builder is near_segment_bank else 'complete_routes'
         result['route_pool']['routes']=len(route_bank['goals'])
         result['route_pool']['unique_goals']=len(np.unique(route_bank['goals']))
         result['route_pool']['lengths']={str(n):int((route_bank['lengths']==n).sum())

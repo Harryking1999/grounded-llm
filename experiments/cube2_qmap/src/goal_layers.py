@@ -10,7 +10,7 @@ import torch
 from grounded_llm.core.files import atomic_json
 from grounded_llm.tasks.cube2.environment import Cube2
 from .coverage_data import (CoverageGuard,keys_to_pairs,closure_keys,goal_orbits,
-    load_coverage_config,coverage,hist,unique_tasks,predicted_scores)
+    load_coverage_config,coverage,hist,unique_tasks,predicted_scores,model_from)
 
 
 def reverse_layers(env,goal):
@@ -84,11 +84,25 @@ def layer_report(model,env,data,role,device,full=False):
         scores=predicted_scores(model,env,rows,device);truth=env.distance(env.successors(rows[:,0]),rows[:,1,None])
         depth=env.distance(*rows.T);pred=source_distances(model,env,rows,device)
         right=truth[np.arange(len(rows)),scores.argmin(-1)]==depth-1
+        ordered=truth[:,:,None]<truth[:,None,:];respected=scores[:,:,None]<scores[:,None,:]
+        def summary(keep):
+            required=ordered[keep];correct=respected[keep]&required
+            return dict(count=int(keep.sum()),top1=float(right[keep].mean()),distance_mae=float(np.abs(pred[keep]-depth[keep]).mean()),
+                strict_pair_order_accuracy=float(correct.sum()/required.sum()) if required.any() else None,
+                all_candidate_ordering_rate=float((~required|respected[keep]).all((1,2)).mean()))
         return dict(rows=len(rows),distance_mae=float(np.abs(pred-depth).mean()),candidate_top1=float(right.mean()),
-            by_layer={str(int(d)):dict(count=int((depth==d).sum()),top1=float(right[depth==d].mean()),
-                distance_mae=float(np.abs(pred[depth==d]-d).mean())) for d in np.unique(depth)})
+            strict_pair_order_accuracy=summary(np.ones(len(rows),bool))['strict_pair_order_accuracy'],
+            all_candidate_ordering_rate=summary(np.ones(len(rows),bool))['all_candidate_ordering_rate'],
+            by_layer={str(int(d)):summary(depth==d) for d in np.unique(depth)},
+            by_goal_layer={str(int(g)):{str(int(d)):summary((rows[:,1]==g)&(depth==d))
+                for d in np.unique(depth[rows[:,1]==g])} for g in np.unique(rows[:,1])})
     result=dict(training=decisions(tasks),micro_development=decisions(np.load(data/'MicroHoldout.npy')),
         switching=switch_metrics(model,env,np.load(data/'SwitchParents.npy'),device))
+    micro=np.load(data/'Micro.npy');parents,counts=np.unique(micro[:,0],return_counts=True)
+    shared=parents[counts==len(np.load(data/'goals.npy'))]
+    g1=np.flatnonzero(env.depth==1);d=env.distance(shared[:,None],g1)
+    shared=shared[d.max(-1)!=d.min(-1)]
+    result['micro_shared_training_switching']=switch_metrics(model,env,shared,device)
     p=np.load(data/'paths.npz');states=p['states'];goals=p['goals'];lengths=p['lengths']
     valid=np.arange(states.shape[1])[None,:]<=lengths[:,None]
     rows=np.column_stack((states[valid],np.broadcast_to(goals[:,None],states.shape)[valid]))
@@ -254,7 +268,16 @@ def prepare(args):
 def main():
     p=argparse.ArgumentParser(__doc__)
     for name in ('config','source','oracle','out'):p.add_argument('--'+name,type=Path,required=True)
-    p.add_argument('--source-commit',required=True);prepare(p.parse_args())
+    p.add_argument('--source-commit',required=True)
+    p.add_argument('--checkpoint',type=Path);p.add_argument('--role',default='Layered')
+    p.add_argument('--device',default='cuda')
+    args=p.parse_args()
+    if args.checkpoint:
+        torch.set_num_threads(2);env=Cube2(args.oracle,metric='QTM_URF_6')
+        model=model_from(args.checkpoint,env,args.device);args.out.mkdir(parents=True,exist_ok=False)
+        atomic_json(args.out/'metrics.json',dict(source_commit=args.source_commit,checkpoint=str(args.checkpoint),
+            role=args.role,metrics=layer_report(model,env,args.source,args.role,args.device,full=True)))
+    else:prepare(args)
 
 
 if __name__=='__main__':main()

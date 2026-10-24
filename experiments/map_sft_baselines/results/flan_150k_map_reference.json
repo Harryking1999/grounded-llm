@@ -1,6 +1,6 @@
 {
   "policy": "frozen_greedy_top1",
-  "source_commit": "53198b1",
+  "source_commit": "9a00408",
   "action_budget": 32,
   "by_cohort": {
     "original": {
@@ -28,7 +28,7 @@
       },
       "cube2": {
         "tasks": 500,
-        "arrival": 62
+        "arrival": 183
       },
       "puzzle8": {
         "tasks": 500,
@@ -40,5 +40,24 @@
   "config": "experiments/map_sft_baselines/configs/flan_150k_reassessment.json",
   "original_flan_data": "/home/gongruochen/grounded_llm/runs/flan_four_fe77be1/data",
   "raw_cases": "runs/model_retests/flan_150k_53198b1/map_reference_cases.jsonl",
-  "remote_run": "/home/gongruochen/grounded_llm/runs/flan_150k_53198b1"
+  "remote_run": "/home/gongruochen/grounded_llm/runs/flan_150k_53198b1",
+  "unchanged_cohorts_source_commit": "53198b1",
+  "cube_small_ood_map": {
+    "run": "cube_near_low_lr_ed21cd4",
+    "checkpoint": "train/best.pt",
+    "step": 2000,
+    "scope": "FLAN_small_ood_only"
+  },
+  "cube_small_ood_previous_reference": {
+    "arrival": 62,
+    "tasks": 500,
+    "source_commit": "53198b1",
+    "raw_directory": "map_reference_original",
+    "paired": {
+      "both_success": 51,
+      "new_only_success": 132,
+      "old_only_success": 11,
+      "both_fail": 306
+    }
+  }
 }

@@ -1,0 +1,175 @@
+{
+  "observed_utc": "2026-10-24T01:24:03Z",
+  "scope": "Saved small OOD decisions only, no model generation or training; actual executed nonterminal legal actions, cap 32.",
+  "tasks": {
+    "blocks": {
+      "cases": 500,
+      "unique_states": 161875,
+      "decisions": 6054,
+      "metrics": {
+        "original_actual": {
+          "decisions": 6054,
+          "action_map_min": 2505,
+          "ndcg1_sum": 3580.6667164480186,
+          "ndcg10_sum": 5022.3765318562255
+        },
+        "original_solved": {
+          "decisions": 6054,
+          "action_map_min": 4685,
+          "ndcg1_sum": 5272.465198042051,
+          "ndcg10_sum": 5776.576921550565
+        }
+      },
+      "conflicts": {
+        "original": {
+          "decisions": 6054,
+          "opposite_pairs": 60981,
+          "rank_favors_actual": 11456,
+          "rank_favors_solved": 49525,
+          "rank_tied": 0,
+          "conflict_states": 5320,
+          "state_favors_actual": 279,
+          "state_favors_solved": 4875,
+          "state_tied": 166,
+          "disjoint_top_decisions": 3549,
+          "action_actual_top": 355,
+          "action_solved_top": 2535,
+          "action_neither_top": 659
+        }
+      },
+      "strata": {
+        "original_first": {
+          "decisions": 500,
+          "opposite_pairs": 6266,
+          "rank_favors_actual": 1470,
+          "rank_favors_solved": 4796,
+          "rank_tied": 0,
+          "action_actual_top_all": 239,
+          "action_solved_top_all": 389,
+          "disjoint_top_decisions": 262,
+          "action_actual_top": 32,
+          "action_solved_top": 182,
+          "action_neither_top": 48
+        },
+        "original_reachable": {
+          "decisions": 2359,
+          "opposite_pairs": 33108,
+          "rank_favors_actual": 6469,
+          "rank_favors_solved": 26639,
+          "rank_tied": 0,
+          "action_actual_top_all": 849,
+          "action_solved_top_all": 1752,
+          "disjoint_top_decisions": 1517,
+          "action_actual_top": 145,
+          "action_solved_top": 1048,
+          "action_neither_top": 324
+        }
+      }
+    },
+    "cube2": {
+      "cases": 388,
+      "unique_states": 16643,
+      "decisions": 11787,
+      "metrics": {
+        "original_actual": {
+          "decisions": 11787,
+          "action_map_min": 6757,
+          "ndcg1_sum": 8447.358333333237,
+          "ndcg10_sum": 10594.041467167077
+        },
+        "original_solved": {
+          "decisions": 11787,
+          "action_map_min": 7310,
+          "ndcg1_sum": 8855.13888888884,
+          "ndcg10_sum": 10629.420203029666
+        },
+        "step2000_actual": {
+          "decisions": 11787,
+          "action_map_min": 8093,
+          "ndcg1_sum": 9250.33333333331,
+          "ndcg10_sum": 10845.468321711047
+        },
+        "step2000_solved": {
+          "decisions": 11787,
+          "action_map_min": 7872,
+          "ndcg1_sum": 9037.877777777801,
+          "ndcg10_sum": 10700.417832972313
+        }
+      },
+      "conflicts": {
+        "original": {
+          "decisions": 11787,
+          "disjoint_top_decisions": 2562,
+          "action_actual_top": 380,
+          "action_solved_top": 931,
+          "action_neither_top": 1251,
+          "opposite_pairs": 17438,
+          "rank_favors_actual": 9566,
+          "rank_favors_solved": 7855,
+          "rank_tied": 17,
+          "conflict_states": 2764,
+          "state_favors_actual": 1381,
+          "state_favors_solved": 1158,
+          "state_tied": 225
+        },
+        "step2000": {
+          "decisions": 11787,
+          "opposite_pairs": 14886,
+          "rank_favors_actual": 10355,
+          "rank_favors_solved": 4408,
+          "rank_tied": 123,
+          "conflict_states": 3186,
+          "state_favors_actual": 2012,
+          "state_favors_solved": 867,
+          "state_tied": 307,
+          "disjoint_top_decisions": 2014,
+          "action_actual_top": 437,
+          "action_solved_top": 212,
+          "action_neither_top": 1365
+        }
+      },
+      "strata": {
+        "original_first": {
+          "decisions": 388,
+          "action_actual_top_all": 334,
+          "action_solved_top_all": 334
+        },
+        "original_reachable": {
+          "decisions": 11787,
+          "action_actual_top_all": 6757,
+          "action_solved_top_all": 7310,
+          "opposite_pairs": 17438,
+          "rank_favors_actual": 9566,
+          "rank_favors_solved": 7855,
+          "rank_tied": 17,
+          "disjoint_top_decisions": 2562,
+          "action_actual_top": 380,
+          "action_solved_top": 931,
+          "action_neither_top": 1251
+        },
+        "step2000_first": {
+          "decisions": 388,
+          "action_actual_top_all": 363,
+          "action_solved_top_all": 363
+        },
+        "step2000_reachable": {
+          "decisions": 11787,
+          "action_actual_top_all": 8093,
+          "action_solved_top_all": 7872,
+          "opposite_pairs": 14886,
+          "rank_favors_actual": 10355,
+          "rank_favors_solved": 4408,
+          "rank_tied": 123,
+          "disjoint_top_decisions": 2014,
+          "action_actual_top": 437,
+          "action_solved_top": 212,
+          "action_neither_top": 1365
+        }
+      }
+    }
+  },
+  "method": "Compare the same saved output against distances to actual g and to fixed solved goal 0. Conflicting pairs contain two named candidates whose strict order reverses between goals; ignore equal-distance pairs. Candidate-only comparisons; predicted ties counted separately. Repeated decisions/pairs are descriptive, not independent samples.",
+  "raw_run": "/home/gongruochen/grounded_llm/runs/flan_150k_53198b1",
+  "raw_script": "goal_bias_audit.py",
+  "raw_local": "runs/model_retests/flan_150k_goal_bias_audit.json"
+}

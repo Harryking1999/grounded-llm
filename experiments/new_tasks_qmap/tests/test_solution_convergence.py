@@ -11,6 +11,7 @@ from experiments.new_tasks_qmap.tests.test_solution_mixture import bank
 from experiments.new_tasks_qmap.src.relation_data import materialize
 from experiments.new_tasks_qmap.src.relations import train,validate_continuation,retain_checkpoint
 from experiments.new_tasks_qmap.src.solution_convergence import ConvergenceProbe,exposure_counts,whole_graph_structure,training_policy_graph,policy_continuity,optimal_branch_coherence
+from experiments.new_tasks_qmap.src.solution_global_order import unit_edge_point_coverage
 
 
 class ConvergenceTests(unittest.TestCase):
@@ -134,6 +135,18 @@ class ConvergenceTests(unittest.TestCase):
         self.assertEqual(row['ever_solved_but_lost'],0)
         self.assertEqual(row['ever_solved_now_unknown'],1)
         self.assertEqual(row['ever_solved_not_confirmed_now'],1)
+
+    def test_physical_edge_audit_keeps_directions_and_duplicate_exposure_separate(self):
+        pairs=np.array([[0,1],[0,1]]);edges=np.array([[0,1],[1,0],[2,1]])
+        summary,rows=unit_edge_point_coverage(pairs,np.ones(2),edges,4,np.array([2,3]))
+        self.assertEqual(summary['unit_labels'],1);self.assertEqual(summary['unit_exposed'],1)
+        np.testing.assert_array_equal(rows['draws'],[5,0,0])
+        np.testing.assert_array_equal(rows['present'],[True,False,False])
+
+    def test_physical_edge_audit_flags_inconsistent_labels_and_unknown_exposure(self):
+        summary,_=unit_edge_point_coverage(np.array([[0,1],[0,1]]),np.array([1,2]),np.array([[0,1]]),4)
+        self.assertEqual(summary['non_unit_matches'],1);self.assertEqual(summary['unit_labels'],0)
+        self.assertIsNone(summary['unit_exposed'])
 
 
 if __name__=='__main__':unittest.main()

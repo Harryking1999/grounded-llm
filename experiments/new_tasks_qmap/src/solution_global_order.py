@@ -46,6 +46,34 @@ def global_order_metrics(corpus, rows, truth, prediction):
         limitation='Pairs from the same target/layout are dependent; pair counts are not independent sample counts. Close-layer accuracy is reported separately from far-layer ordering.')
 
 
+def unit_edge_point_coverage(pairs,truth,edges,size,draws=None):
+    """Audit directed physical one-step pairs without conflating goal contexts.
+
+    Duplicate pool rows retain all their exposure. A reverse relation is a
+    different query; an existing non-unit label is flagged rather than hidden.
+    No new relation is added to a training bank.
+    """
+    pairs=np.asarray(pairs,dtype=np.int64).reshape(-1,2);edges=np.asarray(edges,dtype=np.int64).reshape(-1,2)
+    truth=np.asarray(truth)
+    if len(truth)!=len(pairs) or (draws is not None and len(draws)!=len(pairs)):
+        raise ValueError('Point labels/counters do not match pool rows')
+    known=np.zeros(len(edges),bool);unit=known.copy()
+    exposure=np.zeros(len(edges),np.uint64) if draws is not None else None
+    if len(pairs):
+        key=pairs[:,0]*np.int64(size)+pairs[:,1];order=np.argsort(key);key=key[order]
+        starts=np.r_[0,np.flatnonzero(np.diff(key))+1];unique=key[starts]
+        low=np.minimum.reduceat(truth[order],starts);high=np.maximum.reduceat(truth[order],starts)
+        query=edges[:,0]*np.int64(size)+edges[:,1];at=np.searchsorted(unique,query)
+        safe=np.flatnonzero(at<len(unique));known[safe]=unique[at[safe]]==query[safe]
+        ids=np.flatnonzero(known);unit[ids]=(low[at[ids]]==1)&(high[at[ids]]==1)
+        if exposure is not None:
+            counts=np.add.reduceat(np.asarray(draws,dtype=np.uint64)[order],starts)
+            exposure[ids]=counts[at[ids]]
+    summary=dict(edges=len(edges),present=int(known.sum()),unit_labels=int(unit.sum()),non_unit_matches=int((known&~unit).sum()),
+        unit_exposed=int((unit&(exposure>0)).sum()) if exposure is not None else None)
+    return summary,dict(present=known,unit=unit,draws=exposure)
+
+
 def main():
     import argparse
     import torch

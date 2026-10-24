@@ -22,7 +22,7 @@
 | Rush Hour完整目标 | [完整状态对入口](../experiments/new_tasks_qmap/src/relations.py)、[任务配置](../experiments/new_tasks_qmap/configs/rush_hour/rush_hour_pairs.json) | [任务MapReader](../grounded_llm/tasks/rush_hour/qmap.py)；尚未通过采用验收 |
 | Token Swapping固定树任意目标 | [完整状态对入口](../experiments/new_tasks_qmap/src/relations.py)、[任务配置](../experiments/new_tasks_qmap/configs/token_swapping/token_swapping_pairs.json) | [任务MapReader](../grounded_llm/tasks/token_swapping/qmap.py)；尚未通过采用验收 |
 
-当前所有任务保持统一的距离 Huber＋候选软排序监督和损失配方；针对失败，先从数据覆盖、关系组合与采样修正，不新增任务专属损失或监督。该约束适用于当前及后续工作。历史运行并非全部具有相同采样、损失权重或距离几何。积木有向距离、汉诺塔对称 L1、当前魔方 L∞ 的区别保留在配置中。魔方的额外循环修复属于明确记录的任务适配，不将其描述为所有任务已有的相同训练流程。
+当前基线复用距离Huber＋候选软排序；模型、采样、权重与距离几何以对应配置为准。改进先与现有基线比较；更换损失或监督属于单独研究条件，需明确提出，不能在实现修复中悄悄替换。积木有向距离、汉诺塔对称L1、魔方L∞和循环修复保留各自身份，不描述为完全相同的训练流程。
 
 历史新任务的[固定目标可行性试验](../experiments/new_tasks_qmap/README.md)按任务独立调用同一小型诊断入口，不改动既有训练器。过桥比较即时耗时＋后继距离；推箱子使用成功状态集合的目标条件参照；24点主要检验可解性。不可达保留真值无穷、训练用明确的有限代理值。三者尚无采用权重，也未验证任意目标几何。
 

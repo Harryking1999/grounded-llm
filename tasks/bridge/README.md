@@ -1,6 +1,6 @@
 # 手电过桥
 
-独立规则、数据适配和裁判已实现；首轮仅检验固定目标 Qmap 可行性。正式范围与预算见[配置](../../experiments/new_tasks_qmap/configs/pilot/bridge.json)，结果见[报告](../../experiments/new_tasks_qmap/results/report.md)。不作为多任务SFT已采用任务。纯文字Flash64k固定筛查已完成，来源、结果及后续加难见[基线报告](../../experiments/task_text_baselines/results/report.md)。
+独立规则、数据适配和裁判已实现，首轮地图完成31/32题，尚未采用权重或准备正式SFT数据。作为扩充任务类别的候选，先使用现有两岸、单手电规则核对地图与接口；无需先加难。现有[配置](../../experiments/new_tasks_qmap/configs/pilot/bridge.json)、[结果](../../experiments/new_tasks_qmap/results/report.md)和[历史文字筛查](../../experiments/task_text_baselines/results/report.md)分别保留，下一轮安排见[项目状态](../../docs/PROJECT_STATUS_AND_TODO.md)。
 
 - [规则与输出](prompts/README.md)
 - [数据](data/README.md)与[示例](data/example.json)
@@ -12,6 +12,8 @@
 [Backhouse 与 Truong：The Capacity-C Torch Problem](https://people.cs.nott.ac.uk/psarb2/papers/abstract.html)。采用容量2、正整数时间的受限版本；本项目以完整状态图 Dijkstra 独立验算，不复刻论文中的优化算法。
 
 ## 变体与适用性
+
+以下保留早期难度调查，不作为当前入选门槛或默认扩展计划。
 
 现有实现仍为两岸、一手电、容量2、全员到右岸。这个目标下存在成熟的最优调度结构；增加人数主要增加计划长度，长人数筛查中的完成失败、非最优成本与输出截断须分开，不能据此认定LLM或Qmap的内部机制。
 

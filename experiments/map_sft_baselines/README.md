@@ -1,8 +1,54 @@
 # 地图与 SFT：同数据多基线
 
-本实验在共同物理轨迹与 token CE 下比较地图信息、主干训练范围和接口容量。研究设计见 [DESIGN.md](DESIGN.md)，核心成绩见[主报告](results/report.md)；固定510题已经用于模型选择，不能把最高值当成独立泛化成绩。
+本实验复用公共SFT管线，比较地图信息、主干训练范围与接口容量。当前以四任务联合训练为主体，旧积木对照保留原条件与结果；研究主线见[项目状态](../../docs/PROJECT_STATUS_AND_TODO.md)，数值见[主报告](results/report.md)。
 
-## 条件与结果入口
+## 当前比较
+
+| 比较 | 入口 | 回答的问题 |
+|---|---|---|
+| 四任务联合SFT | [设置与数据](#四任务联合sft) | 地图1.5B与文字3B、7B在同批多任务轨迹上的表现 |
+| 稀疏cross-attention | [层选择与配置](#flan-15b-稀疏-cross-attention) | 减少地图接入层如何影响学习表现与成本 |
+| 150K原验证与小OOD | [题集与评测](#150k-ro重评测与类别内小ood) | 类内换目标后的到达、停止与地图读取 |
+
+下一轮任务类别与子任务的组织见[研究简述](../../docs/RESEARCH_BRIEF.md)。尚未纳入本轮的类别不自动出现在当前训练配置中。
+
+## 四任务联合SFT
+
+[地图1.5B](configs/flan_four_50k_map.json)、[文字3B](configs/flan_four_50k_3b.json)、[文字7B](configs/flan_four_50k_7b.json)联合训练积木、二阶魔方、8-Puzzle与寻路，每任务12,500条，共50,000条。前三任务从已有正式轨迹均匀无放回抽样；寻路使用已采用固定图与纯Q，先锁定500个随机测试关系，再按长轨迹及新增状态—目标覆盖选择经精确距离认证的地图贪心路线，全程排除测试初始关系。测试不按地图成败筛选；SFT留出不代表Qmap未曝光。
+
+`src.multitask_prepare`准备两组相同物理轨迹，`src.multitask_data`按任务复用逐轮重编号；训练仍调用公共SFT，评测由`src.multitask_evaluate`分派既有任务裁判。地图组排序→Reason→Action，文字组去掉排序，模型与GPU拓扑沿用最近三组。学习率时程、batch和20轮上限不变，已有收敛判断改为自动停止：至少5轮、连续6个完整评测点未比既往最好提升5题。达到预算上限与满足收敛标准分别记录。
+
+固定评测每任务500题，按任务分别报告，联合2000题供已有停止判断使用。该配置仅含上述四任务；汉诺塔、过桥等是否进入下一轮由任务组合决定，不沿用这里的排除范围。
+
+## FLAN 1.5B 稀疏 cross-attention
+
+[正式配置](configs/flan_four_50k_sparse_crossatt.json)比较每2层、每4层和仅最后3层接入地图，接入点均位于对应decoder层之前。Qwen2.5-1.5B的28层中，三组分别接入14、7、3层；间隔按一基层号整除选择，最后3层为第26–28层。配置中的各baseline仅覆盖自己的地图接入层设置，训练与评测共用此选择。
+
+三组从同一1.5B基座重新初始化，复用原四任务50k数据、地图、重编号、全参训练、优化器、学习率、global batch、20轮上限及停止规则。保存频率保持每5k步；原固定2000题的RO／TF优先评整50k步断点，同类中新断点优先，其余断点在容量允许时补评。传输与评测使用相同优先级，当前分片完成后切换，源权重与已有答卷保留。028各用两卡训练，一卡参与评测；4090完成当前三组150k RO重评后接续，与028通过既有共享claim分配分片。150k原验证及小OOD仍单独报告，不并入新实验曲线。
+
+跨机缓存采用[稀疏实验缓存配置](configs/flan_sparse_retention.json)，限制总缓存占用且不取消旧断点。产物、进程、原训练停止断点与跨机路径由本实验runtime维护。
+
+## 150K RO重评测与类别内小OOD
+
+三组FLAN模型的150K重评测范围由[重评配置](configs/flan_150k_reassessment.json)维护。每组使用准确的150K断点：原验证四任务各500题，另加积木、二阶魔方、8-Puzzle小OOD各500题。三组150K推理权重均保留；最新训练恢复状态见[报告](results/report.md#原训练停止与恢复条件)，不能由推理权重的存在推断可完整续训。不纳入历史诊断模型。只做RO，沿用各模型的上下文、生成和动作预算；独立重评目录不向原训练的自动停止曲线写入混合成绩。
+
+小OOD保持对应原验证起点，积木取原认证最短清空路线最后一步之前的非空状态作为目标，即留一个合法块；魔方与华容道分别在距复原态1–3步的目标中固定种子取样，距离层题数尽量均分。题集生成不按地图成败筛选，参考路线用原精确环境认证。近复原的是目标，起点到目标的路线仍可能较长；规则化非复原目标可作后续独立条件，本配置先采用复原邻域。
+
+这里的小OOD是类别内新目标任务，不等于地图未见状态或关系；FLAN大OOD是未训练的新任务类别，另行准备。寻路训练本就含任意终点，本轮不把换终点称为新任务小OOD。旧积木路线中段目标OOD保留原题集及结果，不与本轮留一块题集拼接。
+
+魔方仅在本轮FLAN小OOD评测及同题地图贪心参照中使用保留的低学习率2000步候选；身份由重评配置维护，逐题记录实际地图来源。原验证、其他任务、FLAN训练地图及任务selection保持不变。准备题集时通过`--cube-small-ood-checkpoint`传入该候选权重；原`qmap.pt`不覆盖。
+
+评测资源可用`queue evaluate --workers-per-gpu N --worker-memory-gib G --poll-seconds S`在同卡并发独立分片；默认每卡一路，并发必须显式指定单进程所需空闲显存。重启加`--resume-workers`接管现有分片，仍由同一claim排除重复领取；资源参数不改变生成参数、单题预算或评分。节点使用情况在runtime维护。
+
+`src.small_ood_prepare`复用原FLAN评测数据与任务环境，生成带`original`／`small_ood`标签的固定题集，并可用`--map-reference-out`跑同题冻结地图Top-1贪心。模型评测复用`src.queue evaluate`，只领取配置中`only_steps`指定的断点。每组完整结果的`by_cohort`与`cohort_report.md`分别报告七项500题成绩，包括到达与到达且正确停止；汇总3500题仅用于核对完整性，不替代分项结论。地图贪心参照使用相同动作预算、合法候选与终止目标，保留逐题动作和失败；它是经验参照，不是LLM的数学上限。
+
+```bash
+python -m experiments.map_sft_baselines.src.small_ood_prepare --config experiments/map_sft_baselines/configs/flan_150k_reassessment.json --source ORIGINAL_FLAN_EVAL_DATA --out NEW_EVAL_DATA --map-reference-out MAP_REFERENCE_OUT --source-commit COMMIT
+```
+
+## 旧积木与单任务对照
+
+[DESIGN.md](DESIGN.md)维护以下旧积木对照的设计。固定510题已用于模型选择，最高值是监测集成绩。
 
 | 比较 | 正式配置 | 结果与解释 |
 |---|---|---|
@@ -23,40 +69,6 @@
 覆盖组的同更新比较与更长训练后的最终点分开。100k 原样保留50k数据，再按 DESIGN 的长度、覆盖和多样性顺序扩充；不加入重编号或 MLP。SFT 的起终点未重合不等于冻结 Q 或选模过程无泄露。
 
 12块清空训练后的非空目标OOD使用[配置](configs/blocks12_nonempty_ood.json)和`src.blocks12_nonempty_prepare`，配对原固定500题起点，在其最短参考路线的1/4、1/2、3/4位置取非空目标；不按地图成功筛选。三组使用实际停止的最新完整断点，冻结地图的同题贪心成绩单列参照。这是SFT目标条件的分布外评测，不能称为Qmap未见关系。
-
-### 四任务联合SFT
-
-[地图1.5B](configs/flan_four_50k_map.json)、[文字3B](configs/flan_four_50k_3b.json)、[文字7B](configs/flan_four_50k_7b.json)联合训练积木、二阶魔方、8-Puzzle与寻路，每任务12,500条，共50,000条。前三任务从已有正式轨迹均匀无放回抽样；寻路使用已采用固定图与纯Q，先锁定500个随机测试关系，再按长轨迹及新增状态—目标覆盖选择经精确距离认证的地图贪心路线，全程排除测试初始关系。测试不按地图成败筛选；SFT留出不代表Qmap未曝光。
-
-`src.multitask_prepare`准备两组相同物理轨迹，`src.multitask_data`按任务复用逐轮重编号；训练仍调用公共SFT，评测由`src.multitask_evaluate`分派既有任务裁判。地图组排序→Reason→Action，文字组去掉排序，模型与GPU拓扑沿用最近三组。学习率时程、batch和20轮上限不变，已有收敛判断改为自动停止：至少5轮、连续6个完整评测点未比既往最好提升5题。达到预算上限与满足收敛标准分别记录。
-
-固定评测每任务500题，按任务分别报告，联合2000题供已有停止判断使用。汉诺塔暂不处理；过桥、推箱子尚无本轮地图和题集，不伪造跨任务OOD成绩。
-
-### FLAN 1.5B 稀疏 cross-attention
-
-[正式配置](configs/flan_four_50k_sparse_crossatt.json)比较每2层、每4层和仅最后3层接入地图，接入点均位于对应decoder层之前。Qwen2.5-1.5B的28层中，三组分别接入14、7、3层；间隔按一基层号整除选择，最后3层为第26–28层。配置中的各baseline仅覆盖自己的地图接入层设置，训练与评测共用此选择。
-
-三组从同一1.5B基座重新初始化，复用原四任务50k数据、地图、重编号、全参训练、优化器、学习率、global batch、20轮上限及停止规则。保存频率保持每5k步；原固定2000题的RO／TF优先评整50k步断点，同类中新断点优先，其余断点在容量允许时补评。传输与评测使用相同优先级，当前分片完成后切换，源权重与已有答卷保留。028各用两卡训练，一卡参与评测；4090完成当前三组150k RO重评后接续，与028通过既有共享claim分配分片。150k原验证及小OOD仍单独报告，不并入新实验曲线。
-
-跨机缓存采用[稀疏实验缓存配置](configs/flan_sparse_retention.json)，限制总缓存占用且不取消旧断点。产物、进程、原训练停止断点与跨机路径由本实验runtime维护。
-
-### 150K RO重评测与类别内小OOD
-
-三组FLAN模型的150K重评测范围由[重评配置](configs/flan_150k_reassessment.json)维护。每组使用准确的150K断点：原验证四任务各500题，另加积木、二阶魔方、8-Puzzle小OOD各500题。三组150K推理权重均保留；最新训练恢复状态见[报告](results/report.md#原训练停止与恢复条件)，不能由推理权重的存在推断可完整续训。不纳入历史诊断模型。只做RO，沿用各模型的上下文、生成和动作预算；独立重评目录不向原训练的自动停止曲线写入混合成绩。
-
-小OOD保持对应原验证起点，积木取原认证最短清空路线最后一步之前的非空状态作为目标，即留一个合法块；魔方与华容道分别在距复原态1–3步的目标中固定种子取样，距离层题数尽量均分。题集生成不按地图成败筛选，参考路线用原精确环境认证。近复原的是目标，起点到目标的路线仍可能较长；规则化非复原目标可作后续独立条件，本配置先采用复原邻域。
-
-这里的小OOD是类别内新目标任务，不等于地图未见状态或关系；FLAN大OOD是未训练的新任务类别，另行准备。寻路训练本就含任意终点，本轮不把换终点称为新任务小OOD。旧积木路线中段目标OOD保留原题集及结果，不与本轮留一块题集拼接。
-
-魔方仅在本轮FLAN小OOD评测及同题地图贪心参照中使用保留的低学习率2000步候选；身份由重评配置维护，逐题记录实际地图来源。原验证、其他任务、FLAN训练地图及任务selection保持不变。准备题集时通过`--cube-small-ood-checkpoint`传入该候选权重；原`qmap.pt`不覆盖。
-
-评测资源可用`queue evaluate --workers-per-gpu N --worker-memory-gib G --poll-seconds S`在同卡并发独立分片；默认每卡一路，并发必须显式指定单进程所需空闲显存。重启加`--resume-workers`接管现有分片，仍由同一claim排除重复领取；资源参数不改变生成参数、单题预算或评分。节点使用情况在runtime维护。
-
-`src.small_ood_prepare`复用原FLAN评测数据与任务环境，生成带`original`／`small_ood`标签的固定题集，并可用`--map-reference-out`跑同题冻结地图Top-1贪心。模型评测复用`src.queue evaluate`，只领取配置中`only_steps`指定的断点。每组完整结果的`by_cohort`与`cohort_report.md`分别报告七项500题成绩，包括到达与到达且正确停止；汇总3500题仅用于核对完整性，不替代分项结论。地图贪心参照使用相同动作预算、合法候选与终止目标，保留逐题动作和失败；它是经验参照，不是LLM的数学上限。
-
-```bash
-python -m experiments.map_sft_baselines.src.small_ood_prepare --config experiments/map_sft_baselines/configs/flan_150k_reassessment.json --source ORIGINAL_FLAN_EVAL_DATA --out NEW_EVAL_DATA --map-reference-out MAP_REFERENCE_OUT --source-commit COMMIT
-```
 
 ## 代码归属
 

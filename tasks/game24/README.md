@@ -1,6 +1,8 @@
 # 24点
 
-独立规则、数据适配和裁判已实现；首轮仅检验固定目标 Qmap 可行性。正式范围与预算见[配置](../../experiments/new_tasks_qmap/configs/pilot/game24.json)，结果见[报告](../../experiments/new_tasks_qmap/results/report.md)。不作为多任务SFT已采用任务。纯文字Flash64k固定筛查已完成，来源、结果及后续加难见[基线报告](../../experiments/task_text_baselines/results/report.md)。
+独立规则、数据适配和裁判已实现，首轮地图完成70/137题，尚未采用权重或准备正式SFT数据。它是扩充运算类任务的候选，现有[配置](../../experiments/new_tasks_qmap/configs/pilot/game24.json)、[结果](../../experiments/new_tasks_qmap/results/report.md)与[文字筛查](../../experiments/task_text_baselines/results/report.md)保留原条件，下一轮安排见[项目状态](../../docs/PROJECT_STATUS_AND_TODO.md)。
+
+当前状态是剩余有理数的多重集合，动作是选择两个槽位和一个运算符并合并，目标为只剩24。运算符本身不构成完整动作，操作数选择同样重要。现有实现不依赖表达式历史；扩展到其他运算任务时，应先明确哪些信息决定后续合法动作与目标，复用这些规则和裁判入口。
 
 - [规则与输出](prompts/README.md)
 - [数据](data/README.md)与[示例](data/example.json)

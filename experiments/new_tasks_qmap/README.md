@@ -1,6 +1,6 @@
-# 三个新任务的 Qmap 实验
+# 新任务 Qmap：完整目标实验与固定目标试验
 
-推箱子、移车出库、棋子交换分别训练地图，每题指定一个完整目标；先验收地图能否独立贪心完成，再考虑接入LLM。三个任务均未达标，成绩与证据从[总报告](results/report.md)进入。研究优先级见[项目状态页](../../docs/PROJECT_STATUS_AND_TODO.md)。
+推箱子、移车出库、棋子交换使用完整目标训练入口；手电过桥与24点已有固定目标试验入口。各任务独立训练，复用公共Q编码器、距离、排序与采样。地图能力与证据从[总报告](results/report.md)进入，扩任务安排见[项目状态](../../docs/PROJECT_STATUS_AND_TODO.md)。
 
 ## 按任务进入
 
@@ -9,8 +9,10 @@
 | 推箱子 | [任务入口](../../tasks/sokoban/README.md) | [配置目录](configs/sokoban/)、[固定分布收敛检查](configs/sokoban/sokoban_mixture_convergence.json) | [推箱子报告](results/sokoban/report.md) |
 | 移车出库 | [任务入口](../../tasks/rush_hour/README.md) | [配置目录](configs/rush_hour/)、[卷积方案](configs/rush_hour/rush_hour_spatial_pairs.json) | [移车出库报告](results/rush_hour/report.md) |
 | 棋子交换 | [任务入口](../../tasks/token_swapping/README.md) | [配置目录](configs/token_swapping/)、[近距离与排序方案](configs/token_swapping/token_swapping_local_walk8_rank4_pairs.json) | [棋子交换报告](results/token_swapping/report.md) |
+| 手电过桥 | [任务入口](../../tasks/bridge/README.md) | [固定目标配置](configs/pilot/bridge.json) | [首轮结果](results/pilot/summary.json) |
+| 24点 | [任务入口](../../tasks/game24/README.md) | [固定目标配置](configs/pilot/game24.json) | [首轮结果](results/pilot/summary.json) |
 
-验收保留全部合法动作，不搜索、不重试、不自动排除死路。环境提供真实后继，地图学习距离与候选排序，不代表学会动作转移。各必需组完整到达率至少80%，目标90%以上，见[共同验收要求](configs/exact_pair_acceptance.json)。
+完整目标三任务的验收保留全部合法动作，不搜索或重试；各必需组完整到达率至少80%，目标90%以上，见[验收要求](configs/exact_pair_acceptance.json)。过桥和24点的首轮范围由各自pilot配置维护，不能直接套用完整目标三任务的题集。环境提供真实后继，地图学习距离与候选排序。
 
 ## 目录与文件职责
 
@@ -54,15 +56,7 @@ tests/               规则、标签、留出边界、采样及恢复检查
 
 比较和限制见[推箱子报告](results/sokoban/report.md)。多轮条件从原采样路径对照的验证所选权重开始，新建优化器与采样阶段，不作为完整续训；epoch只指当前准备关系池的实际遍历，不代表穷尽物理状态。预算和学习率只维护在配置中。完整断点保存优化器、关系顺序和随机状态；实时状态见忽略的`coverage_epochs_runtime_40048.json`，旧路径三组见`local_path_runtime_40048.json`。
 
-求解结构小验证复用原[训练器](src/relations.py)与[评测器](src/relation_evaluate.py)，[任务编排](src/solution_structure.py)只准备有限棋盘的完整最短路径、精确中间目标距离和采样。三组共享有向最大差、MLP、Huber、完整候选soft-rank、起始权重与预算，32步纯贪心；比较固定预算结束权重。中间目标属于新增辅助监督，不是推理子目标。以完整正确路径的连续下降、单位步长残差、全程分支正确性及未见开发棋盘完成率共同判断；数据量、种子、更新数只见配置。未见开发布局此前已用于选权重，不能充当独立最终测试；没有结构收益前不扩量。
-
-该小验证已完成：教师训练路径拟合良好，未见布局的完整到达与距离连续性没有共同改善，长题仍全失败。训练失败还揭示了替代最优分支后续未连续覆盖的缺口；不据此扩量。逐布局指标及实际曝光见[结果](results/sokoban/sokoban_solution_structure_pilot.json)，解释与限制见推箱子报告。
-
-后续[分支补全](results/sokoban/sokoban_branch_closure_validation.json)修复了保留范围中的最优续程缺口；[定向回放](results/sokoban/sokoban_branch_failure_replay.json)修正原训练错误后仍引入新的错误，未训练目标与跨棋盘未可靠改善。训练起点达到72/73不能替代泛化地图验收；全部条件保持原共享编码器、距离、损失及32步贪心。
-
-完整可达区域的[较长预算](results/sokoban/sokoban_graph_basins_12000.json)和[稠密距离诊断](results/sokoban/sokoban_dense_goal_order.json)已完成：同布局新目标粗略远近性有所学习，跨布局与相邻距离层仍失败。稠密诊断只读固定留出目标，不替换正式评测或参与训练反馈；入口为`src.solution_global_order`。
-
-[连续邻域与分级整图反馈](results/sokoban/sokoban_connected_graph_sampling.json)同样未显示可靠泛化收益。[全量迁移和保持性诊断](results/sokoban/sokoban_error_migration.json)已比较原始及59个阶段／节点权重。[大分布与完整图混合对照](results/sokoban/sokoban_broad_graph_mixture.json)保留原1,000张布局，共用初始化、预算与原损失，在100张验证布局检查终局与200个中间目标：混合缓解纯图遗忘，短预算尚无可靠结构收益，不能据此宣称收敛或否定完整图路线。固定20%混合组及采样条件的[收敛检查](configs/sokoban/sokoban_mixture_convergence.json)已完成：全图拟合继续改善，连续执行仍弱，后期验证排序退化，尚不能宣称收敛；[节点结果](results/sokoban/sokoban_mixture_convergence.json)保留真实曝光和阶段最佳；各指标保存权重的完整补评也未显示新目标结构性共同收益，原采用权重不变。
+结构与采样诊断复用[训练器](src/relations.py)和[评测器](src/relation_evaluate.py)，各 `solution_*` 模块负责具体数据组织或诊断。结果与下一步依据归[推箱子报告](results/sokoban/report.md)，本页不重复维护阶段结论。
 
 ## 运行入口
 

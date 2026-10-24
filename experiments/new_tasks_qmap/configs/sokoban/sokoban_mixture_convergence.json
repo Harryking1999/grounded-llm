@@ -1,0 +1,104 @@
+{
+  "task": "sokoban",
+  "seed": 2026102401,
+  "data": {
+    "mixture_source": "runs/new_tasks_qmap/broad_graph_mixture/prepared",
+    "broad_source": "runs/new_tasks_qmap/sokoban_layout_coverage/coverage1000/data",
+    "graph_source": "runs/new_tasks_qmap/graph_basins/C_2026102401/data",
+    "dense_validation_bank": "runs/new_tasks_qmap/graph_basins/global_order/bank.npz",
+    "required_broad_layouts": 1000,
+    "validation_seed": 2026102411,
+    "scene_loader_workers": 8,
+    "broad_diagnostic_goals": 2,
+    "broad_diagnostic_per_layer": 16,
+    "broad_diagnostic_seed": 2026102413
+  },
+  "model": {
+    "dimension": 128,
+    "hidden": 256,
+    "cap": 256,
+    "metric": "directed_max"
+  },
+  "training": {
+    "steps": 96000,
+    "batch_size": 1024,
+    "decision_batch_size": 128,
+    "learning_rate": 0.0001,
+    "rank_weight": 1.0,
+    "rank_temperature": 1.0,
+    "eval_every": 3000,
+    "cpu_threads": 4,
+    "unreachable_target": 240.0,
+    "features_on_device": "prepared_packed_bits",
+    "initialize_from": "../initial.pt",
+    "training_probe_batches": 8,
+    "validation_only_initial": true,
+    "evaluation_checkpoint": "last.pt",
+    "solution_structure": {
+      "mode": "broad_graph_mixture",
+      "graph_fraction": 0.2,
+      "graphs_per_batch": 4,
+      "neighborhood_size": 8,
+      "root_layer_sampling": "uniform",
+      "finite_point_fraction": 0.75,
+      "boundary_rank_fraction": 0.5,
+      "broad_layouts_per_batch": 16
+    }
+  },
+  "relations": {},
+  "evaluation": {
+    "decision_count": 512,
+    "rollout_count": 512,
+    "horizon": 32,
+    "planning_distance_bins": [
+      5,
+      10,
+      20,
+      32
+    ]
+  },
+  "schema": "exact_state_pairs",
+  "pilot": {
+    "seeds": [
+      2026102401,
+      2026102402
+    ],
+    "condition": "fixed20percent_mixture_convergence",
+    "comparison": "Single existing mixture extended without parameter changes. 6k starting checkpoint is measured baseline; 12k/24k/48k/96k are diagnostic budgets, not presumed epochs or sufficient convergence. Two fixed seeds.",
+    "stopping": "Authorized ceiling96k, no automatic extension beyond it. Report continuing improvement, plateau/instability, or training-fit/generalization separation from measured curves. Preserve improving validation weights and all milestones; never silently substitute a peak for the budget-ending result."
+  },
+  "scope": "Original shared Q MLP, directed_max, exact physical-step distance Huber plus complete-candidate soft-rank, unchanged weights and greedy32. Lossless packed feature lookup only avoids caching hundreds of millions of unused physical states. Original environment provides transitions.",
+  "continuation": {
+    "checkpoint": "runs/new_tasks_qmap/broad_graph_mixture/graph020_2026102401/last.pt",
+    "purpose": "Full continuation from the fixed 20% graph mixture at step6000. Only update budget changes; Adam, sampling RNG/order and exposure counters restored."
+  },
+  "convergence": {
+    "seed": 2026102416,
+    "checkpoints": [
+      12000,
+      24000,
+      48000,
+      96000
+    ],
+    "path_distance_bins": [
+      5,
+      10,
+      20,
+      32
+    ],
+    "queries_per_goal_layer": 1,
+    "order_distance_bins": [
+      1,
+      2,
+      5,
+      10,
+      20,
+      32,
+      64,
+      240
+    ],
+    "order_per_layer": 16,
+    "retention_bank": "runs/new_tasks_qmap/broad_graph_mixture/retention_bank.npz",
+    "scope": "Fixed 20% graph mixture, original shared Q/directed_max/Huber/full-candidate soft rank and greedy32. Inspect every accepted graph decision and all graph point labels at checkpoints; target and distance layer fit, true training teacher paths, alternative optimal/recoverable branch entry greedy, dense heldout global/adjacent order, fixed100-layout/200-goal validation, and original-training retention. No diagnostic feedback changes sampling. Preserve full milestone and improving validation weights. Mean exposure does not establish completed epochs or convergence."
+  }
+}

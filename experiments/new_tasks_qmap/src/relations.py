@@ -3,6 +3,7 @@ import argparse
 import json
 from pathlib import Path
 import time
+from copy import deepcopy
 import numpy as np
 import torch
 from torch.nn import functional as F
@@ -56,6 +57,27 @@ def scope(config,corpus):
     return dict(board=[10,10] if config['task']=='sokoban' else [6,6],
                 boxes=4 if config['task']=='sokoban' else None,wall_count=0 if config['task']=='rush_hour' else None,
                 complete_goal=True,shared_across_layouts=True)
+
+
+def validate_continuation(previous,current,step):
+    """Authorize only a larger update budget; retain every training condition."""
+    old,new=deepcopy(previous),deepcopy(current)
+    for item in (old,new):
+        for key in ('continuation','convergence','pilot'):item.pop(key,None)
+    if not step<=old['training']['steps']<new['training']['steps']:
+        raise ValueError('Continuation must extend the original update budget')
+    new['training']['steps']=old['training']['steps']
+    if old!=new:raise ValueError('Budget continuation changes data, sampler, model, loss, optimizer or evaluation')
+
+
+def retain_checkpoint(source,target):
+    """Preserve a full atomic checkpoint when last.pt is subsequently replaced."""
+    import os,shutil
+    source,target=Path(source),Path(target)
+    temporary=target.with_name(target.name+'.link')
+    try:os.link(source,temporary)
+    except OSError:shutil.copy2(source,temporary)
+    temporary.replace(target)
 
 
 def train(config,out,source_commit,device,resume=False,prepare_only=False):
@@ -165,9 +187,15 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
     validation=[k[6:] for k in data if k.startswith('tasks_') and (k=='tasks_validation' or k.endswith('_validation'))]
     start_step,best,best_step,prior_seconds=0,float('inf'),0,0.
     probe_batches=[];loss_window=np.zeros(3,dtype=np.float64)
-    if resume and (out/'last.pt').exists():
-        saved=torch.load(out/'last.pt',map_location=device,weights_only=False)
-        if saved['config']!=config or saved['input_dim']!=corpus.input_dim: raise ValueError('Checkpoint scope mismatch')
+    continuation=config.get('continuation');external=False
+    checkpoint=(out/'last.pt' if resume and (out/'last.pt').exists() else None)
+    if checkpoint is None and continuation:
+        checkpoint=Path(continuation['checkpoint']).resolve();external=True
+    if checkpoint is not None:
+        saved=torch.load(checkpoint,map_location=device,weights_only=False)
+        if external:validate_continuation(saved['config'],config,saved['step'])
+        elif saved['config']!=config:raise ValueError('Checkpoint scope mismatch')
+        if saved['input_dim']!=corpus.input_dim:raise ValueError('Checkpoint input encoding mismatch')
         model.load_state_dict(saved['model']); optimizer.load_state_dict(saved['optimizer'])
         rng.bit_generator.state=saved['rng']; pair_sampler.load_state_dict(saved['pair_sampler']); rank_sampler.load_state_dict(saved['rank_sampler'])
         if relation_sampler: relation_sampler.load_coverage_state_dict(saved.get('relation_coverage'))
@@ -182,6 +210,17 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
         if saved['cuda_rng'] is not None and torch.cuda.is_available(): torch.cuda.set_rng_state_all([r.cpu() for r in saved['cuda_rng']])
         exposure,pair_draws,rank_draws=saved['exposure'],saved['pair_draws'],saved['rank_draws']
         start_step,best,best_step,prior_seconds=saved['step'],saved['best_score'],saved['best_step'],saved['seconds']
+        if external:
+            import shutil
+            for name in ('initial.json','initial_timing.json','best_eligible.json'):
+                source=checkpoint.parent/name
+                if source.exists() and not (out/name).exists():shutil.copy2(source,out/name)
+            if (checkpoint.parent/'best.pt').exists() and not (out/'best.pt').exists():
+                retain_checkpoint(checkpoint.parent/'best.pt',out/'best.pt')
+            atomic_json(out/'continuation.json',dict(checkpoint=str(checkpoint),source_commit=saved['source_commit'],
+                source_step=start_step,original_budget=saved['config']['training']['steps'],extended_budget=options['steps'],
+                optimizer_restored=True,sampling_rng_restored=True,sampler_state_restored=True,exposure_restored=True,
+                meaning='Full optimizer/RNG/counter continuation with unchanged data, sampling and optimization; only update budget extends.'))
     else:
         initial_checkpoint=options.get('initialize_from')
         if initial_checkpoint:
@@ -225,6 +264,14 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
             values=np.packbits(values.astype(np.uint8),axis=1,bitorder='little') if packed_features else values
             feature_cache[start:stop]=torch.as_tensor(values,dtype=torch.uint8,device=device)
     feature_seconds=time.monotonic()-feature_started
+    convergence=None
+    if config.get('convergence'):
+        from .solution_convergence import ConvergenceProbe
+        convergence=ConvergenceProbe(corpus,data,config,out)
+        if not (out/'convergence'/f'{start_step}.json').exists():
+            baseline=evaluate(model,corpus,data,config,cohorts=validation,exposure=exposure,planning=True)
+            convergence.inspect(model,start_step,pair_draws,rank_draws,baseline,checkpoint)
+            if checkpoint is not None:convergence.retain_policy_bests(checkpoint,start_step,baseline)
     trace=[]; trace_number=0; trace_path=None
     if options.get('record_training_samples'):
         parent=out/'samples'; parent.mkdir(exist_ok=True)
@@ -333,7 +380,7 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
         np.add.at(exposure,ids,1); np.add.at(pair_draws,p[p>=0],1); np.add.at(rank_draws,r[r>=0],1)
         if replay_sampler: np.add.at(replay_draws,replay_ids[replay_ids>=0],1)
         if step==1 or step%options['eval_every']==0 or step==options['steps']:
-            planning=bool(options.get('rollout_eval_every') and (step%options['rollout_eval_every']==0 or step==options['steps']))
+            planning=bool(convergence or (options.get('rollout_eval_every') and (step%options['rollout_eval_every']==0 or step==options['steps'])))
             values=evaluate(model,corpus,data,config,cohorts=validation,exposure=exposure,planning=planning)
             objective=float(np.mean([row['finite_huber']+row['candidate_soft_rank_loss'] for row in values['cohorts'].values()]))
             covered=bool((pair_draws>0).all())
@@ -360,6 +407,11 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
                 save(step,out/'best.pt')
                 if eligible: atomic_json(out/'best_eligible.json',dict(step=step))
             save(step,out/'last.pt')
+            if convergence:
+                convergence.retain_policy_bests(out/'last.pt',step,values)
+                if step in config['convergence']['checkpoints']:
+                    retain_checkpoint(out/'last.pt',out/f'checkpoint-{step}.pt')
+                    convergence.inspect(model,step,pair_draws,rank_draws,values,out/f'checkpoint-{step}.pt')
             print(json.dumps(record),flush=True)
     final_checkpoint=options.get('evaluation_checkpoint','best.pt')
     if final_checkpoint not in ('best.pt','last.pt'): raise ValueError('Unknown final evaluation checkpoint')

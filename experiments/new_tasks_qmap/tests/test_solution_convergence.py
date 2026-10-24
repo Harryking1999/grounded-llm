@@ -10,7 +10,7 @@ import torch
 from experiments.new_tasks_qmap.tests.test_solution_mixture import bank
 from experiments.new_tasks_qmap.src.relation_data import materialize
 from experiments.new_tasks_qmap.src.relations import train,validate_continuation,retain_checkpoint
-from experiments.new_tasks_qmap.src.solution_convergence import ConvergenceProbe,exposure_counts,whole_graph_structure
+from experiments.new_tasks_qmap.src.solution_convergence import ConvergenceProbe,exposure_counts,whole_graph_structure,training_policy_graph,policy_continuity,optimal_branch_coherence
 
 
 class ConvergenceTests(unittest.TestCase):
@@ -80,6 +80,10 @@ class ConvergenceTests(unittest.TestCase):
         self.assertEqual([row[k] for k in ['starts','solved_within32','finite_cycle_detectable_within32',
             'proven_unreachable_entered_within32','protected_boundary_entered_within32','still_executing_at32']],
             [6,2,2,1,1,0])
+        _,policy=training_policy_graph(data,np.arange(9,dtype=np.float32))
+        np.testing.assert_array_equal(policy['outcome'],[1,1,4,4,2,3])
+        np.testing.assert_array_equal(policy['steps_to_terminal_or_cycle'],[2,1,0,0,1,1])
+        np.testing.assert_array_equal(policy['cycle_period'],[0,0,2,2,0,0])
 
     def test_all_start_execution_obeys_original32_step_limit(self):
         data=dict(tasks_train=np.array([[s,36] for s in range(1,36)]),children_train=np.arange(2,37)[:,None],
@@ -89,6 +93,38 @@ class ConvergenceTests(unittest.TestCase):
         self.assertEqual(row['all_accepted']['solved_within32'],32)
         self.assertEqual(row['all_accepted']['still_executing_at32'],3)
         self.assertEqual(row['true_distance_at_most32']['starts'],32)
+
+    def test_policy_migration_distinguishes_repair_from_lost_complete_paths(self):
+        data=dict(tasks_train=np.array([[0,2],[1,2]]),children_train=np.array([[1,2],[0,2]]),
+            distances_train=np.array([1,1]),child_distances_train=np.array([[1,0],[1,0]]),
+            pairs_train=np.array([[0,2],[1,2],[2,2]]))
+        rows=policy_continuity(data,{'6':np.array([2.,1.,0.]),'12':np.zeros(3),'24':np.array([2.,1.,0.])})['checkpoints']
+        self.assertEqual(rows['12']['from_previous'][0][3],2)
+        self.assertEqual(rows['12']['cycle_periods']['2'],dict(components=1,starts_within32=2))
+        self.assertEqual(rows['12']['false_local_minima'],2)
+        self.assertEqual(rows['12']['ever_solved_but_lost'],2)
+        self.assertEqual(rows['24']['from_previous'][3][0],2)
+        self.assertEqual(rows['24']['ever_solved'],2)
+        self.assertEqual(rows['24']['solved_at_every_node'],0)
+
+    def test_all_optimal_branch_check_preserves_alternatives_and_unknown_boundaries(self):
+        # Root0 has two true optimal branches. Only branch1 has a coherent suffix;
+        # Q chooses branch2 and returns to0. No oracle branch is used for rollout.
+        data=dict(tasks_train=np.array([[0,3],[1,3],[2,3]]),children_train=np.array([[1,2],[3,-1],[0,3]]),
+            distances_train=np.array([2,1,1]),child_distances_train=np.array([[1,1],[0,np.inf],[2,0]]),
+            pairs_train=np.array([[i,3] for i in range(4)]))
+        _,policy=training_policy_graph(data,np.array([0.,1.,.5,0.]))
+        result=optimal_branch_coherence(data,policy)['aggregate']
+        self.assertEqual(result['some_optimal_suffix_correct'],2)
+        self.assertEqual(result['all_optimal_suffixes_correct'],1)
+        self.assertEqual(result['actual_policy_optimal_success'],1)
+        data['tasks_train']=data['tasks_train'][:1];data['children_train']=data['children_train'][:1]
+        data['distances_train']=data['distances_train'][:1];data['child_distances_train']=data['child_distances_train'][:1]
+        _,policy=training_policy_graph(data,np.array([2.,1.,1.,0.]))
+        result=optimal_branch_coherence(data,policy)['aggregate']
+        self.assertEqual(result['some_suffix_unknown'],1)
+        self.assertEqual(result['all_suffixes_unknown'],1)
+        self.assertEqual(result['some_optimal_suffix_correct'],0)
 
 
 if __name__=='__main__':unittest.main()

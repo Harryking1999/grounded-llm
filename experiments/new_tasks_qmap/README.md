@@ -6,7 +6,7 @@
 
 | 任务 | 规则与数据 | 配置 | 结果与限制 |
 |---|---|---|---|
-| 推箱子 | [任务入口](../../tasks/sokoban/README.md) | [配置目录](configs/sokoban/)、[当前多轮训练](configs/sokoban/sokoban_coverage_epochs_pairs.json) | [推箱子报告](results/sokoban/report.md) |
+| 推箱子 | [任务入口](../../tasks/sokoban/README.md) | [配置目录](configs/sokoban/)、[固定分布收敛检查](configs/sokoban/sokoban_mixture_convergence.json) | [推箱子报告](results/sokoban/report.md) |
 | 移车出库 | [任务入口](../../tasks/rush_hour/README.md) | [配置目录](configs/rush_hour/)、[卷积方案](configs/rush_hour/rush_hour_spatial_pairs.json) | [移车出库报告](results/rush_hour/report.md) |
 | 棋子交换 | [任务入口](../../tasks/token_swapping/README.md) | [配置目录](configs/token_swapping/)、[近距离与排序方案](configs/token_swapping/token_swapping_local_walk8_rank4_pairs.json) | [棋子交换报告](results/token_swapping/report.md) |
 
@@ -49,6 +49,7 @@ tests/               规则、标签、留出边界、采样及恢复检查
 | 连续图采样与分级反馈 | [配置](configs/sokoban/sokoban_connected_graph_sampling.json) | 固定C数据和匹配初始化，比较原采样、布局与目标均衡的连续邻域、分级整图反馈 |
 | 原大分布与完整图混合 | [配置](configs/sokoban/sokoban_broad_graph_mixture.json) | 保留原1,000张布局，比较原关系、完整目标图及两种混合比例；共用初始化、更新数、损失与固定验证 |
 | 固定混合分布收敛检查 | [配置](configs/sokoban/sokoban_mixture_convergence.json) | 接续现有20%混合组的完整优化状态，不变采样；检查全图拟合、训练分支执行和原留出泛化，保留节点及验证改善权重 |
+| 固定分布延长候选（未运行） | [配置](configs/sokoban/sokoban_mixture_convergence_extension.json) | 仅延长同一混合组的完整优化阶段；额外预算待授权，不能作为已有收益 |
 | 训练失败与路径构造 | [失败诊断](configs/sokoban/sokoban_training_failure_diagnosis.json)、[路径数据](configs/sokoban/sokoban_local_paths_data.json)、[固定验证](configs/sokoban/sokoban_neighborhood_validation.json) | 训练允许范围内的循环、分支、死锁和连续路径 |
 
 比较和限制见[推箱子报告](results/sokoban/report.md)。多轮条件从原采样路径对照的验证所选权重开始，新建优化器与采样阶段，不作为完整续训；epoch只指当前准备关系池的实际遍历，不代表穷尽物理状态。预算和学习率只维护在配置中。完整断点保存优化器、关系顺序和随机状态；实时状态见忽略的`coverage_epochs_runtime_40048.json`，旧路径三组见`local_path_runtime_40048.json`。

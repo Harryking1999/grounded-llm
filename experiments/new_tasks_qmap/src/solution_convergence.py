@@ -204,8 +204,8 @@ class ConvergenceProbe:
             heldout_goal_success=validation['cohorts'].get('broad_goal_validation',{}).get('planning',{}).get('q',{}).get('success_rate'))),flush=True)
 
 
-def whole_graph_structure(data,prediction):
-    """Derive greedy32 execution on all accepted contexts from fixed predictions.
+def training_policy_graph(data,prediction):
+    """Derive the exact functional policy graph on accepted training contexts.
 
     Missing finite continuations remain unknown; actions are never removed.
     This is a read-only training diagnostic, separate from held-out rollout.
@@ -263,4 +263,103 @@ def whole_graph_structure(data,prediction):
         by_distance={str(int(d)):counts(distance==d) for d in np.unique(distance)},
         by_target={str(int(g)):counts((tasks[:,1]==g)&(distance<=32)) for g in np.unique(tasks[:,1])},
         scope='Same complete-candidate argmin policy over saved full-graph predictions. All accepted starts, no teacher actions. Finite protected boundaries are unknown, never pruned or declared failures. Proven-unreachable entries cannot reach goal; their later cycle timing is not reconstructed. Cycles inside accepted finite contexts are exact. This is a read-only training diagnostic, not a changed held-out protocol.')
-    return structural
+    return structural,dict(choice=choice,successor_index=nxt,outcome=kind,
+        steps_to_terminal_or_cycle=length,cycle_period=period,
+        parent_predictions=prediction[parent],child_predictions=scores)
+
+
+def whole_graph_structure(data,prediction):
+    """Summarize greedy32, keeping finite protected boundaries unknown."""
+    return training_policy_graph(data,prediction)[0]
+
+
+def optimal_branch_coherence(data,policy):
+    """Check local greedy correctness along some/all true optimal suffixes.
+
+    This diagnoses alternative branches, never supplies an inference action.
+    Protected missing continuations propagate unknown rather than false.
+    """
+    tasks=data['tasks_train'];children=data['children_train'];distance=data['distances_train']
+    optimal=(children>=0)&(data['child_distances_train']+1==distance[:,None])
+    radix=int(max(tasks.max(),children.max()))+1
+    keys=tasks[:,0]*radix+tasks[:,1];order=np.argsort(keys);keys=keys[order]
+    query=children[optimal]*radix+np.broadcast_to(tasks[:,1,None],children.shape)[optimal]
+    at=np.searchsorted(keys,query);matched=at<len(keys)
+    matched[matched]&=keys[at[matched]]==query[matched]
+    contexts=np.full(children.shape,-3,np.int64)
+    edges=np.full(len(query),-3,np.int64);edges[matched]=order[at[matched]];contexts[optimal]=edges
+    contexts[optimal&(children==tasks[:,1,None])]=-1
+    correct=optimal[np.arange(len(tasks)),policy['choice']]
+    some=np.zeros(len(tasks),np.int8);every=some.copy()
+    for layer in np.unique(distance):
+        ids=np.flatnonzero(distance==layer);links=contexts[ids];take=optimal[ids];known=take&(links>=0)
+        def values(result):
+            v=np.zeros(links.shape,np.int8);v[take&(links==-1)]=1;v[take&(links==-3)]=-1;v[known]=result[links[known]]
+            return v
+        v=values(some);some[ids]=np.where((v==1).any(axis=1),1,np.where((v==-1).any(axis=1),-1,0))
+        v=values(every);every[ids]=np.where((take&(v==0)).any(axis=1),0,np.where((v==-1).any(axis=1),-1,1))
+        some[ids[~correct[ids]]]=0;every[ids[~correct[ids]]]=0
+    actual=(policy['outcome']==1)&(policy['steps_to_terminal_or_cycle']==distance)
+    assert not ((every==1)&~actual).any()
+    assert not (actual&(some!=1)).any()
+    def counts(mask):
+        return dict(starts=int(mask.sum()),local_action_correct=int((mask&correct).sum()),
+            some_optimal_suffix_correct=int((mask&(some==1)).sum()),all_optimal_suffixes_correct=int((mask&(every==1)).sum()),
+            some_suffix_unknown=int((mask&(some==-1)).sum()),all_suffixes_unknown=int((mask&(every==-1)).sum()),
+            actual_policy_optimal_success=int((mask&actual).sum()))
+    eligible=(distance>0)&(distance<=32)
+    return dict(aggregate=counts(eligible),by_distance={str(int(d)):counts(distance==d) for d in np.unique(distance[eligible])},
+        scope='A suffix is coherent when the unchanged Q-greedy first choice is a true optimal action at every context on it. Some/all ranges over the real optimal-edge DAG, not over actions available to inference. Actual policy may choose a different optimal branch than a coherent suffix. All-coherent implies actual optimal success; actual optimal success implies some-coherent. Missing protected contexts stay unknown. No validation, search, forced action, or supervision change.')
+
+
+def policy_continuity(data,predictions):
+    """Pair all fixed starts across saved nodes; no new model queries or actions."""
+    names=['goal','proven_unreachable','protected_boundary','finite_cycle','budget']
+    eligible=(data['distances_train']>0)&(data['distances_train']<=32)
+    rows={};previous=None;first=None;ever=None;persistent=None
+    for step,prediction in predictions.items():
+        _,policy=training_policy_graph(data,prediction)
+        detected=policy['steps_to_terminal_or_cycle']+np.where(policy['outcome']==4,policy['cycle_period'],0)
+        codes=np.where(detected<=32,policy['outcome'],5)-1
+        selected=codes[eligible];solved=selected==0
+        if first is None:first=selected.copy();ever=solved.copy();persistent=solved.copy()
+        ever|=solved;persistent&=solved
+        def migration(old):
+            return np.bincount(old*5+selected,minlength=25).reshape(5,5).tolist()
+        finite_cycle=eligible&(codes==3);members=policy['outcome']==4
+        periods=np.unique(policy['cycle_period'][members]);components=members&(policy['steps_to_terminal_or_cycle']==0)
+        minimum=policy['parent_predictions']<=policy['child_predictions'].min(axis=1)+1e-6
+        zero=policy['parent_predictions']<=1e-6
+        legal=data['children_train']>=0
+        optimal=legal&(data['child_distances_train']+1==data['distances_train'][:,None])
+        best_optimal=np.where(optimal,policy['child_predictions'],np.inf).min(axis=1)
+        best_other=np.where(legal&~optimal,policy['child_predictions'],np.inf).min(axis=1)
+        margin=best_other-best_optimal;comparable=eligible&np.isfinite(margin)
+        delta=policy['parent_predictions'][:,None]-policy['child_predictions']
+        optimal_delta=delta[optimal&eligible[:,None]]
+        cycles2=components&(policy['cycle_period']==2)
+        pairs=cycles2&(np.arange(len(cycles2))<policy['successor_index'])
+        cycle_difference=np.abs(policy['parent_predictions'][pairs]-policy['parent_predictions'][policy['successor_index'][pairs]])
+        by_distance={}
+        for distance in np.unique(data['distances_train'][eligible]):
+            mask=eligible&(data['distances_train']==distance)
+            by_distance[str(int(distance))]=dict(starts=int(mask.sum()),outcomes=np.bincount(codes[mask],minlength=5).tolist(),
+                false_local_minima=int((mask&minimum).sum()))
+        rows[str(step)]=dict(starts=len(selected),outcomes=np.bincount(selected,minlength=5).tolist(),
+            optimal_branch_coherence=optimal_branch_coherence(data,policy),
+            cycle_periods={str(int(period)):dict(components=int((components&(policy['cycle_period']==period)).sum()//period),
+                starts_within32=int((finite_cycle&(policy['cycle_period']==period)).sum())) for period in periods},
+            false_local_minima=int((eligible&minimum).sum()),false_zero_distance=int((eligible&zero).sum()),
+            minima_with_zero_distance=int((eligible&minimum&zero).sum()),
+            optimal_edge_signs=dict(edges=len(optimal_delta),descending=int((optimal_delta>1e-6).sum()),
+                flat=int((np.abs(optimal_delta)<=1e-6).sum()),reversed=int((optimal_delta< -1e-6).sum())),
+            best_candidate_margins=dict(contexts=int(comparable.sum()),correct_strict=int((comparable&(margin>1e-6)).sum()),
+                tied=int((comparable&(np.abs(margin)<=1e-6)).sum()),reversed=int((comparable&(margin< -1e-6)).sum())),
+            two_cycle_potential_differences=dict(components=len(cycle_difference),tied=int((cycle_difference<=1e-6).sum()),
+                median=float(np.median(cycle_difference)) if len(cycle_difference) else None),
+            from_first=migration(first),from_previous=migration(previous) if previous is not None else None,
+            ever_solved=int(ever.sum()),solved_at_every_node=int(persistent.sum()),ever_solved_but_lost=int((ever&~solved).sum()),
+            by_distance=by_distance)
+        previous=selected
+    return dict(outcome_categories=names,checkpoints=rows,
+        scope='All fixed accepted training starts with exact distance1..32. Same scalar predictions and complete-candidate greedy32. Matrix rows are earlier outcome, columns later outcome. Protected finite boundaries remain unknown. Proven-unreachable entry is an irreversible failure, not an inferred later cycle. A false local minimum has no legal successor predicted strictly lower, despite a true optimal child. Repeated nodes and same-goal starts are dependent. Read-only diagnosis, never sampling feedback.')

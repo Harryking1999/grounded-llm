@@ -358,8 +358,10 @@ def policy_continuity(data,predictions):
             two_cycle_potential_differences=dict(components=len(cycle_difference),tied=int((cycle_difference<=1e-6).sum()),
                 median=float(np.median(cycle_difference)) if len(cycle_difference) else None),
             from_first=migration(first),from_previous=migration(previous) if previous is not None else None,
-            ever_solved=int(ever.sum()),solved_at_every_node=int(persistent.sum()),ever_solved_but_lost=int((ever&~solved).sum()),
+            ever_solved=int(ever.sum()),solved_at_every_node=int(persistent.sum()),
+            ever_solved_but_lost=int((ever&np.isin(selected,[1,3,4])).sum()),
+            ever_solved_now_unknown=int((ever&(selected==2)).sum()),ever_solved_not_confirmed_now=int((ever&~solved).sum()),
             by_distance=by_distance)
         previous=selected
     return dict(outcome_categories=names,checkpoints=rows,
-        scope='All fixed accepted training starts with exact distance1..32. Same scalar predictions and complete-candidate greedy32. Matrix rows are earlier outcome, columns later outcome. Protected finite boundaries remain unknown. Proven-unreachable entry is an irreversible failure, not an inferred later cycle. A false local minimum has no legal successor predicted strictly lower, despite a true optimal child. Repeated nodes and same-goal starts are dependent. Read-only diagnosis, never sampling feedback.')
+        scope='All fixed accepted training starts with exact distance1..32. Same scalar predictions and complete-candidate greedy32. Matrix rows are earlier outcome, columns later outcome. Protected finite boundaries remain unknown; ever_solved_but_lost counts only proven unreachable, finite cycle or exhausted32-step budget, while ever_solved_now_unknown is separate. Proven-unreachable entry is an irreversible failure, not an inferred later cycle. A false local minimum has no legal successor predicted strictly lower, despite a true optimal child. Repeated nodes and same-goal starts are dependent. Read-only diagnosis, never sampling feedback.')

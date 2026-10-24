@@ -126,5 +126,14 @@ class ConvergenceTests(unittest.TestCase):
         self.assertEqual(result['all_suffixes_unknown'],1)
         self.assertEqual(result['some_optimal_suffix_correct'],0)
 
+    def test_formerly_solved_start_at_protected_boundary_is_unknown_not_lost(self):
+        data=dict(tasks_train=np.array([[0,2]]),children_train=np.array([[1,2]]),distances_train=np.array([1]),
+            child_distances_train=np.array([[2,0]]),pairs_train=np.array([[0,2],[1,2],[2,2]]))
+        row=policy_continuity(data,{'6':np.array([1.,2.,0.]),'12':np.array([1.,0.,0.])})['checkpoints']['12']
+        self.assertEqual(row['from_first'][0][2],1)
+        self.assertEqual(row['ever_solved_but_lost'],0)
+        self.assertEqual(row['ever_solved_now_unknown'],1)
+        self.assertEqual(row['ever_solved_not_confirmed_now'],1)
+
 
 if __name__=='__main__':unittest.main()

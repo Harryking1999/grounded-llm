@@ -10,7 +10,7 @@ import torch
 from experiments.new_tasks_qmap.tests.test_solution_mixture import bank
 from experiments.new_tasks_qmap.src.relation_data import materialize
 from experiments.new_tasks_qmap.src.relations import train,validate_continuation,retain_checkpoint
-from experiments.new_tasks_qmap.src.solution_convergence import ConvergenceProbe,exposure_counts
+from experiments.new_tasks_qmap.src.solution_convergence import ConvergenceProbe,exposure_counts,whole_graph_structure
 
 
 class ConvergenceTests(unittest.TestCase):
@@ -68,6 +68,27 @@ class ConvergenceTests(unittest.TestCase):
     def test_exposure_mean_does_not_claim_complete_epochs(self):
         row=exposure_counts(np.array([0,0,4,4]))
         self.assertEqual(row['mean_draws'],2);self.assertEqual(row['minimum'],0);self.assertEqual(row['unique_fraction'],.5)
+
+    def test_all_start_execution_separates_goals_cycles_dead_and_protected_boundaries(self):
+        # One fixed chosen successor per context; no search or teacher action.
+        data=dict(tasks_train=np.array([[s,14] for s in [10,11,12,13,15,17]]),
+            children_train=np.array([[s] for s in [11,14,13,12,16,18]]),
+            distances_train=np.array([2,1,2,3,5,4]),
+            child_distances_train=np.array([[v] for v in [1,0,3,2,np.inf,3]]),
+            pairs_train=np.array([[s,14] for s in range(10,19)]))
+        row=whole_graph_structure(data,np.arange(9,dtype=np.float32))['all_start_execution']['true_distance_at_most32']
+        self.assertEqual([row[k] for k in ['starts','solved_within32','finite_cycle_detectable_within32',
+            'proven_unreachable_entered_within32','protected_boundary_entered_within32','still_executing_at32']],
+            [6,2,2,1,1,0])
+
+    def test_all_start_execution_obeys_original32_step_limit(self):
+        data=dict(tasks_train=np.array([[s,36] for s in range(1,36)]),children_train=np.arange(2,37)[:,None],
+            distances_train=np.arange(35,0,-1),child_distances_train=np.arange(34,-1,-1)[:,None],
+            pairs_train=np.array([[s,36] for s in range(1,37)]))
+        row=whole_graph_structure(data,np.arange(35,-1,-1,dtype=np.float32))['all_start_execution']
+        self.assertEqual(row['all_accepted']['solved_within32'],32)
+        self.assertEqual(row['all_accepted']['still_executing_at32'],3)
+        self.assertEqual(row['true_distance_at_most32']['starts'],32)
 
 
 if __name__=='__main__':unittest.main()

@@ -202,3 +202,65 @@ class ConvergenceProbe:
             training_action_rate=training['shortest_action_rate'],graph_unique_fraction=training['decision_exposure']['unique_fraction'],
             training_solved={k:v['success_rate'] for k,v in train_rollouts.items()},
             heldout_goal_success=validation['cohorts'].get('broad_goal_validation',{}).get('planning',{}).get('q',{}).get('success_rate'))),flush=True)
+
+
+def whole_graph_structure(data,prediction):
+    """Derive greedy32 execution on all accepted contexts from fixed predictions.
+
+    Missing finite continuations remain unknown; actions are never removed.
+    This is a read-only training diagnostic, separate from held-out rollout.
+    """
+    pairs=data['pairs_train'];tasks=data['tasks_train'];children=data['children_train']
+    truth=data['child_distances_train'];distance=data['distances_train']
+    radix=int(max(pairs.max(),children.max()))+1
+    key=lambda rows:rows[:,0]*radix+rows[:,1]
+    pk=key(pairs);po=np.argsort(pk);pk=pk[po]
+    tk=key(tasks);to=np.argsort(tk);tk=tk[to]
+    valid=children>=0
+    def point_index(rows):
+        q=key(rows);at=np.searchsorted(pk,q);assert np.array_equal(pk[at],q);return po[at]
+    parent=point_index(tasks);child=np.full(children.shape,-1,np.int64)
+    child[valid]=point_index(np.column_stack([children[valid],np.broadcast_to(tasks[:,1,None],children.shape)[valid]]))
+    scores=np.full(children.shape,np.inf,np.float32);scores[valid]=prediction[child[valid]]
+    choice=scores.argmin(axis=1);ix=np.arange(len(tasks));selected=children[ix,choice];selected_truth=truth[ix,choice]
+    delta=prediction[parent,None]-scores
+    optimal=valid&(truth+1==distance[:,None]);recover=valid&np.isfinite(truth)&~optimal
+    def drops(mask):
+        return dict(edges=int(mask.sum()),descent_rate=float((delta[mask]>1e-6).mean()) if mask.any() else None,
+            true_drop_mae=float(np.abs(delta[mask]-(distance[:,None]-truth)[mask]).mean()) if mask.any() else None)
+    structural=dict(optimal_parent_child=drops(optimal),recoverable_parent_child=drops(recover),
+        predicted_descent_but_true_detour=int(((delta[ix,choice]>1e-6)&np.isfinite(selected_truth)&(selected_truth>distance)).sum()))
+    # The deterministic policy is a functional graph on accepted contexts.
+    # -1 is exact goal, -2 proven unreachable, -3 protected finite boundary.
+    nextkey=selected*radix+tasks[:,1];at=np.searchsorted(tk,nextkey);safe=at<len(tk);matched=np.zeros(len(tasks),bool);matched[safe]=tk[at[safe]]==nextkey[safe]
+    nxt=np.full(len(tasks),-3,np.int64);nxt[matched]=to[at[matched]]
+    nxt[~np.isfinite(selected_truth)]=-2;nxt[selected==tasks[:,1]]=-1
+    indegree=np.bincount(nxt[nxt>=0],minlength=len(tasks));queue=list(np.flatnonzero(indegree==0));front=0
+    while front<len(queue):
+        i=queue[front];front+=1;j=nxt[i]
+        if j>=0:
+            indegree[j]-=1
+            if indegree[j]==0:queue.append(int(j))
+    # Terminal class: 1 goal, 2 dead, 3 protected boundary, 4 finite cycle.
+    kind=np.zeros(len(tasks),np.int8);length=np.zeros(len(tasks),np.int32);period=np.zeros(len(tasks),np.int32)
+    kind[nxt==-1]=1;kind[nxt==-2]=2;kind[nxt==-3]=3;length[nxt<0]=1
+    for start in np.flatnonzero(indegree>0):
+        if kind[start]:continue
+        cycle=[int(start)];j=int(nxt[start])
+        while j!=start:cycle.append(j);j=int(nxt[j])
+        kind[cycle]=4;period[cycle]=len(cycle)
+    for i in reversed(queue):
+        j=nxt[i]
+        if j>=0:kind[i]=kind[j];length[i]=length[j]+1;period[i]=period[j]
+    assert (kind>0).all()
+    def counts(mask):
+        return dict(starts=int(mask.sum()),solved_within32=int((mask&(kind==1)&(length<=32)).sum()),
+            finite_cycle_detectable_within32=int((mask&(kind==4)&(length+period<=32)).sum()),
+            proven_unreachable_entered_within32=int((mask&(kind==2)&(length<=32)).sum()),
+            protected_boundary_entered_within32=int((mask&(kind==3)&(length<=32)).sum()),
+            still_executing_at32=int((mask&(((kind<4)&(length>32))|((kind==4)&(length+period>32)))).sum()))
+    structural['all_start_execution']=dict(all_accepted=counts(np.ones(len(tasks),bool)),true_distance_at_most32=counts(distance<=32),
+        by_distance={str(int(d)):counts(distance==d) for d in np.unique(distance)},
+        by_target={str(int(g)):counts((tasks[:,1]==g)&(distance<=32)) for g in np.unique(tasks[:,1])},
+        scope='Same complete-candidate argmin policy over saved full-graph predictions. All accepted starts, no teacher actions. Finite protected boundaries are unknown, never pruned or declared failures. Proven-unreachable entries cannot reach goal; their later cycle timing is not reconstructed. Cycles inside accepted finite contexts are exact. This is a read-only training diagnostic, not a changed held-out protocol.')
+    return structural

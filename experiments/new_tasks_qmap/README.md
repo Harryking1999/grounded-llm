@@ -61,7 +61,7 @@ tests/               规则、标签、留出边界、采样及恢复检查
 
 完整可达区域的[较长预算](results/sokoban/sokoban_graph_basins_12000.json)和[稠密距离诊断](results/sokoban/sokoban_dense_goal_order.json)已完成：同布局新目标粗略远近性有所学习，跨布局与相邻距离层仍失败。稠密诊断只读固定留出目标，不替换正式评测或参与训练反馈；入口为`src.solution_global_order`。
 
-[连续邻域与分级整图反馈](results/sokoban/sokoban_connected_graph_sampling.json)同样未显示可靠泛化收益。[全量迁移和保持性诊断](results/sokoban/sokoban_error_migration.json)已比较原始及48个阶段结束权重。[大分布与完整图混合对照](results/sokoban/sokoban_broad_graph_mixture.json)保留原1,000张布局，共用初始化、预算与原损失，在100张验证布局检查终局与200个中间目标：混合缓解纯图遗忘，短预算尚无可靠结构收益，不能据此宣称收敛或否定完整图路线。当前固定20%混合组及采样条件，完整接续做[收敛检查](configs/sokoban/sokoban_mixture_convergence.json)，原采用权重不变。
+[连续邻域与分级整图反馈](results/sokoban/sokoban_connected_graph_sampling.json)同样未显示可靠泛化收益。[全量迁移和保持性诊断](results/sokoban/sokoban_error_migration.json)已比较原始及56个阶段／节点权重。[大分布与完整图混合对照](results/sokoban/sokoban_broad_graph_mixture.json)保留原1,000张布局，共用初始化、预算与原损失，在100张验证布局检查终局与200个中间目标：混合缓解纯图遗忘，短预算尚无可靠结构收益，不能据此宣称收敛或否定完整图路线。固定20%混合组及采样条件的[收敛检查](configs/sokoban/sokoban_mixture_convergence.json)已完成：全图拟合继续改善，连续执行仍弱，后期验证排序退化，尚不能宣称收敛；[节点结果](results/sokoban/sokoban_mixture_convergence.json)保留真实曝光和阶段最佳，原采用权重不变。
 
 ## 运行入口
 

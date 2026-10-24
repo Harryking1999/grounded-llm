@@ -34,6 +34,20 @@ def training_completed(path):
     return True
 
 
+def evaluation_completed(path):
+    """Require all configured modes and cases in an exact checkpoint summary."""
+    if not path.exists():
+        return False
+    config = json.loads((path.parents[3] / 'config.json').read_text())
+    from .contract import cohort_size, evaluation_modes
+    summary = json.loads(path.read_text())
+    step = int(path.parent.name.split('-')[-1])
+    baseline = path.parent.parent.name
+    return (summary.get('step') == step and
+            all(summary.get('metrics', {}).get(mode, {}).get('tasks') == cohort_size(config, mode)
+                for mode in evaluation_modes(config, baseline)))
+
+
 def released_training_gpus(path, gpus):
     """Fail closed until the training scheduler has assigned pending work."""
     if not path.exists():
@@ -111,6 +125,12 @@ def run(args, config):
     # Node IDs only label owners; the same coordinator directory arbitrates every node.
     status = root / 'evaluation_queue.json'
     with FileLock(str(root / 'evaluation_queue.lock'), timeout=0):
+        prerequisites = getattr(args, 'after_evaluation', None)
+        while prerequisites and not all(evaluation_completed(path) for path in prerequisites):
+            atomic_json(status, dict(status='waiting_for_evaluation', pid=os.getpid(),
+                updated=time.time(), prerequisites=[str(path) for path in prerequisites],
+                gpus=gpus, active={}, failed=[]))
+            time.sleep(poll_seconds)
         completion = getattr(args, 'after_training', None)
         if completion:
             try:

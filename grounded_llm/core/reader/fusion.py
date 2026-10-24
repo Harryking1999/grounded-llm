@@ -188,6 +188,7 @@ class MapReader(nn.Module):
         loss_chunk_tokens: int = 0,
         sequence_mean_loss: bool = False,
         cache_generation: bool = False,
+        last_n_layers: int | None = None,
     ) -> None:
         super().__init__()
         if every_n_layers <= 0:
@@ -211,10 +212,14 @@ class MapReader(nn.Module):
         original = getattr(parent, parts[-1])
         if not isinstance(original, nn.ModuleList):
             raise TypeError("decoder_path must point to an nn.ModuleList")
+        if last_n_layers is not None and (not 0 < last_n_layers <= len(original) or every_n_layers != 1):
+            raise ValueError("last_n_layers requires a valid layer count and every_n_layers=1")
         wrapped = nn.ModuleList()
         self.conditioned_layers: list[ConditionedDecoderLayer] = []
         for index, layer in enumerate(original):
-            if (index + 1) % every_n_layers == 0:
+            selected = (index >= len(original) - last_n_layers if last_n_layers is not None
+                        else (index + 1) % every_n_layers == 0)
+            if selected:
                 language_dim = (memory_encoder.language_dim if addressed else
                                 memory_encoder.combine.out_features)
                 adapter = GatedMapCrossAttention(language_dim, heads, head_dim,

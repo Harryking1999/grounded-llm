@@ -24,7 +24,8 @@ def build(config,baseline,model_path,training=True,checkpoint_path=None):
     base=AutoModelForCausalLM.from_pretrained(model_path,local_files_only=True,torch_dtype=torch.float32 if training else torch.bfloat16,attn_implementation='sdpa')
     base.config.use_cache=not training
     if spec['interface']:
-        model=build_reader(base,config,sequence_mean_loss=False,cache_generation=not training)
+        reader_config=dict(config,map=dict(config['map'],**spec.get('map',{})))
+        model=build_reader(base,reader_config,sequence_mean_loss=False,cache_generation=not training)
         if spec['full_llm']:base.requires_grad_(True)
     else:
         model=TokenLM(base,config['training']['loss_chunk_tokens'])

@@ -36,6 +36,26 @@ def batch():
 
 
 class InterfaceTest(unittest.TestCase):
+    def test_sparse_layers_preserve_forward_and_checkpoint_identity(self):
+        from grounded_llm.core.reader.fusion import ConditionedDecoderLayer
+        for interval, last, expected in [(1, None, list(range(8))),
+                (2, None, [1, 3, 5, 7]), (4, None, [3, 7]), (1, 3, [5, 6, 7])]:
+            torch.manual_seed(7)
+            base = FakeLM()
+            base.model.layers = nn.ModuleList([nn.Linear(8, 8) for _ in range(8)])
+            hidden = torch.randn(1, 2, 8)
+            original = base(hidden).detach()
+            reader = MapReader(base, MapMemoryEncoder(2, 8, 4, 5, 3), 2,
+                               every_n_layers=interval, last_n_layers=last)
+            self.assertEqual([i for i, layer in enumerate(base.model.layers)
+                              if isinstance(layer, ConditionedDecoderLayer)], expected)
+            output = reader(map_batch=batch(), hidden_states=hidden)
+            torch.testing.assert_close(output, original, rtol=0, atol=0)
+            output.sum().backward()
+            self.assertTrue(all(layer.map_attention.gate.grad is not None
+                                for layer in reader.conditioned_layers))
+            reader.load_state_dict(reader.state_dict(), strict=True)
+
     def test_address_key_and_state_value_are_independent(self):
         torch.manual_seed(13)
         encoder = AddressedMapMemoryEncoder(2, 8, 4, 5, 3)

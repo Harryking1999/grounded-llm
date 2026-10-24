@@ -21,6 +21,7 @@ def build_reader(base, config, *, sequence_mean_loss=False, cache_generation=Fal
                          spec.get("feature_ffn_hidden_dim", 0)} if mode != "joint" else {}))
     return MapReader(base, memory, spec["attention_heads"], spec["attention_head_dim"],
                       spec["cross_attention_every_n_layers"],
+                      last_n_layers=spec.get("cross_attention_last_n_layers"),
                       # Both deprecated; the current configs set neither. Read through
                       # only so the archived runs that did stay reproducible.
                       fixed_gate_tanh=spec.get("fixed_gate_tanh"),

@@ -4,10 +4,24 @@ import tempfile
 import unittest
 
 from experiments.map_sft_baselines.src.evaluation_queue import (
-    released_training_gpus, training_completed, worker_gpu, free_worker_slot)
+    released_training_gpus, training_completed, evaluation_completed, worker_gpu, free_worker_slot)
 
 
 class ReleasedTrainingGPUsTest(unittest.TestCase):
+    def test_evaluation_handoff_requires_complete_exact_checkpoint(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / 'config.json').write_text(json.dumps(dict(
+                baselines={'B2': dict(real_map=True)},
+                evaluation=dict(tasks=3500, modes=['RO'], probe_tasks=0))))
+            path = root / 'evaluation/B2/checkpoint-150000/summary.json'
+            path.parent.mkdir(parents=True)
+            self.assertFalse(evaluation_completed(path))
+            for step, tasks, expected in [(150000, 3499, False), (125000, 3500, False),
+                                           (150000, 3500, True)]:
+                path.write_text(json.dumps(dict(step=step, metrics={'RO': dict(tasks=tasks)})))
+                self.assertEqual(evaluation_completed(path), expected)
+
     def test_concurrent_slots_keep_physical_gpu_and_enforce_capacity(self):
         active = {'1': object(), '2': object()}
         self.assertIsNone(free_worker_slot(active, 1, 1))

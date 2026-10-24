@@ -1,6 +1,6 @@
 # 手电过桥
 
-独立规则、数据适配和裁判已实现，首轮地图完成31/32题，尚未采用权重或准备正式SFT数据。作为扩充任务类别的候选，先使用现有两岸、单手电规则核对地图与接口；无需先加难。现有[配置](../../experiments/new_tasks_qmap/configs/pilot/bridge.json)、[结果](../../experiments/new_tasks_qmap/results/report.md)和[历史文字筛查](../../experiments/task_text_baselines/results/report.md)分别保留，下一轮安排见[项目状态](../../docs/PROJECT_STATUS_AND_TODO.md)。
+独立规则、数据适配和裁判已实现，首轮地图完成31/32题，尚未采用权重或准备正式SFT数据。已纳入下一阶段九类任务，使用正常人数与耗时，准备多目标Qmap、部分人员完整目标和新人数地图，见[训练设计](../QMAP_METHOD.md#任务扩展与训练安排)。现有[配置](../../experiments/new_tasks_qmap/configs/pilot/bridge.json)、[结果](../../experiments/new_tasks_qmap/results/report.md)和[历史文字筛查](../../experiments/task_text_baselines/results/report.md)分别保留，下一轮安排见[项目状态](../../docs/PROJECT_STATUS_AND_TODO.md)。
 
 - [规则与输出](prompts/README.md)
 - [数据](data/README.md)与[示例](data/example.json)

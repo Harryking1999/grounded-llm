@@ -3,10 +3,24 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from experiments.map_sft_baselines.src.evaluation_queue import released_training_gpus, training_completed
+from experiments.map_sft_baselines.src.evaluation_queue import (
+    released_training_gpus, training_completed, worker_gpu, free_worker_slot)
 
 
 class ReleasedTrainingGPUsTest(unittest.TestCase):
+    def test_concurrent_slots_keep_physical_gpu_and_enforce_capacity(self):
+        active = {'1': object(), '2': object()}
+        self.assertIsNone(free_worker_slot(active, 1, 1))
+        slot = free_worker_slot(active, 1, 2)
+        self.assertEqual(slot, '1:1')
+        self.assertEqual(worker_gpu(slot), 1)
+        active[slot] = object()
+        self.assertIsNone(free_worker_slot(active, 1, 2))
+        self.assertEqual(free_worker_slot(active, 3, 2), '3')
+        del active['1']
+        self.assertEqual(free_worker_slot(active, 1, 2), '1')
+        self.assertEqual(worker_gpu('2'), 2)
+
     def test_final_export_is_required_for_handoff(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / 'finished.json'

@@ -92,6 +92,11 @@ def main():
     p.add_argument('--q-checkpoint',type=Path)
     p.add_argument('--node-id',default='local')
     p.add_argument('--gpus',help='Node-specific evaluation GPUs; does not alter the study config')
+    p.add_argument('--workers-per-gpu',type=int,default=1,
+                   help='Independent shard workers on each assigned GPU')
+    p.add_argument('--worker-memory-gib',type=float,
+                   help='Required free memory before admitting a worker; required for concurrency')
+    p.add_argument('--poll-seconds',type=float,help='Runtime dispatcher polling interval')
     p.add_argument('--coordination-profile',type=Path,help='Ignored runtime SSH profile for the common shard authority')
     p.add_argument('--resume-workers',action='store_true')
     p.add_argument('--training-queue',type=Path,help='Use only released training GPUs, after pending training jobs are assigned')

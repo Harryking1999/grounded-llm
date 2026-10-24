@@ -12,6 +12,18 @@ from .shard_pool import ShardPool
 MODULE = 'experiments.map_sft_baselines.src.evaluate'
 
 
+def worker_gpu(slot):
+    return int(str(slot).split(':')[0])
+
+
+def free_worker_slot(active, gpu, limit):
+    for index in range(limit):
+        slot = str(gpu) if index == 0 else f'{gpu}:{index}'
+        if slot not in active:
+            return slot
+    return None
+
+
 def training_completed(path):
     """Only successful final export releases an explicitly assigned GPU group."""
     if not path.exists():
@@ -85,6 +97,14 @@ def run(args, config):
         gpus = released_config['gpus']
     if len(set(gpus)) != len(gpus):
         raise ValueError('Evaluation GPUs must be distinct')
+    workers_per_gpu = getattr(args, 'workers_per_gpu', 1)
+    worker_memory = getattr(args, 'worker_memory_gib', None)
+    poll_seconds = getattr(args, 'poll_seconds', None)
+    poll_seconds = config['execution']['poll_seconds'] if poll_seconds is None else poll_seconds
+    if workers_per_gpu < 1 or poll_seconds <= 0:
+        raise ValueError('Worker count and polling interval must be positive')
+    if workers_per_gpu > 1 and (worker_memory is None or worker_memory <= 0):
+        raise ValueError('Concurrent workers require an explicit positive memory allowance')
     root = args.root.resolve()
     args.root = root
     root.mkdir(parents=True, exist_ok=True)
@@ -118,7 +138,9 @@ def run(args, config):
         def snapshot(state='running', pending=0):
             atomic_json(status, dict(status=state, node=args.node_id, pid=os.getpid(), updated=time.time(),
                 active={str(gpu):dict(pid=item[0].pid, job=[str(x) if isinstance(x, Path) else x for x in item[1]],
-                                     owner=item[3], gpu=gpu) for gpu,item in active.items()},
+                                     owner=item[3], gpu=worker_gpu(gpu)) for gpu,item in active.items()},
+                workers_per_gpu=workers_per_gpu, worker_memory_gib=worker_memory,
+                poll_seconds=poll_seconds,
                 pending_shards=pending, failed=failed, preparing=preparing))
 
         try:
@@ -153,7 +175,8 @@ def run(args, config):
                         # Only explicit restart and a dead local process permit release.
                         pool.release(job, owner)
                 for gpu,pid,job in workers:
-                    if gpu not in gpus or gpu in active:
+                    slot = free_worker_slot(active, gpu, workers_per_gpu)
+                    if gpu not in gpus or slot is None:
                         raise RuntimeError('Live worker GPU conflicts with the new queue')
                     owner = pool.owner(job)
                     if owner:
@@ -167,7 +190,7 @@ def run(args, config):
                             if (job[-1] / 'summary.json').exists():
                                 continue
                             raise RuntimeError('Cannot reserve the shard of an existing worker')
-                    active[gpu] = (ExistingWorker(pid, job[-1]), job, None, owner)
+                    active[slot] = (ExistingWorker(pid, job[-1]), job, None, owner)
                 snapshot()
             while True:
                 for gpu,item in list(active.items()):
@@ -189,10 +212,15 @@ def run(args, config):
                 busy = {str(item[1][-1]) for item in active.values()}
                 available = released_training_gpus(training_queue, gpus) if training_queue else gpus
                 for gpu in available:
-                    if gpu in active:
+                    slot = free_worker_slot(active, gpu, workers_per_gpu)
+                    if slot is None:
                         continue
-                    used = subprocess.check_output(['nvidia-smi',f'--id={gpu}','--query-gpu=memory.used','--format=csv,noheader,nounits'],text=True)
-                    if int(used.strip()) >= 1000:
+                    memory = subprocess.check_output(['nvidia-smi',f'--id={gpu}','--query-gpu=memory.used,memory.free','--format=csv,noheader,nounits'],text=True)
+                    used, free = map(int, memory.strip().split(','))
+                    own_workers = sum(worker_gpu(key) == gpu for key in active)
+                    # Never share a GPU occupied by another queue. Extra workers
+                    # can share only this dispatcher's already-owned GPU.
+                    if (not own_workers and used >= 1000) or (worker_memory is not None and free < worker_memory * 1024):
                         continue
                     selected = pool.acquire_next([job for job in jobs if str(job[-1]) not in busy], args.node_id)
                     if selected:
@@ -209,13 +237,13 @@ def run(args, config):
                             '--start',str(start),'--stop',str(stop)]
                         process = subprocess.Popen(command,env=dict(os.environ,CUDA_VISIBLE_DEVICES=str(gpu)),stdout=log,stderr=subprocess.STDOUT)
                         pool.set_pid(job, owner, process.pid)
-                        active[gpu] = (process,job,log,owner)
+                        active[slot] = (process,job,log,owner)
                         preparing = None
                         busy.add(str(out));snapshot(pending=len(jobs))
                 if not files:
                     collect(root, config)
                 snapshot('running' if active else 'waiting_for_checkpoints',len(jobs))
-                time.sleep(config['execution']['poll_seconds'])
+                time.sleep(poll_seconds)
         except Exception as error:
             failed.append(dict(error=str(error)))
             snapshot('failed')

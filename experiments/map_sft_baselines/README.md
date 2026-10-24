@@ -42,6 +42,8 @@
 
 魔方仅在本轮FLAN小OOD评测及同题地图贪心参照中使用保留的低学习率2000步候选；身份由重评配置维护，逐题记录实际地图来源。原验证、其他任务、FLAN训练地图及任务selection保持不变。准备题集时通过`--cube-small-ood-checkpoint`传入该候选权重；原`qmap.pt`不覆盖。
 
+评测资源可用`queue evaluate --workers-per-gpu N --worker-memory-gib G --poll-seconds S`在同卡并发独立分片；默认每卡一路，并发必须显式指定单进程所需空闲显存。重启加`--resume-workers`接管现有分片，仍由同一claim排除重复领取；资源参数不改变生成参数、单题预算或评分。节点使用情况在runtime维护。
+
 `src.small_ood_prepare`复用原FLAN评测数据与任务环境，生成带`original`／`small_ood`标签的固定题集，并可用`--map-reference-out`跑同题冻结地图Top-1贪心。模型评测复用`src.queue evaluate`，只领取配置中`only_steps`指定的断点。每组完整结果的`by_cohort`与`cohort_report.md`分别报告七项500题成绩，包括到达与到达且正确停止；汇总3500题仅用于核对完整性，不替代分项结论。地图贪心参照使用相同动作预算、合法候选与终止目标，保留逐题动作和失败；它是经验参照，不是LLM的数学上限。
 
 ```bash

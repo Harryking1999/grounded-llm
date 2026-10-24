@@ -17,7 +17,7 @@
 
 | 位置 | 内容 |
 |---|---|
-| `tasks/` | 十个任务的阅读入口；有目录不等于已具备可采用地图 |
+| `tasks/` | 十个任务的阅读入口；地图准备情况见任务索引 |
 | `grounded_llm/core/` | 公共Q编码器、距离与采样、地图读取、SFT基础 |
 | `grounded_llm/tasks/` | 任务规则、状态编码、标签、提示、数据适配与裁判 |
 | `experiments/` | 实验配置、独立编排、结果与必要证据 |
@@ -29,6 +29,6 @@
 
 依赖方向为 `experiments → grounded_llm/tasks → core`；实验也可直接调用core。先找已有任务入口及直接依赖，再改对应层。Qmap训练按任务独立编排，共用数值组件；SFT共用编码、组批与训练。具体接口见[复用表](experiments/README.md#先复用这些实现)。
 
-根目录旧harness和旧实验导入路径仍服务历史复现与缓存兼容，不是新增功能入口。整理目录不迁移正在运行的源码、数据和checkpoint。
+根目录旧harness和旧实验导入路径仍服务历史复现与缓存兼容，整理目录不迁移正在运行的源码、数据和checkpoint。
 
 文献入口：[RELATED_WORK](RELATED_WORK.md)、[GCML任务来源](docs/GCML_TASKS.md)、WorMI[精读](docs/WORMI_PAPER_READING_REPORT.md)与[分享稿](docs/WORMI_READING_REPORT.md)。它们不维护当前计划。

@@ -59,7 +59,7 @@ Return only JSON with "actions" (an array of strings, each one of "Up", "Down", 
 Use "solved" when your sequence reaches the goal; if already at the goal, output an empty actions array. Use "no_solution" only when the goal is unreachable, not merely because you could not find a plan; otherwise use "unsolved".
 ```
 
-中文：一次输出完整剩余计划，动作使用方向名称，无中途反馈；必须精确达到给定目标。沿用积木的 JSON 与终止语义。模型自报 solved 不替代环境验证。
+中文：一次输出完整剩余计划，动作使用方向名称，无中途反馈；必须精确达到给定目标。沿用积木的 JSON 与终止语义。
 
 ## 监督答案：排序／Reason／Action
 
@@ -85,4 +85,4 @@ Reason: The current board exactly matches the goal; no further move is needed.
 <done/>
 ```
 
-无地图 CoT 组直接删除排序行，保留相同 Reason、动作和停止标签。这里只定义简短 R＋A，不把它称为已准备的长 CoT 数据。
+无地图 CoT 组直接删除排序行，保留相同 Reason、动作和停止标签。这里只定义简短 R＋A。

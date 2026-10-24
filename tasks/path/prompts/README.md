@@ -39,7 +39,7 @@ Candidate numbers may change between turns; use only the numbers above.
 
 ## SOTA 组／32B 组：输出格式
 
-共享同一任务描述与规则，按用户确认的格式一次输出完整剩余计划，无中途反馈。不把旧 32 节点 DAG 或旧 Q/V 条件移作新结果。
+共享同一任务描述与规则，按用户确认的格式一次输出完整剩余计划，无中途反馈。
 
 ```text
 Plan the complete remaining sequence from the current node and output it once. There is no intermediate feedback; the judge stops at the first illegal action.
@@ -57,7 +57,7 @@ Reason: Moving from {from} to {to} is legal and leaves a route to the goal with 
 <action>{local_id}</action>
 ```
 
-排序沿用积木：最近的至多 10 个候选加 `current`，用 `<`、`=` 表示远近与并列。地图排序来自选定 Q，环境裁判另外验证动作与依据，不把地图排序自动视为正确动作标签。
+排序沿用积木：最近的至多 10 个候选加 `current`，用 `<`、`=` 表示远近与并列。地图排序来自选定 Q，环境裁判另外验证动作与依据。
 
 动作直接到达目标时，Reason 改为：
 

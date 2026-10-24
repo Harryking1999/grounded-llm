@@ -19,7 +19,7 @@
 
 ## 来源与阅读入口
 
-布局来自[DeepMind Boxoban](https://github.com/google-deepmind/boxoban-levels/blob/78011d8c86ad423bfb2e1005012393b4c3c24409/README.md)，动作规则参考[gym-sokoban](https://github.com/mpSchrader/gym-sokoban/blob/8e06e44e8bf3bb8bc73eeb1e7f0354508ce3fc89/gym_sokoban/envs/sokoban_env.py)。hard是按原作者求解策略的失败筛选出的难题，不代表棋盘更大。我们的完成条件额外指定了玩家终点。
+布局来自[DeepMind Boxoban](https://github.com/google-deepmind/boxoban-levels/blob/78011d8c86ad423bfb2e1005012393b4c3c24409/README.md)，动作规则参考[gym-sokoban](https://github.com/mpSchrader/gym-sokoban/blob/8e06e44e8bf3bb8bc73eeb1e7f0354508ce3fc89/gym_sokoban/envs/sokoban_env.py)。hard是按原作者求解策略的失败筛选出的难题，我们的完成条件额外指定了玩家终点。
 
 - [数据来源与划分](data/README.md)
 - [Qmap输入、目标与评测](Qmap/README.md)

@@ -25,7 +25,7 @@ def main():
                   cot_ra_answer=reason(state, goal, action) + f"\n<action>{candidate}</action>",
                   map_answer_template="{ranking_from_selected_Q}\n" + reason(state, goal, action) + f"\n<action>{candidate}</action>")
     (root / "data/example.json").write_text(json.dumps(sample, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
-    parts = ["说明：这是构造的单步可解格式例，不是训练集抽样，也不是评测结果。排序须由选定 Q 生成，示例不伪造排序标签。"]
+    parts = ["说明：这是构造的单步可解格式例，排序须由选定 Q 生成。"]
     for title, with_map, order in [("地图组首轮", True, "ranking_first"), ("无地图 R＋A 组首轮", False, "reason_first")]:
         parts.append(f"## {title}\n\n```text\n" + prompt(state, goal, [], first=True, start=state, with_map=with_map, response_order=order) + "\n```")
     parts.append("## 执行后的下一轮更新\n\n```text\n" + prompt(goal, goal, [action]) + "\n```")

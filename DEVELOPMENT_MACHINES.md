@@ -11,9 +11,9 @@
 | 4090 | `gongruochen@10.28.0.80`，经 login02 | 五张扩容 48GB 卡；本项目使用 1–4 号卡，0 号卡预留 |
 | login02 | `zhangyue@172.16.78.36:10022` | 仅用于登录和文件中转 |
 
-[平台入口](https://172.16.78.10:32206/index.html?#/developEnv)：业务管理 → 开发环境 → SSH 查看。旧平台端口不作为自动恢复目标。
+[平台入口](https://172.16.78.10:32206/index.html?#/developEnv)：业务管理 → 开发环境 → SSH 查看。
 
-平台评测连接别名使用 `35016`。端口登记只说明连接入口，不代表资源空闲或已授权启动任务；具体用途由本次任务与相应 runtime 确定，不沿用旧对话中的运行授权。
+平台评测连接别名使用 `35016`。端口登记只说明连接入口，具体用途由本次任务与相应 runtime 确定。
 
 ## 2. SSH 连接与认证
 
@@ -62,13 +62,13 @@ ssh grounded-4090
 
 平台 Qmap 在共享盘写入长时间阻塞时，可以使用节点 `/tmp/` 保存源码快照、数据缓存及活动运行镜像，完整断点、采样器状态与阶段结果再回存各任务的持久根。具体活动路径与回存入口见对应实验报告，不得仅凭持久目录未更新就重复启动训练。节点停止会丢失 `/tmp/`；恢复时以最后完整回存的断点接续，并如实说明未回存的曝光缺口。
 
-本地日常阅读入口为 `tasks/<task>/`；选定 Qmap 的本地副本放在各任务 `Qmap/checkpoints/`（Git 忽略），来源登记在同目录 `selection.json`。远端原运行目录不随本地入口整理移动，不能假设这些副本路径在远端已存在。
+本地日常阅读入口为 `tasks/<task>/`；选定 Qmap 的本地副本放在各任务 `Qmap/checkpoints/`（Git 忽略），来源登记在同目录 `selection.json`。远端原运行目录不随本地入口整理移动。
 
-平台 `/zhanghanyue` 可跨其开发环境复用。028 的 `/ssdwork` 为节点本地磁盘；028、login02、4090 与平台之间没有已确认的共享目录，不能假定相同路径代表同一文件。
+平台 `/zhanghanyue` 可跨其开发环境复用。028 的 `/ssdwork` 为节点本地磁盘；028、login02、4090 与平台之间没有已确认的共享目录。
 
 各机器使用项目独立环境，不修改公共 Conda 环境或共享基座。依赖版本由实验配置和对应部署说明记录。
 
-4090 的 `gongruochen` 账号存在独立用户硬配额（当前查询为 100GB），整盘 `df` 有剩余空间并不代表账号仍可写；操作前同时检查 `quota -s`。训练完整存档以 028 为准，4090 的 `runs/map_sft_baselines/models/` 仅作受限推理缓存；其占用、自动清理与重连规则见实验 [README](experiments/map_sft_baselines/README.md) 和正式[缓存策略](experiments/map_sft_baselines/configs/bridge_retention.json)。
+4090 的 `gongruochen` 账号存在独立用户硬配额（当前查询为 100GB），操作前同时检查 `quota -s`。训练完整存档以 028 为准，4090 的 `runs/map_sft_baselines/models/` 仅作受限推理缓存；其占用、自动清理与重连规则见实验 [README](experiments/map_sft_baselines/README.md) 和正式[缓存策略](experiments/map_sft_baselines/configs/bridge_retention.json)。
 
 ## 4. 文件传输与迁移
 
@@ -112,7 +112,7 @@ scp -r /home/zhangyue/transfer/grounded_llm/run-id gongruochen@10.28.0.80:/home/
 | `step2-path` | `codex/archive-step2-path` |
 | `qwen32b-path120` | `codex/qwen32b-path120` |
 
-没有独有运行材料的旧工作树只保留 Git 历史，不创建空产物目录。复现时按原配置与提交导出源码，并把历史绝对路径映射到归档位置；不要把旧状态页或启动脚本当作当前指令。
+没有独有运行材料的旧工作树只保留 Git 历史，不创建空产物目录。复现时按原配置与提交导出源码，并把历史绝对路径映射到归档位置。
 
 ## 7. Qmap 历史归档
 
@@ -121,15 +121,15 @@ scp -r /home/zhangyue/transfer/grounded_llm/run-id gongruochen@10.28.0.80:/home/
 | 本地 `D:\Grounded_llm_archive\qmap\` | 清理前的 Qmap 工作区、后续已完成负结果和小检查分项归档；根目录及各归档的 README 说明布局 |
 | 平台 `/zhanghanyue/experiment/grounded_llm_puzzle_qmaps_archive/20261016_cleanup/` | 完整历史 `code/`、`runs/`、`logs/` 和传输包；内部绝对软链接已随归档重定位 |
 
-归档位于当前工作区之外，不作为新实验的默认数据来源。恢复某次运行时，按其 `source_commit` 在独立目录检出源码，并使用同一归档运行的 `config.json`、数据与 checkpoint。元数据内保留的旧绝对路径属于历史记录，恢复时应指向实际归档位置。不要把全部旧日志、模型和快照搬回当前源码目录。
+归档位于当前工作区之外，恢复某次运行时，按其 `source_commit` 在独立目录检出源码，并使用同一归档运行的 `config.json`、数据与 checkpoint。元数据内保留的旧绝对路径属于历史记录，恢复时应指向实际归档位置。
 
 ## 8. Git 分支清理的恢复入口
 
-旧本地分支已保存为 `refs/archive/2026-10-17/<原分支名>`；这些不是日常开发分支。整合前全部引用还保存在仓库外 `D:\Grounded_llm_archive\git\grounded-llm-before-cleanup-20261017.bundle`，不提交进源代码仓库。恢复时先检查引用，再创建新分支，例如：
+旧本地分支已保存为 `refs/archive/2026-10-17/<原分支名>`；整合前全部引用还保存在仓库外 `D:\Grounded_llm_archive\git\grounded-llm-before-cleanup-20261017.bundle`，不提交进源代码仓库。恢复时先检查引用，再创建新分支，例如：
 
 ```powershell
 git show refs/archive/2026-10-17/codex/cube-metric-trials --stat
 git switch -c codex/recover-cube refs/archive/2026-10-17/codex/cube-metric-trials
 ```
 
-本地独有源码按上述归档引用恢复，Git 外材料见第 6、7 节。已归档的远端历史也可用对应 `archive/2026-10-17/` 标签定位；这些历史不作为新运行的默认代码。
+本地独有源码按上述归档引用恢复，Git 外材料见第 6、7 节。已归档的远端历史也可用对应 `archive/2026-10-17/` 标签定位。

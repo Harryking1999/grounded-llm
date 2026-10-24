@@ -1,6 +1,6 @@
 # 8-Puzzle 数据
 
-[example.json](example.json) 是一题可达的一步说明例，不是正式训练集。[纯文字基线准备脚本](../../../experiments/task_text_baselines/src/prepare.py)按精确距离生成评测题；Qmap数据由[本任务实现](../../../grounded_llm/tasks/puzzle8/data.py)及[实验配置](../../../experiments/puzzle8_qmap/configs/)维护，SFT见[统一实验入口](../../../experiments/map_sft_baselines/README.md)。
+[example.json](example.json) 是一题可达的一步说明例，[纯文字基线准备脚本](../../../experiments/task_text_baselines/src/prepare.py)按精确距离生成评测题；Qmap数据由[本任务实现](../../../grounded_llm/tasks/puzzle8/data.py)及[实验配置](../../../experiments/puzzle8_qmap/configs/)维护，SFT见[统一实验入口](../../../experiments/map_sft_baselines/README.md)。
 
 - 状态：3×3 整数矩阵，0 是空格，1–8 是数字块；展平时按行读取。
 - 决策：当前／目标棋盘、全部合法方向、本轮候选 ID 与对应真实后继。

@@ -1,6 +1,6 @@
 # Q/V 地图学习与历史 LLM token 接口方案
 
-Step 1 的 Q/V 结果仍供当前显式 roadmap 路线复用。图 Step 2 属于 previous approach：将 Q 映射为冻结 LLM 的连续输入 token；已有 runner、正式配置、诊断和结果全部保留供复现，不是当前执行方案。当前方向见[研究简述](../../docs/RESEARCH_BRIEF.md)和[项目状态页](../../docs/PROJECT_STATUS_AND_TODO.md)。
+Step 1 的 Q/V 结果仍供当前显式 roadmap 路线复用。图 Step 2 属于 previous approach：将 Q 映射为冻结 LLM 的连续输入 token；已有 runner、正式配置、诊断和结果全部保留供复现，当前方向见[研究简述](../../docs/RESEARCH_BRIEF.md)和[项目状态页](../../docs/PROJECT_STATUS_AND_TODO.md)。
 
 | 阅读入口 | 内容 |
 | --- | --- |
@@ -18,7 +18,7 @@ Step 1 的 Q/V 结果仍供当前显式 roadmap 路线复用。图 Step 2 属于
 
 主比较为局部更新的不同维度，以及相同维度的完整梯度更新。条件共用图、探索数据、重放顺序和轮数；同维条件也共用初始化。较大图按节点数增加探索量，具体参数见 [exploration.json](configs/exploration.json) 及其继承的 [step1.json](configs/step1.json)。
 
-已完成四个条件、64 张地图，所有后继识别均为 100%，并形成远近关系。图上每条边有专属动作向量，因此转移拟合本身不能证明几何或规划有效，这几项分别统计。
+已完成四个条件、64 张地图，所有后继识别均为 100%，并形成远近关系。图上每条边有专属动作向量，这几项分别统计。
 
 ## 实现依据
 

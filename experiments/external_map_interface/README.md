@@ -10,7 +10,7 @@
 
 ## 图实验入口
 
-`configs/path32_smoke.json` 只用于检查双起终点的逐步调用链。输入为 Step 1 同一 case 目录下的 `inputs.npz` 与 `map.npz`；可使用已训练的 128 维 Q/V，不需要额外 adapter。模型路径与运行 backend 是运行参数；有 SGLang 服务时传 `--endpoint`，在节点上直接加载模型时用 `--backend transformers`。产物写入 Git 忽略的 `runs/`。`plain`、`reasoning` 不读 Q/V；`distance` 在同一图和候选动作上增加 learned-map 距离。每步原始回答都会留档；非法动作、输出截断和步数上限分别计数。256 token 的初试使两个 thinking 条件都在首步截断；1024 token 仍只是诊断预算，path32 的结果不能与正式基线比较。
+`configs/path32_smoke.json` 只用于检查双起终点的逐步调用链。输入为 Step 1 同一 case 目录下的 `inputs.npz` 与 `map.npz`；可使用已训练的 128 维 Q/V，不需要额外 adapter。模型路径与运行 backend 是运行参数；有 SGLang 服务时传 `--endpoint`，在节点上直接加载模型时用 `--backend transformers`。产物写入 Git 忽略的 `runs/`。`plain`、`reasoning` 不读 Q/V；`distance` 在同一图和候选动作上增加 learned-map 距离。每步原始回答都会留档；非法动作、输出截断和步数上限分别计数。256 token 的初试使两个 thinking 条件都在首步截断；1024 token 仍只是诊断预算。
 
 正式逐步对照使用 [path256_distance.json](configs/path256_distance.json) 和[原 path256 合同](../qwen_path_blocks/configs/path256_bidirectional_16k.json)的同一冻结题集：同一 256 节点图、16 个起终点、每题 8 次。`src/train_graph_map.py` 在该图上复用 Step 1 的局部 Q/V 更新，固定训练末轮，不按规划成绩挑地图；原有三张随机 256 节点图的 Q/V 不适用于这张图。`src/evaluate_path256.py` 分别运行 Qwen3-4B 非 thinking、thinking、thinking 加候选地图距离。三组每步都看到同一图、已执行路径和排除已访问节点后的合法动作，每次执行后用环境实际后继更新当前状态。距离条件额外得到 `||Q当前+V动作−Q目标||₂`。程序按原始寻路裁判核验实际路线，不把真实最短距离传给模型。
 
@@ -24,11 +24,11 @@
 
 独立图复测由 [题集配置](configs/path256_diverse_suite.json)冻结新图与分层抽题，[评测配置](configs/path256_diverse_distance.json)沿用逐步预算和采样设置。对 Qwen3-4B 与 Qwen3-4B-Instruct-2507 分别运行非 thinking 的 `plain`、`plain_distance`；新图单独训练 128 维 Q/V，旧图地图不跨图复用。
 
-四组各 128 条已完成并重放裁判验收。Qwen3-4B 的新图到达数为 53→97，两张图合计为 122/256→187/256；新图最短路数两组同为 4/128。Instruct 两组均为 0/128，到达前主要发生格式错误或单步输出截断，不能据此判断其地图规划收益。合并结果与 prompt 示例见[讨论稿](results/path256_diverse.md)。
+四组各 128 条已完成并重放裁判验收。Qwen3-4B 的新图到达数为 53→97，两张图合计为 122/256→187/256；新图最短路数两组同为 4/128。Instruct 两组均为 0/128，到达前主要发生格式错误或单步输出截断，合并结果与 prompt 示例见[讨论稿](results/path256_diverse.md)。
 
 五图评测使用[冻结题集合同](configs/path256_five_graphs_suite.json)与[评测合同](configs/path256_five_graphs_eval.json)。每张图各自训练 Q/V；三组为 Instruct-2507 无地图、Thinking-2507 无地图、Instruct-2507 加地图，统一用正常结束回答末尾的完整动作 JSON 继续逐步执行。全部 5,760 条已完成并通过全量重放。三组最短路 pass@1 分别为 26.98%、47.97%、33.49%；同权重地图组平均输出减少 8.2%，但 10 步题最短路略降，pass@16 题目覆盖几乎持平。详细成绩、推理成本与分析见[五图报告](results/path256_five_graphs.md)及[紧凑结果摘要](results/path256_five_graphs.json)。旧严格格式结果不与此次成绩混合。
 
-五图汇总也报告推理成本：每条轨迹和每次决策的输出 token、输入 token、模型调用耗时与截断，以及获得一次最短路成功所消耗的全部输出 token。失败尝试计入总体成本；成功轨迹的成本另列，避免把提前失败造成的短输出当成加速。耗时包含服务等待，会受 GPU 类型与并行负载影响，因此优先比较同题、同模型的 token 成本和截断。重复反思／停滞从原始回答中检查并附案例；现有运行未保存 token 概率，不能直接判断是否存在低熵或将停滞归因于低熵。
+五图汇总也报告推理成本：每条轨迹和每次决策的输出 token、输入 token、模型调用耗时与截断，以及获得一次最短路成功所消耗的全部输出 token。失败尝试计入总体成本；成功轨迹的成本另列，耗时包含服务等待，会受 GPU 类型与并行负载影响，因此优先比较同题、同模型的 token 成本和截断。重复反思／停滞从原始回答中检查并附案例；现有运行未保存 token 概率。
 
 ```bash
 python -m experiments.external_map_interface.src.evaluate \
@@ -45,9 +45,9 @@ python -m experiments.external_map_interface.src.evaluate \
 
 `src/blocks_dynamics.py` 实现 `δ=MLP([Q(o),E(a)])` 与 `Q̂(o′)=Q(o)+δ`。Q 仍按单张初始棋盘中采样到的完整状态建表；动作 embedding 使用原有 `shape_id,row,col` 编号，一个共享 MLP 预测位移，动作空间不增加。候选距离为 `||Q(o)+δ−Q(goal)||₂`，不查真实后继 Q 来代替预测。
 
-`src/train_blocks_dynamics.py` 复用下面旧试验的环境和转移采样，使用 [blocks_dynamics_pilot.json](configs/blocks_dynamics_pilot.json) 训练。采样包括构造解和随机合法 rollout，保留通向死局的合法动作；没有完整枚举状态图，也没有按好坏过滤转移。用户已确认首轮只训练转移 MSE，**不加入死局标签、路径距离或排序监督**。Q 的两个端点与 MLP 联合反向传播；这不同于旧图 `local_update` 只更新目标 Q 与动作 V 的规则，因此两者也不是只替换 V 参数化的严格消融。
+`src/train_blocks_dynamics.py` 复用下面旧试验的环境和转移采样，使用 [blocks_dynamics_pilot.json](configs/blocks_dynamics_pilot.json) 训练。采样包括构造解和随机合法 rollout，保留通向死局的合法动作；没有完整枚举状态图，也没有按好坏过滤转移。用户已确认首轮只训练转移 MSE，**不加入死局标签、路径距离或排序监督**。Q 的两个端点与 MLP 联合反向传播；这不同于旧图 `local_update` 只更新目标 Q 与动作 V 的规则。
 
-训练保留连通 Q 状态的生成树和每个已出现动作，从剩余边留出一部分评测。这是已观察状态间的留出转移，不是未见棋盘泛化。`src/blocks_diagnostics.py` 分别测留出转移误差、相对不移动预测的误差、Q 尺度、从初始 Q 连续预测的逐深度偏移、候选预测距离以及死局排序。连续预测中不重置到真实 Q；缺少表内 Q 的实际后继只能统计覆盖缺口，不能声称其预测已被验证。立即死局与已有到目标路径的标签仅用于诊断。
+训练保留连通 Q 状态的生成树和每个已出现动作，从剩余边留出一部分评测。这是已观察状态间的留出转移，`src/blocks_diagnostics.py` 分别测留出转移误差、相对不移动预测的误差、Q 尺度、从初始 Q 连续预测的逐深度偏移、候选预测距离以及死局排序。连续预测中不重置到真实 Q；缺少表内 Q 的实际后继只能统计覆盖缺口，立即死局与已有到目标路径的标签仅用于诊断。
 
 ```bash
 python -m experiments.external_map_interface.src.train_blocks_dynamics \
@@ -60,9 +60,9 @@ python -m experiments.external_map_interface.src.train_blocks_dynamics \
 
 ## Previous baseline：积木共享动作 V
 
-`src/blocks_q_map.py` 是**单张初始棋盘绑定**的最小训练试验。它直接复用 [BlocksTask](../sol_dag_blocks/src/tasks.py) 的 10×10 棋盘、`shape_id,row,col` 动作及合法移除，使用现有 case 的构造解和随机合法 rollout 收集 `(o1,a,o2)`。状态 Q 按这张棋盘内观察到的完整 mask 建表；同一个动作三元组在多个转移中共用一个 V 行。训练直接调用图 Step 1 的 `local_update`，没有改 Q/V 目标。产物保存在 `runs/`，不保证覆盖未见棋盘或所有可达状态。
+`src/blocks_q_map.py` 是**单张初始棋盘绑定**的最小训练试验。它直接复用 [BlocksTask](../sol_dag_blocks/src/tasks.py) 的 10×10 棋盘、`shape_id,row,col` 动作及合法移除，使用现有 case 的构造解和随机合法 rollout 收集 `(o1,a,o2)`。状态 Q 按这张棋盘内观察到的完整 mask 建表；同一个动作三元组在多个转移中共用一个 V 行。训练直接调用图 Step 1 的 `local_update`，没有改 Q/V 目标。产物保存在 `runs/`。
 
-`configs/blocks_q_200_rollouts_100_epochs.json` 与 `configs/blocks_q_expanded_pilot.json` 在同一 `blocks8_00` 棋盘上各训练 100 轮，分别采 200 与 2,000 次合法 rollout，用来检查更多 transition 对拟合误差与目标距离排序的影响。这些历史配置保留共享 `V_a` 定义，仍不是跨初始棋盘泛化实验。
+`configs/blocks_q_200_rollouts_100_epochs.json` 与 `configs/blocks_q_expanded_pilot.json` 在同一 `blocks8_00` 棋盘上各训练 100 轮，分别采 200 与 2,000 次合法 rollout，用来检查更多 transition 对拟合误差与目标距离排序的影响。这些历史配置保留共享 `V_a` 定义。
 
 ```bash
 python -m experiments.external_map_interface.src.blocks_q_map \
@@ -71,6 +71,6 @@ python -m experiments.external_map_interface.src.blocks_q_map \
   --out runs/external_map_interface/blocks8_00_q_pilot
 ```
 
-旧试验诊断只把无合法动作且非空的状态确认为 dead，把构造解上的状态确认为可解。报告比较“更少格子的 dead”与“更多格子的可解状态”的 learned Q 到目标距离，并统计已观察状态的合法后继有多少仍在 Q 表中。训练残差小并不推出这两类状态已经分离；初始棋盘绑定也不保证随机 rollout 覆盖全部后继。执行到未见棋盘后，表格无法直接取得 `Q当前`。更深层死局和跨棋盘泛化需后续单独检验。本试验不调用 LLM，也不把构造解或可解性标签交给 planner。
+旧试验诊断只把无合法动作且非空的状态确认为 dead，把构造解上的状态确认为可解。报告比较“更少格子的 dead”与“更多格子的可解状态”的 learned Q 到目标距离，并统计已观察状态的合法后继有多少仍在 Q 表中。训练残差小并不推出这两类状态已经分离；执行到未见棋盘后，表格无法直接取得 `Q当前`。更深层死局和跨棋盘泛化需后续单独检验。本试验不调用 LLM，也不把构造解或可解性标签交给 planner。
 
 已完成的训练数值与局限见 [积木 Q/V 试验结果](results/blocks_q_pilot.md)。

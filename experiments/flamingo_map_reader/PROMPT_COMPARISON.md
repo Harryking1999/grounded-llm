@@ -22,7 +22,7 @@
 | 动作预算 | 评测器最多执行 32 步；当前输入文本没有写出这个上限 | prompt 不写动作预算 | 最多 8 步 | 正式 pilot 不限动作数；生成器支持有上限条件 | 不限动作数 |
 | 评测重点 | rollout 到达与停止；reference 单步可达、地图排序；两类终止判断 | 拟报告完整到达、动作合法性与两类终止判断 | 合法执行并清空 | 合法执行并清空、失败类型 | 合法执行并清空；预测状态与格式另作诊断 |
 
-### 形状编号不能混用
+### 形状编号对应表
 
 | 形状 ID | 当前 1.5B／Astra／早期 API | 历史 Sol／Qwen |
 |---|---|---|
@@ -109,18 +109,18 @@ No solution: no legal moves remain and the goal has not been reached.
 <done/>
 ```
 
-当前无解测试指固定失败历史后的末态：未达目标，且已无合法动作；失败历史中的动作不作为该类 SFT 标签，末态判断才参与监督。它不代表任意复杂无解局面的识别能力。来源：[blocks_failure.py](src/blocks_failure.py)。
+当前无解测试指固定失败历史后的末态：未达目标，且已无合法动作；失败历史中的动作不作为该类 SFT 标签，末态判断才参与监督。来源：[blocks_failure.py](src/blocks_failure.py)。
 
 ### reference 与 rollout 的区别
 
 - **reference**：在固定示范的各个状态上作答；生成本轮答案后，下一轮上下文接入之前的示范答案，而非模型自己的错误动作。它用于测单步选择与排序。
 - **rollout**：执行模型自己选择的动作，再提供真实更新；错误会改变后续状态。完整任务到达率来自这一条件。
 
-两者都逐轮生成，不能把 reference 单步准确率当作一次性完整规划成功率。来源：[trajectory_eval.py](src/trajectory_eval.py)。
+两者都逐轮生成，来源：[trajectory_eval.py](src/trajectory_eval.py)。
 
 ## 3. Astra：一次性输出完整草案，待确认
 
-这是本文整理的待确认版本：复用当前题集和 8 种形状；不提供首步候选、不输入地图、不要求 `board_after`。只提供一个当前起点棋盘和目标棋盘，删去重复的原始棋盘；规则沿用当前 1.5B 的措辞，输出约定压缩为动作 JSON 与终止状态。**它尚不是已执行的正式配置，也不表示用户已经确认。**
+这是本文整理的待确认版本：复用当前题集和 8 种形状；不提供首步候选、不输入地图、不要求 `board_after`。只提供一个当前起点棋盘和目标棋盘，删去重复的原始棋盘；规则沿用当前 1.5B 的措辞，输出约定压缩为动作 JSON 与终止状态。**这是待实施的配置草案，也不表示用户已经确认。**
 
 普通题从初始棋盘出发；初始已达目标题应直接停止；失败题从固定历史后的真实末态继续判断。失败题输入仅整理实际棋盘与动作历史，不添加示范排序、地图距离、答案标签或“这题无解”的类别提示。prompt 不写动作预算。
 
@@ -165,13 +165,13 @@ Use "solved" when your sequence reaches the goal; if already at the goal, output
 | 输出 | 动作与终止判断 | 用坐标 JSON；不输出候选编号或地图排序 |
 | 状态预测 | — | 不要求输出 `board_after`；不因此声称测得逐步状态预测准确率 |
 
-拟优先报告完整到达、完整到达且正确声明成功、非法动作／格式错误，以及两类终止题准确率；不将缺少候选排序的 Astra 答案填入当前 NDCG 列。无解结果仍只解释这 100 个已耗尽合法动作的失败末态。
+拟优先报告完整到达、完整到达且正确声明成功、非法动作／格式错误，以及两类终止题准确率；无解结果仍只解释这 100 个已耗尽合法动作的失败末态。
 
-API 兼容性探测中曾出现请求输出限额未生效；正式预算与实际 token 用量需在正式配置和结果中记录，不能把请求参数当作已约束住的计算预算。本文不保存凭据，也不拟定额外实验调用。
+API 兼容性探测中曾出现请求输出限额未生效；正式预算与实际 token 用量在配置和结果中记录。
 
 ## 4. 历史一次性模板原文
 
-以下都是当时实际模板，不是为本次 Astra 重写的 prompt。Sol 与 Qwen 的任务文字相同；Qwen 外层使用自身 chat template，并开启 thinking。不同模型的推理设置和 token 预算不保证等价。
+以下都是当时实际模板，不是为本次 Astra 重写的 prompt。Sol 与 Qwen 的任务文字相同；Qwen 外层使用自身 chat template，并开启 thinking。
 
 ### 4.1 最早 Luna API：8 种形状，最多 8 步
 
@@ -239,10 +239,10 @@ Plan the COMPLETE sequence before answering. The judge executes it and stops at 
 Output only valid JSON with an actions array. Each action object must contain integer shape_id, row, col, and board_after, an array of exactly ten strings of exactly ten binary characters (0 or 1), in row order. Also include final_status, "solved" or "unsolved", according to whether the final board is empty. Do not include markdown or a reasoning transcript.
 ```
 
-`board_after` 是模型预测，不是环境反馈。主任务执行是否成功与状态报告是否满足合同是不同检查。与当前相比：形状集合、目标、交互、输出负担和训练条件都不同，历史 Qwen 清空失败率不能直接作为当前 510 题的基线。
+`board_after` 是模型预测，不是环境反馈。主任务执行是否成功与状态报告是否满足合同是不同检查。与当前相比：形状集合、目标、交互、输出负担和训练条件都不同。
 
 ## 5. 本次比较能回答什么
 
 本次 Astra 草案用于测：强模型不读取 Q-map、没有逐步反馈时，能在当前同题测试集上完成多少任务。当前 1.5B 条件用于测：训练后的读取接口能否把地图信息转成逐步动作与终止判断。
 
-二者不能单独证明地图接口的因果收益，因为模型规模、项目内训练、候选信息与交互方式同时变化。若以后要隔离其中某个因素，需要另行设计同模型、同题、同交互的比较；本文仅记录现有条件和待确认草案，不授权新增实验。
+现有比较中，模型规模、项目内训练、候选信息与交互方式同时变化。若以后要隔离其中某个因素，需要另行设计同模型、同题、同交互的比较；本文仅记录现有条件和待确认草案。

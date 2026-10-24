@@ -9,7 +9,7 @@
 
 ### 积木：任务文字与监督格式
 
-状态：当前主条件采用八形状、10×10 棋盘，按 12 次放置构造；“八形状”是动作目录，不等于构造块数。主评测配置见 [sol_high_40.json](experiments/task_text_baselines/configs/sol_high_40.json)。15×15、20 块、含 S/Z 的加难条件已停止，仅保留为补充探索，不改变此处规则。
+状态：当前主条件采用八形状、10×10 棋盘，按 12 次放置构造；“八形状”是动作目录，主评测配置见 [sol_high_40.json](experiments/task_text_baselines/configs/sol_high_40.json)。15×15、20 块、含 S/Z 的加难条件已停止，仅保留为补充探索，不改变此处规则。
 
 #### 共享任务描述与规则
 
@@ -48,7 +48,7 @@ Candidate numbers may change between turns; use only the numbers above.
 [/Environment update]
 ```
 
-使用真实执行结果更新，不能把模型自报棋盘当真值。本轮 ID 不是全局动作编号。地图组另收当前／目标／全部合法后继的冻结 Q 槽位；无地图组不收 Q。
+使用真实执行结果更新，本轮 ID 不是全局动作编号。地图组另收当前／目标／全部合法后继的冻结 Q 槽位；无地图组不收 Q。
 
 #### 输出格式与 CoT 监督答案
 
@@ -67,7 +67,7 @@ Reason: The current board exactly matches the goal; no further removal is needed
 <done/>
 ```
 
-当前无地图 7B 监督为相同事实依据与动作，即 R→A，不输出排序。它使用简短 Reason，并非长 CoT。后续长 CoT 文本、是否改为排序＋A，均待讨论，未替换已有运行。排序是 Q 距离顺序，动作正确性由环境裁判另判。
+当前无地图 7B 监督为相同事实依据与动作，即 R→A，不输出排序。它使用简短 Reason，后续长 CoT 文本、是否改为排序＋A，均待讨论，未替换已有运行。排序是 Q 距离顺序，动作正确性由环境裁判另判。
 
 完整实际首轮格式指令与后续更新见同目录 `example.md`，由 `python -m tasks.blocks.data.prepare_example` 调用当前运行的提示函数生成。权威实现：`experiments/flamingo_map_reader/src/blocks_prompt.py`、`experiments/map_sft_baselines/src/common.py`、`experiments/llm_task_sft/src/protocol.py`。
 
@@ -81,7 +81,7 @@ Return JSON with "actions" (an array of objects with integer shape_id, row, col)
 Use "solved" when your sequence reaches the goal; if already at the goal, output an empty actions array. Use "no_solution" only when the goal is unreachable, not merely because you could not find a plan; otherwise use "unsolved".
 ```
 
-动作使用物理参数而非本轮候选 ID；不要求 `board_after`。已在目标时使用 `{"actions":[],"final_status":"solved"}`。输出预算以对应实验正式配置为准。与地图／CoT 逐轮条件的反馈方式不同，报告时注明。旧 SOTA／32B 整段计划条件还使用过不同形状目录与空目标，不能直接移用为本轮匹配结果。
+动作使用物理参数而非本轮候选 ID；不要求 `board_after`。已在目标时使用 `{"actions":[],"final_status":"solved"}`。输出预算以对应实验正式配置为准。与地图／CoT 逐轮条件的反馈方式不同，报告时注明。旧 SOTA／32B 整段计划条件还使用过不同形状目录与空目标。
 
 
 ### 数据说明例
@@ -150,7 +150,7 @@ Use "solved" when your sequence reaches the goal; if already at the goal, output
 
 ### 已渲染文字示例
 
-说明：这是构造的单步可解格式例，不是训练集抽样，也不是评测结果。排序须由选定 Q 生成，示例不伪造排序标签。
+说明：这是构造的单步可解格式例，排序须由选定 Q 生成。
 
 ## 地图组首轮
 
@@ -368,7 +368,7 @@ Candidate numbers may change between turns; use only the numbers above.
 
 #### SOTA 组／32B 组：输出格式
 
-共享同一任务描述与规则，按用户确认的格式一次输出完整剩余计划，无中途反馈。不把旧 32 节点 DAG 或旧 Q/V 条件移作新结果。
+共享同一任务描述与规则，按用户确认的格式一次输出完整剩余计划，无中途反馈。
 
 ```text
 Plan the complete remaining sequence from the current node and output it once. There is no intermediate feedback; the judge stops at the first illegal action.
@@ -386,7 +386,7 @@ Reason: Moving from {from} to {to} is legal and leaves a route to the goal with 
 <action>{local_id}</action>
 ```
 
-排序沿用积木：最近的至多 10 个候选加 `current`，用 `<`、`=` 表示远近与并列。地图排序来自选定 Q，环境裁判另外验证动作与依据，不把地图排序自动视为正确动作标签。
+排序沿用积木：最近的至多 10 个候选加 `current`，用 `<`、`=` 表示远近与并列。地图排序来自选定 Q，环境裁判另外验证动作与依据。
 
 动作直接到达目标时，Reason 改为：
 
@@ -817,7 +817,7 @@ Use "solved" when your sequence reaches the goal; if already at the goal, output
 {"actions":["R","U'","F"],"final_status":"solved"}
 ```
 
-已在目标时输出 `{"actions":[],"final_status":"solved"}`。是否到达由环境执行验证，不能以模型的 `final_status` 作为正确性证据。此组与地图／CoT 的逐轮反馈条件不同，结果中注明。
+已在目标时输出 `{"actions":[],"final_status":"solved"}`。是否到达由环境执行验证，此组与地图／CoT 的逐轮反馈条件不同，结果中注明。
 
 #### 监督答案：排序／Reason／Action
 
@@ -829,7 +829,7 @@ Reason: Turning {turn} is legal and leaves a cube state with one fewer turn need
 <action>{local_id}</action>
 ```
 
-排序包含六个候选和 `current`，按 Q 到目标的距离由近及远排列，用 `<`、`=` 表示远近与并列。动作正确性及“剩余最短步数减少一步”的依据由环境真值另行验证，不把 Q 排序直接当作正确动作标签。
+排序包含六个候选和 `current`，按 Q 到目标的距离由近及远排列，用 `<`、`=` 表示远近与并列。动作正确性及“剩余最短步数减少一步”的依据由环境真值另行验证。
 
 动作直接到达目标时：
 
@@ -845,7 +845,7 @@ Reason: The current cube state exactly matches the goal; no further turn is need
 <done/>
 ```
 
-无地图 CoT 组直接去掉排序行，保留相同 Reason、动作和停止标签，不单独确认。以上均为简短 R＋A 监督，不是长 CoT。复原和任意可达目标共用文字格式，但数据与结果分别报告；当前复原断点不等于任意目标已解决。
+无地图 CoT 组直接去掉排序行，保留相同 Reason、动作和停止标签。以上均为简短 R＋A 监督，复原和任意可达目标共用文字格式，但数据与结果分别报告。
 
 
 ### 数据说明例
@@ -944,7 +944,7 @@ Return only JSON with "actions" (an array of strings, each one of "Up", "Down", 
 Use "solved" when your sequence reaches the goal; if already at the goal, output an empty actions array. Use "no_solution" only when the goal is unreachable, not merely because you could not find a plan; otherwise use "unsolved".
 ```
 
-中文：一次输出完整剩余计划，动作使用方向名称，无中途反馈；必须精确达到给定目标。沿用积木的 JSON 与终止语义。模型自报 solved 不替代环境验证。
+中文：一次输出完整剩余计划，动作使用方向名称，无中途反馈；必须精确达到给定目标。沿用积木的 JSON 与终止语义。
 
 #### 监督答案：排序／Reason／Action
 
@@ -970,7 +970,7 @@ Reason: The current board exactly matches the goal; no further move is needed.
 <done/>
 ```
 
-无地图 CoT 组直接删除排序行，保留相同 Reason、动作和停止标签。这里只定义简短 R＋A，不把它称为已准备的长 CoT 数据。
+无地图 CoT 组直接删除排序行，保留相同 Reason、动作和停止标签。这里只定义简短 R＋A。
 
 
 ### 数据说明例
@@ -1103,7 +1103,7 @@ Reason: The current board exactly matches the goal; no further move is needed.
 
 ### 手电过桥：任务文字与监督格式
 
-规则采用 [Backhouse 与 Truong 的手电过桥问题](https://people.cs.nott.ac.uk/psarb2/papers/abstract.html)的容量2情形。当前六人时间组合是本项目诊断场景，不称为论文原题集。
+规则采用 [Backhouse 与 Truong 的手电过桥问题](https://people.cs.nott.ac.uk/psarb2/papers/abstract.html)的容量2情形。当前六人时间组合是本项目诊断场景。
 
 以下定义可复用的文字协议。完整计划的提示与裁判已接入；逐轮地图／CoT部分是协议模板，尚无本任务LLM训练或已采用Qmap权重。
 
@@ -1162,7 +1162,7 @@ Return JSON with "actions" (an array of arrays; each action contains one or two 
 Use "solved" when your sequence reaches the goal; if already at the goal, output an empty actions array. Use "no_solution" only when the goal is unreachable, not merely because you could not find a plan; otherwise use "unsolved".
 ```
 
-沿用既有完整计划条件：无工具和中途反馈，不要求逐步状态报告。模型自报状态不替代动作回放；完成、最优成本与格式分别记录。模型和token预算以实验配置为准。
+沿用既有完整计划条件：无工具和中途反馈，不要求逐步状态报告。完成、最优成本与格式分别记录。模型和token预算以实验配置为准。
 
 #### 监督答案：排序／Reason／Action
 
@@ -1172,7 +1172,7 @@ Reason: Crossing with people {person_ids} is legal and preserves a minimum-total
 <action>{local_id}</action>
 ```
 
-排序包含最近的至多10个候选及`current`，用`<`、`=`表示远近和并列。排序由实际冻结Q生成，不能把精确距离填入排序冒充Q输出。上述Reason仅在裁判已验证相应事实时作为监督模板；尚未生成本任务SFT数据。无地图CoT组只删除排序行，保留相同Reason和控制标签。
+排序包含最近的至多10个候选及`current`，用`<`、`=`表示远近和并列。排序由实际冻结Q生成，上述Reason仅在裁判已验证相应事实时作为监督模板；尚未生成本任务SFT数据。无地图CoT组只删除排序行，保留相同Reason和控制标签。
 
 直接到达目标时：
 
@@ -1190,7 +1190,7 @@ Reason: The current configuration exactly matches the goal; no further crossing 
 
 #### 完整计划结构说明例
 
-下例对应本任务[data/example.json](tasks/bridge/data/example.json)，只说明格式，不作为测试题提示中的few-shot。
+下例对应本任务[data/example.json](tasks/bridge/data/example.json)，只说明格式。
 
 ```json
 {
@@ -1269,7 +1269,7 @@ Reason: The current configuration exactly matches the goal; no further crossing 
 
 以下定义可复用的文字协议。完整计划的提示与裁判已接入；逐轮地图／CoT部分是协议模板，尚无本任务LLM训练或已采用Qmap权重。
 
-新训练与评测每题指定一张完整成功目标棋盘，包含玩家终点，字段为`goal_board`。没有该字段的适配仅为历史题目回放兼容，不安排原规则对照，不能沿用旧Flash成绩冒充指定目标表现。
+新训练与评测每题指定一张完整成功目标棋盘，包含玩家终点，字段为`goal_board`。没有该字段的适配仅为历史题目回放兼容，不安排原规则对照。
 
 #### 共享任务描述与规则
 
@@ -1303,7 +1303,7 @@ The goal is to match the specified goal board exactly, including the player and 
 
 #### 历史目标文字：仅回放
 
-仅用于没有`goal_board`的历史题目兼容；不作为新评测安排。
+仅用于没有`goal_board`的历史题目兼容。
 
 ```text
 Find a valid sequence of moves that puts every box on a target, as short as you can.
@@ -1334,7 +1334,7 @@ Return JSON with "actions" (an array of strings, each one of "U", "D", "L", or "
 Use "solved" when your sequence reaches the goal; if already at the goal, output an empty actions array. Use "no_solution" only when the goal is unreachable, not merely because you could not find a plan; otherwise use "unsolved".
 ```
 
-沿用既有完整计划条件：无工具和中途反馈，不要求逐步状态报告。模型自报状态不替代动作回放；完成、最优成本与格式分别记录。模型和token预算以实验配置为准。
+沿用既有完整计划条件：无工具和中途反馈，不要求逐步状态报告。完成、最优成本与格式分别记录。模型和token预算以实验配置为准。
 
 #### 监督答案：排序／Reason／Action
 
@@ -1344,7 +1344,7 @@ Reason: Moving {direction} is legal and leaves a solvable board with one fewer m
 <action>{local_id}</action>
 ```
 
-排序包含最近的至多10个候选及`current`，用`<`、`=`表示远近和并列。排序由实际冻结Q生成，不能把精确距离填入排序冒充Q输出。上述Reason仅在裁判已验证相应事实时作为监督模板；尚未生成本任务SFT数据。无地图CoT组只删除排序行，保留相同Reason和控制标签。
+排序包含最近的至多10个候选及`current`，用`<`、`=`表示远近和并列。排序由实际冻结Q生成，上述Reason仅在裁判已验证相应事实时作为监督模板；尚未生成本任务SFT数据。无地图CoT组只删除排序行，保留相同Reason和控制标签。
 
 直接到达目标时：
 
@@ -1362,7 +1362,7 @@ Reason: The required goal is already reached; no further move is needed.
 
 #### 完整计划结构说明例
 
-下例对应本任务[data/example.json](tasks/sokoban/data/example.json)，只说明格式，不作为测试题提示中的few-shot。
+下例对应本任务[data/example.json](tasks/sokoban/data/example.json)，只说明格式。
 
 ```json
 {
@@ -1455,7 +1455,7 @@ Return JSON with "actions" (an array of exactly three arrays [i, op, j], using t
 Use "solved" when your sequence reaches the goal; if already at the goal, output an empty actions array. Use "no_solution" only when the goal is unreachable, not merely because you could not find a plan; otherwise use "unsolved".
 ```
 
-沿用既有完整计划条件：无工具和中途反馈，不要求逐步状态报告。模型自报状态不替代动作回放；完成、最优成本与格式分别记录。模型和token预算以实验配置为准。
+沿用既有完整计划条件：无工具和中途反馈，不要求逐步状态报告。完成、最优成本与格式分别记录。模型和token预算以实验配置为准。
 
 #### 监督答案：排序／Reason／Action
 
@@ -1465,7 +1465,7 @@ Reason: Combining the numbers in slots {i} and {j} with {operation} is legal and
 <action>{local_id}</action>
 ```
 
-排序包含最近的至多10个候选及`current`，用`<`、`=`表示远近和并列。排序由实际冻结Q生成，不能把精确距离填入排序冒充Q输出。上述Reason仅在裁判已验证相应事实时作为监督模板；尚未生成本任务SFT数据。无地图CoT组只删除排序行，保留相同Reason和控制标签。
+排序包含最近的至多10个候选及`current`，用`<`、`=`表示远近和并列。排序由实际冻结Q生成，上述Reason仅在裁判已验证相应事实时作为监督模板；尚未生成本任务SFT数据。无地图CoT组只删除排序行，保留相同Reason和控制标签。
 
 直接到达目标时：
 
@@ -1483,7 +1483,7 @@ Reason: The current list contains only 24; no further operation is needed.
 
 #### 完整计划结构说明例
 
-下例对应本任务[data/example.json](tasks/game24/data/example.json)，只说明格式，不作为测试题提示中的few-shot。
+下例对应本任务[data/example.json](tasks/game24/data/example.json)，只说明格式。
 
 ```json
 {
@@ -1603,7 +1603,7 @@ The goal is to match the specified goal board exactly, including the positions o
 
 #### 历史目标文字：仅回放
 
-仅用于没有`goal_board`的历史题目兼容；不作为新评测安排。
+仅用于没有`goal_board`的历史题目兼容。
 
 ```text
 The goal is to place the horizontal target vehicle A at the rightmost position in its row, occupying columns 4 and 5 (zero-based). Other vehicles may end anywhere legal. Do not move A outside the board or remove it.
@@ -1692,7 +1692,7 @@ Reason: The required goal is already reached; no further move is needed.
 
 ### Token Swapping：任务文字与监督格式
 
-采用[顺序Token Swapping](https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.ESA.2016.66)，公开实例来源为[tket固定问题](https://github.com/Quantinuum/tket/blob/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.hpp)。每点恰有一个不同棋子，目标为题目指定的完整排列；归位是其中一种目标。一次只交换一条边的两端，不使用并行轮数、部分映射或颜色等价规则。完整计划与指定目标裁判已接入；Qmap已完成多组训练但未通过验收，逐轮LLM训练尚未开展。历史Flash筛查的归位提示冻结在原suite中，不能将其成绩改称任意目标评测。
+采用[顺序Token Swapping](https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.ESA.2016.66)，公开实例来源为[tket固定问题](https://github.com/Quantinuum/tket/blob/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.hpp)。每点恰有一个不同棋子，目标为题目指定的完整排列；归位是其中一种目标。一次只交换一条边的两端，不使用并行轮数、部分映射或颜色等价规则。完整计划与指定目标裁判已接入；Qmap已完成多组训练但未通过验收，逐轮LLM训练尚未开展。历史Flash筛查的归位提示冻结在原suite中。
 
 #### 共享任务描述与规则
 

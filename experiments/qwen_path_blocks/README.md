@@ -35,7 +35,7 @@ python experiments/qwen_path_blocks/src/run.py \
 只有全部派发请求结束后才重放和汇总。主要成功率只由环境执行结果决定：严格 JSON、
 最终状态字段和逐步棋盘自报都是诊断项，不构成失败。可无歧义恢复的 JSON 动作／路径数组
 会在送入同一裁判前规范化；无法形成完整最终答案的截断仍失败。报告逐次成功率、pass@8、
-截断、格式恢复来源、非法动作和合法前缀状态报告；保留原始 thinking，但不将其当作模型内部机制的直接证据。
+截断、格式恢复来源、非法动作和合法前缀状态报告；保留原始 thinking。
 
 共享结果根目录由本次运行指定在用户的 `experiment/grounded_llm` 下，独立于 OPD。
 原始模型可只读复用既有目录；不引入 OPD 的训练脚本或运行流程。
@@ -55,7 +55,7 @@ python experiments/qwen_path_blocks/src/run.py \
 `configs/path256_bidirectional_16k.json` 是独立的 256 节点稀疏双向最短路条件。使用
 `src/prepare_path_suite.py --config ... --out "$SUITE_PATH"` 冻结一个 16 题、每题 8 次的
 suite；图为固定的 3-regular 连通图，节点行和邻居顺序按题目打乱。它保留 16,384 token
-上限，截断计失败，不能与原 32 节点 DAG 或 40K 积木条件合并。
+上限，截断计失败。
 
 ## Sol API 同题试点
 
@@ -68,7 +68,7 @@ path256 无向图与 16k 条件。已保存待运行的 suite 和提示词，并
 `max_output_tokens`、Chat Completions 的 `max_completion_tokens` 和 `max_tokens`
 均请求 32 token，却分别报告输出 302、203、203 token，正常完成而非截断。
 Responses 还返回空的输出上限，以及不同于请求的 temperature/top_p 和额外系统指令。
-这不能证明该网关也一定忽略 16k，但不足以确认预算与提示条件匹配；三个探针不是 path
+三个探针不是 path
 样本，不进入成功率或 pass@8。原始响应位于 Git 忽略的 `runs/sol_path256_16k/`，不含请求密钥。
 
 试点参数见 [Sol 试点合同](configs/sol_path256_pilot.json)，使用原 suite 的前四题，
@@ -90,11 +90,11 @@ Responses 还返回空的输出上限，以及不同于请求的 temperature/top
 | 02 | 211→219 | 8／8 | 1,469 | 1,389 | 42.1 秒 |
 
 三条答案实际均未超过请求预算，但返回上限仍为空，temperature/top_p 仍与请求不同，
-且附带额外系统指令；不能据此宣称预算已被执行或与 Qwen 严格匹配。有效输出合计
+且附带额外系统指令；有效输出合计
 3,445 token，服务失败请求的用量未知。所有完成答案已重放通过，提交给 API 的题目提示词
 与冻结的 Qwen 提示词一致，无工具调用。题目 01 的 Qwen 三档历史结果均为 0/8，Sol
-此次为 1/1；这表明该题可被当前 Sol 接口解决，不足以估计模型总体差距或稳定成功率。
-单并发补试成功，但没有隔离并发、时间和服务负载，不能将先前错误确定归因于并发。
+此次为 1/1；这表明该题可被当前 Sol 接口解决。
+单并发补试成功，但没有隔离并发、时间和服务负载。
 
 ```powershell
 # 在进程环境中设置 GND_API_KEY；输出目录必须尚不存在。

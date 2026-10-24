@@ -4,7 +4,7 @@
 
 以下定义可复用的文字协议。完整计划的提示与裁判已接入；逐轮地图／CoT部分是协议模板，尚无本任务LLM训练或已采用Qmap权重。
 
-新训练与评测每题指定一张完整成功目标棋盘，包含玩家终点，字段为`goal_board`。没有该字段的适配仅为历史题目回放兼容，不安排原规则对照，不能沿用旧Flash成绩冒充指定目标表现。
+新训练与评测每题指定一张完整成功目标棋盘，包含玩家终点，字段为`goal_board`。没有该字段的适配仅为历史题目回放兼容，不安排原规则对照。
 
 ## 共享任务描述与规则
 
@@ -38,7 +38,7 @@ The goal is to match the specified goal board exactly, including the player and 
 
 ## 历史目标文字：仅回放
 
-仅用于没有`goal_board`的历史题目兼容；不作为新评测安排。
+仅用于没有`goal_board`的历史题目兼容。
 
 ```text
 Find a valid sequence of moves that puts every box on a target, as short as you can.
@@ -69,7 +69,7 @@ Return JSON with "actions" (an array of strings, each one of "U", "D", "L", or "
 Use "solved" when your sequence reaches the goal; if already at the goal, output an empty actions array. Use "no_solution" only when the goal is unreachable, not merely because you could not find a plan; otherwise use "unsolved".
 ```
 
-沿用既有完整计划条件：无工具和中途反馈，不要求逐步状态报告。模型自报状态不替代动作回放；完成、最优成本与格式分别记录。模型和token预算以实验配置为准。
+沿用既有完整计划条件：无工具和中途反馈，不要求逐步状态报告。完成、最优成本与格式分别记录。模型和token预算以实验配置为准。
 
 ## 监督答案：排序／Reason／Action
 
@@ -79,7 +79,7 @@ Reason: Moving {direction} is legal and leaves a solvable board with one fewer m
 <action>{local_id}</action>
 ```
 
-排序包含最近的至多10个候选及`current`，用`<`、`=`表示远近和并列。排序由实际冻结Q生成，不能把精确距离填入排序冒充Q输出。上述Reason仅在裁判已验证相应事实时作为监督模板；尚未生成本任务SFT数据。无地图CoT组只删除排序行，保留相同Reason和控制标签。
+排序包含最近的至多10个候选及`current`，用`<`、`=`表示远近和并列。排序由实际冻结Q生成，上述Reason仅在裁判已验证相应事实时作为监督模板；尚未生成本任务SFT数据。无地图CoT组只删除排序行，保留相同Reason和控制标签。
 
 直接到达目标时：
 
@@ -97,7 +97,7 @@ Reason: The required goal is already reached; no further move is needed.
 
 ## 完整计划结构说明例
 
-下例对应本任务[data/example.json](../data/example.json)，只说明格式，不作为测试题提示中的few-shot。
+下例对应本任务[data/example.json](../data/example.json)，只说明格式。
 
 ```json
 {

@@ -1,6 +1,6 @@
 # 手电过桥：任务文字与监督格式
 
-规则采用 [Backhouse 与 Truong 的手电过桥问题](https://people.cs.nott.ac.uk/psarb2/papers/abstract.html)的容量2情形。当前六人时间组合是本项目诊断场景，不称为论文原题集。
+规则采用 [Backhouse 与 Truong 的手电过桥问题](https://people.cs.nott.ac.uk/psarb2/papers/abstract.html)的容量2情形。当前六人时间组合是本项目诊断场景。
 
 以下定义可复用的文字协议。完整计划的提示与裁判已接入；逐轮地图／CoT部分是协议模板，尚无本任务LLM训练或已采用Qmap权重。
 
@@ -59,7 +59,7 @@ Return JSON with "actions" (an array of arrays; each action contains one or two 
 Use "solved" when your sequence reaches the goal; if already at the goal, output an empty actions array. Use "no_solution" only when the goal is unreachable, not merely because you could not find a plan; otherwise use "unsolved".
 ```
 
-沿用既有完整计划条件：无工具和中途反馈，不要求逐步状态报告。模型自报状态不替代动作回放；完成、最优成本与格式分别记录。模型和token预算以实验配置为准。
+沿用既有完整计划条件：无工具和中途反馈，不要求逐步状态报告。完成、最优成本与格式分别记录。模型和token预算以实验配置为准。
 
 ## 监督答案：排序／Reason／Action
 
@@ -69,7 +69,7 @@ Reason: Crossing with people {person_ids} is legal and preserves a minimum-total
 <action>{local_id}</action>
 ```
 
-排序包含最近的至多10个候选及`current`，用`<`、`=`表示远近和并列。排序由实际冻结Q生成，不能把精确距离填入排序冒充Q输出。上述Reason仅在裁判已验证相应事实时作为监督模板；尚未生成本任务SFT数据。无地图CoT组只删除排序行，保留相同Reason和控制标签。
+排序包含最近的至多10个候选及`current`，用`<`、`=`表示远近和并列。排序由实际冻结Q生成，上述Reason仅在裁判已验证相应事实时作为监督模板；尚未生成本任务SFT数据。无地图CoT组只删除排序行，保留相同Reason和控制标签。
 
 直接到达目标时：
 
@@ -87,7 +87,7 @@ Reason: The current configuration exactly matches the goal; no further crossing 
 
 ## 完整计划结构说明例
 
-下例对应本任务[data/example.json](../data/example.json)，只说明格式，不作为测试题提示中的few-shot。
+下例对应本任务[data/example.json](../data/example.json)，只说明格式。
 
 ```json
 {

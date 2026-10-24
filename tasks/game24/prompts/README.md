@@ -51,7 +51,7 @@ Return JSON with "actions" (an array of exactly three arrays [i, op, j], using t
 Use "solved" when your sequence reaches the goal; if already at the goal, output an empty actions array. Use "no_solution" only when the goal is unreachable, not merely because you could not find a plan; otherwise use "unsolved".
 ```
 
-沿用既有完整计划条件：无工具和中途反馈，不要求逐步状态报告。模型自报状态不替代动作回放；完成、最优成本与格式分别记录。模型和token预算以实验配置为准。
+沿用既有完整计划条件：无工具和中途反馈，不要求逐步状态报告。完成、最优成本与格式分别记录。模型和token预算以实验配置为准。
 
 ## 监督答案：排序／Reason／Action
 
@@ -61,7 +61,7 @@ Reason: Combining the numbers in slots {i} and {j} with {operation} is legal and
 <action>{local_id}</action>
 ```
 
-排序包含最近的至多10个候选及`current`，用`<`、`=`表示远近和并列。排序由实际冻结Q生成，不能把精确距离填入排序冒充Q输出。上述Reason仅在裁判已验证相应事实时作为监督模板；尚未生成本任务SFT数据。无地图CoT组只删除排序行，保留相同Reason和控制标签。
+排序包含最近的至多10个候选及`current`，用`<`、`=`表示远近和并列。排序由实际冻结Q生成，上述Reason仅在裁判已验证相应事实时作为监督模板；尚未生成本任务SFT数据。无地图CoT组只删除排序行，保留相同Reason和控制标签。
 
 直接到达目标时：
 
@@ -79,7 +79,7 @@ Reason: The current list contains only 24; no further operation is needed.
 
 ## 完整计划结构说明例
 
-下例对应本任务[data/example.json](../data/example.json)，只说明格式，不作为测试题提示中的few-shot。
+下例对应本任务[data/example.json](../data/example.json)，只说明格式。
 
 ```json
 {

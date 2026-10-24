@@ -39,7 +39,7 @@ No solution: no legal moves remain and the goal has not been reached.
 
 NDCG 使用线性 gain 与标准 `1/log2(i+1)` 位置折扣。第一种 gain 为地图真实排序位置倒数 `1/r`，真实距离并列时取其所占位置 gain 的均值；第二种按用户 2026-10-09 决定改为状态内 Q-map 距离归一化 `(d_max-d)/(d_max-d_min)`，最小和最大距离取自该状态全部候选。距离全相等（含单候选）时所有 gain 为 1，这些状态另行计数。@1 为回答首位候选 gain 与真正最优 gain 的比值；首位并列取平均 gain。current 不参加候选 NDCG；无法解析计零，缺失位置计零。同状态精确随机期望与全部候选从远到近的反序作为基线；反序 @10 取最远的前 10 个。两种 NDCG 评价地图排序，不等同于真实可达性。
 
-地图排序以全部未达标且有候选的状态为分母，含 rollout 已走死的状态；单步可达率只在动作前仍可解的状态计分，非法动作和提前停止计错。另报逐轮结果以暴露早期错误。原始评测保留旧 rank-grade 与距离倒数 NDCG 兼容字段；正式汇总使用 `ndcg_inverse_rank_at_*` 与 `ndcg_minmax_distance_at_*`，旧回答通过 CPU 重评分转换，不将旧字段改名冒充新分数，不修改历史报告的定义。
+地图排序以全部未达标且有候选的状态为分母，含 rollout 已走死的状态；单步可达率只在动作前仍可解的状态计分，非法动作和提前停止计错。另报逐轮结果以暴露早期错误。原始评测保留旧 rank-grade 与距离倒数 NDCG 兼容字段；正式汇总使用 `ndcg_inverse_rank_at_*` 与 `ndcg_minmax_distance_at_*`，旧回答通过 CPU 重评分转换，不修改历史报告的定义。
 
 ## 运行与归档
 
@@ -47,4 +47,4 @@ NDCG 使用线性 gain 与标准 `1/log2(i+1)` 位置折扣。第一种 gain 为
 
 运行路径、节点、PID、日志与启动检查保存到 Git 忽略的 `runs/`。当前结果见 [report](results/report.md)。
 
-融合 FFN 运行已停止。其 [设计](DESIGN_ffn_failure.md)、[0.5–5 epoch 报告](results/report_ffn_failure.md)与[紧凑结果](results/blocks_ffn_failure_summary.json)保留；原始回答、断点、日志和数据留在原运行目录，避免破坏现有符号链接。停机时约 5.36 epoch，正式对照截至已全量评齐的 epoch 5。更早分离 K/V 的两任务证据见 [上一轮报告](results/report_long_trajectory.md)。这些运行数据、样本权重及预算不同，不构成纯架构因果对照。
+融合 FFN 运行已停止。其 [设计](DESIGN_ffn_failure.md)、[0.5–5 epoch 报告](results/report_ffn_failure.md)与[紧凑结果](results/blocks_ffn_failure_summary.json)保留；原始回答、断点、日志和数据留在原运行目录，避免破坏现有符号链接。停机时约 5.36 epoch，正式对照截至已全量评齐的 epoch 5。更早分离 K/V 的两任务证据见 [上一轮报告](results/report_long_trajectory.md)。这些运行数据、样本权重及预算不同。

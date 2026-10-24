@@ -205,7 +205,7 @@ Use "solved" when your sequence reaches the goal; if already at the goal, output
 {"actions":["R","U'","F"],"final_status":"solved"}
 ```
 
-已在目标时输出 `{"actions":[],"final_status":"solved"}`。是否到达由环境执行验证，不能以模型的 `final_status` 作为正确性证据。此组与地图／CoT 的逐轮反馈条件不同，结果中注明。
+已在目标时输出 `{"actions":[],"final_status":"solved"}`。是否到达由环境执行验证，此组与地图／CoT 的逐轮反馈条件不同，结果中注明。
 
 ## 监督答案：排序／Reason／Action
 
@@ -217,7 +217,7 @@ Reason: Turning {turn} is legal and leaves a cube state with one fewer turn need
 <action>{local_id}</action>
 ```
 
-排序包含六个候选和 `current`，按 Q 到目标的距离由近及远排列，用 `<`、`=` 表示远近与并列。动作正确性及“剩余最短步数减少一步”的依据由环境真值另行验证，不把 Q 排序直接当作正确动作标签。
+排序包含六个候选和 `current`，按 Q 到目标的距离由近及远排列，用 `<`、`=` 表示远近与并列。动作正确性及“剩余最短步数减少一步”的依据由环境真值另行验证。
 
 动作直接到达目标时：
 
@@ -233,4 +233,4 @@ Reason: The current cube state exactly matches the goal; no further turn is need
 <done/>
 ```
 
-无地图 CoT 组直接去掉排序行，保留相同 Reason、动作和停止标签，不单独确认。以上均为简短 R＋A 监督，不是长 CoT。复原和任意可达目标共用文字格式，但数据与结果分别报告；当前复原断点不等于任意目标已解决。
+无地图 CoT 组直接去掉排序行，保留相同 Reason、动作和停止标签。以上均为简短 R＋A 监督，复原和任意可达目标共用文字格式，但数据与结果分别报告。

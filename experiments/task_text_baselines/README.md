@@ -10,7 +10,7 @@ DeepSeek 积木／二阶魔方新题复测见 [64k 合同](configs/deepseek_bloc
 
 Rush Hour／Token Swapping两项筛查见[64k合同](configs/deepseek_rush_token64k.json)与[结果表](results/report.md)：各40题，共80题，分别完成17/40、36/40，完成答案均最优；25题思考耗尽，Rush Hour另2题误报无解。前者为8个公开无墙分量各5个距离起点，后者为tket公开固定问题的8种架构各5题。精确最优值重算、完成与成本分开评分，复用`src.run`。准备入口为`src.prepare_rush_token`，原始题目与响应在`runs/deepseek_rush_token64k/`；未训练地图。
 
-指定完整目标的Flash筛查采用[独立64k合同](configs/deepseek_exact_goals64k.json)，准备入口`src.prepare_exact_goals`，执行复用`src.run`，输出`runs/deepseek_exact_goals64k/`。只测试指定目标：两道已测hard推箱子、8个Rush Hour原始起点、固定10顶点树的5个非归位目标题。前两项取冻结见证终局并重新核对精确成本；后者对起终点同时重标棋子，保持原精确成本。题集是15题定向诊断，不是独立总体benchmark；旧目标结果仅保留历史，不安排原规则对照。采用地图和LLM训练不在本筛查范围内。
+指定完整目标的Flash筛查采用[独立64k合同](configs/deepseek_exact_goals64k.json)，准备入口`src.prepare_exact_goals`，执行复用`src.run`，输出`runs/deepseek_exact_goals64k/`。只测试指定目标：两道已测hard推箱子、8个Rush Hour原始起点、固定10顶点树的5个非归位目标题。前两项取冻结见证终局并重新核对精确成本；后者对起终点同时重标棋子，保持原精确成本。题集是15题定向诊断，旧目标结果仅保留历史，不安排原规则对照。采用地图和LLM训练不在本筛查范围内。
 
 指定目标15题已完成：推箱子0/2、Rush Hour0/8、Token Swapping4/5，成功的4题均最优，其余11题均64k思考耗尽且最终答案为空。没有服务失败；完整回放与截断核对见[结果表](results/report.md#指定完整目标推箱子rush-hour与固定10顶点树)和[紧凑结果](results/exact_goals_flash64k.json)。
 
@@ -34,13 +34,13 @@ Rush Hour／Token Swapping两项筛查见[64k合同](configs/deepseek_rush_token
 
 提示词从 `tasks/<task>/prompts/README.md` 读取，生成后冻结在各运行目录的 `suite.json`。逐字同题组复制冻结内容；旧十形状保留原棋盘与形状目录，采用已确认的规则与完整计划 JSON；新 S/Z 八形状重新生成棋盘，与旧组不配对。
 
-DeepSeek 组逐字复制初始五任务 200 题，积木采用原八形状、12 次构造、仅动作输出。官方当前 Flash 接口对应 V4.1-Flash-1017，旧 V4 Flash 名称已转接，在线模型列表未提供 R1；不得将本轮记为原 V4 或 R1 实测。通过现有 Responses 入口请求 high，思考和答案共限 16k；返回身份、强度、用量和截断保留在原始答卷。进度及结果见统一结果表。
+DeepSeek 组逐字复制初始五任务 200 题，积木采用原八形状、12 次构造、仅动作输出。官方当前 Flash 接口对应 V4.1-Flash-1017，旧 V4 Flash 名称已转接，在线模型列表未提供 R1；通过现有 Responses 入口请求 high，思考和答案共限 16k；返回身份、强度、用量和截断保留在原始答卷。进度及结果见统一结果表。
 
 6.1 的 S/Z 组直接复制已冻结的 5.6 S/Z 题集，包括逐步状态要求，不再次生成棋盘；只有请求模型不同，高强度、16k 请求及服务重试设置保持一致。
 
 S/Z 仅动作两组只删除冻结提示词末尾的逐步状态指令，保留全部题目、规则、参考解及动作／终态 JSON；5.6 和 6.1 逐字使用同一提示词。两组与各自已完成的逐步状态组构成同题输出要求对照。
 
-完整十形状 100 题复用历史目录和相邻构造：每步从全部可行、不重叠且相邻的放置中均匀选择，排除平移等价重复及历史题。保留已确认的当前规则和动作／终态 JSON，不要求状态报告；两个模型逐字同题同提示词，旧 16 题单列，不混入新 100 题。
+完整十形状 100 题复用历史目录和相邻构造：每步从全部可行、不重叠且相邻的放置中均匀选择，排除平移等价重复及历史题。保留已确认的当前规则和动作／终态 JSON，不要求状态报告；两个模型逐字同题同提示词，旧 16 题单列。
 
 ## 评分与实现
 
@@ -72,4 +72,4 @@ python -m experiments.task_text_baselines.src.state_report --baseline runs/sol56
 python -m experiments.task_text_baselines.src.budget_report --qwen runs/five_task_qwen32b_same40 --sol56 runs/five_task_sol56_high_same40 --sol61 runs/five_task_sol_high_40 --legacy runs/sol61_legacy_blocks12_new_prompt --states runs/sol56_blocks40_state_report --sz runs/sol56_blocks40_sz_state_report --out runs/task_text_reports
 ```
 
-已停止的加难原始答卷在 `runs/sol_difficulty_20/`；需要复核时给 `src.snapshot` 加 `--supplementary runs/sol_difficulty_20`，不把它们并入初始任务成绩。当前研究安排只维护[项目状态页](../../docs/PROJECT_STATUS_AND_TODO.md)。
+已停止的加难原始答卷在 `runs/sol_difficulty_20/`；需要复核时给 `src.snapshot` 加 `--supplementary runs/sol_difficulty_20`，当前研究安排只维护[项目状态页](../../docs/PROJECT_STATUS_AND_TODO.md)。

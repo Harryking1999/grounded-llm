@@ -1,6 +1,6 @@
 # 积木：任务文字与监督格式
 
-状态：当前主条件采用八形状、10×10 棋盘，按 12 次放置构造；“八形状”是动作目录，不等于构造块数。主评测配置见 [sol_high_40.json](../../../experiments/task_text_baselines/configs/sol_high_40.json)。15×15、20 块、含 S/Z 的加难条件已停止，仅保留为补充探索，不改变此处规则。
+状态：当前主条件采用八形状、10×10 棋盘，按 12 次放置构造；“八形状”是动作目录，主评测配置见 [sol_high_40.json](../../../experiments/task_text_baselines/configs/sol_high_40.json)。15×15、20 块、含 S/Z 的加难条件已停止，仅保留为补充探索，不改变此处规则。
 
 ## 共享任务描述与规则
 
@@ -39,7 +39,7 @@ Candidate numbers may change between turns; use only the numbers above.
 [/Environment update]
 ```
 
-使用真实执行结果更新，不能把模型自报棋盘当真值。本轮 ID 不是全局动作编号。地图组另收当前／目标／全部合法后继的冻结 Q 槽位；无地图组不收 Q。
+使用真实执行结果更新，本轮 ID 不是全局动作编号。地图组另收当前／目标／全部合法后继的冻结 Q 槽位；无地图组不收 Q。
 
 ## 输出格式与 CoT 监督答案
 
@@ -58,7 +58,7 @@ Reason: The current board exactly matches the goal; no further removal is needed
 <done/>
 ```
 
-当前无地图 7B 监督为相同事实依据与动作，即 R→A，不输出排序。它使用简短 Reason，并非长 CoT。后续长 CoT 文本、是否改为排序＋A，均待讨论，未替换已有运行。排序是 Q 距离顺序，动作正确性由环境裁判另判。
+当前无地图 7B 监督为相同事实依据与动作，即 R→A，不输出排序。它使用简短 Reason，后续长 CoT 文本、是否改为排序＋A，均待讨论，未替换已有运行。排序是 Q 距离顺序，动作正确性由环境裁判另判。
 
 完整实际首轮格式指令与后续更新见同目录 `example.md`，由 `python -m tasks.blocks.data.prepare_example` 调用当前运行的提示函数生成。权威实现：`experiments/flamingo_map_reader/src/blocks_prompt.py`、`experiments/map_sft_baselines/src/common.py`、`experiments/llm_task_sft/src/protocol.py`。
 
@@ -72,4 +72,4 @@ Return JSON with "actions" (an array of objects with integer shape_id, row, col)
 Use "solved" when your sequence reaches the goal; if already at the goal, output an empty actions array. Use "no_solution" only when the goal is unreachable, not merely because you could not find a plan; otherwise use "unsolved".
 ```
 
-动作使用物理参数而非本轮候选 ID；不要求 `board_after`。已在目标时使用 `{"actions":[],"final_status":"solved"}`。输出预算以对应实验正式配置为准。与地图／CoT 逐轮条件的反馈方式不同，报告时注明。旧 SOTA／32B 整段计划条件还使用过不同形状目录与空目标，不能直接移用为本轮匹配结果。
+动作使用物理参数而非本轮候选 ID；不要求 `board_after`。已在目标时使用 `{"actions":[],"final_status":"solved"}`。输出预算以对应实验正式配置为准。与地图／CoT 逐轮条件的反馈方式不同，报告时注明。旧 SOTA／32B 整段计划条件还使用过不同形状目录与空目标。

@@ -171,9 +171,9 @@ epoch 4→5 的非零步成功增加 62 题，其中非清空增加 59 题、清
 
 ## 5. 积木逐轮分析：早期死局与风险累积
 
-![积木 epoch 5：reference 与 rollout 的逐步动作，以及累计到达和首次死局。动作分母随步骤变化，累计图固定 1,000 个非零步任务；两模式后续状态不同，差值不是同状态因果消融。](figures/blocks_final_trajectory_steps.png)
+![积木 epoch 5：reference 与 rollout 的逐步动作，以及累计到达和首次死局。动作分母随步骤变化，累计图固定 1,000 个非零步任务；两模式后续状态不同。](figures/blocks_final_trajectory_steps.png)
 
-*积木 epoch 5：reference 与 rollout 的逐步动作，以及累计到达和首次死局。动作分母随步骤变化，累计图固定 1,000 个非零步任务；两模式后续状态不同，差值不是同状态因果消融。 [矢量 PDF](figures/blocks_final_trajectory_steps.pdf)。*
+*积木 epoch 5：reference 与 rollout 的逐步动作，以及累计到达和首次死局。动作分母随步骤变化，累计图固定 1,000 个非零步任务；两模式后续状态不同。 [矢量 PDF](figures/blocks_final_trajectory_steps.pdf)。*
 
 **rollout 的错误会改变后续状态，积木移除造成的死局会沿轨迹保留。**reference 由示范历史推进，每轮在参考状态上评价动作。final 首轮动作可达率接近（70.3%／70.1%），之后 rollout 持续损失可解任务。下面按轮次、首次死局、早期保护干预和候选数量展开。
 
@@ -445,5 +445,5 @@ map 的非零步任务各 6 套编号，初始即目标各 1 套，最终 test �
 - [最终诊断验收](final_diagnostic_acceptance.json)：地图反序 reference 配对与前 1–3 步保护的完整核验。
 - [前缀分析](safe_prefix_analysis.json)：早期保护后的任务完成、最短路及目标分层计数。
 - [图表说明](figures/README.md)、[最终逐步证据](final_trajectory_step_analysis.json)和[一步参照](learning_curve_baselines.json)：学习曲线及最终轨迹图的计数、分母与重绘入口。
-- [排序评分诊断](archive/blocks_ranking_diagnostics.md)：同一轮数据的三种排序评分口径，单独归档，不替代动作或闭环指标。
+- [排序评分诊断](archive/blocks_ranking_diagnostics.md)：同一轮数据的三种排序评分口径，单独归档。
 - 历史记录：[读取接口变体](archive/abandoned_readout_variants.md)、[完整轨迹历史](archive/full_trajectory_history.md)、[swap 归档](archive/swap_training.md)。

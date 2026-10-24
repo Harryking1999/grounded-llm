@@ -1,9 +1,9 @@
 # 汉诺塔任务工作区
 
-当前采用八盘Qmap，适用范围为**任意合法起点到指定柱上的整塔终点**。全状态整塔到达99.89%，六个整塔方向6/6；仍保留21个失败起点及两个循环。中间目标结果作为补充，不作为本轮采用门槛。来源与范围见[选用记录](Qmap/selection.json)，三至六盘权重仅作历史参考。
+当前采用八盘Qmap，适用范围为**任意合法起点到指定柱上的整塔终点**。全状态整塔到达99.89%，六个整塔方向6/6；仍保留21个失败起点及两个循环。中间目标结果作为补充，来源与范围见[选用记录](Qmap/selection.json)，三至六盘权重仅作历史参考。
 
 - [文字、规则与各组提示](prompts/README.md)：任务内原文；根目录 `TASK_TEXTS.md` 是自动集中副本。
-- [数据准备与示例](data/README.md)：小例说明字段，不冒充正式训练集。
+- [数据准备与示例](data/README.md)：小例说明字段。
 - [Qmap](Qmap/README.md)：训练、加载、选定权重与适用范围。
 - [环境规则](../../experiments/hanoi_qmap/src/environment.py)；[研究协议与实现](../../experiments/hanoi_qmap/README.md)。
 - 当前进展与下一步只维护在 [项目状态页](../../docs/PROJECT_STATUS_AND_TODO.md)。

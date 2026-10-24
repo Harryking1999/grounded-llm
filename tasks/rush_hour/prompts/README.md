@@ -36,7 +36,7 @@ The goal is to match the specified goal board exactly, including the positions o
 
 ## 历史目标文字：仅回放
 
-仅用于没有`goal_board`的历史题目兼容；不作为新评测安排。
+仅用于没有`goal_board`的历史题目兼容。
 
 ```text
 The goal is to place the horizontal target vehicle A at the rightmost position in its row, occupying columns 4 and 5 (zero-based). Other vehicles may end anywhere legal. Do not move A outside the board or remove it.

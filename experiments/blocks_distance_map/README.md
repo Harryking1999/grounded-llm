@@ -28,7 +28,7 @@
 | [failure_diagnosis.py](src/failure_diagnosis.py) | 同题新旧模型首次错误分叉与得失分析 |
 | [FrozenBoardMap](../flamingo_map_reader/src/blocks.py) | 供 LLM 读取接口加载冻结地图 |
 
-精确 oracle 用于标签和事后分析；纯地图求解只按合法后继的 Q 距离贪心选择。若使用候选过滤或搜索，须作为独立条件。固定监测集已参与选模，不作为独立泛化证据。
+精确 oracle 用于标签和事后分析；纯地图求解只按合法后继的 Q 距离贪心选择。若使用候选过滤或搜索，须作为独立条件。固定监测集已参与选模。
 
 ## 运行方式
 
@@ -47,13 +47,13 @@ python -m experiments.blocks_distance_map.src.blocks12_eval \
 
 ## 独立最终评测
 
-独立最终评测的准备入口为 [blocks12_sealed.py](src/blocks12_sealed.py)，参数见[配置](configs/blocks12_sealed_final.json)。`prepare` 必须显式提供 `--excluded-training-roots` 和 `--excluded-monitoring-cases`（各可传多个文件，监测集包含 `clear1000.json`），只生成冻结题集，不读取模型。确定候选后，`final-evaluate` 再显式指定 `--checkpoint` 与 `--parent-checkpoint`。它排除所提供的训练／监测初盘，不保证中间状态全部未见；非空目标仅作辅助。代码已做本地检查，尚无该入口的最终能力结果。
+独立最终评测的准备入口为 [blocks12_sealed.py](src/blocks12_sealed.py)，参数见[配置](configs/blocks12_sealed_final.json)。`prepare` 必须显式提供 `--excluded-training-roots` 和 `--excluded-monitoring-cases`（各可传多个文件，监测集包含 `clear1000.json`），只生成冻结题集，不读取模型。确定候选后，`final-evaluate` 再显式指定 `--checkpoint` 与 `--parent-checkpoint`。它排除所提供的训练／监测初盘，非空目标仅作辅助。代码已做本地检查，尚无该入口的最终能力结果。
 
 ## 历史结果与复现
 
 - [多棋盘与树关系结果](results/report.md)：保留旧地图的研究结论；历史 SFT 使用的地图来源也见任务 selection。
-- [早期过程归档](results/archive/qmap_progression.md)：仅供追溯，不是当前任务清单。
-- 早期单棋盘、多目标与树关系条件保留在 `configs/`，对应 `run.py`、`multiboard_run.py`、`tree_supervision_run.py`、`tree_continue_run.py`。复现时按原配置与源码版本运行，不把它们叠加为当前训练要求。
+- [早期过程归档](results/archive/qmap_progression.md)：仅供追溯。
+- 早期单棋盘、多目标与树关系条件保留在 `configs/`，对应 `run.py`、`multiboard_run.py`、`tree_supervision_run.py`、`tree_continue_run.py`。复现时按原配置与源码版本运行。
 
 ## Q 坐标与转移图可视化
 

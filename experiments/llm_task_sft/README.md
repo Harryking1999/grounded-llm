@@ -39,8 +39,8 @@ python -u -m experiments.llm_task_sft.src.continuation --profile PROFILE
 完整模型和所有训练状态均恢复；执行信息记录在运行目录，不使用 1,000 题 validation。
 
 不设 epoch 上限，也不因连续几次分数不涨自动停止。每个半轮保留模型、恢复状态、逐题回答与曲线；
-`curve.json` 的峰值仅是固定 510 题监测集上的最佳观察值，不能当作独立 test 泛化成绩。
-进程失败或磁盘不足时停止并记录原因，不自动更改配方或删除旧产物。
+`curve.json` 的峰值仅是固定 510 题监测集上的最佳观察值。
+进程失败或磁盘不足时停止并记录原因。
 运行目录的 `stop_after_cycle` 可要求完成当前训练与评测周期后停止。
 
 ## 实现与验证
@@ -66,7 +66,7 @@ python -u -m experiments.llm_task_sft.src.continuation --profile PROFILE
 不筛选可达动作，不搜索后选路，不进行多次尝试择优。初始已达标题单独统计。
 动作只会移除格子，因此可通过动态规划累加全部成功路线的概率；失败分支仍保留在选择分母中。
 同时报告每题首轮，以及固定参考轨迹上全部非终止状态的随机可达动作率和最短进展率；
-每个状态先计算候选比例，再对状态取平均，不能把单步概率直接当成整题到达率。
+每个状态先计算候选比例，再对状态取平均。
 
 ```bash
 python -m experiments.llm_task_sft.src.random_legal --config experiments/llm_task_sft/configs/blocks_random_legal.json --data DATA --out DIAGNOSTIC
@@ -89,6 +89,6 @@ python -m experiments.llm_task_sft.src.analyze_policies --config CONFIG --sft-ru
 正式范围见 [blocks_policy_comparison.json](configs/blocks_policy_comparison.json)。
 当前地图的内容依赖另用 [配对探针合同](../flamingo_map_reader/configs/blocks_current_map_content_probe.json)：
 同一状态重新生成正常与反序地图两种回答，历史、文字、候选动作和生成预算保持一致，
-实际动作与可达性评分和排序评分分开；不将这项小样本探针当作完整 rollout 成绩。
+实际动作与可达性评分和排序评分分开。
 
 同题成功集合、首次失败类型与分步分布，以及当前权重的配对内容探针结果见[策略诊断](results/policy_comparison.md)。

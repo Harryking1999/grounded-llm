@@ -520,7 +520,13 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
             child_truth=corpus.distance(children,np.broadcast_to(tasks[:,1,None],children.shape))
         if edge_bank is not None:
             nedge=round(len(pair)*options['action_edge_fraction'])
-            slots=rng.choice(len(pair),nedge,replace=False)
+            if options.get('action_edges_replace_finite_only'):
+                if relation_sampler is None or replay_sampler or branch_replay:
+                    raise ValueError('Finite-only action edges require independent board supplements without replay')
+                finite_count=round(options['batch_size']*relation_sampler.finite_fraction)
+                if nedge>finite_count:raise ValueError('Action edges exceed the finite supplement')
+                slots=len(pair)-finite_count+rng.choice(finite_count,nedge,replace=False)
+            else:slots=rng.choice(len(pair),nedge,replace=False)
             pair=pair.copy();p=p.copy();point_true=point_true.copy();point_target=point_target.copy()
             pair[slots]=edge_bank[rng.integers(len(edge_bank),size=nedge)]
             p[slots]=-1;point_origin[slots]=4;point_true[slots]=1;point_target[slots]=1

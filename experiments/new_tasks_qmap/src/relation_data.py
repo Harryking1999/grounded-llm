@@ -168,7 +168,10 @@ class BoardRelationSampler:
         if not hasattr(corpus,'scenes'): raise ValueError('Board relation sampling requires exact board scenes')
         self.corpus,self.data,self.options=corpus,data,options
         self.finite_fraction=options['finite_point_fraction']; self.boundary_fraction=options['boundary_rank_fraction']
+        self.unreachable_fraction=options.get('unreachable_point_fraction',0.)
         if not 0<self.finite_fraction<1 or not 0<=self.boundary_fraction<=1: raise ValueError('Broad and finite quotas required; boundary quota may span zero to one')
+        if self.unreachable_fraction<0 or self.finite_fraction+self.unreachable_fraction>=1:
+            raise ValueError('Finite and unreachable supplements must preserve broad source traversal')
         self.point_index=np.full(corpus.size,-1,dtype=np.int32); self.rank_index=self.point_index.copy()
         self.point_index[data['pairs_train'][:,0]]=np.arange(len(data['pairs_train']))
         self.rank_index[data['tasks_train'][:,0]]=np.arange(len(data['tasks_train']))
@@ -181,8 +184,12 @@ class BoardRelationSampler:
                 if not len(reserved):return np.zeros(values.shape,dtype=bool)
                 at=np.searchsorted(reserved,values)
                 return (at<len(reserved)) & (reserved[np.minimum(at,len(reserved)-1)]==values)
-            points=[];ranks=[];point_labels=[];rank_labels=[];boundaries=[]
+            points=[];ranks=[];point_labels=[];rank_labels=[];boundaries=[];unreachable=[]
             for j,g in enumerate(scene.goals[:scene.metadata['training_goals']]):
+                if self.unreachable_fraction:
+                    source=np.flatnonzero(~np.isfinite(scene.distances[j]))+offset;goal=np.full(len(source),g+offset)
+                    safe=(self.point_index[source]>=0)&~forbidden(keys(source,goal,corpus.size))
+                    unreachable.append(np.column_stack([source[safe],goal[safe]]))
                 source=np.flatnonzero(np.isfinite(scene.distances[j]))+offset; goal=np.full(len(source),g+offset)
                 labels=scene.distances[j,source-offset]
                 # Q(s) versus itself is identically zero under the distance
@@ -200,7 +207,8 @@ class BoardRelationSampler:
                 child_truth[valid]=scene.distances[j,child[valid]-offset]
                 boundary=(valid & np.isfinite(child_truth)).any(axis=1) & (valid & ~np.isfinite(child_truth)).any(axis=1)
                 ranks.append(np.column_stack([source[safe],goal[safe]])); rank_labels.append(labels[safe]); boundaries.append(boundary[safe])
-            return [np.concatenate(values) for values in (points,ranks,point_labels,rank_labels,boundaries)]
+            return [np.concatenate(values) for values in (points,ranks,point_labels,rank_labels,boundaries)]+[
+                np.concatenate(unreachable) if unreachable else np.empty((0,2),dtype=np.int64)]
         ids=[sid for sid,scene in enumerate(corpus.scenes) if scene.metadata['split']=='train']
         workers=options.get('preparation_workers',1)
         if not 1<=workers<=32:raise ValueError('Preparation workers must be between1 and32')
@@ -208,17 +216,30 @@ class BoardRelationSampler:
             from concurrent.futures import ThreadPoolExecutor
             with ThreadPoolExecutor(max_workers=workers) as executor:parts=list(executor.map(scene_bank,ids))
         else:parts=list(map(scene_bank,ids))
-        points,ranks,point_labels,rank_labels,boundaries=map(list,zip(*parts))
+        points,ranks,point_labels,rank_labels,boundaries,unreachable=map(list,zip(*parts))
         self.points=np.concatenate(points); self.ranks=np.concatenate(ranks)
+        self.unreachable_points=np.concatenate(unreachable)
         point_labels=np.concatenate(point_labels); rank_labels=np.concatenate(rank_labels); boundary=np.concatenate(boundaries)
         edges=np.asarray(options['distance_bin_upper_bounds'],dtype=np.float32)
         if np.any(np.diff(edges)<=0) or edges[-1]<max(point_labels.max(),rank_labels.max()): raise ValueError('Distance strata do not cover exact finite labels')
         stage_balance=options.get('sokoban_stage_balance',False)
+        game_balance=options.get('game_layer_balance',False)
+        if stage_balance and game_balance:raise ValueError('Use the corresponding task strata')
         def stages(rows):
             result=np.zeros((len(rows),2),dtype=np.int8)
             scene_ids=corpus.locate(rows[:,0])
             for sid in np.unique(scene_ids):
                 scene=corpus.scenes[sid]
+                if game_balance:
+                    if not hasattr(scene,'values'):raise ValueError('Arithmetic layer balancing requires exact numerical states')
+                    a,b=np.searchsorted(scene_ids,[sid,sid+1]);offset=corpus.offsets[sid]
+                    lengths=np.fromiter(map(len,scene.values),dtype=np.int8,count=len(scene.values))
+                    kinds=np.full(len(scene.states),-1,dtype=np.int8)
+                    for g in scene.goals[:scene.metadata['training_goals']]:
+                        kinds[g]=0 if scene.values[g]==(21,) else 1 if scene.values[g]==(24,) else 1+lengths[g]
+                    result[a:b,0]=kinds[rows[a:b,1]-offset]
+                    result[a:b,1]=lengths[rows[a:b,0]-offset]
+                    continue
                 if not hasattr(scene,'env') or not hasattr(scene.env,'goals') or scene.states.shape[1]!=5:
                     raise ValueError('Box-stage balancing requires raw four-box Sokoban states')
                 local=np.flatnonzero(scene_ids==sid)
@@ -229,7 +250,7 @@ class BoardRelationSampler:
             return result
         def groups(labels,allowed,rows):
             bins=np.searchsorted(edges,labels)
-            stage=stages(rows) if stage_balance else None
+            stage=stages(rows) if stage_balance or game_balance else None
             def local_groups(a,b):
                 take=allowed[a:b];layers=bins[a:b]
                 def distance_groups(mask):
@@ -256,13 +277,18 @@ class BoardRelationSampler:
             return {f'({-1 if j==0 else float(edges[j-1])},{float(upper)}]':int((allowed & (np.searchsorted(edges,labels)==j)).sum())
                     for j,upper in enumerate(edges)}
         self.point_groups=groups(point_labels,np.ones(len(point_labels),bool),self.points)
+        self.unreachable_groups=(groups(np.zeros(len(self.unreachable_points),dtype=np.float32),
+            np.ones(len(self.unreachable_points),bool),self.unreachable_points) if self.unreachable_fraction else [])
+        if self.unreachable_fraction and not self.unreachable_groups:raise ValueError('No proven unreachable point supplement')
         self.boundary_groups=groups(rank_labels,boundary,self.ranks); self.other_groups=groups(rank_labels,~boundary,self.ranks)
         if (self.boundary_fraction and not self.boundary_groups) or (self.boundary_fraction<1 and not self.other_groups):
             raise ValueError('Requested exact boundary/nonboundary training relations unavailable')
         self.summary=dict(finite_point_bank=len(self.points),ranking_bank=len(self.ranks),boundary_ranking_bank=int(boundary.sum()),
             point_stratum_counts=counts(point_labels,np.ones(len(point_labels),bool)),boundary_stratum_counts=counts(rank_labels,boundary),
             nonboundary_stratum_counts=counts(rank_labels,~boundary),options=options,
-            broad_source_fraction=1-self.finite_fraction,all_legal_candidates_preserved=True,
+            broad_source_fraction=1-self.finite_fraction-self.unreachable_fraction,
+            unreachable_point_bank=len(self.unreachable_points),unreachable_point_fraction=self.unreachable_fraction,
+            all_legal_candidates_preserved=True,
             finite_supplement_excludes_identity_pairs=True,
             holdout_closure_excluded=True,banks_use_only_original_training_source_rows=True)
         self.coverage_fraction=options.get('ranking_coverage_fraction',0.)
@@ -300,11 +326,13 @@ class BoardRelationSampler:
     def draw(self,source_sampler,point_count,rank_count,rng):
         nc=round(rank_count*self.coverage_fraction)
         nf=round(point_count*self.finite_fraction); nb=round((rank_count-nc)*self.boundary_fraction)
-        p=source_sampler.draw(point_count-nf); broad=self.data['pairs_train'][p]
+        nu=round(point_count*self.unreachable_fraction)
+        p=source_sampler.draw(point_count-nf-nu); broad=self.data['pairs_train'][p]
         broad=sample_goals(self.corpus,broad[:,0],rng,self.data['reserved_relations'],fallback=broad[:,1])
         limit=self.options.get('layouts_per_batch') if self.options.get('balance_layouts') else None
         finite=self.points[self._draw(self.point_groups,nf,rng,limit)]
-        pair=np.concatenate([broad,finite]); p=np.concatenate([p,self.point_index[finite[:,0]]])
+        negative=self.unreachable_points[self._draw(self.unreachable_groups,nu,rng,limit)]
+        pair=np.concatenate([broad,negative,finite]); p=np.concatenate([p,self.point_index[negative[:,0]],self.point_index[finite[:,0]]])
         selected=np.concatenate([self._draw(self.boundary_groups,nb,rng,limit),self._draw(self.other_groups,rank_count-nc-nb,rng,limit)])
         rng.shuffle(selected)
         if nc: selected=np.concatenate([self.coverage_sampler.draw(nc),selected])

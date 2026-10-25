@@ -21,7 +21,7 @@ from experiments.new_tasks_qmap.src.game_finite_evaluate import numerical_querie
 class FiniteGameTests(unittest.TestCase):
     def test_deduplication_keeps_exact_reachability_and_both_targets(self):
         with tempfile.TemporaryDirectory() as directory,ExitStack() as stack:
-            env=Game24(4);scenes=[];records=[];alphabet=[1,2,3,4,6]
+            env=Game24(4);scenes=[];records=[];alphabet=[1,2,3,4,6,8]
             root=Path(directory);graph_root=root/'run/data/graphs';graph_root.mkdir(parents=True)
             for i,numbers in enumerate(combinations(alphabet,4)):
                 graph=env.graph(numbers)
@@ -55,6 +55,50 @@ class FiniteGameTests(unittest.TestCase):
                     labels=corpus.distance(*rows.T);finite=np.isfinite(labels)
                     self.assertTrue(finite.any());self.assertTrue((~finite).any())
                     self.assertTrue((labels[finite]==arity-1).all())
+            from experiments.new_tasks_qmap.src.relation_data import BoardRelationSampler
+            from grounded_llm.core.qmap.sampling import CoverageSampler
+            sources=[];queries=[]
+            for sid,scene in enumerate(scenes):
+                offset=corpus.offsets[sid];local=np.arange(len(scene.states))+offset
+                sources.append(np.column_stack([local,np.full(len(local),int(scene.goals[0])+offset)]))
+                for j,g in enumerate(scene.goals[:2]):
+                    keep=np.flatnonzero(np.isfinite(scene.distances[j])&(scene.distances[j]>0))+offset
+                    queries.append(np.column_stack([keep,np.full(len(keep),int(g)+offset)]))
+            sampler_data=dict(pairs_train=np.vstack(sources),tasks_train=np.vstack(queries),reserved_relations=np.empty(0,dtype=np.int64))
+            sampler=BoardRelationSampler(corpus,sampler_data,dict(finite_point_fraction=.5,unreachable_point_fraction=.25,
+                boundary_rank_fraction=1.,distance_bin_upper_bounds=[1,2,3],game_layer_balance=True,balance_layouts=True))
+            rng=np.random.default_rng(13);source_sampler=CoverageSampler(np.zeros(corpus.size),rng,corpus.size,1.)
+            _,_,point,ranking=sampler.draw(source_sampler,8192,2048,rng)
+            point_truth=corpus.distance(*point.T)
+            self.assertTrue(np.isinf(point_truth[2048:4096]).all())
+            self.assertTrue(np.isfinite(point_truth[4096:]).all());self.assertTrue((point_truth[4096:]>0).all())
+            negative_arities=[]
+            for source in point[2048:4096,0]:
+                sid=int(corpus.locate(source));negative_arities.append(len(scenes[sid].values[source-corpus.offsets[sid]]))
+            self.assertGreater(negative_arities.count(4),0)
+            self.assertGreater(negative_arities.count(3),200)
+            self.assertTrue((corpus.distance(*ranking.T)>0).all())
+            # A complete training step must leave broad/negative quotas intact
+            # when direct physical edges replace only the finite supplement.
+            from experiments.new_tasks_qmap.src.relations import train
+            from experiments.new_tasks_qmap.src.relation_data import materialize
+            training_data=dict(sampler_data,pair_distances_train=corpus.distance(*sampler_data['pairs_train'].T))
+            for name,rows in [('train',sampler_data['tasks_train']),('validation',groups['root4_to_24'])]:
+                training_data.update({k+'_'+name:v for k,v in materialize(corpus,rows).items()})
+            tiny=dict(task='game24',seed=13,data=dict(max_numbers=4),
+                model=dict(dimension=4,hidden=8,cap=16,metric='directed_max'),
+                training=dict(steps=1,batch_size=64,decision_batch_size=16,learning_rate=.001,rank_weight=1.,
+                    rank_temperature=1.,eval_every=1,cpu_threads=1,unreachable_target=12.,features_on_device='float32',
+                    record_training_samples=True,action_edge_fraction=.25,action_edges_replace_finite_only=True,
+                    relation_sampling=dict(sampler.options)),
+                evaluation=dict(horizon=4,decision_count=16,rollout_count=8))
+            with patch('experiments.new_tasks_qmap.src.relations.prepare',return_value=(corpus,training_data,dict(finite_max=3))),redirect_stdout(StringIO()):
+                train(tiny,root/'training','fixture','cpu')
+            with np.load(next((root/'training/samples/attempt_000').glob('*.npz'))) as trace:
+                np.testing.assert_array_equal(trace['point_origin'][:32],np.zeros(32,dtype=np.uint8))
+                self.assertTrue(np.isinf(trace['point_distance'][16:32]).all())
+                self.assertEqual(int((trace['point_origin']==4).sum()),16)
+                self.assertTrue((trace['point_distance'][trace['point_origin']==4]==1).all())
             exposure[:]=0
             _,coverage=numerical_queries(corpus,[21,24],exposure)
             self.assertEqual(coverage['numerical_input_coverage'],0)

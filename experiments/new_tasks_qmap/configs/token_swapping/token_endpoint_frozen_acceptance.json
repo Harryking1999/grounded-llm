@@ -1,0 +1,14 @@
+{
+  "seed": 2026102631,
+  "output": "token_endpoint_frozen_acceptance",
+  "candidates": ["token_endpoint_linf_fit", "token_endpoint_l1_fit"],
+  "selection": "Freeze the lowest stored validation best_score among terminal matched candidates with full prepared point-source coverage; no acceptance-based candidate replacement.",
+  "queries_per_cohort": 1024,
+  "distance_bin_upper_bounds": [5, 10, 15, 20, 25],
+  "long_distance_above": 20,
+  "minimum_long_queries": 200,
+  "horizon": 128,
+  "minimum_completion_rate": 0.8,
+  "target_completion_rate": 0.9,
+  "scope": "Original labelled10-vertex tree and original endpoint holdout. Existing protected known-endpoint relations are a regression gate; fresh unseen-source and both-unseen queries exclude every old evaluation pair and balance exact distance layers. All held endpoint loss-input exposure must be zero. Each cohort and each fresh21+ subset must meet its completion gate independently. Known five difficult questions are retained as a separate regression gate. No oracle features, search, successor pruning or LLM evaluation."
+}

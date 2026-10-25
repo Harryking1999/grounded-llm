@@ -43,6 +43,23 @@ def small_oracle(path,n,edges):
 
 
 class ExactPairTests(unittest.TestCase):
+    def test_fresh_token_acceptance_respects_held_inputs_layers_and_prior_queries(self):
+        from experiments.new_tasks_qmap.src.token_acceptance import fresh_queries
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);small_oracle(root,5,[(0,1),(1,2),(2,3),(3,4)]);corpus=TokenCorpus(root)
+            try:
+                partition=np.tile(np.arange(3),corpus.size//3);bounds=[2,5,10]
+                first=fresh_queries(corpus,partition,0,12,bounds,np.random.default_rng(71),[])
+                blocked=keys(*first.T,corpus.size)
+                second=fresh_queries(corpus,partition,0,12,bounds,np.random.default_rng(71),blocked)
+                both=fresh_queries(corpus,partition,2,12,bounds,np.random.default_rng(72),blocked)
+                for rows,target_partition in [(first,0),(second,0),(both,2)]:
+                    self.assertTrue((partition[rows[:,0]]==2).all());self.assertTrue((partition[rows[:,1]]==target_partition).all())
+                    self.assertEqual(len(np.unique(rows,axis=0)),12)
+                    np.testing.assert_array_equal(np.bincount(np.searchsorted(bounds,corpus.distance(*rows.T))),[4,4,4])
+                self.assertEqual(len(np.intersect1d(keys(*second.T,corpus.size),blocked)),0)
+            finally:corpus.close()
+
     def test_fixed_sokoban_source_scope_and_query_holdouts(self):
         from grounded_llm.tasks.sokoban.relation_data import build
         from grounded_llm.tasks.sokoban.qmap import MapReader

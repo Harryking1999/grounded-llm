@@ -1,0 +1,9 @@
+{
+  "source_mode": "original_starts",
+  "query_count": 4096,
+  "query_seed_offset": 51003,
+  "planning_distance_bins": [1, 2, 5, 10, 20, 40, 80, 256],
+  "continuation_seeds_per_layout": 16,
+  "maximum_steps": 256,
+  "scope": "Frozen diagnosis from original starts of training scenes to original training goals only. Keep entire legal candidate sets at failed nonoptimal or non-descending decisions and all cycle members, with bounded teacher continuations. Exclude held layouts, complete goals and protected relation closures throughout. No optimizer update; prepared failure candidates do not establish training efficacy."
+}

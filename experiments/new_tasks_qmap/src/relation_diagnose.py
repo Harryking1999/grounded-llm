@@ -868,6 +868,22 @@ def geometry(corpus,data,config,cohorts):
     return result
 
 
+def training_start_queries(corpus,data,mode='prepared'):
+    """Select diagnostic starts without admitting held layouts/goals/closures."""
+    if mode=='prepared':return data['tasks_train'],data['distances_train']
+    if mode!='original_starts':raise ValueError('Unknown training diagnostic source mode')
+    from .relation_data import training_decision_mask
+    groups=[]
+    for sid,scene in enumerate(corpus.scenes):
+        if scene.metadata['split']!='train':continue
+        offset=corpus.offsets[sid];goals=scene.goals[:scene.metadata['training_goals']]+offset
+        groups.append(np.column_stack([np.full(len(goals),int(scene.metadata['original_state'])+offset),goals]))
+    if not groups:raise ValueError('No training scenes for original-start diagnosis')
+    rows=np.concatenate(groups);rows=rows[training_decision_mask(corpus,data,rows)]
+    if not len(rows):raise ValueError('No permitted positive original-start training query')
+    return rows,corpus.distance(rows[:,0],rows[:,1])
+
+
 def main():
     parser=argparse.ArgumentParser(__doc__)
     parser.add_argument('--config',type=Path,required=True)
@@ -888,7 +904,7 @@ def main():
     if args.out.exists(): raise FileExistsError('Keep previous diagnostics; choose a new output')
     corpus,data,_=load(config,args.run/'data')
     if args.training_failures_config:
-        if config['task']!='sokoban' or not args.checkpoint: raise ValueError('Sokoban checkpoint required')
+        if config['task'] not in ('sokoban','rush_hour') or not args.checkpoint: raise ValueError('Physical board checkpoint required')
         import torch
         from grounded_llm.core.qmap.model import StateEncoder
         from .relation_data import training_decision_mask
@@ -901,7 +917,7 @@ def main():
         model=StateEncoder(input_dim=corpus.input_dim,**config['model'])
         model.load_state_dict(saved['model']); model.to(args.device); model.requires_grad_(False); model.eval()
         del saved
-        rows=data['tasks_train']; truth=data['distances_train']
+        rows,truth=training_start_queries(corpus,data,options.get('source_mode','prepared'))
         selected=planning_ids(corpus,rows,truth,options['query_count'],
             np.random.default_rng(config['seed']+options['query_seed_offset']),options['planning_distance_bins'])
         rows=rows[selected]

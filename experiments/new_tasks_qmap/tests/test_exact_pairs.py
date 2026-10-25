@@ -926,6 +926,18 @@ class ExactPairTests(unittest.TestCase):
             env.validate(state)
             for action,child,cost in env.transitions(state):
                 self.assertEqual(env.apply(child,dict(action,displacement=-action['displacement'])),(state,cost))
+        from experiments.new_tasks_qmap.src.relation_diagnose import training_start_queries
+        from experiments.new_tasks_qmap.src.relation_data import training_decision_mask
+        with tempfile.TemporaryDirectory() as directory,ExitStack() as stack:
+            path=Path(directory)/'scene';goals=[3,len(states)-1,9]
+            save_scene(path,states,children,goals,dict(split='train',training_goals=2,source=dict(catalogue='fixture'),original_state=0))
+            scene=PhysicalScene(path,env,lambda rows:[tuple(map(int,row)) for row in rows],lambda s,g:np.zeros(len(s)))
+            for name in ['states','children','distances','reverse_distances']:stack.callback(getattr(scene,name)._mmap.close)
+            corpus=PhysicalCorpus([scene]);reserved=closure(corpus,np.array([[0,goals[0]]]))
+            data=dict(reserved_relations=reserved,holdout_goal_endpoints=np.array(False))
+            rows,truth=training_start_queries(corpus,data,'original_starts')
+            np.testing.assert_array_equal(rows,np.array([[0,goals[1]]]))
+            self.assertTrue(training_decision_mask(corpus,data,rows).all());self.assertTrue((truth>0).all())
 
     def test_relative_oracle_all_pairs_and_labelled_features(self):
         with tempfile.TemporaryDirectory() as tmp, ExitStack() as stack:

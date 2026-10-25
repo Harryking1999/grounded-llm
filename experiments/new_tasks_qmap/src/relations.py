@@ -8,7 +8,7 @@ import numpy as np
 import torch
 from torch.nn import functional as F
 from grounded_llm.core.files import atomic_json, atomic_save
-from grounded_llm.core.qmap.model import StateEncoder, soft_rank_loss
+from grounded_llm.core.qmap.model import StateEncoder, soft_rank_loss, transition_difference_loss
 from grounded_llm.core.qmap.exact_graph import edge_costs
 from grounded_llm.core.qmap.sampling import StratifiedEpochSampler, CoverageSampler, GroupCoverageSampler
 from .relation_data import prepare, load, sample_goals, BoardRelationSampler, decision_neighborhood_points, FailureReplaySampler, LocalPathSampler
@@ -174,6 +174,8 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
     neighborhood_rng=np.random.default_rng(config['seed']+2003)
     replay_rng=np.random.default_rng(config['seed']+62003)
     model=StateEncoder(input_dim=corpus.input_dim,**config['model']).to(device)
+    transition_weight=options.get('transition_difference_weight',0.)
+    if transition_weight<0:raise ValueError('Transition difference weight must be nonnegative')
     if torch.device(device).type=='cuda': torch.cuda.reset_peak_memory_stats(device)
     optimizer=torch.optim.Adam(model.parameters(),lr=options['learning_rate'])
     point_truth=data['pair_distances_train']
@@ -536,6 +538,7 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
             trace.append(row)
             if len(trace)>=100: flush_trace()
         ids=np.concatenate([pair[:,0],pair[:,1],children[valid],tasks[:,1]])
+        if transition_weight:ids=np.r_[ids,tasks[:,0]]
         unique,inverse=np.unique(ids,return_inverse=True)
         cache_index=torch.as_tensor(unique,device=device)
         if feature_ids is not None:
@@ -552,7 +555,7 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
         b,n=len(pair),len(tasks); nchild=int(valid.sum())
         qa,qg=vectors[inverse[:b]],vectors[inverse[b:2*b]]
         pointwise=F.smooth_l1_loss(model.distance(qa,qg),torch.as_tensor(point_target,device=device))
-        child=vectors[inverse[2*b:2*b+nchild]]; goal=vectors[inverse[2*b+nchild:]]
+        child=vectors[inverse[2*b:2*b+nchild]]; goal=vectors[inverse[2*b+nchild:2*b+nchild+n]]
         mask=torch.as_tensor(valid,device=device)
         scores=torch.zeros(children.shape,device=device)
         goals=goal[:,None].expand(-1,children.shape[1],-1)[mask]
@@ -561,6 +564,15 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
         ranking=soft_rank_loss(scores,torch.as_tensor(costs+truth,device=device),mask,options['rank_temperature'],
             target_mode=options.get('rank_target_mode','soft_distance'))
         loss=pointwise+options['rank_weight']*ranking
+        transition_loss=None
+        if transition_weight:
+            parent_vectors=vectors[inverse[-n:]]
+            parent_prediction=model.distance(parent_vectors,goal)
+            child_prediction=scores-torch.as_tensor(costs,device=device)
+            transition_loss=transition_difference_loss(parent_prediction,child_prediction,
+                torch.as_tensor(corpus.distance(tasks[:,0],tasks[:,1]),device=device),
+                torch.as_tensor(child_truth,device=device),mask)
+            loss=loss+transition_weight*transition_loss
         profile_loss=None
         if profiles:
             profile_loss=profiles.loss(vectors,unique)
@@ -626,6 +638,7 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
                 record['anchor_profile_loss_mean']=float(profile_window[0]/max(profile_window[1],1))
                 record['anchor_profile_probe']=profiles.probe(model,corpus,profile_probe_ids)
                 profile_window[:]=0
+            if transition_loss is not None:record['transition_difference_loss']=float(transition_loss.detach())
             if branch_replay:
                 fitting=evaluate(model,corpus,branch_replay.fit,config,planning=True)
                 record['branch_fit']={name:dict(mae=row['finite_mae'],shortest_action_rate=row['shortest_action_rate'],

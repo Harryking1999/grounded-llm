@@ -213,8 +213,35 @@ class BoardRelationSampler:
         point_labels=np.concatenate(point_labels); rank_labels=np.concatenate(rank_labels); boundary=np.concatenate(boundaries)
         edges=np.asarray(options['distance_bin_upper_bounds'],dtype=np.float32)
         if np.any(np.diff(edges)<=0) or edges[-1]<max(point_labels.max(),rank_labels.max()): raise ValueError('Distance strata do not cover exact finite labels')
+        stage_balance=options.get('sokoban_stage_balance',False)
+        def stages(rows):
+            result=np.zeros((len(rows),2),dtype=np.int8)
+            scene_ids=corpus.locate(rows[:,0])
+            for sid in np.unique(scene_ids):
+                scene=corpus.scenes[sid]
+                if not hasattr(scene,'env') or not hasattr(scene.env,'goals') or scene.states.shape[1]!=5:
+                    raise ValueError('Box-stage balancing requires raw four-box Sokoban states')
+                local=np.flatnonzero(scene_ids==sid)
+                source=scene.states[rows[local,0]-corpus.offsets[sid],1:]
+                target=scene.states[rows[local,1]-corpus.offsets[sid],1:]
+                result[local,0]=np.isin(target,list(scene.env.goals)).sum(1)
+                result[local,1]=(source[:,:,None]==target[:,None,:]).any(2).sum(1)
+            return result
         def groups(labels,allowed,rows):
             bins=np.searchsorted(edges,labels)
+            stage=stages(rows) if stage_balance else None
+            def local_groups(a,b):
+                take=allowed[a:b];layers=bins[a:b]
+                def distance_groups(mask):
+                    return [ids+a for j in range(len(edges)) if len(ids:=np.flatnonzero(mask & (layers==j)))]
+                if stage is None:return distance_groups(take)
+                result=[]
+                for target_phase in np.unique(stage[a:b,0][take]):
+                    phase=take & (stage[a:b,0]==target_phase);matches=[]
+                    for k in np.unique(stage[a:b,1][phase]):
+                        matches.append(distance_groups(phase & (stage[a:b,1]==k)))
+                    result.append(matches)
+                return result
             if options.get('balance_layouts'):
                 scene_ids=corpus.locate(rows[:,0])
                 result=[]
@@ -222,10 +249,9 @@ class BoardRelationSampler:
                 # the complete bank once for every layout.
                 for sid in np.unique(scene_ids[allowed]):
                     a,b=np.searchsorted(scene_ids,[sid,sid+1])
-                    result.append([ids+a for j in range(len(edges))
-                                   if len(ids:=np.flatnonzero(allowed[a:b] & (bins[a:b]==j)))])
+                    result.append(local_groups(a,b))
                 return result
-            return [ids for j in range(len(edges)) if len(ids:=np.flatnonzero(allowed & (bins==j)))]
+            return local_groups(0,len(rows))
         def counts(labels,allowed):
             return {f'({-1 if j==0 else float(edges[j-1])},{float(upper)}]':int((allowed & (np.searchsorted(edges,labels)==j)).sum())
                     for j,upper in enumerate(edges)}

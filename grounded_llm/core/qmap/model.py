@@ -60,6 +60,20 @@ def soft_rank_loss(scores, truth, valid, temperature, target_mode='soft_distance
     return -(target * log_prob.masked_fill(~valid, 0)).sum(dim=-1).mean()
 
 
+def transition_difference_loss(parent,successor,parent_truth,successor_truth,valid):
+    """Match remaining-cost changes across real legal edges at one query goal.
+
+    Exact optimal edges decrease remaining cost by their immediate cost;
+    finite detours may increase it. Unreachable/illegal branches receive no
+    finite difference target and remain handled by distance/ranking losses.
+    """
+    finite=valid & torch.isfinite(successor_truth) & torch.isfinite(parent_truth[:,None])
+    predicted=parent[:,None]-successor
+    if not bool(finite.any()):return predicted.sum()*0
+    target=parent_truth[:,None]-successor_truth
+    return torch.nn.functional.smooth_l1_loss(predicted[finite],target[finite])
+
+
 class StateEncoder(nn.Module):
     """Independent state encoder; existing checkpoints default to the same MLP."""
     def __init__(self, dimension, hidden, cap, metric, input_dim=100, group_size=8, output_activation='sigmoid',

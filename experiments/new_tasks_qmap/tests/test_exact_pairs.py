@@ -356,6 +356,47 @@ class ExactPairTests(unittest.TestCase):
         self.assertGreater(float((soft_rank_loss(scores,truth,mask,1.)-hard).abs().detach()),.01)
         with self.assertRaisesRegex(ValueError,'target mode'):soft_rank_loss(scores,truth,mask,1.,target_mode='unknown')
 
+    def test_transition_differences_keep_detours_and_exclude_unreachable_branches(self):
+        from grounded_llm.core.qmap.model import transition_difference_loss
+        parent=torch.tensor([10.,9.],requires_grad=True)
+        successor=torch.tensor([[9.,11.,200.,-999.],[10.,8.,200.,-999.]],requires_grad=True)
+        truth_parent=torch.tensor([10.,9.]);truth_child=torch.tensor([[9.,11.,float('inf'),0.],[10.,8.,float('inf'),0.]])
+        mask=torch.tensor([[True,True,True,False],[True,True,True,False]])
+        exact=transition_difference_loss(parent,successor,truth_parent,truth_child,mask)
+        self.assertEqual(float(exact.detach()),0.)
+        # Both directions of a real two-state move must receive their distinct
+        # same-goal targets. A flat field cannot satisfy descent and return.
+        flat=torch.ones((2,4),requires_grad=True)
+        loss=transition_difference_loss(torch.ones(2),flat,truth_parent,truth_child,mask)
+        self.assertGreater(float(loss.detach()),0);loss.backward()
+        self.assertTrue((flat.grad[:,:2].abs()>0).all());self.assertFalse(flat.grad[:,2:].any())
+
+    def test_box_stage_strata_preserve_the_complete_relation_bank(self):
+        from experiments.new_tasks_qmap.src.relation_data import BoardRelationSampler
+        env=Sokoban(['#####','#@$$#','#$.$#','#...#','#####'])
+        states=[(p,b) for b in combinations(sorted(env.floor),4) for p in sorted(env.floor) if p not in b]
+        index={s:i for i,s in enumerate(states)};children=np.full((len(states),4),-1,dtype=np.int32)
+        for i,state in enumerate(states):
+            for a,child,_ in env.transitions(state):children[i,a]=index[child]
+        goals=np.arange(len(states));oracle=UnitGraphOracle(children)
+        truth=np.stack([oracle.to_goal(g) for g in goals]);packed=np.array([[p,*b] for p,b in states])
+        scene=SimpleNamespace(states=packed,goals=goals,children=children,distances=truth,env=env,
+            metadata=dict(split='train',training_goals=len(goals)),features=lambda ids:env.features([states[i] for i in ids]),
+            distance=lambda s,g:truth[g,s])
+        corpus=PhysicalCorpus([scene]);source,target=np.nonzero(np.isfinite(truth.T)&(truth.T>0))
+        pairs=np.column_stack([np.arange(len(states)),np.full(len(states),index[env.start])])
+        data=dict(pairs_train=pairs,tasks_train=np.column_stack([source,target]),reserved_relations=np.array([],dtype=np.int64))
+        options=dict(finite_point_fraction=.75,boundary_rank_fraction=.5,distance_bin_upper_bounds=[0,1,2,5,10,20,40,80,128],balance_layouts=True)
+        plain=BoardRelationSampler(corpus,data,options);staged=BoardRelationSampler(corpus,data,dict(options,sokoban_stage_balance=True))
+        np.testing.assert_array_equal(plain.ranks,staged.ranks);np.testing.assert_array_equal(plain.points,staged.points)
+        ids=BoardRelationSampler._draw(staged.point_groups,50000,np.random.default_rng(9));rows=staged.points[ids]
+        target_stage=np.isin(packed[rows[:,1],1:],list(env.goals)).sum(1)
+        counts=np.bincount(target_stage,minlength=5);available=np.unique(np.isin(packed[staged.points[:,1],1:],list(env.goals)).sum(1))
+        self.assertLess(counts[available].max()/counts[available].min(),1.15)
+        exact=materialize(corpus,staged.ranks[::max(1,len(staged.ranks)//64)])
+        np.testing.assert_array_equal(exact['children'],corpus.successors(exact['tasks'][:,0]))
+        self.assertTrue(exact['optimal'].any(1).all())
+
     def test_spatial_encoder_preserves_raw_board_and_checkpoint_interface(self):
         options=dict(dimension=128,hidden=256,cap=256,metric='directed_max',input_dim=400)
         mlp=StateEncoder(**options)
@@ -1094,7 +1135,7 @@ class ExactPairTests(unittest.TestCase):
             warm_config=json.loads(json.dumps(config))
             warm_config['training'].update(initialize_from='../run/last.pt',features_on_device=True,
                 record_training_samples=True,online_goals=True,local_goal_fraction=.5,goal_walk_max=4,
-                compact_point_sources=True)
+                compact_point_sources=True,transition_difference_weight=.5)
             phase=root/'phase2'
             def prepare_fixture(config,path):
                 path.mkdir(); np.save(path/'endpoint_partition.npy',partition)
@@ -1102,6 +1143,8 @@ class ExactPairTests(unittest.TestCase):
             with patch('experiments.new_tasks_qmap.src.relations.prepare',side_effect=prepare_fixture):
                 train(warm_config,phase,'warm-fixture','cpu')
             initialization=json.loads((phase/'initialization.json').read_text())
+            phase_progress=[json.loads(row) for row in (phase/'progress.jsonl').read_text().splitlines()]
+            self.assertTrue(np.isfinite(phase_progress[-1]['transition_difference_loss']))
             compact=torch.load(phase/'last.pt',weights_only=False)
             self.assertEqual(len(compact['pair_draws']),len(np.unique(data['pairs_train'][:,0])))
             sampler_summary=json.loads((phase/'point_source_sampling.json').read_text())

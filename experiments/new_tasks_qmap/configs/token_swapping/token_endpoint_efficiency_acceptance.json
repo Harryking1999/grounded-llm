@@ -1,0 +1,30 @@
+{
+  "seed": 2026102651,
+  "output": "token_endpoint_efficiency_acceptance",
+  "candidates": [
+    "token_endpoint_l1_fit",
+    "token_endpoint_efficiency_soft",
+    "token_endpoint_efficiency_optimal"
+  ],
+  "selection": "Freeze the lowest stored validation best_score among terminal matched candidates with full prepared point-source coverage; no acceptance-based candidate replacement.",
+  "queries_per_cohort": 1024,
+  "distance_bin_upper_bounds": [
+    5,
+    10,
+    15,
+    20,
+    25
+  ],
+  "long_distance_above": 20,
+  "minimum_long_queries": 200,
+  "horizon": 128,
+  "minimum_completion_rate": 0.95,
+  "target_completion_rate": 0.9,
+  "scope": "Efficiency acceptance on this fixed tree. Preserve original held input partitions and protect every old prepared/previous acceptance query. Completion>=95 percent and optimal-cost completion>=80 percent must each hold in every primary cohort; target optimal completion90 percent. Mean cost ratio on successes<=1.10 is a secondary guard and never hides noncompletion. Exact oracle is100 percent optimal. Prior adopted candidate may win by unchanged validation objective; that is not automatically an efficiency improvement. The transported known diagnostic is a separate regression, not independent held-input evidence.",
+  "minimum_optimal_rate": 0.8,
+  "target_optimal_rate": 0.9,
+  "maximum_mean_cost_ratio_on_success": 1.1,
+  "exclude_suites": [
+    "token_endpoint_frozen_acceptance/suite.json"
+  ]
+}

@@ -68,6 +68,11 @@ def run(config,runs,device,source_commit):
             raise ValueError('Regression queries are not protected known-input relations')
         prior=np.concatenate([v for k,v in data.items() if k.startswith('tasks_') and k!='tasks_train'])
         excluded=np.unique(keys(prior[:,0],prior[:,1],corpus.size))
+        for filename in config.get('exclude_suites',[]):
+            previous=json.loads((runs/filename).read_text())
+            previous_rows=np.vstack([np.asarray(v,dtype=np.int64) for v in previous['groups'].values()])
+            if ((previous_rows<0)|(previous_rows>=corpus.size)).any():raise ValueError('Previous suite exceeds this tree')
+            excluded=np.unique(np.r_[excluded,keys(previous_rows[:,0],previous_rows[:,1],corpus.size)])
         for name,goal_partition in [('fresh_unseen_endpoint_test',0),('fresh_unseen_both_test',2)]:
             groups[name]=fresh_queries(corpus,partition,goal_partition,config['queries_per_cohort'],
                 config['distance_bin_upper_bounds'],rng,excluded)
@@ -94,14 +99,30 @@ def run(config,runs,device,source_commit):
         for name in ['fresh_unseen_endpoint_test','fresh_unseen_both_test']:
             rows=[v for d,v in plans[name]['by_distance'].items() if float(d)>config['long_distance_above']]
             count=sum(v['count'] for v in rows);solved=sum(v['solved'] for v in rows)
-            long[name]=dict(count=count,solved=solved,success_rate=solved/count if count else None)
+            optimal=sum(v['optimal'] for v in rows)
+            long[name]=dict(count=count,solved=solved,success_rate=solved/count if count else None,
+                optimal=optimal,optimal_rate=optimal/count if count else None)
         oracle_ok=all(r['planning']['oracle']['optimal_rate']==1 for r in metrics['cohorts'].values())
         coverage=bool((exposure[partition==0]>0).all())
         passed=oracle_ok and coverage and all(p['success_rate']>=config['minimum_completion_rate'] for p in plans.values())
         passed=passed and all(p['count']>=config['minimum_long_queries'] and p['success_rate']>=config['minimum_completion_rate'] for p in long.values())
+        efficiency=None
+        if 'minimum_optimal_rate' in config:
+            primary={name:p for name,p in plans.items() if name!='diagnostic'}
+            efficiency=dict(minimum_optimal_rate=config['minimum_optimal_rate'],
+                maximum_mean_cost_ratio_on_success=config['maximum_mean_cost_ratio_on_success'],
+                passed=all(p['optimal_rate']>=config['minimum_optimal_rate']
+                    and p['mean_cost_ratio_on_success'] is not None
+                    and p['mean_cost_ratio_on_success']<=config['maximum_mean_cost_ratio_on_success'] for p in primary.values())
+                    and all(p['optimal_rate'] is not None and p['optimal_rate']>=config['minimum_optimal_rate'] for p in long.values()),
+                target_reached=all(p['optimal_rate']>=config['target_optimal_rate'] for p in primary.values())
+                    and all(p['optimal_rate'] is not None and p['optimal_rate']>=config['target_optimal_rate'] for p in long.values()))
+            passed=passed and efficiency['passed']
         result=dict(source_commit=source_commit,checkpoint_source_commit=saved['source_commit'],step=saved['step'],
             chosen=chosen,oracle_ok=oracle_ok,full_training_input_coverage=coverage,held_input_training_exposure_zero=held_clean,
-            long_distance=long,passed=passed,target_reached=passed and all(p['success_rate']>=config['target_completion_rate'] for p in plans.values()),metrics=metrics)
+            long_distance=long,efficiency=efficiency,passed=passed,
+            target_reached=passed and all(p['success_rate']>=config['target_completion_rate'] for p in plans.values())
+                and (efficiency is None or efficiency['target_reached']),metrics=metrics)
         atomic_json(out/'result.json',result)
         print(json.dumps(dict(passed=passed,chosen=chosen,long_distance=long,
             cohorts={n:{k:p[k] for k in ['count','solved','optimal','cycles']} for n,p in plans.items()})),flush=True)

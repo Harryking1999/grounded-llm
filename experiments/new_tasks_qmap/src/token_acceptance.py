@@ -1,4 +1,4 @@
-"""Frozen original-tree candidates: protected regression and fresh held inputs."""
+"""Frozen fixed-tree candidates: protected regression and fresh held inputs."""
 import argparse
 from copy import deepcopy
 import json
@@ -71,10 +71,17 @@ def run(config,runs,device,source_commit):
         for name,goal_partition in [('fresh_unseen_endpoint_test',0),('fresh_unseen_both_test',2)]:
             groups[name]=fresh_queries(corpus,partition,goal_partition,config['queries_per_cohort'],
                 config['distance_bin_upper_bounds'],rng,excluded)
-        groups['diagnostic']=data['tasks_diagnostic']
+        if 'diagnostic_reference' in config:
+            with np.load(runs/config['diagnostic_reference']) as archive:
+                groups['diagnostic']=archive['tasks_diagnostic'].copy()
+            if ((groups['diagnostic']<0)|(groups['diagnostic']>=corpus.size)).any():
+                raise ValueError('Transported diagnostic permutations exceed this tree size')
+        else:groups['diagnostic']=data['tasks_diagnostic']
         atomic_json(out/'suite.json',dict(config=config,groups={k:v.tolist() for k,v in groups.items()},
             source_scope=corpus.scope,held_input_training_exposure_zero=held_clean,
             protected_relation_scope='Original frozen regression pool; not a new independent relation split.',
+            diagnostic_scope=('Transported known permutation pairs, relabelled costs/actions use this tree; not an independent input-holdout claim.'
+                if 'diagnostic_reference' in config else 'Original known difficult permutation pairs.'),
             fresh_scope='New pairs with held test source inputs; balanced exact distance layers; never added to training.'))
         materialized={}
         for name,rows in groups.items():materialized.update({k+'_'+name:v for k,v in materialize(corpus,rows).items()})

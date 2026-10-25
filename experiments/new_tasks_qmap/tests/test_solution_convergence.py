@@ -15,6 +15,16 @@ from experiments.new_tasks_qmap.src.solution_global_order import unit_edge_point
 
 
 class ConvergenceTests(unittest.TestCase):
+    def test_missing_required_cohort_is_reported_and_cannot_pass(self):
+        from experiments.new_tasks_qmap.src.relations import completion_acceptance
+        metrics=dict(cohorts=dict(test=dict(planning=dict(q=dict(success_rate=1.)))))
+        criteria=dict(minimum_completion_rate=.8,target_completion_rate=.9)
+        missing=completion_acceptance(metrics,['test','diagnostic'],criteria,True)
+        self.assertEqual(missing['rates'],dict(test=1.,diagnostic=None))
+        self.assertEqual(missing['missing_required_cohorts'],['diagnostic']);self.assertFalse(missing['passed'])
+        self.assertTrue(completion_acceptance(metrics,['test'],criteria,True)['passed'])
+        self.assertFalse(completion_acceptance(metrics,['test'],criteria,False)['passed'])
+
     def test_explicit_batch_resize_preserves_other_conditions(self):
         old=dict(task='token_swapping',data=dict(source='fixed'),training=dict(steps=6000,
             batch_size=2048,decision_batch_size=512,learning_rate=.0001,

@@ -108,6 +108,17 @@ def retain_checkpoint(source,target):
     temporary.replace(target)
 
 
+def completion_acceptance(metrics,required,criteria,coverage):
+    """Keep absent required cohorts visible and failing, without losing results."""
+    missing=[name for name in required if name not in metrics['cohorts']]
+    rates={name:(metrics['cohorts'][name]['planning']['q']['success_rate'] if name not in missing else None)
+           for name in required}
+    return dict(minimum=criteria['minimum_completion_rate'],target=criteria['target_completion_rate'],
+        rates=rates,missing_required_cohorts=missing,full_training_source_coverage=coverage,
+        passed=coverage and all(rate is not None and rate>=criteria['minimum_completion_rate'] for rate in rates.values()),
+        target_reached=coverage and all(rate is not None and rate>=criteria['target_completion_rate'] for rate in rates.values()))
+
+
 def write_trace(target,packed):
     started=time.monotonic();temporary=target.with_suffix('.tmp')
     with temporary.open('wb') as stream:np.savez_compressed(stream,**packed)
@@ -667,12 +678,8 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
     if config.get('acceptance'):
         criteria=json.loads(Path(config['acceptance']).read_text())
         required=criteria['required_test_cohorts'][config['task']]
-        rates={name:final['cohorts'][name]['planning']['q']['success_rate'] for name in required}
         coverage=bool((saved['pair_draws']>0).all())
-        summary['acceptance']=dict(minimum=criteria['minimum_completion_rate'],target=criteria['target_completion_rate'],
-            rates=rates,full_training_source_coverage=coverage,
-            passed=coverage and all(rate is not None and rate>=criteria['minimum_completion_rate'] for rate in rates.values()),
-            target_reached=coverage and all(rate is not None and rate>=criteria['target_completion_rate'] for rate in rates.values()))
+        summary['acceptance']=completion_acceptance(final,required,criteria,coverage)
     if config['task']=='game24':
         exact_exposure={}
         for sid,scene in enumerate(corpus.scenes):

@@ -1,0 +1,1261 @@
+{
+  "sokoban_fixed_wall_902_max_fit": {
+    "source_commit": "2e9f428",
+    "best_step": 4000,
+    "evaluated_step": 4000,
+    "last_step": 4000,
+    "model_parameters": 1591424,
+    "actual_exposure": {
+      "unique_gradient_states": 42840,
+      "available_states": 42840,
+      "unique_pair_rows": 856688,
+      "pair_rows": 856688,
+      "unique_decision_rows": 11802,
+      "decision_rows": 67307,
+      "minimum_pair_layer_passes": 38.24963113759035,
+      "minimum_decision_layer_passes": null
+    },
+    "acceptance": {
+      "minimum": 0.8,
+      "target": 0.9,
+      "rates": {
+        "test": 0.4375,
+        "unseen_goal_test": 0.07446808510638298,
+        "original_training_goals": 0.058823529411764705,
+        "original_unseen_goals": 0.0
+      },
+      "full_training_source_coverage": true,
+      "passed": false,
+      "target_reached": false
+    },
+    "cohorts": {
+      "validation": {
+        "mae": 1.5149226188659668,
+        "shortest_action_rate": 1.0,
+        "q": {
+          "count": 16,
+          "solved": 6,
+          "success_rate": 0.375,
+          "optimal": 6,
+          "optimal_rate": 0.375,
+          "cycles": 10,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": 0.0
+        }
+      },
+      "test": {
+        "mae": 1.7228816747665405,
+        "shortest_action_rate": 0.9375,
+        "q": {
+          "count": 16,
+          "solved": 7,
+          "success_rate": 0.4375,
+          "optimal": 7,
+          "optimal_rate": 0.4375,
+          "cycles": 9,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": 0.0
+        }
+      },
+      "unseen_goal_validation": {
+        "mae": 6.79884147644043,
+        "shortest_action_rate": 0.8229166666666666,
+        "q": {
+          "count": 96,
+          "solved": 32,
+          "success_rate": 0.3333333333333333,
+          "optimal": 26,
+          "optimal_rate": 0.2708333333333333,
+          "cycles": 64,
+          "entered_unreachable": 9,
+          "mean_excess_cost_on_success": 0.8125
+        }
+      },
+      "unseen_goal_test": {
+        "mae": 11.758585929870605,
+        "shortest_action_rate": 0.78125,
+        "q": {
+          "count": 94,
+          "solved": 7,
+          "success_rate": 0.07446808510638298,
+          "optimal": 7,
+          "optimal_rate": 0.07446808510638298,
+          "cycles": 87,
+          "entered_unreachable": 14,
+          "mean_excess_cost_on_success": 0.0
+        }
+      },
+      "original_training_goals": {
+        "mae": 3.4432923793792725,
+        "shortest_action_rate": 0.8823529411764706,
+        "q": {
+          "count": 17,
+          "solved": 1,
+          "success_rate": 0.058823529411764705,
+          "optimal": 1,
+          "optimal_rate": 0.058823529411764705,
+          "cycles": 16,
+          "entered_unreachable": 1,
+          "mean_excess_cost_on_success": 0.0
+        }
+      },
+      "original_unseen_goals": {
+        "mae": 10.242347717285156,
+        "shortest_action_rate": 0.5,
+        "q": {
+          "count": 4,
+          "solved": 0,
+          "success_rate": 0.0,
+          "optimal": 0,
+          "optimal_rate": 0.0,
+          "cycles": 4,
+          "entered_unreachable": 2,
+          "mean_excess_cost_on_success": null
+        }
+      }
+    },
+    "last_training_probe": {
+      "batches": 4,
+      "point_count": 131072,
+      "decision_count": 32768,
+      "finite_mae": 1.440978765487671,
+      "distance_huber": 4.523709774017334,
+      "candidate_soft_rank_loss": 0.5092326402664185,
+      "shortest_action_rate": 0.9483642578125,
+      "by_distance": {
+        "1_5": {
+          "count": 64406,
+          "mae": 1.0486871004104614
+        },
+        "6_20": {
+          "count": 21743,
+          "mae": 1.517295479774475
+        },
+        "21_plus": {
+          "count": 22197,
+          "mae": 2.504481792449951
+        }
+      },
+      "role": "Fixed actual training batches; fitting diagnostic only, never checkpoint selection."
+    }
+  },
+  "sokoban_fixed_wall_902_sum_fit": {
+    "source_commit": "2e9f428",
+    "best_step": 2000,
+    "evaluated_step": 2000,
+    "last_step": 4000,
+    "model_parameters": 1591424,
+    "actual_exposure": {
+      "unique_gradient_states": 42840,
+      "available_states": 42840,
+      "unique_pair_rows": 856688,
+      "pair_rows": 856688,
+      "unique_decision_rows": 11802,
+      "decision_rows": 67307,
+      "minimum_pair_layer_passes": 38.24963113759035,
+      "minimum_decision_layer_passes": null
+    },
+    "acceptance": {
+      "minimum": 0.8,
+      "target": 0.9,
+      "rates": {
+        "test": 0.375,
+        "unseen_goal_test": 0.1276595744680851,
+        "original_training_goals": 0.058823529411764705,
+        "original_unseen_goals": 0.0
+      },
+      "full_training_source_coverage": true,
+      "passed": false,
+      "target_reached": false
+    },
+    "cohorts": {
+      "validation": {
+        "mae": 2.253223419189453,
+        "shortest_action_rate": 0.9375,
+        "q": {
+          "count": 16,
+          "solved": 4,
+          "success_rate": 0.25,
+          "optimal": 4,
+          "optimal_rate": 0.25,
+          "cycles": 12,
+          "entered_unreachable": 1,
+          "mean_excess_cost_on_success": 0.0
+        }
+      },
+      "test": {
+        "mae": 2.79168438911438,
+        "shortest_action_rate": 0.875,
+        "q": {
+          "count": 16,
+          "solved": 6,
+          "success_rate": 0.375,
+          "optimal": 6,
+          "optimal_rate": 0.375,
+          "cycles": 10,
+          "entered_unreachable": 1,
+          "mean_excess_cost_on_success": 0.0
+        }
+      },
+      "unseen_goal_validation": {
+        "mae": 18.261308670043945,
+        "shortest_action_rate": 0.7604166666666666,
+        "q": {
+          "count": 96,
+          "solved": 25,
+          "success_rate": 0.2604166666666667,
+          "optimal": 20,
+          "optimal_rate": 0.20833333333333334,
+          "cycles": 71,
+          "entered_unreachable": 5,
+          "mean_excess_cost_on_success": 0.47999998927116394
+        }
+      },
+      "unseen_goal_test": {
+        "mae": 9.971121788024902,
+        "shortest_action_rate": 0.8020833333333334,
+        "q": {
+          "count": 94,
+          "solved": 12,
+          "success_rate": 0.1276595744680851,
+          "optimal": 11,
+          "optimal_rate": 0.11702127659574468,
+          "cycles": 82,
+          "entered_unreachable": 11,
+          "mean_excess_cost_on_success": 0.1666666716337204
+        }
+      },
+      "original_training_goals": {
+        "mae": 5.586117267608643,
+        "shortest_action_rate": 1.0,
+        "q": {
+          "count": 17,
+          "solved": 1,
+          "success_rate": 0.058823529411764705,
+          "optimal": 1,
+          "optimal_rate": 0.058823529411764705,
+          "cycles": 16,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": 0.0
+        }
+      },
+      "original_unseen_goals": {
+        "mae": 10.969438552856445,
+        "shortest_action_rate": 0.75,
+        "q": {
+          "count": 4,
+          "solved": 0,
+          "success_rate": 0.0,
+          "optimal": 0,
+          "optimal_rate": 0.0,
+          "cycles": 4,
+          "entered_unreachable": 1,
+          "mean_excess_cost_on_success": null
+        }
+      }
+    },
+    "last_training_probe": {
+      "batches": 4,
+      "point_count": 131072,
+      "decision_count": 32768,
+      "finite_mae": 1.7586548328399658,
+      "distance_huber": 5.419572830200195,
+      "candidate_soft_rank_loss": 0.4882107675075531,
+      "shortest_action_rate": 0.96441650390625,
+      "by_distance": {
+        "1_5": {
+          "count": 64406,
+          "mae": 1.667752742767334
+        },
+        "6_20": {
+          "count": 21743,
+          "mae": 1.648405909538269
+        },
+        "21_plus": {
+          "count": 22197,
+          "mae": 2.1304070949554443
+        }
+      },
+      "role": "Fixed actual training batches; fitting diagnostic only, never checkpoint selection."
+    }
+  },
+  "sokoban_fixed_wall_902_cnn_fit": {
+    "source_commit": "5d4f01e",
+    "best_step": 2000,
+    "evaluated_step": 2000,
+    "last_step": 4000,
+    "model_parameters": 1584438,
+    "actual_exposure": {
+      "unique_gradient_states": 42840,
+      "available_states": 42840,
+      "unique_pair_rows": 856688,
+      "pair_rows": 856688,
+      "unique_decision_rows": 11802,
+      "decision_rows": 67307,
+      "minimum_pair_layer_passes": 38.24963113759035,
+      "minimum_decision_layer_passes": null
+    },
+    "acceptance": {
+      "minimum": 0.8,
+      "target": 0.9,
+      "rates": {
+        "test": 0.4375,
+        "unseen_goal_test": 0.07446808510638298,
+        "original_training_goals": 0.0,
+        "original_unseen_goals": 0.0
+      },
+      "full_training_source_coverage": true,
+      "passed": false,
+      "target_reached": false
+    },
+    "cohorts": {
+      "validation": {
+        "mae": 1.3998428583145142,
+        "shortest_action_rate": 0.9375,
+        "q": {
+          "count": 16,
+          "solved": 5,
+          "success_rate": 0.3125,
+          "optimal": 5,
+          "optimal_rate": 0.3125,
+          "cycles": 11,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": 0.0
+        }
+      },
+      "test": {
+        "mae": 1.4263756275177002,
+        "shortest_action_rate": 0.9375,
+        "q": {
+          "count": 16,
+          "solved": 7,
+          "success_rate": 0.4375,
+          "optimal": 7,
+          "optimal_rate": 0.4375,
+          "cycles": 9,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": 0.0
+        }
+      },
+      "unseen_goal_validation": {
+        "mae": 4.8298797607421875,
+        "shortest_action_rate": 0.875,
+        "q": {
+          "count": 96,
+          "solved": 10,
+          "success_rate": 0.10416666666666667,
+          "optimal": 10,
+          "optimal_rate": 0.10416666666666667,
+          "cycles": 86,
+          "entered_unreachable": 4,
+          "mean_excess_cost_on_success": 0.0
+        }
+      },
+      "unseen_goal_test": {
+        "mae": 11.388142585754395,
+        "shortest_action_rate": 0.7395833333333334,
+        "q": {
+          "count": 94,
+          "solved": 7,
+          "success_rate": 0.07446808510638298,
+          "optimal": 7,
+          "optimal_rate": 0.07446808510638298,
+          "cycles": 87,
+          "entered_unreachable": 13,
+          "mean_excess_cost_on_success": 0.0
+        }
+      },
+      "original_training_goals": {
+        "mae": 1.6377556324005127,
+        "shortest_action_rate": 1.0,
+        "q": {
+          "count": 17,
+          "solved": 0,
+          "success_rate": 0.0,
+          "optimal": 0,
+          "optimal_rate": 0.0,
+          "cycles": 17,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": null
+        }
+      },
+      "original_unseen_goals": {
+        "mae": 6.600719451904297,
+        "shortest_action_rate": 1.0,
+        "q": {
+          "count": 4,
+          "solved": 0,
+          "success_rate": 0.0,
+          "optimal": 0,
+          "optimal_rate": 0.0,
+          "cycles": 4,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": null
+        }
+      }
+    },
+    "last_training_probe": {
+      "batches": 4,
+      "point_count": 131072,
+      "decision_count": 32768,
+      "finite_mae": 0.8361454010009766,
+      "distance_huber": 1.9125925302505493,
+      "candidate_soft_rank_loss": 0.4657440185546875,
+      "shortest_action_rate": 0.972198486328125,
+      "by_distance": {
+        "1_5": {
+          "count": 64406,
+          "mae": 0.646766185760498
+        },
+        "6_20": {
+          "count": 21743,
+          "mae": 0.8891530632972717
+        },
+        "21_plus": {
+          "count": 22197,
+          "mae": 1.3337174654006958
+        }
+      },
+      "role": "Fixed actual training batches; fitting diagnostic only, never checkpoint selection."
+    }
+  },
+  "exact_profile_geometry": {
+    "scope": "Teacher-only exact capped distance coordinates, including protected labels for geometric diagnosis. No neural fit, adoption or inference modification. Training-target anchors exclude held query goals; all-target reference deliberately includes them and is only an existence check.",
+    "maps": {
+      "902": {
+        "training_targets_only": {
+          "dimensions": 20,
+          "cohorts": {
+            "validation": {
+              "mae": 0.0,
+              "count": 16,
+              "solved": 16,
+              "optimal": 16,
+              "cycles": 0,
+              "entered_unreachable": 0
+            },
+            "test": {
+              "mae": 0.0,
+              "count": 16,
+              "solved": 16,
+              "optimal": 16,
+              "cycles": 0,
+              "entered_unreachable": 0
+            },
+            "unseen_goal_validation": {
+              "mae": 7.822916507720947,
+              "count": 96,
+              "solved": 20,
+              "optimal": 19,
+              "cycles": 76,
+              "entered_unreachable": 8
+            },
+            "unseen_goal_test": {
+              "mae": 16.382978439331055,
+              "count": 94,
+              "solved": 1,
+              "optimal": 1,
+              "cycles": 93,
+              "entered_unreachable": 22
+            },
+            "original_training_goals": {
+              "mae": 0.0,
+              "count": 17,
+              "solved": 17,
+              "optimal": 17,
+              "cycles": 0,
+              "entered_unreachable": 0
+            },
+            "original_unseen_goals": {
+              "mae": 15.5,
+              "count": 4,
+              "solved": 0,
+              "optimal": 0,
+              "cycles": 4,
+              "entered_unreachable": 2
+            },
+            "allowed_training_fit": {
+              "mae": 0.0,
+              "count": 2048,
+              "solved": 2048,
+              "optimal": 2048,
+              "cycles": 0,
+              "entered_unreachable": 0
+            }
+          }
+        },
+        "all_targets_oracle_reference": {
+          "dimensions": 26,
+          "cohorts": {
+            "validation": {
+              "mae": 0.0,
+              "count": 16,
+              "solved": 16,
+              "optimal": 16,
+              "cycles": 0,
+              "entered_unreachable": 0
+            },
+            "test": {
+              "mae": 0.0,
+              "count": 16,
+              "solved": 16,
+              "optimal": 16,
+              "cycles": 0,
+              "entered_unreachable": 0
+            },
+            "unseen_goal_validation": {
+              "mae": 0.0,
+              "count": 96,
+              "solved": 96,
+              "optimal": 96,
+              "cycles": 0,
+              "entered_unreachable": 0
+            },
+            "unseen_goal_test": {
+              "mae": 0.0,
+              "count": 94,
+              "solved": 94,
+              "optimal": 94,
+              "cycles": 0,
+              "entered_unreachable": 0
+            },
+            "original_training_goals": {
+              "mae": 0.0,
+              "count": 17,
+              "solved": 17,
+              "optimal": 17,
+              "cycles": 0,
+              "entered_unreachable": 0
+            },
+            "original_unseen_goals": {
+              "mae": 0.0,
+              "count": 4,
+              "solved": 4,
+              "optimal": 4,
+              "cycles": 0,
+              "entered_unreachable": 0
+            },
+            "allowed_training_fit": {
+              "mae": 0.0,
+              "count": 2048,
+              "solved": 2048,
+              "optimal": 2048,
+              "cycles": 0,
+              "entered_unreachable": 0
+            }
+          }
+        }
+      },
+      "327": {
+        "training_targets_only": {
+          "dimensions": 21,
+          "cohorts": {
+            "validation": {
+              "mae": 0.0,
+              "count": 16,
+              "solved": 16,
+              "optimal": 16,
+              "cycles": 0,
+              "entered_unreachable": 0
+            },
+            "test": {
+              "mae": 0.0,
+              "count": 16,
+              "solved": 16,
+              "optimal": 16,
+              "cycles": 0,
+              "entered_unreachable": 0
+            },
+            "unseen_goal_validation": {
+              "mae": 3.932584285736084,
+              "count": 89,
+              "solved": 50,
+              "optimal": 50,
+              "cycles": 39,
+              "entered_unreachable": 8
+            },
+            "unseen_goal_test": {
+              "mae": 21.10416603088379,
+              "count": 96,
+              "solved": 0,
+              "optimal": 0,
+              "cycles": 96,
+              "entered_unreachable": 39
+            },
+            "original_training_goals": {
+              "mae": 0.0,
+              "count": 15,
+              "solved": 15,
+              "optimal": 15,
+              "cycles": 0,
+              "entered_unreachable": 0
+            },
+            "original_unseen_goals": {
+              "mae": 18.399999618530273,
+              "count": 5,
+              "solved": 2,
+              "optimal": 2,
+              "cycles": 3,
+              "entered_unreachable": 0
+            },
+            "allowed_training_fit": {
+              "mae": 0.0,
+              "count": 2048,
+              "solved": 2048,
+              "optimal": 2048,
+              "cycles": 0,
+              "entered_unreachable": 0
+            }
+          }
+        },
+        "all_targets_oracle_reference": {
+          "dimensions": 27,
+          "cohorts": {
+            "validation": {
+              "mae": 0.0,
+              "count": 16,
+              "solved": 16,
+              "optimal": 16,
+              "cycles": 0,
+              "entered_unreachable": 0
+            },
+            "test": {
+              "mae": 0.0,
+              "count": 16,
+              "solved": 16,
+              "optimal": 16,
+              "cycles": 0,
+              "entered_unreachable": 0
+            },
+            "unseen_goal_validation": {
+              "mae": 0.0,
+              "count": 89,
+              "solved": 89,
+              "optimal": 89,
+              "cycles": 0,
+              "entered_unreachable": 0
+            },
+            "unseen_goal_test": {
+              "mae": 0.0,
+              "count": 96,
+              "solved": 96,
+              "optimal": 96,
+              "cycles": 0,
+              "entered_unreachable": 0
+            },
+            "original_training_goals": {
+              "mae": 0.0,
+              "count": 15,
+              "solved": 15,
+              "optimal": 15,
+              "cycles": 0,
+              "entered_unreachable": 0
+            },
+            "original_unseen_goals": {
+              "mae": 0.0,
+              "count": 5,
+              "solved": 5,
+              "optimal": 5,
+              "cycles": 0,
+              "entered_unreachable": 0
+            },
+            "allowed_training_fit": {
+              "mae": 0.0,
+              "count": 2048,
+              "solved": 2048,
+              "optimal": 2048,
+              "cycles": 0,
+              "entered_unreachable": 0
+            }
+          }
+        }
+      }
+    }
+  },
+  "state_graph_structure": {
+    "902": {
+      "states": 42840,
+      "floor_cells": 18,
+      "box_configurations": 3060,
+      "walk_edges": 91000,
+      "push_edges": 13650,
+      "walk_immediately_reversible": 91000,
+      "push_immediately_reversible": 0,
+      "strong_components": 4159,
+      "largest_strong_component": 238,
+      "original_strong_component": 2,
+      "box_and_walk_region_components": 5432,
+      "edge_distance": {
+        "walk_unprotected": {
+          "count": 90992,
+          "mae_to_one": 1.162300705909729,
+          "median": 1.0711746215820312
+        },
+        "push_unprotected": {
+          "count": 13649,
+          "mae_to_one": 4.81497049331665,
+          "median": 2.67938232421875
+        }
+      },
+      "training_policy_errors": {
+        "queries_with_wrong_action": 1066,
+        "first_wrong_walking": 972,
+        "first_wrong_push": 94,
+        "cycle_closures": 1037,
+        "cycle_closures_walking": 1037,
+        "cycle_closures_push": 0,
+        "cycle_closures_non_tied": 1037
+      },
+      "original_example": {
+        "start": [
+          28,
+          [
+            37,
+            38,
+            67,
+            77
+          ]
+        ],
+        "goal": [
+          57,
+          [
+            48,
+            78,
+            85,
+            88
+          ]
+        ],
+        "optimal_steps": 46.0,
+        "solved": 0,
+        "cycle": 1,
+        "steps": [
+          {
+            "step": 0,
+            "state": [
+              28,
+              37,
+              38,
+              67,
+              77
+            ],
+            "action": "D",
+            "next_state": [
+              38,
+              37,
+              48,
+              67,
+              77
+            ],
+            "true_remaining": 46.0,
+            "true_after": 45.0,
+            "predicted_remaining": 44.42414855957031,
+            "predicted_after": 43.089698791503906,
+            "closes_cycle": false,
+            "candidates": [
+              {
+                "action": "D",
+                "true": 45.0,
+                "pred": 43.089698791503906
+              },
+              {
+                "action": "L",
+                "true": 47.0,
+                "pred": 44.993927001953125
+              }
+            ]
+          },
+          {
+            "step": 1,
+            "state": [
+              38,
+              37,
+              48,
+              67,
+              77
+            ],
+            "action": "D",
+            "next_state": [
+              48,
+              37,
+              58,
+              67,
+              77
+            ],
+            "true_remaining": 45.0,
+            "true_after": 44.0,
+            "predicted_remaining": 43.089698791503906,
+            "predicted_after": 42.295814514160156,
+            "closes_cycle": false,
+            "candidates": [
+              {
+                "action": "U",
+                "true": 46.0,
+                "pred": 44.1336669921875
+              },
+              {
+                "action": "D",
+                "true": 44.0,
+                "pred": 42.295814514160156
+              }
+            ]
+          },
+          {
+            "step": 2,
+            "state": [
+              48,
+              37,
+              58,
+              67,
+              77
+            ],
+            "action": "D",
+            "next_state": [
+              58,
+              37,
+              67,
+              68,
+              77
+            ],
+            "true_remaining": 44.0,
+            "true_after": 43.0,
+            "predicted_remaining": 42.295814514160156,
+            "predicted_after": 41.832000732421875,
+            "closes_cycle": false,
+            "candidates": [
+              {
+                "action": "U",
+                "true": 45.0,
+                "pred": 44.70526123046875
+              },
+              {
+                "action": "D",
+                "true": 43.0,
+                "pred": 41.832000732421875
+              },
+              {
+                "action": "L",
+                "true": 45.0,
+                "pred": 43.882225036621094
+              }
+            ]
+          },
+          {
+            "step": 3,
+            "state": [
+              58,
+              37,
+              67,
+              68,
+              77
+            ],
+            "action": "D",
+            "next_state": [
+              68,
+              37,
+              67,
+              77,
+              78
+            ],
+            "true_remaining": 43.0,
+            "true_after": 42.0,
+            "predicted_remaining": 41.832000732421875,
+            "predicted_after": 41.914207458496094,
+            "closes_cycle": false,
+            "candidates": [
+              {
+                "action": "U",
+                "true": 44.0,
+                "pred": 43.3603515625
+              },
+              {
+                "action": "D",
+                "true": 42.0,
+                "pred": 41.914207458496094
+              },
+              {
+                "action": "L",
+                "true": 44.0,
+                "pred": 43.591270446777344
+              }
+            ]
+          },
+          {
+            "step": 4,
+            "state": [
+              68,
+              37,
+              67,
+              77,
+              78
+            ],
+            "action": "D",
+            "next_state": [
+              78,
+              37,
+              67,
+              77,
+              88
+            ],
+            "true_remaining": 42.0,
+            "true_after": 41.0,
+            "predicted_remaining": 41.914207458496094,
+            "predicted_after": 41.34880065917969,
+            "closes_cycle": false,
+            "candidates": [
+              {
+                "action": "U",
+                "true": 43.0,
+                "pred": 43.582427978515625
+              },
+              {
+                "action": "D",
+                "true": 41.0,
+                "pred": 41.34880065917969
+              },
+              {
+                "action": "L",
+                "true": Infinity,
+                "pred": 244.74896240234375
+              }
+            ]
+          },
+          {
+            "step": 5,
+            "state": [
+              78,
+              37,
+              67,
+              77,
+              88
+            ],
+            "action": "L",
+            "next_state": [
+              77,
+              37,
+              67,
+              76,
+              88
+            ],
+            "true_remaining": 41.0,
+            "true_after": 40.0,
+            "predicted_remaining": 41.34880065917969,
+            "predicted_after": 40.85228729248047,
+            "closes_cycle": false,
+            "candidates": [
+              {
+                "action": "U",
+                "true": 42.0,
+                "pred": 42.22874450683594
+              },
+              {
+                "action": "L",
+                "true": 40.0,
+                "pred": 40.85228729248047
+              }
+            ]
+          },
+          {
+            "step": 6,
+            "state": [
+              77,
+              37,
+              67,
+              76,
+              88
+            ],
+            "action": "U",
+            "next_state": [
+              67,
+              37,
+              57,
+              76,
+              88
+            ],
+            "true_remaining": 40.0,
+            "true_after": 39.0,
+            "predicted_remaining": 40.85228729248047,
+            "predicted_after": 40.50486755371094,
+            "closes_cycle": false,
+            "candidates": [
+              {
+                "action": "U",
+                "true": 39.0,
+                "pred": 40.50486755371094
+              },
+              {
+                "action": "D",
+                "true": 41.0,
+                "pred": 42.450584411621094
+              },
+              {
+                "action": "R",
+                "true": 41.0,
+                "pred": 41.831016540527344
+              }
+            ]
+          },
+          {
+            "step": 7,
+            "state": [
+              67,
+              37,
+              57,
+              76,
+              88
+            ],
+            "action": "R",
+            "next_state": [
+              68,
+              37,
+              57,
+              76,
+              88
+            ],
+            "true_remaining": 39.0,
+            "true_after": 40.0,
+            "predicted_remaining": 40.50486755371094,
+            "predicted_after": 40.99992370605469,
+            "closes_cycle": false,
+            "candidates": [
+              {
+                "action": "U",
+                "true": Infinity,
+                "pred": 233.66326904296875
+              },
+              {
+                "action": "D",
+                "true": 40.0,
+                "pred": 41.0126953125
+              },
+              {
+                "action": "L",
+                "true": 38.0,
+                "pred": 41.05665588378906
+              },
+              {
+                "action": "R",
+                "true": 40.0,
+                "pred": 40.99992370605469
+              }
+            ]
+          },
+          {
+            "step": 8,
+            "state": [
+              68,
+              37,
+              57,
+              76,
+              88
+            ],
+            "action": "L",
+            "next_state": [
+              67,
+              37,
+              57,
+              76,
+              88
+            ],
+            "true_remaining": 40.0,
+            "true_after": 39.0,
+            "predicted_remaining": 40.99992370605469,
+            "predicted_after": 40.50486755371094,
+            "closes_cycle": true,
+            "candidates": [
+              {
+                "action": "U",
+                "true": 41.0,
+                "pred": 41.75444030761719
+              },
+              {
+                "action": "D",
+                "true": 41.0,
+                "pred": 41.46531677246094
+              },
+              {
+                "action": "L",
+                "true": 39.0,
+                "pred": 40.50486755371094
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "327": {
+      "states": 58140,
+      "floor_cells": 19,
+      "box_configurations": 3876,
+      "walk_edges": 123760,
+      "push_edges": 17920,
+      "walk_immediately_reversible": 123760,
+      "push_immediately_reversible": 0,
+      "strong_components": 5629,
+      "largest_strong_component": 255,
+      "original_strong_component": 3,
+      "box_and_walk_region_components": 7300,
+      "edge_distance": {
+        "walk_unprotected": {
+          "count": 123750,
+          "mae_to_one": 0.8516144156455994,
+          "median": 1.062652587890625
+        },
+        "push_unprotected": {
+          "count": 17918,
+          "mae_to_one": 12.043688774108887,
+          "median": 2.747805118560791
+        }
+      },
+      "training_policy_errors": {
+        "queries_with_wrong_action": 1070,
+        "first_wrong_walking": 984,
+        "first_wrong_push": 86,
+        "cycle_closures": 1023,
+        "cycle_closures_walking": 1023,
+        "cycle_closures_push": 0,
+        "cycle_closures_non_tied": 1011
+      },
+      "original_example": {
+        "start": [
+          21,
+          [
+            31,
+            32,
+            52,
+            62
+          ]
+        ],
+        "goal": [
+          52,
+          [
+            11,
+            43,
+            71,
+            83
+          ]
+        ],
+        "optimal_steps": 32.0,
+        "solved": 0,
+        "cycle": 1,
+        "steps": [
+          {
+            "step": 0,
+            "state": [
+              21,
+              31,
+              32,
+              52,
+              62
+            ],
+            "action": "D",
+            "next_state": [
+              31,
+              32,
+              41,
+              52,
+              62
+            ],
+            "true_remaining": 32.0,
+            "true_after": 31.0,
+            "predicted_remaining": 27.49053192138672,
+            "predicted_after": 26.948272705078125,
+            "closes_cycle": false,
+            "candidates": [
+              {
+                "action": "U",
+                "true": 33.0,
+                "pred": 29.24079132080078
+              },
+              {
+                "action": "D",
+                "true": 31.0,
+                "pred": 26.948272705078125
+              },
+              {
+                "action": "R",
+                "true": 33.0,
+                "pred": 28.92998504638672
+              }
+            ]
+          },
+          {
+            "step": 1,
+            "state": [
+              31,
+              32,
+              41,
+              52,
+              62
+            ],
+            "action": "U",
+            "next_state": [
+              21,
+              32,
+              41,
+              52,
+              62
+            ],
+            "true_remaining": 31.0,
+            "true_after": 32.0,
+            "predicted_remaining": 26.948272705078125,
+            "predicted_after": 29.525146484375,
+            "closes_cycle": false,
+            "candidates": [
+              {
+                "action": "U",
+                "true": 32.0,
+                "pred": 29.525146484375
+              },
+              {
+                "action": "D",
+                "true": 30.0,
+                "pred": 30.30773162841797
+              }
+            ]
+          },
+          {
+            "step": 2,
+            "state": [
+              21,
+              32,
+              41,
+              52,
+              62
+            ],
+            "action": "D",
+            "next_state": [
+              31,
+              32,
+              41,
+              52,
+              62
+            ],
+            "true_remaining": 32.0,
+            "true_after": 31.0,
+            "predicted_remaining": 29.525146484375,
+            "predicted_after": 26.948272705078125,
+            "closes_cycle": true,
+            "candidates": [
+              {
+                "action": "U",
+                "true": 33.0,
+                "pred": 31.034408569335938
+              },
+              {
+                "action": "D",
+                "true": 31.0,
+                "pred": 26.948272705078125
+              },
+              {
+                "action": "R",
+                "true": 33.0,
+                "pred": 30.188522338867188
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "interpretation": "All neural conditions failed complete execution gates. Exact profiles are teacher-only geometry diagnostics, not adopted maps or inference features. Raw four-channel state input is retained; derived reachability/push masks were never trained."
+}

@@ -1,0 +1,396 @@
+{
+  "rush_hour_coverage1000_distance_fit": {
+    "source_commit": "f257a0e",
+    "best_step": 2500,
+    "evaluated_step": 2500,
+    "last_step": 3000,
+    "model_parameters": 338708,
+    "actual_exposure": {
+      "unique_gradient_states": 4752516,
+      "available_states": 5263995,
+      "unique_pair_rows": 4752513,
+      "pair_rows": 4752513,
+      "unique_decision_rows": 4230191,
+      "decision_rows": 4690868,
+      "minimum_pair_layer_passes": 1.5176270260043305,
+      "minimum_decision_layer_passes": null
+    },
+    "acceptance": {
+      "minimum": 0.8,
+      "target": 0.9,
+      "rates": {
+        "test": 0.99609375,
+        "unseen_goal_test": 1.0,
+        "unseen_layout_test": 0.455078125,
+        "diagnostic_original": 0.0,
+        "original_layout_test": 0.0
+      },
+      "full_training_source_coverage": true,
+      "passed": false,
+      "target_reached": false
+    },
+    "cohorts": {
+      "validation": {
+        "mae": 1.171478033065796,
+        "shortest_action_rate": 0.72607421875,
+        "q": {
+          "count": 1024,
+          "solved": 1022,
+          "success_rate": 0.998046875,
+          "optimal": 1016,
+          "optimal_rate": 0.9921875,
+          "cycles": 2,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": 0.007827788591384888
+        }
+      },
+      "test": {
+        "mae": 1.155362844467163,
+        "shortest_action_rate": 0.70703125,
+        "q": {
+          "count": 1024,
+          "solved": 1020,
+          "success_rate": 0.99609375,
+          "optimal": 1010,
+          "optimal_rate": 0.986328125,
+          "cycles": 4,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": 0.0117647061124444
+        }
+      },
+      "unseen_goal_validation": {
+        "mae": 1.2795709371566772,
+        "shortest_action_rate": 0.712890625,
+        "q": {
+          "count": 1024,
+          "solved": 1024,
+          "success_rate": 1.0,
+          "optimal": 1024,
+          "optimal_rate": 1.0,
+          "cycles": 0,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": 0.0
+        }
+      },
+      "unseen_goal_test": {
+        "mae": 1.335201621055603,
+        "shortest_action_rate": 0.728515625,
+        "q": {
+          "count": 1024,
+          "solved": 1024,
+          "success_rate": 1.0,
+          "optimal": 1023,
+          "optimal_rate": 0.9990234375,
+          "cycles": 0,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": 0.0009765625
+        }
+      },
+      "unseen_layout_validation": {
+        "mae": 3.4963362216949463,
+        "shortest_action_rate": 0.6435546875,
+        "q": {
+          "count": 1024,
+          "solved": 442,
+          "success_rate": 0.431640625,
+          "optimal": 249,
+          "optimal_rate": 0.2431640625,
+          "cycles": 582,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": 1.1855204105377197
+        }
+      },
+      "unseen_layout_test": {
+        "mae": 3.3310418128967285,
+        "shortest_action_rate": 0.673828125,
+        "q": {
+          "count": 1024,
+          "solved": 466,
+          "success_rate": 0.455078125,
+          "optimal": 276,
+          "optimal_rate": 0.26953125,
+          "cycles": 558,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": 0.8540772795677185
+        }
+      },
+      "original_layout_test": {
+        "mae": 13.170117378234863,
+        "shortest_action_rate": 0.544921875,
+        "q": {
+          "count": 1024,
+          "solved": 0,
+          "success_rate": 0.0,
+          "optimal": 0,
+          "optimal_rate": 0.0,
+          "cycles": 1024,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": null
+        }
+      },
+      "original_layout_validation": {
+        "mae": 14.94017219543457,
+        "shortest_action_rate": 0.7099609375,
+        "q": {
+          "count": 1024,
+          "solved": 16,
+          "success_rate": 0.015625,
+          "optimal": 0,
+          "optimal_rate": 0.0,
+          "cycles": 1008,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": 7.8125
+        }
+      },
+      "diagnostic": {
+        "mae": 5.426071643829346,
+        "shortest_action_rate": 0.619140625,
+        "q": {
+          "count": 1024,
+          "solved": 266,
+          "success_rate": 0.259765625,
+          "optimal": 139,
+          "optimal_rate": 0.1357421875,
+          "cycles": 758,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": 1.432330846786499
+        }
+      },
+      "diagnostic_original": {
+        "mae": 18.75940704345703,
+        "shortest_action_rate": 1.0,
+        "q": {
+          "count": 8,
+          "solved": 0,
+          "success_rate": 0.0,
+          "optimal": 0,
+          "optimal_rate": 0.0,
+          "cycles": 8,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": null
+        }
+      }
+    },
+    "last_training_probe": {
+      "batches": 4,
+      "point_count": 131072,
+      "decision_count": 65536,
+      "finite_mae": 1.0872130393981934,
+      "distance_huber": 0.7045683860778809,
+      "candidate_soft_rank_loss": 2.012284278869629,
+      "shortest_action_rate": 0.8444366455078125,
+      "by_distance": {
+        "1_5": {
+          "count": 32926,
+          "mae": 0.7424994707107544
+        },
+        "6_20": {
+          "count": 78800,
+          "mae": 0.9909108281135559
+        },
+        "21_plus": {
+          "count": 19249,
+          "mae": 2.076568126678467
+        }
+      },
+      "role": "Fixed actual training batches; fitting diagnostic only, never checkpoint selection."
+    }
+  },
+  "rush_hour_coverage1000_distance_continue": {
+    "source_commit": "43b9c54",
+    "best_step": 11500,
+    "evaluated_step": 11500,
+    "last_step": 12000,
+    "model_parameters": 338708,
+    "actual_exposure": {
+      "unique_gradient_states": 4752516,
+      "available_states": 5263995,
+      "unique_pair_rows": 4752513,
+      "pair_rows": 4752513,
+      "unique_decision_rows": 4668433,
+      "decision_rows": 4690868,
+      "minimum_pair_layer_passes": 6.110299286398978,
+      "minimum_decision_layer_passes": null
+    },
+    "acceptance": {
+      "minimum": 0.8,
+      "target": 0.9,
+      "rates": {
+        "test": 0.998046875,
+        "unseen_goal_test": 1.0,
+        "unseen_layout_test": 0.462890625,
+        "diagnostic_original": 0.0,
+        "original_layout_test": 0.017578125
+      },
+      "full_training_source_coverage": true,
+      "passed": false,
+      "target_reached": false
+    },
+    "cohorts": {
+      "validation": {
+        "mae": 1.0220195055007935,
+        "shortest_action_rate": 0.7607421875,
+        "q": {
+          "count": 1024,
+          "solved": 1024,
+          "success_rate": 1.0,
+          "optimal": 1018,
+          "optimal_rate": 0.994140625,
+          "cycles": 0,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": 0.005859375
+        }
+      },
+      "test": {
+        "mae": 1.0111377239227295,
+        "shortest_action_rate": 0.77099609375,
+        "q": {
+          "count": 1024,
+          "solved": 1022,
+          "success_rate": 0.998046875,
+          "optimal": 1013,
+          "optimal_rate": 0.9892578125,
+          "cycles": 2,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": 0.01076320931315422
+        }
+      },
+      "unseen_goal_validation": {
+        "mae": 1.1428300142288208,
+        "shortest_action_rate": 0.75439453125,
+        "q": {
+          "count": 1024,
+          "solved": 1024,
+          "success_rate": 1.0,
+          "optimal": 1022,
+          "optimal_rate": 0.998046875,
+          "cycles": 0,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": 0.001953125
+        }
+      },
+      "unseen_goal_test": {
+        "mae": 1.1949818134307861,
+        "shortest_action_rate": 0.77587890625,
+        "q": {
+          "count": 1024,
+          "solved": 1024,
+          "success_rate": 1.0,
+          "optimal": 1023,
+          "optimal_rate": 0.9990234375,
+          "cycles": 0,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": 0.0009765625
+        }
+      },
+      "unseen_layout_validation": {
+        "mae": 3.3043556213378906,
+        "shortest_action_rate": 0.6513671875,
+        "q": {
+          "count": 1024,
+          "solved": 433,
+          "success_rate": 0.4228515625,
+          "optimal": 249,
+          "optimal_rate": 0.2431640625,
+          "cycles": 591,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": 1.0069284439086914
+        }
+      },
+      "unseen_layout_test": {
+        "mae": 3.2535128593444824,
+        "shortest_action_rate": 0.68017578125,
+        "q": {
+          "count": 1024,
+          "solved": 474,
+          "success_rate": 0.462890625,
+          "optimal": 277,
+          "optimal_rate": 0.2705078125,
+          "cycles": 550,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": 0.8333333134651184
+        }
+      },
+      "original_layout_test": {
+        "mae": 11.289529800415039,
+        "shortest_action_rate": 0.380859375,
+        "q": {
+          "count": 1024,
+          "solved": 18,
+          "success_rate": 0.017578125,
+          "optimal": 0,
+          "optimal_rate": 0.0,
+          "cycles": 1006,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": 5.333333492279053
+        }
+      },
+      "original_layout_validation": {
+        "mae": 13.095871925354004,
+        "shortest_action_rate": 0.7216796875,
+        "q": {
+          "count": 1024,
+          "solved": 24,
+          "success_rate": 0.0234375,
+          "optimal": 0,
+          "optimal_rate": 0.0,
+          "cycles": 1000,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": 4.958333492279053
+        }
+      },
+      "diagnostic": {
+        "mae": 5.192568778991699,
+        "shortest_action_rate": 0.6015625,
+        "q": {
+          "count": 1024,
+          "solved": 231,
+          "success_rate": 0.2255859375,
+          "optimal": 139,
+          "optimal_rate": 0.1357421875,
+          "cycles": 793,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": 0.8138527870178223
+        }
+      },
+      "diagnostic_original": {
+        "mae": 18.02480697631836,
+        "shortest_action_rate": 0.875,
+        "q": {
+          "count": 8,
+          "solved": 0,
+          "success_rate": 0.0,
+          "optimal": 0,
+          "optimal_rate": 0.0,
+          "cycles": 8,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": null
+        }
+      }
+    },
+    "last_training_probe": {
+      "batches": 4,
+      "point_count": 131072,
+      "decision_count": 65536,
+      "finite_mae": 0.9492174983024597,
+      "distance_huber": 0.5761024951934814,
+      "candidate_soft_rank_loss": 1.9927332401275635,
+      "shortest_action_rate": 0.8655548095703125,
+      "by_distance": {
+        "1_5": {
+          "count": 32926,
+          "mae": 0.6988756656646729
+        },
+        "6_20": {
+          "count": 78800,
+          "mae": 0.9082555770874023
+        },
+        "21_plus": {
+          "count": 19249,
+          "mae": 1.5499043464660645
+        }
+      },
+      "role": "Fixed actual training batches; fitting diagnostic only, never checkpoint selection."
+    }
+  }
+}

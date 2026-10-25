@@ -104,6 +104,7 @@ def sample_goals(corpus,sources,rng,reserved,*,ranking=False,allowed=None,fallba
         raise ValueError('Exact-layer proposals require declared distance bins')
     for _ in range(64):
         if not bad.any(): break
+        pending=np.flatnonzero(bad)
         if scene_ids is None:
             goals[bad]=(corpus.sample_layer_goals(sources[bad],distance_bins,desired[bad],rng)
                         if proposal=='exact_layers' else rng.choice(allowed,int(bad.sum())))
@@ -119,19 +120,22 @@ def sample_goals(corpus,sources,rng,reserved,*,ranking=False,allowed=None,fallba
                 mask=bad & (scene_ids==sid); scene=corpus.scenes[sid]
                 pool=scene.goals[:scene.metadata['training_goals']]+corpus.offsets[sid]
                 goals[mask]=rng.choice(pool,int(mask.sum()))
-        bad=forbidden(keys(sources,goals,corpus.size))
+        # Accepted goals never change. Recheck only resampled rows, preserving
+        # proposal draws and RNG order while avoiding full-batch retries.
+        rejected=forbidden(keys(sources[pending],goals[pending],corpus.size))
         if desired is not None:
-            bad|=np.searchsorted(distance_bins,corpus.distance(sources,goals))!=desired
+            rejected|=np.searchsorted(distance_bins,corpus.distance(sources[pending],goals[pending]))!=desired[pending]
         if local_fraction or proposal=='exact_layers':
-            at=np.searchsorted(allowed,goals)
-            bad|=(at==len(allowed)) | (allowed[np.minimum(at,len(allowed)-1)]!=goals)
+            at=np.searchsorted(allowed,goals[pending])
+            rejected|=(at==len(allowed)) | (allowed[np.minimum(at,len(allowed)-1)]!=goals[pending])
         if ranking:
-            labels=corpus.distance(sources,goals)
-            bad|=~np.isfinite(labels) | (labels==0)
-            legal=children>=0
-            relations=np.full(children.shape,-1,dtype=np.int64)
-            relations[legal]=keys(children[legal],np.broadcast_to(goals[:,None],children.shape)[legal],corpus.size)
-            bad|=forbidden(relations).any(axis=1)
+            labels=corpus.distance(sources[pending],goals[pending])
+            rejected|=~np.isfinite(labels) | (labels==0)
+            selected=children[pending];legal=selected>=0
+            relations=np.full(selected.shape,-1,dtype=np.int64)
+            relations[legal]=keys(selected[legal],np.broadcast_to(goals[pending,None],selected.shape)[legal],corpus.size)
+            rejected|=forbidden(relations).any(axis=1)
+        bad[:]=False;bad[pending]=rejected
     if bad.any() and fallback is not None:
         goals[bad]=fallback[bad]; bad[:]=False
     if bad.any() and not allow_missing: raise ValueError('No eligible non-leaking complete goal for training source')

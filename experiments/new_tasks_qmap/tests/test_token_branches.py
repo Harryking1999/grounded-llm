@@ -6,11 +6,22 @@ import unittest
 import numpy as np
 from grounded_llm.tasks.token_swapping.relation_data import TokenCorpus
 from experiments.new_tasks_qmap.tests.test_exact_pairs import small_oracle
-from experiments.new_tasks_qmap.src.relation_data import materialize,closure,token_goal_cohorts
+from experiments.new_tasks_qmap.src.relation_data import materialize,closure,token_goal_cohorts,sample_goals
 from experiments.new_tasks_qmap.src.token_branches import expand,permitted,BranchReplay,cycle_rows
 
 
 class BranchTests(unittest.TestCase):
+    def test_retry_optimization_preserves_checkpointed_proposal_stream(self):
+        with tempfile.TemporaryDirectory() as name:
+            path=Path(name);small_oracle(path,5,[(0,1),(1,2),(1,3),(3,4)]);corpus=TokenCorpus(path)
+            try:
+                reserved=closure(corpus,np.array([[7,8],[9,10],[11,12],[13,14]]));rng=np.random.default_rng(731)
+                rows=sample_goals(corpus,np.arange(32),rng,reserved,ranking=True,allowed=np.arange(corpus.size),local_fraction=.5,walk_max=8)
+                np.testing.assert_array_equal(rows[:,1],[42,42,39,119,21,116,12,45,85,118,46,53,86,18,102,26,90,11,55,115,5,104,5,53,38,80,36,23,34,119,13,38])
+                np.testing.assert_array_equal(rng.integers(1000000,size=5),[274237,667837,680869,97371,357044])
+                self.assertFalse(np.intersect1d(closure(corpus,rows),reserved).size)
+            finally:corpus.close()
+
     def test_query_goal_holdout_allows_complete_paths_without_goal_label_leaks(self):
         with tempfile.TemporaryDirectory() as name:
             path=Path(name);small_oracle(path,6,[(0,1),(1,2),(1,3),(3,4),(4,5)]);corpus=TokenCorpus(path)

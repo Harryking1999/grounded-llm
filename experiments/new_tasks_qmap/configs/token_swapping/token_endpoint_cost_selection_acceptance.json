@@ -1,0 +1,37 @@
+{
+  "seed": 2026102661,
+  "output": "token_endpoint_cost_selection_acceptance",
+  "candidates": [
+    "token_endpoint_l1_fit",
+    "token_endpoint_efficiency_soft",
+    "token_endpoint_efficiency_optimal"
+  ],
+  "selection": "Among terminal original/soft/optimal candidates and complete best/last snapshots, require full point-source coverage and at least95 percent completion in every original validation cohort. Then maximize the minimum validation optimal-completion rate across all cohorts and their21+ subsets, followed by mean optimal rate, success cost ratio, validation loss and deterministic run/checkpoint names. Freeze before generating any new test pair. Earlier efficiency tests are development history and excluded from fresh generation.",
+  "queries_per_cohort": 1024,
+  "distance_bin_upper_bounds": [
+    5,
+    10,
+    15,
+    20,
+    25
+  ],
+  "long_distance_above": 20,
+  "minimum_long_queries": 200,
+  "horizon": 128,
+  "minimum_completion_rate": 0.95,
+  "target_completion_rate": 0.98,
+  "scope": "Use validation trajectories to select for the requested exchange efficiency while preserving completion. No new training. Exclude original prepared and both old acceptance suites from new held-test pair generation; protected regression remains a known relation regression. Every primary test cohort and21+ subset must independently meet95 percent completion and80 percent optimal-cost completion; target optimal90 percent. Do not replace a failed choice after reading this suite. Known five-pair diagnostic is a separate regression, not independent held-input evidence.",
+  "minimum_optimal_rate": 0.8,
+  "target_optimal_rate": 0.9,
+  "maximum_mean_cost_ratio_on_success": 1.1,
+  "exclude_suites": [
+    "token_endpoint_frozen_acceptance/suite.json",
+    "token_endpoint_efficiency_acceptance/suite.json"
+  ],
+  "validation_efficiency_selection": true,
+  "candidate_checkpoints": [
+    "best.pt",
+    "last.pt"
+  ],
+  "selection_queries": 1024
+}

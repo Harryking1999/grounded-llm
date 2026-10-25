@@ -36,22 +36,76 @@ def fresh_queries(corpus,partition,goal_partition,count,bounds,rng,excluded):
     return result
 
 
+def validation_efficiency_candidates(config,runs,device):
+    """Choose among terminal snapshots using validation trajectories only."""
+    candidates=[];expected_scope=None
+    for name in config['candidates']:
+        ref=runs/name
+        if not (ref/'summary.json').exists():raise ValueError('Candidate training is not terminal')
+        seen_steps=set()
+        for filename in config.get('candidate_checkpoints',['best.pt']):
+            if filename not in ('best.pt','last.pt'):raise ValueError('Expected a complete saved candidate checkpoint')
+            saved=torch.load(ref/filename,map_location='cpu',weights_only=False)
+            if saved['step'] in seen_steps:continue
+            seen_steps.add(saved['step']);original=saved['config']
+            torch.set_num_threads(original['training']['cpu_threads'])
+            corpus,data,_=load(original,ref/'data')
+            try:
+                if expected_scope is None:expected_scope=deepcopy(corpus.scope)
+                elif corpus.scope!=expected_scope:raise ValueError('Efficiency candidates use different underlying trees')
+                partition=np.load(ref/'data/endpoint_partition.npy');exposure=saved['exposure']
+                if not (exposure[partition!=0]==0).all():raise ValueError('Held endpoint entered candidate loss inputs')
+                names=[key[6:] for key in data if key.startswith('tasks_') and 'validation' in key]
+                if not names:raise ValueError('No validation trajectories for efficiency selection')
+                evaluation=deepcopy(original);evaluation['evaluation'].update(decision_count=config['selection_queries'],
+                    rollout_count=config['selection_queries'],horizon=config['horizon'])
+                model=StateEncoder(input_dim=saved['input_dim'],**original['model']).to(device)
+                model.load_state_dict(saved['model']);model.requires_grad_(False)
+                metrics=evaluate(model,corpus,data,evaluation,cohorts=names,exposure=exposure)
+                plans=[v['planning']['q'] for v in metrics['cohorts'].values()]
+                long=[]
+                for p in plans:
+                    rows=[v for d,v in p['by_distance'].items() if float(d)>config['long_distance_above']]
+                    n=sum(v['count'] for v in rows)
+                    if n:long.append(sum(v['optimal'] for v in rows)/n)
+                optimal=[p['optimal_rate'] for p in plans]+long
+                ratios=[p['mean_cost_ratio_on_success'] for p in plans]
+                candidates.append(dict(run=name,checkpoint=filename,step=saved['step'],
+                    score=float(np.mean([v['finite_huber']+v['candidate_soft_rank_loss'] for v in metrics['cohorts'].values()])),
+                    full_point_source_coverage=bool((saved['pair_draws']>0).all()),
+                    minimum_validation_completion=min(p['success_rate'] for p in plans),
+                    minimum_validation_optimal_including_long=min(optimal),mean_validation_optimal=float(np.mean(optimal)),
+                    mean_validation_success_cost_ratio=float(np.mean(ratios)) if all(x is not None for x in ratios) else None,
+                    selection_cohorts=names,validation_query_count=config['selection_queries']))
+                del model,metrics
+            finally:corpus.close()
+    eligible=[v for v in candidates if v['full_point_source_coverage']
+        and v['minimum_validation_completion']>=config['minimum_completion_rate']]
+    if not eligible:raise ValueError('No efficiency candidate preserves the validation completion guard')
+    chosen=min(eligible,key=lambda v:(-v['minimum_validation_optimal_including_long'],-v['mean_validation_optimal'],
+        v['mean_validation_success_cost_ratio'],v['score'],v['run'],v['checkpoint']))
+    return candidates,chosen
+
+
 def run(config,runs,device,source_commit):
     out=runs/config['output']
     if out.exists():raise FileExistsError('Do not overwrite a frozen acceptance suite')
     out.mkdir();candidates=[]
-    for name in config['candidates']:
-        ref=runs/name
-        if not (ref/'summary.json').exists():raise ValueError('Candidate training is not terminal')
-        saved=torch.load(ref/'best.pt',map_location='cpu',weights_only=False)
-        candidates.append(dict(run=name,score=float(saved['best_score']),step=saved['step'],
-            full_point_source_coverage=bool((saved['pair_draws']>0).all())))
-    eligible=[r for r in candidates if r['full_point_source_coverage']]
-    if not eligible:raise ValueError('No candidate has full prepared point-source coverage')
-    chosen=min(eligible,key=lambda r:(r['score'],r['run']))
+    if config.get('validation_efficiency_selection'):
+        candidates,chosen=validation_efficiency_candidates(config,runs,device)
+    else:
+        for name in config['candidates']:
+            ref=runs/name
+            if not (ref/'summary.json').exists():raise ValueError('Candidate training is not terminal')
+            saved=torch.load(ref/'best.pt',map_location='cpu',weights_only=False)
+            candidates.append(dict(run=name,score=float(saved['best_score']),step=saved['step'],
+                full_point_source_coverage=bool((saved['pair_draws']>0).all())))
+        eligible=[r for r in candidates if r['full_point_source_coverage']]
+        if not eligible:raise ValueError('No candidate has full prepared point-source coverage')
+        chosen=min(eligible,key=lambda r:(r['score'],r['run']))
     atomic_json(out/'freeze_choice.json',dict(candidates=candidates,chosen=chosen,rule=config['selection'],
         independent_suite_used_for_choice=False))
-    ref=runs/chosen['run'];saved=torch.load(ref/'best.pt',map_location=device,weights_only=False)
+    ref=runs/chosen['run'];saved=torch.load(ref/chosen.get('checkpoint','best.pt'),map_location=device,weights_only=False)
     original=saved['config'];torch.set_num_threads(original['training']['cpu_threads'])
     corpus,data,_=load(original,ref/'data')
     try:

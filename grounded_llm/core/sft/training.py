@@ -110,14 +110,15 @@ def train_update(model, microbatches, optimizer, scheduler, *, device,
     if not torch.isfinite(grad):
         raise FloatingPointError('Nonfinite training gradient')
     optimizer.step()
-    scheduler.step()
+    if scheduler is not None:
+        scheduler.step()
     if distributed:
         dist.all_reduce(loss_sum)
     return loss_sum / count, grad, count
 
 
 def train(config, baseline, model_path, data, out, *, pad_token_id,
-          smoke_steps=None, resume=None, extend_training=False):
+          smoke_steps=None, resume=None, extend_training=False, reinitialize_optimizer=False):
     cfg = config
     out = Path(out)
     resume = Path(resume) if resume is not None else None
@@ -125,6 +126,13 @@ def train(config, baseline, model_path, data, out, *, pad_token_id,
     t = dict(cfg['training'], **spec.get('training', {}))
     if extend_training and not resume:
         raise ValueError('Extension requires a resume checkpoint')
+    calibration_steps = cfg.get('recovery', {}).get('optimizer_calibration_steps', 0)
+    if reinitialize_optimizer and (not resume or extend_training or
+                                  not isinstance(calibration_steps, int) or calibration_steps < 1):
+        raise ValueError('Optimizer reinitialization requires source weights and positive calibration steps')
+    if resume:
+        state = json.loads((resume / 'state.json').read_text())
+        validate_resume_contract(state, cfg, baseline, allow_horizon_extension=extend_training)
     rank,local,world=int(os.environ['RANK']),int(os.environ['LOCAL_RANK']),int(os.environ['WORLD_SIZE'])
     accumulation=t['gradient_accumulation_steps']
     if world!=t['world_size'] or world*t['micro_batch']*accumulation!=t['global_batch']:
@@ -132,7 +140,8 @@ def train(config, baseline, model_path, data, out, *, pad_token_id,
     torch.cuda.set_device(local);dist.init_process_group('nccl');device=torch.device('cuda',local)
     random.seed(cfg['seed']);np.random.seed(cfg['seed']);torch.manual_seed(cfg['seed']);torch.set_num_threads(2)
     sharded=t.get('distributed_strategy','ddp')=='fsdp'
-    model=build(cfg,baseline,model_path)
+    model=build(cfg,baseline,model_path,
+                checkpoint_path=resume if reinitialize_optimizer else None)
     wrapped=shard_model(model,local) if sharded else DDP(model.to(device),device_ids=[local],gradient_as_bucket_view=True)
     params=[p for p in wrapped.parameters() if p.requires_grad]
     optimizer=torch.optim.AdamW(params,lr=t['learning_rate'],weight_decay=t['weight_decay'],fused=True)
@@ -140,9 +149,15 @@ def train(config, baseline, model_path, data, out, *, pad_token_id,
     steps_epoch=len(data)//t['global_batch'];total=training_steps(dict(cfg,training=t))
     scheduler=torch.optim.lr_scheduler.LambdaLR(optimizer,lambda s:learning_rate_factor(s,total,t))
     step=0
-    if resume:
-        state=json.loads((resume/'state.json').read_text())
-        validate_resume_contract(state,cfg,baseline,allow_horizon_extension=extend_training)
+    if resume and reinitialize_optimizer:
+        step = state['step']
+        if not 0 <= step < total:
+            raise ValueError('Source checkpoint must precede the training budget')
+        for group in optimizer.param_groups:
+            group['initial_lr'] = t['learning_rate']
+        scheduler = torch.optim.lr_scheduler.LambdaLR(
+            optimizer, lambda s: learning_rate_factor(s, total, t), last_epoch=step - 1)
+    elif resume:
         saved=torch.load(resume/'resume.pt',map_location='cpu' if sharded else device,weights_only=False)
         if sharded:
             from torch.distributed.fsdp import FullyShardedDataParallel as FSDP, StateDictType, FullStateDictConfig
@@ -160,6 +175,48 @@ def train(config, baseline, model_path, data, out, *, pad_token_id,
         if spec['interface'] and not spec['real_map']:timeline=pseudo_timeline(timeline)
         return timeline,inputs
     loader=DataLoader(data,batch_size=t['micro_batch'],sampler=sampler,num_workers=2,collate_fn=collate)
+    if reinitialize_optimizer:
+        # Zero LR leaves parameters and AdamW decay unchanged while Adam accumulates
+        # clipped gradient moments. Its bias-correction age is the calibration count,
+        # independent of the global LR schedule and data position.
+        rates = [group['lr'] for group in optimizer.param_groups]
+        for group in optimizer.param_groups:
+            group['lr'] = 0.0
+        calibration_epoch = step // steps_epoch
+        data.epoch = calibration_epoch
+        sampler.set_epoch(calibration_epoch)
+        iterator = iter(loader)
+        for _ in range((step % steps_epoch) * accumulation):
+            next(iterator)
+        try:
+            for index in range(calibration_steps):
+                micro = []
+                for _ in range(accumulation):
+                    try:
+                        row = next(iterator)
+                    except StopIteration:
+                        calibration_epoch += 1
+                        data.epoch = calibration_epoch
+                        sampler.set_epoch(calibration_epoch)
+                        iterator = iter(loader)
+                        row = next(iterator)
+                    micro.append(row)
+                loss, grad, count = train_update(wrapped, micro, optimizer, None,
+                    device=device, interface=spec['interface'],
+                    gradient_clip_norm=t['gradient_clip_norm'], sharded=sharded)
+                if rank == 0:
+                    print(json.dumps(dict(stage='optimizer_calibration', batch=index + 1,
+                                          loss=float(loss), grad_norm=float(grad))), flush=True)
+        finally:
+            for group, rate in zip(optimizer.param_groups, rates):
+                group['lr'] = rate
+        if rank == 0:
+            atomic_json(out / 'optimizer_initialization.json', dict(
+                source_checkpoint=str(resume), global_step=step,
+                method='zero_lr_gradient_moment_calibration', batches=calibration_steps,
+                examples=calibration_steps * t['global_batch'], optimizer_step=calibration_steps,
+                learning_rates=rates, historical_optimizer_restored=False,
+                rng_restored=False, calibration_weight_updates=0))
     windows=deque(maxlen=50);start=time.monotonic();limit=smoke_steps or total
     for epoch in range(step//max(1,steps_epoch),t['epochs']):
         data.epoch=epoch;sampler.set_epoch(epoch);it=iter(loader);skip=(step%max(1,steps_epoch))*accumulation

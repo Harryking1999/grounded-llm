@@ -16,6 +16,8 @@ def main():
     parser.add_argument('--smoke-steps', type=int)
     parser.add_argument('--resume', type=Path)
     parser.add_argument('--extend-training', action='store_true')
+    parser.add_argument('--reinitialize-optimizer', action='store_true',
+                        help='Load resume weights; estimate fresh Adam moments using configured calibration batches')
     args = parser.parse_args()
     config = json.loads(args.config.read_text())
     spec = config['baselines'][args.baseline]
@@ -36,7 +38,8 @@ def main():
         raise ValueError('Formal training requires accepted complete common data')
     train(config, args.baseline, args.model_path, data, args.out,
           pad_token_id=tokenizer.pad_token_id or tokenizer.eos_token_id,
-          smoke_steps=args.smoke_steps, resume=args.resume, extend_training=args.extend_training)
+          smoke_steps=args.smoke_steps, resume=args.resume, extend_training=args.extend_training,
+          reinitialize_optimizer=args.reinitialize_optimizer)
 
 
 if __name__ == '__main__':

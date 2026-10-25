@@ -37,6 +37,42 @@ def tiny_lm():
         num_key_value_heads=1, max_position_embeddings=32, pad_token_id=0))
 
 
+def test_adam_calibration_preserves_weights_and_global_lr_schedule():
+    from grounded_llm.core.sft.schedule import learning_rate_factor
+    torch.manual_seed(9)
+    model = TokenLM(tiny_lm(), 8)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=2e-5, weight_decay=.01)
+    recipe = dict(warmup_fraction=.05, cosine_minimum_ratio=.1)
+    for group in optimizer.param_groups:
+        group['initial_lr'] = 2e-5
+    scheduler = torch.optim.lr_scheduler.LambdaLR(
+        optimizer, lambda s: learning_rate_factor(s, 250000, recipe), last_epoch=149999)
+    expected_lr = 2e-5 * learning_rate_factor(150000, 250000, recipe)
+    assert scheduler.last_epoch == 150000
+    assert optimizer.param_groups[0]['lr'] == expected_lr
+    before = {name: p.detach().clone() for name, p in model.named_parameters()}
+    batch = (None, dict(input_ids=torch.tensor([[2, 3, 4]]),
+                        attention_mask=torch.ones(1, 3, dtype=torch.long),
+                        labels=torch.tensor([[-100, 3, 4]])))
+    optimizer.param_groups[0]['lr'] = 0.0
+    for _ in range(3):
+        train_update(model, [batch], optimizer, None, device='cpu',
+                     interface=False, gradient_clip_norm=1.)
+    for name, p in model.named_parameters():
+        assert torch.equal(p, before[name])
+    states = [state for state in optimizer.state.values() if state]
+    assert states and all(state['step'] == 3 for state in states)
+    assert any(state['exp_avg'].abs().sum() > 0 for state in states)
+    assert any(state['exp_avg_sq'].sum() > 0 for state in states)
+    assert scheduler.last_epoch == 150000
+    optimizer.param_groups[0]['lr'] = expected_lr
+    train_update(model, [batch], optimizer, scheduler, device='cpu',
+                 interface=False, gradient_clip_norm=1.)
+    assert scheduler.last_epoch == 150001
+    assert all(state['step'] == 4 for state in states)
+    assert any(not torch.equal(p, before[name]) for name, p in model.named_parameters())
+
+
 def test_five_tasks_load_existing_checkpoint_formats_and_share_sft_update(tmp_path):
     torch.set_num_threads(2)
     torch.manual_seed(41)

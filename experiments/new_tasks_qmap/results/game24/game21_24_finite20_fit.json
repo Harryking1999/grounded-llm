@@ -1,0 +1,372 @@
+{
+  "step": 8000,
+  "source_commit": "403e0ed",
+  "checkpoint_selection": "Existing validation objective only; this suite never selects a checkpoint.",
+  "scope": "Exhaustive finite-domain fitting, not unseen initial-question generalization.2/3-number suffixes are deduplicated across roots. Unsolvable queries remain in distance/reachability evaluation; completion uses every positive-distance solvable query. Local held query goals may occur as training goals or state inputs in other questions.",
+  "coverage": {
+    "physical_states": 6247563,
+    "exact_numerical_states": 482794,
+    "numerical_states_seen_in_loss": 482794,
+    "numerical_input_coverage": 1.0,
+    "duplicate_cost_consistency_verified": true,
+    "deduplication": "Exact sorted reduced Fraction tuples; one representative per2/3-number multiset, separately for each singleton target."
+  },
+  "missing_required_cohorts": [
+    "held_intermediate3_query_test"
+  ],
+  "oracle_ok": true,
+  "completion_passed": false,
+  "reachability_passed": false,
+  "passed": false,
+  "cohorts": {
+    "root4_to_21": {
+      "query_rows": 4845,
+      "finite_rows": 3491,
+      "finite_mae": 0.07525589317083359,
+      "shortest_action_rate": 0.42108278430249213,
+      "unreachable": {
+        "proven_unreachable": 1354,
+        "finite": 3491,
+        "unknown": 0,
+        "auroc": 0.6117554022646121,
+        "validation_threshold": 3.4743709564208984,
+        "recall": 0.0,
+        "finite_false_positive": 0.0,
+        "recall_at_training_proxy": 0.0,
+        "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+      },
+      "q": {
+        "count": 3491,
+        "solved": 1342,
+        "optimal": 1342,
+        "cycles": 0,
+        "entered_unreachable": 2149,
+        "success_rate": 0.384417072472071,
+        "optimal_rate": 0.384417072472071,
+        "by_distance": {
+          "3.0": {
+            "count": 3491,
+            "solved": 1342,
+            "optimal": 1342
+          }
+        }
+      },
+      "oracle_optimal_rate": 1.0
+    },
+    "suffix2_to_21": {
+      "query_rows": 208481,
+      "finite_rows": 211,
+      "finite_mae": 2.783818483352661,
+      "shortest_action_rate": 1.0,
+      "unreachable": {
+        "proven_unreachable": 208270,
+        "finite": 211,
+        "unknown": 0,
+        "auroc": 0.9704936310116948,
+        "validation_threshold": 3.4743709564208984,
+        "recall": 0.9924232966821914,
+        "finite_false_positive": 0.2843601895734597,
+        "recall_at_training_proxy": 0.8366015268641667,
+        "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+      },
+      "q": {
+        "count": 211,
+        "solved": 211,
+        "optimal": 211,
+        "cycles": 0,
+        "entered_unreachable": 0,
+        "success_rate": 1.0,
+        "optimal_rate": 1.0,
+        "by_distance": {
+          "1.0": {
+            "count": 211,
+            "solved": 211,
+            "optimal": 211
+          }
+        }
+      },
+      "oracle_optimal_rate": 1.0
+    },
+    "suffix3_to_21": {
+      "query_rows": 63435,
+      "finite_rows": 2892,
+      "finite_mae": 0.5308972597122192,
+      "shortest_action_rate": 0.9349930843706777,
+      "unreachable": {
+        "proven_unreachable": 60543,
+        "finite": 2892,
+        "unknown": 0,
+        "auroc": 0.801438155737144,
+        "validation_threshold": 3.4743709564208984,
+        "recall": 0.43407165155344135,
+        "finite_false_positive": 0.06811894882434301,
+        "recall_at_training_proxy": 0.0,
+        "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+      },
+      "q": {
+        "count": 2892,
+        "solved": 2704,
+        "optimal": 2704,
+        "cycles": 0,
+        "entered_unreachable": 188,
+        "success_rate": 0.9349930843706777,
+        "optimal_rate": 0.9349930843706777,
+        "by_distance": {
+          "2.0": {
+            "count": 2892,
+            "solved": 2704,
+            "optimal": 2704
+          }
+        }
+      },
+      "oracle_optimal_rate": 1.0
+    },
+    "root4_to_24": {
+      "query_rows": 4845,
+      "finite_rows": 3450,
+      "finite_mae": 0.05201219767332077,
+      "shortest_action_rate": 0.4985507246376812,
+      "unreachable": {
+        "proven_unreachable": 1395,
+        "finite": 3450,
+        "unknown": 0,
+        "auroc": 0.6352501168770454,
+        "validation_threshold": 3.4743709564208984,
+        "recall": 0.0,
+        "finite_false_positive": 0.0,
+        "recall_at_training_proxy": 0.0,
+        "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+      },
+      "q": {
+        "count": 3450,
+        "solved": 1232,
+        "optimal": 1232,
+        "cycles": 0,
+        "entered_unreachable": 2218,
+        "success_rate": 0.3571014492753623,
+        "optimal_rate": 0.3571014492753623,
+        "by_distance": {
+          "3.0": {
+            "count": 3450,
+            "solved": 1232,
+            "optimal": 1232
+          }
+        }
+      },
+      "oracle_optimal_rate": 1.0
+    },
+    "suffix2_to_24": {
+      "query_rows": 208481,
+      "finite_rows": 250,
+      "finite_mae": 2.266014575958252,
+      "shortest_action_rate": 1.0,
+      "unreachable": {
+        "proven_unreachable": 208231,
+        "finite": 250,
+        "unknown": 0,
+        "auroc": 0.9764248166699483,
+        "validation_threshold": 3.4743709564208984,
+        "recall": 0.9834078499358885,
+        "finite_false_positive": 0.276,
+        "recall_at_training_proxy": 0.7199600443737965,
+        "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+      },
+      "q": {
+        "count": 250,
+        "solved": 250,
+        "optimal": 250,
+        "cycles": 0,
+        "entered_unreachable": 0,
+        "success_rate": 1.0,
+        "optimal_rate": 1.0,
+        "by_distance": {
+          "1.0": {
+            "count": 250,
+            "solved": 250,
+            "optimal": 250
+          }
+        }
+      },
+      "oracle_optimal_rate": 1.0
+    },
+    "suffix3_to_24": {
+      "query_rows": 63435,
+      "finite_rows": 3166,
+      "finite_mae": 0.5848032236099243,
+      "shortest_action_rate": 0.8723941882501579,
+      "unreachable": {
+        "proven_unreachable": 60269,
+        "finite": 3166,
+        "unknown": 0,
+        "auroc": 0.7882657680856328,
+        "validation_threshold": 3.4743709564208984,
+        "recall": 0.4338548839370157,
+        "finite_false_positive": 0.08559696778269109,
+        "recall_at_training_proxy": 0.00013273822363072226,
+        "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+      },
+      "q": {
+        "count": 3166,
+        "solved": 2762,
+        "optimal": 2762,
+        "cycles": 0,
+        "entered_unreachable": 404,
+        "success_rate": 0.8723941882501579,
+        "optimal_rate": 0.8723941882501579,
+        "by_distance": {
+          "2.0": {
+            "count": 3166,
+            "solved": 2762,
+            "optimal": 2762
+          }
+        }
+      },
+      "oracle_optimal_rate": 1.0
+    },
+    "held_intermediate2_query_validation": {
+      "query_rows": 232560,
+      "finite_rows": 155040,
+      "finite_mae": 0.1896759420633316,
+      "shortest_action_rate": 0.7415462713469868,
+      "unreachable": {
+        "proven_unreachable": 77520,
+        "finite": 155040,
+        "unknown": 0,
+        "auroc": 0.9962769879419912,
+        "validation_threshold": 3.4743709564208984,
+        "recall": 0.9869195046439628,
+        "finite_false_positive": 0.002818627450980392,
+        "recall_at_training_proxy": 0.91953044375645,
+        "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+      },
+      "q": {
+        "count": 13362,
+        "solved": 10578,
+        "optimal": 10578,
+        "cycles": 0,
+        "entered_unreachable": 2784,
+        "success_rate": 0.7916479568926807,
+        "optimal_rate": 0.7916479568926807,
+        "by_distance": {
+          "1.0": {
+            "count": 8517,
+            "solved": 8517,
+            "optimal": 8517
+          },
+          "2.0": {
+            "count": 4845,
+            "solved": 2061,
+            "optimal": 2061
+          }
+        }
+      },
+      "oracle_optimal_rate": 1.0
+    },
+    "held_intermediate3_query_validation": {
+      "query_rows": 232560,
+      "finite_rows": 155040,
+      "finite_mae": 0.1510818898677826,
+      "shortest_action_rate": 1.0,
+      "unreachable": {
+        "proven_unreachable": 77520,
+        "finite": 155040,
+        "unknown": 0,
+        "auroc": 0.9996910142733564,
+        "validation_threshold": 3.4743709564208984,
+        "recall": 0.9975490196078431,
+        "finite_false_positive": 0.0,
+        "recall_at_training_proxy": 0.9846620227038184,
+        "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+      },
+      "q": {
+        "count": 4845,
+        "solved": 4845,
+        "optimal": 4845,
+        "cycles": 0,
+        "entered_unreachable": 0,
+        "success_rate": 1.0,
+        "optimal_rate": 1.0,
+        "by_distance": {
+          "1.0": {
+            "count": 4845,
+            "solved": 4845,
+            "optimal": 4845
+          }
+        }
+      },
+      "oracle_optimal_rate": 1.0
+    },
+    "held_intermediate2_query_test": {
+      "query_rows": 232560,
+      "finite_rows": 155040,
+      "finite_mae": 0.19196900725364685,
+      "shortest_action_rate": 0.7461187550584946,
+      "unreachable": {
+        "proven_unreachable": 77520,
+        "finite": 155040,
+        "unknown": 0,
+        "auroc": 0.9963915967106861,
+        "validation_threshold": 3.4743709564208984,
+        "recall": 0.9868292053663571,
+        "finite_false_positive": 0.003012125902992776,
+        "recall_at_training_proxy": 0.9170923632610939,
+        "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+      },
+      "q": {
+        "count": 13357,
+        "solved": 10618,
+        "optimal": 10618,
+        "cycles": 0,
+        "entered_unreachable": 2739,
+        "success_rate": 0.7949389833046343,
+        "optimal_rate": 0.7949389833046343,
+        "by_distance": {
+          "1.0": {
+            "count": 8512,
+            "solved": 8512,
+            "optimal": 8512
+          },
+          "2.0": {
+            "count": 4845,
+            "solved": 2106,
+            "optimal": 2106
+          }
+        }
+      },
+      "oracle_optimal_rate": 1.0
+    }
+  },
+  "physical_training_exposure": {
+    "unique_gradient_states": 6247563,
+    "available_states": 6247563,
+    "unique_pair_rows": 6247563,
+    "pair_rows": 6247563,
+    "unique_decision_rows": 154792,
+    "decision_rows": 199705,
+    "minimum_pair_layer_passes": 20.979700404781834,
+    "minimum_decision_layer_passes": null
+  },
+  "training_probe": {
+    "batches": 4,
+    "point_count": 131072,
+    "decision_count": 32768,
+    "finite_mae": 0.3071298897266388,
+    "distance_huber": 0.34559693932533264,
+    "candidate_soft_rank_loss": 1.5455843210220337,
+    "shortest_action_rate": 0.67376708984375,
+    "by_distance": {
+      "1_5": {
+        "count": 82159,
+        "mae": 0.3072682023048401
+      }
+    },
+    "role": "Fixed actual training batches; fitting diagnostic only, never checkpoint selection."
+  },
+  "interpretation": "All numerical state inputs seen does not establish viability learning. Every solvable four-number root has exactly3 remaining operations, so very small root finite MAE can coexist with dead-branch selection. At the unchanged validation threshold no unsolvable four-number root is detected. Two-number suffix completion is easy target equality among immediate successors and does not establish calibrated two-number viability. Three-number intermediate goals are present only in validation in the original declared goal ordering, so their separate test gate is explicitly missing. No adoption.",
+  "artifacts": {
+    "persistent_root": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/followup_5d41460",
+    "raw": "logs/game21_24_finite20_evaluation.json",
+    "checkpoint": "game21_24_finite20_fit/best.pt",
+    "data": "game21_24_finite20_reference/data.tar"
+  }
+}

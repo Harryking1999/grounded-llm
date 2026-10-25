@@ -293,9 +293,150 @@
       "2": 1302
     }
   },
-  "scope": "Development cohorts of 128 queries, not the historical 1024-query acceptance. Fixed original endpoint condition and distinct eight-query-goal fitting condition must not be pooled. Seed and branch arms have matched initialization and budget within each condition. No model adoption.",
+  "scope": "Development cohorts of128 queries, not historical1024-query acceptance. Endpoint, eight-target and128-target fitting protocols remain distinct. The128-target known-goal held relations have minimum exact distance11 and preserve complete terminal-neighborhood training contexts; held complete goals are separate. Matched arms share initialization, quotas and budgets within each protocol. No adoption.",
   "source_commits": {
     "endpoint_branches": "5d41460",
-    "query_goal_branches": "215c237"
+    "query_goal_branches": "215c237",
+    "query128": "17d1817"
+  },
+  "token_query128_seed_training": {
+    "best_step": 1000,
+    "replay": {
+      "kind": "seed",
+      "decisions": 4288,
+      "distance_pairs": 40394,
+      "unique_decisions_drawn": 4288,
+      "decision_draws": 1024000,
+      "unique_distance_pairs_drawn": 40394,
+      "distance_pair_draws": 4096000,
+      "scope": "Selected checkpoint counters. Supplemental distance examples do not displace the original point-source traversal."
+    },
+    "cohorts": {
+      "validation": {
+        "mae": 1.3688881397247314,
+        "shortest": 0.91015625,
+        "count": 128,
+        "solved": 70,
+        "optimal_rate": 0.1171875,
+        "success_rate": 0.546875,
+        "cycles": 58
+      },
+      "test": {
+        "mae": 1.3836750984191895,
+        "shortest": 0.884765625,
+        "count": 128,
+        "solved": 72,
+        "optimal_rate": 0.1328125,
+        "success_rate": 0.5625,
+        "cycles": 56
+      },
+      "unseen_goal_validation": {
+        "mae": 1.4063804149627686,
+        "shortest": 0.9140625,
+        "count": 128,
+        "solved": 81,
+        "optimal_rate": 0.40625,
+        "success_rate": 0.6328125,
+        "cycles": 47
+      },
+      "unseen_goal_test": {
+        "mae": 1.298938274383545,
+        "shortest": 0.90625,
+        "count": 128,
+        "solved": 91,
+        "optimal_rate": 0.4375,
+        "success_rate": 0.7109375,
+        "cycles": 37
+      }
+    }
+  },
+  "token_query128_branches_training": {
+    "best_step": 3000,
+    "replay": {
+      "kind": "branches",
+      "decisions": 366224,
+      "distance_pairs": 1858279,
+      "unique_decisions_drawn": 366224,
+      "decision_draws": 3072000,
+      "unique_distance_pairs_drawn": 1858279,
+      "distance_pair_draws": 12288000,
+      "scope": "Selected checkpoint counters. Supplemental distance examples do not displace the original point-source traversal."
+    },
+    "cohorts": {
+      "validation": {
+        "mae": 1.3868913650512695,
+        "shortest": 0.859375,
+        "count": 128,
+        "solved": 74,
+        "optimal_rate": 0.109375,
+        "success_rate": 0.578125,
+        "cycles": 54
+      },
+      "test": {
+        "mae": 1.401827335357666,
+        "shortest": 0.884765625,
+        "count": 128,
+        "solved": 84,
+        "optimal_rate": 0.15625,
+        "success_rate": 0.65625,
+        "cycles": 44
+      },
+      "unseen_goal_validation": {
+        "mae": 1.372110366821289,
+        "shortest": 0.9140625,
+        "count": 128,
+        "solved": 76,
+        "optimal_rate": 0.3359375,
+        "success_rate": 0.59375,
+        "cycles": 52
+      },
+      "unseen_goal_test": {
+        "mae": 1.29875910282135,
+        "shortest": 0.888671875,
+        "count": 128,
+        "solved": 88,
+        "optimal_rate": 0.40625,
+        "success_rate": 0.6875,
+        "cycles": 40
+      }
+    }
+  },
+  "token_query128_branch_data": {
+    "raw_seeds": 4291,
+    "accepted_seeds": 4288,
+    "rejected_seeds": 3,
+    "branch_contexts": 366224,
+    "nonterminal_candidate_edges": 3294870,
+    "candidate_edges_with_next_context": 1131034,
+    "teacher_paths": 38546,
+    "teacher_paths_reached_goal": 38507,
+    "teacher_paths_blocked_by_holdout": 39,
+    "teacher_paths_budget_exhausted": 0,
+    "scope": "Whole decisions only. Every retained parent has all legal successors; held-out continuations are counted, never pruned or silently labelled as covered.",
+    "config": {
+      "seed": 2026102522,
+      "queries": 4096,
+      "mining_batch": 256,
+      "minimum_distance": 11,
+      "distance_bins": [
+        5,
+        10,
+        20,
+        64
+      ],
+      "horizon": 128,
+      "branch_depth": 2,
+      "teacher_steps": 25,
+      "goal_switch_attempts": 16,
+      "cpu_threads": 4
+    },
+    "source_checkpoint": "/tmp/grounded_qmap_followup_5d41460/runs/token_initial/best.pt",
+    "source_checkpoint_step": 30000,
+    "source_checkpoint_commit": "bf3b6c2",
+    "original_cycle_seeds": 2402,
+    "switched_goal_contexts": 1889,
+    "cycle_length_counts": {
+      "2": 1359
+    }
   }
 }

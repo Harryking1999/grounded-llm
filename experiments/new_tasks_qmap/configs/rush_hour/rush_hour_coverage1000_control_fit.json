@@ -1,0 +1,94 @@
+{
+  "task": "rush_hour",
+  "seed": 2026102303,
+  "data": {
+    "append_from": "../rush_reference/data/graphs",
+    "source_url": "https://www.michaelfogleman.com/static/rush/rush.txt.gz",
+    "source_cache": "tmp/planning_task_sources/rush.txt.gz",
+    "max_states": 50000,
+    "minimum_training_catalogues": 1000,
+    "terminal_goals_per_scene": 16,
+    "intermediate_goals_per_scene": 16,
+    "heldout_goals": 4,
+    "heldout_intermediate_goals": 4,
+    "minimum_vehicles": 8,
+    "selection_reserve": 4,
+    "layout_strata": [
+      {
+        "minimum_moves": 1,
+        "maximum_moves": 10,
+        "training_catalogues": 250
+      },
+      {
+        "minimum_moves": 11,
+        "maximum_moves": 20,
+        "training_catalogues": 250
+      },
+      {
+        "minimum_moves": 21,
+        "maximum_moves": 30,
+        "training_catalogues": 250
+      },
+      {
+        "minimum_moves": 31,
+        "maximum_moves": 100,
+        "training_catalogues": 250
+      }
+    ],
+    "prepared_from": "../rush_hour_coverage1000/data"
+  },
+  "model": {
+    "dimension": 128,
+    "hidden": 256,
+    "cap": 256,
+    "metric": "linf",
+    "architecture": "spatial_cnn",
+    "spatial_shape": [
+      26,
+      6,
+      6
+    ],
+    "conv_channels": 32,
+    "spatial_hidden": 244
+  },
+  "training": {
+    "steps": 3000,
+    "batch_size": 32768,
+    "decision_batch_size": 16384,
+    "learning_rate": 0.0003,
+    "rank_weight": 1.0,
+    "rank_temperature": 1.0,
+    "eval_every": 500,
+    "cpu_threads": 4,
+    "unreachable_target": 240.0,
+    "features_on_device": "packed_bits",
+    "broad_fraction": 0.5,
+    "online_goals": true,
+    "record_training_samples": true,
+    "balance_layouts": true,
+    "balance_rank_layouts": true,
+    "layouts_per_batch": 64,
+    "rollout_eval_every": 1000,
+    "validation_only_initial": true,
+    "training_probe_batches": 4,
+    "initialize_from": "../rush_hour_coverage1000_large_batch/last.pt"
+  },
+  "relations": {
+    "holdout_per_goal": 16,
+    "evaluation_per_goal": 64,
+    "unreachable_eval_per_goal": 24,
+    "complete_training_sources": true,
+    "evaluation_training_goals": 8
+  },
+  "evaluation": {
+    "decision_count": 2048,
+    "rollout_count": 1024,
+    "horizon": 256,
+    "landmarks": 128
+  },
+  "schema": "exact_state_pairs",
+  "selection": "Lowest validation finite Huber plus candidate soft-rank CE, equally averaging predeclared validation cohorts; no test checkpoint selection.",
+  "scope": "Independent Q(S), Q(G); exact complete goals only; no oracle in inference features, no pruning, no search, no LLM retraining.",
+  "acceptance": "experiments/new_tasks_qmap/configs/exact_pair_acceptance.json",
+  "hypothesis": "Matched follow-up after1000 catalogues still failed on new-layout original starts. Same1000 catalogues, frozen goals/held relationships, CNN, losses, initial completed15000-step checkpoint, fresh optimizer, learning rate, batches and3000 updates in both arms. Control retains online relation proposals; treatment stratifies true finite source-goal distances within each training layout while retaining75 percent of all original broad point-source draws. Complete physical candidates and protected query closures remain unchanged. Reversible Rush Hour components have no dead-boundary quota. Layout and actual relation distance are distinct coverage axes. This tests whether long-relation undercoverage contributes; it does not assume more layouts or a completed budget implies convergence."
+}

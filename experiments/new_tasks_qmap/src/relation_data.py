@@ -154,7 +154,7 @@ class BoardRelationSampler:
         if not hasattr(corpus,'scenes'): raise ValueError('Board relation sampling requires exact board scenes')
         self.corpus,self.data,self.options=corpus,data,options
         self.finite_fraction=options['finite_point_fraction']; self.boundary_fraction=options['boundary_rank_fraction']
-        if not 0<self.finite_fraction<1 or not 0<self.boundary_fraction<1: raise ValueError('Nonempty broad, finite and boundary quotas required')
+        if not 0<self.finite_fraction<1 or not 0<=self.boundary_fraction<1: raise ValueError('Broad and finite quotas required; boundary quota may be zero on reversible graphs')
         self.point_index=np.full(corpus.size,-1,dtype=np.int32); self.rank_index=self.point_index.copy()
         self.point_index[data['pairs_train'][:,0]]=np.arange(len(data['pairs_train']))
         self.rank_index[data['tasks_train'][:,0]]=np.arange(len(data['tasks_train']))
@@ -207,7 +207,7 @@ class BoardRelationSampler:
                     for j,upper in enumerate(edges)}
         self.point_groups=groups(point_labels,np.ones(len(point_labels),bool),self.points)
         self.boundary_groups=groups(rank_labels,boundary,self.ranks); self.other_groups=groups(rank_labels,~boundary,self.ranks)
-        if not self.boundary_groups or not self.other_groups: raise ValueError('Both exact boundary and nonboundary training relations required')
+        if (self.boundary_fraction and not self.boundary_groups) or not self.other_groups: raise ValueError('Requested exact boundary/nonboundary training relations unavailable')
         self.summary=dict(finite_point_bank=len(self.points),ranking_bank=len(self.ranks),boundary_ranking_bank=int(boundary.sum()),
             point_stratum_counts=counts(point_labels,np.ones(len(point_labels),bool)),boundary_stratum_counts=counts(rank_labels,boundary),
             nonboundary_stratum_counts=counts(rank_labels,~boundary),options=options,
@@ -237,6 +237,7 @@ class BoardRelationSampler:
 
     @staticmethod
     def _draw(groups,count,rng,max_groups=None):
+        if not count:return np.empty(0,dtype=np.int64)
         if max_groups is not None and len(groups)>max_groups:
             groups=[groups[i] for i in rng.choice(len(groups),max_groups,replace=False)]
         which=rng.integers(len(groups),size=count)

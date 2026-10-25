@@ -1,0 +1,249 @@
+{
+  "task": "rush_hour",
+  "source_commit": "17d1817",
+  "best_step": 15000,
+  "evaluated_step": 15000,
+  "evaluated_checkpoint": "best.pt",
+  "last_step": 15000,
+  "preparation_seconds": 4.586155094206333,
+  "training_seconds": 2890.956610172987,
+  "initial_evaluation_seconds": 30.103501042351127,
+  "final_evaluation_seconds": 63.25232284516096,
+  "raw_feature_cache_seconds": 29.657319702208042,
+  "peak_gpu_allocated_bytes": 6832913920,
+  "peak_gpu_reserved_bytes": 16661872640,
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "data": {
+    "task": "rush_hour",
+    "states": 5263995,
+    "input_dim": 936,
+    "max_candidates": 23,
+    "seed": 2026102303,
+    "finite_max": 75.0,
+    "unknown_training_labels": 0,
+    "pair_count": 4752513,
+    "decision_count": 4690868,
+    "reserved_relations": 2288800,
+    "cohorts": {
+      "validation": {
+        "count": 128224,
+        "reachable": 128224
+      },
+      "test": {
+        "count": 127968,
+        "reachable": 127968
+      },
+      "unseen_goal_validation": {
+        "count": 256768,
+        "reachable": 256768
+      },
+      "unseen_goal_test": {
+        "count": 256768,
+        "reachable": 256768
+      },
+      "unseen_layout_validation": {
+        "count": 17920,
+        "reachable": 17920
+      },
+      "unseen_layout_test": {
+        "count": 18944,
+        "reachable": 18944
+      },
+      "original_layout_test": {
+        "count": 16135,
+        "reachable": 16135
+      },
+      "original_layout_validation": {
+        "count": 22208,
+        "reachable": 22208
+      },
+      "diagnostic": {
+        "count": 4096,
+        "reachable": 4096
+      },
+      "diagnostic_original": {
+        "count": 8,
+        "reachable": 8
+      }
+    },
+    "selected_train_states": 4752513,
+    "all_selected_sources_in_training": true
+  },
+  "model_parameters": 338708,
+  "actual_exposure": {
+    "unique_gradient_states": 4752516,
+    "available_states": 5263995,
+    "unique_pair_rows": 4752513,
+    "pair_rows": 4752513,
+    "unique_decision_rows": 4681231,
+    "decision_rows": 4690868,
+    "minimum_pair_layer_passes": 1.7894006600937586,
+    "minimum_decision_layer_passes": 0.8920003415008965
+  },
+  "acceptance": {
+    "minimum": 0.8,
+    "target": 0.9,
+    "rates": {
+      "test": 0.99609375,
+      "unseen_goal_test": 1.0,
+      "unseen_layout_test": 0.4013671875,
+      "diagnostic_original": 0.0,
+      "original_layout_test": 0.0
+    },
+    "full_training_source_coverage": true,
+    "passed": false,
+    "target_reached": false
+  },
+  "metrics": {
+    "validation": {
+      "count": 128224,
+      "finite_mae": 1.5658091306686401,
+      "finite_huber": 1.1556620597839355,
+      "shortest_action_rate": 0.66943359375,
+      "planning_q": {
+        "count": 1024,
+        "solved": 1023,
+        "success_rate": 0.9990234375,
+        "optimal_rate": 0.990234375,
+        "cycles": 1,
+        "entered_unreachable": 0,
+        "budget_exhausted": 0
+      }
+    },
+    "test": {
+      "count": 127968,
+      "finite_mae": 1.5339418649673462,
+      "finite_huber": 1.1257652044296265,
+      "shortest_action_rate": 0.6533203125,
+      "planning_q": {
+        "count": 1024,
+        "solved": 1020,
+        "success_rate": 0.99609375,
+        "optimal_rate": 0.9775390625,
+        "cycles": 4,
+        "entered_unreachable": 0,
+        "budget_exhausted": 0
+      }
+    },
+    "unseen_goal_validation": {
+      "count": 256768,
+      "finite_mae": 1.6212013959884644,
+      "finite_huber": 1.216977834701538,
+      "shortest_action_rate": 0.66357421875,
+      "planning_q": {
+        "count": 1024,
+        "solved": 1024,
+        "success_rate": 1.0,
+        "optimal_rate": 0.998046875,
+        "cycles": 0,
+        "entered_unreachable": 0,
+        "budget_exhausted": 0
+      }
+    },
+    "unseen_goal_test": {
+      "count": 256768,
+      "finite_mae": 1.6362539529800415,
+      "finite_huber": 1.2319629192352295,
+      "shortest_action_rate": 0.65380859375,
+      "planning_q": {
+        "count": 1024,
+        "solved": 1024,
+        "success_rate": 1.0,
+        "optimal_rate": 0.9990234375,
+        "cycles": 0,
+        "entered_unreachable": 0,
+        "budget_exhausted": 0
+      }
+    },
+    "unseen_layout_validation": {
+      "count": 17920,
+      "finite_mae": 4.110837459564209,
+      "finite_huber": 3.666931629180908,
+      "shortest_action_rate": 0.61669921875,
+      "planning_q": {
+        "count": 1024,
+        "solved": 381,
+        "success_rate": 0.3720703125,
+        "optimal_rate": 0.2138671875,
+        "cycles": 643,
+        "entered_unreachable": 0,
+        "budget_exhausted": 0
+      }
+    },
+    "unseen_layout_test": {
+      "count": 18944,
+      "finite_mae": 3.917926788330078,
+      "finite_huber": 3.480602741241455,
+      "shortest_action_rate": 0.6376953125,
+      "planning_q": {
+        "count": 1024,
+        "solved": 411,
+        "success_rate": 0.4013671875,
+        "optimal_rate": 0.2119140625,
+        "cycles": 613,
+        "entered_unreachable": 0,
+        "budget_exhausted": 0
+      }
+    },
+    "original_layout_test": {
+      "count": 16135,
+      "finite_mae": 17.337291717529297,
+      "finite_huber": 16.837310791015625,
+      "shortest_action_rate": 0.3095703125,
+      "planning_q": {
+        "count": 1024,
+        "solved": 0,
+        "success_rate": 0.0,
+        "optimal_rate": 0.0,
+        "cycles": 1024,
+        "entered_unreachable": 0,
+        "budget_exhausted": 0
+      }
+    },
+    "original_layout_validation": {
+      "count": 22208,
+      "finite_mae": 18.936660766601562,
+      "finite_huber": 18.441286087036133,
+      "shortest_action_rate": 0.658203125,
+      "planning_q": {
+        "count": 1024,
+        "solved": 0,
+        "success_rate": 0.0,
+        "optimal_rate": 0.0,
+        "cycles": 1024,
+        "entered_unreachable": 0,
+        "budget_exhausted": 0
+      }
+    },
+    "diagnostic": {
+      "count": 4096,
+      "finite_mae": 5.987277507781982,
+      "finite_huber": 5.535357475280762,
+      "shortest_action_rate": 0.55810546875,
+      "planning_q": {
+        "count": 1024,
+        "solved": 234,
+        "success_rate": 0.228515625,
+        "optimal_rate": 0.14453125,
+        "cycles": 790,
+        "entered_unreachable": 0,
+        "budget_exhausted": 0
+      }
+    },
+    "diagnostic_original": {
+      "count": 8,
+      "finite_mae": 21.237613677978516,
+      "finite_huber": 20.737613677978516,
+      "shortest_action_rate": 0.875,
+      "planning_q": {
+        "count": 8,
+        "solved": 0,
+        "success_rate": 0.0,
+        "optimal_rate": 0.0,
+        "cycles": 8,
+        "entered_unreachable": 0,
+        "budget_exhausted": 0
+      }
+    }
+  }
+}

@@ -260,7 +260,15 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
                     or saved['config'].get('input_encoding','identity')!=config.get('input_encoding','identity')):
                 raise ValueError('Warm-start model scope mismatch')
             model.load_state_dict(saved['model'])
-            if not structure_options: exposure=saved['exposure'].copy()
+            if not structure_options:
+                prior=saved['exposure']
+                if len(prior)==corpus.size:exposure=prior.copy()
+                elif (config['task'] in ('bridge','game24') and len(prior)<corpus.size
+                      and config['data'].get('additional_training_scenes',0)>saved['config']['data'].get('additional_training_scenes',0)
+                      and {k:v for k,v in config['data'].items() if k!='additional_training_scenes'}
+                          =={k:v for k,v in saved['config']['data'].items() if k!='additional_training_scenes'}):
+                    exposure[:len(prior)]=prior
+                else:raise ValueError('Warm-start exposure IDs do not match the prepared corpus')
             atomic_json(out/'initialization.json',dict(checkpoint=str(initial_path),source_commit=saved['source_commit'],
                 step=saved['step'],optimizer_restored=False,sampler_restored=False,
                 prior_exposure_transferred=not bool(structure_options),

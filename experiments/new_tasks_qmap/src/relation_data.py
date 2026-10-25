@@ -13,6 +13,13 @@ def keys(source, goal, size):
     return np.minimum(source, goal)*np.int64(size)+np.maximum(source, goal)
 
 
+def scene_reserved_relations(corpus,reserved,sid):
+    """Exact sorted-key slice: both endpoints of a board relation share a scene."""
+    begin,end=corpus.offsets[sid:sid+2]*corpus.size
+    left,right=np.searchsorted(reserved,[begin,end])
+    return reserved[left:right]
+
+
 def closure(corpus, rows):
     children=corpus.successors(rows[:,0]); valid=children>=0
     return np.unique(np.concatenate([keys(rows[:,0],rows[:,1],corpus.size),
@@ -553,11 +560,12 @@ def board_cohorts(corpus,config,rng):
     pairs,decisions=[],[]
     for sid,safe_parent,safe_rank in train_specs:
         scene=corpus.scenes[sid]; offset=corpus.offsets[sid]; nt=scene.metadata['training_goals']
+        local_reserved=scene_reserved_relations(corpus,reserved,sid)
         if spec.get('exhaustive_training_goals'):
             for j,g in enumerate(scene.goals[:nt]):
                 parents=np.flatnonzero(safe_parent)+offset
                 rows=np.column_stack([parents,np.full(len(parents),int(g)+offset)])
-                rows=rows[~np.isin(keys(rows[:,0],rows[:,1],corpus.size),reserved)]
+                rows=rows[~np.isin(keys(rows[:,0],rows[:,1],corpus.size),local_reserved)]
                 pairs.append(rows)
                 label=scene.distances[j]
                 parents=np.flatnonzero(safe_rank & np.isfinite(label) & (label>0))+offset
@@ -566,7 +574,7 @@ def board_cohorts(corpus,config,rng):
                     children=corpus.successors(parents);valid=children>=0
                     related=np.full(children.shape,-1,dtype=np.int64)
                     related[valid]=keys(children[valid],np.full(valid.sum(),int(g)+offset),corpus.size)
-                    safe=~np.isin(keys(rows[:,0],rows[:,1],corpus.size),reserved)&~np.isin(related,reserved).any(axis=1)
+                    safe=~np.isin(keys(rows[:,0],rows[:,1],corpus.size),local_reserved)&~np.isin(related,local_reserved).any(axis=1)
                     decisions.append(rows[safe])
             continue
         parents=np.flatnonzero(safe_parent)+offset
@@ -579,7 +587,7 @@ def board_cohorts(corpus,config,rng):
             chosen=np.unique(np.concatenate([local_rng.choice(parents,limit//2,replace=False),near]))
             rest=np.setdiff1d(parents,chosen)
             parents=np.sort(np.concatenate([chosen,local_rng.choice(rest,limit-len(chosen),replace=False)]))
-        rows,_=sample_goals(corpus,parents,rng,reserved,allow_missing=True)
+        rows,_=sample_goals(corpus,parents,rng,local_reserved,allow_missing=True)
         pairs.append(rows)
         reachable=np.isfinite(scene.distances[:nt]).any(axis=0)
         positive=(scene.distances[:nt]>0).any(axis=0)
@@ -589,7 +597,7 @@ def board_cohorts(corpus,config,rng):
             chosen=np.unique(balanced(np.column_stack([parents,np.zeros(len(parents),dtype=np.int64)]),limit,nearest[parents-offset],local_rng)[:,0])
             rest=np.setdiff1d(parents,chosen)
             parents=np.sort(np.concatenate([chosen,local_rng.choice(rest,limit-len(chosen),replace=False)]))
-        rows,_=sample_goals(corpus,parents,rng,reserved,ranking=True,allow_missing=True)
+        rows,_=sample_goals(corpus,parents,rng,local_reserved,ranking=True,allow_missing=True)
         decisions.append(rows)
     return {k:np.concatenate(v) for k,v in groups.items() if v},np.concatenate(pairs),np.concatenate(decisions),reserved,None
 

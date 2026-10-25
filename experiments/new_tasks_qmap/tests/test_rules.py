@@ -13,7 +13,8 @@ class RulesTest(unittest.TestCase):
         from itertools import combinations
         from pathlib import Path
         from contextlib import ExitStack
-        from experiments.new_tasks_qmap.src.relation_data import prepare,training_decision_mask
+        from experiments.new_tasks_qmap.src.relation_data import prepare,training_decision_mask,board_cohorts
+        from unittest.mock import patch
         config=json.loads(Path('experiments/new_tasks_qmap/configs/game24/game24_operation_reference.json').read_text())
         config['data'].update(initial_sampling='exhaustive_distinct',source_values=[1,2,3,4,5],root_targets=[24,21],
             scenes=dict(train=5,validation=0,test=0),additional_training_scenes=0)
@@ -32,6 +33,12 @@ class RulesTest(unittest.TestCase):
                     self.assertTrue(training_decision_mask(corpus,data,queries).all())
                     np.testing.assert_array_equal(data['tasks_train'][data['tasks_train'][:,1]==goal],queries)
             self.assertEqual(actual,set(combinations([1,2,3,4,5],4)))
+            sliced=board_cohorts(corpus,config,np.random.default_rng(config['seed']+1))
+            with patch('experiments.new_tasks_qmap.src.relation_data.scene_reserved_relations',return_value=data['reserved_relations']):
+                global_scan=board_cohorts(corpus,config,np.random.default_rng(config['seed']+1))
+            self.assertEqual(set(sliced[0]),set(global_scan[0]))
+            for name in sliced[0]:np.testing.assert_array_equal(sliced[0][name],global_scan[0][name])
+            for i in [1,2,3]:np.testing.assert_array_equal(sliced[i],global_scan[i])
 
     def test_bridge_optimum_and_judge(self):
         env = Bridge([1, 2, 5, 10])

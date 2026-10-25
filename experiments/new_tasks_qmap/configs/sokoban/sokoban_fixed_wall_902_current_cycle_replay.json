@@ -1,0 +1,127 @@
+{
+  "task": "sokoban",
+  "seed": 2026102502,
+  "data": {
+    "source_url": "https://raw.githubusercontent.com/google-deepmind/boxoban-levels/78011d8c86ad423bfb2e1005012393b4c3c24409/hard/000.txt",
+    "source_commit": "78011d8c86ad423bfb2e1005012393b4c3c24409",
+    "source_cache": "tmp/new_tasks_harder_sources",
+    "max_states": 100000,
+    "minimum_reachable_per_goal": 1,
+    "scenes": {
+      "train": 1,
+      "validation": 0,
+      "test": 0
+    },
+    "goals_per_scene": "all",
+    "training_goals": "all_except_heldout",
+    "diagnostic_goals": {},
+    "heldout_goals": 2,
+    "split_fractions": [
+      0.7,
+      0.15,
+      0.15
+    ],
+    "source_files": [
+      "hard/000.txt",
+      "hard/001.txt",
+      "hard/002.txt",
+      "hard/003.txt"
+    ],
+    "intermediate_goals_per_scene": 12,
+    "heldout_intermediate_goals": 4,
+    "minimum_intermediate_basin": 32,
+    "fixed_layout": {
+      "file": "hard/002.txt",
+      "puzzle_id": "902"
+    },
+    "additional_training_goals": 512,
+    "prepared_from": "../sokoban_fixed_wall_902_goal_coverage_reference/data"
+  },
+  "model": {
+    "dimension": 128,
+    "hidden": 1024,
+    "cap": 256,
+    "metric": "directed_max"
+  },
+  "training": {
+    "steps": 2000,
+    "batch_size": 32768,
+    "decision_batch_size": 8192,
+    "learning_rate": 0.0003,
+    "rank_weight": 1.0,
+    "rank_temperature": 1.0,
+    "eval_every": 500,
+    "cpu_threads": 2,
+    "unreachable_target": 240.0,
+    "features_on_device": "packed_bits",
+    "broad_fraction": 0.5,
+    "online_goals": true,
+    "record_training_samples": true,
+    "rollout_eval_every": 1000,
+    "validation_only_initial": true,
+    "training_probe_batches": 4,
+    "action_edge_fraction": 0.25,
+    "relation_sampling": {
+      "finite_point_fraction": 0.75,
+      "boundary_rank_fraction": 0.5,
+      "distance_bin_upper_bounds": [
+        0,
+        1,
+        2,
+        5,
+        10,
+        20,
+        40,
+        80,
+        128
+      ],
+      "balance_layouts": true,
+      "preparation_workers": 2,
+      "sokoban_stage_balance": true
+    },
+    "trace_write_workers": 1,
+    "compact_point_sources": true,
+    "initialize_from": "../sokoban_fixed_wall_902_transitions_transition_fit/best.pt",
+    "transition_difference_weight": 1.0,
+    "initialize_optimizer": true,
+    "action_edges_replace_finite_only": true,
+    "failure_replay": {
+      "bank": "../sokoban_fixed_wall_902_transitions_transition_fit/training_policy.bank.npz",
+      "ranking_fraction": 0.25,
+      "critical_fraction": 0.5,
+      "distance_bin_upper_bounds": [
+        1,
+        2,
+        5,
+        10,
+        20,
+        40,
+        80,
+        128
+      ],
+      "layouts_per_batch": 1
+    }
+  },
+  "relations": {
+    "holdout_per_goal": 2,
+    "evaluation_per_goal": 32,
+    "unreachable_eval_per_goal": 24,
+    "complete_training_sources": true,
+    "evaluation_training_goals": 8,
+    "exhaustive_training_goals": true,
+    "holdout_goal_endpoints": false,
+    "minimum_relation_holdout_distance": 6,
+    "preserve_original_held_queries": true
+  },
+  "evaluation": {
+    "decision_count": 2048,
+    "rollout_count": 512,
+    "horizon": 256,
+    "landmarks": 128
+  },
+  "schema": "exact_state_pairs",
+  "selection": "Lowest validation finite Huber plus candidate soft-rank CE, equally averaging predeclared validation cohorts; no test checkpoint selection.",
+  "scope": "One Qmap for exactly one fixed wall orientation and original static board markers; player and four-box complete states and query goals vary. No cross-wall generalization claim. All legal successors, no oracle features, no pruning/search or LLM training.",
+  "hypothesis": "After matched stage and finite-transition fitting raised original-root training-goal completion only to32/198, compare two2000-update phases from that same selected MLP state and Adam optimizer. Sampling/RNG start a fresh matched phase; this is not full sampler continuation. Retain raw fixed-wall state inputs,532 original targets, stage/distance strata, direct physical edges, parent-child finite remaining-cost difference weight1, original rank loss and all held relationships. Replay treatment uses only the CURRENT starting policy failure bank: complete cycle members, all legal alternatives, and permitted teacher continuations at the same goal. Replace25 percent of ranking contexts, half critical/half continuation, and fit replay parents plus every legal child together. Direct physical edges replace only still-unused finite-supplement positions, preserving every replay label and broad source traversal. Worst replay point budget10240 plus8192 direct edges fits24576 finite slots. Control uses the same direct-edge preservation rule without replay. Examine common frozen training-query completion/cycles, original root queries and held goals; no search, taboo states or oracle features in inference. Existing maps and complete recovery states remain preserved.",
+  "acceptance": "experiments/new_tasks_qmap/configs/sokoban/sokoban_fixed_wall_acceptance.json"
+}

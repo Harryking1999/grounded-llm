@@ -357,6 +357,10 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
                 from grounded_llm.core.qmap.model import widen_mlp_weights
                 initial_weights=widen_mlp_weights(initial_weights,widening,config['seed']+91003)
             model.load_state_dict(initial_weights)
+            restore_initial_optimizer=options.get('initialize_optimizer',False)
+            if restore_initial_optimizer:
+                if widening!=1:raise ValueError('Cannot restore optimizer into a widened model')
+                optimizer.load_state_dict(saved['optimizer'])
             initialization_match=None
             if widening!=1:
                 old=StateEncoder(input_dim=corpus.input_dim,**saved['config']['model']).to(device);old.load_state_dict(saved['model']);old.eval()
@@ -377,10 +381,11 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
                     exposure[:len(prior)]=prior
                 else:raise ValueError('Warm-start exposure IDs do not match the prepared corpus')
             atomic_json(out/'initialization.json',dict(checkpoint=str(initial_path),source_commit=saved['source_commit'],
-                step=saved['step'],optimizer_restored=False,sampler_restored=False,
+                step=saved['step'],optimizer_restored=restore_initial_optimizer,sampler_restored=False,
                 function_match=initialization_match,
                 prior_exposure_transferred=not bool(structure_options),
-                meaning=('Weights warm start; fresh optimizer and sampling phase, not an exact continuation. '
+                meaning=(('Weights and optimizer restored; fresh sampling phase, not an exact continuation. ' if restore_initial_optimizer
+                          else 'Weights warm start; fresh optimizer and sampling phase, not an exact continuation. ')
                     + ('Small corpus has remapped state IDs; prior endpoint counters are not transferable.' if structure_options
                        else 'Prior gradient endpoint exposure retained separately from fresh source-row coverage.'))))
     if not (out/'initial.json').exists():
@@ -521,11 +526,13 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
         if edge_bank is not None:
             nedge=round(len(pair)*options['action_edge_fraction'])
             if options.get('action_edges_replace_finite_only'):
-                if relation_sampler is None or replay_sampler or branch_replay:
-                    raise ValueError('Finite-only action edges require independent board supplements without replay')
+                if relation_sampler is None or branch_replay:
+                    raise ValueError('Finite-only action edges require board point supplements')
                 finite_count=round(options['batch_size']*relation_sampler.finite_fraction)
-                if nedge>finite_count:raise ValueError('Action edges exceed the finite supplement')
-                slots=len(pair)-finite_count+rng.choice(finite_count,nedge,replace=False)
+                available=np.arange(len(pair)-finite_count,len(pair))
+                available=available[point_origin[available]==0]
+                if nedge>len(available):raise ValueError('Action edges would overwrite broad, negative or replay point labels')
+                slots=rng.choice(available,nedge,replace=False)
             else:slots=rng.choice(len(pair),nedge,replace=False)
             pair=pair.copy();p=p.copy();point_true=point_true.copy();point_target=point_target.copy()
             pair[slots]=edge_bank[rng.integers(len(edge_bank),size=nedge)]

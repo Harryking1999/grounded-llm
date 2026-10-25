@@ -632,6 +632,24 @@ class ExactPairTests(unittest.TestCase):
                 np.savez(path/'failure_replay_bank.npz',**bad)
                 with self.assertRaisesRegex(ValueError,'Replay labels or legal candidates changed'):
                     train(replay_config,path,'replay-fixture','cpu',resume=True)
+        edge_replay_config=deepcopy(replay_config)
+        edge_replay_config['training'].update(batch_size=32,action_edge_fraction=.25,action_edges_replace_finite_only=True)
+        with tempfile.TemporaryDirectory() as tmp:
+            path=Path(tmp)/'run';np.savez(Path(tmp)/'replay.npz',**replay_bank)
+            with patch('experiments.new_tasks_qmap.src.relations.prepare',return_value=(corpus,replay_data,dict(states=corpus.size))):
+                train(edge_replay_config,path,'edge-replay-fixture','cpu')
+            for file in path.glob('samples/attempt_*/*.npz'):
+                with np.load(file) as archive:
+                    for step in np.unique(archive['rank_step']):
+                        rm=(archive['rank_step']==step)&(archive['rank_origin']>0)
+                        context=archive['tasks'][rm];kids=archive['children'][rm];valid=kids>=0
+                        pm=archive['point_step']==step;points=archive['pairs'][pm];origin=archive['point_origin'][pm]
+                        np.testing.assert_array_equal(origin[:8],np.zeros(8,dtype=np.uint8))
+                        self.assertEqual(int((origin==4).sum()),8)
+                        pk=points[:,0]*corpus.size+points[:,1]
+                        self.assertTrue(np.isin(context[:,0]*corpus.size+context[:,1],pk[origin==1]).all())
+                        ck=kids[valid]*corpus.size+np.broadcast_to(context[:,1,None],kids.shape)[valid]
+                        self.assertTrue(np.isin(ck,pk[origin==2]).all())
         from experiments.new_tasks_qmap.src.relation_diagnose import policy_boundaries,training_local_paths
         flat=SimpleNamespace(scores=lambda s,g:np.zeros(np.broadcast_arrays(s,g)[0].shape,dtype=np.float32))
         records=[];rollout(corpus,flat,rank['tasks'],32,'q',edge_records=records)
@@ -1162,6 +1180,14 @@ class ExactPairTests(unittest.TestCase):
                     self.assertTrue((partition[trace['pairs']]==0).all())
                     self.assertFalse(np.intersect1d(closure(corpus,trace['tasks']),reserved).size)
                     np.testing.assert_array_equal(trace['point_distance'],corpus.distance(trace['pairs'][:,0],trace['pairs'][:,1]))
+            optimizer_config=json.loads(json.dumps(warm_config));optimizer_config['training']['initialize_optimizer']=True
+            optimizer_phase=root/'phase_optimizer'
+            with patch('experiments.new_tasks_qmap.src.relations.prepare',side_effect=prepare_fixture):
+                train(optimizer_config,optimizer_phase,'optimizer-fixture','cpu')
+            record=json.loads((optimizer_phase/'initialization.json').read_text())
+            self.assertTrue(record['optimizer_restored']);self.assertFalse(record['sampler_restored'])
+            restored=torch.load(optimizer_phase/'last.pt',weights_only=False)
+            self.assertTrue(all(int(v['step'])==4 for v in restored['optimizer']['state'].values()))
 
 
 if __name__=='__main__': unittest.main()

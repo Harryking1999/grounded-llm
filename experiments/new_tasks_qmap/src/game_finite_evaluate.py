@@ -113,7 +113,10 @@ def main():
         atomic_json(args.out,result)
         print(json.dumps(dict(output=str(args.out),passed=result['passed'],coverage=coverage,
             cohorts={name:{k:p[k] for k in ['count','solved','optimal','cycles','entered_unreachable']} for name,p in plans.items()})),flush=True)
-    finally:corpus.close()
+    finally:
+        for scene in corpus.scenes:
+            for name in ('states','children','distances','reverse_distances'):
+                getattr(scene,name)._mmap.close()
 
 
 if __name__=='__main__':main()

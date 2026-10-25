@@ -1,0 +1,71 @@
+{
+  "source_values": "1..N, distinct positive integer inputs, permutation merged",
+  "targets": [
+    21,
+    24
+  ],
+  "rules": "Exact rational + - * /, both operand orders, each original used exactly once.",
+  "method": "Exhaustive source combinations with exact subset value sets and final split equation checks; sampled complete operation DAG cross-check plus all4-number24 totals matched previous independent full enumeration.",
+  "dag_crosschecked_roots": 83,
+  "by_initial_arity": {
+    "3": {
+      "10": {
+        "roots": 120,
+        "to21": 30,
+        "to24": 35,
+        "both": 12,
+        "only21": 18,
+        "only24": 23,
+        "neither": 67
+      },
+      "13": {
+        "roots": 286,
+        "to21": 64,
+        "to24": 75,
+        "both": 17,
+        "only21": 47,
+        "only24": 58,
+        "neither": 164
+      },
+      "20": {
+        "roots": 1140,
+        "to21": 223,
+        "to24": 233,
+        "both": 41,
+        "only21": 182,
+        "only24": 192,
+        "neither": 725
+      }
+    },
+    "4": {
+      "10": {
+        "roots": 210,
+        "to21": 185,
+        "to24": 197,
+        "both": 173,
+        "only21": 12,
+        "only24": 24,
+        "neither": 1
+      },
+      "13": {
+        "roots": 715,
+        "to21": 576,
+        "to24": 607,
+        "both": 497,
+        "only21": 79,
+        "only24": 110,
+        "neither": 29
+      },
+      "20": {
+        "roots": 4845,
+        "to21": 3491,
+        "to24": 3450,
+        "both": 2514,
+        "only21": 977,
+        "only24": 936,
+        "neither": 418
+      }
+    }
+  },
+  "seconds": 1.702999999979511
+}

@@ -75,16 +75,21 @@ def main():
         # These existing query holdouts are local to their question. A numerical
         # goal may have been trained in another question, so no global unseen
         # target or held input claim is made.
+        missing=[]
         with np.load(args.run/'data/relations.npz') as archive:
-            rows=archive['tasks_unseen_goal_test']
-        goal_arity=np.empty(len(rows),dtype=np.int8)
-        for sid,mask in corpus._scene_groups(rows[:,1]):
-            scene=corpus.scenes[sid];offset=corpus.offsets[sid]
-            goal_arity[mask]=[len(scene.values[g-offset]) for g in rows[mask,1]]
-        for arity in (2,3):
-            selected=rows[goal_arity==arity]
-            if not len(selected):raise ValueError(('Missing held intermediate goal layer',arity))
-            groups[f'held_intermediate{arity}_query_test']=selected
+            for split in ('validation','test'):
+                key='tasks_unseen_goal_'+split
+                if key not in archive:
+                    if split=='test':missing.extend([f'held_intermediate{arity}_query_test' for arity in (2,3)])
+                    continue
+                rows=archive[key];goal_arity=np.empty(len(rows),dtype=np.int8)
+                for sid,mask in corpus._scene_groups(rows[:,1]):
+                    scene=corpus.scenes[sid];offset=corpus.offsets[sid]
+                    goal_arity[mask]=[len(scene.values[g-offset]) for g in rows[mask,1]]
+                for arity in (2,3):
+                    selected=rows[goal_arity==arity];name=f'held_intermediate{arity}_query_{split}'
+                    if len(selected):groups[name]=selected
+                    elif split=='test':missing.append(name)
         materialized={}
         for name,rows in groups.items():
             materialized.update({k+'_'+name:v for k,v in materialize(corpus,rows).items()})
@@ -97,7 +102,7 @@ def main():
             threshold=summary['metrics']['reachability_threshold'])
         plans={name:value['planning']['q'] for name,value in metrics['cohorts'].items()}
         oracle_ok=all(value['planning']['oracle']['optimal_rate']==1 for value in metrics['cohorts'].values())
-        passed=oracle_ok and coverage['numerical_input_coverage']==1
+        passed=not missing and oracle_ok and coverage['numerical_input_coverage']==1
         passed=passed and all(p['success_rate'] is not None and p['success_rate']>=protocol['minimum_completion_rate'] for p in plans.values())
         reachability_passed=all(
             value['unreachable']['recall'] is not None and value['unreachable']['recall']>=protocol['minimum_unreachable_recall']
@@ -107,7 +112,7 @@ def main():
         result=dict(protocol=protocol,checkpoint=str(args.run/'best.pt'),step=saved['step'],source_commit=saved['source_commit'],
             checkpoint_selection='Existing validation objective only; this suite never selects a checkpoint.',
             scope='Exhaustive finite-domain fitting, not unseen initial-question generalization.2/3-number suffixes are deduplicated across roots. Unsolvable queries remain in distance/reachability evaluation; completion uses every positive-distance solvable query. Local held query goals may occur as training goals or state inputs in other questions.',
-            coverage=coverage,oracle_ok=oracle_ok,completion_passed=passed,reachability_passed=reachability_passed,
+            coverage=coverage,missing_required_cohorts=missing,oracle_ok=oracle_ok,completion_passed=passed,reachability_passed=reachability_passed,
             passed=passed and reachability_passed,
             target_reached=passed and reachability_passed and all(p['success_rate']>=protocol['target_completion_rate'] for p in plans.values()),metrics=metrics)
         atomic_json(args.out,result)

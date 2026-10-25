@@ -1,0 +1,18 @@
+{
+  "source_values": [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20],
+  "targets": [21,24],
+  "expected_queries": {
+    "root4_to_21": 4845,
+    "root4_to_24": 4845,
+    "suffix3_to_21": 63435,
+    "suffix3_to_24": 63435,
+    "suffix2_to_21": 208481,
+    "suffix2_to_24": 208481
+  },
+  "minimum_completion_rate": 0.8,
+  "target_completion_rate": 0.9,
+  "minimum_unreachable_recall": 0.8,
+  "maximum_finite_false_positive": 0.2,
+  "threshold": "Use the already selected checkpoint's final validation-calibrated threshold; never calibrate on this suite.",
+  "scope": "All4845 initial questions are in training. These are exhaustive fitting checks, not held initial-question tests. Keep21/24 and arity2/3/4 separate; evaluate reachability on solvable and unsolvable queries and full greedy execution on every solvable query. Preserve existing local intermediate-query holdouts separately. No search or candidate pruning."
+}

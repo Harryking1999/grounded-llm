@@ -37,10 +37,10 @@ def build(config,out):
                 distances=labels,reverse=labels,costs=costs,state_dtype=np.int32)
             records.append(dict(path=path,**record))
     atomic_json(out/'corpus.json',dict(task='bridge',scenes=records,seed=config['seed']))
-    return load(out)
+    return load(out,feature_encoding=config.get('input_encoding','identity'))
 
 
-def load(out):
+def load(out,feature_encoding='identity'):
     out=Path(out);manifest=json.loads((out/'corpus.json').read_text())
-    return PhysicalCorpus([PhysicalScene(out/r['path'],Bridge(r['times']),decode,
+    return PhysicalCorpus([PhysicalScene(out/r['path'],Bridge(r['times'],feature_encoding=feature_encoding),decode,
         lambda s,g:np.zeros(len(s),dtype=np.float32)) for r in manifest['scenes']])

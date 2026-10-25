@@ -18,8 +18,8 @@ def widen_mlp_weights(state,factor,seed,noise_fraction=.01):
         raise ValueError('Widening requires the existing two-hidden-layer MLP')
     rng=torch.Generator(device='cpu').manual_seed(seed)
     values['network.0.weight']=first.repeat_interleave(factor,dim=0)
-    values['network.0.bias']=values['network.0.bias'].repeat_interleave(factor)
-    values['network.2.bias']=values['network.2.bias'].repeat_interleave(factor)
+    for key in ('network.0.bias','network.2.bias'):
+        if key in values:values[key]=values[key].repeat_interleave(factor)
     for index,weight in ((2,middle),(4,last)):
         expanded=(weight.repeat_interleave(factor,dim=0) if index==2 else weight).repeat_interleave(factor,dim=1)/factor
         noise=torch.randn(expanded.shape,generator=rng,dtype=expanded.dtype).reshape(expanded.shape[0],width,factor)
@@ -58,19 +58,20 @@ def soft_rank_loss(scores, truth, valid, temperature):
 class StateEncoder(nn.Module):
     """Independent state encoder; existing checkpoints default to the same MLP."""
     def __init__(self, dimension, hidden, cap, metric, input_dim=100, group_size=8, output_activation='sigmoid',
-                 architecture='mlp',spatial_shape=None,conv_channels=16,spatial_hidden=112):
+                 architecture='mlp',spatial_shape=None,conv_channels=16,spatial_hidden=112,bias=True):
         super().__init__()
         self.cap = cap
         self.metric = metric
         self.group_size = group_size
+        if not bias and architecture!='mlp':raise ValueError('Bias-free construction currently applies to the MLP')
         if output_activation not in ('sigmoid','linear','softsign'):
             raise ValueError('Expected sigmoid, linear or softsign Q output')
         self.output_activation = output_activation
         if architecture=='mlp':
             if spatial_shape is not None: raise ValueError('Spatial shape requires a spatial encoder')
-            self.network = nn.Sequential(nn.Linear(input_dim, hidden), nn.ReLU(),
-                                         nn.Linear(hidden, hidden), nn.ReLU(),
-                                         nn.Linear(hidden, dimension))
+            self.network = nn.Sequential(nn.Linear(input_dim, hidden,bias=bias), nn.ReLU(),
+                                         nn.Linear(hidden, hidden,bias=bias), nn.ReLU(),
+                                         nn.Linear(hidden, dimension,bias=bias))
         elif architecture=='spatial_cnn':
             if spatial_shape is None or len(spatial_shape)!=3 or min(spatial_shape)<1 or prod(spatial_shape)!=input_dim:
                 raise ValueError('Spatial shape must be channels, height, width matching the raw input')
@@ -84,7 +85,7 @@ class StateEncoder(nn.Module):
                 nn.Linear(spatial_hidden,dimension))
         else: raise ValueError('Expected mlp or spatial_cnn architecture')
         nn.init.normal_(self.network[-1].weight, std=.01)
-        nn.init.zeros_(self.network[-1].bias)
+        if self.network[-1].bias is not None:nn.init.zeros_(self.network[-1].bias)
 
     def encode(self, bits):
         values=self.network(bits)

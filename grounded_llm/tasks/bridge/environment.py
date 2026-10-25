@@ -6,11 +6,13 @@ from grounded_llm.core.qmap.exact_graph import goal_distances
 
 
 class Bridge:
-    def __init__(self, times):
+    def __init__(self, times,feature_encoding='identity'):
         if not times or any(t <= 0 for t in times):
             raise ValueError("Crossing times must be positive")
         self.times = tuple(times)
         self.n = len(times)
+        if feature_encoding not in ('identity','time_homogeneous'):raise ValueError('Unknown bridge feature encoding')
+        self.feature_encoding=feature_encoding
         self.goal = ((1 << self.n) - 1) * 2 + 1
 
     @cached_property
@@ -37,6 +39,9 @@ class Bridge:
                 yield a, target, cost
 
     def features(self, states):
+        if self.feature_encoding=='time_homogeneous':
+            return np.asarray([[*self.times,*[self.times[p]*((s//2>>p)&1) for p in range(self.n)],
+                                max(self.times)*(s%2)] for s in states],dtype=np.float32)
         return np.asarray([[*self.times, *[(s // 2 >> p) & 1 for p in range(self.n)], s % 2]
                            for s in states], dtype=np.float32)
 

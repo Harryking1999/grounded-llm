@@ -254,6 +254,13 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
             with np.load(fit_snapshot) as archive:fit_bank={key:archive[key] for key in ('tasks_seed','tasks_branches')}
         branch_replay=BranchReplay(corpus,data,np.load(out/'data/endpoint_partition.npy'),bank,branch_options,
             np.random.default_rng(config['seed']+87003),fit_bank=fit_bank)
+    profiles=None;profile_options=options.get('anchor_profiles');profile_probe_ids=None;profile_window=np.zeros(2,dtype=np.float64)
+    if profile_options:
+        if config['task']!='token_swapping' or config['model']['metric']!='linf' or profile_options['weight']<0:
+            raise ValueError('Anchor-coordinate supervision requires token Linf maps and a nonnegative weight')
+        from .token_profiles import AnchorProfiles
+        profiles=AnchorProfiles((out/profile_options['prepared_from']).resolve(),corpus,data,
+            np.load(out/'data/endpoint_partition.npy'),config['model']['dimension'],device)
     continuation=config.get('continuation');external=False
     checkpoint=(out/'last.pt' if resume and (out/'last.pt').exists() else None)
     if checkpoint is None and continuation:
@@ -267,6 +274,7 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
         rng.bit_generator.state=saved['rng']; pair_sampler.load_state_dict(saved['pair_sampler']); rank_sampler.load_state_dict(saved['rank_sampler'])
         if relation_sampler: relation_sampler.load_coverage_state_dict(saved.get('relation_coverage'))
         probe_batches=saved.get('training_probe_batches',[]);loss_window=saved.get('loss_window',loss_window)
+        profile_probe_ids=saved.get('anchor_probe_ids');profile_window=saved.get('anchor_loss_window',profile_window)
         token_replay=saved.get('token_cycle_replay',token_replay)
         if branch_replay:branch_replay.load_state_dict(saved['token_branch_state'])
         if neighborhood_fraction: neighborhood_rng.bit_generator.state=saved['neighborhood_rng']
@@ -399,6 +407,7 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
             replay_sampler_state=replay_sampler.state_dict() if isinstance(replay_sampler,LocalPathSampler) else None,
             relation_coverage=relation_sampler.coverage_state_dict() if relation_sampler else None,
             training_probe_batches=probe_batches,loss_window=loss_window,
+            anchor_probe_ids=profile_probe_ids,anchor_loss_window=profile_window,
             token_cycle_replay=token_replay,
             token_branch_state=branch_replay.state_dict() if branch_replay else None,
             best_score=best,best_step=best_step,
@@ -499,8 +508,14 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
         truth=np.where(np.isfinite(child_truth),child_truth,options['unreachable_target'])
         ranking=soft_rank_loss(scores,torch.as_tensor(costs+truth,device=device),mask,options['rank_temperature'])
         loss=pointwise+options['rank_weight']*ranking
+        profile_loss=None
+        if profiles:
+            profile_loss=profiles.loss(vectors,unique)
+            loss=loss+profile_options['weight']*profile_loss
+            if profile_probe_ids is None:profile_probe_ids=unique[:min(len(unique),4096)].copy()
         optimizer.zero_grad(set_to_none=True); loss.backward(); optimizer.step()
         loss_window+=np.array([float(pointwise.detach()),float(ranking.detach()),1.])
+        if profile_loss is not None:profile_window+=np.array([float(profile_loss.detach()),1.])
         window_batches+=1;window_points+=len(pair);window_decisions+=len(tasks)
         np.add.at(exposure,ids,1); np.add.at(pair_draws,p[p>=0],1); np.add.at(rank_draws,r[r>=0],1)
         if replay_sampler: np.add.at(replay_draws,replay_ids[replay_ids>=0],1)
@@ -554,6 +569,10 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
                         loss_window_batches=int(loss_window[2]),training_probe=training_probe(model,corpus,probe_batches,options),
                         validation={name:dict(mae=row['finite_mae'],shortest_action_rate=row['shortest_action_rate'],
                             **(dict(success_rate=row['planning']['q']['success_rate']) if planning else {})) for name,row in values['cohorts'].items()})
+            if profiles:
+                record['anchor_profile_loss_mean']=float(profile_window[0]/max(profile_window[1],1))
+                record['anchor_profile_probe']=profiles.probe(model,corpus,profile_probe_ids)
+                profile_window[:]=0
             if branch_replay:
                 fitting=evaluate(model,corpus,branch_replay.fit,config,planning=True)
                 record['branch_fit']={name:dict(mae=row['finite_mae'],shortest_action_rate=row['shortest_action_rate'],

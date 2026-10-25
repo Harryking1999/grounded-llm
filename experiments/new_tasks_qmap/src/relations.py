@@ -100,6 +100,13 @@ def retain_checkpoint(source,target):
     temporary.replace(target)
 
 
+def write_trace(target,packed):
+    started=time.monotonic();temporary=target.with_suffix('.tmp')
+    with temporary.open('wb') as stream:np.savez_compressed(stream,**packed)
+    temporary.replace(target)
+    return dict(seconds=time.monotonic()-started,raw_bytes=sum(value.nbytes for value in packed.values()))
+
+
 def train(config,out,source_commit,device,resume=False,prepare_only=False):
     out=Path(out)
     if out.exists() and not resume:
@@ -380,22 +387,38 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
             baseline=evaluate(model,corpus,data,config,cohorts=validation,exposure=exposure,planning=True)
             convergence.inspect(model,start_step,pair_draws,rank_draws,baseline,checkpoint)
             if checkpoint is not None:convergence.retain_policy_bests(checkpoint,start_step,baseline)
-    trace=[]; trace_number=0; trace_path=None
+    trace=[]; trace_number=0; trace_path=None;trace_executor=None;trace_pending=[]
+    trace_io=dict(files=0,compression_seconds=0.,main_wait_seconds=0.,raw_bytes=0,attempt_only=True)
+    workers=options.get('trace_write_workers',0)
+    if workers not in (0,1):raise ValueError('Trace compression supports synchronous or one bounded background worker')
+    if workers and options.get('record_training_samples'):
+        from concurrent.futures import ThreadPoolExecutor
+        trace_executor=ThreadPoolExecutor(max_workers=1)
     if options.get('record_training_samples'):
         parent=out/'samples'; parent.mkdir(exist_ok=True)
         attempt=0
         while (parent/f'attempt_{attempt:03d}').exists(): attempt+=1
         trace_path=parent/f'attempt_{attempt:03d}'; trace_path.mkdir()
+    def account_trace(result):
+        trace_io['files']+=1;trace_io['compression_seconds']+=result['seconds'];trace_io['raw_bytes']+=result['raw_bytes']
+    def wait_trace():
+        started=time.monotonic()
+        account_trace(trace_pending.pop(0).result())
+        trace_io['main_wait_seconds']+=time.monotonic()-started
     def flush_trace():
         nonlocal trace_number
         if not trace: return
+        if trace_executor and len(trace_pending)>=2:wait_trace()
         packed={key:np.concatenate([row[key] for row in trace]) for key in trace[0]}
-        target=trace_path/f'{trace_number:05d}.npz'; temporary=target.with_suffix('.tmp')
-        with temporary.open('wb') as stream: np.savez_compressed(stream,**packed)
-        temporary.replace(target)
+        target=trace_path/f'{trace_number:05d}.npz'
+        if trace_executor:trace_pending.append(trace_executor.submit(write_trace,target,packed))
+        else:account_trace(write_trace(target,packed))
         trace.clear(); trace_number+=1
     def save(step,path):
         flush_trace()
+        # A complete recovery checkpoint must never get ahead of its traces.
+        # Writer errors propagate here before the checkpoint is replaced.
+        while trace_pending:wait_trace()
         atomic_save(dict(model_type='exact_state_pairs',task=config['task'],scope=scope(config,corpus),
             source_commit=source_commit,config=config,input_dim=corpus.input_dim,step=step,
             model=model.state_dict(),optimizer=optimizer.state_dict(),rng=rng.bit_generator.state,
@@ -598,6 +621,7 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
                     convergence.inspect(model,step,pair_draws,rank_draws,values,out/f'checkpoint-{step}.pt')
             print(json.dumps(record),flush=True)
             window_started=time.monotonic();window_batches=window_points=window_decisions=0
+    if trace_executor:trace_executor.shutdown(wait=True)
     final_checkpoint=options.get('evaluation_checkpoint','best.pt')
     if final_checkpoint not in ('best.pt','last.pt'): raise ValueError('Unknown final evaluation checkpoint')
     saved=torch.load(out/final_checkpoint,map_location=device,weights_only=False)
@@ -619,7 +643,7 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
                                       unique_decision_rows=int((rank_draws>0).sum()),decision_rows=len(rank_draws),
                                       minimum_pair_layer_passes=pair_sampler.passes,
                                       minimum_decision_layer_passes=None if relation_sampler else rank_sampler.passes),
-                 metrics=final)
+                 trace_io=trace_io,metrics=final)
     if relation_sampler and relation_sampler.coverage_sampler is not None:
         summary['actual_exposure']['ranking_bank_epochs']=relation_sampler.ranking_epochs
         summary['actual_exposure']['ranking_bank_relations']=len(relation_sampler.ranks)

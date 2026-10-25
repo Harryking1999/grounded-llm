@@ -50,7 +50,7 @@ class ProfileTests(unittest.TestCase):
                 data.update({k+'_validation':v for k,v in materialize(corpus,np.array([[31,0]])).items()})
                 build(corpus,data,partition,root/'profiles',2)
                 cfg=dict(task='token_swapping',seed=41,model=dict(dimension=4,hidden=16,cap=32,metric='linf'),
-                    training=dict(steps=4,batch_size=8,decision_batch_size=4,learning_rate=.001,rank_weight=1.,rank_temperature=1.,eval_every=2,cpu_threads=1,unreachable_target=24.,evaluation_checkpoint='last.pt',anchor_profiles=dict(weight=1.,prepared_from=str(root/'profiles'))),
+                    training=dict(steps=4,batch_size=8,decision_batch_size=4,learning_rate=.001,rank_weight=1.,rank_temperature=1.,eval_every=2,cpu_threads=1,unreachable_target=24.,evaluation_checkpoint='last.pt',record_training_samples=True,trace_write_workers=0,anchor_profiles=dict(weight=1.,prepared_from=str(root/'profiles'))),
                     evaluation=dict(decision_count=4,rollout_count=2,horizon=24))
                 def prepared(config,path):
                     path.mkdir(exist_ok=True);np.save(path/'endpoint_partition.npy',partition);return corpus,data,dict(finite_max=8)
@@ -59,9 +59,26 @@ class ProfileTests(unittest.TestCase):
                     short=deepcopy(cfg);short['training']['steps']=2;train(short,root/'short','fixture','cpu')
                     resumed=deepcopy(cfg);resumed['continuation']=dict(checkpoint=str(root/'short/last.pt'))
                     train(resumed,root/'resumed','fixture','cpu')
+                    asynchronous=deepcopy(cfg);asynchronous['training']['trace_write_workers']=1
+                    train(asynchronous,root/'asynchronous','fixture','cpu')
+                    with patch('experiments.new_tasks_qmap.src.relations.np.savez_compressed',side_effect=OSError('Trace fixture failure')):
+                        with self.assertRaisesRegex(OSError,'Trace fixture failure'):train(asynchronous,root/'failed','fixture','cpu')
+                    self.assertFalse((root/'failed/last.pt').exists())
                 a=torch.load(root/'continuous/last.pt',weights_only=False);b=torch.load(root/'resumed/last.pt',weights_only=False)
                 for key,value in a['model'].items():torch.testing.assert_close(value,b['model'][key],rtol=0,atol=0)
                 np.testing.assert_array_equal(a['anchor_probe_ids'],b['anchor_probe_ids'])
+                c=torch.load(root/'asynchronous/last.pt',weights_only=False)
+                for key,value in a['model'].items():torch.testing.assert_close(value,c['model'][key],rtol=0,atol=0)
+                for key in ['exposure','pair_draws','rank_draws']:np.testing.assert_array_equal(a[key],c[key])
+                self.assertEqual(a['rng'],c['rng'])
+                def traces(directory):
+                    parts=[]
+                    for path in sorted((root/directory/'samples').rglob('*.npz')):
+                        with np.load(path) as packed:parts.append(dict(packed))
+                    return {key:np.concatenate([part[key] for part in parts]) for key in parts[0]}
+                sync,background=traces('continuous'),traces('asynchronous')
+                for key in sync:np.testing.assert_array_equal(sync[key],background[key])
+                np.testing.assert_array_equal(np.unique(background['point_step']),[1,2,3,4])
                 env=TokenSwapping(corpus.n,corpus.env.edges)
                 with patch.object(AnchorProfiles,'__init__',side_effect=RuntimeError('No training cache at inference')),patch.object(TokenCorpus,'distance',side_effect=RuntimeError('No oracle at inference')):
                     reader=TransitionQMap(env,root/'continuous/last.pt','token_swapping')

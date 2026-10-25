@@ -81,6 +81,8 @@ python -m experiments.new_tasks_qmap.src.run --config experiments/new_tasks_qmap
 
 正式运行使用已提交源码，远端操作前按[机器手册](../../DEVELOPMENT_MACHINES.md)核对进程和资源。恢复使用原配置及完整`last.pt`。
 
+采样记录默认同步压缩。可用单个有界后台线程压缩原样数组；完整断点写入前必须等所有记录成功落盘，写入异常会阻止断点替换。过桥和24点的实际百步记录分别约405MB、614MB，单次压缩耗时约13秒、12秒，是已测CPU等待来源。同步／后台对照见[同步配置](configs/bridge/bridge6_trace_sync.json)和[后台配置](configs/bridge/bridge6_trace_async.json)；实现检查要求权重、随机状态、曝光和记录数组一致。循环吞吐排除了断点等待，因此性能结论同时检查包含写入等待的总耗时。
+
 | 能力 | 模块入口 |
 |---|---|
 | 统一命令入口与模式分流 | [run.py](src/run.py) |

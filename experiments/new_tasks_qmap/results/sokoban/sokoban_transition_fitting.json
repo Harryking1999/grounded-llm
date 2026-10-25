@@ -1416,5 +1416,2061 @@
     "raw_frozen": "logs/sokoban_frozen_transition_comparison.json",
     "raw_dimension": "analysis_sokoban_goal_coverage/sokoban_directed_dimension_probe.json",
     "raw_exhaustive": "logs/sokoban_exhaustive_policy_fit.json"
+  },
+  "lowrate_exhaustive_fitting": {
+    "scope": "Exhaustive frozen-policy evaluation over permitted training state-goal decisions, not independent acceptance. Full physical candidate scores determine one action; pointer jumping computes outcomes of that fixed policy and never changes actions. Exact labels are used only after selection and to diagnose permitted optimal-path coverage. No new training.",
+    "models": {
+      "sokoban_fixed_wall_902_lowrate_control/best.pt": {
+        "step": 2000,
+        "source_commit": "ac2e3b3",
+        "totals": {
+          "count": 747780,
+          "solved": 201603,
+          "optimal": 181328,
+          "does_not_reach_goal": 546177,
+          "reaches_goal_after_horizon": 0,
+          "optimal_path_inside_training": 745234,
+          "solved_with_optimal_path_inside_training": 200521,
+          "first_action_optimal": 638125,
+          "non_descent_first_action": 71387,
+          "finite_mae": 2.6415321552188153
+        },
+        "distance_ranges": {
+          "1_5": {
+            "count": 16067,
+            "solved": 15579,
+            "optimal": 15539
+          },
+          "6_20": {
+            "count": 403659,
+            "solved": 150783,
+            "optimal": 137388
+          },
+          "21_plus": {
+            "count": 328054,
+            "solved": 35241,
+            "optimal": 28401
+          }
+        },
+        "goal_box_phases": {
+          "0": {
+            "count": 113272,
+            "solved": 37366,
+            "optimal": 35400
+          },
+          "1": {
+            "count": 331900,
+            "solved": 73375,
+            "optimal": 65438
+          },
+          "2": {
+            "count": 225837,
+            "solved": 48176,
+            "optimal": 42245
+          },
+          "3": {
+            "count": 27893,
+            "solved": 9733,
+            "optimal": 8649
+          },
+          "4": {
+            "count": 48878,
+            "solved": 32953,
+            "optimal": 29596
+          }
+        },
+        "physical_rollout_checks": 4,
+        "seconds": 16.634371750056744
+      },
+      "sokoban_fixed_wall_902_lowrate_control/last.pt": {
+        "step": 2000,
+        "source_commit": "ac2e3b3",
+        "totals": {
+          "count": 747780,
+          "solved": 201603,
+          "optimal": 181328,
+          "does_not_reach_goal": 546177,
+          "reaches_goal_after_horizon": 0,
+          "optimal_path_inside_training": 745234,
+          "solved_with_optimal_path_inside_training": 200521,
+          "first_action_optimal": 638125,
+          "non_descent_first_action": 71387,
+          "finite_mae": 2.6415321552188153
+        },
+        "distance_ranges": {
+          "1_5": {
+            "count": 16067,
+            "solved": 15579,
+            "optimal": 15539
+          },
+          "6_20": {
+            "count": 403659,
+            "solved": 150783,
+            "optimal": 137388
+          },
+          "21_plus": {
+            "count": 328054,
+            "solved": 35241,
+            "optimal": 28401
+          }
+        },
+        "goal_box_phases": {
+          "0": {
+            "count": 113272,
+            "solved": 37366,
+            "optimal": 35400
+          },
+          "1": {
+            "count": 331900,
+            "solved": 73375,
+            "optimal": 65438
+          },
+          "2": {
+            "count": 225837,
+            "solved": 48176,
+            "optimal": 42245
+          },
+          "3": {
+            "count": 27893,
+            "solved": 9733,
+            "optimal": 8649
+          },
+          "4": {
+            "count": 48878,
+            "solved": 32953,
+            "optimal": 29596
+          }
+        },
+        "physical_rollout_checks": 4,
+        "seconds": 16.0360633097589
+      },
+      "sokoban_fixed_wall_902_lowrate_coverage/best.pt": {
+        "step": 2000,
+        "source_commit": "ac2e3b3",
+        "totals": {
+          "count": 747780,
+          "solved": 216550,
+          "optimal": 194329,
+          "does_not_reach_goal": 531230,
+          "reaches_goal_after_horizon": 0,
+          "optimal_path_inside_training": 745234,
+          "solved_with_optimal_path_inside_training": 215386,
+          "first_action_optimal": 644501,
+          "non_descent_first_action": 64827,
+          "finite_mae": 2.6027134942537824
+        },
+        "distance_ranges": {
+          "1_5": {
+            "count": 16067,
+            "solved": 15515,
+            "optimal": 15467
+          },
+          "6_20": {
+            "count": 403659,
+            "solved": 160522,
+            "optimal": 146473
+          },
+          "21_plus": {
+            "count": 328054,
+            "solved": 40513,
+            "optimal": 32389
+          }
+        },
+        "goal_box_phases": {
+          "0": {
+            "count": 113272,
+            "solved": 38703,
+            "optimal": 36541
+          },
+          "1": {
+            "count": 331900,
+            "solved": 80853,
+            "optimal": 72429
+          },
+          "2": {
+            "count": 225837,
+            "solved": 53732,
+            "optimal": 46972
+          },
+          "3": {
+            "count": 27893,
+            "solved": 9669,
+            "optimal": 8324
+          },
+          "4": {
+            "count": 48878,
+            "solved": 33593,
+            "optimal": 30063
+          }
+        },
+        "physical_rollout_checks": 4,
+        "seconds": 16.106697996146977
+      },
+      "sokoban_fixed_wall_902_lowrate_coverage/last.pt": {
+        "step": 2000,
+        "source_commit": "ac2e3b3",
+        "totals": {
+          "count": 747780,
+          "solved": 216550,
+          "optimal": 194329,
+          "does_not_reach_goal": 531230,
+          "reaches_goal_after_horizon": 0,
+          "optimal_path_inside_training": 745234,
+          "solved_with_optimal_path_inside_training": 215386,
+          "first_action_optimal": 644501,
+          "non_descent_first_action": 64827,
+          "finite_mae": 2.6027134942537824
+        },
+        "distance_ranges": {
+          "1_5": {
+            "count": 16067,
+            "solved": 15515,
+            "optimal": 15467
+          },
+          "6_20": {
+            "count": 403659,
+            "solved": 160522,
+            "optimal": 146473
+          },
+          "21_plus": {
+            "count": 328054,
+            "solved": 40513,
+            "optimal": 32389
+          }
+        },
+        "goal_box_phases": {
+          "0": {
+            "count": 113272,
+            "solved": 38703,
+            "optimal": 36541
+          },
+          "1": {
+            "count": 331900,
+            "solved": 80853,
+            "optimal": 72429
+          },
+          "2": {
+            "count": 225837,
+            "solved": 53732,
+            "optimal": 46972
+          },
+          "3": {
+            "count": 27893,
+            "solved": 9669,
+            "optimal": 8324
+          },
+          "4": {
+            "count": 48878,
+            "solved": 33593,
+            "optimal": 30063
+          }
+        },
+        "physical_rollout_checks": 4,
+        "seconds": 16.122342464514077
+      }
+    }
+  },
+  "lowrate_primary_evaluations": {
+    "control": {
+      "best_step": 2000,
+      "source_commit": "ac2e3b3",
+      "actual_exposure": {
+        "unique_gradient_states": 42840,
+        "available_states": 42840,
+        "unique_pair_rows": 42840,
+        "pair_rows": 42840,
+        "unique_decision_rows": 33893,
+        "decision_rows": 747780,
+        "minimum_pair_layer_passes": 382.44631185807657,
+        "minimum_decision_layer_passes": null
+      },
+      "metrics": {
+        "validation": {
+          "count": 16,
+          "finite_count": 16,
+          "finite_mae": 0.8059165477752686,
+          "shortest_action_rate": 0.9375,
+          "unreachable": {
+            "proven_unreachable": 0,
+            "finite": 16,
+            "unknown": 0,
+            "auroc": null,
+            "validation_threshold": 51.346365585327185,
+            "recall": null,
+            "finite_false_positive": 0.0,
+            "recall_at_training_proxy": null,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 16,
+            "solved": 9,
+            "optimal": 8,
+            "cycles": 7,
+            "entered_unreachable": 1,
+            "mean_excess_cost_on_success": 0.2222222238779068,
+            "mean_cost_ratio_on_success": 1.013071894645691,
+            "by_distance": {
+              "9.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "10.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "11.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "15.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "17.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 0
+              },
+              "20.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "25.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "27.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "29.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "30.0": {
+                "count": 2,
+                "solved": 0,
+                "optimal": 0
+              },
+              "34.0": {
+                "count": 2,
+                "solved": 1,
+                "optimal": 1
+              },
+              "38.0": {
+                "count": 2,
+                "solved": 0,
+                "optimal": 0
+              },
+              "42.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              }
+            }
+          }
+        },
+        "test": {
+          "count": 16,
+          "finite_count": 16,
+          "finite_mae": 1.8492536544799805,
+          "shortest_action_rate": 0.9375,
+          "unreachable": {
+            "proven_unreachable": 0,
+            "finite": 16,
+            "unknown": 0,
+            "auroc": null,
+            "validation_threshold": 51.346365585327185,
+            "recall": null,
+            "finite_false_positive": 0.0,
+            "recall_at_training_proxy": null,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 16,
+            "solved": 10,
+            "optimal": 9,
+            "cycles": 6,
+            "entered_unreachable": 1,
+            "mean_excess_cost_on_success": 0.20000000298023224,
+            "mean_cost_ratio_on_success": 1.0076923370361328,
+            "by_distance": {
+              "10.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "14.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "18.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "19.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 2
+              },
+              "22.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "25.0": {
+                "count": 2,
+                "solved": 1,
+                "optimal": 1
+              },
+              "26.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 1
+              },
+              "30.0": {
+                "count": 3,
+                "solved": 1,
+                "optimal": 1
+              },
+              "36.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "50.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "52.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              }
+            }
+          }
+        },
+        "unseen_goal_validation": {
+          "count": 168,
+          "finite_count": 96,
+          "finite_mae": 1.893009066581726,
+          "shortest_action_rate": 0.8854166666666666,
+          "unreachable": {
+            "proven_unreachable": 72,
+            "finite": 96,
+            "unknown": 0,
+            "auroc": 0.9635416666666666,
+            "validation_threshold": 51.346365585327185,
+            "recall": 0.8888888888888888,
+            "finite_false_positive": 0.0,
+            "recall_at_training_proxy": 0.6805555555555556,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 96,
+            "solved": 55,
+            "optimal": 50,
+            "cycles": 41,
+            "entered_unreachable": 11,
+            "mean_excess_cost_on_success": 0.1818181872367859,
+            "mean_cost_ratio_on_success": 1.0106794834136963,
+            "by_distance": {
+              "1.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "3.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 2
+              },
+              "5.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "6.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 2
+              },
+              "7.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 2
+              },
+              "8.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 1
+              },
+              "9.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 2
+              },
+              "10.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "11.0": {
+                "count": 2,
+                "solved": 1,
+                "optimal": 1
+              },
+              "12.0": {
+                "count": 3,
+                "solved": 3,
+                "optimal": 3
+              },
+              "13.0": {
+                "count": 3,
+                "solved": 2,
+                "optimal": 2
+              },
+              "14.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "15.0": {
+                "count": 3,
+                "solved": 2,
+                "optimal": 2
+              },
+              "17.0": {
+                "count": 4,
+                "solved": 3,
+                "optimal": 3
+              },
+              "18.0": {
+                "count": 5,
+                "solved": 3,
+                "optimal": 3
+              },
+              "19.0": {
+                "count": 2,
+                "solved": 1,
+                "optimal": 1
+              },
+              "20.0": {
+                "count": 4,
+                "solved": 1,
+                "optimal": 0
+              },
+              "21.0": {
+                "count": 4,
+                "solved": 3,
+                "optimal": 3
+              },
+              "22.0": {
+                "count": 3,
+                "solved": 3,
+                "optimal": 1
+              },
+              "23.0": {
+                "count": 2,
+                "solved": 1,
+                "optimal": 1
+              },
+              "24.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "25.0": {
+                "count": 3,
+                "solved": 0,
+                "optimal": 0
+              },
+              "26.0": {
+                "count": 5,
+                "solved": 1,
+                "optimal": 1
+              },
+              "27.0": {
+                "count": 3,
+                "solved": 2,
+                "optimal": 2
+              },
+              "28.0": {
+                "count": 4,
+                "solved": 2,
+                "optimal": 2
+              },
+              "29.0": {
+                "count": 2,
+                "solved": 0,
+                "optimal": 0
+              },
+              "30.0": {
+                "count": 4,
+                "solved": 2,
+                "optimal": 2
+              },
+              "31.0": {
+                "count": 3,
+                "solved": 1,
+                "optimal": 1
+              },
+              "32.0": {
+                "count": 2,
+                "solved": 1,
+                "optimal": 1
+              },
+              "33.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "34.0": {
+                "count": 2,
+                "solved": 0,
+                "optimal": 0
+              },
+              "35.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "36.0": {
+                "count": 3,
+                "solved": 1,
+                "optimal": 0
+              },
+              "37.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "38.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "39.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "41.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "42.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "43.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "45.0": {
+                "count": 2,
+                "solved": 1,
+                "optimal": 1
+              },
+              "47.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 2
+              },
+              "48.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 2
+              },
+              "49.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              }
+            }
+          }
+        },
+        "unseen_goal_test": {
+          "count": 168,
+          "finite_count": 96,
+          "finite_mae": 5.156046390533447,
+          "shortest_action_rate": 0.7708333333333334,
+          "unreachable": {
+            "proven_unreachable": 72,
+            "finite": 96,
+            "unknown": 0,
+            "auroc": 0.9832175925925926,
+            "validation_threshold": 51.346365585327185,
+            "recall": 0.9166666666666666,
+            "finite_false_positive": 0.0,
+            "recall_at_training_proxy": 0.6388888888888888,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 94,
+            "solved": 21,
+            "optimal": 20,
+            "cycles": 73,
+            "entered_unreachable": 12,
+            "mean_excess_cost_on_success": 0.095238097012043,
+            "mean_cost_ratio_on_success": 1.0086580514907837,
+            "by_distance": {
+              "1.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 2
+              },
+              "2.0": {
+                "count": 3,
+                "solved": 3,
+                "optimal": 3
+              },
+              "4.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 2
+              },
+              "5.0": {
+                "count": 5,
+                "solved": 4,
+                "optimal": 4
+              },
+              "6.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "7.0": {
+                "count": 3,
+                "solved": 1,
+                "optimal": 1
+              },
+              "8.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "9.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "10.0": {
+                "count": 5,
+                "solved": 1,
+                "optimal": 1
+              },
+              "11.0": {
+                "count": 7,
+                "solved": 3,
+                "optimal": 2
+              },
+              "12.0": {
+                "count": 3,
+                "solved": 1,
+                "optimal": 1
+              },
+              "13.0": {
+                "count": 2,
+                "solved": 1,
+                "optimal": 1
+              },
+              "14.0": {
+                "count": 7,
+                "solved": 0,
+                "optimal": 0
+              },
+              "15.0": {
+                "count": 2,
+                "solved": 0,
+                "optimal": 0
+              },
+              "16.0": {
+                "count": 3,
+                "solved": 0,
+                "optimal": 0
+              },
+              "17.0": {
+                "count": 4,
+                "solved": 1,
+                "optimal": 1
+              },
+              "18.0": {
+                "count": 3,
+                "solved": 0,
+                "optimal": 0
+              },
+              "19.0": {
+                "count": 4,
+                "solved": 0,
+                "optimal": 0
+              },
+              "20.0": {
+                "count": 3,
+                "solved": 0,
+                "optimal": 0
+              },
+              "21.0": {
+                "count": 6,
+                "solved": 0,
+                "optimal": 0
+              },
+              "22.0": {
+                "count": 5,
+                "solved": 0,
+                "optimal": 0
+              },
+              "23.0": {
+                "count": 4,
+                "solved": 0,
+                "optimal": 0
+              },
+              "24.0": {
+                "count": 3,
+                "solved": 0,
+                "optimal": 0
+              },
+              "25.0": {
+                "count": 3,
+                "solved": 0,
+                "optimal": 0
+              },
+              "26.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "27.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "28.0": {
+                "count": 3,
+                "solved": 0,
+                "optimal": 0
+              },
+              "29.0": {
+                "count": 3,
+                "solved": 0,
+                "optimal": 0
+              },
+              "31.0": {
+                "count": 2,
+                "solved": 0,
+                "optimal": 0
+              },
+              "35.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "36.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              }
+            }
+          }
+        },
+        "original_training_goals": {
+          "count": 532,
+          "finite_count": 198,
+          "finite_mae": 6.0379743576049805,
+          "shortest_action_rate": 0.8787878787878788,
+          "unreachable": {
+            "proven_unreachable": 334,
+            "finite": 198,
+            "unknown": 0,
+            "auroc": 0.5045817455997097,
+            "validation_threshold": 51.346365585327185,
+            "recall": 0.2215568862275449,
+            "finite_false_positive": 0.05555555555555555,
+            "recall_at_training_proxy": 0.17065868263473055,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 198,
+            "solved": 41,
+            "optimal": 38,
+            "cycles": 157,
+            "entered_unreachable": 35,
+            "mean_excess_cost_on_success": 0.3414634168148041,
+            "mean_cost_ratio_on_success": 1.0140489339828491,
+            "by_distance": {
+              "9.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "10.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "11.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "12.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "14.0": {
+                "count": 3,
+                "solved": 3,
+                "optimal": 3
+              },
+              "15.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "16.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "17.0": {
+                "count": 5,
+                "solved": 2,
+                "optimal": 2
+              },
+              "18.0": {
+                "count": 4,
+                "solved": 1,
+                "optimal": 1
+              },
+              "19.0": {
+                "count": 3,
+                "solved": 2,
+                "optimal": 1
+              },
+              "20.0": {
+                "count": 5,
+                "solved": 2,
+                "optimal": 2
+              },
+              "21.0": {
+                "count": 7,
+                "solved": 2,
+                "optimal": 2
+              },
+              "22.0": {
+                "count": 7,
+                "solved": 1,
+                "optimal": 1
+              },
+              "23.0": {
+                "count": 8,
+                "solved": 3,
+                "optimal": 3
+              },
+              "24.0": {
+                "count": 10,
+                "solved": 1,
+                "optimal": 1
+              },
+              "25.0": {
+                "count": 7,
+                "solved": 0,
+                "optimal": 0
+              },
+              "26.0": {
+                "count": 11,
+                "solved": 0,
+                "optimal": 0
+              },
+              "27.0": {
+                "count": 7,
+                "solved": 2,
+                "optimal": 2
+              },
+              "28.0": {
+                "count": 10,
+                "solved": 0,
+                "optimal": 0
+              },
+              "29.0": {
+                "count": 7,
+                "solved": 0,
+                "optimal": 0
+              },
+              "30.0": {
+                "count": 12,
+                "solved": 2,
+                "optimal": 1
+              },
+              "31.0": {
+                "count": 14,
+                "solved": 2,
+                "optimal": 1
+              },
+              "32.0": {
+                "count": 10,
+                "solved": 2,
+                "optimal": 2
+              },
+              "33.0": {
+                "count": 8,
+                "solved": 0,
+                "optimal": 0
+              },
+              "34.0": {
+                "count": 7,
+                "solved": 0,
+                "optimal": 0
+              },
+              "35.0": {
+                "count": 8,
+                "solved": 1,
+                "optimal": 1
+              },
+              "36.0": {
+                "count": 3,
+                "solved": 0,
+                "optimal": 0
+              },
+              "37.0": {
+                "count": 3,
+                "solved": 0,
+                "optimal": 0
+              },
+              "38.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "39.0": {
+                "count": 6,
+                "solved": 0,
+                "optimal": 0
+              },
+              "40.0": {
+                "count": 4,
+                "solved": 0,
+                "optimal": 0
+              },
+              "41.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "44.0": {
+                "count": 2,
+                "solved": 1,
+                "optimal": 1
+              },
+              "45.0": {
+                "count": 2,
+                "solved": 1,
+                "optimal": 1
+              },
+              "46.0": {
+                "count": 7,
+                "solved": 3,
+                "optimal": 3
+              },
+              "47.0": {
+                "count": 4,
+                "solved": 4,
+                "optimal": 4
+              },
+              "48.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "49.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 2
+              },
+              "51.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "52.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "56.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              }
+            }
+          }
+        },
+        "original_unseen_goals": {
+          "count": 6,
+          "finite_count": 4,
+          "finite_mae": 2.047191619873047,
+          "shortest_action_rate": 1.0,
+          "unreachable": {
+            "proven_unreachable": 2,
+            "finite": 4,
+            "unknown": 0,
+            "auroc": 0.5,
+            "validation_threshold": 51.346365585327185,
+            "recall": 0.0,
+            "finite_false_positive": 0.0,
+            "recall_at_training_proxy": 0.0,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 4,
+            "solved": 2,
+            "optimal": 2,
+            "cycles": 2,
+            "entered_unreachable": 1,
+            "mean_excess_cost_on_success": 0.0,
+            "mean_cost_ratio_on_success": 1.0,
+            "by_distance": {
+              "23.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "35.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "48.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "50.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "coverage": {
+      "best_step": 2000,
+      "source_commit": "ac2e3b3",
+      "actual_exposure": {
+        "unique_gradient_states": 42840,
+        "available_states": 42840,
+        "unique_pair_rows": 42840,
+        "pair_rows": 42840,
+        "unique_decision_rows": 34012,
+        "decision_rows": 747780,
+        "minimum_pair_layer_passes": 382.44631185807657,
+        "minimum_decision_layer_passes": null,
+        "ranking_bank_epochs": 10.955093744149348,
+        "ranking_bank_relations": 747780,
+        "epoch_scope": "Prepared finite training (state, goal) ranking bank; not all physical states or all Boxoban layouts."
+      },
+      "metrics": {
+        "validation": {
+          "count": 16,
+          "finite_count": 16,
+          "finite_mae": 0.8228222131729126,
+          "shortest_action_rate": 0.9375,
+          "unreachable": {
+            "proven_unreachable": 0,
+            "finite": 16,
+            "unknown": 0,
+            "auroc": null,
+            "validation_threshold": 49.56807910919191,
+            "recall": null,
+            "finite_false_positive": 0.0,
+            "recall_at_training_proxy": null,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 16,
+            "solved": 11,
+            "optimal": 9,
+            "cycles": 5,
+            "entered_unreachable": 1,
+            "mean_excess_cost_on_success": 0.3636363744735718,
+            "mean_cost_ratio_on_success": 1.0167558193206787,
+            "by_distance": {
+              "9.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "10.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "11.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "15.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "17.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 0
+              },
+              "20.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "25.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "27.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "29.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "30.0": {
+                "count": 2,
+                "solved": 1,
+                "optimal": 0
+              },
+              "34.0": {
+                "count": 2,
+                "solved": 1,
+                "optimal": 1
+              },
+              "38.0": {
+                "count": 2,
+                "solved": 0,
+                "optimal": 0
+              },
+              "42.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              }
+            }
+          }
+        },
+        "test": {
+          "count": 16,
+          "finite_count": 16,
+          "finite_mae": 1.820528268814087,
+          "shortest_action_rate": 0.9375,
+          "unreachable": {
+            "proven_unreachable": 0,
+            "finite": 16,
+            "unknown": 0,
+            "auroc": null,
+            "validation_threshold": 49.56807910919191,
+            "recall": null,
+            "finite_false_positive": 0.125,
+            "recall_at_training_proxy": null,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 16,
+            "solved": 10,
+            "optimal": 9,
+            "cycles": 6,
+            "entered_unreachable": 1,
+            "mean_excess_cost_on_success": 0.20000000298023224,
+            "mean_cost_ratio_on_success": 1.0076923370361328,
+            "by_distance": {
+              "10.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "14.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "18.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "19.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 2
+              },
+              "22.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "25.0": {
+                "count": 2,
+                "solved": 1,
+                "optimal": 1
+              },
+              "26.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 1
+              },
+              "30.0": {
+                "count": 3,
+                "solved": 1,
+                "optimal": 1
+              },
+              "36.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "50.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "52.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              }
+            }
+          }
+        },
+        "unseen_goal_validation": {
+          "count": 168,
+          "finite_count": 96,
+          "finite_mae": 1.9271745681762695,
+          "shortest_action_rate": 0.8958333333333334,
+          "unreachable": {
+            "proven_unreachable": 72,
+            "finite": 96,
+            "unknown": 0,
+            "auroc": 0.9618055555555556,
+            "validation_threshold": 49.56807910919191,
+            "recall": 0.8888888888888888,
+            "finite_false_positive": 0.0,
+            "recall_at_training_proxy": 0.6805555555555556,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 96,
+            "solved": 55,
+            "optimal": 50,
+            "cycles": 41,
+            "entered_unreachable": 13,
+            "mean_excess_cost_on_success": 0.2181818187236786,
+            "mean_cost_ratio_on_success": 1.0118237733840942,
+            "by_distance": {
+              "1.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "3.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 2
+              },
+              "5.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "6.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 2
+              },
+              "7.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 2
+              },
+              "8.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 1
+              },
+              "9.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 2
+              },
+              "10.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "11.0": {
+                "count": 2,
+                "solved": 1,
+                "optimal": 1
+              },
+              "12.0": {
+                "count": 3,
+                "solved": 3,
+                "optimal": 3
+              },
+              "13.0": {
+                "count": 3,
+                "solved": 2,
+                "optimal": 2
+              },
+              "14.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "15.0": {
+                "count": 3,
+                "solved": 2,
+                "optimal": 2
+              },
+              "17.0": {
+                "count": 4,
+                "solved": 2,
+                "optimal": 2
+              },
+              "18.0": {
+                "count": 5,
+                "solved": 3,
+                "optimal": 3
+              },
+              "19.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 2
+              },
+              "20.0": {
+                "count": 4,
+                "solved": 1,
+                "optimal": 0
+              },
+              "21.0": {
+                "count": 4,
+                "solved": 3,
+                "optimal": 3
+              },
+              "22.0": {
+                "count": 3,
+                "solved": 2,
+                "optimal": 1
+              },
+              "23.0": {
+                "count": 2,
+                "solved": 1,
+                "optimal": 1
+              },
+              "24.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "25.0": {
+                "count": 3,
+                "solved": 0,
+                "optimal": 0
+              },
+              "26.0": {
+                "count": 5,
+                "solved": 2,
+                "optimal": 1
+              },
+              "27.0": {
+                "count": 3,
+                "solved": 2,
+                "optimal": 2
+              },
+              "28.0": {
+                "count": 4,
+                "solved": 2,
+                "optimal": 2
+              },
+              "29.0": {
+                "count": 2,
+                "solved": 0,
+                "optimal": 0
+              },
+              "30.0": {
+                "count": 4,
+                "solved": 2,
+                "optimal": 2
+              },
+              "31.0": {
+                "count": 3,
+                "solved": 0,
+                "optimal": 0
+              },
+              "32.0": {
+                "count": 2,
+                "solved": 1,
+                "optimal": 1
+              },
+              "33.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "34.0": {
+                "count": 2,
+                "solved": 1,
+                "optimal": 1
+              },
+              "35.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "36.0": {
+                "count": 3,
+                "solved": 1,
+                "optimal": 0
+              },
+              "37.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "38.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "39.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "41.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "42.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "43.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "45.0": {
+                "count": 2,
+                "solved": 1,
+                "optimal": 1
+              },
+              "47.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 2
+              },
+              "48.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 2
+              },
+              "49.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              }
+            }
+          }
+        },
+        "unseen_goal_test": {
+          "count": 168,
+          "finite_count": 96,
+          "finite_mae": 5.16098165512085,
+          "shortest_action_rate": 0.7708333333333334,
+          "unreachable": {
+            "proven_unreachable": 72,
+            "finite": 96,
+            "unknown": 0,
+            "auroc": 0.9842303240740741,
+            "validation_threshold": 49.56807910919191,
+            "recall": 0.9166666666666666,
+            "finite_false_positive": 0.0,
+            "recall_at_training_proxy": 0.6388888888888888,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 94,
+            "solved": 21,
+            "optimal": 20,
+            "cycles": 73,
+            "entered_unreachable": 11,
+            "mean_excess_cost_on_success": 0.095238097012043,
+            "mean_cost_ratio_on_success": 1.0059523582458496,
+            "by_distance": {
+              "1.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 2
+              },
+              "2.0": {
+                "count": 3,
+                "solved": 3,
+                "optimal": 3
+              },
+              "4.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 2
+              },
+              "5.0": {
+                "count": 5,
+                "solved": 4,
+                "optimal": 4
+              },
+              "6.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "7.0": {
+                "count": 3,
+                "solved": 1,
+                "optimal": 1
+              },
+              "8.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "9.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "10.0": {
+                "count": 5,
+                "solved": 1,
+                "optimal": 1
+              },
+              "11.0": {
+                "count": 7,
+                "solved": 2,
+                "optimal": 2
+              },
+              "12.0": {
+                "count": 3,
+                "solved": 1,
+                "optimal": 1
+              },
+              "13.0": {
+                "count": 2,
+                "solved": 1,
+                "optimal": 1
+              },
+              "14.0": {
+                "count": 7,
+                "solved": 0,
+                "optimal": 0
+              },
+              "15.0": {
+                "count": 2,
+                "solved": 0,
+                "optimal": 0
+              },
+              "16.0": {
+                "count": 3,
+                "solved": 1,
+                "optimal": 0
+              },
+              "17.0": {
+                "count": 4,
+                "solved": 1,
+                "optimal": 1
+              },
+              "18.0": {
+                "count": 3,
+                "solved": 0,
+                "optimal": 0
+              },
+              "19.0": {
+                "count": 4,
+                "solved": 0,
+                "optimal": 0
+              },
+              "20.0": {
+                "count": 3,
+                "solved": 0,
+                "optimal": 0
+              },
+              "21.0": {
+                "count": 6,
+                "solved": 0,
+                "optimal": 0
+              },
+              "22.0": {
+                "count": 5,
+                "solved": 0,
+                "optimal": 0
+              },
+              "23.0": {
+                "count": 4,
+                "solved": 0,
+                "optimal": 0
+              },
+              "24.0": {
+                "count": 3,
+                "solved": 0,
+                "optimal": 0
+              },
+              "25.0": {
+                "count": 3,
+                "solved": 0,
+                "optimal": 0
+              },
+              "26.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "27.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "28.0": {
+                "count": 3,
+                "solved": 0,
+                "optimal": 0
+              },
+              "29.0": {
+                "count": 3,
+                "solved": 0,
+                "optimal": 0
+              },
+              "31.0": {
+                "count": 2,
+                "solved": 0,
+                "optimal": 0
+              },
+              "35.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "36.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              }
+            }
+          }
+        },
+        "original_training_goals": {
+          "count": 532,
+          "finite_count": 198,
+          "finite_mae": 6.069864749908447,
+          "shortest_action_rate": 0.8838383838383839,
+          "unreachable": {
+            "proven_unreachable": 334,
+            "finite": 198,
+            "unknown": 0,
+            "auroc": 0.5040827436037016,
+            "validation_threshold": 49.56807910919191,
+            "recall": 0.24550898203592814,
+            "finite_false_positive": 0.07575757575757576,
+            "recall_at_training_proxy": 0.1497005988023952,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 198,
+            "solved": 40,
+            "optimal": 37,
+            "cycles": 158,
+            "entered_unreachable": 37,
+            "mean_excess_cost_on_success": 0.4000000059604645,
+            "mean_cost_ratio_on_success": 1.0167334079742432,
+            "by_distance": {
+              "9.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "10.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "11.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "12.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "14.0": {
+                "count": 3,
+                "solved": 3,
+                "optimal": 3
+              },
+              "15.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "16.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "17.0": {
+                "count": 5,
+                "solved": 2,
+                "optimal": 2
+              },
+              "18.0": {
+                "count": 4,
+                "solved": 1,
+                "optimal": 1
+              },
+              "19.0": {
+                "count": 3,
+                "solved": 1,
+                "optimal": 0
+              },
+              "20.0": {
+                "count": 5,
+                "solved": 3,
+                "optimal": 3
+              },
+              "21.0": {
+                "count": 7,
+                "solved": 2,
+                "optimal": 2
+              },
+              "22.0": {
+                "count": 7,
+                "solved": 1,
+                "optimal": 1
+              },
+              "23.0": {
+                "count": 8,
+                "solved": 3,
+                "optimal": 3
+              },
+              "24.0": {
+                "count": 10,
+                "solved": 1,
+                "optimal": 1
+              },
+              "25.0": {
+                "count": 7,
+                "solved": 1,
+                "optimal": 0
+              },
+              "26.0": {
+                "count": 11,
+                "solved": 1,
+                "optimal": 1
+              },
+              "27.0": {
+                "count": 7,
+                "solved": 1,
+                "optimal": 1
+              },
+              "28.0": {
+                "count": 10,
+                "solved": 0,
+                "optimal": 0
+              },
+              "29.0": {
+                "count": 7,
+                "solved": 0,
+                "optimal": 0
+              },
+              "30.0": {
+                "count": 12,
+                "solved": 1,
+                "optimal": 1
+              },
+              "31.0": {
+                "count": 14,
+                "solved": 3,
+                "optimal": 2
+              },
+              "32.0": {
+                "count": 10,
+                "solved": 2,
+                "optimal": 2
+              },
+              "33.0": {
+                "count": 8,
+                "solved": 0,
+                "optimal": 0
+              },
+              "34.0": {
+                "count": 7,
+                "solved": 0,
+                "optimal": 0
+              },
+              "35.0": {
+                "count": 8,
+                "solved": 1,
+                "optimal": 1
+              },
+              "36.0": {
+                "count": 3,
+                "solved": 0,
+                "optimal": 0
+              },
+              "37.0": {
+                "count": 3,
+                "solved": 0,
+                "optimal": 0
+              },
+              "38.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "39.0": {
+                "count": 6,
+                "solved": 0,
+                "optimal": 0
+              },
+              "40.0": {
+                "count": 4,
+                "solved": 0,
+                "optimal": 0
+              },
+              "41.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "44.0": {
+                "count": 2,
+                "solved": 0,
+                "optimal": 0
+              },
+              "45.0": {
+                "count": 2,
+                "solved": 1,
+                "optimal": 1
+              },
+              "46.0": {
+                "count": 7,
+                "solved": 3,
+                "optimal": 3
+              },
+              "47.0": {
+                "count": 4,
+                "solved": 4,
+                "optimal": 4
+              },
+              "48.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "49.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 2
+              },
+              "51.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "52.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "56.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              }
+            }
+          }
+        },
+        "original_unseen_goals": {
+          "count": 6,
+          "finite_count": 4,
+          "finite_mae": 2.012531280517578,
+          "shortest_action_rate": 1.0,
+          "unreachable": {
+            "proven_unreachable": 2,
+            "finite": 4,
+            "unknown": 0,
+            "auroc": 0.5,
+            "validation_threshold": 49.56807910919191,
+            "recall": 0.0,
+            "finite_false_positive": 0.0,
+            "recall_at_training_proxy": 0.0,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 4,
+            "solved": 2,
+            "optimal": 2,
+            "cycles": 2,
+            "entered_unreachable": 1,
+            "mean_excess_cost_on_success": 0.0,
+            "mean_cost_ratio_on_success": 1.0,
+            "by_distance": {
+              "23.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "35.0": {
+                "count": 1,
+                "solved": 0,
+                "optimal": 0
+              },
+              "48.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "50.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }

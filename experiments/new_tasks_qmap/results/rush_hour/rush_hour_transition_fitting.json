@@ -1,0 +1,339 @@
+{
+  "matched_conditions": {
+    "rush_hour_transition_control_fit": {
+      "complete": true,
+      "step": 4000,
+      "best_step": 3500,
+      "probe": {
+        "batches": 4,
+        "point_count": 262144,
+        "decision_count": 32768,
+        "finite_mae": 1.0314500331878662,
+        "distance_huber": 0.6334328055381775,
+        "candidate_soft_rank_loss": 2.0054352283477783,
+        "shortest_action_rate": 0.904327392578125,
+        "by_distance": {
+          "1_5": {
+            "count": 84582,
+            "mae": 1.131318211555481
+          },
+          "6_20": {
+            "count": 132224,
+            "mae": 0.8931995630264282
+          },
+          "21_plus": {
+            "count": 44516,
+            "mae": 1.2713828086853027
+          }
+        },
+        "role": "Fixed actual training batches; fitting diagnostic only, never checkpoint selection."
+      },
+      "transition_loss": null,
+      "validation_score": 5.996433198451996,
+      "throughput": {
+        "training_seconds": 130.40458627510816,
+        "batches_per_second": 3.8342209755197914,
+        "point_pairs_per_second": 251279.50585166505,
+        "complete_decisions_per_second": 31409.93823145813,
+        "point_batch_size": 65536,
+        "decision_batch_size": 8192,
+        "cuda_peak_allocated_bytes": 8367768576
+      },
+      "cohorts": {
+        "validation": {
+          "mae": 1.1487032175064087,
+          "count": 1024,
+          "solved": 1024,
+          "optimal": 1020,
+          "cycles": 0
+        },
+        "test": {
+          "mae": 1.147118091583252,
+          "count": 1024,
+          "solved": 1023,
+          "optimal": 1012,
+          "cycles": 1
+        },
+        "unseen_goal_validation": {
+          "mae": 1.2570761442184448,
+          "count": 1024,
+          "solved": 1024,
+          "optimal": 1023,
+          "cycles": 0
+        },
+        "unseen_goal_test": {
+          "mae": 1.356400489807129,
+          "count": 1024,
+          "solved": 1024,
+          "optimal": 1024,
+          "cycles": 0
+        },
+        "unseen_layout_validation": {
+          "mae": 3.454136848449707,
+          "count": 1024,
+          "solved": 436,
+          "optimal": 242,
+          "cycles": 588
+        },
+        "unseen_layout_test": {
+          "mae": 3.3725783824920654,
+          "count": 1024,
+          "solved": 466,
+          "optimal": 291,
+          "cycles": 558
+        },
+        "original_layout_test": {
+          "mae": 10.62548828125,
+          "count": 1024,
+          "solved": 10,
+          "optimal": 0,
+          "cycles": 1014
+        },
+        "original_layout_validation": {
+          "mae": 11.583521842956543,
+          "count": 1024,
+          "solved": 16,
+          "optimal": 0,
+          "cycles": 1008
+        },
+        "diagnostic": {
+          "mae": 5.351849555969238,
+          "count": 1024,
+          "solved": 241,
+          "optimal": 160,
+          "cycles": 783
+        },
+        "diagnostic_original": {
+          "mae": 16.803211212158203,
+          "count": 8,
+          "solved": 0,
+          "optimal": 0,
+          "cycles": 8
+        }
+      },
+      "training_policy": {
+        "count": 4096,
+        "solved": 2271,
+        "optimal": 1306,
+        "cycles": 1825
+      }
+    },
+    "rush_hour_transition_differences_fit": {
+      "complete": true,
+      "pid": 9979,
+      "process_live": false,
+      "step": 4000,
+      "best_step": 3500,
+      "probe": {
+        "batches": 4,
+        "point_count": 262144,
+        "decision_count": 32768,
+        "finite_mae": 0.9890589714050293,
+        "distance_huber": 0.5969434976577759,
+        "candidate_soft_rank_loss": 1.9780093431472778,
+        "shortest_action_rate": 0.906280517578125,
+        "by_distance": {
+          "1_5": {
+            "count": 84582,
+            "mae": 1.0536470413208008
+          },
+          "6_20": {
+            "count": 132224,
+            "mae": 0.8662734031677246
+          },
+          "21_plus": {
+            "count": 44516,
+            "mae": 1.2493070363998413
+          }
+        },
+        "role": "Fixed actual training batches; fitting diagnostic only, never checkpoint selection."
+      },
+      "transition_loss": 0.21992164850234985,
+      "validation_score": 5.992014959454536,
+      "throughput": {
+        "training_seconds": 137.79141060449183,
+        "batches_per_second": 3.628673208340757,
+        "point_pairs_per_second": 237808.72738181986,
+        "complete_decisions_per_second": 29726.090922727482,
+        "point_batch_size": 65536,
+        "decision_batch_size": 8192,
+        "cuda_peak_allocated_bytes": 8386409984
+      },
+      "cohorts": {
+        "validation": {
+          "mae": 1.1289361715316772,
+          "count": 1024,
+          "solved": 1024,
+          "optimal": 1019,
+          "cycles": 0
+        },
+        "test": {
+          "mae": 1.1282176971435547,
+          "count": 1024,
+          "solved": 1023,
+          "optimal": 1010,
+          "cycles": 1
+        },
+        "unseen_goal_validation": {
+          "mae": 1.2346785068511963,
+          "count": 1024,
+          "solved": 1024,
+          "optimal": 1023,
+          "cycles": 0
+        },
+        "unseen_goal_test": {
+          "mae": 1.3174577951431274,
+          "count": 1024,
+          "solved": 1024,
+          "optimal": 1024,
+          "cycles": 0
+        },
+        "unseen_layout_validation": {
+          "mae": 3.4260969161987305,
+          "count": 1024,
+          "solved": 439,
+          "optimal": 253,
+          "cycles": 585
+        },
+        "unseen_layout_test": {
+          "mae": 3.363506317138672,
+          "count": 1024,
+          "solved": 507,
+          "optimal": 304,
+          "cycles": 517
+        },
+        "original_layout_test": {
+          "mae": 10.862238883972168,
+          "count": 1024,
+          "solved": 16,
+          "optimal": 15,
+          "cycles": 1008
+        },
+        "original_layout_validation": {
+          "mae": 11.68337345123291,
+          "count": 1024,
+          "solved": 38,
+          "optimal": 1,
+          "cycles": 986
+        },
+        "diagnostic": {
+          "mae": 5.357123851776123,
+          "count": 1024,
+          "solved": 286,
+          "optimal": 160,
+          "cycles": 738
+        },
+        "diagnostic_original": {
+          "mae": 16.96918487548828,
+          "count": 8,
+          "solved": 0,
+          "optimal": 0,
+          "cycles": 8
+        }
+      }
+    }
+  },
+  "transition_training_root_policy": {
+    "count": 4096,
+    "solved": 2397,
+    "optimal": 1376,
+    "cycles": 1699,
+    "mean_excess_cost_on_success": 0.8669169545173645,
+    "mean_cost_ratio_on_success": 1.0702804327011108
+  },
+  "independent_move_geometry": {
+    "sampled_training_states": 17036,
+    "independent_one_cell_move_counts": {
+      "1": 68,
+      "2": 660,
+      "3": 2639,
+      "4": 4783,
+      "5": 4748,
+      "6": 2929,
+      "7": 1018,
+      "8": 170,
+      "9": 21
+    },
+    "largest_verified_cube": {
+      "scene": 278,
+      "source": {
+        "url": "https://www.michaelfogleman.com/static/rush/rush.txt.gz",
+        "row": 1996937,
+        "original_minimum": 9,
+        "reported_states": 16653
+      },
+      "local_state": 3704,
+      "state": [
+        1,
+        0,
+        4,
+        1,
+        1,
+        0,
+        1,
+        2,
+        1,
+        3
+      ],
+      "dimension": 9,
+      "actions": [
+        {
+          "vehicle": "A",
+          "displacement": -1
+        },
+        {
+          "vehicle": "B",
+          "displacement": 1
+        },
+        {
+          "vehicle": "C",
+          "displacement": -1
+        },
+        {
+          "vehicle": "D",
+          "displacement": -1
+        },
+        {
+          "vehicle": "E",
+          "displacement": -1
+        },
+        {
+          "vehicle": "F",
+          "displacement": 1
+        },
+        {
+          "vehicle": "G",
+          "displacement": 1
+        },
+        {
+          "vehicle": "H",
+          "displacement": -1
+        },
+        {
+          "vehicle": "J",
+          "displacement": 1
+        }
+      ],
+      "verified_cube_states": 512,
+      "verified_directed_cube_edges": 4608,
+      "antipodal_pairs": 256,
+      "exact_linf_dimension_lower_bound_for_all_cube_pairs": 256
+    },
+    "proof": "Moves use distinct initially-empty new cells and separate vehicles. Every subset is legal, all cube edges are physically replayed. Any pair needs at least one slide per changed vehicle; cube paths attain that Hamming count, hence these distances are exact in the FULL physical graph. Each different antipodal pair requires a separate active absolute-difference coordinate: two length-k pairs on one coordinate imply cross-distance sum>=2k, but their true cross sum<=2k-2. Thus exact Linf embedding of all2^k cube vertices needs at least2^(k-1) coordinates. A shared coordinate forces worst absolute distance error>=0.5. Normalized L1 represents this independent subgraph additively.",
+    "limitations": "Only sampled actual training states, not an exhaustive maximum. The lower bound concerns ALL cube state pairs, not the smaller declared training-target subset. It neither proves the current finite target bank is128D-infeasible nor bounds completion rate. This is a teacher/physics-only geometry diagnosis, never an input feature or learned result.",
+    "seconds": 97.76815348118544,
+    "numerical_geometry_check": {
+      "all_cube_pair_labels": 262144,
+      "minimum_cross_gap_all_orientations": 2,
+      "normalized_L1_witness_dimension": 128,
+      "normalized_L1_witness_max_error": 9.5367431640625e-07,
+      "witness_is_not_a_trained_map": true,
+      "no_constructed_coordinates_given_to_training": true
+    }
+  },
+  "interpretation": "The matched finite-transition-difference arm improves held-layout random-query completion466 to507/1024 and original-root10 to16/1024, but long-root execution remains far below threshold; no adoption. Original historical better model is retained. A verified9-dimensional independent-car cube in a real training scene needs256 Linf coordinates to reproduce ALL cube-pair distances exactly, versus current128; this is not an infeasibility result for the finite32-goal training pool or a bound on greedy completion. It motivates a matched from-scratch L1/Linf baseline with identical raw CNN, dimension, losses, source/target boundaries and update budget. No symbolic coordinates enter training.",
+  "readout_configs": [
+    "experiments/new_tasks_qmap/configs/rush_hour/rush_hour_linf_readout_fit.json",
+    "experiments/new_tasks_qmap/configs/rush_hour/rush_hour_l1_readout_fit.json"
+  ]
+}

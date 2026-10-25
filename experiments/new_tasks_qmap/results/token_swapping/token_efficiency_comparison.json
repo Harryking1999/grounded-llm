@@ -1561,5 +1561,2171 @@
   "next_sampling_configs": [
     "experiments/new_tasks_qmap/configs/token_swapping/token_endpoint_efficiency_layers.json",
     "experiments/new_tasks_qmap/configs/token_swapping/token_alternate_efficiency_layers.json"
-  ]
+  ],
+  "optimal_tie_training_diagnosis": {
+    "scope": "Score-space ranking-gradient diagnosis on fixed actual training batches only. Multiple optimal choices are legal. Counts describe direct derivatives with respect to candidate scores, not full shared-network update causality or test improvement.",
+    "trees": {
+      "endpoint": {
+        "token_endpoint_l1_fit": {
+          "step": 4000,
+          "source_commit": "b1e2cb3",
+          "all": {
+            "count": 32768,
+            "wrong_branch_count": 608,
+            "multiple_optimal_count": 30419,
+            "mean_optimal_choices": 4.112152099609375,
+            "wrong_branch_and_soft_raises_best_optimal_score": 13,
+            "wrong_branch_and_uniform_raises_best_optimal_score": 5,
+            "any_decision_soft_raises_best_optimal_score": 22999,
+            "optimal_choice_histogram": {
+              "1": 2349,
+              "2": 6547,
+              "3": 7060,
+              "4": 4973,
+              "5": 3390,
+              "6": 2674,
+              "7": 2334,
+              "8": 2069,
+              "9": 1372
+            }
+          },
+          "long": {
+            "count": 5132,
+            "wrong_branch_count": 135,
+            "multiple_optimal_count": 5130,
+            "mean_optimal_choices": 7.2928682774746685,
+            "wrong_branch_and_soft_raises_best_optimal_score": 4,
+            "wrong_branch_and_uniform_raises_best_optimal_score": 3,
+            "any_decision_soft_raises_best_optimal_score": 4706,
+            "optimal_choice_histogram": {
+              "1": 2,
+              "2": 41,
+              "3": 119,
+              "4": 200,
+              "5": 347,
+              "6": 571,
+              "7": 1056,
+              "8": 1531,
+              "9": 1265
+            }
+          }
+        },
+        "token_endpoint_efficiency_soft": {
+          "step": 2500,
+          "source_commit": "65bc265",
+          "all": {
+            "count": 32768,
+            "wrong_branch_count": 582,
+            "multiple_optimal_count": 30419,
+            "mean_optimal_choices": 4.112152099609375,
+            "wrong_branch_and_soft_raises_best_optimal_score": 14,
+            "wrong_branch_and_uniform_raises_best_optimal_score": 7,
+            "any_decision_soft_raises_best_optimal_score": 23234,
+            "optimal_choice_histogram": {
+              "1": 2349,
+              "2": 6547,
+              "3": 7060,
+              "4": 4973,
+              "5": 3390,
+              "6": 2674,
+              "7": 2334,
+              "8": 2069,
+              "9": 1372
+            }
+          },
+          "long": {
+            "count": 5132,
+            "wrong_branch_count": 132,
+            "multiple_optimal_count": 5130,
+            "mean_optimal_choices": 7.2928682774746685,
+            "wrong_branch_and_soft_raises_best_optimal_score": 7,
+            "wrong_branch_and_uniform_raises_best_optimal_score": 4,
+            "any_decision_soft_raises_best_optimal_score": 4720,
+            "optimal_choice_histogram": {
+              "1": 2,
+              "2": 41,
+              "3": 119,
+              "4": 200,
+              "5": 347,
+              "6": 571,
+              "7": 1056,
+              "8": 1531,
+              "9": 1265
+            }
+          }
+        },
+        "token_endpoint_efficiency_optimal": {
+          "step": 4000,
+          "source_commit": "65bc265",
+          "all": {
+            "count": 32768,
+            "wrong_branch_count": 576,
+            "multiple_optimal_count": 30419,
+            "mean_optimal_choices": 4.112152099609375,
+            "wrong_branch_and_soft_raises_best_optimal_score": 19,
+            "wrong_branch_and_uniform_raises_best_optimal_score": 12,
+            "any_decision_soft_raises_best_optimal_score": 26121,
+            "optimal_choice_histogram": {
+              "1": 2349,
+              "2": 6547,
+              "3": 7060,
+              "4": 4973,
+              "5": 3390,
+              "6": 2674,
+              "7": 2334,
+              "8": 2069,
+              "9": 1372
+            }
+          },
+          "long": {
+            "count": 5132,
+            "wrong_branch_count": 121,
+            "multiple_optimal_count": 5130,
+            "mean_optimal_choices": 7.2928682774746685,
+            "wrong_branch_and_soft_raises_best_optimal_score": 8,
+            "wrong_branch_and_uniform_raises_best_optimal_score": 6,
+            "any_decision_soft_raises_best_optimal_score": 4732,
+            "optimal_choice_histogram": {
+              "1": 2,
+              "2": 41,
+              "3": 119,
+              "4": 200,
+              "5": 347,
+              "6": 571,
+              "7": 1056,
+              "8": 1531,
+              "9": 1265
+            }
+          }
+        },
+        "token_endpoint_efficiency_layers": {
+          "step": 2000,
+          "source_commit": "e6099ac",
+          "all": {
+            "count": 32768,
+            "wrong_branch_count": 571,
+            "multiple_optimal_count": 30419,
+            "mean_optimal_choices": 4.112152099609375,
+            "wrong_branch_and_soft_raises_best_optimal_score": 18,
+            "wrong_branch_and_uniform_raises_best_optimal_score": 10,
+            "any_decision_soft_raises_best_optimal_score": 22846,
+            "optimal_choice_histogram": {
+              "1": 2349,
+              "2": 6547,
+              "3": 7060,
+              "4": 4973,
+              "5": 3390,
+              "6": 2674,
+              "7": 2334,
+              "8": 2069,
+              "9": 1372
+            }
+          },
+          "long": {
+            "count": 5132,
+            "wrong_branch_count": 109,
+            "multiple_optimal_count": 5130,
+            "mean_optimal_choices": 7.2928682774746685,
+            "wrong_branch_and_soft_raises_best_optimal_score": 7,
+            "wrong_branch_and_uniform_raises_best_optimal_score": 3,
+            "any_decision_soft_raises_best_optimal_score": 4682,
+            "optimal_choice_histogram": {
+              "1": 2,
+              "2": 41,
+              "3": 119,
+              "4": 200,
+              "5": 347,
+              "6": 571,
+              "7": 1056,
+              "8": 1531,
+              "9": 1265
+            }
+          }
+        }
+      },
+      "alternate": {
+        "token_alternate_l1_fit": {
+          "step": 3500,
+          "source_commit": "5daf374",
+          "all": {
+            "count": 32768,
+            "wrong_branch_count": 695,
+            "multiple_optimal_count": 30948,
+            "mean_optimal_choices": 4.038909912109375,
+            "wrong_branch_and_soft_raises_best_optimal_score": 10,
+            "wrong_branch_and_uniform_raises_best_optimal_score": 4,
+            "any_decision_soft_raises_best_optimal_score": 24509,
+            "optimal_choice_histogram": {
+              "1": 1820,
+              "2": 6548,
+              "3": 7565,
+              "4": 5427,
+              "5": 3757,
+              "6": 2808,
+              "7": 2209,
+              "8": 1774,
+              "9": 860
+            }
+          },
+          "long": {
+            "count": 5229,
+            "wrong_branch_count": 204,
+            "multiple_optimal_count": 5206,
+            "mean_optimal_choices": 6.791547140944731,
+            "wrong_branch_and_soft_raises_best_optimal_score": 4,
+            "wrong_branch_and_uniform_raises_best_optimal_score": 3,
+            "any_decision_soft_raises_best_optimal_score": 4595,
+            "optimal_choice_histogram": {
+              "1": 23,
+              "2": 100,
+              "3": 195,
+              "4": 312,
+              "5": 462,
+              "6": 785,
+              "7": 1178,
+              "8": 1375,
+              "9": 799
+            }
+          }
+        },
+        "token_alternate_efficiency_soft": {
+          "step": 4000,
+          "source_commit": "65bc265",
+          "all": {
+            "count": 32768,
+            "wrong_branch_count": 672,
+            "multiple_optimal_count": 30948,
+            "mean_optimal_choices": 4.038909912109375,
+            "wrong_branch_and_soft_raises_best_optimal_score": 21,
+            "wrong_branch_and_uniform_raises_best_optimal_score": 6,
+            "any_decision_soft_raises_best_optimal_score": 24360,
+            "optimal_choice_histogram": {
+              "1": 1820,
+              "2": 6548,
+              "3": 7565,
+              "4": 5427,
+              "5": 3757,
+              "6": 2808,
+              "7": 2209,
+              "8": 1774,
+              "9": 860
+            }
+          },
+          "long": {
+            "count": 5229,
+            "wrong_branch_count": 204,
+            "multiple_optimal_count": 5206,
+            "mean_optimal_choices": 6.791547140944731,
+            "wrong_branch_and_soft_raises_best_optimal_score": 7,
+            "wrong_branch_and_uniform_raises_best_optimal_score": 4,
+            "any_decision_soft_raises_best_optimal_score": 4539,
+            "optimal_choice_histogram": {
+              "1": 23,
+              "2": 100,
+              "3": 195,
+              "4": 312,
+              "5": 462,
+              "6": 785,
+              "7": 1178,
+              "8": 1375,
+              "9": 799
+            }
+          }
+        },
+        "token_alternate_efficiency_optimal": {
+          "step": 500,
+          "source_commit": "65bc265",
+          "all": {
+            "count": 32768,
+            "wrong_branch_count": 636,
+            "multiple_optimal_count": 30948,
+            "mean_optimal_choices": 4.038909912109375,
+            "wrong_branch_and_soft_raises_best_optimal_score": 14,
+            "wrong_branch_and_uniform_raises_best_optimal_score": 7,
+            "any_decision_soft_raises_best_optimal_score": 25697,
+            "optimal_choice_histogram": {
+              "1": 1820,
+              "2": 6548,
+              "3": 7565,
+              "4": 5427,
+              "5": 3757,
+              "6": 2808,
+              "7": 2209,
+              "8": 1774,
+              "9": 860
+            }
+          },
+          "long": {
+            "count": 5229,
+            "wrong_branch_count": 197,
+            "multiple_optimal_count": 5206,
+            "mean_optimal_choices": 6.791547140944731,
+            "wrong_branch_and_soft_raises_best_optimal_score": 10,
+            "wrong_branch_and_uniform_raises_best_optimal_score": 7,
+            "any_decision_soft_raises_best_optimal_score": 4582,
+            "optimal_choice_histogram": {
+              "1": 23,
+              "2": 100,
+              "3": 195,
+              "4": 312,
+              "5": 462,
+              "6": 785,
+              "7": 1178,
+              "8": 1375,
+              "9": 799
+            }
+          }
+        },
+        "token_alternate_efficiency_layers": {
+          "step": 2500,
+          "source_commit": "e6099ac",
+          "all": {
+            "count": 32768,
+            "wrong_branch_count": 636,
+            "multiple_optimal_count": 30948,
+            "mean_optimal_choices": 4.038909912109375,
+            "wrong_branch_and_soft_raises_best_optimal_score": 14,
+            "wrong_branch_and_uniform_raises_best_optimal_score": 6,
+            "any_decision_soft_raises_best_optimal_score": 24230,
+            "optimal_choice_histogram": {
+              "1": 1820,
+              "2": 6548,
+              "3": 7565,
+              "4": 5427,
+              "5": 3757,
+              "6": 2808,
+              "7": 2209,
+              "8": 1774,
+              "9": 860
+            }
+          },
+          "long": {
+            "count": 5229,
+            "wrong_branch_count": 176,
+            "multiple_optimal_count": 5206,
+            "mean_optimal_choices": 6.791547140944731,
+            "wrong_branch_and_soft_raises_best_optimal_score": 6,
+            "wrong_branch_and_uniform_raises_best_optimal_score": 4,
+            "any_decision_soft_raises_best_optimal_score": 4621,
+            "optimal_choice_histogram": {
+              "1": 23,
+              "2": 100,
+              "3": 195,
+              "4": 312,
+              "5": 462,
+              "6": 785,
+              "7": 1178,
+              "8": 1375,
+              "9": 799
+            }
+          }
+        }
+      }
+    },
+    "seconds": 4.519179008901119
+  },
+  "exact_layer_training": {
+    "endpoint": {
+      "source_commit": "e6099ac",
+      "best_step": 4000,
+      "actual_exposure": {
+        "unique_gradient_states": 3084480,
+        "available_states": 3628800,
+        "unique_pair_rows": 3084480,
+        "pair_rows": 3084480,
+        "unique_decision_rows": 714835,
+        "decision_rows": 714835,
+        "minimum_pair_layer_passes": 21.2470173254487,
+        "minimum_decision_layer_passes": 22.919974539579062
+      },
+      "metrics": {
+        "validation": {
+          "count": 2048,
+          "finite_count": 2048,
+          "finite_mae": 0.8456940650939941,
+          "shortest_action_rate": 0.966796875,
+          "unreachable": {
+            "proven_unreachable": 0,
+            "finite": 2048,
+            "unknown": 0,
+            "auroc": null,
+            "validation_threshold": null,
+            "recall": null,
+            "finite_false_positive": null,
+            "recall_at_training_proxy": null,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 128,
+            "solved": 122,
+            "optimal": 90,
+            "cycles": 6,
+            "entered_unreachable": 0,
+            "mean_excess_cost_on_success": 0.5901639461517334,
+            "mean_cost_ratio_on_success": 1.035738468170166,
+            "by_distance": {
+              "4.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 2
+              },
+              "5.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 7
+              },
+              "6.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 7
+              },
+              "7.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 7
+              },
+              "8.0": {
+                "count": 7,
+                "solved": 6,
+                "optimal": 5
+              },
+              "9.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 6
+              },
+              "10.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 7
+              },
+              "11.0": {
+                "count": 7,
+                "solved": 6,
+                "optimal": 6
+              },
+              "12.0": {
+                "count": 7,
+                "solved": 6,
+                "optimal": 6
+              },
+              "13.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 7
+              },
+              "14.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 3
+              },
+              "15.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 4
+              },
+              "16.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 5
+              },
+              "17.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 2
+              },
+              "18.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 4
+              },
+              "19.0": {
+                "count": 7,
+                "solved": 6,
+                "optimal": 3
+              },
+              "20.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 4
+              },
+              "21.0": {
+                "count": 6,
+                "solved": 5,
+                "optimal": 2
+              },
+              "22.0": {
+                "count": 6,
+                "solved": 6,
+                "optimal": 2
+              },
+              "23.0": {
+                "count": 2,
+                "solved": 1,
+                "optimal": 1
+              }
+            }
+          }
+        },
+        "test": {
+          "count": 2048,
+          "finite_count": 2048,
+          "finite_mae": 0.8510435223579407,
+          "shortest_action_rate": 0.970703125,
+          "unreachable": {
+            "proven_unreachable": 0,
+            "finite": 2048,
+            "unknown": 0,
+            "auroc": null,
+            "validation_threshold": null,
+            "recall": null,
+            "finite_false_positive": null,
+            "recall_at_training_proxy": null,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 128,
+            "solved": 120,
+            "optimal": 87,
+            "cycles": 8,
+            "entered_unreachable": 0,
+            "mean_excess_cost_on_success": 0.6333333253860474,
+            "mean_cost_ratio_on_success": 1.0366588830947876,
+            "by_distance": {
+              "4.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 2
+              },
+              "5.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 7
+              },
+              "6.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 7
+              },
+              "7.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 7
+              },
+              "8.0": {
+                "count": 7,
+                "solved": 6,
+                "optimal": 6
+              },
+              "9.0": {
+                "count": 7,
+                "solved": 6,
+                "optimal": 5
+              },
+              "10.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 7
+              },
+              "11.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 7
+              },
+              "12.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 6
+              },
+              "13.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 6
+              },
+              "14.0": {
+                "count": 7,
+                "solved": 6,
+                "optimal": 4
+              },
+              "15.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 4
+              },
+              "16.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 4
+              },
+              "17.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 4
+              },
+              "18.0": {
+                "count": 7,
+                "solved": 6,
+                "optimal": 2
+              },
+              "19.0": {
+                "count": 7,
+                "solved": 5,
+                "optimal": 2
+              },
+              "20.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 1
+              },
+              "21.0": {
+                "count": 7,
+                "solved": 6,
+                "optimal": 5
+              },
+              "22.0": {
+                "count": 6,
+                "solved": 5,
+                "optimal": 1
+              },
+              "23.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 0
+              }
+            }
+          }
+        },
+        "unseen_endpoint_validation": {
+          "count": 2048,
+          "finite_count": 2048,
+          "finite_mae": 0.8445508480072021,
+          "shortest_action_rate": 0.982421875,
+          "unreachable": {
+            "proven_unreachable": 0,
+            "finite": 2048,
+            "unknown": 0,
+            "auroc": null,
+            "validation_threshold": null,
+            "recall": null,
+            "finite_false_positive": null,
+            "recall_at_training_proxy": null,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 128,
+            "solved": 124,
+            "optimal": 82,
+            "cycles": 4,
+            "entered_unreachable": 0,
+            "mean_excess_cost_on_success": 0.8064516186714172,
+            "mean_cost_ratio_on_success": 1.0481685400009155,
+            "by_distance": {
+              "5.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "6.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 2
+              },
+              "7.0": {
+                "count": 8,
+                "solved": 7,
+                "optimal": 7
+              },
+              "8.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 8
+              },
+              "9.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 7
+              },
+              "10.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 8
+              },
+              "11.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 6
+              },
+              "12.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 7
+              },
+              "13.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 7
+              },
+              "14.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 4
+              },
+              "15.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 5
+              },
+              "16.0": {
+                "count": 8,
+                "solved": 7,
+                "optimal": 3
+              },
+              "17.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 4
+              },
+              "18.0": {
+                "count": 8,
+                "solved": 7,
+                "optimal": 2
+              },
+              "19.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 4
+              },
+              "20.0": {
+                "count": 8,
+                "solved": 7,
+                "optimal": 4
+              },
+              "21.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 3
+              },
+              "22.0": {
+                "count": 3,
+                "solved": 3,
+                "optimal": 0
+              },
+              "23.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 0
+              }
+            }
+          }
+        },
+        "unseen_both_validation": {
+          "count": 2048,
+          "finite_count": 2048,
+          "finite_mae": 0.8353311419487,
+          "shortest_action_rate": 0.974609375,
+          "unreachable": {
+            "proven_unreachable": 0,
+            "finite": 2048,
+            "unknown": 0,
+            "auroc": null,
+            "validation_threshold": null,
+            "recall": null,
+            "finite_false_positive": null,
+            "recall_at_training_proxy": null,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 128,
+            "solved": 123,
+            "optimal": 99,
+            "cycles": 5,
+            "entered_unreachable": 0,
+            "mean_excess_cost_on_success": 0.4878048896789551,
+            "mean_cost_ratio_on_success": 1.0305290222167969,
+            "by_distance": {
+              "4.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "5.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 2
+              },
+              "6.0": {
+                "count": 3,
+                "solved": 3,
+                "optimal": 3
+              },
+              "7.0": {
+                "count": 8,
+                "solved": 6,
+                "optimal": 6
+              },
+              "8.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 7
+              },
+              "9.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 7
+              },
+              "10.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 8
+              },
+              "11.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 8
+              },
+              "12.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 7
+              },
+              "13.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 6
+              },
+              "14.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 7
+              },
+              "15.0": {
+                "count": 8,
+                "solved": 7,
+                "optimal": 6
+              },
+              "16.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 4
+              },
+              "17.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 5
+              },
+              "18.0": {
+                "count": 7,
+                "solved": 6,
+                "optimal": 5
+              },
+              "19.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 4
+              },
+              "20.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 5
+              },
+              "21.0": {
+                "count": 7,
+                "solved": 6,
+                "optimal": 5
+              },
+              "22.0": {
+                "count": 6,
+                "solved": 6,
+                "optimal": 2
+              },
+              "23.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 1
+              }
+            }
+          }
+        },
+        "unseen_endpoint_test": {
+          "count": 2048,
+          "finite_count": 2048,
+          "finite_mae": 0.8331983089447021,
+          "shortest_action_rate": 0.96875,
+          "unreachable": {
+            "proven_unreachable": 0,
+            "finite": 2048,
+            "unknown": 0,
+            "auroc": null,
+            "validation_threshold": null,
+            "recall": null,
+            "finite_false_positive": null,
+            "recall_at_training_proxy": null,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 128,
+            "solved": 123,
+            "optimal": 91,
+            "cycles": 5,
+            "entered_unreachable": 0,
+            "mean_excess_cost_on_success": 0.6991869807243347,
+            "mean_cost_ratio_on_success": 1.0411121845245361,
+            "by_distance": {
+              "4.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "5.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 2
+              },
+              "6.0": {
+                "count": 4,
+                "solved": 4,
+                "optimal": 4
+              },
+              "7.0": {
+                "count": 6,
+                "solved": 6,
+                "optimal": 6
+              },
+              "8.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 8
+              },
+              "9.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 8
+              },
+              "10.0": {
+                "count": 8,
+                "solved": 7,
+                "optimal": 6
+              },
+              "11.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 6
+              },
+              "12.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 6
+              },
+              "13.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 7
+              },
+              "14.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 7
+              },
+              "15.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 8
+              },
+              "16.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 5
+              },
+              "17.0": {
+                "count": 7,
+                "solved": 6,
+                "optimal": 1
+              },
+              "18.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 3
+              },
+              "19.0": {
+                "count": 7,
+                "solved": 6,
+                "optimal": 2
+              },
+              "20.0": {
+                "count": 7,
+                "solved": 6,
+                "optimal": 3
+              },
+              "21.0": {
+                "count": 7,
+                "solved": 6,
+                "optimal": 2
+              },
+              "22.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 5
+              },
+              "23.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 1
+              }
+            }
+          }
+        },
+        "unseen_both_test": {
+          "count": 2048,
+          "finite_count": 2048,
+          "finite_mae": 0.8262854814529419,
+          "shortest_action_rate": 0.970703125,
+          "unreachable": {
+            "proven_unreachable": 0,
+            "finite": 2048,
+            "unknown": 0,
+            "auroc": null,
+            "validation_threshold": null,
+            "recall": null,
+            "finite_false_positive": null,
+            "recall_at_training_proxy": null,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 128,
+            "solved": 121,
+            "optimal": 88,
+            "cycles": 7,
+            "entered_unreachable": 0,
+            "mean_excess_cost_on_success": 0.6115702390670776,
+            "mean_cost_ratio_on_success": 1.0343289375305176,
+            "by_distance": {
+              "5.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "6.0": {
+                "count": 4,
+                "solved": 3,
+                "optimal": 3
+              },
+              "7.0": {
+                "count": 5,
+                "solved": 5,
+                "optimal": 5
+              },
+              "8.0": {
+                "count": 9,
+                "solved": 9,
+                "optimal": 9
+              },
+              "9.0": {
+                "count": 8,
+                "solved": 6,
+                "optimal": 6
+              },
+              "10.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 8
+              },
+              "11.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 8
+              },
+              "12.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 6
+              },
+              "13.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 8
+              },
+              "14.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 6
+              },
+              "15.0": {
+                "count": 8,
+                "solved": 7,
+                "optimal": 5
+              },
+              "16.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 6
+              },
+              "17.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 4
+              },
+              "18.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 5
+              },
+              "19.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 4
+              },
+              "20.0": {
+                "count": 8,
+                "solved": 7,
+                "optimal": 0
+              },
+              "21.0": {
+                "count": 8,
+                "solved": 7,
+                "optimal": 2
+              },
+              "22.0": {
+                "count": 5,
+                "solved": 4,
+                "optimal": 2
+              }
+            }
+          }
+        },
+        "diagnostic": {
+          "count": 5,
+          "finite_count": 5,
+          "finite_mae": 0.7027300000190735,
+          "shortest_action_rate": 0.8,
+          "unreachable": {
+            "proven_unreachable": 0,
+            "finite": 5,
+            "unknown": 0,
+            "auroc": null,
+            "validation_threshold": null,
+            "recall": null,
+            "finite_false_positive": null,
+            "recall_at_training_proxy": null,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 5,
+            "solved": 5,
+            "optimal": 4,
+            "cycles": 0,
+            "entered_unreachable": 0,
+            "mean_excess_cost_on_success": 0.4000000059604645,
+            "mean_cost_ratio_on_success": 1.0266666412353516,
+            "by_distance": {
+              "12.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "14.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "15.0": {
+                "count": 3,
+                "solved": 3,
+                "optimal": 2
+              }
+            }
+          }
+        }
+      }
+    },
+    "alternate": {
+      "source_commit": "e6099ac",
+      "best_step": 4000,
+      "actual_exposure": {
+        "unique_gradient_states": 3084480,
+        "available_states": 3628800,
+        "unique_pair_rows": 3084480,
+        "pair_rows": 3084480,
+        "unique_decision_rows": 714682,
+        "decision_rows": 714682,
+        "minimum_pair_layer_passes": 21.2470173254487,
+        "minimum_decision_layer_passes": 22.92488127586815
+      },
+      "metrics": {
+        "validation": {
+          "count": 2048,
+          "finite_count": 2048,
+          "finite_mae": 0.9776356220245361,
+          "shortest_action_rate": 0.97265625,
+          "unreachable": {
+            "proven_unreachable": 0,
+            "finite": 2048,
+            "unknown": 0,
+            "auroc": null,
+            "validation_threshold": null,
+            "recall": null,
+            "finite_false_positive": null,
+            "recall_at_training_proxy": null,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 128,
+            "solved": 127,
+            "optimal": 88,
+            "cycles": 1,
+            "entered_unreachable": 0,
+            "mean_excess_cost_on_success": 0.7244094610214233,
+            "mean_cost_ratio_on_success": 1.040682077407837,
+            "by_distance": {
+              "4.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "5.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "6.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 7
+              },
+              "7.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 7
+              },
+              "8.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 7
+              },
+              "9.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 7
+              },
+              "10.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 6
+              },
+              "11.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 7
+              },
+              "12.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 6
+              },
+              "13.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 3
+              },
+              "14.0": {
+                "count": 7,
+                "solved": 6,
+                "optimal": 4
+              },
+              "15.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 6
+              },
+              "16.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 3
+              },
+              "17.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 6
+              },
+              "18.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 2
+              },
+              "19.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 6
+              },
+              "20.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 2
+              },
+              "21.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 3
+              },
+              "22.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 3
+              },
+              "23.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 1
+              }
+            }
+          }
+        },
+        "test": {
+          "count": 2048,
+          "finite_count": 2048,
+          "finite_mae": 0.9211283922195435,
+          "shortest_action_rate": 0.990234375,
+          "unreachable": {
+            "proven_unreachable": 0,
+            "finite": 2048,
+            "unknown": 0,
+            "auroc": null,
+            "validation_threshold": null,
+            "recall": null,
+            "finite_false_positive": null,
+            "recall_at_training_proxy": null,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 128,
+            "solved": 125,
+            "optimal": 97,
+            "cycles": 3,
+            "entered_unreachable": 0,
+            "mean_excess_cost_on_success": 0.4959999918937683,
+            "mean_cost_ratio_on_success": 1.028682827949524,
+            "by_distance": {
+              "3.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "4.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "5.0": {
+                "count": 3,
+                "solved": 3,
+                "optimal": 3
+              },
+              "6.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 7
+              },
+              "7.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 7
+              },
+              "8.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 7
+              },
+              "9.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 7
+              },
+              "10.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 4
+              },
+              "11.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 7
+              },
+              "12.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 7
+              },
+              "13.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 7
+              },
+              "14.0": {
+                "count": 7,
+                "solved": 6,
+                "optimal": 4
+              },
+              "15.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 3
+              },
+              "16.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 7
+              },
+              "17.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 4
+              },
+              "18.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 5
+              },
+              "19.0": {
+                "count": 7,
+                "solved": 6,
+                "optimal": 4
+              },
+              "20.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 4
+              },
+              "21.0": {
+                "count": 6,
+                "solved": 5,
+                "optimal": 4
+              },
+              "22.0": {
+                "count": 6,
+                "solved": 6,
+                "optimal": 2
+              },
+              "23.0": {
+                "count": 6,
+                "solved": 6,
+                "optimal": 2
+              }
+            }
+          }
+        },
+        "unseen_endpoint_validation": {
+          "count": 2048,
+          "finite_count": 2048,
+          "finite_mae": 0.8845099806785583,
+          "shortest_action_rate": 0.947265625,
+          "unreachable": {
+            "proven_unreachable": 0,
+            "finite": 2048,
+            "unknown": 0,
+            "auroc": null,
+            "validation_threshold": null,
+            "recall": null,
+            "finite_false_positive": null,
+            "recall_at_training_proxy": null,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 128,
+            "solved": 127,
+            "optimal": 99,
+            "cycles": 1,
+            "entered_unreachable": 0,
+            "mean_excess_cost_on_success": 0.5039370059967041,
+            "mean_cost_ratio_on_success": 1.0286773443222046,
+            "by_distance": {
+              "6.0": {
+                "count": 3,
+                "solved": 3,
+                "optimal": 3
+              },
+              "7.0": {
+                "count": 6,
+                "solved": 6,
+                "optimal": 6
+              },
+              "8.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 8
+              },
+              "9.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 8
+              },
+              "10.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 8
+              },
+              "11.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 7
+              },
+              "12.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 6
+              },
+              "13.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 8
+              },
+              "14.0": {
+                "count": 8,
+                "solved": 7,
+                "optimal": 5
+              },
+              "15.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 7
+              },
+              "16.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 6
+              },
+              "17.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 5
+              },
+              "18.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 4
+              },
+              "19.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 4
+              },
+              "20.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 4
+              },
+              "21.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 4
+              },
+              "22.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 4
+              },
+              "23.0": {
+                "count": 4,
+                "solved": 4,
+                "optimal": 2
+              }
+            }
+          }
+        },
+        "unseen_both_validation": {
+          "count": 2048,
+          "finite_count": 2048,
+          "finite_mae": 0.9151815176010132,
+          "shortest_action_rate": 0.962890625,
+          "unreachable": {
+            "proven_unreachable": 0,
+            "finite": 2048,
+            "unknown": 0,
+            "auroc": null,
+            "validation_threshold": null,
+            "recall": null,
+            "finite_false_positive": null,
+            "recall_at_training_proxy": null,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 128,
+            "solved": 128,
+            "optimal": 95,
+            "cycles": 0,
+            "entered_unreachable": 0,
+            "mean_excess_cost_on_success": 0.609375,
+            "mean_cost_ratio_on_success": 1.0344233512878418,
+            "by_distance": {
+              "3.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "5.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 2
+              },
+              "6.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "7.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 8
+              },
+              "8.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 8
+              },
+              "9.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 8
+              },
+              "10.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 8
+              },
+              "11.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 8
+              },
+              "12.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 5
+              },
+              "13.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 6
+              },
+              "14.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 6
+              },
+              "15.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 8
+              },
+              "16.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 6
+              },
+              "17.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 5
+              },
+              "18.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 4
+              },
+              "19.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 2
+              },
+              "20.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 4
+              },
+              "21.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 4
+              },
+              "22.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 1
+              },
+              "23.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 0
+              }
+            }
+          }
+        },
+        "unseen_endpoint_test": {
+          "count": 2048,
+          "finite_count": 2048,
+          "finite_mae": 0.9069877862930298,
+          "shortest_action_rate": 0.962890625,
+          "unreachable": {
+            "proven_unreachable": 0,
+            "finite": 2048,
+            "unknown": 0,
+            "auroc": null,
+            "validation_threshold": null,
+            "recall": null,
+            "finite_false_positive": null,
+            "recall_at_training_proxy": null,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 128,
+            "solved": 127,
+            "optimal": 83,
+            "cycles": 1,
+            "entered_unreachable": 0,
+            "mean_excess_cost_on_success": 0.7401574850082397,
+            "mean_cost_ratio_on_success": 1.0454460382461548,
+            "by_distance": {
+              "5.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 2
+              },
+              "6.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 2
+              },
+              "7.0": {
+                "count": 3,
+                "solved": 3,
+                "optimal": 3
+              },
+              "8.0": {
+                "count": 9,
+                "solved": 9,
+                "optimal": 9
+              },
+              "9.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 8
+              },
+              "10.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 7
+              },
+              "11.0": {
+                "count": 8,
+                "solved": 7,
+                "optimal": 5
+              },
+              "12.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 6
+              },
+              "13.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 4
+              },
+              "14.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 5
+              },
+              "15.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 3
+              },
+              "16.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 4
+              },
+              "17.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 4
+              },
+              "18.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 4
+              },
+              "19.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 5
+              },
+              "20.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 6
+              },
+              "21.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 4
+              },
+              "22.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 2
+              }
+            }
+          }
+        },
+        "unseen_both_test": {
+          "count": 2048,
+          "finite_count": 2048,
+          "finite_mae": 0.8599302172660828,
+          "shortest_action_rate": 0.966796875,
+          "unreachable": {
+            "proven_unreachable": 0,
+            "finite": 2048,
+            "unknown": 0,
+            "auroc": null,
+            "validation_threshold": null,
+            "recall": null,
+            "finite_false_positive": null,
+            "recall_at_training_proxy": null,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 128,
+            "solved": 126,
+            "optimal": 91,
+            "cycles": 2,
+            "entered_unreachable": 0,
+            "mean_excess_cost_on_success": 0.5873016119003296,
+            "mean_cost_ratio_on_success": 1.035112977027893,
+            "by_distance": {
+              "5.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "6.0": {
+                "count": 3,
+                "solved": 3,
+                "optimal": 3
+              },
+              "7.0": {
+                "count": 4,
+                "solved": 4,
+                "optimal": 4
+              },
+              "8.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 8
+              },
+              "9.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 8
+              },
+              "10.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 7
+              },
+              "11.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 6
+              },
+              "12.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 8
+              },
+              "13.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 4
+              },
+              "14.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 7
+              },
+              "15.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 6
+              },
+              "16.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 4
+              },
+              "17.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 5
+              },
+              "18.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 5
+              },
+              "19.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 7
+              },
+              "20.0": {
+                "count": 8,
+                "solved": 8,
+                "optimal": 2
+              },
+              "21.0": {
+                "count": 7,
+                "solved": 6,
+                "optimal": 0
+              },
+              "22.0": {
+                "count": 7,
+                "solved": 6,
+                "optimal": 4
+              },
+              "23.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 2
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "current_cost_feedback_mining": {
+    "endpoint": {
+      "current_bank": {
+        "raw_seeds": 2501,
+        "accepted_seeds": 1023,
+        "rejected_seeds": 1478,
+        "branch_contexts": 9380,
+        "nonterminal_candidate_edges": 84411,
+        "candidate_edges_with_next_context": 18326,
+        "teacher_paths": 9205,
+        "teacher_paths_reached_goal": 12,
+        "teacher_paths_blocked_by_holdout": 9193,
+        "teacher_paths_budget_exhausted": 0,
+        "scope": "Whole decisions only. Every retained parent has all legal successors; held-out continuations are counted, never pruned or silently labelled as covered.",
+        "config": {
+          "seed": 2026102667,
+          "queries": 4096,
+          "mining_batch": 256,
+          "minimum_distance": 11,
+          "distance_bins": [
+            5,
+            10,
+            15,
+            20,
+            64
+          ],
+          "horizon": 128,
+          "branch_depth": 2,
+          "teacher_steps": 25,
+          "goal_switch_attempts": 16,
+          "cpu_threads": 2,
+          "mining_mode": "cycles_and_first_uphill"
+        },
+        "source_checkpoint": "/tmp/grounded_qmap_followup_5d41460/runs/token_endpoint_efficiency_layers/best.pt",
+        "source_checkpoint_step": 4000,
+        "source_checkpoint_commit": "e6099ac",
+        "original_cycle_seeds": 430,
+        "switched_goal_contexts": 502,
+        "cycle_length_counts": {
+          "2": 215
+        },
+        "raw_uphill_seeds": 1601,
+        "cost_scope": "First uphill choice per allowed training-root trajectory, including nonoptimal successes; whole cycle members retained. Exact unit-exchange prefix identity checked. Protected complete decisions rejected before branch expansion; no held test trajectory is mined.",
+        "cost_diagnosis_aggregate": {
+          "queries": 4096,
+          "solved": 3881,
+          "first_uphill_queries": 1601,
+          "successful_detour_queries": 1386,
+          "optimal_completed_queries": 2495,
+          "first_uphill_remaining_distance_counts": {
+            "2": 1,
+            "3": 1,
+            "4": 44,
+            "5": 20,
+            "6": 45,
+            "7": 68,
+            "8": 96,
+            "9": 101,
+            "10": 117,
+            "11": 131,
+            "12": 120,
+            "13": 143,
+            "14": 151,
+            "15": 124,
+            "16": 120,
+            "17": 114,
+            "18": 80,
+            "19": 60,
+            "20": 42,
+            "21": 22,
+            "22": 1
+          },
+          "verified_prefixes": 73911,
+          "uphill_exchanges": 2123
+        }
+      },
+      "merged_bank": {
+        "raw_seeds": 2029,
+        "accepted_seeds": 2029,
+        "rejected_seeds": 0,
+        "branch_contexts": 17444,
+        "nonterminal_candidate_edges": 156973,
+        "candidate_edges_with_next_context": 33724,
+        "teacher_paths": 18259,
+        "teacher_paths_reached_goal": 32,
+        "teacher_paths_blocked_by_holdout": 18227,
+        "teacher_paths_budget_exhausted": 0,
+        "scope": "Aggregate old and current-policy cycle seeds, preserving all prior roots; recompute complete branches and exact continuations under the same protected training information.",
+        "config": {
+          "seed": 2026102667,
+          "queries": 4096,
+          "mining_batch": 256,
+          "minimum_distance": 11,
+          "distance_bins": [
+            5,
+            10,
+            15,
+            20,
+            64
+          ],
+          "horizon": 128,
+          "branch_depth": 2,
+          "teacher_steps": 25,
+          "goal_switch_attempts": 16,
+          "cpu_threads": 2,
+          "mining_mode": "cycles_and_first_uphill"
+        },
+        "source_banks": [
+          "/tmp/grounded_qmap_followup_5d41460/runs/token_branch_data/branch_bank.npz",
+          "/tmp/grounded_qmap_followup_5d41460/runs/token_endpoint_cost_feedback_data/branch_bank.npz"
+        ],
+        "unique_source_queries": 8192
+      }
+    },
+    "alternate": {
+      "current_bank": {
+        "raw_seeds": 2239,
+        "accepted_seeds": 951,
+        "rejected_seeds": 1288,
+        "branch_contexts": 8867,
+        "nonterminal_candidate_edges": 79791,
+        "candidate_edges_with_next_context": 17420,
+        "teacher_paths": 8559,
+        "teacher_paths_reached_goal": 28,
+        "teacher_paths_blocked_by_holdout": 8531,
+        "teacher_paths_budget_exhausted": 0,
+        "scope": "Whole decisions only. Every retained parent has all legal successors; held-out continuations are counted, never pruned or silently labelled as covered.",
+        "config": {
+          "seed": 2026102668,
+          "queries": 4096,
+          "mining_batch": 256,
+          "minimum_distance": 11,
+          "distance_bins": [
+            5,
+            10,
+            15,
+            20,
+            64
+          ],
+          "horizon": 128,
+          "branch_depth": 2,
+          "teacher_steps": 25,
+          "goal_switch_attempts": 16,
+          "cpu_threads": 2,
+          "mining_mode": "cycles_and_first_uphill"
+        },
+        "source_checkpoint": "/tmp/grounded_qmap_followup_5d41460/runs/token_alternate_efficiency_layers/best.pt",
+        "source_checkpoint_step": 4000,
+        "source_checkpoint_commit": "e6099ac",
+        "original_cycle_seeds": 114,
+        "switched_goal_contexts": 462,
+        "cycle_length_counts": {
+          "2": 57
+        },
+        "raw_uphill_seeds": 1677,
+        "cost_scope": "First uphill choice per allowed training-root trajectory, including nonoptimal successes; whole cycle members retained. Exact unit-exchange prefix identity checked. Protected complete decisions rejected before branch expansion; no held test trajectory is mined.",
+        "cost_diagnosis_aggregate": {
+          "queries": 4096,
+          "solved": 4039,
+          "first_uphill_queries": 1677,
+          "successful_detour_queries": 1620,
+          "optimal_completed_queries": 2419,
+          "first_uphill_remaining_distance_counts": {
+            "4": 6,
+            "5": 11,
+            "6": 21,
+            "7": 36,
+            "8": 56,
+            "9": 96,
+            "10": 78,
+            "11": 97,
+            "12": 109,
+            "13": 154,
+            "14": 163,
+            "15": 168,
+            "16": 156,
+            "17": 144,
+            "18": 136,
+            "19": 112,
+            "20": 70,
+            "21": 56,
+            "22": 8
+          },
+          "verified_prefixes": 75380,
+          "uphill_exchanges": 2040
+        }
+      },
+      "merged_bank": {
+        "raw_seeds": 2983,
+        "accepted_seeds": 2983,
+        "rejected_seeds": 0,
+        "branch_contexts": 25910,
+        "nonterminal_candidate_edges": 233128,
+        "candidate_edges_with_next_context": 50528,
+        "teacher_paths": 26847,
+        "teacher_paths_reached_goal": 112,
+        "teacher_paths_blocked_by_holdout": 26735,
+        "teacher_paths_budget_exhausted": 0,
+        "scope": "Aggregate old and current-policy cycle seeds, preserving all prior roots; recompute complete branches and exact continuations under the same protected training information.",
+        "config": {
+          "seed": 2026102668,
+          "queries": 4096,
+          "mining_batch": 256,
+          "minimum_distance": 11,
+          "distance_bins": [
+            5,
+            10,
+            15,
+            20,
+            64
+          ],
+          "horizon": 128,
+          "branch_depth": 2,
+          "teacher_steps": 25,
+          "goal_switch_attempts": 16,
+          "cpu_threads": 2,
+          "mining_mode": "cycles_and_first_uphill"
+        },
+        "source_banks": [
+          "/tmp/grounded_qmap_followup_5d41460/runs/token_alternate_branch_data/branch_bank.npz",
+          "/tmp/grounded_qmap_followup_5d41460/runs/token_alternate_cost_feedback_data/branch_bank.npz"
+        ],
+        "unique_source_queries": 8192
+      }
+    }
+  }
 }

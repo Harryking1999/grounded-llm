@@ -21,7 +21,10 @@ def run(config,runs,people,device,source_commit):
     if saved['scope']['people']!=people:raise ValueError('Mismatched personnel count')
     manifest=json.loads((reference/'data/graphs/corpus.json').read_text())
     excluded=[scene['times'] for scene in manifest['scenes']]
-    preparation=dict(seed=config['seed']+people,data=dict(people=people,maximum_time=config['maximum_time'],
+    for suite in config.get('excluded_suites',[]):
+        excluded.extend(json.loads((runs/suite).read_text())['times'])
+    excluded=sorted({tuple(times) for times in excluded})
+    preparation=dict(seed=config['seed']+people,input_encoding=original.get('input_encoding','identity'),data=dict(people=people,maximum_time=config['maximum_time'],
         scenes=dict(test=config['scenarios_per_map']),goals_per_scene=config['goals_per_scene'],
         heldout_goals=0,excluded_times=excluded))
     # Freeze the data inputs and exact graphs before loading model predictions.

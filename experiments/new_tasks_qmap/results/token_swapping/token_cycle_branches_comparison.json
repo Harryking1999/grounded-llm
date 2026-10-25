@@ -1757,5 +1757,145 @@
         }
       }
     }
+  },
+  "anchor_supervision_comparison": {
+    "token_query128_anchor_control": {
+      "source_commit": "c95286a",
+      "best_step": 4000,
+      "last_step": 4000,
+      "model_parameters": 1284224,
+      "actual_exposure": {
+        "unique_gradient_states": 3628800,
+        "available_states": 3628800,
+        "unique_pair_rows": 3628800,
+        "pair_rows": 3628800,
+        "unique_decision_rows": 2195621,
+        "decision_rows": 3628800,
+        "minimum_pair_layer_passes": 9.029982363315696,
+        "minimum_decision_layer_passes": 2.257495590828924
+      },
+      "cohorts": {
+        "validation": {
+          "mae": 1.0030510425567627,
+          "action": 0.974609375,
+          "count": 128,
+          "solved": 121,
+          "optimal": 95,
+          "cycles": 7
+        },
+        "test": {
+          "mae": 0.996701180934906,
+          "action": 0.9609375,
+          "count": 128,
+          "solved": 119,
+          "optimal": 84,
+          "cycles": 9
+        },
+        "unseen_goal_validation": {
+          "mae": 4.029090881347656,
+          "action": 0.814453125,
+          "count": 128,
+          "solved": 60,
+          "optimal": 46,
+          "cycles": 68
+        },
+        "unseen_goal_test": {
+          "mae": 3.782052755355835,
+          "action": 0.826171875,
+          "count": 128,
+          "solved": 66,
+          "optimal": 49,
+          "cycles": 62
+        }
+      },
+      "last_fit": {
+        "seed_fit": {
+          "mae": 0.30015456676483154,
+          "shortest_action_rate": 1.0,
+          "count": 128,
+          "solved": 127,
+          "success_rate": 0.9921875,
+          "cycles": 1
+        },
+        "branches_fit": {
+          "mae": 0.4413336217403412,
+          "shortest_action_rate": 0.9921875,
+          "count": 128,
+          "solved": 123,
+          "success_rate": 0.9609375,
+          "cycles": 5
+        }
+      },
+      "fit_passed": false
+    },
+    "token_query128_anchor_supervised": {
+      "source_commit": "c95286a",
+      "best_step": 4000,
+      "last_step": 4000,
+      "model_parameters": 1284224,
+      "actual_exposure": {
+        "unique_gradient_states": 3628800,
+        "available_states": 3628800,
+        "unique_pair_rows": 3628800,
+        "pair_rows": 3628800,
+        "unique_decision_rows": 2195621,
+        "decision_rows": 3628800,
+        "minimum_pair_layer_passes": 9.029982363315696,
+        "minimum_decision_layer_passes": 2.257495590828924
+      },
+      "cohorts": {
+        "validation": {
+          "mae": 1.1305534839630127,
+          "action": 0.97265625,
+          "count": 128,
+          "solved": 123,
+          "optimal": 91,
+          "cycles": 5
+        },
+        "test": {
+          "mae": 1.0447866916656494,
+          "action": 0.9765625,
+          "count": 128,
+          "solved": 123,
+          "optimal": 93,
+          "cycles": 5
+        },
+        "unseen_goal_validation": {
+          "mae": 3.9070816040039062,
+          "action": 0.837890625,
+          "count": 128,
+          "solved": 61,
+          "optimal": 50,
+          "cycles": 67
+        },
+        "unseen_goal_test": {
+          "mae": 3.6964149475097656,
+          "action": 0.826171875,
+          "count": 128,
+          "solved": 70,
+          "optimal": 54,
+          "cycles": 58
+        }
+      },
+      "last_fit": {
+        "seed_fit": {
+          "mae": 0.40187978744506836,
+          "shortest_action_rate": 0.998046875,
+          "count": 128,
+          "solved": 127,
+          "success_rate": 0.9921875,
+          "cycles": 1
+        },
+        "branches_fit": {
+          "mae": 0.5566427111625671,
+          "shortest_action_rate": 0.98828125,
+          "count": 128,
+          "solved": 125,
+          "success_rate": 0.9765625,
+          "cycles": 3
+        }
+      },
+      "fit_passed": false
+    }
   }
 }

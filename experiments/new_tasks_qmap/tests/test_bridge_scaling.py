@@ -42,5 +42,37 @@ class ScalingTests(unittest.TestCase):
                     expected=model.encode(torch.from_numpy(Bridge(env.times,encoding).features(states)))
                     torch.testing.assert_close(reader.encode(states),expected)
 
+    def test_frozen_acceptance_keeps_encoding_and_excludes_prior_suite(self):
+        import json
+        from experiments.new_tasks_qmap.src.bridge_acceptance import run
+        from experiments.new_tasks_qmap.src.relation_evaluate import evaluate
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);ref=root/'fixture';(ref/'data/graphs').mkdir(parents=True)
+            model_cfg=dict(dimension=8,hidden=16,cap=256,metric='linf',bias=False,output_activation='linear')
+            original=dict(seed=41,input_encoding='time_homogeneous',model=model_cfg,
+                training=dict(cpu_threads=1,unreachable_target=240,rank_temperature=1),evaluation=dict(horizon=128,decision_count=32,rollout_count=2))
+            (ref/'config.json').write_text(json.dumps(original));(ref/'summary.json').write_text(json.dumps(dict(metrics=dict(reachability_threshold=None))))
+            (ref/'data/graphs/corpus.json').write_text(json.dumps(dict(scenes=[dict(times=[1,2,4,7,11,17])])))
+            (root/'prior.json').write_text(json.dumps(dict(times=[[1,2,3,4,5,6]])))
+            model=StateEncoder(input_dim=13,**model_cfg)
+            torch.save(dict(scope=dict(people=6),input_dim=13,model=model.state_dict(),source_commit='fixture',step=0),ref/'best.pt')
+            config=dict(candidates={'6':'fixture'},seed=83,maximum_time=20,scenarios_per_map=2,goals_per_scene=20,horizon=128,
+                required_cohorts=['all_right_test','intermediate_goal_test','intermediate_start_test'],excluded_suites=['prior.json'],
+                minimum_completion_rate=.8,minimum_optimal_cost_rate=.8,target_completion_rate=.9)
+            def checked(model,corpus,*args,**kwargs):
+                self.assertTrue(all(s.env.feature_encoding=='time_homogeneous' for s in corpus.scenes))
+                try:return evaluate(model,corpus,*args,**kwargs)
+                finally:
+                    closed=set()
+                    for scene in corpus.scenes:
+                        for value in scene.__dict__.values():
+                            if isinstance(value,np.memmap) and id(value._mmap) not in closed:
+                                closed.add(id(value._mmap));value._mmap.close()
+            with patch('experiments.new_tasks_qmap.src.bridge_acceptance.evaluate',side_effect=checked):run(config,root,6,'cpu','fixture')
+            prepared=json.loads((ref/'frozen_acceptance/config.json').read_text())['preparation']
+            self.assertIn([1,2,3,4,5,6],prepared['data']['excluded_times'])
+            suite=json.loads((ref/'frozen_acceptance/suite.json').read_text())
+            self.assertFalse(set(map(tuple,suite['times']))&set(map(tuple,prepared['data']['excluded_times'])))
+
 
 if __name__=='__main__':unittest.main()

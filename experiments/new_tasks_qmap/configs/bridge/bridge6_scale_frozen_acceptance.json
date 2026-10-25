@@ -1,0 +1,29 @@
+{
+  "seed": 2026102607,
+  "scenarios_per_map": 128,
+  "maximum_time": 20,
+  "goals_per_scene": 20,
+  "horizon": 128,
+  "minimum_completion_rate": 0.8,
+  "target_completion_rate": 0.9,
+  "minimum_optimal_cost_rate": 0.8,
+  "required_cohorts": [
+    "all_right_test",
+    "intermediate_goal_test",
+    "intermediate_start_test"
+  ],
+  "candidates": {
+    "6": "bridge6_scale_candidate"
+  },
+  "scope": "Independent six-person time-scenario acceptance with unchanged completion and optimal-cost gates. Exclude every time tuple in the matched candidates1040-scenario corpus and the128 historical frozen six-person scenarios. Recover the historical suite from its original committed recipe before this freeze. One development-selected frozen checkpoint, no search or candidate filtering. Input encoding is loaded from that checkpoint configuration. This new suite never selects or replaces a checkpoint.",
+  "excluded_suites": [
+    "bridge6_prior_acceptance/suite.json"
+  ],
+  "freeze_choice": {
+    "candidates": [
+      "bridge6_scale_control",
+      "bridge6_scale_homogeneous"
+    ],
+    "criterion": "Lowest stored best_score (mean validation finite Huber plus candidate soft-rank), with full point-source coverage; freeze one checkpoint after both8000-update runs complete and before generating this suite. No test-based choice or retest of another candidate on failure."
+  }
+}

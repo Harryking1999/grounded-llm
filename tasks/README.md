@@ -10,7 +10,7 @@
 |---|---|---|
 | 积木、二阶魔方、8-Puzzle、寻路 | 各有采用地图，已进入四任务联合SFT | 补多目标结构验收；寻路准备新图及新Qmap；复用联合数据与评测入口 |
 | 汉诺塔 | 八盘整塔目标地图已采用，本轮联合SFT未纳入 | 作为已有能力保留，后续按任务组合安排 |
-| 手电过桥 | 五人限定范围地图已采用，六人地图成本最优性未通过；见[报告](../experiments/new_tasks_qmap/results/bridge/report.md)及[selection](bridge/Qmap/selection.json) | 六人成本改进；已采用地图的LLM读取与目标停止 |
+| 手电过桥 | 五人、六人限定范围地图分别通过完成与成本验收并采用；见[报告](../experiments/new_tasks_qmap/results/bridge/report.md)及[selection](bridge/Qmap/selection.json) | 已采用两张地图的LLM读取与目标停止 |
 | 24点 | 完整有理数DAG、多层目标、跨起题数值曝光与reader已有；四数原起点执行仍弱，见[报告](../experiments/new_tasks_qmap/results/game24/report.md) | 可达分支与原起点拟合；通过后再扩操作数规模 |
 | 推箱子、移车出库、棋子交换 | 普通完整目标、几何车辆编码及新树训练入口已有，尚未通过验收 | 推箱子先验收固定墙体内多目标执行，移车保留跨布局；棋子交换分别验收固定树长程与新树地图，再接LLM |
 

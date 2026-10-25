@@ -13,5 +13,24 @@
     "llm": "Not evaluated"
   },
   "acceptance": "experiments/new_tasks_qmap/configs/bridge/bridge_frozen_acceptance.json",
-  "evidence": "experiments/new_tasks_qmap/results/bridge/frozen_acceptance.json"
+  "evidence": "experiments/new_tasks_qmap/results/bridge/frozen_acceptance.json",
+  "additional_maps": {
+    "6": {
+      "task": "bridge",
+      "status": "adopted",
+      "checkpoint": "tasks/bridge/Qmap/checkpoints/bridge6_cost_optimal.pt",
+      "config": "experiments/new_tasks_qmap/configs/bridge/bridge6_cost_optimal_fit.json",
+      "source_commit": "47de3e8",
+      "step": 3500,
+      "scope": {
+        "people": 6,
+        "times": "Distinct ascending positive integer times in the configured range; no empirical adoption claim for repeated times, reordered person IDs or out-of-range scales.",
+        "goal": "Complete personnel mask and torch bank; all-right and intermediate targets.",
+        "inference": "All legal weighted successors; greedy immediate cost plus frozen remaining-cost estimate; exact goal equality.",
+        "llm": "Not evaluated"
+      },
+      "acceptance": "experiments/new_tasks_qmap/configs/bridge/bridge6_cost_frozen_acceptance.json",
+      "evidence": "experiments/new_tasks_qmap/results/bridge/bridge6_cost_comparison.json"
+    }
+  }
 }

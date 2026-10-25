@@ -1,6 +1,6 @@
 # 手电过桥
 
-独立规则、数据适配和裁判已实现，首轮地图完成31/32题，尚未采用权重或准备正式SFT数据。已纳入下一阶段九类任务，使用正常人数与耗时，准备多目标Qmap、部分人员完整目标和新人数地图，见[训练设计](../QMAP_METHOD.md#任务扩展与训练安排)。现有[配置](../../experiments/new_tasks_qmap/configs/pilot/bridge.json)、[结果](../../experiments/new_tasks_qmap/results/report.md)和[历史文字筛查](../../experiments/task_text_baselines/results/report.md)分别保留，下一轮安排见[项目状态](../../docs/PROJECT_STATUS_AND_TODO.md)。
+独立规则、数据适配和裁判已实现，五人和六人各有通过限定范围独立验收的多目标地图，尚未准备正式SFT或验证LLM读取。首轮31/32成绩仅属历史试验。已纳入下一阶段九类任务，使用正常人数与耗时，准备多目标Qmap、部分人员完整目标和新人数地图，见[训练设计](../QMAP_METHOD.md#任务扩展与训练安排)。现有[配置](../../experiments/new_tasks_qmap/configs/pilot/bridge.json)、[结果](../../experiments/new_tasks_qmap/results/report.md)和[历史文字筛查](../../experiments/task_text_baselines/results/report.md)分别保留，下一轮安排见[项目状态](../../docs/PROJECT_STATUS_AND_TODO.md)。
 
 - [规则与输出](prompts/README.md)
 - [数据](data/README.md)与[示例](data/example.json)
@@ -15,7 +15,7 @@
 
 以下保留早期难度调查。
 
-现有实现仍为两岸、一手电、容量2、全员到右岸。这个目标下存在成熟的最优调度结构；增加人数主要增加计划长度，长人数筛查中的完成失败、非最优成本与输出截断须分开。
+现有实现为两岸、一手电、容量2，目标指定完整人员与手电分布；全员到右岸是其中一种目标。这个目标下存在成熟的最优调度结构；增加人数主要增加计划长度，长人数筛查中的完成失败、非最优成本与输出截断须分开。
 
 | 候选 | 可核实来源 | 研究判断 |
 |---|---|---|

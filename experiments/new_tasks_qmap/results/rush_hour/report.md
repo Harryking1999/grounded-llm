@@ -12,4 +12,6 @@
 
 几何编码保留A，其他车辆按固定方向、长度、车道和车道内身份一致分配通道。在四组各128题的联合改名检查中，候选距离、第一步物理动作和完整完成数均保持完全一致。原身份编码在熟悉关系组的完成数从127降到85，新布局从47降到25。该检查固定并运输物理候选顺序，以隔离输入编码；未据此宣称重新枚举候选时的并列打破也不受名称影响。
 
-因此，几何编码解决了这项命名依赖，但没有改善跨布局求解；命名敏感不是当前跨布局缺口的充分解释。配置见[身份](../../configs/rush_hour/rush_hour_multigoal_identity.json)与[几何](../../configs/rush_hour/rush_hour_multigoal_geometry.json)，完整比较与命名检查见[结果](rush_hour_multigoal_encoding.json)。原lane-order MLP对照从完整断点恢复，最终成绩另行核对。当前未登记采用权重，见[selection](../../../../tasks/rush_hour/Qmap/selection.json)。
+因此，几何编码解决了这项命名依赖，但没有改善跨布局求解；命名敏感不是当前跨布局缺口的充分解释。配置见[身份](../../configs/rush_hour/rush_hour_multigoal_identity.json)与[几何](../../configs/rush_hour/rush_hour_multigoal_geometry.json)，完整比较与命名检查见[结果](rush_hour_multigoal_encoding.json)。
+
+原lane-order MLP对照已完成，三个主要测试组分别993/1024、990/1024和520/1024，与身份MLP完全相同。核对224个原始场景发现两种编码的起始输入均相同；车道内车辆不能互穿，因而分量内映射也不变。这份公共数据本来已按该顺序分配字母，原lane-order训练不是有效的不同表示对照，见[完成结果与编码核对](rush_hour_lane_order_completed.json)。当前未登记采用权重，见[selection](../../../../tasks/rush_hour/Qmap/selection.json)。

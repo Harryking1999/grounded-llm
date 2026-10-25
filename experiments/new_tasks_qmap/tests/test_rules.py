@@ -104,6 +104,24 @@ class RulesTest(unittest.TestCase):
         self.assertTrue(env.judge([[0,1]],goal=target)['optimal'])
         self.assertTrue(env.judge([],start=target,goal=target)['optimal'])
 
+    def test_bridge_reader_returns_physical_crossing_actions(self):
+        from pathlib import Path
+        import tempfile
+        import torch
+        from grounded_llm.core.qmap.model import StateEncoder
+        from grounded_llm.tasks.bridge.qmap import MapReader
+        options=dict(dimension=8,hidden=16,cap=64,metric='linf')
+        model=StateEncoder(input_dim=7,**options)
+        with tempfile.TemporaryDirectory() as directory:
+            checkpoint=Path(directory)/'map.pt'
+            torch.save(dict(model_type='exact_state_pairs',task='bridge',scope=dict(people=3),
+                config=dict(model=options),input_dim=7,step=0,model=model.state_dict()),checkpoint)
+            env=Bridge([1,2,5]);reader=MapReader(env,checkpoint)
+            people,child=reader.choose(0,env.goal)
+            self.assertEqual(env.apply(0,people)[0],child)
+            _,actions=reader.map_batch(0,env.goal)
+            self.assertTrue(all(isinstance(action,tuple) for action in actions))
+
     def test_game24_intermediate_targets_and_variable_capacity(self):
         env=Game24();start=env.canonical([1,2,3,4]);action,goal,_=next(env.transitions(start))
         self.assertTrue(env.judge(start,[env.actions[action]],goal=goal)['success'])

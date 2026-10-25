@@ -27,7 +27,7 @@
 | 多基线训练、评测与跨机传输 | [map_sft_baselines](map_sft_baselines/README.md#运行入口) |
 | 寻路环境与距离标签 | [tasks/path](../grounded_llm/tasks/path)；既有题集入口 [prepare_path_suite.py](qwen_path_blocks/src/prepare_path_suite.py) |
 
-任务训练独立编排，具体适配见 [QMAP_METHOD](../tasks/QMAP_METHOD.md)，层次见[根目录说明](../README.md#代码依赖与接入)。Boxoban hard跨布局、Rush Hour跨布局和Token Swapping固定10顶点树已有[正式配置与训练入口](new_tasks_qmap/README.md)，但地图均未通过验收。过桥和24点仍使用该实验的 `configs/pilot/` 与首轮入口。
+任务训练独立编排，具体适配见 [QMAP_METHOD](../tasks/QMAP_METHOD.md)，层次见[根目录说明](../README.md#代码依赖与接入)。五类新任务共用[完整目标训练入口](new_tasks_qmap/README.md)，各任务维护精确数据适配；过桥已接入真实边成本，24点使用精确有理数DAG。五人过桥已限定采用，其他新条件仍待通过；旧 `configs/pilot/` 仅保留首轮复现。
 
 SFT任务层提供 `Demonstration`，每轮含文字、答案和地图step；`encode_trajectory`生成监督token，`collate_examples`组批，公共 `train_update`按监督token加权更新。正式入口为 `train(config, baseline, model_path, data, out, pad_token_id=...)`；任务变换由 `PreparedRoutes(transform=...)`接入。已有[共享管线检查](../tests/test_shared_pipeline.py)只证明接口接通。
 

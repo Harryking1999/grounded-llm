@@ -1,8 +1,17 @@
 {
   "task": "bridge",
-  "status": "pilot_not_selected",
-  "checkpoint": null,
-  "config": "experiments/new_tasks_qmap/configs/pilot/bridge.json",
-  "scope": "fixed task goal only; no adopted model",
-  "evidence": "experiments/new_tasks_qmap/results/report.md"
+  "status": "adopted",
+  "checkpoint": "tasks/bridge/Qmap/checkpoints/bridge5_multigoal.pt",
+  "config": "experiments/new_tasks_qmap/configs/bridge/bridge_multigoal_coverage.json",
+  "source_commit": "d31a295",
+  "step": 8000,
+  "scope": {
+    "people": 5,
+    "times": "Distinct positive integer times in the configured range, ascending time order defines person IDs; no evidence for repeated times, reordered person IDs, or out-of-range scales.",
+    "goal": "Complete personnel mask and torch bank; full all-right or intermediate targets.",
+    "inference": "Environment supplies every legal weighted successor; greedy immediate cost plus frozen remaining-cost estimate; stop at exact state equality.",
+    "llm": "Not evaluated"
+  },
+  "acceptance": "experiments/new_tasks_qmap/configs/bridge/bridge_frozen_acceptance.json",
+  "evidence": "experiments/new_tasks_qmap/results/bridge/frozen_acceptance.json"
 }

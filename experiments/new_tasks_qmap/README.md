@@ -9,8 +9,8 @@
 | 推箱子 | [任务入口](../../tasks/sokoban/README.md) | [配置目录](configs/sokoban/)、[固定分布收敛检查](configs/sokoban/sokoban_mixture_convergence.json) | [推箱子报告](results/sokoban/report.md) |
 | 移车出库 | [任务入口](../../tasks/rush_hour/README.md) | [配置目录](configs/rush_hour/)、[卷积方案](configs/rush_hour/rush_hour_spatial_pairs.json) | [移车出库报告](results/rush_hour/report.md) |
 | 棋子交换 | [任务入口](../../tasks/token_swapping/README.md) | [配置目录](configs/token_swapping/)、[近距离与排序方案](configs/token_swapping/token_swapping_local_walk8_rank4_pairs.json) | [棋子交换报告](results/token_swapping/report.md) |
-| 手电过桥 | [任务入口](../../tasks/bridge/README.md) | [固定目标配置](configs/pilot/bridge.json) | [首轮结果](results/pilot/summary.json) |
-| 24点 | [任务入口](../../tasks/game24/README.md) | [固定目标配置](configs/pilot/game24.json) | [首轮结果](results/pilot/summary.json) |
+| 手电过桥 | [任务入口](../../tasks/bridge/README.md) | [五人多目标](configs/bridge/bridge_multigoal_coverage.json)、[独立验收](configs/bridge/bridge_frozen_acceptance.json) | [带权目标与采用范围](results/bridge/report.md) |
+| 24点 | [任务入口](../../tasks/game24/README.md) | [多目标](configs/game24/game24_multigoal_fit.json)、[查询关系留出](configs/game24/game24_goal_relation_holdout.json) | [运算层与原起点缺口](results/game24/report.md) |
 
 多目标开发条件使用同一 `src.run` 的 `exact_state_pairs` 模式，配置预算均有限定；这些条件的完成不代表地图已通过正式验收。
 
@@ -24,7 +24,7 @@
 
 过桥与24点复用任务层 `relation_data.py` 和 `qmap.py`。过桥人数与24点槽位数保存在checkpoint范围中，不同人数／槽位拒绝错配。24点裁判可指定完整中间目标，默认四数到24的旧调用保持可用；五数动作与特征槽位已支持，尚不因此宣称五数地图或LLM已训练。开发集与验证集用于选模；最终验收和权重采用仍按原流程执行。
 
-完整目标三任务的验收保留全部合法动作，不搜索或重试；各必需组完整到达率至少80%，目标90%以上，见[验收要求](configs/exact_pair_acceptance.json)。过桥和24点的首轮范围由各自pilot配置维护，环境提供真实后继，地图学习距离与候选排序。
+三个棋盘／图任务的验收保留全部合法动作，不搜索或重试；各必需组完整到达率至少80%，目标90%以上，见[验收要求](configs/exact_pair_acceptance.json)。过桥另以已冻结的新耗时场景检查成本最优性，五人通过、六人未通过；24点尚未采用。旧固定目标试验仍由各自pilot配置维护。环境提供真实后继，地图学习距离与候选排序。
 
 ## 目录与文件职责
 

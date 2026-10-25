@@ -8,7 +8,9 @@
 
 在小规模精确物理图中加入普通箱子布局和玩家位置目标，逐目标重算有向距离。保持模型、损失、初始化、完整候选和更新预算，比较原关系采样与25%距离监督替换为真实动作边。熟悉关系完成从7/62变为11/62；留出普通目标均9/128，新布局均7/128，原始起点均0/47。小图多目标执行仍弱，动作边没有带来目标或布局泛化收益，不能据此扩棋盘。
 
-配置见[原关系](../../configs/sokoban/sokoban_multigoal_control.json)与[动作边](../../configs/sokoban/sokoban_multigoal_edges.json)，教师路径、循环和首次不可达位置保存在原始运行，紧凑结果见[比较](sokoban_multigoal_pairs.json)。下一步复用现有有限距离／死锁边界采样器，保证换目标后仍有明确的可达关系配额；[无动作边](../../configs/sokoban/sokoban_multigoal_finite_control.json)与[动作边](../../configs/sokoban/sokoban_multigoal_finite_edges.json)继续匹配比较。
+配置见[原关系](../../configs/sokoban/sokoban_multigoal_control.json)与[动作边](../../configs/sokoban/sokoban_multigoal_edges.json)，教师路径、循环和首次不可达位置保存在原始运行，紧凑结果见[比较](sokoban_multigoal_pairs.json)。
+
+复用现有有限距离／死锁边界采样器，保证换目标后仍有明确可达关系配额后，无动作边／动作边分别完成熟悉关系7/62与14/62、留出目标10/128与14/128、新布局11/128与9/128，原始起点仍均0/47。可达配额和动作边仍未形成可靠执行，见[配置](../../configs/sokoban/sokoban_multigoal_finite_control.json)、[动作边配置](../../configs/sokoban/sokoban_multigoal_finite_edges.json)及[结果](sokoban_multigoal_finite_pairs.json)。下一步检查小图内真正曝光的目标关系和首次循环；暂不混入更大棋盘。
 
 ## 布局覆盖与连续路径采样
 

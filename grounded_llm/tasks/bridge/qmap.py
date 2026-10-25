@@ -4,5 +4,5 @@ from grounded_llm.core.qmap.transitions import TransitionQMap
 
 class MapReader(TransitionQMap):
     def __init__(self,env,checkpoint,device='cpu'):
-        super().__init__(env,checkpoint,'bridge',device)
+        super().__init__(env,checkpoint,'bridge',device,lambda a:env.actions[a])
         if self.scope['people']!=env.n:raise ValueError('Personnel count differs from trained map')

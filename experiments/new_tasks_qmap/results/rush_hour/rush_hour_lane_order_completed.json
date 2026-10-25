@@ -1,0 +1,83 @@
+{
+  "task": "rush_hour",
+  "source_commit": "c307583e698bbd70b546dba57ea99ec976eef243",
+  "best_step": 20000,
+  "last_step": 60000,
+  "actual_exposure": {
+    "unique_gradient_states": 843575,
+    "available_states": 1348182,
+    "unique_pair_rows": 843575,
+    "pair_rows": 843575,
+    "unique_decision_rows": 836409,
+    "decision_rows": 836409,
+    "minimum_pair_layer_passes": 72.83288385739264,
+    "minimum_decision_layer_passes": 36.72844266381639
+  },
+  "cohorts": {
+    "validation": {
+      "count": 1024,
+      "solved": 987,
+      "optimal": 845,
+      "cycles": 37
+    },
+    "test": {
+      "count": 1024,
+      "solved": 993,
+      "optimal": 829,
+      "cycles": 31
+    },
+    "unseen_goal_validation": {
+      "count": 1024,
+      "solved": 997,
+      "optimal": 867,
+      "cycles": 27
+    },
+    "unseen_goal_test": {
+      "count": 1024,
+      "solved": 990,
+      "optimal": 875,
+      "cycles": 34
+    },
+    "unseen_layout_validation": {
+      "count": 1024,
+      "solved": 545,
+      "optimal": 323,
+      "cycles": 479
+    },
+    "unseen_layout_test": {
+      "count": 1024,
+      "solved": 520,
+      "optimal": 318,
+      "cycles": 504
+    },
+    "original_layout_test": {
+      "count": 1024,
+      "solved": 205,
+      "optimal": 84,
+      "cycles": 819
+    },
+    "original_layout_validation": {
+      "count": 1024,
+      "solved": 256,
+      "optimal": 73,
+      "cycles": 768
+    },
+    "diagnostic": {
+      "count": 1024,
+      "solved": 262,
+      "optimal": 153,
+      "cycles": 762
+    },
+    "diagnostic_original": {
+      "count": 8,
+      "solved": 0,
+      "optimal": 0,
+      "cycles": 8
+    }
+  },
+  "encoding_check": {
+    "scene_initial_states_checked": 224,
+    "different_identity_vs_lane_order": 0,
+    "scope": "Initial feature equality plus nonpassing lane order implies identical component channel assignment on this public corpus. Not a distinct training representation control."
+  }
+}

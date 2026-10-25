@@ -618,6 +618,10 @@ def token_goal_cohorts(corpus,config,rng):
     chosen=rng.choice(corpus.size,nt+2*nh,replace=False)
     pools=[np.sort(chosen[:nt]),chosen[nt:nt+nh],chosen[nt+nh:]]
     corpus.training_goal_pool=pools[0]
+    near_training=np.empty(0,dtype=np.int64)
+    if spec.get('preserve_training_goal_neighborhood'):
+        terminal=np.column_stack([corpus.successors(pools[0]).ravel(),np.repeat(pools[0],corpus.max_candidates)])
+        near_training=closure(corpus,terminal)
     groups={};reserved=[]
     for name,pool in [('validation',pools[0]),('test',pools[0]),
                       ('unseen_goal_validation',pools[1]),('unseen_goal_test',pools[2])]:
@@ -628,8 +632,10 @@ def token_goal_cohorts(corpus,config,rng):
             ids=np.flatnonzero(lengths>step)
             sources[ids]=corpus.children[sources[ids],rng.integers(corpus.max_candidates,size=len(ids))]
         rows=np.column_stack([sources,goals]);rows=rows[rows[:,0]!=rows[:,1]]
-        if reserved:
-            protected=np.unique(np.concatenate(reserved));children=corpus.successors(rows[:,0])
+        if name in ('validation','test') and spec.get('minimum_relation_holdout_distance',0):
+            rows=rows[corpus.distance(rows[:,0],rows[:,1])>=spec['minimum_relation_holdout_distance']]
+        if reserved or len(near_training):
+            protected=np.unique(np.concatenate([near_training,*reserved]));children=corpus.successors(rows[:,0])
             safe=~np.isin(keys(rows[:,0],rows[:,1],corpus.size),protected)
             safe&=~np.isin(keys(children,rows[:,1,None],corpus.size),protected).any(axis=1);rows=rows[safe]
         selected=balanced(rows,count,corpus.distance(rows[:,0],rows[:,1]),rng)

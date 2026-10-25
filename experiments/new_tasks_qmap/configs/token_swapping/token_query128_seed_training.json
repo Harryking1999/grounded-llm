@@ -1,0 +1,66 @@
+{
+  "task": "token_swapping",
+  "seed": 2026102304,
+  "data": {
+    "tree": "tasks/token_swapping/data/tree10.json",
+    "prepared_from": "../token_query128_reference/data"
+  },
+  "model": {
+    "dimension": 128,
+    "hidden": 256,
+    "cap": 64,
+    "metric": "linf"
+  },
+  "training": {
+    "steps": 6000,
+    "batch_size": 16384,
+    "decision_batch_size": 4096,
+    "learning_rate": 0.0003,
+    "rank_weight": 4.0,
+    "rank_temperature": 1.0,
+    "eval_every": 1000,
+    "cpu_threads": 4,
+    "unreachable_target": 60.0,
+    "features_on_device": true,
+    "broad_fraction": 0.5,
+    "online_goals": true,
+    "record_training_samples": true,
+    "initialize_from": "../token_initial/best.pt",
+    "local_goal_fraction": 0.0,
+    "rollout_eval_every": 1000,
+    "goal_walk_max": 8,
+    "validation_only_initial": true,
+    "training_probe_batches": 4,
+    "token_branch_replay": {
+      "bank": "../token_query128_branch_data/branch_bank.npz",
+      "kind": "seed",
+      "decision_fraction": 0.25,
+      "point_count": 4096,
+      "fit_gate": {
+        "maximum_mae": 0.5,
+        "minimum_shortest_action_rate": 0.99,
+        "minimum_completion_rate": 0.9,
+        "maximum_cycle_rate": 0.01
+      }
+    }
+  },
+  "relations": {
+    "protocol": "query_goal_holdout",
+    "training_goals": 128,
+    "heldout_goals_per_split": 16,
+    "evaluation_count": 2048,
+    "complete_training_sources": true,
+    "minimum_relation_holdout_distance": 11,
+    "preserve_training_goal_neighborhood": true
+  },
+  "evaluation": {
+    "decision_count": 512,
+    "rollout_count": 128,
+    "horizon": 128,
+    "landmarks": 128
+  },
+  "schema": "exact_state_pairs",
+  "selection": "Lowest validation finite Huber plus candidate soft-rank CE, equally averaging predeclared validation cohorts; no test checkpoint selection.",
+  "scope": "Independent Q(S), Q(G); exact complete goals only; no oracle in inference features, no pruning, no search, no LLM retraining.",
+  "hypothesis": "Follow up the eight-goal fitting result with broader complete-target coverage: 128 training goals and 16 held complete query goals per split. State inputs may all be exposed. Known-goal held relations are long range (distance >=11); no evaluation closure may intersect the complete one-action training-goal neighborhood, so terminal actions remain supervisable. All protected evaluation relations still excluded from both losses. Compare frozen actual cycle roots with full physical branches and teacher continuations under identical larger batches; report target generalization, source-goal exposure, continuation reachability and fit gates separately. This condition does not test unseen states or all arbitrary goals."
+}

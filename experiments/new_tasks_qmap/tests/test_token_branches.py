@@ -42,6 +42,20 @@ class BranchTests(unittest.TestCase):
                 self.assertTrue(permitted(corpus,data,partition,bank['tasks_branches']).all())
             finally:corpus.close()
 
+    def test_long_relation_holdout_keeps_terminal_neighborhood_trainable(self):
+        with tempfile.TemporaryDirectory() as name:
+            path=Path(name);small_oracle(path,6,[(0,1),(1,2),(1,3),(3,4),(4,5)]);corpus=TokenCorpus(path)
+            try:
+                config=dict(relations=dict(evaluation_count=8,training_goals=12,heldout_goals_per_split=2,minimum_relation_holdout_distance=5,preserve_training_goal_neighborhood=True))
+                groups,_,_,reserved,partition=token_goal_cohorts(corpus,config,np.random.default_rng(31))
+                for name in ('validation','test'):
+                    self.assertTrue((corpus.distance(groups[name][:,0],groups[name][:,1])>=5).all())
+                goals=corpus.training_goal_pool
+                terminal_edges=np.column_stack([corpus.children[goals].ravel(),np.repeat(goals,corpus.max_candidates)])
+                data=dict(reserved_relations=reserved,training_goal_pool=goals)
+                self.assertTrue(permitted(corpus,data,partition,terminal_edges).all())
+            finally:corpus.close()
+
     def test_both_cycle_ends_keep_correct_backtrack_and_teacher_continuation(self):
         with tempfile.TemporaryDirectory() as name:
             path=Path(name);small_oracle(path,5,[(0,1),(1,2),(1,3),(3,4)]);corpus=TokenCorpus(path)

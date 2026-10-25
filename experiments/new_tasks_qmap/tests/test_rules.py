@@ -73,13 +73,17 @@ class RulesTest(unittest.TestCase):
         import json
         from pathlib import Path
         import tempfile
+        from contextlib import ExitStack
         from experiments.new_tasks_qmap.src.relation_data import prepare,closure
         config=json.loads(Path('experiments/new_tasks_qmap/configs/game24/game24_multigoal_fit.json').read_text())
         config['data']['scenes']={'train':2,'validation':1,'test':1}
-        with tempfile.TemporaryDirectory() as directory:
+        with tempfile.TemporaryDirectory() as directory, ExitStack() as stack:
             for endpoint_holdout in (True,False):
                 config['relations']['holdout_goal_endpoints']=endpoint_holdout
                 corpus,data,summary=prepare(config,Path(directory)/str(endpoint_holdout))
+                for scene in corpus.scenes:
+                    for field in ('states','children','distances','reverse_distances'):
+                        stack.callback(getattr(scene,field)._mmap.close)
                 self.assertEqual(summary['original_starts_with_candidate_supervision'],0 if endpoint_holdout else 2)
                 if not endpoint_holdout:
                     self.assertEqual(len(np.intersect1d(closure(corpus,data['tasks_train']),data['reserved_relations'])),0)

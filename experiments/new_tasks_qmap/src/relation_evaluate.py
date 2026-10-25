@@ -13,15 +13,29 @@ def distance_strata(values):
 
 
 class QCache:
-    def __init__(self,model,corpus,device):
+    def __init__(self,model,corpus,device,max_table_bytes=4*1024**3):
         self.model,self.corpus,self.device=model,corpus,device
-        self.cache={}
+        self.cache={};self.table=None;self.present=None;self.max_table_bytes=max_table_bytes
+        self.table_checked=False
 
     @torch.no_grad()
     def q(self,ids):
         ids=np.asarray(ids,dtype=np.int64); flat=ids.ravel()
-        missing=np.asarray([i for i in np.unique(flat) if int(i) not in self.cache],dtype=np.int64)
-        if len(missing): self.cache.update(zip(map(int,missing),encode(self.model,self.corpus,missing,self.device)))
+        unique=np.unique(flat)
+        missing=(unique[~self.present[unique]] if self.table is not None else
+                 np.asarray([i for i in unique if int(i) not in self.cache],dtype=np.int64))
+        if len(missing):
+            vectors=encode(self.model,self.corpus,missing,self.device)
+            if not self.table_checked:
+                self.table_checked=True
+                if self.corpus.size*vectors.shape[-1]*vectors.element_size()<=self.max_table_bytes:
+                    self.table=torch.empty((self.corpus.size,vectors.shape[-1]),device=self.device,dtype=vectors.dtype)
+                    self.present=np.zeros(self.corpus.size,dtype=bool)
+            if self.table is not None:
+                self.table[torch.as_tensor(missing,device=self.device)]=vectors;self.present[missing]=True
+            else:self.cache.update(zip(map(int,missing),vectors))
+        if self.table is not None:
+            return self.table[torch.as_tensor(flat,device=self.device)].reshape(*ids.shape,-1)
         return torch.stack([self.cache[int(i)] for i in flat]).reshape(*ids.shape,-1)
 
     @torch.no_grad()

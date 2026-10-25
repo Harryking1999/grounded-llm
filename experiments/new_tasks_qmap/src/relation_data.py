@@ -158,15 +158,16 @@ class BoardRelationSampler:
         self.point_index=np.full(corpus.size,-1,dtype=np.int32); self.rank_index=self.point_index.copy()
         self.point_index[data['pairs_train'][:,0]]=np.arange(len(data['pairs_train']))
         self.rank_index[data['tasks_train'][:,0]]=np.arange(len(data['tasks_train']))
-        reserved=data['reserved_relations']
-        def forbidden(values):
-            if not len(reserved): return np.zeros(values.shape,dtype=bool)
-            at=np.searchsorted(reserved,values)
-            return (at<len(reserved)) & (reserved[np.minimum(at,len(reserved)-1)]==values)
-        points=[]; ranks=[]; point_labels=[]; rank_labels=[]; boundaries=[]
-        for sid,scene in enumerate(corpus.scenes):
-            if scene.metadata['split']!='train': continue
-            offset=corpus.offsets[sid]
+        all_reserved=data['reserved_relations']
+        def scene_bank(sid):
+            scene=corpus.scenes[sid];offset=corpus.offsets[sid]
+            start,stop=np.searchsorted(all_reserved,[offset*corpus.size,(offset+len(scene.states))*corpus.size])
+            reserved=all_reserved[start:stop]
+            def forbidden(values):
+                if not len(reserved):return np.zeros(values.shape,dtype=bool)
+                at=np.searchsorted(reserved,values)
+                return (at<len(reserved)) & (reserved[np.minimum(at,len(reserved)-1)]==values)
+            points=[];ranks=[];point_labels=[];rank_labels=[];boundaries=[]
             for j,g in enumerate(scene.goals[:scene.metadata['training_goals']]):
                 source=np.flatnonzero(np.isfinite(scene.distances[j]))+offset; goal=np.full(len(source),g+offset)
                 labels=scene.distances[j,source-offset]
@@ -185,6 +186,15 @@ class BoardRelationSampler:
                 child_truth[valid]=scene.distances[j,child[valid]-offset]
                 boundary=(valid & np.isfinite(child_truth)).any(axis=1) & (valid & ~np.isfinite(child_truth)).any(axis=1)
                 ranks.append(np.column_stack([source[safe],goal[safe]])); rank_labels.append(labels[safe]); boundaries.append(boundary[safe])
+            return [np.concatenate(values) for values in (points,ranks,point_labels,rank_labels,boundaries)]
+        ids=[sid for sid,scene in enumerate(corpus.scenes) if scene.metadata['split']=='train']
+        workers=options.get('preparation_workers',1)
+        if not 1<=workers<=32:raise ValueError('Preparation workers must be between1 and32')
+        if workers>1:
+            from concurrent.futures import ThreadPoolExecutor
+            with ThreadPoolExecutor(max_workers=workers) as executor:parts=list(executor.map(scene_bank,ids))
+        else:parts=list(map(scene_bank,ids))
+        points,ranks,point_labels,rank_labels,boundaries=map(list,zip(*parts))
         self.points=np.concatenate(points); self.ranks=np.concatenate(ranks)
         point_labels=np.concatenate(point_labels); rank_labels=np.concatenate(rank_labels); boundary=np.concatenate(boundaries)
         edges=np.asarray(options['distance_bin_upper_bounds'],dtype=np.float32)

@@ -27,5 +27,26 @@ class ReversibleSamplingTests(unittest.TestCase):
         np.testing.assert_array_equal(corpus.successors(tasks[:,0]),children[tasks[:,0]])
         with self.assertRaises(ValueError):BoardRelationSampler(corpus,data,dict(options,boundary_rank_fraction=.5))
 
+    def test_parallel_scene_preparation_preserves_banks_and_sampling_rng(self):
+        children=np.array([[1,-1],[0,2],[1,3],[2,4],[3,-1]])
+        distances=np.array([[0,1,2,3,4],[4,3,2,1,0]],dtype=np.float32);columns=np.array([0,-1,-1,-1,1])
+        scene=SimpleNamespace(states=np.arange(5),children=children,goals=np.array([0,4]),distances=distances,
+            metadata=dict(split='train',training_goals=2),features=lambda ids:np.eye(5,dtype=np.float32)[ids],
+            distance=lambda source,goal:distances[columns[goal],source])
+        corpus=PhysicalCorpus([scene,scene]);reserved=closure(corpus,np.array([[2,0],[7,5]]))
+        pairs=np.array([[0,4],[1,4],[2,4],[3,4],[4,0],[5,9],[6,9],[7,9],[8,9],[9,5]])
+        tasks=pairs[~np.isin(pairs[:,0],[4,9])]
+        data=dict(pairs_train=pairs,tasks_train=tasks,reserved_relations=reserved)
+        options=dict(finite_point_fraction=.25,boundary_rank_fraction=0.,distance_bin_upper_bounds=[1,2,4],balance_layouts=True,layouts_per_batch=2)
+        a=BoardRelationSampler(corpus,data,options);b=BoardRelationSampler(corpus,data,dict(options,preparation_workers=2))
+        np.testing.assert_array_equal(a.points,b.points);np.testing.assert_array_equal(a.ranks,b.ranks)
+        self.assertEqual(set(map(tuple,a.points)),set(map(tuple,pairs)))
+        self.assertEqual(set(map(tuple,a.ranks)),set(map(tuple,tasks)))
+        outputs=[]
+        for sampler in (a,b):
+            rng=np.random.default_rng(63);source=CoverageSampler(np.ones(10),rng,10,1.)
+            outputs.append(sampler.draw(source,32,16,rng))
+        for x,y in zip(*outputs):np.testing.assert_array_equal(x,y)
+
 
 if __name__=='__main__':unittest.main()

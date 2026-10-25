@@ -6,11 +6,31 @@ import unittest
 import numpy as np
 from grounded_llm.tasks.token_swapping.relation_data import TokenCorpus
 from experiments.new_tasks_qmap.tests.test_exact_pairs import small_oracle
-from experiments.new_tasks_qmap.src.relation_data import materialize,closure
+from experiments.new_tasks_qmap.src.relation_data import materialize,closure,token_goal_cohorts
 from experiments.new_tasks_qmap.src.token_branches import expand,permitted,BranchReplay,cycle_rows
 
 
 class BranchTests(unittest.TestCase):
+    def test_query_goal_holdout_allows_complete_paths_without_goal_label_leaks(self):
+        with tempfile.TemporaryDirectory() as name:
+            path=Path(name);small_oracle(path,6,[(0,1),(1,2),(1,3),(3,4),(4,5)]);corpus=TokenCorpus(path)
+            try:
+                config=dict(relations=dict(evaluation_count=3,training_goals=12,heldout_goals_per_split=2))
+                groups,pairs,tasks,reserved,partition=token_goal_cohorts(corpus,config,np.random.default_rng(7))
+                self.assertFalse(partition.any())
+                self.assertTrue(np.isin(pairs[:,1],corpus.training_goal_pool).all())
+                self.assertTrue(np.isin(tasks[:,1],corpus.training_goal_pool).all())
+                self.assertEqual(len(pairs),corpus.size);self.assertEqual(len(tasks),corpus.size)
+                self.assertFalse(np.intersect1d(closure(corpus,tasks),reserved).size)
+                for name in ('unseen_goal_validation','unseen_goal_test'):
+                    self.assertFalse(np.isin(groups[name][:,1],corpus.training_goal_pool).any())
+                data=dict(reserved_relations=reserved,training_goal_pool=corpus.training_goal_pool)
+                self.assertFalse(permitted(corpus,data,partition,groups['unseen_goal_test']).any())
+                bank,summary=expand(corpus,data,partition,tasks[:30],1,20)
+                self.assertGreater(summary['teacher_paths_reached_goal'],0)
+                self.assertTrue(permitted(corpus,data,partition,bank['tasks_branches']).all())
+            finally:corpus.close()
+
     def test_both_cycle_ends_keep_correct_backtrack_and_teacher_continuation(self):
         with tempfile.TemporaryDirectory() as name:
             path=Path(name);small_oracle(path,5,[(0,1),(1,2),(1,3),(3,4)]);corpus=TokenCorpus(path)

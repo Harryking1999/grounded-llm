@@ -14,7 +14,9 @@ from .relation_evaluate import QCache,rollout
 def permitted(corpus,data,partition,rows):
     rows=np.asarray(rows,dtype=np.int64).reshape(-1,2)
     children=corpus.successors(rows[:,0])
-    return ((partition[rows]==0).all(axis=1)&(partition[children]==0).all(axis=1)
+    goal_allowed=(np.isin(rows[:,1],data['training_goal_pool']) if 'training_goal_pool' in data
+                  else np.ones(len(rows),dtype=bool))
+    return (goal_allowed & (partition[rows]==0).all(axis=1)&(partition[children]==0).all(axis=1)
         & (rows[:,0]!=rows[:,1])
         & ~np.isin(keys(rows[:,0],rows[:,1],corpus.size),data['reserved_relations'])
         & ~np.isin(keys(children,rows[:,1,None],corpus.size),data['reserved_relations']).any(axis=1))
@@ -91,13 +93,14 @@ def prepare(config,reference,checkpoint,out,device):
     if saved['scope']!=corpus.scope:raise ValueError('Mining model belongs to another tree')
     torch.set_num_threads(config['cpu_threads'])
     model=StateEncoder(input_dim=corpus.input_dim,**saved['config']['model']).to(device)
-    model.load_state_dict(saved['model']);model.eval();allowed=np.flatnonzero(partition==0)
+    model.load_state_dict(saved['model']);model.eval();allowed=data.get('training_goal_pool')
+    if allowed is None:allowed=np.flatnonzero(partition==0)
+    proposals={} if 'training_goal_pool' in data else dict(distance_bins=config['distance_bins'],proposal='exact_layers')
     seeds=[];lengths=[];queries=[]
     while sum(map(len,queries))<config['queries']:
         n=min(config['mining_batch'],config['queries']-sum(map(len,queries)))
         source=rng.choice(data['tasks_train'][:,0],n*2)
-        rows=sample_goals(corpus,source,rng,data['reserved_relations'],ranking=True,allowed=allowed,
-            distance_bins=config['distance_bins'],proposal='exact_layers')
+        rows=sample_goals(corpus,source,rng,data['reserved_relations'],ranking=True,allowed=allowed,**proposals)
         distance=corpus.distance(rows[:,0],rows[:,1]);rows=rows[distance>=config['minimum_distance']][:n]
         if not len(rows):continue
         edges=[];rollout(corpus,QCache(model,corpus,device),rows,config['horizon'],'q',edges)
@@ -110,8 +113,7 @@ def prepare(config,reference,checkpoint,out,device):
         for _ in range(config['goal_switch_attempts']):
             ids=np.flatnonzero(pending)
             if not len(ids):break
-            proposed=sample_goals(corpus,base[ids,0],rng,data['reserved_relations'],ranking=True,allowed=allowed,
-                distance_bins=config['distance_bins'],proposal='exact_layers')
+            proposed=sample_goals(corpus,base[ids,0],rng,data['reserved_relations'],ranking=True,allowed=allowed,**proposals)
             optimal=materialize(corpus,proposed)['optimal']
             changed=~(original_actions[ids]&optimal).any(axis=1)&(proposed[:,1]!=base[ids,1])
             switched.append(proposed[changed]);pending[ids[changed]]=False

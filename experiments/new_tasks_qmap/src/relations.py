@@ -189,7 +189,8 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
     pair_draws=np.zeros(len(point_truth),dtype=np.uint32); rank_draws=np.zeros(len(data['tasks_train']),dtype=np.uint32)
     allowed=None
     if options.get('online_goals') and not hasattr(corpus,'scenes'):
-        allowed=np.flatnonzero(np.load(out/'data'/'endpoint_partition.npy')==0)
+        allowed=data.get('training_goal_pool')
+        if allowed is None:allowed=np.flatnonzero(np.load(out/'data'/'endpoint_partition.npy')==0)
     edge_bank=None
     if options.get('action_edge_fraction',0):
         fraction=options['action_edge_fraction']

@@ -549,6 +549,8 @@ def board_cohorts(corpus,config,rng):
 
 
 def token_cohorts(corpus,config,rng):
+    if config['relations'].get('protocol')=='query_goal_holdout':
+        return token_goal_cohorts(corpus,config,rng)
     spec=config['relations']; partition=np.zeros(corpus.size,dtype=np.int8)
     order=rng.permutation(corpus.size)
     held=round(corpus.size*spec['endpoint_holdout_fraction'])
@@ -605,6 +607,35 @@ def token_cohorts(corpus,config,rng):
     return groups,pairs,decisions,reserved,partition
 
 
+def token_goal_cohorts(corpus,config,rng):
+    """Fit continuous branches while holding out queries, not state inputs."""
+    spec=config['relations'];count=spec['evaluation_count']
+    nt,nh=spec['training_goals'],spec['heldout_goals_per_split']
+    chosen=rng.choice(corpus.size,nt+2*nh,replace=False)
+    pools=[np.sort(chosen[:nt]),chosen[nt:nt+nh],chosen[nt+nh:]]
+    corpus.training_goal_pool=pools[0]
+    groups={};reserved=[]
+    for name,pool in [('validation',pools[0]),('test',pools[0]),
+                      ('unseen_goal_validation',pools[1]),('unseen_goal_test',pools[2])]:
+        goals=rng.choice(pool,count*8);sources=rng.integers(corpus.size,size=len(goals))
+        half=len(goals)//2;sources[:half]=goals[:half]
+        lengths=rng.integers(1,2*int(corpus.metadata['statistics']['diameter'])+1,size=half)
+        for step in range(int(lengths.max())):
+            ids=np.flatnonzero(lengths>step)
+            sources[ids]=corpus.children[sources[ids],rng.integers(corpus.max_candidates,size=len(ids))]
+        rows=np.column_stack([sources,goals]);rows=rows[rows[:,0]!=rows[:,1]]
+        if reserved:
+            protected=np.unique(np.concatenate(reserved));children=corpus.successors(rows[:,0])
+            safe=~np.isin(keys(rows[:,0],rows[:,1],corpus.size),protected)
+            safe&=~np.isin(keys(children,rows[:,1,None],corpus.size),protected).any(axis=1);rows=rows[safe]
+        selected=balanced(rows,count,corpus.distance(rows[:,0],rows[:,1]),rng)
+        groups[name]=selected;reserved.append(closure(corpus,selected))
+    reserved=np.unique(np.concatenate(reserved));sources=np.arange(corpus.size,dtype=np.int64)
+    pairs=sample_goals(corpus,sources,rng,reserved,allowed=pools[0])
+    decisions=sample_goals(corpus,sources,rng,reserved,ranking=True,allowed=pools[0])
+    return groups,pairs,decisions,reserved,np.zeros(corpus.size,dtype=np.int8)
+
+
 def prepare(config,out):
     out=Path(out); out.mkdir(parents=True,exist_ok=True)
     module=importlib.import_module(f'grounded_llm.tasks.{config["task"]}.relation_data')
@@ -613,6 +644,7 @@ def prepare(config,out):
     groups,pairs,decisions,reserved,partition=(token_cohorts if config['task']=='token_swapping' else board_cohorts)(corpus,config,rng)
     data={'pairs_train':pairs,'pair_distances_train':corpus.distance(pairs[:,0],pairs[:,1]),'reserved_relations':reserved,
           'holdout_goal_endpoints':np.array(config['relations'].get('holdout_goal_endpoints',True))}
+    if hasattr(corpus,'training_goal_pool'):data['training_goal_pool']=corpus.training_goal_pool
     for name,rows in [('train',decisions),*groups.items()]:
         for key,value in materialize(corpus,rows).items(): data[f'{key}_{name}']=value
     finite=np.concatenate([v[np.isfinite(v)] for k,v in data.items() if k.startswith('distances_') or k.startswith('child_distances_') or k=='pair_distances_train'])
@@ -638,6 +670,9 @@ def prepare(config,out):
         summary['training_original_starts']=len(roots)
         summary['original_starts_with_candidate_supervision']=int(np.isin(roots,decisions[:,0]).sum())
         summary['goal_holdout_scope']='endpoints' if bool(data['holdout_goal_endpoints']) else 'query_goal_relations; candidate endpoint exposure allowed'
+    if 'training_goal_pool' in data:
+        summary['training_goals']=len(data['training_goal_pool'])
+        summary['goal_holdout_scope']='query_goal_relations; all physical state inputs allowed'
     atomic_json(out/'summary.json',summary)
     return corpus,data,summary
 

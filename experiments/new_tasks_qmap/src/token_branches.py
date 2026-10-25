@@ -85,6 +85,36 @@ def expand(corpus,data,partition,seeds,depth,teacher_steps):
         scope='Whole decisions only. Every retained parent has all legal successors; held-out continuations are counted, never pruned or silently labelled as covered.')
 
 
+def save_bank(corpus,bank,out):
+    for kind in ('seed','branches'):
+        bank.update({kind+'_'+key:value for key,value in materialize(corpus,bank['tasks_'+kind]).items()})
+        bank['pair_distances_'+kind]=corpus.distance(bank['pairs_'+kind][:,0],bank['pairs_'+kind][:,1])
+    np.savez_compressed(Path(out)/'branch_bank.npz',**bank)
+
+
+def combine(corpus,data,partition,banks,depth,teacher_steps):
+    seeds=np.unique(np.vstack([bank['tasks_seed'] for bank in banks]),axis=0)
+    if not permitted(corpus,data,partition,seeds).all():raise ValueError('Source bank changes the allowed training scope')
+    merged,summary=expand(corpus,data,partition,seeds,depth,teacher_steps)
+    for key in ('mining_queries','raw_cycle_seeds','switched_goals'):
+        merged[key]=np.unique(np.vstack([bank[key] for bank in banks]),axis=0)
+    return merged,summary
+
+
+def merge(config,reference,paths,out):
+    out=Path(out);out.mkdir(parents=True,exist_ok=False)
+    original=json.loads((reference/'config.json').read_text());corpus,data,_=load(original,reference/'data')
+    partition=np.load(reference/'data/endpoint_partition.npy');banks=[]
+    for path in paths:
+        with np.load(path) as archive:
+            banks.append({key:archive[key] for key in ('tasks_seed','mining_queries','raw_cycle_seeds','switched_goals')})
+    bank,summary=combine(corpus,data,partition,banks,config['branch_depth'],config['teacher_steps'])
+    save_bank(corpus,bank,out)
+    summary.update(config=config,source_banks=list(map(str,paths)),unique_source_queries=len(bank['mining_queries']),
+        scope='Aggregate old and current-policy cycle seeds, preserving all prior roots; recompute complete branches and exact continuations under the same protected training information.')
+    atomic_json(out/'bank_summary.json',summary);print(json.dumps(summary),flush=True)
+
+
 def prepare(config,reference,checkpoint,out,device):
     out=Path(out);out.mkdir(parents=True,exist_ok=False)
     original=json.loads((reference/'config.json').read_text());corpus,data,_=load(original,reference/'data')
@@ -120,10 +150,7 @@ def prepare(config,reference,checkpoint,out,device):
     extra=np.vstack(switched) if switched else np.empty((0,2),dtype=np.int64)
     bank,summary=expand(corpus,data,partition,np.vstack([seeds,extra]),config['branch_depth'],config['teacher_steps'])
     bank['mining_queries']=np.vstack(queries);bank['raw_cycle_seeds']=seeds;bank['switched_goals']=extra
-    for kind in ('seed','branches'):
-        bank.update({kind+'_'+key:value for key,value in materialize(corpus,bank['tasks_'+kind]).items()})
-        bank['pair_distances_'+kind]=corpus.distance(bank['pairs_'+kind][:,0],bank['pairs_'+kind][:,1])
-    np.savez_compressed(out/'branch_bank.npz',**bank)
+    save_bank(corpus,bank,out)
     summary.update(config=config,source_checkpoint=str(checkpoint),source_checkpoint_step=saved['step'],
         source_checkpoint_commit=saved['source_commit'],original_cycle_seeds=len(seeds),switched_goal_contexts=len(extra),
         cycle_length_counts={str(n):lengths.count(n) for n in sorted(set(lengths))})
@@ -132,7 +159,7 @@ def prepare(config,reference,checkpoint,out,device):
 
 
 class BranchReplay:
-    def __init__(self,corpus,data,partition,bank,options,rng):
+    def __init__(self,corpus,data,partition,bank,options,rng,fit_bank=None):
         self.corpus,self.rng,self.options=corpus,rng,options
         kind=options['kind']
         if kind not in ('seed','branches'):raise ValueError('Expected seed or branches replay')
@@ -145,7 +172,9 @@ class BranchReplay:
         self.rank_draws=np.zeros(len(self.tasks),dtype=np.int64);self.point_draws=np.zeros(len(self.pairs),dtype=np.int64)
         self.fit={}
         for name in ('seed','branches'):
-            self.fit.update({key+'_'+name+'_fit':value for key,value in materialize(corpus,bank['tasks_'+name]).items()})
+            rows=(fit_bank if fit_bank is not None else bank)['tasks_'+name]
+            if not permitted(corpus,data,partition,rows).all():raise ValueError('Fit bank contains protected queries')
+            self.fit.update({key+'_'+name+'_fit':value for key,value in materialize(corpus,rows).items()})
 
     def apply(self,pair,p,truth,target,tasks,r,point_origin,rank_origin):
         count=round(len(tasks)*self.options['decision_fraction']);slots=self.rng.choice(len(tasks),count,replace=False)
@@ -168,9 +197,16 @@ class BranchReplay:
 def main():
     parser=argparse.ArgumentParser(__doc__)
     parser.add_argument('--config',type=Path,required=True);parser.add_argument('--reference',type=Path,required=True)
-    parser.add_argument('--checkpoint',type=Path,required=True);parser.add_argument('--out',type=Path,required=True)
+    parser.add_argument('--checkpoint',type=Path);parser.add_argument('--merge-banks',nargs='+',type=Path)
+    parser.add_argument('--out',type=Path,required=True)
     parser.add_argument('--device',default='cpu');args=parser.parse_args()
-    prepare(json.loads(args.config.read_text()),args.reference,args.checkpoint,args.out,args.device)
+    config=json.loads(args.config.read_text())
+    if args.merge_banks:
+        if args.checkpoint:parser.error('Merge uses frozen banks, without another mining checkpoint')
+        merge(config,args.reference,args.merge_banks,args.out)
+    else:
+        if not args.checkpoint:parser.error('Mining requires a frozen checkpoint')
+        prepare(config,args.reference,args.checkpoint,args.out,args.device)
 
 
 if __name__=='__main__':main()

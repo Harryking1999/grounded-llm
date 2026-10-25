@@ -246,8 +246,14 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
         if not snapshot.exists():
             temporary=snapshot.with_suffix('.tmp');shutil.copyfile((out/branch_options['bank']).resolve(),temporary);temporary.replace(snapshot)
         with np.load(snapshot) as archive:bank={k:archive[k] for k in archive.files}
+        fit_bank=None
+        if branch_options.get('fit_bank'):
+            fit_snapshot=out/'token_fit_bank.npz'
+            if not fit_snapshot.exists():
+                temporary=fit_snapshot.with_suffix('.tmp');shutil.copyfile((out/branch_options['fit_bank']).resolve(),temporary);temporary.replace(fit_snapshot)
+            with np.load(fit_snapshot) as archive:fit_bank={key:archive[key] for key in ('tasks_seed','tasks_branches')}
         branch_replay=BranchReplay(corpus,data,np.load(out/'data/endpoint_partition.npy'),bank,branch_options,
-            np.random.default_rng(config['seed']+87003))
+            np.random.default_rng(config['seed']+87003),fit_bank=fit_bank)
     continuation=config.get('continuation');external=False
     checkpoint=(out/'last.pt' if resume and (out/'last.pt').exists() else None)
     if checkpoint is None and continuation:

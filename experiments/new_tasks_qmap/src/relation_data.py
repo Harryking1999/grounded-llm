@@ -72,8 +72,9 @@ def training_decision_mask(corpus,data,rows):
         if scene.metadata['split']!='train': continue
         ids=np.flatnonzero((source_scene==sid)&(goal_scene==sid)); offset=corpus.offsets[sid]
         nt=scene.metadata['training_goals']; heldout=scene.goals[nt:]+offset
-        allowed=(np.isin(rows[ids,1],scene.goals[:nt]+offset)
-                 & ~np.isin(rows[ids,0],heldout) & ~np.isin(children[ids],heldout).any(axis=1)
+        endpoint_safe=(~np.isin(rows[ids,0],heldout) & ~np.isin(children[ids],heldout).any(axis=1)
+                       if bool(data.get('holdout_goal_endpoints',True)) else np.ones(len(ids),dtype=bool))
+        allowed=(np.isin(rows[ids,1],scene.goals[:nt]+offset) & endpoint_safe
                  & ~blocked[ids] & legal[ids].any(axis=1))
         truth=corpus.distance(rows[ids,0],rows[ids,1])
         result[ids]=allowed & np.isfinite(truth) & (truth>0)
@@ -447,8 +448,9 @@ def board_cohorts(corpus,config,rng):
     for sid,scene in enumerate(corpus.scenes):
         offset=corpus.offsets[sid]; split=scene.metadata['split']; nt=scene.metadata['training_goals']
         blocked=scene.goals[nt:]
-        safe_parent=~np.isin(np.arange(len(scene.states)),blocked)
-        safe_rank=safe_parent & ~np.isin(scene.children,blocked).any(axis=1)
+        endpoint_holdout=spec.get('holdout_goal_endpoints',True)
+        safe_parent=~np.isin(np.arange(len(scene.states)),blocked) if endpoint_holdout else np.ones(len(scene.states),dtype=bool)
+        safe_rank=safe_parent & ~np.isin(scene.children,blocked).any(axis=1) if endpoint_holdout else safe_parent.copy()
         source_key=json.dumps(scene.metadata['source'],sort_keys=True)
         eval_columns=np.arange(min(nt,spec.get('evaluation_training_goals',nt)))
         if split=='train':
@@ -482,6 +484,7 @@ def board_cohorts(corpus,config,rng):
                     bad=local_rng.choice(np.flatnonzero(~finite),spec['unreachable_eval_per_goal'],replace=True)
                     selected=np.concatenate([selected,rows[bad]])
                 groups[cohort].append(selected)
+                if not endpoint_holdout:reserved.append(closure(corpus,selected))
             train_specs.append((sid,safe_parent,safe_rank))
         else:
             cohort='diagnostic' if split=='diagnostic' else 'unseen_layout_'+split
@@ -608,7 +611,8 @@ def prepare(config,out):
     corpus=module.load(out/'graphs') if (out/'graphs'/'corpus.json').exists() or (out/'graphs'/'oracle.json').exists() else module.build(config,out/'graphs')
     rng=np.random.default_rng(config['seed']+1)
     groups,pairs,decisions,reserved,partition=(token_cohorts if config['task']=='token_swapping' else board_cohorts)(corpus,config,rng)
-    data={'pairs_train':pairs,'pair_distances_train':corpus.distance(pairs[:,0],pairs[:,1]),'reserved_relations':reserved}
+    data={'pairs_train':pairs,'pair_distances_train':corpus.distance(pairs[:,0],pairs[:,1]),'reserved_relations':reserved,
+          'holdout_goal_endpoints':np.array(config['relations'].get('holdout_goal_endpoints',True))}
     for name,rows in [('train',decisions),*groups.items()]:
         for key,value in materialize(corpus,rows).items(): data[f'{key}_{name}']=value
     finite=np.concatenate([v[np.isfinite(v)] for k,v in data.items() if k.startswith('distances_') or k.startswith('child_distances_') or k=='pair_distances_train'])
@@ -629,6 +633,11 @@ def prepare(config,out):
                  cohorts={name:dict(count=len(rows),reachable=int(np.isfinite(data[f'distances_{name}']).sum())) for name,rows in groups.items()},
                  selected_train_states=len(np.unique(pairs[:,0])),
                  all_selected_sources_in_training=bool(config['relations'].get('complete_training_sources',False)))
+    if config['task']=='game24':
+        roots=np.asarray([corpus.offsets[i]+s.metadata['original_state'] for i,s in enumerate(corpus.scenes) if s.metadata['split']=='train'])
+        summary['training_original_starts']=len(roots)
+        summary['original_starts_with_candidate_supervision']=int(np.isin(roots,decisions[:,0]).sum())
+        summary['goal_holdout_scope']='endpoints' if bool(data['holdout_goal_endpoints']) else 'query_goal_relations; candidate endpoint exposure allowed'
     atomic_json(out/'summary.json',summary)
     return corpus,data,summary
 

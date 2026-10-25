@@ -69,6 +69,26 @@ class RulesTest(unittest.TestCase):
         env = Game24()
         self.assertEqual(env.canonical([Fraction(1, 3), Fraction(2, 6)]), (Fraction(1, 3),) * 2)
 
+    def test_game24_goal_relation_holdout_keeps_root_candidates(self):
+        import json
+        from pathlib import Path
+        import tempfile
+        from experiments.new_tasks_qmap.src.relation_data import prepare,closure
+        config=json.loads(Path('experiments/new_tasks_qmap/configs/game24/game24_multigoal_fit.json').read_text())
+        config['data']['scenes']={'train':2,'validation':1,'test':1}
+        with tempfile.TemporaryDirectory() as directory:
+            for endpoint_holdout in (True,False):
+                config['relations']['holdout_goal_endpoints']=endpoint_holdout
+                corpus,data,summary=prepare(config,Path(directory)/str(endpoint_holdout))
+                self.assertEqual(summary['original_starts_with_candidate_supervision'],0 if endpoint_holdout else 2)
+                if not endpoint_holdout:
+                    self.assertEqual(len(np.intersect1d(closure(corpus,data['tasks_train']),data['reserved_relations'])),0)
+                    held=[]
+                    for sid,scene in enumerate(corpus.scenes):
+                        if scene.metadata['split']=='train':held.extend(scene.goals[scene.metadata['training_goals']:]+corpus.offsets[sid])
+                    self.assertFalse(np.isin(data['tasks_train'][:,1],held).any())
+                    self.assertTrue(np.isin(data['children_train'],held).any())
+
     def test_bridge_all_goals_against_floyd_and_intermediate_stop(self):
         env=Bridge([1,2,5,10]);graph=env.graph();n=len(graph['children'])
         exact=np.full((n,n),np.inf);np.fill_diagonal(exact,0)

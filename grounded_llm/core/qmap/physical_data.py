@@ -101,21 +101,26 @@ class PhysicalCorpus:
     def locate(self, ids):
         return np.searchsorted(self.offsets[1:], ids, side='right')
 
+    def _scene_groups(self,ids):
+        scene_ids=self.locate(ids)
+        if scene_ids.ndim==1 and len(scene_ids) and np.all(scene_ids[1:]>=scene_ids[:-1]):
+            cuts=np.r_[0,np.flatnonzero(scene_ids[1:]!=scene_ids[:-1])+1,len(scene_ids)]
+            for begin,end in zip(cuts[:-1],cuts[1:]):
+                yield int(scene_ids[begin]),slice(int(begin),int(end))
+        else:
+            for sid in np.unique(scene_ids):yield int(sid),scene_ids==sid
+
     def features(self, ids):
         ids = np.asarray(ids, dtype=np.int64)
         result = np.empty((*ids.shape, self.input_dim), dtype=np.float32)
-        scene_ids = self.locate(ids)
-        for scene_id in np.unique(scene_ids):
-            mask = scene_ids == scene_id
+        for scene_id,mask in self._scene_groups(ids):
             result[mask] = self.scenes[scene_id].features(ids[mask]-self.offsets[scene_id])
         return result
 
     def successors(self, ids):
         ids = np.asarray(ids, dtype=np.int64)
         result = np.full((*ids.shape, self.max_candidates), -1, dtype=np.int64)
-        scene_ids = self.locate(ids)
-        for scene_id in np.unique(scene_ids):
-            mask = scene_ids == scene_id
+        for scene_id,mask in self._scene_groups(ids):
             rows = self.scenes[scene_id].children[ids[mask]-self.offsets[scene_id]]
             result[mask, :rows.shape[-1]] = np.where(rows >= 0, rows+self.offsets[scene_id], -1)
         return result
@@ -126,8 +131,7 @@ class PhysicalCorpus:
         if np.any(scene_ids != self.locate(goal)):
             raise ValueError('Distances across different physical scenes are undefined')
         result = np.empty(source.shape, dtype=np.float32)
-        for scene_id in np.unique(scene_ids):
-            mask = scene_ids == scene_id
+        for scene_id,mask in self._scene_groups(source):
             s, g = source[mask]-self.offsets[scene_id], goal[mask]-self.offsets[scene_id]
             method = self.scenes[scene_id].reverse if reverse else self.scenes[scene_id].distance
             result[mask] = method(s, g)

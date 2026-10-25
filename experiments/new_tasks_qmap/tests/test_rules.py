@@ -39,6 +39,16 @@ class RulesTest(unittest.TestCase):
             self.assertEqual(set(sliced[0]),set(global_scan[0]))
             for name in sliced[0]:np.testing.assert_array_equal(sliced[0][name],global_scan[0][name])
             for i in [1,2,3]:np.testing.assert_array_equal(sliced[i],global_scan[i])
+            sources=np.concatenate([np.arange(min(32,len(scene.states)))+corpus.offsets[sid] for sid,scene in enumerate(corpus.scenes)])
+            goals=np.concatenate([np.full(min(32,len(scene.states)),int(scene.goals[0])+corpus.offsets[sid]) for sid,scene in enumerate(corpus.scenes)])
+            permutation=np.random.default_rng(55).permutation(len(sources))
+            for reverse in [False,True]:
+                expected=np.concatenate([(scene.reverse if reverse else scene.distance)(np.arange(min(32,len(scene.states))),np.full(min(32,len(scene.states)),scene.goals[0])) for scene in corpus.scenes])
+                np.testing.assert_array_equal(corpus.distance(sources,goals,reverse=reverse),expected)
+                np.testing.assert_array_equal(corpus.distance(sources[permutation],goals[permutation],reverse=reverse),expected[permutation])
+                np.testing.assert_array_equal(corpus.distance(sources.reshape(-1,8),goals.reshape(-1,8),reverse=reverse),expected.reshape(-1,8))
+            np.testing.assert_array_equal(corpus.features(sources)[permutation],corpus.features(sources[permutation]))
+            np.testing.assert_array_equal(corpus.successors(sources)[permutation],corpus.successors(sources[permutation]))
 
     def test_bridge_optimum_and_judge(self):
         env = Bridge([1, 2, 5, 10])

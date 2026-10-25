@@ -1732,5 +1732,30 @@
         "branch_fit_passed": false
       }
     }
+  },
+  "exact_anchor_coordinate_diagnostic": {
+    "role": "Teacher-only representation diagnostic. Exact128 distance-coordinate vectors, not a learned encoder or inference policy; contains oracle-derived protected coordinates for analysis only and supplies no new training labels.",
+    "results": {
+      "validation": {
+        "mae": 0.0,
+        "planning": {
+          "count": 128,
+          "solved": 128,
+          "cycles": 0,
+          "optimal": 128,
+          "success_rate": 1.0
+        }
+      },
+      "unseen_goal_validation": {
+        "mae": 3.5390625,
+        "planning": {
+          "count": 128,
+          "solved": 33,
+          "cycles": 95,
+          "optimal": 33,
+          "success_rate": 0.2578125
+        }
+      }
+    }
   }
 }

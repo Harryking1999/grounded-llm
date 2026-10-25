@@ -19,6 +19,13 @@ def closure(corpus, rows):
         keys(children[valid],np.broadcast_to(rows[:,1,None],children.shape)[valid],corpus.size)]))
 
 
+def disjoint_decisions(corpus,rows,protected):
+    children=corpus.successors(rows[:,0]);valid=children>=0
+    related=np.full(children.shape,-1,dtype=np.int64)
+    related[valid]=keys(children[valid],np.broadcast_to(rows[:,1,None],children.shape)[valid],corpus.size)
+    return ~np.isin(keys(rows[:,0],rows[:,1],corpus.size),protected)&~np.isin(related,protected).any(axis=1)
+
+
 def balanced(pool, count, distances, rng):
     """Half broad proposals, half uniform true-distance layers; exact labels only."""
     if not len(pool): raise ValueError('No eligible exact relations')
@@ -154,7 +161,7 @@ class BoardRelationSampler:
         if not hasattr(corpus,'scenes'): raise ValueError('Board relation sampling requires exact board scenes')
         self.corpus,self.data,self.options=corpus,data,options
         self.finite_fraction=options['finite_point_fraction']; self.boundary_fraction=options['boundary_rank_fraction']
-        if not 0<self.finite_fraction<1 or not 0<=self.boundary_fraction<1: raise ValueError('Broad and finite quotas required; boundary quota may be zero on reversible graphs')
+        if not 0<self.finite_fraction<1 or not 0<=self.boundary_fraction<=1: raise ValueError('Broad and finite quotas required; boundary quota may span zero to one')
         self.point_index=np.full(corpus.size,-1,dtype=np.int32); self.rank_index=self.point_index.copy()
         self.point_index[data['pairs_train'][:,0]]=np.arange(len(data['pairs_train']))
         self.rank_index[data['tasks_train'][:,0]]=np.arange(len(data['tasks_train']))
@@ -217,7 +224,8 @@ class BoardRelationSampler:
                     for j,upper in enumerate(edges)}
         self.point_groups=groups(point_labels,np.ones(len(point_labels),bool),self.points)
         self.boundary_groups=groups(rank_labels,boundary,self.ranks); self.other_groups=groups(rank_labels,~boundary,self.ranks)
-        if (self.boundary_fraction and not self.boundary_groups) or not self.other_groups: raise ValueError('Requested exact boundary/nonboundary training relations unavailable')
+        if (self.boundary_fraction and not self.boundary_groups) or (self.boundary_fraction<1 and not self.other_groups):
+            raise ValueError('Requested exact boundary/nonboundary training relations unavailable')
         self.summary=dict(finite_point_bank=len(self.points),ranking_bank=len(self.ranks),boundary_ranking_bank=int(boundary.sum()),
             point_stratum_counts=counts(point_labels,np.ones(len(point_labels),bool)),boundary_stratum_counts=counts(rank_labels,boundary),
             nonboundary_stratum_counts=counts(rank_labels,~boundary),options=options,
@@ -459,7 +467,10 @@ def board_cohorts(corpus,config,rng):
     names=('validation','test','unseen_goal_validation','unseen_goal_test',
            'unseen_layout_validation','unseen_layout_test','original_layout_test',
            'original_layout_validation','diagnostic','diagnostic_original')
-    groups={name:[] for name in names}; reserved=[]; train_specs=[]
+    groups={name:[] for name in names}; reserved=[]; train_specs=[];required_relations=[]
+    execution_goals=spec.get('preserve_goal_execution',[])
+    if execution_goals and (config['task']!='game24' or spec.get('holdout_goal_endpoints',True)):
+        raise ValueError('Required goal execution currently applies to Game24 query-relation holdout only')
     for sid,scene in enumerate(corpus.scenes):
         offset=corpus.offsets[sid]; split=scene.metadata['split']; nt=scene.metadata['training_goals']
         blocked=scene.goals[nt:]
@@ -469,7 +480,17 @@ def board_cohorts(corpus,config,rng):
         source_key=json.dumps(scene.metadata['source'],sort_keys=True)
         eval_columns=np.arange(min(nt,spec.get('evaluation_training_goals',nt)))
         if split=='train':
-            local_reserved=[]
+            required=[]
+            if execution_goals:
+                for column,g in enumerate(scene.goals[:nt]):
+                    if ','.join(map(str,scene.values[g])) in execution_goals:
+                        source=np.flatnonzero(np.isfinite(scene.distances[column]))+offset
+                        required.append(closure(corpus,np.column_stack([source,np.full(len(source),g+offset)])))
+            required=np.unique(np.concatenate(required)) if required else np.empty(0,dtype=np.int64)
+            if len(required):required_relations.append(required)
+            # Required training decisions must be kept before evaluation rows
+            # are sampled; removing already selected tests would leak them.
+            local_reserved=[required] if len(required) else []
             for cohort in ('validation','test'):
                 rows=[]
                 local_rng=np.random.default_rng(group_seed(source_key,config['seed'],'queries:'+cohort))
@@ -494,9 +515,10 @@ def board_cohorts(corpus,config,rng):
                 local_rng=np.random.default_rng(group_seed(source_key,config['seed'],'queries:'+cohort+str(column)))
                 g=scene.goals[column]; finite=np.isfinite(scene.distances[column]); pool=np.arange(len(scene.states))
                 rows=np.column_stack([pool+offset,np.full(len(pool),g+offset,dtype=np.int64)])
-                selected=balanced(rows[finite],spec['evaluation_per_goal'],scene.distances[column,finite],local_rng)
-                if (~finite).any():
-                    bad=local_rng.choice(np.flatnonzero(~finite),spec['unreachable_eval_per_goal'],replace=True)
+                eligible=disjoint_decisions(corpus,rows,required) if len(required) else np.ones(len(rows),bool)
+                selected=balanced(rows[finite&eligible],spec['evaluation_per_goal'],scene.distances[column,finite&eligible],local_rng)
+                if (~finite&eligible).any():
+                    bad=local_rng.choice(np.flatnonzero(~finite&eligible),spec['unreachable_eval_per_goal'],replace=True)
                     selected=np.concatenate([selected,rows[bad]])
                 groups[cohort].append(selected)
                 if not endpoint_holdout:reserved.append(closure(corpus,selected))
@@ -519,6 +541,9 @@ def board_cohorts(corpus,config,rng):
             else:
                 groups['original_layout_'+split].append(np.column_stack([np.full(len(scene.goals),original),scene.goals+offset]))
     reserved=np.unique(np.concatenate(reserved))
+    if execution_goals:
+        corpus.required_training_relations=np.unique(np.concatenate(required_relations)) if required_relations else np.empty(0,dtype=np.int64)
+        if np.intersect1d(corpus.required_training_relations,reserved).size:raise ValueError('Required execution and held queries overlap')
     pairs,decisions=[],[]
     for sid,safe_parent,safe_rank in train_specs:
         scene=corpus.scenes[sid]; offset=corpus.offsets[sid]; nt=scene.metadata['training_goals']
@@ -666,6 +691,7 @@ def prepare(config,out):
     data={'pairs_train':pairs,'pair_distances_train':corpus.distance(pairs[:,0],pairs[:,1]),'reserved_relations':reserved,
           'holdout_goal_endpoints':np.array(config['relations'].get('holdout_goal_endpoints',True))}
     if hasattr(corpus,'training_goal_pool'):data['training_goal_pool']=corpus.training_goal_pool
+    if hasattr(corpus,'required_training_relations'):data['required_training_relations']=corpus.required_training_relations
     for name,rows in [('train',decisions),*groups.items()]:
         for key,value in materialize(corpus,rows).items(): data[f'{key}_{name}']=value
     finite=np.concatenate([v[np.isfinite(v)] for k,v in data.items() if k.startswith('distances_') or k.startswith('child_distances_') or k=='pair_distances_train'])
@@ -691,6 +717,11 @@ def prepare(config,out):
         summary['training_original_starts']=len(roots)
         summary['original_starts_with_candidate_supervision']=int(np.isin(roots,decisions[:,0]).sum())
         summary['goal_holdout_scope']='endpoints' if bool(data['holdout_goal_endpoints']) else 'query_goal_relations; candidate endpoint exposure allowed'
+        queries=np.asarray([[corpus.offsets[i]+s.metadata['original_state'],corpus.offsets[i]+s.goals[0]] for i,s in enumerate(corpus.scenes) if s.metadata['split']=='train'])
+        finite=np.isfinite(corpus.distance(queries[:,0],queries[:,1]))
+        summary['fixed24_training_originals']=dict(solvable=int(finite.sum()),
+            complete_candidate_supervision=int((finite&training_decision_mask(corpus,data,queries)).sum()))
+        summary['required_execution_relation_count']=len(data.get('required_training_relations',[]))
     if 'training_goal_pool' in data:
         summary['training_goals']=len(data['training_goal_pool'])
         summary['goal_holdout_scope']='query_goal_relations; all physical state inputs allowed'

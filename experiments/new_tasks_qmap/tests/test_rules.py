@@ -93,6 +93,37 @@ class RulesTest(unittest.TestCase):
                     self.assertFalse(np.isin(data['tasks_train'][:,1],held).any())
                     self.assertTrue(np.isin(data['children_train'],held).any())
 
+    def test_game24_required_execution_keeps_all_finite_24_branches(self):
+        import json,tempfile
+        from pathlib import Path
+        from contextlib import ExitStack
+        from experiments.new_tasks_qmap.src.relation_data import prepare,closure,training_decision_mask
+        config=json.loads(Path('experiments/new_tasks_qmap/configs/game24/game24_goal_relation_holdout.json').read_text())
+        config['data']['scenes']={'train':2,'validation':1,'test':1};config['data']['additional_training_scenes']=0
+        config['relations']['preserve_goal_execution']=['24']
+        with tempfile.TemporaryDirectory() as directory,ExitStack() as stack:
+            corpus,data,summary=prepare(config,Path(directory))
+            for scene in corpus.scenes:
+                for field in ('states','children','distances','reverse_distances'):stack.callback(getattr(scene,field)._mmap.close)
+            self.assertGreater(summary['fixed24_training_originals']['solvable'],0)
+            self.assertEqual(summary['fixed24_training_originals']['solvable'],summary['fixed24_training_originals']['complete_candidate_supervision'])
+            for sid,scene in enumerate(corpus.scenes):
+                if scene.metadata['split']!='train':continue
+                offset=corpus.offsets[sid];g=offset+scene.goals[0]
+                sources=np.flatnonzero(np.isfinite(scene.distances[0])&(scene.distances[0]>0))+offset
+                queries=np.column_stack([sources,np.full(len(sources),g)])
+                self.assertTrue(training_decision_mask(corpus,data,queries).all())
+                actual=data['tasks_train'][data['tasks_train'][:,1]==g]
+                np.testing.assert_array_equal(actual,queries)
+            self.assertFalse(np.intersect1d(data['required_training_relations'],data['reserved_relations']).size)
+            self.assertFalse(np.intersect1d(closure(corpus,data['tasks_train']),data['reserved_relations']).size)
+            self.assertGreater(len(data['tasks_unseen_goal_validation']),0)
+            self.assertGreater(len(data['tasks_unseen_goal_test']),0)
+            held=[]
+            for sid,scene in enumerate(corpus.scenes):
+                if scene.metadata['split']=='train':held.extend(scene.goals[scene.metadata['training_goals']:]+corpus.offsets[sid])
+            self.assertFalse(np.isin(data['tasks_train'][:,1],held).any())
+
     def test_bridge_all_goals_against_floyd_and_intermediate_stop(self):
         env=Bridge([1,2,5,10]);graph=env.graph();n=len(graph['children'])
         exact=np.full((n,n),np.inf);np.fill_diagonal(exact,0)

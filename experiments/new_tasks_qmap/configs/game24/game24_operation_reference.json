@@ -1,0 +1,65 @@
+{
+  "schema": "exact_state_pairs",
+  "seed": 2026102501,
+  "model": {
+    "dimension": 128,
+    "hidden": 256,
+    "cap": 16,
+    "metric": "directed_max"
+  },
+  "training": {
+    "steps": 4000,
+    "batch_size": 32768,
+    "decision_batch_size": 8192,
+    "learning_rate": 0.0003,
+    "rank_weight": 1.0,
+    "rank_temperature": 1.0,
+    "eval_every": 500,
+    "rollout_eval_every": 1000,
+    "cpu_threads": 4,
+    "unreachable_target": 12.0,
+    "features_on_device": "float32",
+    "broad_fraction": 0.5,
+    "online_goals": false,
+    "record_training_samples": true,
+    "validation_only_initial": true,
+    "action_edge_fraction": 0.25,
+    "training_probe_batches": 4
+  },
+  "relations": {
+    "holdout_per_goal": 1,
+    "evaluation_per_goal": 32,
+    "unreachable_eval_per_goal": 16,
+    "complete_training_sources": true,
+    "evaluation_training_goals": 4,
+    "exhaustive_training_goals": true,
+    "holdout_goal_endpoints": false,
+    "preserve_goal_execution": [
+      "24"
+    ]
+  },
+  "evaluation": {
+    "decision_count": 512,
+    "rollout_count": 128,
+    "horizon": 4
+  },
+  "selection": "Minimum mean validation finite Huber plus candidate soft-rank; final test never selects a checkpoint.",
+  "scope": "Development multi-goal experiment. Environment supplies complete real successors; independent Q(s), Q(g); no search or candidate pruning.",
+  "task": "game24",
+  "data": {
+    "max_numbers": 4,
+    "initial_numbers": 4,
+    "minimum_number": 1,
+    "maximum_number": 13,
+    "scenes": {
+      "train": 48,
+      "validation": 8,
+      "test": 8
+    },
+    "goals_per_scene": 16,
+    "heldout_goals": 4,
+    "minimum_reachable_per_goal": 2,
+    "additional_training_scenes": 144
+  },
+  "hypothesis": "Paired follow-up on the same192 question DAGs, fixed complete goals, new predeclared query-goal closures, same from-scratch initialization and optimizer, enlarged batches and4000 updates. Control retains the prepared relation distribution. Treatment retains half broad point-source traversal, adds finite exact relation strata at operation distances1/2/3, and balances complete candidate decisions by question and true distance. Distance3 on four-number inputs necessarily exposes original starts to one-number goals, including24 when permitted; all reachability labels and every legal operation remain intact. All finite eligible operation decisions have both reachable and unreachable successors, so their boundary quota is100 percent rather than manufacturing a nonboundary class. This is sampling redistribution within the existing information set, not inference search or a change to rational physics. Report original-start-to24 and2/3-number suffixes separately and exclude protected roots. Before drawing any development query, reserve every finite training-state-to24 decision and all its legal successors for supervision. Choose held relation/goal-query closures disjoint from that required region. This changes the relation-holdout information condition relative to the prior run, which excluded all156 solvable training original-to24 decisions. Existing held question graphs/goals remain fixed; familiar relation scores are not directly compared with earlier cohorts. Both new arms use the same newly frozen queries."
+}

@@ -1,0 +1,653 @@
+{
+  "source_commit": "9e07d04",
+  "checkpoint_source_commit": "b1e2cb3",
+  "step": 4000,
+  "chosen": {
+    "run": "token_endpoint_l1_fit",
+    "score": 2.548392564058304,
+    "step": 4000,
+    "full_point_source_coverage": true
+  },
+  "oracle_ok": true,
+  "full_training_input_coverage": true,
+  "held_input_training_exposure_zero": true,
+  "long_distance": {
+    "fresh_unseen_endpoint_test": {
+      "count": 204,
+      "solved": 197,
+      "success_rate": 0.9656862745098039
+    },
+    "fresh_unseen_both_test": {
+      "count": 204,
+      "solved": 197,
+      "success_rate": 0.9656862745098039
+    }
+  },
+  "passed": true,
+  "target_reached": true,
+  "cohorts": {
+    "protected_relation_test": {
+      "count": 1024,
+      "finite_mae": 0.8785082101821899,
+      "shortest_action_rate": 0.966796875,
+      "candidate_soft_rank_loss": 2.059945583343506,
+      "q": {
+        "count": 1024,
+        "solved": 998,
+        "success_rate": 0.974609375,
+        "optimal": 723,
+        "optimal_rate": 0.7060546875,
+        "cycles": 26,
+        "mean_excess_cost_on_success": 0.6653306484222412,
+        "mean_cost_ratio_on_success": 1.0413979291915894,
+        "by_distance": {
+          "4.0": {
+            "count": 2,
+            "solved": 2,
+            "optimal": 2
+          },
+          "5.0": {
+            "count": 4,
+            "solved": 4,
+            "optimal": 4
+          },
+          "6.0": {
+            "count": 9,
+            "solved": 9,
+            "optimal": 9
+          },
+          "7.0": {
+            "count": 15,
+            "solved": 15,
+            "optimal": 15
+          },
+          "8.0": {
+            "count": 21,
+            "solved": 21,
+            "optimal": 21
+          },
+          "9.0": {
+            "count": 31,
+            "solved": 30,
+            "optimal": 28
+          },
+          "10.0": {
+            "count": 54,
+            "solved": 52,
+            "optimal": 51
+          },
+          "11.0": {
+            "count": 64,
+            "solved": 63,
+            "optimal": 54
+          },
+          "12.0": {
+            "count": 81,
+            "solved": 80,
+            "optimal": 67
+          },
+          "13.0": {
+            "count": 84,
+            "solved": 83,
+            "optimal": 64
+          },
+          "14.0": {
+            "count": 96,
+            "solved": 92,
+            "optimal": 70
+          },
+          "15.0": {
+            "count": 98,
+            "solved": 97,
+            "optimal": 66
+          },
+          "16.0": {
+            "count": 111,
+            "solved": 110,
+            "optimal": 75
+          },
+          "17.0": {
+            "count": 116,
+            "solved": 112,
+            "optimal": 78
+          },
+          "18.0": {
+            "count": 88,
+            "solved": 86,
+            "optimal": 45
+          },
+          "19.0": {
+            "count": 66,
+            "solved": 63,
+            "optimal": 31
+          },
+          "20.0": {
+            "count": 49,
+            "solved": 47,
+            "optimal": 26
+          },
+          "21.0": {
+            "count": 23,
+            "solved": 21,
+            "optimal": 12
+          },
+          "22.0": {
+            "count": 12,
+            "solved": 11,
+            "optimal": 5
+          }
+        }
+      },
+      "oracle_optimal_rate": 1.0
+    },
+    "fresh_unseen_endpoint_test": {
+      "count": 1024,
+      "finite_mae": 1.0157325267791748,
+      "shortest_action_rate": 0.9814453125,
+      "candidate_soft_rank_loss": 2.02189302444458,
+      "q": {
+        "count": 1024,
+        "solved": 1006,
+        "success_rate": 0.982421875,
+        "optimal": 772,
+        "optimal_rate": 0.75390625,
+        "cycles": 18,
+        "mean_excess_cost_on_success": 0.5526838898658752,
+        "mean_cost_ratio_on_success": 1.0326731204986572,
+        "by_distance": {
+          "2.0": {
+            "count": 1,
+            "solved": 1,
+            "optimal": 1
+          },
+          "3.0": {
+            "count": 18,
+            "solved": 18,
+            "optimal": 18
+          },
+          "4.0": {
+            "count": 49,
+            "solved": 49,
+            "optimal": 49
+          },
+          "5.0": {
+            "count": 137,
+            "solved": 136,
+            "optimal": 136
+          },
+          "6.0": {
+            "count": 5,
+            "solved": 5,
+            "optimal": 4
+          },
+          "7.0": {
+            "count": 14,
+            "solved": 14,
+            "optimal": 14
+          },
+          "8.0": {
+            "count": 32,
+            "solved": 32,
+            "optimal": 32
+          },
+          "9.0": {
+            "count": 48,
+            "solved": 45,
+            "optimal": 42
+          },
+          "10.0": {
+            "count": 106,
+            "solved": 105,
+            "optimal": 96
+          },
+          "11.0": {
+            "count": 24,
+            "solved": 24,
+            "optimal": 21
+          },
+          "12.0": {
+            "count": 32,
+            "solved": 31,
+            "optimal": 25
+          },
+          "13.0": {
+            "count": 36,
+            "solved": 35,
+            "optimal": 29
+          },
+          "14.0": {
+            "count": 49,
+            "solved": 49,
+            "optimal": 34
+          },
+          "15.0": {
+            "count": 64,
+            "solved": 63,
+            "optimal": 42
+          },
+          "16.0": {
+            "count": 72,
+            "solved": 72,
+            "optimal": 50
+          },
+          "17.0": {
+            "count": 51,
+            "solved": 51,
+            "optimal": 32
+          },
+          "18.0": {
+            "count": 42,
+            "solved": 41,
+            "optimal": 18
+          },
+          "19.0": {
+            "count": 25,
+            "solved": 23,
+            "optimal": 14
+          },
+          "20.0": {
+            "count": 15,
+            "solved": 15,
+            "optimal": 10
+          },
+          "21.0": {
+            "count": 166,
+            "solved": 160,
+            "optimal": 83
+          },
+          "22.0": {
+            "count": 32,
+            "solved": 31,
+            "optimal": 19
+          },
+          "23.0": {
+            "count": 6,
+            "solved": 6,
+            "optimal": 3
+          }
+        }
+      },
+      "oracle_optimal_rate": 1.0
+    },
+    "fresh_unseen_both_test": {
+      "count": 1024,
+      "finite_mae": 1.0441648960113525,
+      "shortest_action_rate": 0.9736328125,
+      "candidate_soft_rank_loss": 2.025562047958374,
+      "q": {
+        "count": 1024,
+        "solved": 998,
+        "success_rate": 0.974609375,
+        "optimal": 766,
+        "optimal_rate": 0.748046875,
+        "cycles": 26,
+        "mean_excess_cost_on_success": 0.5470941662788391,
+        "mean_cost_ratio_on_success": 1.031578779220581,
+        "by_distance": {
+          "2.0": {
+            "count": 1,
+            "solved": 1,
+            "optimal": 1
+          },
+          "3.0": {
+            "count": 7,
+            "solved": 7,
+            "optimal": 7
+          },
+          "4.0": {
+            "count": 53,
+            "solved": 53,
+            "optimal": 53
+          },
+          "5.0": {
+            "count": 144,
+            "solved": 144,
+            "optimal": 144
+          },
+          "6.0": {
+            "count": 6,
+            "solved": 6,
+            "optimal": 6
+          },
+          "7.0": {
+            "count": 12,
+            "solved": 12,
+            "optimal": 11
+          },
+          "8.0": {
+            "count": 23,
+            "solved": 23,
+            "optimal": 22
+          },
+          "9.0": {
+            "count": 60,
+            "solved": 59,
+            "optimal": 56
+          },
+          "10.0": {
+            "count": 104,
+            "solved": 103,
+            "optimal": 95
+          },
+          "11.0": {
+            "count": 16,
+            "solved": 16,
+            "optimal": 15
+          },
+          "12.0": {
+            "count": 33,
+            "solved": 31,
+            "optimal": 25
+          },
+          "13.0": {
+            "count": 49,
+            "solved": 47,
+            "optimal": 37
+          },
+          "14.0": {
+            "count": 54,
+            "solved": 53,
+            "optimal": 43
+          },
+          "15.0": {
+            "count": 53,
+            "solved": 50,
+            "optimal": 33
+          },
+          "16.0": {
+            "count": 64,
+            "solved": 61,
+            "optimal": 43
+          },
+          "17.0": {
+            "count": 65,
+            "solved": 63,
+            "optimal": 32
+          },
+          "18.0": {
+            "count": 29,
+            "solved": 29,
+            "optimal": 17
+          },
+          "19.0": {
+            "count": 29,
+            "solved": 25,
+            "optimal": 16
+          },
+          "20.0": {
+            "count": 18,
+            "solved": 18,
+            "optimal": 9
+          },
+          "21.0": {
+            "count": 152,
+            "solved": 147,
+            "optimal": 75
+          },
+          "22.0": {
+            "count": 45,
+            "solved": 44,
+            "optimal": 24
+          },
+          "23.0": {
+            "count": 7,
+            "solved": 6,
+            "optimal": 2
+          }
+        }
+      },
+      "oracle_optimal_rate": 1.0
+    },
+    "diagnostic": {
+      "count": 5,
+      "finite_mae": 0.6342405080795288,
+      "shortest_action_rate": 0.8,
+      "candidate_soft_rank_loss": 2.0567543506622314,
+      "q": {
+        "count": 5,
+        "solved": 5,
+        "success_rate": 1.0,
+        "optimal": 4,
+        "optimal_rate": 0.8,
+        "cycles": 0,
+        "mean_excess_cost_on_success": 0.4000000059604645,
+        "mean_cost_ratio_on_success": 1.0266666412353516,
+        "by_distance": {
+          "12.0": {
+            "count": 1,
+            "solved": 1,
+            "optimal": 1
+          },
+          "14.0": {
+            "count": 1,
+            "solved": 1,
+            "optimal": 1
+          },
+          "15.0": {
+            "count": 3,
+            "solved": 3,
+            "optimal": 2
+          }
+        }
+      },
+      "oracle_optimal_rate": 1.0
+    }
+  },
+  "freeze_choice": {
+    "candidates": [
+      {
+        "run": "token_endpoint_linf_fit",
+        "score": 3.00581556558609,
+        "step": 3000,
+        "full_point_source_coverage": true
+      },
+      {
+        "run": "token_endpoint_l1_fit",
+        "score": 2.548392564058304,
+        "step": 4000,
+        "full_point_source_coverage": true
+      }
+    ],
+    "chosen": {
+      "run": "token_endpoint_l1_fit",
+      "score": 2.548392564058304,
+      "step": 4000,
+      "full_point_source_coverage": true
+    },
+    "rule": "Freeze the lowest stored validation best_score among terminal matched candidates with full prepared point-source coverage; no acceptance-based candidate replacement.",
+    "independent_suite_used_for_choice": false
+  },
+  "actual_map_reader": {
+    "step": 4000,
+    "source_commit": "b1e2cb3",
+    "sample_rule": "First128 frozen queries per large cohort; all5 diagnostics. Interface regression, not the full acceptance result.",
+    "model_copy_weights_identical": true,
+    "search_forbidden": true,
+    "all_actions_physically_replayed": true,
+    "groups": {
+      "protected_relation_test": {
+        "count": 128,
+        "solved": 127,
+        "optimal": 98,
+        "cycles": 1,
+        "identical_selected_physical_steps": 2011
+      },
+      "fresh_unseen_endpoint_test": {
+        "count": 128,
+        "solved": 126,
+        "optimal": 100,
+        "cycles": 2,
+        "identical_selected_physical_steps": 1775
+      },
+      "fresh_unseen_both_test": {
+        "count": 128,
+        "solved": 125,
+        "optimal": 102,
+        "cycles": 3,
+        "identical_selected_physical_steps": 1701
+      },
+      "diagnostic": {
+        "count": 5,
+        "solved": 5,
+        "optimal": 4,
+        "cycles": 0,
+        "identical_selected_physical_steps": 73
+      }
+    }
+  },
+  "fit": {
+    "token_endpoint_linf_fit": {
+      "training_probe": {
+        "batches": 4,
+        "point_count": 163840,
+        "decision_count": 32768,
+        "finite_mae": 0.8530181646347046,
+        "distance_huber": 0.5074699521064758,
+        "candidate_soft_rank_loss": 1.9938738346099854,
+        "shortest_action_rate": 0.9400634765625,
+        "by_distance": {
+          "1_5": {
+            "count": 50244,
+            "mae": 0.7937214970588684
+          },
+          "6_20": {
+            "count": 103183,
+            "mae": 0.9470131993293762
+          },
+          "21_plus": {
+            "count": 1378,
+            "mae": 1.5697275400161743
+          }
+        },
+        "role": "Fixed actual training batches; fitting diagnostic only, never checkpoint selection."
+      },
+      "branch_fit": {
+        "seed_fit": {
+          "mae": 0.2021166831254959,
+          "shortest_action_rate": 1.0,
+          "count": 128,
+          "solved": 110,
+          "success_rate": 0.859375,
+          "cycles": 18
+        },
+        "branches_fit": {
+          "mae": 0.19933514297008514,
+          "shortest_action_rate": 1.0,
+          "count": 128,
+          "solved": 111,
+          "success_rate": 0.8671875,
+          "cycles": 17
+        }
+      },
+      "branch_fit_passed": false
+    },
+    "token_endpoint_l1_fit": {
+      "training_probe": {
+        "batches": 4,
+        "point_count": 163840,
+        "decision_count": 32768,
+        "finite_mae": 0.6739345192909241,
+        "distance_huber": 0.32598695158958435,
+        "candidate_soft_rank_loss": 1.9309675693511963,
+        "shortest_action_rate": 0.98248291015625,
+        "by_distance": {
+          "1_5": {
+            "count": 50244,
+            "mae": 0.7359374761581421
+          },
+          "6_20": {
+            "count": 103183,
+            "mae": 0.6938807368278503
+          },
+          "21_plus": {
+            "count": 1378,
+            "mae": 1.3383886814117432
+          }
+        },
+        "role": "Fixed actual training batches; fitting diagnostic only, never checkpoint selection."
+      },
+      "branch_fit": {
+        "seed_fit": {
+          "mae": 0.2689519226551056,
+          "shortest_action_rate": 1.0,
+          "count": 128,
+          "solved": 127,
+          "success_rate": 0.9921875,
+          "cycles": 1
+        },
+        "branches_fit": {
+          "mae": 0.2588404417037964,
+          "shortest_action_rate": 1.0,
+          "count": 128,
+          "solved": 128,
+          "success_rate": 1.0,
+          "cycles": 0
+        }
+      },
+      "branch_fit_passed": true
+    }
+  },
+  "matched_development": {
+    "token_endpoint_linf_fit": {
+      "test": {
+        "mae": 1.2218272686004639,
+        "count": 128,
+        "solved": 91,
+        "optimal": 41,
+        "cycles": 37
+      },
+      "unseen_endpoint_test": {
+        "mae": 1.2597006559371948,
+        "count": 128,
+        "solved": 99,
+        "optimal": 30,
+        "cycles": 29
+      },
+      "unseen_both_test": {
+        "mae": 1.2347033023834229,
+        "count": 128,
+        "solved": 94,
+        "optimal": 29,
+        "cycles": 34
+      },
+      "diagnostic": {
+        "mae": 1.3909114599227905,
+        "count": 5,
+        "solved": 3,
+        "optimal": 1,
+        "cycles": 2
+      }
+    },
+    "token_endpoint_l1_fit": {
+      "test": {
+        "mae": 0.950390100479126,
+        "count": 128,
+        "solved": 123,
+        "optimal": 89,
+        "cycles": 5
+      },
+      "unseen_endpoint_test": {
+        "mae": 0.8726380467414856,
+        "count": 128,
+        "solved": 126,
+        "optimal": 92,
+        "cycles": 2
+      },
+      "unseen_both_test": {
+        "mae": 0.8486199975013733,
+        "count": 128,
+        "solved": 126,
+        "optimal": 96,
+        "cycles": 2
+      },
+      "diagnostic": {
+        "mae": 0.6342405080795288,
+        "count": 5,
+        "solved": 5,
+        "optimal": 4,
+        "cycles": 0
+      }
+    }
+  },
+  "raw_source": "runs/new_tasks_qmap/followup_operations_recovery/token_endpoint_frozen_acceptance/result.json"
+}

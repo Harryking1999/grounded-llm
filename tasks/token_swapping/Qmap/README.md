@@ -1,6 +1,6 @@
 # 棋子交换 Qmap
 
-**当前主要测试组完成率约68%–69%，尚未达标。** 仍有约三成题循环，尚无采用权重。完整比较见[三任务报告](../../../experiments/new_tasks_qmap/results/report.md)，采用状态见[selection](selection.json)。
+**原固定树地图通过完整完成率验收并采用。** 三个1024题组完成率97.46%、98.24%、97.46%；最优完成约71%–75%，仍有残余循环。完整比较见[三任务报告](../../../experiments/new_tasks_qmap/results/report.md)，采用状态见[selection](selection.json)。
 
 ## 输入和目标
 
@@ -28,4 +28,5 @@
 
 - [基线配置](../../../experiments/new_tasks_qmap/configs/token_swapping/token_swapping_pairs.json)、[验收要求](../../../experiments/new_tasks_qmap/configs/exact_pair_acceptance.json)
 - [数据来源](../data/README.md)、[实验入口](../../../experiments/new_tasks_qmap/README.md)
-- [当前较好结果](../../../experiments/new_tasks_qmap/results/token_swapping/token_pairs_local_walk8_rank4.json)、[对应配置](../../../experiments/new_tasks_qmap/configs/token_swapping/token_swapping_local_walk8_rank4_pairs.json)
+- [采用地图验收](../../../experiments/new_tasks_qmap/results/token_swapping/token_endpoint_acceptance.json)、[采用配置](../../../experiments/new_tasks_qmap/configs/token_swapping/token_endpoint_l1_fit.json)
+- [历史较好结果](../../../experiments/new_tasks_qmap/results/token_swapping/token_pairs_local_walk8_rank4.json)、[对应配置](../../../experiments/new_tasks_qmap/configs/token_swapping/token_swapping_local_walk8_rank4_pairs.json)

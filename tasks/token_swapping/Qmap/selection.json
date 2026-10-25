@@ -1,8 +1,56 @@
 {
   "task": "token_swapping",
-  "status": "not_adopted",
-  "checkpoint": null,
-  "config": null,
-  "scope": null,
-  "evidence": "experiments/new_tasks_qmap/results/token_swapping/token_pairs_baseline.json"
+  "status": "adopted",
+  "checkpoint": "tasks/token_swapping/Qmap/checkpoints/token_endpoint_l1.pt",
+  "config": "experiments/new_tasks_qmap/configs/token_swapping/token_endpoint_l1_fit.json",
+  "source_commit": "b1e2cb3",
+  "step": 4000,
+  "scope": {
+    "vertex_count": 10,
+    "tree": "tasks/token_swapping/data/tree10.json",
+    "edges": [
+      [
+        0,
+        1
+      ],
+      [
+        0,
+        2
+      ],
+      [
+        1,
+        4
+      ],
+      [
+        1,
+        5
+      ],
+      [
+        1,
+        6
+      ],
+      [
+        2,
+        3
+      ],
+      [
+        6,
+        7
+      ],
+      [
+        6,
+        8
+      ],
+      [
+        7,
+        9
+      ]
+    ],
+    "goals": "Complete labelled permutations on this tree; new query goals and held state inputs evaluated.",
+    "inference": "All9 legal adjacent swaps, independently encode source and goal, choose smallest predicted successor distance; exact equality stops.",
+    "limitations": "Completion acceptance passed; roughly71-75 percent optimal on large frozen cohorts, residual cycles remain. No alternate-tree or LLM-readout claim.",
+    "llm": "Not evaluated"
+  },
+  "acceptance": "experiments/new_tasks_qmap/configs/token_swapping/token_endpoint_frozen_acceptance.json",
+  "evidence": "experiments/new_tasks_qmap/results/token_swapping/token_endpoint_acceptance.json"
 }

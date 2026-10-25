@@ -469,6 +469,8 @@ def board_cohorts(corpus,config,rng):
            'original_layout_validation','diagnostic','diagnostic_original')
     groups={name:[] for name in names}; reserved=[]; train_specs=[];required_relations=[]
     execution_goals=spec.get('preserve_goal_execution',[])
+    minimum_held_distance=spec.get('minimum_relation_holdout_distance',1)
+    if minimum_held_distance<1:raise ValueError('Relation holdout distance must be positive')
     if execution_goals and (config['task']!='game24' or spec.get('holdout_goal_endpoints',True)):
         raise ValueError('Required goal execution currently applies to Game24 query-relation holdout only')
     for sid,scene in enumerate(corpus.scenes):
@@ -496,7 +498,7 @@ def board_cohorts(corpus,config,rng):
                 local_rng=np.random.default_rng(group_seed(source_key,config['seed'],'queries:'+cohort))
                 for column in eval_columns:
                     g=scene.goals[column]
-                    pool=np.flatnonzero(np.isfinite(scene.distances[column]) & (scene.distances[column]>0) & safe_rank)
+                    pool=np.flatnonzero(np.isfinite(scene.distances[column]) & (scene.distances[column]>=minimum_held_distance) & safe_rank)
                     proposed=np.column_stack([pool+offset,np.full(len(pool),g+offset,dtype=np.int64)])
                     if local_reserved:
                         held=np.concatenate(local_reserved); kids=corpus.successors(proposed[:,0]); legal=kids>=0
@@ -523,6 +525,10 @@ def board_cohorts(corpus,config,rng):
                 groups[cohort].append(selected)
                 if not endpoint_holdout:reserved.append(closure(corpus,selected))
             train_specs.append((sid,safe_parent,safe_rank))
+            if config.get('task')=='sokoban' and config['data'].get('fixed_layout'):
+                original=int(scene.metadata['original_state'])+offset
+                for name,goals in [('original_training_goals',scene.goals[:nt]),('original_unseen_goals',scene.goals[nt:])]:
+                    groups.setdefault(name,[]).append(np.column_stack([np.full(len(goals),original),goals+offset]))
         else:
             cohort='diagnostic' if split=='diagnostic' else 'unseen_layout_'+split
             columns=np.linspace(0,len(scene.goals)-1,min(len(scene.goals),spec.get('evaluation_training_goals',8)),dtype=int)

@@ -43,6 +43,38 @@ def small_oracle(path,n,edges):
 
 
 class ExactPairTests(unittest.TestCase):
+    def test_fixed_sokoban_source_scope_and_query_holdouts(self):
+        from grounded_llm.tasks.sokoban.relation_data import build
+        from grounded_llm.tasks.sokoban.qmap import MapReader
+        from experiments.new_tasks_qmap.src.relations import scope
+        from experiments.new_tasks_qmap.src.relation_data import board_cohorts
+        board=['##########','#@$$ #####','# $$ #####','#....#####']+['##########']*6
+        with tempfile.TemporaryDirectory() as tmp,ExitStack() as stack:
+            root=Path(tmp);cache=root/'cache';cache.mkdir()
+            (cache/'hard_002.txt').write_text('; fixture\n'+'\n'.join(board)+'\n')
+            cfg=dict(task='sokoban',seed=17,data=dict(source_cache=str(cache),source_commit='fixture',
+                source_files=['hard/002.txt'],fixed_layout=dict(file='hard/002.txt',puzzle_id='fixture'),
+                scenes=dict(train=1,validation=0,test=0),diagnostic_goals={},split_fractions=[0,0,1],
+                max_states=10000,minimum_reachable_per_goal=1,goals_per_scene='all',heldout_goals=2),
+                relations=dict(holdout_per_goal=1,evaluation_per_goal=4,unreachable_eval_per_goal=2,
+                    evaluation_training_goals=2,holdout_goal_endpoints=False,minimum_relation_holdout_distance=6,
+                    exhaustive_training_goals=True))
+            corpus=build(cfg,root/'graphs');scene=corpus.scenes[0]
+            for name in ['states','children','distances','reverse_distances']:stack.callback(getattr(scene,name)._mmap.close)
+            self.assertEqual(scene.metadata['split'],'train');self.assertEqual(scene.metadata['source']['puzzle_id'],'fixture')
+            groups,pairs,tasks,reserved,_=board_cohorts(corpus,cfg,np.random.default_rng(18))
+            for name in ['validation','test']:
+                self.assertTrue((corpus.distance(*groups[name].T)>=6).all())
+            self.assertIn('original_training_goals',groups);self.assertIn('original_unseen_goals',groups)
+            self.assertEqual(len(np.intersect1d(closure(corpus,tasks),reserved)),0)
+            self.assertFalse(np.isin(pairs[:,1],scene.goals[-2:]).any())
+            model_cfg=dict(dimension=128,hidden=16,cap=256,metric='directed_max');model=StateEncoder(input_dim=400,**model_cfg)
+            path=root/'map.pt';torch.save(dict(model_type='exact_state_pairs',task='sokoban',input_dim=400,
+                config=dict(model=model_cfg),model=model.state_dict(),scope=scope(cfg,corpus),step=0),path)
+            MapReader(scene.env,path)
+            other=board.copy();other[4]='# #######'+'#'
+            with self.assertRaisesRegex(ValueError,'fixed wall'):MapReader(Sokoban(other),path)
+
     def test_exact_layer_goal_transport_and_endpoint_exclusions(self):
         with tempfile.TemporaryDirectory() as name:
             path=Path(name);small_oracle(path,5,[(0,1),(1,2),(1,3),(3,4)])

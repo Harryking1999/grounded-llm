@@ -1,6 +1,6 @@
 # 推箱子 Qmap：覆盖、执行与泛化
 
-**当前尚无通过验收的地图。** 扩大布局覆盖改善短题，但长题和新目标仍弱；后续路径、分支及完整图对照没有带来稳定的跨布局求解收益。现有完整图训练仍未充分拟合。
+**当前尚无通过验收的地图。主条件改为每套固定墙体分别训练Qmap。** 同墙体内保留不同箱子、玩家、终局与普通完整中间目标，验收留出关系、目标及原题起点；不要求这张地图泛化到另一墙体。先使用[902](../../configs/sokoban/sokoban_fixed_wall_902.json)与[327](../../configs/sokoban/sokoban_fixed_wall_327.json)两套独立地图，采用[固定墙体验收](../../configs/sokoban/sokoban_fixed_wall_acceptance.json)，尚无该条件的完成成绩。以下原共享地图结果保留：扩大布局覆盖改善短题，长题和训练图自主执行仍弱，完整图训练未充分拟合。
 
 范围为Boxoban hard、10×10四箱，每题指定箱子与玩家的完整目标，环境提供全部合法后继，地图按预测距离逐步贪心。规则与划分见[任务数据](../../../../tasks/sokoban/data/README.md)，验收见[配置](../../configs/exact_pair_acceptance.json)，采用状态见[selection](../../../../tasks/sokoban/Qmap/selection.json)。本页按研究问题组织已有结果；参数、逐题轨迹和逐节点统计由链接来源维护。
 

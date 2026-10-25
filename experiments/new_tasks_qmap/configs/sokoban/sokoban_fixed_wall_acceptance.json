@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "primary_metric": "frozen_q_greedy_exact_goal_completion_rate",
+  "minimum_completion_rate": 0.8,
+  "target_completion_rate": 0.9,
+  "required_test_cohorts": {
+    "sokoban": [
+      "test",
+      "unseen_goal_test",
+      "original_training_goals",
+      "original_unseen_goals"
+    ]
+  },
+  "validation_target_rate": 0.9,
+  "minimum_training_state_exposure_fraction": 1.0,
+  "require_oracle_optimal_rate": 1.0,
+  "invariants": [
+    "One independently encoded Qmap per fixed wall orientation, player/four-box states and complete query goals vary.",
+    "No oracle distances, reachability labels, target-relative state inputs, search, or dead-end filtering in Q inference.",
+    "All legal successors remain available to every planning policy.",
+    "Known-goal relation closures and held complete query goals are excluded from training supervision; state inputs may recur. Original training-goal starts are reported as a fitting gate, not independent generalization.",
+    "Do not pool cohorts or drop difficult cases to pass the completion threshold.",
+    "Distance error, ranking, optimality, extra cost, exposure and resource use are reported independently of completion."
+  ]
+}

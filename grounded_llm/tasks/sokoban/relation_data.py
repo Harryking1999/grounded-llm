@@ -92,6 +92,12 @@ def build(config, out):
             cache.write_bytes(source.read_bytes() if source.exists() else urllib.request.urlopen(url,timeout=60).read())
         pool.extend((relative,identity,board) for identity,board in boards(cache.read_text(encoding='utf-8')))
     rng.shuffle(pool)
+    fixed=spec.get('fixed_layout')
+    if fixed:
+        if spec['scenes']!={'train':1,'validation':0,'test':0} or spec['diagnostic_goals'] or spec.get('layout_selection'):
+            raise ValueError('Fixed-wall training requires exactly one explicit training layout')
+        pool=[row for row in pool if (row[0],row[1])==(fixed['file'],fixed['puzzle_id'])]
+        if len(pool)!=1:raise ValueError('Fixed layout is missing or ambiguous in the pinned source')
     selection=spec.get('layout_selection')
     if selection:
         chosen=json.loads(Path(selection).read_text(encoding='utf-8'))
@@ -116,7 +122,7 @@ def build(config, out):
                 rejected.append(dict(id=identity, reason='equivalent_wall_group')); continue
             if count > spec['max_states']:
                 rejected.append(dict(id=identity, reason='unknown_resource', physical_states=count)); continue
-            split=group_split(key,config['seed'],spec['split_fractions'])
+            split='train' if fixed else group_split(key,config['seed'],spec['split_fractions'])
             if selected[split]>=spec['scenes'][split]: continue
         if key in used: continue
         sid=len(records); scene_path=out/f'scene_{sid:03d}'

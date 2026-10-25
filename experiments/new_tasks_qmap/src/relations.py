@@ -59,6 +59,10 @@ def scope(config,corpus):
     if config['task']=='token_swapping': return corpus.scope
     if config['task']=='bridge': return dict(people=corpus.scenes[0].env.n,complete_goal=True,weighted=True)
     if config['task']=='game24': return dict(max_numbers=corpus.scenes[0].env.max_numbers,complete_goal=True,exact_rationals=True)
+    if config['task']=='sokoban' and config.get('data',{}).get('fixed_layout'):
+        if len(corpus.scenes)!=1:raise ValueError('A fixed-wall map requires one physical scene')
+        return dict(board=[10,10],boxes=4,complete_goal=True,shared_across_layouts=False,
+                    floor=sorted(corpus.scenes[0].env.floor),goal_markers=sorted(corpus.scenes[0].env.goals))
     return dict(board=[10,10] if config['task']=='sokoban' else [6,6],
                 boxes=4 if config['task']=='sokoban' else None,wall_count=0 if config['task']=='rush_hour' else None,
                 complete_goal=True,shared_across_layouts=True)

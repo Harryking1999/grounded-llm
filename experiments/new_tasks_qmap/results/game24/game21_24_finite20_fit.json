@@ -368,5 +368,273 @@
     "raw": "logs/game21_24_finite20_evaluation.json",
     "checkpoint": "game21_24_finite20_fit/best.pt",
     "data": "game21_24_finite20_reference/data.tar"
+  },
+  "actual_layer_sampling": {
+    "run": "game21_24_finite20_fit",
+    "updates": 8000,
+    "role": "All actual saved point/ranking loss inputs, not theoretical pool quotas. Direct action-edge labels and identity pairs are separate. Arity follows the always-legal addition actions in the existing exact four-slot DAG; no rational rounding.",
+    "axes": {
+      "source_arity": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "target_kind": [
+        "21",
+        "24",
+        "other_singleton",
+        "two_number",
+        "three_number"
+      ],
+      "reachable": [
+        false,
+        true
+      ]
+    },
+    "point_rows": [
+      [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      [
+        [
+          5783410,
+          6359
+        ],
+        [
+          5780067,
+          6404
+        ],
+        [
+          23093028,
+          20647
+        ],
+        [
+          17345638,
+          0
+        ],
+        [
+          17318662,
+          0
+        ]
+      ],
+      [
+        [
+          2168729,
+          5642783
+        ],
+        [
+          2167605,
+          5851577
+        ],
+        [
+          8694156,
+          10894096
+        ],
+        [
+          6512916,
+          17281
+        ],
+        [
+          6535822,
+          0
+        ]
+      ],
+      [
+        [
+          219848,
+          6461348
+        ],
+        [
+          218951,
+          6773758
+        ],
+        [
+          780536,
+          14600242
+        ],
+        [
+          584443,
+          5779390
+        ],
+        [
+          697012,
+          21000
+        ]
+      ],
+      [
+        [
+          1975,
+          4697484
+        ],
+        [
+          1958,
+          4643733
+        ],
+        [
+          0,
+          23465817
+        ],
+        [
+          0,
+          5063983
+        ],
+        [
+          0,
+          4757342
+        ]
+      ]
+    ],
+    "ranking_contexts": [
+      [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      [
+        [
+          0,
+          4629115
+        ],
+        [
+          0,
+          4792400
+        ],
+        [
+          0,
+          8316599
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      [
+        [
+          0,
+          4594678
+        ],
+        [
+          0,
+          4812668
+        ],
+        [
+          0,
+          9692876
+        ],
+        [
+          0,
+          4106434
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      [
+        [
+          0,
+          3485661
+        ],
+        [
+          0,
+          3433502
+        ],
+        [
+          0,
+          14928257
+        ],
+        [
+          0,
+          2743810
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    ],
+    "direct_action_edge_rows": 65536000,
+    "regular_identity_rows": 71691,
+    "root_to_21": {
+      "unreachable": 1975,
+      "reachable": 4697484
+    },
+    "root_to_24": {
+      "unreachable": 1958,
+      "reachable": 4643733
+    },
+    "three_to_21": {
+      "unreachable": 219848,
+      "reachable": 6461348
+    },
+    "three_to_24": {
+      "unreachable": 218951,
+      "reachable": 6773758
+    },
+    "seconds": 29.719003139063716
   }
 }

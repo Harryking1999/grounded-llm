@@ -1,0 +1,1420 @@
+{
+  "fixed_scope": "One fixed wall902, raw4x10x10 binary input, MLP1024 and128D directed_max,532 training goals; original held query closures unchanged. No extra oracle feature/search/pruning.",
+  "primary_evaluations": {
+    "sokoban_fixed_wall_902_control_transition_fit": {
+      "complete": true,
+      "step": 4000,
+      "best_step": 3500,
+      "probe": {
+        "batches": 4,
+        "point_count": 131072,
+        "decision_count": 32768,
+        "finite_mae": 1.2110600471496582,
+        "distance_huber": 3.7888524532318115,
+        "candidate_soft_rank_loss": 0.5128674507141113,
+        "shortest_action_rate": 0.925689697265625,
+        "by_distance": {
+          "1_5": {
+            "count": 64368,
+            "mae": 0.5491822361946106
+          },
+          "6_20": {
+            "count": 21504,
+            "mae": 1.8169670104980469
+          },
+          "21_plus": {
+            "count": 21478,
+            "mae": 2.588019847869873
+          }
+        },
+        "role": "Fixed actual training batches; fitting diagnostic only, never checkpoint selection."
+      },
+      "transition_loss": null,
+      "validation_score": 2.2382065653800964,
+      "throughput": {
+        "training_seconds": 30.278575468808413,
+        "batches_per_second": 16.513326411775115,
+        "point_pairs_per_second": 541108.679861047,
+        "complete_decisions_per_second": 135277.16996526174,
+        "point_batch_size": 32768,
+        "decision_batch_size": 8192,
+        "cuda_peak_allocated_bytes": 629843456
+      },
+      "cohorts": {
+        "validation": {
+          "mae": 1.326491355895996,
+          "count": 16,
+          "solved": 4,
+          "optimal": 4,
+          "cycles": 12
+        },
+        "test": {
+          "mae": 2.7841601371765137,
+          "count": 16,
+          "solved": 2,
+          "optimal": 2,
+          "cycles": 14
+        },
+        "unseen_goal_validation": {
+          "mae": 1.9827685356140137,
+          "count": 96,
+          "solved": 32,
+          "optimal": 28,
+          "cycles": 64
+        },
+        "unseen_goal_test": {
+          "mae": 5.374258518218994,
+          "count": 94,
+          "solved": 17,
+          "optimal": 16,
+          "cycles": 77
+        },
+        "original_training_goals": {
+          "mae": 5.952600479125977,
+          "count": 198,
+          "solved": 13,
+          "optimal": 13,
+          "cycles": 185
+        },
+        "original_unseen_goals": {
+          "mae": 1.9412479400634766,
+          "count": 4,
+          "solved": 0,
+          "optimal": 0,
+          "cycles": 4
+        }
+      },
+      "training_policy": {
+        "count": 4096,
+        "solved": 2350,
+        "optimal": 2302,
+        "cycles": 1746
+      }
+    },
+    "sokoban_fixed_wall_902_stages_transition_fit": {
+      "complete": true,
+      "step": 4000,
+      "best_step": 3500,
+      "probe": {
+        "batches": 4,
+        "point_count": 131072,
+        "decision_count": 32768,
+        "finite_mae": 1.3063713312149048,
+        "distance_huber": 4.031696796417236,
+        "candidate_soft_rank_loss": 0.4999149441719055,
+        "shortest_action_rate": 0.934906005859375,
+        "by_distance": {
+          "1_5": {
+            "count": 54205,
+            "mae": 0.6342082619667053
+          },
+          "6_20": {
+            "count": 28213,
+            "mae": 1.407981276512146
+          },
+          "21_plus": {
+            "count": 24804,
+            "mae": 2.659801959991455
+          }
+        },
+        "role": "Fixed actual training batches; fitting diagnostic only, never checkpoint selection."
+      },
+      "transition_loss": null,
+      "validation_score": 2.289733409881592,
+      "throughput": {
+        "training_seconds": 31.022596389986575,
+        "batches_per_second": 16.117284114923056,
+        "point_pairs_per_second": 528131.1658777987,
+        "complete_decisions_per_second": 132032.79146944967,
+        "point_batch_size": 32768,
+        "decision_batch_size": 8192,
+        "cuda_peak_allocated_bytes": 605843968
+      },
+      "cohorts": {
+        "validation": {
+          "mae": 1.180180549621582,
+          "count": 16,
+          "solved": 8,
+          "optimal": 5,
+          "cycles": 8
+        },
+        "test": {
+          "mae": 2.0691990852355957,
+          "count": 16,
+          "solved": 6,
+          "optimal": 6,
+          "cycles": 10
+        },
+        "unseen_goal_validation": {
+          "mae": 1.805588722229004,
+          "count": 96,
+          "solved": 37,
+          "optimal": 34,
+          "cycles": 59
+        },
+        "unseen_goal_test": {
+          "mae": 5.892005920410156,
+          "count": 94,
+          "solved": 17,
+          "optimal": 17,
+          "cycles": 77
+        },
+        "original_training_goals": {
+          "mae": 5.811765670776367,
+          "count": 198,
+          "solved": 13,
+          "optimal": 13,
+          "cycles": 185
+        },
+        "original_unseen_goals": {
+          "mae": 1.9150981903076172,
+          "count": 4,
+          "solved": 0,
+          "optimal": 0,
+          "cycles": 4
+        }
+      },
+      "training_policy": {
+        "count": 4096,
+        "solved": 2208,
+        "optimal": 2170,
+        "cycles": 1888
+      }
+    },
+    "sokoban_fixed_wall_902_transitions_transition_fit": {
+      "complete": true,
+      "step": 4000,
+      "best_step": 3500,
+      "probe": {
+        "batches": 4,
+        "point_count": 131072,
+        "decision_count": 32768,
+        "finite_mae": 1.129084587097168,
+        "distance_huber": 4.003831386566162,
+        "candidate_soft_rank_loss": 0.48686957359313965,
+        "shortest_action_rate": 0.942169189453125,
+        "by_distance": {
+          "1_5": {
+            "count": 54205,
+            "mae": 0.5758122205734253
+          },
+          "6_20": {
+            "count": 28213,
+            "mae": 1.232792854309082
+          },
+          "21_plus": {
+            "count": 24804,
+            "mae": 2.2202985286712646
+          }
+        },
+        "role": "Fixed actual training batches; fitting diagnostic only, never checkpoint selection."
+      },
+      "transition_loss": 0.205846905708313,
+      "validation_score": 1.7574345171451569,
+      "throughput": {
+        "training_seconds": 33.20328308548778,
+        "batches_per_second": 15.058751832240826,
+        "point_pairs_per_second": 493445.1800388674,
+        "complete_decisions_per_second": 123361.29500971685,
+        "point_batch_size": 32768,
+        "decision_batch_size": 8192,
+        "cuda_peak_allocated_bytes": 619725312
+      },
+      "cohorts": {
+        "validation": {
+          "mae": 0.8372888565063477,
+          "count": 16,
+          "solved": 9,
+          "optimal": 8,
+          "cycles": 7
+        },
+        "test": {
+          "mae": 2.0524888038635254,
+          "count": 16,
+          "solved": 8,
+          "optimal": 8,
+          "cycles": 8
+        },
+        "unseen_goal_validation": {
+          "mae": 1.9712282419204712,
+          "count": 96,
+          "solved": 48,
+          "optimal": 43,
+          "cycles": 48
+        },
+        "unseen_goal_test": {
+          "mae": 5.174100399017334,
+          "count": 94,
+          "solved": 22,
+          "optimal": 20,
+          "cycles": 72
+        },
+        "original_training_goals": {
+          "mae": 5.88192081451416,
+          "count": 198,
+          "solved": 32,
+          "optimal": 29,
+          "cycles": 166
+        },
+        "original_unseen_goals": {
+          "mae": 2.190164566040039,
+          "count": 4,
+          "solved": 1,
+          "optimal": 1,
+          "cycles": 3
+        }
+      },
+      "training_policy": {
+        "count": 4096,
+        "solved": 2364,
+        "optimal": 2302,
+        "cycles": 1732
+      }
+    },
+    "sokoban_fixed_wall_902_current_cycle_control": {
+      "complete": true,
+      "step": 2000,
+      "best_step": 500,
+      "source_commit": "3d49362",
+      "cohorts": {
+        "validation": {
+          "finite_mae": 0.9820294380187988,
+          "shortest_action_rate": 0.9375,
+          "q": {
+            "count": 16,
+            "solved": 9,
+            "optimal": 8,
+            "cycles": 7,
+            "entered_unreachable": 1
+          }
+        },
+        "test": {
+          "finite_mae": 1.9996976852416992,
+          "shortest_action_rate": 0.9375,
+          "q": {
+            "count": 16,
+            "solved": 10,
+            "optimal": 10,
+            "cycles": 6,
+            "entered_unreachable": 1
+          }
+        },
+        "unseen_goal_validation": {
+          "finite_mae": 1.9944275617599487,
+          "shortest_action_rate": 0.8958333333333334,
+          "q": {
+            "count": 96,
+            "solved": 49,
+            "optimal": 44,
+            "cycles": 47,
+            "entered_unreachable": 11
+          }
+        },
+        "unseen_goal_test": {
+          "finite_mae": 5.367868900299072,
+          "shortest_action_rate": 0.7395833333333334,
+          "q": {
+            "count": 94,
+            "solved": 21,
+            "optimal": 20,
+            "cycles": 73,
+            "entered_unreachable": 9
+          }
+        },
+        "original_training_goals": {
+          "finite_mae": 6.295418739318848,
+          "shortest_action_rate": 0.8787878787878788,
+          "q": {
+            "count": 198,
+            "solved": 33,
+            "optimal": 28,
+            "cycles": 165,
+            "entered_unreachable": 36
+          }
+        },
+        "original_unseen_goals": {
+          "finite_mae": 1.9371528625488281,
+          "shortest_action_rate": 1.0,
+          "q": {
+            "count": 4,
+            "solved": 2,
+            "optimal": 2,
+            "cycles": 2,
+            "entered_unreachable": 1
+          }
+        }
+      }
+    },
+    "sokoban_fixed_wall_902_current_cycle_replay": {
+      "complete": true,
+      "step": 2000,
+      "best_step": 2000,
+      "source_commit": "3d49362",
+      "cohorts": {
+        "validation": {
+          "finite_mae": 1.125370979309082,
+          "shortest_action_rate": 0.9375,
+          "q": {
+            "count": 16,
+            "solved": 7,
+            "optimal": 6,
+            "cycles": 9,
+            "entered_unreachable": 0
+          }
+        },
+        "test": {
+          "finite_mae": 2.1368765830993652,
+          "shortest_action_rate": 0.9375,
+          "q": {
+            "count": 16,
+            "solved": 5,
+            "optimal": 5,
+            "cycles": 11,
+            "entered_unreachable": 2
+          }
+        },
+        "unseen_goal_validation": {
+          "finite_mae": 2.0075247287750244,
+          "shortest_action_rate": 0.875,
+          "q": {
+            "count": 96,
+            "solved": 30,
+            "optimal": 29,
+            "cycles": 66,
+            "entered_unreachable": 11
+          }
+        },
+        "unseen_goal_test": {
+          "finite_mae": 5.630296230316162,
+          "shortest_action_rate": 0.8020833333333334,
+          "q": {
+            "count": 94,
+            "solved": 18,
+            "optimal": 15,
+            "cycles": 76,
+            "entered_unreachable": 9
+          }
+        },
+        "original_training_goals": {
+          "finite_mae": 6.781623840332031,
+          "shortest_action_rate": 0.8737373737373737,
+          "q": {
+            "count": 198,
+            "solved": 10,
+            "optimal": 6,
+            "cycles": 188,
+            "entered_unreachable": 34
+          }
+        },
+        "original_unseen_goals": {
+          "finite_mae": 1.560251235961914,
+          "shortest_action_rate": 1.0,
+          "q": {
+            "count": 4,
+            "solved": 0,
+            "optimal": 0,
+            "cycles": 4,
+            "entered_unreachable": 2
+          }
+        }
+      }
+    }
+  },
+  "common_fixed_batch_regression": {
+    "scope": "Matched frozen queries and fixed8192 feature batches used to precompute every independently encoded Q(s). Offline truth only judges actions after selection. No training or checkpoint selection. These common regression queries are development evidence, not a new independent acceptance.",
+    "models": {
+      "sokoban_fixed_wall_902_goal_coverage_mlp": {
+        "checkpoint_step": 8000,
+        "source_commit": "403e0ed",
+        "cohorts": {
+          "frozen_training_queries": {
+            "count": 2048,
+            "solved": 782,
+            "optimal": 759,
+            "cycles": 1266,
+            "entered_unreachable": 184,
+            "success_rate": 0.3818359375,
+            "optimal_rate": 0.37060546875,
+            "mean_excess_cost_on_success": 0.07161125540733337,
+            "distance_ranges": {
+              "1_5": {
+                "count": 409,
+                "solved": 391,
+                "optimal": 391
+              },
+              "6_20": {
+                "count": 819,
+                "solved": 367,
+                "optimal": 349
+              },
+              "21_plus": {
+                "count": 820,
+                "solved": 24,
+                "optimal": 19
+              }
+            }
+          },
+          "original_old_training_goals": {
+            "count": 17,
+            "solved": 0,
+            "optimal": 0,
+            "cycles": 17,
+            "entered_unreachable": 0,
+            "success_rate": 0.0,
+            "optimal_rate": 0.0,
+            "mean_excess_cost_on_success": null,
+            "distance_ranges": {
+              "1_5": {
+                "count": 0,
+                "solved": 0,
+                "optimal": 0
+              },
+              "6_20": {
+                "count": 0,
+                "solved": 0,
+                "optimal": 0
+              },
+              "21_plus": {
+                "count": 17,
+                "solved": 0,
+                "optimal": 0
+              }
+            }
+          },
+          "original_terminal_training_goals": {
+            "count": 12,
+            "solved": 0,
+            "optimal": 0,
+            "cycles": 12,
+            "entered_unreachable": 0,
+            "success_rate": 0.0,
+            "optimal_rate": 0.0,
+            "mean_excess_cost_on_success": null,
+            "distance_ranges": {
+              "1_5": {
+                "count": 0,
+                "solved": 0,
+                "optimal": 0
+              },
+              "6_20": {
+                "count": 0,
+                "solved": 0,
+                "optimal": 0
+              },
+              "21_plus": {
+                "count": 12,
+                "solved": 0,
+                "optimal": 0
+              }
+            }
+          },
+          "original_all_training_goals": {
+            "count": 198,
+            "solved": 8,
+            "optimal": 7,
+            "cycles": 190,
+            "entered_unreachable": 10,
+            "success_rate": 0.04040404040404041,
+            "optimal_rate": 0.03535353535353535,
+            "mean_excess_cost_on_success": 0.25,
+            "distance_ranges": {
+              "1_5": {
+                "count": 0,
+                "solved": 0,
+                "optimal": 0
+              },
+              "6_20": {
+                "count": 26,
+                "solved": 5,
+                "optimal": 4
+              },
+              "21_plus": {
+                "count": 172,
+                "solved": 3,
+                "optimal": 3
+              }
+            }
+          }
+        }
+      },
+      "sokoban_fixed_wall_902_control_transition_fit": {
+        "checkpoint_step": 3500,
+        "source_commit": "723f7b1",
+        "cohorts": {
+          "frozen_training_queries": {
+            "count": 2048,
+            "solved": 903,
+            "optimal": 871,
+            "cycles": 1145,
+            "entered_unreachable": 89,
+            "success_rate": 0.44091796875,
+            "optimal_rate": 0.42529296875,
+            "mean_excess_cost_on_success": 0.08859357982873917,
+            "distance_ranges": {
+              "1_5": {
+                "count": 409,
+                "solved": 393,
+                "optimal": 393
+              },
+              "6_20": {
+                "count": 819,
+                "solved": 466,
+                "optimal": 446
+              },
+              "21_plus": {
+                "count": 820,
+                "solved": 44,
+                "optimal": 32
+              }
+            }
+          },
+          "original_old_training_goals": {
+            "count": 17,
+            "solved": 0,
+            "optimal": 0,
+            "cycles": 17,
+            "entered_unreachable": 0,
+            "success_rate": 0.0,
+            "optimal_rate": 0.0,
+            "mean_excess_cost_on_success": null,
+            "distance_ranges": {
+              "1_5": {
+                "count": 0,
+                "solved": 0,
+                "optimal": 0
+              },
+              "6_20": {
+                "count": 0,
+                "solved": 0,
+                "optimal": 0
+              },
+              "21_plus": {
+                "count": 17,
+                "solved": 0,
+                "optimal": 0
+              }
+            }
+          },
+          "original_terminal_training_goals": {
+            "count": 12,
+            "solved": 0,
+            "optimal": 0,
+            "cycles": 12,
+            "entered_unreachable": 0,
+            "success_rate": 0.0,
+            "optimal_rate": 0.0,
+            "mean_excess_cost_on_success": null,
+            "distance_ranges": {
+              "1_5": {
+                "count": 0,
+                "solved": 0,
+                "optimal": 0
+              },
+              "6_20": {
+                "count": 0,
+                "solved": 0,
+                "optimal": 0
+              },
+              "21_plus": {
+                "count": 12,
+                "solved": 0,
+                "optimal": 0
+              }
+            }
+          },
+          "original_all_training_goals": {
+            "count": 198,
+            "solved": 13,
+            "optimal": 13,
+            "cycles": 185,
+            "entered_unreachable": 15,
+            "success_rate": 0.06565656565656566,
+            "optimal_rate": 0.06565656565656566,
+            "mean_excess_cost_on_success": 0.0,
+            "distance_ranges": {
+              "1_5": {
+                "count": 0,
+                "solved": 0,
+                "optimal": 0
+              },
+              "6_20": {
+                "count": 26,
+                "solved": 8,
+                "optimal": 8
+              },
+              "21_plus": {
+                "count": 172,
+                "solved": 5,
+                "optimal": 5
+              }
+            }
+          }
+        }
+      },
+      "sokoban_fixed_wall_902_stages_transition_fit": {
+        "checkpoint_step": 3500,
+        "source_commit": "723f7b1",
+        "cohorts": {
+          "frozen_training_queries": {
+            "count": 2048,
+            "solved": 1094,
+            "optimal": 1039,
+            "cycles": 954,
+            "entered_unreachable": 71,
+            "success_rate": 0.5341796875,
+            "optimal_rate": 0.50732421875,
+            "mean_excess_cost_on_success": 0.12979890406131744,
+            "distance_ranges": {
+              "1_5": {
+                "count": 409,
+                "solved": 386,
+                "optimal": 385
+              },
+              "6_20": {
+                "count": 819,
+                "solved": 568,
+                "optimal": 534
+              },
+              "21_plus": {
+                "count": 820,
+                "solved": 140,
+                "optimal": 120
+              }
+            }
+          },
+          "original_old_training_goals": {
+            "count": 17,
+            "solved": 2,
+            "optimal": 2,
+            "cycles": 15,
+            "entered_unreachable": 1,
+            "success_rate": 0.11764705882352941,
+            "optimal_rate": 0.11764705882352941,
+            "mean_excess_cost_on_success": 0.0,
+            "distance_ranges": {
+              "1_5": {
+                "count": 0,
+                "solved": 0,
+                "optimal": 0
+              },
+              "6_20": {
+                "count": 0,
+                "solved": 0,
+                "optimal": 0
+              },
+              "21_plus": {
+                "count": 17,
+                "solved": 2,
+                "optimal": 2
+              }
+            }
+          },
+          "original_terminal_training_goals": {
+            "count": 12,
+            "solved": 2,
+            "optimal": 2,
+            "cycles": 10,
+            "entered_unreachable": 1,
+            "success_rate": 0.16666666666666666,
+            "optimal_rate": 0.16666666666666666,
+            "mean_excess_cost_on_success": 0.0,
+            "distance_ranges": {
+              "1_5": {
+                "count": 0,
+                "solved": 0,
+                "optimal": 0
+              },
+              "6_20": {
+                "count": 0,
+                "solved": 0,
+                "optimal": 0
+              },
+              "21_plus": {
+                "count": 12,
+                "solved": 2,
+                "optimal": 2
+              }
+            }
+          },
+          "original_all_training_goals": {
+            "count": 198,
+            "solved": 13,
+            "optimal": 13,
+            "cycles": 185,
+            "entered_unreachable": 26,
+            "success_rate": 0.06565656565656566,
+            "optimal_rate": 0.06565656565656566,
+            "mean_excess_cost_on_success": 0.0,
+            "distance_ranges": {
+              "1_5": {
+                "count": 0,
+                "solved": 0,
+                "optimal": 0
+              },
+              "6_20": {
+                "count": 26,
+                "solved": 5,
+                "optimal": 5
+              },
+              "21_plus": {
+                "count": 172,
+                "solved": 8,
+                "optimal": 8
+              }
+            }
+          }
+        }
+      },
+      "sokoban_fixed_wall_902_transitions_transition_fit": {
+        "checkpoint_step": 3500,
+        "source_commit": "723f7b1",
+        "cohorts": {
+          "frozen_training_queries": {
+            "count": 2048,
+            "solved": 1356,
+            "optimal": 1279,
+            "cycles": 692,
+            "entered_unreachable": 154,
+            "success_rate": 0.662109375,
+            "optimal_rate": 0.62451171875,
+            "mean_excess_cost_on_success": 0.13421829044818878,
+            "distance_ranges": {
+              "1_5": {
+                "count": 409,
+                "solved": 402,
+                "optimal": 401
+              },
+              "6_20": {
+                "count": 819,
+                "solved": 630,
+                "optimal": 602
+              },
+              "21_plus": {
+                "count": 820,
+                "solved": 324,
+                "optimal": 276
+              }
+            }
+          },
+          "original_old_training_goals": {
+            "count": 17,
+            "solved": 10,
+            "optimal": 9,
+            "cycles": 7,
+            "entered_unreachable": 1,
+            "success_rate": 0.5882352941176471,
+            "optimal_rate": 0.5294117647058824,
+            "mean_excess_cost_on_success": 0.20000000298023224,
+            "distance_ranges": {
+              "1_5": {
+                "count": 0,
+                "solved": 0,
+                "optimal": 0
+              },
+              "6_20": {
+                "count": 0,
+                "solved": 0,
+                "optimal": 0
+              },
+              "21_plus": {
+                "count": 17,
+                "solved": 10,
+                "optimal": 9
+              }
+            }
+          },
+          "original_terminal_training_goals": {
+            "count": 12,
+            "solved": 10,
+            "optimal": 9,
+            "cycles": 2,
+            "entered_unreachable": 0,
+            "success_rate": 0.8333333333333334,
+            "optimal_rate": 0.75,
+            "mean_excess_cost_on_success": 0.20000000298023224,
+            "distance_ranges": {
+              "1_5": {
+                "count": 0,
+                "solved": 0,
+                "optimal": 0
+              },
+              "6_20": {
+                "count": 0,
+                "solved": 0,
+                "optimal": 0
+              },
+              "21_plus": {
+                "count": 12,
+                "solved": 10,
+                "optimal": 9
+              }
+            }
+          },
+          "original_all_training_goals": {
+            "count": 198,
+            "solved": 32,
+            "optimal": 29,
+            "cycles": 166,
+            "entered_unreachable": 34,
+            "success_rate": 0.16161616161616163,
+            "optimal_rate": 0.14646464646464646,
+            "mean_excess_cost_on_success": 0.4375,
+            "distance_ranges": {
+              "1_5": {
+                "count": 0,
+                "solved": 0,
+                "optimal": 0
+              },
+              "6_20": {
+                "count": 26,
+                "solved": 11,
+                "optimal": 10
+              },
+              "21_plus": {
+                "count": 172,
+                "solved": 21,
+                "optimal": 19
+              }
+            }
+          }
+        }
+      },
+      "sokoban_fixed_wall_902_current_cycle_control": {
+        "checkpoint_step": 500,
+        "source_commit": "3d49362",
+        "cohorts": {
+          "frozen_training_queries": {
+            "count": 2048,
+            "solved": 1435,
+            "optimal": 1382,
+            "cycles": 613,
+            "entered_unreachable": 104,
+            "success_rate": 0.70068359375,
+            "optimal_rate": 0.6748046875,
+            "mean_excess_cost_on_success": 0.08501742035150528,
+            "distance_ranges": {
+              "1_5": {
+                "count": 409,
+                "solved": 399,
+                "optimal": 399
+              },
+              "6_20": {
+                "count": 819,
+                "solved": 629,
+                "optimal": 614
+              },
+              "21_plus": {
+                "count": 820,
+                "solved": 407,
+                "optimal": 369
+              }
+            }
+          },
+          "original_old_training_goals": {
+            "count": 17,
+            "solved": 12,
+            "optimal": 11,
+            "cycles": 5,
+            "entered_unreachable": 1,
+            "success_rate": 0.7058823529411765,
+            "optimal_rate": 0.6470588235294118,
+            "mean_excess_cost_on_success": 0.8333333134651184,
+            "distance_ranges": {
+              "1_5": {
+                "count": 0,
+                "solved": 0,
+                "optimal": 0
+              },
+              "6_20": {
+                "count": 0,
+                "solved": 0,
+                "optimal": 0
+              },
+              "21_plus": {
+                "count": 17,
+                "solved": 12,
+                "optimal": 11
+              }
+            }
+          },
+          "original_terminal_training_goals": {
+            "count": 12,
+            "solved": 11,
+            "optimal": 11,
+            "cycles": 1,
+            "entered_unreachable": 0,
+            "success_rate": 0.9166666666666666,
+            "optimal_rate": 0.9166666666666666,
+            "mean_excess_cost_on_success": 0.0,
+            "distance_ranges": {
+              "1_5": {
+                "count": 0,
+                "solved": 0,
+                "optimal": 0
+              },
+              "6_20": {
+                "count": 0,
+                "solved": 0,
+                "optimal": 0
+              },
+              "21_plus": {
+                "count": 12,
+                "solved": 11,
+                "optimal": 11
+              }
+            }
+          },
+          "original_all_training_goals": {
+            "count": 198,
+            "solved": 33,
+            "optimal": 28,
+            "cycles": 165,
+            "entered_unreachable": 36,
+            "success_rate": 0.16666666666666666,
+            "optimal_rate": 0.1414141414141414,
+            "mean_excess_cost_on_success": 0.8484848737716675,
+            "distance_ranges": {
+              "1_5": {
+                "count": 0,
+                "solved": 0,
+                "optimal": 0
+              },
+              "6_20": {
+                "count": 26,
+                "solved": 8,
+                "optimal": 7
+              },
+              "21_plus": {
+                "count": 172,
+                "solved": 25,
+                "optimal": 21
+              }
+            }
+          }
+        }
+      },
+      "sokoban_fixed_wall_902_current_cycle_replay": {
+        "checkpoint_step": 2000,
+        "source_commit": "3d49362",
+        "cohorts": {
+          "frozen_training_queries": {
+            "count": 2048,
+            "solved": 1157,
+            "optimal": 1124,
+            "cycles": 891,
+            "entered_unreachable": 53,
+            "success_rate": 0.56494140625,
+            "optimal_rate": 0.548828125,
+            "mean_excess_cost_on_success": 0.062229905277490616,
+            "distance_ranges": {
+              "1_5": {
+                "count": 409,
+                "solved": 398,
+                "optimal": 398
+              },
+              "6_20": {
+                "count": 819,
+                "solved": 613,
+                "optimal": 596
+              },
+              "21_plus": {
+                "count": 820,
+                "solved": 146,
+                "optimal": 130
+              }
+            }
+          },
+          "original_old_training_goals": {
+            "count": 17,
+            "solved": 1,
+            "optimal": 0,
+            "cycles": 16,
+            "entered_unreachable": 0,
+            "success_rate": 0.058823529411764705,
+            "optimal_rate": 0.0,
+            "mean_excess_cost_on_success": 10.0,
+            "distance_ranges": {
+              "1_5": {
+                "count": 0,
+                "solved": 0,
+                "optimal": 0
+              },
+              "6_20": {
+                "count": 0,
+                "solved": 0,
+                "optimal": 0
+              },
+              "21_plus": {
+                "count": 17,
+                "solved": 1,
+                "optimal": 0
+              }
+            }
+          },
+          "original_terminal_training_goals": {
+            "count": 12,
+            "solved": 0,
+            "optimal": 0,
+            "cycles": 12,
+            "entered_unreachable": 0,
+            "success_rate": 0.0,
+            "optimal_rate": 0.0,
+            "mean_excess_cost_on_success": null,
+            "distance_ranges": {
+              "1_5": {
+                "count": 0,
+                "solved": 0,
+                "optimal": 0
+              },
+              "6_20": {
+                "count": 0,
+                "solved": 0,
+                "optimal": 0
+              },
+              "21_plus": {
+                "count": 12,
+                "solved": 0,
+                "optimal": 0
+              }
+            }
+          },
+          "original_all_training_goals": {
+            "count": 198,
+            "solved": 10,
+            "optimal": 6,
+            "cycles": 188,
+            "entered_unreachable": 34,
+            "success_rate": 0.050505050505050504,
+            "optimal_rate": 0.030303030303030304,
+            "mean_excess_cost_on_success": 1.7999999523162842,
+            "distance_ranges": {
+              "1_5": {
+                "count": 0,
+                "solved": 0,
+                "optimal": 0
+              },
+              "6_20": {
+                "count": 26,
+                "solved": 6,
+                "optimal": 4
+              },
+              "21_plus": {
+                "count": 172,
+                "solved": 4,
+                "optimal": 2
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "exhaustive_permitted_training_fit": {
+    "scope": "Exhaustive frozen-policy evaluation over permitted training state-goal decisions, not independent acceptance. Full physical candidate scores determine one action; pointer jumping computes outcomes of that fixed policy and never changes actions. Exact labels are used only after selection and to diagnose permitted optimal-path coverage. No new training.",
+    "models": {
+      "sokoban_fixed_wall_902_transitions_transition_fit/best.pt": {
+        "step": 3500,
+        "source_commit": "723f7b1",
+        "totals": {
+          "count": 747780,
+          "solved": 186876,
+          "optimal": 167178,
+          "does_not_reach_goal": 560904,
+          "reaches_goal_after_horizon": 0,
+          "optimal_path_inside_training": 745234,
+          "solved_with_optimal_path_inside_training": 185782,
+          "first_action_optimal": 635388,
+          "non_descent_first_action": 72546,
+          "finite_mae": 2.694560711770694
+        },
+        "distance_ranges": {
+          "1_5": {
+            "count": 16067,
+            "solved": 15391,
+            "optimal": 15344
+          },
+          "6_20": {
+            "count": 403659,
+            "solved": 140746,
+            "optimal": 127639
+          },
+          "21_plus": {
+            "count": 328054,
+            "solved": 30739,
+            "optimal": 24195
+          }
+        },
+        "goal_box_phases": {
+          "0": {
+            "count": 113272,
+            "solved": 35268,
+            "optimal": 32945
+          },
+          "1": {
+            "count": 331900,
+            "solved": 68480,
+            "optimal": 61547
+          },
+          "2": {
+            "count": 225837,
+            "solved": 44355,
+            "optimal": 39273
+          },
+          "3": {
+            "count": 27893,
+            "solved": 9399,
+            "optimal": 7680
+          },
+          "4": {
+            "count": 48878,
+            "solved": 29374,
+            "optimal": 25733
+          }
+        },
+        "physical_rollout_checks": 4,
+        "seconds": 16.70708284061402
+      },
+      "sokoban_fixed_wall_902_current_cycle_control/best.pt": {
+        "step": 500,
+        "source_commit": "3d49362",
+        "totals": {
+          "count": 747780,
+          "solved": 191576,
+          "optimal": 172105,
+          "does_not_reach_goal": 556204,
+          "reaches_goal_after_horizon": 0,
+          "optimal_path_inside_training": 745234,
+          "solved_with_optimal_path_inside_training": 190364,
+          "first_action_optimal": 636428,
+          "non_descent_first_action": 72956,
+          "finite_mae": 2.7304741799546033
+        },
+        "distance_ranges": {
+          "1_5": {
+            "count": 16067,
+            "solved": 15417,
+            "optimal": 15374
+          },
+          "6_20": {
+            "count": 403659,
+            "solved": 142845,
+            "optimal": 130237
+          },
+          "21_plus": {
+            "count": 328054,
+            "solved": 33314,
+            "optimal": 26494
+          }
+        },
+        "goal_box_phases": {
+          "0": {
+            "count": 113272,
+            "solved": 35534,
+            "optimal": 33351
+          },
+          "1": {
+            "count": 331900,
+            "solved": 68933,
+            "optimal": 61601
+          },
+          "2": {
+            "count": 225837,
+            "solved": 44976,
+            "optimal": 40319
+          },
+          "3": {
+            "count": 27893,
+            "solved": 9840,
+            "optimal": 8663
+          },
+          "4": {
+            "count": 48878,
+            "solved": 32293,
+            "optimal": 28171
+          }
+        },
+        "physical_rollout_checks": 4,
+        "seconds": 16.245250375010073
+      },
+      "sokoban_fixed_wall_902_current_cycle_control/last.pt": {
+        "step": 2000,
+        "source_commit": "3d49362",
+        "totals": {
+          "count": 747780,
+          "solved": 182169,
+          "optimal": 162877,
+          "does_not_reach_goal": 565611,
+          "reaches_goal_after_horizon": 0,
+          "optimal_path_inside_training": 745234,
+          "solved_with_optimal_path_inside_training": 181538,
+          "first_action_optimal": 638091,
+          "non_descent_first_action": 74671,
+          "finite_mae": 2.7258951043147817
+        },
+        "distance_ranges": {
+          "1_5": {
+            "count": 16067,
+            "solved": 15276,
+            "optimal": 15229
+          },
+          "6_20": {
+            "count": 403659,
+            "solved": 136199,
+            "optimal": 122540
+          },
+          "21_plus": {
+            "count": 328054,
+            "solved": 30694,
+            "optimal": 25108
+          }
+        },
+        "goal_box_phases": {
+          "0": {
+            "count": 113272,
+            "solved": 33817,
+            "optimal": 31615
+          },
+          "1": {
+            "count": 331900,
+            "solved": 65380,
+            "optimal": 57161
+          },
+          "2": {
+            "count": 225837,
+            "solved": 43735,
+            "optimal": 38706
+          },
+          "3": {
+            "count": 27893,
+            "solved": 10701,
+            "optimal": 9691
+          },
+          "4": {
+            "count": 48878,
+            "solved": 28536,
+            "optimal": 25704
+          }
+        },
+        "physical_rollout_checks": 4,
+        "seconds": 17.16310256998986
+      },
+      "sokoban_fixed_wall_902_current_cycle_replay/best.pt": {
+        "step": 2000,
+        "source_commit": "3d49362",
+        "totals": {
+          "count": 747780,
+          "solved": 181798,
+          "optimal": 161509,
+          "does_not_reach_goal": 565982,
+          "reaches_goal_after_horizon": 0,
+          "optimal_path_inside_training": 745234,
+          "solved_with_optimal_path_inside_training": 181282,
+          "first_action_optimal": 635573,
+          "non_descent_first_action": 81473,
+          "finite_mae": 2.940516386752927
+        },
+        "distance_ranges": {
+          "1_5": {
+            "count": 16067,
+            "solved": 15179,
+            "optimal": 15140
+          },
+          "6_20": {
+            "count": 403659,
+            "solved": 137350,
+            "optimal": 123022
+          },
+          "21_plus": {
+            "count": 328054,
+            "solved": 29269,
+            "optimal": 23347
+          }
+        },
+        "goal_box_phases": {
+          "0": {
+            "count": 113272,
+            "solved": 32409,
+            "optimal": 29779
+          },
+          "1": {
+            "count": 331900,
+            "solved": 67953,
+            "optimal": 58931
+          },
+          "2": {
+            "count": 225837,
+            "solved": 47033,
+            "optimal": 41308
+          },
+          "3": {
+            "count": 27893,
+            "solved": 9858,
+            "optimal": 8694
+          },
+          "4": {
+            "count": 48878,
+            "solved": 24545,
+            "optimal": 22797
+          }
+        },
+        "physical_rollout_checks": 4,
+        "seconds": 17.009216321632266
+      }
+    }
+  },
+  "limited_dimension_probe": {
+    "run": "sokoban_fixed_wall_902_goal_coverage_mlp",
+    "sampled_pairs": 4096,
+    "positive_long_pairs": 2048,
+    "proven_unreachable_pairs": 2048,
+    "results": {
+      "1": {
+        "witness_pairs": 27,
+        "minimum_cross_gap": 1.0,
+        "uniform_error_lower_bound_if_dimension_below_witness": 0.25,
+        "full_training_goal_teacher_profiles_reproduce_pairs_exactly": true,
+        "active_teacher_axes_all_distinct": true
+      },
+      "2": {
+        "witness_pairs": 24,
+        "minimum_cross_gap": 2.0,
+        "uniform_error_lower_bound_if_dimension_below_witness": 0.5,
+        "full_training_goal_teacher_profiles_reproduce_pairs_exactly": true,
+        "active_teacher_axes_all_distinct": true
+      },
+      "4": {
+        "witness_pairs": 16,
+        "minimum_cross_gap": 4.0,
+        "uniform_error_lower_bound_if_dimension_below_witness": 1.0,
+        "full_training_goal_teacher_profiles_reproduce_pairs_exactly": true,
+        "active_teacher_axes_all_distinct": true
+      },
+      "8": {
+        "witness_pairs": 10,
+        "minimum_cross_gap": 10.0,
+        "uniform_error_lower_bound_if_dimension_below_witness": 2.5,
+        "full_training_goal_teacher_profiles_reproduce_pairs_exactly": true,
+        "active_teacher_axes_all_distinct": true
+      },
+      "16": {
+        "witness_pairs": 9,
+        "minimum_cross_gap": 17.0,
+        "uniform_error_lower_bound_if_dimension_below_witness": 4.25,
+        "full_training_goal_teacher_profiles_reproduce_pairs_exactly": true,
+        "active_teacher_axes_all_distinct": true
+      }
+    },
+    "excluded_held_cross_relations": true,
+    "proof": "For directed_max, pairs(a,b),(c,d) with positive fitted distances whose active maximum is the same coordinate obey F(a,b)+F(c,d)<=F(a,d)+F(c,b). Under uniform absolute label error epsilon, exact D(a,b)+D(c,d)-D(a,d)-D(c,b)<=4epsilon. A verified pairwise-positive-gap clique ofM pairs therefore needs at leastM active coordinates for exact fit, or forces uniform error>=minimum_gap/4 when dimension<M. Unreachable teacher labels use the declared240 proxy, exactly as the point loss. Only original allowed point/cross relations are used.",
+    "scope": "Teacher-only finite label geometry. A witness below128 does not prove128D feasibility. A bound on worst absolute error is not a bound on average error or80 percent greedy completion. No encoder coordinate or new training label is supplied.",
+    "seconds": 2.7327940575778484,
+    "interpretation": "Largest discovered incompatibility clique has27 pairs, below the current128 coordinates. This probe finds no128D lower-bound obstruction at the tested gaps; it does not establish representability or convergence and does not justify changing dimensionality by itself. Full training-goal distance profiles validate the witnesses only and are never model inputs or a trained solution."
+  },
+  "interpretation": "Stage plus finite parent-child distance-difference supervision improves the common frozen2048 training-query completion from782 to1356, and a subsequent no-replay phase to1435. Original-root terminal training goals improve0/12 to10/12 then11/12, but arbitrary original-root training goals remain33/198. The matched25 percent CURRENT-cycle replay arm regresses to0/12 terminal and10/198 arbitrary goals, versus11/12 and33/198 control; do not adopt replay. These repeatedly inspected development queries are not independent acceptance. Held-goal and full training-pool fitting gates remain failed. The largest discovered label incompatibility witness27 is below128 and neither proves representability nor convergence.",
+  "artifacts": {
+    "persistent_root": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/followup_5d41460",
+    "raw_frozen": "logs/sokoban_frozen_transition_comparison.json",
+    "raw_dimension": "analysis_sokoban_goal_coverage/sokoban_directed_dimension_probe.json",
+    "raw_exhaustive": "logs/sokoban_exhaustive_policy_fit.json"
+  }
+}

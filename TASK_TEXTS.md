@@ -1692,7 +1692,7 @@ Reason: The required goal is already reached; no further move is needed.
 
 ### Token Swapping：任务文字与监督格式
 
-采用[顺序Token Swapping](https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.ESA.2016.66)，公开实例来源为[tket固定问题](https://github.com/Quantinuum/tket/blob/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.hpp)。每点恰有一个不同棋子，目标为题目指定的完整排列；归位是其中一种目标。一次只交换一条边的两端，不使用并行轮数、部分映射或颜色等价规则。完整计划与指定目标裁判已接入；Qmap已完成多组训练但未通过验收，逐轮LLM训练尚未开展。历史Flash筛查的归位提示冻结在原suite中。
+采用[顺序Token Swapping](https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.ESA.2016.66)，公开实例来源为[tket固定问题](https://github.com/Quantinuum/tket/blob/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.hpp)。每点恰有一个不同棋子，目标为题目指定的完整排列；归位是其中一种目标。一次只交换一条边的两端，不使用并行轮数、部分映射或颜色等价规则。完整计划与指定目标裁判已接入；Qmap当前采用范围见[selection](tasks/token_swapping/Qmap/selection.json)，逐轮LLM训练尚未开展。历史Flash筛查的归位提示冻结在原suite中。
 
 #### 共享任务描述与规则
 

@@ -1,0 +1,1565 @@
+{
+  "conditions": {
+    "endpoint": {
+      "matched_training": {
+        "token_endpoint_efficiency_soft": {
+          "complete": true,
+          "step": 4000,
+          "best_step": 2500,
+          "probe": {
+            "batches": 4,
+            "point_count": 163840,
+            "decision_count": 32768,
+            "finite_mae": 0.6382759809494019,
+            "distance_huber": 0.3004019856452942,
+            "candidate_soft_rank_loss": 1.9246439933776855,
+            "shortest_action_rate": 0.983428955078125,
+            "by_distance": {
+              "1_5": {
+                "count": 50244,
+                "mae": 0.6737080812454224
+              },
+              "6_20": {
+                "count": 103183,
+                "mae": 0.6695573925971985
+              },
+              "21_plus": {
+                "count": 1378,
+                "mae": 1.188976526260376
+              }
+            },
+            "role": "Fixed actual training batches; fitting diagnostic only, never checkpoint selection."
+          },
+          "transition_loss": null,
+          "validation_score": 2.5261523524920144,
+          "throughput": {
+            "training_seconds": 138.87057459540665,
+            "batches_per_second": 3.600474769091495,
+            "point_pairs_per_second": 147475.44654198765,
+            "complete_decisions_per_second": 29495.089308397528,
+            "point_batch_size": 32768,
+            "decision_batch_size": 8192,
+            "cuda_peak_allocated_bytes": 3274770944
+          },
+          "cohorts": {
+            "validation": {
+              "mae": 0.8961465358734131,
+              "count": 128,
+              "solved": 125,
+              "optimal": 90,
+              "cycles": 3
+            },
+            "test": {
+              "mae": 0.9175848960876465,
+              "count": 128,
+              "solved": 127,
+              "optimal": 89,
+              "cycles": 1
+            },
+            "unseen_endpoint_validation": {
+              "mae": 0.8371829986572266,
+              "count": 128,
+              "solved": 123,
+              "optimal": 91,
+              "cycles": 5
+            },
+            "unseen_both_validation": {
+              "mae": 0.8196535110473633,
+              "count": 128,
+              "solved": 124,
+              "optimal": 101,
+              "cycles": 4
+            },
+            "unseen_endpoint_test": {
+              "mae": 0.8453523516654968,
+              "count": 128,
+              "solved": 123,
+              "optimal": 93,
+              "cycles": 5
+            },
+            "unseen_both_test": {
+              "mae": 0.8228334188461304,
+              "count": 128,
+              "solved": 124,
+              "optimal": 89,
+              "cycles": 4
+            },
+            "diagnostic": {
+              "mae": 0.7823734283447266,
+              "count": 5,
+              "solved": 5,
+              "optimal": 4,
+              "cycles": 0
+            }
+          }
+        },
+        "token_endpoint_efficiency_optimal": {
+          "complete": true,
+          "step": 4000,
+          "best_step": 4000,
+          "probe": {
+            "batches": 4,
+            "point_count": 163840,
+            "decision_count": 32768,
+            "finite_mae": 0.7508331537246704,
+            "distance_huber": 0.39094123244285583,
+            "candidate_soft_rank_loss": 1.9395911693572998,
+            "shortest_action_rate": 0.98358154296875,
+            "by_distance": {
+              "1_5": {
+                "count": 50244,
+                "mae": 0.994377613067627
+              },
+              "6_20": {
+                "count": 103183,
+                "mae": 0.6932827234268188
+              },
+              "21_plus": {
+                "count": 1378,
+                "mae": 1.1030470132827759
+              }
+            },
+            "role": "Fixed actual training batches; fitting diagnostic only, never checkpoint selection."
+          },
+          "transition_loss": null,
+          "validation_score": 2.5283593436082206,
+          "throughput": {
+            "training_seconds": 143.06236118637025,
+            "batches_per_second": 3.4949793632207693,
+            "point_pairs_per_second": 143154.3547175227,
+            "complete_decisions_per_second": 28630.870943504542,
+            "point_batch_size": 32768,
+            "decision_batch_size": 8192,
+            "cuda_peak_allocated_bytes": 3274770944
+          },
+          "cohorts": {
+            "validation": {
+              "mae": 0.9290210008621216,
+              "count": 128,
+              "solved": 125,
+              "optimal": 89,
+              "cycles": 3
+            },
+            "test": {
+              "mae": 0.9558423757553101,
+              "count": 128,
+              "solved": 125,
+              "optimal": 91,
+              "cycles": 3
+            },
+            "unseen_endpoint_validation": {
+              "mae": 0.8385029435157776,
+              "count": 128,
+              "solved": 123,
+              "optimal": 85,
+              "cycles": 5
+            },
+            "unseen_both_validation": {
+              "mae": 0.8201758861541748,
+              "count": 128,
+              "solved": 126,
+              "optimal": 100,
+              "cycles": 2
+            },
+            "unseen_endpoint_test": {
+              "mae": 0.8298306465148926,
+              "count": 128,
+              "solved": 126,
+              "optimal": 89,
+              "cycles": 2
+            },
+            "unseen_both_test": {
+              "mae": 0.8195998668670654,
+              "count": 128,
+              "solved": 121,
+              "optimal": 88,
+              "cycles": 7
+            },
+            "diagnostic": {
+              "mae": 0.7870737314224243,
+              "count": 5,
+              "solved": 5,
+              "optimal": 4,
+              "cycles": 0
+            }
+          }
+        }
+      },
+      "first_efficiency_acceptance": {
+        "chosen": {
+          "run": "token_endpoint_efficiency_soft",
+          "score": 2.5190317034721375,
+          "step": 2500,
+          "full_point_source_coverage": true
+        },
+        "passed": false,
+        "target_reached": false,
+        "efficiency": {
+          "minimum_optimal_rate": 0.8,
+          "maximum_mean_cost_ratio_on_success": 1.1,
+          "passed": false,
+          "target_reached": false
+        },
+        "long_distance": {
+          "fresh_unseen_endpoint_test": {
+            "count": 204,
+            "solved": 193,
+            "success_rate": 0.946078431372549,
+            "optimal": 106,
+            "optimal_rate": 0.5196078431372549
+          },
+          "fresh_unseen_both_test": {
+            "count": 204,
+            "solved": 198,
+            "success_rate": 0.9705882352941176,
+            "optimal": 101,
+            "optimal_rate": 0.4950980392156863
+          }
+        }
+      },
+      "validation_cost_choice": {
+        "candidates": [
+          {
+            "run": "token_endpoint_l1_fit",
+            "checkpoint": "best.pt",
+            "step": 4000,
+            "score": 2.542778044939041,
+            "full_point_source_coverage": true,
+            "minimum_validation_completion": 0.9814453125,
+            "minimum_validation_optimal_including_long": 0.30434782608695654,
+            "mean_validation_optimal": 0.5905333865382649,
+            "mean_validation_success_cost_ratio": 1.0398213863372803,
+            "selection_cohorts": [
+              "validation",
+              "unseen_endpoint_validation",
+              "unseen_both_validation"
+            ],
+            "validation_query_count": 1024
+          },
+          {
+            "run": "token_endpoint_efficiency_soft",
+            "checkpoint": "best.pt",
+            "step": 2500,
+            "score": 2.5130141774813333,
+            "full_point_source_coverage": true,
+            "minimum_validation_completion": 0.970703125,
+            "minimum_validation_optimal_including_long": 0.43478260869565216,
+            "mean_validation_optimal": 0.6021930041726296,
+            "mean_validation_success_cost_ratio": 1.0394484202067058,
+            "selection_cohorts": [
+              "validation",
+              "unseen_endpoint_validation",
+              "unseen_both_validation"
+            ],
+            "validation_query_count": 1024
+          },
+          {
+            "run": "token_endpoint_efficiency_soft",
+            "checkpoint": "last.pt",
+            "step": 4000,
+            "score": 2.5203813513120017,
+            "full_point_source_coverage": true,
+            "minimum_validation_completion": 0.9755859375,
+            "minimum_validation_optimal_including_long": 0.34782608695652173,
+            "mean_validation_optimal": 0.5895912306630775,
+            "mean_validation_success_cost_ratio": 1.0399839480717976,
+            "selection_cohorts": [
+              "validation",
+              "unseen_endpoint_validation",
+              "unseen_both_validation"
+            ],
+            "validation_query_count": 1024
+          },
+          {
+            "run": "token_endpoint_efficiency_optimal",
+            "checkpoint": "best.pt",
+            "step": 4000,
+            "score": 2.522196223338445,
+            "full_point_source_coverage": true,
+            "minimum_validation_completion": 0.9765625,
+            "minimum_validation_optimal_including_long": 0.391304347826087,
+            "mean_validation_optimal": 0.5747254568738358,
+            "mean_validation_success_cost_ratio": 1.0420122146606445,
+            "selection_cohorts": [
+              "validation",
+              "unseen_endpoint_validation",
+              "unseen_both_validation"
+            ],
+            "validation_query_count": 1024
+          }
+        ],
+        "chosen": {
+          "run": "token_endpoint_efficiency_soft",
+          "checkpoint": "best.pt",
+          "step": 2500,
+          "score": 2.5130141774813333,
+          "full_point_source_coverage": true,
+          "minimum_validation_completion": 0.970703125,
+          "minimum_validation_optimal_including_long": 0.43478260869565216,
+          "mean_validation_optimal": 0.6021930041726296,
+          "mean_validation_success_cost_ratio": 1.0394484202067058,
+          "selection_cohorts": [
+            "validation",
+            "unseen_endpoint_validation",
+            "unseen_both_validation"
+          ],
+          "validation_query_count": 1024
+        },
+        "rule": "Among terminal original/soft/optimal candidates and complete best/last snapshots, require full point-source coverage and at least95 percent completion in every original validation cohort. Then maximize the minimum validation optimal-completion rate across all cohorts and their21+ subsets, followed by mean optimal rate, success cost ratio, validation loss and deterministic run/checkpoint names. Freeze before generating any new test pair. Earlier efficiency tests are development history and excluded from fresh generation.",
+        "independent_suite_used_for_choice": false
+      },
+      "fresh_cost_acceptance": {
+        "source_commit": "0053c1b",
+        "checkpoint_source_commit": "65bc265",
+        "step": 2500,
+        "chosen": {
+          "run": "token_endpoint_efficiency_soft",
+          "checkpoint": "best.pt",
+          "step": 2500,
+          "score": 2.5130141774813333,
+          "full_point_source_coverage": true,
+          "minimum_validation_completion": 0.970703125,
+          "minimum_validation_optimal_including_long": 0.43478260869565216,
+          "mean_validation_optimal": 0.6021930041726296,
+          "mean_validation_success_cost_ratio": 1.0394484202067058,
+          "selection_cohorts": [
+            "validation",
+            "unseen_endpoint_validation",
+            "unseen_both_validation"
+          ],
+          "validation_query_count": 1024
+        },
+        "oracle_ok": true,
+        "full_training_input_coverage": true,
+        "held_input_training_exposure_zero": true,
+        "long_distance": {
+          "fresh_unseen_endpoint_test": {
+            "count": 204,
+            "solved": 196,
+            "success_rate": 0.9607843137254902,
+            "optimal": 108,
+            "optimal_rate": 0.5294117647058824
+          },
+          "fresh_unseen_both_test": {
+            "count": 204,
+            "solved": 191,
+            "success_rate": 0.9362745098039216,
+            "optimal": 107,
+            "optimal_rate": 0.5245098039215687
+          }
+        },
+        "efficiency": {
+          "minimum_optimal_rate": 0.8,
+          "maximum_mean_cost_ratio_on_success": 1.1,
+          "passed": false,
+          "target_reached": false
+        },
+        "passed": false,
+        "target_reached": false
+      },
+      "fresh_cost_metrics": {
+        "protected_relation_test": {
+          "finite_mae": 0.8621063232421875,
+          "shortest_action_rate": 0.962890625,
+          "q": {
+            "count": 1024,
+            "solved": 996,
+            "optimal": 731,
+            "cycles": 28,
+            "success_rate": 0.97265625,
+            "optimal_rate": 0.7138671875,
+            "mean_excess_cost_on_success": 0.6526104211807251,
+            "mean_cost_ratio_on_success": 1.039865493774414,
+            "by_distance": {
+              "4.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 2
+              },
+              "5.0": {
+                "count": 4,
+                "solved": 4,
+                "optimal": 4
+              },
+              "6.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 7
+              },
+              "7.0": {
+                "count": 16,
+                "solved": 16,
+                "optimal": 16
+              },
+              "8.0": {
+                "count": 25,
+                "solved": 25,
+                "optimal": 25
+              },
+              "9.0": {
+                "count": 29,
+                "solved": 28,
+                "optimal": 27
+              },
+              "10.0": {
+                "count": 46,
+                "solved": 43,
+                "optimal": 41
+              },
+              "11.0": {
+                "count": 60,
+                "solved": 59,
+                "optimal": 51
+              },
+              "12.0": {
+                "count": 83,
+                "solved": 80,
+                "optimal": 68
+              },
+              "13.0": {
+                "count": 86,
+                "solved": 83,
+                "optimal": 68
+              },
+              "14.0": {
+                "count": 96,
+                "solved": 94,
+                "optimal": 79
+              },
+              "15.0": {
+                "count": 109,
+                "solved": 107,
+                "optimal": 76
+              },
+              "16.0": {
+                "count": 116,
+                "solved": 115,
+                "optimal": 80
+              },
+              "17.0": {
+                "count": 108,
+                "solved": 104,
+                "optimal": 68
+              },
+              "18.0": {
+                "count": 85,
+                "solved": 83,
+                "optimal": 47
+              },
+              "19.0": {
+                "count": 69,
+                "solved": 65,
+                "optimal": 37
+              },
+              "20.0": {
+                "count": 52,
+                "solved": 51,
+                "optimal": 21
+              },
+              "21.0": {
+                "count": 20,
+                "solved": 20,
+                "optimal": 11
+              },
+              "22.0": {
+                "count": 11,
+                "solved": 10,
+                "optimal": 3
+              }
+            }
+          }
+        },
+        "fresh_unseen_endpoint_test": {
+          "finite_mae": 0.9390934705734253,
+          "shortest_action_rate": 0.962890625,
+          "q": {
+            "count": 1024,
+            "solved": 998,
+            "optimal": 759,
+            "cycles": 26,
+            "success_rate": 0.974609375,
+            "optimal_rate": 0.7412109375,
+            "mean_excess_cost_on_success": 0.6012024283409119,
+            "mean_cost_ratio_on_success": 1.0352624654769897,
+            "by_distance": {
+              "1.0": {
+                "count": 3,
+                "solved": 3,
+                "optimal": 3
+              },
+              "2.0": {
+                "count": 4,
+                "solved": 4,
+                "optimal": 4
+              },
+              "3.0": {
+                "count": 7,
+                "solved": 7,
+                "optimal": 7
+              },
+              "4.0": {
+                "count": 47,
+                "solved": 47,
+                "optimal": 47
+              },
+              "5.0": {
+                "count": 144,
+                "solved": 142,
+                "optimal": 142
+              },
+              "6.0": {
+                "count": 5,
+                "solved": 5,
+                "optimal": 5
+              },
+              "7.0": {
+                "count": 14,
+                "solved": 14,
+                "optimal": 14
+              },
+              "8.0": {
+                "count": 38,
+                "solved": 38,
+                "optimal": 36
+              },
+              "9.0": {
+                "count": 55,
+                "solved": 54,
+                "optimal": 53
+              },
+              "10.0": {
+                "count": 93,
+                "solved": 90,
+                "optimal": 80
+              },
+              "11.0": {
+                "count": 26,
+                "solved": 26,
+                "optimal": 19
+              },
+              "12.0": {
+                "count": 33,
+                "solved": 31,
+                "optimal": 28
+              },
+              "13.0": {
+                "count": 36,
+                "solved": 33,
+                "optimal": 25
+              },
+              "14.0": {
+                "count": 52,
+                "solved": 51,
+                "optimal": 37
+              },
+              "15.0": {
+                "count": 58,
+                "solved": 55,
+                "optimal": 42
+              },
+              "16.0": {
+                "count": 64,
+                "solved": 64,
+                "optimal": 41
+              },
+              "17.0": {
+                "count": 60,
+                "solved": 59,
+                "optimal": 33
+              },
+              "18.0": {
+                "count": 46,
+                "solved": 44,
+                "optimal": 21
+              },
+              "19.0": {
+                "count": 24,
+                "solved": 24,
+                "optimal": 10
+              },
+              "20.0": {
+                "count": 11,
+                "solved": 11,
+                "optimal": 4
+              },
+              "21.0": {
+                "count": 157,
+                "solved": 153,
+                "optimal": 79
+              },
+              "22.0": {
+                "count": 41,
+                "solved": 38,
+                "optimal": 26
+              },
+              "23.0": {
+                "count": 5,
+                "solved": 4,
+                "optimal": 3
+              },
+              "24.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 0
+              }
+            }
+          }
+        },
+        "fresh_unseen_both_test": {
+          "finite_mae": 0.9738033413887024,
+          "shortest_action_rate": 0.974609375,
+          "q": {
+            "count": 1024,
+            "solved": 999,
+            "optimal": 777,
+            "cycles": 25,
+            "success_rate": 0.9755859375,
+            "optimal_rate": 0.7587890625,
+            "mean_excess_cost_on_success": 0.5305305123329163,
+            "mean_cost_ratio_on_success": 1.0304772853851318,
+            "by_distance": {
+              "1.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "2.0": {
+                "count": 3,
+                "solved": 3,
+                "optimal": 3
+              },
+              "3.0": {
+                "count": 11,
+                "solved": 11,
+                "optimal": 11
+              },
+              "4.0": {
+                "count": 44,
+                "solved": 44,
+                "optimal": 44
+              },
+              "5.0": {
+                "count": 146,
+                "solved": 146,
+                "optimal": 146
+              },
+              "6.0": {
+                "count": 4,
+                "solved": 4,
+                "optimal": 4
+              },
+              "7.0": {
+                "count": 10,
+                "solved": 10,
+                "optimal": 10
+              },
+              "8.0": {
+                "count": 30,
+                "solved": 30,
+                "optimal": 30
+              },
+              "9.0": {
+                "count": 62,
+                "solved": 61,
+                "optimal": 56
+              },
+              "10.0": {
+                "count": 99,
+                "solved": 95,
+                "optimal": 91
+              },
+              "11.0": {
+                "count": 29,
+                "solved": 29,
+                "optimal": 28
+              },
+              "12.0": {
+                "count": 32,
+                "solved": 32,
+                "optimal": 26
+              },
+              "13.0": {
+                "count": 45,
+                "solved": 44,
+                "optimal": 33
+              },
+              "14.0": {
+                "count": 46,
+                "solved": 45,
+                "optimal": 35
+              },
+              "15.0": {
+                "count": 53,
+                "solved": 52,
+                "optimal": 40
+              },
+              "16.0": {
+                "count": 49,
+                "solved": 49,
+                "optimal": 37
+              },
+              "17.0": {
+                "count": 52,
+                "solved": 51,
+                "optimal": 26
+              },
+              "18.0": {
+                "count": 53,
+                "solved": 52,
+                "optimal": 28
+              },
+              "19.0": {
+                "count": 35,
+                "solved": 33,
+                "optimal": 17
+              },
+              "20.0": {
+                "count": 16,
+                "solved": 16,
+                "optimal": 4
+              },
+              "21.0": {
+                "count": 158,
+                "solved": 149,
+                "optimal": 81
+              },
+              "22.0": {
+                "count": 40,
+                "solved": 37,
+                "optimal": 22
+              },
+              "23.0": {
+                "count": 6,
+                "solved": 5,
+                "optimal": 4
+              }
+            }
+          }
+        },
+        "diagnostic": {
+          "finite_mae": 0.7823734283447266,
+          "shortest_action_rate": 0.8,
+          "q": {
+            "count": 5,
+            "solved": 5,
+            "optimal": 4,
+            "cycles": 0,
+            "success_rate": 1.0,
+            "optimal_rate": 0.8,
+            "mean_excess_cost_on_success": 0.4000000059604645,
+            "mean_cost_ratio_on_success": 1.0266666412353516,
+            "by_distance": {
+              "12.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "14.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "15.0": {
+                "count": 3,
+                "solved": 3,
+                "optimal": 2
+              }
+            }
+          }
+        }
+      }
+    },
+    "alternate": {
+      "matched_training": {
+        "token_alternate_efficiency_soft": {
+          "complete": true,
+          "step": 4000,
+          "best_step": 4000,
+          "probe": {
+            "batches": 4,
+            "point_count": 163840,
+            "decision_count": 32768,
+            "finite_mae": 0.7254420518875122,
+            "distance_huber": 0.36727410554885864,
+            "candidate_soft_rank_loss": 1.946026086807251,
+            "shortest_action_rate": 0.981689453125,
+            "by_distance": {
+              "1_5": {
+                "count": 51136,
+                "mae": 0.7473909854888916
+              },
+              "6_20": {
+                "count": 100435,
+                "mae": 0.7654997706413269
+              },
+              "21_plus": {
+                "count": 3267,
+                "mae": 1.1493346691131592
+              }
+            },
+            "role": "Fixed actual training batches; fitting diagnostic only, never checkpoint selection."
+          },
+          "transition_loss": null,
+          "validation_score": 2.622989296913147,
+          "throughput": {
+            "training_seconds": 145.08509845566005,
+            "batches_per_second": 3.446253304592868,
+            "point_pairs_per_second": 141158.53535612387,
+            "complete_decisions_per_second": 28231.707071224773,
+            "point_batch_size": 32768,
+            "decision_batch_size": 8192,
+            "cuda_peak_allocated_bytes": 3279294976
+          },
+          "cohorts": {
+            "validation": {
+              "mae": 1.0058605670928955,
+              "count": 128,
+              "solved": 127,
+              "optimal": 89,
+              "cycles": 1
+            },
+            "test": {
+              "mae": 0.9520546793937683,
+              "count": 128,
+              "solved": 125,
+              "optimal": 92,
+              "cycles": 3
+            },
+            "unseen_endpoint_validation": {
+              "mae": 0.8972680568695068,
+              "count": 128,
+              "solved": 127,
+              "optimal": 96,
+              "cycles": 1
+            },
+            "unseen_both_validation": {
+              "mae": 0.9329766035079956,
+              "count": 128,
+              "solved": 127,
+              "optimal": 94,
+              "cycles": 1
+            },
+            "unseen_endpoint_test": {
+              "mae": 0.9285905361175537,
+              "count": 128,
+              "solved": 125,
+              "optimal": 83,
+              "cycles": 3
+            },
+            "unseen_both_test": {
+              "mae": 0.875967800617218,
+              "count": 128,
+              "solved": 127,
+              "optimal": 84,
+              "cycles": 1
+            }
+          }
+        },
+        "token_alternate_efficiency_optimal": {
+          "complete": true,
+          "step": 4000,
+          "best_step": 500,
+          "probe": {
+            "batches": 4,
+            "point_count": 163840,
+            "decision_count": 32768,
+            "finite_mae": 0.8333762884140015,
+            "distance_huber": 0.4587191939353943,
+            "candidate_soft_rank_loss": 1.9548572301864624,
+            "shortest_action_rate": 0.982574462890625,
+            "by_distance": {
+              "1_5": {
+                "count": 51136,
+                "mae": 1.0748924016952515
+              },
+              "6_20": {
+                "count": 100435,
+                "mae": 0.7746700048446655
+              },
+              "21_plus": {
+                "count": 3267,
+                "mae": 1.154179573059082
+              }
+            },
+            "role": "Fixed actual training batches; fitting diagnostic only, never checkpoint selection."
+          },
+          "transition_loss": null,
+          "validation_score": 2.6276217103004456,
+          "throughput": {
+            "training_seconds": 139.39402251970023,
+            "batches_per_second": 3.5869543827055868,
+            "point_pairs_per_second": 146921.65151562085,
+            "complete_decisions_per_second": 29384.330303124167,
+            "point_batch_size": 32768,
+            "decision_batch_size": 8192,
+            "cuda_peak_allocated_bytes": 3279294976
+          },
+          "cohorts": {
+            "validation": {
+              "mae": 1.0436207056045532,
+              "count": 128,
+              "solved": 126,
+              "optimal": 87,
+              "cycles": 2
+            },
+            "test": {
+              "mae": 1.0189971923828125,
+              "count": 128,
+              "solved": 126,
+              "optimal": 96,
+              "cycles": 2
+            },
+            "unseen_endpoint_validation": {
+              "mae": 0.8870260715484619,
+              "count": 128,
+              "solved": 127,
+              "optimal": 92,
+              "cycles": 1
+            },
+            "unseen_both_validation": {
+              "mae": 0.9271189570426941,
+              "count": 128,
+              "solved": 128,
+              "optimal": 91,
+              "cycles": 0
+            },
+            "unseen_endpoint_test": {
+              "mae": 0.9179415702819824,
+              "count": 128,
+              "solved": 127,
+              "optimal": 74,
+              "cycles": 1
+            },
+            "unseen_both_test": {
+              "mae": 0.8756899833679199,
+              "count": 128,
+              "solved": 126,
+              "optimal": 86,
+              "cycles": 2
+            }
+          }
+        }
+      },
+      "first_efficiency_acceptance": {
+        "chosen": {
+          "run": "token_alternate_efficiency_soft",
+          "score": 2.622989296913147,
+          "step": 4000,
+          "full_point_source_coverage": true
+        },
+        "passed": false,
+        "target_reached": false,
+        "efficiency": {
+          "minimum_optimal_rate": 0.8,
+          "maximum_mean_cost_ratio_on_success": 1.1,
+          "passed": false,
+          "target_reached": false
+        },
+        "long_distance": {
+          "fresh_unseen_endpoint_test": {
+            "count": 204,
+            "solved": 200,
+            "success_rate": 0.9803921568627451,
+            "optimal": 66,
+            "optimal_rate": 0.3235294117647059
+          },
+          "fresh_unseen_both_test": {
+            "count": 204,
+            "solved": 197,
+            "success_rate": 0.9656862745098039,
+            "optimal": 62,
+            "optimal_rate": 0.30392156862745096
+          }
+        }
+      },
+      "validation_cost_choice": {
+        "candidates": [
+          {
+            "run": "token_alternate_l1_fit",
+            "checkpoint": "best.pt",
+            "step": 3500,
+            "score": 2.6308122475941977,
+            "full_point_source_coverage": true,
+            "minimum_validation_completion": 0.9853515625,
+            "minimum_validation_optimal_including_long": 0.30357142857142855,
+            "mean_validation_optimal": 0.502241443452381,
+            "mean_validation_success_cost_ratio": 1.0420941511789958,
+            "selection_cohorts": [
+              "validation",
+              "unseen_endpoint_validation",
+              "unseen_both_validation"
+            ],
+            "validation_query_count": 1024
+          },
+          {
+            "run": "token_alternate_l1_fit",
+            "checkpoint": "last.pt",
+            "step": 4000,
+            "score": 2.635699152946472,
+            "full_point_source_coverage": true,
+            "minimum_validation_completion": 0.9912109375,
+            "minimum_validation_optimal_including_long": 0.3333333333333333,
+            "mean_validation_optimal": 0.5202567638241892,
+            "mean_validation_success_cost_ratio": 1.0411717891693115,
+            "selection_cohorts": [
+              "validation",
+              "unseen_endpoint_validation",
+              "unseen_both_validation"
+            ],
+            "validation_query_count": 1024
+          },
+          {
+            "run": "token_alternate_efficiency_soft",
+            "checkpoint": "best.pt",
+            "step": 4000,
+            "score": 2.6163403590520224,
+            "full_point_source_coverage": true,
+            "minimum_validation_completion": 0.984375,
+            "minimum_validation_optimal_including_long": 0.3392857142857143,
+            "mean_validation_optimal": 0.5300785967693237,
+            "mean_validation_success_cost_ratio": 1.0404707193374634,
+            "selection_cohorts": [
+              "validation",
+              "unseen_endpoint_validation",
+              "unseen_both_validation"
+            ],
+            "validation_query_count": 1024
+          },
+          {
+            "run": "token_alternate_efficiency_optimal",
+            "checkpoint": "best.pt",
+            "step": 500,
+            "score": 2.619092325369517,
+            "full_point_source_coverage": true,
+            "minimum_validation_completion": 0.9873046875,
+            "minimum_validation_optimal_including_long": 0.3333333333333333,
+            "mean_validation_optimal": 0.5087642609126984,
+            "mean_validation_success_cost_ratio": 1.0431493918100994,
+            "selection_cohorts": [
+              "validation",
+              "unseen_endpoint_validation",
+              "unseen_both_validation"
+            ],
+            "validation_query_count": 1024
+          },
+          {
+            "run": "token_alternate_efficiency_optimal",
+            "checkpoint": "last.pt",
+            "step": 4000,
+            "score": 2.6211493611335754,
+            "full_point_source_coverage": true,
+            "minimum_validation_completion": 0.9833984375,
+            "minimum_validation_optimal_including_long": 0.32142857142857145,
+            "mean_validation_optimal": 0.5047293526785716,
+            "mean_validation_success_cost_ratio": 1.0422584613164265,
+            "selection_cohorts": [
+              "validation",
+              "unseen_endpoint_validation",
+              "unseen_both_validation"
+            ],
+            "validation_query_count": 1024
+          }
+        ],
+        "chosen": {
+          "run": "token_alternate_efficiency_soft",
+          "checkpoint": "best.pt",
+          "step": 4000,
+          "score": 2.6163403590520224,
+          "full_point_source_coverage": true,
+          "minimum_validation_completion": 0.984375,
+          "minimum_validation_optimal_including_long": 0.3392857142857143,
+          "mean_validation_optimal": 0.5300785967693237,
+          "mean_validation_success_cost_ratio": 1.0404707193374634,
+          "selection_cohorts": [
+            "validation",
+            "unseen_endpoint_validation",
+            "unseen_both_validation"
+          ],
+          "validation_query_count": 1024
+        },
+        "rule": "Among terminal original/soft/optimal candidates and complete best/last snapshots, require full point-source coverage and at least95 percent completion in every original validation cohort. Then maximize the minimum validation optimal-completion rate across all cohorts and their21+ subsets, followed by mean optimal rate, success cost ratio, validation loss and deterministic run/checkpoint names. Freeze before generating any new test pair. Earlier efficiency tests are development history and excluded from fresh generation.",
+        "independent_suite_used_for_choice": false
+      },
+      "fresh_cost_acceptance": {
+        "source_commit": "0053c1b",
+        "checkpoint_source_commit": "65bc265",
+        "step": 4000,
+        "chosen": {
+          "run": "token_alternate_efficiency_soft",
+          "checkpoint": "best.pt",
+          "step": 4000,
+          "score": 2.6163403590520224,
+          "full_point_source_coverage": true,
+          "minimum_validation_completion": 0.984375,
+          "minimum_validation_optimal_including_long": 0.3392857142857143,
+          "mean_validation_optimal": 0.5300785967693237,
+          "mean_validation_success_cost_ratio": 1.0404707193374634,
+          "selection_cohorts": [
+            "validation",
+            "unseen_endpoint_validation",
+            "unseen_both_validation"
+          ],
+          "validation_query_count": 1024
+        },
+        "oracle_ok": true,
+        "full_training_input_coverage": true,
+        "held_input_training_exposure_zero": true,
+        "long_distance": {
+          "fresh_unseen_endpoint_test": {
+            "count": 204,
+            "solved": 201,
+            "success_rate": 0.9852941176470589,
+            "optimal": 78,
+            "optimal_rate": 0.38235294117647056
+          },
+          "fresh_unseen_both_test": {
+            "count": 204,
+            "solved": 200,
+            "success_rate": 0.9803921568627451,
+            "optimal": 80,
+            "optimal_rate": 0.39215686274509803
+          }
+        },
+        "efficiency": {
+          "minimum_optimal_rate": 0.8,
+          "maximum_mean_cost_ratio_on_success": 1.1,
+          "passed": false,
+          "target_reached": false
+        },
+        "passed": false,
+        "target_reached": false
+      },
+      "fresh_cost_metrics": {
+        "protected_relation_test": {
+          "finite_mae": 0.9274253845214844,
+          "shortest_action_rate": 0.9501953125,
+          "q": {
+            "count": 1024,
+            "solved": 1007,
+            "optimal": 679,
+            "cycles": 17,
+            "success_rate": 0.9833984375,
+            "optimal_rate": 0.6630859375,
+            "mean_excess_cost_on_success": 0.738828182220459,
+            "mean_cost_ratio_on_success": 1.0431456565856934,
+            "by_distance": {
+              "3.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "5.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 2
+              },
+              "6.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 2
+              },
+              "7.0": {
+                "count": 11,
+                "solved": 11,
+                "optimal": 10
+              },
+              "8.0": {
+                "count": 22,
+                "solved": 22,
+                "optimal": 22
+              },
+              "9.0": {
+                "count": 34,
+                "solved": 34,
+                "optimal": 32
+              },
+              "10.0": {
+                "count": 36,
+                "solved": 36,
+                "optimal": 34
+              },
+              "11.0": {
+                "count": 55,
+                "solved": 55,
+                "optimal": 51
+              },
+              "12.0": {
+                "count": 51,
+                "solved": 49,
+                "optimal": 46
+              },
+              "13.0": {
+                "count": 87,
+                "solved": 87,
+                "optimal": 76
+              },
+              "14.0": {
+                "count": 89,
+                "solved": 87,
+                "optimal": 62
+              },
+              "15.0": {
+                "count": 90,
+                "solved": 89,
+                "optimal": 70
+              },
+              "16.0": {
+                "count": 129,
+                "solved": 126,
+                "optimal": 81
+              },
+              "17.0": {
+                "count": 106,
+                "solved": 105,
+                "optimal": 60
+              },
+              "18.0": {
+                "count": 105,
+                "solved": 104,
+                "optimal": 56
+              },
+              "19.0": {
+                "count": 82,
+                "solved": 80,
+                "optimal": 38
+              },
+              "20.0": {
+                "count": 57,
+                "solved": 56,
+                "optimal": 18
+              },
+              "21.0": {
+                "count": 40,
+                "solved": 38,
+                "optimal": 12
+              },
+              "22.0": {
+                "count": 18,
+                "solved": 17,
+                "optimal": 5
+              },
+              "23.0": {
+                "count": 7,
+                "solved": 6,
+                "optimal": 1
+              }
+            }
+          }
+        },
+        "fresh_unseen_endpoint_test": {
+          "finite_mae": 0.9763772487640381,
+          "shortest_action_rate": 0.96875,
+          "q": {
+            "count": 1024,
+            "solved": 1013,
+            "optimal": 743,
+            "cycles": 11,
+            "success_rate": 0.9892578125,
+            "optimal_rate": 0.7255859375,
+            "mean_excess_cost_on_success": 0.625863790512085,
+            "mean_cost_ratio_on_success": 1.0351663827896118,
+            "by_distance": {
+              "1.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "2.0": {
+                "count": 3,
+                "solved": 3,
+                "optimal": 3
+              },
+              "3.0": {
+                "count": 13,
+                "solved": 13,
+                "optimal": 13
+              },
+              "4.0": {
+                "count": 56,
+                "solved": 56,
+                "optimal": 56
+              },
+              "5.0": {
+                "count": 132,
+                "solved": 132,
+                "optimal": 131
+              },
+              "6.0": {
+                "count": 4,
+                "solved": 4,
+                "optimal": 4
+              },
+              "7.0": {
+                "count": 18,
+                "solved": 18,
+                "optimal": 18
+              },
+              "8.0": {
+                "count": 29,
+                "solved": 28,
+                "optimal": 26
+              },
+              "9.0": {
+                "count": 50,
+                "solved": 48,
+                "optimal": 45
+              },
+              "10.0": {
+                "count": 104,
+                "solved": 104,
+                "optimal": 96
+              },
+              "11.0": {
+                "count": 25,
+                "solved": 25,
+                "optimal": 22
+              },
+              "12.0": {
+                "count": 29,
+                "solved": 29,
+                "optimal": 26
+              },
+              "13.0": {
+                "count": 41,
+                "solved": 40,
+                "optimal": 35
+              },
+              "14.0": {
+                "count": 56,
+                "solved": 55,
+                "optimal": 43
+              },
+              "15.0": {
+                "count": 54,
+                "solved": 53,
+                "optimal": 39
+              },
+              "16.0": {
+                "count": 56,
+                "solved": 55,
+                "optimal": 34
+              },
+              "17.0": {
+                "count": 53,
+                "solved": 53,
+                "optimal": 33
+              },
+              "18.0": {
+                "count": 47,
+                "solved": 47,
+                "optimal": 21
+              },
+              "19.0": {
+                "count": 32,
+                "solved": 31,
+                "optimal": 14
+              },
+              "20.0": {
+                "count": 17,
+                "solved": 17,
+                "optimal": 5
+              },
+              "21.0": {
+                "count": 154,
+                "solved": 151,
+                "optimal": 64
+              },
+              "22.0": {
+                "count": 45,
+                "solved": 45,
+                "optimal": 14
+              },
+              "23.0": {
+                "count": 4,
+                "solved": 4,
+                "optimal": 0
+              },
+              "24.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 0
+              }
+            }
+          }
+        },
+        "fresh_unseen_both_test": {
+          "finite_mae": 1.0135319232940674,
+          "shortest_action_rate": 0.9697265625,
+          "q": {
+            "count": 1024,
+            "solved": 1017,
+            "optimal": 755,
+            "cycles": 7,
+            "success_rate": 0.9931640625,
+            "optimal_rate": 0.7373046875,
+            "mean_excess_cost_on_success": 0.5998033285140991,
+            "mean_cost_ratio_on_success": 1.0335317850112915,
+            "by_distance": {
+              "1.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "2.0": {
+                "count": 5,
+                "solved": 5,
+                "optimal": 5
+              },
+              "3.0": {
+                "count": 12,
+                "solved": 12,
+                "optimal": 12
+              },
+              "4.0": {
+                "count": 48,
+                "solved": 48,
+                "optimal": 48
+              },
+              "5.0": {
+                "count": 139,
+                "solved": 139,
+                "optimal": 139
+              },
+              "6.0": {
+                "count": 10,
+                "solved": 10,
+                "optimal": 10
+              },
+              "7.0": {
+                "count": 15,
+                "solved": 15,
+                "optimal": 15
+              },
+              "8.0": {
+                "count": 25,
+                "solved": 25,
+                "optimal": 24
+              },
+              "9.0": {
+                "count": 56,
+                "solved": 56,
+                "optimal": 53
+              },
+              "10.0": {
+                "count": 99,
+                "solved": 98,
+                "optimal": 91
+              },
+              "11.0": {
+                "count": 16,
+                "solved": 16,
+                "optimal": 13
+              },
+              "12.0": {
+                "count": 21,
+                "solved": 21,
+                "optimal": 21
+              },
+              "13.0": {
+                "count": 49,
+                "solved": 49,
+                "optimal": 42
+              },
+              "14.0": {
+                "count": 56,
+                "solved": 55,
+                "optimal": 37
+              },
+              "15.0": {
+                "count": 63,
+                "solved": 63,
+                "optimal": 47
+              },
+              "16.0": {
+                "count": 54,
+                "solved": 54,
+                "optimal": 32
+              },
+              "17.0": {
+                "count": 58,
+                "solved": 58,
+                "optimal": 39
+              },
+              "18.0": {
+                "count": 35,
+                "solved": 35,
+                "optimal": 20
+              },
+              "19.0": {
+                "count": 36,
+                "solved": 36,
+                "optimal": 17
+              },
+              "20.0": {
+                "count": 22,
+                "solved": 21,
+                "optimal": 9
+              },
+              "21.0": {
+                "count": 145,
+                "solved": 141,
+                "optimal": 60
+              },
+              "22.0": {
+                "count": 48,
+                "solved": 48,
+                "optimal": 18
+              },
+              "23.0": {
+                "count": 9,
+                "solved": 9,
+                "optimal": 2
+              },
+              "24.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 0
+              }
+            }
+          }
+        },
+        "diagnostic": {
+          "finite_mae": 1.2894933223724365,
+          "shortest_action_rate": 1.0,
+          "q": {
+            "count": 5,
+            "solved": 5,
+            "optimal": 3,
+            "cycles": 0,
+            "success_rate": 1.0,
+            "optimal_rate": 0.6,
+            "mean_excess_cost_on_success": 0.800000011920929,
+            "mean_cost_ratio_on_success": 1.0435293912887573,
+            "by_distance": {
+              "10.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "13.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 1
+              },
+              "17.0": {
+                "count": 2,
+                "solved": 2,
+                "optimal": 1
+              },
+              "20.0": {
+                "count": 1,
+                "solved": 1,
+                "optimal": 0
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "interpretation": "Neither optimal-only ranking nor selecting existing complete snapshots on validation exchange efficiency passes the requested cost/completion gates. Freeze choice uses validation only, and fresh suites exclude previous held test pairs; no post-test model swap. Original adopted completion maps remain unchanged. Last fixed actual-training probes contain only1378/163840 and3267/163840 point rows above20, about0.84 and1.99 percent; this motivates a matched goal-layer sampling trial but does not establish sampling as the sole cause. L1 encoder and complete branch banks remain unchanged.",
+  "next_sampling_configs": [
+    "experiments/new_tasks_qmap/configs/token_swapping/token_endpoint_efficiency_layers.json",
+    "experiments/new_tasks_qmap/configs/token_swapping/token_alternate_efficiency_layers.json"
+  ]
+}

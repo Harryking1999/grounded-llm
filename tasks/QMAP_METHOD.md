@@ -20,15 +20,15 @@
 | 8-Puzzle | [独立训练](../experiments/puzzle8_qmap/src/run.py)、[完整状态与目标关系数据](../grounded_llm/tasks/puzzle8/data.py)、[评测](../grounded_llm/tasks/puzzle8/evaluate.py) | [环境](../grounded_llm/tasks/puzzle8/environment.py)、[QMap／MapReader](../grounded_llm/tasks/puzzle8/model.py)；不复用其他任务权重 |
 | Boxoban hard完整目标 | [完整状态对入口](../experiments/new_tasks_qmap/src/relations.py)、[任务配置](../experiments/new_tasks_qmap/configs/sokoban/sokoban_pairs.json) | [任务MapReader](../grounded_llm/tasks/sokoban/qmap.py)；尚未通过采用验收 |
 | Rush Hour完整目标 | [完整状态对入口](../experiments/new_tasks_qmap/src/relations.py)、[任务配置](../experiments/new_tasks_qmap/configs/rush_hour/rush_hour_pairs.json) | [任务MapReader](../grounded_llm/tasks/rush_hour/qmap.py)；尚未通过采用验收 |
-| Token Swapping固定树任意目标 | [完整状态对入口](../experiments/new_tasks_qmap/src/relations.py)、[任务配置](../experiments/new_tasks_qmap/configs/token_swapping/token_swapping_pairs.json) | [任务MapReader](../grounded_llm/tasks/token_swapping/qmap.py)；尚未通过采用验收 |
+| Token Swapping固定树任意目标 | [完整状态对入口](../experiments/new_tasks_qmap/src/relations.py)、[任务配置](../experiments/new_tasks_qmap/configs/token_swapping/token_swapping_pairs.json) | [任务MapReader](../grounded_llm/tasks/token_swapping/qmap.py)；当前两棵树采用范围见[selection](token_swapping/Qmap/selection.json) |
 
 当前基线复用距离Huber＋候选软排序；模型、采样、权重与距离几何以对应配置为准。改进先与现有基线比较；更换损失或监督属于单独研究条件，需明确提出，不能在实现修复中悄悄替换。积木有向距离、汉诺塔对称L1、魔方L∞和循环修复保留各自身份，不描述为完全相同的训练流程。
 
-历史新任务的[固定目标可行性试验](../experiments/new_tasks_qmap/README.md)按任务独立调用同一小型诊断入口，不改动既有训练器。过桥比较即时耗时＋后继距离；推箱子使用成功状态集合的目标条件参照；24点主要检验可解性。不可达保留真值无穷、训练用明确的有限代理值。三者尚无采用权重，也未验证任意目标几何。
+历史新任务的[固定目标可行性试验](../experiments/new_tasks_qmap/README.md)按任务独立调用同一小型诊断入口，不改动既有训练器。过桥比较即时耗时＋后继距离；推箱子使用成功状态集合的目标条件参照；24点主要检验可解性。不可达保留真值无穷、训练用明确的有限代理值。早期固定目标结果不代表当前多目标地图的采用状态，当前证据和范围以任务selection及报告为准。
 
 ## 当前已实现的完整目标范围
 
-以下为已实现完整状态对数据与训练入口的范围，尚无通过验收的对应地图，场景内的状态与合法动作受环境约束，跨场景泛化需把场景信息编码进输入并整组留出测试。
+以下为已实现完整状态对数据与训练入口的范围；是否通过验收及采用以任务selection为准。场景内的状态与合法动作受环境约束，跨场景泛化需把场景信息编码进输入并整组留出测试。
 
 | 任务 | 输入与共享范围 | 监督关系与泛化 |
 |---|---|---|
@@ -96,6 +96,10 @@
 可达结构按任务生成：连通图寻路、固定连通底图棋子交换的合法排列互达；8-Puzzle按奇偶分量区分；推箱子、积木和24点包含方向性与不可恢复分支。过桥按真实动作图检查手电位置和人员分布。数据采样跟随这些结构。
 
 “整体空间结构自然张成”具体落实为：共享Q(s)同时满足跨目标、跨分支和跨跨度的监督，并在留出关系上保持顺序和连续执行。二维投影用于展示，训练和验收在原向量空间完成。
+
+记F(s,g)=D(Q(s),Q(g))。正成本真实图的最短路满足d(s,g)=min_a[c(s,a)+d(T(s,a),g)]，在可达非目标状态上有最优后继严格降低剩余成本。固定距离的三角关系、自身为零或平均MAE低，都不自动保证学习后的F满足这项沿真实动作的关系。需要分别检查物理一步成本、同目标父／后继的剩余成本差、全候选最优排序与完整执行。对绕路或回退动作不能一律要求距离下降；不可达分支另按可达性检查，不把有限代理值当成真实无穷。
+
+推箱子、移车的转移差值条件在已有点距离与排序之外，增加对同一查询目标的有限父／后继距离差监督；它是单列的新损失条件，不改变独立Q输入，不给推理加入教师标签或搜索，也不因实现接通就声称学会动作生成。推箱子0/4–4/4及24点源元素数／目标类型／可达性的分层都只用于数据与检查，不能充当必须单调增加的进度输入。匹配比较和适用范围见[各任务报告](../experiments/new_tasks_qmap/results/report.md)。
 
 ### 四、保持距离监督与排序监督，扩充它们看到的数据
 

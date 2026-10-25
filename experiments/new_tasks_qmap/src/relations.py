@@ -298,10 +298,29 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
         if initial_checkpoint:
             initial_path=(out/initial_checkpoint).resolve()
             saved=torch.load(initial_path,map_location=device,weights_only=False)
-            if (saved['task']!=config['task'] or saved['scope']!=scope(config,corpus) or saved['config']['model']!=config['model']
+            widening=options.get('initialize_widen_factor',1)
+            expected_model=deepcopy(saved['config']['model'])
+            if widening!=1:
+                if expected_model.get('architecture','mlp')!='mlp':raise ValueError('Only the existing MLP supports widening')
+                expected_model['hidden']*=widening
+            if (saved['task']!=config['task'] or saved['scope']!=scope(config,corpus) or expected_model!=config['model']
                     or saved['config'].get('input_encoding','identity')!=config.get('input_encoding','identity')):
                 raise ValueError('Warm-start model scope mismatch')
-            model.load_state_dict(saved['model'])
+            initial_weights=saved['model']
+            if widening!=1:
+                from grounded_llm.core.qmap.model import widen_mlp_weights
+                initial_weights=widen_mlp_weights(initial_weights,widening,config['seed']+91003)
+            model.load_state_dict(initial_weights)
+            initialization_match=None
+            if widening!=1:
+                old=StateEncoder(input_dim=corpus.input_dim,**saved['config']['model']).to(device);old.load_state_dict(saved['model']);old.eval()
+                ids=np.random.default_rng(config['seed']+91004).choice(corpus.size,min(corpus.size,1024),replace=False)
+                with torch.no_grad():
+                    x=torch.as_tensor(corpus.features(ids),device=device)
+                    difference=float((old.encode(x)-model.encode(x)).abs().max())
+                if difference>.001:raise ValueError(('Widened initial function drift exceeds tolerance',difference))
+                initialization_match=dict(widen_factor=widening,maximum_coordinate_drift=difference,tolerance=.001)
+                del old,x
             if not structure_options:
                 prior=saved['exposure']
                 if len(prior)==corpus.size:exposure=prior.copy()
@@ -313,6 +332,7 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
                 else:raise ValueError('Warm-start exposure IDs do not match the prepared corpus')
             atomic_json(out/'initialization.json',dict(checkpoint=str(initial_path),source_commit=saved['source_commit'],
                 step=saved['step'],optimizer_restored=False,sampler_restored=False,
+                function_match=initialization_match,
                 prior_exposure_transferred=not bool(structure_options),
                 meaning=('Weights warm start; fresh optimizer and sampling phase, not an exact continuation. '
                     + ('Small corpus has remapped state IDs; prior endpoint counters are not transferable.' if structure_options

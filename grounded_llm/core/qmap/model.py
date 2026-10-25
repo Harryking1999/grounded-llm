@@ -3,6 +3,31 @@ import torch
 from math import prod
 from torch import nn
 
+
+def widen_mlp_weights(state,factor,seed,noise_fraction=.01):
+    """Replicate hidden units, preserving the initial function up to rounding.
+
+    Zero-sum outgoing perturbations let replicated units diverge in training.
+    This changes optimization conditioning; it is not an exact continuation.
+    """
+    if not isinstance(factor,int) or factor<2:raise ValueError('Integer widening factor >=2 required')
+    values={key:value.detach().cpu().clone() for key,value in state.items()}
+    first,middle,last=[values[f'network.{i}.weight'] for i in (0,2,4)]
+    width=first.shape[0]
+    if first.ndim!=2 or middle.shape!=(width,width) or last.ndim!=2 or last.shape[1]!=width:
+        raise ValueError('Widening requires the existing two-hidden-layer MLP')
+    rng=torch.Generator(device='cpu').manual_seed(seed)
+    values['network.0.weight']=first.repeat_interleave(factor,dim=0)
+    values['network.0.bias']=values['network.0.bias'].repeat_interleave(factor)
+    values['network.2.bias']=values['network.2.bias'].repeat_interleave(factor)
+    for index,weight in ((2,middle),(4,last)):
+        expanded=(weight.repeat_interleave(factor,dim=0) if index==2 else weight).repeat_interleave(factor,dim=1)/factor
+        noise=torch.randn(expanded.shape,generator=rng,dtype=expanded.dtype).reshape(expanded.shape[0],width,factor)
+        noise-=noise.mean(dim=-1,keepdim=True)
+        expanded+=noise.reshape_as(expanded)*(float(weight.std())*noise_fraction/factor)
+        values[f'network.{index}.weight']=expanded
+    return values
+
 def distance(source, target, metric, group_size=8):
     difference = source - target
     if metric == "directed_max":

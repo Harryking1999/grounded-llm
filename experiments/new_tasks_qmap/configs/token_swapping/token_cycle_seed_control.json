@@ -1,0 +1,63 @@
+{
+  "task": "token_swapping",
+  "seed": 2026102304,
+  "data": {
+    "tree": "tasks/token_swapping/data/tree10.json",
+    "diagnostic_suite": "runs/deepseek_exact_goals64k/suite.json",
+    "prepared_from": "../token_reference/data"
+  },
+  "model": {
+    "dimension": 128,
+    "hidden": 256,
+    "cap": 64,
+    "metric": "linf"
+  },
+  "training": {
+    "steps": 6000,
+    "batch_size": 2048,
+    "decision_batch_size": 512,
+    "learning_rate": 0.0001,
+    "rank_weight": 4.0,
+    "rank_temperature": 1.0,
+    "eval_every": 1000,
+    "cpu_threads": 4,
+    "unreachable_target": 60.0,
+    "features_on_device": true,
+    "broad_fraction": 0.5,
+    "online_goals": true,
+    "record_training_samples": true,
+    "initialize_from": "../token_initial/best.pt",
+    "local_goal_fraction": 0.5,
+    "rollout_eval_every": 1000,
+    "goal_walk_max": 8,
+    "validation_only_initial": true,
+    "token_branch_replay": {
+      "bank": "../token_branch_data/branch_bank.npz",
+      "kind": "seed",
+      "decision_fraction": 0.25,
+      "point_count": 512,
+      "fit_gate": {
+        "maximum_mae": 0.5,
+        "minimum_shortest_action_rate": 0.99,
+        "minimum_completion_rate": 0.9,
+        "maximum_cycle_rate": 0.01
+      }
+    },
+    "training_probe_batches": 4
+  },
+  "relations": {
+    "endpoint_holdout_fraction": 0.075,
+    "evaluation_count": 2048,
+    "complete_training_sources": true
+  },
+  "evaluation": {
+    "decision_count": 512,
+    "rollout_count": 128,
+    "horizon": 128,
+    "landmarks": 128
+  },
+  "schema": "exact_state_pairs",
+  "selection": "Lowest validation finite Huber plus candidate soft-rank CE, equally averaging predeclared validation cohorts; no test checkpoint selection.",
+  "scope": "Independent Q(S), Q(G); exact complete goals only; no oracle in inference features, no pruning, no search, no LLM retraining.",
+  "hypothesis": "Matched frozen data test: same better initial checkpoint, fresh optimizer, lower fixed learning rate, original near/broad proposals, 6000 updates, 2048 untouched broad point samples plus 512 supplemental exact distance samples and 512 complete decisions per update. Both arms share mined cycle and goal-switch seeds; only the replay bank differs: seed contexts versus full branches and teacher continuations. Preserve all original endpoint and relation exclusions; never forbid backtracking at inference. Compare initial, selected and last execution; distance loss alone is not adoption evidence."
+}

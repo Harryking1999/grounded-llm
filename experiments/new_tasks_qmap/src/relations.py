@@ -102,7 +102,7 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
             raise ValueError('Prepared relation reference changes task, seed or fixed splits')
         if {k:v for k,v in previous['data'].items() if k!='prepared_from'}!={k:v for k,v in config['data'].items() if k!='prepared_from'}:
             raise ValueError('Prepared relation reference changes physical data scope')
-        (out/'data').symlink_to(reference,target_is_directory=True)
+        (out/'data').symlink_to(Path(reference),target_is_directory=True)
     prepared=time.monotonic()
     if structure_options:
         from .solution_structure import prepare as prepare_structure
@@ -171,7 +171,8 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
         return StratifiedEpochSampler(labels,rng)
     pair_sampler=(GroupCoverageSampler(corpus.locate(data['pairs_train'][:,0]),rng,options.get('layouts_per_batch'))
                   if options.get('balance_layouts') else sampler(point_labels,broad_only=bool(relation_sampler)))
-    rank_sampler=sampler(data['distances_train'])
+    rank_sampler=(GroupCoverageSampler(corpus.locate(data['tasks_train'][:,0]),rng,options.get('layouts_per_batch'))
+                  if options.get('balance_rank_layouts') else sampler(data['distances_train']))
     solution_sampler=None
     if structure_options:
         from .solution_structure import SolutionSampler
@@ -216,6 +217,21 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
     start_step,best,best_step,prior_seconds=0,float('inf'),0,0.
     probe_batches=[];loss_window=np.zeros(3,dtype=np.float64)
     token_replay=np.empty((0,2),dtype=np.int64)
+    branch_replay=None
+    if options.get('token_branch_replay'):
+        from .token_branches import BranchReplay
+        import shutil
+        branch_options=options['token_branch_replay']
+        if config['task']!='token_swapping' or not options.get('online_goals') or options.get('token_cycle_replay'):
+            raise ValueError('Frozen token branch replay requires its own online-goal condition')
+        if not 0<branch_options['decision_fraction']<1 or branch_options['point_count']<1:
+            raise ValueError('Positive bounded branch replay quotas required')
+        snapshot=out/'token_branch_bank.npz'
+        if not snapshot.exists():
+            temporary=snapshot.with_suffix('.tmp');shutil.copyfile((out/branch_options['bank']).resolve(),temporary);temporary.replace(snapshot)
+        with np.load(snapshot) as archive:bank={k:archive[k] for k in archive.files}
+        branch_replay=BranchReplay(corpus,data,np.load(out/'data/endpoint_partition.npy'),bank,branch_options,
+            np.random.default_rng(config['seed']+87003))
     continuation=config.get('continuation');external=False
     checkpoint=(out/'last.pt' if resume and (out/'last.pt').exists() else None)
     if checkpoint is None and continuation:
@@ -230,6 +246,7 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
         if relation_sampler: relation_sampler.load_coverage_state_dict(saved.get('relation_coverage'))
         probe_batches=saved.get('training_probe_batches',[]);loss_window=saved.get('loss_window',loss_window)
         token_replay=saved.get('token_cycle_replay',token_replay)
+        if branch_replay:branch_replay.load_state_dict(saved['token_branch_state'])
         if neighborhood_fraction: neighborhood_rng.bit_generator.state=saved['neighborhood_rng']
         if replay_sampler:
             if not np.array_equal(saved['replay_tasks'],replay_sampler.tasks) or not np.array_equal(saved['replay_reasons'],replay_sampler.reason):
@@ -338,6 +355,7 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
             relation_coverage=relation_sampler.coverage_state_dict() if relation_sampler else None,
             training_probe_batches=probe_batches,loss_window=loss_window,
             token_cycle_replay=token_replay,
+            token_branch_state=branch_replay.state_dict() if branch_replay else None,
             best_score=best,best_step=best_step,
             seconds=prior_seconds+time.monotonic()-started),path)
     step=start_step
@@ -386,6 +404,11 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
             child_truth=np.full(children.shape,np.inf,dtype=np.float32)
             child_truth[valid]=corpus.distance(children[valid],np.broadcast_to(tasks[:,1,None],children.shape)[valid])
         else: point_true=point_truth[p]
+        if branch_replay:
+            pair,p,point_true,point_target,tasks,r,point_origin,rank_origin=branch_replay.apply(
+                pair,p,point_true,point_target,tasks,r,point_origin,rank_origin)
+            children=corpus.successors(tasks[:,0]);valid=children>=0;costs=edge_costs(corpus,tasks[:,0])
+            child_truth=corpus.distance(children,np.broadcast_to(tasks[:,1,None],children.shape))
         if edge_bank is not None:
             nedge=round(len(pair)*options['action_edge_fraction'])
             slots=rng.choice(len(pair),nedge,replace=False)
@@ -479,6 +502,17 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
                         loss_window_batches=int(loss_window[2]),training_probe=training_probe(model,corpus,probe_batches,options),
                         validation={name:dict(mae=row['finite_mae'],shortest_action_rate=row['shortest_action_rate'],
                             **(dict(success_rate=row['planning']['q']['success_rate']) if planning else {})) for name,row in values['cohorts'].items()})
+            if branch_replay:
+                fitting=evaluate(model,corpus,branch_replay.fit,config,planning=True)
+                record['branch_fit']={name:dict(mae=row['finite_mae'],shortest_action_rate=row['shortest_action_rate'],
+                    **{k:row['planning']['q'][k] for k in ('count','solved','success_rate','cycles')}) for name,row in fitting['cohorts'].items()}
+                gate=options['token_branch_replay'].get('fit_gate',{})
+                if gate:
+                    record['branch_fit_passed']=all(row['mae']<=gate['maximum_mae'] and row['shortest_action_rate']>=gate['minimum_shortest_action_rate']
+                        and row['success_rate']>=gate['minimum_completion_rate'] and row['cycles']/max(row['count'],1)<=gate['maximum_cycle_rate']
+                        for row in record['branch_fit'].values())
+                atomic_json(out/'branch_fit_latest.json',dict(step=step,metrics=fitting,passed=record.get('branch_fit_passed'),
+                    scope='Training-only seed and branch fitting diagnostics; never checkpoint selection or independent validation.'))
             loss_window[:]=0
             with (out/'progress.jsonl').open('a') as stream: stream.write(json.dumps(record)+'\n')
             atomic_json(out/'validation_latest.json',values)
@@ -544,6 +578,13 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
         atomic_json(out/'exact_rational_exposure.json',dict(checkpoint=final_checkpoint,counts=exact_exposure,
             semantics='Loss-input occurrences aggregated by sorted reduced rational multiset across questions; not proven nonzero gradients.'))
         summary['exact_rational_exposure']=dict(unique_states=len(exact_exposure),file='exact_rational_exposure.json')
+    if branch_replay:
+        state=saved['token_branch_state']
+        summary['token_branch_replay']=dict(kind=options['token_branch_replay']['kind'],
+            decisions=len(branch_replay.tasks),distance_pairs=len(branch_replay.pairs),
+            unique_decisions_drawn=int((state['rank_draws']>0).sum()),decision_draws=int(state['rank_draws'].sum()),
+            unique_distance_pairs_drawn=int((state['point_draws']>0).sum()),distance_pair_draws=int(state['point_draws'].sum()),
+            scope='Selected checkpoint counters. Supplemental distance examples do not displace the original point-source traversal.')
     atomic_json(out/'summary.json',summary)
     print(json.dumps(dict(complete=str(out),best_step=saved['step'])),flush=True)
 

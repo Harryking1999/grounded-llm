@@ -142,8 +142,9 @@ class GroupCoverageSampler:
         groups=np.asarray(groups)
         if groups.ndim!=1 or not len(groups): raise ValueError('Nonempty row groups required')
         self.rng=rng
-        self.levels=np.unique(groups)
-        self.orders=[rng.permutation(np.flatnonzero(groups==level)) for level in self.levels]
+        order=np.argsort(groups,kind='stable')
+        self.levels,starts=np.unique(groups[order],return_index=True)
+        self.orders=[rng.permutation(indices) for indices in np.split(order,starts[1:])]
         self.positions=np.zeros(len(self.levels),dtype=np.int64)
         self.drawn=self.positions.copy()
         self.offset=0

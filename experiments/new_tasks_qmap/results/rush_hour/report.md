@@ -15,3 +15,5 @@
 因此，几何编码解决了这项命名依赖，但没有改善跨布局求解；命名敏感不是当前跨布局缺口的充分解释。配置见[身份](../../configs/rush_hour/rush_hour_multigoal_identity.json)与[几何](../../configs/rush_hour/rush_hour_multigoal_geometry.json)，完整比较与命名检查见[结果](rush_hour_multigoal_encoding.json)。
 
 原lane-order MLP对照已完成，三个主要测试组分别993/1024、990/1024和520/1024，与身份MLP完全相同。核对224个原始场景发现两种编码的起始输入均相同；车道内车辆不能互穿，因而分量内映射也不变。这份公共数据本来已按该顺序分配字母，原lane-order训练不是有效的不同表示对照，见[完成结果与编码核对](rush_hour_lane_order_completed.json)。当前未登记采用权重，见[selection](../../../../tasks/rush_hour/Qmap/selection.json)。
+
+棋盘覆盖扩展使用完整公开数据库，训练目标为至少1,000个独立车辆配置组，按原题最短移动数分层选取，保留旧场景、目标和整布局留出。原144个训练场景对应141个不同配置组，不能按144个不同配置组计算。新增棋盘补A未到出口的完整中间目标；点关系和完整候选分别按场景均衡遍历。模型、距离、损失及更新预算沿用原CNN，布局和目标分布的变化单独记录，见[覆盖配置](../../configs/rush_hour/rush_hour_coverage1000.json)。预算跑完或状态源遍历完并不等于距离场和长程执行收敛。

@@ -1,0 +1,92 @@
+{
+  "task": "rush_hour",
+  "seed": 2026102303,
+  "data": {
+    "append_from": "../rush_reference/data/graphs",
+    "source_url": "https://www.michaelfogleman.com/static/rush/rush.txt.gz",
+    "source_cache": "tmp/planning_task_sources/rush.txt.gz",
+    "max_states": 50000,
+    "minimum_training_catalogues": 1000,
+    "terminal_goals_per_scene": 16,
+    "intermediate_goals_per_scene": 16,
+    "heldout_goals": 4,
+    "heldout_intermediate_goals": 4,
+    "minimum_vehicles": 8,
+    "selection_reserve": 4,
+    "layout_strata": [
+      {
+        "minimum_moves": 1,
+        "maximum_moves": 10,
+        "training_catalogues": 250
+      },
+      {
+        "minimum_moves": 11,
+        "maximum_moves": 20,
+        "training_catalogues": 250
+      },
+      {
+        "minimum_moves": 21,
+        "maximum_moves": 30,
+        "training_catalogues": 250
+      },
+      {
+        "minimum_moves": 31,
+        "maximum_moves": 100,
+        "training_catalogues": 250
+      }
+    ]
+  },
+  "model": {
+    "dimension": 128,
+    "hidden": 256,
+    "cap": 256,
+    "metric": "linf",
+    "architecture": "spatial_cnn",
+    "spatial_shape": [
+      26,
+      6,
+      6
+    ],
+    "conv_channels": 32,
+    "spatial_hidden": 244
+  },
+  "training": {
+    "steps": 60000,
+    "batch_size": 2048,
+    "decision_batch_size": 1024,
+    "learning_rate": 0.001,
+    "rank_weight": 1.0,
+    "rank_temperature": 1.0,
+    "eval_every": 5000,
+    "cpu_threads": 4,
+    "unreachable_target": 240.0,
+    "features_on_device": "packed_bits",
+    "broad_fraction": 0.5,
+    "online_goals": true,
+    "record_training_samples": true,
+    "balance_layouts": true,
+    "balance_rank_layouts": true,
+    "layouts_per_batch": 16,
+    "rollout_eval_every": 10000,
+    "validation_only_initial": true,
+    "training_probe_batches": 4
+  },
+  "relations": {
+    "holdout_per_goal": 16,
+    "evaluation_per_goal": 64,
+    "unreachable_eval_per_goal": 24,
+    "complete_training_sources": true,
+    "evaluation_training_goals": 8
+  },
+  "evaluation": {
+    "decision_count": 2048,
+    "rollout_count": 1024,
+    "horizon": 256,
+    "landmarks": 128
+  },
+  "schema": "exact_state_pairs",
+  "selection": "Lowest validation finite Huber plus candidate soft-rank CE, equally averaging predeclared validation cohorts; no test checkpoint selection.",
+  "scope": "Independent Q(S), Q(G); exact complete goals only; no oracle in inference features, no pruning, no search, no LLM retraining.",
+  "acceptance": "experiments/new_tasks_qmap/configs/exact_pair_acceptance.json",
+  "hypothesis": "At least 1000 distinct geometry catalogue groups in training. Preserve all original train/validation/test/diagnostic scenes as an immutable prefix; append only new no-wall6x6 catalogue groups from the full public database. Same CNN, losses, optimizer and 60000-update budget as the historical spatial baseline; explicit scene-balanced point and rank sampling, and exit plus complete intermediate targets on appended boards. Different states or vehicle names do not count as new catalogues. Fixed old-layout cohorts remain a separate matched evaluation. Training catalogue quotas cover four original puzzle-distance strata equally; deterministic priority sampling spans the full database instead of taking only its hardest prefix. Report vehicle count/orientation/length histograms and the actual sampled source-goal distance distribution."
+}

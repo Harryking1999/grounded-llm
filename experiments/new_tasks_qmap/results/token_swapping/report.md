@@ -19,3 +19,7 @@
 另一棵10顶点树独立训练的开发图完成熟悉关系56/128、未见起点56/128、两端未见52/128，仍有大量循环；所选节点未完整曝光所有准备点关系，不能作为验收通过或接入LLM。弱初始化的原树条件也未通过。随机游走对照按原固定预算继续，运行状态见runtime。
 
 配置见[原图较好权重长程检查](../../configs/token_swapping/token_swapping_best_long_coverage.json)与[新树精确层条件](../../configs/token_swapping/token_swapping_alternate_tree_exact_layers.json)，完整结果及同题初始参照见[开发比较](token_multigoal_long_development.json)。下一步定位已曝光关系中的首次两步环和选模指标与完整执行的分歧，先解决原树，再考虑LLM读取新图。
+
+循环分支数据复用同一精确教师与完整候选评测。冻结较好地图，在训练允许的长程起终点中挖掘实际循环，保留循环两端及相同起点下最优交换集合不同的目标。匹配比较使用相同根关系：控制组回放根关系，分支组补全部合法后继、两层邻域及每条初始分支的精确下降后续。回边仍按真实最短距离标注，不能一律视为错误。
+
+原端点和关系留出继续生效；遇到保护边界就停止该后续的监督扩展，记录中断，保留已接受父节点的全部合法候选。数据不宣称形成全图闭包。原广域距离样本保持不变，两组另加相同数量的局部距离样本；实际回放关系曝光单独计数。数据准备见[配置](../../configs/token_swapping/token_cycle_branches_data.json)，匹配[根关系控制](../../configs/token_swapping/token_cycle_seed_control.json)和[完整分支条件](../../configs/token_swapping/token_cycle_branch_training.json)先检查训练区误差、分支排序与连续完成，未通过不能称为收敛或直接扩大训练。

@@ -9,6 +9,7 @@ import torch
 from torch.nn import functional as F
 from grounded_llm.core.files import atomic_json, atomic_save
 from grounded_llm.core.qmap.model import StateEncoder, soft_rank_loss
+from grounded_llm.core.qmap.exact_graph import edge_costs
 from grounded_llm.core.qmap.sampling import StratifiedEpochSampler, CoverageSampler, GroupCoverageSampler
 from .relation_data import prepare, load, sample_goals, BoardRelationSampler, decision_neighborhood_points, FailureReplaySampler, LocalPathSampler
 from .relation_evaluate import evaluate
@@ -37,11 +38,13 @@ def training_probe(model,corpus,batches,options):
     predictions=cache.scores(pairs[:,0],pairs[:,1]);finite=np.isfinite(truth)
     target=np.where(finite,truth,options['unreachable_target'])
     scores=safe_scores(cache,children,tasks[:,1]);device=next(model.parameters()).device
-    ranking=soft_rank_loss(torch.as_tensor(np.where(valid,1+scores,0),device=device),
-        torch.as_tensor(1+np.where(np.isfinite(child_truth),child_truth,options['unreachable_target']),device=device),
+    costs=edge_costs(corpus,tasks[:,0])
+    ranking=soft_rank_loss(torch.as_tensor(np.where(valid,costs+scores,0),device=device),
+        torch.as_tensor(costs+np.where(np.isfinite(child_truth),child_truth,options['unreachable_target']),device=device),
         torch.as_tensor(valid,device=device),options['rank_temperature'])
     parent=corpus.distance(tasks[:,0],tasks[:,1]);eligible=np.isfinite(parent)&(parent>0)
-    optimal=child_truth[np.arange(len(tasks)),scores.argmin(axis=1)]+1==parent
+    chosen=np.where(valid,costs+scores,np.inf).argmin(axis=1)
+    optimal=(child_truth+costs)[np.arange(len(tasks)),chosen]==parent
     error=np.abs(predictions-target)
     return dict(batches=len(batches),point_count=len(pairs),decision_count=len(tasks),
         finite_mae=float(np.abs(predictions[finite]-truth[finite]).mean()) if finite.any() else None,
@@ -54,6 +57,8 @@ def training_probe(model,corpus,batches,options):
 
 def scope(config,corpus):
     if config['task']=='token_swapping': return corpus.scope
+    if config['task']=='bridge': return dict(people=corpus.scenes[0].env.n,complete_goal=True,weighted=True)
+    if config['task']=='game24': return dict(max_numbers=corpus.scenes[0].env.max_numbers,complete_goal=True,exact_rationals=True)
     return dict(board=[10,10] if config['task']=='sokoban' else [6,6],
                 boxes=4 if config['task']=='sokoban' else None,wall_count=0 if config['task']=='rush_hour' else None,
                 complete_goal=True,shared_across_layouts=True)
@@ -184,9 +189,33 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
     allowed=None
     if options.get('online_goals') and not hasattr(corpus,'scenes'):
         allowed=np.flatnonzero(np.load(out/'data'/'endpoint_partition.npy')==0)
+    edge_bank=None
+    if options.get('action_edge_fraction',0):
+        fraction=options['action_edge_fraction']
+        if not 0<fraction<1 or config['task']=='bridge':raise ValueError('Direct unit-edge quota requires a unit-cost task')
+        from .relation_data import keys
+        if hasattr(corpus,'scenes'):
+            banks=[]
+            for sid,scene in enumerate(corpus.scenes):
+                if scene.metadata['split']!='train':continue
+                parent,slot=np.nonzero(scene.children>=0);child=scene.children[parent,slot]
+                held=scene.goals[scene.metadata['training_goals']:]
+                safe=~np.isin(parent,held)&~np.isin(child,held)
+                banks.append(np.column_stack([parent[safe]+corpus.offsets[sid],child[safe]+corpus.offsets[sid]]))
+            edge_bank=np.concatenate(banks)
+        else:
+            partition=np.load(out/'data'/'endpoint_partition.npy')
+            parent,slot=np.nonzero((partition[:,None]==0)&(partition[corpus.children]==0))
+            edge_bank=np.column_stack([parent,corpus.children[parent,slot]])
+        safe=~np.isin(keys(edge_bank[:,0],edge_bank[:,1],corpus.size),data['reserved_relations'])
+        edge_bank=edge_bank[safe]
+        if not len(edge_bank):raise ValueError('No non-leaking direct physical edges')
+        atomic_json(out/'action_edges.json',dict(count=len(edge_bank),fraction=fraction,label=1,
+            scope='Real directed physical edges on training scenes/endpoints; protected goals and relation closures excluded.'))
     validation=[k[6:] for k in data if k.startswith('tasks_') and (k=='tasks_validation' or k.endswith('_validation'))]
     start_step,best,best_step,prior_seconds=0,float('inf'),0,0.
     probe_batches=[];loss_window=np.zeros(3,dtype=np.float64)
+    token_replay=np.empty((0,2),dtype=np.int64)
     continuation=config.get('continuation');external=False
     checkpoint=(out/'last.pt' if resume and (out/'last.pt').exists() else None)
     if checkpoint is None and continuation:
@@ -200,6 +229,7 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
         rng.bit_generator.state=saved['rng']; pair_sampler.load_state_dict(saved['pair_sampler']); rank_sampler.load_state_dict(saved['rank_sampler'])
         if relation_sampler: relation_sampler.load_coverage_state_dict(saved.get('relation_coverage'))
         probe_batches=saved.get('training_probe_batches',[]);loss_window=saved.get('loss_window',loss_window)
+        token_replay=saved.get('token_cycle_replay',token_replay)
         if neighborhood_fraction: neighborhood_rng.bit_generator.state=saved['neighborhood_rng']
         if replay_sampler:
             if not np.array_equal(saved['replay_tasks'],replay_sampler.tasks) or not np.array_equal(saved['replay_reasons'],replay_sampler.reason):
@@ -257,12 +287,12 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
         feature_cache=torch.as_tensor(np.array(packed),dtype=torch.uint8,device=device)
     elif options.get('features_on_device'):
         width=(corpus.input_dim+7)//8 if packed_features else corpus.input_dim
-        feature_cache=torch.empty((corpus.size,width),dtype=torch.uint8,device=device)
+        feature_cache=torch.empty((corpus.size,width),dtype=torch.float32 if options.get('features_on_device')=='float32' else torch.uint8,device=device)
         for start in range(0,corpus.size,65536):
             stop=min(start+65536,corpus.size); values=corpus.features(np.arange(start,stop))
-            if not ((values==0)|(values==1)).all(): raise ValueError('Lossless bit-feature cache requires binary input')
+            if options.get('features_on_device')!='float32' and not ((values==0)|(values==1)).all(): raise ValueError('Lossless bit-feature cache requires binary input')
             values=np.packbits(values.astype(np.uint8),axis=1,bitorder='little') if packed_features else values
-            feature_cache[start:stop]=torch.as_tensor(values,dtype=torch.uint8,device=device)
+            feature_cache[start:stop]=torch.as_tensor(values,dtype=feature_cache.dtype,device=device)
     feature_seconds=time.monotonic()-feature_started
     convergence=None
     if config.get('convergence'):
@@ -299,6 +329,7 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
             replay_sampler_state=replay_sampler.state_dict() if isinstance(replay_sampler,LocalPathSampler) else None,
             relation_coverage=relation_sampler.coverage_state_dict() if relation_sampler else None,
             training_probe_batches=probe_batches,loss_window=loss_window,
+            token_cycle_replay=token_replay,
             best_score=best,best_step=best_step,
             seconds=prior_seconds+time.monotonic()-started),path)
     step=start_step
@@ -325,18 +356,34 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
                 relation_sampler.point_index,relation_sampler.rank_index,replay_rng)
             children=corpus.successors(tasks[:,0])
         valid=children>=0
+        costs=edge_costs(corpus,tasks[:,0])
         point_target=point_labels[p]
         child_truth=data['child_distances_train'][r]
         if options.get('online_goals') or relation_sampler:
-            extra=dict(local_fraction=options.get('local_goal_fraction',0.),walk_max=options.get('goal_walk_max'))
+            extra=dict(local_fraction=options.get('local_goal_fraction',0.),walk_max=options.get('goal_walk_max'),
+                       distance_bins=options.get('goal_distance_bins'))
             if not relation_sampler:
                 pair=sample_goals(corpus,pair[:,0],rng,data['reserved_relations'],allowed=allowed,fallback=pair[:,1],**extra)
                 tasks=sample_goals(corpus,tasks[:,0],rng,data['reserved_relations'],ranking=True,allowed=allowed,fallback=tasks[:,1],**extra)
+                if len(token_replay):
+                    count=round(len(tasks)*options['token_cycle_replay']['fraction'])
+                    slots=rng.choice(len(tasks),count,replace=False)
+                    tasks=tasks.copy();r=r.copy()
+                    tasks[slots]=token_replay[rng.integers(len(token_replay),size=count)];r[slots]=-1
+                    rank_origin[slots]=5
+                    children=corpus.successors(tasks[:,0]);valid=children>=0
+                    costs=edge_costs(corpus,tasks[:,0])
             point_true=corpus.distance(pair[:,0],pair[:,1])
             point_target=np.where(np.isfinite(point_true),point_true,options['unreachable_target'])
             child_truth=np.full(children.shape,np.inf,dtype=np.float32)
             child_truth[valid]=corpus.distance(children[valid],np.broadcast_to(tasks[:,1,None],children.shape)[valid])
         else: point_true=point_truth[p]
+        if edge_bank is not None:
+            nedge=round(len(pair)*options['action_edge_fraction'])
+            slots=rng.choice(len(pair),nedge,replace=False)
+            pair=pair.copy();p=p.copy();point_true=point_true.copy();point_target=point_target.copy()
+            pair[slots]=edge_bank[rng.integers(len(edge_bank),size=nedge)]
+            p[slots]=-1;point_origin[slots]=4;point_true[slots]=1;point_target[slots]=1
         if len(probe_batches)<options.get('training_probe_batches',0):
             probe_batches.append(dict(pairs=pair.copy(),point_truth=point_true.copy(),tasks=tasks.copy(),
                 children=children.copy(),child_truth=child_truth.copy()))
@@ -346,7 +393,7 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
                 rank_step=np.full(len(tasks),step,dtype=np.int32),tasks=tasks.copy(),children=children.copy(),
                 parent_distance=parent_true,child_distance=child_truth.copy(),
                 point_reachability=np.isfinite(point_true),point_origin=point_origin,rank_origin=rank_origin,rank_replay_index=replay_ids,
-                optimal=valid & (child_truth+1==parent_true[:,None]))
+                optimal=valid & (child_truth+costs==parent_true[:,None]),edge_costs=costs)
             if isinstance(replay_sampler,LocalPathSampler):row.update({key:value.copy() for key,value in replay_sampler.last_annotations.items()})
             trace.append(row)
             if len(trace)>=100: flush_trace()
@@ -371,9 +418,9 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
         mask=torch.as_tensor(valid,device=device)
         scores=torch.zeros(children.shape,device=device)
         goals=goal[:,None].expand(-1,children.shape[1],-1)[mask]
-        scores[mask]=1+model.distance(child,goals)
+        scores[mask]=torch.as_tensor(costs,device=device)[mask]+model.distance(child,goals)
         truth=np.where(np.isfinite(child_truth),child_truth,options['unreachable_target'])
-        ranking=soft_rank_loss(scores,torch.as_tensor(1+truth,device=device),mask,options['rank_temperature'])
+        ranking=soft_rank_loss(scores,torch.as_tensor(costs+truth,device=device),mask,options['rank_temperature'])
         loss=pointwise+options['rank_weight']*ranking
         optimizer.zero_grad(set_to_none=True); loss.backward(); optimizer.step()
         loss_window+=np.array([float(pointwise.detach()),float(ranking.detach()),1.])
@@ -382,6 +429,30 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
         if step==1 or step%options['eval_every']==0 or step==options['steps']:
             planning=bool(convergence or (options.get('rollout_eval_every') and (step%options['rollout_eval_every']==0 or step==options['steps'])))
             values=evaluate(model,corpus,data,config,cohorts=validation,exposure=exposure,planning=planning)
+            if options.get('token_cycle_replay') and step%options['eval_every']==0:
+                if config['task']!='token_swapping':raise ValueError('Permutation-cycle replay requires token swapping')
+                from .relation_evaluate import QCache,rollout
+                from .relation_data import keys
+                settings=options['token_cycle_replay'];candidates=data['tasks_train']
+                queries=candidates[rng.choice(len(candidates),min(len(candidates),settings['queries']),replace=False)]
+                records=[];rollout(corpus,QCache(model,corpus,device),queries,settings['horizon'],'q',records)
+                repeated=set();previous={};mined=[]
+                for edge in records:
+                    for j,q in enumerate(edge['query_index']):
+                        row=(int(edge['source'][j]),int(edge['goal'][j]))
+                        target=int(edge['children'][j,edge['choice'][j]])
+                        if int(q) in previous and target==previous[int(q)][0]:
+                            repeated.add(int(q));mined.extend([previous[int(q)],row])
+                        previous[int(q)]=row
+                rows=np.unique(np.concatenate([token_replay,np.asarray(mined,dtype=np.int64).reshape(-1,2)]),axis=0)
+                if len(rows):
+                    partition=np.load(out/'data'/'endpoint_partition.npy');kids=corpus.successors(rows[:,0])
+                    safe=(partition[rows]==0).all(axis=1)&(partition[kids]==0).all(axis=1)
+                    safe&=~np.isin(keys(rows[:,0],rows[:,1],corpus.size),data['reserved_relations'])
+                    safe&=~np.isin(keys(kids,rows[:,1,None],corpus.size),data['reserved_relations']).any(axis=1)
+                    token_replay=rows[safe]
+                atomic_json(out/'token_cycle_replay.json',dict(step=step,relations=len(token_replay),
+                    queries=len(queries),cycling_queries=len(repeated),scope='Full candidate decisions from training-only cyclic trajectories; all endpoint and relationship exclusions retained.'))
             objective=float(np.mean([row['finite_huber']+row['candidate_soft_rank_loss'] for row in values['cohorts'].values()]))
             covered=bool((pair_draws>0).all())
             relation_options=config.get('relations',{})
@@ -455,6 +526,16 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
             rates=rates,full_training_source_coverage=coverage,
             passed=coverage and all(rate is not None and rate>=criteria['minimum_completion_rate'] for rate in rates.values()),
             target_reached=coverage and all(rate is not None and rate>=criteria['target_completion_rate'] for rate in rates.values()))
+    if config['task']=='game24':
+        exact_exposure={}
+        for sid,scene in enumerate(corpus.scenes):
+            counts=saved['exposure'][corpus.offsets[sid]:corpus.offsets[sid+1]]
+            for state,count in zip(scene.values,counts):
+                if count:
+                    key=','.join(map(str,state));exact_exposure[key]=exact_exposure.get(key,0)+int(count)
+        atomic_json(out/'exact_rational_exposure.json',dict(checkpoint=final_checkpoint,counts=exact_exposure,
+            semantics='Loss-input occurrences aggregated by sorted reduced rational multiset across questions; not proven nonzero gradients.'))
+        summary['exact_rational_exposure']=dict(unique_states=len(exact_exposure),file='exact_rational_exposure.json')
     atomic_json(out/'summary.json',summary)
     print(json.dumps(dict(complete=str(out),best_step=saved['step'])),flush=True)
 

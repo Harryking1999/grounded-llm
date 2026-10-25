@@ -36,13 +36,16 @@ def enumerate_component(env, start, bound):
     return states, index, packed
 
 
-def save_scene(path, states, children, goal_ids, metadata, symmetric=False, distances=None, reverse=None):
+def save_scene(path, states, children, goal_ids, metadata, symmetric=False, distances=None, reverse=None,
+               costs=None, state_dtype=np.uint8):
     path = Path(path)
     path.mkdir(parents=True, exist_ok=False)
-    np.save(path/'states.npy', np.asarray(states, dtype=np.uint8))
+    np.save(path/'states.npy', np.asarray(states, dtype=state_dtype))
     np.save(path/'children.npy', children)
+    if costs is not None: np.save(path/'costs.npy', costs)
     np.save(path/'goal_ids.npy', np.asarray(goal_ids, dtype=np.int32))
     if distances is None:
+        if costs is not None:raise ValueError('Weighted scenes require exact weighted distance tables')
         oracle = UnitGraphOracle(children)
         distances = np.stack([oracle.to_goal(g) for g in goal_ids])
         reverse = distances if symmetric else np.stack([oracle.from_goal(g) for g in goal_ids])
@@ -62,6 +65,7 @@ class PhysicalScene:
         self.metadata = json.loads((self.path/'scene.json').read_text(encoding='utf-8'))
         self.states = np.load(self.path/'states.npy', mmap_mode='r')
         self.children = np.load(self.path/'children.npy', mmap_mode='r')
+        self.costs = np.load(self.path/'costs.npy', mmap_mode='r') if (self.path/'costs.npy').exists() else None
         self.goals = np.load(self.path/'goal_ids.npy')
         self.distances = np.load(self.path/'distances.npy', mmap_mode='r')
         self.reverse_distances = np.load(self.path/'reverse_distances.npy', mmap_mode='r')
@@ -127,6 +131,17 @@ class PhysicalCorpus:
             s, g = source[mask]-self.offsets[scene_id], goal[mask]-self.offsets[scene_id]
             method = self.scenes[scene_id].reverse if reverse else self.scenes[scene_id].distance
             result[mask] = method(s, g)
+        return result
+
+    def edge_costs(self, ids):
+        ids=np.asarray(ids,dtype=np.int64)
+        result=np.ones((*ids.shape,self.max_candidates),dtype=np.float32)
+        scene_ids=self.locate(ids)
+        for sid in np.unique(scene_ids):
+            scene=self.scenes[sid]
+            if getattr(scene,'costs',None) is not None:
+                mask=scene_ids==sid
+                result[mask,:scene.children.shape[1]]=scene.costs[ids[mask]-self.offsets[sid]]
         return result
 
     def baseline(self, source, goal):

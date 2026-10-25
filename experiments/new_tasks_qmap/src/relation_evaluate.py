@@ -3,6 +3,7 @@ import numpy as np
 import torch
 from grounded_llm.core.qmap.metrics import correlation, encode, average_ranks
 from grounded_llm.core.qmap.model import soft_rank_loss
+from grounded_llm.core.qmap.exact_graph import edge_costs
 
 
 def distance_strata(values):
@@ -90,11 +91,12 @@ def coordinate_statistics(source,goal,truth,predictions,cap,activation):
         all=describe(np.ones(len(truth),dtype=bool)),by_true_distance=bins)
 
 
-def unit_cost_consistency(parent,children,optimal,valid):
+def unit_cost_consistency(parent,children,optimal,valid,costs=None):
     """Frozen distance-field diagnosis; never changes a candidate or its score."""
     children=np.where(valid,children,np.inf)
-    chosen=children.argmin(axis=1); index=np.arange(len(parent))
-    drop=parent-children[index,chosen]; residual=drop-1
+    costs=np.ones(children.shape,dtype=np.float32) if costs is None else costs
+    chosen=(children+costs).argmin(axis=1); index=np.arange(len(parent))
+    drop=parent-children[index,chosen]; residual=drop-costs[index,chosen]
     optimal=optimal & valid
     teacher_drop=np.broadcast_to(parent[:,None],children.shape)[optimal]-children[optimal]
     selected_optimal=optimal[index,chosen]
@@ -107,6 +109,7 @@ def unit_cost_consistency(parent,children,optimal,valid):
         chosen_true_optimal_but_non_descent_count=int((selected_optimal & (drop<=1e-6)).sum()),
         teacher_optimal_edge_count=int(optimal.sum()),
         teacher_optimal_drop_mae_to_one=float(np.abs(teacher_drop-1).mean()) if len(teacher_drop) else None,
+        teacher_optimal_drop_mae_to_edge_cost=float(np.abs(teacher_drop-costs[optimal]).mean()) if len(teacher_drop) else None,
         teacher_optimal_non_descent_rate=float((teacher_drop<=1e-6).mean()) if len(teacher_drop) else None,
         teacher_optimal_predicted_drop_quantiles={str(q):float(np.quantile(teacher_drop,q)) for q in (0,.1,.5,.9,1)} if len(teacher_drop) else {},
         note='Reference decisions, not whole trajectories. Unit-cost teacher-optimal edges should have a true remaining-distance drop of1. Candidate order can be correct even when the parent-to-child predicted drop is wrong. No oracle is used to change model action selection.')
@@ -117,9 +120,11 @@ def rollout(corpus,cache,rows,horizon,policy,edge_records=None):
     exact=corpus.distance(current,goal)
     if not np.isfinite(exact).all(): raise ValueError('Rollout starts must have exact finite labels')
     steps=np.zeros(len(rows),dtype=int); active=current!=goal
+    total_cost=np.zeros(len(rows),dtype=np.float32)
+    first_cycle=np.full(len(rows),-1,dtype=int); first_dead=first_cycle.copy()
     seen=[{int(s)} for s in current]; cycles=np.zeros(len(rows),bool); dead=np.zeros(len(rows),bool)
     no_action=np.zeros(len(rows),bool); traces=[[] for _ in rows]
-    descent=[[] for _ in rows]; progress_counts=dict(executed_edges=0,predicted_decrease=0,predicted_plateau=0,
+    descent=[[] for _ in rows]; descent_costs=[[] for _ in rows]; progress_counts=dict(executed_edges=0,predicted_decrease=0,predicted_plateau=0,
         predicted_increase=0,true_finite_edges=0,true_optimal_edges=0,predicted_decrease_but_not_true_optimal=0,
         entered_dead_edges=0,non_goal_predicted_zero=0)
     progress_layers={name:dict(executed_edges=0,true_optimal_edges=0,predicted_decrease=0,entered_dead_edges=0)
@@ -132,6 +137,7 @@ def rollout(corpus,cache,rows,horizon,policy,edge_records=None):
         no_action[ids[empty]]=True; active[ids[empty]]=False
         ids=ids[~empty]; children=children[~empty]; valid=valid[~empty]
         if not len(ids): continue
+        costs=edge_costs(corpus,current[ids])
         if policy=='q': scores=safe_scores(cache,children,goal[ids])
         else:
             scores=np.full(children.shape,np.inf)
@@ -139,15 +145,19 @@ def rollout(corpus,cache,rows,horizon,policy,edge_records=None):
             scores[valid]=(corpus.distance(children[valid],targets) if policy=='oracle'
                            else corpus.baseline(children[valid],targets) if policy=='heuristic'
                            else np.zeros(valid.sum()))
-        choices=np.argmin(1+scores,axis=1)
+        choices=np.argmin(costs+scores,axis=1)
+        selected_cost=costs[np.arange(len(ids)),choices]
         next_states=children[np.arange(len(ids)),choices]
         # Oracle inspection occurs AFTER action selection and cannot prune/stop Q.
         after_truth=corpus.distance(next_states,goal[ids])
         dead[ids]|=~np.isfinite(after_truth)
-        if policy=='q':
-            before=cache.scores(current[ids],goal[ids]); drop=before-scores[np.arange(len(ids)),choices]
+        first_dead[ids[(first_dead[ids]<0)&~np.isfinite(after_truth)]]=steps[ids[(first_dead[ids]<0)&~np.isfinite(after_truth)]]+1
+        if policy in ('q','oracle'):
+            predicted_children=scores if policy=='q' else safe_scores(cache,children,goal[ids])
+            before=cache.scores(current[ids],goal[ids]); drop=before-predicted_children[np.arange(len(ids)),choices]
+            for j,c in zip(ids,selected_cost):descent_costs[j].append(float(c))
             before_truth=corpus.distance(current[ids],goal[ids]); finite=np.isfinite(before_truth)&np.isfinite(after_truth)
-            optimal=finite & (before_truth==1+after_truth); decreasing=drop>1e-6
+            optimal=finite & (before_truth==selected_cost+after_truth); decreasing=drop>1e-6
             progress_counts['executed_edges']+=len(ids)
             progress_counts['predicted_decrease']+=int(decreasing.sum())
             progress_counts['predicted_plateau']+=int((np.abs(drop)<=1e-6).sum())
@@ -168,32 +178,33 @@ def rollout(corpus,cache,rows,horizon,policy,edge_records=None):
                 child_truth[valid]=corpus.distance(children[valid],np.broadcast_to(goal[ids,None],children.shape)[valid])
                 edge_records.append(dict(query_index=ids.copy(),step=steps[ids].copy(),
                     source=current[ids].copy(),goal=goal[ids].copy(),children=children.copy(),choice=choices.copy(),
-                    parent_prediction=before.copy(),child_predictions=scores.copy(),
+                    parent_prediction=before.copy(),child_predictions=predicted_children.copy(),
                     parent_distance=before_truth.copy(),child_distances=child_truth,
                     next_is_goal=next_states==goal[ids],
                     next_repeated=np.asarray([int(s) in seen[j] for j,s in zip(ids,next_states)])))
         for j,slot in zip(ids,choices): traces[j].append(corpus.action(int(current[j]),int(slot)))
-        current[ids]=next_states; steps[ids]+=1
+        current[ids]=next_states; steps[ids]+=1; total_cost[ids]+=selected_cost
         for j in ids:
             if current[j]==goal[j]: active[j]=False
-            elif int(current[j]) in seen[j]: cycles[j]=True; active[j]=False
+            elif int(current[j]) in seen[j]: cycles[j]=True; first_cycle[j]=steps[j]; active[j]=False
             else: seen[j].add(int(current[j]))
-    solved=current==goal; optimum=solved & (steps==exact)
+    solved=current==goal; optimum=solved & (total_cost==exact)
     examples=[]
     for status in (True,False):
         for i in np.flatnonzero(solved==status)[:2]:
             examples.append(dict(start=corpus.describe(int(rows[i,0])),goal=corpus.describe(int(goal[i])),
                                  end=corpus.describe(int(current[i])),solved=bool(solved[i]),
-                                 optimum=float(exact[i]),cost=int(steps[i]),cycle=bool(cycles[i]),
+                                 optimum=float(exact[i]),cost=float(total_cost[i]),steps=int(steps[i]),cycle=bool(cycles[i]),
+                                 first_cycle_step=int(first_cycle[i]),first_unreachable_step=int(first_dead[i]),
                                  entered_unreachable=bool(dead[i]),actions=traces[i],
-                                 predicted_distance_drops=descent[i] if policy=='q' else None))
+                                 predicted_distance_drops=descent[i] if policy in ('q','oracle') else None))
     per_scene={}
     if hasattr(corpus,'scenes'):
         scene_ids=corpus.locate(rows[:,0])
         per_scene={str(sid):dict(count=int((scene_ids==sid).sum()),solved=int(solved[scene_ids==sid].sum()),
                     success_rate=float(solved[scene_ids==sid].mean())) for sid in np.unique(scene_ids)}
     progress=None
-    if policy=='q':
+    if policy in ('q','oracle'):
         drops=np.asarray([d for path in descent for d in path])
         all_down=np.asarray([all(d>1e-6 for d in path) for path in descent])
         progress=dict(counts=progress_counts,strict_descent_trajectory_count=int(all_down.sum()),
@@ -201,17 +212,21 @@ def rollout(corpus,cache,rows,horizon,policy,edge_records=None):
             non_descent_trajectory_count=int((~all_down).sum()),
             predicted_drop_quantiles={str(q):float(np.quantile(drops,q)) for q in (0,.1,.5,.9,1)} if len(drops) else {},
             mean_abs_unit_descent_residual=float(np.abs(drops-1).mean()) if len(drops) else None,
+            mean_abs_cost_descent_residual=float(np.abs(drops-np.asarray([c for path in descent_costs for c in path])).mean()) if len(drops) else None,
             executed_edge_optimal_rate=progress_counts['true_optimal_edges']/len(drops) if len(drops) else None,
             predicted_strict_descent_edge_rate=progress_counts['predicted_decrease']/len(drops) if len(drops) else None,
             executed_edges_by_true_distance=progress_layers,
-            note='Observed policy trajectories only, after action selection. A nondecreasing chosen edge also means no legal successor has a strictly lower predicted distance under this greedy policy. Strict predicted descent alone does not prove goal completion or true optimality; full rollouts remain the acceptance metric.')
+            note=('Q predictions along exact teacher paths; teacher actions are a diagnostic and never used by the autonomous Q policy.' if policy=='oracle' else
+                  'Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric.'))
     return dict(count=len(rows),unique_state_goal_pairs=len(np.unique(rows,axis=0)),
                 solved=int(solved.sum()),success_rate=float(solved.mean()) if len(rows) else None,
                 optimal=int(optimum.sum()),optimal_rate=float(optimum.mean()) if len(rows) else None,cycles=int(cycles.sum()),
                 entered_unreachable=int(dead.sum()),no_legal_action=int(no_action.sum()),
                 budget_exhausted=int(active.sum()),horizon=horizon,illegal_actions=0,
-                mean_excess_cost_on_success=float((steps[solved]-exact[solved]).mean()) if solved.any() else None,
-                mean_cost_ratio_on_success=float((steps[solved]/np.maximum(exact[solved],1)).mean()) if solved.any() else None,
+                mean_excess_cost_on_success=float((total_cost[solved]-exact[solved]).mean()) if solved.any() else None,
+                mean_cost_ratio_on_success=float((total_cost[solved]/np.maximum(exact[solved],1)).mean()) if solved.any() else None,
+                first_cycle_step_counts={str(s):int((first_cycle==s).sum()) for s in np.unique(first_cycle[first_cycle>=0])},
+                first_unreachable_step_counts={str(s):int((first_dead==s).sum()) for s in np.unique(first_dead[first_dead>=0])},
                 by_distance={str(d):dict(count=int((exact==d).sum()),solved=int(solved[exact==d].sum()),optimal=int(optimum[exact==d].sum())) for d in np.unique(exact)},
                 by_scene=per_scene,examples=examples,predicted_progress=progress)
 
@@ -278,18 +293,20 @@ def evaluate(model,corpus,data,config,cohorts=None,exposure=None,planning=True,t
         if len(ids)>config['evaluation']['decision_count']:
             from .relation_data import balanced
             ids=balanced(ids[:,None],config['evaluation']['decision_count'],truth[ids],np.random.default_rng(config['seed']+len(name))).ravel()
-        chosen=scores[ids].argmin(axis=1)
+        costs=edge_costs(corpus,rows[:,0])
+        combined=scores+costs
+        chosen=combined[ids].argmin(axis=1)
         optimal=data['optimal_'+name][ids]
-        order=np.argsort(scores[ids],axis=1,kind='stable')
-        actual=child_truth[ids]; ordered=(actual[:,:,None]<actual[:,None,:]) & valid[ids,:,None] & valid[ids,None,:]
-        strict=(scores[ids,:,None]<scores[ids,None,:]-1e-7)
+        order=np.argsort(combined[ids],axis=1,kind='stable')
+        actual=child_truth[ids]+costs[ids]; ordered=(actual[:,:,None]<actual[:,None,:]) & valid[ids,:,None] & valid[ids,None,:]
+        strict=(combined[ids,:,None]<combined[ids,None,:]-1e-7)
         reverse=cache.scores(rows[:,1],rows[:,0]); reverse_truth=corpus.distance(rows[:,0],rows[:,1],reverse=True)
         rank_loss=None
         if len(ids):
             device=next(model.parameters()).device
             target=np.where(np.isfinite(child_truth[ids]),child_truth[ids],config['training']['unreachable_target'])
-            rank_loss=float(soft_rank_loss(torch.as_tensor(np.where(valid[ids],1+scores[ids],0),device=device),
-                torch.as_tensor(1+target,device=device),torch.as_tensor(valid[ids],device=device),config['training']['rank_temperature']))
+            rank_loss=float(soft_rank_loss(torch.as_tensor(np.where(valid[ids],combined[ids],0),device=device),
+                torch.as_tensor(costs[ids]+target,device=device),torch.as_tensor(valid[ids],device=device),config['training']['rank_temperature']))
         result=dict(count=len(rows),finite_count=int(finite.sum()),finite_mae=float(error.mean()),
                     finite_huber=float(np.where(error<1,.5*error**2,error-.5).mean()),
                     finite_bias=float(signed.mean()),spearman=correlation(pred[finite],truth[finite]),
@@ -301,7 +318,7 @@ def evaluate(model,corpus,data,config,cohorts=None,exposure=None,planning=True,t
                     strict_candidate_order_accuracy=float(strict[ordered].mean()) if ordered.any() else None,
                     dead_end_choice_rate=float((~np.isfinite(actual[np.arange(len(ids)),chosen])).mean()) if len(ids) else None,
                     candidate_soft_rank_loss=rank_loss,
-                    bellman=unit_cost_consistency(pred[ids],scores[ids],optimal,valid[ids]),
+                    bellman=unit_cost_consistency(pred[ids],scores[ids],optimal,valid[ids],costs[ids]),
                     directionality=dict(predicted_mean_absolute_asymmetry=float(np.abs(pred-reverse).mean()),
                         both_reachable=int((finite & np.isfinite(reverse_truth)).sum()),
                         forward_only=int((finite & ~np.isfinite(reverse_truth)).sum()),
@@ -315,7 +332,7 @@ def evaluate(model,corpus,data,config,cohorts=None,exposure=None,planning=True,t
             result['solution_paths']=path_metrics(cache,corpus,data['solution_paths_'+name])
         result['bellman']['by_true_distance']={name:dict(count=int(mask.sum()),
             shortest_action_rate=float(optimal[mask,chosen[mask]].mean()),
-            **unit_cost_consistency(pred[ids][mask],scores[ids][mask],optimal[mask],valid[ids][mask]))
+            **unit_cost_consistency(pred[ids][mask],scores[ids][mask],optimal[mask],valid[ids][mask],costs[ids][mask]))
             for name,mask in distance_strata(truth[ids]) if mask.any()}
         if exposure is not None:
             seen_source=exposure[rows[:,0]]>0; seen_goal=exposure[rows[:,1]]>0

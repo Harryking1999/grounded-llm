@@ -40,21 +40,29 @@ class Bridge:
         return np.asarray([[*self.times, *[(s // 2 >> p) & 1 for p in range(self.n)], s % 2]
                            for s in states], dtype=np.float32)
 
-    def graph(self):
+    def validate(self, state):
+        if type(state) is not int or not 0 <= state < 2**(self.n+1):
+            raise ValueError('Invalid personnel mask or torch bank')
+
+    def graph(self, goal=None):
+        goal=self.goal if goal is None else goal
+        self.validate(goal)
         states = list(range(2 ** (self.n + 1)))
         children = np.full((len(states), len(self.actions)), -1, dtype=np.int32)
         costs = np.zeros_like(children, dtype=np.float32)
         for s in states:
             for a, t, c in self.transitions(s):
                 children[s, a], costs[s, a] = t, c
-        terminal = np.asarray(states) == self.goal
+        terminal = np.asarray(states) == goal
         return dict(features=self.features(states), children=children, costs=costs,
                     baseline=np.asarray([max([self.times[p] for p in range(self.n) if not ((s // 2 >> p) & 1)] or [0]) for s in states], dtype=np.float32),
                     distances=goal_distances(children, costs, terminal), terminal=terminal,
-                    goal_features=self.features([self.goal])[0], starts=np.array([0]),
+                    goal_features=self.features([goal])[0], starts=np.array([0]),
                     metadata={"times": self.times, "actions": self.actions})
 
-    def judge(self, actions, start=0):
+    def judge(self, actions, start=0, goal=None):
+        goal=self.goal if goal is None else goal
+        self.validate(start); self.validate(goal)
         state, total = start, 0
         for action in actions:
             choices = {self.actions[a]: (t, c) for a, t, c in self.transitions(state)}
@@ -63,6 +71,6 @@ class Bridge:
                 return {"success": False, "reason": "illegal_action", "cost": total}
             state, cost = choices[key]
             total += cost
-        optimum = float(self.graph()["distances"][start])
-        return {"success": state == self.goal, "cost": total,
-                "optimal": state == self.goal and total == optimum}
+        optimum = float(self.graph(goal)["distances"][start])
+        return {"success": state == goal, "cost": total,
+                "optimal": state == goal and total == optimum}

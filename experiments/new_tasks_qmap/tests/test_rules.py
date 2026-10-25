@@ -69,5 +69,38 @@ class RulesTest(unittest.TestCase):
         env = Game24()
         self.assertEqual(env.canonical([Fraction(1, 3), Fraction(2, 6)]), (Fraction(1, 3),) * 2)
 
+    def test_bridge_all_goals_against_floyd_and_intermediate_stop(self):
+        env=Bridge([1,2,5,10]);graph=env.graph();n=len(graph['children'])
+        exact=np.full((n,n),np.inf);np.fill_diagonal(exact,0)
+        for s in range(n):
+            for _,t,c in env.transitions(s):exact[s,t]=min(exact[s,t],c)
+        for k in range(n):exact=np.minimum(exact,exact[:,k,None]+exact[None,k,:])
+        for goal in range(n):np.testing.assert_array_equal(env.graph(goal)['distances'],exact[:,goal])
+        target,cost=env.apply(0,[0,1])
+        self.assertTrue(env.judge([[0,1]],goal=target)['optimal'])
+        self.assertTrue(env.judge([],start=target,goal=target)['optimal'])
+
+    def test_game24_intermediate_targets_and_variable_capacity(self):
+        env=Game24();start=env.canonical([1,2,3,4]);action,goal,_=next(env.transitions(start))
+        self.assertTrue(env.judge(start,[env.actions[action]],goal=goal)['success'])
+        self.assertTrue(env.judge(goal,[],goal=goal)['success'])
+        self.assertFalse(env.judge(start,[],goal=goal)['success'])
+        five=Game24(5);state=five.canonical([1,2,3,4,5])
+        self.assertEqual(five.features([state]).shape,(1,20))
+        self.assertTrue(any(five.actions[a][2]==4 for a,_,_ in five.transitions(state)))
+
+    def test_geometry_encoding_preserves_component_identity_under_renaming(self):
+        from grounded_llm.tasks.rush_hour.environment import RushHour
+        from grounded_llm.core.qmap.physical_data import enumerate_component
+        board='..B...'+ '..B.C.'+'AAB.C.'+'....C.'+'......'+'......'
+        renamed=board.translate(str.maketrans({'B':'Z','C':'D'}))
+        original=RushHour(board,'geometry_order');other=RushHour(renamed,'geometry_order')
+        states,_,_=enumerate_component(original,original.start,10000)
+        inverse=str.maketrans({'Z':'B','D':'C'})
+        mapped=[tuple(s[original.labels[label.translate(inverse)]]
+                      for label,_,_,_ in other.pieces) for s in states]
+        np.testing.assert_array_equal(original.features(states),other.features(mapped))
+        self.assertTrue(all(original.geometry_channels[0]==0 for _ in states))
+
 
 if __name__ == '__main__': unittest.main()

@@ -1,0 +1,59 @@
+{
+  "task": "token_swapping",
+  "seed": 2026102304,
+  "data": {
+    "tree": "tasks/token_swapping/data/tree10.json"
+  },
+  "model": {
+    "dimension": 128,
+    "hidden": 256,
+    "cap": 64,
+    "metric": "linf"
+  },
+  "training": {
+    "steps": 12000,
+    "batch_size": 2048,
+    "decision_batch_size": 512,
+    "learning_rate": 0.001,
+    "rank_weight": 4.0,
+    "rank_temperature": 1.0,
+    "eval_every": 2000,
+    "cpu_threads": 4,
+    "unreachable_target": 60.0,
+    "features_on_device": true,
+    "broad_fraction": 0.5,
+    "online_goals": true,
+    "record_training_samples": true,
+    "initialize_from": "../token_reference/best.pt",
+    "local_goal_fraction": 0.75,
+    "goal_walk_max": 50,
+    "rollout_eval_every": 6000,
+    "goal_distance_bins": [
+      5,
+      10,
+      20,
+      64
+    ],
+    "action_edge_fraction": 0.25,
+    "token_cycle_replay": {
+      "fraction": 0.125,
+      "queries": 128,
+      "horizon": 128
+    }
+  },
+  "relations": {
+    "endpoint_holdout_fraction": 0.075,
+    "evaluation_count": 2048,
+    "complete_training_sources": true
+  },
+  "evaluation": {
+    "decision_count": 512,
+    "rollout_count": 128,
+    "horizon": 128,
+    "landmarks": 128
+  },
+  "schema": "exact_state_pairs",
+  "selection": "Lowest validation finite Huber plus candidate soft-rank CE, equally averaging predeclared validation cohorts; no test checkpoint selection.",
+  "scope": "Independent Q(S), Q(G); exact complete goals only; no oracle in inference features, no pruning, no search, no LLM retraining.",
+  "hypothesis": "Fixed-tree long-range development: exact distance-layer proposals, full candidate decisions, direct physical edges, and training-only two-step-cycle replay. Original baseline weights with a fresh optimizer; no claim of single-factor attribution."
+}

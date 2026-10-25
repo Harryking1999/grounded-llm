@@ -147,10 +147,27 @@ def build(config, out):
         if len(goals)<expected:
             rejected.append(dict(id=identity,reason='insufficient_exact_reachable_goal_coverage',goals=len(goals)))
             continue
+        ordinary=spec.get('intermediate_goals_per_scene',0)
+        extra_held=spec.get('heldout_intermediate_goals',0)
+        if ordinary:
+            candidates=goal_rng.permutation(len(packed))
+            extras=[];extra_labels=[]
+            for goal in candidates:
+                if np.array_equal(packed[goal,1:],sorted(env.goals)):continue
+                values=oracle.to_goal(int(goal))
+                if np.isfinite(values).sum()<spec.get('minimum_intermediate_basin',32):continue
+                if values[np.isfinite(values)].max()>=config['training']['unreachable_target']:continue
+                extras.append(int(goal));extra_labels.append(values)
+                if len(extras)==ordinary:break
+            if len(extras)!=ordinary:raise ValueError(('Insufficient ordinary target basins',identity,len(extras)))
+            held=spec['heldout_goals'];cut=ordinary-extra_held
+            goals=goals[:-held]+extras[:cut]+goals[-held:]+extras[cut:]
+            labels=labels[:-held]+extra_labels[:cut]+labels[-held:]+extra_labels[cut:]
         metadata = dict(task='sokoban', split=split, wall_group=key,
                         source=dict(commit=spec['source_commit'], file=relative, puzzle_id=identity),
                         initial_board=board, original_state=state_id(env.start),
-                        training_goals=len(goals)-spec['heldout_goals'], symmetric=False)
+                        training_goals=len(goals)-spec['heldout_goals']-extra_held, symmetric=False,
+                        intermediate_goals=ordinary)
         if split=='diagnostic': metadata['diagnostic_goal']=goals[0]
         record = save_scene(out/f'scene_{sid:03d}', packed, children, goals, metadata,
                             distances=np.stack(labels),reverse=np.stack([oracle.from_goal(g) for g in goals]))

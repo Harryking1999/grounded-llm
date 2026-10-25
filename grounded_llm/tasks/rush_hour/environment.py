@@ -5,7 +5,7 @@ import numpy as np
 
 class RushHour:
     def __init__(self, board, feature_encoding='identity'):
-        if feature_encoding not in ('identity','lane_order'): raise ValueError('Expected identity or lane_order vehicle features')
+        if feature_encoding not in ('identity','lane_order','geometry_order'): raise ValueError('Unsupported vehicle features')
         self.feature_encoding=feature_encoding
         if len(board) != 36 or any(c not in 'ox.ABCDEFGHIJKLMNOPQRSTUVWXYZ' for c in board):
             raise ValueError('Expected a 36-cell Rush Hour board')
@@ -25,6 +25,9 @@ class RushHour:
             raise ValueError('A must be the horizontal length-two target car')
         self.labels = {piece[0]: i for i, piece in enumerate(self.pieces)}
         self.start = tuple(starts)
+        ordinary=sorted(range(1,len(self.pieces)),key=lambda i:(self.pieces[i][1:4],self.start[i]))
+        self.geometry_channels=np.empty(len(self.pieces),dtype=np.int64)
+        self.geometry_channels[[0,*ordinary]]=np.arange(len(self.pieces))
 
     def occupancy(self, state):
         occupied = self.walls
@@ -47,7 +50,7 @@ class RushHour:
     def features(self, states, encoding=None):
         """Separate vehicle channels; lane_order preserves identity within a component."""
         encoding=self.feature_encoding if encoding is None else encoding
-        if encoding not in ('identity','lane_order'): raise ValueError('Unsupported vehicle feature encoding')
+        if encoding not in ('identity','lane_order','geometry_order'): raise ValueError('Unsupported vehicle feature encoding')
         out = np.zeros((len(states), 26, 36), dtype=np.float32)
         if len(states):
             positions=np.asarray(states,dtype=np.int64)
@@ -62,7 +65,8 @@ class RushHour:
             for i,(label,horizontal,size,lane) in enumerate(self.pieces):
                 axis=positions[:,i,None]+np.arange(size)[None,:]
                 cells=lane*6+axis if horizontal else axis*6+lane
-                channel=ord(label)-ord('A') if encoding=='identity' else channels[:,i,None]
+                channel=(ord(label)-ord('A') if encoding=='identity' else
+                         self.geometry_channels[i] if encoding=='geometry_order' else channels[:,i,None])
                 out[np.arange(len(states))[:,None],channel,cells]=1
         return out.reshape(len(states), -1)
 

@@ -1,0 +1,77 @@
+{
+  "task": "sokoban",
+  "seed": 2026102502,
+  "data": {
+    "source_url": "https://raw.githubusercontent.com/google-deepmind/boxoban-levels/78011d8c86ad423bfb2e1005012393b4c3c24409/hard/000.txt",
+    "source_commit": "78011d8c86ad423bfb2e1005012393b4c3c24409",
+    "source_cache": "tmp/new_tasks_harder_sources",
+    "max_states": 100000,
+    "minimum_reachable_per_goal": 1,
+    "scenes": {
+      "train": 4,
+      "validation": 2,
+      "test": 2
+    },
+    "goals_per_scene": "all",
+    "training_goals": "all_except_heldout",
+    "diagnostic_goals": {},
+    "heldout_goals": 2,
+    "split_fractions": [
+      0.7,
+      0.15,
+      0.15
+    ],
+    "source_files": [
+      "hard/000.txt",
+      "hard/001.txt",
+      "hard/002.txt",
+      "hard/003.txt"
+    ],
+    "intermediate_goals_per_scene": 12,
+    "heldout_intermediate_goals": 4,
+    "minimum_intermediate_basin": 32,
+    "prepared_from": "../sokoban_multigoal_control/data"
+  },
+  "model": {
+    "dimension": 128,
+    "hidden": 256,
+    "cap": 256,
+    "metric": "directed_max"
+  },
+  "training": {
+    "steps": 12000,
+    "batch_size": 2048,
+    "decision_batch_size": 512,
+    "learning_rate": 0.001,
+    "rank_weight": 1.0,
+    "rank_temperature": 1.0,
+    "eval_every": 2000,
+    "cpu_threads": 4,
+    "unreachable_target": 240.0,
+    "features_on_device": "packed_bits",
+    "broad_fraction": 0.5,
+    "online_goals": true,
+    "record_training_samples": true,
+    "rollout_eval_every": 6000,
+    "validation_only_initial": true,
+    "training_probe_batches": 4,
+    "action_edge_fraction": 0.25
+  },
+  "relations": {
+    "holdout_per_goal": 2,
+    "evaluation_per_goal": 32,
+    "unreachable_eval_per_goal": 24,
+    "complete_training_sources": true,
+    "evaluation_training_goals": 8
+  },
+  "evaluation": {
+    "decision_count": 512,
+    "rollout_count": 128,
+    "horizon": 128,
+    "landmarks": 128
+  },
+  "schema": "exact_state_pairs",
+  "selection": "Lowest validation finite Huber plus candidate soft-rank CE, equally averaging predeclared validation cohorts; no test checkpoint selection.",
+  "scope": "Independent Q(S), Q(G); exact complete goals only; no oracle in inference features, no pruning, no search, no LLM retraining.",
+  "hypothesis": "Replace 25 percent of point examples by exact real directed action edges; same multi-goal data and all candidates as control."
+}

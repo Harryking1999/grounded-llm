@@ -1,6 +1,6 @@
 # 新任务 Qmap：完整目标实验与固定目标试验
 
-推箱子、移车出库、棋子交换使用完整目标训练入口；手电过桥与24点已有固定目标试验入口。五类均已纳入下一阶段任务池。后续扩展普通中间目标与多起终点关系，方案见[Qmap方法](../../tasks/QMAP_METHOD.md#任务扩展与训练安排)。各任务独立训练，复用公共Q编码器、距离、排序与采样。地图能力与证据从[总报告](results/report.md)进入，扩任务安排见[项目状态](../../docs/PROJECT_STATUS_AND_TODO.md)。
+五类任务均可使用完整目标训练入口，原手电过桥与24点的固定目标入口保留复现。普通中间目标与多起终点关系的实施设计见[Qmap方法](../../tasks/QMAP_METHOD.md#任务扩展与训练安排)。各任务独立训练，复用公共Q编码器、距离、排序与采样。地图能力与证据从[总报告](results/report.md)进入，扩任务安排见[项目状态](../../docs/PROJECT_STATUS_AND_TODO.md)。
 
 ## 按任务进入
 
@@ -11,6 +11,18 @@
 | 棋子交换 | [任务入口](../../tasks/token_swapping/README.md) | [配置目录](configs/token_swapping/)、[近距离与排序方案](configs/token_swapping/token_swapping_local_walk8_rank4_pairs.json) | [棋子交换报告](results/token_swapping/report.md) |
 | 手电过桥 | [任务入口](../../tasks/bridge/README.md) | [固定目标配置](configs/pilot/bridge.json) | [首轮结果](results/pilot/summary.json) |
 | 24点 | [任务入口](../../tasks/game24/README.md) | [固定目标配置](configs/pilot/game24.json) | [首轮结果](results/pilot/summary.json) |
+
+多目标开发条件使用同一 `src.run` 的 `exact_state_pairs` 模式，配置预算均有限定；这些条件的完成不代表地图已通过正式验收。
+
+| 任务 | 首批开发对照 | 新增信息与评测 |
+|---|---|---|
+| 推箱子 | [原关系](configs/sokoban/sokoban_multigoal_control.json)、[直接动作边](configs/sokoban/sokoban_multigoal_edges.json) | 同一小图、多目标、模型、预算和完整候选；教师路径上的Q下降、自主完成与首次循环／不可达步骤 |
+| 移车出库 | [身份编码](configs/rush_hour/rush_hour_multigoal_identity.json)、[几何编码](configs/rush_hour/rush_hour_multigoal_geometry.json) | 同题同CNN；普通目标包含A未到出口的完整排列；几何编码保持场景内固定身份和A标记 |
+| 棋子交换 | [原树长程](configs/token_swapping/token_swapping_multigoal_long.json)、[另一棵10顶点树](configs/token_swapping/token_swapping_alternate_tree.json) | 精确距离层、完整候选、动作边及训练两步环回放；新树独立训练，LLM读取另行验收 |
+| 过桥 | [五人多目标](configs/bridge/bridge_multigoal_fit.json) | 全人员位掩码和手电位置图；Dijkstra精确耗时；训练、选择、总成本均包含即时耗时 |
+| 24点 | [四数与中间目标](configs/game24/game24_multigoal_fit.json) | 每题全部运算DAG、各层精确多重集目标、可达与不可达候选；按约分有理数跨起题合并曝光 |
+
+过桥与24点复用任务层 `relation_data.py` 和 `qmap.py`。过桥人数与24点槽位数保存在checkpoint范围中，不同人数／槽位拒绝错配。24点裁判可指定完整中间目标，默认四数到24的旧调用保持可用；五数动作与特征槽位已支持，尚不因此宣称五数地图或LLM已训练。开发集与验证集用于选模；最终验收和权重采用仍按原流程执行。
 
 完整目标三任务的验收保留全部合法动作，不搜索或重试；各必需组完整到达率至少80%，目标90%以上，见[验收要求](configs/exact_pair_acceptance.json)。过桥和24点的首轮范围由各自pilot配置维护，环境提供真实后继，地图学习距离与候选排序。
 

@@ -3,6 +3,12 @@ import heapq
 import numpy as np
 
 
+def edge_costs(corpus, ids):
+    """Physical immediate costs; legacy permutation corpora use unit edges."""
+    if hasattr(corpus,'edge_costs'): return corpus.edge_costs(ids)
+    return np.ones((*np.shape(ids),corpus.max_candidates),dtype=np.float32)
+
+
 def goal_distances(children, costs, terminal):
     reverse = [[] for _ in children]
     for source, row in enumerate(children):

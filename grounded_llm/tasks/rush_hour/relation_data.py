@@ -62,9 +62,17 @@ def build(config, out):
             rejected.append(dict(row=row,reason='too_few_complete_goals',count=len(terminals))); continue
         count=len(terminals) if spec['goals_per_scene']=='all' else min(len(terminals),spec['goals_per_scene'])
         goals=goal_rng.choice(terminals,count,replace=False).tolist()
+        ordinary=spec.get('intermediate_goals_per_scene',0)
+        extra_held=spec.get('heldout_intermediate_goals',0)
+        if ordinary:
+            pool=np.asarray([i for i,s in enumerate(states) if not env.terminal(s)])
+            extras=goal_rng.choice(pool,ordinary,replace=False).tolist()
+            held=spec['heldout_goals']
+            goals=goals[:-held]+extras[:ordinary-extra_held]+goals[-held:]+extras[ordinary-extra_held:]
         metadata=dict(task='rush_hour',split=split,catalogue_group=key,
                       source=dict(url=spec['source_url'],row=row,original_minimum=distance,reported_states=size),
-                      initial_board=board,original_state=0,training_goals=len(goals)-spec['heldout_goals'],symmetric=True)
+                      initial_board=board,original_state=0,training_goals=len(goals)-spec['heldout_goals']-extra_held,symmetric=True,
+                      intermediate_goals=ordinary)
         if split=='diagnostic':
             frozen=json.loads(Path(spec['diagnostic_suite']).read_text(encoding='utf-8'))
             case=next(c for c in frozen['cases'] if c['task']=='rush_hour' and c['source']['row']==row)

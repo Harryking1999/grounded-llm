@@ -11,6 +11,17 @@ class Game24:
                     for op in ('+', '-', 'r-', '*', '/', 'r/'))
     goal = (Fraction(24),)
 
+    def __init__(self, max_numbers=4):
+        if max_numbers < 2: raise ValueError('At least two input slots required')
+        self.max_numbers=max_numbers
+        if max_numbers != 4:
+            self.actions=tuple((i,op,j) for i,j in combinations(range(max_numbers),2)
+                               for op in ('+','-','r-','*','/','r/'))
+
+    def validate(self, state):
+        if not 1 <= len(state) <= self.max_numbers or tuple(state)!=self.canonical(state):
+            raise ValueError('Expected a canonical exact rational multiset within slot capacity')
+
     @staticmethod
     def canonical(numbers):
         return tuple(sorted(Fraction(x) for x in numbers))
@@ -29,7 +40,7 @@ class Game24:
             yield action, tuple(sorted([z] + [v for k, v in enumerate(state) if k not in (i, j)])), 1
 
     def features(self, states):
-        out = np.zeros((len(states), 4, 4), dtype=np.float32)
+        out = np.zeros((len(states), self.max_numbers, 4), dtype=np.float32)
         for row, state in enumerate(states):
             for col, value in enumerate(state):
                 out[row, col] = (1, math.copysign(math.log1p(abs(value.numerator)), value.numerator),
@@ -38,6 +49,7 @@ class Game24:
 
     def graph(self, numbers):
         start = self.canonical(numbers)
+        self.validate(start)
         states, index = [start], {start: 0}
         rows = []
         for state in states:
@@ -59,13 +71,14 @@ class Game24:
                     metadata={"numbers": list(numbers), "state_count": len(states),
                               "exact_rational_states": [[str(v) for v in s] for s in states]})
 
-    def judge(self, numbers, actions):
-        if len(numbers) != 4 or len(actions) != 3:
-            return {"success": False, "reason": "need_four_numbers_and_three_actions"}
+    def judge(self, numbers, actions, goal=None):
+        goal=self.goal if goal is None else self.canonical(goal)
+        if not 1 <= len(goal) <= len(numbers) <= self.max_numbers or len(actions)!=len(numbers)-len(goal):
+            return {"success": False, "reason": "operand_or_action_count_mismatch"}
         state = self.canonical(numbers)
         for action in actions:
             choices = {self.actions[a]: child for a, child, _ in self.transitions(state)}
             if tuple(action) not in choices:
                 return {"success": False, "reason": "illegal_action"}
             state = choices[tuple(action)]
-        return {"success": state == self.goal, "result": str(state[0])}
+        return {"success": state == goal, "result": str(state[0]) if len(state)==1 else [str(v) for v in state]}

@@ -5,6 +5,7 @@ from pathlib import Path
 import numpy as np
 from grounded_llm.core.files import atomic_json
 from grounded_llm.core.qmap.sampling import CoverageSampler
+from grounded_llm.core.qmap.exact_graph import edge_costs
 
 
 def keys(source, goal, size):
@@ -38,7 +39,7 @@ def materialize(corpus, rows):
     children=corpus.successors(rows[:,0]); valid=children>=0
     truth=np.full(children.shape,np.inf,dtype=np.float32)
     truth[valid]=corpus.distance(children[valid],np.broadcast_to(rows[:,1,None],children.shape)[valid])
-    optimal=valid & np.isfinite(truth) & (truth+1==distances[:,None])
+    optimal=valid & np.isfinite(truth) & (truth+edge_costs(corpus,rows[:,0])==distances[:,None])
     return dict(tasks=rows,distances=distances,children=children,child_distances=truth,
                 reachability=np.isfinite(distances).astype(np.int8),optimal=optimal)
 
@@ -80,7 +81,7 @@ def training_decision_mask(corpus,data,rows):
 
 
 def sample_goals(corpus,sources,rng,reserved,*,ranking=False,allowed=None,fallback=None,allow_missing=False,
-                 local_fraction=0.,walk_max=None):
+                 local_fraction=0.,walk_max=None,distance_bins=None):
     """Fresh complete goals, using teacher labels only in the training sampler."""
     sources=np.asarray(sources,dtype=np.int64)
     if not 0<=local_fraction<=1 or (local_fraction and (hasattr(corpus,'scenes') or walk_max is None or walk_max<0)):
@@ -92,6 +93,12 @@ def sample_goals(corpus,sources,rng,reserved,*,ranking=False,allowed=None,fallba
         return (at<len(reserved)) & (reserved[np.minimum(at,len(reserved)-1)]==values)
     scene_ids=corpus.locate(sources) if hasattr(corpus,'scenes') else None
     children=corpus.successors(sources) if ranking else None
+    desired=None
+    if distance_bins is not None:
+        if scene_ids is not None:raise ValueError('Distance-layer proposals require a permutation oracle')
+        distance_bins=np.asarray(distance_bins,dtype=np.float32)
+        if np.any(np.diff(distance_bins)<=0):raise ValueError('Increasing exact distance bins required')
+        desired=rng.integers(len(distance_bins),size=len(sources))
     for _ in range(64):
         if not bad.any(): break
         if scene_ids is None:
@@ -109,6 +116,8 @@ def sample_goals(corpus,sources,rng,reserved,*,ranking=False,allowed=None,fallba
                 pool=scene.goals[:scene.metadata['training_goals']]+corpus.offsets[sid]
                 goals[mask]=rng.choice(pool,int(mask.sum()))
         bad=forbidden(keys(sources,goals,corpus.size))
+        if desired is not None:
+            bad|=np.searchsorted(distance_bins,corpus.distance(sources,goals))!=desired
         if local_fraction:
             at=np.searchsorted(allowed,goals)
             bad|=(at==len(allowed)) | (allowed[np.minimum(at,len(allowed)-1)]!=goals)
@@ -492,6 +501,22 @@ def board_cohorts(corpus,config,rng):
     pairs,decisions=[],[]
     for sid,safe_parent,safe_rank in train_specs:
         scene=corpus.scenes[sid]; offset=corpus.offsets[sid]; nt=scene.metadata['training_goals']
+        if spec.get('exhaustive_training_goals'):
+            for j,g in enumerate(scene.goals[:nt]):
+                parents=np.flatnonzero(safe_parent)+offset
+                rows=np.column_stack([parents,np.full(len(parents),int(g)+offset)])
+                rows=rows[~np.isin(keys(rows[:,0],rows[:,1],corpus.size),reserved)]
+                pairs.append(rows)
+                label=scene.distances[j]
+                parents=np.flatnonzero(safe_rank & np.isfinite(label) & (label>0))+offset
+                rows=np.column_stack([parents,np.full(len(parents),int(g)+offset)])
+                if len(rows):
+                    children=corpus.successors(parents);valid=children>=0
+                    related=np.full(children.shape,-1,dtype=np.int64)
+                    related[valid]=keys(children[valid],np.full(valid.sum(),int(g)+offset),corpus.size)
+                    safe=~np.isin(keys(rows[:,0],rows[:,1],corpus.size),reserved)&~np.isin(related,reserved).any(axis=1)
+                    decisions.append(rows[safe])
+            continue
         parents=np.flatnonzero(safe_parent)+offset
         limit=spec.get('training_sources_per_scene')
         local_rng=np.random.default_rng(group_seed(json.dumps(scene.metadata['source'],sort_keys=True),config['seed'],'training_sources')) if limit else rng

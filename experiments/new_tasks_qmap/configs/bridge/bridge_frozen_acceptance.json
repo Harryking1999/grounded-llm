@@ -1,0 +1,16 @@
+{
+  "seed": 2026102519,
+  "scenarios_per_map": 128,
+  "maximum_time": 20,
+  "goals_per_scene": 20,
+  "horizon": 128,
+  "minimum_completion_rate": 0.8,
+  "target_completion_rate": 0.9,
+  "minimum_optimal_cost_rate": 0.8,
+  "required_cohorts": ["all_right_test", "intermediate_goal_test", "intermediate_start_test"],
+  "candidates": {
+    "5": "bridge_multigoal_coverage",
+    "6": "bridge6_multigoal_fit"
+  },
+  "scope": "Frozen selected checkpoints, no search or pruning. Exclude every time tuple in each candidate's training, validation and development-test corpus. Generate this independent suite once; do not select another checkpoint on its results. Optimal-cost threshold is declared before this suite is evaluated."
+}

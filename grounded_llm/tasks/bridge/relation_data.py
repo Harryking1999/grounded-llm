@@ -14,7 +14,7 @@ def decode(rows): return [int(row[0]) for row in rows]
 def build(config,out):
     out=Path(out);out.mkdir(parents=True,exist_ok=True)
     spec=config['data'];rng=np.random.default_rng(config['seed']);records=[]
-    seen=set()
+    seen={tuple(times) for times in spec.get('excluded_times',[])}
     scenes=list(spec['scenes'].items())
     if spec.get('additional_training_scenes'):scenes.append(('train',spec['additional_training_scenes']))
     for split,count in scenes:

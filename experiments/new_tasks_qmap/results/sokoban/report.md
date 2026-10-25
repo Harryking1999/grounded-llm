@@ -4,7 +4,13 @@
 
 范围为Boxoban hard、10×10四箱，每题指定箱子与玩家的完整目标，环境提供全部合法后继，地图按预测距离逐步贪心。规则与划分见[任务数据](../../../../tasks/sokoban/data/README.md)，验收见[配置](../../configs/exact_pair_acceptance.json)，采用状态见[selection](../../../../tasks/sokoban/Qmap/selection.json)。本页按研究问题组织已有结果；参数、逐题轨迹和逐节点统计由链接来源维护。
 
-## 覆盖量与连续路径采样
+## 普通完整目标与直接动作边
+
+在小规模精确物理图中加入普通箱子布局和玩家位置目标，逐目标重算有向距离。保持模型、损失、初始化、完整候选和更新预算，比较原关系采样与25%距离监督替换为真实动作边。熟悉关系完成从7/62变为11/62；留出普通目标均9/128，新布局均7/128，原始起点均0/47。小图多目标执行仍弱，动作边没有带来目标或布局泛化收益，不能据此扩棋盘。
+
+配置见[原关系](../../configs/sokoban/sokoban_multigoal_control.json)与[动作边](../../configs/sokoban/sokoban_multigoal_edges.json)，教师路径、循环和首次不可达位置保存在原始运行，紧凑结果见[比较](sokoban_multigoal_pairs.json)。下一步复用现有有限距离／死锁边界采样器，保证换目标后仍有明确的可达关系配额；[无动作边](../../configs/sokoban/sokoban_multigoal_finite_control.json)与[动作边](../../configs/sokoban/sokoban_multigoal_finite_edges.json)继续匹配比较。
+
+## 布局覆盖与连续路径采样
 
 64张与1,000张训练棋盘采用相同模型和更新预算，使用同一批100张未见测试棋盘的1,024题。以下为单个种子。
 

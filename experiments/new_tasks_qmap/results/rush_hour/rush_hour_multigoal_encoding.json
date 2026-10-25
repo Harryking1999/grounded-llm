@@ -1,0 +1,638 @@
+{
+  "identity": {
+    "task": "rush_hour",
+    "source_commit": "f912ce3",
+    "best_step": 10000,
+    "last_step": 12000,
+    "training_seconds": 420.7190800430253,
+    "data": {
+      "task": "rush_hour",
+      "states": 271534,
+      "input_dim": 936,
+      "max_candidates": 18,
+      "seed": 2026102503,
+      "finite_max": 77.0,
+      "unknown_training_labels": 0,
+      "pair_count": 204270,
+      "decision_count": 201631,
+      "reserved_relations": 69715,
+      "cohorts": {
+        "validation": {
+          "count": 4096,
+          "reachable": 4096
+        },
+        "test": {
+          "count": 4096,
+          "reachable": 4096
+        },
+        "unseen_goal_validation": {
+          "count": 12288,
+          "reachable": 12288
+        },
+        "unseen_goal_test": {
+          "count": 12288,
+          "reachable": 12288
+        },
+        "unseen_layout_validation": {
+          "count": 4096,
+          "reachable": 4096
+        },
+        "unseen_layout_test": {
+          "count": 4096,
+          "reachable": 4096
+        },
+        "original_layout_test": {
+          "count": 6401,
+          "reachable": 6401
+        },
+        "original_layout_validation": {
+          "count": 2026,
+          "reachable": 2026
+        }
+      },
+      "selected_train_states": 204270,
+      "all_selected_sources_in_training": true
+    },
+    "actual_exposure": {
+      "unique_gradient_states": 204270,
+      "available_states": 271534,
+      "unique_pair_rows": 204270,
+      "pair_rows": 204270,
+      "unique_decision_rows": 201631,
+      "decision_rows": 201631,
+      "minimum_pair_layer_passes": 60.155676310765166,
+      "minimum_decision_layer_passes": 15.235752438861088
+    },
+    "model_parameters": 338708,
+    "cohorts": {
+      "validation": {
+        "finite_mae": 0.5376965999603271,
+        "shortest_action_rate": 0.958984375,
+        "reachability": {
+          "proven_unreachable": 0,
+          "finite": 4096,
+          "unknown": 0,
+          "auroc": null,
+          "validation_threshold": null,
+          "recall": null,
+          "finite_false_positive": null,
+          "recall_at_training_proxy": null,
+          "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+        },
+        "q": {
+          "count": 128,
+          "solved": 127,
+          "success_rate": 0.9921875,
+          "optimal": 111,
+          "optimal_rate": 0.8671875,
+          "cycles": 1,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": 0.13385826349258423,
+          "mean_cost_ratio_on_success": 1.0329396724700928
+        },
+        "oracle_optimal_rate": 1.0
+      },
+      "test": {
+        "finite_mae": 0.5305109024047852,
+        "shortest_action_rate": 0.978515625,
+        "reachability": {
+          "proven_unreachable": 0,
+          "finite": 4096,
+          "unknown": 0,
+          "auroc": null,
+          "validation_threshold": null,
+          "recall": null,
+          "finite_false_positive": null,
+          "recall_at_training_proxy": null,
+          "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+        },
+        "q": {
+          "count": 128,
+          "solved": 127,
+          "success_rate": 0.9921875,
+          "optimal": 112,
+          "optimal_rate": 0.875,
+          "cycles": 1,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": 0.13385826349258423,
+          "mean_cost_ratio_on_success": 1.0299400091171265
+        },
+        "oracle_optimal_rate": 1.0
+      },
+      "unseen_goal_validation": {
+        "finite_mae": 0.536300003528595,
+        "shortest_action_rate": 0.96484375,
+        "reachability": {
+          "proven_unreachable": 0,
+          "finite": 12288,
+          "unknown": 0,
+          "auroc": null,
+          "validation_threshold": null,
+          "recall": null,
+          "finite_false_positive": null,
+          "recall_at_training_proxy": null,
+          "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+        },
+        "q": {
+          "count": 128,
+          "solved": 128,
+          "success_rate": 1.0,
+          "optimal": 125,
+          "optimal_rate": 0.9765625,
+          "cycles": 0,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": 0.0390625,
+          "mean_cost_ratio_on_success": 1.0123697519302368
+        },
+        "oracle_optimal_rate": 1.0
+      },
+      "unseen_goal_test": {
+        "finite_mae": 1.2348881959915161,
+        "shortest_action_rate": 0.80859375,
+        "reachability": {
+          "proven_unreachable": 0,
+          "finite": 12288,
+          "unknown": 0,
+          "auroc": null,
+          "validation_threshold": null,
+          "recall": null,
+          "finite_false_positive": null,
+          "recall_at_training_proxy": null,
+          "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+        },
+        "q": {
+          "count": 128,
+          "solved": 124,
+          "success_rate": 0.96875,
+          "optimal": 111,
+          "optimal_rate": 0.8671875,
+          "cycles": 4,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": 0.16935484111309052,
+          "mean_cost_ratio_on_success": 1.0477149486541748
+        },
+        "oracle_optimal_rate": 1.0
+      },
+      "unseen_layout_validation": {
+        "finite_mae": 6.271657466888428,
+        "shortest_action_rate": 0.529296875,
+        "reachability": {
+          "proven_unreachable": 0,
+          "finite": 4096,
+          "unknown": 0,
+          "auroc": null,
+          "validation_threshold": null,
+          "recall": null,
+          "finite_false_positive": null,
+          "recall_at_training_proxy": null,
+          "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+        },
+        "q": {
+          "count": 128,
+          "solved": 49,
+          "success_rate": 0.3828125,
+          "optimal": 34,
+          "optimal_rate": 0.265625,
+          "cycles": 79,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": 0.6326530575752258,
+          "mean_cost_ratio_on_success": 1.0935146808624268
+        },
+        "oracle_optimal_rate": 1.0
+      },
+      "unseen_layout_test": {
+        "finite_mae": 7.543712615966797,
+        "shortest_action_rate": 0.4609375,
+        "reachability": {
+          "proven_unreachable": 0,
+          "finite": 4096,
+          "unknown": 0,
+          "auroc": null,
+          "validation_threshold": null,
+          "recall": null,
+          "finite_false_positive": null,
+          "recall_at_training_proxy": null,
+          "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+        },
+        "q": {
+          "count": 128,
+          "solved": 47,
+          "success_rate": 0.3671875,
+          "optimal": 28,
+          "optimal_rate": 0.21875,
+          "cycles": 81,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": 0.6808510422706604,
+          "mean_cost_ratio_on_success": 1.1131824254989624
+        },
+        "oracle_optimal_rate": 1.0
+      },
+      "original_layout_test": {
+        "finite_mae": 21.340877532958984,
+        "shortest_action_rate": 0.892578125,
+        "reachability": {
+          "proven_unreachable": 0,
+          "finite": 6401,
+          "unknown": 0,
+          "auroc": null,
+          "validation_threshold": null,
+          "recall": null,
+          "finite_false_positive": null,
+          "recall_at_training_proxy": null,
+          "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+        },
+        "q": {
+          "count": 128,
+          "solved": 2,
+          "success_rate": 0.015625,
+          "optimal": 0,
+          "optimal_rate": 0.0,
+          "cycles": 126,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": 1.0,
+          "mean_cost_ratio_on_success": 1.0916666984558105
+        },
+        "oracle_optimal_rate": 1.0
+      },
+      "original_layout_validation": {
+        "finite_mae": 19.762975692749023,
+        "shortest_action_rate": 0.73046875,
+        "reachability": {
+          "proven_unreachable": 0,
+          "finite": 2026,
+          "unknown": 0,
+          "auroc": null,
+          "validation_threshold": null,
+          "recall": null,
+          "finite_false_positive": null,
+          "recall_at_training_proxy": null,
+          "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+        },
+        "q": {
+          "count": 128,
+          "solved": 6,
+          "success_rate": 0.046875,
+          "optimal": 3,
+          "optimal_rate": 0.0234375,
+          "cycles": 122,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": 0.5,
+          "mean_cost_ratio_on_success": 1.081944465637207
+        },
+        "oracle_optimal_rate": 1.0
+      }
+    }
+  },
+  "geometry": {
+    "task": "rush_hour",
+    "source_commit": "f912ce3",
+    "best_step": 8000,
+    "last_step": 12000,
+    "training_seconds": 467.650915726088,
+    "data": {
+      "task": "rush_hour",
+      "states": 271534,
+      "input_dim": 936,
+      "max_candidates": 18,
+      "seed": 2026102503,
+      "finite_max": 77.0,
+      "unknown_training_labels": 0,
+      "pair_count": 204270,
+      "decision_count": 201631,
+      "reserved_relations": 69715,
+      "cohorts": {
+        "validation": {
+          "count": 4096,
+          "reachable": 4096
+        },
+        "test": {
+          "count": 4096,
+          "reachable": 4096
+        },
+        "unseen_goal_validation": {
+          "count": 12288,
+          "reachable": 12288
+        },
+        "unseen_goal_test": {
+          "count": 12288,
+          "reachable": 12288
+        },
+        "unseen_layout_validation": {
+          "count": 4096,
+          "reachable": 4096
+        },
+        "unseen_layout_test": {
+          "count": 4096,
+          "reachable": 4096
+        },
+        "original_layout_test": {
+          "count": 6401,
+          "reachable": 6401
+        },
+        "original_layout_validation": {
+          "count": 2026,
+          "reachable": 2026
+        }
+      },
+      "selected_train_states": 204270,
+      "all_selected_sources_in_training": true
+    },
+    "actual_exposure": {
+      "unique_gradient_states": 204270,
+      "available_states": 271534,
+      "unique_pair_rows": 204270,
+      "pair_rows": 204270,
+      "unique_decision_rows": 201631,
+      "decision_rows": 201631,
+      "minimum_pair_layer_passes": 60.155676310765166,
+      "minimum_decision_layer_passes": 15.235752438861088
+    },
+    "model_parameters": 338708,
+    "cohorts": {
+      "validation": {
+        "finite_mae": 0.6586124897003174,
+        "shortest_action_rate": 0.951171875,
+        "reachability": {
+          "proven_unreachable": 0,
+          "finite": 4096,
+          "unknown": 0,
+          "auroc": null,
+          "validation_threshold": null,
+          "recall": null,
+          "finite_false_positive": null,
+          "recall_at_training_proxy": null,
+          "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+        },
+        "q": {
+          "count": 128,
+          "solved": 127,
+          "success_rate": 0.9921875,
+          "optimal": 114,
+          "optimal_rate": 0.890625,
+          "cycles": 1,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": 0.11811023950576782,
+          "mean_cost_ratio_on_success": 1.0283089876174927
+        },
+        "oracle_optimal_rate": 1.0
+      },
+      "test": {
+        "finite_mae": 0.6580216288566589,
+        "shortest_action_rate": 0.9609375,
+        "reachability": {
+          "proven_unreachable": 0,
+          "finite": 4096,
+          "unknown": 0,
+          "auroc": null,
+          "validation_threshold": null,
+          "recall": null,
+          "finite_false_positive": null,
+          "recall_at_training_proxy": null,
+          "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+        },
+        "q": {
+          "count": 128,
+          "solved": 127,
+          "success_rate": 0.9921875,
+          "optimal": 117,
+          "optimal_rate": 0.9140625,
+          "cycles": 1,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": 0.09448818862438202,
+          "mean_cost_ratio_on_success": 1.0216535329818726
+        },
+        "oracle_optimal_rate": 1.0
+      },
+      "unseen_goal_validation": {
+        "finite_mae": 0.6550645232200623,
+        "shortest_action_rate": 0.955078125,
+        "reachability": {
+          "proven_unreachable": 0,
+          "finite": 12288,
+          "unknown": 0,
+          "auroc": null,
+          "validation_threshold": null,
+          "recall": null,
+          "finite_false_positive": null,
+          "recall_at_training_proxy": null,
+          "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+        },
+        "q": {
+          "count": 128,
+          "solved": 126,
+          "success_rate": 0.984375,
+          "optimal": 116,
+          "optimal_rate": 0.90625,
+          "cycles": 2,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": 0.0873015895485878,
+          "mean_cost_ratio_on_success": 1.0234127044677734
+        },
+        "oracle_optimal_rate": 1.0
+      },
+      "unseen_goal_test": {
+        "finite_mae": 1.5149892568588257,
+        "shortest_action_rate": 0.74609375,
+        "reachability": {
+          "proven_unreachable": 0,
+          "finite": 12288,
+          "unknown": 0,
+          "auroc": null,
+          "validation_threshold": null,
+          "recall": null,
+          "finite_false_positive": null,
+          "recall_at_training_proxy": null,
+          "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+        },
+        "q": {
+          "count": 128,
+          "solved": 122,
+          "success_rate": 0.953125,
+          "optimal": 112,
+          "optimal_rate": 0.875,
+          "cycles": 6,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": 0.16393442451953888,
+          "mean_cost_ratio_on_success": 1.0546447038650513
+        },
+        "oracle_optimal_rate": 1.0
+      },
+      "unseen_layout_validation": {
+        "finite_mae": 6.42232608795166,
+        "shortest_action_rate": 0.46875,
+        "reachability": {
+          "proven_unreachable": 0,
+          "finite": 4096,
+          "unknown": 0,
+          "auroc": null,
+          "validation_threshold": null,
+          "recall": null,
+          "finite_false_positive": null,
+          "recall_at_training_proxy": null,
+          "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+        },
+        "q": {
+          "count": 128,
+          "solved": 53,
+          "success_rate": 0.4140625,
+          "optimal": 39,
+          "optimal_rate": 0.3046875,
+          "cycles": 75,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": 0.849056601524353,
+          "mean_cost_ratio_on_success": 1.1072313785552979
+        },
+        "oracle_optimal_rate": 1.0
+      },
+      "unseen_layout_test": {
+        "finite_mae": 7.394480228424072,
+        "shortest_action_rate": 0.474609375,
+        "reachability": {
+          "proven_unreachable": 0,
+          "finite": 4096,
+          "unknown": 0,
+          "auroc": null,
+          "validation_threshold": null,
+          "recall": null,
+          "finite_false_positive": null,
+          "recall_at_training_proxy": null,
+          "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+        },
+        "q": {
+          "count": 128,
+          "solved": 45,
+          "success_rate": 0.3515625,
+          "optimal": 32,
+          "optimal_rate": 0.25,
+          "cycles": 83,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": 0.4888888895511627,
+          "mean_cost_ratio_on_success": 1.090937852859497
+        },
+        "oracle_optimal_rate": 1.0
+      },
+      "original_layout_test": {
+        "finite_mae": 25.043073654174805,
+        "shortest_action_rate": 0.66796875,
+        "reachability": {
+          "proven_unreachable": 0,
+          "finite": 6401,
+          "unknown": 0,
+          "auroc": null,
+          "validation_threshold": null,
+          "recall": null,
+          "finite_false_positive": null,
+          "recall_at_training_proxy": null,
+          "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+        },
+        "q": {
+          "count": 128,
+          "solved": 0,
+          "success_rate": 0.0,
+          "optimal": 0,
+          "optimal_rate": 0.0,
+          "cycles": 128,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": null,
+          "mean_cost_ratio_on_success": null
+        },
+        "oracle_optimal_rate": 1.0
+      },
+      "original_layout_validation": {
+        "finite_mae": 16.243770599365234,
+        "shortest_action_rate": 0.69921875,
+        "reachability": {
+          "proven_unreachable": 0,
+          "finite": 2026,
+          "unknown": 0,
+          "auroc": null,
+          "validation_threshold": null,
+          "recall": null,
+          "finite_false_positive": null,
+          "recall_at_training_proxy": null,
+          "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+        },
+        "q": {
+          "count": 128,
+          "solved": 6,
+          "success_rate": 0.046875,
+          "optimal": 3,
+          "optimal_rate": 0.0234375,
+          "cycles": 122,
+          "entered_unreachable": 0,
+          "mean_excess_cost_on_success": 0.6666666865348816,
+          "mean_cost_ratio_on_success": 1.1166666746139526
+        },
+        "oracle_optimal_rate": 1.0
+      }
+    }
+  },
+  "naming_checks": {
+    "identity": {
+      "protocol": "Joint ordinary vehicle renaming, fixed physical candidate order transported; A preserved. This isolates feature semantics and does not test fresh-enumeration tie order.",
+      "cohorts": {
+        "test": {
+          "count": 128,
+          "max_candidate_distance_change": 20.816261291503906,
+          "physical_first_action_changes": 69,
+          "original_solved": 127,
+          "renamed_solved": 85
+        },
+        "unseen_goal_test": {
+          "count": 128,
+          "max_candidate_distance_change": 17.178871154785156,
+          "physical_first_action_changes": 61,
+          "original_solved": 124,
+          "renamed_solved": 102
+        },
+        "unseen_layout_test": {
+          "count": 128,
+          "max_candidate_distance_change": 16.102371215820312,
+          "physical_first_action_changes": 88,
+          "original_solved": 47,
+          "renamed_solved": 25
+        },
+        "original_layout_test": {
+          "count": 128,
+          "max_candidate_distance_change": 41.42567443847656,
+          "physical_first_action_changes": 96,
+          "original_solved": 2,
+          "renamed_solved": 1
+        }
+      }
+    },
+    "geometry": {
+      "protocol": "Joint ordinary vehicle renaming, fixed physical candidate order transported; A preserved. This isolates feature semantics and does not test fresh-enumeration tie order.",
+      "cohorts": {
+        "test": {
+          "count": 128,
+          "max_candidate_distance_change": 0.0,
+          "physical_first_action_changes": 0,
+          "original_solved": 127,
+          "renamed_solved": 127
+        },
+        "unseen_goal_test": {
+          "count": 128,
+          "max_candidate_distance_change": 0.0,
+          "physical_first_action_changes": 0,
+          "original_solved": 122,
+          "renamed_solved": 122
+        },
+        "unseen_layout_test": {
+          "count": 128,
+          "max_candidate_distance_change": 0.0,
+          "physical_first_action_changes": 0,
+          "original_solved": 45,
+          "renamed_solved": 45
+        },
+        "original_layout_test": {
+          "count": 128,
+          "max_candidate_distance_change": 0.0,
+          "physical_first_action_changes": 0,
+          "original_solved": 0,
+          "renamed_solved": 0
+        }
+      }
+    }
+  }
+}

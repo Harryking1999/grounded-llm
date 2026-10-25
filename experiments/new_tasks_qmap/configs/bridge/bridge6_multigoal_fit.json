@@ -1,0 +1,55 @@
+{
+  "schema": "exact_state_pairs",
+  "seed": 2026102501,
+  "model": {
+    "dimension": 128,
+    "hidden": 256,
+    "cap": 256,
+    "metric": "linf"
+  },
+  "training": {
+    "steps": 12000,
+    "batch_size": 2048,
+    "decision_batch_size": 512,
+    "learning_rate": 0.001,
+    "rank_weight": 1.0,
+    "rank_temperature": 1.0,
+    "eval_every": 2000,
+    "rollout_eval_every": 6000,
+    "cpu_threads": 4,
+    "unreachable_target": 240.0,
+    "features_on_device": "float32",
+    "broad_fraction": 0,
+    "online_goals": false,
+    "record_training_samples": true,
+    "validation_only_initial": true
+  },
+  "relations": {
+    "holdout_per_goal": 1,
+    "evaluation_per_goal": 32,
+    "unreachable_eval_per_goal": 16,
+    "complete_training_sources": true,
+    "evaluation_training_goals": 4,
+    "exhaustive_training_goals": true
+  },
+  "evaluation": {
+    "decision_count": 512,
+    "rollout_count": 128,
+    "horizon": 128
+  },
+  "selection": "Minimum mean validation finite Huber plus candidate soft-rank; final test never selects a checkpoint.",
+  "scope": "Development multi-goal experiment. Environment supplies complete real successors; independent Q(s), Q(g); no search or candidate pruning.",
+  "task": "bridge",
+  "data": {
+    "people": 6,
+    "maximum_time": 20,
+    "scenes": {
+      "train": 192,
+      "validation": 8,
+      "test": 8
+    },
+    "goals_per_scene": 20,
+    "heldout_goals": 4
+  },
+  "hypothesis": "Independent six-person weighted map, from scratch. Same complete-mask/torch targets and time range as the five-person map. People count is a distinct map scope, not zero-shot count generalization."
+}

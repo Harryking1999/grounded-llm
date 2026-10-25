@@ -1,0 +1,41 @@
+{
+  "seed": 2026102671,
+  "output": "token_endpoint_cost_feedback_acceptance",
+  "candidates": [
+    "token_endpoint_l1_fit",
+    "token_endpoint_efficiency_soft",
+    "token_endpoint_efficiency_optimal",
+    "token_endpoint_efficiency_layers",
+    "token_endpoint_cost_control",
+    "token_endpoint_cost_feedback"
+  ],
+  "selection": "Among terminal original, earlier ranking, exact-layer and matched current-cost feedback candidates and complete best/last snapshots, require full point-source coverage and95 percent completion in every original validation cohort. Maximize minimum validation optimal-completion rate including21+ subsets, then mean optimal rate, successful cost ratio, validation loss and deterministic names. Freeze before generating fresh test pairs, excluding all previous declared suites. No test trajectory is mined and no post-test swap is permitted.",
+  "queries_per_cohort": 1024,
+  "distance_bin_upper_bounds": [
+    5,
+    10,
+    15,
+    20,
+    25
+  ],
+  "long_distance_above": 20,
+  "minimum_long_queries": 200,
+  "horizon": 128,
+  "minimum_completion_rate": 0.95,
+  "target_completion_rate": 0.98,
+  "scope": "Independent completion and optimal-cost check after the predeclared finite cost-feedback study. Preserve all original endpoint/relationship protections and every candidate. Each primary group and21+ subset separately requires95 percent completion,80 percent optimal completion and successful mean cost ratio<=1.1. Exclude original, efficiency and cost-selection suites from new held-test pair generation; the original protected-relation pool is a known regression. Known difficult permutations are a separate diagnostic. This is not an LLM reading result.",
+  "minimum_optimal_rate": 0.8,
+  "target_optimal_rate": 0.9,
+  "maximum_mean_cost_ratio_on_success": 1.1,
+  "exclude_suites": [
+    "token_endpoint_frozen_acceptance/suite.json",
+    "token_endpoint_efficiency_acceptance/suite.json",
+    "token_endpoint_cost_selection_acceptance/suite.json"
+  ],
+  "validation_efficiency_selection": true,
+  "candidate_checkpoints": [
+    "best.pt",
+    "last.pt"
+  ],
+  "selection_queries": 1024
+}

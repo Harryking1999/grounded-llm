@@ -1,4 +1,4 @@
-"""Training-only cycle seeds, complete branches and exact teacher continuations."""
+"""Training-only cycle/cost seeds, complete branches and teacher continuations."""
 import argparse
 import json
 from pathlib import Path
@@ -33,6 +33,36 @@ def cycle_rows(records):
                 begin=next(i for i,row in enumerate(path) if row[0]==target)
                 cycles.extend(path[begin:]);lengths.append(len(path)-begin)
     return np.unique(np.asarray(cycles,dtype=np.int64).reshape(-1,2),axis=0),lengths
+
+
+def first_uphill_rows(records):
+    """Locate first costly choices, including trajectories that still succeed.
+
+    One exchange changes permutation parity, so exact remaining swap counts
+    across an edge differ by1. Every uphill exchange adds exactly2 to the
+    eventual successful plan. Labels inspect an already chosen action only.
+    """
+    seeds=[];first={};paths={};uphill=0;verified=0;solved=0;extra=0
+    for edge in records:
+        index=np.arange(len(edge['query_index']))
+        before=edge['parent_distance'];after=edge['child_distances'][index,edge['choice']]
+        if not (np.isfinite(before).all() and np.isfinite(after).all() and (np.abs(after-before)==1).all()):
+            raise ValueError('Expected exact unit-exchange permutation distance parity')
+        for j,q in enumerate(edge['query_index']):
+            q=int(q);path=paths.setdefault(q,[float(before[j]),0,0])
+            path[1]+=1
+            if after[j]>before[j]:
+                path[2]+=1;uphill+=1
+                if q not in first:
+                    first[q]=int(before[j]);seeds.append((int(edge['source'][j]),int(edge['goal'][j])))
+            if path[1]+after[j]-path[0]!=2*path[2]:
+                raise ValueError('Exchange prefix cost differs from exact uphill count')
+            verified+=1
+            if after[j]==0:solved+=1;extra+=2*path[2]
+    rows=np.unique(np.asarray(seeds,dtype=np.int64).reshape(-1,2),axis=0)
+    return rows,dict(first_uphill_queries=len(first),uphill_exchanges=uphill,verified_prefixes=verified,
+        solved_queries=solved,extra_exchanges_on_success=extra,
+        first_uphill_remaining_distance_counts={str(d):list(first.values()).count(d) for d in sorted(set(first.values()))})
 
 
 def point_pairs(corpus,rows):
@@ -98,6 +128,8 @@ def combine(corpus,data,partition,banks,depth,teacher_steps):
     merged,summary=expand(corpus,data,partition,seeds,depth,teacher_steps)
     for key in ('mining_queries','raw_cycle_seeds','switched_goals'):
         merged[key]=np.unique(np.vstack([bank[key] for bank in banks]),axis=0)
+    uphill=[bank['raw_uphill_seeds'] for bank in banks if 'raw_uphill_seeds' in bank]
+    if uphill:merged['raw_uphill_seeds']=np.unique(np.vstack(uphill),axis=0)
     return merged,summary
 
 
@@ -108,6 +140,7 @@ def merge(config,reference,paths,out):
     for path in paths:
         with np.load(path) as archive:
             banks.append({key:archive[key] for key in ('tasks_seed','mining_queries','raw_cycle_seeds','switched_goals')})
+            if 'raw_uphill_seeds' in archive:banks[-1]['raw_uphill_seeds']=archive['raw_uphill_seeds']
     bank,summary=combine(corpus,data,partition,banks,config['branch_depth'],config['teacher_steps'])
     save_bank(corpus,bank,out)
     summary.update(config=config,source_banks=list(map(str,paths)),unique_source_queries=len(bank['mining_queries']),
@@ -116,6 +149,8 @@ def merge(config,reference,paths,out):
 
 
 def prepare(config,reference,checkpoint,out,device):
+    mode=config.get('mining_mode','cycles')
+    if mode not in ('cycles','cycles_and_first_uphill'):raise ValueError('Unknown token feedback mining mode')
     out=Path(out);out.mkdir(parents=True,exist_ok=False)
     original=json.loads((reference/'config.json').read_text());corpus,data,_=load(original,reference/'data')
     partition=np.load(reference/'data/endpoint_partition.npy');rng=np.random.default_rng(config['seed'])
@@ -126,7 +161,7 @@ def prepare(config,reference,checkpoint,out,device):
     model.load_state_dict(saved['model']);model.eval();allowed=data.get('training_goal_pool')
     if allowed is None:allowed=np.flatnonzero(partition==0)
     proposals={} if 'training_goal_pool' in data else dict(distance_bins=config['distance_bins'],proposal='exact_layers')
-    seeds=[];lengths=[];queries=[]
+    seeds=[];lengths=[];queries=[];uphill=[];cost_diagnosis=[]
     while sum(map(len,queries))<config['queries']:
         n=min(config['mining_batch'],config['queries']-sum(map(len,queries)))
         source=rng.choice(data['tasks_train'][:,0],n*2)
@@ -135,8 +170,12 @@ def prepare(config,reference,checkpoint,out,device):
         if not len(rows):continue
         edges=[];rollout(corpus,QCache(model,corpus,device),rows,config['horizon'],'q',edges)
         mined,loop_lengths=cycle_rows(edges);seeds.append(mined);lengths.extend(loop_lengths);queries.append(rows)
+        if mode=='cycles_and_first_uphill':
+            costly,diagnosis=first_uphill_rows(edges);uphill.append(costly);cost_diagnosis.append(diagnosis)
         atomic_json(out/'mining_progress.json',dict(queries=sum(map(len,queries)),cycle_relations=sum(map(len,seeds))))
-    seeds=np.unique(np.vstack(seeds),axis=0);safe=permitted(corpus,data,partition,seeds);base=seeds[safe]
+    cycles=np.unique(np.vstack(seeds),axis=0)
+    costly=np.unique(np.vstack(uphill),axis=0) if uphill else np.empty((0,2),dtype=np.int64)
+    seeds=np.unique(np.vstack([cycles,costly]),axis=0);safe=permitted(corpus,data,partition,seeds);base=seeds[safe]
     switched=[]
     if config.get('goal_switch_attempts') and len(base):
         original_actions=materialize(corpus,base)['optimal'];pending=np.ones(len(base),bool)
@@ -149,11 +188,14 @@ def prepare(config,reference,checkpoint,out,device):
             switched.append(proposed[changed]);pending[ids[changed]]=False
     extra=np.vstack(switched) if switched else np.empty((0,2),dtype=np.int64)
     bank,summary=expand(corpus,data,partition,np.vstack([seeds,extra]),config['branch_depth'],config['teacher_steps'])
-    bank['mining_queries']=np.vstack(queries);bank['raw_cycle_seeds']=seeds;bank['switched_goals']=extra
+    bank['mining_queries']=np.vstack(queries);bank['raw_cycle_seeds']=cycles;bank['switched_goals']=extra
+    if mode=='cycles_and_first_uphill':bank['raw_uphill_seeds']=costly
     save_bank(corpus,bank,out)
     summary.update(config=config,source_checkpoint=str(checkpoint),source_checkpoint_step=saved['step'],
-        source_checkpoint_commit=saved['source_commit'],original_cycle_seeds=len(seeds),switched_goal_contexts=len(extra),
+        source_checkpoint_commit=saved['source_commit'],original_cycle_seeds=len(cycles),switched_goal_contexts=len(extra),
         cycle_length_counts={str(n):lengths.count(n) for n in sorted(set(lengths))})
+    if mode=='cycles_and_first_uphill':summary.update(raw_uphill_seeds=len(costly),cost_diagnosis=cost_diagnosis,
+        cost_scope='First uphill choice per allowed training-root trajectory, including nonoptimal successes; whole cycle members retained. Exact unit-exchange prefix identity checked. Protected complete decisions rejected before branch expansion; no held test trajectory is mined.')
     atomic_json(out/'bank_summary.json',summary)
     print(json.dumps(summary),flush=True)
 

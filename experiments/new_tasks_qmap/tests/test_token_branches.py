@@ -7,10 +7,33 @@ import numpy as np
 from grounded_llm.tasks.token_swapping.relation_data import TokenCorpus
 from experiments.new_tasks_qmap.tests.test_exact_pairs import small_oracle
 from experiments.new_tasks_qmap.src.relation_data import materialize,closure,token_goal_cohorts,sample_goals
-from experiments.new_tasks_qmap.src.token_branches import expand,permitted,BranchReplay,cycle_rows,combine
+from experiments.new_tasks_qmap.src.token_branches import expand,permitted,BranchReplay,cycle_rows,combine,first_uphill_rows
 
 
 class BranchTests(unittest.TestCase):
+    def test_first_uphill_includes_successful_detour_and_preserves_correct_returns(self):
+        with tempfile.TemporaryDirectory() as name:
+            path=Path(name);small_oracle(path,5,[(0,1),(1,2),(1,3),(3,4)]);corpus=TokenCorpus(path)
+            try:
+                goal=0;start=int(np.flatnonzero(corpus.distances==3)[0])
+                def up(s):return int(np.flatnonzero(corpus.distances[corpus.children[s]]>corpus.distances[s])[0])
+                a=up(start);middle=int(corpus.children[start,a]);b=up(middle)
+                near=int(corpus.children[goal,0]);detour=int(corpus.children[near,3]);other=int(corpus.children[detour,0])
+                self.assertNotEqual(other,near);self.assertEqual(corpus.children[other,3],goal)
+                def edge(q,s,choice):
+                    rows=np.column_stack([s,np.zeros(len(s),dtype=np.int64)]);exact=materialize(corpus,rows)
+                    return dict(query_index=np.array(q),source=np.array(s),goal=np.zeros(len(s),dtype=np.int64),
+                        choice=np.array(choice),parent_distance=exact['distances'],child_distances=exact['child_distances'])
+                records=[edge([0,1],[start,near],[a,3]),edge([0,1],[middle,detour],[b,0]),edge([1],[other],[3])]
+                rows,stats=first_uphill_rows(records)
+                np.testing.assert_array_equal(rows,np.unique([[start,0],[near,0]],axis=0))
+                self.assertEqual(stats['first_uphill_queries'],2);self.assertEqual(stats['uphill_exchanges'],3)
+                self.assertEqual(stats['solved_queries'],1);self.assertEqual(stats['extra_exchanges_on_success'],2)
+                self.assertEqual(stats['verified_prefixes'],5)
+                corrupt=deepcopy(records);corrupt[0]['child_distances'][0,a]=corrupt[0]['parent_distance'][0]
+                with self.assertRaisesRegex(ValueError,'parity'):first_uphill_rows(corrupt)
+            finally:corpus.close()
+
     def test_feedback_union_retains_old_branches_and_shared_fit_queries(self):
         with tempfile.TemporaryDirectory() as name:
             path=Path(name);small_oracle(path,5,[(0,1),(1,2),(1,3),(3,4)]);corpus=TokenCorpus(path)
@@ -19,7 +42,9 @@ class BranchTests(unittest.TestCase):
                 for root in [17,91]:
                     bank,_=expand(corpus,data,partition,np.array([[root,0]]),1,12)
                     bank.update(mining_queries=np.array([[root,0]]),raw_cycle_seeds=bank['tasks_seed'],switched_goals=np.empty((0,2),dtype=np.int64));banks.append(bank)
+                banks[1]['raw_uphill_seeds']=np.array([[91,0]])
                 merged,summary=combine(corpus,data,partition,banks,1,12)
+                np.testing.assert_array_equal(merged['raw_uphill_seeds'],[[91,0]])
                 rows=set(map(tuple,merged['tasks_branches']))
                 for bank in banks:self.assertTrue(set(map(tuple,bank['tasks_branches'])).issubset(rows))
                 replay=BranchReplay(corpus,data,partition,merged,dict(kind='branches',decision_fraction=.5,point_count=6),np.random.default_rng(1),fit_bank=banks[0])

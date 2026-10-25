@@ -70,6 +70,10 @@ def validate_continuation(previous,current,step):
     resize=current.get('continuation',{}).get('mode')=='batch_resize'
     for item in (old,new):
         for key in ('continuation','convergence','pilot'):item.pop(key,None)
+        # Trace compression changes I/O scheduling only; checkpoint saves wait
+        # for every pending trace and preserve optimizer/sampling/RNG state.
+        workers=item['training'].pop('trace_write_workers',0)
+        if workers not in (0,1):raise ValueError('Only synchronous or one-worker trace writing is supported')
     if resize:
         if not step<new['training']['steps']<=old['training']['steps']:
             raise ValueError('Batch resize must stay within the original update budget')

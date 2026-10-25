@@ -11,9 +11,20 @@ from grounded_llm.core.qmap.model import StateEncoder
 from grounded_llm.tasks.token_swapping.relation_data import TokenCorpus
 from experiments.new_tasks_qmap.tests.test_exact_pairs import small_oracle
 from experiments.new_tasks_qmap.src.token_acceptance import validation_efficiency_candidates
+from experiments.new_tasks_qmap.src.relations import completion_criteria
 
 
 class EfficiencySelectionTests(unittest.TestCase):
+    def test_cost_protocol_explicitly_selects_training_summary_completion_profile(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory);base=root/'base.json';cost=root/'cost.json'
+            expected=dict(required_test_cohorts={'token_swapping':['test']},minimum_completion_rate=.8,target_completion_rate=.9)
+            atomic_json(base,expected)
+            atomic_json(cost,dict(minimum_completion_rate=.95,target_completion_rate=.98,candidates=['candidate']))
+            with self.assertRaisesRegex(ValueError,'completion criteria'):completion_criteria(cost,'token_swapping')
+            atomic_json(cost,dict(training_summary_criteria=str(base),minimum_completion_rate=.95,target_completion_rate=.98))
+            self.assertEqual(completion_criteria(cost,'token_swapping'),expected)
+
     def test_validation_only_cost_selection_rejects_completion_regression(self):
         with tempfile.TemporaryDirectory() as directory,ExitStack() as stack:
             root=Path(directory);graphs=root/'graphs';graphs.mkdir()

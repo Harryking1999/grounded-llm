@@ -119,6 +119,17 @@ def completion_acceptance(metrics,required,criteria,coverage):
         target_reached=coverage and all(rate is not None and rate>=criteria['target_completion_rate'] for rate in rates.values()))
 
 
+def completion_criteria(filename,task):
+    """Keep a training summary's completion profile separate from cost suites."""
+    criteria=json.loads(Path(filename).read_text())
+    if 'training_summary_criteria' in criteria:
+        criteria=json.loads(Path(criteria['training_summary_criteria']).read_text())
+    if (task not in criteria.get('required_test_cohorts',{})
+            or not {'minimum_completion_rate','target_completion_rate'}<=criteria.keys()):
+        raise ValueError('Training completion criteria require cohort names and thresholds; independent cost protocols must declare training_summary_criteria')
+    return criteria
+
+
 def write_trace(target,packed):
     started=time.monotonic();temporary=target.with_suffix('.tmp')
     with temporary.open('wb') as stream:np.savez_compressed(stream,**packed)
@@ -128,6 +139,7 @@ def write_trace(target,packed):
 
 def train(config,out,source_commit,device,resume=False,prepare_only=False):
     out=Path(out)
+    criteria=(completion_criteria(config['acceptance'],config['task']) if config.get('acceptance') else None)
     if out.exists() and not resume:
         raise FileExistsError('Existing exact-pair run; use --resume with its original config')
     out.mkdir(parents=True,exist_ok=True)
@@ -714,7 +726,6 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
             summary['failure_replay']['local_paths']=dict(paths=len(replay_sampler.paths),actual_path_context_draws=int(replay_sampler.actual_path_steps.sum()),
                 paths_with_any_context_draw=int((replay_sampler.actual_path_steps>0).sum()),completed_sampling_blocks=replay_sampler.blocks-int(replay_sampler.cursor<replay_sampler.options['block_batches']))
     if config.get('acceptance'):
-        criteria=json.loads(Path(config['acceptance']).read_text())
         required=criteria['required_test_cohorts'][config['task']]
         coverage=bool((saved['pair_draws']>0).all())
         summary['acceptance']=completion_acceptance(final,required,criteria,coverage)

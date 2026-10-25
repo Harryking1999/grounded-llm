@@ -529,7 +529,8 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
         goals=goal[:,None].expand(-1,children.shape[1],-1)[mask]
         scores[mask]=torch.as_tensor(costs,device=device)[mask]+model.distance(child,goals)
         truth=np.where(np.isfinite(child_truth),child_truth,options['unreachable_target'])
-        ranking=soft_rank_loss(scores,torch.as_tensor(costs+truth,device=device),mask,options['rank_temperature'])
+        ranking=soft_rank_loss(scores,torch.as_tensor(costs+truth,device=device),mask,options['rank_temperature'],
+            target_mode=options.get('rank_target_mode','soft_distance'))
         loss=pointwise+options['rank_weight']*ranking
         profile_loss=None
         if profiles:

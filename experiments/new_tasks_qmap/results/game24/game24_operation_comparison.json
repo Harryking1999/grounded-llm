@@ -1,0 +1,2286 @@
+{
+  "game24_operation_control_fit": {
+    "source_commit": "6386fb4",
+    "best_step": 4000,
+    "evaluated_step": 4000,
+    "last_step": 4000,
+    "training_seconds": 839.2196382302791,
+    "model_parameters": 103040,
+    "actual_exposure": {
+      "unique_gradient_states": 170573,
+      "available_states": 182593,
+      "unique_pair_rows": 2027529,
+      "pair_rows": 2027529,
+      "unique_decision_rows": 6843,
+      "decision_rows": 6843,
+      "minimum_pair_layer_passes": 32.3230888436121,
+      "minimum_decision_layer_passes": 2394.2715183399096
+    },
+    "data": {
+      "task": "game24",
+      "states": 182593,
+      "input_dim": 16,
+      "max_candidates": 36,
+      "seed": 2026102501,
+      "finite_max": 3.0,
+      "unknown_training_labels": 0,
+      "pair_count": 2027529,
+      "decision_count": 6843,
+      "reserved_relations": 93942,
+      "cohorts": {
+        "validation": {
+          "count": 576,
+          "reachable": 576
+        },
+        "test": {
+          "count": 148,
+          "reachable": 148
+        },
+        "unseen_goal_validation": {
+          "count": 18432,
+          "reachable": 12288
+        },
+        "unseen_goal_test": {
+          "count": 18432,
+          "reachable": 12288
+        },
+        "unseen_layout_validation": {
+          "count": 1536,
+          "reachable": 1024
+        },
+        "unseen_layout_test": {
+          "count": 1536,
+          "reachable": 1024
+        },
+        "original_layout_test": {
+          "count": 128,
+          "reachable": 127
+        },
+        "original_layout_validation": {
+          "count": 128,
+          "reachable": 125
+        }
+      },
+      "selected_train_states": 170573,
+      "all_selected_sources_in_training": true,
+      "training_original_starts": 192,
+      "original_starts_with_candidate_supervision": 192,
+      "goal_holdout_scope": "query_goal_relations; candidate endpoint exposure allowed",
+      "fixed24_training_originals": {
+        "solvable": 156,
+        "complete_candidate_supervision": 156
+      },
+      "required_execution_relation_count": 20963
+    },
+    "metrics": {
+      "cohorts": {
+        "validation": {
+          "count": 576,
+          "finite_count": 576,
+          "finite_mae": 0.35334232449531555,
+          "finite_huber": 0.13050664961338043,
+          "finite_bias": 0.25973400473594666,
+          "shortest_action_rate": 0.6953125,
+          "candidate_soft_rank_loss": 1.5076417922973633,
+          "by_distance": {
+            "1.0": {
+              "count": 351,
+              "mae": 0.43707379698753357,
+              "predicted_mean": 1.4079822301864624
+            },
+            "2.0": {
+              "count": 166,
+              "mae": 0.2642354667186737,
+              "predicted_mean": 2.0516865253448486
+            },
+            "3.0": {
+              "count": 59,
+              "mae": 0.10591870546340942,
+              "predicted_mean": 2.963136672973633
+            }
+          },
+          "planning": {
+            "q": {
+              "count": 128,
+              "solved": 128,
+              "success_rate": 1.0,
+              "optimal": 128,
+              "optimal_rate": 1.0,
+              "cycles": 0,
+              "entered_unreachable": 0,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {}
+            },
+            "oracle": {
+              "count": 128,
+              "solved": 128,
+              "success_rate": 1.0,
+              "optimal": 128,
+              "optimal_rate": 1.0,
+              "cycles": 0,
+              "entered_unreachable": 0,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {}
+            },
+            "heuristic": {
+              "count": 128,
+              "solved": 8,
+              "success_rate": 0.0625,
+              "optimal": 8,
+              "optimal_rate": 0.0625,
+              "cycles": 0,
+              "entered_unreachable": 120,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 120
+              }
+            },
+            "immediate_cost_only": {
+              "count": 128,
+              "solved": 8,
+              "success_rate": 0.0625,
+              "optimal": 8,
+              "optimal_rate": 0.0625,
+              "cycles": 0,
+              "entered_unreachable": 120,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 120
+              }
+            }
+          }
+        },
+        "test": {
+          "count": 148,
+          "finite_count": 148,
+          "finite_mae": 0.247171550989151,
+          "finite_huber": 0.07698556035757065,
+          "finite_bias": 0.11960496008396149,
+          "shortest_action_rate": 0.722972972972973,
+          "candidate_soft_rank_loss": 1.2386811971664429,
+          "by_distance": {
+            "1.0": {
+              "count": 84,
+              "mae": 0.30848246812820435,
+              "predicted_mean": 1.268811583518982
+            },
+            "2.0": {
+              "count": 16,
+              "mae": 0.2702915668487549,
+              "predicted_mean": 1.9771766662597656
+            },
+            "3.0": {
+              "count": 48,
+              "mae": 0.13217073678970337,
+              "predicted_mean": 2.9059696197509766
+            }
+          },
+          "planning": {
+            "q": {
+              "count": 128,
+              "solved": 85,
+              "success_rate": 0.6640625,
+              "optimal": 85,
+              "optimal_rate": 0.6640625,
+              "cycles": 0,
+              "entered_unreachable": 43,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 37,
+                "2": 6
+              }
+            },
+            "oracle": {
+              "count": 128,
+              "solved": 128,
+              "success_rate": 1.0,
+              "optimal": 128,
+              "optimal_rate": 1.0,
+              "cycles": 0,
+              "entered_unreachable": 0,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {}
+            },
+            "heuristic": {
+              "count": 128,
+              "solved": 14,
+              "success_rate": 0.109375,
+              "optimal": 14,
+              "optimal_rate": 0.109375,
+              "cycles": 0,
+              "entered_unreachable": 114,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 108,
+                "2": 5,
+                "3": 1
+              }
+            },
+            "immediate_cost_only": {
+              "count": 128,
+              "solved": 14,
+              "success_rate": 0.109375,
+              "optimal": 14,
+              "optimal_rate": 0.109375,
+              "cycles": 0,
+              "entered_unreachable": 114,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 108,
+                "2": 5,
+                "3": 1
+              }
+            }
+          }
+        },
+        "unseen_goal_validation": {
+          "count": 18432,
+          "finite_count": 12288,
+          "finite_mae": 0.22719241678714752,
+          "finite_huber": 0.08551041036844254,
+          "finite_bias": 0.13855041563510895,
+          "shortest_action_rate": 0.71875,
+          "candidate_soft_rank_loss": 1.5128381252288818,
+          "by_distance": {
+            "0.0": {
+              "count": 4327,
+              "mae": 0.0,
+              "predicted_mean": 0.0
+            },
+            "1.0": {
+              "count": 4837,
+              "mae": 0.39319121837615967,
+              "predicted_mean": 1.368639349937439
+            },
+            "2.0": {
+              "count": 1815,
+              "mae": 0.4001534879207611,
+              "predicted_mean": 1.9932695627212524
+            },
+            "3.0": {
+              "count": 1309,
+              "mae": 0.12497776001691818,
+              "predicted_mean": 2.9477577209472656
+            }
+          },
+          "planning": {
+            "q": {
+              "count": 128,
+              "solved": 128,
+              "success_rate": 1.0,
+              "optimal": 128,
+              "optimal_rate": 1.0,
+              "cycles": 0,
+              "entered_unreachable": 0,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {}
+            },
+            "oracle": {
+              "count": 128,
+              "solved": 128,
+              "success_rate": 1.0,
+              "optimal": 128,
+              "optimal_rate": 1.0,
+              "cycles": 0,
+              "entered_unreachable": 0,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {}
+            },
+            "heuristic": {
+              "count": 128,
+              "solved": 14,
+              "success_rate": 0.109375,
+              "optimal": 14,
+              "optimal_rate": 0.109375,
+              "cycles": 0,
+              "entered_unreachable": 114,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 114
+              }
+            },
+            "immediate_cost_only": {
+              "count": 128,
+              "solved": 14,
+              "success_rate": 0.109375,
+              "optimal": 14,
+              "optimal_rate": 0.109375,
+              "cycles": 0,
+              "entered_unreachable": 114,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 114
+              }
+            }
+          }
+        },
+        "unseen_goal_test": {
+          "count": 18432,
+          "finite_count": 12288,
+          "finite_mae": 0.21147608757019043,
+          "finite_huber": 0.07403547316789627,
+          "finite_bias": 0.19504918158054352,
+          "shortest_action_rate": 0.77734375,
+          "candidate_soft_rank_loss": 1.3162956237792969,
+          "by_distance": {
+            "0.0": {
+              "count": 4855,
+              "mae": 0.0,
+              "predicted_mean": 0.0
+            },
+            "1.0": {
+              "count": 5531,
+              "mae": 0.40948742628097534,
+              "predicted_mean": 1.3802748918533325
+            },
+            "2.0": {
+              "count": 1902,
+              "mae": 0.17546971142292023,
+              "predicted_mean": 2.1542928218841553
+            }
+          },
+          "planning": {
+            "q": {
+              "count": 128,
+              "solved": 128,
+              "success_rate": 1.0,
+              "optimal": 128,
+              "optimal_rate": 1.0,
+              "cycles": 0,
+              "entered_unreachable": 0,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {}
+            },
+            "oracle": {
+              "count": 128,
+              "solved": 128,
+              "success_rate": 1.0,
+              "optimal": 128,
+              "optimal_rate": 1.0,
+              "cycles": 0,
+              "entered_unreachable": 0,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {}
+            },
+            "heuristic": {
+              "count": 128,
+              "solved": 4,
+              "success_rate": 0.03125,
+              "optimal": 4,
+              "optimal_rate": 0.03125,
+              "cycles": 0,
+              "entered_unreachable": 124,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 124
+              }
+            },
+            "immediate_cost_only": {
+              "count": 128,
+              "solved": 4,
+              "success_rate": 0.03125,
+              "optimal": 4,
+              "optimal_rate": 0.03125,
+              "cycles": 0,
+              "entered_unreachable": 124,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 124
+              }
+            }
+          }
+        },
+        "unseen_layout_validation": {
+          "count": 1536,
+          "finite_count": 1024,
+          "finite_mae": 0.1972569078207016,
+          "finite_huber": 0.06963712722063065,
+          "finite_bias": 0.10817624628543854,
+          "shortest_action_rate": 0.66015625,
+          "candidate_soft_rank_loss": 1.6884807348251343,
+          "by_distance": {
+            "0.0": {
+              "count": 405,
+              "mae": 0.0,
+              "predicted_mean": 0.0
+            },
+            "1.0": {
+              "count": 342,
+              "mae": 0.4693300426006317,
+              "predicted_mean": 1.3537012338638306
+            },
+            "2.0": {
+              "count": 201,
+              "mae": 0.17962130904197693,
+              "predicted_mean": 1.962210774421692
+            },
+            "3.0": {
+              "count": 76,
+              "mae": 0.07074107974767685,
+              "predicted_mean": 2.9658191204071045
+            }
+          },
+          "planning": {
+            "q": {
+              "count": 128,
+              "solved": 103,
+              "success_rate": 0.8046875,
+              "optimal": 103,
+              "optimal_rate": 0.8046875,
+              "cycles": 0,
+              "entered_unreachable": 25,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 24,
+                "2": 1
+              }
+            },
+            "oracle": {
+              "count": 128,
+              "solved": 128,
+              "success_rate": 1.0,
+              "optimal": 128,
+              "optimal_rate": 1.0,
+              "cycles": 0,
+              "entered_unreachable": 0,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {}
+            },
+            "heuristic": {
+              "count": 128,
+              "solved": 14,
+              "success_rate": 0.109375,
+              "optimal": 14,
+              "optimal_rate": 0.109375,
+              "cycles": 0,
+              "entered_unreachable": 114,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 109,
+                "2": 4,
+                "3": 1
+              }
+            },
+            "immediate_cost_only": {
+              "count": 128,
+              "solved": 14,
+              "success_rate": 0.109375,
+              "optimal": 14,
+              "optimal_rate": 0.109375,
+              "cycles": 0,
+              "entered_unreachable": 114,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 109,
+                "2": 4,
+                "3": 1
+              }
+            }
+          }
+        },
+        "unseen_layout_test": {
+          "count": 1536,
+          "finite_count": 1024,
+          "finite_mae": 0.21813826262950897,
+          "finite_huber": 0.07594899833202362,
+          "finite_bias": 0.11063224822282791,
+          "shortest_action_rate": 0.701171875,
+          "candidate_soft_rank_loss": 1.6015701293945312,
+          "by_distance": {
+            "0.0": {
+              "count": 336,
+              "mae": 0.0,
+              "predicted_mean": 0.0
+            },
+            "1.0": {
+              "count": 370,
+              "mae": 0.4229227304458618,
+              "predicted_mean": 1.341854453086853
+            },
+            "2.0": {
+              "count": 223,
+              "mae": 0.2615894675254822,
+              "predicted_mean": 1.9741405248641968
+            },
+            "3.0": {
+              "count": 95,
+              "mae": 0.0900813639163971,
+              "predicted_mean": 2.921769380569458
+            }
+          },
+          "planning": {
+            "q": {
+              "count": 128,
+              "solved": 100,
+              "success_rate": 0.78125,
+              "optimal": 100,
+              "optimal_rate": 0.78125,
+              "cycles": 0,
+              "entered_unreachable": 28,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 26,
+                "2": 2
+              }
+            },
+            "oracle": {
+              "count": 128,
+              "solved": 128,
+              "success_rate": 1.0,
+              "optimal": 128,
+              "optimal_rate": 1.0,
+              "cycles": 0,
+              "entered_unreachable": 0,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {}
+            },
+            "heuristic": {
+              "count": 128,
+              "solved": 21,
+              "success_rate": 0.1640625,
+              "optimal": 21,
+              "optimal_rate": 0.1640625,
+              "cycles": 0,
+              "entered_unreachable": 107,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 98,
+                "2": 9
+              }
+            },
+            "immediate_cost_only": {
+              "count": 128,
+              "solved": 21,
+              "success_rate": 0.1640625,
+              "optimal": 21,
+              "optimal_rate": 0.1640625,
+              "cycles": 0,
+              "entered_unreachable": 107,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 98,
+                "2": 9
+              }
+            }
+          }
+        },
+        "original_layout_test": {
+          "count": 128,
+          "finite_count": 127,
+          "finite_mae": 0.20594137907028198,
+          "finite_huber": 0.04818235710263252,
+          "finite_bias": 0.14245367050170898,
+          "shortest_action_rate": 0.5511811023622047,
+          "candidate_soft_rank_loss": 2.2606353759765625,
+          "by_distance": {
+            "1.0": {
+              "count": 40,
+              "mae": 0.357127845287323,
+              "predicted_mean": 1.3541719913482666
+            },
+            "2.0": {
+              "count": 40,
+              "mae": 0.18029674887657166,
+              "predicted_mean": 2.1593127250671387
+            },
+            "3.0": {
+              "count": 47,
+              "mae": 0.09909719228744507,
+              "predicted_mean": 2.9479193687438965
+            }
+          },
+          "planning": {
+            "q": {
+              "count": 127,
+              "solved": 64,
+              "success_rate": 0.5039370078740157,
+              "optimal": 64,
+              "optimal_rate": 0.5039370078740157,
+              "cycles": 0,
+              "entered_unreachable": 63,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 57,
+                "2": 6
+              }
+            },
+            "oracle": {
+              "count": 127,
+              "solved": 127,
+              "success_rate": 1.0,
+              "optimal": 127,
+              "optimal_rate": 1.0,
+              "cycles": 0,
+              "entered_unreachable": 0,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {}
+            },
+            "heuristic": {
+              "count": 127,
+              "solved": 4,
+              "success_rate": 0.031496062992125984,
+              "optimal": 4,
+              "optimal_rate": 0.031496062992125984,
+              "cycles": 0,
+              "entered_unreachable": 123,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 107,
+                "2": 16
+              }
+            },
+            "immediate_cost_only": {
+              "count": 127,
+              "solved": 4,
+              "success_rate": 0.031496062992125984,
+              "optimal": 4,
+              "optimal_rate": 0.031496062992125984,
+              "cycles": 0,
+              "entered_unreachable": 123,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 107,
+                "2": 16
+              }
+            }
+          }
+        },
+        "original_layout_validation": {
+          "count": 128,
+          "finite_count": 125,
+          "finite_mae": 0.20692825317382812,
+          "finite_huber": 0.0481860488653183,
+          "finite_bias": 0.1553013026714325,
+          "shortest_action_rate": 0.496,
+          "candidate_soft_rank_loss": 2.3978397846221924,
+          "by_distance": {
+            "1.0": {
+              "count": 40,
+              "mae": 0.3598637580871582,
+              "predicted_mean": 1.3432801961898804
+            },
+            "2.0": {
+              "count": 40,
+              "mae": 0.19623276591300964,
+              "predicted_mean": 2.1857283115386963
+            },
+            "3.0": {
+              "count": 45,
+              "mae": 0.08049267530441284,
+              "predicted_mean": 2.961162567138672
+            }
+          },
+          "planning": {
+            "q": {
+              "count": 125,
+              "solved": 60,
+              "success_rate": 0.48,
+              "optimal": 60,
+              "optimal_rate": 0.48,
+              "cycles": 0,
+              "entered_unreachable": 65,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 63,
+                "2": 2
+              }
+            },
+            "oracle": {
+              "count": 125,
+              "solved": 125,
+              "success_rate": 1.0,
+              "optimal": 125,
+              "optimal_rate": 1.0,
+              "cycles": 0,
+              "entered_unreachable": 0,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {}
+            },
+            "heuristic": {
+              "count": 125,
+              "solved": 2,
+              "success_rate": 0.016,
+              "optimal": 2,
+              "optimal_rate": 0.016,
+              "cycles": 0,
+              "entered_unreachable": 123,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 112,
+                "2": 9,
+                "3": 2
+              }
+            },
+            "immediate_cost_only": {
+              "count": 125,
+              "solved": 2,
+              "success_rate": 0.016,
+              "optimal": 2,
+              "optimal_rate": 0.016,
+              "cycles": 0,
+              "entered_unreachable": 123,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 112,
+                "2": 9,
+                "3": 2
+              }
+            }
+          }
+        }
+      }
+    },
+    "last_training_probe": {
+      "batches": 4,
+      "point_count": 131072,
+      "decision_count": 32768,
+      "finite_mae": 0.3890174925327301,
+      "distance_huber": 0.5630388855934143,
+      "candidate_soft_rank_loss": 1.3130455017089844,
+      "shortest_action_rate": 0.7843017578125,
+      "by_distance": {
+        "1_5": {
+          "count": 69945,
+          "mae": 0.3893234133720398
+        }
+      },
+      "role": "Fixed actual training batches; fitting diagnostic only, never checkpoint selection."
+    },
+    "curves": [
+      {
+        "step": 1,
+        "mean_distance_loss": 5.680962562561035,
+        "mean_rank_loss": 2.6867294311523438,
+        "validation_score": 3.9229711443185806,
+        "full_source_coverage": false,
+        "validation": {
+          "validation": {
+            "mae": 1.223374843597412,
+            "shortest_action_rate": 0.576171875
+          },
+          "unseen_goal_validation": {
+            "mae": 0.8366357684135437,
+            "shortest_action_rate": 0.556640625
+          },
+          "unseen_layout_validation": {
+            "mae": 0.7966062426567078,
+            "shortest_action_rate": 0.53125
+          },
+          "original_layout_validation": {
+            "mae": 1.7635643482208252,
+            "shortest_action_rate": 0.456
+          }
+        }
+      },
+      {
+        "step": 500,
+        "mean_distance_loss": 1.5998954006091866,
+        "mean_rank_loss": 1.817516001288542,
+        "validation_score": 2.1939626960083842,
+        "full_source_coverage": false,
+        "validation": {
+          "validation": {
+            "mae": 0.3052210211753845,
+            "shortest_action_rate": 0.724609375
+          },
+          "unseen_goal_validation": {
+            "mae": 0.20654092729091644,
+            "shortest_action_rate": 0.703125
+          },
+          "unseen_layout_validation": {
+            "mae": 0.21652564406394958,
+            "shortest_action_rate": 0.642578125
+          },
+          "original_layout_validation": {
+            "mae": 0.177906796336174,
+            "shortest_action_rate": 0.528
+          }
+        }
+      },
+      {
+        "step": 1000,
+        "mean_distance_loss": 0.8262135381698609,
+        "mean_rank_loss": 1.51826961517334,
+        "validation_score": 2.037985699251294,
+        "full_source_coverage": false,
+        "validation": {
+          "validation": {
+            "mae": 0.3244854807853699,
+            "shortest_action_rate": 0.728515625,
+            "success_rate": 1.0
+          },
+          "unseen_goal_validation": {
+            "mae": 0.21228177845478058,
+            "shortest_action_rate": 0.71484375,
+            "success_rate": 1.0
+          },
+          "unseen_layout_validation": {
+            "mae": 0.18727785348892212,
+            "shortest_action_rate": 0.6953125,
+            "success_rate": 0.78125
+          },
+          "original_layout_validation": {
+            "mae": 0.2095475196838379,
+            "shortest_action_rate": 0.544,
+            "success_rate": 0.52
+          }
+        }
+      },
+      {
+        "step": 1500,
+        "mean_distance_loss": 0.7099715007543563,
+        "mean_rank_loss": 1.4515293667316436,
+        "validation_score": 1.9705848284065723,
+        "full_source_coverage": true,
+        "validation": {
+          "validation": {
+            "mae": 0.3380333185195923,
+            "shortest_action_rate": 0.7265625
+          },
+          "unseen_goal_validation": {
+            "mae": 0.22269384562969208,
+            "shortest_action_rate": 0.7109375
+          },
+          "unseen_layout_validation": {
+            "mae": 0.2070595771074295,
+            "shortest_action_rate": 0.69140625
+          },
+          "original_layout_validation": {
+            "mae": 0.21304406225681305,
+            "shortest_action_rate": 0.528
+          }
+        }
+      },
+      {
+        "step": 2000,
+        "mean_distance_loss": 0.6501469647884369,
+        "mean_rank_loss": 1.4087927231788635,
+        "validation_score": 1.9183517033234239,
+        "full_source_coverage": true,
+        "validation": {
+          "validation": {
+            "mae": 0.3313956558704376,
+            "shortest_action_rate": 0.728515625,
+            "success_rate": 1.0
+          },
+          "unseen_goal_validation": {
+            "mae": 0.2257036715745926,
+            "shortest_action_rate": 0.73828125,
+            "success_rate": 1.0
+          },
+          "unseen_layout_validation": {
+            "mae": 0.1954323649406433,
+            "shortest_action_rate": 0.689453125,
+            "success_rate": 0.828125
+          },
+          "original_layout_validation": {
+            "mae": 0.19267351925373077,
+            "shortest_action_rate": 0.568,
+            "success_rate": 0.56
+          }
+        }
+      },
+      {
+        "step": 2500,
+        "mean_distance_loss": 0.6178489865064621,
+        "mean_rank_loss": 1.3791127460002899,
+        "validation_score": 1.8920179093256593,
+        "full_source_coverage": true,
+        "validation": {
+          "validation": {
+            "mae": 0.3385382294654846,
+            "shortest_action_rate": 0.728515625
+          },
+          "unseen_goal_validation": {
+            "mae": 0.22389714419841766,
+            "shortest_action_rate": 0.71875
+          },
+          "unseen_layout_validation": {
+            "mae": 0.18452760577201843,
+            "shortest_action_rate": 0.6875
+          },
+          "original_layout_validation": {
+            "mae": 0.19447006285190582,
+            "shortest_action_rate": 0.512
+          }
+        }
+      },
+      {
+        "step": 3000,
+        "mean_distance_loss": 0.5965526666641235,
+        "mean_rank_loss": 1.3560972771644593,
+        "validation_score": 1.873639632947743,
+        "full_source_coverage": true,
+        "validation": {
+          "validation": {
+            "mae": 0.34371331334114075,
+            "shortest_action_rate": 0.703125,
+            "success_rate": 1.0
+          },
+          "unseen_goal_validation": {
+            "mae": 0.22717177867889404,
+            "shortest_action_rate": 0.732421875,
+            "success_rate": 1.0
+          },
+          "unseen_layout_validation": {
+            "mae": 0.18069297075271606,
+            "shortest_action_rate": 0.701171875,
+            "success_rate": 0.8203125
+          },
+          "original_layout_validation": {
+            "mae": 0.18888986110687256,
+            "shortest_action_rate": 0.504,
+            "success_rate": 0.496
+          }
+        }
+      },
+      {
+        "step": 3500,
+        "mean_distance_loss": 0.578477093219757,
+        "mean_rank_loss": 1.3367235169410705,
+        "validation_score": 1.8676178064197302,
+        "full_source_coverage": true,
+        "validation": {
+          "validation": {
+            "mae": 0.357687771320343,
+            "shortest_action_rate": 0.6953125
+          },
+          "unseen_goal_validation": {
+            "mae": 0.22929084300994873,
+            "shortest_action_rate": 0.71875
+          },
+          "unseen_layout_validation": {
+            "mae": 0.1893596202135086,
+            "shortest_action_rate": 0.69921875
+          },
+          "original_layout_validation": {
+            "mae": 0.21312573552131653,
+            "shortest_action_rate": 0.512
+          }
+        }
+      },
+      {
+        "step": 4000,
+        "mean_distance_loss": 0.5646144217252731,
+        "mean_rank_loss": 1.320623143196106,
+        "validation_score": 1.860160168260336,
+        "full_source_coverage": true,
+        "validation": {
+          "validation": {
+            "mae": 0.35334232449531555,
+            "shortest_action_rate": 0.6953125,
+            "success_rate": 1.0
+          },
+          "unseen_goal_validation": {
+            "mae": 0.22719241678714752,
+            "shortest_action_rate": 0.71875,
+            "success_rate": 1.0
+          },
+          "unseen_layout_validation": {
+            "mae": 0.1972569078207016,
+            "shortest_action_rate": 0.66015625,
+            "success_rate": 0.8046875
+          },
+          "original_layout_validation": {
+            "mae": 0.20692825317382812,
+            "shortest_action_rate": 0.496,
+            "success_rate": 0.48
+          }
+        }
+      }
+    ],
+    "operation_profile": {
+      "protocol": "Frozen selected four-slot map; complete targets and real rational successors. Original starts are enumerated by goal type; suffix groups split the unchanged primary unseen-question queries.",
+      "results": {
+        "original_validation": {
+          "target24": {
+            "count": 5,
+            "solved": 3,
+            "entered_unreachable": 2,
+            "first_unreachable_step_counts": {
+              "1": 2
+            }
+          },
+          "intermediate_complete": {
+            "count": 80,
+            "solved": 54,
+            "entered_unreachable": 26,
+            "first_unreachable_step_counts": {
+              "1": 26
+            }
+          },
+          "other_single_rational": {
+            "count": 40,
+            "solved": 3,
+            "entered_unreachable": 37,
+            "first_unreachable_step_counts": {
+              "1": 35,
+              "2": 2
+            }
+          }
+        },
+        "suffix_validation": {
+          "2": {
+            "count": 52,
+            "solved": 52,
+            "entered_unreachable": 0,
+            "first_unreachable_step_counts": {}
+          },
+          "3": {
+            "count": 47,
+            "solved": 37,
+            "entered_unreachable": 10,
+            "first_unreachable_step_counts": {
+              "1": 10
+            }
+          },
+          "4": {
+            "count": 29,
+            "solved": 14,
+            "entered_unreachable": 15,
+            "first_unreachable_step_counts": {
+              "1": 14,
+              "2": 1
+            }
+          }
+        },
+        "original_test": {
+          "target24": {
+            "count": 7,
+            "solved": 1,
+            "entered_unreachable": 6,
+            "first_unreachable_step_counts": {
+              "1": 5,
+              "2": 1
+            }
+          },
+          "intermediate_complete": {
+            "count": 80,
+            "solved": 56,
+            "entered_unreachable": 24,
+            "first_unreachable_step_counts": {
+              "1": 24
+            }
+          },
+          "other_single_rational": {
+            "count": 40,
+            "solved": 7,
+            "entered_unreachable": 33,
+            "first_unreachable_step_counts": {
+              "1": 28,
+              "2": 5
+            }
+          }
+        },
+        "suffix_test": {
+          "2": {
+            "count": 42,
+            "solved": 42,
+            "entered_unreachable": 0,
+            "first_unreachable_step_counts": {}
+          },
+          "3": {
+            "count": 56,
+            "solved": 44,
+            "entered_unreachable": 12,
+            "first_unreachable_step_counts": {
+              "1": 12
+            }
+          },
+          "4": {
+            "count": 30,
+            "solved": 14,
+            "entered_unreachable": 16,
+            "first_unreachable_step_counts": {
+              "1": 14,
+              "2": 2
+            }
+          }
+        },
+        "train_original_target24": {
+          "count": 156,
+          "solved": 83,
+          "entered_unreachable": 73,
+          "first_unreachable_step_counts": {
+            "1": 65,
+            "2": 8
+          }
+        }
+      }
+    }
+  },
+  "game24_operation_distance_fit": {
+    "source_commit": "6386fb4",
+    "best_step": 4000,
+    "evaluated_step": 4000,
+    "last_step": 4000,
+    "training_seconds": 1008.507088442333,
+    "model_parameters": 103040,
+    "actual_exposure": {
+      "unique_gradient_states": 170573,
+      "available_states": 182593,
+      "unique_pair_rows": 2027529,
+      "pair_rows": 2027529,
+      "unique_decision_rows": 5059,
+      "decision_rows": 6843,
+      "minimum_pair_layer_passes": 32.3230888436121,
+      "minimum_decision_layer_passes": null
+    },
+    "data": {
+      "task": "game24",
+      "states": 182593,
+      "input_dim": 16,
+      "max_candidates": 36,
+      "seed": 2026102501,
+      "finite_max": 3.0,
+      "unknown_training_labels": 0,
+      "pair_count": 2027529,
+      "decision_count": 6843,
+      "reserved_relations": 93942,
+      "cohorts": {
+        "validation": {
+          "count": 576,
+          "reachable": 576
+        },
+        "test": {
+          "count": 148,
+          "reachable": 148
+        },
+        "unseen_goal_validation": {
+          "count": 18432,
+          "reachable": 12288
+        },
+        "unseen_goal_test": {
+          "count": 18432,
+          "reachable": 12288
+        },
+        "unseen_layout_validation": {
+          "count": 1536,
+          "reachable": 1024
+        },
+        "unseen_layout_test": {
+          "count": 1536,
+          "reachable": 1024
+        },
+        "original_layout_test": {
+          "count": 128,
+          "reachable": 127
+        },
+        "original_layout_validation": {
+          "count": 128,
+          "reachable": 125
+        }
+      },
+      "selected_train_states": 170573,
+      "all_selected_sources_in_training": true,
+      "training_original_starts": 192,
+      "original_starts_with_candidate_supervision": 192,
+      "goal_holdout_scope": "query_goal_relations; candidate endpoint exposure allowed",
+      "fixed24_training_originals": {
+        "solvable": 156,
+        "complete_candidate_supervision": 156
+      },
+      "required_execution_relation_count": 20963
+    },
+    "metrics": {
+      "cohorts": {
+        "validation": {
+          "count": 576,
+          "finite_count": 576,
+          "finite_mae": 0.34044668078422546,
+          "finite_huber": 0.12615853548049927,
+          "finite_bias": 0.2264331430196762,
+          "shortest_action_rate": 0.720703125,
+          "candidate_soft_rank_loss": 1.5595431327819824,
+          "by_distance": {
+            "1.0": {
+              "count": 351,
+              "mae": 0.3984847068786621,
+              "predicted_mean": 1.3667664527893066
+            },
+            "2.0": {
+              "count": 166,
+              "mae": 0.29787957668304443,
+              "predicted_mean": 2.0317814350128174
+            },
+            "3.0": {
+              "count": 59,
+              "mae": 0.114934541285038,
+              "predicted_mean": 2.93923282623291
+            }
+          },
+          "planning": {
+            "q": {
+              "count": 128,
+              "solved": 128,
+              "success_rate": 1.0,
+              "optimal": 128,
+              "optimal_rate": 1.0,
+              "cycles": 0,
+              "entered_unreachable": 0,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {}
+            },
+            "oracle": {
+              "count": 128,
+              "solved": 128,
+              "success_rate": 1.0,
+              "optimal": 128,
+              "optimal_rate": 1.0,
+              "cycles": 0,
+              "entered_unreachable": 0,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {}
+            },
+            "heuristic": {
+              "count": 128,
+              "solved": 8,
+              "success_rate": 0.0625,
+              "optimal": 8,
+              "optimal_rate": 0.0625,
+              "cycles": 0,
+              "entered_unreachable": 120,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 120
+              }
+            },
+            "immediate_cost_only": {
+              "count": 128,
+              "solved": 8,
+              "success_rate": 0.0625,
+              "optimal": 8,
+              "optimal_rate": 0.0625,
+              "cycles": 0,
+              "entered_unreachable": 120,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 120
+              }
+            }
+          }
+        },
+        "test": {
+          "count": 148,
+          "finite_count": 148,
+          "finite_mae": 0.23093721270561218,
+          "finite_huber": 0.05866384506225586,
+          "finite_bias": 0.08185328543186188,
+          "shortest_action_rate": 0.6824324324324325,
+          "candidate_soft_rank_loss": 1.2605541944503784,
+          "by_distance": {
+            "1.0": {
+              "count": 84,
+              "mae": 0.27654480934143066,
+              "predicted_mean": 1.2195253372192383
+            },
+            "2.0": {
+              "count": 16,
+              "mae": 0.27538156509399414,
+              "predicted_mean": 1.8659069538116455
+            },
+            "3.0": {
+              "count": 48,
+              "mae": 0.13630908727645874,
+              "predicted_mean": 2.9129092693328857
+            }
+          },
+          "planning": {
+            "q": {
+              "count": 128,
+              "solved": 84,
+              "success_rate": 0.65625,
+              "optimal": 84,
+              "optimal_rate": 0.65625,
+              "cycles": 0,
+              "entered_unreachable": 44,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 42,
+                "2": 2
+              }
+            },
+            "oracle": {
+              "count": 128,
+              "solved": 128,
+              "success_rate": 1.0,
+              "optimal": 128,
+              "optimal_rate": 1.0,
+              "cycles": 0,
+              "entered_unreachable": 0,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {}
+            },
+            "heuristic": {
+              "count": 128,
+              "solved": 14,
+              "success_rate": 0.109375,
+              "optimal": 14,
+              "optimal_rate": 0.109375,
+              "cycles": 0,
+              "entered_unreachable": 114,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 108,
+                "2": 5,
+                "3": 1
+              }
+            },
+            "immediate_cost_only": {
+              "count": 128,
+              "solved": 14,
+              "success_rate": 0.109375,
+              "optimal": 14,
+              "optimal_rate": 0.109375,
+              "cycles": 0,
+              "entered_unreachable": 114,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 108,
+                "2": 5,
+                "3": 1
+              }
+            }
+          }
+        },
+        "unseen_goal_validation": {
+          "count": 18432,
+          "finite_count": 12288,
+          "finite_mae": 0.21992428600788116,
+          "finite_huber": 0.08235622197389603,
+          "finite_bias": 0.11719765514135361,
+          "shortest_action_rate": 0.703125,
+          "candidate_soft_rank_loss": 1.5816850662231445,
+          "by_distance": {
+            "0.0": {
+              "count": 4327,
+              "mae": 0.0,
+              "predicted_mean": 0.0
+            },
+            "1.0": {
+              "count": 4837,
+              "mae": 0.35634341835975647,
+              "predicted_mean": 1.330618143081665
+            },
+            "2.0": {
+              "count": 1815,
+              "mae": 0.4355293810367584,
+              "predicted_mean": 1.9850645065307617
+            },
+            "3.0": {
+              "count": 1309,
+              "mae": 0.143858402967453,
+              "predicted_mean": 2.899184226989746
+            }
+          },
+          "planning": {
+            "q": {
+              "count": 128,
+              "solved": 128,
+              "success_rate": 1.0,
+              "optimal": 128,
+              "optimal_rate": 1.0,
+              "cycles": 0,
+              "entered_unreachable": 0,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {}
+            },
+            "oracle": {
+              "count": 128,
+              "solved": 128,
+              "success_rate": 1.0,
+              "optimal": 128,
+              "optimal_rate": 1.0,
+              "cycles": 0,
+              "entered_unreachable": 0,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {}
+            },
+            "heuristic": {
+              "count": 128,
+              "solved": 14,
+              "success_rate": 0.109375,
+              "optimal": 14,
+              "optimal_rate": 0.109375,
+              "cycles": 0,
+              "entered_unreachable": 114,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 114
+              }
+            },
+            "immediate_cost_only": {
+              "count": 128,
+              "solved": 14,
+              "success_rate": 0.109375,
+              "optimal": 14,
+              "optimal_rate": 0.109375,
+              "cycles": 0,
+              "entered_unreachable": 114,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 114
+              }
+            }
+          }
+        },
+        "unseen_goal_test": {
+          "count": 18432,
+          "finite_count": 12288,
+          "finite_mae": 0.21266596019268036,
+          "finite_huber": 0.0824650228023529,
+          "finite_bias": 0.19282247126102448,
+          "shortest_action_rate": 0.7734375,
+          "candidate_soft_rank_loss": 1.392358422279358,
+          "by_distance": {
+            "0.0": {
+              "count": 4855,
+              "mae": 0.0,
+              "predicted_mean": 0.0
+            },
+            "1.0": {
+              "count": 5531,
+              "mae": 0.4180454611778259,
+              "predicted_mean": 1.391358494758606
+            },
+            "2.0": {
+              "count": 1902,
+              "mae": 0.158270001411438,
+              "predicted_mean": 2.107675790786743
+            }
+          },
+          "planning": {
+            "q": {
+              "count": 128,
+              "solved": 128,
+              "success_rate": 1.0,
+              "optimal": 128,
+              "optimal_rate": 1.0,
+              "cycles": 0,
+              "entered_unreachable": 0,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {}
+            },
+            "oracle": {
+              "count": 128,
+              "solved": 128,
+              "success_rate": 1.0,
+              "optimal": 128,
+              "optimal_rate": 1.0,
+              "cycles": 0,
+              "entered_unreachable": 0,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {}
+            },
+            "heuristic": {
+              "count": 128,
+              "solved": 4,
+              "success_rate": 0.03125,
+              "optimal": 4,
+              "optimal_rate": 0.03125,
+              "cycles": 0,
+              "entered_unreachable": 124,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 124
+              }
+            },
+            "immediate_cost_only": {
+              "count": 128,
+              "solved": 4,
+              "success_rate": 0.03125,
+              "optimal": 4,
+              "optimal_rate": 0.03125,
+              "cycles": 0,
+              "entered_unreachable": 124,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 124
+              }
+            }
+          }
+        },
+        "unseen_layout_validation": {
+          "count": 1536,
+          "finite_count": 1024,
+          "finite_mae": 0.19801032543182373,
+          "finite_huber": 0.07108057290315628,
+          "finite_bias": 0.10530731081962585,
+          "shortest_action_rate": 0.640625,
+          "candidate_soft_rank_loss": 1.7651277780532837,
+          "by_distance": {
+            "0.0": {
+              "count": 405,
+              "mae": 0.0,
+              "predicted_mean": 0.0
+            },
+            "1.0": {
+              "count": 342,
+              "mae": 0.42514288425445557,
+              "predicted_mean": 1.3555876016616821
+            },
+            "2.0": {
+              "count": 201,
+              "mae": 0.24417996406555176,
+              "predicted_mean": 1.950822353363037
+            },
+            "3.0": {
+              "count": 76,
+              "mae": 0.10899391025304794,
+              "predicted_mean": 2.9487955570220947
+            }
+          },
+          "planning": {
+            "q": {
+              "count": 128,
+              "solved": 104,
+              "success_rate": 0.8125,
+              "optimal": 104,
+              "optimal_rate": 0.8125,
+              "cycles": 0,
+              "entered_unreachable": 24,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 23,
+                "2": 1
+              }
+            },
+            "oracle": {
+              "count": 128,
+              "solved": 128,
+              "success_rate": 1.0,
+              "optimal": 128,
+              "optimal_rate": 1.0,
+              "cycles": 0,
+              "entered_unreachable": 0,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {}
+            },
+            "heuristic": {
+              "count": 128,
+              "solved": 14,
+              "success_rate": 0.109375,
+              "optimal": 14,
+              "optimal_rate": 0.109375,
+              "cycles": 0,
+              "entered_unreachable": 114,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 109,
+                "2": 4,
+                "3": 1
+              }
+            },
+            "immediate_cost_only": {
+              "count": 128,
+              "solved": 14,
+              "success_rate": 0.109375,
+              "optimal": 14,
+              "optimal_rate": 0.109375,
+              "cycles": 0,
+              "entered_unreachable": 114,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 109,
+                "2": 4,
+                "3": 1
+              }
+            }
+          }
+        },
+        "unseen_layout_test": {
+          "count": 1536,
+          "finite_count": 1024,
+          "finite_mae": 0.21116092801094055,
+          "finite_huber": 0.06787465512752533,
+          "finite_bias": 0.10161356627941132,
+          "shortest_action_rate": 0.69921875,
+          "candidate_soft_rank_loss": 1.6665536165237427,
+          "by_distance": {
+            "0.0": {
+              "count": 336,
+              "mae": 0.0,
+              "predicted_mean": 0.0
+            },
+            "1.0": {
+              "count": 370,
+              "mae": 0.397305965423584,
+              "predicted_mean": 1.3224737644195557
+            },
+            "2.0": {
+              "count": 223,
+              "mae": 0.2596619725227356,
+              "predicted_mean": 1.9655789136886597
+            },
+            "3.0": {
+              "count": 95,
+              "mae": 0.11916807293891907,
+              "predicted_mean": 2.920135736465454
+            }
+          },
+          "planning": {
+            "q": {
+              "count": 128,
+              "solved": 101,
+              "success_rate": 0.7890625,
+              "optimal": 101,
+              "optimal_rate": 0.7890625,
+              "cycles": 0,
+              "entered_unreachable": 27,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 25,
+                "2": 2
+              }
+            },
+            "oracle": {
+              "count": 128,
+              "solved": 128,
+              "success_rate": 1.0,
+              "optimal": 128,
+              "optimal_rate": 1.0,
+              "cycles": 0,
+              "entered_unreachable": 0,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {}
+            },
+            "heuristic": {
+              "count": 128,
+              "solved": 21,
+              "success_rate": 0.1640625,
+              "optimal": 21,
+              "optimal_rate": 0.1640625,
+              "cycles": 0,
+              "entered_unreachable": 107,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 98,
+                "2": 9
+              }
+            },
+            "immediate_cost_only": {
+              "count": 128,
+              "solved": 21,
+              "success_rate": 0.1640625,
+              "optimal": 21,
+              "optimal_rate": 0.1640625,
+              "cycles": 0,
+              "entered_unreachable": 107,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 98,
+                "2": 9
+              }
+            }
+          }
+        },
+        "original_layout_test": {
+          "count": 128,
+          "finite_count": 127,
+          "finite_mae": 0.20470207929611206,
+          "finite_huber": 0.036553166806697845,
+          "finite_bias": 0.0993862897157669,
+          "shortest_action_rate": 0.5590551181102362,
+          "candidate_soft_rank_loss": 2.337080717086792,
+          "by_distance": {
+            "1.0": {
+              "count": 40,
+              "mae": 0.3133172392845154,
+              "predicted_mean": 1.3091431856155396
+            },
+            "2.0": {
+              "count": 40,
+              "mae": 0.16453370451927185,
+              "predicted_mean": 2.1170597076416016
+            },
+            "3.0": {
+              "count": 47,
+              "mae": 0.14644955098628998,
+              "predicted_mean": 2.9058289527893066
+            }
+          },
+          "planning": {
+            "q": {
+              "count": 127,
+              "solved": 64,
+              "success_rate": 0.5039370078740157,
+              "optimal": 64,
+              "optimal_rate": 0.5039370078740157,
+              "cycles": 0,
+              "entered_unreachable": 63,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 56,
+                "2": 7
+              }
+            },
+            "oracle": {
+              "count": 127,
+              "solved": 127,
+              "success_rate": 1.0,
+              "optimal": 127,
+              "optimal_rate": 1.0,
+              "cycles": 0,
+              "entered_unreachable": 0,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {}
+            },
+            "heuristic": {
+              "count": 127,
+              "solved": 4,
+              "success_rate": 0.031496062992125984,
+              "optimal": 4,
+              "optimal_rate": 0.031496062992125984,
+              "cycles": 0,
+              "entered_unreachable": 123,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 107,
+                "2": 16
+              }
+            },
+            "immediate_cost_only": {
+              "count": 127,
+              "solved": 4,
+              "success_rate": 0.031496062992125984,
+              "optimal": 4,
+              "optimal_rate": 0.031496062992125984,
+              "cycles": 0,
+              "entered_unreachable": 123,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 107,
+                "2": 16
+              }
+            }
+          }
+        },
+        "original_layout_validation": {
+          "count": 128,
+          "finite_count": 125,
+          "finite_mae": 0.18761399388313293,
+          "finite_huber": 0.033334068953990936,
+          "finite_bias": 0.11261637508869171,
+          "shortest_action_rate": 0.488,
+          "candidate_soft_rank_loss": 2.4692976474761963,
+          "by_distance": {
+            "1.0": {
+              "count": 40,
+              "mae": 0.2800571322441101,
+              "predicted_mean": 1.2739582061767578
+            },
+            "2.0": {
+              "count": 40,
+              "mae": 0.1784813404083252,
+              "predicted_mean": 2.1449742317199707
+            },
+            "3.0": {
+              "count": 45,
+              "mae": 0.11356022953987122,
+              "predicted_mean": 2.940438747406006
+            }
+          },
+          "planning": {
+            "q": {
+              "count": 125,
+              "solved": 57,
+              "success_rate": 0.456,
+              "optimal": 57,
+              "optimal_rate": 0.456,
+              "cycles": 0,
+              "entered_unreachable": 68,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 64,
+                "2": 4
+              }
+            },
+            "oracle": {
+              "count": 125,
+              "solved": 125,
+              "success_rate": 1.0,
+              "optimal": 125,
+              "optimal_rate": 1.0,
+              "cycles": 0,
+              "entered_unreachable": 0,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {}
+            },
+            "heuristic": {
+              "count": 125,
+              "solved": 2,
+              "success_rate": 0.016,
+              "optimal": 2,
+              "optimal_rate": 0.016,
+              "cycles": 0,
+              "entered_unreachable": 123,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 112,
+                "2": 9,
+                "3": 2
+              }
+            },
+            "immediate_cost_only": {
+              "count": 125,
+              "solved": 2,
+              "success_rate": 0.016,
+              "optimal": 2,
+              "optimal_rate": 0.016,
+              "cycles": 0,
+              "entered_unreachable": 123,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_unreachable_step_counts": {
+                "1": 112,
+                "2": 9,
+                "3": 2
+              }
+            }
+          }
+        }
+      }
+    },
+    "last_training_probe": {
+      "batches": 4,
+      "point_count": 131072,
+      "decision_count": 32768,
+      "finite_mae": 0.35094207525253296,
+      "distance_huber": 0.49820178747177124,
+      "candidate_soft_rank_loss": 1.6304150819778442,
+      "shortest_action_rate": 0.70098876953125,
+      "by_distance": {
+        "1_5": {
+          "count": 82073,
+          "mae": 0.3511430323123932
+        }
+      },
+      "role": "Fixed actual training batches; fitting diagnostic only, never checkpoint selection."
+    },
+    "curves": [
+      {
+        "step": 1,
+        "mean_distance_loss": 4.759510040283203,
+        "mean_rank_loss": 2.8287036418914795,
+        "validation_score": 3.92161326110363,
+        "full_source_coverage": false,
+        "validation": {
+          "validation": {
+            "mae": 1.2215837240219116,
+            "shortest_action_rate": 0.578125
+          },
+          "unseen_goal_validation": {
+            "mae": 0.835285484790802,
+            "shortest_action_rate": 0.568359375
+          },
+          "unseen_layout_validation": {
+            "mae": 0.7955570220947266,
+            "shortest_action_rate": 0.544921875
+          },
+          "original_layout_validation": {
+            "mae": 1.7609333992004395,
+            "shortest_action_rate": 0.448
+          }
+        }
+      },
+      {
+        "step": 500,
+        "mean_distance_loss": 1.3724200893977363,
+        "mean_rank_loss": 2.088129172822039,
+        "validation_score": 2.2257036338560283,
+        "full_source_coverage": false,
+        "validation": {
+          "validation": {
+            "mae": 0.2880603075027466,
+            "shortest_action_rate": 0.689453125
+          },
+          "unseen_goal_validation": {
+            "mae": 0.1943572759628296,
+            "shortest_action_rate": 0.69140625
+          },
+          "unseen_layout_validation": {
+            "mae": 0.18543879687786102,
+            "shortest_action_rate": 0.6484375
+          },
+          "original_layout_validation": {
+            "mae": 0.14188241958618164,
+            "shortest_action_rate": 0.52
+          }
+        }
+      },
+      {
+        "step": 1000,
+        "mean_distance_loss": 0.7309859199523926,
+        "mean_rank_loss": 1.821803458929062,
+        "validation_score": 2.1065236488357186,
+        "full_source_coverage": false,
+        "validation": {
+          "validation": {
+            "mae": 0.29181042313575745,
+            "shortest_action_rate": 0.703125,
+            "success_rate": 1.0
+          },
+          "unseen_goal_validation": {
+            "mae": 0.2078593224287033,
+            "shortest_action_rate": 0.685546875,
+            "success_rate": 1.0
+          },
+          "unseen_layout_validation": {
+            "mae": 0.18059894442558289,
+            "shortest_action_rate": 0.69921875,
+            "success_rate": 0.78125
+          },
+          "original_layout_validation": {
+            "mae": 0.17534717917442322,
+            "shortest_action_rate": 0.528,
+            "success_rate": 0.488
+          }
+        }
+      },
+      {
+        "step": 1500,
+        "mean_distance_loss": 0.6130888282060624,
+        "mean_rank_loss": 1.7538194587230682,
+        "validation_score": 2.004154176916927,
+        "full_source_coverage": true,
+        "validation": {
+          "validation": {
+            "mae": 0.31278038024902344,
+            "shortest_action_rate": 0.71484375
+          },
+          "unseen_goal_validation": {
+            "mae": 0.22476311028003693,
+            "shortest_action_rate": 0.697265625
+          },
+          "unseen_layout_validation": {
+            "mae": 0.1774638593196869,
+            "shortest_action_rate": 0.6875
+          },
+          "original_layout_validation": {
+            "mae": 0.17592614889144897,
+            "shortest_action_rate": 0.536
+          }
+        }
+      },
+      {
+        "step": 2000,
+        "mean_distance_loss": 0.5699403955936432,
+        "mean_rank_loss": 1.7136052474975585,
+        "validation_score": 1.9684743266552687,
+        "full_source_coverage": true,
+        "validation": {
+          "validation": {
+            "mae": 0.31203848123550415,
+            "shortest_action_rate": 0.724609375,
+            "success_rate": 1.0
+          },
+          "unseen_goal_validation": {
+            "mae": 0.2237458974123001,
+            "shortest_action_rate": 0.71875,
+            "success_rate": 1.0
+          },
+          "unseen_layout_validation": {
+            "mae": 0.1855880469083786,
+            "shortest_action_rate": 0.736328125,
+            "success_rate": 0.8125
+          },
+          "original_layout_validation": {
+            "mae": 0.1788017451763153,
+            "shortest_action_rate": 0.536,
+            "success_rate": 0.488
+          }
+        }
+      },
+      {
+        "step": 2500,
+        "mean_distance_loss": 0.5462246084213257,
+        "mean_rank_loss": 1.691913015127182,
+        "validation_score": 1.956086155027151,
+        "full_source_coverage": true,
+        "validation": {
+          "validation": {
+            "mae": 0.32892072200775146,
+            "shortest_action_rate": 0.72265625
+          },
+          "unseen_goal_validation": {
+            "mae": 0.22100365161895752,
+            "shortest_action_rate": 0.705078125
+          },
+          "unseen_layout_validation": {
+            "mae": 0.19198672473430634,
+            "shortest_action_rate": 0.66015625
+          },
+          "original_layout_validation": {
+            "mae": 0.18211792409420013,
+            "shortest_action_rate": 0.488
+          }
+        }
+      },
+      {
+        "step": 3000,
+        "mean_distance_loss": 0.5282545675039292,
+        "mean_rank_loss": 1.6692819430828094,
+        "validation_score": 1.9396913624368608,
+        "full_source_coverage": true,
+        "validation": {
+          "validation": {
+            "mae": 0.33341217041015625,
+            "shortest_action_rate": 0.728515625,
+            "success_rate": 1.0
+          },
+          "unseen_goal_validation": {
+            "mae": 0.22879235446453094,
+            "shortest_action_rate": 0.6953125,
+            "success_rate": 1.0
+          },
+          "unseen_layout_validation": {
+            "mae": 0.19889360666275024,
+            "shortest_action_rate": 0.666015625,
+            "success_rate": 0.7890625
+          },
+          "original_layout_validation": {
+            "mae": 0.18943221867084503,
+            "shortest_action_rate": 0.512,
+            "success_rate": 0.472
+          }
+        }
+      },
+      {
+        "step": 3500,
+        "mean_distance_loss": 0.5150186601877212,
+        "mean_rank_loss": 1.6505048575401307,
+        "validation_score": 1.9320090301334858,
+        "full_source_coverage": true,
+        "validation": {
+          "validation": {
+            "mae": 0.33471524715423584,
+            "shortest_action_rate": 0.732421875
+          },
+          "unseen_goal_validation": {
+            "mae": 0.21515022218227386,
+            "shortest_action_rate": 0.72265625
+          },
+          "unseen_layout_validation": {
+            "mae": 0.19554445147514343,
+            "shortest_action_rate": 0.6640625
+          },
+          "original_layout_validation": {
+            "mae": 0.1799134463071823,
+            "shortest_action_rate": 0.528
+          }
+        }
+      },
+      {
+        "step": 4000,
+        "mean_distance_loss": 0.5043594341874122,
+        "mean_rank_loss": 1.6363918473720551,
+        "validation_score": 1.9221457559615374,
+        "full_source_coverage": true,
+        "validation": {
+          "validation": {
+            "mae": 0.34044668078422546,
+            "shortest_action_rate": 0.720703125,
+            "success_rate": 1.0
+          },
+          "unseen_goal_validation": {
+            "mae": 0.21992428600788116,
+            "shortest_action_rate": 0.703125,
+            "success_rate": 1.0
+          },
+          "unseen_layout_validation": {
+            "mae": 0.19801032543182373,
+            "shortest_action_rate": 0.640625,
+            "success_rate": 0.8125
+          },
+          "original_layout_validation": {
+            "mae": 0.18761399388313293,
+            "shortest_action_rate": 0.488,
+            "success_rate": 0.456
+          }
+        }
+      }
+    ],
+    "operation_profile": {
+      "protocol": "Frozen selected four-slot map; complete targets and real rational successors. Original starts are enumerated by goal type; suffix groups split the unchanged primary unseen-question queries.",
+      "results": {
+        "original_validation": {
+          "target24": {
+            "count": 5,
+            "solved": 2,
+            "entered_unreachable": 3,
+            "first_unreachable_step_counts": {
+              "1": 3
+            }
+          },
+          "intermediate_complete": {
+            "count": 80,
+            "solved": 54,
+            "entered_unreachable": 26,
+            "first_unreachable_step_counts": {
+              "1": 26
+            }
+          },
+          "other_single_rational": {
+            "count": 40,
+            "solved": 1,
+            "entered_unreachable": 39,
+            "first_unreachable_step_counts": {
+              "1": 35,
+              "2": 4
+            }
+          }
+        },
+        "suffix_validation": {
+          "2": {
+            "count": 52,
+            "solved": 52,
+            "entered_unreachable": 0,
+            "first_unreachable_step_counts": {}
+          },
+          "3": {
+            "count": 47,
+            "solved": 39,
+            "entered_unreachable": 8,
+            "first_unreachable_step_counts": {
+              "1": 8
+            }
+          },
+          "4": {
+            "count": 29,
+            "solved": 13,
+            "entered_unreachable": 16,
+            "first_unreachable_step_counts": {
+              "1": 15,
+              "2": 1
+            }
+          }
+        },
+        "original_test": {
+          "target24": {
+            "count": 7,
+            "solved": 2,
+            "entered_unreachable": 5,
+            "first_unreachable_step_counts": {
+              "1": 4,
+              "2": 1
+            }
+          },
+          "intermediate_complete": {
+            "count": 80,
+            "solved": 56,
+            "entered_unreachable": 24,
+            "first_unreachable_step_counts": {
+              "1": 24
+            }
+          },
+          "other_single_rational": {
+            "count": 40,
+            "solved": 6,
+            "entered_unreachable": 34,
+            "first_unreachable_step_counts": {
+              "1": 28,
+              "2": 6
+            }
+          }
+        },
+        "suffix_test": {
+          "2": {
+            "count": 42,
+            "solved": 42,
+            "entered_unreachable": 0,
+            "first_unreachable_step_counts": {}
+          },
+          "3": {
+            "count": 56,
+            "solved": 46,
+            "entered_unreachable": 10,
+            "first_unreachable_step_counts": {
+              "1": 10
+            }
+          },
+          "4": {
+            "count": 30,
+            "solved": 13,
+            "entered_unreachable": 17,
+            "first_unreachable_step_counts": {
+              "1": 15,
+              "2": 2
+            }
+          }
+        },
+        "train_original_target24": {
+          "count": 156,
+          "solved": 70,
+          "entered_unreachable": 86,
+          "first_unreachable_step_counts": {
+            "1": 78,
+            "2": 8
+          }
+        }
+      }
+    }
+  }
+}

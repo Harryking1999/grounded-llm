@@ -280,6 +280,19 @@ class ExactPairTests(unittest.TestCase):
         truth=torch.as_tensor(np.where(valid,children,30))
         torch.testing.assert_close(soft_rank_loss(scores,truth,mask,1.),soft_rank_loss(scores+17,truth,mask,1.))
 
+    def test_optimal_only_rank_keeps_weighted_ties_and_masks_illegal_actions(self):
+        from grounded_llm.core.qmap.model import soft_rank_loss
+        scores=torch.tensor([[8.,11.,10.,-999.]],requires_grad=True)
+        truth=torch.tensor([[8.,9.,8.,0.]])
+        mask=torch.tensor([[True,True,True,False]])
+        hard=soft_rank_loss(scores,truth,mask,1.,target_mode='optimal_only')
+        log_probability=torch.log_softmax(-scores[:,:3],dim=-1)
+        torch.testing.assert_close(hard,-(log_probability[0,0]+log_probability[0,2])/2)
+        hard.backward();self.assertEqual(float(scores.grad[0,3]),0.)
+        torch.testing.assert_close(soft_rank_loss(scores,truth,mask,1.),soft_rank_loss(scores,truth,mask,1.,target_mode='soft_distance'))
+        self.assertGreater(float((soft_rank_loss(scores,truth,mask,1.)-hard).abs().detach()),.01)
+        with self.assertRaisesRegex(ValueError,'target mode'):soft_rank_loss(scores,truth,mask,1.,target_mode='unknown')
+
     def test_spatial_encoder_preserves_raw_board_and_checkpoint_interface(self):
         options=dict(dimension=128,hidden=256,cap=256,metric='directed_max',input_dim=400)
         mlp=StateEncoder(**options)

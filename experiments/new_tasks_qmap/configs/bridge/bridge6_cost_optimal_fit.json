@@ -1,0 +1,65 @@
+{
+  "schema": "exact_state_pairs",
+  "seed": 2026102501,
+  "model": {
+    "dimension": 128,
+    "hidden": 512,
+    "cap": 256,
+    "metric": "linf",
+    "bias": false,
+    "output_activation": "linear"
+  },
+  "training": {
+    "steps": 4000,
+    "batch_size": 32768,
+    "decision_batch_size": 8192,
+    "learning_rate": 0.0001,
+    "rank_weight": 1.0,
+    "rank_temperature": 1.0,
+    "eval_every": 500,
+    "rollout_eval_every": 1000,
+    "cpu_threads": 4,
+    "unreachable_target": 240.0,
+    "features_on_device": "float32",
+    "broad_fraction": 0.5,
+    "online_goals": false,
+    "record_training_samples": true,
+    "validation_only_initial": true,
+    "training_probe_batches": 4,
+    "initialize_from": "../bridge6_scale_homogeneous/last.pt",
+    "trace_write_workers": 1,
+    "sampling_seed_offset": 30002,
+    "rank_target_mode": "optimal_only"
+  },
+  "relations": {
+    "holdout_per_goal": 1,
+    "evaluation_per_goal": 32,
+    "unreachable_eval_per_goal": 16,
+    "complete_training_sources": true,
+    "evaluation_training_goals": 4,
+    "exhaustive_training_goals": true
+  },
+  "evaluation": {
+    "decision_count": 512,
+    "rollout_count": 128,
+    "horizon": 128
+  },
+  "selection": "Minimum mean validation finite Huber plus candidate soft-rank; final test never selects a checkpoint.",
+  "scope": "Development multi-goal experiment. Environment supplies complete real successors; independent Q(s), Q(g); no search or candidate pruning.",
+  "task": "bridge",
+  "data": {
+    "people": 6,
+    "maximum_time": 20,
+    "scenes": {
+      "train": 192,
+      "validation": 8,
+      "test": 8
+    },
+    "goals_per_scene": 20,
+    "heldout_goals": 4,
+    "additional_training_scenes": 832,
+    "prepared_from": "../bridge6_scale_reference/data"
+  },
+  "hypothesis": "Matched cost-action follow-up after the six-person scale model missed all-right optimal-cost acceptance (97/128); no test states or failures enter replay. Both arms start at the completed homogeneous8000-update last weights, with fresh identical optimizer and sampling phase, unchanged raw input/model, all1024 training time scenarios and complete legal weighted candidates. Only the training ranking target changes: soft_distance keeps the original cost softmax; optimal_only distributes its target uniformly over exact minimum immediate-plus-remaining-cost actions, including ties. Huber distance calibration, rank weight, temperature, data draws and4000-update budget match. Checkpoint selection and reported candidate-soft-rank metrics retain the original soft-distance validation criterion in both arms. This is a changed training-loss condition, not an exact optimizer continuation. Freeze before a fresh acceptance suite; the failed scale suite becomes development history and is excluded.",
+  "input_encoding": "time_homogeneous"
+}

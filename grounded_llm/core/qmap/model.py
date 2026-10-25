@@ -48,9 +48,14 @@ def distance(source, target, metric, group_size=8):
     raise ValueError(metric)
 
 
-def soft_rank_loss(scores, truth, valid, temperature):
+def soft_rank_loss(scores, truth, valid, temperature, target_mode='soft_distance'):
     """One soft-distance ranking objective, shared by blocks and all Qmap tasks."""
-    target = torch.softmax((-truth.float() / temperature).masked_fill(~valid, -torch.inf), dim=-1)
+    if target_mode=='soft_distance':
+        target = torch.softmax((-truth.float() / temperature).masked_fill(~valid, -torch.inf), dim=-1)
+    elif target_mode=='optimal_only':
+        best=truth.float().masked_fill(~valid,torch.inf).amin(dim=-1,keepdim=True)
+        target=((truth==best)&valid).float();target/=target.sum(dim=-1,keepdim=True)
+    else:raise ValueError('Unknown candidate ranking target mode')
     log_prob = torch.log_softmax((-scores / temperature).masked_fill(~valid, -torch.inf), dim=-1)
     return -(target * log_prob.masked_fill(~valid, 0)).sum(dim=-1).mean()
 

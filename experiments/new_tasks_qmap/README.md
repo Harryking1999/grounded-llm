@@ -83,6 +83,8 @@ python -m experiments.new_tasks_qmap.src.run --config experiments/new_tasks_qmap
 
 采样记录默认同步压缩。可用单个有界后台线程压缩原样数组；完整断点写入前必须等所有记录成功落盘，写入异常会阻止断点替换。过桥和24点的实际百步记录分别约405MB、614MB，单次压缩耗时约13秒、12秒，是已测CPU等待来源。同步／后台对照见[同步配置](configs/bridge/bridge6_trace_sync.json)和[后台配置](configs/bridge/bridge6_trace_async.json)；实现检查要求权重、随机状态、曝光和记录数组一致。循环吞吐排除了断点等待，因此性能结论同时检查包含写入等待的总耗时。
 
+实际匹配检查中，后台压缩把包含断点等待和最终评测的阶段耗时从109.92秒降到73.62秒，点关系循环吞吐约14.87万→25.58万/秒；显存峰值相同。最终权重逐位一致，随机状态、曝光和70个记录数组也一致。该结果仅说明记录写入的性能改善，不表示模型能力提高，见[结果](results/shared/trace_write_performance.json)。
+
 | 能力 | 模块入口 |
 |---|---|
 | 统一命令入口与模式分流 | [run.py](src/run.py) |

@@ -361,7 +361,7 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
         child_truth=data['child_distances_train'][r]
         if options.get('online_goals') or relation_sampler:
             extra=dict(local_fraction=options.get('local_goal_fraction',0.),walk_max=options.get('goal_walk_max'),
-                       distance_bins=options.get('goal_distance_bins'))
+                       distance_bins=options.get('goal_distance_bins'),proposal=options.get('goal_proposal','walk'))
             if not relation_sampler:
                 pair=sample_goals(corpus,pair[:,0],rng,data['reserved_relations'],allowed=allowed,fallback=pair[:,1],**extra)
                 tasks=sample_goals(corpus,tasks[:,0],rng,data['reserved_relations'],ranking=True,allowed=allowed,fallback=tasks[:,1],**extra)

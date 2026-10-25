@@ -72,6 +72,24 @@ class TokenCorpus:
     def successors(self,ids):
         return self.children[ids].astype(np.int64)
 
+    def sample_layer_goals(self,sources,bounds,layers,rng):
+        """Teacher-only uniform relative permutations in exact distance layers."""
+        key=tuple(bounds)
+        if not hasattr(self,'_layer_pools'):self._layer_pools={}
+        if key not in self._layer_pools:
+            bucket=np.searchsorted(bounds,self.distances)
+            pools=[np.flatnonzero(bucket==j) for j in range(len(bounds))]
+            if any(not len(pool) for pool in pools):raise ValueError('Empty exact permutation-distance layer')
+            self._layer_pools[key]=pools
+        pools=self._layer_pools[key];relative_ids=np.empty(len(sources),dtype=np.int64)
+        for layer in np.unique(layers):
+            mask=layers==layer;pool=pools[int(layer)]
+            relative_ids[mask]=pool[rng.integers(len(pool),size=int(mask.sum()))]
+        relative=self.states[relative_ids];source=self.states[sources]
+        goal=np.empty_like(source)
+        np.put_along_axis(goal,relative,source,axis=1)
+        return rank(goal)
+
     def distance(self,source,goal,reverse=False):
         source,goal=np.broadcast_arrays(source,goal)
         s,g=self.states[source],self.states[goal]

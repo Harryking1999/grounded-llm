@@ -43,6 +43,22 @@ def small_oracle(path,n,edges):
 
 
 class ExactPairTests(unittest.TestCase):
+    def test_exact_layer_goal_transport_and_endpoint_exclusions(self):
+        with tempfile.TemporaryDirectory() as name:
+            path=Path(name);small_oracle(path,5,[(0,1),(1,2),(1,3),(3,4)])
+            corpus=TokenCorpus(path)
+            try:
+                rng=np.random.default_rng(123);sources=np.tile(np.arange(corpus.size),3)
+                bounds=np.array([2,5,64]);layers=np.repeat(np.arange(3),corpus.size)
+                goals=corpus.sample_layer_goals(sources,bounds,layers,rng)
+                np.testing.assert_array_equal(np.searchsorted(bounds,corpus.distance(sources,goals)),layers)
+                allowed=np.arange(corpus.size)[::2]
+                rows=sample_goals(corpus,sources,rng,np.array([],dtype=np.int64),allowed=allowed,
+                    ranking=True,distance_bins=bounds,proposal='exact_layers')
+                self.assertTrue(np.isin(rows[:,1],allowed).all())
+                self.assertTrue((corpus.distance(rows[:,0],rows[:,1])>0).all())
+            finally:corpus.close()
+
     def test_vectorized_sokoban_graph_matches_every_physical_transition(self):
         from grounded_llm.tasks.sokoban.relation_data import physical_graph,decode
         env=Sokoban(['######','#@$$ #','# $$ #','#....#','######'])

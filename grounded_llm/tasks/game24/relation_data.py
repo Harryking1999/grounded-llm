@@ -30,7 +30,9 @@ def build(config,out):
     out=Path(out);out.mkdir(parents=True,exist_ok=True)
     spec=config['data'];rng=np.random.default_rng(config['seed']);env=Game24(spec['max_numbers'])
     records=[];seen=set()
-    for split,count in spec['scenes'].items():
+    scenes=list(spec['scenes'].items())
+    if spec.get('additional_training_scenes'):scenes.append(('train',spec['additional_training_scenes']))
+    for split,count in scenes:
         for _ in range(count):
             while True:
                 numbers=tuple(sorted(rng.integers(spec['minimum_number'],spec['maximum_number']+1,spec['initial_numbers']).tolist()))

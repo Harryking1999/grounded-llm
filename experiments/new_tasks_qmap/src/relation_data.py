@@ -81,7 +81,7 @@ def training_decision_mask(corpus,data,rows):
 
 
 def sample_goals(corpus,sources,rng,reserved,*,ranking=False,allowed=None,fallback=None,allow_missing=False,
-                 local_fraction=0.,walk_max=None,distance_bins=None):
+                 local_fraction=0.,walk_max=None,distance_bins=None,proposal='walk'):
     """Fresh complete goals, using teacher labels only in the training sampler."""
     sources=np.asarray(sources,dtype=np.int64)
     if not 0<=local_fraction<=1 or (local_fraction and (hasattr(corpus,'scenes') or walk_max is None or walk_max<0)):
@@ -99,11 +99,14 @@ def sample_goals(corpus,sources,rng,reserved,*,ranking=False,allowed=None,fallba
         distance_bins=np.asarray(distance_bins,dtype=np.float32)
         if np.any(np.diff(distance_bins)<=0):raise ValueError('Increasing exact distance bins required')
         desired=rng.integers(len(distance_bins),size=len(sources))
+    if proposal not in ('walk','exact_layers') or (proposal=='exact_layers' and desired is None):
+        raise ValueError('Exact-layer proposals require declared distance bins')
     for _ in range(64):
         if not bad.any(): break
         if scene_ids is None:
-            goals[bad]=rng.choice(allowed,int(bad.sum()))
-            if local_fraction:
+            goals[bad]=(corpus.sample_layer_goals(sources[bad],distance_bins,desired[bad],rng)
+                        if proposal=='exact_layers' else rng.choice(allowed,int(bad.sum())))
+            if local_fraction and proposal=='walk':
                 local=np.flatnonzero(bad & (rng.random(len(sources))<local_fraction))
                 goals[local]=sources[local]
                 lengths=rng.integers(0,walk_max+1,len(local))
@@ -118,7 +121,7 @@ def sample_goals(corpus,sources,rng,reserved,*,ranking=False,allowed=None,fallba
         bad=forbidden(keys(sources,goals,corpus.size))
         if desired is not None:
             bad|=np.searchsorted(distance_bins,corpus.distance(sources,goals))!=desired
-        if local_fraction:
+        if local_fraction or proposal=='exact_layers':
             at=np.searchsorted(allowed,goals)
             bad|=(at==len(allowed)) | (allowed[np.minimum(at,len(allowed)-1)]!=goals)
         if ranking:

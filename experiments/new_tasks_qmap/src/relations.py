@@ -65,10 +65,25 @@ def scope(config,corpus):
 
 
 def validate_continuation(previous,current,step):
-    """Authorize only a larger update budget; retain every training condition."""
+    """Validate an explicit budget extension or recorded batch resize."""
     old,new=deepcopy(previous),deepcopy(current)
+    resize=current.get('continuation',{}).get('mode')=='batch_resize'
     for item in (old,new):
         for key in ('continuation','convergence','pilot'):item.pop(key,None)
+    if resize:
+        if not step<new['training']['steps']<=old['training']['steps']:
+            raise ValueError('Batch resize must stay within the original update budget')
+        ratios=[new['training'][k]/old['training'][k] for k in ('batch_size','decision_batch_size')]
+        if ratios[0]<=1 or ratios[0]!=ratios[1]:raise ValueError('Resize point and decision batches by the same larger factor')
+        for key in ('batch_size','decision_batch_size'):new['training'][key]=old['training'][key]
+        if 'token_branch_replay' in old['training']:
+            a,b=old['training']['token_branch_replay'],new['training']['token_branch_replay']
+            if b['point_count']/a['point_count']!=ratios[0]:raise ValueError('Preserve supplemental point quota during batch resize')
+            b['point_count']=a['point_count']
+        for item in (old,new):item.get('data',{}).pop('prepared_from',None)
+        new['training']['steps']=old['training']['steps']
+        if old!=new:raise ValueError('Batch resize changes a condition other than batches or remaining updates')
+        return
     if not step<=old['training']['steps']<new['training']['steps']:
         raise ValueError('Continuation must extend the original update budget')
     new['training']['steps']=old['training']['steps']
@@ -268,7 +283,10 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
             atomic_json(out/'continuation.json',dict(checkpoint=str(checkpoint),source_commit=saved['source_commit'],
                 source_step=start_step,original_budget=saved['config']['training']['steps'],extended_budget=options['steps'],
                 optimizer_restored=True,sampling_rng_restored=True,sampler_state_restored=True,exposure_restored=True,
-                meaning='Full optimizer/RNG/counter continuation with unchanged data, sampling and optimization; only update budget extends.'))
+                batch_sizes={k:dict(previous=saved['config']['training'][k],current=options[k]) for k in ('batch_size','decision_batch_size')},
+                meaning=('Full optimizer/RNG/counter restoration; batch sizes change explicitly, so the update trajectory changes.'
+                    if continuation.get('mode')=='batch_resize' else
+                    'Full optimizer/RNG/counter continuation with unchanged data, sampling and optimization; only update budget extends.')))
     else:
         initial_checkpoint=options.get('initialize_from')
         if initial_checkpoint:
@@ -360,6 +378,7 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
             best_score=best,best_step=best_step,
             seconds=prior_seconds+time.monotonic()-started),path)
     step=start_step
+    window_started=time.monotonic();window_batches=window_points=window_decisions=0
     for step in range(start_step+1,options['steps']+1):
         model.train()
         epoch=relation_sampler.ranking_epochs if relation_sampler and relation_sampler.coverage_sampler is not None else 0.
@@ -456,9 +475,11 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
         loss=pointwise+options['rank_weight']*ranking
         optimizer.zero_grad(set_to_none=True); loss.backward(); optimizer.step()
         loss_window+=np.array([float(pointwise.detach()),float(ranking.detach()),1.])
+        window_batches+=1;window_points+=len(pair);window_decisions+=len(tasks)
         np.add.at(exposure,ids,1); np.add.at(pair_draws,p[p>=0],1); np.add.at(rank_draws,r[r>=0],1)
         if replay_sampler: np.add.at(replay_draws,replay_ids[replay_ids>=0],1)
         if step==1 or step%options['eval_every']==0 or step==options['steps']:
+            window_seconds=max(time.monotonic()-window_started,1e-9)
             planning=bool(convergence or (options.get('rollout_eval_every') and (step%options['rollout_eval_every']==0 or step==options['steps'])))
             values=evaluate(model,corpus,data,config,cohorts=validation,exposure=exposure,planning=planning)
             if options.get('token_cycle_replay') and step%options['eval_every']==0:
@@ -495,6 +516,10 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
             improved=(eligible and (not previous_eligible or objective<best)) or (not previous_eligible and objective<best)
             if improved: best,best_step=objective,step
             record=dict(step=step,seconds=round(prior_seconds+time.monotonic()-started,3),
+                        throughput=dict(training_seconds=window_seconds,batches_per_second=window_batches/window_seconds,
+                            point_pairs_per_second=window_points/window_seconds,complete_decisions_per_second=window_decisions/window_seconds,
+                            point_batch_size=options['batch_size'],decision_batch_size=options['decision_batch_size'],
+                            cuda_peak_allocated_bytes=torch.cuda.max_memory_allocated(device) if torch.device(device).type=='cuda' else None),
                         distance_loss=float(pointwise.detach()),rank_loss=float(ranking.detach()),
                         validation_score=objective,best_step=best_step,full_source_coverage=covered,
                         source_rows_seen=int((pair_draws>0).sum()),source_rows_total=len(pair_draws),
@@ -527,6 +552,7 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
                     retain_checkpoint(out/'last.pt',out/f'checkpoint-{step}.pt')
                     convergence.inspect(model,step,pair_draws,rank_draws,values,out/f'checkpoint-{step}.pt')
             print(json.dumps(record),flush=True)
+            window_started=time.monotonic();window_batches=window_points=window_decisions=0
     final_checkpoint=options.get('evaluation_checkpoint','best.pt')
     if final_checkpoint not in ('best.pt','last.pt'): raise ValueError('Unknown final evaluation checkpoint')
     saved=torch.load(out/final_checkpoint,map_location=device,weights_only=False)

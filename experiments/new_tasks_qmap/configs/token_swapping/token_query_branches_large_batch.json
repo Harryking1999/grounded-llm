@@ -1,0 +1,68 @@
+{
+  "task": "token_swapping",
+  "seed": 2026102304,
+  "data": {
+    "tree": "tasks/token_swapping/data/tree10.json",
+    "prepared_from": "../token_query_reference/data"
+  },
+  "model": {
+    "dimension": 128,
+    "hidden": 256,
+    "cap": 64,
+    "metric": "linf"
+  },
+  "training": {
+    "steps": 12000,
+    "batch_size": 16384,
+    "decision_batch_size": 4096,
+    "learning_rate": 0.0003,
+    "rank_weight": 4.0,
+    "rank_temperature": 1.0,
+    "eval_every": 1000,
+    "cpu_threads": 4,
+    "unreachable_target": 60.0,
+    "features_on_device": true,
+    "broad_fraction": 0.5,
+    "online_goals": true,
+    "record_training_samples": true,
+    "initialize_from": "../token_initial/best.pt",
+    "local_goal_fraction": 0.0,
+    "rollout_eval_every": 1000,
+    "goal_walk_max": 8,
+    "validation_only_initial": true,
+    "token_branch_replay": {
+      "bank": "../token_query_branch_data/branch_bank.npz",
+      "kind": "branches",
+      "decision_fraction": 0.25,
+      "point_count": 4096,
+      "fit_gate": {
+        "maximum_mae": 0.5,
+        "minimum_shortest_action_rate": 0.99,
+        "minimum_completion_rate": 0.9,
+        "maximum_cycle_rate": 0.01
+      }
+    },
+    "training_probe_batches": 4
+  },
+  "relations": {
+    "protocol": "query_goal_holdout",
+    "training_goals": 8,
+    "heldout_goals_per_split": 4,
+    "evaluation_count": 2048,
+    "complete_training_sources": true
+  },
+  "evaluation": {
+    "decision_count": 512,
+    "rollout_count": 128,
+    "horizon": 128,
+    "landmarks": 128
+  },
+  "schema": "exact_state_pairs",
+  "selection": "Lowest validation finite Huber plus candidate soft-rank CE, equally averaging predeclared validation cohorts; no test checkpoint selection.",
+  "scope": "Independent Q(S), Q(G); exact complete goals only; no oracle in inference features, no pruning, no search, no LLM retraining.",
+  "hypothesis": "Explicit fitting condition on the original tree: all physical state inputs allowed; eight fixed complete training goals, four held query goals per validation/test split, and protected held relation closures. This is not unseen-state evaluation. Frozen actual cycle seeds and goal switches are compared with their complete branches under equal updates, losses, sampling quotas and initialization. No oracle labels enter inference. Report fit gates, teacher continuation reachability, actual sample coverage and independent query completion separately.",
+  "continuation": {
+    "mode": "batch_resize",
+    "checkpoint": "/tmp/grounded_qmap_followup_5d41460/runs/token_query_branches_batch_initial/last.pt"
+  }
+}

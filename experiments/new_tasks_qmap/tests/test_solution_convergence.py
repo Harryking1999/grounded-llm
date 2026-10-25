@@ -15,6 +15,19 @@ from experiments.new_tasks_qmap.src.solution_global_order import unit_edge_point
 
 
 class ConvergenceTests(unittest.TestCase):
+    def test_explicit_batch_resize_preserves_other_conditions(self):
+        old=dict(task='token_swapping',data=dict(source='fixed'),training=dict(steps=6000,
+            batch_size=2048,decision_batch_size=512,learning_rate=.0001,
+            token_branch_replay=dict(point_count=512,decision_fraction=.25)))
+        new=deepcopy(old);new['continuation']=dict(mode='batch_resize');new['training'].update(steps=4000,batch_size=16384,decision_batch_size=4096)
+        new['training']['token_branch_replay']['point_count']=4096
+        validate_continuation(old,new,2000)
+        for key,value in [('learning_rate',.001),('decision_batch_size',2048),('steps',7000)]:
+            bad=deepcopy(new);bad['training'][key]=value
+            with self.assertRaises(ValueError):validate_continuation(old,bad,2000)
+        bad=deepcopy(new);bad['training']['token_branch_replay']['point_count']=512
+        with self.assertRaises(ValueError):validate_continuation(old,bad,2000)
+
     def test_only_budget_and_diagnostic_metadata_can_change(self):
         old=dict(task='sokoban',training=dict(steps=6,learning_rate=.0001,solution_structure=dict(graph_fraction=.2)),
                  data=dict(source='fixed'),evaluation=dict(horizon=32))

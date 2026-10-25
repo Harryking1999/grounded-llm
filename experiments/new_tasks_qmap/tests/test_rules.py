@@ -8,6 +8,31 @@ from grounded_llm.tasks.game24.environment import Game24
 
 
 class RulesTest(unittest.TestCase):
+    def test_finite_distinct_game_inputs_and_both_targets_keep_complete_branches(self):
+        import json,tempfile
+        from itertools import combinations
+        from pathlib import Path
+        from contextlib import ExitStack
+        from experiments.new_tasks_qmap.src.relation_data import prepare,training_decision_mask
+        config=json.loads(Path('experiments/new_tasks_qmap/configs/game24/game24_operation_reference.json').read_text())
+        config['data'].update(initial_sampling='exhaustive_distinct',source_values=[1,2,3,4,5],root_targets=[24,21],
+            scenes=dict(train=5,validation=0,test=0),additional_training_scenes=0)
+        config['relations']['preserve_goal_execution']=['24','21']
+        with tempfile.TemporaryDirectory() as directory,ExitStack() as stack:
+            corpus,data,_=prepare(config,Path(directory))
+            actual=set()
+            for sid,scene in enumerate(corpus.scenes):
+                for field in ('states','children','distances','reverse_distances'):stack.callback(getattr(scene,field)._mmap.close)
+                actual.add(tuple(scene.metadata['source']['numbers']))
+                self.assertEqual([scene.values[g] for g in scene.goals[:2]],[(Fraction(24),),(Fraction(21),)])
+                for column in [0,1]:
+                    offset=corpus.offsets[sid];goal=int(scene.goals[column])+offset
+                    parents=np.flatnonzero(np.isfinite(scene.distances[column])&(scene.distances[column]>0))+offset
+                    queries=np.column_stack([parents,np.full(len(parents),goal)])
+                    self.assertTrue(training_decision_mask(corpus,data,queries).all())
+                    np.testing.assert_array_equal(data['tasks_train'][data['tasks_train'][:,1]==goal],queries)
+            self.assertEqual(actual,set(combinations([1,2,3,4,5],4)))
+
     def test_bridge_optimum_and_judge(self):
         env = Bridge([1, 2, 5, 10])
         self.assertEqual(env.graph()['distances'][0], 17)

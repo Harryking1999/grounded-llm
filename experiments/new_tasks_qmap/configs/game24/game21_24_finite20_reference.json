@@ -1,0 +1,103 @@
+{
+  "schema": "exact_state_pairs",
+  "seed": 2026102501,
+  "model": {
+    "dimension": 128,
+    "hidden": 1024,
+    "cap": 16,
+    "metric": "directed_max"
+  },
+  "training": {
+    "steps": 4000,
+    "batch_size": 32768,
+    "decision_batch_size": 8192,
+    "learning_rate": 0.0003,
+    "rank_weight": 1.0,
+    "rank_temperature": 1.0,
+    "eval_every": 500,
+    "rollout_eval_every": 1000,
+    "cpu_threads": 4,
+    "unreachable_target": 12.0,
+    "features_on_device": "float32",
+    "broad_fraction": 0.5,
+    "online_goals": false,
+    "record_training_samples": true,
+    "validation_only_initial": true,
+    "action_edge_fraction": 0.25,
+    "training_probe_batches": 4,
+    "relation_sampling": {
+      "finite_point_fraction": 0.5,
+      "boundary_rank_fraction": 1.0,
+      "distance_bin_upper_bounds": [
+        1,
+        2,
+        3
+      ],
+      "balance_layouts": true,
+      "layouts_per_batch": 64,
+      "preparation_workers": 2
+    },
+    "trace_write_workers": 1
+  },
+  "relations": {
+    "holdout_per_goal": 1,
+    "evaluation_per_goal": 32,
+    "unreachable_eval_per_goal": 16,
+    "complete_training_sources": true,
+    "evaluation_training_goals": 4,
+    "exhaustive_training_goals": true,
+    "holdout_goal_endpoints": false,
+    "preserve_goal_execution": [
+      "24",
+      "21"
+    ]
+  },
+  "evaluation": {
+    "decision_count": 512,
+    "rollout_count": 128,
+    "horizon": 4
+  },
+  "selection": "Minimum mean validation finite Huber plus candidate soft-rank; final test never selects a checkpoint.",
+  "scope": "Finite1..20 distinct four-number domain; all4845 initial sets belong to training. One shared independent Q(s), queried complete21/24 and intermediate goals, all legal rational operations and2/3-number suffixes. No claim of held initial-question generalization, oracle input, search or pruning. Exact duplicates across questions represent identical numerical states; aggregate their exposure by rational identity.",
+  "task": "game24",
+  "data": {
+    "max_numbers": 4,
+    "initial_numbers": 4,
+    "scenes": {
+      "train": 4845,
+      "validation": 0,
+      "test": 0
+    },
+    "goals_per_scene": 16,
+    "heldout_goals": 4,
+    "minimum_reachable_per_goal": 2,
+    "initial_sampling": "exhaustive_distinct",
+    "source_values": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20
+    ],
+    "root_targets": [
+      24,
+      21
+    ]
+  },
+  "hypothesis": "Exhaustively cover the finite distinct-source domain rather than sample a small subset of initial sets. Preserve all reachable complete21/24 decisions and every legal candidate before selecting held intermediate query closures. Known-query relation validation and held intermediate goals remain separate from exhaustive initial-root fitting. Do not exclude unsolvable initial queries from reachability reporting or treat finite enumeration as neural convergence. Preparation reuses the existing per-question physical DAG interface; cross-question state duplicates are retained physically but share identical numerical features. First inspect2/3/4-number, reachable/unreachable and21/24 strata before starting the declared training budget."
+}

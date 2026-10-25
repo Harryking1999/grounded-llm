@@ -1,0 +1,858 @@
+{
+  "source_commit": "403e0ed",
+  "same_budget_updates": 8000,
+  "training_goals": 532,
+  "configurations": {
+    "mlp": "experiments/new_tasks_qmap/configs/sokoban/sokoban_fixed_wall_902_goal_coverage_mlp.json",
+    "cnn": "experiments/new_tasks_qmap/configs/sokoban/sokoban_fixed_wall_902_goal_coverage_cnn.json"
+  },
+  "scope": "Fixed wall902, raw four-channel board, independent128D Q(s), original losses and directed_max readout. One training seed per arm. Broad source traversal and exact ranking contexts do not establish exhaustive state-goal supervision or convergence.",
+  "models": {
+    "sokoban_fixed_wall_902_goal_coverage_mlp": {
+      "source_commit": "403e0ed",
+      "best_step": 8000,
+      "evaluated_step": 8000,
+      "last_step": 8000,
+      "model_parameters": 1591424,
+      "actual_exposure": {
+        "unique_gradient_states": 42840,
+        "available_states": 42840,
+        "unique_pair_rows": 42840,
+        "pair_rows": 42840,
+        "unique_decision_rows": 34012,
+        "decision_rows": 747780,
+        "minimum_pair_layer_passes": 1529.7852474323063,
+        "minimum_decision_layer_passes": null
+      },
+      "acceptance": {
+        "minimum": 0.8,
+        "target": 0.9,
+        "rates": {
+          "test": 0.0625,
+          "unseen_goal_test": 0.2127659574468085,
+          "original_training_goals": 0.04040404040404041,
+          "original_unseen_goals": 0.0
+        },
+        "missing_required_cohorts": [],
+        "full_training_source_coverage": true,
+        "passed": false,
+        "target_reached": false
+      },
+      "cohorts": {
+        "validation": {
+          "mae": 1.3424620628356934,
+          "shortest_action_rate": 0.9375,
+          "q": {
+            "count": 16,
+            "solved": 3,
+            "optimal": 3,
+            "cycles": 13,
+            "entered_unreachable": 2,
+            "success_rate": 0.1875,
+            "optimal_rate": 0.1875,
+            "mean_excess_cost_on_success": 0.0
+          }
+        },
+        "test": {
+          "mae": 3.1927146911621094,
+          "shortest_action_rate": 0.875,
+          "q": {
+            "count": 16,
+            "solved": 1,
+            "optimal": 1,
+            "cycles": 15,
+            "entered_unreachable": 1,
+            "success_rate": 0.0625,
+            "optimal_rate": 0.0625,
+            "mean_excess_cost_on_success": 0.0
+          }
+        },
+        "unseen_goal_validation": {
+          "mae": 1.8056062459945679,
+          "shortest_action_rate": 0.8958333333333334,
+          "q": {
+            "count": 96,
+            "solved": 23,
+            "optimal": 19,
+            "cycles": 73,
+            "entered_unreachable": 10,
+            "success_rate": 0.23958333333333334,
+            "optimal_rate": 0.19791666666666666,
+            "mean_excess_cost_on_success": 0.3478260934352875
+          }
+        },
+        "unseen_goal_test": {
+          "mae": 4.608286380767822,
+          "shortest_action_rate": 0.7708333333333334,
+          "q": {
+            "count": 94,
+            "solved": 20,
+            "optimal": 19,
+            "cycles": 74,
+            "entered_unreachable": 14,
+            "success_rate": 0.2127659574468085,
+            "optimal_rate": 0.20212765957446807,
+            "mean_excess_cost_on_success": 0.10000000149011612
+          }
+        },
+        "original_training_goals": {
+          "mae": 7.810421943664551,
+          "shortest_action_rate": 0.8333333333333334,
+          "q": {
+            "count": 198,
+            "solved": 8,
+            "optimal": 7,
+            "cycles": 190,
+            "entered_unreachable": 10,
+            "success_rate": 0.04040404040404041,
+            "optimal_rate": 0.03535353535353535,
+            "mean_excess_cost_on_success": 0.25
+          }
+        },
+        "original_unseen_goals": {
+          "mae": 4.074125289916992,
+          "shortest_action_rate": 0.5,
+          "q": {
+            "count": 4,
+            "solved": 0,
+            "optimal": 0,
+            "cycles": 4,
+            "entered_unreachable": 0,
+            "success_rate": 0.0,
+            "optimal_rate": 0.0,
+            "mean_excess_cost_on_success": null
+          }
+        }
+      },
+      "probes": [
+        {
+          "step": 1,
+          "validation_score": 23.074826925992966,
+          "best_step": 1,
+          "full_source_coverage": false,
+          "source_rows_seen": 14904,
+          "source_rows_total": 42840,
+          "training_probe": {
+            "batches": 1,
+            "point_count": 32768,
+            "decision_count": 8192,
+            "finite_mae": 9.384695053100586,
+            "distance_huber": 50.509883880615234,
+            "candidate_soft_rank_loss": 0.8584619760513306,
+            "shortest_action_rate": 0.6177978515625,
+            "by_distance": {
+              "1_5": {
+                "count": 16102,
+                "mae": 0.7787024974822998
+              },
+              "6_20": {
+                "count": 5377,
+                "mae": 10.454459190368652
+              },
+              "21_plus": {
+                "count": 5346,
+                "mae": 34.229732513427734
+              }
+            },
+            "role": "Fixed actual training batches; fitting diagnostic only, never checkpoint selection."
+          },
+          "throughput": {
+            "training_seconds": 0.20387374330312014,
+            "batches_per_second": 4.904996513029129,
+            "point_pairs_per_second": 160726.9257389385,
+            "complete_decisions_per_second": 40181.731434734626,
+            "point_batch_size": 32768,
+            "decision_batch_size": 8192,
+            "cuda_peak_allocated_bytes": 595972096
+          }
+        },
+        {
+          "step": 1000,
+          "validation_score": 3.9990087747573853,
+          "best_step": 1000,
+          "full_source_coverage": true,
+          "source_rows_seen": 42840,
+          "source_rows_total": 42840,
+          "training_probe": {
+            "batches": 4,
+            "point_count": 131072,
+            "decision_count": 32768,
+            "finite_mae": 1.920670509338379,
+            "distance_huber": 6.891911506652832,
+            "candidate_soft_rank_loss": 0.657943844795227,
+            "shortest_action_rate": 0.823333740234375,
+            "by_distance": {
+              "1_5": {
+                "count": 64368,
+                "mae": 0.746544361114502
+              },
+              "6_20": {
+                "count": 21504,
+                "mae": 2.8015928268432617
+              },
+              "21_plus": {
+                "count": 21478,
+                "mae": 4.557451248168945
+              }
+            },
+            "role": "Fixed actual training batches; fitting diagnostic only, never checkpoint selection."
+          },
+          "throughput": {
+            "training_seconds": 30.6483756294474,
+            "batches_per_second": 16.314078306962305,
+            "point_pairs_per_second": 534579.7179625408,
+            "complete_decisions_per_second": 133644.9294906352,
+            "point_batch_size": 32768,
+            "decision_batch_size": 8192,
+            "cuda_peak_allocated_bytes": 611731968
+          }
+        },
+        {
+          "step": 2000,
+          "validation_score": 3.587806314229965,
+          "best_step": 2000,
+          "full_source_coverage": true,
+          "source_rows_seen": 42840,
+          "source_rows_total": 42840,
+          "training_probe": {
+            "batches": 4,
+            "point_count": 131072,
+            "decision_count": 32768,
+            "finite_mae": 1.7210336923599243,
+            "distance_huber": 6.285693645477295,
+            "candidate_soft_rank_loss": 0.6129484176635742,
+            "shortest_action_rate": 0.8507080078125,
+            "by_distance": {
+              "1_5": {
+                "count": 64368,
+                "mae": 0.6616907119750977
+              },
+              "6_20": {
+                "count": 21504,
+                "mae": 2.6394498348236084
+              },
+              "21_plus": {
+                "count": 21478,
+                "mae": 3.9762792587280273
+              }
+            },
+            "role": "Fixed actual training batches; fitting diagnostic only, never checkpoint selection."
+          },
+          "throughput": {
+            "training_seconds": 30.190221180208027,
+            "batches_per_second": 16.56165408711175,
+            "point_pairs_per_second": 542692.2811264779,
+            "complete_decisions_per_second": 135673.07028161947,
+            "point_batch_size": 32768,
+            "decision_batch_size": 8192,
+            "cuda_peak_allocated_bytes": 611731968
+          }
+        },
+        {
+          "step": 4000,
+          "validation_score": 3.125255972146988,
+          "best_step": 4000,
+          "full_source_coverage": true,
+          "source_rows_seen": 42840,
+          "source_rows_total": 42840,
+          "training_probe": {
+            "batches": 4,
+            "point_count": 131072,
+            "decision_count": 32768,
+            "finite_mae": 1.5999817848205566,
+            "distance_huber": 5.218947410583496,
+            "candidate_soft_rank_loss": 0.5827807784080505,
+            "shortest_action_rate": 0.876434326171875,
+            "by_distance": {
+              "1_5": {
+                "count": 64368,
+                "mae": 0.6279021501541138
+              },
+              "6_20": {
+                "count": 21504,
+                "mae": 2.375756025314331
+              },
+              "21_plus": {
+                "count": 21478,
+                "mae": 3.7365200519561768
+              }
+            },
+            "role": "Fixed actual training batches; fitting diagnostic only, never checkpoint selection."
+          },
+          "throughput": {
+            "training_seconds": 31.12984216120094,
+            "batches_per_second": 16.061758277180765,
+            "point_pairs_per_second": 526311.6952266593,
+            "complete_decisions_per_second": 131577.92380666482,
+            "point_batch_size": 32768,
+            "decision_batch_size": 8192,
+            "cuda_peak_allocated_bytes": 611731968
+          }
+        },
+        {
+          "step": 6000,
+          "validation_score": 2.1845844388008118,
+          "best_step": 6000,
+          "full_source_coverage": true,
+          "source_rows_seen": 42840,
+          "source_rows_total": 42840,
+          "training_probe": {
+            "batches": 4,
+            "point_count": 131072,
+            "decision_count": 32768,
+            "finite_mae": 1.4585638046264648,
+            "distance_huber": 4.455204010009766,
+            "candidate_soft_rank_loss": 0.5578124523162842,
+            "shortest_action_rate": 0.894378662109375,
+            "by_distance": {
+              "1_5": {
+                "count": 64368,
+                "mae": 0.566178560256958
+              },
+              "6_20": {
+                "count": 21504,
+                "mae": 2.154754400253296
+              },
+              "21_plus": {
+                "count": 21478,
+                "mae": 3.4359445571899414
+              }
+            },
+            "role": "Fixed actual training batches; fitting diagnostic only, never checkpoint selection."
+          },
+          "throughput": {
+            "training_seconds": 30.93450709618628,
+            "batches_per_second": 16.163179792887078,
+            "point_pairs_per_second": 529635.0754533238,
+            "complete_decisions_per_second": 132408.76886333094,
+            "point_batch_size": 32768,
+            "decision_batch_size": 8192,
+            "cuda_peak_allocated_bytes": 611731968
+          }
+        },
+        {
+          "step": 8000,
+          "validation_score": 1.8441704213619232,
+          "best_step": 8000,
+          "full_source_coverage": true,
+          "source_rows_seen": 42840,
+          "source_rows_total": 42840,
+          "training_probe": {
+            "batches": 4,
+            "point_count": 131072,
+            "decision_count": 32768,
+            "finite_mae": 1.372590184211731,
+            "distance_huber": 4.200003623962402,
+            "candidate_soft_rank_loss": 0.5426561236381531,
+            "shortest_action_rate": 0.90716552734375,
+            "by_distance": {
+              "1_5": {
+                "count": 64368,
+                "mae": 0.5313775539398193
+              },
+              "6_20": {
+                "count": 21504,
+                "mae": 2.0375382900238037
+              },
+              "21_plus": {
+                "count": 21478,
+                "mae": 3.2278902530670166
+              }
+            },
+            "role": "Fixed actual training batches; fitting diagnostic only, never checkpoint selection."
+          },
+          "throughput": {
+            "training_seconds": 30.156652214936912,
+            "batches_per_second": 16.58008974060936,
+            "point_pairs_per_second": 543296.3806202875,
+            "complete_decisions_per_second": 135824.09515507187,
+            "point_batch_size": 32768,
+            "decision_batch_size": 8192,
+            "cuda_peak_allocated_bytes": 611731968
+          }
+        }
+      ]
+    },
+    "sokoban_fixed_wall_902_goal_coverage_cnn": {
+      "source_commit": "403e0ed",
+      "best_step": 8000,
+      "evaluated_step": 8000,
+      "last_step": 8000,
+      "model_parameters": 1584438,
+      "actual_exposure": {
+        "unique_gradient_states": 42840,
+        "available_states": 42840,
+        "unique_pair_rows": 42840,
+        "pair_rows": 42840,
+        "unique_decision_rows": 34012,
+        "decision_rows": 747780,
+        "minimum_pair_layer_passes": 1529.7852474323063,
+        "minimum_decision_layer_passes": null
+      },
+      "acceptance": {
+        "minimum": 0.8,
+        "target": 0.9,
+        "rates": {
+          "test": 0.1875,
+          "unseen_goal_test": 0.18085106382978725,
+          "original_training_goals": 0.025252525252525252,
+          "original_unseen_goals": 0.0
+        },
+        "missing_required_cohorts": [],
+        "full_training_source_coverage": true,
+        "passed": false,
+        "target_reached": false
+      },
+      "cohorts": {
+        "validation": {
+          "mae": 2.0889196395874023,
+          "shortest_action_rate": 1.0,
+          "q": {
+            "count": 16,
+            "solved": 3,
+            "optimal": 2,
+            "cycles": 13,
+            "entered_unreachable": 1,
+            "success_rate": 0.1875,
+            "optimal_rate": 0.125,
+            "mean_excess_cost_on_success": 2.0
+          }
+        },
+        "test": {
+          "mae": 4.4348907470703125,
+          "shortest_action_rate": 0.875,
+          "q": {
+            "count": 16,
+            "solved": 3,
+            "optimal": 3,
+            "cycles": 13,
+            "entered_unreachable": 1,
+            "success_rate": 0.1875,
+            "optimal_rate": 0.1875,
+            "mean_excess_cost_on_success": 0.0
+          }
+        },
+        "unseen_goal_validation": {
+          "mae": 2.1606781482696533,
+          "shortest_action_rate": 0.8125,
+          "q": {
+            "count": 96,
+            "solved": 16,
+            "optimal": 15,
+            "cycles": 80,
+            "entered_unreachable": 15,
+            "success_rate": 0.16666666666666666,
+            "optimal_rate": 0.15625,
+            "mean_excess_cost_on_success": 0.375
+          }
+        },
+        "unseen_goal_test": {
+          "mae": 3.7447450160980225,
+          "shortest_action_rate": 0.7395833333333334,
+          "q": {
+            "count": 94,
+            "solved": 17,
+            "optimal": 16,
+            "cycles": 77,
+            "entered_unreachable": 12,
+            "success_rate": 0.18085106382978725,
+            "optimal_rate": 0.1702127659574468,
+            "mean_excess_cost_on_success": 0.11764705926179886
+          }
+        },
+        "original_training_goals": {
+          "mae": 6.052348613739014,
+          "shortest_action_rate": 0.7525252525252525,
+          "q": {
+            "count": 198,
+            "solved": 5,
+            "optimal": 5,
+            "cycles": 193,
+            "entered_unreachable": 56,
+            "success_rate": 0.025252525252525252,
+            "optimal_rate": 0.025252525252525252,
+            "mean_excess_cost_on_success": 0.0
+          }
+        },
+        "original_unseen_goals": {
+          "mae": 2.799715995788574,
+          "shortest_action_rate": 0.5,
+          "q": {
+            "count": 4,
+            "solved": 0,
+            "optimal": 0,
+            "cycles": 4,
+            "entered_unreachable": 2,
+            "success_rate": 0.0,
+            "optimal_rate": 0.0,
+            "mean_excess_cost_on_success": null
+          }
+        }
+      },
+      "probes": [
+        {
+          "step": 1,
+          "validation_score": 24.874071657657623,
+          "best_step": 1,
+          "full_source_coverage": false,
+          "source_rows_seen": 14904,
+          "source_rows_total": 42840,
+          "training_probe": {
+            "batches": 1,
+            "point_count": 32768,
+            "decision_count": 8192,
+            "finite_mae": 10.577224731445312,
+            "distance_huber": 51.659305572509766,
+            "candidate_soft_rank_loss": 0.912514328956604,
+            "shortest_action_rate": 0.597900390625,
+            "by_distance": {
+              "1_5": {
+                "count": 16102,
+                "mae": 1.6065994501113892
+              },
+              "6_20": {
+                "count": 5377,
+                "mae": 11.965571403503418
+              },
+              "21_plus": {
+                "count": 5346,
+                "mae": 36.200096130371094
+              }
+            },
+            "role": "Fixed actual training batches; fitting diagnostic only, never checkpoint selection."
+          },
+          "throughput": {
+            "training_seconds": 0.2175477147102356,
+            "batches_per_second": 4.596692736266882,
+            "point_pairs_per_second": 150624.4275819932,
+            "complete_decisions_per_second": 37656.1068954983,
+            "point_batch_size": 32768,
+            "decision_batch_size": 8192,
+            "cuda_peak_allocated_bytes": 2219250688
+          }
+        },
+        {
+          "step": 1000,
+          "validation_score": 4.808292239904404,
+          "best_step": 1000,
+          "full_source_coverage": true,
+          "source_rows_seen": 42840,
+          "source_rows_total": 42840,
+          "training_probe": {
+            "batches": 4,
+            "point_count": 131072,
+            "decision_count": 32768,
+            "finite_mae": 3.3083243370056152,
+            "distance_huber": 6.83928918838501,
+            "candidate_soft_rank_loss": 0.6945971250534058,
+            "shortest_action_rate": 0.81005859375,
+            "by_distance": {
+              "1_5": {
+                "count": 64368,
+                "mae": 1.9580767154693604
+              },
+              "6_20": {
+                "count": 21504,
+                "mae": 4.97512149810791
+              },
+              "21_plus": {
+                "count": 21478,
+                "mae": 5.6861042976379395
+              }
+            },
+            "role": "Fixed actual training batches; fitting diagnostic only, never checkpoint selection."
+          },
+          "throughput": {
+            "training_seconds": 43.47169328387827,
+            "batches_per_second": 11.501737388854552,
+            "point_pairs_per_second": 376888.930757986,
+            "complete_decisions_per_second": 94222.2326894965,
+            "point_batch_size": 32768,
+            "decision_batch_size": 8192,
+            "cuda_peak_allocated_bytes": 2259932672
+          }
+        },
+        {
+          "step": 2000,
+          "validation_score": 3.761789709329605,
+          "best_step": 2000,
+          "full_source_coverage": true,
+          "source_rows_seen": 42840,
+          "source_rows_total": 42840,
+          "training_probe": {
+            "batches": 4,
+            "point_count": 131072,
+            "decision_count": 32768,
+            "finite_mae": 2.002429962158203,
+            "distance_huber": 5.036640644073486,
+            "candidate_soft_rank_loss": 0.626350998878479,
+            "shortest_action_rate": 0.8402099609375,
+            "by_distance": {
+              "1_5": {
+                "count": 64368,
+                "mae": 0.844693124294281
+              },
+              "6_20": {
+                "count": 21504,
+                "mae": 2.8206753730773926
+              },
+              "21_plus": {
+                "count": 21478,
+                "mae": 4.652845859527588
+              }
+            },
+            "role": "Fixed actual training batches; fitting diagnostic only, never checkpoint selection."
+          },
+          "throughput": {
+            "training_seconds": 43.73611958138645,
+            "batches_per_second": 11.43219848458604,
+            "point_pairs_per_second": 374610.27994291537,
+            "complete_decisions_per_second": 93652.56998572884,
+            "point_batch_size": 32768,
+            "decision_batch_size": 8192,
+            "cuda_peak_allocated_bytes": 2259932672
+          }
+        },
+        {
+          "step": 4000,
+          "validation_score": 2.756791442632675,
+          "best_step": 4000,
+          "full_source_coverage": true,
+          "source_rows_seen": 42840,
+          "source_rows_total": 42840,
+          "training_probe": {
+            "batches": 4,
+            "point_count": 131072,
+            "decision_count": 32768,
+            "finite_mae": 1.7703747749328613,
+            "distance_huber": 4.20185661315918,
+            "candidate_soft_rank_loss": 0.593259334564209,
+            "shortest_action_rate": 0.869659423828125,
+            "by_distance": {
+              "1_5": {
+                "count": 64368,
+                "mae": 0.6790249347686768
+              },
+              "6_20": {
+                "count": 21504,
+                "mae": 2.4808497428894043
+              },
+              "21_plus": {
+                "count": 21478,
+                "mae": 4.329734802246094
+              }
+            },
+            "role": "Fixed actual training batches; fitting diagnostic only, never checkpoint selection."
+          },
+          "throughput": {
+            "training_seconds": 42.04171728435904,
+            "batches_per_second": 11.892949011053295,
+            "point_pairs_per_second": 389708.15319419437,
+            "complete_decisions_per_second": 97427.03829854859,
+            "point_batch_size": 32768,
+            "decision_batch_size": 8192,
+            "cuda_peak_allocated_bytes": 2259998208
+          }
+        },
+        {
+          "step": 6000,
+          "validation_score": 2.5833862721920013,
+          "best_step": 6000,
+          "full_source_coverage": true,
+          "source_rows_seen": 42840,
+          "source_rows_total": 42840,
+          "training_probe": {
+            "batches": 4,
+            "point_count": 131072,
+            "decision_count": 32768,
+            "finite_mae": 1.5972996950149536,
+            "distance_huber": 3.8522191047668457,
+            "candidate_soft_rank_loss": 0.5727068185806274,
+            "shortest_action_rate": 0.8851318359375,
+            "by_distance": {
+              "1_5": {
+                "count": 64368,
+                "mae": 0.6179304122924805
+              },
+              "6_20": {
+                "count": 21504,
+                "mae": 2.322082996368408
+              },
+              "21_plus": {
+                "count": 21478,
+                "mae": 3.8067376613616943
+              }
+            },
+            "role": "Fixed actual training batches; fitting diagnostic only, never checkpoint selection."
+          },
+          "throughput": {
+            "training_seconds": 42.069295858033,
+            "batches_per_second": 11.88515257510607,
+            "point_pairs_per_second": 389452.6795810757,
+            "complete_decisions_per_second": 97363.16989526892,
+            "point_batch_size": 32768,
+            "decision_batch_size": 8192,
+            "cuda_peak_allocated_bytes": 2259998208
+          }
+        },
+        {
+          "step": 8000,
+          "validation_score": 2.4094373881816864,
+          "best_step": 8000,
+          "full_source_coverage": true,
+          "source_rows_seen": 42840,
+          "source_rows_total": 42840,
+          "training_probe": {
+            "batches": 4,
+            "point_count": 131072,
+            "decision_count": 32768,
+            "finite_mae": 1.4948844909667969,
+            "distance_huber": 3.576432943344116,
+            "candidate_soft_rank_loss": 0.5551559925079346,
+            "shortest_action_rate": 0.896148681640625,
+            "by_distance": {
+              "1_5": {
+                "count": 64368,
+                "mae": 0.5960027575492859
+              },
+              "6_20": {
+                "count": 21504,
+                "mae": 2.119752883911133
+              },
+              "21_plus": {
+                "count": 21478,
+                "mae": 3.5631415843963623
+              }
+            },
+            "role": "Fixed actual training batches; fitting diagnostic only, never checkpoint selection."
+          },
+          "throughput": {
+            "training_seconds": 43.868224423378706,
+            "batches_per_second": 11.397771543576194,
+            "point_pairs_per_second": 373482.17793990474,
+            "complete_decisions_per_second": 93370.54448497618,
+            "point_batch_size": 32768,
+            "decision_batch_size": 8192,
+            "cuda_peak_allocated_bytes": 2259998208
+          }
+        }
+      ]
+    }
+  },
+  "frozen_original_queries": {
+    "mlp": {
+      "step": 8000,
+      "source_commit": "403e0ed",
+      "cycle_lengths": {
+        "0": 782,
+        "2": 1266
+      },
+      "queries_with_wrong_action": 1289,
+      "first_wrong_at_21_plus": 679,
+      "cohorts": {
+        "original_training_goals": {
+          "finite_mae": 3.8393077850341797,
+          "shortest_action_rate": 0.29411764705882354,
+          "q": {
+            "count": 17,
+            "solved": 0,
+            "optimal": 0,
+            "cycles": 17,
+            "entered_unreachable": 0,
+            "success_rate": 0.0,
+            "optimal_rate": 0.0
+          },
+          "oracle_optimal_rate": 1.0
+        },
+        "original_unseen_goals": {
+          "finite_mae": 4.074125289916992,
+          "shortest_action_rate": 0.5,
+          "q": {
+            "count": 4,
+            "solved": 0,
+            "optimal": 0,
+            "cycles": 4,
+            "entered_unreachable": 0,
+            "success_rate": 0.0,
+            "optimal_rate": 0.0
+          },
+          "oracle_optimal_rate": 1.0
+        },
+        "frozen_training_queries": {
+          "finite_mae": 1.8827338218688965,
+          "shortest_action_rate": 0.89599609375,
+          "q": {
+            "count": 2048,
+            "solved": 782,
+            "optimal": 759,
+            "cycles": 1266,
+            "entered_unreachable": 184,
+            "success_rate": 0.3818359375,
+            "optimal_rate": 0.37060546875
+          },
+          "oracle_optimal_rate": 1.0
+        }
+      }
+    },
+    "cnn": {
+      "step": 8000,
+      "source_commit": "403e0ed",
+      "cycle_lengths": {
+        "0": 853,
+        "2": 1195
+      },
+      "queries_with_wrong_action": 1249,
+      "first_wrong_at_21_plus": 700,
+      "cohorts": {
+        "original_training_goals": {
+          "finite_mae": 4.185171604156494,
+          "shortest_action_rate": 0.8235294117647058,
+          "q": {
+            "count": 17,
+            "solved": 0,
+            "optimal": 0,
+            "cycles": 17,
+            "entered_unreachable": 2,
+            "success_rate": 0.0,
+            "optimal_rate": 0.0
+          },
+          "oracle_optimal_rate": 1.0
+        },
+        "original_unseen_goals": {
+          "finite_mae": 2.799715995788574,
+          "shortest_action_rate": 0.5,
+          "q": {
+            "count": 4,
+            "solved": 0,
+            "optimal": 0,
+            "cycles": 4,
+            "entered_unreachable": 2,
+            "success_rate": 0.0,
+            "optimal_rate": 0.0
+          },
+          "oracle_optimal_rate": 1.0
+        },
+        "frozen_training_queries": {
+          "finite_mae": 2.0884616374969482,
+          "shortest_action_rate": 0.876953125,
+          "q": {
+            "count": 2048,
+            "solved": 815,
+            "optimal": 771,
+            "cycles": 1233,
+            "entered_unreachable": 100,
+            "success_rate": 0.39794921875,
+            "optimal_rate": 0.37646484375
+          },
+          "oracle_optimal_rate": 1.0
+        }
+      }
+    }
+  },
+  "interpretation": "CNN does not show an overall execution advantage in this matched trial. Keep MLP as the main encoder; neither checkpoint meets completion acceptance. Curves are still improving, so budget completion is not optimization convergence. Enlarged original_training_goals contains198 queries and must not be confused with the frozen original17. Held validation/test relation and goal queries are identical to the earlier data; the root training-goal pool expands explicitly.",
+  "artifacts": {
+    "persistent_root": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/followup_5d41460",
+    "completed": "logs/sokoban_goal_coverage_completed.json",
+    "frozen": "logs/sokoban_goal_coverage_frozen_queries.json"
+  }
+}

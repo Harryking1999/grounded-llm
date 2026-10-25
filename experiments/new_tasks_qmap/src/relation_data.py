@@ -521,7 +521,8 @@ def board_cohorts(corpus,config,rng):
             heldout=len(scene.goals)-nt
             for column in range(nt,len(scene.goals)):
                 cohort='unseen_goal_validation' if column-nt<(heldout+1)//2 else 'unseen_goal_test'
-                local_rng=np.random.default_rng(group_seed(source_key,config['seed'],'queries:'+cohort+str(column)))
+                seed_column=column-(scene.metadata.get('additional_training_goals',0) if spec.get('preserve_original_held_queries') else 0)
+                local_rng=np.random.default_rng(group_seed(source_key,config['seed'],'queries:'+cohort+str(seed_column)))
                 g=scene.goals[column]; finite=np.isfinite(scene.distances[column]); pool=np.arange(len(scene.states))
                 rows=np.column_stack([pool+offset,np.full(len(pool),g+offset,dtype=np.int64)])
                 eligible=disjoint_decisions(corpus,rows,required) if len(required) else np.ones(len(rows),bool)

@@ -169,11 +169,27 @@ def build(config, out):
             held=spec['heldout_goals'];cut=ordinary-extra_held
             goals=goals[:-held]+extras[:cut]+goals[-held:]+extras[cut:]
             labels=labels[:-held]+extra_labels[:cut]+labels[-held:]+extra_labels[cut:]
+        additional=spec.get('additional_training_goals',0)
+        if additional and split=='train':
+            held=spec['heldout_goals']+extra_held;cut=len(goals)-held
+            excluded=set(goals)
+            held_boxes={tuple(packed[g,1:]) for g in goals[cut:]}
+            extra_rng=np.random.default_rng(group_seed(relative+':'+identity,config['seed'],'additional_training_goals'))
+            added,added_labels=[],[]
+            for goal in extra_rng.permutation(len(packed)):
+                if int(goal) in excluded or tuple(packed[goal,1:]) in held_boxes:continue
+                values=oracle.to_goal(int(goal));finite=values[np.isfinite(values)]
+                if len(finite)<2 or finite.max()>=config['training']['unreachable_target']:continue
+                added.append(int(goal));added_labels.append(values)
+                if len(added)==additional:break
+            if len(added)!=additional:raise ValueError('Insufficient additional training goal states')
+            goals=goals[:cut]+added+goals[cut:];labels=labels[:cut]+added_labels+labels[cut:]
         metadata = dict(task='sokoban', split=split, wall_group=key,
                         source=dict(commit=spec['source_commit'], file=relative, puzzle_id=identity),
                         initial_board=board, original_state=state_id(env.start),
                         training_goals=len(goals)-spec['heldout_goals']-extra_held, symmetric=False,
                         intermediate_goals=ordinary)
+        if additional:metadata['additional_training_goals']=additional if split=='train' else 0
         if split=='diagnostic': metadata['diagnostic_goal']=goals[0]
         record = save_scene(out/f'scene_{sid:03d}', packed, children, goals, metadata,
                             distances=np.stack(labels),reverse=np.stack([oracle.from_goal(g) for g in goals]))

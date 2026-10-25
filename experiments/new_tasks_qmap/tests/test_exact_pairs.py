@@ -85,6 +85,20 @@ class ExactPairTests(unittest.TestCase):
             self.assertIn('original_training_goals',groups);self.assertIn('original_unseen_goals',groups)
             self.assertEqual(len(np.intersect1d(closure(corpus,tasks),reserved)),0)
             self.assertFalse(np.isin(pairs[:,1],scene.goals[-2:]).any())
+            expanded=json.loads(json.dumps(cfg));expanded['data']['additional_training_goals']=8
+            expanded['training']=dict(unreachable_target=240)
+            expanded['relations']['preserve_original_held_queries']=True
+            larger=build(expanded,root/'expanded_graphs');other=larger.scenes[0]
+            for name in ['states','children','distances','reverse_distances']:stack.callback(getattr(other,name)._mmap.close)
+            nt=scene.metadata['training_goals']
+            np.testing.assert_array_equal(other.states,scene.states);np.testing.assert_array_equal(other.children,scene.children)
+            np.testing.assert_array_equal(other.goals[:nt],scene.goals[:nt]);np.testing.assert_array_equal(other.goals[-2:],scene.goals[-2:])
+            np.testing.assert_array_equal(other.distances[-2:],scene.distances[-2:])
+            held_boxes={tuple(scene.states[g,1:]) for g in scene.goals[-2:]}
+            self.assertTrue(all(tuple(other.states[g,1:]) not in held_boxes for g in other.goals[nt:nt+8]))
+            new_groups,*_=board_cohorts(larger,expanded,np.random.default_rng(18))
+            for name in ['validation','test','unseen_goal_validation','unseen_goal_test','original_unseen_goals']:
+                np.testing.assert_array_equal(groups[name],new_groups[name])
             model_cfg=dict(dimension=128,hidden=16,cap=256,metric='directed_max');model=StateEncoder(input_dim=400,**model_cfg)
             path=root/'map.pt';torch.save(dict(model_type='exact_state_pairs',task='sokoban',input_dim=400,
                 config=dict(model=model_cfg),model=model.state_dict(),scope=scope(cfg,corpus),step=0),path)
@@ -1067,7 +1081,8 @@ class ExactPairTests(unittest.TestCase):
                 self.assertEqual(cohort['planning']['oracle']['optimal_rate'],1)
             warm_config=json.loads(json.dumps(config))
             warm_config['training'].update(initialize_from='../run/last.pt',features_on_device=True,
-                record_training_samples=True,online_goals=True,local_goal_fraction=.5,goal_walk_max=4)
+                record_training_samples=True,online_goals=True,local_goal_fraction=.5,goal_walk_max=4,
+                compact_point_sources=True)
             phase=root/'phase2'
             def prepare_fixture(config,path):
                 path.mkdir(); np.save(path/'endpoint_partition.npy',partition)
@@ -1075,6 +1090,14 @@ class ExactPairTests(unittest.TestCase):
             with patch('experiments.new_tasks_qmap.src.relations.prepare',side_effect=prepare_fixture):
                 train(warm_config,phase,'warm-fixture','cpu')
             initialization=json.loads((phase/'initialization.json').read_text())
+            compact=torch.load(phase/'last.pt',weights_only=False)
+            self.assertEqual(len(compact['pair_draws']),len(np.unique(data['pairs_train'][:,0])))
+            sampler_summary=json.loads((phase/'point_source_sampling.json').read_text())
+            self.assertEqual(sampler_summary['original_rows'],len(pairs))
+            with patch('experiments.new_tasks_qmap.src.relations.prepare',return_value=prepared):
+                train(warm_config,phase,'warm-fixture','cpu',resume=True)
+            resumed=torch.load(phase/'last.pt',weights_only=False)
+            for key,value in compact['model'].items():torch.testing.assert_close(value,resumed['model'][key],rtol=0,atol=0)
             self.assertFalse(initialization['optimizer_restored'])
             self.assertFalse(initialization['sampler_restored'])
             initial=json.loads((phase/'initial.json').read_text())

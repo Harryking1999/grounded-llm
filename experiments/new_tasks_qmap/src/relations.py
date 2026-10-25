@@ -157,6 +157,16 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
         print(json.dumps(dict(prepared=str(out),data=description)),flush=True)
         return
     options=config['training']
+    if options.get('compact_point_sources'):
+        if structure_options:raise ValueError('Fixed path/structure banks require their original point indices')
+        data=dict(data)
+        original_count=len(data['pairs_train'])
+        _,first=np.unique(data['pairs_train'][:,0],return_index=True)
+        first=np.sort(first)
+        data['pairs_train']=data['pairs_train'][first]
+        data['pair_distances_train']=data['pair_distances_train'][first]
+        atomic_json(out/'point_source_sampling.json',dict(original_rows=original_count,source_rows=len(first),
+            rule='One original permitted fallback relation per physical source; online goals still resample queries. Ranking banks and protected relations unchanged. Coverage counters refer to source rows, not all state-goal pairs.'))
     if description.get('finite_max',0)>=min(config['model']['cap'],options['unreachable_target']):
         raise ValueError('Prepared finite oracle costs exceed the configured encoding scale')
     torch.set_num_threads(options['cpu_threads']); torch.manual_seed(config['seed'])
@@ -664,6 +674,8 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
                                       minimum_pair_layer_passes=pair_sampler.passes,
                                       minimum_decision_layer_passes=None if relation_sampler else rank_sampler.passes),
                  trace_io=trace_io,metrics=final)
+    if options.get('compact_point_sources'):
+        summary['point_source_sampling']=json.loads((out/'point_source_sampling.json').read_text())
     if relation_sampler and relation_sampler.coverage_sampler is not None:
         summary['actual_exposure']['ranking_bank_epochs']=relation_sampler.ranking_epochs
         summary['actual_exposure']['ranking_bank_relations']=len(relation_sampler.ranks)

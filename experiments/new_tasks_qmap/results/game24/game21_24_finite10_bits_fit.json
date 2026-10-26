@@ -1382,5 +1382,120 @@
     },
     "distinct_numerical_queries_replayed": 4670,
     "inference": "Actual MapReader.choose over every legal arithmetic action; exact graphs forbidden; judge physically replays all chosen actions. Same frozen queries as formal evaluation; no retraining or checkpoint selection."
+  },
+  "failure_structure": {
+    "step": 3500,
+    "training_all_allowed_candidates": {
+      "2_to_1": {
+        "count": 4771,
+        "optimal": 4771
+      },
+      "3_to_1": {
+        "count": 5235,
+        "optimal": 5150
+      },
+      "3_to_2": {
+        "count": 828,
+        "optimal": 828
+      },
+      "4_to_1": {
+        "count": 1051,
+        "optimal": 877
+      },
+      "4_to_2": {
+        "count": 398,
+        "optimal": 393
+      }
+    },
+    "cohorts": {
+      "root4_to_21": {
+        "count": 185,
+        "solved": 181,
+        "first_wrong_layer": {
+          "4_to_3": 4
+        },
+        "training_numeric_relation": {
+          "same_numeric_parent_goal_in_training": 4
+        },
+        "wrong_vs_best_viable_score_gap_quantiles": {
+          "0": 0.02009868621826172,
+          "0.5": 0.12482380867004395,
+          "0.9": 0.22796192169189453,
+          "1": 0.23708486557006836
+        }
+      },
+      "suffix3_to_21": {
+        "count": 431,
+        "solved": 431,
+        "first_wrong_layer": {},
+        "training_numeric_relation": {},
+        "wrong_vs_best_viable_score_gap_quantiles": {}
+      },
+      "root4_to_24": {
+        "count": 197,
+        "solved": 190,
+        "first_wrong_layer": {
+          "4_to_3": 7
+        },
+        "training_numeric_relation": {
+          "same_numeric_parent_goal_in_training": 7
+        },
+        "wrong_vs_best_viable_score_gap_quantiles": {
+          "0": 0.007450103759765625,
+          "0.5": 0.09241199493408203,
+          "0.9": 0.1458515167236328,
+          "1": 0.1495814323425293
+        }
+      },
+      "suffix3_to_24": {
+        "count": 476,
+        "solved": 462,
+        "first_wrong_layer": {
+          "3_to_2": 14
+        },
+        "training_numeric_relation": {
+          "same_numeric_parent_goal_in_training": 14
+        },
+        "wrong_vs_best_viable_score_gap_quantiles": {
+          "0": 3.814697265625e-06,
+          "0.5": 0.021981239318847656,
+          "0.9": 0.5579725265502931,
+          "1": 1.1109561920166016
+        }
+      },
+      "held_intermediate2_validation": {
+        "count": 1208,
+        "solved": 979,
+        "first_wrong_layer": {
+          "4_to_3": 229
+        },
+        "training_numeric_relation": {
+          "new_numeric_parent_goal": 229
+        },
+        "wrong_vs_best_viable_score_gap_quantiles": {
+          "0": 0.001697540283203125,
+          "0.5": 0.6035284996032715,
+          "0.9": 2.5917445182800307,
+          "1": 6.695511817932129
+        }
+      },
+      "held_intermediate2_test": {
+        "count": 1195,
+        "solved": 977,
+        "first_wrong_layer": {
+          "4_to_3": 218
+        },
+        "training_numeric_relation": {
+          "new_numeric_parent_goal": 218
+        },
+        "wrong_vs_best_viable_score_gap_quantiles": {
+          "0": 0.0030107498168945312,
+          "0.5": 0.7451843023300171,
+          "0.9": 2.8513912677764903,
+          "1": 7.771213531494141
+        }
+      }
+    },
+    "scope": "Post-selection diagnosis only; no optimizer update or new labels. Exact truth inspected after model choices. Numeric overlap means a whole parent-goal candidate context exists in prepared training, not proof of this exact occurrence exposure. Frozen test failures are not added to training."
   }
 }

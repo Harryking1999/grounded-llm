@@ -13,12 +13,43 @@ import torch
 from grounded_llm.core.files import atomic_json
 from grounded_llm.core.qmap.physical_data import save_scene
 from grounded_llm.tasks.game24.environment import Game24
-from grounded_llm.tasks.game24.relation_data import GameScene,GameCorpus
+from grounded_llm.tasks.game24.relation_data import GameScene,GameCorpus,build
 from grounded_llm.core.qmap.model import StateEncoder
-from experiments.new_tasks_qmap.src.game_finite_evaluate import numerical_queries,main
+from experiments.new_tasks_qmap.src.game_finite_evaluate import numerical_queries,main,target_switch_metrics
 
 
 class FiniteGameTests(unittest.TestCase):
+    def test_cached_subdomain_reuses_physics_and_both_held_operation_layers(self):
+        with tempfile.TemporaryDirectory() as directory,ExitStack() as stack,redirect_stdout(StringIO()):
+            root=Path(directory)
+            def close(corpus):
+                for scene in corpus.scenes:
+                    for key in ['states','children','distances','reverse_distances']:getattr(scene,key)._mmap.close()
+            spec=dict(max_numbers=4,initial_numbers=4,initial_sampling='exhaustive_distinct',source_values=[1,2,3,4,5],
+                root_targets=[24,21],scenes=dict(train=5,validation=0,test=0),goals_per_scene=16,heldout_goals=4,minimum_reachable_per_goal=2)
+            cfg=dict(seed=71,data=spec)
+            source=build(cfg,root/'source');stack.callback(close,source)
+            small=json.loads(json.dumps(cfg));small['data'].update(source_values=[1,2,3,4],scenes=dict(train=1,validation=0,test=0),
+                goals_per_scene=20,heldout_goals=8,heldout_goal_arities=[2,3,2,3,2,3,2,3],graphs_from=str(root/'source'))
+            with patch.object(Game24,'graph',side_effect=RuntimeError('Cached physical DAG should be reused')):
+                cached=build(small,root/'cached');stack.callback(close,cached)
+            fresh=json.loads(json.dumps(small));fresh['data'].pop('graphs_from')
+            reference=build(fresh,root/'fresh');stack.callback(close,reference)
+            a,b=cached.scenes[0],reference.scenes[0]
+            self.assertEqual(a.values,b.values)
+            for key in ['states','children','goals','distances','reverse_distances']:np.testing.assert_array_equal(getattr(a,key),getattr(b,key))
+            self.assertEqual(a.metadata['training_goals'],12)
+            self.assertEqual(a.metadata['goal_layers'][12:16],[2,3,2,3]);self.assertEqual(a.metadata['goal_layers'][16:],[2,3,2,3])
+            from experiments.new_tasks_qmap.src.relation_data import board_cohorts,closure
+            small.update(task='game24',relations=dict(holdout_goal_endpoints=False,preserve_goal_execution=['24','21'],
+                holdout_per_goal=1,evaluation_per_goal=4,unreachable_eval_per_goal=2,complete_training_sources=True,
+                evaluation_training_goals=2,exhaustive_training_goals=True))
+            groups,_,decisions,reserved,_=board_cohorts(cached,small,np.random.default_rng(8))
+            for split in ['validation','test']:
+                rows=groups['unseen_goal_'+split]
+                self.assertEqual({len(a.values[g]) for g in rows[:,1]},{2,3})
+            self.assertFalse(np.intersect1d(closure(cached,decisions),reserved).size)
+
     def test_deduplication_keeps_exact_reachability_and_both_targets(self):
         with tempfile.TemporaryDirectory() as directory,ExitStack() as stack:
             env=Game24(4);scenes=[];records=[];alphabet=[1,2,3,4,6,8]
@@ -40,6 +71,22 @@ class FiniteGameTests(unittest.TestCase):
                 for name in ('states','children','distances','reverse_distances'):stack.callback(getattr(scene,name)._mmap.close)
             corpus=GameCorpus(scenes);exposure=np.ones(corpus.size,dtype=np.int64)
             groups,coverage=numerical_queries(corpus,[21,24],exposure)
+            class OracleCache:
+                def __init__(self,*args):pass
+                def scores(self,s,g):return corpus.distance(s,g)
+            class IgnoreGoalCache(OracleCache):
+                def scores(self,s,g):
+                    s,g=np.broadcast_arrays(s,g);sid=corpus.locate(s)
+                    target=np.asarray([int(corpus.offsets[i])+int(scenes[i].goals[1]) for i in sid.ravel()]).reshape(s.shape)
+                    return corpus.distance(s,target)
+            model=StateEncoder(input_dim=16,dimension=4,hidden=8,cap=16,metric='directed_max')
+            with patch('experiments.new_tasks_qmap.src.game_finite_evaluate.QCache',OracleCache):
+                switched=target_switch_metrics(model,corpus,groups,4)
+            self.assertGreater(switched['count'],0);self.assertEqual(switched['both_complete'],switched['count'])
+            self.assertEqual(switched['both_first_actions_optimal'],switched['count'])
+            with patch('experiments.new_tasks_qmap.src.game_finite_evaluate.QCache',IgnoreGoalCache):
+                ignored=target_switch_metrics(model,corpus,groups,4)
+            self.assertEqual(ignored['different_first_actions'],0);self.assertEqual(ignored['both_complete'],0)
             self.assertEqual(coverage['numerical_input_coverage'],1)
             self.assertLess(coverage['exact_numerical_states'],corpus.size)
             for target in (21,24):

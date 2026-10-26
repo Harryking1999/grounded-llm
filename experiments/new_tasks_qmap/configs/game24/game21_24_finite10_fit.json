@@ -1,0 +1,110 @@
+{
+  "schema": "exact_state_pairs",
+  "seed": 2026102610,
+  "model": {
+    "dimension": 128,
+    "hidden": 1024,
+    "cap": 16,
+    "metric": "directed_max"
+  },
+  "training": {
+    "steps": 4000,
+    "batch_size": 32768,
+    "decision_batch_size": 8192,
+    "learning_rate": 0.0003,
+    "rank_weight": 1.0,
+    "rank_temperature": 1.0,
+    "eval_every": 500,
+    "rollout_eval_every": 1000,
+    "cpu_threads": 1,
+    "unreachable_target": 12.0,
+    "features_on_device": "float32",
+    "broad_fraction": 0.5,
+    "online_goals": false,
+    "record_training_samples": true,
+    "validation_only_initial": true,
+    "action_edge_fraction": 0.25,
+    "training_probe_batches": 4,
+    "relation_sampling": {
+      "finite_point_fraction": 0.5,
+      "boundary_rank_fraction": 1.0,
+      "distance_bin_upper_bounds": [
+        1,
+        2,
+        3
+      ],
+      "balance_layouts": false,
+      "preparation_workers": 1,
+      "unreachable_point_fraction": 0.25,
+      "game_layer_balance": true,
+      "ranking_coverage_fraction": 0.5,
+      "coverage_seed": 2026102611
+    },
+    "trace_write_workers": 1,
+    "compact_point_sources": true,
+    "action_edges_replace_finite_only": true
+  },
+  "relations": {
+    "holdout_per_goal": 1,
+    "evaluation_per_goal": 32,
+    "unreachable_eval_per_goal": 16,
+    "complete_training_sources": true,
+    "evaluation_training_goals": 2,
+    "exhaustive_training_goals": true,
+    "holdout_goal_endpoints": false,
+    "preserve_goal_execution": [
+      "24",
+      "21"
+    ]
+  },
+  "evaluation": {
+    "decision_count": 512,
+    "rollout_count": 128,
+    "horizon": 4
+  },
+  "selection": "Minimum mean validation finite Huber plus candidate soft-rank; final test never selects a checkpoint.",
+  "scope": "Finite1..10 distinct four-number domain: all210 initial sets are training cases. One shared Qmap for complete21/24 goals and ordinary complete intermediate goals. Preserve four-slot raw rational encoding and all legal operation candidates. Root fitting, deduplicated2/3-number suffixes, local held2/3-number goals and47 goal-switch roots are separate checks. No claim of unseen initial-question or globally unexposed numerical-target generalization. No old learned weights, symbolic search or oracle features.",
+  "task": "game24",
+  "data": {
+    "max_numbers": 4,
+    "initial_numbers": 4,
+    "scenes": {
+      "train": 210,
+      "validation": 0,
+      "test": 0
+    },
+    "goals_per_scene": 20,
+    "heldout_goals": 8,
+    "minimum_reachable_per_goal": 2,
+    "initial_sampling": "exhaustive_distinct",
+    "source_values": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "root_targets": [
+      24,
+      21
+    ],
+    "heldout_goal_arities": [
+      2,
+      3,
+      2,
+      3,
+      2,
+      3,
+      2,
+      3
+    ],
+    "graphs_from": "/tmp/grounded_qmap_followup_5d41460/runs/game21_24_finite20_reference/data/graphs",
+    "prepared_from": "../game21_24_finite10_reference/data"
+  },
+  "hypothesis": "First test the user-requested smaller1..10 finite domain from scratch before expanding. Reuse only the exact physical operation DAGs of the210 matching roots, resample complete goals and holdout relations. Keep the existing MLP128D/hidden1024, rational features, point Huber, soft branch ranking and point quotas. Sample finite/unreachable/ranking supplements globally by target kind then source arity then exact distance, rather than choosing a scene first; otherwise the13/25 unsolvable roots can again be diluted. Preserve25 percent broad source traversal and25 percent direct-action labels without overwriting negatives. Half of ranking draws traverse every allowed complete decision without replacement, half retain strata. Training has12 targets per root including21/24; validation and test each hold two2-number and two3-number complete goals, fixing the old missing3-test condition. Preserve every solvable21/24 decision before selecting held closures. Measure full root and suffix completion, dead-branch entry, finite/unreachable discrimination and same-root target switches, not just mean distance. This is a new declared smaller-domain fitting condition, not an independent ablation against earlier finite20 training."
+}

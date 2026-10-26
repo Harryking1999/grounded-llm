@@ -48,6 +48,15 @@ def build(config,out):
     if not target_values or target_values[0]!=24 or len(set(target_values))!=len(target_values):
         raise ValueError('Keep24 first and use distinct explicit singleton targets')
     targets=[env.canonical([v]) for v in target_values]
+    cached=None
+    if spec.get('graphs_from'):
+        source=Path(spec['graphs_from'])
+        manifest=json.loads((source/'corpus.json').read_text())
+        cached={tuple(row['source']['numbers']):source/row['path'] for row in manifest['scenes']}
+    held_arities=spec.get('heldout_goal_arities')
+    if held_arities is not None and (len(held_arities)!=spec['heldout_goals']
+            or any(type(n) is not int or not 1<=n<spec['initial_numbers'] for n in held_arities)):
+        raise ValueError('Declare one valid arity for each held intermediate goal')
     for split,count in scenes:
         for _ in range(count):
             if exhaustive:numbers=next(root_order)
@@ -55,9 +64,18 @@ def build(config,out):
                 while True:
                     numbers=tuple(sorted(rng.integers(spec['minimum_number'],spec['maximum_number']+1,spec['initial_numbers']).tolist()))
                     if numbers not in seen:seen.add(numbers);break
-            graph=env.graph(numbers)
-            values=[tuple(Fraction(v) for v in row) for row in graph['metadata']['exact_rational_states']]
-            children=graph['children']
+            if cached is None:
+                graph=env.graph(numbers)
+                values=[tuple(Fraction(v) for v in row) for row in graph['metadata']['exact_rational_states']]
+                children=graph['children']
+            else:
+                if numbers not in cached:raise ValueError(('Cached physical graph missing requested root',numbers))
+                path=cached[numbers];record=json.loads((path/'scene.json').read_text())
+                if record['max_numbers']!=spec['max_numbers'] or record['original_state']!=0:
+                    raise ValueError('Cached arithmetic graph has different slots or root convention')
+                values=[tuple(Fraction(v) for v in row) for row in json.loads((path/'values.json').read_text())]
+                if values[0]!=env.canonical(numbers):raise ValueError('Cached arithmetic root differs from requested source')
+                children=np.load(path/'children.npy')
             for target in targets:
                 if target not in values:
                     values.append(target);children=np.vstack([children,np.full((1,len(env.actions)),-1,dtype=np.int32)])
@@ -66,13 +84,24 @@ def build(config,out):
             # ordinary 2/3-number goals; keep 24 as the first training goal.
             pools=[rng.permutation(np.flatnonzero(lengths==n)).tolist() for n in range(1,spec['initial_numbers'])]
             goals=[values.index(target) for target in targets]
+            ordinary_count=spec['goals_per_scene']-(len(held_arities) if held_arities is not None else 0)
+            if ordinary_count<len(goals):raise ValueError('Training goal quota excludes mandatory singleton targets')
             for i in range(spec['goals_per_scene']*2):
+                if len(goals)==ordinary_count:break
                 pool=pools[i%len(pools)]
                 while pool:
                     g=pool.pop()
                     if g not in goals and np.isfinite(oracle.to_goal(g)).sum()>=spec['minimum_reachable_per_goal']:
                         goals.append(g);break
-                if len(goals)==spec['goals_per_scene']:break
+                if len(goals)==ordinary_count:break
+            if held_arities is not None:
+                for n in held_arities:
+                    pool=pools[n-1]
+                    while pool:
+                        g=pool.pop()
+                        if g not in goals and np.isfinite(oracle.to_goal(g)).sum()>=spec['minimum_reachable_per_goal']:
+                            goals.append(g);break
+                    else:raise ValueError(('Insufficient held intermediate targets',numbers,n))
             if len(goals)!=spec['goals_per_scene']:raise ValueError(('Insufficient reachable complete DAG targets',numbers))
             metadata=dict(task='game24',split=split,source=dict(numbers=numbers),max_numbers=spec['max_numbers'],
                 original_state=0,training_goals=len(goals)-spec['heldout_goals'],symmetric=False,

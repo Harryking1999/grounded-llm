@@ -43,6 +43,16 @@ def small_oracle(path,n,edges):
 
 
 class ExactPairTests(unittest.TestCase):
+    def test_declared_rank_weight_comparison_preserves_other_conditions(self):
+        from copy import deepcopy
+        from experiments.new_tasks_qmap.src.relations import validate_continuation
+        previous=dict(training=dict(steps=4000,rank_weight=1.,learning_rate=.0003),data=dict(prepared_from='same'))
+        current=deepcopy(previous);current['training'].update(steps=8000,rank_weight=4.)
+        with self.assertRaises(ValueError):validate_continuation(previous,current,4000)
+        current['continuation']=dict(mode='rank_weight_change');validate_continuation(previous,current,4000)
+        current['training']['learning_rate']=.001
+        with self.assertRaises(ValueError):validate_continuation(previous,current,4000)
+
     def test_cuda_rng_recovery_maps_source_stream_on_smaller_node(self):
         from experiments.new_tasks_qmap.src.relations import restore_cuda_rng
         from unittest.mock import patch

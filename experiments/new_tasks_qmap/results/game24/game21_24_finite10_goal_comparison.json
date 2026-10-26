@@ -2637,5 +2637,105 @@
         }
       }
     }
+  },
+  "full_training_diagnosis": {
+    "best.pt": {
+      "step": 3500,
+      "all_training_groups": {
+        "2_to_1": {
+          "count": 4771,
+          "optimal": 4771,
+          "optimal_rate": 1.0,
+          "finite_mae": 0.5050990581512451
+        },
+        "3_to_1": {
+          "count": 5235,
+          "optimal": 5177,
+          "optimal_rate": 0.9889207258834766,
+          "finite_mae": 0.7804892063140869
+        },
+        "3_to_2": {
+          "count": 82624,
+          "optimal": 82624,
+          "optimal_rate": 1.0,
+          "finite_mae": 0.9398517608642578
+        },
+        "4_to_1": {
+          "count": 1051,
+          "optimal": 949,
+          "optimal_rate": 0.9029495718363464,
+          "finite_mae": 0.4930352568626404
+        },
+        "4_to_2": {
+          "count": 42069,
+          "optimal": 36150,
+          "optimal_rate": 0.8593025743421522,
+          "finite_mae": 0.17022140324115753
+        }
+      },
+      "four_to_two_candidates": {
+        "viable": 71816,
+        "unreachable": 1442668,
+        "viable_mean_score": 1.7436665296554565,
+        "unreachable_mean_score": 8.845983505249023,
+        "unreachable_predicted_zero": 0,
+        "wrong_first_with_no_goal_value_preserved": 1798
+      },
+      "coordinate_sample": {
+        "states": 4096,
+        "boundary_fraction": 0.10863494873046875,
+        "low_sigmoid_derivative_fraction": 0.10863494873046875
+      },
+      "scope": "All allowed training contexts only, no held queries or model selection. Every legal candidate retained; teacher truth checked after frozen model scores. Snapshot diagnostics are not convergence or independent acceptance."
+    },
+    "last.pt": {
+      "step": 4000,
+      "all_training_groups": {
+        "2_to_1": {
+          "count": 4771,
+          "optimal": 4771,
+          "optimal_rate": 1.0,
+          "finite_mae": 0.3778509199619293
+        },
+        "3_to_1": {
+          "count": 5235,
+          "optimal": 5158,
+          "optimal_rate": 0.9852913085004775,
+          "finite_mae": 0.4552019536495209
+        },
+        "3_to_2": {
+          "count": 82624,
+          "optimal": 82624,
+          "optimal_rate": 1.0,
+          "finite_mae": 0.9992344975471497
+        },
+        "4_to_1": {
+          "count": 1051,
+          "optimal": 943,
+          "optimal_rate": 0.8972407231208372,
+          "finite_mae": 0.5376738905906677
+        },
+        "4_to_2": {
+          "count": 42069,
+          "optimal": 36044,
+          "optimal_rate": 0.856782904276308,
+          "finite_mae": 0.23051241040229797
+        }
+      },
+      "four_to_two_candidates": {
+        "viable": 71816,
+        "unreachable": 1442668,
+        "viable_mean_score": 1.818332314491272,
+        "unreachable_mean_score": 9.00605297088623,
+        "unreachable_predicted_zero": 0,
+        "wrong_first_with_no_goal_value_preserved": 1821
+      },
+      "coordinate_sample": {
+        "states": 4096,
+        "boundary_fraction": 0.10988044738769531,
+        "low_sigmoid_derivative_fraction": 0.10988044738769531
+      },
+      "scope": "All allowed training contexts only, no held queries or model selection. Every legal candidate retained; teacher truth checked after frozen model scores. Snapshot diagnostics are not convergence or independent acceptance."
+    }
   }
 }

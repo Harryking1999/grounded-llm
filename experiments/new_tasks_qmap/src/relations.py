@@ -88,6 +88,7 @@ def validate_continuation(previous,current,step):
     """Validate an explicit budget extension or recorded batch resize."""
     old,new=deepcopy(previous),deepcopy(current)
     resize=current.get('continuation',{}).get('mode')=='batch_resize'
+    rank_change=current.get('continuation',{}).get('mode')=='rank_weight_change'
     for item in (old,new):
         for key in ('continuation','convergence','pilot'):item.pop(key,None)
         # Trace compression changes I/O scheduling only; checkpoint saves wait
@@ -110,6 +111,11 @@ def validate_continuation(previous,current,step):
         return
     if not step<=old['training']['steps']<new['training']['steps']:
         raise ValueError('Continuation must extend the original update budget')
+    if rank_change:
+        before,after=old['training']['rank_weight'],new['training']['rank_weight']
+        if not np.isfinite([before,after]).all() or min(before,after)<=0 or before==after:
+            raise ValueError('Ranking-weight comparison requires distinct positive finite weights')
+        new['training']['rank_weight']=before
     new['training']['steps']=old['training']['steps']
     if old!=new:raise ValueError('Budget continuation changes data, sampler, model, loss, optimizer or evaluation')
 
@@ -364,8 +370,11 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
                 source_step=start_step,original_budget=saved['config']['training']['steps'],extended_budget=options['steps'],
                 optimizer_restored=True,sampling_rng_restored=True,sampler_state_restored=True,exposure_restored=True,
                 cuda_rng_restoration=cuda_restoration,
+                rank_weight=dict(previous=saved['config']['training']['rank_weight'],current=options['rank_weight']),
                 batch_sizes={k:dict(previous=saved['config']['training'][k],current=options[k]) for k in ('batch_size','decision_batch_size')},
-                meaning=('Full optimizer/RNG/counter restoration; batch sizes change explicitly, so the update trajectory changes.'
+                meaning=('Full optimizer/RNG/counter restoration; only ranking weight changes explicitly, with the same future samples.'
+                    if continuation.get('mode')=='rank_weight_change' else
+                    'Full optimizer/RNG/counter restoration; batch sizes change explicitly, so the update trajectory changes.'
                     if continuation.get('mode')=='batch_resize' else
                     'Full optimizer/RNG/counter continuation with unchanged data, sampling and optimization; only update budget extends.')))
     else:

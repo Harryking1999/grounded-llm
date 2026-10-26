@@ -1,0 +1,236 @@
+{
+  "random_goal_audit": {
+    "sampled_quintuples": 3349173,
+    "violating_quintuples": 61,
+    "training_scenes_with_violation": 51,
+    "maximum_residual": 3.0,
+    "witness": {
+      "scene": 15,
+      "source": {
+        "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+        "row": 689,
+        "original_minimum": 39,
+        "reported_states": 2442
+      },
+      "initial_board": "EoBBBoEooGIJAAoGIJCCCHIJooFHDDooFooo",
+      "states": [
+        [
+          4,
+          0,
+          1,
+          0,
+          2,
+          4,
+          0,
+          4,
+          3,
+          3
+        ],
+        [
+          4,
+          3,
+          0,
+          0,
+          0,
+          4,
+          2,
+          4,
+          3,
+          3
+        ],
+        [
+          4,
+          1,
+          0,
+          0,
+          1,
+          4,
+          1,
+          3,
+          3,
+          3
+        ],
+        [
+          4,
+          3,
+          1,
+          0,
+          2,
+          4,
+          1,
+          4,
+          3,
+          3
+        ],
+        [
+          4,
+          1,
+          0,
+          0,
+          1,
+          4,
+          2,
+          4,
+          3,
+          3
+        ]
+      ],
+      "distance_matrix": [
+        [
+          0,
+          5,
+          5,
+          2,
+          4
+        ],
+        [
+          5,
+          0,
+          4,
+          3,
+          2
+        ],
+        [
+          5,
+          4,
+          0,
+          4,
+          2
+        ],
+        [
+          2,
+          3,
+          4,
+          0,
+          4
+        ],
+        [
+          4,
+          2,
+          2,
+          4,
+          0
+        ]
+      ],
+      "pentagonal_residual": 1
+    },
+    "scope": "Read-only exact training-goal distances. Every L1 metric, including the current normalized L1 readout in any dimension, obeys within(A3)+within(B2)<=cross(A,B). Positive exact residual proves those distances cannot all fit exactly; it does not prove perfect greedy completion is impossible. Finite random checks without violation do not prove embeddability."
+  },
+  "independent_witness_verification": {
+    "passed": true,
+    "component_states": 2442,
+    "independent_physical_bfs_sources": 5,
+    "within_sum": 18,
+    "cross_sum": 17,
+    "strict_violation": 1,
+    "distance_matrix": [
+      [
+        0,
+        5,
+        5,
+        2,
+        4
+      ],
+      [
+        5,
+        0,
+        4,
+        3,
+        2
+      ],
+      [
+        5,
+        4,
+        0,
+        4,
+        2
+      ],
+      [
+        2,
+        3,
+        4,
+        0,
+        4
+      ],
+      [
+        4,
+        2,
+        2,
+        4,
+        0
+      ]
+    ],
+    "states": [
+      [
+        4,
+        0,
+        1,
+        0,
+        2,
+        4,
+        0,
+        4,
+        3,
+        3
+      ],
+      [
+        4,
+        3,
+        0,
+        0,
+        0,
+        4,
+        2,
+        4,
+        3,
+        3
+      ],
+      [
+        4,
+        1,
+        0,
+        0,
+        1,
+        4,
+        1,
+        3,
+        3,
+        3
+      ],
+      [
+        4,
+        3,
+        1,
+        0,
+        2,
+        4,
+        1,
+        4,
+        3,
+        3
+      ],
+      [
+        4,
+        1,
+        0,
+        0,
+        1,
+        4,
+        2,
+        4,
+        3,
+        3
+      ]
+    ],
+    "initial_board": "EoBBBoEooGIJAAoGIJCCCHIJooFHDDooFooo",
+    "source": {
+      "url": "https://www.michaelfogleman.com/static/rush/rush1000.txt",
+      "row": 689,
+      "original_minimum": 39,
+      "reported_states": 2442
+    },
+    "linf_128_can_represent_this_five_point_metric": true,
+    "proof": "For a single cut with a of the3 A-points and b of the2 B-points on one side, within-minus-cross=(a-b)*(1-(a-b))<=0. Absolute coordinate distance is a nonnegative integral of cut distances; summing/scaling coordinates preserves the inequality. Thus any L1 embedding, irrespective of dimension/encoder capacity, cannot match all these exact distances.",
+    "limitation": "This is an exact-distance representation obstruction, not proof that L1 causes current policy loops or prevents perfect completion. The constructed distance rows verify only this five-point Linf representability; they are not neural inputs, training targets beyond ordinary distances, or deployed coordinates."
+  }
+}

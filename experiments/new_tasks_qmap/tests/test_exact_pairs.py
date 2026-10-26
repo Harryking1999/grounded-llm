@@ -237,6 +237,41 @@ class ExactPairTests(unittest.TestCase):
                 torch.testing.assert_close(before,reader.encode([states[0]]))
                 self.assertTrue(all(not parameter.requires_grad for parameter in reader.encoder.parameters()))
 
+    def test_vehicle_attributes_reconstruct_geometry_and_preserve_renaming(self):
+        from grounded_llm.tasks.rush_hour.qmap import MapReader
+        boards=[''.join(['BBCC..','......','AA....','......','......','......']),
+                ''.join(['..B...','..B...','AAB.C.','....C.','......','......'])]
+        for board in boards:
+            env=RushHour(board);states,_,_=enumerate_component(env,env.start,1000)
+            attributes=env.features(states,encoding='vehicle_attributes').reshape(len(states),26,36)
+            restored=np.zeros_like(attributes)
+            for row in range(len(states)):
+                for channel in np.flatnonzero(attributes[row,:,0]):
+                    field=attributes[row,channel];self.assertEqual(field[1],channel==0)
+                    horizontal=bool(field[2]);self.assertEqual(field[2:4].sum(),1)
+                    size=int(field[4:6].argmax())+2;lane=int(field[6:12].argmax());position=int(field[12:18].argmax())
+                    axis=position+np.arange(size);cells=lane*6+axis if horizontal else axis*6+lane
+                    restored[row,channel,cells]=1
+            np.testing.assert_array_equal(restored.reshape(len(states),-1),env.features(states,encoding='geometry_order'))
+            self.assertFalse(attributes[:,:,18:].any())
+            rename=str.maketrans({'B':'C','C':'B'});other=RushHour(board.translate(rename),feature_encoding='vehicle_attributes')
+            mapped=[RushHour(''.join(env.render(s)).translate(rename)).start for s in states]
+            np.testing.assert_array_equal(attributes.reshape(len(states),-1),other.features(mapped))
+            self.assertEqual(len(np.unique(attributes.reshape(len(states),-1),axis=0)),len(states))
+            parents=[];successors=[]
+            for state in states:
+                for _,child,cost in env.transitions(state):
+                    self.assertEqual(cost,1);parents.append(state);successors.append(child)
+            delta=env.features(parents,encoding='vehicle_attributes')-env.features(successors,encoding='vehicle_attributes')
+            self.assertTrue((np.abs(delta).sum(1)==2).all())
+            grid_delta=env.features(parents,encoding='geometry_order')-env.features(successors,encoding='geometry_order')
+            self.assertGreater(len(np.unique(np.abs(grid_delta).sum(1))),1)
+            with tempfile.TemporaryDirectory() as directory:
+                cfg=dict(input_encoding='vehicle_attributes',model=dict(dimension=128,hidden=16,cap=256,metric='l1'))
+                model=StateEncoder(input_dim=936,**cfg['model']);path=Path(directory)/'map.pt'
+                torch.save(dict(model_type='exact_state_pairs',task='rush_hour',scope={},input_dim=936,config=cfg,model=model.state_dict(),step=0),path)
+                reader=MapReader(env,path);torch.testing.assert_close(reader.encode(states[:2]),model.encode(torch.tensor(attributes[:2].reshape(2,-1))))
+
     def test_input_isometries_preserve_physics_and_complete_state_identity(self):
         from experiments.new_tasks_qmap.src.relation_diagnose import isometry_feature_view
         board=np.full((10,10),'#')

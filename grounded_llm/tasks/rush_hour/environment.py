@@ -5,7 +5,7 @@ import numpy as np
 
 class RushHour:
     def __init__(self, board, feature_encoding='identity'):
-        if feature_encoding not in ('identity','lane_order','geometry_order'): raise ValueError('Unsupported vehicle features')
+        if feature_encoding not in ('identity','lane_order','geometry_order','vehicle_attributes'): raise ValueError('Unsupported vehicle features')
         self.feature_encoding=feature_encoding
         if len(board) != 36 or any(c not in 'ox.ABCDEFGHIJKLMNOPQRSTUVWXYZ' for c in board):
             raise ValueError('Expected a 36-cell Rush Hour board')
@@ -50,8 +50,18 @@ class RushHour:
     def features(self, states, encoding=None):
         """Separate vehicle channels; lane_order preserves identity within a component."""
         encoding=self.feature_encoding if encoding is None else encoding
-        if encoding not in ('identity','lane_order','geometry_order'): raise ValueError('Unsupported vehicle feature encoding')
+        if encoding not in ('identity','lane_order','geometry_order','vehicle_attributes'): raise ValueError('Unsupported vehicle feature encoding')
         out = np.zeros((len(states), 26, 36), dtype=np.float32)
+        if encoding=='vehicle_attributes':
+            if self.walls:raise ValueError('Vehicle-only input is restricted to wall-free boards')
+            positions=np.asarray(states,dtype=np.int64)
+            for i,(label,horizontal,size,lane) in enumerate(self.pieces):
+                channel=int(self.geometry_channels[i])
+                out[:,channel,0]=1;out[:,channel,1]=label=='A'
+                out[:,channel,2 if horizontal else 3]=1;out[:,channel,4+size-2]=1
+                out[:,channel,6+lane]=1
+                if len(states):out[np.arange(len(states)),channel,12+positions[:,i]]=1
+            return out.reshape(len(states),-1)
         if len(states):
             positions=np.asarray(states,dtype=np.int64)
             if encoding=='lane_order':

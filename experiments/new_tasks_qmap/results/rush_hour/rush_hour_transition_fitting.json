@@ -826,5 +826,5527 @@
       }
     },
     "scope": "Exact reachability inside complete TRAINING-ALLOWED decision graph, including terminal goal as sink. All physical actions remain; protected candidate closures reject a whole decision. This diagnoses supervision connectivity, not inference search or learned execution."
+  },
+  "local_path_comparison": {
+    "scope": "Same init and full candidate bank, matched update budget and context multiset; joint versus shuffled within batches. Validation checkpoint selection; no adoption.",
+    "conditions": {
+      "joint": {
+        "source_commit": "32c00f372c286333adfbf5355ee4b984380783a0",
+        "selected_step": 3500,
+        "last_step": 4000,
+        "training_roots": {
+          "count": 4096,
+          "unique_state_goal_pairs": 4096,
+          "solved": 2749,
+          "success_rate": 0.671142578125,
+          "optimal": 1775,
+          "optimal_rate": 0.433349609375,
+          "cycles": 1347,
+          "entered_unreachable": 0,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.7260822057723999,
+          "mean_cost_ratio_on_success": 1.0422061681747437,
+          "first_cycle_step_counts": {
+            "2": 43,
+            "3": 79,
+            "4": 95,
+            "5": 75,
+            "6": 81,
+            "7": 107,
+            "8": 101,
+            "9": 80,
+            "10": 67,
+            "11": 60,
+            "12": 43,
+            "13": 41,
+            "14": 33,
+            "15": 51,
+            "16": 37,
+            "17": 36,
+            "18": 42,
+            "19": 28,
+            "20": 20,
+            "21": 23,
+            "22": 29,
+            "23": 21,
+            "24": 18,
+            "25": 14,
+            "26": 17,
+            "27": 16,
+            "28": 10,
+            "29": 7,
+            "30": 2,
+            "31": 3,
+            "32": 9,
+            "33": 12,
+            "34": 11,
+            "35": 4,
+            "36": 2,
+            "37": 2,
+            "38": 1,
+            "39": 2,
+            "40": 4,
+            "41": 3,
+            "42": 2,
+            "43": 1,
+            "44": 1,
+            "46": 3,
+            "47": 3,
+            "48": 3,
+            "50": 2,
+            "52": 1,
+            "55": 1,
+            "57": 1
+          },
+          "first_unreachable_step_counts": {},
+          "by_distance": {
+            "1.0": {
+              "count": 46,
+              "solved": 46,
+              "optimal": 46
+            },
+            "2.0": {
+              "count": 103,
+              "solved": 103,
+              "optimal": 103
+            },
+            "3.0": {
+              "count": 115,
+              "solved": 115,
+              "optimal": 115
+            },
+            "4.0": {
+              "count": 192,
+              "solved": 192,
+              "optimal": 191
+            },
+            "5.0": {
+              "count": 245,
+              "solved": 243,
+              "optimal": 231
+            },
+            "6.0": {
+              "count": 134,
+              "solved": 133,
+              "optimal": 123
+            },
+            "7.0": {
+              "count": 167,
+              "solved": 165,
+              "optimal": 139
+            },
+            "8.0": {
+              "count": 182,
+              "solved": 174,
+              "optimal": 138
+            },
+            "9.0": {
+              "count": 217,
+              "solved": 210,
+              "optimal": 153
+            },
+            "10.0": {
+              "count": 220,
+              "solved": 198,
+              "optimal": 119
+            },
+            "11.0": {
+              "count": 199,
+              "solved": 178,
+              "optimal": 98
+            },
+            "12.0": {
+              "count": 165,
+              "solved": 145,
+              "optimal": 77
+            },
+            "13.0": {
+              "count": 119,
+              "solved": 102,
+              "optimal": 55
+            },
+            "14.0": {
+              "count": 100,
+              "solved": 77,
+              "optimal": 42
+            },
+            "15.0": {
+              "count": 86,
+              "solved": 63,
+              "optimal": 29
+            },
+            "16.0": {
+              "count": 105,
+              "solved": 68,
+              "optimal": 20
+            },
+            "17.0": {
+              "count": 78,
+              "solved": 47,
+              "optimal": 14
+            },
+            "18.0": {
+              "count": 67,
+              "solved": 46,
+              "optimal": 12
+            },
+            "19.0": {
+              "count": 77,
+              "solved": 43,
+              "optimal": 15
+            },
+            "20.0": {
+              "count": 71,
+              "solved": 40,
+              "optimal": 7
+            },
+            "21.0": {
+              "count": 56,
+              "solved": 23,
+              "optimal": 5
+            },
+            "22.0": {
+              "count": 64,
+              "solved": 31,
+              "optimal": 7
+            },
+            "23.0": {
+              "count": 60,
+              "solved": 24,
+              "optimal": 5
+            },
+            "24.0": {
+              "count": 60,
+              "solved": 24,
+              "optimal": 2
+            },
+            "25.0": {
+              "count": 44,
+              "solved": 21,
+              "optimal": 7
+            },
+            "26.0": {
+              "count": 43,
+              "solved": 10,
+              "optimal": 2
+            },
+            "27.0": {
+              "count": 35,
+              "solved": 7,
+              "optimal": 0
+            },
+            "28.0": {
+              "count": 31,
+              "solved": 6,
+              "optimal": 1
+            },
+            "29.0": {
+              "count": 25,
+              "solved": 3,
+              "optimal": 0
+            },
+            "30.0": {
+              "count": 29,
+              "solved": 3,
+              "optimal": 0
+            },
+            "31.0": {
+              "count": 24,
+              "solved": 7,
+              "optimal": 2
+            },
+            "32.0": {
+              "count": 25,
+              "solved": 3,
+              "optimal": 0
+            },
+            "33.0": {
+              "count": 20,
+              "solved": 4,
+              "optimal": 0
+            },
+            "34.0": {
+              "count": 22,
+              "solved": 6,
+              "optimal": 0
+            },
+            "35.0": {
+              "count": 15,
+              "solved": 4,
+              "optimal": 1
+            },
+            "36.0": {
+              "count": 20,
+              "solved": 3,
+              "optimal": 1
+            },
+            "37.0": {
+              "count": 18,
+              "solved": 1,
+              "optimal": 0
+            },
+            "38.0": {
+              "count": 19,
+              "solved": 4,
+              "optimal": 0
+            },
+            "39.0": {
+              "count": 42,
+              "solved": 9,
+              "optimal": 1
+            },
+            "40.0": {
+              "count": 140,
+              "solved": 36,
+              "optimal": 3
+            },
+            "41.0": {
+              "count": 65,
+              "solved": 11,
+              "optimal": 1
+            },
+            "42.0": {
+              "count": 63,
+              "solved": 21,
+              "optimal": 1
+            },
+            "43.0": {
+              "count": 73,
+              "solved": 19,
+              "optimal": 3
+            },
+            "44.0": {
+              "count": 72,
+              "solved": 19,
+              "optimal": 0
+            },
+            "45.0": {
+              "count": 53,
+              "solved": 15,
+              "optimal": 0
+            },
+            "46.0": {
+              "count": 54,
+              "solved": 9,
+              "optimal": 2
+            },
+            "47.0": {
+              "count": 45,
+              "solved": 10,
+              "optimal": 1
+            },
+            "48.0": {
+              "count": 44,
+              "solved": 7,
+              "optimal": 1
+            },
+            "49.0": {
+              "count": 37,
+              "solved": 7,
+              "optimal": 0
+            },
+            "50.0": {
+              "count": 29,
+              "solved": 6,
+              "optimal": 1
+            },
+            "51.0": {
+              "count": 27,
+              "solved": 6,
+              "optimal": 0
+            },
+            "52.0": {
+              "count": 16,
+              "solved": 1,
+              "optimal": 1
+            },
+            "53.0": {
+              "count": 6,
+              "solved": 0,
+              "optimal": 0
+            },
+            "54.0": {
+              "count": 8,
+              "solved": 0,
+              "optimal": 0
+            },
+            "55.0": {
+              "count": 6,
+              "solved": 1,
+              "optimal": 0
+            },
+            "56.0": {
+              "count": 5,
+              "solved": 0,
+              "optimal": 0
+            },
+            "57.0": {
+              "count": 3,
+              "solved": 0,
+              "optimal": 0
+            },
+            "59.0": {
+              "count": 1,
+              "solved": 0,
+              "optimal": 0
+            },
+            "60.0": {
+              "count": 2,
+              "solved": 0,
+              "optimal": 0
+            },
+            "62.0": {
+              "count": 3,
+              "solved": 0,
+              "optimal": 0
+            },
+            "63.0": {
+              "count": 1,
+              "solved": 0,
+              "optimal": 0
+            },
+            "68.0": {
+              "count": 1,
+              "solved": 0,
+              "optimal": 0
+            },
+            "70.0": {
+              "count": 1,
+              "solved": 0,
+              "optimal": 0
+            },
+            "71.0": {
+              "count": 1,
+              "solved": 0,
+              "optimal": 0
+            }
+          },
+          "predicted_progress": {
+            "counts": {
+              "executed_edges": 52432,
+              "predicted_decrease": 50084,
+              "predicted_plateau": 1,
+              "predicted_increase": 2347,
+              "true_finite_edges": 52432,
+              "true_optimal_edges": 46227,
+              "predicted_decrease_but_not_true_optimal": 5066,
+              "entered_dead_edges": 0,
+              "non_goal_predicted_zero": 0
+            },
+            "strict_descent_trajectory_count": 2365,
+            "strict_descent_success_count": 2365,
+            "non_descent_trajectory_count": 1731,
+            "predicted_drop_quantiles": {
+              "0": -1.1217803955078125,
+              "0.1": 0.19717650413513185,
+              "0.5": 0.845973014831543,
+              "0.9": 1.5343922853469851,
+              "1": 8.919624328613281
+            },
+            "mean_abs_unit_descent_residual": 0.43406513107666017,
+            "mean_abs_cost_descent_residual": 0.43406513107666017,
+            "executed_edge_optimal_rate": 0.8816562404638388,
+            "predicted_strict_descent_edge_rate": 0.9552181873664938,
+            "executed_edges_by_true_distance": {
+              "1_1": {
+                "executed_edges": 2749,
+                "true_optimal_edges": 2749,
+                "predicted_decrease": 2749,
+                "entered_dead_edges": 0
+              },
+              "2_2": {
+                "executed_edges": 2724,
+                "true_optimal_edges": 2703,
+                "predicted_decrease": 2719,
+                "entered_dead_edges": 0
+              },
+              "3_5": {
+                "executed_edges": 7677,
+                "true_optimal_edges": 7418,
+                "predicted_decrease": 7590,
+                "entered_dead_edges": 0
+              },
+              "6_10": {
+                "executed_edges": 10180,
+                "true_optimal_edges": 9166,
+                "predicted_decrease": 9913,
+                "entered_dead_edges": 0
+              },
+              "11_20": {
+                "executed_edges": 11106,
+                "true_optimal_edges": 9182,
+                "predicted_decrease": 10431,
+                "entered_dead_edges": 0
+              },
+              "21_40": {
+                "executed_edges": 14378,
+                "true_optimal_edges": 11790,
+                "predicted_decrease": 13254,
+                "entered_dead_edges": 0
+              },
+              "41_80": {
+                "executed_edges": 3618,
+                "true_optimal_edges": 3219,
+                "predicted_decrease": 3428,
+                "entered_dead_edges": 0
+              },
+              "81_inf": {
+                "executed_edges": 0,
+                "true_optimal_edges": 0,
+                "predicted_decrease": 0,
+                "entered_dead_edges": 0
+              },
+              "proven_unreachable": {
+                "executed_edges": 0,
+                "true_optimal_edges": 0,
+                "predicted_decrease": 0,
+                "entered_dead_edges": 0
+              }
+            },
+            "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+          }
+        },
+        "cohorts": {
+          "validation": {
+            "finite_mae": 1.2715014219284058,
+            "q": {
+              "count": 1024,
+              "unique_state_goal_pairs": 1024,
+              "solved": 1024,
+              "success_rate": 1.0,
+              "optimal": 1022,
+              "optimal_rate": 0.998046875,
+              "cycles": 0,
+              "entered_unreachable": 0,
+              "no_legal_action": 0,
+              "budget_exhausted": 0,
+              "horizon": 256,
+              "illegal_actions": 0,
+              "mean_excess_cost_on_success": 0.0029296875,
+              "mean_cost_ratio_on_success": 1.00146484375,
+              "first_cycle_step_counts": {},
+              "first_unreachable_step_counts": {},
+              "by_distance": {
+                "1.0": {
+                  "count": 914,
+                  "solved": 914,
+                  "optimal": 914
+                },
+                "2.0": {
+                  "count": 88,
+                  "solved": 88,
+                  "optimal": 86
+                },
+                "3.0": {
+                  "count": 14,
+                  "solved": 14,
+                  "optimal": 14
+                },
+                "4.0": {
+                  "count": 8,
+                  "solved": 8,
+                  "optimal": 8
+                }
+              },
+              "predicted_progress": {
+                "counts": {
+                  "executed_edges": 1167,
+                  "predicted_decrease": 1166,
+                  "predicted_plateau": 0,
+                  "predicted_increase": 1,
+                  "true_finite_edges": 1167,
+                  "true_optimal_edges": 1164,
+                  "predicted_decrease_but_not_true_optimal": 3,
+                  "entered_dead_edges": 0,
+                  "non_goal_predicted_zero": 0
+                },
+                "strict_descent_trajectory_count": 1023,
+                "strict_descent_success_count": 1023,
+                "non_descent_trajectory_count": 1,
+                "predicted_drop_quantiles": {
+                  "0": -0.011018753051757812,
+                  "0.1": 1.1725324153900147,
+                  "0.5": 1.541621208190918,
+                  "0.9": 2.156065320968628,
+                  "1": 4.340394020080566
+                },
+                "mean_abs_unit_descent_residual": 0.6347384063627542,
+                "mean_abs_cost_descent_residual": 0.6347384063627542,
+                "executed_edge_optimal_rate": 0.9974293059125964,
+                "predicted_strict_descent_edge_rate": 0.9991431019708654,
+                "executed_edges_by_true_distance": {
+                  "1_1": {
+                    "executed_edges": 1024,
+                    "true_optimal_edges": 1024,
+                    "predicted_decrease": 1024,
+                    "entered_dead_edges": 0
+                  },
+                  "2_2": {
+                    "executed_edges": 113,
+                    "true_optimal_edges": 110,
+                    "predicted_decrease": 112,
+                    "entered_dead_edges": 0
+                  },
+                  "3_5": {
+                    "executed_edges": 30,
+                    "true_optimal_edges": 30,
+                    "predicted_decrease": 30,
+                    "entered_dead_edges": 0
+                  },
+                  "6_10": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "11_20": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "21_40": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "41_80": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "81_inf": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "proven_unreachable": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  }
+                },
+                "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+              }
+            }
+          },
+          "test": {
+            "finite_mae": 1.2761282920837402,
+            "q": {
+              "count": 1024,
+              "unique_state_goal_pairs": 1024,
+              "solved": 1024,
+              "success_rate": 1.0,
+              "optimal": 1022,
+              "optimal_rate": 0.998046875,
+              "cycles": 0,
+              "entered_unreachable": 0,
+              "no_legal_action": 0,
+              "budget_exhausted": 0,
+              "horizon": 256,
+              "illegal_actions": 0,
+              "mean_excess_cost_on_success": 0.001953125,
+              "mean_cost_ratio_on_success": 1.0009765625,
+              "first_cycle_step_counts": {},
+              "first_unreachable_step_counts": {},
+              "by_distance": {
+                "1.0": {
+                  "count": 765,
+                  "solved": 765,
+                  "optimal": 765
+                },
+                "2.0": {
+                  "count": 207,
+                  "solved": 207,
+                  "optimal": 205
+                },
+                "3.0": {
+                  "count": 38,
+                  "solved": 38,
+                  "optimal": 38
+                },
+                "4.0": {
+                  "count": 11,
+                  "solved": 11,
+                  "optimal": 11
+                },
+                "5.0": {
+                  "count": 2,
+                  "solved": 2,
+                  "optimal": 2
+                },
+                "7.0": {
+                  "count": 1,
+                  "solved": 1,
+                  "optimal": 1
+                }
+              },
+              "predicted_progress": {
+                "counts": {
+                  "executed_edges": 1356,
+                  "predicted_decrease": 1356,
+                  "predicted_plateau": 0,
+                  "predicted_increase": 0,
+                  "true_finite_edges": 1356,
+                  "true_optimal_edges": 1354,
+                  "predicted_decrease_but_not_true_optimal": 2,
+                  "entered_dead_edges": 0,
+                  "non_goal_predicted_zero": 0
+                },
+                "strict_descent_trajectory_count": 1024,
+                "strict_descent_success_count": 1024,
+                "non_descent_trajectory_count": 0,
+                "predicted_drop_quantiles": {
+                  "0": 0.17685914039611816,
+                  "0.1": 0.9671161770820618,
+                  "0.5": 1.4852803349494934,
+                  "0.9": 2.1196351051330566,
+                  "1": 4.2282233238220215
+                },
+                "mean_abs_unit_descent_residual": 0.5737626793461915,
+                "mean_abs_cost_descent_residual": 0.5737626793461915,
+                "executed_edge_optimal_rate": 0.9985250737463127,
+                "predicted_strict_descent_edge_rate": 1.0,
+                "executed_edges_by_true_distance": {
+                  "1_1": {
+                    "executed_edges": 1024,
+                    "true_optimal_edges": 1024,
+                    "predicted_decrease": 1024,
+                    "entered_dead_edges": 0
+                  },
+                  "2_2": {
+                    "executed_edges": 261,
+                    "true_optimal_edges": 259,
+                    "predicted_decrease": 261,
+                    "entered_dead_edges": 0
+                  },
+                  "3_5": {
+                    "executed_edges": 69,
+                    "true_optimal_edges": 69,
+                    "predicted_decrease": 69,
+                    "entered_dead_edges": 0
+                  },
+                  "6_10": {
+                    "executed_edges": 2,
+                    "true_optimal_edges": 2,
+                    "predicted_decrease": 2,
+                    "entered_dead_edges": 0
+                  },
+                  "11_20": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "21_40": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "41_80": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "81_inf": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "proven_unreachable": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  }
+                },
+                "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+              }
+            }
+          },
+          "unseen_goal_validation": {
+            "finite_mae": 1.3224365711212158,
+            "q": {
+              "count": 1024,
+              "unique_state_goal_pairs": 1024,
+              "solved": 1024,
+              "success_rate": 1.0,
+              "optimal": 1024,
+              "optimal_rate": 1.0,
+              "cycles": 0,
+              "entered_unreachable": 0,
+              "no_legal_action": 0,
+              "budget_exhausted": 0,
+              "horizon": 256,
+              "illegal_actions": 0,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_cycle_step_counts": {},
+              "first_unreachable_step_counts": {},
+              "by_distance": {
+                "1.0": {
+                  "count": 992,
+                  "solved": 992,
+                  "optimal": 992
+                },
+                "2.0": {
+                  "count": 29,
+                  "solved": 29,
+                  "optimal": 29
+                },
+                "3.0": {
+                  "count": 3,
+                  "solved": 3,
+                  "optimal": 3
+                }
+              },
+              "predicted_progress": {
+                "counts": {
+                  "executed_edges": 1059,
+                  "predicted_decrease": 1059,
+                  "predicted_plateau": 0,
+                  "predicted_increase": 0,
+                  "true_finite_edges": 1059,
+                  "true_optimal_edges": 1059,
+                  "predicted_decrease_but_not_true_optimal": 0,
+                  "entered_dead_edges": 0,
+                  "non_goal_predicted_zero": 0
+                },
+                "strict_descent_trajectory_count": 1024,
+                "strict_descent_success_count": 1024,
+                "non_descent_trajectory_count": 0,
+                "predicted_drop_quantiles": {
+                  "0": 0.0783381462097168,
+                  "0.1": 1.279496169090271,
+                  "0.5": 1.581268072128296,
+                  "0.9": 2.2349122047424315,
+                  "1": 4.488933563232422
+                },
+                "mean_abs_unit_descent_residual": 0.6892078538566856,
+                "mean_abs_cost_descent_residual": 0.6892078538566856,
+                "executed_edge_optimal_rate": 1.0,
+                "predicted_strict_descent_edge_rate": 1.0,
+                "executed_edges_by_true_distance": {
+                  "1_1": {
+                    "executed_edges": 1024,
+                    "true_optimal_edges": 1024,
+                    "predicted_decrease": 1024,
+                    "entered_dead_edges": 0
+                  },
+                  "2_2": {
+                    "executed_edges": 32,
+                    "true_optimal_edges": 32,
+                    "predicted_decrease": 32,
+                    "entered_dead_edges": 0
+                  },
+                  "3_5": {
+                    "executed_edges": 3,
+                    "true_optimal_edges": 3,
+                    "predicted_decrease": 3,
+                    "entered_dead_edges": 0
+                  },
+                  "6_10": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "11_20": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "21_40": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "41_80": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "81_inf": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "proven_unreachable": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  }
+                },
+                "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+              }
+            }
+          },
+          "unseen_goal_test": {
+            "finite_mae": 1.3579760789871216,
+            "q": {
+              "count": 1024,
+              "unique_state_goal_pairs": 1024,
+              "solved": 1024,
+              "success_rate": 1.0,
+              "optimal": 1024,
+              "optimal_rate": 1.0,
+              "cycles": 0,
+              "entered_unreachable": 0,
+              "no_legal_action": 0,
+              "budget_exhausted": 0,
+              "horizon": 256,
+              "illegal_actions": 0,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_cycle_step_counts": {},
+              "first_unreachable_step_counts": {},
+              "by_distance": {
+                "1.0": {
+                  "count": 996,
+                  "solved": 996,
+                  "optimal": 996
+                },
+                "2.0": {
+                  "count": 26,
+                  "solved": 26,
+                  "optimal": 26
+                },
+                "3.0": {
+                  "count": 2,
+                  "solved": 2,
+                  "optimal": 2
+                }
+              },
+              "predicted_progress": {
+                "counts": {
+                  "executed_edges": 1054,
+                  "predicted_decrease": 1053,
+                  "predicted_plateau": 0,
+                  "predicted_increase": 1,
+                  "true_finite_edges": 1054,
+                  "true_optimal_edges": 1054,
+                  "predicted_decrease_but_not_true_optimal": 0,
+                  "entered_dead_edges": 0,
+                  "non_goal_predicted_zero": 0
+                },
+                "strict_descent_trajectory_count": 1023,
+                "strict_descent_success_count": 1023,
+                "non_descent_trajectory_count": 1,
+                "predicted_drop_quantiles": {
+                  "0": -0.4982306957244873,
+                  "0.1": 1.2716240644454957,
+                  "0.5": 1.5672482252120972,
+                  "0.9": 2.1291288614273074,
+                  "1": 4.254006385803223
+                },
+                "mean_abs_unit_descent_residual": 0.6655475604692491,
+                "mean_abs_cost_descent_residual": 0.6655475604692491,
+                "executed_edge_optimal_rate": 1.0,
+                "predicted_strict_descent_edge_rate": 0.9990512333965844,
+                "executed_edges_by_true_distance": {
+                  "1_1": {
+                    "executed_edges": 1024,
+                    "true_optimal_edges": 1024,
+                    "predicted_decrease": 1024,
+                    "entered_dead_edges": 0
+                  },
+                  "2_2": {
+                    "executed_edges": 28,
+                    "true_optimal_edges": 28,
+                    "predicted_decrease": 27,
+                    "entered_dead_edges": 0
+                  },
+                  "3_5": {
+                    "executed_edges": 2,
+                    "true_optimal_edges": 2,
+                    "predicted_decrease": 2,
+                    "entered_dead_edges": 0
+                  },
+                  "6_10": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "11_20": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "21_40": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "41_80": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "81_inf": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "proven_unreachable": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  }
+                },
+                "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+              }
+            }
+          },
+          "unseen_layout_validation": {
+            "finite_mae": 3.460275888442993,
+            "q": {
+              "count": 1024,
+              "unique_state_goal_pairs": 1024,
+              "solved": 547,
+              "success_rate": 0.5341796875,
+              "optimal": 339,
+              "optimal_rate": 0.3310546875,
+              "cycles": 477,
+              "entered_unreachable": 0,
+              "no_legal_action": 0,
+              "budget_exhausted": 0,
+              "horizon": 256,
+              "illegal_actions": 0,
+              "mean_excess_cost_on_success": 0.7531992793083191,
+              "mean_cost_ratio_on_success": 1.0511385202407837,
+              "first_cycle_step_counts": {
+                "2": 9,
+                "3": 31,
+                "4": 60,
+                "5": 68,
+                "6": 54,
+                "7": 44,
+                "8": 48,
+                "9": 27,
+                "10": 23,
+                "11": 16,
+                "12": 19,
+                "13": 11,
+                "14": 14,
+                "15": 6,
+                "16": 10,
+                "17": 8,
+                "18": 8,
+                "19": 4,
+                "20": 1,
+                "21": 5,
+                "22": 4,
+                "23": 4,
+                "25": 1,
+                "27": 1,
+                "29": 1
+              },
+              "first_unreachable_step_counts": {},
+              "by_distance": {
+                "1.0": {
+                  "count": 35,
+                  "solved": 35,
+                  "optimal": 35
+                },
+                "2.0": {
+                  "count": 34,
+                  "solved": 34,
+                  "optimal": 34
+                },
+                "3.0": {
+                  "count": 35,
+                  "solved": 35,
+                  "optimal": 33
+                },
+                "4.0": {
+                  "count": 35,
+                  "solved": 34,
+                  "optimal": 34
+                },
+                "5.0": {
+                  "count": 35,
+                  "solved": 35,
+                  "optimal": 32
+                },
+                "6.0": {
+                  "count": 35,
+                  "solved": 35,
+                  "optimal": 30
+                },
+                "7.0": {
+                  "count": 35,
+                  "solved": 29,
+                  "optimal": 24
+                },
+                "8.0": {
+                  "count": 35,
+                  "solved": 29,
+                  "optimal": 21
+                },
+                "9.0": {
+                  "count": 35,
+                  "solved": 30,
+                  "optimal": 18
+                },
+                "10.0": {
+                  "count": 35,
+                  "solved": 28,
+                  "optimal": 19
+                },
+                "11.0": {
+                  "count": 35,
+                  "solved": 27,
+                  "optimal": 14
+                },
+                "12.0": {
+                  "count": 35,
+                  "solved": 22,
+                  "optimal": 9
+                },
+                "13.0": {
+                  "count": 35,
+                  "solved": 16,
+                  "optimal": 8
+                },
+                "14.0": {
+                  "count": 35,
+                  "solved": 17,
+                  "optimal": 4
+                },
+                "15.0": {
+                  "count": 35,
+                  "solved": 17,
+                  "optimal": 6
+                },
+                "16.0": {
+                  "count": 35,
+                  "solved": 16,
+                  "optimal": 2
+                },
+                "17.0": {
+                  "count": 35,
+                  "solved": 10,
+                  "optimal": 3
+                },
+                "18.0": {
+                  "count": 35,
+                  "solved": 14,
+                  "optimal": 4
+                },
+                "19.0": {
+                  "count": 35,
+                  "solved": 11,
+                  "optimal": 3
+                },
+                "20.0": {
+                  "count": 35,
+                  "solved": 9,
+                  "optimal": 1
+                },
+                "21.0": {
+                  "count": 35,
+                  "solved": 9,
+                  "optimal": 0
+                },
+                "22.0": {
+                  "count": 35,
+                  "solved": 10,
+                  "optimal": 0
+                },
+                "23.0": {
+                  "count": 35,
+                  "solved": 8,
+                  "optimal": 1
+                },
+                "24.0": {
+                  "count": 35,
+                  "solved": 6,
+                  "optimal": 2
+                },
+                "25.0": {
+                  "count": 35,
+                  "solved": 7,
+                  "optimal": 0
+                },
+                "26.0": {
+                  "count": 35,
+                  "solved": 6,
+                  "optimal": 1
+                },
+                "27.0": {
+                  "count": 35,
+                  "solved": 8,
+                  "optimal": 0
+                },
+                "28.0": {
+                  "count": 35,
+                  "solved": 3,
+                  "optimal": 0
+                },
+                "29.0": {
+                  "count": 35,
+                  "solved": 4,
+                  "optimal": 1
+                },
+                "30.0": {
+                  "count": 10,
+                  "solved": 3,
+                  "optimal": 0
+                }
+              },
+              "predicted_progress": {
+                "counts": {
+                  "executed_edges": 9944,
+                  "predicted_decrease": 9261,
+                  "predicted_plateau": 0,
+                  "predicted_increase": 683,
+                  "true_finite_edges": 9944,
+                  "true_optimal_edges": 7771,
+                  "predicted_decrease_but_not_true_optimal": 1764,
+                  "entered_dead_edges": 0,
+                  "non_goal_predicted_zero": 0
+                },
+                "strict_descent_trajectory_count": 472,
+                "strict_descent_success_count": 472,
+                "non_descent_trajectory_count": 552,
+                "predicted_drop_quantiles": {
+                  "0": -1.1196517944335938,
+                  "0.1": 0.0993891716003418,
+                  "0.5": 0.8178768157958984,
+                  "0.9": 1.6153970718383794,
+                  "1": 5.990974426269531
+                },
+                "mean_abs_unit_descent_residual": 0.5024102258519213,
+                "mean_abs_cost_descent_residual": 0.5024102258519213,
+                "executed_edge_optimal_rate": 0.7814762670957361,
+                "predicted_strict_descent_edge_rate": 0.9313153660498793,
+                "executed_edges_by_true_distance": {
+                  "1_1": {
+                    "executed_edges": 547,
+                    "true_optimal_edges": 547,
+                    "predicted_decrease": 547,
+                    "entered_dead_edges": 0
+                  },
+                  "2_2": {
+                    "executed_edges": 518,
+                    "true_optimal_edges": 512,
+                    "predicted_decrease": 514,
+                    "entered_dead_edges": 0
+                  },
+                  "3_5": {
+                    "executed_edges": 1448,
+                    "true_optimal_edges": 1355,
+                    "predicted_decrease": 1423,
+                    "entered_dead_edges": 0
+                  },
+                  "6_10": {
+                    "executed_edges": 2099,
+                    "true_optimal_edges": 1792,
+                    "predicted_decrease": 2013,
+                    "entered_dead_edges": 0
+                  },
+                  "11_20": {
+                    "executed_edges": 3533,
+                    "true_optimal_edges": 2499,
+                    "predicted_decrease": 3207,
+                    "entered_dead_edges": 0
+                  },
+                  "21_40": {
+                    "executed_edges": 1799,
+                    "true_optimal_edges": 1066,
+                    "predicted_decrease": 1557,
+                    "entered_dead_edges": 0
+                  },
+                  "41_80": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "81_inf": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "proven_unreachable": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  }
+                },
+                "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+              }
+            }
+          },
+          "unseen_layout_test": {
+            "finite_mae": 3.3404579162597656,
+            "q": {
+              "count": 1024,
+              "unique_state_goal_pairs": 1024,
+              "solved": 586,
+              "success_rate": 0.572265625,
+              "optimal": 397,
+              "optimal_rate": 0.3876953125,
+              "cycles": 438,
+              "entered_unreachable": 0,
+              "no_legal_action": 0,
+              "budget_exhausted": 0,
+              "horizon": 256,
+              "illegal_actions": 0,
+              "mean_excess_cost_on_success": 0.552901029586792,
+              "mean_cost_ratio_on_success": 1.0407993793487549,
+              "first_cycle_step_counts": {
+                "2": 12,
+                "3": 42,
+                "4": 50,
+                "5": 60,
+                "6": 42,
+                "7": 47,
+                "8": 36,
+                "9": 43,
+                "10": 20,
+                "11": 17,
+                "12": 23,
+                "13": 10,
+                "14": 12,
+                "15": 6,
+                "16": 7,
+                "17": 3,
+                "18": 4,
+                "20": 2,
+                "21": 2
+              },
+              "first_unreachable_step_counts": {},
+              "by_distance": {
+                "1.0": {
+                  "count": 37,
+                  "solved": 37,
+                  "optimal": 37
+                },
+                "2.0": {
+                  "count": 37,
+                  "solved": 37,
+                  "optimal": 36
+                },
+                "3.0": {
+                  "count": 37,
+                  "solved": 37,
+                  "optimal": 37
+                },
+                "4.0": {
+                  "count": 37,
+                  "solved": 37,
+                  "optimal": 36
+                },
+                "5.0": {
+                  "count": 37,
+                  "solved": 37,
+                  "optimal": 32
+                },
+                "6.0": {
+                  "count": 37,
+                  "solved": 37,
+                  "optimal": 32
+                },
+                "7.0": {
+                  "count": 37,
+                  "solved": 36,
+                  "optimal": 31
+                },
+                "8.0": {
+                  "count": 37,
+                  "solved": 34,
+                  "optimal": 28
+                },
+                "9.0": {
+                  "count": 37,
+                  "solved": 31,
+                  "optimal": 21
+                },
+                "10.0": {
+                  "count": 37,
+                  "solved": 29,
+                  "optimal": 16
+                },
+                "11.0": {
+                  "count": 37,
+                  "solved": 29,
+                  "optimal": 16
+                },
+                "12.0": {
+                  "count": 37,
+                  "solved": 24,
+                  "optimal": 13
+                },
+                "13.0": {
+                  "count": 37,
+                  "solved": 24,
+                  "optimal": 14
+                },
+                "14.0": {
+                  "count": 37,
+                  "solved": 19,
+                  "optimal": 9
+                },
+                "15.0": {
+                  "count": 37,
+                  "solved": 20,
+                  "optimal": 8
+                },
+                "16.0": {
+                  "count": 37,
+                  "solved": 16,
+                  "optimal": 8
+                },
+                "17.0": {
+                  "count": 37,
+                  "solved": 15,
+                  "optimal": 5
+                },
+                "18.0": {
+                  "count": 37,
+                  "solved": 15,
+                  "optimal": 4
+                },
+                "19.0": {
+                  "count": 37,
+                  "solved": 14,
+                  "optimal": 1
+                },
+                "20.0": {
+                  "count": 37,
+                  "solved": 10,
+                  "optimal": 3
+                },
+                "21.0": {
+                  "count": 37,
+                  "solved": 8,
+                  "optimal": 4
+                },
+                "22.0": {
+                  "count": 37,
+                  "solved": 6,
+                  "optimal": 2
+                },
+                "23.0": {
+                  "count": 37,
+                  "solved": 7,
+                  "optimal": 1
+                },
+                "24.0": {
+                  "count": 37,
+                  "solved": 6,
+                  "optimal": 1
+                },
+                "25.0": {
+                  "count": 37,
+                  "solved": 4,
+                  "optimal": 1
+                },
+                "26.0": {
+                  "count": 37,
+                  "solved": 6,
+                  "optimal": 0
+                },
+                "27.0": {
+                  "count": 37,
+                  "solved": 7,
+                  "optimal": 0
+                },
+                "28.0": {
+                  "count": 25,
+                  "solved": 4,
+                  "optimal": 1
+                }
+              },
+              "predicted_progress": {
+                "counts": {
+                  "executed_edges": 9362,
+                  "predicted_decrease": 8773,
+                  "predicted_plateau": 0,
+                  "predicted_increase": 589,
+                  "true_finite_edges": 9362,
+                  "true_optimal_edges": 7578,
+                  "predicted_decrease_but_not_true_optimal": 1421,
+                  "entered_dead_edges": 0,
+                  "non_goal_predicted_zero": 0
+                },
+                "strict_descent_trajectory_count": 518,
+                "strict_descent_success_count": 518,
+                "non_descent_trajectory_count": 506,
+                "predicted_drop_quantiles": {
+                  "0": -1.0604686737060547,
+                  "0.1": 0.10934247970581054,
+                  "0.5": 0.8260015249252319,
+                  "0.9": 1.596642780303955,
+                  "1": 13.045475006103516
+                },
+                "mean_abs_unit_descent_residual": 0.4886308683337526,
+                "mean_abs_cost_descent_residual": 0.4886308683337526,
+                "executed_edge_optimal_rate": 0.8094424268318735,
+                "predicted_strict_descent_edge_rate": 0.9370860927152318,
+                "executed_edges_by_true_distance": {
+                  "1_1": {
+                    "executed_edges": 586,
+                    "true_optimal_edges": 586,
+                    "predicted_decrease": 586,
+                    "entered_dead_edges": 0
+                  },
+                  "2_2": {
+                    "executed_edges": 553,
+                    "true_optimal_edges": 549,
+                    "predicted_decrease": 544,
+                    "entered_dead_edges": 0
+                  },
+                  "3_5": {
+                    "executed_edges": 1525,
+                    "true_optimal_edges": 1443,
+                    "predicted_decrease": 1508,
+                    "entered_dead_edges": 0
+                  },
+                  "6_10": {
+                    "executed_edges": 2056,
+                    "true_optimal_edges": 1820,
+                    "predicted_decrease": 1972,
+                    "entered_dead_edges": 0
+                  },
+                  "11_20": {
+                    "executed_edges": 3200,
+                    "true_optimal_edges": 2301,
+                    "predicted_decrease": 2919,
+                    "entered_dead_edges": 0
+                  },
+                  "21_40": {
+                    "executed_edges": 1442,
+                    "true_optimal_edges": 879,
+                    "predicted_decrease": 1244,
+                    "entered_dead_edges": 0
+                  },
+                  "41_80": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "81_inf": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "proven_unreachable": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  }
+                },
+                "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+              }
+            }
+          },
+          "original_layout_test": {
+            "finite_mae": 11.423688888549805,
+            "q": {
+              "count": 1024,
+              "unique_state_goal_pairs": 1024,
+              "solved": 27,
+              "success_rate": 0.0263671875,
+              "optimal": 0,
+              "optimal_rate": 0.0,
+              "cycles": 997,
+              "entered_unreachable": 0,
+              "no_legal_action": 0,
+              "budget_exhausted": 0,
+              "horizon": 256,
+              "illegal_actions": 0,
+              "mean_excess_cost_on_success": 5.44444465637207,
+              "mean_cost_ratio_on_success": 1.1270813941955566,
+              "first_cycle_step_counts": {
+                "2": 72,
+                "3": 169,
+                "4": 161,
+                "5": 97,
+                "6": 135,
+                "7": 61,
+                "8": 8,
+                "9": 47,
+                "10": 36,
+                "11": 14,
+                "12": 28,
+                "14": 8,
+                "15": 11,
+                "16": 7,
+                "17": 3,
+                "19": 1,
+                "20": 5,
+                "21": 38,
+                "22": 3,
+                "23": 5,
+                "24": 11,
+                "28": 1,
+                "30": 9,
+                "31": 6,
+                "32": 23,
+                "33": 7,
+                "34": 3,
+                "37": 11,
+                "38": 5,
+                "39": 10,
+                "45": 1,
+                "48": 1
+              },
+              "first_unreachable_step_counts": {},
+              "by_distance": {
+                "38.0": {
+                  "count": 11,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "39.0": {
+                  "count": 38,
+                  "solved": 1,
+                  "optimal": 0
+                },
+                "40.0": {
+                  "count": 57,
+                  "solved": 5,
+                  "optimal": 0
+                },
+                "41.0": {
+                  "count": 75,
+                  "solved": 5,
+                  "optimal": 0
+                },
+                "42.0": {
+                  "count": 104,
+                  "solved": 3,
+                  "optimal": 0
+                },
+                "43.0": {
+                  "count": 94,
+                  "solved": 3,
+                  "optimal": 0
+                },
+                "44.0": {
+                  "count": 82,
+                  "solved": 1,
+                  "optimal": 0
+                },
+                "45.0": {
+                  "count": 82,
+                  "solved": 1,
+                  "optimal": 0
+                },
+                "46.0": {
+                  "count": 76,
+                  "solved": 4,
+                  "optimal": 0
+                },
+                "47.0": {
+                  "count": 64,
+                  "solved": 2,
+                  "optimal": 0
+                },
+                "48.0": {
+                  "count": 51,
+                  "solved": 2,
+                  "optimal": 0
+                },
+                "49.0": {
+                  "count": 47,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "50.0": {
+                  "count": 47,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "51.0": {
+                  "count": 39,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "52.0": {
+                  "count": 33,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "53.0": {
+                  "count": 22,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "54.0": {
+                  "count": 22,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "55.0": {
+                  "count": 16,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "56.0": {
+                  "count": 7,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "57.0": {
+                  "count": 7,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "58.0": {
+                  "count": 9,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "59.0": {
+                  "count": 9,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "60.0": {
+                  "count": 9,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "61.0": {
+                  "count": 8,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "62.0": {
+                  "count": 3,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "63.0": {
+                  "count": 2,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "64.0": {
+                  "count": 2,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "65.0": {
+                  "count": 1,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "66.0": {
+                  "count": 1,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "67.0": {
+                  "count": 1,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "68.0": {
+                  "count": 1,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "69.0": {
+                  "count": 1,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "70.0": {
+                  "count": 1,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "71.0": {
+                  "count": 1,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "72.0": {
+                  "count": 1,
+                  "solved": 0,
+                  "optimal": 0
+                }
+              },
+              "predicted_progress": {
+                "counts": {
+                  "executed_edges": 10098,
+                  "predicted_decrease": 8797,
+                  "predicted_plateau": 0,
+                  "predicted_increase": 1301,
+                  "true_finite_edges": 10098,
+                  "true_optimal_edges": 6944,
+                  "predicted_decrease_but_not_true_optimal": 2303,
+                  "entered_dead_edges": 0,
+                  "non_goal_predicted_zero": 0
+                },
+                "strict_descent_trajectory_count": 1,
+                "strict_descent_success_count": 1,
+                "non_descent_trajectory_count": 1023,
+                "predicted_drop_quantiles": {
+                  "0": -1.4563789367675781,
+                  "0.1": -0.05985031127929687,
+                  "0.5": 0.7051448822021484,
+                  "0.9": 1.5962257385253906,
+                  "1": 3.660686492919922
+                },
+                "mean_abs_unit_descent_residual": 0.5904145896682694,
+                "mean_abs_cost_descent_residual": 0.5904145896682694,
+                "executed_edge_optimal_rate": 0.6876609229550406,
+                "predicted_strict_descent_edge_rate": 0.871162606456724,
+                "executed_edges_by_true_distance": {
+                  "1_1": {
+                    "executed_edges": 27,
+                    "true_optimal_edges": 27,
+                    "predicted_decrease": 27,
+                    "entered_dead_edges": 0
+                  },
+                  "2_2": {
+                    "executed_edges": 27,
+                    "true_optimal_edges": 27,
+                    "predicted_decrease": 27,
+                    "entered_dead_edges": 0
+                  },
+                  "3_5": {
+                    "executed_edges": 88,
+                    "true_optimal_edges": 81,
+                    "predicted_decrease": 86,
+                    "entered_dead_edges": 0
+                  },
+                  "6_10": {
+                    "executed_edges": 172,
+                    "true_optimal_edges": 143,
+                    "predicted_decrease": 163,
+                    "entered_dead_edges": 0
+                  },
+                  "11_20": {
+                    "executed_edges": 661,
+                    "true_optimal_edges": 505,
+                    "predicted_decrease": 602,
+                    "entered_dead_edges": 0
+                  },
+                  "21_40": {
+                    "executed_edges": 4920,
+                    "true_optimal_edges": 3588,
+                    "predicted_decrease": 4391,
+                    "entered_dead_edges": 0
+                  },
+                  "41_80": {
+                    "executed_edges": 4203,
+                    "true_optimal_edges": 2573,
+                    "predicted_decrease": 3501,
+                    "entered_dead_edges": 0
+                  },
+                  "81_inf": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "proven_unreachable": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  }
+                },
+                "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+              }
+            }
+          },
+          "original_layout_validation": {
+            "finite_mae": 12.818682670593262,
+            "q": {
+              "count": 1024,
+              "unique_state_goal_pairs": 1024,
+              "solved": 33,
+              "success_rate": 0.0322265625,
+              "optimal": 0,
+              "optimal_rate": 0.0,
+              "cycles": 991,
+              "entered_unreachable": 0,
+              "no_legal_action": 0,
+              "budget_exhausted": 0,
+              "horizon": 256,
+              "illegal_actions": 0,
+              "mean_excess_cost_on_success": 5.515151500701904,
+              "mean_cost_ratio_on_success": 1.122156023979187,
+              "first_cycle_step_counts": {
+                "2": 90,
+                "3": 180,
+                "4": 73,
+                "5": 59,
+                "6": 45,
+                "7": 100,
+                "8": 96,
+                "9": 42,
+                "10": 24,
+                "11": 27,
+                "12": 13,
+                "15": 1,
+                "16": 13,
+                "17": 13,
+                "18": 3,
+                "19": 40,
+                "20": 46,
+                "21": 29,
+                "22": 7,
+                "23": 7,
+                "24": 10,
+                "25": 10,
+                "26": 6,
+                "27": 10,
+                "28": 1,
+                "31": 1,
+                "32": 8,
+                "33": 19,
+                "34": 3,
+                "38": 1,
+                "40": 2,
+                "43": 1,
+                "47": 2,
+                "49": 1,
+                "51": 3,
+                "52": 3,
+                "55": 1,
+                "57": 1
+              },
+              "first_unreachable_step_counts": {},
+              "by_distance": {
+                "38.0": {
+                  "count": 17,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "39.0": {
+                  "count": 25,
+                  "solved": 1,
+                  "optimal": 0
+                },
+                "40.0": {
+                  "count": 36,
+                  "solved": 1,
+                  "optimal": 0
+                },
+                "41.0": {
+                  "count": 54,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "42.0": {
+                  "count": 61,
+                  "solved": 3,
+                  "optimal": 0
+                },
+                "43.0": {
+                  "count": 84,
+                  "solved": 1,
+                  "optimal": 0
+                },
+                "44.0": {
+                  "count": 100,
+                  "solved": 6,
+                  "optimal": 0
+                },
+                "45.0": {
+                  "count": 106,
+                  "solved": 8,
+                  "optimal": 0
+                },
+                "46.0": {
+                  "count": 76,
+                  "solved": 3,
+                  "optimal": 0
+                },
+                "47.0": {
+                  "count": 61,
+                  "solved": 2,
+                  "optimal": 0
+                },
+                "48.0": {
+                  "count": 67,
+                  "solved": 4,
+                  "optimal": 0
+                },
+                "49.0": {
+                  "count": 58,
+                  "solved": 2,
+                  "optimal": 0
+                },
+                "50.0": {
+                  "count": 57,
+                  "solved": 2,
+                  "optimal": 0
+                },
+                "51.0": {
+                  "count": 41,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "52.0": {
+                  "count": 39,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "53.0": {
+                  "count": 29,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "54.0": {
+                  "count": 20,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "55.0": {
+                  "count": 17,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "56.0": {
+                  "count": 16,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "57.0": {
+                  "count": 14,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "58.0": {
+                  "count": 10,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "59.0": {
+                  "count": 9,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "60.0": {
+                  "count": 4,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "61.0": {
+                  "count": 3,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "62.0": {
+                  "count": 3,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "63.0": {
+                  "count": 3,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "64.0": {
+                  "count": 2,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "65.0": {
+                  "count": 2,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "66.0": {
+                  "count": 2,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "67.0": {
+                  "count": 2,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "68.0": {
+                  "count": 2,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "69.0": {
+                  "count": 1,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "70.0": {
+                  "count": 1,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "71.0": {
+                  "count": 1,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "72.0": {
+                  "count": 1,
+                  "solved": 0,
+                  "optimal": 0
+                }
+              },
+              "predicted_progress": {
+                "counts": {
+                  "executed_edges": 11579,
+                  "predicted_decrease": 10164,
+                  "predicted_plateau": 0,
+                  "predicted_increase": 1415,
+                  "true_finite_edges": 11579,
+                  "true_optimal_edges": 8250,
+                  "predicted_decrease_but_not_true_optimal": 2454,
+                  "entered_dead_edges": 0,
+                  "non_goal_predicted_zero": 0
+                },
+                "strict_descent_trajectory_count": 7,
+                "strict_descent_success_count": 7,
+                "non_descent_trajectory_count": 1017,
+                "predicted_drop_quantiles": {
+                  "0": -1.3257904052734375,
+                  "0.1": -0.06807098388671876,
+                  "0.5": 0.6688003540039062,
+                  "0.9": 1.5642990112304687,
+                  "1": 4.746696472167969
+                },
+                "mean_abs_unit_descent_residual": 0.5878077293988676,
+                "mean_abs_cost_descent_residual": 0.5878077293988676,
+                "executed_edge_optimal_rate": 0.7124967613783574,
+                "predicted_strict_descent_edge_rate": 0.8777960100181362,
+                "executed_edges_by_true_distance": {
+                  "1_1": {
+                    "executed_edges": 33,
+                    "true_optimal_edges": 33,
+                    "predicted_decrease": 33,
+                    "entered_dead_edges": 0
+                  },
+                  "2_2": {
+                    "executed_edges": 33,
+                    "true_optimal_edges": 33,
+                    "predicted_decrease": 33,
+                    "entered_dead_edges": 0
+                  },
+                  "3_5": {
+                    "executed_edges": 113,
+                    "true_optimal_edges": 105,
+                    "predicted_decrease": 111,
+                    "entered_dead_edges": 0
+                  },
+                  "6_10": {
+                    "executed_edges": 203,
+                    "true_optimal_edges": 182,
+                    "predicted_decrease": 200,
+                    "entered_dead_edges": 0
+                  },
+                  "11_20": {
+                    "executed_edges": 610,
+                    "true_optimal_edges": 460,
+                    "predicted_decrease": 554,
+                    "entered_dead_edges": 0
+                  },
+                  "21_40": {
+                    "executed_edges": 4914,
+                    "true_optimal_edges": 3421,
+                    "predicted_decrease": 4254,
+                    "entered_dead_edges": 0
+                  },
+                  "41_80": {
+                    "executed_edges": 5673,
+                    "true_optimal_edges": 4016,
+                    "predicted_decrease": 4979,
+                    "entered_dead_edges": 0
+                  },
+                  "81_inf": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "proven_unreachable": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  }
+                },
+                "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+              }
+            }
+          },
+          "diagnostic": {
+            "finite_mae": 5.095502853393555,
+            "q": {
+              "count": 1024,
+              "unique_state_goal_pairs": 1024,
+              "solved": 334,
+              "success_rate": 0.326171875,
+              "optimal": 218,
+              "optimal_rate": 0.212890625,
+              "cycles": 690,
+              "entered_unreachable": 0,
+              "no_legal_action": 0,
+              "budget_exhausted": 0,
+              "horizon": 256,
+              "illegal_actions": 0,
+              "mean_excess_cost_on_success": 0.6946107745170593,
+              "mean_cost_ratio_on_success": 1.0509883165359497,
+              "first_cycle_step_counts": {
+                "2": 29,
+                "3": 76,
+                "4": 100,
+                "5": 90,
+                "6": 82,
+                "7": 66,
+                "8": 57,
+                "9": 46,
+                "10": 33,
+                "11": 22,
+                "12": 14,
+                "13": 16,
+                "14": 15,
+                "15": 10,
+                "16": 7,
+                "17": 9,
+                "18": 4,
+                "20": 3,
+                "21": 4,
+                "22": 2,
+                "24": 1,
+                "25": 1,
+                "26": 1,
+                "30": 1,
+                "31": 1
+              },
+              "first_unreachable_step_counts": {},
+              "by_distance": {
+                "1.0": {
+                  "count": 26,
+                  "solved": 26,
+                  "optimal": 26
+                },
+                "2.0": {
+                  "count": 26,
+                  "solved": 26,
+                  "optimal": 26
+                },
+                "3.0": {
+                  "count": 26,
+                  "solved": 26,
+                  "optimal": 25
+                },
+                "4.0": {
+                  "count": 26,
+                  "solved": 25,
+                  "optimal": 23
+                },
+                "5.0": {
+                  "count": 25,
+                  "solved": 24,
+                  "optimal": 22
+                },
+                "6.0": {
+                  "count": 24,
+                  "solved": 23,
+                  "optimal": 14
+                },
+                "7.0": {
+                  "count": 24,
+                  "solved": 21,
+                  "optimal": 15
+                },
+                "8.0": {
+                  "count": 24,
+                  "solved": 19,
+                  "optimal": 17
+                },
+                "9.0": {
+                  "count": 24,
+                  "solved": 17,
+                  "optimal": 13
+                },
+                "10.0": {
+                  "count": 24,
+                  "solved": 18,
+                  "optimal": 6
+                },
+                "11.0": {
+                  "count": 24,
+                  "solved": 14,
+                  "optimal": 7
+                },
+                "12.0": {
+                  "count": 24,
+                  "solved": 14,
+                  "optimal": 7
+                },
+                "13.0": {
+                  "count": 24,
+                  "solved": 10,
+                  "optimal": 5
+                },
+                "14.0": {
+                  "count": 24,
+                  "solved": 10,
+                  "optimal": 1
+                },
+                "15.0": {
+                  "count": 22,
+                  "solved": 7,
+                  "optimal": 2
+                },
+                "16.0": {
+                  "count": 23,
+                  "solved": 9,
+                  "optimal": 3
+                },
+                "17.0": {
+                  "count": 23,
+                  "solved": 9,
+                  "optimal": 3
+                },
+                "18.0": {
+                  "count": 23,
+                  "solved": 8,
+                  "optimal": 1
+                },
+                "19.0": {
+                  "count": 23,
+                  "solved": 10,
+                  "optimal": 1
+                },
+                "20.0": {
+                  "count": 23,
+                  "solved": 6,
+                  "optimal": 1
+                },
+                "21.0": {
+                  "count": 23,
+                  "solved": 7,
+                  "optimal": 0
+                },
+                "22.0": {
+                  "count": 22,
+                  "solved": 1,
+                  "optimal": 0
+                },
+                "23.0": {
+                  "count": 22,
+                  "solved": 1,
+                  "optimal": 0
+                },
+                "24.0": {
+                  "count": 22,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "25.0": {
+                  "count": 20,
+                  "solved": 3,
+                  "optimal": 0
+                },
+                "26.0": {
+                  "count": 21,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "27.0": {
+                  "count": 20,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "28.0": {
+                  "count": 20,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "29.0": {
+                  "count": 20,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "30.0": {
+                  "count": 20,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "31.0": {
+                  "count": 20,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "32.0": {
+                  "count": 19,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "33.0": {
+                  "count": 20,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "34.0": {
+                  "count": 20,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "35.0": {
+                  "count": 20,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "36.0": {
+                  "count": 20,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "37.0": {
+                  "count": 20,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "38.0": {
+                  "count": 19,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "39.0": {
+                  "count": 19,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "40.0": {
+                  "count": 18,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "41.0": {
+                  "count": 19,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "42.0": {
+                  "count": 13,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "43.0": {
+                  "count": 13,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "44.0": {
+                  "count": 10,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "45.0": {
+                  "count": 11,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "46.0": {
+                  "count": 10,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "47.0": {
+                  "count": 9,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "48.0": {
+                  "count": 8,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "49.0": {
+                  "count": 7,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "50.0": {
+                  "count": 9,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "51.0": {
+                  "count": 7,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "52.0": {
+                  "count": 7,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "53.0": {
+                  "count": 4,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "54.0": {
+                  "count": 4,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "55.0": {
+                  "count": 2,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "56.0": {
+                  "count": 2,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "59.0": {
+                  "count": 1,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "60.0": {
+                  "count": 1,
+                  "solved": 0,
+                  "optimal": 0
+                }
+              },
+              "predicted_progress": {
+                "counts": {
+                  "executed_edges": 8022,
+                  "predicted_decrease": 7150,
+                  "predicted_plateau": 0,
+                  "predicted_increase": 872,
+                  "true_finite_edges": 8022,
+                  "true_optimal_edges": 5407,
+                  "predicted_decrease_but_not_true_optimal": 2033,
+                  "entered_dead_edges": 0,
+                  "non_goal_predicted_zero": 0
+                },
+                "strict_descent_trajectory_count": 298,
+                "strict_descent_success_count": 298,
+                "non_descent_trajectory_count": 726,
+                "predicted_drop_quantiles": {
+                  "0": -1.6764049530029297,
+                  "0.1": -0.02761135101318357,
+                  "0.5": 0.6897134780883789,
+                  "0.9": 1.6244214057922364,
+                  "1": 5.888566970825195
+                },
+                "mean_abs_unit_descent_residual": 0.5879995571916106,
+                "mean_abs_cost_descent_residual": 0.5879995571916106,
+                "executed_edge_optimal_rate": 0.6740214410371479,
+                "predicted_strict_descent_edge_rate": 0.8912989279481426,
+                "executed_edges_by_true_distance": {
+                  "1_1": {
+                    "executed_edges": 334,
+                    "true_optimal_edges": 334,
+                    "predicted_decrease": 334,
+                    "entered_dead_edges": 0
+                  },
+                  "2_2": {
+                    "executed_edges": 311,
+                    "true_optimal_edges": 308,
+                    "predicted_decrease": 311,
+                    "entered_dead_edges": 0
+                  },
+                  "3_5": {
+                    "executed_edges": 914,
+                    "true_optimal_edges": 822,
+                    "predicted_decrease": 869,
+                    "entered_dead_edges": 0
+                  },
+                  "6_10": {
+                    "executed_edges": 1314,
+                    "true_optimal_edges": 1088,
+                    "predicted_decrease": 1253,
+                    "entered_dead_edges": 0
+                  },
+                  "11_20": {
+                    "executed_edges": 1780,
+                    "true_optimal_edges": 1185,
+                    "predicted_decrease": 1603,
+                    "entered_dead_edges": 0
+                  },
+                  "21_40": {
+                    "executed_edges": 2662,
+                    "true_optimal_edges": 1292,
+                    "predicted_decrease": 2220,
+                    "entered_dead_edges": 0
+                  },
+                  "41_80": {
+                    "executed_edges": 707,
+                    "true_optimal_edges": 378,
+                    "predicted_decrease": 560,
+                    "entered_dead_edges": 0
+                  },
+                  "81_inf": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "proven_unreachable": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  }
+                },
+                "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+              }
+            }
+          },
+          "diagnostic_original": {
+            "finite_mae": 15.694726943969727,
+            "q": {
+              "count": 8,
+              "unique_state_goal_pairs": 8,
+              "solved": 1,
+              "success_rate": 0.125,
+              "optimal": 0,
+              "optimal_rate": 0.0,
+              "cycles": 7,
+              "entered_unreachable": 0,
+              "no_legal_action": 0,
+              "budget_exhausted": 0,
+              "horizon": 256,
+              "illegal_actions": 0,
+              "mean_excess_cost_on_success": 3.0,
+              "mean_cost_ratio_on_success": 1.0789474248886108,
+              "first_cycle_step_counts": {
+                "3": 1,
+                "4": 1,
+                "6": 1,
+                "7": 1,
+                "9": 1,
+                "12": 1,
+                "17": 1
+              },
+              "first_unreachable_step_counts": {},
+              "by_distance": {
+                "38.0": {
+                  "count": 3,
+                  "solved": 1,
+                  "optimal": 0
+                },
+                "41.0": {
+                  "count": 1,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "44.0": {
+                  "count": 1,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "46.0": {
+                  "count": 1,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "47.0": {
+                  "count": 1,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "51.0": {
+                  "count": 1,
+                  "solved": 0,
+                  "optimal": 0
+                }
+              },
+              "predicted_progress": {
+                "counts": {
+                  "executed_edges": 99,
+                  "predicted_decrease": 90,
+                  "predicted_plateau": 0,
+                  "predicted_increase": 9,
+                  "true_finite_edges": 99,
+                  "true_optimal_edges": 79,
+                  "predicted_decrease_but_not_true_optimal": 12,
+                  "entered_dead_edges": 0,
+                  "non_goal_predicted_zero": 0
+                },
+                "strict_descent_trajectory_count": 0,
+                "strict_descent_success_count": 0,
+                "non_descent_trajectory_count": 8,
+                "predicted_drop_quantiles": {
+                  "0": -0.7913103103637695,
+                  "0.1": 0.028111648559570313,
+                  "0.5": 0.7247657775878906,
+                  "0.9": 1.6204360961914064,
+                  "1": 3.9725494384765625
+                },
+                "mean_abs_unit_descent_residual": 0.5730383612892844,
+                "mean_abs_cost_descent_residual": 0.5730383612892844,
+                "executed_edge_optimal_rate": 0.797979797979798,
+                "predicted_strict_descent_edge_rate": 0.9090909090909091,
+                "executed_edges_by_true_distance": {
+                  "1_1": {
+                    "executed_edges": 1,
+                    "true_optimal_edges": 1,
+                    "predicted_decrease": 1,
+                    "entered_dead_edges": 0
+                  },
+                  "2_2": {
+                    "executed_edges": 1,
+                    "true_optimal_edges": 1,
+                    "predicted_decrease": 1,
+                    "entered_dead_edges": 0
+                  },
+                  "3_5": {
+                    "executed_edges": 3,
+                    "true_optimal_edges": 3,
+                    "predicted_decrease": 3,
+                    "entered_dead_edges": 0
+                  },
+                  "6_10": {
+                    "executed_edges": 5,
+                    "true_optimal_edges": 5,
+                    "predicted_decrease": 5,
+                    "entered_dead_edges": 0
+                  },
+                  "11_20": {
+                    "executed_edges": 11,
+                    "true_optimal_edges": 10,
+                    "predicted_decrease": 11,
+                    "entered_dead_edges": 0
+                  },
+                  "21_40": {
+                    "executed_edges": 49,
+                    "true_optimal_edges": 38,
+                    "predicted_decrease": 43,
+                    "entered_dead_edges": 0
+                  },
+                  "41_80": {
+                    "executed_edges": 29,
+                    "true_optimal_edges": 21,
+                    "predicted_decrease": 26,
+                    "entered_dead_edges": 0
+                  },
+                  "81_inf": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "proven_unreachable": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  }
+                },
+                "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+              }
+            }
+          }
+        },
+        "actual_exposure": {
+          "unique_gradient_states": 4752537,
+          "available_states": 5263995,
+          "unique_pair_rows": 4752513,
+          "pair_rows": 4752513,
+          "unique_decision_rows": 3783337,
+          "decision_rows": 4690868,
+          "minimum_pair_layer_passes": 1.286215812819273,
+          "minimum_decision_layer_passes": null
+        },
+        "raw_run": "/tmp/grounded_qmap_followup_5d41460/runs/rush_hour_l1_local_path_joint_fit"
+      },
+      "shuffled": {
+        "source_commit": "32c00f372c286333adfbf5355ee4b984380783a0",
+        "selected_step": 4000,
+        "last_step": 4000,
+        "training_roots": {
+          "count": 4096,
+          "unique_state_goal_pairs": 4096,
+          "solved": 2806,
+          "success_rate": 0.68505859375,
+          "optimal": 1816,
+          "optimal_rate": 0.443359375,
+          "cycles": 1290,
+          "entered_unreachable": 0,
+          "no_legal_action": 0,
+          "budget_exhausted": 0,
+          "horizon": 256,
+          "illegal_actions": 0,
+          "mean_excess_cost_on_success": 0.7369921803474426,
+          "mean_cost_ratio_on_success": 1.042215347290039,
+          "first_cycle_step_counts": {
+            "2": 39,
+            "3": 79,
+            "4": 87,
+            "5": 65,
+            "6": 86,
+            "7": 109,
+            "8": 82,
+            "9": 55,
+            "10": 49,
+            "11": 57,
+            "12": 49,
+            "13": 35,
+            "14": 47,
+            "15": 20,
+            "16": 34,
+            "17": 48,
+            "18": 25,
+            "19": 32,
+            "20": 35,
+            "21": 27,
+            "22": 19,
+            "23": 15,
+            "24": 27,
+            "25": 28,
+            "26": 23,
+            "27": 20,
+            "28": 17,
+            "29": 11,
+            "30": 7,
+            "31": 2,
+            "32": 12,
+            "33": 10,
+            "34": 7,
+            "35": 4,
+            "36": 3,
+            "38": 1,
+            "39": 2,
+            "41": 1,
+            "42": 4,
+            "43": 3,
+            "44": 1,
+            "45": 2,
+            "46": 4,
+            "47": 1,
+            "48": 2,
+            "49": 3,
+            "50": 1
+          },
+          "first_unreachable_step_counts": {},
+          "by_distance": {
+            "1.0": {
+              "count": 46,
+              "solved": 46,
+              "optimal": 46
+            },
+            "2.0": {
+              "count": 103,
+              "solved": 103,
+              "optimal": 103
+            },
+            "3.0": {
+              "count": 115,
+              "solved": 115,
+              "optimal": 115
+            },
+            "4.0": {
+              "count": 192,
+              "solved": 192,
+              "optimal": 190
+            },
+            "5.0": {
+              "count": 245,
+              "solved": 243,
+              "optimal": 230
+            },
+            "6.0": {
+              "count": 134,
+              "solved": 133,
+              "optimal": 123
+            },
+            "7.0": {
+              "count": 167,
+              "solved": 164,
+              "optimal": 144
+            },
+            "8.0": {
+              "count": 182,
+              "solved": 175,
+              "optimal": 141
+            },
+            "9.0": {
+              "count": 217,
+              "solved": 211,
+              "optimal": 151
+            },
+            "10.0": {
+              "count": 220,
+              "solved": 197,
+              "optimal": 121
+            },
+            "11.0": {
+              "count": 199,
+              "solved": 176,
+              "optimal": 95
+            },
+            "12.0": {
+              "count": 165,
+              "solved": 151,
+              "optimal": 81
+            },
+            "13.0": {
+              "count": 119,
+              "solved": 99,
+              "optimal": 50
+            },
+            "14.0": {
+              "count": 100,
+              "solved": 79,
+              "optimal": 41
+            },
+            "15.0": {
+              "count": 86,
+              "solved": 69,
+              "optimal": 38
+            },
+            "16.0": {
+              "count": 105,
+              "solved": 72,
+              "optimal": 30
+            },
+            "17.0": {
+              "count": 78,
+              "solved": 52,
+              "optimal": 19
+            },
+            "18.0": {
+              "count": 67,
+              "solved": 47,
+              "optimal": 20
+            },
+            "19.0": {
+              "count": 77,
+              "solved": 51,
+              "optimal": 18
+            },
+            "20.0": {
+              "count": 71,
+              "solved": 44,
+              "optimal": 10
+            },
+            "21.0": {
+              "count": 56,
+              "solved": 26,
+              "optimal": 5
+            },
+            "22.0": {
+              "count": 64,
+              "solved": 33,
+              "optimal": 9
+            },
+            "23.0": {
+              "count": 60,
+              "solved": 31,
+              "optimal": 6
+            },
+            "24.0": {
+              "count": 60,
+              "solved": 26,
+              "optimal": 2
+            },
+            "25.0": {
+              "count": 44,
+              "solved": 17,
+              "optimal": 4
+            },
+            "26.0": {
+              "count": 43,
+              "solved": 14,
+              "optimal": 1
+            },
+            "27.0": {
+              "count": 35,
+              "solved": 11,
+              "optimal": 0
+            },
+            "28.0": {
+              "count": 31,
+              "solved": 10,
+              "optimal": 2
+            },
+            "29.0": {
+              "count": 25,
+              "solved": 7,
+              "optimal": 0
+            },
+            "30.0": {
+              "count": 29,
+              "solved": 2,
+              "optimal": 1
+            },
+            "31.0": {
+              "count": 24,
+              "solved": 7,
+              "optimal": 1
+            },
+            "32.0": {
+              "count": 25,
+              "solved": 5,
+              "optimal": 1
+            },
+            "33.0": {
+              "count": 20,
+              "solved": 4,
+              "optimal": 1
+            },
+            "34.0": {
+              "count": 22,
+              "solved": 6,
+              "optimal": 0
+            },
+            "35.0": {
+              "count": 15,
+              "solved": 4,
+              "optimal": 1
+            },
+            "36.0": {
+              "count": 20,
+              "solved": 4,
+              "optimal": 1
+            },
+            "37.0": {
+              "count": 18,
+              "solved": 3,
+              "optimal": 1
+            },
+            "38.0": {
+              "count": 19,
+              "solved": 3,
+              "optimal": 0
+            },
+            "39.0": {
+              "count": 42,
+              "solved": 8,
+              "optimal": 0
+            },
+            "40.0": {
+              "count": 140,
+              "solved": 32,
+              "optimal": 5
+            },
+            "41.0": {
+              "count": 65,
+              "solved": 12,
+              "optimal": 2
+            },
+            "42.0": {
+              "count": 63,
+              "solved": 16,
+              "optimal": 1
+            },
+            "43.0": {
+              "count": 73,
+              "solved": 10,
+              "optimal": 1
+            },
+            "44.0": {
+              "count": 72,
+              "solved": 14,
+              "optimal": 1
+            },
+            "45.0": {
+              "count": 53,
+              "solved": 15,
+              "optimal": 1
+            },
+            "46.0": {
+              "count": 54,
+              "solved": 9,
+              "optimal": 2
+            },
+            "47.0": {
+              "count": 45,
+              "solved": 14,
+              "optimal": 0
+            },
+            "48.0": {
+              "count": 44,
+              "solved": 12,
+              "optimal": 0
+            },
+            "49.0": {
+              "count": 37,
+              "solved": 12,
+              "optimal": 0
+            },
+            "50.0": {
+              "count": 29,
+              "solved": 8,
+              "optimal": 1
+            },
+            "51.0": {
+              "count": 27,
+              "solved": 12,
+              "optimal": 0
+            },
+            "52.0": {
+              "count": 16,
+              "solved": 0,
+              "optimal": 0
+            },
+            "53.0": {
+              "count": 6,
+              "solved": 0,
+              "optimal": 0
+            },
+            "54.0": {
+              "count": 8,
+              "solved": 0,
+              "optimal": 0
+            },
+            "55.0": {
+              "count": 6,
+              "solved": 0,
+              "optimal": 0
+            },
+            "56.0": {
+              "count": 5,
+              "solved": 0,
+              "optimal": 0
+            },
+            "57.0": {
+              "count": 3,
+              "solved": 0,
+              "optimal": 0
+            },
+            "59.0": {
+              "count": 1,
+              "solved": 0,
+              "optimal": 0
+            },
+            "60.0": {
+              "count": 2,
+              "solved": 0,
+              "optimal": 0
+            },
+            "62.0": {
+              "count": 3,
+              "solved": 0,
+              "optimal": 0
+            },
+            "63.0": {
+              "count": 1,
+              "solved": 0,
+              "optimal": 0
+            },
+            "68.0": {
+              "count": 1,
+              "solved": 0,
+              "optimal": 0
+            },
+            "70.0": {
+              "count": 1,
+              "solved": 0,
+              "optimal": 0
+            },
+            "71.0": {
+              "count": 1,
+              "solved": 0,
+              "optimal": 0
+            }
+          },
+          "predicted_progress": {
+            "counts": {
+              "executed_edges": 53804,
+              "predicted_decrease": 51437,
+              "predicted_plateau": 0,
+              "predicted_increase": 2367,
+              "true_finite_edges": 53804,
+              "true_optimal_edges": 47633,
+              "predicted_decrease_but_not_true_optimal": 5069,
+              "entered_dead_edges": 0,
+              "non_goal_predicted_zero": 0
+            },
+            "strict_descent_trajectory_count": 2380,
+            "strict_descent_success_count": 2380,
+            "non_descent_trajectory_count": 1716,
+            "predicted_drop_quantiles": {
+              "0": -1.1165122985839844,
+              "0.1": 0.21094741821289062,
+              "0.5": 0.8559792041778564,
+              "0.9": 1.5471670150756838,
+              "1": 8.228370666503906
+            },
+            "mean_abs_unit_descent_residual": 0.43207146441167227,
+            "mean_abs_cost_descent_residual": 0.43207146441167227,
+            "executed_edge_optimal_rate": 0.8853059252100216,
+            "predicted_strict_descent_edge_rate": 0.9560069883280053,
+            "executed_edges_by_true_distance": {
+              "1_1": {
+                "executed_edges": 2806,
+                "true_optimal_edges": 2806,
+                "predicted_decrease": 2806,
+                "entered_dead_edges": 0
+              },
+              "2_2": {
+                "executed_edges": 2771,
+                "true_optimal_edges": 2760,
+                "predicted_decrease": 2767,
+                "entered_dead_edges": 0
+              },
+              "3_5": {
+                "executed_edges": 7832,
+                "true_optimal_edges": 7572,
+                "predicted_decrease": 7755,
+                "entered_dead_edges": 0
+              },
+              "6_10": {
+                "executed_edges": 10418,
+                "true_optimal_edges": 9389,
+                "predicted_decrease": 10149,
+                "entered_dead_edges": 0
+              },
+              "11_20": {
+                "executed_edges": 11345,
+                "true_optimal_edges": 9517,
+                "predicted_decrease": 10666,
+                "entered_dead_edges": 0
+              },
+              "21_40": {
+                "executed_edges": 15060,
+                "true_optimal_edges": 12440,
+                "predicted_decrease": 13956,
+                "entered_dead_edges": 0
+              },
+              "41_80": {
+                "executed_edges": 3572,
+                "true_optimal_edges": 3149,
+                "predicted_decrease": 3338,
+                "entered_dead_edges": 0
+              },
+              "81_inf": {
+                "executed_edges": 0,
+                "true_optimal_edges": 0,
+                "predicted_decrease": 0,
+                "entered_dead_edges": 0
+              },
+              "proven_unreachable": {
+                "executed_edges": 0,
+                "true_optimal_edges": 0,
+                "predicted_decrease": 0,
+                "entered_dead_edges": 0
+              }
+            },
+            "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+          }
+        },
+        "cohorts": {
+          "validation": {
+            "finite_mae": 1.2698173522949219,
+            "q": {
+              "count": 1024,
+              "unique_state_goal_pairs": 1024,
+              "solved": 1024,
+              "success_rate": 1.0,
+              "optimal": 1022,
+              "optimal_rate": 0.998046875,
+              "cycles": 0,
+              "entered_unreachable": 0,
+              "no_legal_action": 0,
+              "budget_exhausted": 0,
+              "horizon": 256,
+              "illegal_actions": 0,
+              "mean_excess_cost_on_success": 0.0029296875,
+              "mean_cost_ratio_on_success": 1.00146484375,
+              "first_cycle_step_counts": {},
+              "first_unreachable_step_counts": {},
+              "by_distance": {
+                "1.0": {
+                  "count": 914,
+                  "solved": 914,
+                  "optimal": 914
+                },
+                "2.0": {
+                  "count": 88,
+                  "solved": 88,
+                  "optimal": 86
+                },
+                "3.0": {
+                  "count": 14,
+                  "solved": 14,
+                  "optimal": 14
+                },
+                "4.0": {
+                  "count": 8,
+                  "solved": 8,
+                  "optimal": 8
+                }
+              },
+              "predicted_progress": {
+                "counts": {
+                  "executed_edges": 1167,
+                  "predicted_decrease": 1167,
+                  "predicted_plateau": 0,
+                  "predicted_increase": 0,
+                  "true_finite_edges": 1167,
+                  "true_optimal_edges": 1164,
+                  "predicted_decrease_but_not_true_optimal": 3,
+                  "entered_dead_edges": 0,
+                  "non_goal_predicted_zero": 0
+                },
+                "strict_descent_trajectory_count": 1024,
+                "strict_descent_success_count": 1024,
+                "non_descent_trajectory_count": 0,
+                "predicted_drop_quantiles": {
+                  "0": 0.19886183738708496,
+                  "0.1": 1.155952024459839,
+                  "0.5": 1.5356355905532837,
+                  "0.9": 2.1003155708312993,
+                  "1": 4.276049613952637
+                },
+                "mean_abs_unit_descent_residual": 0.6158390522207474,
+                "mean_abs_cost_descent_residual": 0.6158390522207474,
+                "executed_edge_optimal_rate": 0.9974293059125964,
+                "predicted_strict_descent_edge_rate": 1.0,
+                "executed_edges_by_true_distance": {
+                  "1_1": {
+                    "executed_edges": 1024,
+                    "true_optimal_edges": 1024,
+                    "predicted_decrease": 1024,
+                    "entered_dead_edges": 0
+                  },
+                  "2_2": {
+                    "executed_edges": 113,
+                    "true_optimal_edges": 110,
+                    "predicted_decrease": 113,
+                    "entered_dead_edges": 0
+                  },
+                  "3_5": {
+                    "executed_edges": 30,
+                    "true_optimal_edges": 30,
+                    "predicted_decrease": 30,
+                    "entered_dead_edges": 0
+                  },
+                  "6_10": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "11_20": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "21_40": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "41_80": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "81_inf": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "proven_unreachable": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  }
+                },
+                "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+              }
+            }
+          },
+          "test": {
+            "finite_mae": 1.2738378047943115,
+            "q": {
+              "count": 1024,
+              "unique_state_goal_pairs": 1024,
+              "solved": 1024,
+              "success_rate": 1.0,
+              "optimal": 1023,
+              "optimal_rate": 0.9990234375,
+              "cycles": 0,
+              "entered_unreachable": 0,
+              "no_legal_action": 0,
+              "budget_exhausted": 0,
+              "horizon": 256,
+              "illegal_actions": 0,
+              "mean_excess_cost_on_success": 0.0009765625,
+              "mean_cost_ratio_on_success": 1.00048828125,
+              "first_cycle_step_counts": {},
+              "first_unreachable_step_counts": {},
+              "by_distance": {
+                "1.0": {
+                  "count": 765,
+                  "solved": 765,
+                  "optimal": 765
+                },
+                "2.0": {
+                  "count": 207,
+                  "solved": 207,
+                  "optimal": 206
+                },
+                "3.0": {
+                  "count": 38,
+                  "solved": 38,
+                  "optimal": 38
+                },
+                "4.0": {
+                  "count": 11,
+                  "solved": 11,
+                  "optimal": 11
+                },
+                "5.0": {
+                  "count": 2,
+                  "solved": 2,
+                  "optimal": 2
+                },
+                "7.0": {
+                  "count": 1,
+                  "solved": 1,
+                  "optimal": 1
+                }
+              },
+              "predicted_progress": {
+                "counts": {
+                  "executed_edges": 1355,
+                  "predicted_decrease": 1355,
+                  "predicted_plateau": 0,
+                  "predicted_increase": 0,
+                  "true_finite_edges": 1355,
+                  "true_optimal_edges": 1354,
+                  "predicted_decrease_but_not_true_optimal": 1,
+                  "entered_dead_edges": 0,
+                  "non_goal_predicted_zero": 0
+                },
+                "strict_descent_trajectory_count": 1024,
+                "strict_descent_success_count": 1024,
+                "non_descent_trajectory_count": 0,
+                "predicted_drop_quantiles": {
+                  "0": 0.07885074615478516,
+                  "0.1": 0.9460482597351074,
+                  "0.5": 1.47064208984375,
+                  "0.9": 2.0617657661437994,
+                  "1": 3.8191301822662354
+                },
+                "mean_abs_unit_descent_residual": 0.5575869937664468,
+                "mean_abs_cost_descent_residual": 0.5575869937664468,
+                "executed_edge_optimal_rate": 0.9992619926199262,
+                "predicted_strict_descent_edge_rate": 1.0,
+                "executed_edges_by_true_distance": {
+                  "1_1": {
+                    "executed_edges": 1024,
+                    "true_optimal_edges": 1024,
+                    "predicted_decrease": 1024,
+                    "entered_dead_edges": 0
+                  },
+                  "2_2": {
+                    "executed_edges": 260,
+                    "true_optimal_edges": 259,
+                    "predicted_decrease": 260,
+                    "entered_dead_edges": 0
+                  },
+                  "3_5": {
+                    "executed_edges": 69,
+                    "true_optimal_edges": 69,
+                    "predicted_decrease": 69,
+                    "entered_dead_edges": 0
+                  },
+                  "6_10": {
+                    "executed_edges": 2,
+                    "true_optimal_edges": 2,
+                    "predicted_decrease": 2,
+                    "entered_dead_edges": 0
+                  },
+                  "11_20": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "21_40": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "41_80": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "81_inf": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "proven_unreachable": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  }
+                },
+                "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+              }
+            }
+          },
+          "unseen_goal_validation": {
+            "finite_mae": 1.3212978839874268,
+            "q": {
+              "count": 1024,
+              "unique_state_goal_pairs": 1024,
+              "solved": 1024,
+              "success_rate": 1.0,
+              "optimal": 1024,
+              "optimal_rate": 1.0,
+              "cycles": 0,
+              "entered_unreachable": 0,
+              "no_legal_action": 0,
+              "budget_exhausted": 0,
+              "horizon": 256,
+              "illegal_actions": 0,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_cycle_step_counts": {},
+              "first_unreachable_step_counts": {},
+              "by_distance": {
+                "1.0": {
+                  "count": 992,
+                  "solved": 992,
+                  "optimal": 992
+                },
+                "2.0": {
+                  "count": 29,
+                  "solved": 29,
+                  "optimal": 29
+                },
+                "3.0": {
+                  "count": 3,
+                  "solved": 3,
+                  "optimal": 3
+                }
+              },
+              "predicted_progress": {
+                "counts": {
+                  "executed_edges": 1059,
+                  "predicted_decrease": 1059,
+                  "predicted_plateau": 0,
+                  "predicted_increase": 0,
+                  "true_finite_edges": 1059,
+                  "true_optimal_edges": 1059,
+                  "predicted_decrease_but_not_true_optimal": 0,
+                  "entered_dead_edges": 0,
+                  "non_goal_predicted_zero": 0
+                },
+                "strict_descent_trajectory_count": 1024,
+                "strict_descent_success_count": 1024,
+                "non_descent_trajectory_count": 0,
+                "predicted_drop_quantiles": {
+                  "0": 0.3747422695159912,
+                  "0.1": 1.2726299285888671,
+                  "0.5": 1.5791621208190918,
+                  "0.9": 2.1774013519287108,
+                  "1": 4.720442771911621
+                },
+                "mean_abs_unit_descent_residual": 0.673756750829947,
+                "mean_abs_cost_descent_residual": 0.673756750829947,
+                "executed_edge_optimal_rate": 1.0,
+                "predicted_strict_descent_edge_rate": 1.0,
+                "executed_edges_by_true_distance": {
+                  "1_1": {
+                    "executed_edges": 1024,
+                    "true_optimal_edges": 1024,
+                    "predicted_decrease": 1024,
+                    "entered_dead_edges": 0
+                  },
+                  "2_2": {
+                    "executed_edges": 32,
+                    "true_optimal_edges": 32,
+                    "predicted_decrease": 32,
+                    "entered_dead_edges": 0
+                  },
+                  "3_5": {
+                    "executed_edges": 3,
+                    "true_optimal_edges": 3,
+                    "predicted_decrease": 3,
+                    "entered_dead_edges": 0
+                  },
+                  "6_10": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "11_20": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "21_40": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "41_80": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "81_inf": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "proven_unreachable": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  }
+                },
+                "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+              }
+            }
+          },
+          "unseen_goal_test": {
+            "finite_mae": 1.3597495555877686,
+            "q": {
+              "count": 1024,
+              "unique_state_goal_pairs": 1024,
+              "solved": 1024,
+              "success_rate": 1.0,
+              "optimal": 1024,
+              "optimal_rate": 1.0,
+              "cycles": 0,
+              "entered_unreachable": 0,
+              "no_legal_action": 0,
+              "budget_exhausted": 0,
+              "horizon": 256,
+              "illegal_actions": 0,
+              "mean_excess_cost_on_success": 0.0,
+              "mean_cost_ratio_on_success": 1.0,
+              "first_cycle_step_counts": {},
+              "first_unreachable_step_counts": {},
+              "by_distance": {
+                "1.0": {
+                  "count": 996,
+                  "solved": 996,
+                  "optimal": 996
+                },
+                "2.0": {
+                  "count": 26,
+                  "solved": 26,
+                  "optimal": 26
+                },
+                "3.0": {
+                  "count": 2,
+                  "solved": 2,
+                  "optimal": 2
+                }
+              },
+              "predicted_progress": {
+                "counts": {
+                  "executed_edges": 1054,
+                  "predicted_decrease": 1053,
+                  "predicted_plateau": 0,
+                  "predicted_increase": 1,
+                  "true_finite_edges": 1054,
+                  "true_optimal_edges": 1054,
+                  "predicted_decrease_but_not_true_optimal": 0,
+                  "entered_dead_edges": 0,
+                  "non_goal_predicted_zero": 0
+                },
+                "strict_descent_trajectory_count": 1023,
+                "strict_descent_success_count": 1023,
+                "non_descent_trajectory_count": 1,
+                "predicted_drop_quantiles": {
+                  "0": -0.19550001621246338,
+                  "0.1": 1.2665651798248292,
+                  "0.5": 1.5638805031776428,
+                  "0.9": 2.17015118598938,
+                  "1": 4.752459526062012
+                },
+                "mean_abs_unit_descent_residual": 0.6702094704647896,
+                "mean_abs_cost_descent_residual": 0.6702094704647896,
+                "executed_edge_optimal_rate": 1.0,
+                "predicted_strict_descent_edge_rate": 0.9990512333965844,
+                "executed_edges_by_true_distance": {
+                  "1_1": {
+                    "executed_edges": 1024,
+                    "true_optimal_edges": 1024,
+                    "predicted_decrease": 1024,
+                    "entered_dead_edges": 0
+                  },
+                  "2_2": {
+                    "executed_edges": 28,
+                    "true_optimal_edges": 28,
+                    "predicted_decrease": 27,
+                    "entered_dead_edges": 0
+                  },
+                  "3_5": {
+                    "executed_edges": 2,
+                    "true_optimal_edges": 2,
+                    "predicted_decrease": 2,
+                    "entered_dead_edges": 0
+                  },
+                  "6_10": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "11_20": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "21_40": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "41_80": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "81_inf": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "proven_unreachable": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  }
+                },
+                "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+              }
+            }
+          },
+          "unseen_layout_validation": {
+            "finite_mae": 3.410169839859009,
+            "q": {
+              "count": 1024,
+              "unique_state_goal_pairs": 1024,
+              "solved": 561,
+              "success_rate": 0.5478515625,
+              "optimal": 351,
+              "optimal_rate": 0.3427734375,
+              "cycles": 463,
+              "entered_unreachable": 0,
+              "no_legal_action": 0,
+              "budget_exhausted": 0,
+              "horizon": 256,
+              "illegal_actions": 0,
+              "mean_excess_cost_on_success": 0.6809269189834595,
+              "mean_cost_ratio_on_success": 1.045139193534851,
+              "first_cycle_step_counts": {
+                "2": 11,
+                "3": 26,
+                "4": 56,
+                "5": 65,
+                "6": 60,
+                "7": 39,
+                "8": 56,
+                "9": 29,
+                "10": 17,
+                "11": 21,
+                "12": 14,
+                "13": 12,
+                "14": 8,
+                "15": 8,
+                "16": 12,
+                "17": 5,
+                "18": 5,
+                "19": 4,
+                "20": 5,
+                "21": 5,
+                "22": 2,
+                "23": 3
+              },
+              "first_unreachable_step_counts": {},
+              "by_distance": {
+                "1.0": {
+                  "count": 35,
+                  "solved": 35,
+                  "optimal": 35
+                },
+                "2.0": {
+                  "count": 34,
+                  "solved": 34,
+                  "optimal": 34
+                },
+                "3.0": {
+                  "count": 35,
+                  "solved": 35,
+                  "optimal": 33
+                },
+                "4.0": {
+                  "count": 35,
+                  "solved": 35,
+                  "optimal": 34
+                },
+                "5.0": {
+                  "count": 35,
+                  "solved": 34,
+                  "optimal": 28
+                },
+                "6.0": {
+                  "count": 35,
+                  "solved": 33,
+                  "optimal": 28
+                },
+                "7.0": {
+                  "count": 35,
+                  "solved": 30,
+                  "optimal": 27
+                },
+                "8.0": {
+                  "count": 35,
+                  "solved": 31,
+                  "optimal": 22
+                },
+                "9.0": {
+                  "count": 35,
+                  "solved": 27,
+                  "optimal": 18
+                },
+                "10.0": {
+                  "count": 35,
+                  "solved": 25,
+                  "optimal": 19
+                },
+                "11.0": {
+                  "count": 35,
+                  "solved": 29,
+                  "optimal": 15
+                },
+                "12.0": {
+                  "count": 35,
+                  "solved": 21,
+                  "optimal": 11
+                },
+                "13.0": {
+                  "count": 35,
+                  "solved": 15,
+                  "optimal": 6
+                },
+                "14.0": {
+                  "count": 35,
+                  "solved": 17,
+                  "optimal": 6
+                },
+                "15.0": {
+                  "count": 35,
+                  "solved": 16,
+                  "optimal": 7
+                },
+                "16.0": {
+                  "count": 35,
+                  "solved": 19,
+                  "optimal": 6
+                },
+                "17.0": {
+                  "count": 35,
+                  "solved": 10,
+                  "optimal": 2
+                },
+                "18.0": {
+                  "count": 35,
+                  "solved": 15,
+                  "optimal": 3
+                },
+                "19.0": {
+                  "count": 35,
+                  "solved": 12,
+                  "optimal": 2
+                },
+                "20.0": {
+                  "count": 35,
+                  "solved": 10,
+                  "optimal": 3
+                },
+                "21.0": {
+                  "count": 35,
+                  "solved": 10,
+                  "optimal": 1
+                },
+                "22.0": {
+                  "count": 35,
+                  "solved": 9,
+                  "optimal": 3
+                },
+                "23.0": {
+                  "count": 35,
+                  "solved": 10,
+                  "optimal": 2
+                },
+                "24.0": {
+                  "count": 35,
+                  "solved": 8,
+                  "optimal": 0
+                },
+                "25.0": {
+                  "count": 35,
+                  "solved": 10,
+                  "optimal": 3
+                },
+                "26.0": {
+                  "count": 35,
+                  "solved": 10,
+                  "optimal": 1
+                },
+                "27.0": {
+                  "count": 35,
+                  "solved": 6,
+                  "optimal": 0
+                },
+                "28.0": {
+                  "count": 35,
+                  "solved": 7,
+                  "optimal": 1
+                },
+                "29.0": {
+                  "count": 35,
+                  "solved": 4,
+                  "optimal": 1
+                },
+                "30.0": {
+                  "count": 10,
+                  "solved": 4,
+                  "optimal": 0
+                }
+              },
+              "predicted_progress": {
+                "counts": {
+                  "executed_edges": 10108,
+                  "predicted_decrease": 9431,
+                  "predicted_plateau": 0,
+                  "predicted_increase": 677,
+                  "true_finite_edges": 10108,
+                  "true_optimal_edges": 8019,
+                  "predicted_decrease_but_not_true_optimal": 1707,
+                  "entered_dead_edges": 0,
+                  "non_goal_predicted_zero": 0
+                },
+                "strict_descent_trajectory_count": 491,
+                "strict_descent_success_count": 491,
+                "non_descent_trajectory_count": 533,
+                "predicted_drop_quantiles": {
+                  "0": -1.22021484375,
+                  "0.1": 0.09839763641357423,
+                  "0.5": 0.8375682830810547,
+                  "0.9": 1.6234620690345767,
+                  "1": 6.13153076171875
+                },
+                "mean_abs_unit_descent_residual": 0.4923415159372459,
+                "mean_abs_cost_descent_residual": 0.4923415159372459,
+                "executed_edge_optimal_rate": 0.7933320142461416,
+                "predicted_strict_descent_edge_rate": 0.9330233478432924,
+                "executed_edges_by_true_distance": {
+                  "1_1": {
+                    "executed_edges": 561,
+                    "true_optimal_edges": 561,
+                    "predicted_decrease": 561,
+                    "entered_dead_edges": 0
+                  },
+                  "2_2": {
+                    "executed_edges": 532,
+                    "true_optimal_edges": 526,
+                    "predicted_decrease": 528,
+                    "entered_dead_edges": 0
+                  },
+                  "3_5": {
+                    "executed_edges": 1452,
+                    "true_optimal_edges": 1392,
+                    "predicted_decrease": 1429,
+                    "entered_dead_edges": 0
+                  },
+                  "6_10": {
+                    "executed_edges": 2161,
+                    "true_optimal_edges": 1860,
+                    "predicted_decrease": 2068,
+                    "entered_dead_edges": 0
+                  },
+                  "11_20": {
+                    "executed_edges": 3547,
+                    "true_optimal_edges": 2574,
+                    "predicted_decrease": 3233,
+                    "entered_dead_edges": 0
+                  },
+                  "21_40": {
+                    "executed_edges": 1853,
+                    "true_optimal_edges": 1104,
+                    "predicted_decrease": 1611,
+                    "entered_dead_edges": 0
+                  },
+                  "41_80": {
+                    "executed_edges": 2,
+                    "true_optimal_edges": 2,
+                    "predicted_decrease": 1,
+                    "entered_dead_edges": 0
+                  },
+                  "81_inf": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "proven_unreachable": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  }
+                },
+                "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+              }
+            }
+          },
+          "unseen_layout_test": {
+            "finite_mae": 3.3073086738586426,
+            "q": {
+              "count": 1024,
+              "unique_state_goal_pairs": 1024,
+              "solved": 585,
+              "success_rate": 0.5712890625,
+              "optimal": 403,
+              "optimal_rate": 0.3935546875,
+              "cycles": 439,
+              "entered_unreachable": 0,
+              "no_legal_action": 0,
+              "budget_exhausted": 0,
+              "horizon": 256,
+              "illegal_actions": 0,
+              "mean_excess_cost_on_success": 0.5316239595413208,
+              "mean_cost_ratio_on_success": 1.037551999092102,
+              "first_cycle_step_counts": {
+                "2": 11,
+                "3": 36,
+                "4": 53,
+                "5": 56,
+                "6": 47,
+                "7": 49,
+                "8": 38,
+                "9": 32,
+                "10": 25,
+                "11": 26,
+                "12": 23,
+                "13": 7,
+                "14": 4,
+                "15": 9,
+                "16": 8,
+                "17": 5,
+                "18": 2,
+                "19": 4,
+                "21": 2,
+                "28": 1,
+                "29": 1
+              },
+              "first_unreachable_step_counts": {},
+              "by_distance": {
+                "1.0": {
+                  "count": 37,
+                  "solved": 37,
+                  "optimal": 37
+                },
+                "2.0": {
+                  "count": 37,
+                  "solved": 37,
+                  "optimal": 37
+                },
+                "3.0": {
+                  "count": 37,
+                  "solved": 37,
+                  "optimal": 37
+                },
+                "4.0": {
+                  "count": 37,
+                  "solved": 37,
+                  "optimal": 35
+                },
+                "5.0": {
+                  "count": 37,
+                  "solved": 37,
+                  "optimal": 31
+                },
+                "6.0": {
+                  "count": 37,
+                  "solved": 37,
+                  "optimal": 33
+                },
+                "7.0": {
+                  "count": 37,
+                  "solved": 36,
+                  "optimal": 33
+                },
+                "8.0": {
+                  "count": 37,
+                  "solved": 35,
+                  "optimal": 31
+                },
+                "9.0": {
+                  "count": 37,
+                  "solved": 33,
+                  "optimal": 24
+                },
+                "10.0": {
+                  "count": 37,
+                  "solved": 30,
+                  "optimal": 19
+                },
+                "11.0": {
+                  "count": 37,
+                  "solved": 28,
+                  "optimal": 16
+                },
+                "12.0": {
+                  "count": 37,
+                  "solved": 23,
+                  "optimal": 12
+                },
+                "13.0": {
+                  "count": 37,
+                  "solved": 23,
+                  "optimal": 11
+                },
+                "14.0": {
+                  "count": 37,
+                  "solved": 20,
+                  "optimal": 10
+                },
+                "15.0": {
+                  "count": 37,
+                  "solved": 18,
+                  "optimal": 8
+                },
+                "16.0": {
+                  "count": 37,
+                  "solved": 13,
+                  "optimal": 5
+                },
+                "17.0": {
+                  "count": 37,
+                  "solved": 14,
+                  "optimal": 5
+                },
+                "18.0": {
+                  "count": 37,
+                  "solved": 14,
+                  "optimal": 6
+                },
+                "19.0": {
+                  "count": 37,
+                  "solved": 13,
+                  "optimal": 4
+                },
+                "20.0": {
+                  "count": 37,
+                  "solved": 11,
+                  "optimal": 3
+                },
+                "21.0": {
+                  "count": 37,
+                  "solved": 9,
+                  "optimal": 2
+                },
+                "22.0": {
+                  "count": 37,
+                  "solved": 6,
+                  "optimal": 2
+                },
+                "23.0": {
+                  "count": 37,
+                  "solved": 8,
+                  "optimal": 0
+                },
+                "24.0": {
+                  "count": 37,
+                  "solved": 7,
+                  "optimal": 0
+                },
+                "25.0": {
+                  "count": 37,
+                  "solved": 6,
+                  "optimal": 0
+                },
+                "26.0": {
+                  "count": 37,
+                  "solved": 5,
+                  "optimal": 0
+                },
+                "27.0": {
+                  "count": 37,
+                  "solved": 7,
+                  "optimal": 1
+                },
+                "28.0": {
+                  "count": 25,
+                  "solved": 4,
+                  "optimal": 1
+                }
+              },
+              "predicted_progress": {
+                "counts": {
+                  "executed_edges": 9426,
+                  "predicted_decrease": 8806,
+                  "predicted_plateau": 0,
+                  "predicted_increase": 620,
+                  "true_finite_edges": 9426,
+                  "true_optimal_edges": 7587,
+                  "predicted_decrease_but_not_true_optimal": 1489,
+                  "entered_dead_edges": 0,
+                  "non_goal_predicted_zero": 0
+                },
+                "strict_descent_trajectory_count": 508,
+                "strict_descent_success_count": 508,
+                "non_descent_trajectory_count": 516,
+                "predicted_drop_quantiles": {
+                  "0": -1.0935802459716797,
+                  "0.1": 0.10702800750732422,
+                  "0.5": 0.8221420049667358,
+                  "0.9": 1.5726662874221802,
+                  "1": 13.567249298095703
+                },
+                "mean_abs_unit_descent_residual": 0.491864842415463,
+                "mean_abs_cost_descent_residual": 0.491864842415463,
+                "executed_edge_optimal_rate": 0.8049013367281986,
+                "predicted_strict_descent_edge_rate": 0.9342244854657331,
+                "executed_edges_by_true_distance": {
+                  "1_1": {
+                    "executed_edges": 585,
+                    "true_optimal_edges": 585,
+                    "predicted_decrease": 585,
+                    "entered_dead_edges": 0
+                  },
+                  "2_2": {
+                    "executed_edges": 550,
+                    "true_optimal_edges": 548,
+                    "predicted_decrease": 545,
+                    "entered_dead_edges": 0
+                  },
+                  "3_5": {
+                    "executed_edges": 1501,
+                    "true_optimal_edges": 1431,
+                    "predicted_decrease": 1478,
+                    "entered_dead_edges": 0
+                  },
+                  "6_10": {
+                    "executed_edges": 2047,
+                    "true_optimal_edges": 1811,
+                    "predicted_decrease": 1965,
+                    "entered_dead_edges": 0
+                  },
+                  "11_20": {
+                    "executed_edges": 3283,
+                    "true_optimal_edges": 2332,
+                    "predicted_decrease": 2980,
+                    "entered_dead_edges": 0
+                  },
+                  "21_40": {
+                    "executed_edges": 1460,
+                    "true_optimal_edges": 880,
+                    "predicted_decrease": 1253,
+                    "entered_dead_edges": 0
+                  },
+                  "41_80": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "81_inf": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "proven_unreachable": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  }
+                },
+                "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+              }
+            }
+          },
+          "original_layout_test": {
+            "finite_mae": 11.110721588134766,
+            "q": {
+              "count": 1024,
+              "unique_state_goal_pairs": 1024,
+              "solved": 38,
+              "success_rate": 0.037109375,
+              "optimal": 0,
+              "optimal_rate": 0.0,
+              "cycles": 986,
+              "entered_unreachable": 0,
+              "no_legal_action": 0,
+              "budget_exhausted": 0,
+              "horizon": 256,
+              "illegal_actions": 0,
+              "mean_excess_cost_on_success": 4.263157844543457,
+              "mean_cost_ratio_on_success": 1.1023752689361572,
+              "first_cycle_step_counts": {
+                "2": 54,
+                "3": 226,
+                "4": 97,
+                "5": 135,
+                "6": 74,
+                "7": 62,
+                "8": 36,
+                "9": 41,
+                "10": 40,
+                "11": 25,
+                "12": 5,
+                "14": 4,
+                "15": 7,
+                "17": 4,
+                "18": 13,
+                "19": 5,
+                "20": 14,
+                "21": 16,
+                "22": 3,
+                "23": 4,
+                "24": 1,
+                "25": 3,
+                "26": 1,
+                "27": 3,
+                "28": 2,
+                "30": 4,
+                "31": 24,
+                "32": 19,
+                "33": 3,
+                "34": 11,
+                "35": 4,
+                "36": 11,
+                "37": 2,
+                "38": 2,
+                "39": 22,
+                "40": 2,
+                "41": 1,
+                "42": 1,
+                "44": 1,
+                "45": 1,
+                "47": 1,
+                "48": 1,
+                "51": 1
+              },
+              "first_unreachable_step_counts": {},
+              "by_distance": {
+                "38.0": {
+                  "count": 11,
+                  "solved": 1,
+                  "optimal": 0
+                },
+                "39.0": {
+                  "count": 38,
+                  "solved": 3,
+                  "optimal": 0
+                },
+                "40.0": {
+                  "count": 57,
+                  "solved": 6,
+                  "optimal": 0
+                },
+                "41.0": {
+                  "count": 75,
+                  "solved": 9,
+                  "optimal": 0
+                },
+                "42.0": {
+                  "count": 104,
+                  "solved": 6,
+                  "optimal": 0
+                },
+                "43.0": {
+                  "count": 94,
+                  "solved": 2,
+                  "optimal": 0
+                },
+                "44.0": {
+                  "count": 82,
+                  "solved": 3,
+                  "optimal": 0
+                },
+                "45.0": {
+                  "count": 82,
+                  "solved": 3,
+                  "optimal": 0
+                },
+                "46.0": {
+                  "count": 76,
+                  "solved": 4,
+                  "optimal": 0
+                },
+                "47.0": {
+                  "count": 64,
+                  "solved": 1,
+                  "optimal": 0
+                },
+                "48.0": {
+                  "count": 51,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "49.0": {
+                  "count": 47,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "50.0": {
+                  "count": 47,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "51.0": {
+                  "count": 39,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "52.0": {
+                  "count": 33,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "53.0": {
+                  "count": 22,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "54.0": {
+                  "count": 22,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "55.0": {
+                  "count": 16,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "56.0": {
+                  "count": 7,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "57.0": {
+                  "count": 7,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "58.0": {
+                  "count": 9,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "59.0": {
+                  "count": 9,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "60.0": {
+                  "count": 9,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "61.0": {
+                  "count": 8,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "62.0": {
+                  "count": 3,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "63.0": {
+                  "count": 2,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "64.0": {
+                  "count": 2,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "65.0": {
+                  "count": 1,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "66.0": {
+                  "count": 1,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "67.0": {
+                  "count": 1,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "68.0": {
+                  "count": 1,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "69.0": {
+                  "count": 1,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "70.0": {
+                  "count": 1,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "71.0": {
+                  "count": 1,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "72.0": {
+                  "count": 1,
+                  "solved": 0,
+                  "optimal": 0
+                }
+              },
+              "predicted_progress": {
+                "counts": {
+                  "executed_edges": 11362,
+                  "predicted_decrease": 10013,
+                  "predicted_plateau": 0,
+                  "predicted_increase": 1349,
+                  "true_finite_edges": 11362,
+                  "true_optimal_edges": 7974,
+                  "predicted_decrease_but_not_true_optimal": 2580,
+                  "entered_dead_edges": 0,
+                  "non_goal_predicted_zero": 0
+                },
+                "strict_descent_trajectory_count": 4,
+                "strict_descent_success_count": 4,
+                "non_descent_trajectory_count": 1020,
+                "predicted_drop_quantiles": {
+                  "0": -1.0981330871582031,
+                  "0.1": -0.0392585754394531,
+                  "0.5": 0.6916351318359375,
+                  "0.9": 1.556161117553711,
+                  "1": 4.115261077880859
+                },
+                "mean_abs_unit_descent_residual": 0.5797076687764962,
+                "mean_abs_cost_descent_residual": 0.5797076687764962,
+                "executed_edge_optimal_rate": 0.7018130610807957,
+                "predicted_strict_descent_edge_rate": 0.8812709030100334,
+                "executed_edges_by_true_distance": {
+                  "1_1": {
+                    "executed_edges": 38,
+                    "true_optimal_edges": 38,
+                    "predicted_decrease": 38,
+                    "entered_dead_edges": 0
+                  },
+                  "2_2": {
+                    "executed_edges": 38,
+                    "true_optimal_edges": 38,
+                    "predicted_decrease": 38,
+                    "entered_dead_edges": 0
+                  },
+                  "3_5": {
+                    "executed_edges": 118,
+                    "true_optimal_edges": 114,
+                    "predicted_decrease": 117,
+                    "entered_dead_edges": 0
+                  },
+                  "6_10": {
+                    "executed_edges": 247,
+                    "true_optimal_edges": 203,
+                    "predicted_decrease": 236,
+                    "entered_dead_edges": 0
+                  },
+                  "11_20": {
+                    "executed_edges": 943,
+                    "true_optimal_edges": 738,
+                    "predicted_decrease": 855,
+                    "entered_dead_edges": 0
+                  },
+                  "21_40": {
+                    "executed_edges": 5483,
+                    "true_optimal_edges": 4121,
+                    "predicted_decrease": 4991,
+                    "entered_dead_edges": 0
+                  },
+                  "41_80": {
+                    "executed_edges": 4495,
+                    "true_optimal_edges": 2722,
+                    "predicted_decrease": 3738,
+                    "entered_dead_edges": 0
+                  },
+                  "81_inf": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "proven_unreachable": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  }
+                },
+                "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+              }
+            }
+          },
+          "original_layout_validation": {
+            "finite_mae": 12.624835014343262,
+            "q": {
+              "count": 1024,
+              "unique_state_goal_pairs": 1024,
+              "solved": 99,
+              "success_rate": 0.0966796875,
+              "optimal": 2,
+              "optimal_rate": 0.001953125,
+              "cycles": 925,
+              "entered_unreachable": 0,
+              "no_legal_action": 0,
+              "budget_exhausted": 0,
+              "horizon": 256,
+              "illegal_actions": 0,
+              "mean_excess_cost_on_success": 3.070707082748413,
+              "mean_cost_ratio_on_success": 1.065981149673462,
+              "first_cycle_step_counts": {
+                "2": 88,
+                "3": 147,
+                "4": 47,
+                "5": 45,
+                "6": 89,
+                "7": 126,
+                "8": 65,
+                "9": 72,
+                "10": 20,
+                "11": 6,
+                "12": 39,
+                "13": 12,
+                "15": 16,
+                "16": 4,
+                "17": 2,
+                "18": 7,
+                "19": 52,
+                "20": 11,
+                "21": 12,
+                "22": 1,
+                "23": 1,
+                "24": 2,
+                "25": 11,
+                "26": 1,
+                "28": 2,
+                "29": 4,
+                "31": 3,
+                "32": 4,
+                "36": 1,
+                "42": 2,
+                "43": 9,
+                "44": 4,
+                "45": 1,
+                "46": 3,
+                "47": 5,
+                "48": 1,
+                "50": 6,
+                "51": 1,
+                "55": 1,
+                "56": 2
+              },
+              "first_unreachable_step_counts": {},
+              "by_distance": {
+                "38.0": {
+                  "count": 17,
+                  "solved": 1,
+                  "optimal": 0
+                },
+                "39.0": {
+                  "count": 25,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "40.0": {
+                  "count": 36,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "41.0": {
+                  "count": 54,
+                  "solved": 2,
+                  "optimal": 0
+                },
+                "42.0": {
+                  "count": 61,
+                  "solved": 6,
+                  "optimal": 0
+                },
+                "43.0": {
+                  "count": 84,
+                  "solved": 11,
+                  "optimal": 0
+                },
+                "44.0": {
+                  "count": 100,
+                  "solved": 20,
+                  "optimal": 0
+                },
+                "45.0": {
+                  "count": 106,
+                  "solved": 20,
+                  "optimal": 1
+                },
+                "46.0": {
+                  "count": 76,
+                  "solved": 11,
+                  "optimal": 0
+                },
+                "47.0": {
+                  "count": 61,
+                  "solved": 5,
+                  "optimal": 1
+                },
+                "48.0": {
+                  "count": 67,
+                  "solved": 5,
+                  "optimal": 0
+                },
+                "49.0": {
+                  "count": 58,
+                  "solved": 3,
+                  "optimal": 0
+                },
+                "50.0": {
+                  "count": 57,
+                  "solved": 5,
+                  "optimal": 0
+                },
+                "51.0": {
+                  "count": 41,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "52.0": {
+                  "count": 39,
+                  "solved": 2,
+                  "optimal": 0
+                },
+                "53.0": {
+                  "count": 29,
+                  "solved": 2,
+                  "optimal": 0
+                },
+                "54.0": {
+                  "count": 20,
+                  "solved": 2,
+                  "optimal": 0
+                },
+                "55.0": {
+                  "count": 17,
+                  "solved": 1,
+                  "optimal": 0
+                },
+                "56.0": {
+                  "count": 16,
+                  "solved": 2,
+                  "optimal": 0
+                },
+                "57.0": {
+                  "count": 14,
+                  "solved": 1,
+                  "optimal": 0
+                },
+                "58.0": {
+                  "count": 10,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "59.0": {
+                  "count": 9,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "60.0": {
+                  "count": 4,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "61.0": {
+                  "count": 3,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "62.0": {
+                  "count": 3,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "63.0": {
+                  "count": 3,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "64.0": {
+                  "count": 2,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "65.0": {
+                  "count": 2,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "66.0": {
+                  "count": 2,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "67.0": {
+                  "count": 2,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "68.0": {
+                  "count": 2,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "69.0": {
+                  "count": 1,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "70.0": {
+                  "count": 1,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "71.0": {
+                  "count": 1,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "72.0": {
+                  "count": 1,
+                  "solved": 0,
+                  "optimal": 0
+                }
+              },
+              "predicted_progress": {
+                "counts": {
+                  "executed_edges": 13731,
+                  "predicted_decrease": 12344,
+                  "predicted_plateau": 0,
+                  "predicted_increase": 1387,
+                  "true_finite_edges": 13731,
+                  "true_optimal_edges": 10666,
+                  "predicted_decrease_but_not_true_optimal": 2271,
+                  "entered_dead_edges": 0,
+                  "non_goal_predicted_zero": 0
+                },
+                "strict_descent_trajectory_count": 25,
+                "strict_descent_success_count": 25,
+                "non_descent_trajectory_count": 999,
+                "predicted_drop_quantiles": {
+                  "0": -1.058074951171875,
+                  "0.1": -0.00383758544921875,
+                  "0.5": 0.7697601318359375,
+                  "0.9": 1.5114517211914062,
+                  "1": 4.802577972412109
+                },
+                "mean_abs_unit_descent_residual": 0.5117874432874172,
+                "mean_abs_cost_descent_residual": 0.5117874432874172,
+                "executed_edge_optimal_rate": 0.7767824630398369,
+                "predicted_strict_descent_edge_rate": 0.8989876920836064,
+                "executed_edges_by_true_distance": {
+                  "1_1": {
+                    "executed_edges": 99,
+                    "true_optimal_edges": 99,
+                    "predicted_decrease": 99,
+                    "entered_dead_edges": 0
+                  },
+                  "2_2": {
+                    "executed_edges": 100,
+                    "true_optimal_edges": 99,
+                    "predicted_decrease": 100,
+                    "entered_dead_edges": 0
+                  },
+                  "3_5": {
+                    "executed_edges": 306,
+                    "true_optimal_edges": 297,
+                    "predicted_decrease": 302,
+                    "entered_dead_edges": 0
+                  },
+                  "6_10": {
+                    "executed_edges": 576,
+                    "true_optimal_edges": 515,
+                    "predicted_decrease": 559,
+                    "entered_dead_edges": 0
+                  },
+                  "11_20": {
+                    "executed_edges": 1411,
+                    "true_optimal_edges": 1273,
+                    "predicted_decrease": 1363,
+                    "entered_dead_edges": 0
+                  },
+                  "21_40": {
+                    "executed_edges": 5692,
+                    "true_optimal_edges": 4416,
+                    "predicted_decrease": 5069,
+                    "entered_dead_edges": 0
+                  },
+                  "41_80": {
+                    "executed_edges": 5547,
+                    "true_optimal_edges": 3967,
+                    "predicted_decrease": 4852,
+                    "entered_dead_edges": 0
+                  },
+                  "81_inf": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "proven_unreachable": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  }
+                },
+                "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+              }
+            }
+          },
+          "diagnostic": {
+            "finite_mae": 5.074179649353027,
+            "q": {
+              "count": 1024,
+              "unique_state_goal_pairs": 1024,
+              "solved": 355,
+              "success_rate": 0.3466796875,
+              "optimal": 222,
+              "optimal_rate": 0.216796875,
+              "cycles": 669,
+              "entered_unreachable": 0,
+              "no_legal_action": 0,
+              "budget_exhausted": 0,
+              "horizon": 256,
+              "illegal_actions": 0,
+              "mean_excess_cost_on_success": 0.7436619997024536,
+              "mean_cost_ratio_on_success": 1.0540778636932373,
+              "first_cycle_step_counts": {
+                "2": 25,
+                "3": 85,
+                "4": 113,
+                "5": 105,
+                "6": 74,
+                "7": 54,
+                "8": 48,
+                "9": 43,
+                "10": 31,
+                "11": 23,
+                "12": 13,
+                "13": 15,
+                "14": 7,
+                "15": 7,
+                "16": 5,
+                "17": 4,
+                "18": 3,
+                "19": 3,
+                "20": 4,
+                "21": 2,
+                "22": 1,
+                "23": 2,
+                "24": 1,
+                "25": 1
+              },
+              "first_unreachable_step_counts": {},
+              "by_distance": {
+                "1.0": {
+                  "count": 26,
+                  "solved": 26,
+                  "optimal": 26
+                },
+                "2.0": {
+                  "count": 26,
+                  "solved": 26,
+                  "optimal": 26
+                },
+                "3.0": {
+                  "count": 26,
+                  "solved": 26,
+                  "optimal": 24
+                },
+                "4.0": {
+                  "count": 26,
+                  "solved": 25,
+                  "optimal": 23
+                },
+                "5.0": {
+                  "count": 25,
+                  "solved": 25,
+                  "optimal": 23
+                },
+                "6.0": {
+                  "count": 24,
+                  "solved": 22,
+                  "optimal": 16
+                },
+                "7.0": {
+                  "count": 24,
+                  "solved": 21,
+                  "optimal": 17
+                },
+                "8.0": {
+                  "count": 24,
+                  "solved": 21,
+                  "optimal": 18
+                },
+                "9.0": {
+                  "count": 24,
+                  "solved": 20,
+                  "optimal": 16
+                },
+                "10.0": {
+                  "count": 24,
+                  "solved": 19,
+                  "optimal": 7
+                },
+                "11.0": {
+                  "count": 24,
+                  "solved": 17,
+                  "optimal": 6
+                },
+                "12.0": {
+                  "count": 24,
+                  "solved": 16,
+                  "optimal": 7
+                },
+                "13.0": {
+                  "count": 24,
+                  "solved": 12,
+                  "optimal": 5
+                },
+                "14.0": {
+                  "count": 24,
+                  "solved": 13,
+                  "optimal": 5
+                },
+                "15.0": {
+                  "count": 22,
+                  "solved": 7,
+                  "optimal": 1
+                },
+                "16.0": {
+                  "count": 23,
+                  "solved": 11,
+                  "optimal": 0
+                },
+                "17.0": {
+                  "count": 23,
+                  "solved": 9,
+                  "optimal": 0
+                },
+                "18.0": {
+                  "count": 23,
+                  "solved": 10,
+                  "optimal": 1
+                },
+                "19.0": {
+                  "count": 23,
+                  "solved": 11,
+                  "optimal": 1
+                },
+                "20.0": {
+                  "count": 23,
+                  "solved": 6,
+                  "optimal": 0
+                },
+                "21.0": {
+                  "count": 23,
+                  "solved": 6,
+                  "optimal": 0
+                },
+                "22.0": {
+                  "count": 22,
+                  "solved": 2,
+                  "optimal": 0
+                },
+                "23.0": {
+                  "count": 22,
+                  "solved": 1,
+                  "optimal": 0
+                },
+                "24.0": {
+                  "count": 22,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "25.0": {
+                  "count": 20,
+                  "solved": 2,
+                  "optimal": 0
+                },
+                "26.0": {
+                  "count": 21,
+                  "solved": 1,
+                  "optimal": 0
+                },
+                "27.0": {
+                  "count": 20,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "28.0": {
+                  "count": 20,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "29.0": {
+                  "count": 20,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "30.0": {
+                  "count": 20,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "31.0": {
+                  "count": 20,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "32.0": {
+                  "count": 19,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "33.0": {
+                  "count": 20,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "34.0": {
+                  "count": 20,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "35.0": {
+                  "count": 20,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "36.0": {
+                  "count": 20,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "37.0": {
+                  "count": 20,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "38.0": {
+                  "count": 19,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "39.0": {
+                  "count": 19,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "40.0": {
+                  "count": 18,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "41.0": {
+                  "count": 19,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "42.0": {
+                  "count": 13,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "43.0": {
+                  "count": 13,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "44.0": {
+                  "count": 10,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "45.0": {
+                  "count": 11,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "46.0": {
+                  "count": 10,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "47.0": {
+                  "count": 9,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "48.0": {
+                  "count": 8,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "49.0": {
+                  "count": 7,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "50.0": {
+                  "count": 9,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "51.0": {
+                  "count": 7,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "52.0": {
+                  "count": 7,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "53.0": {
+                  "count": 4,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "54.0": {
+                  "count": 4,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "55.0": {
+                  "count": 2,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "56.0": {
+                  "count": 2,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "59.0": {
+                  "count": 1,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "60.0": {
+                  "count": 1,
+                  "solved": 0,
+                  "optimal": 0
+                }
+              },
+              "predicted_progress": {
+                "counts": {
+                  "executed_edges": 7881,
+                  "predicted_decrease": 7066,
+                  "predicted_plateau": 0,
+                  "predicted_increase": 815,
+                  "true_finite_edges": 7881,
+                  "true_optimal_edges": 5379,
+                  "predicted_decrease_but_not_true_optimal": 2001,
+                  "entered_dead_edges": 0,
+                  "non_goal_predicted_zero": 0
+                },
+                "strict_descent_trajectory_count": 324,
+                "strict_descent_success_count": 324,
+                "non_descent_trajectory_count": 700,
+                "predicted_drop_quantiles": {
+                  "0": -1.5783309936523438,
+                  "0.1": -0.012775421142578125,
+                  "0.5": 0.7137775421142578,
+                  "0.9": 1.6448841094970703,
+                  "1": 6.261701583862305
+                },
+                "mean_abs_unit_descent_residual": 0.5803073176332059,
+                "mean_abs_cost_descent_residual": 0.5803073176332059,
+                "executed_edge_optimal_rate": 0.6825275980205557,
+                "predicted_strict_descent_edge_rate": 0.896586727572643,
+                "executed_edges_by_true_distance": {
+                  "1_1": {
+                    "executed_edges": 355,
+                    "true_optimal_edges": 355,
+                    "predicted_decrease": 355,
+                    "entered_dead_edges": 0
+                  },
+                  "2_2": {
+                    "executed_edges": 330,
+                    "true_optimal_edges": 329,
+                    "predicted_decrease": 329,
+                    "entered_dead_edges": 0
+                  },
+                  "3_5": {
+                    "executed_edges": 915,
+                    "true_optimal_edges": 842,
+                    "predicted_decrease": 893,
+                    "entered_dead_edges": 0
+                  },
+                  "6_10": {
+                    "executed_edges": 1271,
+                    "true_optimal_edges": 1070,
+                    "predicted_decrease": 1218,
+                    "entered_dead_edges": 0
+                  },
+                  "11_20": {
+                    "executed_edges": 1659,
+                    "true_optimal_edges": 1078,
+                    "predicted_decrease": 1502,
+                    "entered_dead_edges": 0
+                  },
+                  "21_40": {
+                    "executed_edges": 2658,
+                    "true_optimal_edges": 1313,
+                    "predicted_decrease": 2222,
+                    "entered_dead_edges": 0
+                  },
+                  "41_80": {
+                    "executed_edges": 693,
+                    "true_optimal_edges": 392,
+                    "predicted_decrease": 547,
+                    "entered_dead_edges": 0
+                  },
+                  "81_inf": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "proven_unreachable": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  }
+                },
+                "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+              }
+            }
+          },
+          "diagnostic_original": {
+            "finite_mae": 15.351570129394531,
+            "q": {
+              "count": 8,
+              "unique_state_goal_pairs": 8,
+              "solved": 1,
+              "success_rate": 0.125,
+              "optimal": 0,
+              "optimal_rate": 0.0,
+              "cycles": 7,
+              "entered_unreachable": 0,
+              "no_legal_action": 0,
+              "budget_exhausted": 0,
+              "horizon": 256,
+              "illegal_actions": 0,
+              "mean_excess_cost_on_success": 4.0,
+              "mean_cost_ratio_on_success": 1.105263113975525,
+              "first_cycle_step_counts": {
+                "3": 1,
+                "4": 1,
+                "5": 2,
+                "9": 1,
+                "10": 1,
+                "13": 1
+              },
+              "first_unreachable_step_counts": {},
+              "by_distance": {
+                "38.0": {
+                  "count": 3,
+                  "solved": 1,
+                  "optimal": 0
+                },
+                "41.0": {
+                  "count": 1,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "44.0": {
+                  "count": 1,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "46.0": {
+                  "count": 1,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "47.0": {
+                  "count": 1,
+                  "solved": 0,
+                  "optimal": 0
+                },
+                "51.0": {
+                  "count": 1,
+                  "solved": 0,
+                  "optimal": 0
+                }
+              },
+              "predicted_progress": {
+                "counts": {
+                  "executed_edges": 91,
+                  "predicted_decrease": 82,
+                  "predicted_plateau": 0,
+                  "predicted_increase": 9,
+                  "true_finite_edges": 91,
+                  "true_optimal_edges": 69,
+                  "predicted_decrease_but_not_true_optimal": 16,
+                  "entered_dead_edges": 0,
+                  "non_goal_predicted_zero": 0
+                },
+                "strict_descent_trajectory_count": 0,
+                "strict_descent_success_count": 0,
+                "non_descent_trajectory_count": 8,
+                "predicted_drop_quantiles": {
+                  "0": -0.7049198150634766,
+                  "0.1": 0.012432098388671875,
+                  "0.5": 0.7300128936767578,
+                  "0.9": 1.3273124694824219,
+                  "1": 3.9899826049804688
+                },
+                "mean_abs_unit_descent_residual": 0.5634949547903878,
+                "mean_abs_cost_descent_residual": 0.5634949547903878,
+                "executed_edge_optimal_rate": 0.7582417582417582,
+                "predicted_strict_descent_edge_rate": 0.9010989010989011,
+                "executed_edges_by_true_distance": {
+                  "1_1": {
+                    "executed_edges": 1,
+                    "true_optimal_edges": 1,
+                    "predicted_decrease": 1,
+                    "entered_dead_edges": 0
+                  },
+                  "2_2": {
+                    "executed_edges": 1,
+                    "true_optimal_edges": 1,
+                    "predicted_decrease": 1,
+                    "entered_dead_edges": 0
+                  },
+                  "3_5": {
+                    "executed_edges": 3,
+                    "true_optimal_edges": 3,
+                    "predicted_decrease": 3,
+                    "entered_dead_edges": 0
+                  },
+                  "6_10": {
+                    "executed_edges": 5,
+                    "true_optimal_edges": 5,
+                    "predicted_decrease": 5,
+                    "entered_dead_edges": 0
+                  },
+                  "11_20": {
+                    "executed_edges": 12,
+                    "true_optimal_edges": 10,
+                    "predicted_decrease": 11,
+                    "entered_dead_edges": 0
+                  },
+                  "21_40": {
+                    "executed_edges": 36,
+                    "true_optimal_edges": 28,
+                    "predicted_decrease": 32,
+                    "entered_dead_edges": 0
+                  },
+                  "41_80": {
+                    "executed_edges": 33,
+                    "true_optimal_edges": 21,
+                    "predicted_decrease": 29,
+                    "entered_dead_edges": 0
+                  },
+                  "81_inf": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  },
+                  "proven_unreachable": {
+                    "executed_edges": 0,
+                    "true_optimal_edges": 0,
+                    "predicted_decrease": 0,
+                    "entered_dead_edges": 0
+                  }
+                },
+                "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+              }
+            }
+          }
+        },
+        "actual_exposure": {
+          "unique_gradient_states": 4752537,
+          "available_states": 5263995,
+          "unique_pair_rows": 4752513,
+          "pair_rows": 4752513,
+          "unique_decision_rows": 3783337,
+          "decision_rows": 4690868,
+          "minimum_pair_layer_passes": 1.286215812819273,
+          "minimum_decision_layer_passes": null
+        },
+        "raw_run": "/tmp/grounded_qmap_followup_5d41460/runs/rush_hour_l1_local_path_shuffled_fit"
+      }
+    }
   }
 }

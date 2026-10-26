@@ -93,6 +93,20 @@ class FiniteGameTests(unittest.TestCase):
                 self.assertEqual(view.input_dim,136);self.assertEqual(description['input_dim'],136)
                 for key in data:np.testing.assert_array_equal(data[key],loaded[key])
                 np.testing.assert_array_equal(base.successors(np.arange(base.size)),view.successors(np.arange(view.size)))
+            expanded=json.loads(json.dumps(small));expanded['data']['complete_training_goal_arities']=[2]
+            expanded['relations']['preserve_original_held_queries']=True
+            bigger,extra,description=prepare(expanded,root/'expanded');stack.callback(close,bigger)
+            self.assertEqual(base.size,bigger.size)
+            np.testing.assert_array_equal(base.successors(np.arange(base.size)),bigger.successors(np.arange(bigger.size)))
+            for key in data:
+                if not key.endswith('_train'):np.testing.assert_array_equal(data[key],extra[key],err_msg=key)
+            self.assertGreater(len(extra['tasks_train']),len(data['tasks_train']))
+            self.assertFalse(np.intersect1d(closure(bigger,extra['tasks_train']),extra['reserved_relations']).size)
+            old=base.scenes[0];new=bigger.scenes[0];old_n=old.metadata['training_goals'];new_n=new.metadata['training_goals']
+            np.testing.assert_array_equal(old.goals[old_n:],new.goals[new_n:])
+            self.assertTrue(set(new.goals[:new_n]).isdisjoint(new.goals[new_n:]))
+            expected={g for g,v in enumerate(new.values) if len(v)==2 and np.isfinite(new.distance(np.array([0]),np.array([g])))[0]}
+            self.assertTrue(expected.issubset(set(new.goals)))
 
     def test_deduplication_keeps_exact_reachability_and_both_targets(self):
         with tempfile.TemporaryDirectory() as directory,ExitStack() as stack:

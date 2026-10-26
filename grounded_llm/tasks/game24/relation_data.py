@@ -103,9 +103,22 @@ def build(config,out):
                             goals.append(g);break
                     else:raise ValueError(('Insufficient held intermediate targets',numbers,n))
             if len(goals)!=spec['goals_per_scene']:raise ValueError(('Insufficient reachable complete DAG targets',numbers))
+            extra_arities=spec.get('complete_training_goal_arities',[])
+            if len(set(extra_arities))!=len(extra_arities) or any(type(n) is not int or not 1<=n<spec['initial_numbers'] for n in extra_arities):
+                raise ValueError('Extra training goal layers must be distinct intermediate arities')
+            additional=[]
+            if extra_arities and split=='train':
+                if not config['relations'].get('preserve_original_held_queries'):
+                    raise ValueError('Goal expansion must preserve the original held query seeds')
+                existing=set(goals)
+                additional=[g for g,n in enumerate(lengths) if n in extra_arities and g not in existing
+                            and np.isfinite(oracle.to_goal(g)).sum()>=spec['minimum_reachable_per_goal']]
+                cut=len(goals)-spec['heldout_goals']
+                goals=goals[:cut]+additional+goals[cut:]
             metadata=dict(task='game24',split=split,source=dict(numbers=numbers),max_numbers=spec['max_numbers'],
                 original_state=0,training_goals=len(goals)-spec['heldout_goals'],symmetric=False,
                 goal_layers=lengths[goals].tolist(),rational_identity='sorted reduced Fraction strings across all questions')
+            if extra_arities:metadata['additional_training_goals']=len(additional)
             path=f'scene_{len(records):03d}'
             record=save_scene(out/path,np.arange(len(values))[:,None],children,goals,metadata,state_dtype=np.int32)
             atomic_json(out/path/'values.json',[[str(v) for v in row] for row in values])

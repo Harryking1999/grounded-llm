@@ -1,8 +1,18 @@
 {
   "task": "game24",
-  "status": "pilot_not_selected",
-  "checkpoint": null,
-  "config": "experiments/new_tasks_qmap/configs/pilot/game24.json",
-  "scope": "fixed task goal only; no adopted model",
-  "evidence": "experiments/new_tasks_qmap/results/report.md"
+  "status": "adopted",
+  "checkpoint": "tasks/game24/Qmap/checkpoints/game21_24_finite10_bits.pt",
+  "config": "experiments/new_tasks_qmap/configs/game24/game21_24_finite10_bits_fit.json",
+  "source_commit": "90d23a6d03fc39c7fa921d49bc898ebfce488da6",
+  "step": 3500,
+  "scope": {
+    "initial_values": "All210 unordered four-number sets chosen without replacement from1..10; every root is in the training domain. No unseen-root or larger-domain claim.",
+    "goals": "21,24 and configured complete intermediate targets; two/three-number suffixes. Local held targets can occur in other initial-question graphs.",
+    "encoding": "Exact rational_bits; 16-bit absolute numerator and denominator; overflow raises.",
+    "inference": "Every legal arithmetic action supplied by environment; frozen Qmap selects greedily and exact equality stops. No search or exact graph queries.",
+    "llm": "Not evaluated"
+  },
+  "acceptance": "experiments/new_tasks_qmap/configs/game24/game21_24_finite10_evaluation.json",
+  "evidence": "experiments/new_tasks_qmap/results/game24/game21_24_finite10_bits_fit.json",
+  "limitations": "Passed every basic80% completion/reachability gate, not every90% target. Held two-number test977/1195 and forced target switching41/47 remain weak. No convergence claim."
 }

@@ -2737,5 +2737,37 @@
       },
       "scope": "All allowed training contexts only, no held queries or model selection. Every legal candidate retained; teacher truth checked after frozen model scores. Snapshot diagnostics are not convergence or independent acceptance."
     }
+  },
+  "ranking_emphasis": {
+    "control": "game21_24_finite10_goal_expanded_convergence.json",
+    "rank4": "game21_24_finite10_goal_rank4.json",
+    "actual_future_sample_equivalence": {
+      "passed": true,
+      "optimizer_steps": [
+        4001,
+        4100
+      ],
+      "updates": 100,
+      "point_relations": 3276800,
+      "complete_decisions": 819200,
+      "all_trace_fields_identical": [
+        "point_step",
+        "pairs",
+        "point_distance",
+        "rank_step",
+        "tasks",
+        "children",
+        "parent_distance",
+        "child_distance",
+        "point_reachability",
+        "point_origin",
+        "rank_origin",
+        "rank_replay_index",
+        "optimal",
+        "edge_costs"
+      ],
+      "scope": "First100 actual future optimizer batches, including exact parent/goal IDs, all candidates, costs, labels and origin quotas; no model predictions or test selection. Loss weight differs1 versus4."
+    },
+    "scope": "Matched future4001..8000updates from identical complete recovery. Validation selects7000control and8000rank4; test does not select checkpoints. Stronger basic gates pass for rank4, not all90%targets. Old singleton map preserved."
   }
 }

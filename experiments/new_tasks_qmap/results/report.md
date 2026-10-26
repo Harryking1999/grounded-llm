@@ -14,4 +14,4 @@
 
 移车全量长题和推箱子训练执行仍有明显失败。五类的地图结果见分项报告，LLM读取待评测。
 
-历史配置及原始结果保留在各任务目录；早期固定目标条件见[pilot](pilot/summary.json)，与当前范围不同。实现、文件职责及复现入口见[实验README](../README.md)。
+历史配置及原始结果保留在各任务目录；早期固定目标条件见[pilot](../archive/results/pilot/summary.json)，与当前范围不同。实现、文件职责及复现入口见[实验README](../README.md)。

@@ -35,4 +35,4 @@
 - [转移、关系遍历及拓宽的训练拟合](sokoban_transition_fitting.json)。
 - [扩大目标覆盖及阶段分层](sokoban_goal_coverage_comparison.json)、[MLP／CNN比较](sokoban_fixed_wall_encoder_comparison.json)。
 - [固定墙体及教师坐标诊断](sokoban_fixed_wall_baseline.json)、[历史共享布局覆盖比较](sokoban_coverage_comparison.json)。
-- [采用状态](../../../../tasks/sokoban/Qmap/selection.json)、[任务与数据](../../../../tasks/sokoban/README.md)、[配置目录](../../configs/sokoban/)。
+- [采用状态](../../../../tasks/sokoban/Qmap/selection.json)、[任务与数据](../../../../tasks/sokoban/README.md)、[历史配置](../../archive/configs/sokoban/)。

@@ -6,7 +6,7 @@
 
 第一版固定使用公开的“Medium random tree 1”，完整边表见[tree10.json](tree10.json)。十个顶点上共有3,628,800种排列，任意两种都能互达；最远需要25次交换。
 
-地图训练使用多种起点和目标，不只学习按编号归位。划分分别检验未见关系、未见起点和两端都未见，留出关系也不会通过候选排序进入训练。实际规模见[数据统计](../../../experiments/new_tasks_qmap/results/shared/exact_pairs_data.json)，参数见[配置](../../../experiments/new_tasks_qmap/configs/token_swapping/token_swapping_pairs.json)。
+地图训练使用多种起点和目标，不只学习按编号归位。划分分别检验未见关系、未见起点和两端都未见，留出关系也不会通过候选排序进入训练。实际规模见[数据统计](../../../experiments/new_tasks_qmap/results/shared/exact_pairs_data.json)，参数见[配置](../../../experiments/new_tasks_qmap/archive/configs/token_swapping/token_swapping_pairs.json)。
 
 全状态距离表用于生成正确标签，训练样本、固定测试题和模型分别保存。
 

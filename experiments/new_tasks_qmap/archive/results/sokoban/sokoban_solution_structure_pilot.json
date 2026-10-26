@@ -1,0 +1,4133 @@
+{
+  "source_commit": "b8bdd84afef14f1e1e5f8e9a8f636ed6ce943b9a",
+  "initialization": {
+    "source_commit": "5ae9a4e37fa4a0546f0e01114eee2186100d48ed",
+    "step": 20000,
+    "artifact_role": "Weights-only copy for a fresh matched pilot, not optimizer or sampler recovery.",
+    "original_checkpoint": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/sokoban_coverage_d365a4c/local_path_control/best.pt"
+  },
+  "configuration": "experiments/new_tasks_qmap/archive/configs/sokoban/sokoban_solution_structure_pilot.json",
+  "device": "cpu",
+  "dataset": {
+    "task": "sokoban",
+    "states": 3457655,
+    "finite_max": 32.0,
+    "terminal_contexts": 831,
+    "auxiliary_contexts": 1421,
+    "point_pairs": 4674,
+    "terminal_paths": 96,
+    "intermediate_prefixes": 259,
+    "layouts": {
+      "train": 8,
+      "validation": 8
+    },
+    "rejected": {
+      "protected_train_paths": 468,
+      "protected_auxiliary_contexts": 33
+    },
+    "training_path_lengths": {
+      "1": 2,
+      "2": 3,
+      "3": 8,
+      "4": 5,
+      "5": 10,
+      "6": 7,
+      "7": 4,
+      "8": 2,
+      "9": 4,
+      "10": 4,
+      "11": 1,
+      "12": 1,
+      "13": 4,
+      "14": 2,
+      "15": 2,
+      "17": 4,
+      "18": 2,
+      "19": 3,
+      "20": 4,
+      "21": 1,
+      "23": 1,
+      "24": 4,
+      "26": 4,
+      "27": 2,
+      "28": 1,
+      "29": 4,
+      "30": 1,
+      "31": 3,
+      "32": 3
+    },
+    "shared_terminal_context_occurrences": 468,
+    "evaluation_distance_bins": {
+      "validation": {
+        "1_5": 32,
+        "6_10": 32,
+        "11_20": 32,
+        "21_32": 32
+      },
+      "unseen_layout_validation": {
+        "1_5": 32,
+        "6_10": 32,
+        "11_20": 32,
+        "21_32": 32
+      }
+    },
+    "all_candidates_preserved": true,
+    "original_holdout_closure_excluded": true,
+    "auxiliary_targets": "Intermediate states are additional exact supervised targets; never supplied as inference subgoals.",
+    "scope": "Small development pilot; validation layouts have previously been used for model selection. No final independent test claim."
+  },
+  "baseline": {
+    "2026102401": {
+      "validation": {
+        "finite_mae": 3.8616647720336914,
+        "completion": {
+          "count": 128,
+          "solved": 24,
+          "success_rate": 0.1875,
+          "cycles": 104,
+          "entered_unreachable": 12,
+          "horizon": 32
+        },
+        "by_distance": {
+          "1_5": {
+            "count": 32,
+            "solved": 17
+          },
+          "6_20": {
+            "count": 64,
+            "solved": 7
+          },
+          "21_32": {
+            "count": 32,
+            "solved": 0
+          }
+        },
+        "teacher_paths": {
+          "all": {
+            "count": 128,
+            "strict_descent": 0.09375,
+            "all_span_order": 0.09375,
+            "unit_drop_mae": 1.2751613203436136,
+            "edge_descent_rate": 0.7491878480503523,
+            "all_branch_correct": 0.1875,
+            "all_span_order_rate": 0.9074732080018313,
+            "branch_margin_mean": 4.7640124096069485,
+            "branch_positive_margin_rate": 0.7705249566293151
+          },
+          "long_21_32": {
+            "count": 32,
+            "strict_descent": 0.0,
+            "all_span_order": 0.0,
+            "unit_drop_mae": 1.7535975575447083,
+            "edge_descent_rate": 0.6870112316642769,
+            "all_branch_correct": 0.0,
+            "all_span_order_rate": 0.9070196031549944,
+            "branch_margin_mean": 3.890415893867612,
+            "branch_positive_margin_rate": 0.6942763796199453
+          },
+          "by_scene": {
+            "0": {
+              "count": 16,
+              "strict_descent": 0.0625,
+              "all_span_order": 0.0625,
+              "unit_drop_mae": 1.09926238656044,
+              "edge_descent_rate": 0.7630106959349581,
+              "all_branch_correct": 0.375,
+              "all_span_order_rate": 0.9466637503588884,
+              "branch_margin_mean": 8.126436091959476,
+              "branch_positive_margin_rate": 0.8898733171177323
+            },
+            "1": {
+              "count": 16,
+              "strict_descent": 0.125,
+              "all_span_order": 0.125,
+              "unit_drop_mae": 1.1296421065926552,
+              "edge_descent_rate": 0.7827411838481212,
+              "all_branch_correct": 0.125,
+              "all_span_order_rate": 0.9036122535523111,
+              "branch_margin_mean": 1.4962522387504578,
+              "branch_positive_margin_rate": 0.7083368537632444
+            },
+            "2": {
+              "count": 16,
+              "strict_descent": 0.25,
+              "all_span_order": 0.25,
+              "unit_drop_mae": 1.0000087842345238,
+              "edge_descent_rate": 0.8188682844932845,
+              "all_branch_correct": 0.25,
+              "all_span_order_rate": 0.9318924138369354,
+              "branch_margin_mean": 18.66321586072445,
+              "branch_positive_margin_rate": 0.827312271062271
+            },
+            "3": {
+              "count": 16,
+              "strict_descent": 0.125,
+              "all_span_order": 0.125,
+              "unit_drop_mae": 1.302496775984764,
+              "edge_descent_rate": 0.7357460248085248,
+              "all_branch_correct": 0.125,
+              "all_span_order_rate": 0.9116869463730559,
+              "branch_margin_mean": 1.2403314895927906,
+              "branch_positive_margin_rate": 0.7098875661375661
+            },
+            "4": {
+              "count": 16,
+              "strict_descent": 0.0,
+              "all_span_order": 0.0,
+              "unit_drop_mae": 1.1959962286055088,
+              "edge_descent_rate": 0.7208863450745422,
+              "all_branch_correct": 0.0,
+              "all_span_order_rate": 0.8927136103580783,
+              "branch_margin_mean": 2.6595363318920135,
+              "branch_positive_margin_rate": 0.757501729233478
+            },
+            "5": {
+              "count": 16,
+              "strict_descent": 0.0625,
+              "all_span_order": 0.0625,
+              "unit_drop_mae": 1.065363373607397,
+              "edge_descent_rate": 0.7998634908585567,
+              "all_branch_correct": 0.4375,
+              "all_span_order_rate": 0.9489072543245438,
+              "branch_margin_mean": 2.6207432448863983,
+              "branch_positive_margin_rate": 0.8798275934305346
+            },
+            "6": {
+              "count": 16,
+              "strict_descent": 0.0,
+              "all_span_order": 0.0,
+              "unit_drop_mae": 1.5154093652963638,
+              "edge_descent_rate": 0.68027206102864,
+              "all_branch_correct": 0.0,
+              "all_span_order_rate": 0.9055782168611115,
+              "branch_margin_mean": 1.2874470800161362,
+              "branch_positive_margin_rate": 0.6839631067984902
+            },
+            "7": {
+              "count": 16,
+              "strict_descent": 0.125,
+              "all_span_order": 0.125,
+              "unit_drop_mae": 1.8931115418672562,
+              "edge_descent_rate": 0.6921146983561911,
+              "all_branch_correct": 0.1875,
+              "all_span_order_rate": 0.8187312183497262,
+              "branch_margin_mean": 2.018136939033866,
+              "branch_positive_margin_rate": 0.7074972154912037
+            }
+          },
+          "meaning": "Complete exact teacher paths; all-span order includes nonadjacent pairs. These diagnostics never choose or filter an inference action."
+        },
+        "by_scene": {
+          "0": {
+            "count": 16,
+            "solved": 6,
+            "success_rate": 0.375
+          },
+          "1": {
+            "count": 16,
+            "solved": 2,
+            "success_rate": 0.125
+          },
+          "2": {
+            "count": 16,
+            "solved": 4,
+            "success_rate": 0.25
+          },
+          "3": {
+            "count": 16,
+            "solved": 2,
+            "success_rate": 0.125
+          },
+          "4": {
+            "count": 16,
+            "solved": 0,
+            "success_rate": 0.0
+          },
+          "5": {
+            "count": 16,
+            "solved": 7,
+            "success_rate": 0.4375
+          },
+          "6": {
+            "count": 16,
+            "solved": 0,
+            "success_rate": 0.0
+          },
+          "7": {
+            "count": 16,
+            "solved": 3,
+            "success_rate": 0.1875
+          }
+        }
+      },
+      "unseen_layout_validation": {
+        "finite_mae": 18.66435432434082,
+        "completion": {
+          "count": 128,
+          "solved": 20,
+          "success_rate": 0.15625,
+          "cycles": 108,
+          "entered_unreachable": 6,
+          "horizon": 32
+        },
+        "by_distance": {
+          "1_5": {
+            "count": 32,
+            "solved": 16
+          },
+          "6_20": {
+            "count": 64,
+            "solved": 4
+          },
+          "21_32": {
+            "count": 32,
+            "solved": 0
+          }
+        },
+        "teacher_paths": {
+          "all": {
+            "count": 128,
+            "strict_descent": 0.125,
+            "all_span_order": 0.125,
+            "unit_drop_mae": 4.19056746410206,
+            "edge_descent_rate": 0.7333678857607686,
+            "all_branch_correct": 0.15625,
+            "all_span_order_rate": 0.8679103995873687,
+            "branch_margin_mean": 4.641852154338267,
+            "branch_positive_margin_rate": 0.7499383327490055
+          },
+          "long_21_32": {
+            "count": 32,
+            "strict_descent": 0.0,
+            "all_span_order": 0.0,
+            "unit_drop_mae": 8.28046077862382,
+            "edge_descent_rate": 0.6355129645988148,
+            "all_branch_correct": 0.0,
+            "all_span_order_rate": 0.8199963183736028,
+            "branch_margin_mean": 3.8677947083488107,
+            "branch_positive_margin_rate": 0.654823427254682
+          },
+          "by_scene": {
+            "8": {
+              "count": 16,
+              "strict_descent": 0.1875,
+              "all_span_order": 0.1875,
+              "unit_drop_mae": 2.135312907397747,
+              "edge_descent_rate": 0.771452101139601,
+              "all_branch_correct": 0.1875,
+              "all_span_order_rate": 0.898267548303127,
+              "branch_margin_mean": 1.9919357411563396,
+              "branch_positive_margin_rate": 0.7856019220243358
+            },
+            "9": {
+              "count": 16,
+              "strict_descent": 0.1875,
+              "all_span_order": 0.1875,
+              "unit_drop_mae": 1.546044073998928,
+              "edge_descent_rate": 0.6809213018341307,
+              "all_branch_correct": 0.1875,
+              "all_span_order_rate": 0.8329879640816641,
+              "branch_margin_mean": 13.859532162547112,
+              "branch_positive_margin_rate": 0.8004784688995216
+            },
+            "10": {
+              "count": 16,
+              "strict_descent": 0.25,
+              "all_span_order": 0.25,
+              "unit_drop_mae": 5.524289153516293,
+              "edge_descent_rate": 0.8585316862256517,
+              "all_branch_correct": 0.1875,
+              "all_span_order_rate": 0.9602303022959882,
+              "branch_margin_mean": 3.432114228606224,
+              "branch_positive_margin_rate": 0.8328770081534325
+            },
+            "11": {
+              "count": 16,
+              "strict_descent": 0.0,
+              "all_span_order": 0.0,
+              "unit_drop_mae": 4.7492461279034615,
+              "edge_descent_rate": 0.6848898564802265,
+              "all_branch_correct": 0.0,
+              "all_span_order_rate": 0.8845198651115023,
+              "branch_margin_mean": 7.109439093619585,
+              "branch_positive_margin_rate": 0.6454638723653161
+            },
+            "12": {
+              "count": 16,
+              "strict_descent": 0.0,
+              "all_span_order": 0.0,
+              "unit_drop_mae": 6.517411723732948,
+              "edge_descent_rate": 0.6813678728560442,
+              "all_branch_correct": 0.0625,
+              "all_span_order_rate": 0.8198066806618597,
+              "branch_margin_mean": 3.0409909412264824,
+              "branch_positive_margin_rate": 0.6700770573380868
+            },
+            "13": {
+              "count": 16,
+              "strict_descent": 0.25,
+              "all_span_order": 0.25,
+              "unit_drop_mae": 7.859350372105837,
+              "edge_descent_rate": 0.772671959712401,
+              "all_branch_correct": 0.25,
+              "all_span_order_rate": 0.8968109828227301,
+              "branch_margin_mean": 4.8173940517008305,
+              "branch_positive_margin_rate": 0.7872674829349525
+            },
+            "14": {
+              "count": 16,
+              "strict_descent": 0.0625,
+              "all_span_order": 0.0625,
+              "unit_drop_mae": 3.2503787204623222,
+              "edge_descent_rate": 0.7366693780756282,
+              "all_branch_correct": 0.0625,
+              "all_span_order_rate": 0.7993674833324769,
+              "branch_margin_mean": 1.0966814602725208,
+              "branch_positive_margin_rate": 0.6895136617414843
+            },
+            "15": {
+              "count": 16,
+              "strict_descent": 0.0625,
+              "all_span_order": 0.0625,
+              "unit_drop_mae": 1.9425066336989403,
+              "edge_descent_rate": 0.6804389297624654,
+              "all_branch_correct": 0.3125,
+              "all_span_order_rate": 0.8512923700896016,
+              "branch_margin_mean": 1.7867295555770397,
+              "branch_positive_margin_rate": 0.7882271885349135
+            }
+          },
+          "meaning": "Complete exact teacher paths; all-span order includes nonadjacent pairs. These diagnostics never choose or filter an inference action."
+        },
+        "by_scene": {
+          "8": {
+            "count": 16,
+            "solved": 3,
+            "success_rate": 0.1875
+          },
+          "9": {
+            "count": 16,
+            "solved": 3,
+            "success_rate": 0.1875
+          },
+          "10": {
+            "count": 16,
+            "solved": 3,
+            "success_rate": 0.1875
+          },
+          "11": {
+            "count": 16,
+            "solved": 0,
+            "success_rate": 0.0
+          },
+          "12": {
+            "count": 16,
+            "solved": 1,
+            "success_rate": 0.0625
+          },
+          "13": {
+            "count": 16,
+            "solved": 4,
+            "success_rate": 0.25
+          },
+          "14": {
+            "count": 16,
+            "solved": 1,
+            "success_rate": 0.0625
+          },
+          "15": {
+            "count": 16,
+            "solved": 5,
+            "success_rate": 0.3125
+          }
+        }
+      }
+    },
+    "2026102402": {
+      "validation": {
+        "finite_mae": 3.8616647720336914,
+        "completion": {
+          "count": 128,
+          "solved": 24,
+          "success_rate": 0.1875,
+          "cycles": 104,
+          "entered_unreachable": 12,
+          "horizon": 32
+        },
+        "by_distance": {
+          "1_5": {
+            "count": 32,
+            "solved": 17
+          },
+          "6_20": {
+            "count": 64,
+            "solved": 7
+          },
+          "21_32": {
+            "count": 32,
+            "solved": 0
+          }
+        },
+        "teacher_paths": {
+          "all": {
+            "count": 128,
+            "strict_descent": 0.09375,
+            "all_span_order": 0.09375,
+            "unit_drop_mae": 1.2751613203436136,
+            "edge_descent_rate": 0.7491878480503523,
+            "all_branch_correct": 0.1875,
+            "all_span_order_rate": 0.9074732080018313,
+            "branch_margin_mean": 4.7640124096069485,
+            "branch_positive_margin_rate": 0.7705249566293151
+          },
+          "long_21_32": {
+            "count": 32,
+            "strict_descent": 0.0,
+            "all_span_order": 0.0,
+            "unit_drop_mae": 1.7535975575447083,
+            "edge_descent_rate": 0.6870112316642769,
+            "all_branch_correct": 0.0,
+            "all_span_order_rate": 0.9070196031549944,
+            "branch_margin_mean": 3.890415893867612,
+            "branch_positive_margin_rate": 0.6942763796199453
+          },
+          "by_scene": {
+            "0": {
+              "count": 16,
+              "strict_descent": 0.0625,
+              "all_span_order": 0.0625,
+              "unit_drop_mae": 1.09926238656044,
+              "edge_descent_rate": 0.7630106959349581,
+              "all_branch_correct": 0.375,
+              "all_span_order_rate": 0.9466637503588884,
+              "branch_margin_mean": 8.126436091959476,
+              "branch_positive_margin_rate": 0.8898733171177323
+            },
+            "1": {
+              "count": 16,
+              "strict_descent": 0.125,
+              "all_span_order": 0.125,
+              "unit_drop_mae": 1.1296421065926552,
+              "edge_descent_rate": 0.7827411838481212,
+              "all_branch_correct": 0.125,
+              "all_span_order_rate": 0.9036122535523111,
+              "branch_margin_mean": 1.4962522387504578,
+              "branch_positive_margin_rate": 0.7083368537632444
+            },
+            "2": {
+              "count": 16,
+              "strict_descent": 0.25,
+              "all_span_order": 0.25,
+              "unit_drop_mae": 1.0000087842345238,
+              "edge_descent_rate": 0.8188682844932845,
+              "all_branch_correct": 0.25,
+              "all_span_order_rate": 0.9318924138369354,
+              "branch_margin_mean": 18.66321586072445,
+              "branch_positive_margin_rate": 0.827312271062271
+            },
+            "3": {
+              "count": 16,
+              "strict_descent": 0.125,
+              "all_span_order": 0.125,
+              "unit_drop_mae": 1.302496775984764,
+              "edge_descent_rate": 0.7357460248085248,
+              "all_branch_correct": 0.125,
+              "all_span_order_rate": 0.9116869463730559,
+              "branch_margin_mean": 1.2403314895927906,
+              "branch_positive_margin_rate": 0.7098875661375661
+            },
+            "4": {
+              "count": 16,
+              "strict_descent": 0.0,
+              "all_span_order": 0.0,
+              "unit_drop_mae": 1.1959962286055088,
+              "edge_descent_rate": 0.7208863450745422,
+              "all_branch_correct": 0.0,
+              "all_span_order_rate": 0.8927136103580783,
+              "branch_margin_mean": 2.6595363318920135,
+              "branch_positive_margin_rate": 0.757501729233478
+            },
+            "5": {
+              "count": 16,
+              "strict_descent": 0.0625,
+              "all_span_order": 0.0625,
+              "unit_drop_mae": 1.065363373607397,
+              "edge_descent_rate": 0.7998634908585567,
+              "all_branch_correct": 0.4375,
+              "all_span_order_rate": 0.9489072543245438,
+              "branch_margin_mean": 2.6207432448863983,
+              "branch_positive_margin_rate": 0.8798275934305346
+            },
+            "6": {
+              "count": 16,
+              "strict_descent": 0.0,
+              "all_span_order": 0.0,
+              "unit_drop_mae": 1.5154093652963638,
+              "edge_descent_rate": 0.68027206102864,
+              "all_branch_correct": 0.0,
+              "all_span_order_rate": 0.9055782168611115,
+              "branch_margin_mean": 1.2874470800161362,
+              "branch_positive_margin_rate": 0.6839631067984902
+            },
+            "7": {
+              "count": 16,
+              "strict_descent": 0.125,
+              "all_span_order": 0.125,
+              "unit_drop_mae": 1.8931115418672562,
+              "edge_descent_rate": 0.6921146983561911,
+              "all_branch_correct": 0.1875,
+              "all_span_order_rate": 0.8187312183497262,
+              "branch_margin_mean": 2.018136939033866,
+              "branch_positive_margin_rate": 0.7074972154912037
+            }
+          },
+          "meaning": "Complete exact teacher paths; all-span order includes nonadjacent pairs. These diagnostics never choose or filter an inference action."
+        },
+        "by_scene": {
+          "0": {
+            "count": 16,
+            "solved": 6,
+            "success_rate": 0.375
+          },
+          "1": {
+            "count": 16,
+            "solved": 2,
+            "success_rate": 0.125
+          },
+          "2": {
+            "count": 16,
+            "solved": 4,
+            "success_rate": 0.25
+          },
+          "3": {
+            "count": 16,
+            "solved": 2,
+            "success_rate": 0.125
+          },
+          "4": {
+            "count": 16,
+            "solved": 0,
+            "success_rate": 0.0
+          },
+          "5": {
+            "count": 16,
+            "solved": 7,
+            "success_rate": 0.4375
+          },
+          "6": {
+            "count": 16,
+            "solved": 0,
+            "success_rate": 0.0
+          },
+          "7": {
+            "count": 16,
+            "solved": 3,
+            "success_rate": 0.1875
+          }
+        }
+      },
+      "unseen_layout_validation": {
+        "finite_mae": 18.66435432434082,
+        "completion": {
+          "count": 128,
+          "solved": 20,
+          "success_rate": 0.15625,
+          "cycles": 108,
+          "entered_unreachable": 6,
+          "horizon": 32
+        },
+        "by_distance": {
+          "1_5": {
+            "count": 32,
+            "solved": 16
+          },
+          "6_20": {
+            "count": 64,
+            "solved": 4
+          },
+          "21_32": {
+            "count": 32,
+            "solved": 0
+          }
+        },
+        "teacher_paths": {
+          "all": {
+            "count": 128,
+            "strict_descent": 0.125,
+            "all_span_order": 0.125,
+            "unit_drop_mae": 4.19056746410206,
+            "edge_descent_rate": 0.7333678857607686,
+            "all_branch_correct": 0.15625,
+            "all_span_order_rate": 0.8679103995873687,
+            "branch_margin_mean": 4.641852154338267,
+            "branch_positive_margin_rate": 0.7499383327490055
+          },
+          "long_21_32": {
+            "count": 32,
+            "strict_descent": 0.0,
+            "all_span_order": 0.0,
+            "unit_drop_mae": 8.28046077862382,
+            "edge_descent_rate": 0.6355129645988148,
+            "all_branch_correct": 0.0,
+            "all_span_order_rate": 0.8199963183736028,
+            "branch_margin_mean": 3.8677947083488107,
+            "branch_positive_margin_rate": 0.654823427254682
+          },
+          "by_scene": {
+            "8": {
+              "count": 16,
+              "strict_descent": 0.1875,
+              "all_span_order": 0.1875,
+              "unit_drop_mae": 2.135312907397747,
+              "edge_descent_rate": 0.771452101139601,
+              "all_branch_correct": 0.1875,
+              "all_span_order_rate": 0.898267548303127,
+              "branch_margin_mean": 1.9919357411563396,
+              "branch_positive_margin_rate": 0.7856019220243358
+            },
+            "9": {
+              "count": 16,
+              "strict_descent": 0.1875,
+              "all_span_order": 0.1875,
+              "unit_drop_mae": 1.546044073998928,
+              "edge_descent_rate": 0.6809213018341307,
+              "all_branch_correct": 0.1875,
+              "all_span_order_rate": 0.8329879640816641,
+              "branch_margin_mean": 13.859532162547112,
+              "branch_positive_margin_rate": 0.8004784688995216
+            },
+            "10": {
+              "count": 16,
+              "strict_descent": 0.25,
+              "all_span_order": 0.25,
+              "unit_drop_mae": 5.524289153516293,
+              "edge_descent_rate": 0.8585316862256517,
+              "all_branch_correct": 0.1875,
+              "all_span_order_rate": 0.9602303022959882,
+              "branch_margin_mean": 3.432114228606224,
+              "branch_positive_margin_rate": 0.8328770081534325
+            },
+            "11": {
+              "count": 16,
+              "strict_descent": 0.0,
+              "all_span_order": 0.0,
+              "unit_drop_mae": 4.7492461279034615,
+              "edge_descent_rate": 0.6848898564802265,
+              "all_branch_correct": 0.0,
+              "all_span_order_rate": 0.8845198651115023,
+              "branch_margin_mean": 7.109439093619585,
+              "branch_positive_margin_rate": 0.6454638723653161
+            },
+            "12": {
+              "count": 16,
+              "strict_descent": 0.0,
+              "all_span_order": 0.0,
+              "unit_drop_mae": 6.517411723732948,
+              "edge_descent_rate": 0.6813678728560442,
+              "all_branch_correct": 0.0625,
+              "all_span_order_rate": 0.8198066806618597,
+              "branch_margin_mean": 3.0409909412264824,
+              "branch_positive_margin_rate": 0.6700770573380868
+            },
+            "13": {
+              "count": 16,
+              "strict_descent": 0.25,
+              "all_span_order": 0.25,
+              "unit_drop_mae": 7.859350372105837,
+              "edge_descent_rate": 0.772671959712401,
+              "all_branch_correct": 0.25,
+              "all_span_order_rate": 0.8968109828227301,
+              "branch_margin_mean": 4.8173940517008305,
+              "branch_positive_margin_rate": 0.7872674829349525
+            },
+            "14": {
+              "count": 16,
+              "strict_descent": 0.0625,
+              "all_span_order": 0.0625,
+              "unit_drop_mae": 3.2503787204623222,
+              "edge_descent_rate": 0.7366693780756282,
+              "all_branch_correct": 0.0625,
+              "all_span_order_rate": 0.7993674833324769,
+              "branch_margin_mean": 1.0966814602725208,
+              "branch_positive_margin_rate": 0.6895136617414843
+            },
+            "15": {
+              "count": 16,
+              "strict_descent": 0.0625,
+              "all_span_order": 0.0625,
+              "unit_drop_mae": 1.9425066336989403,
+              "edge_descent_rate": 0.6804389297624654,
+              "all_branch_correct": 0.3125,
+              "all_span_order_rate": 0.8512923700896016,
+              "branch_margin_mean": 1.7867295555770397,
+              "branch_positive_margin_rate": 0.7882271885349135
+            }
+          },
+          "meaning": "Complete exact teacher paths; all-span order includes nonadjacent pairs. These diagnostics never choose or filter an inference action."
+        },
+        "by_scene": {
+          "8": {
+            "count": 16,
+            "solved": 3,
+            "success_rate": 0.1875
+          },
+          "9": {
+            "count": 16,
+            "solved": 3,
+            "success_rate": 0.1875
+          },
+          "10": {
+            "count": 16,
+            "solved": 3,
+            "success_rate": 0.1875
+          },
+          "11": {
+            "count": 16,
+            "solved": 0,
+            "success_rate": 0.0
+          },
+          "12": {
+            "count": 16,
+            "solved": 1,
+            "success_rate": 0.0625
+          },
+          "13": {
+            "count": 16,
+            "solved": 4,
+            "success_rate": 0.25
+          },
+          "14": {
+            "count": 16,
+            "solved": 1,
+            "success_rate": 0.0625
+          },
+          "15": {
+            "count": 16,
+            "solved": 5,
+            "success_rate": 0.3125
+          }
+        }
+      }
+    }
+  },
+  "runs": {
+    "flat_terminal_2026102401": {
+      "seed": 2026102401,
+      "condition": "flat_terminal",
+      "evaluated_step": 3000,
+      "evaluated_checkpoint": "last.pt",
+      "actual_point_labels": 3072000,
+      "actual_ranking_decisions": 384000,
+      "actual_auxiliary_ranking_decisions": 0,
+      "fitting": {
+        "teacher_paths": {
+          "all": {
+            "count": 96,
+            "strict_descent": 0.9791666666666666,
+            "all_span_order": 0.9791666666666666,
+            "unit_drop_mae": 0.13924822385888547,
+            "edge_descent_rate": 0.9962022569444445,
+            "all_branch_correct": 0.9895833333333334,
+            "all_span_order_rate": 0.9982441603535354,
+            "branch_margin_mean": 4.152087400356929,
+            "branch_positive_margin_rate": 0.9996744791666666
+          },
+          "long_21_32": {
+            "count": 24,
+            "strict_descent": 0.9583333333333334,
+            "all_span_order": 0.9583333333333334,
+            "unit_drop_mae": 0.14890643333395323,
+            "edge_descent_rate": 0.9986979166666666,
+            "all_branch_correct": 0.9583333333333334,
+            "all_span_order_rate": 0.999921085858586,
+            "branch_margin_mean": 4.217740923166275,
+            "branch_positive_margin_rate": 0.9986979166666666
+          },
+          "by_scene": {
+            "0": {
+              "count": 12,
+              "strict_descent": 0.9166666666666666,
+              "all_span_order": 0.9166666666666666,
+              "unit_drop_mae": 0.14213382080197334,
+              "edge_descent_rate": 0.9973958333333334,
+              "all_branch_correct": 0.9166666666666666,
+              "all_span_order_rate": 0.9998421717171717,
+              "branch_margin_mean": 8.430020074049631,
+              "branch_positive_margin_rate": 0.9973958333333334
+            },
+            "1": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.2417562653621038,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 1.9464033544063568,
+              "branch_positive_margin_rate": 1.0
+            },
+            "2": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.06095794029533863,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 3.0862044791380563,
+              "branch_positive_margin_rate": 1.0
+            },
+            "3": {
+              "count": 12,
+              "strict_descent": 0.9166666666666666,
+              "all_span_order": 0.9166666666666666,
+              "unit_drop_mae": 0.18158332134286562,
+              "edge_descent_rate": 0.9722222222222222,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 0.9861111111111112,
+              "branch_margin_mean": 1.8037869830926259,
+              "branch_positive_margin_rate": 1.0
+            },
+            "4": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.07162211152414481,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 3.7089266180992126,
+              "branch_positive_margin_rate": 1.0
+            },
+            "5": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.1093277328958114,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 6.623085667689641,
+              "branch_positive_margin_rate": 1.0
+            },
+            "6": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.22416413575410843,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 2.613415449857712,
+              "branch_positive_margin_rate": 1.0
+            },
+            "7": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.08244046289473772,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 5.004856576522191,
+              "branch_positive_margin_rate": 1.0
+            }
+          },
+          "meaning": "Complete exact teacher paths; all-span order includes nonadjacent pairs. These diagnostics never choose or filter an inference action."
+        },
+        "completion": {
+          "count": 96,
+          "solved": 88,
+          "success_rate": 0.9166666666666666,
+          "cycles": 8
+        },
+        "failure_diagnosis": {
+          "failures": 8,
+          "first_nonoptimal_outside_terminal_contexts": 7,
+          "prior_optimal_departure_from_teacher": 7
+        }
+      },
+      "cohorts": {
+        "validation": {
+          "finite_mae": 17.253414154052734,
+          "completion": {
+            "count": 128,
+            "solved": 17,
+            "success_rate": 0.1328125,
+            "cycles": 111,
+            "entered_unreachable": 5,
+            "horizon": 32
+          },
+          "by_distance": {
+            "1_5": {
+              "count": 32,
+              "solved": 12
+            },
+            "6_20": {
+              "count": 64,
+              "solved": 5
+            },
+            "21_32": {
+              "count": 32,
+              "solved": 0
+            }
+          },
+          "teacher_paths": {
+            "all": {
+              "count": 128,
+              "strict_descent": 0.09375,
+              "all_span_order": 0.09375,
+              "unit_drop_mae": 5.573250967543572,
+              "edge_descent_rate": 0.7293415942081802,
+              "all_branch_correct": 0.1328125,
+              "all_span_order_rate": 0.813763970891725,
+              "branch_margin_mean": 5.667547342018224,
+              "branch_positive_margin_rate": 0.7047482179886784
+            },
+            "long_21_32": {
+              "count": 32,
+              "strict_descent": 0.0,
+              "all_span_order": 0.0,
+              "unit_drop_mae": 6.062504917383194,
+              "edge_descent_rate": 0.7004429162257757,
+              "all_branch_correct": 0.0,
+              "all_span_order_rate": 0.8786070303475361,
+              "branch_margin_mean": 5.036392265930772,
+              "branch_positive_margin_rate": 0.6830240111479078
+            },
+            "by_scene": {
+              "0": {
+                "count": 16,
+                "strict_descent": 0.0625,
+                "all_span_order": 0.0625,
+                "unit_drop_mae": 6.908895969390869,
+                "edge_descent_rate": 0.6245212431362946,
+                "all_branch_correct": 0.0625,
+                "all_span_order_rate": 0.6735442170138681,
+                "branch_margin_mean": 6.282069085165858,
+                "branch_positive_margin_rate": 0.6195626528994336
+              },
+              "1": {
+                "count": 16,
+                "strict_descent": 0.0625,
+                "all_span_order": 0.0625,
+                "unit_drop_mae": 6.842892482876778,
+                "edge_descent_rate": 0.7814391005147878,
+                "all_branch_correct": 0.0625,
+                "all_span_order_rate": 0.8390677761721559,
+                "branch_margin_mean": 4.5389702543616295,
+                "branch_positive_margin_rate": 0.6583826779039375
+              },
+              "2": {
+                "count": 16,
+                "strict_descent": 0.125,
+                "all_span_order": 0.125,
+                "unit_drop_mae": 3.376131407916546,
+                "edge_descent_rate": 0.7445074023199023,
+                "all_branch_correct": 0.125,
+                "all_span_order_rate": 0.8805623887683816,
+                "branch_margin_mean": 19.92936097085476,
+                "branch_positive_margin_rate": 0.7391979548229548
+              },
+              "3": {
+                "count": 16,
+                "strict_descent": 0.0625,
+                "all_span_order": 0.0625,
+                "unit_drop_mae": 4.491715833544731,
+                "edge_descent_rate": 0.7230243714618715,
+                "all_branch_correct": 0.0625,
+                "all_span_order_rate": 0.7306864537328943,
+                "branch_margin_mean": 3.7141308411955833,
+                "branch_positive_margin_rate": 0.6127232142857143
+              },
+              "4": {
+                "count": 16,
+                "strict_descent": 0.1875,
+                "all_span_order": 0.1875,
+                "unit_drop_mae": 2.01610254496336,
+                "edge_descent_rate": 0.813184143966702,
+                "all_branch_correct": 0.5,
+                "all_span_order_rate": 0.9107149533696208,
+                "branch_margin_mean": 3.7899616174399853,
+                "branch_positive_margin_rate": 0.876184131924794
+              },
+              "5": {
+                "count": 16,
+                "strict_descent": 0.125,
+                "all_span_order": 0.125,
+                "unit_drop_mae": 13.362667717039585,
+                "edge_descent_rate": 0.6728537589968511,
+                "all_branch_correct": 0.125,
+                "all_span_order_rate": 0.7993983916854768,
+                "branch_margin_mean": 4.906822230666876,
+                "branch_positive_margin_rate": 0.7384608651152769
+              },
+              "6": {
+                "count": 16,
+                "strict_descent": 0.0,
+                "all_span_order": 0.0,
+                "unit_drop_mae": 3.3783041313290596,
+                "edge_descent_rate": 0.6981455709251762,
+                "all_branch_correct": 0.0,
+                "all_span_order_rate": 0.7767527866869972,
+                "branch_margin_mean": 0.48981773760169744,
+                "branch_positive_margin_rate": 0.6056934543018639
+              },
+              "7": {
+                "count": 16,
+                "strict_descent": 0.125,
+                "all_span_order": 0.125,
+                "unit_drop_mae": 4.209297653287649,
+                "edge_descent_rate": 0.7770571623438569,
+                "all_branch_correct": 0.125,
+                "all_span_order_rate": 0.8993847997044058,
+                "branch_margin_mean": 1.6892459988594055,
+                "branch_positive_margin_rate": 0.7877807926554523
+              }
+            },
+            "meaning": "Complete exact teacher paths; all-span order includes nonadjacent pairs. These diagnostics never choose or filter an inference action."
+          },
+          "by_scene": {
+            "0": {
+              "count": 16,
+              "solved": 1,
+              "success_rate": 0.0625
+            },
+            "1": {
+              "count": 16,
+              "solved": 1,
+              "success_rate": 0.0625
+            },
+            "2": {
+              "count": 16,
+              "solved": 2,
+              "success_rate": 0.125
+            },
+            "3": {
+              "count": 16,
+              "solved": 1,
+              "success_rate": 0.0625
+            },
+            "4": {
+              "count": 16,
+              "solved": 8,
+              "success_rate": 0.5
+            },
+            "5": {
+              "count": 16,
+              "solved": 2,
+              "success_rate": 0.125
+            },
+            "6": {
+              "count": 16,
+              "solved": 0,
+              "success_rate": 0.0
+            },
+            "7": {
+              "count": 16,
+              "solved": 2,
+              "success_rate": 0.125
+            }
+          }
+        },
+        "unseen_layout_validation": {
+          "finite_mae": 45.34025573730469,
+          "completion": {
+            "count": 128,
+            "solved": 18,
+            "success_rate": 0.140625,
+            "cycles": 110,
+            "entered_unreachable": 8,
+            "horizon": 32
+          },
+          "by_distance": {
+            "1_5": {
+              "count": 32,
+              "solved": 16
+            },
+            "6_20": {
+              "count": 64,
+              "solved": 2
+            },
+            "21_32": {
+              "count": 32,
+              "solved": 0
+            }
+          },
+          "teacher_paths": {
+            "all": {
+              "count": 128,
+              "strict_descent": 0.1484375,
+              "all_span_order": 0.1484375,
+              "unit_drop_mae": 12.676923890132457,
+              "edge_descent_rate": 0.7069848801567279,
+              "all_branch_correct": 0.140625,
+              "all_span_order_rate": 0.8041765689025202,
+              "branch_margin_mean": 5.58117597810633,
+              "branch_positive_margin_rate": 0.7002754158458078
+            },
+            "long_21_32": {
+              "count": 32,
+              "strict_descent": 0.0,
+              "all_span_order": 0.0,
+              "unit_drop_mae": 15.716090768575668,
+              "edge_descent_rate": 0.5998659596634512,
+              "all_branch_correct": 0.0,
+              "all_span_order_rate": 0.7099609773496898,
+              "branch_margin_mean": 5.620429264381528,
+              "branch_positive_margin_rate": 0.6015496338316852
+            },
+            "by_scene": {
+              "8": {
+                "count": 16,
+                "strict_descent": 0.25,
+                "all_span_order": 0.25,
+                "unit_drop_mae": 2.852096974849701,
+                "edge_descent_rate": 0.7742543625356125,
+                "all_branch_correct": 0.1875,
+                "all_span_order_rate": 0.9188850976356906,
+                "branch_margin_mean": 3.392052412033081,
+                "branch_positive_margin_rate": 0.7763522654309292
+              },
+              "9": {
+                "count": 16,
+                "strict_descent": 0.125,
+                "all_span_order": 0.125,
+                "unit_drop_mae": 6.707982808351517,
+                "edge_descent_rate": 0.6914769879243563,
+                "all_branch_correct": 0.125,
+                "all_span_order_rate": 0.7164276384460941,
+                "branch_margin_mean": 8.87702091038227,
+                "branch_positive_margin_rate": 0.659775041296423
+              },
+              "10": {
+                "count": 16,
+                "strict_descent": 0.25,
+                "all_span_order": 0.25,
+                "unit_drop_mae": 14.021723292768002,
+                "edge_descent_rate": 0.8000388919031161,
+                "all_branch_correct": 0.3125,
+                "all_span_order_rate": 0.9177348104793757,
+                "branch_margin_mean": 5.816963586956263,
+                "branch_positive_margin_rate": 0.8417732068031918
+              },
+              "11": {
+                "count": 16,
+                "strict_descent": 0.1875,
+                "all_span_order": 0.1875,
+                "unit_drop_mae": 7.9193712174892426,
+                "edge_descent_rate": 0.7386799343393271,
+                "all_branch_correct": 0.125,
+                "all_span_order_rate": 0.8554357138299575,
+                "branch_margin_mean": 8.537882536649704,
+                "branch_positive_margin_rate": 0.7581943317394626
+              },
+              "12": {
+                "count": 16,
+                "strict_descent": 0.0625,
+                "all_span_order": 0.0625,
+                "unit_drop_mae": 40.398501485586166,
+                "edge_descent_rate": 0.5949478896529727,
+                "all_branch_correct": 0.0,
+                "all_span_order_rate": 0.6832260066115565,
+                "branch_margin_mean": 5.670638345181942,
+                "branch_positive_margin_rate": 0.530859885620915
+              },
+              "13": {
+                "count": 16,
+                "strict_descent": 0.25,
+                "all_span_order": 0.25,
+                "unit_drop_mae": 9.102624658495188,
+                "edge_descent_rate": 0.7669460951630069,
+                "all_branch_correct": 0.1875,
+                "all_span_order_rate": 0.8234916613596206,
+                "branch_margin_mean": 8.037153998739086,
+                "branch_positive_margin_rate": 0.7213428193397767
+              },
+              "14": {
+                "count": 16,
+                "strict_descent": 0.0625,
+                "all_span_order": 0.0625,
+                "unit_drop_mae": 14.917333155870438,
+                "edge_descent_rate": 0.6173429001554002,
+                "all_branch_correct": 0.0,
+                "all_span_order_rate": 0.6856907484477017,
+                "branch_margin_mean": 2.484697885811329,
+                "branch_positive_margin_rate": 0.6156523639890575
+              },
+              "15": {
+                "count": 16,
+                "strict_descent": 0.0,
+                "all_span_order": 0.0,
+                "unit_drop_mae": 5.495757527649403,
+                "edge_descent_rate": 0.6721919795800313,
+                "all_branch_correct": 0.1875,
+                "all_span_order_rate": 0.832520874410165,
+                "branch_margin_mean": 1.8329981490969658,
+                "branch_positive_margin_rate": 0.6982534125467063
+              }
+            },
+            "meaning": "Complete exact teacher paths; all-span order includes nonadjacent pairs. These diagnostics never choose or filter an inference action."
+          },
+          "by_scene": {
+            "8": {
+              "count": 16,
+              "solved": 3,
+              "success_rate": 0.1875
+            },
+            "9": {
+              "count": 16,
+              "solved": 2,
+              "success_rate": 0.125
+            },
+            "10": {
+              "count": 16,
+              "solved": 5,
+              "success_rate": 0.3125
+            },
+            "11": {
+              "count": 16,
+              "solved": 2,
+              "success_rate": 0.125
+            },
+            "12": {
+              "count": 16,
+              "solved": 0,
+              "success_rate": 0.0
+            },
+            "13": {
+              "count": 16,
+              "solved": 3,
+              "success_rate": 0.1875
+            },
+            "14": {
+              "count": 16,
+              "solved": 0,
+              "success_rate": 0.0
+            },
+            "15": {
+              "count": 16,
+              "solved": 3,
+              "success_rate": 0.1875
+            }
+          }
+        }
+      }
+    },
+    "path_terminal_2026102401": {
+      "seed": 2026102401,
+      "condition": "path_terminal",
+      "evaluated_step": 3000,
+      "evaluated_checkpoint": "last.pt",
+      "actual_point_labels": 3072000,
+      "actual_ranking_decisions": 384000,
+      "actual_auxiliary_ranking_decisions": 0,
+      "fitting": {
+        "teacher_paths": {
+          "all": {
+            "count": 96,
+            "strict_descent": 0.9895833333333334,
+            "all_span_order": 0.9895833333333334,
+            "unit_drop_mae": 0.0654171386170977,
+            "edge_descent_rate": 0.9995993589743589,
+            "all_branch_correct": 0.9895833333333334,
+            "all_span_order_rate": 0.9999703228869895,
+            "branch_margin_mean": 4.1837439859906835,
+            "branch_positive_margin_rate": 0.9995993589743589
+          },
+          "long_21_32": {
+            "count": 24,
+            "strict_descent": 0.9583333333333334,
+            "all_span_order": 0.9583333333333334,
+            "unit_drop_mae": 0.1031043113519748,
+            "edge_descent_rate": 0.9983974358974358,
+            "all_branch_correct": 0.9583333333333334,
+            "all_span_order_rate": 0.9998812915479581,
+            "branch_margin_mean": 4.218559632698695,
+            "branch_positive_margin_rate": 0.9983974358974358
+          },
+          "by_scene": {
+            "0": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.08771514628703396,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 8.4679982761542,
+              "branch_positive_margin_rate": 1.0
+            },
+            "1": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.09633474797010422,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 1.952284296353658,
+              "branch_positive_margin_rate": 1.0
+            },
+            "2": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.04216985101811588,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 3.108948359886805,
+              "branch_positive_margin_rate": 1.0
+            },
+            "3": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.015657568039993446,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 1.9948892891407013,
+              "branch_positive_margin_rate": 1.0
+            },
+            "4": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.05653941538184881,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 3.698642541964849,
+              "branch_positive_margin_rate": 1.0
+            },
+            "5": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.06636820174753666,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 6.605721165736516,
+              "branch_positive_margin_rate": 1.0
+            },
+            "6": {
+              "count": 12,
+              "strict_descent": 0.9166666666666666,
+              "all_span_order": 0.9166666666666666,
+              "unit_drop_mae": 0.08430368173867464,
+              "edge_descent_rate": 0.9967948717948718,
+              "all_branch_correct": 0.9166666666666666,
+              "all_span_order_rate": 0.9997625830959165,
+              "branch_margin_mean": 2.6322416067123413,
+              "branch_positive_margin_rate": 0.9967948717948718
+            },
+            "7": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.07424849675347407,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 5.009226351976395,
+              "branch_positive_margin_rate": 1.0
+            }
+          },
+          "meaning": "Complete exact teacher paths; all-span order includes nonadjacent pairs. These diagnostics never choose or filter an inference action."
+        },
+        "completion": {
+          "count": 96,
+          "solved": 89,
+          "success_rate": 0.9270833333333334,
+          "cycles": 7
+        },
+        "failure_diagnosis": {
+          "failures": 7,
+          "first_nonoptimal_outside_terminal_contexts": 6,
+          "prior_optimal_departure_from_teacher": 6
+        }
+      },
+      "cohorts": {
+        "validation": {
+          "finite_mae": 14.265652656555176,
+          "completion": {
+            "count": 128,
+            "solved": 7,
+            "success_rate": 0.0546875,
+            "cycles": 121,
+            "entered_unreachable": 3,
+            "horizon": 32
+          },
+          "by_distance": {
+            "1_5": {
+              "count": 32,
+              "solved": 7
+            },
+            "6_20": {
+              "count": 64,
+              "solved": 0
+            },
+            "21_32": {
+              "count": 32,
+              "solved": 0
+            }
+          },
+          "teacher_paths": {
+            "all": {
+              "count": 128,
+              "strict_descent": 0.0546875,
+              "all_span_order": 0.0546875,
+              "unit_drop_mae": 3.449626770801842,
+              "edge_descent_rate": 0.7163666163718775,
+              "all_branch_correct": 0.046875,
+              "all_span_order_rate": 0.8341117140572716,
+              "branch_margin_mean": 5.072542882175185,
+              "branch_positive_margin_rate": 0.7119877700042959
+            },
+            "long_21_32": {
+              "count": 32,
+              "strict_descent": 0.0,
+              "all_span_order": 0.0,
+              "unit_drop_mae": 5.465168388560414,
+              "edge_descent_rate": 0.7118250640773873,
+              "all_branch_correct": 0.0,
+              "all_span_order_rate": 0.9136817818749056,
+              "branch_margin_mean": 5.267134374938905,
+              "branch_positive_margin_rate": 0.7190999794386256
+            },
+            "by_scene": {
+              "0": {
+                "count": 16,
+                "strict_descent": 0.0625,
+                "all_span_order": 0.0625,
+                "unit_drop_mae": 3.4499219581484795,
+                "edge_descent_rate": 0.6943566773099641,
+                "all_branch_correct": 0.0,
+                "all_span_order_rate": 0.7388115128197783,
+                "branch_margin_mean": 7.49123602360487,
+                "branch_positive_margin_rate": 0.7127154192741828
+              },
+              "1": {
+                "count": 16,
+                "strict_descent": 0.125,
+                "all_span_order": 0.125,
+                "unit_drop_mae": 3.872496485710144,
+                "edge_descent_rate": 0.7687260888887328,
+                "all_branch_correct": 0.0625,
+                "all_span_order_rate": 0.8510714031693891,
+                "branch_margin_mean": 2.8253873232752085,
+                "branch_positive_margin_rate": 0.7488538914729772
+              },
+              "2": {
+                "count": 16,
+                "strict_descent": 0.125,
+                "all_span_order": 0.125,
+                "unit_drop_mae": 3.7755592986941338,
+                "edge_descent_rate": 0.7898084554334553,
+                "all_branch_correct": 0.1875,
+                "all_span_order_rate": 0.9140144989856475,
+                "branch_margin_mean": 20.002790987491608,
+                "branch_positive_margin_rate": 0.8156230921855923
+              },
+              "3": {
+                "count": 16,
+                "strict_descent": 0.0625,
+                "all_span_order": 0.0625,
+                "unit_drop_mae": 3.1142794862389565,
+                "edge_descent_rate": 0.6753232878232878,
+                "all_branch_correct": 0.0625,
+                "all_span_order_rate": 0.8102569022097664,
+                "branch_margin_mean": 2.514434026554227,
+                "branch_positive_margin_rate": 0.6403935185185186
+              },
+              "4": {
+                "count": 16,
+                "strict_descent": 0.0,
+                "all_span_order": 0.0,
+                "unit_drop_mae": 3.0869242399930954,
+                "edge_descent_rate": 0.6669966961370102,
+                "all_branch_correct": 0.0,
+                "all_span_order_rate": 0.8340164407050678,
+                "branch_margin_mean": 4.029027905315161,
+                "branch_positive_margin_rate": 0.7218413978494623
+              },
+              "5": {
+                "count": 16,
+                "strict_descent": 0.0,
+                "all_span_order": 0.0,
+                "unit_drop_mae": 4.875315178185701,
+                "edge_descent_rate": 0.6670815158890817,
+                "all_branch_correct": 0.0,
+                "all_span_order_rate": 0.8237981127388422,
+                "branch_margin_mean": 1.7339889034628868,
+                "branch_positive_margin_rate": 0.6459921682348153
+              },
+              "6": {
+                "count": 16,
+                "strict_descent": 0.0,
+                "all_span_order": 0.0,
+                "unit_drop_mae": 1.634972270578146,
+                "edge_descent_rate": 0.735849640125956,
+                "all_branch_correct": 0.0,
+                "all_span_order_rate": 0.8368271092942146,
+                "branch_margin_mean": 0.4975906880572438,
+                "branch_positive_margin_rate": 0.6620437459660857
+              },
+              "7": {
+                "count": 16,
+                "strict_descent": 0.0625,
+                "all_span_order": 0.0625,
+                "unit_drop_mae": 3.7875452488660812,
+                "edge_descent_rate": 0.7327905693675317,
+                "all_branch_correct": 0.0625,
+                "all_span_order_rate": 0.8640977325354661,
+                "branch_margin_mean": 1.485887199640274,
+                "branch_positive_margin_rate": 0.7484389265327333
+              }
+            },
+            "meaning": "Complete exact teacher paths; all-span order includes nonadjacent pairs. These diagnostics never choose or filter an inference action."
+          },
+          "by_scene": {
+            "0": {
+              "count": 16,
+              "solved": 1,
+              "success_rate": 0.0625
+            },
+            "1": {
+              "count": 16,
+              "solved": 1,
+              "success_rate": 0.0625
+            },
+            "2": {
+              "count": 16,
+              "solved": 3,
+              "success_rate": 0.1875
+            },
+            "3": {
+              "count": 16,
+              "solved": 1,
+              "success_rate": 0.0625
+            },
+            "4": {
+              "count": 16,
+              "solved": 0,
+              "success_rate": 0.0
+            },
+            "5": {
+              "count": 16,
+              "solved": 0,
+              "success_rate": 0.0
+            },
+            "6": {
+              "count": 16,
+              "solved": 0,
+              "success_rate": 0.0
+            },
+            "7": {
+              "count": 16,
+              "solved": 1,
+              "success_rate": 0.0625
+            }
+          }
+        },
+        "unseen_layout_validation": {
+          "finite_mae": 40.294498443603516,
+          "completion": {
+            "count": 128,
+            "solved": 19,
+            "success_rate": 0.1484375,
+            "cycles": 109,
+            "entered_unreachable": 10,
+            "horizon": 32
+          },
+          "by_distance": {
+            "1_5": {
+              "count": 32,
+              "solved": 17
+            },
+            "6_20": {
+              "count": 64,
+              "solved": 2
+            },
+            "21_32": {
+              "count": 32,
+              "solved": 0
+            }
+          },
+          "teacher_paths": {
+            "all": {
+              "count": 128,
+              "strict_descent": 0.09375,
+              "all_span_order": 0.09375,
+              "unit_drop_mae": 11.805369180627167,
+              "edge_descent_rate": 0.6873957865710203,
+              "all_branch_correct": 0.1484375,
+              "all_span_order_rate": 0.8159486528547052,
+              "branch_margin_mean": 4.550140454048233,
+              "branch_positive_margin_rate": 0.7138642205816192
+            },
+            "long_21_32": {
+              "count": 32,
+              "strict_descent": 0.0,
+              "all_span_order": 0.0,
+              "unit_drop_mae": 14.255191404372454,
+              "edge_descent_rate": 0.6035666290734365,
+              "all_branch_correct": 0.0,
+              "all_span_order_rate": 0.7409129866796107,
+              "branch_margin_mean": 3.7375910840928555,
+              "branch_positive_margin_rate": 0.6251132411626446
+            },
+            "by_scene": {
+              "8": {
+                "count": 16,
+                "strict_descent": 0.25,
+                "all_span_order": 0.25,
+                "unit_drop_mae": 2.7723815962672234,
+                "edge_descent_rate": 0.7789730235042736,
+                "all_branch_correct": 0.25,
+                "all_span_order_rate": 0.9140842577067672,
+                "branch_margin_mean": 3.4008010178804398,
+                "branch_positive_margin_rate": 0.8578811023746369
+              },
+              "9": {
+                "count": 16,
+                "strict_descent": 0.125,
+                "all_span_order": 0.125,
+                "unit_drop_mae": 2.72715275734663,
+                "edge_descent_rate": 0.6912126196172248,
+                "all_branch_correct": 0.3125,
+                "all_span_order_rate": 0.8322722078003251,
+                "branch_margin_mean": 8.615086637437344,
+                "branch_positive_margin_rate": 0.8131122906698565
+              },
+              "10": {
+                "count": 16,
+                "strict_descent": 0.0,
+                "all_span_order": 0.0,
+                "unit_drop_mae": 14.415845789015293,
+                "edge_descent_rate": 0.6911653002170244,
+                "all_branch_correct": 0.125,
+                "all_span_order_rate": 0.8900285658868867,
+                "branch_margin_mean": 4.015272885560989,
+                "branch_positive_margin_rate": 0.7437877815899743
+              },
+              "11": {
+                "count": 16,
+                "strict_descent": 0.0,
+                "all_span_order": 0.0,
+                "unit_drop_mae": 18.17072059214115,
+                "edge_descent_rate": 0.6528792077987109,
+                "all_branch_correct": 0.0,
+                "all_span_order_rate": 0.7233945197091545,
+                "branch_margin_mean": 5.632447686686646,
+                "branch_positive_margin_rate": 0.6750673333154174
+              },
+              "12": {
+                "count": 16,
+                "strict_descent": 0.0,
+                "all_span_order": 0.0,
+                "unit_drop_mae": 35.98778638243675,
+                "edge_descent_rate": 0.5697266661301188,
+                "all_branch_correct": 0.0,
+                "all_span_order_rate": 0.6876282938431276,
+                "branch_margin_mean": 3.3719079392030835,
+                "branch_positive_margin_rate": 0.5198119058229352
+              },
+              "13": {
+                "count": 16,
+                "strict_descent": 0.125,
+                "all_span_order": 0.125,
+                "unit_drop_mae": 12.189445473253727,
+                "edge_descent_rate": 0.7085676748360572,
+                "all_branch_correct": 0.125,
+                "all_span_order_rate": 0.823194806664109,
+                "branch_margin_mean": 7.059298124164343,
+                "branch_positive_margin_rate": 0.657522799161998
+              },
+              "14": {
+                "count": 16,
+                "strict_descent": 0.125,
+                "all_span_order": 0.125,
+                "unit_drop_mae": 5.852771870791912,
+                "edge_descent_rate": 0.70445095991971,
+                "all_branch_correct": 0.125,
+                "all_span_order_rate": 0.7930193859937307,
+                "branch_margin_mean": 1.8473535422235727,
+                "branch_positive_margin_rate": 0.6601422491039426
+              },
+              "15": {
+                "count": 16,
+                "strict_descent": 0.125,
+                "all_span_order": 0.125,
+                "unit_drop_mae": 2.3268489837646484,
+                "edge_descent_rate": 0.7021908405450425,
+                "all_branch_correct": 0.25,
+                "all_span_order_rate": 0.8639671852335403,
+                "branch_margin_mean": 2.458955799229443,
+                "branch_positive_margin_rate": 0.783588302614194
+              }
+            },
+            "meaning": "Complete exact teacher paths; all-span order includes nonadjacent pairs. These diagnostics never choose or filter an inference action."
+          },
+          "by_scene": {
+            "8": {
+              "count": 16,
+              "solved": 4,
+              "success_rate": 0.25
+            },
+            "9": {
+              "count": 16,
+              "solved": 5,
+              "success_rate": 0.3125
+            },
+            "10": {
+              "count": 16,
+              "solved": 2,
+              "success_rate": 0.125
+            },
+            "11": {
+              "count": 16,
+              "solved": 0,
+              "success_rate": 0.0
+            },
+            "12": {
+              "count": 16,
+              "solved": 0,
+              "success_rate": 0.0
+            },
+            "13": {
+              "count": 16,
+              "solved": 2,
+              "success_rate": 0.125
+            },
+            "14": {
+              "count": 16,
+              "solved": 2,
+              "success_rate": 0.125
+            },
+            "15": {
+              "count": 16,
+              "solved": 4,
+              "success_rate": 0.25
+            }
+          }
+        }
+      }
+    },
+    "path_multiscale_2026102401": {
+      "seed": 2026102401,
+      "condition": "path_multiscale",
+      "evaluated_step": 3000,
+      "evaluated_checkpoint": "last.pt",
+      "actual_point_labels": 3072000,
+      "actual_ranking_decisions": 384000,
+      "actual_auxiliary_ranking_decisions": 192000,
+      "fitting": {
+        "teacher_paths": {
+          "all": {
+            "count": 96,
+            "strict_descent": 1.0,
+            "all_span_order": 1.0,
+            "unit_drop_mae": 0.1680059387969474,
+            "edge_descent_rate": 1.0,
+            "all_branch_correct": 1.0,
+            "all_span_order_rate": 1.0,
+            "branch_margin_mean": 3.9913014185925326,
+            "branch_positive_margin_rate": 1.0
+          },
+          "long_21_32": {
+            "count": 24,
+            "strict_descent": 1.0,
+            "all_span_order": 1.0,
+            "unit_drop_mae": 0.21326880902051926,
+            "edge_descent_rate": 1.0,
+            "all_branch_correct": 1.0,
+            "all_span_order_rate": 1.0,
+            "branch_margin_mean": 4.165672113498052,
+            "branch_positive_margin_rate": 1.0
+          },
+          "by_scene": {
+            "0": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.12794856913387775,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 8.445677508910498,
+              "branch_positive_margin_rate": 1.0
+            },
+            "1": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.28310417508085567,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 1.8868278861045837,
+              "branch_positive_margin_rate": 1.0
+            },
+            "2": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.15641213146348795,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 2.0040015975634256,
+              "branch_positive_margin_rate": 1.0
+            },
+            "3": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.036119972355663776,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 1.9471569458643596,
+              "branch_positive_margin_rate": 1.0
+            },
+            "4": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.15429762875040373,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 3.6132801175117493,
+              "branch_positive_margin_rate": 1.0
+            },
+            "5": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.20833820601304373,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 6.510019838809967,
+              "branch_positive_margin_rate": 1.0
+            },
+            "6": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.18534797926743826,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 2.5911909143129983,
+              "branch_positive_margin_rate": 1.0
+            },
+            "7": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.19247884831080833,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 4.932256539662679,
+              "branch_positive_margin_rate": 1.0
+            }
+          },
+          "meaning": "Complete exact teacher paths; all-span order includes nonadjacent pairs. These diagnostics never choose or filter an inference action."
+        },
+        "completion": {
+          "count": 96,
+          "solved": 87,
+          "success_rate": 0.90625,
+          "cycles": 9
+        },
+        "failure_diagnosis": {
+          "failures": 9,
+          "first_nonoptimal_outside_terminal_contexts": 9,
+          "prior_optimal_departure_from_teacher": 9
+        }
+      },
+      "cohorts": {
+        "validation": {
+          "finite_mae": 12.248350143432617,
+          "completion": {
+            "count": 128,
+            "solved": 17,
+            "success_rate": 0.1328125,
+            "cycles": 111,
+            "entered_unreachable": 4,
+            "horizon": 32
+          },
+          "by_distance": {
+            "1_5": {
+              "count": 32,
+              "solved": 14
+            },
+            "6_20": {
+              "count": 64,
+              "solved": 3
+            },
+            "21_32": {
+              "count": 32,
+              "solved": 0
+            }
+          },
+          "teacher_paths": {
+            "all": {
+              "count": 128,
+              "strict_descent": 0.0859375,
+              "all_span_order": 0.0859375,
+              "unit_drop_mae": 3.108689706772566,
+              "edge_descent_rate": 0.7649215361069812,
+              "all_branch_correct": 0.1328125,
+              "all_span_order_rate": 0.898462064418925,
+              "branch_margin_mean": 5.860972977243364,
+              "branch_positive_margin_rate": 0.7669888978040534
+            },
+            "long_21_32": {
+              "count": 32,
+              "strict_descent": 0.0,
+              "all_span_order": 0.0,
+              "unit_drop_mae": 3.5341804195195436,
+              "edge_descent_rate": 0.7646845530701518,
+              "all_branch_correct": 0.0,
+              "all_span_order_rate": 0.9334879563735448,
+              "branch_margin_mean": 5.57399395853281,
+              "branch_positive_margin_rate": 0.7516345593874898
+            },
+            "by_scene": {
+              "0": {
+                "count": 16,
+                "strict_descent": 0.0625,
+                "all_span_order": 0.0625,
+                "unit_drop_mae": 1.499208390712738,
+                "edge_descent_rate": 0.7518773171448454,
+                "all_branch_correct": 0.0625,
+                "all_span_order_rate": 0.85533233073004,
+                "branch_margin_mean": 7.900404306128621,
+                "branch_positive_margin_rate": 0.7348172609939317
+              },
+              "1": {
+                "count": 16,
+                "strict_descent": 0.0625,
+                "all_span_order": 0.0625,
+                "unit_drop_mae": 3.78806059807539,
+                "edge_descent_rate": 0.771607037463815,
+                "all_branch_correct": 0.0625,
+                "all_span_order_rate": 0.9014195990378855,
+                "branch_margin_mean": 3.053942646831274,
+                "branch_positive_margin_rate": 0.7155251032269094
+              },
+              "2": {
+                "count": 16,
+                "strict_descent": 0.25,
+                "all_span_order": 0.25,
+                "unit_drop_mae": 2.213449005037546,
+                "edge_descent_rate": 0.8397645757020756,
+                "all_branch_correct": 0.1875,
+                "all_span_order_rate": 0.9348127061805455,
+                "branch_margin_mean": 19.380210638046265,
+                "branch_positive_margin_rate": 0.8117769383394383
+              },
+              "3": {
+                "count": 16,
+                "strict_descent": 0.0625,
+                "all_span_order": 0.0625,
+                "unit_drop_mae": 1.2149350829422474,
+                "edge_descent_rate": 0.7225267787767787,
+                "all_branch_correct": 0.125,
+                "all_span_order_rate": 0.8915821272797774,
+                "branch_margin_mean": 1.6164598502218723,
+                "branch_positive_margin_rate": 0.7722304894179894
+              },
+              "4": {
+                "count": 16,
+                "strict_descent": 0.0625,
+                "all_span_order": 0.0625,
+                "unit_drop_mae": 2.6094257310032845,
+                "edge_descent_rate": 0.7791023674516984,
+                "all_branch_correct": 0.1875,
+                "all_span_order_rate": 0.907222993735054,
+                "branch_margin_mean": 3.396325297653675,
+                "branch_positive_margin_rate": 0.7622539772369993
+              },
+              "5": {
+                "count": 16,
+                "strict_descent": 0.0,
+                "all_span_order": 0.0,
+                "unit_drop_mae": 10.111497193574905,
+                "edge_descent_rate": 0.6731291369449264,
+                "all_branch_correct": 0.0,
+                "all_span_order_rate": 0.8695338935497204,
+                "branch_margin_mean": 7.874916784465313,
+                "branch_positive_margin_rate": 0.7181314192343604
+              },
+              "6": {
+                "count": 16,
+                "strict_descent": 0.0625,
+                "all_span_order": 0.0625,
+                "unit_drop_mae": 1.100985299795866,
+                "edge_descent_rate": 0.7969384934023092,
+                "all_branch_correct": 0.0625,
+                "all_span_order_rate": 0.928161356187672,
+                "branch_margin_mean": 1.164542419835925,
+                "branch_positive_margin_rate": 0.8037711047057443
+              },
+              "7": {
+                "count": 16,
+                "strict_descent": 0.125,
+                "all_span_order": 0.125,
+                "unit_drop_mae": 2.3319563530385494,
+                "edge_descent_rate": 0.7844265819694018,
+                "all_branch_correct": 0.375,
+                "all_span_order_rate": 0.8996315086507051,
+                "branch_margin_mean": 2.5009818747639656,
+                "branch_positive_margin_rate": 0.8174048892770536
+              }
+            },
+            "meaning": "Complete exact teacher paths; all-span order includes nonadjacent pairs. These diagnostics never choose or filter an inference action."
+          },
+          "by_scene": {
+            "0": {
+              "count": 16,
+              "solved": 1,
+              "success_rate": 0.0625
+            },
+            "1": {
+              "count": 16,
+              "solved": 1,
+              "success_rate": 0.0625
+            },
+            "2": {
+              "count": 16,
+              "solved": 3,
+              "success_rate": 0.1875
+            },
+            "3": {
+              "count": 16,
+              "solved": 2,
+              "success_rate": 0.125
+            },
+            "4": {
+              "count": 16,
+              "solved": 3,
+              "success_rate": 0.1875
+            },
+            "5": {
+              "count": 16,
+              "solved": 0,
+              "success_rate": 0.0
+            },
+            "6": {
+              "count": 16,
+              "solved": 1,
+              "success_rate": 0.0625
+            },
+            "7": {
+              "count": 16,
+              "solved": 6,
+              "success_rate": 0.375
+            }
+          }
+        },
+        "unseen_layout_validation": {
+          "finite_mae": 45.25916290283203,
+          "completion": {
+            "count": 128,
+            "solved": 20,
+            "success_rate": 0.15625,
+            "cycles": 108,
+            "entered_unreachable": 7,
+            "horizon": 32
+          },
+          "by_distance": {
+            "1_5": {
+              "count": 32,
+              "solved": 17
+            },
+            "6_20": {
+              "count": 64,
+              "solved": 3
+            },
+            "21_32": {
+              "count": 32,
+              "solved": 0
+            }
+          },
+          "teacher_paths": {
+            "all": {
+              "count": 128,
+              "strict_descent": 0.1328125,
+              "all_span_order": 0.1328125,
+              "unit_drop_mae": 14.90172924962826,
+              "edge_descent_rate": 0.7084496567456029,
+              "all_branch_correct": 0.1640625,
+              "all_span_order_rate": 0.7858752983450897,
+              "branch_margin_mean": 7.857211502618156,
+              "branch_positive_margin_rate": 0.7039786343073636
+            },
+            "long_21_32": {
+              "count": 32,
+              "strict_descent": 0.0,
+              "all_span_order": 0.0,
+              "unit_drop_mae": 20.148780703544617,
+              "edge_descent_rate": 0.5990217332320273,
+              "all_branch_correct": 0.0,
+              "all_span_order_rate": 0.6653461338930625,
+              "branch_margin_mean": 4.624178854282945,
+              "branch_positive_margin_rate": 0.5919949725857219
+            },
+            "by_scene": {
+              "8": {
+                "count": 16,
+                "strict_descent": 0.3125,
+                "all_span_order": 0.3125,
+                "unit_drop_mae": 3.0760960951447487,
+                "edge_descent_rate": 0.8029021036833537,
+                "all_branch_correct": 0.25,
+                "all_span_order_rate": 0.8841497662240072,
+                "branch_margin_mean": 3.0148862823843956,
+                "branch_positive_margin_rate": 0.7641121097532736
+              },
+              "9": {
+                "count": 16,
+                "strict_descent": 0.1875,
+                "all_span_order": 0.1875,
+                "unit_drop_mae": 2.626225894317031,
+                "edge_descent_rate": 0.8003675381635909,
+                "all_branch_correct": 0.4375,
+                "all_span_order_rate": 0.8349615798651309,
+                "branch_margin_mean": 24.75008089840412,
+                "branch_positive_margin_rate": 0.8650793888129414
+              },
+              "10": {
+                "count": 16,
+                "strict_descent": 0.25,
+                "all_span_order": 0.25,
+                "unit_drop_mae": 12.755450695753098,
+                "edge_descent_rate": 0.7684890181657423,
+                "all_branch_correct": 0.25,
+                "all_span_order_rate": 0.892510068694008,
+                "branch_margin_mean": 4.459254498593509,
+                "branch_positive_margin_rate": 0.7921609965392762
+              },
+              "11": {
+                "count": 16,
+                "strict_descent": 0.0,
+                "all_span_order": 0.0,
+                "unit_drop_mae": 29.936783991754055,
+                "edge_descent_rate": 0.5694513272378844,
+                "all_branch_correct": 0.0625,
+                "all_span_order_rate": 0.6256786649938053,
+                "branch_margin_mean": 5.029143199324608,
+                "branch_positive_margin_rate": 0.5991780293411395
+              },
+              "12": {
+                "count": 16,
+                "strict_descent": 0.0625,
+                "all_span_order": 0.0625,
+                "unit_drop_mae": 34.34552946686745,
+                "edge_descent_rate": 0.6483811904208323,
+                "all_branch_correct": 0.0,
+                "all_span_order_rate": 0.7246648131398771,
+                "branch_margin_mean": 7.460470549762249,
+                "branch_positive_margin_rate": 0.5958693553178847
+              },
+              "13": {
+                "count": 16,
+                "strict_descent": 0.1875,
+                "all_span_order": 0.1875,
+                "unit_drop_mae": 8.029232826083899,
+                "edge_descent_rate": 0.7365163975458093,
+                "all_branch_correct": 0.125,
+                "all_span_order_rate": 0.8410383657930598,
+                "branch_margin_mean": 8.322361201047897,
+                "branch_positive_margin_rate": 0.718707281562251
+              },
+              "14": {
+                "count": 16,
+                "strict_descent": 0.0625,
+                "all_span_order": 0.0625,
+                "unit_drop_mae": 23.791752099990845,
+                "edge_descent_rate": 0.6822039505633255,
+                "all_branch_correct": 0.0,
+                "all_span_order_rate": 0.7254694091223024,
+                "branch_margin_mean": 8.089243985712528,
+                "branch_positive_margin_rate": 0.6261803832368349
+              },
+              "15": {
+                "count": 16,
+                "strict_descent": 0.0,
+                "all_span_order": 0.0,
+                "unit_drop_mae": 4.6527629271149635,
+                "edge_descent_rate": 0.659285728184285,
+                "all_branch_correct": 0.1875,
+                "all_span_order_rate": 0.7585297189285272,
+                "branch_margin_mean": 1.7322514057159424,
+                "branch_positive_margin_rate": 0.6705415298953075
+              }
+            },
+            "meaning": "Complete exact teacher paths; all-span order includes nonadjacent pairs. These diagnostics never choose or filter an inference action."
+          },
+          "by_scene": {
+            "8": {
+              "count": 16,
+              "solved": 4,
+              "success_rate": 0.25
+            },
+            "9": {
+              "count": 16,
+              "solved": 7,
+              "success_rate": 0.4375
+            },
+            "10": {
+              "count": 16,
+              "solved": 4,
+              "success_rate": 0.25
+            },
+            "11": {
+              "count": 16,
+              "solved": 1,
+              "success_rate": 0.0625
+            },
+            "12": {
+              "count": 16,
+              "solved": 0,
+              "success_rate": 0.0
+            },
+            "13": {
+              "count": 16,
+              "solved": 2,
+              "success_rate": 0.125
+            },
+            "14": {
+              "count": 16,
+              "solved": 0,
+              "success_rate": 0.0
+            },
+            "15": {
+              "count": 16,
+              "solved": 2,
+              "success_rate": 0.125
+            }
+          }
+        }
+      }
+    },
+    "flat_terminal_2026102402": {
+      "seed": 2026102402,
+      "condition": "flat_terminal",
+      "evaluated_step": 3000,
+      "evaluated_checkpoint": "last.pt",
+      "actual_point_labels": 3072000,
+      "actual_ranking_decisions": 384000,
+      "actual_auxiliary_ranking_decisions": 0,
+      "fitting": {
+        "teacher_paths": {
+          "all": {
+            "count": 96,
+            "strict_descent": 1.0,
+            "all_span_order": 1.0,
+            "unit_drop_mae": 0.09225378178719741,
+            "edge_descent_rate": 1.0,
+            "all_branch_correct": 1.0,
+            "all_span_order_rate": 1.0,
+            "branch_margin_mean": 4.1721274716158705,
+            "branch_positive_margin_rate": 1.0
+          },
+          "long_21_32": {
+            "count": 24,
+            "strict_descent": 1.0,
+            "all_span_order": 1.0,
+            "unit_drop_mae": 0.06790755176916718,
+            "edge_descent_rate": 1.0,
+            "all_branch_correct": 1.0,
+            "all_span_order_rate": 1.0,
+            "branch_margin_mean": 4.248602658510208,
+            "branch_positive_margin_rate": 1.0
+          },
+          "by_scene": {
+            "0": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.05488914872209231,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 8.49406107266744,
+              "branch_positive_margin_rate": 1.0
+            },
+            "1": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.10307655607660611,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 1.9809805154800415,
+              "branch_positive_margin_rate": 1.0
+            },
+            "2": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.03335594960177938,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 3.121761371692022,
+              "branch_positive_margin_rate": 1.0
+            },
+            "3": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.26679977735814947,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 1.7649623552958171,
+              "branch_positive_margin_rate": 1.0
+            },
+            "4": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.04803476808592677,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 3.7119711538155875,
+              "branch_positive_margin_rate": 1.0
+            },
+            "5": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.05832550302147865,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 6.64097801844279,
+              "branch_positive_margin_rate": 1.0
+            },
+            "6": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.11457740950087707,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 2.671686122814814,
+              "branch_positive_margin_rate": 1.0
+            },
+            "7": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.058971141930669546,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 4.990619162718455,
+              "branch_positive_margin_rate": 1.0
+            }
+          },
+          "meaning": "Complete exact teacher paths; all-span order includes nonadjacent pairs. These diagnostics never choose or filter an inference action."
+        },
+        "completion": {
+          "count": 96,
+          "solved": 89,
+          "success_rate": 0.9270833333333334,
+          "cycles": 7
+        },
+        "failure_diagnosis": {
+          "failures": 7,
+          "first_nonoptimal_outside_terminal_contexts": 7,
+          "prior_optimal_departure_from_teacher": 7
+        }
+      },
+      "cohorts": {
+        "validation": {
+          "finite_mae": 14.885757446289062,
+          "completion": {
+            "count": 128,
+            "solved": 11,
+            "success_rate": 0.0859375,
+            "cycles": 117,
+            "entered_unreachable": 4,
+            "horizon": 32
+          },
+          "by_distance": {
+            "1_5": {
+              "count": 32,
+              "solved": 9
+            },
+            "6_20": {
+              "count": 64,
+              "solved": 2
+            },
+            "21_32": {
+              "count": 32,
+              "solved": 0
+            }
+          },
+          "teacher_paths": {
+            "all": {
+              "count": 128,
+              "strict_descent": 0.046875,
+              "all_span_order": 0.046875,
+              "unit_drop_mae": 4.002748149912804,
+              "edge_descent_rate": 0.6928564002285218,
+              "all_branch_correct": 0.0859375,
+              "all_span_order_rate": 0.8083656404539309,
+              "branch_margin_mean": 5.771771015803097,
+              "branch_positive_margin_rate": 0.6882105309725023
+            },
+            "long_21_32": {
+              "count": 32,
+              "strict_descent": 0.0,
+              "all_span_order": 0.0,
+              "unit_drop_mae": 5.06666605733335,
+              "edge_descent_rate": 0.7074878145486206,
+              "all_branch_correct": 0.0,
+              "all_span_order_rate": 0.8924635426675172,
+              "branch_margin_mean": 5.712911497801542,
+              "branch_positive_margin_rate": 0.6957360792960583
+            },
+            "by_scene": {
+              "0": {
+                "count": 16,
+                "strict_descent": 0.0625,
+                "all_span_order": 0.0625,
+                "unit_drop_mae": 4.906129151582718,
+                "edge_descent_rate": 0.6641283286605628,
+                "all_branch_correct": 0.0625,
+                "all_span_order_rate": 0.7197548706659449,
+                "branch_margin_mean": 7.819557644426823,
+                "branch_positive_margin_rate": 0.6835556367888957
+              },
+              "1": {
+                "count": 16,
+                "strict_descent": 0.0625,
+                "all_span_order": 0.0625,
+                "unit_drop_mae": 6.133507177233696,
+                "edge_descent_rate": 0.6378265290229804,
+                "all_branch_correct": 0.0625,
+                "all_span_order_rate": 0.7653566604253944,
+                "branch_margin_mean": 4.024244488216937,
+                "branch_positive_margin_rate": 0.5633931791780258
+              },
+              "2": {
+                "count": 16,
+                "strict_descent": 0.125,
+                "all_span_order": 0.125,
+                "unit_drop_mae": 3.3148328065872192,
+                "edge_descent_rate": 0.7466880341880342,
+                "all_branch_correct": 0.125,
+                "all_span_order_rate": 0.8964419856782899,
+                "branch_margin_mean": 20.368744269013405,
+                "branch_positive_margin_rate": 0.7748721764346764
+              },
+              "3": {
+                "count": 16,
+                "strict_descent": 0.0625,
+                "all_span_order": 0.0625,
+                "unit_drop_mae": 3.724198639392853,
+                "edge_descent_rate": 0.7067491536241537,
+                "all_branch_correct": 0.0625,
+                "all_span_order_rate": 0.7466711407027036,
+                "branch_margin_mean": 2.946887094527483,
+                "branch_positive_margin_rate": 0.6953125
+              },
+              "4": {
+                "count": 16,
+                "strict_descent": 0.0,
+                "all_span_order": 0.0,
+                "unit_drop_mae": 2.577171966433525,
+                "edge_descent_rate": 0.7274605324287033,
+                "all_branch_correct": 0.375,
+                "all_span_order_rate": 0.884499775185744,
+                "branch_margin_mean": 4.008761171251535,
+                "branch_positive_margin_rate": 0.8546080142111552
+              },
+              "5": {
+                "count": 16,
+                "strict_descent": 0.0,
+                "all_span_order": 0.0,
+                "unit_drop_mae": 7.318561494350433,
+                "edge_descent_rate": 0.5793380185238738,
+                "all_branch_correct": 0.0,
+                "all_span_order_rate": 0.737027624471243,
+                "branch_margin_mean": 3.6636227059643716,
+                "branch_positive_margin_rate": 0.6034560619119442
+              },
+              "6": {
+                "count": 16,
+                "strict_descent": 0.0,
+                "all_span_order": 0.0,
+                "unit_drop_mae": 1.611658077687025,
+                "edge_descent_rate": 0.6817499812565602,
+                "all_branch_correct": 0.0,
+                "all_span_order_rate": 0.8209772768654348,
+                "branch_margin_mean": 0.7485280502587557,
+                "branch_positive_margin_rate": 0.5818380835729233
+              },
+              "7": {
+                "count": 16,
+                "strict_descent": 0.0625,
+                "all_span_order": 0.0625,
+                "unit_drop_mae": 2.4359258860349655,
+                "edge_descent_rate": 0.7989106241233056,
+                "all_branch_correct": 0.0,
+                "all_span_order_rate": 0.8961957896366926,
+                "branch_margin_mean": 2.593822702765465,
+                "branch_positive_margin_rate": 0.7486485956823978
+              }
+            },
+            "meaning": "Complete exact teacher paths; all-span order includes nonadjacent pairs. These diagnostics never choose or filter an inference action."
+          },
+          "by_scene": {
+            "0": {
+              "count": 16,
+              "solved": 1,
+              "success_rate": 0.0625
+            },
+            "1": {
+              "count": 16,
+              "solved": 1,
+              "success_rate": 0.0625
+            },
+            "2": {
+              "count": 16,
+              "solved": 2,
+              "success_rate": 0.125
+            },
+            "3": {
+              "count": 16,
+              "solved": 1,
+              "success_rate": 0.0625
+            },
+            "4": {
+              "count": 16,
+              "solved": 6,
+              "success_rate": 0.375
+            },
+            "5": {
+              "count": 16,
+              "solved": 0,
+              "success_rate": 0.0
+            },
+            "6": {
+              "count": 16,
+              "solved": 0,
+              "success_rate": 0.0
+            },
+            "7": {
+              "count": 16,
+              "solved": 0,
+              "success_rate": 0.0
+            }
+          }
+        },
+        "unseen_layout_validation": {
+          "finite_mae": 47.30010223388672,
+          "completion": {
+            "count": 128,
+            "solved": 16,
+            "success_rate": 0.125,
+            "cycles": 112,
+            "entered_unreachable": 9,
+            "horizon": 32
+          },
+          "by_distance": {
+            "1_5": {
+              "count": 32,
+              "solved": 16
+            },
+            "6_20": {
+              "count": 64,
+              "solved": 0
+            },
+            "21_32": {
+              "count": 32,
+              "solved": 0
+            }
+          },
+          "teacher_paths": {
+            "all": {
+              "count": 128,
+              "strict_descent": 0.140625,
+              "all_span_order": 0.140625,
+              "unit_drop_mae": 12.160583484917879,
+              "edge_descent_rate": 0.7332517488549943,
+              "all_branch_correct": 0.125,
+              "all_span_order_rate": 0.8052804414212108,
+              "branch_margin_mean": 5.603025320568122,
+              "branch_positive_margin_rate": 0.6929561238915205
+            },
+            "long_21_32": {
+              "count": 32,
+              "strict_descent": 0.0,
+              "all_span_order": 0.0,
+              "unit_drop_mae": 13.989921428263187,
+              "edge_descent_rate": 0.6270841807582888,
+              "all_branch_correct": 0.0,
+              "all_span_order_rate": 0.7160533235275854,
+              "branch_margin_mean": 4.6436030780896544,
+              "branch_positive_margin_rate": 0.5895412784821685
+            },
+            "by_scene": {
+              "8": {
+                "count": 16,
+                "strict_descent": 0.25,
+                "all_span_order": 0.25,
+                "unit_drop_mae": 2.3653473556041718,
+                "edge_descent_rate": 0.8062280601343101,
+                "all_branch_correct": 0.25,
+                "all_span_order_rate": 0.9233345939761974,
+                "branch_margin_mean": 3.08578422665596,
+                "branch_positive_margin_rate": 0.8026978469327607
+              },
+              "9": {
+                "count": 16,
+                "strict_descent": 0.125,
+                "all_span_order": 0.125,
+                "unit_drop_mae": 4.901871681213379,
+                "edge_descent_rate": 0.7377070161198451,
+                "all_branch_correct": 0.25,
+                "all_span_order_rate": 0.7515620429185004,
+                "branch_margin_mean": 4.822500973939896,
+                "branch_positive_margin_rate": 0.7690165399293688
+              },
+              "10": {
+                "count": 16,
+                "strict_descent": 0.25,
+                "all_span_order": 0.25,
+                "unit_drop_mae": 13.495246142148972,
+                "edge_descent_rate": 0.8402094552956622,
+                "all_branch_correct": 0.125,
+                "all_span_order_rate": 0.9138102583323723,
+                "branch_margin_mean": 4.440759122371674,
+                "branch_positive_margin_rate": 0.741770635401164
+              },
+              "11": {
+                "count": 16,
+                "strict_descent": 0.125,
+                "all_span_order": 0.125,
+                "unit_drop_mae": 7.248363584280014,
+                "edge_descent_rate": 0.7288226681801753,
+                "all_branch_correct": 0.1875,
+                "all_span_order_rate": 0.8494581224827997,
+                "branch_margin_mean": 8.56650934368372,
+                "branch_positive_margin_rate": 0.7395373628455832
+              },
+              "12": {
+                "count": 16,
+                "strict_descent": 0.125,
+                "all_span_order": 0.125,
+                "unit_drop_mae": 36.22069174051285,
+                "edge_descent_rate": 0.6350462716631196,
+                "all_branch_correct": 0.0,
+                "all_span_order_rate": 0.7005438823277699,
+                "branch_margin_mean": 7.4115047082304955,
+                "branch_positive_margin_rate": 0.5350063131313132
+              },
+              "13": {
+                "count": 16,
+                "strict_descent": 0.25,
+                "all_span_order": 0.25,
+                "unit_drop_mae": 10.945859611034393,
+                "edge_descent_rate": 0.7848526065437831,
+                "all_branch_correct": 0.1875,
+                "all_span_order_rate": 0.8493441372674619,
+                "branch_margin_mean": 11.250883878208697,
+                "branch_positive_margin_rate": 0.7096800029894603
+              },
+              "14": {
+                "count": 16,
+                "strict_descent": 0.0,
+                "all_span_order": 0.0,
+                "unit_drop_mae": 17.834233909845352,
+                "edge_descent_rate": 0.6328624789562289,
+                "all_branch_correct": 0.0,
+                "all_span_order_rate": 0.5937322350585618,
+                "branch_margin_mean": 3.011521579697728,
+                "branch_positive_margin_rate": 0.5694709356503711
+              },
+              "15": {
+                "count": 16,
+                "strict_descent": 0.0,
+                "all_span_order": 0.0,
+                "unit_drop_mae": 4.273053854703903,
+                "edge_descent_rate": 0.7002854339468303,
+                "all_branch_correct": 0.0,
+                "all_span_order_rate": 0.8604582590060232,
+                "branch_margin_mean": 2.2347387317568064,
+                "branch_positive_margin_rate": 0.6764693542521428
+              }
+            },
+            "meaning": "Complete exact teacher paths; all-span order includes nonadjacent pairs. These diagnostics never choose or filter an inference action."
+          },
+          "by_scene": {
+            "8": {
+              "count": 16,
+              "solved": 4,
+              "success_rate": 0.25
+            },
+            "9": {
+              "count": 16,
+              "solved": 4,
+              "success_rate": 0.25
+            },
+            "10": {
+              "count": 16,
+              "solved": 2,
+              "success_rate": 0.125
+            },
+            "11": {
+              "count": 16,
+              "solved": 3,
+              "success_rate": 0.1875
+            },
+            "12": {
+              "count": 16,
+              "solved": 0,
+              "success_rate": 0.0
+            },
+            "13": {
+              "count": 16,
+              "solved": 3,
+              "success_rate": 0.1875
+            },
+            "14": {
+              "count": 16,
+              "solved": 0,
+              "success_rate": 0.0
+            },
+            "15": {
+              "count": 16,
+              "solved": 0,
+              "success_rate": 0.0
+            }
+          }
+        }
+      }
+    },
+    "path_terminal_2026102402": {
+      "seed": 2026102402,
+      "condition": "path_terminal",
+      "evaluated_step": 3000,
+      "evaluated_checkpoint": "last.pt",
+      "actual_point_labels": 3072000,
+      "actual_ranking_decisions": 384000,
+      "actual_auxiliary_ranking_decisions": 0,
+      "fitting": {
+        "teacher_paths": {
+          "all": {
+            "count": 96,
+            "strict_descent": 1.0,
+            "all_span_order": 1.0,
+            "unit_drop_mae": 0.1284386090216382,
+            "edge_descent_rate": 1.0,
+            "all_branch_correct": 1.0,
+            "all_span_order_rate": 1.0,
+            "branch_margin_mean": 4.1677443608641624,
+            "branch_positive_margin_rate": 1.0
+          },
+          "long_21_32": {
+            "count": 24,
+            "strict_descent": 1.0,
+            "all_span_order": 1.0,
+            "unit_drop_mae": 0.15627249920119843,
+            "edge_descent_rate": 1.0,
+            "all_branch_correct": 1.0,
+            "all_span_order_rate": 1.0,
+            "branch_margin_mean": 4.227029611666997,
+            "branch_positive_margin_rate": 1.0
+          },
+          "by_scene": {
+            "0": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.11643985938280821,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 8.487655719121298,
+              "branch_positive_margin_rate": 1.0
+            },
+            "1": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.18609020486474037,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 2.0321144461631775,
+              "branch_positive_margin_rate": 1.0
+            },
+            "2": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.13446837601562342,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 3.0933379034201303,
+              "branch_positive_margin_rate": 1.0
+            },
+            "3": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.19346228482512137,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 1.7337088386217754,
+              "branch_positive_margin_rate": 1.0
+            },
+            "4": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.08018381738414367,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 3.7110293904940286,
+              "branch_positive_margin_rate": 1.0
+            },
+            "5": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.09700905407468478,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 6.6211235125859575,
+              "branch_positive_margin_rate": 1.0
+            },
+            "6": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.13347144673268,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 2.664042721192042,
+              "branch_positive_margin_rate": 1.0
+            },
+            "7": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.08638382889330387,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 4.998942355314891,
+              "branch_positive_margin_rate": 1.0
+            }
+          },
+          "meaning": "Complete exact teacher paths; all-span order includes nonadjacent pairs. These diagnostics never choose or filter an inference action."
+        },
+        "completion": {
+          "count": 96,
+          "solved": 88,
+          "success_rate": 0.9166666666666666,
+          "cycles": 8
+        },
+        "failure_diagnosis": {
+          "failures": 8,
+          "first_nonoptimal_outside_terminal_contexts": 8,
+          "prior_optimal_departure_from_teacher": 8
+        }
+      },
+      "cohorts": {
+        "validation": {
+          "finite_mae": 11.276641845703125,
+          "completion": {
+            "count": 128,
+            "solved": 13,
+            "success_rate": 0.1015625,
+            "cycles": 115,
+            "entered_unreachable": 4,
+            "horizon": 32
+          },
+          "by_distance": {
+            "1_5": {
+              "count": 32,
+              "solved": 11
+            },
+            "6_20": {
+              "count": 64,
+              "solved": 2
+            },
+            "21_32": {
+              "count": 32,
+              "solved": 0
+            }
+          },
+          "teacher_paths": {
+            "all": {
+              "count": 128,
+              "strict_descent": 0.0546875,
+              "all_span_order": 0.0546875,
+              "unit_drop_mae": 3.258153258357197,
+              "edge_descent_rate": 0.7186872229348505,
+              "all_branch_correct": 0.1015625,
+              "all_span_order_rate": 0.8312691847323399,
+              "branch_margin_mean": 5.080125894470257,
+              "branch_positive_margin_rate": 0.7240946751671186
+            },
+            "long_21_32": {
+              "count": 32,
+              "strict_descent": 0.0,
+              "all_span_order": 0.0,
+              "unit_drop_mae": 4.6916288156062365,
+              "edge_descent_rate": 0.7318459559668844,
+              "all_branch_correct": 0.0,
+              "all_span_order_rate": 0.9080332359604506,
+              "branch_margin_mean": 4.995842440985143,
+              "branch_positive_margin_rate": 0.7191386238432096
+            },
+            "by_scene": {
+              "0": {
+                "count": 16,
+                "strict_descent": 0.0625,
+                "all_span_order": 0.0625,
+                "unit_drop_mae": 4.529046714305878,
+                "edge_descent_rate": 0.6546138357288872,
+                "all_branch_correct": 0.0625,
+                "all_span_order_rate": 0.6941540195770495,
+                "branch_margin_mean": 6.848488454357721,
+                "branch_positive_margin_rate": 0.6524196247111469
+              },
+              "1": {
+                "count": 16,
+                "strict_descent": 0.0625,
+                "all_span_order": 0.0625,
+                "unit_drop_mae": 2.600422516465187,
+                "edge_descent_rate": 0.7381976818737528,
+                "all_branch_correct": 0.0625,
+                "all_span_order_rate": 0.8612456084043361,
+                "branch_margin_mean": 2.8263333179056644,
+                "branch_positive_margin_rate": 0.770784039995597
+              },
+              "2": {
+                "count": 16,
+                "strict_descent": 0.125,
+                "all_span_order": 0.125,
+                "unit_drop_mae": 2.801440194249153,
+                "edge_descent_rate": 0.7647092490842491,
+                "all_branch_correct": 0.125,
+                "all_span_order_rate": 0.9129192229077518,
+                "branch_margin_mean": 19.907914876937866,
+                "branch_positive_margin_rate": 0.7949614621489621
+              },
+              "3": {
+                "count": 16,
+                "strict_descent": 0.0625,
+                "all_span_order": 0.0625,
+                "unit_drop_mae": 3.372615784406662,
+                "edge_descent_rate": 0.659305278055278,
+                "all_branch_correct": 0.0625,
+                "all_span_order_rate": 0.7677075390698166,
+                "branch_margin_mean": 1.8241416793316603,
+                "branch_positive_margin_rate": 0.6190310846560847
+              },
+              "4": {
+                "count": 16,
+                "strict_descent": 0.0625,
+                "all_span_order": 0.0625,
+                "unit_drop_mae": 2.834654249250889,
+                "edge_descent_rate": 0.7551562646651855,
+                "all_branch_correct": 0.375,
+                "all_span_order_rate": 0.8839573551219075,
+                "branch_margin_mean": 4.137234501540661,
+                "branch_positive_margin_rate": 0.8076911589008363
+              },
+              "5": {
+                "count": 16,
+                "strict_descent": 0.0,
+                "all_span_order": 0.0,
+                "unit_drop_mae": 5.529881186783314,
+                "edge_descent_rate": 0.6452816235299789,
+                "all_branch_correct": 0.125,
+                "all_span_order_rate": 0.8027946168224205,
+                "branch_margin_mean": 2.778051719069481,
+                "branch_positive_margin_rate": 0.7463653516962341
+              },
+              "6": {
+                "count": 16,
+                "strict_descent": 0.0,
+                "all_span_order": 0.0,
+                "unit_drop_mae": 1.241061095148325,
+                "edge_descent_rate": 0.766204875168691,
+                "all_branch_correct": 0.0,
+                "all_span_order_rate": 0.8461392603497866,
+                "branch_margin_mean": 0.8242700509727001,
+                "branch_positive_margin_rate": 0.6593341291145924
+              },
+              "7": {
+                "count": 16,
+                "strict_descent": 0.0625,
+                "all_span_order": 0.0625,
+                "unit_drop_mae": 3.156104326248169,
+                "edge_descent_rate": 0.766028975372782,
+                "all_branch_correct": 0.0,
+                "all_span_order_rate": 0.8812358556056511,
+                "branch_margin_mean": 1.4945725556463003,
+                "branch_positive_margin_rate": 0.7421705501134948
+              }
+            },
+            "meaning": "Complete exact teacher paths; all-span order includes nonadjacent pairs. These diagnostics never choose or filter an inference action."
+          },
+          "by_scene": {
+            "0": {
+              "count": 16,
+              "solved": 1,
+              "success_rate": 0.0625
+            },
+            "1": {
+              "count": 16,
+              "solved": 1,
+              "success_rate": 0.0625
+            },
+            "2": {
+              "count": 16,
+              "solved": 2,
+              "success_rate": 0.125
+            },
+            "3": {
+              "count": 16,
+              "solved": 1,
+              "success_rate": 0.0625
+            },
+            "4": {
+              "count": 16,
+              "solved": 6,
+              "success_rate": 0.375
+            },
+            "5": {
+              "count": 16,
+              "solved": 2,
+              "success_rate": 0.125
+            },
+            "6": {
+              "count": 16,
+              "solved": 0,
+              "success_rate": 0.0
+            },
+            "7": {
+              "count": 16,
+              "solved": 0,
+              "success_rate": 0.0
+            }
+          }
+        },
+        "unseen_layout_validation": {
+          "finite_mae": 44.19709777832031,
+          "completion": {
+            "count": 128,
+            "solved": 13,
+            "success_rate": 0.1015625,
+            "cycles": 115,
+            "entered_unreachable": 14,
+            "horizon": 32
+          },
+          "by_distance": {
+            "1_5": {
+              "count": 32,
+              "solved": 12
+            },
+            "6_20": {
+              "count": 64,
+              "solved": 1
+            },
+            "21_32": {
+              "count": 32,
+              "solved": 0
+            }
+          },
+          "teacher_paths": {
+            "all": {
+              "count": 128,
+              "strict_descent": 0.109375,
+              "all_span_order": 0.109375,
+              "unit_drop_mae": 13.001684837043285,
+              "edge_descent_rate": 0.6999215848851157,
+              "all_branch_correct": 0.1015625,
+              "all_span_order_rate": 0.807539404250332,
+              "branch_margin_mean": 6.0955012065242045,
+              "branch_positive_margin_rate": 0.6870088345013827
+            },
+            "long_21_32": {
+              "count": 32,
+              "strict_descent": 0.0,
+              "all_span_order": 0.0,
+              "unit_drop_mae": 15.670037545263767,
+              "edge_descent_rate": 0.6263678721515138,
+              "all_branch_correct": 0.0,
+              "all_span_order_rate": 0.7416917589751951,
+              "branch_margin_mean": 4.863245113519952,
+              "branch_positive_margin_rate": 0.6179460527208118
+            },
+            "by_scene": {
+              "8": {
+                "count": 16,
+                "strict_descent": 0.25,
+                "all_span_order": 0.25,
+                "unit_drop_mae": 2.514992766082287,
+                "edge_descent_rate": 0.8023838141025641,
+                "all_branch_correct": 0.25,
+                "all_span_order_rate": 0.9296240548315975,
+                "branch_margin_mean": 3.4706777036190033,
+                "branch_positive_margin_rate": 0.8274974408972253
+              },
+              "9": {
+                "count": 16,
+                "strict_descent": 0.125,
+                "all_span_order": 0.125,
+                "unit_drop_mae": 3.273540072143078,
+                "edge_descent_rate": 0.7144614020847573,
+                "all_branch_correct": 0.125,
+                "all_span_order_rate": 0.8392475080900204,
+                "branch_margin_mean": 12.84230437874794,
+                "branch_positive_margin_rate": 0.7539977073365232
+              },
+              "10": {
+                "count": 16,
+                "strict_descent": 0.0,
+                "all_span_order": 0.0,
+                "unit_drop_mae": 14.458027392625809,
+                "edge_descent_rate": 0.7470304420196662,
+                "all_branch_correct": 0.0625,
+                "all_span_order_rate": 0.9116436289951095,
+                "branch_margin_mean": 4.357763558626175,
+                "branch_positive_margin_rate": 0.7471825127958
+              },
+              "11": {
+                "count": 16,
+                "strict_descent": 0.0,
+                "all_span_order": 0.0,
+                "unit_drop_mae": 20.260695040225983,
+                "edge_descent_rate": 0.588364808288907,
+                "all_branch_correct": 0.0,
+                "all_span_order_rate": 0.6682678031951321,
+                "branch_margin_mean": 2.876358777284622,
+                "branch_positive_margin_rate": 0.6122062388057745
+              },
+              "12": {
+                "count": 16,
+                "strict_descent": 0.125,
+                "all_span_order": 0.125,
+                "unit_drop_mae": 38.45123642683029,
+                "edge_descent_rate": 0.6211489464286779,
+                "all_branch_correct": 0.0,
+                "all_span_order_rate": 0.6961852790337445,
+                "branch_margin_mean": 6.557840585708618,
+                "branch_positive_margin_rate": 0.5436502896613191
+              },
+              "13": {
+                "count": 16,
+                "strict_descent": 0.1875,
+                "all_span_order": 0.1875,
+                "unit_drop_mae": 15.531998172402382,
+                "edge_descent_rate": 0.7075973998768117,
+                "all_branch_correct": 0.125,
+                "all_span_order_rate": 0.8148182720300218,
+                "branch_margin_mean": 14.746375469956547,
+                "branch_positive_margin_rate": 0.665345955200798
+              },
+              "14": {
+                "count": 16,
+                "strict_descent": 0.0625,
+                "all_span_order": 0.0625,
+                "unit_drop_mae": 6.7473792135715485,
+                "edge_descent_rate": 0.6733027389277388,
+                "all_branch_correct": 0.0,
+                "all_span_order_rate": 0.7303349754820343,
+                "branch_margin_mean": 1.2786188488826156,
+                "branch_positive_margin_rate": 0.5539790518621164
+              },
+              "15": {
+                "count": 16,
+                "strict_descent": 0.125,
+                "all_span_order": 0.125,
+                "unit_drop_mae": 2.775609612464905,
+                "edge_descent_rate": 0.745083127351803,
+                "all_branch_correct": 0.25,
+                "all_span_order_rate": 0.8701937123449958,
+                "branch_margin_mean": 2.6340703293681145,
+                "branch_positive_margin_rate": 0.7922114794515049
+              }
+            },
+            "meaning": "Complete exact teacher paths; all-span order includes nonadjacent pairs. These diagnostics never choose or filter an inference action."
+          },
+          "by_scene": {
+            "8": {
+              "count": 16,
+              "solved": 4,
+              "success_rate": 0.25
+            },
+            "9": {
+              "count": 16,
+              "solved": 2,
+              "success_rate": 0.125
+            },
+            "10": {
+              "count": 16,
+              "solved": 1,
+              "success_rate": 0.0625
+            },
+            "11": {
+              "count": 16,
+              "solved": 0,
+              "success_rate": 0.0
+            },
+            "12": {
+              "count": 16,
+              "solved": 0,
+              "success_rate": 0.0
+            },
+            "13": {
+              "count": 16,
+              "solved": 2,
+              "success_rate": 0.125
+            },
+            "14": {
+              "count": 16,
+              "solved": 0,
+              "success_rate": 0.0
+            },
+            "15": {
+              "count": 16,
+              "solved": 4,
+              "success_rate": 0.25
+            }
+          }
+        }
+      }
+    },
+    "path_multiscale_2026102402": {
+      "seed": 2026102402,
+      "condition": "path_multiscale",
+      "evaluated_step": 3000,
+      "evaluated_checkpoint": "last.pt",
+      "actual_point_labels": 3072000,
+      "actual_ranking_decisions": 384000,
+      "actual_auxiliary_ranking_decisions": 192000,
+      "fitting": {
+        "teacher_paths": {
+          "all": {
+            "count": 96,
+            "strict_descent": 0.9791666666666666,
+            "all_span_order": 0.9791666666666666,
+            "unit_drop_mae": 0.13355790591352465,
+            "edge_descent_rate": 0.9989583333333334,
+            "all_branch_correct": 1.0,
+            "all_span_order_rate": 0.9999007936507937,
+            "branch_margin_mean": 3.995444924881061,
+            "branch_positive_margin_rate": 1.0
+          },
+          "long_21_32": {
+            "count": 24,
+            "strict_descent": 1.0,
+            "all_span_order": 1.0,
+            "unit_drop_mae": 0.20546753611415625,
+            "edge_descent_rate": 1.0,
+            "all_branch_correct": 1.0,
+            "all_span_order_rate": 1.0,
+            "branch_margin_mean": 4.17509991923968,
+            "branch_positive_margin_rate": 1.0
+          },
+          "by_scene": {
+            "0": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.12643547480305037,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 8.437381774187088,
+              "branch_positive_margin_rate": 1.0
+            },
+            "1": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.16382160410284996,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 1.9154338737328847,
+              "branch_positive_margin_rate": 1.0
+            },
+            "2": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.15307874915500483,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 1.9823635121186574,
+              "branch_positive_margin_rate": 1.0
+            },
+            "3": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.05096114461775869,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 1.9396282931168873,
+              "branch_positive_margin_rate": 1.0
+            },
+            "4": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.09501975184927385,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 3.6336677273114524,
+              "branch_positive_margin_rate": 1.0
+            },
+            "5": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.13134252714614073,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 6.562510331471761,
+              "branch_positive_margin_rate": 1.0
+            },
+            "6": {
+              "count": 12,
+              "strict_descent": 1.0,
+              "all_span_order": 1.0,
+              "unit_drop_mae": 0.19511524649957815,
+              "edge_descent_rate": 1.0,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 1.0,
+              "branch_margin_mean": 2.5463435451189675,
+              "branch_positive_margin_rate": 1.0
+            },
+            "7": {
+              "count": 12,
+              "strict_descent": 0.8333333333333334,
+              "all_span_order": 0.8333333333333334,
+              "unit_drop_mae": 0.15268874913454056,
+              "edge_descent_rate": 0.9916666666666666,
+              "all_branch_correct": 1.0,
+              "all_span_order_rate": 0.9992063492063492,
+              "branch_margin_mean": 4.9462303419907885,
+              "branch_positive_margin_rate": 1.0
+            }
+          },
+          "meaning": "Complete exact teacher paths; all-span order includes nonadjacent pairs. These diagnostics never choose or filter an inference action."
+        },
+        "completion": {
+          "count": 96,
+          "solved": 93,
+          "success_rate": 0.96875,
+          "cycles": 3
+        },
+        "failure_diagnosis": {
+          "failures": 3,
+          "first_nonoptimal_outside_terminal_contexts": 3,
+          "prior_optimal_departure_from_teacher": 3
+        }
+      },
+      "cohorts": {
+        "validation": {
+          "finite_mae": 13.696891784667969,
+          "completion": {
+            "count": 128,
+            "solved": 23,
+            "success_rate": 0.1796875,
+            "cycles": 105,
+            "entered_unreachable": 6,
+            "horizon": 32
+          },
+          "by_distance": {
+            "1_5": {
+              "count": 32,
+              "solved": 18
+            },
+            "6_20": {
+              "count": 64,
+              "solved": 5
+            },
+            "21_32": {
+              "count": 32,
+              "solved": 0
+            }
+          },
+          "teacher_paths": {
+            "all": {
+              "count": 128,
+              "strict_descent": 0.109375,
+              "all_span_order": 0.109375,
+              "unit_drop_mae": 2.853435503318906,
+              "edge_descent_rate": 0.7875338987613694,
+              "all_branch_correct": 0.1875,
+              "all_span_order_rate": 0.9038622728661542,
+              "branch_margin_mean": 5.3210540905129164,
+              "branch_positive_margin_rate": 0.801982296061735
+            },
+            "long_21_32": {
+              "count": 32,
+              "strict_descent": 0.0,
+              "all_span_order": 0.0,
+              "unit_drop_mae": 4.668344035744667,
+              "edge_descent_rate": 0.7584428892358502,
+              "all_branch_correct": 0.03125,
+              "all_span_order_rate": 0.9346036573901775,
+              "branch_margin_mean": 5.144927739165723,
+              "branch_positive_margin_rate": 0.7697359964201895
+            },
+            "by_scene": {
+              "0": {
+                "count": 16,
+                "strict_descent": 0.0625,
+                "all_span_order": 0.0625,
+                "unit_drop_mae": 1.1215217523276806,
+                "edge_descent_rate": 0.8219496024614725,
+                "all_branch_correct": 0.0625,
+                "all_span_order_rate": 0.8728008350706752,
+                "branch_margin_mean": 7.719756368547678,
+                "branch_positive_margin_rate": 0.7584347779240754
+              },
+              "1": {
+                "count": 16,
+                "strict_descent": 0.25,
+                "all_span_order": 0.25,
+                "unit_drop_mae": 3.0121353082358837,
+                "edge_descent_rate": 0.8509694795560365,
+                "all_branch_correct": 0.375,
+                "all_span_order_rate": 0.9377314149452896,
+                "branch_margin_mean": 2.7550112642347813,
+                "branch_positive_margin_rate": 0.8306381917315422
+              },
+              "2": {
+                "count": 16,
+                "strict_descent": 0.0625,
+                "all_span_order": 0.0625,
+                "unit_drop_mae": 3.6001987643539906,
+                "edge_descent_rate": 0.7615708943833943,
+                "all_branch_correct": 0.1875,
+                "all_span_order_rate": 0.9099815598904866,
+                "branch_margin_mean": 19.154281198978424,
+                "branch_positive_margin_rate": 0.8405601343101343
+              },
+              "3": {
+                "count": 16,
+                "strict_descent": 0.0625,
+                "all_span_order": 0.0625,
+                "unit_drop_mae": 2.5861789509654045,
+                "edge_descent_rate": 0.7570296023421024,
+                "all_branch_correct": 0.25,
+                "all_span_order_rate": 0.8720850519289758,
+                "branch_margin_mean": 1.9756652675569057,
+                "branch_positive_margin_rate": 0.7993964947089948
+              },
+              "4": {
+                "count": 16,
+                "strict_descent": 0.0625,
+                "all_span_order": 0.0625,
+                "unit_drop_mae": 1.53879664093256,
+                "edge_descent_rate": 0.7421832046252775,
+                "all_branch_correct": 0.125,
+                "all_span_order_rate": 0.9067892742429692,
+                "branch_margin_mean": 3.241992350667715,
+                "branch_positive_margin_rate": 0.7469093881657549
+              },
+              "5": {
+                "count": 16,
+                "strict_descent": 0.0,
+                "all_span_order": 0.0,
+                "unit_drop_mae": 6.6153468526899815,
+                "edge_descent_rate": 0.716909260330313,
+                "all_branch_correct": 0.0,
+                "all_span_order_rate": 0.8640455861144182,
+                "branch_margin_mean": 4.514825321733952,
+                "branch_positive_margin_rate": 0.7262248916660681
+              },
+              "6": {
+                "count": 16,
+                "strict_descent": 0.0625,
+                "all_span_order": 0.0625,
+                "unit_drop_mae": 0.7668759860098362,
+                "edge_descent_rate": 0.8262743196131355,
+                "all_branch_correct": 0.25,
+                "all_span_order_rate": 0.9479350607969029,
+                "branch_margin_mean": 1.0503327995538712,
+                "branch_positive_margin_rate": 0.8633714293747188
+              },
+              "7": {
+                "count": 16,
+                "strict_descent": 0.3125,
+                "all_span_order": 0.3125,
+                "unit_drop_mae": 3.5864297710359097,
+                "edge_descent_rate": 0.8233848267792233,
+                "all_branch_correct": 0.25,
+                "all_span_order_rate": 0.9195293999395167,
+                "branch_margin_mean": 2.1565681528300047,
+                "branch_positive_margin_rate": 0.850323060612591
+              }
+            },
+            "meaning": "Complete exact teacher paths; all-span order includes nonadjacent pairs. These diagnostics never choose or filter an inference action."
+          },
+          "by_scene": {
+            "0": {
+              "count": 16,
+              "solved": 1,
+              "success_rate": 0.0625
+            },
+            "1": {
+              "count": 16,
+              "solved": 6,
+              "success_rate": 0.375
+            },
+            "2": {
+              "count": 16,
+              "solved": 3,
+              "success_rate": 0.1875
+            },
+            "3": {
+              "count": 16,
+              "solved": 4,
+              "success_rate": 0.25
+            },
+            "4": {
+              "count": 16,
+              "solved": 2,
+              "success_rate": 0.125
+            },
+            "5": {
+              "count": 16,
+              "solved": 0,
+              "success_rate": 0.0
+            },
+            "6": {
+              "count": 16,
+              "solved": 3,
+              "success_rate": 0.1875
+            },
+            "7": {
+              "count": 16,
+              "solved": 4,
+              "success_rate": 0.25
+            }
+          }
+        },
+        "unseen_layout_validation": {
+          "finite_mae": 43.597869873046875,
+          "completion": {
+            "count": 128,
+            "solved": 16,
+            "success_rate": 0.125,
+            "cycles": 112,
+            "entered_unreachable": 7,
+            "horizon": 32
+          },
+          "by_distance": {
+            "1_5": {
+              "count": 32,
+              "solved": 14
+            },
+            "6_20": {
+              "count": 64,
+              "solved": 2
+            },
+            "21_32": {
+              "count": 32,
+              "solved": 0
+            }
+          },
+          "teacher_paths": {
+            "all": {
+              "count": 128,
+              "strict_descent": 0.1328125,
+              "all_span_order": 0.1328125,
+              "unit_drop_mae": 13.506821063579991,
+              "edge_descent_rate": 0.6922111172394689,
+              "all_branch_correct": 0.1328125,
+              "all_span_order_rate": 0.7871798690506404,
+              "branch_margin_mean": 5.039331319596386,
+              "branch_positive_margin_rate": 0.6884736828645627
+            },
+            "long_21_32": {
+              "count": 32,
+              "strict_descent": 0.0,
+              "all_span_order": 0.0,
+              "unit_drop_mae": 18.81960817053914,
+              "edge_descent_rate": 0.5986988705010352,
+              "all_branch_correct": 0.0,
+              "all_span_order_rate": 0.6803269645389589,
+              "branch_margin_mean": 2.664278380572796,
+              "branch_positive_margin_rate": 0.5803651980723897
+            },
+            "by_scene": {
+              "8": {
+                "count": 16,
+                "strict_descent": 0.125,
+                "all_span_order": 0.125,
+                "unit_drop_mae": 3.2406721338629723,
+                "edge_descent_rate": 0.7541819291819292,
+                "all_branch_correct": 0.3125,
+                "all_span_order_rate": 0.8867513852985864,
+                "branch_margin_mean": 2.9736626595258713,
+                "branch_positive_margin_rate": 0.8143587901562039
+              },
+              "9": {
+                "count": 16,
+                "strict_descent": 0.4375,
+                "all_span_order": 0.4375,
+                "unit_drop_mae": 1.1522511672228575,
+                "edge_descent_rate": 0.8517123419343814,
+                "all_branch_correct": 0.3125,
+                "all_span_order_rate": 0.8592985396267196,
+                "branch_margin_mean": 6.027318067848682,
+                "branch_positive_margin_rate": 0.8091241954317612
+              },
+              "10": {
+                "count": 16,
+                "strict_descent": 0.125,
+                "all_span_order": 0.125,
+                "unit_drop_mae": 13.632144909352064,
+                "edge_descent_rate": 0.6415031867079282,
+                "all_branch_correct": 0.125,
+                "all_span_order_rate": 0.869640327397074,
+                "branch_margin_mean": 4.03073962777853,
+                "branch_positive_margin_rate": 0.7587380731566451
+              },
+              "11": {
+                "count": 16,
+                "strict_descent": 0.0,
+                "all_span_order": 0.0,
+                "unit_drop_mae": 22.755100965499878,
+                "edge_descent_rate": 0.5988300780661727,
+                "all_branch_correct": 0.0,
+                "all_span_order_rate": 0.6613678631469566,
+                "branch_margin_mean": 2.701961688697338,
+                "branch_positive_margin_rate": 0.563591857708508
+              },
+              "12": {
+                "count": 16,
+                "strict_descent": 0.0625,
+                "all_span_order": 0.0625,
+                "unit_drop_mae": 27.300957158207893,
+                "edge_descent_rate": 0.6071093894383536,
+                "all_branch_correct": 0.0,
+                "all_span_order_rate": 0.6894122384435684,
+                "branch_margin_mean": 5.703972701681778,
+                "branch_positive_margin_rate": 0.5572023544266191
+              },
+              "13": {
+                "count": 16,
+                "strict_descent": 0.125,
+                "all_span_order": 0.125,
+                "unit_drop_mae": 10.079043373465538,
+                "edge_descent_rate": 0.7203808514470279,
+                "all_branch_correct": 0.1875,
+                "all_span_order_rate": 0.8194942978626065,
+                "branch_margin_mean": 9.675377234816551,
+                "branch_positive_margin_rate": 0.7319404963040865
+              },
+              "14": {
+                "count": 16,
+                "strict_descent": 0.125,
+                "all_span_order": 0.125,
+                "unit_drop_mae": 25.011041708290577,
+                "edge_descent_rate": 0.7123394400738151,
+                "all_branch_correct": 0.0,
+                "all_span_order_rate": 0.747947510213335,
+                "branch_margin_mean": 6.908616667613387,
+                "branch_positive_margin_rate": 0.613254666480473
+              },
+              "15": {
+                "count": 16,
+                "strict_descent": 0.0625,
+                "all_span_order": 0.0625,
+                "unit_drop_mae": 4.8833570927381516,
+                "edge_descent_rate": 0.6516317210661438,
+                "all_branch_correct": 0.125,
+                "all_span_order_rate": 0.763526790416277,
+                "branch_margin_mean": 2.2930019088089466,
+                "branch_positive_margin_rate": 0.6595790292522041
+              }
+            },
+            "meaning": "Complete exact teacher paths; all-span order includes nonadjacent pairs. These diagnostics never choose or filter an inference action."
+          },
+          "by_scene": {
+            "8": {
+              "count": 16,
+              "solved": 5,
+              "success_rate": 0.3125
+            },
+            "9": {
+              "count": 16,
+              "solved": 5,
+              "success_rate": 0.3125
+            },
+            "10": {
+              "count": 16,
+              "solved": 2,
+              "success_rate": 0.125
+            },
+            "11": {
+              "count": 16,
+              "solved": 0,
+              "success_rate": 0.0
+            },
+            "12": {
+              "count": 16,
+              "solved": 0,
+              "success_rate": 0.0
+            },
+            "13": {
+              "count": 16,
+              "solved": 3,
+              "success_rate": 0.1875
+            },
+            "14": {
+              "count": 16,
+              "solved": 0,
+              "success_rate": 0.0
+            },
+            "15": {
+              "count": 16,
+              "solved": 1,
+              "success_rate": 0.0625
+            }
+          }
+        }
+      }
+    }
+  },
+  "comparisons": {
+    "path_terminal_vs_flat_terminal": {
+      "completion": {
+        "mean_difference": -0.0078125,
+        "by_seed": [
+          0.0078125,
+          -0.0234375
+        ],
+        "paired_layout_95_interval": [
+          -0.078125,
+          0.05859375
+        ]
+      },
+      "strict_descent": {
+        "mean_difference": -0.04296875,
+        "by_seed": [
+          -0.0546875,
+          -0.03125
+        ],
+        "paired_layout_95_interval": [
+          -0.12109375,
+          0.03125
+        ]
+      },
+      "unit_drop_mae": {
+        "mean_difference": -0.015226678689941764,
+        "by_seed": [
+          -0.8715547095052898,
+          0.8411013521254063
+        ],
+        "paired_layout_95_interval": [
+          -3.854820470325649,
+          4.256383985507999
+        ]
+      },
+      "all_branch_correct": {
+        "mean_difference": -0.0078125,
+        "by_seed": [
+          0.0078125,
+          -0.0234375
+        ],
+        "paired_layout_95_interval": [
+          -0.07421875,
+          0.0546875
+        ]
+      },
+      "branch_positive_margin_rate": {
+        "mean_difference": 0.0038207576728368706,
+        "by_seed": [
+          0.013588804735811588,
+          -0.005947289390137847
+        ],
+        "paired_layout_95_interval": [
+          -0.04174093902785655,
+          0.046345817838695104
+        ]
+      }
+    },
+    "path_multiscale_vs_flat_terminal": {
+      "completion": {
+        "mean_difference": 0.0078125,
+        "by_seed": [
+          0.015625,
+          0.0
+        ],
+        "paired_layout_95_interval": [
+          -0.046875,
+          0.06640625
+        ]
+      },
+      "strict_descent": {
+        "mean_difference": -0.01171875,
+        "by_seed": [
+          -0.015625,
+          -0.0078125
+        ],
+        "paired_layout_95_interval": [
+          -0.07421875,
+          0.05859375
+        ]
+      },
+      "unit_drop_mae": {
+        "mean_difference": 1.785521469078958,
+        "by_seed": [
+          2.2248053594958037,
+          1.3462375786621124
+        ],
+        "paired_layout_95_interval": [
+          -2.9603246532264165,
+          7.279080295504521
+        ]
+      },
+      "all_branch_correct": {
+        "mean_difference": 0.015625,
+        "by_seed": [
+          0.0234375,
+          0.0078125
+        ],
+        "paired_layout_95_interval": [
+          -0.04296875,
+          0.07822265624999947
+        ]
+      },
+      "branch_positive_margin_rate": {
+        "mean_difference": -0.0003896112827010273,
+        "by_seed": [
+          0.0037032184615558433,
+          -0.004482441026957898
+        ],
+        "paired_layout_95_interval": [
+          -0.054017349877406445,
+          0.049831765256459146
+        ]
+      }
+    },
+    "path_multiscale_vs_path_terminal": {
+      "completion": {
+        "mean_difference": 0.015625,
+        "by_seed": [
+          0.0078125,
+          0.0234375
+        ],
+        "paired_layout_95_interval": [
+          -0.046875,
+          0.07421875
+        ]
+      },
+      "strict_descent": {
+        "mean_difference": 0.03125,
+        "by_seed": [
+          0.0390625,
+          0.0234375
+        ],
+        "paired_layout_95_interval": [
+          -0.02734375,
+          0.10546875
+        ]
+      },
+      "unit_drop_mae": {
+        "mean_difference": 1.8007481477688998,
+        "by_seed": [
+          3.0963600690010935,
+          0.5051362265367061
+        ],
+        "paired_layout_95_interval": [
+          -2.58486914736568,
+          7.281355752708621
+        ]
+      },
+      "all_branch_correct": {
+        "mean_difference": 0.0234375,
+        "by_seed": [
+          0.015625,
+          0.03125
+        ],
+        "paired_layout_95_interval": [
+          -0.02734375,
+          0.07421875
+        ]
+      },
+      "branch_positive_margin_rate": {
+        "mean_difference": -0.004210368955537898,
+        "by_seed": [
+          -0.009885586274255745,
+          0.0014648483631799492
+        ],
+        "paired_layout_95_interval": [
+          -0.047342375137853776,
+          0.035238491919293645
+        ]
+      }
+    },
+    "path_terminal_vs_initial": {
+      "completion": {
+        "mean_difference": -0.03125,
+        "by_seed": [
+          -0.0078125,
+          -0.0546875
+        ],
+        "paired_layout_95_interval": [
+          -0.0703125,
+          0.01171875
+        ]
+      },
+      "strict_descent": {
+        "mean_difference": -0.0234375,
+        "by_seed": [
+          -0.03125,
+          -0.015625
+        ],
+        "paired_layout_95_interval": [
+          -0.09765625,
+          0.0390625
+        ]
+      },
+      "unit_drop_mae": {
+        "mean_difference": 8.212959544733167,
+        "by_seed": [
+          7.614801716525108,
+          8.811117372941226
+        ],
+        "paired_layout_95_interval": [
+          2.71375122879399,
+          15.511563391913654
+        ]
+      },
+      "all_branch_correct": {
+        "mean_difference": -0.03125,
+        "by_seed": [
+          -0.0078125,
+          -0.0546875
+        ],
+        "paired_layout_95_interval": [
+          -0.07421875,
+          0.01171875
+        ]
+      },
+      "branch_positive_margin_rate": {
+        "mean_difference": -0.049501805207504364,
+        "by_seed": [
+          -0.03607411216738603,
+          -0.0629294982476227
+        ],
+        "paired_layout_95_interval": [
+          -0.092789651037426,
+          -0.006819209666232318
+        ]
+      }
+    },
+    "path_multiscale_vs_initial": {
+      "completion": {
+        "mean_difference": -0.015625,
+        "by_seed": [
+          0.0,
+          -0.03125
+        ],
+        "paired_layout_95_interval": [
+          -0.1015625,
+          0.06640625
+        ]
+      },
+      "strict_descent": {
+        "mean_difference": 0.0078125,
+        "by_seed": [
+          0.0078125,
+          0.0078125
+        ],
+        "paired_layout_95_interval": [
+          -0.0390625,
+          0.0546875
+        ]
+      },
+      "unit_drop_mae": {
+        "mean_difference": 10.013707692502066,
+        "by_seed": [
+          10.711161785526201,
+          9.316253599477932
+        ],
+        "paired_layout_95_interval": [
+          3.5217668107303326,
+          16.936830967757835
+        ]
+      },
+      "all_branch_correct": {
+        "mean_difference": -0.0078125,
+        "by_seed": [
+          0.0078125,
+          -0.0234375
+        ],
+        "paired_layout_95_interval": [
+          -0.078125,
+          0.06640625
+        ]
+      },
+      "branch_positive_margin_rate": {
+        "mean_difference": -0.05371217416304226,
+        "by_seed": [
+          -0.04595969844164177,
+          -0.06146464988444275
+        ],
+        "paired_layout_95_interval": [
+          -0.08460591481091133,
+          -0.01740660286559181
+        ]
+      }
+    }
+  },
+  "inference": "32-step greedy over all legal environment successors with one terminal goal; no search, pruning or intermediate inference goals.",
+  "uncertainty": "Eight validation layouts, two fixed training seeds. Paired layout bootstrap is conditional on these seeds. Previously used development layouts are not independent final test evidence. Null trace distances denote proven unreachable states.",
+  "outcome": "No structural improvement gate passed. Do not expand layouts or training budget on these results. Teacher-path fitting is strong but does not ensure closure over alternative optimal continuations, and unseen layouts degrade relative to initialization.",
+  "information_conditions": "Path-terminal changes point supervision coupling and batches. Path-multiscale also adds intermediate-target relations. These comparisons do not isolate batching order alone.",
+  "verification": {
+    "all_initial_evaluations_identical": true,
+    "all_runs_completed": true,
+    "training_updates_per_run": 3000,
+    "checkpoint_rule": "Fixed budget last.pt, not development-best selection",
+    "test_result": "41 tests completed successfully on Linux; local runtime ran 41 tests with 1 platform-specific skip.",
+    "training_failure_traces": "runs/new_tasks_qmap/solution_structure_pilot/comparison.json; null exact distances are proven unreachable"
+  },
+  "runtime_directory": "runs/new_tasks_qmap/solution_structure_pilot"
+}

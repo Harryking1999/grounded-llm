@@ -15,7 +15,7 @@ class RulesTest(unittest.TestCase):
         from contextlib import ExitStack
         from experiments.new_tasks_qmap.src.relation_data import prepare,training_decision_mask,board_cohorts
         from unittest.mock import patch
-        config=json.loads(Path('experiments/new_tasks_qmap/configs/game24/game24_operation_reference.json').read_text())
+        config=json.loads(Path('experiments/new_tasks_qmap/archive/configs/game24/game24_operation_reference.json').read_text())
         config['data'].update(initial_sampling='exhaustive_distinct',source_values=[1,2,3,4,5],root_targets=[24,21],
             scenes=dict(train=5,validation=0,test=0),additional_training_scenes=0)
         config['relations']['preserve_goal_execution']=['24','21']
@@ -117,7 +117,7 @@ class RulesTest(unittest.TestCase):
         import tempfile
         from contextlib import ExitStack
         from experiments.new_tasks_qmap.src.relation_data import prepare,closure
-        config=json.loads(Path('experiments/new_tasks_qmap/configs/game24/game24_multigoal_fit.json').read_text())
+        config=json.loads(Path('experiments/new_tasks_qmap/archive/configs/game24/game24_multigoal_fit.json').read_text())
         config['data']['scenes']={'train':2,'validation':1,'test':1}
         with tempfile.TemporaryDirectory() as directory, ExitStack() as stack:
             for endpoint_holdout in (True,False):
@@ -140,7 +140,7 @@ class RulesTest(unittest.TestCase):
         from pathlib import Path
         from contextlib import ExitStack
         from experiments.new_tasks_qmap.src.relation_data import prepare,closure,training_decision_mask
-        config=json.loads(Path('experiments/new_tasks_qmap/configs/game24/game24_goal_relation_holdout.json').read_text())
+        config=json.loads(Path('experiments/new_tasks_qmap/archive/configs/game24/game24_goal_relation_holdout.json').read_text())
         config['data']['scenes']={'train':2,'validation':1,'test':1};config['data']['additional_training_scenes']=0
         config['relations']['preserve_goal_execution']=['24']
         with tempfile.TemporaryDirectory() as directory,ExitStack() as stack:

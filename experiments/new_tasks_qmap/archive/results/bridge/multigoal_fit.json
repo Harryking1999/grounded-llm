@@ -1,0 +1,1032 @@
+{
+  "task": "bridge",
+  "source_commit": "f912ce3",
+  "best_step": 12000,
+  "last_step": 12000,
+  "training_seconds": 198.69089697301388,
+  "data": {
+    "task": "bridge",
+    "states": 4096,
+    "input_dim": 11,
+    "max_candidates": 15,
+    "seed": 2026102501,
+    "finite_max": 139.0,
+    "unknown_training_labels": 0,
+    "pair_count": 43587,
+    "decision_count": 22782,
+    "reserved_relations": 1957,
+    "cohorts": {
+      "validation": {
+        "count": 192,
+        "reachable": 192
+      },
+      "test": {
+        "count": 192,
+        "reachable": 192
+      },
+      "unseen_goal_validation": {
+        "count": 4608,
+        "reachable": 3072
+      },
+      "unseen_goal_test": {
+        "count": 4608,
+        "reachable": 3072
+      },
+      "unseen_layout_validation": {
+        "count": 1536,
+        "reachable": 1024
+      },
+      "unseen_layout_test": {
+        "count": 1536,
+        "reachable": 1024
+      },
+      "original_layout_test": {
+        "count": 160,
+        "reachable": 160
+      },
+      "original_layout_validation": {
+        "count": 160,
+        "reachable": 160
+      }
+    },
+    "selected_train_states": 2880,
+    "all_selected_sources_in_training": true
+  },
+  "actual_exposure": {
+    "unique_gradient_states": 2880,
+    "available_states": 4096,
+    "unique_pair_rows": 43587,
+    "pair_rows": 43587,
+    "unique_decision_rows": 22782,
+    "decision_rows": 22782,
+    "minimum_pair_layer_passes": 118.51822916666667,
+    "minimum_decision_layer_passes": 60.826254826254825
+  },
+  "model_parameters": 101760,
+  "config": "experiments/new_tasks_qmap/archive/configs/bridge/bridge_multigoal_fit.json",
+  "status": "development result, not final acceptance",
+  "cohorts": {
+    "validation": {
+      "finite_mae": 1.414407730102539,
+      "shortest_action_rate": 0.96875,
+      "unreachable": {
+        "proven_unreachable": 0,
+        "finite": 192,
+        "unknown": 0,
+        "auroc": null,
+        "validation_threshold": 50.99163055419922,
+        "recall": null,
+        "finite_false_positive": 0.19270833333333334,
+        "recall_at_training_proxy": null,
+        "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+      },
+      "q": {
+        "count": 128,
+        "unique_state_goal_pairs": 128,
+        "solved": 128,
+        "success_rate": 1.0,
+        "optimal": 122,
+        "optimal_rate": 0.953125,
+        "cycles": 0,
+        "entered_unreachable": 0,
+        "no_legal_action": 0,
+        "budget_exhausted": 0,
+        "horizon": 128,
+        "illegal_actions": 0,
+        "mean_excess_cost_on_success": 0.1171875,
+        "mean_cost_ratio_on_success": 1.002840280532837,
+        "first_cycle_step_counts": {},
+        "first_unreachable_step_counts": {}
+      },
+      "oracle_optimal_rate": 1.0,
+      "teacher_path_q": {
+        "counts": {
+          "executed_edges": 400,
+          "predicted_decrease": 393,
+          "predicted_plateau": 0,
+          "predicted_increase": 7,
+          "true_finite_edges": 400,
+          "true_optimal_edges": 400,
+          "predicted_decrease_but_not_true_optimal": 0,
+          "entered_dead_edges": 0,
+          "non_goal_predicted_zero": 0
+        },
+        "strict_descent_trajectory_count": 121,
+        "strict_descent_success_count": 121,
+        "non_descent_trajectory_count": 7,
+        "predicted_drop_quantiles": {
+          "0": -4.660430908203125,
+          "0.1": 1.8205787658691406,
+          "0.5": 8.32183837890625,
+          "0.9": 18.268338775634767,
+          "1": 25.357948303222656
+        },
+        "mean_abs_unit_descent_residual": 8.184599285125733,
+        "mean_abs_cost_descent_residual": 1.0789282417297363,
+        "executed_edge_optimal_rate": 1.0,
+        "predicted_strict_descent_edge_rate": 0.9825,
+        "executed_edges_by_true_distance": {
+          "1_1": {
+            "executed_edges": 3,
+            "true_optimal_edges": 3,
+            "predicted_decrease": 3,
+            "entered_dead_edges": 0
+          },
+          "2_2": {
+            "executed_edges": 8,
+            "true_optimal_edges": 8,
+            "predicted_decrease": 8,
+            "entered_dead_edges": 0
+          },
+          "3_5": {
+            "executed_edges": 27,
+            "true_optimal_edges": 27,
+            "predicted_decrease": 27,
+            "entered_dead_edges": 0
+          },
+          "6_10": {
+            "executed_edges": 45,
+            "true_optimal_edges": 45,
+            "predicted_decrease": 45,
+            "entered_dead_edges": 0
+          },
+          "11_20": {
+            "executed_edges": 130,
+            "true_optimal_edges": 130,
+            "predicted_decrease": 128,
+            "entered_dead_edges": 0
+          },
+          "21_40": {
+            "executed_edges": 140,
+            "true_optimal_edges": 140,
+            "predicted_decrease": 136,
+            "entered_dead_edges": 0
+          },
+          "41_80": {
+            "executed_edges": 45,
+            "true_optimal_edges": 45,
+            "predicted_decrease": 44,
+            "entered_dead_edges": 0
+          },
+          "81_inf": {
+            "executed_edges": 2,
+            "true_optimal_edges": 2,
+            "predicted_decrease": 2,
+            "entered_dead_edges": 0
+          },
+          "proven_unreachable": {
+            "executed_edges": 0,
+            "true_optimal_edges": 0,
+            "predicted_decrease": 0,
+            "entered_dead_edges": 0
+          }
+        },
+        "note": "Q predictions along exact teacher paths; teacher actions are a diagnostic and never used by the autonomous Q policy."
+      }
+    },
+    "test": {
+      "finite_mae": 1.492974877357483,
+      "shortest_action_rate": 0.9739583333333334,
+      "unreachable": {
+        "proven_unreachable": 0,
+        "finite": 192,
+        "unknown": 0,
+        "auroc": null,
+        "validation_threshold": 50.99163055419922,
+        "recall": null,
+        "finite_false_positive": 0.1875,
+        "recall_at_training_proxy": null,
+        "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+      },
+      "q": {
+        "count": 128,
+        "unique_state_goal_pairs": 128,
+        "solved": 127,
+        "success_rate": 0.9921875,
+        "optimal": 121,
+        "optimal_rate": 0.9453125,
+        "cycles": 1,
+        "entered_unreachable": 0,
+        "no_legal_action": 0,
+        "budget_exhausted": 0,
+        "horizon": 128,
+        "illegal_actions": 0,
+        "mean_excess_cost_on_success": 0.14173229038715363,
+        "mean_cost_ratio_on_success": 1.0033249855041504,
+        "first_cycle_step_counts": {
+          "4": 1
+        },
+        "first_unreachable_step_counts": {}
+      },
+      "oracle_optimal_rate": 1.0,
+      "teacher_path_q": {
+        "counts": {
+          "executed_edges": 372,
+          "predicted_decrease": 372,
+          "predicted_plateau": 0,
+          "predicted_increase": 0,
+          "true_finite_edges": 372,
+          "true_optimal_edges": 372,
+          "predicted_decrease_but_not_true_optimal": 0,
+          "entered_dead_edges": 0,
+          "non_goal_predicted_zero": 0
+        },
+        "strict_descent_trajectory_count": 128,
+        "strict_descent_success_count": 128,
+        "non_descent_trajectory_count": 0,
+        "predicted_drop_quantiles": {
+          "0": 0.25249481201171875,
+          "0.1": 2.3200447082519533,
+          "0.5": 9.028369903564453,
+          "0.9": 18.631237792968758,
+          "1": 26.415687561035156
+        },
+        "mean_abs_unit_descent_residual": 8.805804467970326,
+        "mean_abs_cost_descent_residual": 1.1636116479032783,
+        "executed_edge_optimal_rate": 1.0,
+        "predicted_strict_descent_edge_rate": 1.0,
+        "executed_edges_by_true_distance": {
+          "1_1": {
+            "executed_edges": 5,
+            "true_optimal_edges": 5,
+            "predicted_decrease": 5,
+            "entered_dead_edges": 0
+          },
+          "2_2": {
+            "executed_edges": 7,
+            "true_optimal_edges": 7,
+            "predicted_decrease": 7,
+            "entered_dead_edges": 0
+          },
+          "3_5": {
+            "executed_edges": 21,
+            "true_optimal_edges": 21,
+            "predicted_decrease": 21,
+            "entered_dead_edges": 0
+          },
+          "6_10": {
+            "executed_edges": 37,
+            "true_optimal_edges": 37,
+            "predicted_decrease": 37,
+            "entered_dead_edges": 0
+          },
+          "11_20": {
+            "executed_edges": 112,
+            "true_optimal_edges": 112,
+            "predicted_decrease": 112,
+            "entered_dead_edges": 0
+          },
+          "21_40": {
+            "executed_edges": 141,
+            "true_optimal_edges": 141,
+            "predicted_decrease": 141,
+            "entered_dead_edges": 0
+          },
+          "41_80": {
+            "executed_edges": 44,
+            "true_optimal_edges": 44,
+            "predicted_decrease": 44,
+            "entered_dead_edges": 0
+          },
+          "81_inf": {
+            "executed_edges": 5,
+            "true_optimal_edges": 5,
+            "predicted_decrease": 5,
+            "entered_dead_edges": 0
+          },
+          "proven_unreachable": {
+            "executed_edges": 0,
+            "true_optimal_edges": 0,
+            "predicted_decrease": 0,
+            "entered_dead_edges": 0
+          }
+        },
+        "note": "Q predictions along exact teacher paths; teacher actions are a diagnostic and never used by the autonomous Q policy."
+      }
+    },
+    "unseen_goal_validation": {
+      "finite_mae": 1.6520847082138062,
+      "shortest_action_rate": 0.96484375,
+      "unreachable": {
+        "proven_unreachable": 1536,
+        "finite": 3072,
+        "unknown": 0,
+        "auroc": 0.9494720035129123,
+        "validation_threshold": 50.99163055419922,
+        "recall": 0.9134114583333334,
+        "finite_false_positive": 0.1416015625,
+        "recall_at_training_proxy": 0.3059895833333333,
+        "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+      },
+      "q": {
+        "count": 128,
+        "unique_state_goal_pairs": 128,
+        "solved": 128,
+        "success_rate": 1.0,
+        "optimal": 128,
+        "optimal_rate": 1.0,
+        "cycles": 0,
+        "entered_unreachable": 0,
+        "no_legal_action": 0,
+        "budget_exhausted": 0,
+        "horizon": 128,
+        "illegal_actions": 0,
+        "mean_excess_cost_on_success": 0.0,
+        "mean_cost_ratio_on_success": 1.0,
+        "first_cycle_step_counts": {},
+        "first_unreachable_step_counts": {}
+      },
+      "oracle_optimal_rate": 1.0,
+      "teacher_path_q": {
+        "counts": {
+          "executed_edges": 170,
+          "predicted_decrease": 170,
+          "predicted_plateau": 0,
+          "predicted_increase": 0,
+          "true_finite_edges": 170,
+          "true_optimal_edges": 170,
+          "predicted_decrease_but_not_true_optimal": 0,
+          "entered_dead_edges": 0,
+          "non_goal_predicted_zero": 0
+        },
+        "strict_descent_trajectory_count": 128,
+        "strict_descent_success_count": 128,
+        "non_descent_trajectory_count": 0,
+        "predicted_drop_quantiles": {
+          "0": 0.07952880859375,
+          "0.1": 2.1262725830078124,
+          "0.5": 6.489051818847656,
+          "0.9": 15.21984176635742,
+          "1": 23.736160278320312
+        },
+        "mean_abs_unit_descent_residual": 6.835904940436868,
+        "mean_abs_cost_descent_residual": 0.9774732926312615,
+        "executed_edge_optimal_rate": 1.0,
+        "predicted_strict_descent_edge_rate": 1.0,
+        "executed_edges_by_true_distance": {
+          "1_1": {
+            "executed_edges": 5,
+            "true_optimal_edges": 5,
+            "predicted_decrease": 5,
+            "entered_dead_edges": 0
+          },
+          "2_2": {
+            "executed_edges": 10,
+            "true_optimal_edges": 10,
+            "predicted_decrease": 10,
+            "entered_dead_edges": 0
+          },
+          "3_5": {
+            "executed_edges": 49,
+            "true_optimal_edges": 49,
+            "predicted_decrease": 49,
+            "entered_dead_edges": 0
+          },
+          "6_10": {
+            "executed_edges": 49,
+            "true_optimal_edges": 49,
+            "predicted_decrease": 49,
+            "entered_dead_edges": 0
+          },
+          "11_20": {
+            "executed_edges": 55,
+            "true_optimal_edges": 55,
+            "predicted_decrease": 55,
+            "entered_dead_edges": 0
+          },
+          "21_40": {
+            "executed_edges": 2,
+            "true_optimal_edges": 2,
+            "predicted_decrease": 2,
+            "entered_dead_edges": 0
+          },
+          "41_80": {
+            "executed_edges": 0,
+            "true_optimal_edges": 0,
+            "predicted_decrease": 0,
+            "entered_dead_edges": 0
+          },
+          "81_inf": {
+            "executed_edges": 0,
+            "true_optimal_edges": 0,
+            "predicted_decrease": 0,
+            "entered_dead_edges": 0
+          },
+          "proven_unreachable": {
+            "executed_edges": 0,
+            "true_optimal_edges": 0,
+            "predicted_decrease": 0,
+            "entered_dead_edges": 0
+          }
+        },
+        "note": "Q predictions along exact teacher paths; teacher actions are a diagnostic and never used by the autonomous Q policy."
+      }
+    },
+    "unseen_goal_test": {
+      "finite_mae": 1.6917403936386108,
+      "shortest_action_rate": 0.96484375,
+      "unreachable": {
+        "proven_unreachable": 1536,
+        "finite": 3072,
+        "unknown": 0,
+        "auroc": 0.9429181416829427,
+        "validation_threshold": 50.99163055419922,
+        "recall": 0.916015625,
+        "finite_false_positive": 0.14615885416666666,
+        "recall_at_training_proxy": 0.2682291666666667,
+        "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+      },
+      "q": {
+        "count": 128,
+        "unique_state_goal_pairs": 128,
+        "solved": 128,
+        "success_rate": 1.0,
+        "optimal": 128,
+        "optimal_rate": 1.0,
+        "cycles": 0,
+        "entered_unreachable": 0,
+        "no_legal_action": 0,
+        "budget_exhausted": 0,
+        "horizon": 128,
+        "illegal_actions": 0,
+        "mean_excess_cost_on_success": 0.0,
+        "mean_cost_ratio_on_success": 1.0,
+        "first_cycle_step_counts": {},
+        "first_unreachable_step_counts": {}
+      },
+      "oracle_optimal_rate": 1.0,
+      "teacher_path_q": {
+        "counts": {
+          "executed_edges": 178,
+          "predicted_decrease": 176,
+          "predicted_plateau": 0,
+          "predicted_increase": 2,
+          "true_finite_edges": 178,
+          "true_optimal_edges": 178,
+          "predicted_decrease_but_not_true_optimal": 0,
+          "entered_dead_edges": 0,
+          "non_goal_predicted_zero": 0
+        },
+        "strict_descent_trajectory_count": 126,
+        "strict_descent_success_count": 126,
+        "non_descent_trajectory_count": 2,
+        "predicted_drop_quantiles": {
+          "0": -0.1726837158203125,
+          "0.1": 1.6878578186035156,
+          "0.5": 6.864105224609375,
+          "0.9": 15.615993499755866,
+          "1": 26.95697021484375
+        },
+        "mean_abs_unit_descent_residual": 7.051675603630837,
+        "mean_abs_cost_descent_residual": 0.98551143689102,
+        "executed_edge_optimal_rate": 1.0,
+        "predicted_strict_descent_edge_rate": 0.9887640449438202,
+        "executed_edges_by_true_distance": {
+          "1_1": {
+            "executed_edges": 6,
+            "true_optimal_edges": 6,
+            "predicted_decrease": 6,
+            "entered_dead_edges": 0
+          },
+          "2_2": {
+            "executed_edges": 5,
+            "true_optimal_edges": 5,
+            "predicted_decrease": 5,
+            "entered_dead_edges": 0
+          },
+          "3_5": {
+            "executed_edges": 42,
+            "true_optimal_edges": 42,
+            "predicted_decrease": 42,
+            "entered_dead_edges": 0
+          },
+          "6_10": {
+            "executed_edges": 54,
+            "true_optimal_edges": 54,
+            "predicted_decrease": 53,
+            "entered_dead_edges": 0
+          },
+          "11_20": {
+            "executed_edges": 67,
+            "true_optimal_edges": 67,
+            "predicted_decrease": 66,
+            "entered_dead_edges": 0
+          },
+          "21_40": {
+            "executed_edges": 4,
+            "true_optimal_edges": 4,
+            "predicted_decrease": 4,
+            "entered_dead_edges": 0
+          },
+          "41_80": {
+            "executed_edges": 0,
+            "true_optimal_edges": 0,
+            "predicted_decrease": 0,
+            "entered_dead_edges": 0
+          },
+          "81_inf": {
+            "executed_edges": 0,
+            "true_optimal_edges": 0,
+            "predicted_decrease": 0,
+            "entered_dead_edges": 0
+          },
+          "proven_unreachable": {
+            "executed_edges": 0,
+            "true_optimal_edges": 0,
+            "predicted_decrease": 0,
+            "entered_dead_edges": 0
+          }
+        },
+        "note": "Q predictions along exact teacher paths; teacher actions are a diagnostic and never used by the autonomous Q policy."
+      }
+    },
+    "unseen_layout_validation": {
+      "finite_mae": 3.4682302474975586,
+      "shortest_action_rate": 0.94921875,
+      "unreachable": {
+        "proven_unreachable": 512,
+        "finite": 1024,
+        "unknown": 0,
+        "auroc": 0.8812789916992188,
+        "validation_threshold": 50.99163055419922,
+        "recall": 0.771484375,
+        "finite_false_positive": 0.1630859375,
+        "recall_at_training_proxy": 0.189453125,
+        "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+      },
+      "q": {
+        "count": 128,
+        "unique_state_goal_pairs": 128,
+        "solved": 118,
+        "success_rate": 0.921875,
+        "optimal": 117,
+        "optimal_rate": 0.9140625,
+        "cycles": 10,
+        "entered_unreachable": 0,
+        "no_legal_action": 0,
+        "budget_exhausted": 0,
+        "horizon": 128,
+        "illegal_actions": 0,
+        "mean_excess_cost_on_success": 0.008474576286971569,
+        "mean_cost_ratio_on_success": 1.0002923011779785,
+        "first_cycle_step_counts": {
+          "2": 6,
+          "3": 2,
+          "4": 2
+        },
+        "first_unreachable_step_counts": {}
+      },
+      "oracle_optimal_rate": 1.0,
+      "teacher_path_q": {
+        "counts": {
+          "executed_edges": 285,
+          "predicted_decrease": 279,
+          "predicted_plateau": 0,
+          "predicted_increase": 6,
+          "true_finite_edges": 285,
+          "true_optimal_edges": 285,
+          "predicted_decrease_but_not_true_optimal": 0,
+          "entered_dead_edges": 0,
+          "non_goal_predicted_zero": 0
+        },
+        "strict_descent_trajectory_count": 122,
+        "strict_descent_success_count": 122,
+        "non_descent_trajectory_count": 6,
+        "predicted_drop_quantiles": {
+          "0": -2.49609375,
+          "0.1": 1.7105941772460938,
+          "0.5": 7.38946533203125,
+          "0.9": 18.165617370605467,
+          "1": 24.40130615234375
+        },
+        "mean_abs_unit_descent_residual": 7.917279708594607,
+        "mean_abs_cost_descent_residual": 1.5909709328099302,
+        "executed_edge_optimal_rate": 1.0,
+        "predicted_strict_descent_edge_rate": 0.9789473684210527,
+        "executed_edges_by_true_distance": {
+          "1_1": {
+            "executed_edges": 4,
+            "true_optimal_edges": 4,
+            "predicted_decrease": 4,
+            "entered_dead_edges": 0
+          },
+          "2_2": {
+            "executed_edges": 11,
+            "true_optimal_edges": 11,
+            "predicted_decrease": 11,
+            "entered_dead_edges": 0
+          },
+          "3_5": {
+            "executed_edges": 16,
+            "true_optimal_edges": 16,
+            "predicted_decrease": 16,
+            "entered_dead_edges": 0
+          },
+          "6_10": {
+            "executed_edges": 37,
+            "true_optimal_edges": 37,
+            "predicted_decrease": 36,
+            "entered_dead_edges": 0
+          },
+          "11_20": {
+            "executed_edges": 134,
+            "true_optimal_edges": 134,
+            "predicted_decrease": 134,
+            "entered_dead_edges": 0
+          },
+          "21_40": {
+            "executed_edges": 82,
+            "true_optimal_edges": 82,
+            "predicted_decrease": 77,
+            "entered_dead_edges": 0
+          },
+          "41_80": {
+            "executed_edges": 1,
+            "true_optimal_edges": 1,
+            "predicted_decrease": 1,
+            "entered_dead_edges": 0
+          },
+          "81_inf": {
+            "executed_edges": 0,
+            "true_optimal_edges": 0,
+            "predicted_decrease": 0,
+            "entered_dead_edges": 0
+          },
+          "proven_unreachable": {
+            "executed_edges": 0,
+            "true_optimal_edges": 0,
+            "predicted_decrease": 0,
+            "entered_dead_edges": 0
+          }
+        },
+        "note": "Q predictions along exact teacher paths; teacher actions are a diagnostic and never used by the autonomous Q policy."
+      }
+    },
+    "unseen_layout_test": {
+      "finite_mae": 4.877006530761719,
+      "shortest_action_rate": 0.931640625,
+      "unreachable": {
+        "proven_unreachable": 512,
+        "finite": 1024,
+        "unknown": 0,
+        "auroc": 0.8436698913574219,
+        "validation_threshold": 50.99163055419922,
+        "recall": 0.732421875,
+        "finite_false_positive": 0.1962890625,
+        "recall_at_training_proxy": 0.205078125,
+        "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+      },
+      "q": {
+        "count": 128,
+        "unique_state_goal_pairs": 128,
+        "solved": 125,
+        "success_rate": 0.9765625,
+        "optimal": 119,
+        "optimal_rate": 0.9296875,
+        "cycles": 3,
+        "entered_unreachable": 0,
+        "no_legal_action": 0,
+        "budget_exhausted": 0,
+        "horizon": 128,
+        "illegal_actions": 0,
+        "mean_excess_cost_on_success": 0.1599999964237213,
+        "mean_cost_ratio_on_success": 1.0107852220535278,
+        "first_cycle_step_counts": {
+          "2": 2,
+          "3": 1
+        },
+        "first_unreachable_step_counts": {}
+      },
+      "oracle_optimal_rate": 1.0,
+      "teacher_path_q": {
+        "counts": {
+          "executed_edges": 269,
+          "predicted_decrease": 257,
+          "predicted_plateau": 0,
+          "predicted_increase": 12,
+          "true_finite_edges": 269,
+          "true_optimal_edges": 269,
+          "predicted_decrease_but_not_true_optimal": 0,
+          "entered_dead_edges": 0,
+          "non_goal_predicted_zero": 0
+        },
+        "strict_descent_trajectory_count": 117,
+        "strict_descent_success_count": 117,
+        "non_descent_trajectory_count": 11,
+        "predicted_drop_quantiles": {
+          "0": -2.606231689453125,
+          "0.1": 2.02564697265625,
+          "0.5": 9.10296630859375,
+          "0.9": 17.62858581542969,
+          "1": 23.269485473632812
+        },
+        "mean_abs_unit_descent_residual": 8.75648631836845,
+        "mean_abs_cost_descent_residual": 2.0976869377504936,
+        "executed_edge_optimal_rate": 1.0,
+        "predicted_strict_descent_edge_rate": 0.9553903345724907,
+        "executed_edges_by_true_distance": {
+          "1_1": {
+            "executed_edges": 3,
+            "true_optimal_edges": 3,
+            "predicted_decrease": 3,
+            "entered_dead_edges": 0
+          },
+          "2_2": {
+            "executed_edges": 5,
+            "true_optimal_edges": 5,
+            "predicted_decrease": 5,
+            "entered_dead_edges": 0
+          },
+          "3_5": {
+            "executed_edges": 18,
+            "true_optimal_edges": 18,
+            "predicted_decrease": 18,
+            "entered_dead_edges": 0
+          },
+          "6_10": {
+            "executed_edges": 54,
+            "true_optimal_edges": 54,
+            "predicted_decrease": 54,
+            "entered_dead_edges": 0
+          },
+          "11_20": {
+            "executed_edges": 135,
+            "true_optimal_edges": 135,
+            "predicted_decrease": 130,
+            "entered_dead_edges": 0
+          },
+          "21_40": {
+            "executed_edges": 54,
+            "true_optimal_edges": 54,
+            "predicted_decrease": 47,
+            "entered_dead_edges": 0
+          },
+          "41_80": {
+            "executed_edges": 0,
+            "true_optimal_edges": 0,
+            "predicted_decrease": 0,
+            "entered_dead_edges": 0
+          },
+          "81_inf": {
+            "executed_edges": 0,
+            "true_optimal_edges": 0,
+            "predicted_decrease": 0,
+            "entered_dead_edges": 0
+          },
+          "proven_unreachable": {
+            "executed_edges": 0,
+            "true_optimal_edges": 0,
+            "predicted_decrease": 0,
+            "entered_dead_edges": 0
+          }
+        },
+        "note": "Q predictions along exact teacher paths; teacher actions are a diagnostic and never used by the autonomous Q policy."
+      }
+    },
+    "original_layout_test": {
+      "finite_mae": 5.969937801361084,
+      "shortest_action_rate": 0.8734177215189873,
+      "unreachable": {
+        "proven_unreachable": 0,
+        "finite": 160,
+        "unknown": 0,
+        "auroc": null,
+        "validation_threshold": 50.99163055419922,
+        "recall": null,
+        "finite_false_positive": 0.24375,
+        "recall_at_training_proxy": null,
+        "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+      },
+      "q": {
+        "count": 128,
+        "unique_state_goal_pairs": 128,
+        "solved": 119,
+        "success_rate": 0.9296875,
+        "optimal": 91,
+        "optimal_rate": 0.7109375,
+        "cycles": 9,
+        "entered_unreachable": 0,
+        "no_legal_action": 0,
+        "budget_exhausted": 0,
+        "horizon": 128,
+        "illegal_actions": 0,
+        "mean_excess_cost_on_success": 0.5966386795043945,
+        "mean_cost_ratio_on_success": 1.015708565711975,
+        "first_cycle_step_counts": {
+          "2": 2,
+          "3": 2,
+          "5": 3,
+          "7": 2
+        },
+        "first_unreachable_step_counts": {}
+      },
+      "oracle_optimal_rate": 1.0,
+      "teacher_path_q": {
+        "counts": {
+          "executed_edges": 478,
+          "predicted_decrease": 458,
+          "predicted_plateau": 0,
+          "predicted_increase": 20,
+          "true_finite_edges": 478,
+          "true_optimal_edges": 478,
+          "predicted_decrease_but_not_true_optimal": 0,
+          "entered_dead_edges": 0,
+          "non_goal_predicted_zero": 0
+        },
+        "strict_descent_trajectory_count": 111,
+        "strict_descent_success_count": 111,
+        "non_descent_trajectory_count": 17,
+        "predicted_drop_quantiles": {
+          "0": -2.45257568359375,
+          "0.1": 1.8128662109375,
+          "0.5": 8.983169555664062,
+          "0.9": 17.998855590820312,
+          "1": 23.269485473632812
+        },
+        "mean_abs_unit_descent_residual": 8.502409563902532,
+        "mean_abs_cost_descent_residual": 2.2692827360400596,
+        "executed_edge_optimal_rate": 1.0,
+        "predicted_strict_descent_edge_rate": 0.9581589958158996,
+        "executed_edges_by_true_distance": {
+          "1_1": {
+            "executed_edges": 7,
+            "true_optimal_edges": 7,
+            "predicted_decrease": 7,
+            "entered_dead_edges": 0
+          },
+          "2_2": {
+            "executed_edges": 2,
+            "true_optimal_edges": 2,
+            "predicted_decrease": 2,
+            "entered_dead_edges": 0
+          },
+          "3_5": {
+            "executed_edges": 25,
+            "true_optimal_edges": 25,
+            "predicted_decrease": 25,
+            "entered_dead_edges": 0
+          },
+          "6_10": {
+            "executed_edges": 52,
+            "true_optimal_edges": 52,
+            "predicted_decrease": 52,
+            "entered_dead_edges": 0
+          },
+          "11_20": {
+            "executed_edges": 124,
+            "true_optimal_edges": 124,
+            "predicted_decrease": 117,
+            "entered_dead_edges": 0
+          },
+          "21_40": {
+            "executed_edges": 204,
+            "true_optimal_edges": 204,
+            "predicted_decrease": 194,
+            "entered_dead_edges": 0
+          },
+          "41_80": {
+            "executed_edges": 64,
+            "true_optimal_edges": 64,
+            "predicted_decrease": 61,
+            "entered_dead_edges": 0
+          },
+          "81_inf": {
+            "executed_edges": 0,
+            "true_optimal_edges": 0,
+            "predicted_decrease": 0,
+            "entered_dead_edges": 0
+          },
+          "proven_unreachable": {
+            "executed_edges": 0,
+            "true_optimal_edges": 0,
+            "predicted_decrease": 0,
+            "entered_dead_edges": 0
+          }
+        },
+        "note": "Q predictions along exact teacher paths; teacher actions are a diagnostic and never used by the autonomous Q policy."
+      }
+    },
+    "original_layout_validation": {
+      "finite_mae": 3.597308397293091,
+      "shortest_action_rate": 0.8291139240506329,
+      "unreachable": {
+        "proven_unreachable": 0,
+        "finite": 160,
+        "unknown": 0,
+        "auroc": null,
+        "validation_threshold": 50.99163055419922,
+        "recall": null,
+        "finite_false_positive": 0.20625,
+        "recall_at_training_proxy": null,
+        "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+      },
+      "q": {
+        "count": 128,
+        "unique_state_goal_pairs": 128,
+        "solved": 99,
+        "success_rate": 0.7734375,
+        "optimal": 88,
+        "optimal_rate": 0.6875,
+        "cycles": 29,
+        "entered_unreachable": 0,
+        "no_legal_action": 0,
+        "budget_exhausted": 0,
+        "horizon": 128,
+        "illegal_actions": 0,
+        "mean_excess_cost_on_success": 0.49494948983192444,
+        "mean_cost_ratio_on_success": 1.009437918663025,
+        "first_cycle_step_counts": {
+          "2": 18,
+          "3": 9,
+          "5": 2
+        },
+        "first_unreachable_step_counts": {}
+      },
+      "oracle_optimal_rate": 1.0,
+      "teacher_path_q": {
+        "counts": {
+          "executed_edges": 498,
+          "predicted_decrease": 486,
+          "predicted_plateau": 0,
+          "predicted_increase": 12,
+          "true_finite_edges": 498,
+          "true_optimal_edges": 498,
+          "predicted_decrease_but_not_true_optimal": 0,
+          "entered_dead_edges": 0,
+          "non_goal_predicted_zero": 0
+        },
+        "strict_descent_trajectory_count": 116,
+        "strict_descent_success_count": 116,
+        "non_descent_trajectory_count": 12,
+        "predicted_drop_quantiles": {
+          "0": -2.5399017333984375,
+          "0.1": 1.190081024169922,
+          "0.5": 7.2369537353515625,
+          "0.9": 19.321890258789065,
+          "1": 26.226165771484375
+        },
+        "mean_abs_unit_descent_residual": 8.37038893488995,
+        "mean_abs_cost_descent_residual": 1.797906377708098,
+        "executed_edge_optimal_rate": 1.0,
+        "predicted_strict_descent_edge_rate": 0.9759036144578314,
+        "executed_edges_by_true_distance": {
+          "1_1": {
+            "executed_edges": 4,
+            "true_optimal_edges": 4,
+            "predicted_decrease": 4,
+            "entered_dead_edges": 0
+          },
+          "2_2": {
+            "executed_edges": 8,
+            "true_optimal_edges": 8,
+            "predicted_decrease": 8,
+            "entered_dead_edges": 0
+          },
+          "3_5": {
+            "executed_edges": 33,
+            "true_optimal_edges": 33,
+            "predicted_decrease": 33,
+            "entered_dead_edges": 0
+          },
+          "6_10": {
+            "executed_edges": 28,
+            "true_optimal_edges": 28,
+            "predicted_decrease": 28,
+            "entered_dead_edges": 0
+          },
+          "11_20": {
+            "executed_edges": 105,
+            "true_optimal_edges": 105,
+            "predicted_decrease": 104,
+            "entered_dead_edges": 0
+          },
+          "21_40": {
+            "executed_edges": 187,
+            "true_optimal_edges": 187,
+            "predicted_decrease": 177,
+            "entered_dead_edges": 0
+          },
+          "41_80": {
+            "executed_edges": 124,
+            "true_optimal_edges": 124,
+            "predicted_decrease": 123,
+            "entered_dead_edges": 0
+          },
+          "81_inf": {
+            "executed_edges": 9,
+            "true_optimal_edges": 9,
+            "predicted_decrease": 9,
+            "entered_dead_edges": 0
+          },
+          "proven_unreachable": {
+            "executed_edges": 0,
+            "true_optimal_edges": 0,
+            "predicted_decrease": 0,
+            "entered_dead_edges": 0
+          }
+        },
+        "note": "Q predictions along exact teacher paths; teacher actions are a diagnostic and never used by the autonomous Q policy."
+      }
+    }
+  }
+}

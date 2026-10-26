@@ -1,0 +1,74 @@
+{
+  "task": "token_swapping",
+  "seed": 2026102304,
+  "data": {
+    "tree": "tasks/token_swapping/data/tree10.json",
+    "diagnostic_suite": "runs/deepseek_exact_goals64k/suite.json",
+    "prepared_from": "../token_reference/data"
+  },
+  "model": {
+    "dimension": 128,
+    "hidden": 1024,
+    "cap": 64,
+    "metric": "l1"
+  },
+  "training": {
+    "steps": 2000,
+    "batch_size": 32768,
+    "decision_batch_size": 8192,
+    "learning_rate": 0.0003,
+    "rank_weight": 4.0,
+    "rank_temperature": 1.0,
+    "eval_every": 500,
+    "cpu_threads": 2,
+    "unreachable_target": 60.0,
+    "features_on_device": true,
+    "broad_fraction": 0.5,
+    "online_goals": true,
+    "record_training_samples": true,
+    "local_goal_fraction": 0.0,
+    "rollout_eval_every": 1000,
+    "goal_walk_max": 8,
+    "validation_only_initial": true,
+    "token_branch_replay": {
+      "bank": "../token_branch_data/branch_bank.npz",
+      "kind": "branches",
+      "decision_fraction": 0.25,
+      "point_count": 8192,
+      "fit_gate": {
+        "maximum_mae": 0.5,
+        "minimum_shortest_action_rate": 0.99,
+        "minimum_completion_rate": 0.9,
+        "maximum_cycle_rate": 0.01
+      },
+      "fit_bank": "../token_endpoint_cost_feedback_merged/branch_bank.npz"
+    },
+    "training_probe_batches": 4,
+    "trace_write_workers": 1,
+    "initialize_from": "../token_endpoint_efficiency_layers/best.pt",
+    "goal_proposal": "exact_layers",
+    "goal_distance_bins": [
+      5,
+      10,
+      15,
+      20,
+      64
+    ]
+  },
+  "relations": {
+    "endpoint_holdout_fraction": 0.075,
+    "evaluation_count": 2048,
+    "complete_training_sources": true
+  },
+  "evaluation": {
+    "decision_count": 512,
+    "rollout_count": 128,
+    "horizon": 128,
+    "landmarks": 128
+  },
+  "schema": "exact_state_pairs",
+  "selection": "Lowest validation finite Huber plus candidate soft-rank CE, equally averaging predeclared validation cohorts; no test checkpoint selection.",
+  "scope": "Independent Q(S), Q(G); exact complete goals only; no oracle in inference features, no pruning, no search, no LLM retraining.",
+  "hypothesis": "Matched2000-update stages after exact-layer fitting, initialized from the same validation-selected layer checkpoint with fresh identical optimizer/sampler states. Current unit-exchange policy is mined on4096 protected TRAINING-only roots. Preserve cycle ends and additionally select the FIRST true-distance-increasing exchange on every trajectory, including successful detours: for this parity graph each uphill exchange adds exactly2 to successful plan length. Expand each accepted complete decision with all legal branches and permitted exact continuations, add goals that change optimal actions, and union with original cycle seeds; count holdout cuts. Control replays original bank; feedback replays the union, with identical25 percent context and8192 supplemental point quotas, same exact-layer broad proposals, MLP/L1, soft ranking, point loss, batches, learning rate and source coverage. Both diagnose fitting on the same merged bank. New data do not prune actions or enter inference. Frozen independent completion/cost acceptance is validation-selected after all terminal candidates; no test mining or post-test candidate swap.",
+  "acceptance": "experiments/new_tasks_qmap/archive/configs/token_swapping/token_endpoint_cost_feedback_acceptance.json"
+}

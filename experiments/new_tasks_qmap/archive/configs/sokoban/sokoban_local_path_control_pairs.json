@@ -1,0 +1,114 @@
+{
+  "task": "sokoban",
+  "seed": 2026102302,
+  "data": {
+    "source_url": "https://raw.githubusercontent.com/google-deepmind/boxoban-levels/78011d8c86ad423bfb2e1005012393b4c3c24409/hard/000.txt",
+    "source_commit": "78011d8c86ad423bfb2e1005012393b4c3c24409",
+    "source_cache": "tmp/new_tasks_harder_sources",
+    "max_states": 750000,
+    "minimum_reachable_per_goal": 1,
+    "scenes": {
+      "train": 1000,
+      "validation": 100,
+      "test": 100
+    },
+    "goals_per_scene": "all",
+    "training_goals": "all_except_heldout",
+    "diagnostic_goals": {
+      "359": [
+        75
+      ],
+      "362": [
+        77
+      ]
+    },
+    "heldout_goals": 2,
+    "split_fractions": [
+      0.7,
+      0.15,
+      0.15
+    ],
+    "diagnostic_suite": "runs/deepseek_exact_goals64k/suite.json",
+    "source_files": [
+      "hard/000.txt",
+      "hard/001.txt",
+      "hard/002.txt",
+      "hard/003.txt"
+    ],
+    "layout_selection": "experiments/new_tasks_qmap/archive/configs/sokoban_coverage_layouts.json",
+    "prepared_from": "../coverage1000/data"
+  },
+  "model": {
+    "dimension": 128,
+    "hidden": 256,
+    "cap": 256,
+    "metric": "directed_max"
+  },
+  "training": {
+    "steps": 30000,
+    "batch_size": 2048,
+    "decision_batch_size": 1024,
+    "learning_rate": 0.001,
+    "rank_weight": 1.0,
+    "rank_temperature": 1.0,
+    "eval_every": 5000,
+    "cpu_threads": 4,
+    "unreachable_target": 240.0,
+    "features_on_device": "packed_bits",
+    "broad_fraction": 0.5,
+    "online_goals": true,
+    "record_training_samples": true,
+    "balance_layouts": true,
+    "relation_sampling": {
+      "finite_point_fraction": 0.75,
+      "boundary_rank_fraction": 0.5,
+      "distance_bin_upper_bounds": [
+        0,
+        1,
+        2,
+        5,
+        10,
+        20,
+        40,
+        80,
+        160,
+        240
+      ],
+      "balance_layouts": true,
+      "layouts_per_batch": 16
+    },
+    "layouts_per_batch": 16,
+    "initialize_from": "../neighborhood_control/best.pt",
+    "sampling_seed_offset": 80002,
+    "decision_neighborhood_point_fraction": 0.0
+  },
+  "relations": {
+    "holdout_per_goal": 16,
+    "evaluation_per_goal": 64,
+    "unreachable_eval_per_goal": 24,
+    "complete_training_sources": false,
+    "evaluation_training_goals": 8,
+    "training_sources_per_scene": 8192
+  },
+  "evaluation": {
+    "decision_count": 2048,
+    "rollout_count": 1024,
+    "horizon": 256,
+    "landmarks": 128,
+    "planning_distance_bins": [
+      1,
+      2,
+      5,
+      10,
+      20,
+      40,
+      80,
+      256
+    ]
+  },
+  "schema": "exact_state_pairs",
+  "selection": "Lowest validation finite Huber plus candidate soft-rank CE, equally averaging predeclared validation cohorts; no test checkpoint selection.",
+  "scope": "Independent Q(S), Q(G); exact complete goals only; no oracle in inference features, no pruning, no search, no LLM retraining.",
+  "acceptance": "experiments/new_tasks_qmap/configs/exact_pair_acceptance.json",
+  "hypothesis": "Matched fresh30k phases from the same validation-selected neighborhood control checkpoint, with identical1000-layout data splits,128D Sigmoid, original distance Huber plus soft-rank loss, main proposal seed and evaluation. Original control diagnoses the new data effect. The shuffled and joint local-path arms use the same fixed5-10-step bank. Every complete250-batch block has exactly the same replay context multiset; shuffling within layout and legal-child count also preserves each batch replay count, point-label count, layout/degree profile and untouched main supervision. The only difference between these two arms is whether consecutive path contexts co-occur. Parent and ALL legal children are point-supervised in either arm. Separate planned groups, actual context exposure and same-batch path completion are recorded. No Bellman term, model change, inference search or filtering. Local-path labels replace the finite far supplement first, retaining the broad prefix and original1-5 labels whenever far slots suffice. Shared randomized replacement positions prevent batch degree/layout matching from changing the independent point multiset between the two path arms."
+}

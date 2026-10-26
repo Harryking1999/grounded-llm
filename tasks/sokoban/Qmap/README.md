@@ -14,4 +14,4 @@
 
 历史跨墙共享条件未见布局388/1024、21步以上0/312，属于另一条件。精确教师图、采样入口与失败结果保留；当前没有可供新LLM训练采用的地图。
 
-入口：[数据](../data/README.md) · [固定墙体配置](../../../experiments/new_tasks_qmap/configs/sokoban/sokoban_fixed_wall_902.json) · [实验工作区](../../../experiments/new_tasks_qmap/README.md)。
+入口：[数据](../data/README.md) · [固定墙体配置](../../../experiments/new_tasks_qmap/archive/configs/sokoban/sokoban_fixed_wall_902.json) · [实验工作区](../../../experiments/new_tasks_qmap/README.md)。

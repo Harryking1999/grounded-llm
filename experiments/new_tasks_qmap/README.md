@@ -1,12 +1,12 @@
 # 五类新任务 Qmap 实验工作区
 
-本目录维护推箱子、移车出库、棋子交换、过桥和21／24点的独立地图实验。**优化已暂停，推箱子搁置；其余地图按已验证范围保留。** 九类任务、小类及可用能力从[任务总览](../../tasks/README.md)阅读；本页只提供实验和实现入口。
+本目录维护推箱子、移车出库、棋子交换、过桥和21／24点的独立地图实验。**优化已暂停，推箱子搁置；其余地图按已验证范围保留。** 八类任务、小类及可用能力从[任务总览](../../tasks/README.md)阅读；本页只提供实验和实现入口。
 
 ## 当前结果入口
 
 | 任务 | 当前采用情况 | 结果与限制 | 权重和正式配置 |
 |---|---|---|---|
-| 推箱子 | 固定墙体仍未通过，无采用地图 | [报告](results/sokoban/report.md) | [selection](../../tasks/sokoban/Qmap/selection.json)／[配置](configs/sokoban/) |
+| 推箱子 | 固定墙体仍未通过，无采用地图 | [报告](results/sokoban/report.md) | [selection](../../tasks/sokoban/Qmap/selection.json)／[历史配置](archive/configs/sokoban/) |
 | 移车出库 | 原占格MLP限定选用；不覆盖可靠长程和新布局 | [报告](results/rush_hour/report.md) | [selection](../../tasks/rush_hour/Qmap/selection.json)／[配置](configs/rush_hour/) |
 | 棋子交换 | 两棵10顶点树各自采用；最优效率未通过 | [报告](results/token_swapping/report.md) | [selection](../../tasks/token_swapping/Qmap/selection.json)／[配置](configs/token_swapping/) |
 | 过桥 | 五人与六人分别采用，限定耗时分布 | [报告](results/bridge/report.md) | [selection](../../tasks/bridge/Qmap/selection.json)／[配置](configs/bridge/) |
@@ -14,19 +14,20 @@
 
 [五类结果摘要](results/report.md)只汇总当前结论。各分任务报告按“范围、关键成绩、限制、证据”组织；历史试验不再逐次写进正文。五类均尚无新增LLM读取验收。
 
-## 文件职责
+## 目录组织
 
-| 位置 | 保存什么 | 怎样使用 |
-|---|---|---|
-| `configs/<task>/` | 已提交的数据、采样、训练与验收合同 | 当前权重使用selection所指配置，其他配置用于历史复现 |
-| `results/<task>/report.md` | 当前科学结论及改变判断的关键负结果 | 日常阅读入口 |
-| `results/<task>/*.json` | 计数、误差、分层结果、比较条件与来源 | 由报告链接深入核对；不以文件名较新代替采用判断 |
-| `results/shared/` | 跨任务标签、划分、接口及性能检查 | 性能优化与模型能力分开解释 |
-| `configs/pilot/`、`results/pilot/` | 早期固定目标试验 | 历史固定目标复现 |
-| `src/`、`tests/` | 实验编排及直接检查 | 复用任务规则与公共Qmap实现 |
-| Git忽略的`runs/`、`tmp/`及远端运行目录 | 原始数据、曝光、日志、完整恢复断点、源码快照 | 保持原路径；机器连接与存储见[手册](../../DEVELOPMENT_MACHINES.md) |
+| 位置 | 内容 |
+|---|---|
+| `configs/<task>/` | 当前采用地图的训练和验收配置；移车另保留现用选题所需的基础配置 |
+| `results/<task>/report.md` | 各任务的结果与关键比较 |
+| `results/<task>/*.json` | 报告直接引用的结果证据 |
+| `results/shared/` | 跨任务划分、接口和性能检查 |
+| `archive/configs/<task>/` | 已结束的采样、编码、损失、效率和速度对照配置 |
+| `archive/results/<task>/` | 对应历史结果；首轮固定目标试验在`pilot/`下 |
+| `src/`、`tests/` | 复用任务规则和公共Qmap的实验入口与检查 |
+| Git外的`runs/`、`tmp/` | 数据、曝光、日志、完整断点与运行源码快照 |
 
-整理只收束阅读入口，不移动已被配置、结果或checkpoint引用的文件。原始JSON、失败样本、旧配置及独有源码保留；采用记录是唯一模型身份入口。
+当前地图及其配置从各任务selection进入，历史对照集中在[archive/](archive/)。远端正在运行的源码、数据和模型保持原路径，连接与存储见[机器手册](../../DEVELOPMENT_MACHINES.md)。
 
 ## 运行与加载入口
 

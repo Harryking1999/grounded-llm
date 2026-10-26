@@ -1,0 +1,125 @@
+{
+  "task": "rush_hour",
+  "seed": 2026102303,
+  "data": {
+    "append_from": "../rush_reference/data/graphs",
+    "source_url": "https://www.michaelfogleman.com/static/rush/rush.txt.gz",
+    "source_cache": "tmp/planning_task_sources/rush.txt.gz",
+    "max_states": 50000,
+    "minimum_training_catalogues": 1000,
+    "terminal_goals_per_scene": 16,
+    "intermediate_goals_per_scene": 16,
+    "heldout_goals": 4,
+    "heldout_intermediate_goals": 4,
+    "minimum_vehicles": 8,
+    "selection_reserve": 4,
+    "layout_strata": [
+      {
+        "minimum_moves": 1,
+        "maximum_moves": 10,
+        "training_catalogues": 250
+      },
+      {
+        "minimum_moves": 11,
+        "maximum_moves": 20,
+        "training_catalogues": 250
+      },
+      {
+        "minimum_moves": 21,
+        "maximum_moves": 30,
+        "training_catalogues": 250
+      },
+      {
+        "minimum_moves": 31,
+        "maximum_moves": 100,
+        "training_catalogues": 250
+      }
+    ],
+    "prepared_from": "../rush_hour_coverage1000/data"
+  },
+  "model": {
+    "dimension": 128,
+    "hidden": 256,
+    "cap": 256,
+    "metric": "l1",
+    "architecture": "spatial_cnn",
+    "spatial_shape": [
+      26,
+      6,
+      6
+    ],
+    "conv_channels": 32,
+    "spatial_hidden": 244
+  },
+  "training": {
+    "steps": 4000,
+    "batch_size": 65536,
+    "decision_batch_size": 8192,
+    "learning_rate": 0.0003,
+    "rank_weight": 4.0,
+    "rank_temperature": 1.0,
+    "eval_every": 500,
+    "cpu_threads": 2,
+    "unreachable_target": 240.0,
+    "features_on_device": "packed_bits",
+    "broad_fraction": 0.5,
+    "online_goals": true,
+    "record_training_samples": true,
+    "balance_layouts": true,
+    "balance_rank_layouts": true,
+    "layouts_per_batch": 64,
+    "rollout_eval_every": 1000,
+    "validation_only_initial": true,
+    "training_probe_batches": 4,
+    "relation_sampling": {
+      "finite_point_fraction": 0.75,
+      "boundary_rank_fraction": 0.0,
+      "distance_bin_upper_bounds": [
+        1,
+        5,
+        10,
+        20,
+        40,
+        80
+      ],
+      "balance_layouts": true,
+      "layouts_per_batch": 64,
+      "preparation_workers": 2
+    },
+    "trace_write_workers": 1,
+    "action_edge_fraction": 0.25,
+    "action_edges_replace_finite_only": true,
+    "initialize_from": "../rush_hour_l1_readout_convergence/best.pt",
+    "sampling_seed_offset": 2026102601,
+    "failure_replay": {
+      "bank": "../../logs/rush_l1_current_local_paths.bank.npz",
+      "sampler": "local_paths",
+      "minimum_steps": 5,
+      "maximum_steps": 10,
+      "groups_per_batch": 128,
+      "block_batches": 100,
+      "layouts_per_batch": 64,
+      "preserve_point_distances_up_to": 5,
+      "mode": "joint"
+    }
+  },
+  "relations": {
+    "holdout_per_goal": 16,
+    "evaluation_per_goal": 64,
+    "unreachable_eval_per_goal": 24,
+    "complete_training_sources": true,
+    "evaluation_training_goals": 8
+  },
+  "evaluation": {
+    "decision_count": 2048,
+    "rollout_count": 1024,
+    "horizon": 256,
+    "landmarks": 128
+  },
+  "schema": "exact_state_pairs",
+  "selection": "Lowest validation finite Huber plus candidate soft-rank CE, equally averaging predeclared validation cohorts; no test checkpoint selection.",
+  "scope": "Independent Q(S), Q(G); exact complete goals only; no oracle in inference features, no pruning, no search, no LLM retraining.",
+  "acceptance": "experiments/new_tasks_qmap/configs/exact_pair_acceptance.json",
+  "hypothesis": "Matched fresh4000-update optimization phases from the same validation-selected L1 checkpoint after its10000-update budget. Preserve1000 training catalogue groups, all complete goals and protected layouts/relations, raw26x6x6 CNN,128D normalized L1, point Huber, original soft-distance rank loss and weight, learning rate,65536 point/8192 complete decision batches and25 percent direct-action labels. Both arms use the identical current-policy failure bank of5-10 consecutive exact-optimal decisions, choosing offline teacher ties to maximize permitted continuation while retaining ALL legal candidates. Each100-batch block has exactly the same replay context multiset; shuffling only within layout/degree also preserves each batch layout/degree, replay point counts and untouched proposals. The only comparison is whether whole local paths co-occur in a batch or are shuffled.128 groups of at most10 contexts and at most24 parent/child points need at most30720 point slots, leaving the broad16384 plus direct-edge16384 quotas intact. Prefer replacing far point labels before short1-5 labels. Newly sampled data and reset optimizer are common to both arms, not an isolated comparison to older runs. Report root completion/cycles, actual path co-occurrence/exposure and held-layout tests; no inference search, backtracking ban, oracle features or held-label mining.",
+  "failure_diagnosis": "experiments/new_tasks_qmap/archive/configs/rush_hour/rush_hour_training_root_failures.json"
+}

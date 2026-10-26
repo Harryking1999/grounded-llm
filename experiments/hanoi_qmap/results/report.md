@@ -26,7 +26,7 @@
 
 运行目录：`/zhanghanyue/experiment/grounded_llm_puzzle_qmaps/runs/hanoi8_6155519`；日志：同根目录 `logs/hanoi8_6155519.log`。训练已完成；按验证合同选择的最佳断点与最终断点均为第 100,000 步，保存 `best.pt`、`last.pt` 和 `summary.json`。
 
-八盘测试随机关系到达 **221/1024（21.58%）**，一步最优率 90.75%，距离 MAE 1.80；失败均进入循环。六个标准整塔方向仅 C→B 成功，268 步，比精确解多 13 步，其余五个方向均循环。精确裁判随机题与整塔方向全部成功。不能采用为可靠八盘地图。紧凑结果见 [hanoi8_summary.json](hanoi8_summary.json)，原始小型结果回收在本地忽略目录 `runs/qmap_followup_6155519/hanoi8/`。
+八盘测试随机关系到达 **221/1024（21.58%）**，一步最优率 90.75%，距离 MAE 1.80；失败均进入循环。六个标准整塔方向仅 C→B 成功，268 步，比精确解多 13 步，其余五个方向均循环。精确裁判随机题与整塔方向全部成功。该地图未通过八盘验收。紧凑结果见 [hanoi8_summary.json](hanoi8_summary.json)，原始小型结果回收在本地忽略目录 `runs/qmap_followup_6155519/hanoi8/`。
 
 ## 八盘整塔关系覆盖续训（已完成）
 

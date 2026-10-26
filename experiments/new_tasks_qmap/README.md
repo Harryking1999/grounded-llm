@@ -18,11 +18,11 @@
 
 | 位置 | 保存什么 | 怎样使用 |
 |---|---|---|
-| `configs/<task>/` | 已提交的数据、采样、训练与验收合同 | 当前权重用selection所指配置；其他配置保留复现，不代表待运行队列 |
+| `configs/<task>/` | 已提交的数据、采样、训练与验收合同 | 当前权重使用selection所指配置，其他配置用于历史复现 |
 | `results/<task>/report.md` | 当前科学结论及改变判断的关键负结果 | 日常阅读入口 |
 | `results/<task>/*.json` | 计数、误差、分层结果、比较条件与来源 | 由报告链接深入核对；不以文件名较新代替采用判断 |
 | `results/shared/` | 跨任务标签、划分、接口及性能检查 | 性能优化与模型能力分开解释 |
-| `configs/pilot/`、`results/pilot/` | 早期固定目标试验 | 历史复现，不能替代当前多目标验收 |
+| `configs/pilot/`、`results/pilot/` | 早期固定目标试验 | 历史固定目标复现 |
 | `src/`、`tests/` | 实验编排及直接检查 | 复用任务规则与公共Qmap实现 |
 | Git忽略的`runs/`、`tmp/`及远端运行目录 | 原始数据、曝光、日志、完整恢复断点、源码快照 | 保持原路径；机器连接与存储见[手册](../../DEVELOPMENT_MACHINES.md) |
 
@@ -37,7 +37,7 @@ python -m experiments.new_tasks_qmap.src.run --config CONFIG --out RUN_DIR --sou
 python -m experiments.new_tasks_qmap.src.run --config CONFIG --out RUN_DIR --source-commit COMMIT --device cuda:0 --resume
 ```
 
-配置可能引用邻接运行的数据或初始化权重，复现时保留对应目录关系。只读推理从任务selection找到checkpoint，使用各任务的`MapReader`，不把精确教师图带入选动作过程。
+配置可能引用邻接运行的数据或初始化权重，复现时保留对应目录关系。只读推理从任务selection找到checkpoint，使用各任务的`MapReader`。
 
 | 功能 | 实现入口 |
 |---|---|
@@ -47,4 +47,4 @@ python -m experiments.new_tasks_qmap.src.run --config CONFIG --out RUN_DIR --sou
 | 规则、特征及MapReader | [任务实现](../../grounded_llm/tasks/) |
 | 编码器、距离、排序与采样 | [公共Qmap](../../grounded_llm/core/qmap/)、[方法说明](../../tasks/QMAP_METHOD.md) |
 
-环境提供全部合法后继；单位成本任务比较预测剩余距离，过桥比较即时耗时加预测剩余成本。完整目标必须精确匹配。一般基本要求见[验收合同](configs/exact_pair_acceptance.json)，各任务额外的成本、效率或可达性条件以各自配置为准；限定选用不等于原全范围验收通过。
+环境提供全部合法后继；单位成本任务比较预测剩余距离，过桥比较即时耗时加预测剩余成本。完整目标必须精确匹配。一般基本要求见[验收合同](configs/exact_pair_acceptance.json)，各任务额外的成本、效率或可达性条件以各自配置为准。

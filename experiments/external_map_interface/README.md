@@ -39,7 +39,7 @@ python -m experiments.external_map_interface.src.evaluate \
   --condition distance --out runs/external_map_interface/path32_distance.json
 ```
 
-已完成的 128 维训练摘要见 [Step 1 报告](../cml_map_scaling/results/report.md)。原始 Q/V 记录在开发机的 `runs/cml_step1_explore_d813282/local128/...`；复制或重放时应在运行记录中标出来源。完整 Q 向量接口只需从同一 loader 序列化 Q，128 维接口可直接读取已训练的短地图；两者目前都不是首轮模型输入条件。不可将 1000 维 Q 直接截短并声称是训练后的 128 维地图。
+已完成的 128 维训练摘要见 [Step 1 报告](../cml_map_scaling/results/report.md)。原始 Q/V 记录在开发机的 `runs/cml_step1_explore_d813282/local128/...`；复制或重放时应在运行记录中标出来源。完整 Q 向量接口只需从同一 loader 序列化 Q，128 维接口可直接读取已训练的短地图；两者目前都不是首轮模型输入条件。128维地图使用对应训练权重。
 
 ## 当前积木训练：状态条件位移
 
@@ -71,6 +71,6 @@ python -m experiments.external_map_interface.src.blocks_q_map \
   --out runs/external_map_interface/blocks8_00_q_pilot
 ```
 
-旧试验诊断只把无合法动作且非空的状态确认为 dead，把构造解上的状态确认为可解。报告比较“更少格子的 dead”与“更多格子的可解状态”的 learned Q 到目标距离，并统计已观察状态的合法后继有多少仍在 Q 表中。训练残差小并不推出这两类状态已经分离；执行到未见棋盘后，表格无法直接取得 `Q当前`。更深层死局和跨棋盘泛化需后续单独检验。本试验不调用 LLM，也不把构造解或可解性标签交给 planner。
+旧试验诊断只把无合法动作且非空的状态确认为 dead，把构造解上的状态确认为可解。报告比较“更少格子的 dead”与“更多格子的可解状态”的 learned Q 到目标距离，并统计已观察状态的合法后继有多少仍在 Q 表中。执行到未见棋盘后，表格无法直接取得 `Q当前`。更深层死局和跨棋盘泛化需后续单独检验。本试验不调用 LLM，也不把构造解或可解性标签交给 planner。
 
 已完成的训练数值与局限见 [积木 Q/V 试验结果](results/blocks_q_pilot.md)。

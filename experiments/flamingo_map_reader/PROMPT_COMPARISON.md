@@ -163,7 +163,7 @@ Use "solved" when your sequence reaches the goal; if already at the goal, output
 | 地图 | — | 不输入 Q-map，测纯文本规划 |
 | 交互 | — | 整条序列一次提交，无逐步更新 |
 | 输出 | 动作与终止判断 | 用坐标 JSON；不输出候选编号或地图排序 |
-| 状态预测 | — | 不要求输出 `board_after`；不因此声称测得逐步状态预测准确率 |
+| 状态预测 | — | 不要求输出 `board_after` |
 
 拟优先报告完整到达、完整到达且正确声明成功、非法动作／格式错误，以及两类终止题准确率；无解结果仍只解释这 100 个已耗尽合法动作的失败末态。
 

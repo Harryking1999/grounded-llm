@@ -211,7 +211,7 @@ Summary: Reached the goal after {步数} executed {moves/removals}.
 
 积木 `valid_ranking` 要求语法可解析且列齐正确 Top-10；名单不齐时，逐对及 current 关系均计错。它是比选择一个有效动作更强的输出要求，仅作辅助诊断。
 
-可达性指标要同时报作答前是否可解。参考轨迹可能已经进入死局，`remaining_shortest < 0` 时模型任何动作都无法得分；终止轮是停止而不是动作选择，同样不进入该子集；参考分片在终止轮上也带该字段，因此不能以"字段存在"作为筛选条件。原始全部决策轮计数继续保留；汇总器的 `action_keeps_goal_reachable_rate` 与 `reachable_candidate_rate` 都在作答前可解的非终止决策轮上计算，并记录该子集大小 `solvable_decisions` 供核对。
+可达性指标要同时报作答前是否可解。参考轨迹可能已经进入死局，`remaining_shortest < 0` 时模型任何动作都无法得分；终止轮是停止而不是动作选择，同样不进入该子集；参考分片在终止轮上也带该字段，因此不能以"字段存在"作为筛选条件。汇总器的 `action_keeps_goal_reachable_rate` 与 `reachable_candidate_rate` 都在作答前可解的非终止决策轮上计算，并记录该子集大小 `solvable_decisions` 供核对。
 
 对应的均匀随机基线是**先算每轮可行候选比例，再对相同轮次平均**。汇总器的 `reachable_candidate_rate` 改为计算同一子集内全部可行候选数除以该子集的候选槽位数，是候选数加权比例，逐轮平均基线仍须从逐轮记录单独计算。rollout 提前退出及预算末轮漏记的可达性字段，由证据汇总器回放保存的状态与候选编号后补算；预算末轮未执行的选择也计入逐轮指标，不改变实际到达与步数。无法补算的字段须明确缺失。
 

@@ -130,3 +130,23 @@ def test_evaluation_collect_reports_subclasses_with_actual_denominators(tmp_path
     assert partial['tasks']==2 and partial['arrival']==partial['arrival_and_stop']==1
     assert partial['optimal']['value']==.5
     assert (tmp_path/'results'/base/'subclass_report.md').exists()
+
+
+def test_deadend_has_no_ranking_and_legacy_null_scores_still_aggregate():
+    from dataclasses import replace
+    from experiments.map_sft_baselines.src.metrics import summarize
+    tile=rules.PLACEMENTS[0][0]
+    env=StateTask(block_row('remove',tile,0),ROOT)
+    live=env.make_step(tile,0)
+    dead=replace(live,current=1,goal=0,candidate_actions=(),candidate_destinations=(),
+        candidate_map_distances=(),map_minimal_candidates=())
+    row=score('Reason: No legal moves remain.\n<done/>',dead,env)
+    assert row['live'] and not row['rank_eligible']
+    assert 'ndcg_inverse_rank_at_1' not in row
+    normal=score('Reason: action.\n<action>1</action>',live,env)
+    assert normal['ndcg_inverse_rank_at_1']==0
+    legacy=dict(row,rank_eligible=True,ndcg_inverse_rank_at_1=None)
+    result=summarize([dict(arrived=False,arrived_and_stopped=False,turns=[normal,legacy])])
+    assert result['ndcg_inverse_rank_at_1']=={'denominator':1,'value':0.0}
+    assert result['safe']['denominator']==2
+    assert result['map_optimal']['denominator']==1

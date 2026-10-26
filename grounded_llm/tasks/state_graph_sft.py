@@ -244,11 +244,12 @@ def make_step(env, reader, state, goal):
 def score(text, step, env):
     before=float(env.distance(step.current,step.goal));candidate,error=parse_control(text,len(step.candidate_actions))
     row=dict(current=str(step.current),goal=str(step.goal),answer=text,candidate=candidate,error=error,
-        live=not step.done,rank_eligible=not step.done,safe=False,optimal=False,map_optimal=False)
+        live=not step.done,rank_eligible=not step.done and bool(step.candidate_actions),
+        safe=False,optimal=False,map_optimal=False)
     if candidate is not None and error is None:
         action,child=step.execute(candidate);remaining=env.distance(child,step.goal)
         cost=next(c for a,_,c in env.transitions(step.current) if a==action)
         row.update(after=str(child),safe=bool(np.isfinite(remaining)),optimal=bool(np.isclose(cost+remaining,before)),
             map_optimal=candidate in step.map_minimal_candidates)
-    if not step.done:row.update(meeting_ranking_scores(step.candidate_map_distances,parse_ranking(text,len(step.candidate_actions),10)))
+    if row['rank_eligible']:row.update(meeting_ranking_scores(step.candidate_map_distances,parse_ranking(text,len(step.candidate_actions),10)))
     return row

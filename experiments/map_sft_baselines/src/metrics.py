@@ -3,7 +3,8 @@
 def summarize(cases):
     turns = [row for case in cases for row in case['turns']]
     live = [row for row in turns if row['live']]
-    ranked = [row for row in turns if row['rank_eligible']]
+    ranked = [row for row in turns if row['rank_eligible'] and
+              ('ndcg_inverse_rank_at_1' not in row or row['ndcg_inverse_rank_at_1'] is not None)]
 
     def rate(key, rows):
         numerator = sum(int(row.get(key, False)) for row in rows)
@@ -16,7 +17,7 @@ def summarize(cases):
                   map_optimal=rate('map_optimal', ranked))
     for key in ('ndcg_inverse_rank_at_1', 'ndcg_inverse_rank_at_10',
                 'ndcg_minmax_distance_at_1', 'ndcg_minmax_distance_at_10'):
-        rows = [row for row in ranked if key in row]
+        rows = [row for row in ranked if row.get(key) is not None]
         result[key] = dict(denominator=len(rows),
                            value=sum(row[key] for row in rows) / len(rows) if rows else None)
     for key in ('changed_action','map_zero_action_changed','renumber_safe',

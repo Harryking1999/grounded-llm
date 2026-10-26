@@ -335,5 +335,235 @@
   "readout_configs": [
     "experiments/new_tasks_qmap/configs/rush_hour/rush_hour_linf_readout_fit.json",
     "experiments/new_tasks_qmap/configs/rush_hour/rush_hour_l1_readout_fit.json"
-  ]
+  ],
+  "matched_readout_2000": {
+    "linf": {
+      "best_step": 2000,
+      "last_step": 2000,
+      "source_commit": "f5bd3f3",
+      "cohorts": {
+        "validation": {
+          "mae": 2.0651161670684814,
+          "q": {
+            "count": 1024,
+            "solved": 1024,
+            "optimal": 1021,
+            "cycles": 0,
+            "mean_excess_cost_on_success": 0.00390625
+          }
+        },
+        "test": {
+          "mae": 2.070408821105957,
+          "q": {
+            "count": 1024,
+            "solved": 1023,
+            "optimal": 1016,
+            "cycles": 1,
+            "mean_excess_cost_on_success": 0.008797653950750828
+          }
+        },
+        "unseen_goal_validation": {
+          "mae": 2.0715203285217285,
+          "q": {
+            "count": 1024,
+            "solved": 1024,
+            "optimal": 1023,
+            "cycles": 0,
+            "mean_excess_cost_on_success": 0.0009765625
+          }
+        },
+        "unseen_goal_test": {
+          "mae": 2.1019418239593506,
+          "q": {
+            "count": 1024,
+            "solved": 1024,
+            "optimal": 1024,
+            "cycles": 0,
+            "mean_excess_cost_on_success": 0.0
+          }
+        },
+        "unseen_layout_validation": {
+          "mae": 4.867121696472168,
+          "q": {
+            "count": 1024,
+            "solved": 444,
+            "optimal": 277,
+            "cycles": 580,
+            "mean_excess_cost_on_success": 0.869369387626648
+          }
+        },
+        "unseen_layout_test": {
+          "mae": 4.519513130187988,
+          "q": {
+            "count": 1024,
+            "solved": 527,
+            "optimal": 312,
+            "cycles": 497,
+            "mean_excess_cost_on_success": 0.8994307518005371
+          }
+        },
+        "original_layout_test": {
+          "mae": 18.17626953125,
+          "q": {
+            "count": 1024,
+            "solved": 0,
+            "optimal": 0,
+            "cycles": 1024,
+            "mean_excess_cost_on_success": null
+          }
+        },
+        "original_layout_validation": {
+          "mae": 19.977224349975586,
+          "q": {
+            "count": 1024,
+            "solved": 0,
+            "optimal": 0,
+            "cycles": 1024,
+            "mean_excess_cost_on_success": null
+          }
+        },
+        "diagnostic": {
+          "mae": 6.467902183532715,
+          "q": {
+            "count": 1024,
+            "solved": 310,
+            "optimal": 180,
+            "cycles": 714,
+            "mean_excess_cost_on_success": 0.9677419066429138
+          }
+        },
+        "diagnostic_original": {
+          "mae": 22.830394744873047,
+          "q": {
+            "count": 8,
+            "solved": 0,
+            "optimal": 0,
+            "cycles": 8,
+            "mean_excess_cost_on_success": null
+          }
+        }
+      }
+    },
+    "l1": {
+      "best_step": 1500,
+      "last_step": 2000,
+      "source_commit": "f5bd3f3",
+      "cohorts": {
+        "validation": {
+          "mae": 2.2643933296203613,
+          "q": {
+            "count": 1024,
+            "solved": 1024,
+            "optimal": 1022,
+            "cycles": 0,
+            "mean_excess_cost_on_success": 0.0029296875
+          }
+        },
+        "test": {
+          "mae": 2.2610580921173096,
+          "q": {
+            "count": 1024,
+            "solved": 1024,
+            "optimal": 1021,
+            "cycles": 0,
+            "mean_excess_cost_on_success": 0.0029296875
+          }
+        },
+        "unseen_goal_validation": {
+          "mae": 2.2533252239227295,
+          "q": {
+            "count": 1024,
+            "solved": 1024,
+            "optimal": 1024,
+            "cycles": 0,
+            "mean_excess_cost_on_success": 0.0
+          }
+        },
+        "unseen_goal_test": {
+          "mae": 2.2010064125061035,
+          "q": {
+            "count": 1024,
+            "solved": 1024,
+            "optimal": 1024,
+            "cycles": 0,
+            "mean_excess_cost_on_success": 0.0
+          }
+        },
+        "unseen_layout_validation": {
+          "mae": 5.115670680999756,
+          "q": {
+            "count": 1024,
+            "solved": 479,
+            "optimal": 303,
+            "cycles": 545,
+            "mean_excess_cost_on_success": 0.736952006816864
+          }
+        },
+        "unseen_layout_test": {
+          "mae": 4.759036540985107,
+          "q": {
+            "count": 1024,
+            "solved": 528,
+            "optimal": 337,
+            "cycles": 496,
+            "mean_excess_cost_on_success": 0.7386363744735718
+          }
+        },
+        "original_layout_test": {
+          "mae": 19.771324157714844,
+          "q": {
+            "count": 1024,
+            "solved": 0,
+            "optimal": 0,
+            "cycles": 1024,
+            "mean_excess_cost_on_success": null
+          }
+        },
+        "original_layout_validation": {
+          "mae": 20.457082748413086,
+          "q": {
+            "count": 1024,
+            "solved": 0,
+            "optimal": 0,
+            "cycles": 1024,
+            "mean_excess_cost_on_success": null
+          }
+        },
+        "diagnostic": {
+          "mae": 6.639168739318848,
+          "q": {
+            "count": 1024,
+            "solved": 350,
+            "optimal": 210,
+            "cycles": 674,
+            "mean_excess_cost_on_success": 0.9514285922050476
+          }
+        },
+        "diagnostic_original": {
+          "mae": 22.920135498046875,
+          "q": {
+            "count": 8,
+            "solved": 0,
+            "optimal": 0,
+            "cycles": 8,
+            "mean_excess_cost_on_success": null
+          }
+        }
+      }
+    }
+  },
+  "readout_training_roots": {
+    "linf": {
+      "count": 4096,
+      "solved": 1819,
+      "optimal": 1017,
+      "cycles": 2277
+    },
+    "l1": {
+      "count": 4096,
+      "solved": 1970,
+      "optimal": 1325,
+      "cycles": 2126
+    }
+  }
 }

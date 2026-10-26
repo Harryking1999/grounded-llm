@@ -29,7 +29,7 @@ def collect(root,config):
         curve=[]
         for checkpoint in sorted((Path(root)/'evaluation'/base).glob('checkpoint-*'),key=lambda p:int(p.name.split('-')[-1])):
             modes=evaluation_modes(config,base)
-            all_metrics={};by_task={};by_cohort={};valid=True
+            all_metrics={};by_task={};by_cohort={};by_subclass={};valid=True
             for mode in modes:
                 cases=[];total=cohort_size(config,mode)
                 for start in range(0,total,config['evaluation']['shard_tasks']):
@@ -47,10 +47,15 @@ def collect(root,config):
                             selected=[c for c in cases if c.get('cohort')==cohort and c['task']==task]
                             if selected:
                                 by_cohort.setdefault(cohort,{}).setdefault(task,{})[mode]=summarize(selected)
+                    subclasses=sorted({(c.get('cohort','id'),c['task'],c['variant']) for c in cases if 'variant' in c})
+                    for cohort,task,variant in subclasses:
+                        selected=[c for c in cases if (c.get('cohort','id'),c['task'],c.get('variant'))==(cohort,task,variant)]
+                        by_subclass.setdefault(cohort,{}).setdefault(task,{}).setdefault(variant,{})[mode]=summarize(selected)
             if valid:
                 step=int(checkpoint.name.split('-')[-1]);row=dict(step=step,epoch=step/steps_per_epoch(config),metrics=all_metrics)
                 if by_task:row['by_task']=by_task
                 if by_cohort:row['by_cohort']=by_cohort
+                if by_subclass:row['by_subclass']=by_subclass
                 atomic_json(checkpoint/'summary.json',row);curve.append(row)
         if curve:
             destination=Path(root)/'results'/base
@@ -85,6 +90,18 @@ def collect(root,config):
                             metric=metrics['RO'];count=metric['tasks']
                             lines.append(f"| {row['step']} | {cohort} | {task} | {metric['arrival']}/{count} | {metric['arrival_and_stop']}/{count} |")
                 (destination/'cohort_report.md').write_text('\n'.join(lines)+'\n')
+            if any('by_subclass' in row for row in curve):
+                lines=['# 各小类评测','',
+                    '| step | 题组 | 大类 | 小类 | 题数 | 完成率RO | 正确停止率RO | 最优动作率TF／RO |',
+                    '|---|---|---|---|---:|---:|---:|---|']
+                for row in curve:
+                    for cohort,tasks in row.get('by_subclass',{}).items():
+                        for task,variants in tasks.items():
+                            for variant,metrics in variants.items():
+                                ro=metrics['RO'];count=ro['tasks']
+                                optimal='／'.join(percent(metrics[m]['optimal']['value']) for m in report_modes)
+                                lines.append(f"| {row['step']} | {cohort} | {task} | {variant} | {count} | {percent(ro['arrival']/count)} | {percent(ro['arrival_and_stop']/count)} | {optimal} |")
+                (destination/'subclass_report.md').write_text('\n'.join(lines)+'\n')
 
 def main():
     p=argparse.ArgumentParser();p.add_argument('role',choices=['train','evaluate'])

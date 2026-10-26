@@ -91,6 +91,11 @@ def prepare(cfg,sources,data_root):
         for task in cfg['task_pool']:
             rows=[dict(r,cohort='id' if task in study['tasks'] else 'big_ood') for r in cohorts[task]]
             if task in study['tasks']:rows+=small[task]
+            if task in study['tasks']:
+                per_cohort=cfg['evaluation_final_per_task']//2
+                rows=(evaluation_subset(rows[:len(cohorts[task])],per_cohort,cfg['evaluation_subset']['seed'])+
+                      evaluation_subset(rows[len(cohorts[task]):],cfg['evaluation_final_per_task']-per_cohort,cfg['evaluation_subset']['seed']))
+            else:rows=evaluation_subset(rows,cfg['evaluation_final_per_task'],cfg['evaluation_subset']['seed'])
             task_out=target/task;link_assets(pool/task,task_out)
             atomic_json(task_out/'evaluation.json',rows);atomic_json(task_out/'probe_indices.json',[])
             all_rows+=rows

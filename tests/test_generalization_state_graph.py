@@ -110,3 +110,23 @@ def test_evaluation_half_preserves_strata_and_ignores_model_outcomes():
     ids=lambda records:[r['trajectory_id'] for r in records]
     assert ids(chosen)==ids(evaluation_subset(rows,250,2026102102))
     assert ids(chosen)==ids(evaluation_subset(altered,250,2026102102))
+
+
+def test_evaluation_collect_reports_subclasses_with_actual_denominators(tmp_path):
+    from experiments.map_sft_baselines.src.queue import collect
+    cfg=json.loads((ROOT/'experiments/map_sft_baselines/configs/flan_generalization_4_50k_map.json').read_text())
+    cfg['data']['tasks']=['bridge'];cfg['evaluation'].update(tasks=3,shard_tasks=3)
+    base='B2_flan_four';checkpoint=tmp_path/'evaluation'/base/'checkpoint-12500'
+    cases=[dict(trajectory_id=str(i),task='bridge',variant=variant,cohort='id',arrived=success,
+        arrived_and_stopped=success,turns=[dict(live=True,rank_eligible=True,optimal=success,safe=True)])
+        for i,(variant,success) in enumerate([('all_right',True),('partial',True),('partial',False)])]
+    for mode in ('TF','RO'):
+        path=checkpoint/f'{mode}_0000_0003';path.mkdir(parents=True)
+        (path/'summary.json').write_text('{}')
+        (path/'cases.jsonl').write_text(''.join(json.dumps(c)+'\n' for c in cases))
+    collect(tmp_path,cfg)
+    curve=json.loads((tmp_path/'results'/base/'curve.json').read_text())
+    partial=curve[0]['by_subclass']['id']['bridge']['partial']['RO']
+    assert partial['tasks']==2 and partial['arrival']==partial['arrival_and_stop']==1
+    assert partial['optimal']['value']==.5
+    assert (tmp_path/'results'/base/'subclass_report.md').exists()

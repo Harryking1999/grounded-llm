@@ -72,8 +72,10 @@
     "game24": [
       "four_to21_big_ood",
       "four_to24_big_ood",
-      "three_number_suffix_big_ood",
-      "two_number_suffix_big_ood"
+      "three_to21_big_ood",
+      "three_to24_big_ood",
+      "two_to21_big_ood",
+      "two_to24_big_ood"
     ]
   },
   "cohorts": [
@@ -159,5 +161,7 @@
       "reference_action_count"
     ],
     "allocation": "Proportional largest remainder by variant then route length; uniform without replacement within each stratum; ignore model outcomes"
-  }
+  },
+  "evaluation_final_per_task": 250,
+  "evaluation_final_allocation": "Trained task:125ID+125smallOOD across subclasses. Untrained task:250bigOOD across subclasses."
 }

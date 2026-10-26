@@ -32,8 +32,9 @@ def evaluate(args, config):
         metadata={r['trajectory_id']:r for r in task_records}
         rows=[dict(json.loads(line),task=task) for line in (output/'cases.jsonl').read_text().splitlines()]
         for row in rows:
-            if 'cohort' in metadata[row['trajectory_id']]:
-                row['cohort']=metadata[row['trajectory_id']]['cohort']
+            for field in ('cohort','variant'):
+                if field in metadata[row['trajectory_id']]:
+                    row[field]=metadata[row['trajectory_id']][field]
         cases.extend(rows)
     lookup={r['trajectory_id']:r for r in cases}
     cases=[lookup[r['trajectory_id']] for r in selected]

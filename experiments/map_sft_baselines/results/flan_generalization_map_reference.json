@@ -1,0 +1,208 @@
+{
+  "query_source_commit": "7504226",
+  "scope": "Frozen selected Qmaps on the fixed FLAN final query union. No LLM, no search, no Q-success filtering. All legal candidates; immediate action cost plus predicted successor distance; exact state equality stops.",
+  "unique_queries": 7000,
+  "evaluation_config": "experiments/map_sft_baselines/configs/flan_generalization_6_50k_map.json",
+  "study_cohort_counts": {
+    "4": {
+      "id": 2000,
+      "small_ood": 2000,
+      "big_ood": 2000
+    },
+    "5": {
+      "id": 2500,
+      "small_ood": 2500,
+      "big_ood": 1500
+    },
+    "6": {
+      "id": 3000,
+      "small_ood": 3000,
+      "big_ood": 1000
+    }
+  },
+  "groups": {
+    "id|blocks|clear8": {
+      "count": 167,
+      "solved": 166,
+      "optimal": 158,
+      "cycles": 0,
+      "excess_cost_on_success": 8.0
+    },
+    "id|blocks|clear12": {
+      "count": 167,
+      "solved": 151,
+      "optimal": 118,
+      "cycles": 0,
+      "excess_cost_on_success": 36.0
+    },
+    "id|blocks|partial8": {
+      "count": 166,
+      "solved": 159,
+      "optimal": 145,
+      "cycles": 0,
+      "excess_cost_on_success": 14.0
+    },
+    "small_ood|blocks|partial12_ood": {
+      "count": 500,
+      "solved": 303,
+      "optimal": 228,
+      "cycles": 0,
+      "excess_cost_on_success": 82.0
+    },
+    "id|cube2|id": {
+      "count": 500,
+      "solved": 388,
+      "optimal": 211,
+      "cycles": 112,
+      "excess_cost_on_success": 462.0
+    },
+    "small_ood|cube2|noncanonical_goal_ood": {
+      "count": 500,
+      "solved": 0,
+      "optimal": 0,
+      "cycles": 500,
+      "excess_cost_on_success": 0.0
+    },
+    "id|path|id": {
+      "count": 500,
+      "solved": 491,
+      "optimal": 400,
+      "cycles": 9,
+      "excess_cost_on_success": 138.0
+    },
+    "small_ood|path|new_graph_ood": {
+      "count": 500,
+      "solved": 486,
+      "optimal": 378,
+      "cycles": 14,
+      "excess_cost_on_success": 161.0
+    },
+    "id|bridge|five_all_right": {
+      "count": 176,
+      "solved": 169,
+      "optimal": 145,
+      "cycles": 7,
+      "excess_cost_on_success": 36.0
+    },
+    "id|bridge|five_partial_goal": {
+      "count": 166,
+      "solved": 162,
+      "optimal": 144,
+      "cycles": 4,
+      "excess_cost_on_success": 46.0
+    },
+    "id|bridge|five_intermediate_start": {
+      "count": 158,
+      "solved": 153,
+      "optimal": 142,
+      "cycles": 5,
+      "excess_cost_on_success": 36.0
+    },
+    "small_ood|bridge|six_people_ood": {
+      "count": 500,
+      "solved": 486,
+      "optimal": 436,
+      "cycles": 14,
+      "excess_cost_on_success": 140.0
+    },
+    "id|puzzle8|id": {
+      "count": 500,
+      "solved": 498,
+      "optimal": 481,
+      "cycles": 2,
+      "excess_cost_on_success": 34.0
+    },
+    "small_ood|puzzle8|noncanonical_goal_ood": {
+      "count": 500,
+      "solved": 81,
+      "optimal": 57,
+      "cycles": 418,
+      "excess_cost_on_success": 78.0
+    },
+    "id|token_swapping|original_tree_home": {
+      "count": 250,
+      "solved": 250,
+      "optimal": 176,
+      "cycles": 0,
+      "excess_cost_on_success": 162.0
+    },
+    "id|token_swapping|original_tree_arbitrary": {
+      "count": 250,
+      "solved": 242,
+      "optimal": 168,
+      "cycles": 8,
+      "excess_cost_on_success": 180.0
+    },
+    "small_ood|token_swapping|alternate_tree_ood": {
+      "count": 500,
+      "solved": 497,
+      "optimal": 325,
+      "cycles": 3,
+      "excess_cost_on_success": 394.0
+    },
+    "big_ood|rush_hour|familiar_relation_big_ood": {
+      "count": 253,
+      "solved": 252,
+      "optimal": 242,
+      "cycles": 1,
+      "excess_cost_on_success": 11.0
+    },
+    "big_ood|rush_hour|familiar_complete_goal_big_ood": {
+      "count": 247,
+      "solved": 247,
+      "optimal": 244,
+      "cycles": 0,
+      "excess_cost_on_success": 3.0
+    },
+    "big_ood|game24|4_to24_big_ood": {
+      "count": 100,
+      "solved": 100,
+      "optimal": 100,
+      "cycles": 0,
+      "excess_cost_on_success": 0.0
+    },
+    "big_ood|game24|2_to24_big_ood": {
+      "count": 50,
+      "solved": 50,
+      "optimal": 50,
+      "cycles": 0,
+      "excess_cost_on_success": 0.0
+    },
+    "big_ood|game24|3_to24_big_ood": {
+      "count": 100,
+      "solved": 93,
+      "optimal": 93,
+      "cycles": 0,
+      "excess_cost_on_success": 0.0
+    },
+    "big_ood|game24|3_to21_big_ood": {
+      "count": 100,
+      "solved": 100,
+      "optimal": 100,
+      "cycles": 0,
+      "excess_cost_on_success": 0.0
+    },
+    "big_ood|game24|4_to21_big_ood": {
+      "count": 100,
+      "solved": 100,
+      "optimal": 100,
+      "cycles": 0,
+      "excess_cost_on_success": 0.0
+    },
+    "big_ood|game24|2_to21_big_ood": {
+      "count": 50,
+      "solved": 50,
+      "optimal": 50,
+      "cycles": 0,
+      "excess_cost_on_success": 0.0
+    }
+  },
+  "source_run": "data/flan_generalization_6f2af92/categories6/final_evaluation",
+  "interpretation": "The standard puzzle8 and original-tree token queries are whole-category OOD in smaller studies. Small-OOD cube and puzzle Qmaps are weak; their LLM failures cannot isolate reader transfer. Rush Hour is familiar catalogues, exact distance1-7; arithmetic is distinct1-10 source numbers with2/3-number suffixes and21/24 targets.",
+  "training_source_commits": {
+    "categories4": "6f2af92",
+    "categories5": "7504226",
+    "categories6": "7504226"
+  },
+  "model_condition": "Only map1.5B task-count studies; plain3B/7B are deferred"
+}

@@ -887,6 +887,32 @@ class ExactPairTests(unittest.TestCase):
         self.assertEqual(summary['short_paths_reaching_goal'],2)
         self.assertTrue(bank['path_reached_goal'].all())
 
+    def test_local_teacher_chooses_complete_permitted_route_without_pruning_branches(self):
+        from experiments.new_tasks_qmap.src.relation_diagnose import policy_boundaries,training_local_paths,permitted_optimal_prefix
+        children=np.full((6,3),-1,dtype=np.int64)
+        children[0]=[0,1,2];children[1,0]=3;children[2,0]=4;children[3,0]=5;children[4,0]=5
+        truth=UnitGraphOracle(children).to_goal(5)
+        scene=SimpleNamespace(states=np.arange(6)[:,None],children=children,goals=np.array([5]),
+            metadata=dict(split='train',training_goals=1),features=lambda ids:np.eye(6)[ids],distance=lambda s,g:truth[s])
+        corpus=PhysicalCorpus([scene]);corpus.action=lambda s,a:int(a);corpus.describe=lambda s:dict(state=int(s))
+        flat=SimpleNamespace(scores=lambda s,g:np.zeros(np.broadcast_arrays(s,g)[0].shape,dtype=np.float32))
+        records=[];rollout(corpus,flat,np.array([[0,5]]),8,'q',edge_records=records)
+        _,edges=policy_boundaries(records);data=dict(reserved_relations=keys(np.array([3]),np.array([5]),corpus.size))
+        old,_=training_local_paths(corpus,data,edges,minimum_steps=2,maximum_steps=4)
+        self.assertEqual(old['retained_paths'],0)
+        span,choice=permitted_optimal_prefix(corpus,data,0,5)
+        self.assertEqual(span[0],3);self.assertEqual(choice[0],2)
+        summary,bank=training_local_paths(corpus,data,edges,minimum_steps=2,maximum_steps=4,
+            continuation_policy='longest_permitted_prefix')
+        self.assertEqual(summary['retained_paths'],1);self.assertEqual(summary['seeds_with_full_permitted_optimal_path'],1)
+        np.testing.assert_array_equal(bank['path_tasks'][0,:3,0],[0,2,4])
+        np.testing.assert_array_equal(bank['path_children'][0,0],[0,1,2])
+        self.assertTrue(bank['path_reached_goal'][0]);self.assertEqual(bank['path_teacher_choice'][0,0],2)
+        # When all exact-optimal routes are censored, retain the longest valid
+        # prefix without claiming it reaches the goal or deleting the bad branch.
+        blocked=dict(reserved_relations=keys(np.array([3,4]),np.array([5,5]),corpus.size))
+        span,_=permitted_optimal_prefix(corpus,blocked,0,5);self.assertEqual(span[0],1)
+
     def test_output_scale_and_interval_diagnostics_keep_physical_units(self):
         from experiments.new_tasks_qmap.src.relation_evaluate import coordinate_statistics
         outputs=[]; slopes=[]

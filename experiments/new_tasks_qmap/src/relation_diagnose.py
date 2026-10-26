@@ -376,7 +376,33 @@ def training_failure_bank(corpus,data,edges,*,continuation_seeds_per_layout=16,m
     return summary,dict(**materialize(corpus,bank),reason=reason)
 
 
-def training_local_paths(corpus,data,edges,*,minimum_steps=5,maximum_steps=10,seeds_per_layout=32,seed=0):
+def permitted_optimal_prefix(corpus,data,sid,goal):
+    """Offline teacher choices maximizing permitted exact-optimal continuation.
+
+    An unsafe decision ends supervision, including when only one of its legal
+    candidates touches a protected relation. Physical candidate arrays stay intact.
+    """
+    from .relation_data import training_decision_mask
+    scene=corpus.scenes[sid];offset=corpus.offsets[sid];n=len(scene.states)
+    local=np.arange(n,dtype=np.int64);target=int(goal-offset)
+    truth=scene.distance(local,np.full(n,target));children=scene.children
+    safe=training_decision_mask(corpus,data,np.column_stack([local+offset,np.full(n,goal)]))
+    span=np.zeros(n,dtype=np.int32);choice=np.full(n,-1,dtype=np.int16)
+    finite=truth[np.isfinite(truth)]
+    if len(finite) and not np.equal(finite,np.floor(finite)).all():raise ValueError('Optimal-prefix teacher requires unit costs')
+    for level in range(1,int(finite.max(initial=0))+1):
+        ids=np.flatnonzero(safe&(truth==level));candidate=children[ids];valid=candidate>=0
+        scores=np.full(candidate.shape,-1,dtype=np.int32)
+        optimal=np.zeros(candidate.shape,bool);optimal[valid]=truth[candidate[valid]]==level-1
+        scores[optimal]=span[candidate[optimal]]
+        if len(ids) and not optimal.any(1).all():raise ValueError('No exact-optimal physical successor')
+        if len(ids):
+            slots=scores.argmax(1);choice[ids]=slots;span[ids]=1+scores[np.arange(len(ids)),slots]
+    return span,choice
+
+
+def training_local_paths(corpus,data,edges,*,minimum_steps=5,maximum_steps=10,seeds_per_layout=32,seed=0,
+                         continuation_policy='first_optimal'):
     """Whole same-goal optimal path groups, with every legal branch at each step.
 
     Shorter groups are retained only when they reach the exact goal. A protected
@@ -386,6 +412,7 @@ def training_local_paths(corpus,data,edges,*,minimum_steps=5,maximum_steps=10,se
     from .relation_data import training_decision_mask,materialize
     from .relation_evaluate import distance_strata
     if not 1<=minimum_steps<=maximum_steps or seeds_per_layout<1:raise ValueError('Invalid local path bounds')
+    if continuation_policy not in ('first_optimal','longest_permitted_prefix'):raise ValueError('Unknown offline continuation policy')
     _,critical=training_failure_bank(corpus,data,edges,continuation_seeds_per_layout=1,maximum_steps=1)
     take=(critical['reason']&15)>0;pool=critical['tasks'][take];reasons=critical['reason'][take]&15
     rng=np.random.default_rng(seed);scene_ids=corpus.locate(pool[:,0]);chosen=[]
@@ -409,6 +436,14 @@ def training_local_paths(corpus,data,edges,*,minimum_steps=5,maximum_steps=10,se
     teacher=np.full((n,maximum_steps),-1,dtype=np.int8)
     lengths=np.zeros(n,dtype=np.int16);reached=np.zeros(n,dtype=bool);protected=np.zeros(n,dtype=bool)
     active=np.ones(n,dtype=bool);current=seeds.copy()
+    prefix_cache={};available=np.full(n,-1,dtype=np.int32)
+    if continuation_policy=='longest_permitted_prefix':
+        seed_scenes=scene_ids[chosen]
+        for sid in np.unique(seed_scenes):
+            mask=seed_scenes==sid
+            for g in np.unique(seeds[mask,1]):
+                span,preferred=permitted_optimal_prefix(corpus,data,int(sid),int(g));prefix_cache[(int(sid),int(g))]=preferred
+                take=mask&(seeds[:,1]==g);available[take]=span[seeds[take,0]-corpus.offsets[sid]]
     for step in range(maximum_steps):
         ids=np.flatnonzero(active)
         if not len(ids):break
@@ -416,6 +451,10 @@ def training_local_paths(corpus,data,edges,*,minimum_steps=5,maximum_steps=10,se
         blocked=ids[~safe];protected[blocked]=True;active[blocked]=False;ids=ids[safe]
         if not len(ids):continue
         exact=materialize(corpus,current[ids]);slots=exact['optimal'].argmax(axis=1)
+        if prefix_cache:
+            slots=np.asarray([prefix_cache[(int(sid),int(g))][s-corpus.offsets[sid]]
+                for (s,g),sid in zip(current[ids],corpus.locate(current[ids,0]))])
+            if (slots<0).any() or not exact['optimal'][np.arange(len(ids)),slots].all():raise ValueError('Offline prefix choice lost exact optimality')
         if not exact['optimal'].any(axis=1).all():raise ValueError('No optimal path continuation')
         tasks[ids,step]=current[ids];children[ids,step]=exact['children'];labels[ids,step]=exact['distances']
         child_labels[ids,step]=exact['child_distances'];optimal[ids,step]=exact['optimal'];teacher[ids,step]=slots
@@ -439,6 +478,8 @@ def training_local_paths(corpus,data,edges,*,minimum_steps=5,maximum_steps=10,se
     def distribution(mask):
         return {name:int((mask&layer).sum()) for name,layer in distance_strata(initial)}
     summary=dict(minimum_steps=minimum_steps,maximum_steps=maximum_steps,seeds_per_layout=seeds_per_layout,
+        continuation_policy=continuation_policy,
+        seeds_with_full_permitted_optimal_path=int((available==distances[chosen]).sum()) if prefix_cache else None,
         eligible_failure_seeds=len(pool),selected_seeds=n,retained_paths=int(keep.sum()),rejected_paths=int((~keep).sum()),
         retained_layouts=len(np.unique(corpus.locate(seeds[keep,0]))),selected_layouts=len(np.unique(corpus.locate(seeds[:,0]))),
         retained_lengths={str(i):int((kept_lengths==i).sum()) for i in np.unique(kept_lengths)},

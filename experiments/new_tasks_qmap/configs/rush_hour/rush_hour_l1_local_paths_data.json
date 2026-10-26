@@ -1,0 +1,25 @@
+{
+  "source_mode": "original_starts",
+  "query_count": 4096,
+  "query_seed_offset": 51003,
+  "planning_distance_bins": [
+    1,
+    2,
+    5,
+    10,
+    20,
+    40,
+    80,
+    256
+  ],
+  "continuation_seeds_per_layout": 16,
+  "maximum_steps": 256,
+  "scope": "Use the frozen validation-selected L1 convergence map and the same4096 permitted training-root queries. Keep current-policy failed/cyclic seeds and all legal alternatives. Offline exact-optimal continuations maximize the length of fully permitted supervision, so an arbitrary tied action cannot unnecessarily truncate a path at a held relation. Retain5-10-step groups, or shorter only when the complete goal is reached. Protected branches still remain in every candidate array; no held label is added and no inference action is filtered. Report rejected/censored paths separately.",
+  "local_paths": {
+    "minimum_steps": 5,
+    "maximum_steps": 10,
+    "seeds_per_layout": 32,
+    "seed": 2026102602,
+    "continuation_policy": "longest_permitted_prefix"
+  }
+}

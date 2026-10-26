@@ -1,7 +1,7 @@
 # 手电过桥数据
 
-生成入口：[data.py](../../../grounded_llm/tasks/bridge/data.py)。参数和划分数量只维护在[配置](../../../experiments/new_tasks_qmap/configs/pilot/bridge.json)。运行输出为忽略目录中的 data.npz、scenes.jsonl.gz 和 data_summary.json，包含场景、状态编码、全部合法动作后继、动作成本、精确距离、终止掩码、起点及划分。不可达距离是正无穷，训练代理标签另存，不覆盖真值。
+每个场景由人数与完整耗时组合定义，按排序后的耗时元组划分，训练、开发与独立验收组合排除重叠。五人、六人分别准备与训练；耗时为配置范围内互异正整数，升序定义人员编号。参数只维护在[selection所指配置](../Qmap/selection.json)。
 
-按排序后的完整时间组合划分，训练、验证、测试组合不重叠；每场景完整枚举人员位置和手电位置，初始均全员左岸。经典四人题只作规则回归。
+每场景枚举全部人员位掩码与手电岸，保留合法载1／2人的全部动作及即时耗时；对选定完整目标运行Dijkstra，生成距离与完整候选。目标包括全员右岸和指定人员／手电中间分布，起点可为全员左岸或中间状态。无解真值保留为无穷，训练代理值另存。
 
-[example.json](example.json)仅为结构与规则说明。
+生成实现见[relation_data.py](../../../grounded_llm/tasks/bridge/relation_data.py)。精确图、曝光、日志和断点保存在忽略运行目录；[报告](../../../experiments/new_tasks_qmap/results/bridge/report.md)链接已采用地图的独立题集结果。[example.json](example.json)仅作格式说明；早期pilot题集不代表当前验收范围。

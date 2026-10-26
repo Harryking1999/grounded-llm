@@ -14,7 +14,9 @@
 
 筛选方法见[原论文附录第7节](https://proceedings.mlr.press/v97/guez19a/guez19a-supp.pdf)。这是相对原作者策略的难度。
 
-## 本项目使用的范围
+## 固定墙体条件与历史共享数据
+
+当前主条件每套固定墙体独立训练Qmap，固定墙体内改变箱子、玩家与完整中间目标，精确有向距离逐目标计算；训练拟合与目标泛化均未通过，优化搁置。详见[当前报告](../../../experiments/new_tasks_qmap/results/sokoban/report.md)。以下规模属于原多墙体共享条件。
 
 当前已扩展到1,202个场景：1,000个训练、100个验证、100个测试，另有2个已知困难题。原来的64张训练及16张验证／测试棋盘均保留在各自划分中。只接纳能完整计算精确距离的布局，实际规模和同题比较见[覆盖量结果](../../../experiments/new_tasks_qmap/results/sokoban/sokoban_coverage_comparison.json)，选题与筛选条件见[配置](../../../experiments/new_tasks_qmap/configs/sokoban/sokoban_coverage1000_pairs.json)。
 
@@ -22,4 +24,4 @@
 
 原题359、362已用于开发和DeepSeek诊断，单列记录，历史6×6两箱试验与当前hard数据不同，结果保留在[首轮记录](../../../experiments/new_tasks_qmap/results/pilot/summary.json)。[example.json](example.json)只是格式示例。
 
-64张／1,000张训练棋盘的两组对照已完成，按棋盘均衡抽样；全部实际训练批次的距离与合法候选已核对。见[实验入口](../../../experiments/new_tasks_qmap/README.md#推箱子覆盖量对照)。
+64张／1,000张训练棋盘的两组对照已完成，按棋盘均衡抽样；全部实际训练批次的距离与合法候选已核对。见[历史覆盖量结果](../../../experiments/new_tasks_qmap/results/sokoban/sokoban_coverage_comparison.json)。

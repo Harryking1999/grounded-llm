@@ -1,6 +1,6 @@
 # 棋子交换 Qmap
 
-**原固定树地图通过完整完成率验收并采用。** 三个1024题组完成率97.46%、98.24%、97.46%；最优完成约71%–75%，仍有残余循环。完整比较见[三任务报告](../../../experiments/new_tasks_qmap/results/report.md)，采用状态见[selection](selection.json)。
+**原固定树地图通过完整完成率验收并采用。** 三个1024题组完成率97.46%、98.24%、97.46%；最优完成约71%–75%，仍有残余循环。另一棵10顶点树也有独立采用地图；两树追加效率验收未通过，优化已暂停。完整比较见[棋子交换报告](../../../experiments/new_tasks_qmap/results/token_swapping/report.md)，采用状态见[selection](selection.json)。
 
 ## 输入和目标
 

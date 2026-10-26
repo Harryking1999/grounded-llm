@@ -1,8 +1,9 @@
 {
   "task": "sokoban",
-  "status": "not_adopted",
+  "status": "deferred_not_adopted",
   "checkpoint": null,
-  "config": "experiments/new_tasks_qmap/configs/sokoban/sokoban_pairs.json",
-  "scope": "Exact complete goals including player; shared across Boxoban hard layouts. Baseline failed minimum greedy completion; no adopted model.",
-  "evidence": "experiments/new_tasks_qmap/results/sokoban/sokoban_pairs_baseline.json"
+  "config": "experiments/new_tasks_qmap/configs/sokoban/sokoban_fixed_wall_902_width_wide4.json",
+  "scope": "Per-fixed-wall10x10 four-box Qmap with complete box/player goals; MLP retained. No adopted model. Optimization deferred by user.",
+  "evidence": "experiments/new_tasks_qmap/results/sokoban/sokoban_transition_fitting.json",
+  "limitations": "Training execution and held complete goals remain weak; exact teacher graphs and historical checkpoints preserved. Earlier shared-wall conditions are historical evidence only."
 }

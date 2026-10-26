@@ -1,121 +1,147 @@
-# 按任务工作的统一入口
+# 九类任务与 Qmap 可用性总览
 
-本页索引已有十个任务，其中九类组成下一阶段任务池，汉诺塔保留为已有能力与后续扩展项。四任务联合SFT已经开展，实验范围与下一阶段选择见[项目状态](../docs/PROJECT_STATUS_AND_TODO.md)。各任务独立训练地图；多任务LLM共用读取接口。
+本页回答：**有哪些任务和小类、现在能用哪张地图、结果到什么程度。** 截至2026-10-26，新任务优化已暂停；推箱子搁置，移车与21／24点按已经验证的范围保留使用。汉诺塔作为既有能力单列，不计入九类。
 
-## 多任务扩展准备情况
-
-下一阶段新增推箱子、移车出库、棋子交换、过桥和24点。数据与训练设计统一见[Qmap方法](QMAP_METHOD.md#任务扩展与训练安排)；本表维护已有条件和接入缺口。
-
-| 任务 | 已有地图与LLM条件 | 进入下一轮要补齐什么 |
-|---|---|---|
-| 积木、二阶魔方、8-Puzzle、寻路 | 各有采用地图，已进入四任务联合SFT | 补多目标结构验收；寻路准备新图及新Qmap；复用联合数据与评测入口 |
-| 汉诺塔 | 八盘整塔目标地图已采用，本轮联合SFT未纳入 | 作为已有能力保留，后续按任务组合安排 |
-| 手电过桥 | 五人、六人限定范围地图分别通过完成与成本验收并采用；见[报告](../experiments/new_tasks_qmap/results/bridge/report.md)及[selection](bridge/Qmap/selection.json) | 已采用两张地图的LLM读取与目标停止 |
-| 24点 | 1–10任取四数的位编码地图已通过基本验收并限定采用，实际reader复核通过，见[报告](../experiments/new_tasks_qmap/results/game24/report.md) | 留出4→2规划348/420已过基本门槛，继续提高到90%目标，再扩大范围 |
-| 推箱子、移车出库、棋子交换 | 原树棋子交换已通过完成率验收并采用；推箱子、移车未通过 | 推箱子先验收固定墙体内多目标执行，移车保留跨布局；棋子交换分别验收固定树长程与新树地图，再接LLM |
-
-Qmap、文字协议、正式SFT数据和LLM结果是不同准备阶段。现有公共接口可复用，下一轮任务组合由[状态页](../docs/PROJECT_STATUS_AND_TODO.md#推进安排)维护，各地图身份仍以selection为准。
+“已选用”表示有明确的权重和适用范围，不表示所有题都能完成。下表成绩均为**冻结Qmap逐步选择合法后继的整题完成率**，不是LLM成绩，也不是单步准确率。完整完成、最优完成和距离误差分别判断。
 
 ## 任务能力总表
 
-指标均为整题成功率，**每行明确题集与实际题数**。同一行未测试的模型用 `-` 占位。7B SFT为无地图基线。四任务固定500题的150K比较见[联合SFT报告](../experiments/map_sft_baselines/results/report.md#7-flan-150k重评测冻结地图的同题贪心参照)。
+| 大类 | 现在使用的条件 | Qmap状态 | 代表结果与主要边界 |
+|---|---|---|---|
+| [积木](blocks/README.md) | 原八种形状，12次放置构造的棋盘→清空 | **已有候选，未完成验收** | 固定1000题889/1000（88.9%），低于正式要求900；非空目标未采用 |
+| [二阶魔方](cube2/README.md) | 现有六动作→标准复原态 | **已选用，能力有限** | 全状态复原2,846,397/3,674,160（77.47%）；任意非复原目标未采用 |
+| [8-Puzzle](puzzle8/README.md) | 标准3×3棋盘→标准复原态 | **已选用** | 同一可达分量全状态178,326/181,439（98.28%）；留出中间目标328/1024，未采用 |
+| [寻路](path/README.md) | 已登记固定图上的指定起终点，纯Q地图 | **已选用** | 固定图留出关系251/256（98.05%）；不能据此宣称新图直接泛化 |
+| [推箱子](sokoban/README.md) | 固定墙体，四箱及玩家的完整目标 | **搁置，无采用地图** | 固定墙体宽MLP留出目标22/94；训练长题也明显不足 |
+| [移车出库](rush_hour/README.md) | 无墙6×6，原占格MLP，同一任务地图覆盖训练布局 | **限定选用** | 熟悉布局两组短程测试均1024/1024；全量训练原起点查询60,688/96,502（62.89%），新布局原题60/1024 |
+| [棋子交换](token_swapping/README.md) | 两棵固定10顶点树，各有独立地图，完整排列目标 | **两张均已采用** | 原树三组97.46%–98.24%；另一树三组均98.73%；最优完成约67%–75%，效率未达标 |
+| [过桥](bridge/README.md) | 两岸一手电、容量2；五人和六人各一张地图 | **两张均已采用** | 新耗时场景三组：五人119–126/128，六人126–127/128；完成与成本最优率均通过各自基本门槛 |
+| [21／24点](game24/README.md) | 1–10任取四个不同整数，共210组；目标21／24及配置内中间目标 | **有限域已采用** | 默认多目标图：四数→21为185/185，→24为196/197；留出两步4→2目标348/420（82.86%） |
 
-| 任务／目标范围／测试集 | DeepSeek | Qwen3-32B | 5.6 | 6.1 | 认知地图本身贪心 |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| **积木：12块清空，固定1000题（正式）** | - | - | - | - | **88.9%（889/1000）** |
-| 积木：原文字40题，12块清空 | 77.5%（31/40） | 2.5%（1/40） | 92.5%（37/40） | 95%（38/40） | - |
-| 寻路：原文字40题 | 97.5%（39/40） | 65%（26/40） | 100%（40/40） | 100%（40/40） | - |
-| 寻路：固定留出256题 | - | - | - | - | **98.05%（251/256）** |
-| 八盘汉诺塔：原文字40题 | 42.5%（17/40） | 10%（4/40） | 97.5%（39/40） | 95%（38/40） | - |
-| 八盘汉诺塔：全状态到指定柱整塔，19680题 | - | - | - | - | **99.89%（19659/19680）** |
-| 二阶魔方：原文字40题，复原 | 12.5%（5/40） | 2.5%（1/40） | 65%（26/40） | 77.5%（31/40） | - |
-| 二阶魔方：全状态复原，3674160题 | - | - | - | - | **77.47%（2846397/3674160）** |
-| 8-Puzzle：原文字40题，复原 | 22.5%（9/40） | 15%（6/40） | 82.5%（33/40） | 90%（36/40） | - |
-| 8-Puzzle：全状态复原，181439题 | - | - | - | - | **98.28%（178326/181439）** |
+移车“熟悉布局”指车辆方向、长度、固定车道等配置参与过地图训练；起点、目标或关系可以留出。“新布局”指整套车辆配置留出。两个1024题的高分组主要是短题，不能代表从原题起点出发的长程能力，更不能代表1000张题库内全部查询完美完成。
 
-三个新任务仍处于地图验证阶段，单列如下，完整结果见[三任务报告](../experiments/new_tasks_qmap/results/report.md)。
+## 多任务扩展准备情况
 
-### 三个新任务
+以下保留既定的小类安排，并逐项区分已经可用与尚未验收的范围。“同一地图”是适配方式，不代表相应小类已经训练成功。
 
-下表均为指定完整目标、冻结地图逐步贪心的结果。各主要组1,024题；每个任务使用同一行所指方案。
+### 积木
 
-| 任务 | 熟悉环境的新关系 | 未见目标或状态 | 未见布局 | 状态 |
-|---|---:|---:|---:|---|
-| [推箱子](sokoban/README.md)，10×10四箱，1,000张训练棋盘 | 19.43%（199/1024） | 未见目标16.21%（166/1024） | 37.89%（388/1024），100张测试棋盘 | 未达标 |
-| [移车出库](rush_hour/README.md)，无墙6×6 | 98.24%（1006/1024） | 未见目标98.83%（1012/1024） | 54.59%（559/1024） | 未达标 |
-| [棋子交换](token_swapping/README.md)，原固定10顶点树L1 | 97.46%（998/1024），原保护关系回归 | 新查询未见起点98.24%（1006/1024）；两端未见97.46%（998/1024） | 新树独立地图亦通过 | 完成率通过；最优率另列 |
+状态是棋盘占格，目标是指定完整棋盘；当前正式能力是清空。**八种形状与八块积木是两个概念。**
 
-推箱子使用固定距离区间的同题重评：64张组与1,000张组的未见布局完成率为29.88%与37.89%，21步及以上均0/312；旧16张布局测试另保留，各组距离分布不同，覆盖量对照在同一题集上比较。
-
-各必需组分别至少80%，目标90%以上，困难原题也需单独验收。棋子交换原树已采用，推箱子和移车未采用；三类均无LLM读取结果。指定目标的DeepSeek Flash 64k诊断为推箱子0/2、移车出库0/8、棋子交换4/5；这是已知困难题，见[文字结果](../experiments/task_text_baselines/results/exact_goals_flash64k.json)。
-
-早期手电过桥、小棋盘推箱子、24点的地图结果分别为31/32、92/475、70/137；规则和题集不同，只保留为[首轮试验](../experiments/new_tasks_qmap/results/pilot/summary.json)。历史文字筛查见[文字报告](../experiments/task_text_baselines/results/report.md)。
-
-**积木历史回归（单独题集，非12块清空1000题）：**
-
-| 测试集 | 当前地图贪心4f413b5 | 旧地图贪心986cb4d | 1.5B＋旧地图：单任务SFT | 7B无地图SFT |
-|---|---:|---:|---:|---:|
-| 原地图SFT固定510题 | 84.90%（433/510） | 77.84%（397/510） | 94.12%（480/510） | 92.16%（470/510） |
-
-旧1.5B为50k B2，7B为10k R＋A最佳断点，训练条件不同；旧1.5B到达且正确停止为475/510。统一训指同一个1.5B读图模型跨任务训练，各任务Qmap仍独立。
-
-积木正式范围仅清空，**正式完成须≥900/1000，当前未完成**；[固定1000题](blocks/data/clear1000.json)、[验收合同](../experiments/blocks_distance_map/configs/blocks12_clear_acceptance.json)。当前889/1000；相对880参照丢48、新增57，净增9，历史510为433（丢20、新增24）。789基线及全部历史权重保留。当前图原文字40题尚未补测；旧ffba71f在该40题为27/40，尚无1.5B／7B在1000题上的正式结果；独立最终泛化仍待验收，见[模型比较](../experiments/blocks_distance_map/results/blocks12_joint_report.md)。
-
-采用权重：[积木](blocks/Qmap/selection.json)、[寻路](path/Qmap/selection.json)、[汉诺塔](hanoi/Qmap/selection.json)、[二阶魔方](cube2/Qmap/selection.json)、[华容道](puzzle8/Qmap/selection.json)。全状态评测包含地图训练状态，原文字每任务40题、思考＋答案16k token，其他任务验收范围保持原定义。
-
-证据：[当前积木1000逐题](../runs/qmap_dual_20261018/blocks12/decision_clear_028_300/evaluation/step_000300/results.json)、[纯文字四模型](../experiments/task_text_baselines/results/report.md)、[历史SFT](../experiments/map_sft_baselines/results/report.md)、[寻路](../experiments/path_qmap/results/summary.json)、[汉诺塔](../experiments/hanoi_qmap/results/full_coverage_summary.json)、[魔方](../runs/cube2_qmap/cycle_repair_f42c487/summary.json)、[华容道](../runs/qmap_dual_20261018/puzzle8/goal_expansion/stages/step_001000/metrics.json)。后续仅在相应题集行原位更新真实结果。
-
-## 任务目录
-
-| 任务 | 任务工作区 | 文字与提示 | 数据形态 | 地图 |
-|---|---|---|---|---|
-| 积木 | [blocks](blocks/README.md) | [prompts](blocks/prompts/README.md) | [data](blocks/data/README.md) | [Qmap](blocks/Qmap/README.md) |
-| 寻路 | [path](path/README.md) | [prompts](path/prompts/README.md) | [data](path/data/README.md) | [Qmap](path/Qmap/README.md) |
-| 汉诺塔 | [hanoi](hanoi/README.md) | [prompts](hanoi/prompts/README.md) | [data](hanoi/data/README.md) | [Qmap](hanoi/Qmap/README.md) |
-| 二阶魔方 | [cube2](cube2/README.md) | [prompts](cube2/prompts/README.md) | [data](cube2/data/README.md) | [Qmap](cube2/Qmap/README.md) |
-| 8-Puzzle（数字华容道） | [puzzle8](puzzle8/README.md) | [prompts](puzzle8/prompts/README.md) | [data](puzzle8/data/README.md) | [Qmap](puzzle8/Qmap/README.md) |
-| 手电过桥 | [bridge](bridge/README.md) | [prompts](bridge/prompts/README.md) | [data](bridge/data/README.md) | [Qmap](bridge/Qmap/README.md) |
-| 推箱子 | [sokoban](sokoban/README.md) | [prompts](sokoban/prompts/README.md) | [data](sokoban/data/README.md) | [Qmap](sokoban/Qmap/README.md) |
-| 24点 | [game24](game24/README.md) | [prompts](game24/prompts/README.md) | [data](game24/data/README.md) | [Qmap](game24/Qmap/README.md) |
-| Rush Hour | [rush_hour](rush_hour/README.md) | [prompts](rush_hour/prompts/README.md) | [data](rush_hour/data/README.md) | [Qmap](rush_hour/Qmap/README.md) |
-| Token Swapping | [token_swapping](token_swapping/README.md) | [prompts](token_swapping/prompts/README.md) | [data](token_swapping/data/README.md) | [Qmap](token_swapping/Qmap/README.md) |
-
-## 任务来源与结构背景
-
-五类任务均已有完整目标地图实验；过桥两人数、棋子交换两树及有限21／24已有限定采用权重，具体条件见各任务采用记录。过桥、24点按正常难度推进。下表保留任务来源与后续变体的结构背景；复杂度针对可增长任务族。
-
-| 候选／来源 | 难在什么目标 | 对本项目的价值与限制 |
+| 小类 | 地图如何提供 | 当前可用性 |
 |---|---|---|
-| Rush Hour／[复杂度与规则建模论文](https://air.uniud.it/retrieve/22b19a17-19a9-4b13-a1e2-3b9126cce139/paper_29.pdf)、[公开代码](https://github.com/fogleman/rush) | 可变棋盘推广版的目标可达性为PSPACE完全；车只能沿自身轴线移动 | 优先考虑。动作可逆，同一车辆布局的可达分量内有对称最短路；适合固定出口目标，也可另设完整排列目标考察任意状态对。需要区分两种目标及单格／多格动作口径 |
-| Token Swapping／[ESA2016](https://drops.dagstuhl.de/entities/document/10.4230/LIPIcs.ESA.2016.66)、[树上的困难性](https://arxiv.org/abs/2103.06707)、[公开实例及适配](token_swapping/data/README.md) | 一步交换图上相邻节点的棋子，最少交换次数NP-hard，即使底图是树 | 最适合直接检验任意起终点的距离。连通底图上所有排列互达；仅要求最终完成时可由通用流程求解，必须把成本／最优性列为目标。tket固定问题的上游序列不保证最短，本地另用精确搜索标定 |
-| 冲突图渡河／[Csorba等，SIAM](https://doi.org/10.1137/080736661) | 狼羊菜推广成任意冲突图，求可完成运输的最小船容量NP-hard | 保留为过桥邻近候选。冲突关系改变可行状态与连通性，输入需有位置、船／管理者位置、冲突图与容量。一般冲突图规则尚无本地实现 |
-| 多岛多手电／[原题及本地核对](bridge/README.md#变体与适用性) | 维护人员与手电分布，人员有不同目的地；已核对的具体规则没有NP-hard结论 | 保留过桥语义、精确状态规模小，但现有来源为教学任务 |
+| 原八形状、12块构造后清空 | 当前棋盘编码Qmap | 已有889/1000候选，正式验收未完成 |
+| 中间残余状态→清空 | 同一Qmap | 属于现有训练范围；没有独立小类验收分数 |
+| 8块清空 | 沿用棋盘编码，按该条件准备数据 | 保留为训练小类安排，未单列验收；不能用八形状成绩代替 |
+| 放积木／构造、不同块组合的非空完整目标 | 同一编码，需相应源—目标监督 | 非空目标目前仅作辅助，尚无采用能力 |
 
-推箱子在棋盘与箱数可增长的推广下为PSPACE完全，见[文献入口](https://webdocs.cs.ualberta.ca/~games/Sokoban/papers.html)。当前Boxoban hard是固定10×10四箱题集。
+### 二阶魔方
 
-## 每个任务采用相同布局
+| 小类 | 地图如何提供 | 当前可用性 |
+|---|---|---|
+| 六动作下标准复原，不同距离层 | 当前魔方Qmap | 已选用；全状态完成77.47%，仍有执行失败 |
+| 非复原完整目标、同一起点换目标 | 计划共用魔方Qmap | 尚无可靠采用结果，不能把复原成绩外推为任意目标能力 |
 
-```text
-tasks/<task>/
-  README.md             # 环境、已有代码、结果与正式配置的入口
-  prompts/README.md     # 任务描述、规则、环境更新、各组输出与监督答案
-  data/README.md        # 数据字段、准备代码与划分说明
-  data/example.json     # 小型说明例；不是新增训练数据
-  Qmap/README.md        # 共享方法、任务适配、训练与加载入口
-  Qmap/selection.json   # 已采用权重的来源、适用范围和正式配置
-  Qmap/checkpoints/     # Git 忽略：只放选定权重，不堆训练过程
-```
+### 8-Puzzle
 
-根目录 [TASK_TEXTS.md](../TASK_TEXTS.md) 是所有任务文字的集中副本，由 `python -m tasks.export_texts` 从各任务的 `prompts/README.md` 与文字示例生成。修改任务内原文后重生成；不要直接编辑集中副本。`python -m tasks.export_texts --check` 检查是否同步。
+| 小类 | 地图如何提供 | 当前可用性 |
+|---|---|---|
+| 标准复原，不同空格位置和距离层 | 当前Qmap，同一奇偶可达分量 | 已选用；全状态完成98.28% |
+| 指定中间棋盘、同一起点换目标 | 同一Qmap已有多目标训练入口 | 留出中间目标328/1024（32.03%），未采用 |
+| 另一可达分量 | 按对应连通分量另准备关系 | 未取得采用结论；不属于当前复原全状态成绩 |
 
-## 文字分组
+### 寻路
 
-- 地图组／CoT 组：共享任务描述与规则，每轮收到真实环境更新。地图向量是地图组的独立输入，不把精确裁判距离放进文字。
-- SOTA 组／32B 组：共享同一任务的描述与规则，一次输出完整剩余计划 JSON、无中途反馈。五任务文字已用于用户授权的纯文字基线，预算和题集见对应正式配置。
-- 监督答案单列排序、Reason、Action。地图组是排序→R→A，无地图组删除排序行；当前为简短 Reason，长 CoT 尚未准备。
+| 小类 | 地图如何提供 | 当前可用性 |
+|---|---|---|
+| 已登记固定图的指定起终点 | 该图独立训练的纯Q地图 | 已选用；留出关系251/256 |
+| 另一张规模、密度相近的图 | 新图独立Qmap，供原LLM读取 | 当前selection只登记现用图；没有一组已验收的新图地图清单 |
+| 改变分叉／环结构 | 每张新图独立训练、验收 | 保留小OOD安排，尚未形成采用结果 |
 
-## 代码和权重怎么维护
+历史多图文字实验与当前纯Q地图条件不同，不计为新增可用Qmap。
 
-`tasks/` 是日常阅读入口；公共实现放在 `grounded_llm/core/`，规则、数据适配与裁判放在 `grounded_llm/tasks/`，正式合同与运行编排放在 `experiments/`。任务独立编排 Qmap 训练与评测，SFT 使用公共训练基础，见 [Qmap 方法](QMAP_METHOD.md)和[源码结构](../README.md#代码依赖与接入)。新训练写入 Git 外的 `runs/`；确认采用的模型才放入该任务的 `Qmap/checkpoints/`，来源写入 `selection.json`。
+### 推箱子
 
-项目进展与下一步只维护在 [状态页](../docs/PROJECT_STATUS_AND_TODO.md)。历史结果仍按原合同解释。
+状态含墙、原目标格标记、四箱和玩家；每走一格或推一格计一步。完成要求箱子和玩家都匹配查询目标，箱子无编号。
+
+| 小类 | 地图如何提供 | 当前可用性 |
+|---|---|---|
+| 固定墙体，箱子与玩家的完整目标 | **每套墙体独立Qmap**，保留MLP路线 | 未通过，搁置 |
+| 箱子0/4至4/4就位、中间目标、不同玩家终点、死锁附近分支 | 同一固定墙体地图 | 已有精确数据与分层诊断，连续执行未解决；无采用能力 |
+| 新墙体 | 另训对应地图 | 未取得可用结果；更早的跨墙共享地图也未通过 |
+
+### 移车出库
+
+状态为所有车辆的位置；一次将一辆车沿自身方向滑动任意合法距离计一步。**所有车辆**必须匹配完整目标；普通中间目标不要求A已到出口。
+
+| 小类 | 地图如何提供 | 当前可用性 |
+|---|---|---|
+| 熟悉配置中的新关系、留出完整车辆目标 | 已选占格MLP，一张图覆盖训练配置 | 限定选用；已测短程组均1024/1024 |
+| A未到出口、让路阶段的中间完整排列、同起点换目标 | 同一Qmap；已有多目标数据 | 属于训练／开发范围，但没有单独证明所有让路再归位组合都可靠 |
+| 熟悉布局原题起点与长路径 | 同一Qmap | 4096题分层样本90.55%；全量原起点×训练目标62.89%，**未全面可用** |
+| 新车辆配置 | 同一Qmap直接编码 | 随机中间起点591/1024（57.71%），原题起点60/1024（5.86%），未采用 |
+
+保留原占格编码，属性编码没有改善。当前训练数据覆盖1000个独立车辆配置组；追加2000组条件已暂停，不能作为新的可用范围。
+
+### 棋子交换
+
+一次沿底图的一条边交换两端棋子；完整排列一致才完成。连通底图上的排列都可达，另需评价最少交换次数。
+
+| 小类 | 地图如何提供 | 当前可用性 |
+|---|---|---|
+| 原10顶点树，新关系／未见起点／两端未见 | 原树采用地图 | 三组998、1006、998/1024；最优723、772、766/1024 |
+| 另一棵10顶点树，同样的排列变化 | 第二棵树的独立采用地图 | 三组均1011/1024；最优690、739、732/1024 |
+| 长题的最优交换效率 | 对应树地图 | 完成率较高，追加效率验收未通过；两张采用地图保留 |
+| 环、一般连通图、改变顶点数 | 新底图独立训练并匹配输入槽位 | 尚无采用地图；原LLM读取第二棵树也未验证 |
+
+### 过桥
+
+完整状态为每个人所在岸和手电岸，人员耗时属于场景输入；一步载1或2人，成本为同行者最大耗时。选择动作比较“即时耗时＋预测剩余成本”。
+
+| 小类 | 地图如何提供 | 当前可用性 |
+|---|---|---|
+| 五人：全员到右岸／指定人员与手电目标／中间起点 | 五人独立地图 | 新耗时三组完成119、125、126/128；最优103、114、118/128，均通过 |
+| 六人：相同三类目标与起点 | 六人独立地图 | 完成127、127、126/128；最优108、118、121/128，均通过 |
+| 同人数的新耗时组合 | 使用该人数地图 | 已测配置范围内可用；人员按耗时升序编号、耗时互异且为正整数 |
+| 其他人数、重复耗时、人员重排、范围外耗时 | 新人数另训地图；其余变化另验收 | 无采用结论，不能由五／六人成绩外推 |
+
+### 21／24点
+
+状态是剩余数的精确有理数多重集；一步合并两个数，元素数减少1，所以没有循环。可达时步数恒为源、目标元素数之差，重点是选中仍保留解的分支。
+
+| 小类 | 地图如何提供 | 当前可用性 |
+|---|---|---|
+| 1–10任取四个不同数→21／24 | 默认四槽位编码多目标地图 | 可解起题185/185、196/197；无解题另检可达性，不要求求出解 |
+| 同一起点在21与24间换目标 | 同一地图 | 47组要求改变首步的题，均正确换动作且两边完成 |
+| 从3数后缀继续→21／24 | 同一四槽地图，空槽有存在位 | 431/431、462/476 |
+| 从2数后缀继续→21／24 | 同一四槽地图 | 92/92、94/94 |
+| 留出完整中间数值多重集 | 同一多目标地图 | 留出两步4→2为348/420；留出一步4→3为420/420。只支持配置内评测范围 |
+| 独立3数初题／5数初题／扩大来源数字集 | 按条件准备；改变槽位上限时另训地图 | 尚未独立采用。3数后缀成绩不能代替任意3数初题；5槽规则已支持但无采用权重 |
+
+210组起题全部属于训练域；留出的是题内查询关系／中间目标，同一数值状态可能在其他起题出现，**不宣称未见起题或全局未曝光目标泛化**。保留的旧单数目标专用地图在四数→21／24为185/185、197/197，但不承担任意中间目标规划；默认地图与备选范围见selection。
+
+## 任务、数据与地图入口
+
+权重身份、正式配置及适用范围只维护在各任务的selection。权重文件位于对应`Qmap/checkpoints/`，不提交Git；结果报告提供评测证据。
+
+| 大类 | 任务与规则 | 数据说明 | 地图与采用记录 | 结果 |
+|---|---|---|---|---|
+| 积木 | [任务](blocks/README.md)／[文字](blocks/prompts/README.md) | [data](blocks/data/README.md) | [Qmap](blocks/Qmap/README.md)／[selection](blocks/Qmap/selection.json) | [报告](../experiments/blocks_distance_map/results/blocks12_joint_report.md) |
+| 二阶魔方 | [任务](cube2/README.md)／[文字](cube2/prompts/README.md) | [data](cube2/data/README.md) | [Qmap](cube2/Qmap/README.md)／[selection](cube2/Qmap/selection.json) | [实验结果](../experiments/cube2_qmap/README.md) |
+| 8-Puzzle | [任务](puzzle8/README.md)／[文字](puzzle8/prompts/README.md) | [data](puzzle8/data/README.md) | [Qmap](puzzle8/Qmap/README.md)／[selection](puzzle8/Qmap/selection.json) | [报告](../experiments/puzzle8_qmap/results/report.md) |
+| 寻路 | [任务](path/README.md)／[文字](path/prompts/README.md) | [data](path/data/README.md) | [Qmap](path/Qmap/README.md)／[selection](path/Qmap/selection.json) | [报告](../experiments/path_qmap/results/report.md) |
+| 推箱子 | [任务](sokoban/README.md)／[文字](sokoban/prompts/README.md) | [data](sokoban/data/README.md) | [Qmap](sokoban/Qmap/README.md)／[selection](sokoban/Qmap/selection.json) | [报告](../experiments/new_tasks_qmap/results/sokoban/report.md) |
+| 移车出库 | [任务](rush_hour/README.md)／[文字](rush_hour/prompts/README.md) | [data](rush_hour/data/README.md) | [Qmap](rush_hour/Qmap/README.md)／[selection](rush_hour/Qmap/selection.json) | [报告](../experiments/new_tasks_qmap/results/rush_hour/report.md) |
+| 棋子交换 | [任务](token_swapping/README.md)／[文字](token_swapping/prompts/README.md) | [data](token_swapping/data/README.md) | [Qmap](token_swapping/Qmap/README.md)／[selection](token_swapping/Qmap/selection.json) | [报告](../experiments/new_tasks_qmap/results/token_swapping/report.md) |
+| 过桥 | [任务](bridge/README.md)／[文字](bridge/prompts/README.md) | [data](bridge/data/README.md) | [Qmap](bridge/Qmap/README.md)／[selection](bridge/Qmap/selection.json) | [报告](../experiments/new_tasks_qmap/results/bridge/report.md) |
+| 21／24点 | [任务](game24/README.md)／[文字](game24/prompts/README.md) | [data](game24/data/README.md) | [Qmap](game24/Qmap/README.md)／[selection](game24/Qmap/selection.json) | [报告](../experiments/new_tasks_qmap/results/game24/report.md) |
+
+## Qmap与LLM的能力边界
+
+环境提供真实状态及全部合法动作后继；Qmap分别编码当前、目标和后继，学习距离与分支排序。这些成绩说明在环境后继支持下的动作选择能力，不证明网络自行生成了物理转移，也不包含搜索、回访禁令或重试。
+
+积木、二阶魔方、8-Puzzle和寻路已有四任务联合SFT，具体地图版本、题集、到达与停止成绩见[联合SFT报告](../experiments/map_sft_baselines/results/report.md)，不能直接套用本页最新地图分数。其余五类尚无新增LLM读取验收；棋子交换第二棵树、过桥新人数的地图本身通过，也不等于原LLM已经会读取。
+
+汉诺塔保留已有八盘地图，全状态到指定柱整塔为19,659/19,680（99.89%），未纳入本轮四任务联合SFT。入口：[任务](hanoi/README.md)、[地图](hanoi/Qmap/README.md)、[采用记录](hanoi/Qmap/selection.json)。
+
+共享实现见[Qmap方法](QMAP_METHOD.md)，新五类实验入口见[实验工作区](../experiments/new_tasks_qmap/README.md)。当前优先级只维护在[项目状态页](../docs/PROJECT_STATUS_AND_TODO.md)。任务文字原文在各`prompts/README.md`；根目录[TASK_TEXTS.md](../TASK_TEXTS.md)是自动导出的集中副本。

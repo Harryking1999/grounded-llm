@@ -1,8 +1,19 @@
 {
   "task": "rush_hour",
-  "status": "not_adopted",
-  "checkpoint": null,
-  "config": "experiments/new_tasks_qmap/configs/rush_hour/rush_hour_pairs.json",
-  "scope": "Exact complete vehicle goals, shared across no-wall6x6 layouts. Within-layout completion exceeds90 percent, but unseen layouts and original hard starts fail the minimum gate.",
-  "evidence": "experiments/new_tasks_qmap/results/rush_hour/rush_hour_pairs_baseline.json"
+  "status": "selected_by_user_limited",
+  "checkpoint": "tasks/rush_hour/Qmap/checkpoints/rush_hour_geometry_mlp_8000.pt",
+  "config": "experiments/new_tasks_qmap/configs/rush_hour/rush_hour_geometry_grid_mlp_convergence.json",
+  "source_commit": "478a022a17a34deebaaf0b2572a06221633c73fc",
+  "step": 8000,
+  "scope": {
+    "board": "No-wall6x6; trained vehicle catalogues only, within the evaluated relation and complete-goal distribution.",
+    "encoding": "Original26x36 occupancy geometry_order input; consistent per-scene vehicle identities and A marker; MLP with L1 readout. Not vehicle_attributes.",
+    "goals": "Exact complete vehicle arrangements, including intermediate goals with A not yet at the exit.",
+    "inference": "All physical legal slides retained; any legal slide length costs one move. Greedy frozen successor distance; exact state equality stops. No search or oracle.",
+    "exclusions": "No reliable arbitrary long-path, all1000-catalogue-query, unseen-layout, or original-hard-start claim; no2000-catalogue adoption.",
+    "llm": "Not evaluated"
+  },
+  "evidence": "experiments/new_tasks_qmap/results/rush_hour/rush_hour_transition_fitting.json",
+  "evidence_section": "occupancy_mlp_convergence",
+  "limitations": "User-selected limited reuse, not a full acceptance pass. Familiar relation1024/1024 (distance1-7), familiar unseen complete goal1024/1024 (distance1-3). Stratified training roots3709/4096; all original-to-selected-training-goal queries60688/96502 with35814 cycles. New-layout random591/1024, original60/1024. No convergence claim."
 }

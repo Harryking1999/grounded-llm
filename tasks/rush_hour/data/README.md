@@ -1,15 +1,11 @@
 # 移车出库数据
 
-来源为[Fogleman公开题库](https://www.michaelfogleman.com/rush/)及其[题目预览文件](https://www.michaelfogleman.com/static/rush/rush1000.txt)。本项目只使用无墙6×6布局，并独立核对可达状态和最短距离。
+来源为[Fogleman公开题库](https://www.michaelfogleman.com/rush/)。当前采用地图使用无墙6×6、1000个独立车辆配置组：1003个训练场景、35个验证、37个测试，另有8个已知题，共5,263,995个状态。配置描述车辆方向、长度与固定车道；场景包含该配置下的可达分量。同一配置不跨训练与整布局测试。
 
-## 当前数据
+每题指定所有车辆的完整目标排列，既含A到出口的终局，也含A未到出口和不同让路阶段的中间排列。一次滑动任意合法距离计一步，对各完整目标重算最短路。完整候选保留回退和先远离目标位置的合法动作。
 
-共有224个场景：144个训练、35个验证、37个测试，另有8个已知题；总计1,348,182个状态。一个场景包含固定车辆配置及其可达局面，同一配置下的场景不会跨训练与测试组。具体范围见[数据统计](../../../experiments/new_tasks_qmap/results/shared/exact_pairs_data.json)和[配置](../../../experiments/new_tasks_qmap/configs/rush_hour/rush_hour_pairs.json)。
+数据、关系、目标和实际损失曝光分别统计；物理图覆盖不等于任意状态对已拟合。全量原起点×已选训练目标共96,502个非自身查询，其中5235条受保护关系；分层4096题不是它的等权抽样。
 
-每题指定一张完整目标棋盘，所有车辆位置明确，A在最右端。距离重新计算到这个目标，一辆车滑动任意合法距离均计一步。
+正式范围以[采用配置](../Qmap/selection.json)为准；[1000组结构统计](../../../experiments/new_tasks_qmap/results/rush_hour/rush_hour_coverage1000_structure.json)、[结果与限制](../../../experiments/new_tasks_qmap/results/rush_hour/report.md)提供证据。早期144训练场景和224总场景属于历史条件，不再作为当前规模。
 
-## 如何理解来源成绩
-
-上游的最短步数只针对A到出口，同一原题产生的中间起点也不算独立新布局。
-
-早期DeepSeek筛查使用8个场景中的40个起点；它与当前完整目标评测分开记录，见[文字报告](../../../experiments/task_text_baselines/results/report.md)。下载的原始文件和实际选题保存在运行数据中。[example.json](example.json)仅说明格式。
+2000组扩量的数据与部分训练断点保留，训练已暂停，不增加当前采用范围。原始来源文件、场景目录和精确图保存在忽略的运行目录；[example.json](example.json)只说明格式。上游A到出口步数与本项目完整目标成本不同，不能直接替代标签。

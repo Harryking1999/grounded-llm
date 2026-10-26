@@ -249,7 +249,8 @@ def score(text, step, env):
     if candidate is not None and error is None:
         action,child=step.execute(candidate);remaining=env.distance(child,step.goal)
         cost=next(c for a,_,c in env.transitions(step.current) if a==action)
-        row.update(after=str(child),safe=bool(np.isfinite(remaining)),optimal=bool(np.isclose(cost+remaining,before)),
+        row.update(after=str(child),safe=bool(np.isfinite(remaining)),
+            optimal=bool(np.isfinite(before) and np.isclose(cost+remaining,before)),
             map_optimal=candidate in step.map_minimal_candidates)
     if row['rank_eligible']:row.update(meeting_ranking_scores(step.candidate_map_distances,parse_ranking(text,len(step.candidate_actions),10)))
     return row

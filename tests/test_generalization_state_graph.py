@@ -150,3 +150,5 @@ def test_deadend_has_no_ranking_and_legacy_null_scores_still_aggregate():
     assert result['ndcg_inverse_rank_at_1']=={'denominator':1,'value':0.0}
     assert result['safe']['denominator']==2
     assert result['map_optimal']['denominator']==1
+    unreachable=env.make_step(tile,1<<99)
+    assert not score('Reason: action.\n<action>1</action>',unreachable,env)['optimal']

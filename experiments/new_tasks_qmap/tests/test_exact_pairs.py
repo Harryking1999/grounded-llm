@@ -43,6 +43,25 @@ def small_oracle(path,n,edges):
 
 
 class ExactPairTests(unittest.TestCase):
+    def test_layout_scaling_freezes_queries_when_candidate_padding_grows(self):
+        from experiments.new_tasks_qmap.src.rush_scale_prepare import freeze_queries,pad_replay
+        base=SimpleNamespace(size=2,max_candidates=1,successors=lambda ids:np.array([[1] for _ in ids]),
+            distance=lambda s,g:np.where(np.asarray(s)==np.asarray(g),0,1).astype(np.float32))
+        rows=np.array([[0,1]]);old={k+'_test':v for k,v in materialize(base,rows).items()}
+        larger=SimpleNamespace(size=5,max_candidates=3,successors=lambda ids:np.array([[1,-1,-1] for _ in ids]),
+            distance=base.distance)
+        training=np.array([[3,4]]);new=dict(tasks_train=training,reserved_relations=np.array([17]))
+        frozen,counts=freeze_queries(larger,new,old)
+        np.testing.assert_array_equal(frozen['tasks_test'],rows);self.assertEqual(counts,dict(test=1))
+        np.testing.assert_array_equal(frozen['tasks_train'],training);np.testing.assert_array_equal(frozen['reserved_relations'],[17])
+        np.testing.assert_array_equal(frozen['children_test'],[[1,-1,-1]])
+        bank=dict(children=np.array([[1]]),child_distances=np.array([[0.]]),optimal=np.array([[True]]),
+            path_children=np.array([[[1]]]),path_child_distances=np.array([[[0.]]]),path_optimal=np.array([[[True]]]))
+        padded=pad_replay(bank,3);np.testing.assert_array_equal(padded['path_children'],[[[1,-1,-1]]])
+        self.assertTrue(np.isinf(padded['child_distances'][0,1:]).all());self.assertFalse(padded['optimal'][0,1:].any())
+        larger.successors=lambda ids:np.array([[1,2,-1] for _ in ids])
+        with self.assertRaises(ValueError):freeze_queries(larger,new,old)
+
     def test_declared_rank_weight_comparison_preserves_other_conditions(self):
         from copy import deepcopy
         from experiments.new_tasks_qmap.src.relations import validate_continuation

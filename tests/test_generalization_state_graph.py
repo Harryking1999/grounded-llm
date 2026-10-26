@@ -73,6 +73,14 @@ def test_study_budgets_and_fixed_big_ood():
             assert t['world_size']==2 and t['micro_batch']*t['world_size']*t['gradient_accumulation_steps']==t['global_batch']==4
             assert cfg['execution']['evaluation_gpus']==[6]
             assert cfg['execution']['gpu_pairs']==[[2*(len(cohort['tasks'])-4),2*(len(cohort['tasks'])-4)+1]]
+            assert cfg['baselines']['B2_flan_four']['renumber_each_epoch']
+            assert cfg['map']['feature_ffn_hidden_dim']==512
+            assert cfg['evaluation']['tasks']==len(cohort['tasks'])*study['evaluation_per_group']
+            assert t['save_steps']==cfg['data']['samples_per_epoch']//t['global_batch']
+            assert cfg['evaluation']['priority_step_interval']==50000
+            from experiments.map_sft_baselines.src.contract import checkpoint_priority
+            steps=[12500,25000,37500,50000]
+            assert sorted(steps,key=lambda s:checkpoint_priority(s,cfg))==[50000,37500,25000,12500]
 
 
 def test_six_person_ood_pool_excludes_stranded_torch():
@@ -83,3 +91,22 @@ def test_six_person_ood_pool_excludes_stranded_torch():
     costs=Bridge([2,3,5,7,11,17]).graph(0)['distances']
     assert np.isfinite(costs[pool]).all()
     assert 127 in pool and not np.isfinite(costs[[1,126]]).any()
+
+
+def test_evaluation_half_preserves_strata_and_ignores_model_outcomes():
+    from collections import Counter
+    from experiments.map_sft_baselines.src.generalization_prepare import evaluation_subset
+    rows=[]
+    for variant,size in [('a',200),('b',100),('c',100),('d',50),('e',50)]:
+        for i in range(size):
+            length=1 if i<size//2 else 3
+            rows.append(dict(task='game24',variant=variant,trajectory_id=f'{variant}_{i:03d}',
+                shortest_moves=length,reference_actions=['move']*length,cohort='id',map_success=i%2))
+    chosen=evaluation_subset(rows,250,2026102102)
+    assert len(chosen)==len({r['trajectory_id'] for r in chosen})==250
+    assert Counter(r['variant'] for r in chosen)==dict(a=100,b=50,c=50,d=25,e=25)
+    assert Counter(r['shortest_moves'] for r in chosen if r['variant']=='a')=={1:50,3:50}
+    altered=[dict(r,cohort='big_ood',map_success=1-r['map_success']) for r in rows]
+    ids=lambda records:[r['trajectory_id'] for r in records]
+    assert ids(chosen)==ids(evaluation_subset(rows,250,2026102102))
+    assert ids(chosen)==ids(evaluation_subset(altered,250,2026102102))

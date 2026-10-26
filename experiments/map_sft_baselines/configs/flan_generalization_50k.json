@@ -20,7 +20,7 @@
     "puzzle8",
     "token_swapping"
   ],
-  "evaluation_per_group": 500,
+  "evaluation_per_group": 250,
   "bridge_maximum_time": 20,
   "maximum_candidate_queries": 500000,
   "heldout_subclasses": {
@@ -150,5 +150,14 @@
   ],
   "model_conditions": [
     "Qwen2.5-1.5B-Instruct with frozen Qmaps"
-  ]
+  ],
+  "evaluation_source_per_group": 500,
+  "evaluation_subset": {
+    "seed": 2026102102,
+    "strata": [
+      "variant",
+      "reference_action_count"
+    ],
+    "allocation": "Proportional largest remainder by variant then route length; uniform without replacement within each stratum; ignore model outcomes"
+  }
 }

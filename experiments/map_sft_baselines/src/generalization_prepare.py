@@ -160,6 +160,37 @@ def query_key(row):
     return json.dumps([row['task'],row.get('operation'),row.get('context'),row['start'],row['goal']],sort_keys=True)
 
 
+def evaluation_subset(rows, count, seed):
+    """Fixed proportional variant/route-length subset, without model scores."""
+    if not 0<count<=len(rows):raise ValueError('Evaluation subset exceeds its frozen source pool')
+    if len({r['trajectory_id'] for r in rows})!=len(rows):raise ValueError('Duplicate evaluation IDs')
+    if count==len(rows):return list(rows)
+    tasks={r['task'] for r in rows}
+    if len(tasks)!=1:raise ValueError('Select within one task at a time')
+    rng=np.random.default_rng(np.random.SeedSequence([seed,*map(ord,next(iter(tasks)))]))
+
+    def quotas(groups, total):
+        keys=sorted(groups);sizes=np.asarray([len(groups[k]) for k in keys])
+        expected=sizes*total/sizes.sum();assigned=np.floor(expected).astype(int)
+        tie=rng.random(len(keys))
+        order=sorted(range(len(keys)),key=lambda i:(-(expected[i]-assigned[i]),tie[i]))
+        for i in order[:total-int(assigned.sum())]:assigned[i]+=1
+        return dict(zip(keys,map(int,assigned)))
+
+    variants={}
+    for i,row in enumerate(rows):variants.setdefault(row['variant'],[]).append(i)
+    selected=[]
+    for variant,quota in quotas(variants,count).items():
+        lengths={}
+        for i in variants[variant]:
+            row=rows[i];length=int(row.get('shortest_moves',len(row['reference_actions'])))
+            lengths.setdefault(length,[]).append(i)
+        for length,n in quotas(lengths,quota).items():
+            indices=sorted(lengths[length],key=lambda i:rows[i]['trajectory_id'])
+            selected.extend(map(int,rng.choice(indices,n,replace=False)))
+    return [rows[i] for i in sorted(selected)]
+
+
 def prepare_task(task,cfg,sources,pool,device,workers,smoke=0):
     global WORKER
     out=pool/task
@@ -186,6 +217,7 @@ def prepare_task(task,cfg,sources,pool,device,workers,smoke=0):
     count=smoke if smoke else requested
     quotas={v:count//len(variants)+(i<count%len(variants)) for i,v in enumerate(variants)}
     protected=[];small_ood=[]
+    evaluation_count=cfg.get('evaluation_source_per_group',cfg['evaluation_per_group'])
     if source and (source/'evaluation.json').exists():
         for row in json.loads((source/'evaluation.json').read_text()):
             if row.get('task',task)!=task:continue
@@ -198,16 +230,16 @@ def prepare_task(task,cfg,sources,pool,device,workers,smoke=0):
                 o=block_variant(states,'partial12_ood',cut)
                 o.update(cohort='small_ood',trajectory_id=f'blocks_small_ood_{len(small_ood):04d}')
                 small_ood.append(teacher_record(o,out,device))
-                if len(protected)==cfg['evaluation_per_group']:break
+                if len(protected)==evaluation_count:break
                 continue
             r=dict(task=task,variant='id',cohort='id',start=row['start'],goal=row['goal'],
                 map_checkpoint='qmap.pt',context={} if task=='blocks' else dict(oracle='oracle.npy'),
                 trajectory_id=f'{task}_id_{len(protected):04d}',reference_actions=row['reference_actions'],graph_sft=True)
             env=StateTask(r,out,device);r['initial_text']=initial_text(r,env);protected.append(r)
-            if len(protected)==cfg['evaluation_per_group']:break
+            if len(protected)==evaluation_count:break
     excluded={(str(r['start']),str(r['goal'])) for r in protected+small_ood};seen=set();rows=[];stats=Counter();attempts=0
     if task=='token_swapping':
-        while len(protected)<cfg['evaluation_per_group']:
+        while len(protected)<evaluation_count:
             r=next(candidates);r=teacher_record(r,out,device)
             if r is None:continue
             r.update(trajectory_id=f'token_swapping_id_{len(protected):04d}',cohort='id')
@@ -242,7 +274,7 @@ def prepare_task(task,cfg,sources,pool,device,workers,smoke=0):
         # Evaluation times and queries are fixed before mixing; never Q-success filter evaluation.
         train_times={tuple(r['context']['times']) for r in rows}
         protected_keys={query_key(r) for r in protected}
-        while len(protected)<cfg['evaluation_per_group']:
+        while len(protected)<evaluation_count:
             r=next(candidates)
             key=query_key(r)
             if tuple(r['context']['times']) in train_times or key in protected_keys:continue
@@ -288,7 +320,8 @@ def assemble(cfg,pool,out,smoke=0):
             task_out=target/task;task_out.mkdir(exist_ok=True)
             for asset in bank.iterdir():
                 if asset.name in ('qmap.pt','oracle.npy','graph.npz','distances.bin') and not (task_out/asset.name).exists():(task_out/asset.name).symlink_to(asset.resolve())
-            records=json.loads((bank/'evaluation.json').read_text());evaluation.extend(records)
+            records=evaluation_subset(json.loads((bank/'evaluation.json').read_text()),
+                cfg['evaluation_per_group'],cfg['evaluation_subset']['seed']);evaluation.extend(records)
             atomic_json(task_out/'evaluation.json',records);atomic_json(task_out/'probe_indices.json',[])
             all_rows.extend(selected)
         atomic_json(target/'dataset.json',dict(task='multitask',rows=all_rows,response_order='ranking_first'))
@@ -304,7 +337,8 @@ def main():
     p.add_argument('--device',default='cpu');p.add_argument('--workers',type=int,default=8);p.add_argument('--smoke',type=int,default=0)
     p.add_argument('--tasks',nargs='+',help='Small validation only; formal preparation uses the configured order')
     args=p.parse_args();cfg=json.loads(args.config.read_text());sources=json.loads(args.sources.read_text())
-    if args.smoke:cfg=dict(cfg,evaluation_per_group=min(args.smoke,cfg['evaluation_per_group']))
+    if args.smoke:cfg=dict(cfg,evaluation_per_group=min(args.smoke,cfg['evaluation_per_group']),
+        evaluation_source_per_group=min(args.smoke,cfg.get('evaluation_source_per_group',cfg['evaluation_per_group'])))
     torch.set_num_threads(1);pool=args.out/'pool';pool.mkdir(parents=True,exist_ok=True)
     if args.tasks and not args.smoke:raise ValueError('Formal preparation must include all configured tasks')
     for task in args.tasks or cfg['preparation_order']:

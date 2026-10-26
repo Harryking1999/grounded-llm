@@ -5,7 +5,7 @@ from pathlib import Path
 import shutil
 import numpy as np
 from grounded_llm.core.files import atomic_json
-from .generalization_prepare import teacher_record
+from .generalization_prepare import teacher_record, evaluation_subset
 from grounded_llm.tasks.state_graph_sft import StateTask
 
 
@@ -27,7 +27,8 @@ def link_assets(source,target):
 
 
 def prepare(cfg,sources,data_root):
-    rng=np.random.default_rng(cfg['seed']+1);pool=data_root/'pool';count=cfg['evaluation_per_group'];cohorts={};small={}
+    rng=np.random.default_rng(cfg['seed']+1);pool=data_root/'pool'
+    count=cfg.get('evaluation_source_per_group',cfg['evaluation_per_group']);cohorts={};small={}
     for task in cfg['task_pool']:
         bank=pool/task
         if task in ('rush_hour','game24'):
@@ -80,15 +81,23 @@ def prepare(cfg,sources,data_root):
             if result is None:raise ValueError('Invalid frozen subclass query; do not Q-success filter or silently replace')
             small[task].append(result)
         atomic_json(bank/'small_ood.json',small[task])
+    for task in cohorts:
+        cohorts[task]=evaluation_subset(cohorts[task],cfg['evaluation_per_group'],cfg['evaluation_subset']['seed'])
+    for task in small:
+        small[task]=evaluation_subset(small[task],cfg['evaluation_per_group'],cfg['evaluation_subset']['seed'])
     for study in cfg['cohorts']:
         target=data_root/study['name']/'final_evaluation';target.mkdir(exist_ok=True)
-        all_rows=[]
+        all_rows=[];id_rows=[]
         for task in cfg['task_pool']:
             rows=[dict(r,cohort='id' if task in study['tasks'] else 'big_ood') for r in cohorts[task]]
             if task in study['tasks']:rows+=small[task]
             task_out=target/task;link_assets(pool/task,task_out)
             atomic_json(task_out/'evaluation.json',rows);atomic_json(task_out/'probe_indices.json',[])
             all_rows+=rows
+            if task in study['tasks']:
+                monitored=[dict(r,cohort='id') for r in cohorts[task]];id_rows+=monitored
+                atomic_json(target.parent/task/'evaluation.json',monitored)
+        atomic_json(target.parent/'evaluation.json',id_rows)
         atomic_json(target/'evaluation.json',all_rows);atomic_json(target/'probe_indices.json',[])
         atomic_json(target/'ready.json',dict(tasks=len(all_rows),smoke=False,final_only=True,
             filter='Random reachable physical queries, no Q-success filtering; Qmap exposure separate from LLM exposure.'))

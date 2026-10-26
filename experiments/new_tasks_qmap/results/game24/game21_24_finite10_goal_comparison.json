@@ -36,6 +36,2606 @@
     "held_relation_closure_overlap": 0,
     "scope": "Only ordinary training-goal diversity expands. Frozen query rows, labels, full candidates, reserved closures, source identities and physical transitions verified before optimizer launch."
   },
-  "training_complete": false,
-  "scope": "Matched goal-diversity stages launched after real-corpus equivalence checks. No training-effect claim yet."
+  "training_complete": true,
+  "scope": "Matched4000-update target-diversity phases are complete. Original frozen query rows and candidate closures unchanged. Expanded goals improve two-step held planning but still fail its test gate and regress fixed21/24/switch performance; adopted8000 singleton map retained.",
+  "conditions": {
+    "control": {
+      "step": 2000,
+      "source_commit": "108611f0d1935c25e3d5cd1d6dade8194f884982",
+      "passed": false,
+      "completion_passed": false,
+      "reachability_passed": true,
+      "target_reached": false,
+      "target_switch": {
+        "count": 47,
+        "different_first_actions": 47,
+        "both_first_actions_optimal": 47,
+        "both_first_actions_optimal_rate": 1.0,
+        "both_complete": 47,
+        "both_complete_rate": 1.0,
+        "scope": "Same root, both singleton goals solvable and exact optimal FIRST physical action sets disjoint. All candidates retained; teacher checks follow model action selection."
+      },
+      "completion_gates": {
+        "passed": false,
+        "target_reached": false,
+        "required_distance_subgroups": {
+          "held_intermediate2_query_validation:distance=2.0": {
+            "count": 420,
+            "solved": 198,
+            "expected_count": 420,
+            "success_rate": 0.4714285714285714,
+            "passed": false,
+            "target_reached": false
+          },
+          "held_intermediate2_query_test:distance=2.0": {
+            "count": 420,
+            "solved": 211,
+            "expected_count": 420,
+            "success_rate": 0.5023809523809524,
+            "passed": false,
+            "target_reached": false
+          }
+        }
+      },
+      "coverage": {
+        "physical_states": 203913,
+        "exact_numerical_states": 28118,
+        "numerical_states_seen_in_loss": 28118,
+        "numerical_input_coverage": 1.0,
+        "duplicate_cost_consistency_verified": true,
+        "deduplication": "Exact sorted reduced Fraction tuples; one representative per2/3-number multiset, separately for each singleton target."
+      },
+      "checkpoint_selection": "Existing validation objective only; this suite never selects a checkpoint.",
+      "scope": "Exhaustive finite-domain fitting, not unseen initial-question generalization.2/3-number suffixes are deduplicated across roots. Unsolvable queries remain in distance/reachability evaluation; completion uses every positive-distance solvable query. Local held query goals may occur as training goals or state inputs in other questions.",
+      "cohorts": {
+        "root4_to_21": {
+          "finite_mae": 0.7383459210395813,
+          "unreachable": {
+            "proven_unreachable": 25,
+            "finite": 185,
+            "unknown": 0,
+            "auroc": 0.9403243243243243,
+            "validation_threshold": 6.713167266845768,
+            "recall": 0.92,
+            "finite_false_positive": 0.06486486486486487,
+            "recall_at_training_proxy": 0.76,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 185,
+            "unique_state_goal_pairs": 185,
+            "solved": 185,
+            "success_rate": 1.0,
+            "optimal": 185,
+            "optimal_rate": 1.0,
+            "cycles": 0,
+            "entered_unreachable": 0,
+            "no_legal_action": 0,
+            "budget_exhausted": 0,
+            "horizon": 4,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": 0.0,
+            "mean_cost_ratio_on_success": 1.0,
+            "first_cycle_step_counts": {},
+            "first_unreachable_step_counts": {},
+            "by_distance": {
+              "3.0": {
+                "count": 185,
+                "solved": 185,
+                "optimal": 185
+              }
+            },
+            "predicted_progress": {
+              "counts": {
+                "executed_edges": 555,
+                "predicted_decrease": 554,
+                "predicted_plateau": 0,
+                "predicted_increase": 1,
+                "true_finite_edges": 555,
+                "true_optimal_edges": 555,
+                "predicted_decrease_but_not_true_optimal": 0,
+                "entered_dead_edges": 0,
+                "non_goal_predicted_zero": 0
+              },
+              "strict_descent_trajectory_count": 184,
+              "strict_descent_success_count": 184,
+              "non_descent_trajectory_count": 1,
+              "predicted_drop_quantiles": {
+                "0": -0.3751082420349121,
+                "0.1": 0.8366231918334961,
+                "0.5": 1.0867695808410645,
+                "0.9": 1.265289878845215,
+                "1": 10.219754219055176
+              },
+              "mean_abs_unit_descent_residual": 0.33754255363533087,
+              "mean_abs_cost_descent_residual": 0.33754255363533087,
+              "executed_edge_optimal_rate": 1.0,
+              "predicted_strict_descent_edge_rate": 0.9981981981981982,
+              "executed_edges_by_true_distance": {
+                "1_1": {
+                  "executed_edges": 185,
+                  "true_optimal_edges": 185,
+                  "predicted_decrease": 185,
+                  "entered_dead_edges": 0
+                },
+                "2_2": {
+                  "executed_edges": 185,
+                  "true_optimal_edges": 185,
+                  "predicted_decrease": 184,
+                  "entered_dead_edges": 0
+                },
+                "3_5": {
+                  "executed_edges": 185,
+                  "true_optimal_edges": 185,
+                  "predicted_decrease": 185,
+                  "entered_dead_edges": 0
+                },
+                "6_10": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "11_20": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "21_40": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "41_80": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "81_inf": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "proven_unreachable": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                }
+              },
+              "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+            }
+          }
+        },
+        "suffix2_to_21": {
+          "finite_mae": 1.5698535442352295,
+          "unreachable": {
+            "proven_unreachable": 12356,
+            "finite": 92,
+            "unknown": 0,
+            "auroc": 0.9308886195053978,
+            "validation_threshold": 6.713167266845768,
+            "recall": 0.9951440595662027,
+            "finite_false_positive": 0.11956521739130435,
+            "recall_at_training_proxy": 0.9696503722887666,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 92,
+            "unique_state_goal_pairs": 92,
+            "solved": 92,
+            "success_rate": 1.0,
+            "optimal": 92,
+            "optimal_rate": 1.0,
+            "cycles": 0,
+            "entered_unreachable": 0,
+            "no_legal_action": 0,
+            "budget_exhausted": 0,
+            "horizon": 4,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": 0.0,
+            "mean_cost_ratio_on_success": 1.0,
+            "first_cycle_step_counts": {},
+            "first_unreachable_step_counts": {},
+            "by_distance": {
+              "1.0": {
+                "count": 92,
+                "solved": 92,
+                "optimal": 92
+              }
+            },
+            "predicted_progress": {
+              "counts": {
+                "executed_edges": 92,
+                "predicted_decrease": 92,
+                "predicted_plateau": 0,
+                "predicted_increase": 0,
+                "true_finite_edges": 92,
+                "true_optimal_edges": 92,
+                "predicted_decrease_but_not_true_optimal": 0,
+                "entered_dead_edges": 0,
+                "non_goal_predicted_zero": 0
+              },
+              "strict_descent_trajectory_count": 92,
+              "strict_descent_success_count": 92,
+              "non_descent_trajectory_count": 0,
+              "predicted_drop_quantiles": {
+                "0": 0.8910202980041504,
+                "0.1": 0.9981914043426514,
+                "0.5": 1.1514432430267334,
+                "0.9": 12.084329414367676,
+                "1": 12.084392547607422
+              },
+              "mean_abs_unit_descent_residual": 1.5698536219804182,
+              "mean_abs_cost_descent_residual": 1.5698536219804182,
+              "executed_edge_optimal_rate": 1.0,
+              "predicted_strict_descent_edge_rate": 1.0,
+              "executed_edges_by_true_distance": {
+                "1_1": {
+                  "executed_edges": 92,
+                  "true_optimal_edges": 92,
+                  "predicted_decrease": 92,
+                  "entered_dead_edges": 0
+                },
+                "2_2": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "3_5": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "6_10": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "11_20": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "21_40": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "41_80": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "81_inf": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "proven_unreachable": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                }
+              },
+              "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+            }
+          }
+        },
+        "suffix3_to_21": {
+          "finite_mae": 1.0457502603530884,
+          "unreachable": {
+            "proven_unreachable": 2891,
+            "finite": 431,
+            "unknown": 0,
+            "auroc": 0.9537596075828577,
+            "validation_threshold": 6.713167266845768,
+            "recall": 0.914562435143549,
+            "finite_false_positive": 0.05336426914153132,
+            "recall_at_training_proxy": 0.6354202698028364,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 431,
+            "unique_state_goal_pairs": 431,
+            "solved": 431,
+            "success_rate": 1.0,
+            "optimal": 431,
+            "optimal_rate": 1.0,
+            "cycles": 0,
+            "entered_unreachable": 0,
+            "no_legal_action": 0,
+            "budget_exhausted": 0,
+            "horizon": 4,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": 0.0,
+            "mean_cost_ratio_on_success": 1.0,
+            "first_cycle_step_counts": {},
+            "first_unreachable_step_counts": {},
+            "by_distance": {
+              "2.0": {
+                "count": 431,
+                "solved": 431,
+                "optimal": 431
+              }
+            },
+            "predicted_progress": {
+              "counts": {
+                "executed_edges": 862,
+                "predicted_decrease": 861,
+                "predicted_plateau": 0,
+                "predicted_increase": 1,
+                "true_finite_edges": 862,
+                "true_optimal_edges": 862,
+                "predicted_decrease_but_not_true_optimal": 0,
+                "entered_dead_edges": 0,
+                "non_goal_predicted_zero": 0
+              },
+              "strict_descent_trajectory_count": 430,
+              "strict_descent_success_count": 430,
+              "non_descent_trajectory_count": 1,
+              "predicted_drop_quantiles": {
+                "0": -0.3751082420349121,
+                "0.1": 0.9244544506072998,
+                "0.5": 1.1194920539855957,
+                "0.9": 1.9507703065872186,
+                "1": 11.101411819458008
+              },
+              "mean_abs_unit_descent_residual": 0.5626770194334663,
+              "mean_abs_cost_descent_residual": 0.5626770194334663,
+              "executed_edge_optimal_rate": 1.0,
+              "predicted_strict_descent_edge_rate": 0.9988399071925754,
+              "executed_edges_by_true_distance": {
+                "1_1": {
+                  "executed_edges": 431,
+                  "true_optimal_edges": 431,
+                  "predicted_decrease": 431,
+                  "entered_dead_edges": 0
+                },
+                "2_2": {
+                  "executed_edges": 431,
+                  "true_optimal_edges": 431,
+                  "predicted_decrease": 430,
+                  "entered_dead_edges": 0
+                },
+                "3_5": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "6_10": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "11_20": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "21_40": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "41_80": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "81_inf": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "proven_unreachable": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                }
+              },
+              "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+            }
+          }
+        },
+        "root4_to_24": {
+          "finite_mae": 1.1010692119598389,
+          "unreachable": {
+            "proven_unreachable": 13,
+            "finite": 197,
+            "unknown": 0,
+            "auroc": 0.9953143303397111,
+            "validation_threshold": 6.713167266845768,
+            "recall": 1.0,
+            "finite_false_positive": 0.1116751269035533,
+            "recall_at_training_proxy": 1.0,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 197,
+            "unique_state_goal_pairs": 197,
+            "solved": 197,
+            "success_rate": 1.0,
+            "optimal": 197,
+            "optimal_rate": 1.0,
+            "cycles": 0,
+            "entered_unreachable": 0,
+            "no_legal_action": 0,
+            "budget_exhausted": 0,
+            "horizon": 4,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": 0.0,
+            "mean_cost_ratio_on_success": 1.0,
+            "first_cycle_step_counts": {},
+            "first_unreachable_step_counts": {},
+            "by_distance": {
+              "3.0": {
+                "count": 197,
+                "solved": 197,
+                "optimal": 197
+              }
+            },
+            "predicted_progress": {
+              "counts": {
+                "executed_edges": 591,
+                "predicted_decrease": 587,
+                "predicted_plateau": 0,
+                "predicted_increase": 4,
+                "true_finite_edges": 591,
+                "true_optimal_edges": 591,
+                "predicted_decrease_but_not_true_optimal": 0,
+                "entered_dead_edges": 0,
+                "non_goal_predicted_zero": 0
+              },
+              "strict_descent_trajectory_count": 193,
+              "strict_descent_success_count": 193,
+              "non_descent_trajectory_count": 4,
+              "predicted_drop_quantiles": {
+                "0": -4.882674694061279,
+                "0.1": 0.8474030494689941,
+                "0.5": 1.1031851768493652,
+                "0.9": 1.2683298587799072,
+                "1": 9.897209167480469
+              },
+              "mean_abs_unit_descent_residual": 0.48932164614979184,
+              "mean_abs_cost_descent_residual": 0.48932164614979184,
+              "executed_edge_optimal_rate": 1.0,
+              "predicted_strict_descent_edge_rate": 0.9932318104906938,
+              "executed_edges_by_true_distance": {
+                "1_1": {
+                  "executed_edges": 197,
+                  "true_optimal_edges": 197,
+                  "predicted_decrease": 197,
+                  "entered_dead_edges": 0
+                },
+                "2_2": {
+                  "executed_edges": 197,
+                  "true_optimal_edges": 197,
+                  "predicted_decrease": 194,
+                  "entered_dead_edges": 0
+                },
+                "3_5": {
+                  "executed_edges": 197,
+                  "true_optimal_edges": 197,
+                  "predicted_decrease": 196,
+                  "entered_dead_edges": 0
+                },
+                "6_10": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "11_20": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "21_40": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "41_80": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "81_inf": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "proven_unreachable": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                }
+              },
+              "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+            }
+          }
+        },
+        "suffix2_to_24": {
+          "finite_mae": 1.2833396196365356,
+          "unreachable": {
+            "proven_unreachable": 12354,
+            "finite": 94,
+            "unknown": 0,
+            "auroc": 0.9416981837220437,
+            "validation_threshold": 6.713167266845768,
+            "recall": 0.9978144730451676,
+            "finite_false_positive": 0.09574468085106383,
+            "recall_at_training_proxy": 0.9672170956775133,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 94,
+            "unique_state_goal_pairs": 94,
+            "solved": 94,
+            "success_rate": 1.0,
+            "optimal": 94,
+            "optimal_rate": 1.0,
+            "cycles": 0,
+            "entered_unreachable": 0,
+            "no_legal_action": 0,
+            "budget_exhausted": 0,
+            "horizon": 4,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": 0.0,
+            "mean_cost_ratio_on_success": 1.0,
+            "first_cycle_step_counts": {},
+            "first_unreachable_step_counts": {},
+            "by_distance": {
+              "1.0": {
+                "count": 94,
+                "solved": 94,
+                "optimal": 94
+              }
+            },
+            "predicted_progress": {
+              "counts": {
+                "executed_edges": 94,
+                "predicted_decrease": 94,
+                "predicted_plateau": 0,
+                "predicted_increase": 0,
+                "true_finite_edges": 94,
+                "true_optimal_edges": 94,
+                "predicted_decrease_but_not_true_optimal": 0,
+                "entered_dead_edges": 0,
+                "non_goal_predicted_zero": 0
+              },
+              "strict_descent_trajectory_count": 94,
+              "strict_descent_success_count": 94,
+              "non_descent_trajectory_count": 0,
+              "predicted_drop_quantiles": {
+                "0": 0.9760384559631348,
+                "0.1": 1.0435867786407471,
+                "0.5": 1.1728615760803223,
+                "0.9": 2.0979516267776495,
+                "1": 12.03676700592041
+              },
+              "mean_abs_unit_descent_residual": 1.283339632318375,
+              "mean_abs_cost_descent_residual": 1.283339632318375,
+              "executed_edge_optimal_rate": 1.0,
+              "predicted_strict_descent_edge_rate": 1.0,
+              "executed_edges_by_true_distance": {
+                "1_1": {
+                  "executed_edges": 94,
+                  "true_optimal_edges": 94,
+                  "predicted_decrease": 94,
+                  "entered_dead_edges": 0
+                },
+                "2_2": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "3_5": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "6_10": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "11_20": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "21_40": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "41_80": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "81_inf": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "proven_unreachable": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                }
+              },
+              "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+            }
+          }
+        },
+        "suffix3_to_24": {
+          "finite_mae": 1.2544535398483276,
+          "unreachable": {
+            "proven_unreachable": 2846,
+            "finite": 476,
+            "unknown": 0,
+            "auroc": 0.9321010027341927,
+            "validation_threshold": 6.713167266845768,
+            "recall": 0.9356992269852424,
+            "finite_false_positive": 0.07563025210084033,
+            "recall_at_training_proxy": 0.601194659170766,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 476,
+            "unique_state_goal_pairs": 476,
+            "solved": 462,
+            "success_rate": 0.9705882352941176,
+            "optimal": 462,
+            "optimal_rate": 0.9705882352941176,
+            "cycles": 0,
+            "entered_unreachable": 14,
+            "no_legal_action": 14,
+            "budget_exhausted": 0,
+            "horizon": 4,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": 0.0,
+            "mean_cost_ratio_on_success": 1.0,
+            "first_cycle_step_counts": {},
+            "first_unreachable_step_counts": {
+              "1": 14
+            },
+            "by_distance": {
+              "2.0": {
+                "count": 476,
+                "solved": 462,
+                "optimal": 462
+              }
+            },
+            "predicted_progress": {
+              "counts": {
+                "executed_edges": 952,
+                "predicted_decrease": 934,
+                "predicted_plateau": 2,
+                "predicted_increase": 16,
+                "true_finite_edges": 924,
+                "true_optimal_edges": 924,
+                "predicted_decrease_but_not_true_optimal": 12,
+                "entered_dead_edges": 14,
+                "non_goal_predicted_zero": 0
+              },
+              "strict_descent_trajectory_count": 460,
+              "strict_descent_success_count": 460,
+              "non_descent_trajectory_count": 16,
+              "predicted_drop_quantiles": {
+                "0": -8.825790405273438,
+                "0.1": 0.9296698093414306,
+                "0.5": 1.1431101560592651,
+                "0.9": 1.8425291538238524,
+                "1": 10.945850372314453
+              },
+              "mean_abs_unit_descent_residual": 0.5536460658582318,
+              "mean_abs_cost_descent_residual": 0.5536460658582318,
+              "executed_edge_optimal_rate": 0.9705882352941176,
+              "predicted_strict_descent_edge_rate": 0.9810924369747899,
+              "executed_edges_by_true_distance": {
+                "1_1": {
+                  "executed_edges": 462,
+                  "true_optimal_edges": 462,
+                  "predicted_decrease": 462,
+                  "entered_dead_edges": 0
+                },
+                "2_2": {
+                  "executed_edges": 476,
+                  "true_optimal_edges": 462,
+                  "predicted_decrease": 472,
+                  "entered_dead_edges": 14
+                },
+                "3_5": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "6_10": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "11_20": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "21_40": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "41_80": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "81_inf": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "proven_unreachable": {
+                  "executed_edges": 14,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                }
+              },
+              "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+            }
+          }
+        },
+        "held_intermediate2_query_validation": {
+          "finite_mae": 0.6769495010375977,
+          "unreachable": {
+            "proven_unreachable": 6720,
+            "finite": 13440,
+            "unknown": 0,
+            "auroc": 0.9975204502373867,
+            "validation_threshold": 6.713167266845768,
+            "recall": 0.9854166666666667,
+            "finite_false_positive": 0.01443452380952381,
+            "recall_at_training_proxy": 0.8784226190476191,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 1208,
+            "unique_state_goal_pairs": 1208,
+            "solved": 986,
+            "success_rate": 0.8162251655629139,
+            "optimal": 986,
+            "optimal_rate": 0.8162251655629139,
+            "cycles": 0,
+            "entered_unreachable": 222,
+            "no_legal_action": 222,
+            "budget_exhausted": 0,
+            "horizon": 4,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": 0.0,
+            "mean_cost_ratio_on_success": 1.0,
+            "first_cycle_step_counts": {},
+            "first_unreachable_step_counts": {
+              "1": 222
+            },
+            "by_distance": {
+              "1.0": {
+                "count": 788,
+                "solved": 788,
+                "optimal": 788
+              },
+              "2.0": {
+                "count": 420,
+                "solved": 198,
+                "optimal": 198
+              }
+            },
+            "predicted_progress": {
+              "counts": {
+                "executed_edges": 1850,
+                "predicted_decrease": 1330,
+                "predicted_plateau": 0,
+                "predicted_increase": 520,
+                "true_finite_edges": 1184,
+                "true_optimal_edges": 1184,
+                "predicted_decrease_but_not_true_optimal": 184,
+                "entered_dead_edges": 222,
+                "non_goal_predicted_zero": 0
+              },
+              "strict_descent_trajectory_count": 948,
+              "strict_descent_success_count": 948,
+              "non_descent_trajectory_count": 260,
+              "predicted_drop_quantiles": {
+                "0": -10.42371940612793,
+                "0.1": -6.0693525791168215,
+                "0.5": 1.049790382385254,
+                "0.9": 3.201161432266236,
+                "1": 12.000595092773438
+              },
+              "mean_abs_unit_descent_residual": 2.3660732436502303,
+              "mean_abs_cost_descent_residual": 2.3660732436502303,
+              "executed_edge_optimal_rate": 0.64,
+              "predicted_strict_descent_edge_rate": 0.7189189189189189,
+              "executed_edges_by_true_distance": {
+                "1_1": {
+                  "executed_edges": 986,
+                  "true_optimal_edges": 986,
+                  "predicted_decrease": 986,
+                  "entered_dead_edges": 0
+                },
+                "2_2": {
+                  "executed_edges": 420,
+                  "true_optimal_edges": 198,
+                  "predicted_decrease": 342,
+                  "entered_dead_edges": 222
+                },
+                "3_5": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "6_10": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "11_20": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "21_40": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "41_80": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "81_inf": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "proven_unreachable": {
+                  "executed_edges": 444,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 2,
+                  "entered_dead_edges": 0
+                }
+              },
+              "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+            }
+          }
+        },
+        "held_intermediate3_query_validation": {
+          "finite_mae": 0.3052326738834381,
+          "unreachable": {
+            "proven_unreachable": 6720,
+            "finite": 13440,
+            "unknown": 0,
+            "auroc": 0.9978847124787414,
+            "validation_threshold": 6.713167266845768,
+            "recall": 0.9992559523809523,
+            "finite_false_positive": 0.013244047619047619,
+            "recall_at_training_proxy": 0.9883928571428572,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 420,
+            "unique_state_goal_pairs": 420,
+            "solved": 420,
+            "success_rate": 1.0,
+            "optimal": 420,
+            "optimal_rate": 1.0,
+            "cycles": 0,
+            "entered_unreachable": 0,
+            "no_legal_action": 0,
+            "budget_exhausted": 0,
+            "horizon": 4,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": 0.0,
+            "mean_cost_ratio_on_success": 1.0,
+            "first_cycle_step_counts": {},
+            "first_unreachable_step_counts": {},
+            "by_distance": {
+              "1.0": {
+                "count": 420,
+                "solved": 420,
+                "optimal": 420
+              }
+            },
+            "predicted_progress": {
+              "counts": {
+                "executed_edges": 420,
+                "predicted_decrease": 420,
+                "predicted_plateau": 0,
+                "predicted_increase": 0,
+                "true_finite_edges": 420,
+                "true_optimal_edges": 420,
+                "predicted_decrease_but_not_true_optimal": 0,
+                "entered_dead_edges": 0,
+                "non_goal_predicted_zero": 0
+              },
+              "strict_descent_trajectory_count": 420,
+              "strict_descent_success_count": 420,
+              "non_descent_trajectory_count": 0,
+              "predicted_drop_quantiles": {
+                "0": 0.7816637754440308,
+                "0.1": 0.973140823841095,
+                "0.5": 1.2308437824249268,
+                "0.9": 2.030340623855591,
+                "1": 15.209953308105469
+              },
+              "mean_abs_unit_descent_residual": 0.6375984999395552,
+              "mean_abs_cost_descent_residual": 0.6375984999395552,
+              "executed_edge_optimal_rate": 1.0,
+              "predicted_strict_descent_edge_rate": 1.0,
+              "executed_edges_by_true_distance": {
+                "1_1": {
+                  "executed_edges": 420,
+                  "true_optimal_edges": 420,
+                  "predicted_decrease": 420,
+                  "entered_dead_edges": 0
+                },
+                "2_2": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "3_5": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "6_10": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "11_20": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "21_40": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "41_80": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "81_inf": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "proven_unreachable": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                }
+              },
+              "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+            }
+          }
+        },
+        "held_intermediate2_query_test": {
+          "finite_mae": 0.7245965600013733,
+          "unreachable": {
+            "proven_unreachable": 6720,
+            "finite": 13440,
+            "unknown": 0,
+            "auroc": 0.9967586318381519,
+            "validation_threshold": 6.713167266845768,
+            "recall": 0.984375,
+            "finite_false_positive": 0.021875,
+            "recall_at_training_proxy": 0.8782738095238095,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 1195,
+            "unique_state_goal_pairs": 1195,
+            "solved": 986,
+            "success_rate": 0.8251046025104602,
+            "optimal": 986,
+            "optimal_rate": 0.8251046025104602,
+            "cycles": 0,
+            "entered_unreachable": 209,
+            "no_legal_action": 209,
+            "budget_exhausted": 0,
+            "horizon": 4,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": 0.0,
+            "mean_cost_ratio_on_success": 1.0,
+            "first_cycle_step_counts": {},
+            "first_unreachable_step_counts": {
+              "1": 209
+            },
+            "by_distance": {
+              "1.0": {
+                "count": 775,
+                "solved": 775,
+                "optimal": 775
+              },
+              "2.0": {
+                "count": 420,
+                "solved": 211,
+                "optimal": 211
+              }
+            },
+            "predicted_progress": {
+              "counts": {
+                "executed_edges": 1824,
+                "predicted_decrease": 1322,
+                "predicted_plateau": 0,
+                "predicted_increase": 502,
+                "true_finite_edges": 1197,
+                "true_optimal_edges": 1197,
+                "predicted_decrease_but_not_true_optimal": 173,
+                "entered_dead_edges": 209,
+                "non_goal_predicted_zero": 0
+              },
+              "strict_descent_trajectory_count": 938,
+              "strict_descent_success_count": 938,
+              "non_descent_trajectory_count": 257,
+              "predicted_drop_quantiles": {
+                "0": -10.74913501739502,
+                "0.1": -5.7089942455291744,
+                "0.5": 1.0458492040634155,
+                "0.9": 3.344151496887207,
+                "1": 12.088181495666504
+              },
+              "mean_abs_unit_descent_residual": 2.359349262394142,
+              "mean_abs_cost_descent_residual": 2.359349262394142,
+              "executed_edge_optimal_rate": 0.65625,
+              "predicted_strict_descent_edge_rate": 0.7247807017543859,
+              "executed_edges_by_true_distance": {
+                "1_1": {
+                  "executed_edges": 986,
+                  "true_optimal_edges": 986,
+                  "predicted_decrease": 986,
+                  "entered_dead_edges": 0
+                },
+                "2_2": {
+                  "executed_edges": 420,
+                  "true_optimal_edges": 211,
+                  "predicted_decrease": 334,
+                  "entered_dead_edges": 209
+                },
+                "3_5": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "6_10": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "11_20": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "21_40": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "41_80": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "81_inf": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "proven_unreachable": {
+                  "executed_edges": 418,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 2,
+                  "entered_dead_edges": 0
+                }
+              },
+              "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+            }
+          }
+        },
+        "held_intermediate3_query_test": {
+          "finite_mae": 0.3499559760093689,
+          "unreachable": {
+            "proven_unreachable": 6720,
+            "finite": 13440,
+            "unknown": 0,
+            "auroc": 0.9982646417942177,
+            "validation_threshold": 6.713167266845768,
+            "recall": 0.9994047619047619,
+            "finite_false_positive": 0.016220238095238097,
+            "recall_at_training_proxy": 0.9888392857142857,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 420,
+            "unique_state_goal_pairs": 420,
+            "solved": 420,
+            "success_rate": 1.0,
+            "optimal": 420,
+            "optimal_rate": 1.0,
+            "cycles": 0,
+            "entered_unreachable": 0,
+            "no_legal_action": 0,
+            "budget_exhausted": 0,
+            "horizon": 4,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": 0.0,
+            "mean_cost_ratio_on_success": 1.0,
+            "first_cycle_step_counts": {},
+            "first_unreachable_step_counts": {},
+            "by_distance": {
+              "1.0": {
+                "count": 420,
+                "solved": 420,
+                "optimal": 420
+              }
+            },
+            "predicted_progress": {
+              "counts": {
+                "executed_edges": 420,
+                "predicted_decrease": 420,
+                "predicted_plateau": 0,
+                "predicted_increase": 0,
+                "true_finite_edges": 420,
+                "true_optimal_edges": 420,
+                "predicted_decrease_but_not_true_optimal": 0,
+                "entered_dead_edges": 0,
+                "non_goal_predicted_zero": 0
+              },
+              "strict_descent_trajectory_count": 420,
+              "strict_descent_success_count": 420,
+              "non_descent_trajectory_count": 0,
+              "predicted_drop_quantiles": {
+                "0": 0.7646787166595459,
+                "0.1": 0.9662582635879516,
+                "0.5": 1.2111318111419678,
+                "0.9": 2.10679931640625,
+                "1": 15.141297340393066
+              },
+              "mean_abs_unit_descent_residual": 0.6770811532224927,
+              "mean_abs_cost_descent_residual": 0.6770811532224927,
+              "executed_edge_optimal_rate": 1.0,
+              "predicted_strict_descent_edge_rate": 1.0,
+              "executed_edges_by_true_distance": {
+                "1_1": {
+                  "executed_edges": 420,
+                  "true_optimal_edges": 420,
+                  "predicted_decrease": 420,
+                  "entered_dead_edges": 0
+                },
+                "2_2": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "3_5": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "6_10": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "11_20": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "21_40": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "41_80": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "81_inf": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "proven_unreachable": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                }
+              },
+              "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+            }
+          }
+        }
+      }
+    },
+    "expanded": {
+      "step": 3500,
+      "source_commit": "108611f0d1935c25e3d5cd1d6dade8194f884982",
+      "passed": false,
+      "completion_passed": false,
+      "reachability_passed": true,
+      "target_reached": false,
+      "target_switch": {
+        "count": 47,
+        "different_first_actions": 45,
+        "both_first_actions_optimal": 40,
+        "both_first_actions_optimal_rate": 0.851063829787234,
+        "both_complete": 40,
+        "both_complete_rate": 0.851063829787234,
+        "scope": "Same root, both singleton goals solvable and exact optimal FIRST physical action sets disjoint. All candidates retained; teacher checks follow model action selection."
+      },
+      "completion_gates": {
+        "passed": false,
+        "target_reached": false,
+        "required_distance_subgroups": {
+          "held_intermediate2_query_validation:distance=2.0": {
+            "count": 420,
+            "solved": 337,
+            "expected_count": 420,
+            "success_rate": 0.8023809523809524,
+            "passed": true,
+            "target_reached": false
+          },
+          "held_intermediate2_query_test:distance=2.0": {
+            "count": 420,
+            "solved": 300,
+            "expected_count": 420,
+            "success_rate": 0.7142857142857143,
+            "passed": false,
+            "target_reached": false
+          }
+        }
+      },
+      "coverage": {
+        "physical_states": 203913,
+        "exact_numerical_states": 28118,
+        "numerical_states_seen_in_loss": 28118,
+        "numerical_input_coverage": 1.0,
+        "duplicate_cost_consistency_verified": true,
+        "deduplication": "Exact sorted reduced Fraction tuples; one representative per2/3-number multiset, separately for each singleton target."
+      },
+      "checkpoint_selection": "Existing validation objective only; this suite never selects a checkpoint.",
+      "scope": "Exhaustive finite-domain fitting, not unseen initial-question generalization.2/3-number suffixes are deduplicated across roots. Unsolvable queries remain in distance/reachability evaluation; completion uses every positive-distance solvable query. Local held query goals may occur as training goals or state inputs in other questions.",
+      "cohorts": {
+        "root4_to_21": {
+          "finite_mae": 0.6342655420303345,
+          "unreachable": {
+            "proven_unreachable": 25,
+            "finite": 185,
+            "unknown": 0,
+            "auroc": 0.939027027027027,
+            "validation_threshold": 8.402482986450195,
+            "recall": 0.88,
+            "finite_false_positive": 0.06486486486486487,
+            "recall_at_training_proxy": 0.88,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 185,
+            "unique_state_goal_pairs": 185,
+            "solved": 181,
+            "success_rate": 0.9783783783783784,
+            "optimal": 181,
+            "optimal_rate": 0.9783783783783784,
+            "cycles": 0,
+            "entered_unreachable": 4,
+            "no_legal_action": 4,
+            "budget_exhausted": 0,
+            "horizon": 4,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": 0.0,
+            "mean_cost_ratio_on_success": 1.0,
+            "first_cycle_step_counts": {},
+            "first_unreachable_step_counts": {
+              "1": 4
+            },
+            "by_distance": {
+              "3.0": {
+                "count": 185,
+                "solved": 181,
+                "optimal": 181
+              }
+            },
+            "predicted_progress": {
+              "counts": {
+                "executed_edges": 555,
+                "predicted_decrease": 543,
+                "predicted_plateau": 0,
+                "predicted_increase": 12,
+                "true_finite_edges": 543,
+                "true_optimal_edges": 543,
+                "predicted_decrease_but_not_true_optimal": 4,
+                "entered_dead_edges": 4,
+                "non_goal_predicted_zero": 0
+              },
+              "strict_descent_trajectory_count": 177,
+              "strict_descent_success_count": 177,
+              "non_descent_trajectory_count": 8,
+              "predicted_drop_quantiles": {
+                "0": -6.429263114929199,
+                "0.1": 0.5302155494689942,
+                "0.5": 1.0453057289123535,
+                "0.9": 1.435265302658081,
+                "1": 10.254106521606445
+              },
+              "mean_abs_unit_descent_residual": 0.5644244589247145,
+              "mean_abs_cost_descent_residual": 0.5644244589247145,
+              "executed_edge_optimal_rate": 0.9783783783783784,
+              "predicted_strict_descent_edge_rate": 0.9783783783783784,
+              "executed_edges_by_true_distance": {
+                "1_1": {
+                  "executed_edges": 181,
+                  "true_optimal_edges": 181,
+                  "predicted_decrease": 181,
+                  "entered_dead_edges": 0
+                },
+                "2_2": {
+                  "executed_edges": 181,
+                  "true_optimal_edges": 181,
+                  "predicted_decrease": 180,
+                  "entered_dead_edges": 0
+                },
+                "3_5": {
+                  "executed_edges": 185,
+                  "true_optimal_edges": 181,
+                  "predicted_decrease": 182,
+                  "entered_dead_edges": 4
+                },
+                "6_10": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "11_20": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "21_40": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "41_80": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "81_inf": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "proven_unreachable": {
+                  "executed_edges": 8,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                }
+              },
+              "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+            }
+          }
+        },
+        "suffix2_to_21": {
+          "finite_mae": 1.8700435161590576,
+          "unreachable": {
+            "proven_unreachable": 12356,
+            "finite": 92,
+            "unknown": 0,
+            "auroc": 0.9275967845229215,
+            "validation_threshold": 8.402482986450195,
+            "recall": 0.9957105859501457,
+            "finite_false_positive": 0.11956521739130435,
+            "recall_at_training_proxy": 0.9790385237941082,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 92,
+            "unique_state_goal_pairs": 92,
+            "solved": 92,
+            "success_rate": 1.0,
+            "optimal": 92,
+            "optimal_rate": 1.0,
+            "cycles": 0,
+            "entered_unreachable": 0,
+            "no_legal_action": 0,
+            "budget_exhausted": 0,
+            "horizon": 4,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": 0.0,
+            "mean_cost_ratio_on_success": 1.0,
+            "first_cycle_step_counts": {},
+            "first_unreachable_step_counts": {},
+            "by_distance": {
+              "1.0": {
+                "count": 92,
+                "solved": 92,
+                "optimal": 92
+              }
+            },
+            "predicted_progress": {
+              "counts": {
+                "executed_edges": 92,
+                "predicted_decrease": 92,
+                "predicted_plateau": 0,
+                "predicted_increase": 0,
+                "true_finite_edges": 92,
+                "true_optimal_edges": 92,
+                "predicted_decrease_but_not_true_optimal": 0,
+                "entered_dead_edges": 0,
+                "non_goal_predicted_zero": 0
+              },
+              "strict_descent_trajectory_count": 92,
+              "strict_descent_success_count": 92,
+              "non_descent_trajectory_count": 0,
+              "predicted_drop_quantiles": {
+                "0": 1.0761072635650635,
+                "0.1": 1.2757618188858033,
+                "0.5": 1.5420252084732056,
+                "0.9": 12.169102478027344,
+                "1": 12.169121742248535
+              },
+              "mean_abs_unit_descent_residual": 1.8700431611226953,
+              "mean_abs_cost_descent_residual": 1.8700431611226953,
+              "executed_edge_optimal_rate": 1.0,
+              "predicted_strict_descent_edge_rate": 1.0,
+              "executed_edges_by_true_distance": {
+                "1_1": {
+                  "executed_edges": 92,
+                  "true_optimal_edges": 92,
+                  "predicted_decrease": 92,
+                  "entered_dead_edges": 0
+                },
+                "2_2": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "3_5": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "6_10": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "11_20": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "21_40": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "41_80": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "81_inf": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "proven_unreachable": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                }
+              },
+              "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+            }
+          }
+        },
+        "suffix3_to_21": {
+          "finite_mae": 1.5023199319839478,
+          "unreachable": {
+            "proven_unreachable": 2891,
+            "finite": 431,
+            "unknown": 0,
+            "auroc": 0.9487075257961142,
+            "validation_threshold": 8.402482986450195,
+            "recall": 0.9010722933241093,
+            "finite_false_positive": 0.05336426914153132,
+            "recall_at_training_proxy": 0.7125562089242476,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 431,
+            "unique_state_goal_pairs": 431,
+            "solved": 431,
+            "success_rate": 1.0,
+            "optimal": 431,
+            "optimal_rate": 1.0,
+            "cycles": 0,
+            "entered_unreachable": 0,
+            "no_legal_action": 0,
+            "budget_exhausted": 0,
+            "horizon": 4,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": 0.0,
+            "mean_cost_ratio_on_success": 1.0,
+            "first_cycle_step_counts": {},
+            "first_unreachable_step_counts": {},
+            "by_distance": {
+              "2.0": {
+                "count": 431,
+                "solved": 431,
+                "optimal": 431
+              }
+            },
+            "predicted_progress": {
+              "counts": {
+                "executed_edges": 862,
+                "predicted_decrease": 861,
+                "predicted_plateau": 0,
+                "predicted_increase": 1,
+                "true_finite_edges": 862,
+                "true_optimal_edges": 862,
+                "predicted_decrease_but_not_true_optimal": 0,
+                "entered_dead_edges": 0,
+                "non_goal_predicted_zero": 0
+              },
+              "strict_descent_trajectory_count": 430,
+              "strict_descent_success_count": 430,
+              "non_descent_trajectory_count": 1,
+              "predicted_drop_quantiles": {
+                "0": -0.6435389518737793,
+                "0.1": 1.0761072635650635,
+                "0.5": 1.36983323097229,
+                "0.9": 2.2285526037216186,
+                "1": 11.09301471710205
+              },
+              "mean_abs_unit_descent_residual": 0.7871616243486338,
+              "mean_abs_cost_descent_residual": 0.7871616243486338,
+              "executed_edge_optimal_rate": 1.0,
+              "predicted_strict_descent_edge_rate": 0.9988399071925754,
+              "executed_edges_by_true_distance": {
+                "1_1": {
+                  "executed_edges": 431,
+                  "true_optimal_edges": 431,
+                  "predicted_decrease": 431,
+                  "entered_dead_edges": 0
+                },
+                "2_2": {
+                  "executed_edges": 431,
+                  "true_optimal_edges": 431,
+                  "predicted_decrease": 430,
+                  "entered_dead_edges": 0
+                },
+                "3_5": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "6_10": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "11_20": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "21_40": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "41_80": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "81_inf": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "proven_unreachable": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                }
+              },
+              "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+            }
+          }
+        },
+        "root4_to_24": {
+          "finite_mae": 1.0373082160949707,
+          "unreachable": {
+            "proven_unreachable": 13,
+            "finite": 197,
+            "unknown": 0,
+            "auroc": 0.9976571651698555,
+            "validation_threshold": 8.402482986450195,
+            "recall": 1.0,
+            "finite_false_positive": 0.1065989847715736,
+            "recall_at_training_proxy": 1.0,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 197,
+            "unique_state_goal_pairs": 197,
+            "solved": 186,
+            "success_rate": 0.9441624365482234,
+            "optimal": 186,
+            "optimal_rate": 0.9441624365482234,
+            "cycles": 0,
+            "entered_unreachable": 11,
+            "no_legal_action": 11,
+            "budget_exhausted": 0,
+            "horizon": 4,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": 0.0,
+            "mean_cost_ratio_on_success": 1.0,
+            "first_cycle_step_counts": {},
+            "first_unreachable_step_counts": {
+              "1": 11
+            },
+            "by_distance": {
+              "3.0": {
+                "count": 197,
+                "solved": 186,
+                "optimal": 186
+              }
+            },
+            "predicted_progress": {
+              "counts": {
+                "executed_edges": 591,
+                "predicted_decrease": 558,
+                "predicted_plateau": 0,
+                "predicted_increase": 33,
+                "true_finite_edges": 558,
+                "true_optimal_edges": 558,
+                "predicted_decrease_but_not_true_optimal": 11,
+                "entered_dead_edges": 11,
+                "non_goal_predicted_zero": 0
+              },
+              "strict_descent_trajectory_count": 175,
+              "strict_descent_success_count": 175,
+              "non_descent_trajectory_count": 22,
+              "predicted_drop_quantiles": {
+                "0": -9.462864875793457,
+                "0.1": 0.26578664779663086,
+                "0.5": 1.0646567344665527,
+                "0.9": 1.4843201637268066,
+                "1": 9.8685302734375
+              },
+              "mean_abs_unit_descent_residual": 0.8748511558055071,
+              "mean_abs_cost_descent_residual": 0.8748511558055071,
+              "executed_edge_optimal_rate": 0.9441624365482234,
+              "predicted_strict_descent_edge_rate": 0.9441624365482234,
+              "executed_edges_by_true_distance": {
+                "1_1": {
+                  "executed_edges": 186,
+                  "true_optimal_edges": 186,
+                  "predicted_decrease": 186,
+                  "entered_dead_edges": 0
+                },
+                "2_2": {
+                  "executed_edges": 186,
+                  "true_optimal_edges": 186,
+                  "predicted_decrease": 186,
+                  "entered_dead_edges": 0
+                },
+                "3_5": {
+                  "executed_edges": 197,
+                  "true_optimal_edges": 186,
+                  "predicted_decrease": 186,
+                  "entered_dead_edges": 11
+                },
+                "6_10": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "11_20": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "21_40": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "41_80": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "81_inf": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "proven_unreachable": {
+                  "executed_edges": 22,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                }
+              },
+              "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+            }
+          }
+        },
+        "suffix2_to_24": {
+          "finite_mae": 1.5776779651641846,
+          "unreachable": {
+            "proven_unreachable": 12354,
+            "finite": 94,
+            "unknown": 0,
+            "auroc": 0.9419733121152939,
+            "validation_threshold": 8.402482986450195,
+            "recall": 0.9987048729156548,
+            "finite_false_positive": 0.09574468085106383,
+            "recall_at_training_proxy": 0.9875344018131779,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 94,
+            "unique_state_goal_pairs": 94,
+            "solved": 94,
+            "success_rate": 1.0,
+            "optimal": 94,
+            "optimal_rate": 1.0,
+            "cycles": 0,
+            "entered_unreachable": 0,
+            "no_legal_action": 0,
+            "budget_exhausted": 0,
+            "horizon": 4,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": 0.0,
+            "mean_cost_ratio_on_success": 1.0,
+            "first_cycle_step_counts": {},
+            "first_unreachable_step_counts": {},
+            "by_distance": {
+              "1.0": {
+                "count": 94,
+                "solved": 94,
+                "optimal": 94
+              }
+            },
+            "predicted_progress": {
+              "counts": {
+                "executed_edges": 94,
+                "predicted_decrease": 94,
+                "predicted_plateau": 0,
+                "predicted_increase": 0,
+                "true_finite_edges": 94,
+                "true_optimal_edges": 94,
+                "predicted_decrease_but_not_true_optimal": 0,
+                "entered_dead_edges": 0,
+                "non_goal_predicted_zero": 0
+              },
+              "strict_descent_trajectory_count": 94,
+              "strict_descent_success_count": 94,
+              "non_descent_trajectory_count": 0,
+              "predicted_drop_quantiles": {
+                "0": 0.964970588684082,
+                "0.1": 1.2569520473480225,
+                "0.5": 1.526820182800293,
+                "0.9": 2.7041356086730963,
+                "1": 12.129131317138672
+              },
+              "mean_abs_unit_descent_residual": 1.5776779042913558,
+              "mean_abs_cost_descent_residual": 1.5776779042913558,
+              "executed_edge_optimal_rate": 1.0,
+              "predicted_strict_descent_edge_rate": 1.0,
+              "executed_edges_by_true_distance": {
+                "1_1": {
+                  "executed_edges": 94,
+                  "true_optimal_edges": 94,
+                  "predicted_decrease": 94,
+                  "entered_dead_edges": 0
+                },
+                "2_2": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "3_5": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "6_10": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "11_20": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "21_40": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "41_80": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "81_inf": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "proven_unreachable": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                }
+              },
+              "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+            }
+          }
+        },
+        "suffix3_to_24": {
+          "finite_mae": 1.724760890007019,
+          "unreachable": {
+            "proven_unreachable": 2846,
+            "finite": 476,
+            "unknown": 0,
+            "auroc": 0.9271301458039295,
+            "validation_threshold": 8.402482986450195,
+            "recall": 0.9279690794096979,
+            "finite_false_positive": 0.07352941176470588,
+            "recall_at_training_proxy": 0.7343640196767393,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 476,
+            "unique_state_goal_pairs": 476,
+            "solved": 462,
+            "success_rate": 0.9705882352941176,
+            "optimal": 462,
+            "optimal_rate": 0.9705882352941176,
+            "cycles": 0,
+            "entered_unreachable": 14,
+            "no_legal_action": 14,
+            "budget_exhausted": 0,
+            "horizon": 4,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": 0.0,
+            "mean_cost_ratio_on_success": 1.0,
+            "first_cycle_step_counts": {},
+            "first_unreachable_step_counts": {
+              "1": 14
+            },
+            "by_distance": {
+              "2.0": {
+                "count": 476,
+                "solved": 462,
+                "optimal": 462
+              }
+            },
+            "predicted_progress": {
+              "counts": {
+                "executed_edges": 952,
+                "predicted_decrease": 936,
+                "predicted_plateau": 2,
+                "predicted_increase": 14,
+                "true_finite_edges": 924,
+                "true_optimal_edges": 924,
+                "predicted_decrease_but_not_true_optimal": 12,
+                "entered_dead_edges": 14,
+                "non_goal_predicted_zero": 0
+              },
+              "strict_descent_trajectory_count": 462,
+              "strict_descent_success_count": 462,
+              "non_descent_trajectory_count": 14,
+              "predicted_drop_quantiles": {
+                "0": -8.238039016723633,
+                "0.1": 0.964970588684082,
+                "0.5": 1.4036569595336914,
+                "0.9": 2.1890182018280027,
+                "1": 11.134604454040527
+              },
+              "mean_abs_unit_descent_residual": 0.7922882703172058,
+              "mean_abs_cost_descent_residual": 0.7922882703172058,
+              "executed_edge_optimal_rate": 0.9705882352941176,
+              "predicted_strict_descent_edge_rate": 0.9831932773109243,
+              "executed_edges_by_true_distance": {
+                "1_1": {
+                  "executed_edges": 462,
+                  "true_optimal_edges": 462,
+                  "predicted_decrease": 462,
+                  "entered_dead_edges": 0
+                },
+                "2_2": {
+                  "executed_edges": 476,
+                  "true_optimal_edges": 462,
+                  "predicted_decrease": 474,
+                  "entered_dead_edges": 14
+                },
+                "3_5": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "6_10": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "11_20": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "21_40": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "41_80": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "81_inf": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "proven_unreachable": {
+                  "executed_edges": 14,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                }
+              },
+              "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+            }
+          }
+        },
+        "held_intermediate2_query_validation": {
+          "finite_mae": 0.44047343730926514,
+          "unreachable": {
+            "proven_unreachable": 6720,
+            "finite": 13440,
+            "unknown": 0,
+            "auroc": 0.9989723617311508,
+            "validation_threshold": 8.402482986450195,
+            "recall": 0.9836309523809523,
+            "finite_false_positive": 0.003720238095238095,
+            "recall_at_training_proxy": 0.9450892857142857,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 1208,
+            "unique_state_goal_pairs": 1208,
+            "solved": 1125,
+            "success_rate": 0.9312913907284768,
+            "optimal": 1125,
+            "optimal_rate": 0.9312913907284768,
+            "cycles": 0,
+            "entered_unreachable": 83,
+            "no_legal_action": 83,
+            "budget_exhausted": 0,
+            "horizon": 4,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": 0.0,
+            "mean_cost_ratio_on_success": 1.0,
+            "first_cycle_step_counts": {},
+            "first_unreachable_step_counts": {
+              "1": 83
+            },
+            "by_distance": {
+              "1.0": {
+                "count": 788,
+                "solved": 788,
+                "optimal": 788
+              },
+              "2.0": {
+                "count": 420,
+                "solved": 337,
+                "optimal": 337
+              }
+            },
+            "predicted_progress": {
+              "counts": {
+                "executed_edges": 1711,
+                "predicted_decrease": 1471,
+                "predicted_plateau": 0,
+                "predicted_increase": 240,
+                "true_finite_edges": 1462,
+                "true_optimal_edges": 1462,
+                "predicted_decrease_but_not_true_optimal": 62,
+                "entered_dead_edges": 83,
+                "non_goal_predicted_zero": 0
+              },
+              "strict_descent_trajectory_count": 1072,
+              "strict_descent_success_count": 1072,
+              "non_descent_trajectory_count": 136,
+              "predicted_drop_quantiles": {
+                "0": -10.653564453125,
+                "0.1": -0.7443132400512695,
+                "0.5": 1.1163582801818848,
+                "0.9": 2.6421689987182617,
+                "1": 11.788248062133789
+              },
+              "mean_abs_unit_descent_residual": 1.3485162658763865,
+              "mean_abs_cost_descent_residual": 1.3485162658763865,
+              "executed_edge_optimal_rate": 0.8544710695499708,
+              "predicted_strict_descent_edge_rate": 0.8597311513734658,
+              "executed_edges_by_true_distance": {
+                "1_1": {
+                  "executed_edges": 1125,
+                  "true_optimal_edges": 1125,
+                  "predicted_decrease": 1125,
+                  "entered_dead_edges": 0
+                },
+                "2_2": {
+                  "executed_edges": 420,
+                  "true_optimal_edges": 337,
+                  "predicted_decrease": 346,
+                  "entered_dead_edges": 83
+                },
+                "3_5": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "6_10": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "11_20": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "21_40": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "41_80": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "81_inf": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "proven_unreachable": {
+                  "executed_edges": 166,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                }
+              },
+              "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+            }
+          }
+        },
+        "held_intermediate3_query_validation": {
+          "finite_mae": 0.25541600584983826,
+          "unreachable": {
+            "proven_unreachable": 6720,
+            "finite": 13440,
+            "unknown": 0,
+            "auroc": 0.9979216380562642,
+            "validation_threshold": 8.402482986450195,
+            "recall": 0.9988095238095238,
+            "finite_false_positive": 0.011011904761904763,
+            "recall_at_training_proxy": 0.9913690476190476,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 420,
+            "unique_state_goal_pairs": 420,
+            "solved": 420,
+            "success_rate": 1.0,
+            "optimal": 420,
+            "optimal_rate": 1.0,
+            "cycles": 0,
+            "entered_unreachable": 0,
+            "no_legal_action": 0,
+            "budget_exhausted": 0,
+            "horizon": 4,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": 0.0,
+            "mean_cost_ratio_on_success": 1.0,
+            "first_cycle_step_counts": {},
+            "first_unreachable_step_counts": {},
+            "by_distance": {
+              "1.0": {
+                "count": 420,
+                "solved": 420,
+                "optimal": 420
+              }
+            },
+            "predicted_progress": {
+              "counts": {
+                "executed_edges": 420,
+                "predicted_decrease": 420,
+                "predicted_plateau": 0,
+                "predicted_increase": 0,
+                "true_finite_edges": 420,
+                "true_optimal_edges": 420,
+                "predicted_decrease_but_not_true_optimal": 0,
+                "entered_dead_edges": 0,
+                "non_goal_predicted_zero": 0
+              },
+              "strict_descent_trajectory_count": 420,
+              "strict_descent_success_count": 420,
+              "non_descent_trajectory_count": 0,
+              "predicted_drop_quantiles": {
+                "0": 0.7594125270843506,
+                "0.1": 0.9984677791595459,
+                "0.5": 1.179580569267273,
+                "0.9": 1.7536019325256351,
+                "1": 15.22518253326416
+              },
+              "mean_abs_unit_descent_residual": 0.5336015931197575,
+              "mean_abs_cost_descent_residual": 0.5336015931197575,
+              "executed_edge_optimal_rate": 1.0,
+              "predicted_strict_descent_edge_rate": 1.0,
+              "executed_edges_by_true_distance": {
+                "1_1": {
+                  "executed_edges": 420,
+                  "true_optimal_edges": 420,
+                  "predicted_decrease": 420,
+                  "entered_dead_edges": 0
+                },
+                "2_2": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "3_5": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "6_10": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "11_20": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "21_40": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "41_80": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "81_inf": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "proven_unreachable": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                }
+              },
+              "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+            }
+          }
+        },
+        "held_intermediate2_query_test": {
+          "finite_mae": 0.4741441011428833,
+          "unreachable": {
+            "proven_unreachable": 6720,
+            "finite": 13440,
+            "unknown": 0,
+            "auroc": 0.9990699847647392,
+            "validation_threshold": 8.402482986450195,
+            "recall": 0.9822916666666667,
+            "finite_false_positive": 0.007291666666666667,
+            "recall_at_training_proxy": 0.9391369047619048,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 1195,
+            "unique_state_goal_pairs": 1195,
+            "solved": 1075,
+            "success_rate": 0.899581589958159,
+            "optimal": 1075,
+            "optimal_rate": 0.899581589958159,
+            "cycles": 0,
+            "entered_unreachable": 120,
+            "no_legal_action": 120,
+            "budget_exhausted": 0,
+            "horizon": 4,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": 0.0,
+            "mean_cost_ratio_on_success": 1.0,
+            "first_cycle_step_counts": {},
+            "first_unreachable_step_counts": {
+              "1": 120
+            },
+            "by_distance": {
+              "1.0": {
+                "count": 775,
+                "solved": 775,
+                "optimal": 775
+              },
+              "2.0": {
+                "count": 420,
+                "solved": 300,
+                "optimal": 300
+              }
+            },
+            "predicted_progress": {
+              "counts": {
+                "executed_edges": 1735,
+                "predicted_decrease": 1420,
+                "predicted_plateau": 0,
+                "predicted_increase": 315,
+                "true_finite_edges": 1375,
+                "true_optimal_edges": 1375,
+                "predicted_decrease_but_not_true_optimal": 93,
+                "entered_dead_edges": 120,
+                "non_goal_predicted_zero": 0
+              },
+              "strict_descent_trajectory_count": 1027,
+              "strict_descent_success_count": 1027,
+              "non_descent_trajectory_count": 168,
+              "predicted_drop_quantiles": {
+                "0": -10.939322471618652,
+                "0.1": -2.589881420135497,
+                "0.5": 1.0842175483703613,
+                "0.9": 2.644106006622321,
+                "1": 11.668724060058594
+              },
+              "mean_abs_unit_descent_residual": 1.612543697865621,
+              "mean_abs_cost_descent_residual": 1.612543697865621,
+              "executed_edge_optimal_rate": 0.792507204610951,
+              "predicted_strict_descent_edge_rate": 0.8184438040345822,
+              "executed_edges_by_true_distance": {
+                "1_1": {
+                  "executed_edges": 1075,
+                  "true_optimal_edges": 1075,
+                  "predicted_decrease": 1075,
+                  "entered_dead_edges": 0
+                },
+                "2_2": {
+                  "executed_edges": 420,
+                  "true_optimal_edges": 300,
+                  "predicted_decrease": 344,
+                  "entered_dead_edges": 120
+                },
+                "3_5": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "6_10": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "11_20": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "21_40": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "41_80": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "81_inf": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "proven_unreachable": {
+                  "executed_edges": 240,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 1,
+                  "entered_dead_edges": 0
+                }
+              },
+              "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+            }
+          }
+        },
+        "held_intermediate3_query_test": {
+          "finite_mae": 0.29740995168685913,
+          "unreachable": {
+            "proven_unreachable": 6720,
+            "finite": 13440,
+            "unknown": 0,
+            "auroc": 0.9987115353954081,
+            "validation_threshold": 8.402482986450195,
+            "recall": 0.9988095238095238,
+            "finite_false_positive": 0.014955357142857144,
+            "recall_at_training_proxy": 0.9930059523809524,
+            "note": "Finite surrogate is not infinity; classification never filters planning candidates."
+          },
+          "q": {
+            "count": 420,
+            "unique_state_goal_pairs": 420,
+            "solved": 420,
+            "success_rate": 1.0,
+            "optimal": 420,
+            "optimal_rate": 1.0,
+            "cycles": 0,
+            "entered_unreachable": 0,
+            "no_legal_action": 0,
+            "budget_exhausted": 0,
+            "horizon": 4,
+            "illegal_actions": 0,
+            "mean_excess_cost_on_success": 0.0,
+            "mean_cost_ratio_on_success": 1.0,
+            "first_cycle_step_counts": {},
+            "first_unreachable_step_counts": {},
+            "by_distance": {
+              "1.0": {
+                "count": 420,
+                "solved": 420,
+                "optimal": 420
+              }
+            },
+            "predicted_progress": {
+              "counts": {
+                "executed_edges": 420,
+                "predicted_decrease": 420,
+                "predicted_plateau": 0,
+                "predicted_increase": 0,
+                "true_finite_edges": 420,
+                "true_optimal_edges": 420,
+                "predicted_decrease_but_not_true_optimal": 0,
+                "entered_dead_edges": 0,
+                "non_goal_predicted_zero": 0
+              },
+              "strict_descent_trajectory_count": 420,
+              "strict_descent_success_count": 420,
+              "non_descent_trajectory_count": 0,
+              "predicted_drop_quantiles": {
+                "0": 0.784205436706543,
+                "0.1": 1.0027676105499268,
+                "0.5": 1.1909589171409607,
+                "0.9": 1.801161623001099,
+                "1": 15.021285057067871
+              },
+              "mean_abs_unit_descent_residual": 0.5753155559301376,
+              "mean_abs_cost_descent_residual": 0.5753155559301376,
+              "executed_edge_optimal_rate": 1.0,
+              "predicted_strict_descent_edge_rate": 1.0,
+              "executed_edges_by_true_distance": {
+                "1_1": {
+                  "executed_edges": 420,
+                  "true_optimal_edges": 420,
+                  "predicted_decrease": 420,
+                  "entered_dead_edges": 0
+                },
+                "2_2": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "3_5": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "6_10": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "11_20": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "21_40": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "41_80": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "81_inf": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                },
+                "proven_unreachable": {
+                  "executed_edges": 0,
+                  "true_optimal_edges": 0,
+                  "predicted_decrease": 0,
+                  "entered_dead_edges": 0
+                }
+              },
+              "note": "Observed autonomous policy trajectories after action selection; full completion remains the acceptance metric."
+            }
+          }
+        }
+      }
+    }
+  }
 }

@@ -1,0 +1,123 @@
+{
+  "schema": "exact_state_pairs",
+  "seed": 2026102610,
+  "model": {
+    "dimension": 128,
+    "hidden": 1024,
+    "cap": 16,
+    "metric": "directed_max"
+  },
+  "training": {
+    "steps": 8000,
+    "batch_size": 32768,
+    "decision_batch_size": 8192,
+    "learning_rate": 0.0003,
+    "rank_weight": 1.0,
+    "rank_temperature": 1.0,
+    "eval_every": 500,
+    "rollout_eval_every": 1000,
+    "cpu_threads": 1,
+    "unreachable_target": 12.0,
+    "features_on_device": "float32",
+    "broad_fraction": 0.5,
+    "online_goals": false,
+    "record_training_samples": true,
+    "validation_only_initial": true,
+    "action_edge_fraction": 0.25,
+    "training_probe_batches": 4,
+    "relation_sampling": {
+      "finite_point_fraction": 0.5,
+      "boundary_rank_fraction": 1.0,
+      "distance_bin_upper_bounds": [
+        1,
+        2,
+        3
+      ],
+      "balance_layouts": false,
+      "preparation_workers": 1,
+      "unreachable_point_fraction": 0.25,
+      "game_layer_balance": true,
+      "ranking_coverage_fraction": 0.5,
+      "coverage_seed": 2026102611
+    },
+    "trace_write_workers": 1,
+    "compact_point_sources": true,
+    "action_edges_replace_finite_only": true,
+    "initialize_from": "../game21_24_finite10_bits_convergence/best.pt",
+    "initialize_optimizer": true,
+    "sampling_seed_offset": 2026102602
+  },
+  "relations": {
+    "holdout_per_goal": 1,
+    "evaluation_per_goal": 32,
+    "unreachable_eval_per_goal": 16,
+    "complete_training_sources": true,
+    "evaluation_training_goals": 2,
+    "exhaustive_training_goals": true,
+    "holdout_goal_endpoints": false,
+    "preserve_goal_execution": [
+      "24",
+      "21"
+    ],
+    "preserve_original_held_queries": true
+  },
+  "evaluation": {
+    "decision_count": 512,
+    "rollout_count": 128,
+    "horizon": 4
+  },
+  "selection": "Minimum mean validation finite Huber plus candidate soft-rank; final test never selects a checkpoint.",
+  "scope": "All210 distinct four-number roots from1..10 and their exact arithmetic states; independent Q(s),Q(g) with rational_bits. Complete21/24 and ordinary intermediate goals, identical frozen held queries. No unseen-root, globally unseen numerical-target or LLM claim.",
+  "task": "game24",
+  "data": {
+    "max_numbers": 4,
+    "initial_numbers": 4,
+    "scenes": {
+      "train": 210,
+      "validation": 0,
+      "test": 0
+    },
+    "goals_per_scene": 20,
+    "heldout_goals": 8,
+    "minimum_reachable_per_goal": 2,
+    "initial_sampling": "exhaustive_distinct",
+    "source_values": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "root_targets": [
+      24,
+      21
+    ],
+    "heldout_goal_arities": [
+      2,
+      3,
+      2,
+      3,
+      2,
+      3,
+      2,
+      3
+    ],
+    "graphs_from": "/tmp/grounded_qmap_followup_5d41460/runs/game21_24_finite20_reference/data/graphs",
+    "prepared_from": "../game21_24_finite10_intermediate_reference/data",
+    "complete_training_goal_arities": [
+      2
+    ]
+  },
+  "hypothesis": "Matched4000-update fresh sampling phases from the same validation-selected8000 bit map, retaining identical Adam state, network, losses, batches, source domain and point/rank quotas. Control retains the original12training goals per question. Treatment adds every ordinary two-number state as a training goal except the existing complete held goals, within the same physical DAG; all existing goal IDs and exact frozen query closures remain protected. It enumerates target diversity instead of repeating the original398 four-to-two contexts. Preserve raw rational_bits only; no overlap predicate, reachability mask, arithmetic search or candidate pruning in inference. All original validation/test queries and their labels must be identical before optimizer launch. Report four-to-two two-step completion separately from direct suffixes, plus both singleton targets, reachability and47forced target switches. New data and fresh sampling are not exact continuation.",
+  "input_encoding": "rational_bits",
+  "failure_evaluation": "experiments/new_tasks_qmap/configs/game24/game21_24_finite10_intermediate_evaluation.json",
+  "continuation": {
+    "checkpoint": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/followup_35016_5d41460/game21_24_finite10_goal_expanded_fit/last.pt",
+    "reason": "Continue the completed4000-update condition on the user-restarted35016 three-A800 node. Restore complete weights, Adam, source/rank/replay samplers, RNG and exposure; only total update budget increases. Preserve current data, frozen queries, inputs, losses and batch sizes. Prior best models and negative results remain. No inference search or test checkpoint selection."
+  }
+}

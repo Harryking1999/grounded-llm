@@ -15,13 +15,20 @@ def evaluate(args, config):
     from .evaluate import Boundary
     task = config["task"]
     spec = config['baselines'][args.baseline]
-    env = environment(task, args.data / "oracle.npy")
-    qmap = load_map(task, env, args.q_checkpoint)
+    graph_sft = config.get('graph_sft',False)
+    if graph_sft:
+        from grounded_llm.tasks.state_graph_sft import StateTask
+        from grounded_llm.tasks.state_graph_sft import make_step as step_fn, prompt as prompt_fn, score as score_fn
+        env,qmap = None,None
+    else:
+        env = environment(task, args.data / "oracle.npy")
+        qmap = load_map(task, env, args.q_checkpoint)
+        step_fn,prompt_fn,score_fn = make_step,prompt,score
     maps = {args.q_checkpoint: qmap}
     records = json.loads((args.data / "evaluation.json").read_text())
     if len(records) != config["evaluation"]["tasks"]:
         raise ValueError("Evaluation cohort mismatch")
-    if task == 'puzzle8':
+    if task == 'puzzle8' and not graph_sft:
         env.prepare_goals(sorted({int(r['goal']) for r in records}))
     if args.mode == "probe":
         records = [records[i] for i in json.loads((args.data / "probe_indices.json").read_text())]
@@ -50,30 +57,35 @@ def evaluate(args, config):
         for record in records:
             checkpoint = (args.data/record['map_checkpoint'] if 'map_checkpoint' in record
                           else args.q_checkpoint)
-            if checkpoint not in maps:
-                maps[checkpoint] = load_map(task, env, checkpoint)
-            qmap = maps[checkpoint]
-            state, goal = record["start"], record["goal"]
+            if graph_sft:
+                env=StateTask(record,args.data)
+                qmap=env.reader
+                state,goal=env.state(record['start']),env.state(record['goal'])
+            else:
+                if checkpoint not in maps:
+                    maps[checkpoint] = load_map(task, env, checkpoint)
+                qmap = maps[checkpoint]
+                state,goal=record['start'],record['goal']
             executed, messages, steps, previous_ids, turns = [], [], [], [], []
             arrived, stopped = state == goal, False
             limit = (config["evaluation"]["action_budget"] if args.mode == "RO"
                      else len(record["reference_actions"]))
             for index in range(limit + 1):
-                step = make_step(env, qmap, state, goal)
+                step = step_fn(env, qmap, state, goal)
                 if args.mode != "RO":
                     messages, steps, previous_ids = [], [], []
-                update = prompt(task, env, step, executed, record["start"], not messages, spec['real_map'])
+                update = prompt_fn(task, env, step, executed, record["start"], not messages, spec['real_map'])
                 messages.append(dict(role="user", content=update))
                 steps.append(step)
                 ids = tokenizer.apply_chat_template(messages, tokenize=True, add_generation_prompt=True)
                 map_ids = previous_ids + [len(steps) - 1] * (len(ids) - len(previous_ids))
                 text = generate(messages, steps, map_ids)
-                row = score(text, step, env)
+                row = score_fn(text, step, env)
                 turns.append(row)
                 if args.mode == "probe" and not step.done:
                     altered, _ = reverse_candidate_q(step)
                     other = generate(messages, [altered], [0] * len(ids))
-                    row["reverse"] = score(other, step, env)
+                    row["reverse"] = score_fn(other, step, env)
                     row["changed_action"] = row["candidate"] != row["reverse"]["candidate"]
                 if args.mode != "RO":
                     if index == len(record["reference_actions"]):

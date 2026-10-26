@@ -1,0 +1,151 @@
+{
+  "study": "flan_generalization_4_5_6_50k",
+  "seed": 2026102607,
+  "maximum_sequence_tokens": 32768,
+  "task_pool": [
+    "blocks",
+    "cube2",
+    "path",
+    "bridge",
+    "puzzle8",
+    "token_swapping",
+    "rush_hour",
+    "game24"
+  ],
+  "preparation_order": [
+    "blocks",
+    "cube2",
+    "path",
+    "bridge",
+    "puzzle8",
+    "token_swapping"
+  ],
+  "evaluation_per_group": 500,
+  "bridge_maximum_time": 20,
+  "maximum_candidate_queries": 500000,
+  "heldout_subclasses": {
+    "blocks": "12-placement nonempty complete goal; train8-nonempty and8/12-clearing; reverse placement deferred",
+    "cube2": "noncanonical complete targets",
+    "path": "another fixed graph with independently trained Qmap",
+    "bridge": "six people and their independently adopted Qmap",
+    "puzzle8": "noncanonical complete targets",
+    "token_swapping": "alternate10-vertex tree and its independently adopted Qmap"
+  },
+  "always_heldout_tasks": [
+    "rush_hour",
+    "game24"
+  ],
+  "subclasses": {
+    "blocks": [
+      "clear8",
+      "clear12",
+      "partial8",
+      "partial12_ood"
+    ],
+    "cube2": [
+      "restoration",
+      "noncanonical_goal_ood"
+    ],
+    "path": [
+      "fixed_graph",
+      "new_graph_ood"
+    ],
+    "bridge": [
+      "five_all_right",
+      "five_partial_goal",
+      "five_intermediate_start",
+      "six_people_ood"
+    ],
+    "puzzle8": [
+      "restoration",
+      "intermediate_goal_ood"
+    ],
+    "token_swapping": [
+      "original_tree_home",
+      "original_tree_arbitrary",
+      "alternate_tree_ood"
+    ],
+    "rush_hour": [
+      "familiar_relation_big_ood",
+      "familiar_complete_goal_big_ood"
+    ],
+    "game24": [
+      "four_to21_big_ood",
+      "four_to24_big_ood",
+      "three_number_suffix_big_ood",
+      "two_number_suffix_big_ood"
+    ]
+  },
+  "cohorts": [
+    {
+      "name": "categories4",
+      "tasks": [
+        "blocks",
+        "cube2",
+        "path",
+        "bridge"
+      ],
+      "counts": {
+        "blocks": 12500,
+        "cube2": 12500,
+        "path": 12500,
+        "bridge": 12500
+      },
+      "big_ood_tasks": [
+        "puzzle8",
+        "token_swapping",
+        "rush_hour",
+        "game24"
+      ]
+    },
+    {
+      "name": "categories5",
+      "tasks": [
+        "blocks",
+        "cube2",
+        "path",
+        "bridge",
+        "puzzle8"
+      ],
+      "counts": {
+        "blocks": 10000,
+        "cube2": 10000,
+        "path": 10000,
+        "bridge": 10000,
+        "puzzle8": 10000
+      },
+      "big_ood_tasks": [
+        "token_swapping",
+        "rush_hour",
+        "game24"
+      ]
+    },
+    {
+      "name": "categories6",
+      "tasks": [
+        "blocks",
+        "cube2",
+        "path",
+        "bridge",
+        "puzzle8",
+        "token_swapping"
+      ],
+      "counts": {
+        "blocks": 8334,
+        "cube2": 8334,
+        "path": 8333,
+        "bridge": 8333,
+        "puzzle8": 8333,
+        "token_swapping": 8333
+      },
+      "big_ood_tasks": [
+        "rush_hour",
+        "game24"
+      ]
+    }
+  ],
+  "deferred_subclasses": [
+    "blocks reverse placement",
+    "sokoban"
+  ]
+}

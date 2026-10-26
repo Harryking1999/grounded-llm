@@ -18,6 +18,12 @@ class Routes(PreparedRoutes):
         return environment(task, self.path / task / 'oracle.npy')
 
     def augment(self, row, item, epoch, index):
+        if row.get('graph_sft'):
+            from grounded_llm.tasks.state_graph_sft import demonstration as graph_demonstration
+            rng = np.random.default_rng(np.random.SeedSequence([self.config['seed'], epoch, index]))
+            demo = graph_demonstration(row,item['steps'],rng)
+            encoded = encode_trajectory(demo,self.tokenizer,self.config['maximum_sequence_tokens'])
+            return encoded,[turn.step for turn in demo.turns]
         if row['task'] == 'blocks':
             demo = renumber_trajectory(row, item['steps'], self.config['seed'], epoch, index,
                                       'ranking_first')

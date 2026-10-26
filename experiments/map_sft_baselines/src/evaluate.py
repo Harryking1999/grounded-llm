@@ -33,7 +33,7 @@ def main():
     if cfg.get('task') == 'multitask':
         from .multitask_evaluate import evaluate
         return evaluate(a, cfg)
-    if cfg.get('task') in ('cube2', 'puzzle8', 'path'):
+    if cfg.get('graph_sft') or cfg.get('task') in ('cube2', 'puzzle8', 'path'):
         from .restoration_evaluate import evaluate
         return evaluate(a, cfg)
     records=json.loads((a.data/'evaluation.json').read_text())

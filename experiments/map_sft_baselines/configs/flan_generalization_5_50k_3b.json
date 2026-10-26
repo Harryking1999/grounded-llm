@@ -1,0 +1,145 @@
+{
+  "study": "flan_generalization_5_50k_3b",
+  "model": "Qwen/Qwen2.5-3B-Instruct",
+  "seed": 20261013,
+  "maximum_sequence_tokens": 32768,
+  "data": {
+    "samples_per_epoch": 50000,
+    "tasks": [
+      "blocks",
+      "cube2",
+      "path",
+      "bridge",
+      "puzzle8"
+    ],
+    "samples_per_task": {
+      "blocks": 10000,
+      "cube2": 10000,
+      "path": 10000,
+      "bridge": 10000,
+      "puzzle8": 10000
+    },
+    "subset_seed": 2026102202,
+    "existing_selection": "uniform_without_replacement",
+    "new_path_selection": "longest_then_new_state_goal_coverage_certified_map_greedy",
+    "subclass_definition": "flan_generalization_50k.json"
+  },
+  "map": {
+    "memory_mode": "address_key_state_value",
+    "state_dim": 128,
+    "projection_dim": 256,
+    "role_and_id_dim": 32,
+    "attention_heads": 4,
+    "attention_head_dim": 64,
+    "cross_attention_every_n_layers": 1,
+    "maximum_candidates": 664,
+    "feature_ffn_hidden_dim": 512
+  },
+  "training": {
+    "epochs": 20,
+    "world_size": 2,
+    "micro_batch": 1,
+    "gradient_accumulation_steps": 2,
+    "global_batch": 4,
+    "learning_rate": 2e-05,
+    "weight_decay": 0.01,
+    "warmup_fraction": 0.05,
+    "cosine_minimum_ratio": 0.1,
+    "gradient_clip_norm": 1.0,
+    "checkpoint_layers": true,
+    "loss_chunk_tokens": 128,
+    "loss": "global_assistant_token_mean_cross_entropy",
+    "save_steps": 12500,
+    "log_steps": 10,
+    "keep_resume_checkpoints": 1,
+    "distributed_strategy": "fsdp"
+  },
+  "baselines": {
+    "B0_flan_3b": {
+      "interface": false,
+      "real_map": false,
+      "full_llm": true
+    }
+  },
+  "execution": {
+    "initial_baselines": [
+      "B0_flan_3b"
+    ],
+    "pending_baselines": [],
+    "retired_baselines": [],
+    "gpu_pairs": [
+      [
+        2,
+        3
+      ]
+    ],
+    "evaluation_gpus": [
+      6
+    ],
+    "poll_seconds": 60
+  },
+  "evaluation": {
+    "priority_step_interval": 50000,
+    "prioritize_full_epochs": true,
+    "tasks": 2500,
+    "modes": [
+      "TF",
+      "RO"
+    ],
+    "probe_tasks": 0,
+    "shard_tasks": 32,
+    "max_new_tokens": 256,
+    "action_budget": 32,
+    "main_metric": "arrival",
+    "subset_seed": 2026102102,
+    "tasks_per_task": 500
+  },
+  "early_stop": {
+    "mode": "automatic",
+    "minimum_epochs": 5,
+    "patience_points": 6,
+    "minimum_gain_tasks": 5
+  },
+  "task": "multitask",
+  "map_sources": {
+    "blocks": "tasks/blocks/Qmap/selection.json",
+    "cube2": "tasks/cube2/Qmap/selection.json",
+    "path": "tasks/path/Qmap/selection.json",
+    "bridge": "tasks/bridge/Qmap/selection.json",
+    "puzzle8": "tasks/puzzle8/Qmap/selection.json",
+    "token_swapping": "tasks/token_swapping/Qmap/selection.json",
+    "rush_hour": "tasks/rush_hour/Qmap/selection.json",
+    "game24": "tasks/game24/Qmap/selection.json"
+  },
+  "heldout_tasks": {
+    "token_swapping": "whole_category_ood",
+    "rush_hour": "whole_category_ood",
+    "game24": "whole_category_ood"
+  },
+  "graph_sft": true,
+  "generalization": {
+    "task_pool": [
+      "blocks",
+      "cube2",
+      "path",
+      "bridge",
+      "puzzle8",
+      "token_swapping",
+      "rush_hour",
+      "game24"
+    ],
+    "heldout_subclasses": {
+      "blocks": "12-placement nonempty complete goal; train8-nonempty and8/12-clearing; reverse placement deferred",
+      "cube2": "noncanonical complete targets",
+      "path": "another fixed graph with independently trained Qmap",
+      "bridge": "six people and their independently adopted Qmap",
+      "puzzle8": "noncanonical complete targets",
+      "token_swapping": "alternate10-vertex tree and its independently adopted Qmap"
+    },
+    "final_only_ood": true,
+    "selection_cohort": "id_only",
+    "spare_gpu": 7,
+    "stage": 5,
+    "from_base_model": true
+  }
+}

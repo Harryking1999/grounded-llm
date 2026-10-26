@@ -1105,7 +1105,7 @@ Reason: The current board exactly matches the goal; no further move is needed.
 
 规则采用 [Backhouse 与 Truong 的手电过桥问题](https://people.cs.nott.ac.uk/psarb2/papers/abstract.html)的容量2情形。当前六人时间组合是本项目诊断场景。
 
-以下定义可复用的文字协议。完整计划的提示与裁判已接入；逐轮地图／CoT部分是协议模板，尚无本任务LLM训练或已采用Qmap权重。
+以下定义正式文字协议。完整计划裁判与逐轮SFT适配分别维护；地图采用范围见同任务Qmap/selection.json，训练进展不在协议中维护。
 
 #### 共享任务描述与规则
 
@@ -1135,6 +1135,23 @@ Torch bank: right
 ```
 
 过桥以总时间为成本，不能用最少动作替代。地图距离排序仍表示后继到目标的剩余成本；选动作需加上本次过桥耗时，不能直接把后继距离最小的动作作为标签。
+
+#### 完整目标规则
+
+```text
+Find a minimum-total-time sequence of crossings from the initial configuration to the complete goal.
+There are {people_count} people, numbered from0, two banks and one torch.
+One or two distinct people cross with the torch. All travellers must be on the torch bank.
+The travellers and torch move to the other bank. Cost is the maximum traveller time.
+The same rules apply in either direction. Match EVERY person's bank and the torch bank exactly.
+Use at most {action_limit} actions. A local candidate is the listed group of person IDs.
+Person ID: crossing time
+{crossing_times}
+Initial configuration:
+{initial_configuration}
+Complete goal configuration:
+{goal_configuration}
+```
 
 #### 地图组／CoT 组：每轮环境更新
 
@@ -1172,7 +1189,7 @@ Reason: Crossing with people {person_ids} is legal and preserves a minimum-total
 <action>{local_id}</action>
 ```
 
-排序包含最近的至多10个候选及`current`，用`<`、`=`表示远近和并列。排序由实际冻结Q生成，上述Reason仅在裁判已验证相应事实时作为监督模板；尚未生成本任务SFT数据。无地图CoT组只删除排序行，保留相同Reason和控制标签。
+排序包含最近的至多10个候选及`current`，用`<`、`=`表示远近和并列。排序由实际冻结Q生成，上述Reason仅在裁判已验证相应事实时作为监督模板；数据须通过对应实验的认证。无地图CoT组只删除排序行，保留相同Reason和控制标签。
 
 直接到达目标时：
 
@@ -1406,7 +1423,7 @@ Reason: The required goal is already reached; no further move is needed.
 
 参考 [XoT的两数合并规则](https://github.com/microsoft/Everything-of-Thoughts-XoT/blob/d69d3b8ddb75f888732e893394e8e5e5df4f4e6f/xot_all_in_one/xot/prompter/prompts/prompts_game24.py)及[公开环境](https://github.com/microsoft/Everything-of-Thoughts-XoT/blob/d69d3b8ddb75f888732e893394e8e5e5df4f4e6f/xot_mcts/game24/Game24Game.py)。保留题目及运算规则；完整计划采用本项目统一JSON，不引入上游few-shot、MCTS或多次求解。
 
-以下定义可复用的文字协议。完整计划的提示与裁判已接入；逐轮地图／CoT部分是协议模板，尚无本任务LLM训练或已采用Qmap权重。
+以下定义正式文字协议。完整计划裁判与逐轮SFT适配分别维护；地图采用范围见同任务Qmap/selection.json，训练进展不在协议中维护。
 
 #### 共享任务描述与规则
 
@@ -1430,6 +1447,23 @@ Goal list:
 ```
 
 列表中的分数用最简分数字符串显示，排序按实际数值。动作只引用当前槽位，不能把表达式当动作提交。全部可解状态到[24]的距离恒为剩余数字个数减1；这里主要检验可解分支。
+
+#### 完整多重集目标规则
+
+```text
+Reduce the initial sorted list to the complete goal multiset using exact rational arithmetic.
+At each step choose two distinct current slots i<j, remove their numbers x,y and insert the result.
+Sort the remaining list numerically after every operation. Slot indices start at0 and change after sorting.
+Actions are[i,op,j]. Allowed ops:+ means x+y;- means x-y;r- means y-x;
+* means x*y;/ means x/y;r/ means y/x. Division by zero is illegal.
+Negative numbers, zero and fractions are allowed. Equal numbers occupy distinct slots.
+Do not concatenate, introduce constants, split numbers or discard unused numbers.
+Stop only when the entire sorted list exactly matches the goal, including repeated values.
+Initial sorted list:
+{initial_numbers}
+Complete goal sorted list:
+{goal_numbers}
+```
 
 #### 地图组／CoT 组：每轮环境更新
 
@@ -1465,7 +1499,7 @@ Reason: Combining the numbers in slots {i} and {j} with {operation} is legal and
 <action>{local_id}</action>
 ```
 
-排序包含最近的至多10个候选及`current`，用`<`、`=`表示远近和并列。排序由实际冻结Q生成，上述Reason仅在裁判已验证相应事实时作为监督模板；尚未生成本任务SFT数据。无地图CoT组只删除排序行，保留相同Reason和控制标签。
+排序包含最近的至多10个候选及`current`，用`<`、`=`表示远近和并列。排序由实际冻结Q生成，上述Reason仅在裁判已验证相应事实时作为监督模板；数据须通过对应实验的认证。无地图CoT组只删除排序行，保留相同Reason和控制标签。
 
 直接到达目标时：
 

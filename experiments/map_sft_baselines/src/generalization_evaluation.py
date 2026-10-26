@@ -47,6 +47,12 @@ def prepare(cfg,sources,data_root):
             atomic_json(bank/'big_ood.json',cohorts[task]);continue
         cohorts[task]=json.loads((bank/'evaluation.json').read_text())
         if len(cohorts[task])!=count:raise ValueError('ID cohort size differs from the contract')
+        # Legacy fixed-goal ID records stored actions but no cost. Bridge actions
+        # have unequal costs, so obtain the exact value rather than count moves.
+        for row in cohorts[task]:
+            if 'reference_cost' not in row:
+                env=StateTask(row,bank)
+                row['reference_cost']=float(env.distance(env.state(row['start']),env.state(row['goal'])))
         if task=='blocks':small[task]=json.loads((bank/'small_ood.json').read_text());continue
         small[task]=[]
         if task=='bridge':bridge_goals=bridge_goal_pool(6)

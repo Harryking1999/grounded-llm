@@ -67,11 +67,12 @@ def test_study_budgets_and_fixed_big_ood():
         assert sum(cohort['counts'].values())==50000
         assert max(cohort['counts'].values())-min(cohort['counts'].values())<=1
         assert {'rush_hour','game24'}<=set(cohort['big_ood_tasks'])
-        for group in ['map','3b','7b']:
+        for group in ['map']:
             cfg=json.loads((root/f"flan_generalization_{len(cohort['tasks'])}_50k_{group}.json").read_text())
             t=cfg['training']
             assert t['world_size']==2 and t['micro_batch']*t['world_size']*t['gradient_accumulation_steps']==t['global_batch']==4
             assert cfg['execution']['evaluation_gpus']==[6]
+            assert cfg['execution']['gpu_pairs']==[[2*(len(cohort['tasks'])-4),2*(len(cohort['tasks'])-4)+1]]
 
 
 def test_six_person_ood_pool_excludes_stranded_torch():

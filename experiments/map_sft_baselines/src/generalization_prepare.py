@@ -241,9 +241,11 @@ def prepare_task(task,cfg,sources,pool,device,workers,smoke=0):
     if task=='bridge':
         # Evaluation times and queries are fixed before mixing; never Q-success filter evaluation.
         train_times={tuple(r['context']['times']) for r in rows}
+        protected_keys={query_key(r) for r in protected}
         while len(protected)<cfg['evaluation_per_group']:
             r=next(candidates)
-            if tuple(r['context']['times']) in train_times:continue
+            key=query_key(r)
+            if tuple(r['context']['times']) in train_times or key in protected_keys:continue
             env=StateTask(r,out,device);start=env.state(r['start']);goal=env.state(r['goal'])
             if start==goal or not np.isfinite(env.distance(start,goal)):continue
             actions=[];state=start
@@ -252,6 +254,7 @@ def prepare_task(task,cfg,sources,pool,device,workers,smoke=0):
                 actions.append(action)
             r.update(trajectory_id=f'bridge_id_{len(protected):04d}',cohort='id',reference_actions=actions,graph_sft=True,
                 initial_text=initial_text(r,env));protected.append(r)
+            protected_keys.add(key)
     atomic_json(out/'dataset.json',dict(task=task,rows=rows,response_order='ranking_first'))
     atomic_json(out/'evaluation.json',protected);atomic_json(out/'probe_indices.json',[])
     if small_ood:atomic_json(out/'small_ood.json',small_ood)
@@ -291,7 +294,7 @@ def assemble(cfg,pool,out,smoke=0):
         atomic_json(target/'dataset.json',dict(task='multitask',rows=all_rows,response_order='ranking_first'))
         atomic_json(target/'evaluation.json',evaluation);atomic_json(target/'probe_indices.json',[])
         atomic_json(target/'acceptance.json',dict(samples=len(all_rows),by_task=dict(Counter(r['task'] for r in all_rows)),
-            by_subclass=dict(Counter(r['task']+'/'+r['variant'] for r in all_rows)),common_physical_data_for_all_three_models=True))
+            by_subclass=dict(Counter(r['task']+'/'+r['variant'] for r in all_rows)),shared_task_pool_across_training_sizes=True))
         atomic_json(target/'ready.json',dict(samples=len(all_rows),smoke=bool(smoke)))
 
 

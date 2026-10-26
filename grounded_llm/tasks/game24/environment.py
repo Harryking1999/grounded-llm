@@ -11,9 +11,11 @@ class Game24:
                     for op in ('+', '-', 'r-', '*', '/', 'r/'))
     goal = (Fraction(24),)
 
-    def __init__(self, max_numbers=4):
+    def __init__(self, max_numbers=4,feature_encoding='identity'):
         if max_numbers < 2: raise ValueError('At least two input slots required')
         self.max_numbers=max_numbers
+        if feature_encoding not in ('identity','rational_padded','rational_bits'):raise ValueError('Unknown rational feature encoding')
+        self.feature_encoding=feature_encoding
         if max_numbers != 4:
             self.actions=tuple((i,op,j) for i,j in combinations(range(max_numbers),2)
                                for op in ('+','-','r-','*','/','r/'))
@@ -40,11 +42,24 @@ class Game24:
             yield action, tuple(sorted([z] + [v for k, v in enumerate(state) if k not in (i, j)])), 1
 
     def features(self, states):
+        if self.feature_encoding=='rational_bits':
+            out=np.zeros((len(states),self.max_numbers,34),dtype=np.float32)
+            shifts=np.arange(16,dtype=np.uint32)
+            for row,state in enumerate(states):
+                for col,value in enumerate(state):
+                    numerator,denominator=abs(value.numerator),value.denominator
+                    if numerator>=2**16 or denominator>=2**16:raise ValueError('Exact rational exceeds the declared16-bit input view')
+                    out[row,col,:2]=(1,value.numerator<0)
+                    out[row,col,2:18]=(numerator>>shifts)&1
+                    out[row,col,18:]=(denominator>>shifts)&1
+            return out.reshape(len(states),-1)
         out = np.zeros((len(states), self.max_numbers, 4), dtype=np.float32)
         for row, state in enumerate(states):
             for col, value in enumerate(state):
                 out[row, col] = (1, math.copysign(math.log1p(abs(value.numerator)), value.numerator),
                                  math.log1p(value.denominator), float(value) / (1 + abs(float(value))))
+        if self.feature_encoding=='rational_padded':
+            padded=np.zeros((len(states),self.max_numbers,34),dtype=np.float32);padded[:,:,:4]=out;out=padded
         return out.reshape(len(states), -1)
 
     def graph(self, numbers):

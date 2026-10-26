@@ -11,11 +11,11 @@ from .environment import Game24
 
 
 class GameScene(PhysicalScene):
-    def __init__(self,path,record):
+    def __init__(self,path,record,feature_encoding='identity'):
         values=[tuple(Fraction(v) for v in row) for row in json.loads((path/'values.json').read_text())]
         self.values=values
         lengths=np.asarray([len(v) for v in values])
-        super().__init__(path,Game24(record['max_numbers']),
+        super().__init__(path,Game24(record['max_numbers'],feature_encoding=feature_encoding),
             lambda rows:[values[int(row[0])] for row in rows],
             lambda s,g:np.maximum(lengths[s[:,0]]-lengths[g[:,0]],0).astype(np.float32))
 
@@ -112,9 +112,9 @@ def build(config,out):
             records.append(dict(path=path,**record))
             print(json.dumps(dict(task='game24',scene=len(records),split=split,states=len(values))),flush=True)
     atomic_json(out/'corpus.json',dict(task='game24',scenes=records,seed=config['seed']))
-    return load(out)
+    return load(out,feature_encoding=config.get('input_encoding','identity'))
 
 
-def load(out):
+def load(out,feature_encoding='identity'):
     out=Path(out);manifest=json.loads((out/'corpus.json').read_text())
-    return GameCorpus([GameScene(out/r['path'],r) for r in manifest['scenes']])
+    return GameCorpus([GameScene(out/r['path'],r,feature_encoding=feature_encoding) for r in manifest['scenes']])

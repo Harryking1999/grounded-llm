@@ -754,7 +754,8 @@ def token_goal_cohorts(corpus,config,rng):
 def prepare(config,out):
     out=Path(out); out.mkdir(parents=True,exist_ok=True)
     module=importlib.import_module(f'grounded_llm.tasks.{config["task"]}.relation_data')
-    corpus=module.load(out/'graphs') if (out/'graphs'/'corpus.json').exists() or (out/'graphs'/'oracle.json').exists() else module.build(config,out/'graphs')
+    extra=dict(feature_encoding=config.get('input_encoding','identity')) if config['task'] in ('rush_hour','bridge','game24') else {}
+    corpus=module.load(out/'graphs',**extra) if (out/'graphs'/'corpus.json').exists() or (out/'graphs'/'oracle.json').exists() else module.build(config,out/'graphs')
     rng=np.random.default_rng(config['seed']+1)
     groups,pairs,decisions,reserved,partition=(token_cohorts if config['task']=='token_swapping' else board_cohorts)(corpus,config,rng)
     data={'pairs_train':pairs,'pair_distances_train':corpus.distance(pairs[:,0],pairs[:,1]),'reserved_relations':reserved,
@@ -800,7 +801,8 @@ def prepare(config,out):
 
 def load(config,out):
     out=Path(out)
-    extra=dict(feature_encoding=config.get('input_encoding','identity')) if config['task'] in ('rush_hour','bridge') else {}
+    extra=dict(feature_encoding=config.get('input_encoding','identity')) if config['task'] in ('rush_hour','bridge','game24') else {}
     corpus=importlib.import_module(f'grounded_llm.tasks.{config["task"]}.relation_data').load(out/'graphs',**extra)
     data=dict(np.load(out/'relations.npz'))
-    return corpus,data,json.loads((out/'summary.json').read_text())
+    description=json.loads((out/'summary.json').read_text());description['input_dim']=corpus.input_dim
+    return corpus,data,description

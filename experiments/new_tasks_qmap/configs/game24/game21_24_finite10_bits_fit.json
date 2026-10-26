@@ -1,0 +1,111 @@
+{
+  "schema": "exact_state_pairs",
+  "seed": 2026102610,
+  "model": {
+    "dimension": 128,
+    "hidden": 1024,
+    "cap": 16,
+    "metric": "directed_max"
+  },
+  "training": {
+    "steps": 4000,
+    "batch_size": 32768,
+    "decision_batch_size": 8192,
+    "learning_rate": 0.0003,
+    "rank_weight": 1.0,
+    "rank_temperature": 1.0,
+    "eval_every": 500,
+    "rollout_eval_every": 1000,
+    "cpu_threads": 1,
+    "unreachable_target": 12.0,
+    "features_on_device": "float32",
+    "broad_fraction": 0.5,
+    "online_goals": false,
+    "record_training_samples": true,
+    "validation_only_initial": true,
+    "action_edge_fraction": 0.25,
+    "training_probe_batches": 4,
+    "relation_sampling": {
+      "finite_point_fraction": 0.5,
+      "boundary_rank_fraction": 1.0,
+      "distance_bin_upper_bounds": [
+        1,
+        2,
+        3
+      ],
+      "balance_layouts": false,
+      "preparation_workers": 1,
+      "unreachable_point_fraction": 0.25,
+      "game_layer_balance": true,
+      "ranking_coverage_fraction": 0.5,
+      "coverage_seed": 2026102611
+    },
+    "trace_write_workers": 1,
+    "compact_point_sources": true,
+    "action_edges_replace_finite_only": true
+  },
+  "relations": {
+    "holdout_per_goal": 1,
+    "evaluation_per_goal": 32,
+    "unreachable_eval_per_goal": 16,
+    "complete_training_sources": true,
+    "evaluation_training_goals": 2,
+    "exhaustive_training_goals": true,
+    "holdout_goal_endpoints": false,
+    "preserve_goal_execution": [
+      "24",
+      "21"
+    ]
+  },
+  "evaluation": {
+    "decision_count": 512,
+    "rollout_count": 128,
+    "horizon": 4
+  },
+  "selection": "Minimum mean validation finite Huber plus candidate soft-rank; final test never selects a checkpoint.",
+  "scope": "Finite1..10 distinct four-number domain: all210 initial sets are training cases. One shared Qmap for complete21/24 goals and ordinary complete intermediate goals. Preserve four-slot raw rational encoding and all legal operation candidates. Root fitting, deduplicated2/3-number suffixes, local held2/3-number goals and47 goal-switch roots are separate checks. No claim of unseen initial-question or globally unexposed numerical-target generalization. No old learned weights, symbolic search or oracle features.",
+  "task": "game24",
+  "data": {
+    "max_numbers": 4,
+    "initial_numbers": 4,
+    "scenes": {
+      "train": 210,
+      "validation": 0,
+      "test": 0
+    },
+    "goals_per_scene": 20,
+    "heldout_goals": 8,
+    "minimum_reachable_per_goal": 2,
+    "initial_sampling": "exhaustive_distinct",
+    "source_values": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "root_targets": [
+      24,
+      21
+    ],
+    "heldout_goal_arities": [
+      2,
+      3,
+      2,
+      3,
+      2,
+      3,
+      2,
+      3
+    ],
+    "graphs_from": "/tmp/grounded_qmap_followup_5d41460/runs/game21_24_finite20_reference/data/graphs",
+    "prepared_from": "../game21_24_finite10_reference/data"
+  },
+  "hypothesis": "Matched fresh4000-update input-view comparison after complete small-domain branch exposure and directed readout comparisons failed. Both arms use4 slots of34 features,136 total, the identical1024-hidden128D directed_max MLP, cap16, exact initial weights under the same seed, same210 roots, prepared21/24/intermediate targets and protected closures, point/rank quotas and losses. rational_padded retains the original4 raw rational features per slot and appends30 zeros. rational_bits supplies presence, sign,16 exact absolute-numerator bits and16 denominator bits per slot; overflow raises rather than truncates. Bits are the given rational numbers only, without reachability, factorization, operator-result, source-expression or teacher-coordinate features. Both136-wide arms have the same parameter count; comparison to the old16-input model also changes its input width and initialization and is not isolated. Keep all candidates and the same frozen complete-root/suffix/goal-switch protocol; no inference search or test checkpoint selection.",
+  "input_encoding": "rational_bits"
+}

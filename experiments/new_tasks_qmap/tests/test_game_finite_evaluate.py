@@ -19,6 +19,31 @@ from experiments.new_tasks_qmap.src.game_finite_evaluate import numerical_querie
 
 
 class FiniteGameTests(unittest.TestCase):
+    def test_rational_feature_views_are_exact_and_reader_uses_checkpoint_view(self):
+        from grounded_llm.tasks.game24.qmap import MapReader
+        env=Game24(4);states=[env.canonical([Fraction(-7,9),0,Fraction(11,3)]),env.canonical([21]),env.canonical([24])]
+        raw=env.features(states).reshape(3,4,4)
+        padded=Game24(4,'rational_padded').features(states).reshape(3,4,34)
+        np.testing.assert_array_equal(padded[:,:,:4],raw);self.assertFalse(padded[:,:,4:].any())
+        bit_env=Game24(4,'rational_bits');bits=bit_env.features(states).reshape(3,4,34)
+        for i,state in enumerate(states):
+            for j,value in enumerate(state):
+                slot=bits[i,j];numerator=sum(int(v)*2**k for k,v in enumerate(slot[2:18]));denominator=sum(int(v)*2**k for k,v in enumerate(slot[18:]))
+                self.assertEqual(Fraction(-numerator if slot[1] else numerator,denominator),value)
+            self.assertFalse(bits[i,len(state):].any())
+        with self.assertRaises(ValueError):bit_env.features([env.canonical([2**16])])
+        with tempfile.TemporaryDirectory() as directory:
+            for encoding in ['rational_padded','rational_bits']:
+                cfg=dict(input_encoding=encoding,model=dict(dimension=4,hidden=8,cap=16,metric='directed_max'))
+                model=StateEncoder(input_dim=136,**cfg['model']);path=Path(directory)/(encoding+'.pt')
+                torch.save(dict(model_type='exact_state_pairs',task='game24',config=cfg,input_dim=136,model=model.state_dict(),scope=dict(max_numbers=4),step=1),path)
+                with patch.object(Game24,'graph',side_effect=RuntimeError('Reader must not use the exact graph')):
+                    reader=MapReader(env,path)
+                    score=reader.scores([states[0]],[states[1]])
+                features=torch.tensor(Game24(4,encoding).features([states[0],states[1]]))
+                expected=model.distance(model.encode(features[:1]),model.encode(features[1:])).detach().numpy()
+                np.testing.assert_allclose(score,expected)
+
     def test_cached_subdomain_reuses_physics_and_both_held_operation_layers(self):
         with tempfile.TemporaryDirectory() as directory,ExitStack() as stack,redirect_stdout(StringIO()):
             root=Path(directory)
@@ -49,6 +74,14 @@ class FiniteGameTests(unittest.TestCase):
                 rows=groups['unseen_goal_'+split]
                 self.assertEqual({len(a.values[g]) for g in rows[:,1]},{2,3})
             self.assertFalse(np.intersect1d(closure(cached,decisions),reserved).size)
+            from experiments.new_tasks_qmap.src.relation_data import prepare,load
+            small.update(model=dict(cap=16),training=dict(unreachable_target=12))
+            base,data,_=prepare(small,root/'prepared');stack.callback(close,base)
+            for encoding in ['rational_padded','rational_bits']:
+                view,loaded,description=load(dict(small,input_encoding=encoding),root/'prepared');stack.callback(close,view)
+                self.assertEqual(view.input_dim,136);self.assertEqual(description['input_dim'],136)
+                for key in data:np.testing.assert_array_equal(data[key],loaded[key])
+                np.testing.assert_array_equal(base.successors(np.arange(base.size)),view.successors(np.arange(view.size)))
 
     def test_deduplication_keeps_exact_reachability_and_both_targets(self):
         with tempfile.TemporaryDirectory() as directory,ExitStack() as stack:
@@ -169,6 +202,13 @@ class FiniteGameTests(unittest.TestCase):
             self.assertEqual(result['coverage']['numerical_input_coverage'],0)
             for cohort in result['metrics']['cohorts'].values():
                 self.assertEqual(cohort['planning']['oracle']['count'],cohort['finite_count'])
+            config['input_encoding']='rational_bits';model=StateEncoder(input_dim=136,**config['model'])
+            torch.save(dict(config=config,input_dim=136,model=model.state_dict(),step=1,source_commit='fixture',exposure=exposure),root/'run/best.pt')
+            with patch('sys.argv',['evaluate','--protocol',str(root/'protocol.json'),'--run',str(root/'run'),'--out',str(root/'bits_result.json')]),redirect_stdout(StringIO()):main()
+            bits_result=json.loads((root/'bits_result.json').read_text())
+            self.assertTrue(bits_result['oracle_ok']);self.assertFalse(bits_result['passed'])
+            for name,cohort in bits_result['metrics']['cohorts'].items():
+                self.assertEqual(cohort['count'],result['metrics']['cohorts'][name]['count'])
 
 
 if __name__=='__main__':unittest.main()

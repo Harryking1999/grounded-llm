@@ -90,7 +90,7 @@ def main():
         raise ValueError('Finite source domain differs from the declared protocol')
     if saved['step']!=summary['evaluated_step']:raise ValueError('Final report and frozen selected checkpoint differ')
     torch.set_num_threads(config['training']['cpu_threads'])
-    corpus=load(args.run/'data/graphs')
+    corpus=load(args.run/'data/graphs',feature_encoding=config.get('input_encoding','identity'))
     try:
         roots=[tuple(s.metadata['source']['numbers']) for s in corpus.scenes]
         if len(set(roots))!=len(roots) or set(roots)!=set(combinations(protocol['source_values'],4)):

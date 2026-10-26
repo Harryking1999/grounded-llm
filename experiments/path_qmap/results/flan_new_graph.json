@@ -1,0 +1,573 @@
+{
+  "source_commit": "6f2af92",
+  "best_step": 19000,
+  "last_step": 20000,
+  "training_seconds": 70.9,
+  "state_count": 256,
+  "directed_edges": 768,
+  "diameter": 10,
+  "train_pairs": 52448,
+  "train_decisions": 28220,
+  "initial": {
+    "all_routes": {
+      "count": 65280,
+      "solved": 1719,
+      "success_rate": 0.026332720588235294,
+      "shortest_action_rate": 0.4242800245098039,
+      "cycles": 63561,
+      "budget_exhausted": 0,
+      "horizon": 20,
+      "mean_extra_steps_on_solved": 0.02210587550901687,
+      "by_distance": {
+        "1": {
+          "count": 768,
+          "success_rate": 1.0,
+          "shortest_action_rate": 1.0
+        },
+        "2": {
+          "count": 1522,
+          "success_rate": 0.3002628120893561,
+          "shortest_action_rate": 0.29632063074901444
+        },
+        "3": {
+          "count": 2968,
+          "success_rate": 0.1091644204851752,
+          "shortest_action_rate": 0.34097035040431267
+        },
+        "4": {
+          "count": 5640,
+          "success_rate": 0.022872340425531913,
+          "shortest_action_rate": 0.34698581560283687
+        },
+        "5": {
+          "count": 9838,
+          "success_rate": 0.0038625736938402116,
+          "shortest_action_rate": 0.34966456596869283
+        },
+        "6": {
+          "count": 14718,
+          "success_rate": 0.00020383204239706482,
+          "shortest_action_rate": 0.3791275988585406
+        },
+        "7": {
+          "count": 16546,
+          "success_rate": 0.0,
+          "shortest_action_rate": 0.4304363592409041
+        },
+        "8": {
+          "count": 10768,
+          "success_rate": 0.0,
+          "shortest_action_rate": 0.5257243684992571
+        },
+        "9": {
+          "count": 2404,
+          "success_rate": 0.0,
+          "shortest_action_rate": 0.6709650582362728
+        },
+        "10": {
+          "count": 108,
+          "success_rate": 0.0,
+          "shortest_action_rate": 0.8611111111111112
+        }
+      }
+    },
+    "mean_direction_gap": 0.0040219007059931755,
+    "train": {
+      "relations": {
+        "count": 52448,
+        "mae": 6.045082642421883,
+        "max_error": 9.979222320020199,
+        "huber": 5.545086802844532
+      },
+      "routes": {
+        "count": 1024,
+        "solved": 30,
+        "success_rate": 0.029296875,
+        "shortest_action_rate": 0.4326171875,
+        "cycles": 994,
+        "budget_exhausted": 0,
+        "horizon": 20,
+        "mean_extra_steps_on_solved": 0.0,
+        "by_distance": {
+          "1": {
+            "count": 19,
+            "success_rate": 1.0,
+            "shortest_action_rate": 1.0
+          },
+          "2": {
+            "count": 24,
+            "success_rate": 0.2916666666666667,
+            "shortest_action_rate": 0.2916666666666667
+          },
+          "3": {
+            "count": 31,
+            "success_rate": 0.0967741935483871,
+            "shortest_action_rate": 0.41935483870967744
+          },
+          "4": {
+            "count": 79,
+            "success_rate": 0.012658227848101266,
+            "shortest_action_rate": 0.3924050632911392
+          },
+          "5": {
+            "count": 144,
+            "success_rate": 0.0,
+            "shortest_action_rate": 0.2916666666666667
+          },
+          "6": {
+            "count": 260,
+            "success_rate": 0.0,
+            "shortest_action_rate": 0.4076923076923077
+          },
+          "7": {
+            "count": 296,
+            "success_rate": 0.0,
+            "shortest_action_rate": 0.4189189189189189
+          },
+          "8": {
+            "count": 144,
+            "success_rate": 0.0,
+            "shortest_action_rate": 0.5972222222222222
+          },
+          "9": {
+            "count": 27,
+            "success_rate": 0.0,
+            "shortest_action_rate": 0.5555555555555556
+          }
+        }
+      }
+    },
+    "validation": {
+      "relations": {
+        "count": 5936,
+        "mae": 6.096146488331435,
+        "max_error": 9.983062403276563,
+        "huber": 5.596146488331435
+      },
+      "routes": {
+        "count": 128,
+        "solved": 4,
+        "success_rate": 0.03125,
+        "shortest_action_rate": 0.5859375,
+        "cycles": 124,
+        "budget_exhausted": 0,
+        "horizon": 20,
+        "mean_extra_steps_on_solved": 0.0,
+        "by_distance": {
+          "3": {
+            "count": 16,
+            "success_rate": 0.1875,
+            "shortest_action_rate": 0.625
+          },
+          "4": {
+            "count": 16,
+            "success_rate": 0.0625,
+            "shortest_action_rate": 0.375
+          },
+          "5": {
+            "count": 16,
+            "success_rate": 0.0,
+            "shortest_action_rate": 0.375
+          },
+          "6": {
+            "count": 16,
+            "success_rate": 0.0,
+            "shortest_action_rate": 0.4375
+          },
+          "7": {
+            "count": 16,
+            "success_rate": 0.0,
+            "shortest_action_rate": 0.375
+          },
+          "8": {
+            "count": 16,
+            "success_rate": 0.0,
+            "shortest_action_rate": 0.6875
+          },
+          "9": {
+            "count": 16,
+            "success_rate": 0.0,
+            "shortest_action_rate": 0.875
+          },
+          "10": {
+            "count": 16,
+            "success_rate": 0.0,
+            "shortest_action_rate": 0.9375
+          }
+        }
+      }
+    },
+    "test": {
+      "relations": {
+        "count": 6896,
+        "mae": 6.1896992673635,
+        "max_error": 9.98419670201838,
+        "huber": 5.6896992673635
+      },
+      "routes": {
+        "count": 256,
+        "solved": 3,
+        "success_rate": 0.01171875,
+        "shortest_action_rate": 0.48828125,
+        "cycles": 253,
+        "budget_exhausted": 0,
+        "horizon": 20,
+        "mean_extra_steps_on_solved": 0.0,
+        "by_distance": {
+          "3": {
+            "count": 32,
+            "success_rate": 0.09375,
+            "shortest_action_rate": 0.21875
+          },
+          "4": {
+            "count": 32,
+            "success_rate": 0.0,
+            "shortest_action_rate": 0.3125
+          },
+          "5": {
+            "count": 32,
+            "success_rate": 0.0,
+            "shortest_action_rate": 0.40625
+          },
+          "6": {
+            "count": 32,
+            "success_rate": 0.0,
+            "shortest_action_rate": 0.4375
+          },
+          "7": {
+            "count": 32,
+            "success_rate": 0.0,
+            "shortest_action_rate": 0.5
+          },
+          "8": {
+            "count": 32,
+            "success_rate": 0.0,
+            "shortest_action_rate": 0.40625
+          },
+          "9": {
+            "count": 32,
+            "success_rate": 0.0,
+            "shortest_action_rate": 0.71875
+          },
+          "10": {
+            "count": 32,
+            "success_rate": 0.0,
+            "shortest_action_rate": 0.90625
+          }
+        }
+      }
+    }
+  },
+  "final": {
+    "all_routes": {
+      "count": 65280,
+      "solved": 62921,
+      "success_rate": 0.9638633578431373,
+      "shortest_action_rate": 0.8737285539215687,
+      "cycles": 2359,
+      "budget_exhausted": 0,
+      "horizon": 20,
+      "mean_extra_steps_on_solved": 0.29513199090923536,
+      "by_distance": {
+        "1": {
+          "count": 768,
+          "success_rate": 1.0,
+          "shortest_action_rate": 1.0
+        },
+        "2": {
+          "count": 1522,
+          "success_rate": 1.0,
+          "shortest_action_rate": 1.0
+        },
+        "3": {
+          "count": 2968,
+          "success_rate": 1.0,
+          "shortest_action_rate": 0.998989218328841
+        },
+        "4": {
+          "count": 5640,
+          "success_rate": 0.9959219858156029,
+          "shortest_action_rate": 0.9833333333333333
+        },
+        "5": {
+          "count": 9838,
+          "success_rate": 0.978044317950803,
+          "shortest_action_rate": 0.9331164870908721
+        },
+        "6": {
+          "count": 14718,
+          "success_rate": 0.9599809756760429,
+          "shortest_action_rate": 0.8647234678624813
+        },
+        "7": {
+          "count": 16546,
+          "success_rate": 0.949413755590475,
+          "shortest_action_rate": 0.8122809138160281
+        },
+        "8": {
+          "count": 10768,
+          "success_rate": 0.9461367013372957,
+          "shortest_action_rate": 0.8064635958395245
+        },
+        "9": {
+          "count": 2404,
+          "success_rate": 0.9546589018302829,
+          "shortest_action_rate": 0.8743760399334443
+        },
+        "10": {
+          "count": 108,
+          "success_rate": 0.9537037037037037,
+          "shortest_action_rate": 0.9537037037037037
+        }
+      }
+    },
+    "mean_direction_gap": 0.09492725133895874,
+    "train": {
+      "relations": {
+        "count": 52448,
+        "mae": 0.6825858468759198,
+        "max_error": 3.6490492820739746,
+        "huber": 0.3260744344697937
+      },
+      "routes": {
+        "count": 1024,
+        "solved": 985,
+        "success_rate": 0.9619140625,
+        "shortest_action_rate": 0.8642578125,
+        "cycles": 39,
+        "budget_exhausted": 0,
+        "horizon": 20,
+        "mean_extra_steps_on_solved": 0.2913705583756345,
+        "by_distance": {
+          "1": {
+            "count": 19,
+            "success_rate": 1.0,
+            "shortest_action_rate": 1.0
+          },
+          "2": {
+            "count": 24,
+            "success_rate": 1.0,
+            "shortest_action_rate": 1.0
+          },
+          "3": {
+            "count": 31,
+            "success_rate": 1.0,
+            "shortest_action_rate": 1.0
+          },
+          "4": {
+            "count": 79,
+            "success_rate": 1.0,
+            "shortest_action_rate": 0.9873417721518988
+          },
+          "5": {
+            "count": 144,
+            "success_rate": 0.9791666666666666,
+            "shortest_action_rate": 0.9375
+          },
+          "6": {
+            "count": 260,
+            "success_rate": 0.9653846153846154,
+            "shortest_action_rate": 0.8846153846153846
+          },
+          "7": {
+            "count": 296,
+            "success_rate": 0.9459459459459459,
+            "shortest_action_rate": 0.7905405405405406
+          },
+          "8": {
+            "count": 144,
+            "success_rate": 0.9305555555555556,
+            "shortest_action_rate": 0.7847222222222222
+          },
+          "9": {
+            "count": 27,
+            "success_rate": 0.9629629629629629,
+            "shortest_action_rate": 0.7777777777777778
+          }
+        }
+      }
+    },
+    "validation": {
+      "relations": {
+        "count": 5936,
+        "mae": 0.7345569821380862,
+        "max_error": 2.996732711791992,
+        "huber": 0.36470105253802654
+      },
+      "routes": {
+        "count": 128,
+        "solved": 120,
+        "success_rate": 0.9375,
+        "shortest_action_rate": 0.90625,
+        "cycles": 8,
+        "budget_exhausted": 0,
+        "horizon": 20,
+        "mean_extra_steps_on_solved": 0.25833333333333336,
+        "by_distance": {
+          "3": {
+            "count": 16,
+            "success_rate": 1.0,
+            "shortest_action_rate": 1.0
+          },
+          "4": {
+            "count": 16,
+            "success_rate": 1.0,
+            "shortest_action_rate": 1.0
+          },
+          "5": {
+            "count": 16,
+            "success_rate": 0.9375,
+            "shortest_action_rate": 0.875
+          },
+          "6": {
+            "count": 16,
+            "success_rate": 0.9375,
+            "shortest_action_rate": 0.875
+          },
+          "7": {
+            "count": 16,
+            "success_rate": 0.9375,
+            "shortest_action_rate": 0.875
+          },
+          "8": {
+            "count": 16,
+            "success_rate": 0.8125,
+            "shortest_action_rate": 0.9375
+          },
+          "9": {
+            "count": 16,
+            "success_rate": 0.9375,
+            "shortest_action_rate": 0.75
+          },
+          "10": {
+            "count": 16,
+            "success_rate": 0.9375,
+            "shortest_action_rate": 0.9375
+          }
+        }
+      }
+    },
+    "test": {
+      "relations": {
+        "count": 6896,
+        "mae": 0.7496014300673302,
+        "max_error": 3.1626992225646973,
+        "huber": 0.37861321174824064
+      },
+      "routes": {
+        "count": 256,
+        "solved": 248,
+        "success_rate": 0.96875,
+        "shortest_action_rate": 0.8515625,
+        "cycles": 8,
+        "budget_exhausted": 0,
+        "horizon": 20,
+        "mean_extra_steps_on_solved": 0.40725806451612906,
+        "by_distance": {
+          "3": {
+            "count": 32,
+            "success_rate": 1.0,
+            "shortest_action_rate": 1.0
+          },
+          "4": {
+            "count": 32,
+            "success_rate": 1.0,
+            "shortest_action_rate": 1.0
+          },
+          "5": {
+            "count": 32,
+            "success_rate": 0.96875,
+            "shortest_action_rate": 0.75
+          },
+          "6": {
+            "count": 32,
+            "success_rate": 0.90625,
+            "shortest_action_rate": 0.78125
+          },
+          "7": {
+            "count": 32,
+            "success_rate": 1.0,
+            "shortest_action_rate": 0.625
+          },
+          "8": {
+            "count": 32,
+            "success_rate": 0.90625,
+            "shortest_action_rate": 0.78125
+          },
+          "9": {
+            "count": 32,
+            "success_rate": 1.0,
+            "shortest_action_rate": 0.875
+          },
+          "10": {
+            "count": 32,
+            "success_rate": 0.96875,
+            "shortest_action_rate": 1.0
+          }
+        }
+      }
+    }
+  },
+  "oracle_check": {
+    "count": 65280,
+    "solved": 65280,
+    "success_rate": 1.0,
+    "shortest_action_rate": 1.0,
+    "cycles": 0,
+    "budget_exhausted": 0,
+    "horizon": 20,
+    "mean_extra_steps_on_solved": 0.0,
+    "by_distance": {
+      "1": {
+        "count": 768,
+        "success_rate": 1.0,
+        "shortest_action_rate": 1.0
+      },
+      "2": {
+        "count": 1522,
+        "success_rate": 1.0,
+        "shortest_action_rate": 1.0
+      },
+      "3": {
+        "count": 2968,
+        "success_rate": 1.0,
+        "shortest_action_rate": 1.0
+      },
+      "4": {
+        "count": 5640,
+        "success_rate": 1.0,
+        "shortest_action_rate": 1.0
+      },
+      "5": {
+        "count": 9838,
+        "success_rate": 1.0,
+        "shortest_action_rate": 1.0
+      },
+      "6": {
+        "count": 14718,
+        "success_rate": 1.0,
+        "shortest_action_rate": 1.0
+      },
+      "7": {
+        "count": 16546,
+        "success_rate": 1.0,
+        "shortest_action_rate": 1.0
+      },
+      "8": {
+        "count": 10768,
+        "success_rate": 1.0,
+        "shortest_action_rate": 1.0
+      },
+      "9": {
+        "count": 2404,
+        "success_rate": 1.0,
+        "shortest_action_rate": 1.0
+      },
+      "10": {
+        "count": 108,
+        "success_rate": 1.0,
+        "shortest_action_rate": 1.0
+      }
+    }
+  }
+}

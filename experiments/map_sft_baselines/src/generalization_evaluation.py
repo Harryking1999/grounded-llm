@@ -9,6 +9,13 @@ from .generalization_prepare import teacher_record
 from grounded_llm.tasks.state_graph_sft import StateTask
 
 
+def bridge_goal_pool(n):
+    """Physical reachable states only; no Qmap or success filtering."""
+    from grounded_llm.tasks.bridge.environment import Bridge
+    distances=Bridge(list(range(1,n+1))).graph(0)['distances']
+    return np.flatnonzero(np.isfinite(distances) & (np.arange(len(distances))!=0))
+
+
 def link_assets(source,target):
     target.mkdir(parents=True,exist_ok=True)
     for asset in source.iterdir():
@@ -42,6 +49,7 @@ def prepare(cfg,sources,data_root):
         if len(cohorts[task])!=count:raise ValueError('ID cohort size differs from the contract')
         if task=='blocks':small[task]=json.loads((bank/'small_ood.json').read_text());continue
         small[task]=[]
+        if task=='bridge':bridge_goals=bridge_goal_pool(6)
         for original in cohorts[task]:
             row=dict(original,cohort='small_ood',trajectory_id=original['trajectory_id'].replace('_id_','_small_ood_'))
             if task in ('cube2','puzzle8'):
@@ -51,7 +59,7 @@ def prepare(cfg,sources,data_root):
             elif task=='bridge':
                 if not (bank/'qmap6.pt').exists():shutil.copy2(sources['bridge6_map'],bank/'qmap6.pt')
                 row.update(context={'times':sorted(map(int,rng.choice(np.arange(1,cfg['bridge_maximum_time']+1),6,replace=False)))},
-                    start=0,goal=int(rng.integers(1,127)),map_checkpoint='qmap6.pt',variant='six_people_ood')
+                    start=0,goal=int(rng.choice(bridge_goals)),map_checkpoint='qmap6.pt',variant='six_people_ood')
             elif task=='token_swapping':
                 if not (bank/'alternate.pt').exists():shutil.copy2(sources['token_alternate_map'],bank/'alternate.pt')
                 if not (bank/'alternate_distances.bin').exists():(bank/'alternate_distances.bin').symlink_to(Path(sources['token_alternate_oracle']).resolve())

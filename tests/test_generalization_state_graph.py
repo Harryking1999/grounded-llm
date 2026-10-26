@@ -72,3 +72,13 @@ def test_study_budgets_and_fixed_big_ood():
             t=cfg['training']
             assert t['world_size']==2 and t['micro_batch']*t['world_size']*t['gradient_accumulation_steps']==t['global_batch']==4
             assert cfg['execution']['evaluation_gpus']==[6]
+
+
+def test_six_person_ood_pool_excludes_stranded_torch():
+    from experiments.map_sft_baselines.src.generalization_evaluation import bridge_goal_pool
+    from grounded_llm.tasks.bridge.environment import Bridge
+    pool=bridge_goal_pool(6)
+    assert set(pool)==set(range(1,128))-{1,126}
+    costs=Bridge([2,3,5,7,11,17]).graph(0)['distances']
+    assert np.isfinite(costs[pool]).all()
+    assert 127 in pool and not np.isfinite(costs[[1,126]]).any()

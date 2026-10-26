@@ -7,3 +7,5 @@
 选定模型来源与适用条件记录在 [selection.json](selection.json)。选定权重放 `checkpoints/`，由 Git 忽略；过程断点与原始日志仍留在运行／归档目录。不用失败续训覆盖已采用模型。
 
 采用魔方／汉诺塔分支中新增的统一方法寻路 Q（`experiments/path_qmap`），不采用旧 Q/V。当前合同是固定图、节点独热输入；已采用本方法 path256_01c053f 的验证最优 best.pt；测试到达 251/256（98.05%）。
+
+FLAN类内OOD另提供一张同规模、同度分布和同密度的新图及其独立Qmap，采用身份见 selection 的 `additional_maps.flan_new_graph256`。新图关系测试到达248/256（96.88%），见[结果](../../../experiments/path_qmap/results/report.md#flan新图)。这不代表原Qmap跨图泛化，也尚不是LLM读取结果。

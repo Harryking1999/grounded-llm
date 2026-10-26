@@ -9,5 +9,20 @@
   "source_run": "runs/path_qmap/path256_01c053f",
   "source_checkpoint": "best.pt",
   "selection": "validation_Huber_plus_full_candidate_soft_rank_CE",
-  "evidence": "experiments/path_qmap/results/report.md"
+  "evidence": "experiments/path_qmap/results/report.md",
+  "additional_maps": {
+    "flan_new_graph256": {
+      "task": "path",
+      "status": "adopted",
+      "checkpoint": "tasks/path/Qmap/checkpoints/flan_ood/best.pt",
+      "graph": "tasks/path/Qmap/checkpoints/flan_ood/graph.npz",
+      "config": "experiments/map_sft_baselines/configs/flan_generalization_path_ood_qmap.json",
+      "source_commit": "6f2af92",
+      "source_run": "data/flan_generalization_6f2af92/path_ood/qmap",
+      "step": 19000,
+      "selection": "Best validation Huber plus full-candidate soft rank CE; fixed budget, no test selection",
+      "scope": "Independent256-node topology with matched degree and density. This graph is LLM-held-out in the FLAN study; the Qmap itself was trained on this graph. Full legal neighbors, greedy distance, no search.",
+      "evidence": "experiments/path_qmap/results/flan_new_graph.json"
+    }
+  }
 }

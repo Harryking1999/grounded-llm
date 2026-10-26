@@ -68,6 +68,22 @@ def scope(config,corpus):
                 complete_goal=True,shared_across_layouts=True)
 
 
+def restore_cuda_rng(states,device,source_device=None):
+    """Restore the active stream explicitly when moving a run to another GPU."""
+    if states is None or not torch.cuda.is_available():return None
+    target=torch.device(device)
+    if target.type!='cuda':return None
+    count=torch.cuda.device_count();target_index=target.index if target.index is not None else torch.cuda.current_device()
+    if source_device is None:
+        if len(states)!=count:raise ValueError('Changed GPU count requires continuation.source_cuda_device')
+        source_device=target_index
+    if type(source_device) is not int or not 0<=source_device<len(states):raise ValueError('Invalid checkpoint CUDA source device')
+    torch.cuda.set_rng_state_all([state.cpu() for state in states[:count]])
+    torch.cuda.set_rng_state(states[source_device].cpu(),device=target)
+    return dict(source_device=source_device,target_device=target_index,source_device_count=len(states),
+                target_device_count=count,active_stream_restored=True)
+
+
 def validate_continuation(previous,current,step):
     """Validate an explicit budget extension or recorded batch resize."""
     old,new=deepcopy(previous),deepcopy(current)
@@ -334,7 +350,7 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
             replay_rng.bit_generator.state=saved['replay_rng'];replay_draws=saved['replay_draws']
             if isinstance(replay_sampler,LocalPathSampler):replay_sampler.load_state_dict(saved['replay_sampler_state'])
         torch.set_rng_state(saved['torch_rng'].cpu())
-        if saved['cuda_rng'] is not None and torch.cuda.is_available(): torch.cuda.set_rng_state_all([r.cpu() for r in saved['cuda_rng']])
+        cuda_restoration=restore_cuda_rng(saved['cuda_rng'],device,continuation.get('source_cuda_device') if external else None)
         exposure,pair_draws,rank_draws=saved['exposure'],saved['pair_draws'],saved['rank_draws']
         start_step,best,best_step,prior_seconds=saved['step'],saved['best_score'],saved['best_step'],saved['seconds']
         if external:
@@ -347,6 +363,7 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
             atomic_json(out/'continuation.json',dict(checkpoint=str(checkpoint),source_commit=saved['source_commit'],
                 source_step=start_step,original_budget=saved['config']['training']['steps'],extended_budget=options['steps'],
                 optimizer_restored=True,sampling_rng_restored=True,sampler_state_restored=True,exposure_restored=True,
+                cuda_rng_restoration=cuda_restoration,
                 batch_sizes={k:dict(previous=saved['config']['training'][k],current=options[k]) for k in ('batch_size','decision_batch_size')},
                 meaning=('Full optimizer/RNG/counter restoration; batch sizes change explicitly, so the update trajectory changes.'
                     if continuation.get('mode')=='batch_resize' else

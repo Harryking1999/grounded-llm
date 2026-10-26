@@ -43,6 +43,21 @@ def small_oracle(path,n,edges):
 
 
 class ExactPairTests(unittest.TestCase):
+    def test_cuda_rng_recovery_maps_source_stream_on_smaller_node(self):
+        from experiments.new_tasks_qmap.src.relations import restore_cuda_rng
+        from unittest.mock import patch
+        states=[torch.tensor([i],dtype=torch.uint8) for i in range(4)]
+        with patch('torch.cuda.is_available',return_value=True),patch('torch.cuda.device_count',return_value=3),patch('torch.cuda.set_rng_state_all') as restore_all,patch('torch.cuda.set_rng_state') as restore_active:
+            with self.assertRaisesRegex(ValueError,'source_cuda_device'):restore_cuda_rng(states,'cuda:0')
+            result=restore_cuda_rng(states,'cuda:0',2)
+            self.assertEqual(len(restore_all.call_args.args[0]),3)
+            torch.testing.assert_close(restore_active.call_args.args[0],states[2])
+            self.assertEqual(restore_active.call_args.kwargs['device'],torch.device('cuda:0'))
+            self.assertEqual(result['source_device_count'],4);self.assertEqual(result['target_device_count'],3)
+        with patch('torch.cuda.is_available',return_value=True),patch('torch.cuda.device_count',return_value=4),patch('torch.cuda.set_rng_state_all'),patch('torch.cuda.set_rng_state') as restore_active:
+            result=restore_cuda_rng(states,'cuda:1');torch.testing.assert_close(restore_active.call_args.args[0],states[1])
+            self.assertEqual(result['source_device'],1)
+
     def test_fresh_token_acceptance_respects_held_inputs_layers_and_prior_queries(self):
         from experiments.new_tasks_qmap.src.token_acceptance import fresh_queries
         with tempfile.TemporaryDirectory() as tmp:

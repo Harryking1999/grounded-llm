@@ -15,10 +15,21 @@ from grounded_llm.core.qmap.physical_data import save_scene
 from grounded_llm.tasks.game24.environment import Game24
 from grounded_llm.tasks.game24.relation_data import GameScene,GameCorpus,build
 from grounded_llm.core.qmap.model import StateEncoder
-from experiments.new_tasks_qmap.src.game_finite_evaluate import numerical_queries,main,target_switch_metrics
+from experiments.new_tasks_qmap.src.game_finite_evaluate import numerical_queries,main,target_switch_metrics,completion_gates
 
 
 class FiniteGameTests(unittest.TestCase):
+    def test_two_step_holdout_must_pass_separately_from_easy_suffixes(self):
+        plans={'held':dict(success_rate=977/1195,by_distance={'1.0':dict(count=775,solved=775),'2.0':dict(count=420,solved=202)})}
+        protocol=dict(minimum_completion_rate=.8,target_completion_rate=.9)
+        self.assertTrue(completion_gates(plans,protocol)['passed'])
+        protocol['required_distance_subgroups']=[dict(cohort='held',distance=2,expected_count=420)]
+        self.assertFalse(completion_gates(plans,protocol)['passed'])
+        plans['held']['by_distance']['2.0']['solved']=378
+        self.assertTrue(completion_gates(plans,protocol)['passed'])
+        plans['held']['by_distance'].pop('2.0')
+        self.assertFalse(completion_gates(plans,protocol)['passed'])
+
     def test_rational_feature_views_are_exact_and_reader_uses_checkpoint_view(self):
         from grounded_llm.tasks.game24.qmap import MapReader
         env=Game24(4);states=[env.canonical([Fraction(-7,9),0,Fraction(11,3)]),env.canonical([21]),env.canonical([24])]

@@ -7,12 +7,17 @@
   "step": 3500,
   "scope": {
     "initial_values": "All210 unordered four-number sets chosen without replacement from1..10; every root is in the training domain. No unseen-root or larger-domain claim.",
-    "goals": "21,24 and configured complete intermediate targets; two/three-number suffixes. Local held targets can occur in other initial-question graphs.",
+    "goals": "Singleton21 or24, including two/three-number source suffixes. Arbitrary complete intermediate-goal planning is not adopted.",
     "encoding": "Exact rational_bits; 16-bit absolute numerator and denominator; overflow raises.",
     "inference": "Every legal arithmetic action supplied by environment; frozen Qmap selects greedily and exact equality stops. No search or exact graph queries.",
     "llm": "Not evaluated"
   },
   "acceptance": "experiments/new_tasks_qmap/configs/game24/game21_24_finite10_evaluation.json",
   "evidence": "experiments/new_tasks_qmap/results/game24/game21_24_finite10_bits_fit.json",
-  "limitations": "Passed every basic80% completion/reachability gate, not every90% target. Held two-number test977/1195 and forced target switching41/47 remain weak. No convergence claim."
+  "limitations": "Original mixed-group basic protocol passed; stronger two-step intermediate-goal condition fails: held4-to2 validation191/420, test202/420. Retain singleton21/24 adoption only. Forced target switching41/47 remains below90%; no convergence, unseen-root or LLM claim.",
+  "unadopted_conditions": {
+    "goals": "Arbitrary complete intermediate numerical multisets",
+    "acceptance": "experiments/new_tasks_qmap/configs/game24/game21_24_finite10_intermediate_evaluation.json",
+    "evidence": "experiments/new_tasks_qmap/results/game24/game21_24_finite10_bits_fit.json"
+  }
 }

@@ -72,6 +72,24 @@ def target_switch_metrics(model,corpus,groups,horizon):
         scope='Same root, both singleton goals solvable and exact optimal FIRST physical action sets disjoint. All candidates retained; teacher checks follow model action selection.')
 
 
+def completion_gates(plans,protocol):
+    """Do not let easy one-step goals conceal failure on two-step queries."""
+    minimum=protocol['minimum_completion_rate'];target=protocol['target_completion_rate']
+    passed=all(p['success_rate'] is not None and p['success_rate']>=minimum for p in plans.values())
+    reached=all(p['success_rate'] is not None and p['success_rate']>=target for p in plans.values())
+    subgroups={}
+    for spec in protocol.get('required_distance_subgroups',[]):
+        name=spec['cohort'];distance=str(float(spec['distance']));key=name+':distance='+distance
+        row=plans.get(name,{}).get('by_distance',{}).get(distance,{})
+        count=row.get('count',0);solved=row.get('solved',0)
+        complete=count>0 and count==spec['expected_count']
+        rate=solved/count if count else None
+        ok=complete and rate>=minimum;good=complete and rate>=target
+        subgroups[key]=dict(count=count,solved=solved,expected_count=spec['expected_count'],success_rate=rate,passed=ok,target_reached=good)
+        passed=passed and ok;reached=reached and good
+    return dict(passed=passed,target_reached=reached,required_distance_subgroups=subgroups)
+
+
 def main():
     parser=argparse.ArgumentParser(__doc__)
     parser.add_argument('--protocol',type=Path,required=True)
@@ -130,9 +148,10 @@ def main():
         if switches is not None and switches['count']!=protocol.get('expected_target_switch_count',switches['count']):
             raise ValueError('Target-switch query domain differs from the frozen count')
         plans={name:value['planning']['q'] for name,value in metrics['cohorts'].items()}
+        completion=completion_gates(plans,protocol)
         oracle_ok=all(value['planning']['oracle']['optimal_rate']==1 for value in metrics['cohorts'].values())
         passed=not missing and oracle_ok and coverage['numerical_input_coverage']==1
-        passed=passed and all(p['success_rate'] is not None and p['success_rate']>=protocol['minimum_completion_rate'] for p in plans.values())
+        passed=passed and completion['passed']
         if switches is not None:
             passed=passed and switches['count']>0 and switches['both_first_actions_optimal_rate']>=protocol['minimum_completion_rate'] and switches['both_complete_rate']>=protocol['minimum_completion_rate']
         reachability_passed=all(
@@ -144,8 +163,8 @@ def main():
             checkpoint_selection='Existing validation objective only; this suite never selects a checkpoint.',
             scope='Exhaustive finite-domain fitting, not unseen initial-question generalization.2/3-number suffixes are deduplicated across roots. Unsolvable queries remain in distance/reachability evaluation; completion uses every positive-distance solvable query. Local held query goals may occur as training goals or state inputs in other questions.',
             coverage=coverage,missing_required_cohorts=missing,target_switch=switches,oracle_ok=oracle_ok,completion_passed=passed,reachability_passed=reachability_passed,
-            passed=passed and reachability_passed,
-            target_reached=passed and reachability_passed and all(p['success_rate']>=protocol['target_completion_rate'] for p in plans.values())
+            passed=passed and reachability_passed,completion_gates=completion,
+            target_reached=passed and reachability_passed and completion['target_reached']
                 and (switches is None or (switches['both_first_actions_optimal_rate']>=protocol['target_completion_rate']
                     and switches['both_complete_rate']>=protocol['target_completion_rate'])),metrics=metrics)
         atomic_json(args.out,result)

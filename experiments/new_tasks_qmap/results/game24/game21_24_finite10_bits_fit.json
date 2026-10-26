@@ -1497,5 +1497,32 @@
       }
     },
     "scope": "Post-selection diagnosis only; no optimizer update or new labels. Exact truth inspected after model choices. Numeric overlap means a whole parent-goal candidate context exists in prepared training, not proof of this exact occurrence exposure. Frozen test failures are not added to training."
+  },
+  "intermediate_goal_acceptance": {
+    "protocol": "experiments/new_tasks_qmap/configs/game24/game21_24_finite10_intermediate_evaluation.json",
+    "passed": false,
+    "completion_gates": {
+      "passed": false,
+      "target_reached": false,
+      "required_distance_subgroups": {
+        "held_intermediate2_query_validation:distance=2.0": {
+          "count": 420,
+          "solved": 191,
+          "expected_count": 420,
+          "success_rate": 0.45476190476190476,
+          "passed": false,
+          "target_reached": false
+        },
+        "held_intermediate2_query_test:distance=2.0": {
+          "count": 420,
+          "solved": 202,
+          "expected_count": 420,
+          "success_rate": 0.48095238095238096,
+          "passed": false,
+          "target_reached": false
+        }
+      }
+    },
+    "interpretation": "Original mixed held-group protocol passed, but the two-step4-to2 subsets fail separately. Adopt only singleton21/24 and their suffix scope; arbitrary intermediate-goal planning remains unadopted."
   }
 }

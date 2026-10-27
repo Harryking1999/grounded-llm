@@ -17,6 +17,8 @@
 
 配置描述已经定义的条件，不表示任务仍在运行或可以自动续训。运行采用的配置应与对应产物中的 `config.json` 和源码版本一起解释。
 
+非空目标泛化的小规模对照见[配置](configs/nonempty_generalization.json)，入口为`src.nonempty_generalization`的`--prepare`与训练模式。它从采用图建立新采样阶段，比较仅清空与四小类均衡目标；保留原Huber、完整候选soft-rank及精确标签。初盘划分、采用范围和旧清空训练分开解释，不替换原完整图训练器。
+
 ## 可复用接口
 
 | 模块 | 职责 |

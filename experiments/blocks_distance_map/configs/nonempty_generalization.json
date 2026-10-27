@@ -1,0 +1,8 @@
+{
+  "seed":2026102801,
+  "data":{"train_roots_per_size":128,"development_roots_per_size":32,"test_roots_per_size":32,"placements":[8,12],"goal_fractions":[0.25,0.5,0.75],"oracle_seconds":600,"oracle_cache_limit":2000000,"excluded_roots":"tasks/blocks/data/clear1000.json"},
+  "training":{"seed":2026102802,"steps":2048,"batch_size":128,"learning_rate":0.00003,"listwise_weight":1.0,"temperature":1.0,"unreachable_label":19,"evaluate_every":512,"cpu_threads":2},
+  "arms":{"clear_control":["clear8","clear12"],"balanced_goals":["clear8","clear12","partial8","partial12"]},
+  "selection":{"clear_loss_tolerance_per_size":2,"objective":"Mean development full-rollout completion across four subclasses, with each clearing size no more than2 lost successes against the shared parent. Initialization is eligible; test opens only after selection freezes."},
+  "scope":"New small sampling stage from the adopted889 shared Q and Adam. Same encoder, directed_sum, coordinate cap13, unreachable19, Huber, complete-candidate soft-rank and physical actions. Both arms share fresh seeds, total decision budget and generated training roots; only goal-class sampling differs. Full stars along one exact teacher route per query; no oracle or goal-cell filtering in inference. Whole source roots are disjoint across this stage's train/development/test and exclude clear1000. Descendant-state overlap and older model exposure are not claimed absent. No automatic adoption or expansion."
+}

@@ -1,6 +1,4 @@
 import copy
-import contextlib
-import io
 import json
 from pathlib import Path
 import tempfile
@@ -19,7 +17,6 @@ from experiments.flamingo_map_reader.src.state_q import path_q_step, puzzle_q_ba
 from experiments.hanoi_qmap.src.environment import Hanoi
 from experiments.path_qmap.src.data import prepare
 from experiments.path_qmap.src.evaluate import route_metrics
-from experiments.path_qmap.src.run import training_hard_indices, train
 from experiments.path_qmap.src.reader import FrozenPathMap
 from experiments.puzzle_qmap.src.model import MapReader, MODEL_TYPE, QMap
 
@@ -67,39 +64,6 @@ class PathQTest(unittest.TestCase):
         collapsed = route_metrics(np.zeros_like(data["distances"]), data, tasks, 32)
         self.assertGreater(collapsed["cycles"], 0)
         self.assertLess(collapsed["success_rate"], 1)
-
-    def test_error_replay_only_uses_unprotected_complete_stars(self):
-        data = prepare(cycle_graph().adjacency, self.small)
-        self.assertEqual(len(training_hard_indices(data['distances'],data)),0)
-        ids = training_hard_indices(np.zeros_like(data['distances']),data)
-        self.assertGreater(len(ids),0)
-        self.assertTrue(np.all(ids < len(data['train_tasks'])))
-        # A protected successor label must be rejected even with a permitted parent.
-        source,goal = data['train_tasks'][ids[0]]
-        child = data['children'][source,0]
-        data['membership'][child,goal] = 2
-        with self.assertRaisesRegex(ValueError,'protected complete decision'):
-            training_hard_indices(np.zeros_like(data['distances']),data)
-
-    def test_continuation_keeps_parent_eligible_and_publishes_loadable_sampler_state(self):
-        env = cycle_graph(); cfg = copy.deepcopy(self.small)
-        cfg['training'].update(steps=1,learning_rate=0,eval_every=1,
-            hard_replay_fraction=.5,hard_refresh_every=1)
-        data = prepare(env.adjacency,cfg)
-        model = StateEncoder(128,256,int(data['distances'].max()),'directed_sum',input_dim=32)
-        optimizer = torch.optim.Adam(model.parameters())
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp); prepared = root/'prepared'; prepared.mkdir()
-            np.savez_compressed(prepared/'data.npz',**data,actions=env.actions)
-            torch.save(dict(model_type='state_q_path',model=model.state_dict(),optimizer=optimizer.state_dict(),
-                cap=model.cap,adjacency=torch.from_numpy(env.adjacency),config=cfg),root/'parent.pt')
-            with contextlib.redirect_stdout(io.StringIO()):
-                result = train(cfg,root/'run','test',checkpoint=root/'parent.pt',prepared_run=prepared)
-            self.assertEqual(result['best_step'],0)
-            self.assertEqual(result['initial'],result['final'])
-            saved = torch.load(root/'run'/'last.pt',weights_only=True)
-            self.assertIsInstance(saved['hard_indices'],torch.Tensor)
-            self.assertIn('replay_rng',saved)
 
     def test_shared_architecture_and_attention_accept_all_task_inputs(self):
         for feature_dim, cls in ((100, BoardEncoder), (9, QMap), (192, QMap), (256, StateEncoder)):

@@ -15,9 +15,10 @@
 | 固定题集评测 | [blocks12_eval.py](src/blocks12_eval.py)、[1000题](../../tasks/blocks/data/clear1000.json) |
 | 本地运行定位 | [runtime 索引](../../runs/qmap_dual_20261018/current_qmap_runtime.json)（Git 外；运行时再核对） |
 
-配置描述已经定义的条件，不表示任务仍在运行或可以自动续训。运行采用的配置应与对应产物中的 `config.json` 和源码版本一起解释。
+运行条件由正式配置、产物中的 `config.json` 和源码版本共同确定。
 
-非空目标泛化的小规模对照见[配置](configs/nonempty_generalization.json)，入口为`src.nonempty_generalization`的`--prepare`与训练模式。它从采用图建立新采样阶段，比较仅清空与四小类均衡目标；保留原Huber、完整候选soft-rank及精确标签。初盘划分、采用范围和旧清空训练分开解释，不替换原完整图训练器。
+当前非空目标优化使用原`full_graph_run.py`和`failure_sampling.py`，参数见[目标泛化配置](configs/goal_generalization.json)。训练同时保留原关系、广域关系、已成功轨迹和当前失败分叉，实际曝光与固定训练探针共同用于检查训练充分性。
+
 
 ## 可复用接口
 
@@ -49,7 +50,7 @@ python -m experiments.blocks_distance_map.src.blocks12_eval \
 
 ## 独立最终评测
 
-独立最终评测的准备入口为 [blocks12_sealed.py](src/blocks12_sealed.py)，参数见[配置](configs/blocks12_sealed_final.json)。`prepare` 必须显式提供 `--excluded-training-roots` 和 `--excluded-monitoring-cases`（各可传多个文件，监测集包含 `clear1000.json`），只生成冻结题集，不读取模型。确定候选后，`final-evaluate` 再显式指定 `--checkpoint` 与 `--parent-checkpoint`。它排除所提供的训练／监测初盘，非空目标仅作辅助。代码已做本地检查，尚无该入口的最终能力结果。
+独立最终评测的准备入口为 [blocks12_sealed.py](src/blocks12_sealed.py)，参数见[配置](configs/blocks12_sealed_final.json)。`prepare` 必须显式提供 `--excluded-training-roots` 和 `--excluded-monitoring-cases`（各可传多个文件，监测集包含 `clear1000.json`），只生成冻结题集，不读取模型。确定候选后，`final-evaluate` 再显式指定 `--checkpoint` 与 `--parent-checkpoint`。题集排除所提供的训练和监测初盘，分别报告清空与非空目标；最终能力结果待取得。
 
 ## 历史结果与复现
 

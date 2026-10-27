@@ -11,7 +11,7 @@ from experiments.blocks_distance_map.src.full_graph_sampling import JointData
 from experiments.blocks_distance_map.src.full_graph_data import local_tiles
 from experiments.blocks_distance_map.src.symbolic_graph import build_symbolic, SymbolicComponent
 from experiments.blocks_distance_map.src.oracle import DistanceOracle
-from experiments.blocks_distance_map.src.full_graph_run import relation_batch
+from experiments.blocks_distance_map.src.full_graph_run import relation_batch, relation_losses
 from experiments.blocks_distance_map.src.model import soft_rank_loss
 
 
@@ -22,11 +22,8 @@ class SamplingTest(unittest.TestCase):
                  np.asarray([2, -1, 1, 0, 3]), np.asarray([1, 0, 1, 2, 1]))
         _, _, _, truth, order, slots, shape = relation_batch(batch, "cpu", 13)
         scores = torch.tensor([.5, 1.5, 2.5, 3.5, 4.5], requires_grad=True)
-        matrix = torch.zeros(shape[0] * shape[1]).scatter(0, slots, scores[order]).reshape(shape)
-        target = torch.zeros(shape[0] * shape[1]).scatter(0, slots, truth).reshape(shape)
-        valid = torch.zeros(shape[0] * shape[1], dtype=torch.bool)
-        valid[slots] = True
-        actual = soft_rank_loss(matrix, target, valid.reshape(shape), 1.)
+        _, actual, _, _, _ = relation_losses(torch.cat((scores.new_tensor([1.]),scores)),
+            scores.new_tensor([1.]),truth,order,slots,shape,1.)
         wanted = sum(soft_rank_loss(scores[torch.tensor(batch[-1] == group)][None],
                                    torch.tensor(np.where(batch[-2][batch[-1] == group] < 0, 13,
                                                          batch[-2][batch[-1] == group]))[None],

@@ -14,7 +14,7 @@ from grounded_llm.tasks.cube2.evaluate import decisions, rollout
 from grounded_llm.tasks.cube2.model import MODEL_TYPE, QMap
 from .cycle_trial import close_axis_mask
 from .cycle_repair import ExitGuard, choose_guard, full_policy, guarded_adam_step
-from .fixed_goal import prepare, exhaustive_policy
+from .fixed_goal import prepare, exhaustive_policy, make_batch
 from .full_state_joint import RelationGuard, task_pairs, fixed_batch, batch_losses
 
 
@@ -40,11 +40,11 @@ class ProtectedRelations(RelationGuard):
         return super().contains(pairs) | self.state_mask[np.asarray(pairs)].any(-1)
 
 
-def sample_tasks(env, pools, count, rng, forbidden):
+def sample_tasks(env, pools, count, rng, forbidden, goal_weights=None):
     tasks = []
     depths = sorted(pools)
     for index in range(count):
-        pool = pools[depths[index % len(depths)]]
+        pool = pools[int(rng.choice(depths,p=goal_weights)) if goal_weights is not None else depths[index % len(depths)]]
         for _ in range(10000):
             source = int(rng.integers(env.size))
             goal = int(rng.choice(pool))
@@ -57,8 +57,9 @@ def sample_tasks(env, pools, count, rng, forbidden):
     return np.asarray(tasks, dtype=np.int64)
 
 
-def training_tasks(env, pools, count, rng, guard, offset, relative_pools=None, local_fraction=0.):
-    levels = np.asarray(sorted(pools))[(np.arange(count)+offset) % len(pools)]
+def training_tasks(env, pools, count, rng, guard, offset, relative_pools=None, local_fraction=0., goal_weights=None):
+    levels = (rng.choice(sorted(pools),size=count,p=goal_weights) if goal_weights is not None else
+              np.asarray(sorted(pools))[(np.arange(count)+offset) % len(pools)])
     goals = np.array([rng.choice(pools[int(level)]) for level in levels], dtype=np.int64)
     parents = rng.integers(env.size, size=count)
     local = rng.random(count)<local_fraction if relative_pools else np.zeros(count,dtype=bool)
@@ -116,18 +117,30 @@ def run(args):
     if any(len(rows) != 500 for rows in cohorts.values()):
         raise ValueError('Expected the paired 500+500 cube regression tasks')
     pools = {d:np.flatnonzero(env.depth==d) for d in opts['goal_depths']}
+    if 'goal_id_range' in opts:
+        first,last=opts['goal_id_range']
+        pools={d:pool[(pool>=first)&(pool<=last)] for d,pool in pools.items()}
+        pools={d:pool for d,pool in pools.items() if len(pool)}
+    goal_weights=None
+    if opts.get('goal_sampling')=='uniform':
+        goal_weights=np.asarray([len(pools[d]) for d in sorted(pools)],dtype=float)
+        goal_weights/=goal_weights.sum()
     relation_pairs = axis_pairs(env, task_pairs(env, np.concatenate(list(cohorts.values()))))
+    if opts.get('protection')=='relations':
+        fixed=np.column_stack((np.flatnonzero(state_mask),np.zeros(int(state_mask.sum()),dtype=np.int64)))
+        relation_pairs=np.concatenate((relation_pairs,axis_pairs(env,fixed)))
+        state_mask=np.zeros(env.size,dtype=bool)
     rng = np.random.default_rng(config['seed'])
     # Fresh monitor tasks have disjoint relation stars, including hard-coded
     # symmetry equivalents. Test and regression never guide checkpoint choice.
     for name in ('validation', 'test'):
         guard = ProtectedRelations(env, relation_pairs, state_mask)
-        tasks = sample_tasks(env, pools, opts[name+'_tasks'], rng, guard)
+        tasks = sample_tasks(env, pools, opts[name+'_tasks'], rng, guard,goal_weights)
         cohorts[name] = tasks
         relation_pairs = np.concatenate((relation_pairs, axis_pairs(env, task_pairs(env, tasks))))
     if opts.get('final_test_tasks'):
         guard=ProtectedRelations(env,relation_pairs,state_mask)
-        cohorts['final_test']=sample_tasks(env,pools,opts['final_test_tasks'],rng,guard)
+        cohorts['final_test']=sample_tasks(env,pools,opts['final_test_tasks'],rng,guard,goal_weights)
         relation_pairs=np.concatenate((relation_pairs,axis_pairs(env,task_pairs(env,cohorts['final_test']))))
     guard = ProtectedRelations(env, relation_pairs, state_mask)
     args.out.mkdir(parents=True, exist_ok=False)
@@ -147,8 +160,9 @@ def run(args):
         initial_optimizer_loaded=True, historical_sampling_state_resumed=False,
         protected_states=int(state_mask.sum()), protected_relation_count=len(guard.keys),
         goal_pool_sizes={d:len(pool) for d,pool in pools.items()}, evaluations=[])
-    result['initial'] = {name:inspect(model, env, tasks, args.device, horizon)
-                         for name,tasks in cohorts.items() if name!='final_test'}
+    initial_names=[n for n in cohorts if n!='final_test' and
+                   not (config['evaluation'].get('sealed_test') and n=='test')]
+    result['initial'] = {name:inspect(model, env, cohorts[name], args.device, horizon) for name in initial_names}
     if config['evaluation']['final_exhaustive_restoration']:
         result['initial_exhaustive_restoration'] = exhaustive_policy(
             model, env, mask, evaluation_base, args.device)
@@ -158,7 +172,11 @@ def run(args):
     training_rng = np.random.default_rng(options.get('seed',config['seed']+1))
     if options.get('resume_sampler'):
         training_rng.bit_generator.state=saved['rng']
-    seen_goals, exposed = set(), {'near_stars':0, 'restoration_stars':0}
+    seen_goals, exposed = set(), {'near_stars':0, 'restoration_stars':0,'retention_path_pairs':0,'failure_stars':0}
+    source_seen=np.zeros(env.size,dtype=bool);distance_draws=np.zeros(env.diameter+1,dtype=np.int64)
+    retention_seen=np.zeros(env.size,dtype=bool)
+    goal_draws=np.zeros(int(max(np.concatenate(list(pools.values()))))+1,dtype=np.int64)
+    failure_bank=np.empty((0,2),dtype=np.int64)
     relative_pools={d:np.flatnonzero(env.depth==d) for d in opts.get('local_distance_levels',[])}
     route_bank=None
     if opts.get('route_pool'):
@@ -175,6 +193,7 @@ def run(args):
                                        for n in np.unique(route_bank['lengths'])}
         atomic_json(args.out/'summary.json',result)
     fixed_guard=None;accepted_scales=[]
+    fitting_batches=[]
     if config.get('guard'):
         allowed=np.zeros(env.size,dtype=bool)
         for begin in range(0,env.size,32768):
@@ -207,18 +226,42 @@ def run(args):
         else:
             near = training_tasks(env, pools, options['near_goal_batch_size'], training_rng,
                               guard, ((step if options.get('resume_sampler') else phase_step)-1)*options['near_goal_batch_size'],
-                              relative_pools,opts.get('local_fraction',0.))
+                              relative_pools,opts.get('local_fraction',0.),goal_weights)
+        if options.get('failure_fraction'):
+            if phase_step==1 or (phase_step-1)%options['failure_refresh_every']==0:
+                from .coverage_data import predicted_scores
+                candidates=training_tasks(env,pools,options['failure_probe_size'],training_rng,guard,0,
+                    relative_pools,opts.get('local_fraction',0.),goal_weights)
+                scores=predicted_scores(model,env,candidates,args.device)
+                truth=env.distance(env.successors(candidates[:,0]),candidates[:,1,None])
+                failure_bank=candidates[truth[np.arange(len(candidates)),scores.argmin(-1)]!=truth.min(-1)]
+            if len(failure_bank):
+                count=round(len(near)*options['failure_fraction'])
+                near[:count]=failure_bank[training_rng.integers(len(failure_bank),size=count)]
+                exposed['failure_stars']+=count
         restoration = training_tasks(env, {0:np.array([0])}, options['restoration_batch_size'],
                                      training_rng, guard, 0)
         terms = []
         optimizer.zero_grad(set_to_none=True)
         for index,(tasks,weight) in enumerate(((near,options['near_goal_weight']),
                                               (restoration,1-options['near_goal_weight']))):
-            batch = fixed_batch(env, tasks)
+            if index==1 and options.get('retention_paths_per_batch'):
+                batch=make_batch(env,tasks[:,0],state_mask,
+                    tasks[:options['retention_paths_per_batch'],0],training_rng)
+                keep=~guard.contains(batch['states'][batch['pairs']])
+                batch['pairs']=batch['pairs'][keep];batch['labels']=batch['labels'][keep]
+                path_count=int(batch['path_pair_count'])
+                exposed['retention_path_pairs']+=int(keep[-path_count:].sum()) if path_count else 0
+            else:
+                batch = fixed_batch(env, tasks)
             if guard.contains(batch['states'][batch['pairs']]).any():
                 raise ValueError('Protected relation entered supervision')
+            if index==1:retention_seen[batch['states'][batch['pairs']].ravel()]=True
             huber,rank = batch_losses(model, torch.as_tensor(env.features(batch['states']),
                                                           device=args.device), batch, config)
+            if options.get('training_probe') and phase_step<=4:
+                fitting_batches.append((index,batch))
+                if phase_step==4 and index==1:torch.save(fitting_batches,args.out/'training_probe.pt')
             huber_weight=options.get('near_huber_weight',1.) if index==0 else 1.
             (weight*(huber_weight*huber+options['rank_weight']*rank)).backward()
             terms.append({'huber':float(huber.detach()), 'rank':float(rank.detach())})
@@ -234,21 +277,48 @@ def run(args):
         accepted_scales.append(scale)
         seen_goals.update(map(int,near[:, 1]))
         exposed['near_stars'] += len(near);exposed['restoration_stars'] += len(restoration)
+        source_seen[near[:,0]]=True;np.add.at(goal_draws,near[:,1],1)
+        distance_draws+=np.bincount(env.distance(*near.T),minlength=len(distance_draws))
         if phase_step==1 or phase_step % options['log_every']==0:
             progress=dict(step=step, terms=terms, seconds=time.monotonic()-started,
                           goal_count=len(seen_goals), accepted_scale=scale, **exposed)
+            progress.update(unique_noncanonical_parents=int(source_seen.sum()),
+                unique_retention_states=int(retention_seen.sum()),
+                distance_draws=distance_draws.tolist(),failure_pool=len(failure_bank),
+                goal_depth_draws={str(d):int(goal_draws[pool].sum()) for d,pool in pools.items()},
+                goal_exposure_minimum=int(goal_draws[np.concatenate(list(pools.values()))].min()))
             atomic_json(args.out/'progress.json', progress)
             print(json.dumps(progress), flush=True)
         if phase_step % options['evaluate_every']==0 or phase_step==options['steps']:
             metrics = {name:inspect(model, env, cohorts[name], args.device, horizon)
                        for name in ('validation', 'original')}
-            result['evaluations'].append(dict(step=step, metrics=metrics, **exposed))
+            fitting={}
+            if fitting_batches:
+                with torch.no_grad():
+                    for role in (0,1):
+                        rows=[]
+                        for index,batch in fitting_batches:
+                            if index!=role:continue
+                            bits=torch.as_tensor(env.features(batch['states']),device=args.device)
+                            h,r=batch_losses(model,bits,batch,config);q=model.encode(bits)
+                            scores=model.distance(q[batch['children']],q[batch['goals']][:,None])
+                            truth=torch.as_tensor(batch['truth'],device=args.device)
+                            target=torch.softmax(-truth.float()/options['temperature'],-1)
+                            entropy=-(target*target.clamp_min(1e-30).log()).sum(-1).mean()
+                            choice=scores.argmin(-1)
+                            correct=truth.gather(1,choice[:,None]).ravel()==truth.amin(-1)
+                            rows.append([float(h),float(r),float(r-entropy),float(correct.float().mean())])
+                        fitting['noncanonical' if role==0 else 'retention']=dict(zip(
+                            ('huber','rank','rank_kl','shortest_action_rate'),np.mean(rows,axis=0).tolist()))
+            result['evaluations'].append(dict(step=step, metrics=metrics, training_probe=fitting, **exposed))
             payload = dict(model_type=MODEL_TYPE, task=env.name, actions=list(env.actions),
                 model_config=saved['model_config'], cap=saved['cap'], model=model.state_dict(),
                 optimizer=optimizer.state_dict(), rng=training_rng.bit_generator.state,
                 torch_rng=torch.get_rng_state(), config=config, step=step,
                 source_commit=args.source_commit, initial_checkpoint=str(args.checkpoint),
                 seen_goals=sorted(seen_goals), exposure=exposed.copy(),
+                source_seen=source_seen,goal_draws=goal_draws,distance_draws=distance_draws,failure_bank=failure_bank,
+                retention_seen=retention_seen,
                 cohorts_file=str(args.out/'cohorts.npz'))
             temporary = args.out/'last.pt.tmp';torch.save(payload,temporary)
             temporary.replace(args.out/'last.pt')

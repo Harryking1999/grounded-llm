@@ -1,8 +1,0 @@
-{
-  "seed":2026102803,
-  "data":{"goal_minimum":1,"goal_maximum":999,"goal_development_fraction":0.2,"goal_test_fraction":0.2,"near_decisions":65536,"restoration_decisions":32768,"evaluation_per_group":256,"local_source_fraction":0.5,"local_source_depths":[1,2,3,4,5,6]},
-  "training":{"seed":2026102804,"steps":4096,"learning_rate":0.0003,"rank_weight":1.0,"temperature":1.0,"clip_norm":5.0,"cpu_threads":2,"evaluate_every":1024,"noncanonical_batch":256,"restoration_batch":128,"noncanonical_weight":0.5},
-  "arms":{"inherited":"inherited","reset_head":"reset_head"},
-  "selection":{"restoration_tolerance":10,"objective":"Mean relation-held and entire-goal-orbit-held validation completion. Require restoration at least parent minus10 out of500; initialization remains eligible. Freeze selection before opening new tests."},
-  "scope":"Target IDs1..999 match the FLAN noncanonical family (actual targets lie6-13 moves from restoration), not the older near-restoration1-3-move target family. Reuse exact simulator/oracle and all earlier relation/state/axis exclusions. Partition target axis orbits into training/development/test; globally exclude held orbits from both supervised endpoints in this stage. Source pairs and all six candidate relations of every validation/test query are also protected under axis closure. Earlier inherited-map exposure is not fully audited. Same symmetric shared Q128, sigmoid, Linf and original Huber plus soft-rank; both arms reset Adam and use identical new data streams. Independent task-specific continuation,4096 updates then stop, no search, no automatic adoption or expansion."
-}

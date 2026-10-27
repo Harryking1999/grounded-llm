@@ -20,6 +20,12 @@
 
 比较数值、同题得失和审计细节见[受控比较](blocks12_clear_controls.json)、[监督一致性](supervision_consistency.json)、[联合结果摘要](blocks12_joint_summary.json)。这些负结果约束下一步判断。
 
+## 非空目标泛化
+
+12块非空目标是当前主要缺口。256个初盘的小池诊断中，候选在留出12块非空目标上仍为60/96，原关系重放与训练充分性需要补全；对应分项集中在联合摘要。
+
+当前采用图在1000个原训练初盘的2000道分层非空目标上完成605道；失败以删掉目标格（860道）和局部覆盖破坏（517道）为主。优化复用原完整图训练器，把原关系池、广域关系、成功轨迹和失败分叉及后续关系放在同一训练分布；正式参数见[目标泛化配置](../configs/goal_generalization.json)。固定实际训练批次的距离误差、排序KL和最优动作率用于检查训练稳定性，清空与非空目标分别验证。
+
 复现入口：[采用图配置](../configs/blocks12_decision_clear.json)、[原采样续训对照](../configs/blocks12_original_continuation.json)、[固定1000题](../../../tasks/blocks/data/clear1000.json)、[完整训练与评测模块](../README.md)。原模型、损失与验收条件按相应配置解释。
 
 原始证据：[889完整状态与逐题评测](../../../runs/qmap_dual_20261018/blocks12/decision_clear_028_300/)、[分叉诊断](../../../runs/qmap_dual_20261018/blocks12/lost101_gained43_diagnosis.json)、[梯度与路径池诊断](../../../runs/qmap_dual_20261018/blocks12/decision_clear_028_support/)。实际运行位置见[本地 runtime](../../../runs/qmap_dual_20261018/current_qmap_runtime.json)，本页不报告实时运行状态。

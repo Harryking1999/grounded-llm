@@ -1,0 +1,65 @@
+{
+  "seed": 2026102809,
+  "data": {
+    "goal_depths": [
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13
+    ],
+    "goal_id_range": [
+      1,
+      999
+    ],
+    "goal_sampling": "uniform",
+    "protection": "relations",
+    "local_distance_levels": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "local_fraction": 0.5,
+    "validation_tasks": 500,
+    "test_tasks": 500
+  },
+  "training": {
+    "steps": 40000,
+    "near_goal_batch_size": 256,
+    "restoration_batch_size": 768,
+    "near_goal_weight": 0.25,
+    "retention_paths_per_batch": 64,
+    "failure_fraction": 0.125,
+    "failure_refresh_every": 1000,
+    "failure_probe_size": 2048,
+    "log_every": 100,
+    "evaluate_every": 1000,
+    "training_probe": true,
+    "learning_rate": 3e-05,
+    "rank_weight": 1.0,
+    "temperature": 1.0,
+    "clip_norm": 5.0,
+    "cpu_threads": 2
+  },
+  "evaluation": {
+    "sealed_test": true,
+    "final_exhaustive_restoration": true,
+    "horizon": 32
+  },
+  "selection": {
+    "primary": "validation completion with restoration at least its starting value"
+  },
+  "supervision": "Retain restoration stars and original shortest-path intermediate relations; add broad and local sources for the actual1-999 target family and a small refreshed training-error component. Original shared Q,Adam,Huber and six-candidate soft ranking.",
+  "split": "Known-state relation completion. Historical restoration,regression,validation and test parent/candidate-to-goal relations are protected in both directions and under all six axis presentations. Other relations may use these states as inputs.",
+  "training_assessment": "Track actual goal,distance,parent and failure exposure,training losses,and validation with restoration retention throughout the declared window. Curve stability and fitting determine convergence interpretation.",
+  "hypothesis": "Preserve restoration and learned path relations while improving the actual noncanonical target family through broad coverage and training-error replay.",
+  "initial_selection": "tasks/cube2/Qmap/selection.json",
+  "base_contract": "experiments/cube2_qmap/configs/fixed_goal.json",
+  "initialization": "Adopted Q and saved Adam with a fresh declared sampling stream."
+}

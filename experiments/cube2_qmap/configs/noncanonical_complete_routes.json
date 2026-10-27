@@ -1,5 +1,0 @@
-{
-  "parent_contract":"experiments/cube2_qmap/configs/noncanonical_generalization.json",
-  "data":{"complete_routes":2048,"maximum_candidate_routes":65536,"route_seed":2026102807,"route_distance_bins":[[1,3],[4,6],[7,10],[11,14]],"final_query_seed":2026102808},
-  "scope":"Address measured route censoring: only204/1024 sampled original training starts have an entirely admissible exact route;26/539 goals have no permitted terminal star. Keep every protected label and every physical candidate. From the fixed original training starts, accept complete shortest teacher routes only when every full star is permitted, balancing four initial-distance bins. Reuse original validation, but freeze new final relation/goal-orbit queries before route filtering; previous tests are regression only. Record accepted goals, missing terminal coverage, unique decisions and repeated exposure. Same two initialization arms, parent, learning rate, batch, restoration replay and4096-update budget as the scattered-source stage. This changes data and repetition, not model, losses or inference. No automatic adoption or expansion."
-}

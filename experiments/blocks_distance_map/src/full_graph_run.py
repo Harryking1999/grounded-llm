@@ -39,6 +39,17 @@ def relation_batch(batch, device, cap):
             (len(counts), int(counts.max())))
 
 
+def relation_losses(scores, truth, rt, order, slots, shape, temperature):
+    point = F.smooth_l1_loss(scores[:len(truth)], truth)
+    rank_scores = torch.zeros(shape[0] * shape[1], device=scores.device).scatter(
+        0, slots, scores[len(truth):][order]).reshape(shape)
+    rank_truth = torch.zeros(shape[0] * shape[1], device=scores.device).scatter(0, slots, rt).reshape(shape)
+    valid = torch.zeros(shape[0] * shape[1], device=scores.device, dtype=torch.bool)
+    valid[slots] = True; valid = valid.reshape(shape)
+    ranking = soft_rank_loss(rank_scores, rank_truth, valid, temperature)
+    return point, ranking, rank_scores, rank_truth, valid
+
+
 def run(config, out, source_commit, smoke_steps=None, resume=None):
     world = int(os.environ.get("WORLD_SIZE", 1))
     rank = int(os.environ.get("RANK", 0))
@@ -95,6 +106,10 @@ def run(config, out, source_commit, smoke_steps=None, resume=None):
         dist.barrier()
     started = time.monotonic()
     last = smoke_steps or options["steps"]
+    probe = None
+    probe_path=out/f'training_probe_rank{rank}.pt'
+    if options.get('training_probe') and resume is not None and probe_path.exists():
+        probe=torch.load(probe_path,map_location=device,weights_only=False)
     for step in range(first_step + 1, last + 1):
         # A single idle GPU can alternate both retained distributed data streams.
         # Each update still uses the original Huber+soft-rank on one full batch.
@@ -104,14 +119,12 @@ def run(config, out, source_commit, smoke_steps=None, resume=None):
         bits, pairs, truth, rt, order, slots, shape = relation_batch(
             arrays, device, options.get("unreachable_label", parent.get("unreachable_label", parent["cap"])))
         prepared = time.monotonic()
+        if probe is None and options.get('training_probe'):
+            probe = (bits, pairs, truth, rt, order, slots, shape)
+            atomic_save(probe,probe_path)
         scores = model(bits, pairs)
-        point = F.smooth_l1_loss(scores[:len(truth)], truth)
-        rank_scores = torch.zeros(shape[0] * shape[1], device=device).scatter(
-            0, slots, scores[len(truth):][order]).reshape(shape)
-        rank_truth = torch.zeros(shape[0] * shape[1], device=device).scatter(0, slots, rt).reshape(shape)
-        valid = torch.zeros(shape[0] * shape[1], device=device, dtype=torch.bool)
-        valid[slots] = True
-        ranking = soft_rank_loss(rank_scores, rank_truth, valid.reshape(shape), options["temperature"])
+        point, ranking, rank_scores, rank_truth, valid = relation_losses(
+            scores, truth, rt, order, slots, shape, options['temperature'])
         with torch.no_grad():
             mask = valid.reshape(shape)
             predicted = torch.softmax((-rank_scores / options["temperature"]).masked_fill(~mask, -torch.inf), -1)
@@ -138,6 +151,20 @@ def run(config, out, source_commit, smoke_steps=None, resume=None):
                           "sampling_seconds": prepared - begin,
                           "pointwise": point.item(), "soft_rank": ranking.item(),
                           "unique_batch_states": len(bits), "exposure": sampler.report()}
+                if probe is not None and (step == 1 or step % options['checkpoint_every'] == 0 or step == last):
+                    with torch.no_grad():
+                        pb, pp, pt, prt, po, ps, pshape = probe
+                        ph, pr, predicted, actual, mask = relation_losses(
+                            raw(pb, pp), pt, prt, po, ps, pshape, options['temperature'])
+                        target = torch.softmax((-actual/options['temperature']).masked_fill(~mask,-torch.inf),-1)
+                        entropy = -(target*target.clamp_min(1e-30).log()).sum(-1).mean()
+                        nontrivial = actual.masked_fill(~mask,-torch.inf).amax(-1) != actual.masked_fill(~mask,torch.inf).amin(-1)
+                        choice = predicted.masked_fill(~mask,torch.inf).argmin(-1)
+                        correct = actual.gather(1,choice[:,None]).ravel() == actual.masked_fill(~mask,torch.inf).amin(-1)
+                        record['training_probe'] = dict(huber=float(ph),rank=float(pr),rank_kl=float(pr-entropy),
+                            sampler_rank=rank,
+                            nontrivial_decisions=int(nontrivial.sum()),
+                            shortest_action_rate=float(correct[nontrivial].float().mean()) if nontrivial.any() else None)
                 with (out / "progress.jsonl").open("a") as handle:
                     handle.write(json.dumps(record) + "\n")
                 print(json.dumps(record), flush=True)

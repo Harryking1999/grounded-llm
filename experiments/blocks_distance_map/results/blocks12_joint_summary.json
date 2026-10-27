@@ -3670,5 +3670,96 @@
     "encoder_scale": 13,
     "status": "training; no new quality result yet",
     "review_window_not_acceptance": 3000
+  },
+  "nonempty_goal_diagnosis": {
+    "source_commit": "242971f",
+    "raw": "runs/goal_generalization_242971f",
+    "training_roots": 256,
+    "complete_training_stars": 6247,
+    "updates": 2048,
+    "selected_step": 512,
+    "parent_test": {
+      "clear12": {
+        "count": 32,
+        "solved": 30,
+        "outcomes": {
+          "reached": 30,
+          "local_coverage_failure": 2
+        },
+        "success_rate": 0.9375
+      },
+      "clear8": {
+        "count": 32,
+        "solved": 32,
+        "outcomes": {
+          "reached": 32
+        },
+        "success_rate": 1.0
+      },
+      "partial12": {
+        "count": 96,
+        "solved": 60,
+        "outcomes": {
+          "reached": 60,
+          "local_coverage_failure": 6,
+          "removed_goal_cell": 29,
+          "globally_unreachable": 1
+        },
+        "success_rate": 0.625
+      },
+      "partial8": {
+        "count": 96,
+        "solved": 92,
+        "outcomes": {
+          "reached": 92,
+          "local_coverage_failure": 1,
+          "removed_goal_cell": 2,
+          "globally_unreachable": 1
+        },
+        "success_rate": 0.9583333333333334
+      }
+    },
+    "candidate_test": {
+      "clear12": {
+        "count": 32,
+        "solved": 28,
+        "outcomes": {
+          "reached": 28,
+          "local_coverage_failure": 2,
+          "globally_unreachable": 2
+        },
+        "success_rate": 0.875
+      },
+      "clear8": {
+        "count": 32,
+        "solved": 31,
+        "outcomes": {
+          "reached": 31,
+          "local_coverage_failure": 1
+        },
+        "success_rate": 0.96875
+      },
+      "partial12": {
+        "count": 96,
+        "solved": 60,
+        "outcomes": {
+          "reached": 60,
+          "local_coverage_failure": 5,
+          "removed_goal_cell": 31
+        },
+        "success_rate": 0.625
+      },
+      "partial8": {
+        "count": 96,
+        "solved": 88,
+        "outcomes": {
+          "reached": 88,
+          "removed_goal_cell": 3,
+          "local_coverage_failure": 5
+        },
+        "success_rate": 0.9166666666666666
+      }
+    },
+    "assessment": "短预算诊断；原关系保留、广域覆盖与训练稳定性需联合检查。"
   }
 }

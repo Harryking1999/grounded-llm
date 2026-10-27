@@ -1,7 +1,7 @@
 {
   "date": "2026-10-24",
   "policy": "unchanged symmetric shared Q / Linf / six QTM actions / Q greedy horizon 32",
-  "conclusion": "No structural improvement; retain step-2000 continuation candidate, do not adopt or replace the frozen FLAN map; stop scaling this recipe.",
+  "conclusion": "原1–3步近目标配方未取得结构性改善。实际非复原目标族的拟合、覆盖与泛化结果分别记录。",
   "historical_coverage": {
     "exposures": 768000,
     "unique_goals": 154,
@@ -4217,5 +4217,64 @@
     "layer_metrics": "D:\\Grounded_llm\\runs\\model_retests\\cube_goal_layers_251bad3\\final_paths_corrected",
     "per_case_changes": "D:\\Grounded_llm\\runs\\model_retests\\cube_goal_layers_251bad3\\final\\final_comparisons.json",
     "evaluated_state_goal_pairs": "D:\\Grounded_llm\\runs\\model_retests\\cube_goal_layers_251bad3\\final\\evaluated_tasks.npz"
+  },
+  "coordinate_fitting": {
+    "source_commit": "e267804",
+    "raw": "runs/model_retests/coordinate_fit_e267804",
+    "decisions": 396,
+    "updates_per_condition": 8192,
+    "inherited_high_train_top1": 0.8964646464646465,
+    "reset_head_train_top1": 1.0,
+    "reset_head_all_strict_orderings": 1.0,
+    "parent_development_top1": 0.7530864197530864,
+    "reset_head_development_top1": 0.5925925925925926
+  },
+  "noncanonical_family": {
+    "source_commit": "242971f",
+    "raw": "runs/goal_generalization_242971f",
+    "target_ids": [
+      1,
+      999
+    ],
+    "target_depths": [
+      6,
+      13
+    ],
+    "training_decisions": 65536,
+    "restoration_decisions": 32768,
+    "updates": 4096,
+    "parent_validation": {
+      "relation": 0,
+      "held_goal": 0,
+      "restoration": 385
+    },
+    "final_validation": {
+      "inherited": {
+        "relation": 1,
+        "held_goal": 2,
+        "restoration": 330
+      },
+      "reset_head": {
+        "relation": 1,
+        "held_goal": 1,
+        "restoration": 250
+      }
+    },
+    "complete_route_coverage": {
+      "sampled_starts": 1024,
+      "fully_admissible_routes": 204,
+      "training_goals_without_terminal_star": 26
+    },
+    "route_pool_preparation": {
+      "requested_per_bin": 512,
+      "accepted_per_bin": [
+        512,
+        512,
+        107,
+        48
+      ],
+      "optimizer_updates": 0
+    },
+    "assessment": "短预算诊断；训练充分性及原关系重放待补全。"
   }
 }

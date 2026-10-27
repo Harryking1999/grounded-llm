@@ -83,3 +83,5 @@ python -m experiments.cube2_qmap.src.near_goal_continuation --contract experimen
 `coverage_data.py` 构造、审计与冻结训练池；`coverage_train.py` 保留阶段权重、Adam、采样排列及逐关系曝光；`coverage_evaluate.py` 先落盘验证选择，再统一打开封闭测试。原小OOD只作最终配对回归。一步边的辅助Huber与目标条件化完整候选排序分开统计；任何候选被保护的星形邻域都不进入排序监督。生成池的覆盖、实际曝光以及最后选定候选的曝光分别报告。
 
 [真实距离层小试验](configs/goal_layers_pilot.json)用环境反向BFS构造目标距离层，核对全部精确标签，并匹配分层与普通采样的目标曝光、完整决策数及复原replay；不训练全量边辅助。`goal_layers.py`维护层数据、小集合拟合、真实距离不同／最优动作不同的同起点诊断及最短路径单调性。微型权重用于诊断；训练内的受保护路径关系不监督，最终全路径评测在选择冻结后执行。整题成功、非平凡排序约束量与训练拟合分别验收，结论与复现来源见[报告](results/report.md#目标距离层与监督覆盖诊断)。
+
+[坐标拟合对照](configs/coordinate_fit.json)复用上述396条微型完整决策及隔离开发集，固定预算比较原初始化的两档学习率、重置输出层、释放不变坐标126。四组均重置Adam，以同一采样流训练；共享Q、对称适配、sigmoid、L∞、Huber与soft-rank保持不变。入口为`python -m experiments.cube2_qmap.src.coordinate_fit`，提供配置、父断点、原数据、oracle、输出、arm及源码提交。该实验只诊断可拟合性，不选用地图，也不打开封闭测试。

@@ -1,0 +1,14 @@
+{
+  "parent_contract": "experiments/cube2_qmap/configs/goal_layers_pilot.json",
+  "seed": 2026102701,
+  "training": {"updates": 8192, "evaluate_every": 1024, "batch_size": 128},
+  "fit_arms": {
+    "inherited_low": {"initialization": "inherited", "learning_rate": 0.000003},
+    "inherited_high": {"initialization": "inherited", "learning_rate": 0.0003},
+    "reset_head_high": {"initialization": "reset_head", "learning_rate": 0.0003},
+    "release126_high": {"initialization": "release126", "learning_rate": 0.0003}
+  },
+  "scope": "Fixed 396-decision fitting diagnostic using the existing protected Micro and MicroHoldout pools. All arms reset Adam, use identical minibatches and retain the shared symmetric Q, sigmoid, Linf, exact labels, Huber and soft-rank weights. Pairwise controls isolate learning rate (inherited_low/high), full output-head initialization (inherited_high/reset_head_high), or zero-initializing invariant channel126 (inherited_high/release126_high). Not a continuation or an adoption experiment. No replay, auxiliary losses, search or test-driven mining.",
+  "selection": "Fixed final budget, no checkpoint selection. Development and switching diagnostics track fitting; original validation/restoration are evaluated only at the final point. Previously sealed tests stay closed. Do not expand unless training fitting and independent development both improve.",
+  "budget": "Four independent single-GPU arms,8192 updates each,128 complete decisions/update. No automatic continuation. Complete optimizer, sampling and random states saved at each1024-update observation. Existing adopted maps remain unchanged."
+}

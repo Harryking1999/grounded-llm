@@ -1,0 +1,12 @@
+{
+  "hypothesis": "Replaying wrong complete training decisions may reduce greedy cycles while preserving protected relation generalization on each fixed graph.",
+  "graph_suite": "Reuse the matching prepared data and checkpoint; do not generate a new split.",
+  "model": {"state_dim":128,"encoder_hidden_dim":256,"metric":"directed_sum"},
+  "data": {"seed":20261026,"first_heldout_distance":3,"validation_tasks_per_distance":16,"test_tasks_per_distance":32,"extra_pair_fraction_per_split":0.08},
+  "training": {"seed":2026102702,"steps":4000,"batch_size":512,"listwise_batch_size":256,"learning_rate":0.0001,"listwise_weight":1.0,"temperature":1.0,"eval_every":500,"cpu_threads":2,"hard_refresh_every":250},
+  "arms": {"control":{"hard_replay_fraction":0.0},"replay":{"hard_replay_fraction":0.5}},
+  "evaluation": {"budget_multiplier":2},
+  "selection": "Initialization is eligible; choose lowest validation Huber plus existing complete-candidate soft-rank CE. Evaluate test and all routes after freezing selection; no automatic expansion or adoption.",
+  "split": "Reuse the original membership, pairs and complete stars. Mine wrong first actions exclusively from train_tasks; reject any parent/candidate-to-goal label with nonzero membership. No held-out queries, trajectories or failures enter replay.",
+  "scope": "Two independent256-node maps, each with control/replay from its own adopted Q and Adam. New matched seeded sampling streams, not exact historical resume. Same512 point pairs and256 complete decisions/update, architecture, losses, physical neighbors and greedy budget. Replay changes half the decision sampling only; ordinary random draws remain matched. Four4000-update runs then stop; adopted maps and FLAN training maps unchanged."
+}

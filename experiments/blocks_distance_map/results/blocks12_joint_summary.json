@@ -3760,6 +3760,129 @@
         "success_rate": 0.9166666666666666
       }
     },
-    "assessment": "短预算诊断；原关系保留、广域覆盖与训练稳定性需联合检查。"
+    "assessment": "短预算诊断；原关系保留、广域覆盖与训练稳定性需联合检查。",
+    "goal_fraction_profile": {
+      "scope": "1000 exact training roots, one canonical shortest clearing trajectory per root; 8-placement sources are residuals along the same trajectory. Matching source/goal questions for both checkpoints. Training-root diagnostics and fixed monitor outcomes are separate.",
+      "adopted": {
+        "groups": {
+          "clear12|clear": {
+            "count": 1000,
+            "solved": 881
+          },
+          "partial12|0.25": {
+            "count": 1000,
+            "solved": 804
+          },
+          "partial12|0.5": {
+            "count": 1000,
+            "solved": 466
+          },
+          "partial12|0.75": {
+            "count": 1000,
+            "solved": 588
+          },
+          "clear8|clear": {
+            "count": 1000,
+            "solved": 978
+          },
+          "partial8|0.25": {
+            "count": 1000,
+            "solved": 981
+          },
+          "partial8|0.5": {
+            "count": 1000,
+            "solved": 932
+          },
+          "partial8|0.75": {
+            "count": 1000,
+            "solved": 960
+          }
+        },
+        "monitor_nonempty": {
+          "tasks": 192,
+          "success": 160
+        }
+      },
+      "continuation_1000": {
+        "source_commit": "ef53934",
+        "groups": {
+          "clear12|clear": {
+            "count": 1000,
+            "solved": 906
+          },
+          "partial12|0.25": {
+            "count": 1000,
+            "solved": 851
+          },
+          "partial12|0.5": {
+            "count": 1000,
+            "solved": 660
+          },
+          "partial12|0.75": {
+            "count": 1000,
+            "solved": 680
+          },
+          "clear8|clear": {
+            "count": 1000,
+            "solved": 983
+          },
+          "partial8|0.25": {
+            "count": 1000,
+            "solved": 994
+          },
+          "partial8|0.5": {
+            "count": 1000,
+            "solved": 955
+          },
+          "partial8|0.75": {
+            "count": 1000,
+            "solved": 953
+          }
+        },
+        "monitor_nonempty": {
+          "tasks": 192,
+          "success": 168
+        }
+      },
+      "matched_training_questions": {
+        "clear12|clear": {
+          "lost": 68,
+          "gained": 93
+        },
+        "partial12|0.25": {
+          "lost": 98,
+          "gained": 145
+        },
+        "partial12|0.5": {
+          "lost": 112,
+          "gained": 306
+        },
+        "partial12|0.75": {
+          "lost": 134,
+          "gained": 226
+        },
+        "clear8|clear": {
+          "lost": 11,
+          "gained": 16
+        },
+        "partial8|0.25": {
+          "lost": 3,
+          "gained": 16
+        },
+        "partial8|0.5": {
+          "lost": 21,
+          "gained": 44
+        },
+        "partial8|0.75": {
+          "lost": 35,
+          "gained": 28
+        }
+      },
+      "goal_area_coverage": {
+        "old_2000_question_pool_at_least_70_percent_retained": 0,
+        "new_6000_nonempty_questions_at_least_70_percent_retained": 1941
+      },
+      "raw_result": "runs/qmap_goal_generalization_20261028/blocks_profiles.json"
+    }
   }
 }

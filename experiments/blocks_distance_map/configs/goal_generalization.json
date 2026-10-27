@@ -1,22 +1,67 @@
 {
-  "study":"blocks_goal_generalization",
-  "parent_checkpoint":"maps/blocks_parent.pt",
-  "graph_data":"data/blocks12_graphs",
-  "legacy_data":"data/legacy_tree.npz",
-  "baseline_cases":"tasks/blocks/data/clear1000.json",
-  "training":{
-    "seed":2026102810,"learning_rate":0.0003,"steps":40000,
-    "batch_size_per_rank":4096,"rank_contexts_per_rank":512,"boards_per_batch":8,
-    "legacy_fraction":0.4,"broad_fraction":0.25,"clear_fraction":0.35,
-    "listwise_weight":1.0,"temperature":1.0,"original_cap":13,"unreachable_label":19,
-    "failure_diagnosis":"runs/blocks_goal_generalization/diagnosis.json",
-    "retention_diagnosis":"runs/blocks_goal_generalization/diagnosis.json",
-    "failure_fraction":0.25,"repair_descendant_steps":[0,0,0,1,2,4],
-    "hard_negative_fraction":0.25,"retention_fraction":0.25,"fresh_fraction":0.25,
-    "fresh_distance_cycle":[6,7,8,-1,-1,-1],"long_context_fraction":0.5,
-    "legacy_long_fraction":0.5,"cpu_threads":2,"log_every":100,"checkpoint_every":1000,
-    "sampler_shards":2,"training_probe":true
+  "study": "blocks_goal_generalization",
+  "parent_checkpoint": "runs/blocks_goal_generalization/train/checkpoints/step_002000.pt",
+  "graph_data": "data/blocks12_graphs",
+  "legacy_data": "data/legacy_tree.npz",
+  "baseline_cases": "tasks/blocks/data/clear1000.json",
+  "diagnosis": {
+    "goal_mode": "goal_fractions",
+    "goal_fractions": [
+      0.25,
+      0.5,
+      0.75
+    ]
   },
-  "data_distribution":"Original legacy relations plus broad exact source-target pairs,clearing,structural relations,and training-policy failures with successful-trajectory retention. Full legal candidate stars and optimal descendants share the existing objective.",
-  "training_assessment":"Inspect actual root,goal,distance,action and relation exposure with training-loss stability and frozen greedy execution. Evaluate old relations,clearing and nonempty goals together throughout the declared training window."
+  "training": {
+    "seed": 2026102810,
+    "learning_rate": 0.0003,
+    "steps": 38000,
+    "batch_size_per_rank": 4096,
+    "rank_contexts_per_rank": 512,
+    "boards_per_batch": 8,
+    "legacy_fraction": 0.4,
+    "broad_fraction": 0.25,
+    "clear_fraction": 0.35,
+    "listwise_weight": 1.0,
+    "temperature": 1.0,
+    "original_cap": 13,
+    "unreachable_label": 19,
+    "failure_diagnosis": "runs/blocks_goal_generalization/step1000_goal_fractions.json",
+    "retention_diagnosis": "runs/blocks_goal_generalization/adopted_goal_fractions.json",
+    "failure_fraction": 0.25,
+    "repair_descendant_steps": [
+      0,
+      0,
+      0,
+      1,
+      2,
+      4
+    ],
+    "hard_negative_fraction": 0.25,
+    "retention_fraction": 0.25,
+    "fresh_fraction": 0.25,
+    "fresh_distance_cycle": [
+      6,
+      7,
+      8,
+      -1,
+      -1,
+      -1
+    ],
+    "long_context_fraction": 0.5,
+    "legacy_long_fraction": 0.5,
+    "cpu_threads": 2,
+    "log_every": 100,
+    "checkpoint_every": 1000,
+    "sampler_shards": 2,
+    "training_probe": true,
+    "previous_sampler_root": "runs/blocks_goal_generalization/train",
+    "previous_sampler_step": 2000,
+    "additional_failure_diagnoses": [
+      "runs/blocks_goal_generalization/diagnosis.json"
+    ]
+  },
+  "data_distribution": "Original legacy relations, broad exact pairs, clearing, structural relations, training-policy failures across 8/12-placement sources and three goal fractions, and adopted-policy successful trajectories. Historical long-goal failures remain in the repair pool.",
+  "training_assessment": "Inspect actual root,goal,distance,action and relation exposure with training-loss stability and frozen greedy execution. Evaluate old relations,clearing and nonempty goals together throughout the declared training window.",
+  "total_continuation_updates": 40000
 }

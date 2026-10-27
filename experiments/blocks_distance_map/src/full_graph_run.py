@@ -154,8 +154,9 @@ def run(config, out, source_commit, smoke_steps=None, resume=None):
                 if probe is not None and (step == 1 or step % options['checkpoint_every'] == 0 or step == last):
                     with torch.no_grad():
                         pb, pp, pt, prt, po, ps, pshape = probe
+                        probe_prediction=raw(pb,pp)
                         ph, pr, predicted, actual, mask = relation_losses(
-                            raw(pb, pp), pt, prt, po, ps, pshape, options['temperature'])
+                            probe_prediction, pt, prt, po, ps, pshape, options['temperature'])
                         target = torch.softmax((-actual/options['temperature']).masked_fill(~mask,-torch.inf),-1)
                         entropy = -(target*target.clamp_min(1e-30).log()).sum(-1).mean()
                         nontrivial = actual.masked_fill(~mask,-torch.inf).amax(-1) != actual.masked_fill(~mask,torch.inf).amin(-1)
@@ -163,8 +164,18 @@ def run(config, out, source_commit, smoke_steps=None, resume=None):
                         correct = actual.gather(1,choice[:,None]).ravel() == actual.masked_fill(~mask,torch.inf).amin(-1)
                         record['training_probe'] = dict(huber=float(ph),rank=float(pr),rank_kl=float(pr-entropy),
                             sampler_rank=rank,
-                            nontrivial_decisions=int(nontrivial.sum()),
-                            shortest_action_rate=float(correct[nontrivial].float().mean()) if nontrivial.any() else None)
+                            nontrivial_decisions=int(nontrivial.sum()))
+                        legacy_pairs=round(len(pt)*options['legacy_fraction'])
+                        legacy_rank=round(options['rank_contexts_per_rank']*options['legacy_fraction'])
+                        record['training_probe']['legacy_huber']=float(F.smooth_l1_loss(
+                            probe_prediction[:legacy_pairs],pt[:legacy_pairs]))
+                        record['training_probe']['root_huber']=float(F.smooth_l1_loss(
+                            probe_prediction[legacy_pairs:len(pt)],pt[legacy_pairs:]))
+                        for name,begin,end in (('legacy_best_relation_rate',0,legacy_rank),
+                                              ('physical_shortest_action_rate',legacy_rank,len(correct))):
+                            take=nontrivial[begin:end]
+                            record['training_probe'][name]=(float(correct[begin:end][take].float().mean())
+                                                           if take.any() else None)
                 with (out / "progress.jsonl").open("a") as handle:
                     handle.write(json.dumps(record) + "\n")
                 print(json.dumps(record), flush=True)

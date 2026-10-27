@@ -97,6 +97,17 @@ class Component:
             setattr(self, name, np.load(path / f"{name}.npy", mmap_mode="r"))
         self.size = len(self.states)
         self.initial_id, self.zero_id = 0, int(np.argmin(self.states))
+        self.tiles = np.asarray(self.summary['tiles'], dtype=np.uint64)
+
+    def rank(self, masks):
+        if not hasattr(self, '_mask_order'):
+            self._mask_order = np.argsort(self.states)
+        masks = np.asarray(masks, dtype=np.uint64)
+        positions = np.searchsorted(self.states[self._mask_order], masks)
+        ids = self._mask_order[np.minimum(positions, self.size-1)]
+        if np.any(positions >= self.size) or np.any(self.states[ids] != masks):
+            raise ValueError('Mask is outside the complete component graph')
+        return ids
 
     def close(self):
         for name in ("states", "removed", "distances", "offsets", "children"):
@@ -166,25 +177,32 @@ class Root:
 
     def advance(self, local_ids, rng, steps):
         """Exact random legal transitions, including all branch choices."""
-        current = local_ids.copy()
-        limits = np.broadcast_to(steps, current.shape[:-1])
-        for move in range(int(np.max(limits, initial=0))):
-            degrees = np.stack([g.degrees(current[:, i])
-                                for i, (g, _) in enumerate(self.parts)], -1)
-            total = degrees.sum(-1)
-            active = (total > 0) & (move < limits)
-            if not active.any():
-                break
-            ids = np.flatnonzero(active)
-            choice = (rng.random(len(ids)) * total[ids]).astype(np.int64)
-            ends = np.cumsum(degrees[ids], axis=-1)
-            selected = (choice[:, None] >= ends).sum(-1)
-            starts = np.column_stack((np.zeros(len(ids), dtype=np.int64), ends[:, :-1]))
-            offset = choice - starts[np.arange(len(ids)), selected]
-            for i, (graph, _) in enumerate(self.parts):
-                keep = np.flatnonzero(selected == i)
-                rows = ids[keep]
-                current[rows, i] = graph.take(current[rows, i], offset[keep])
+        masks = np.stack([g.states[local_ids[:, i]] for i, (g, _) in enumerate(self.parts)], -1)
+        advanced = self.advance_masks(masks, rng, steps)
+        result = local_ids.copy()
+        for i, (graph, _) in enumerate(self.parts):
+            changed = advanced[:, i] != masks[:, i]
+            result[changed, i] = graph.rank(advanced[changed, i])
+        return result
+
+    def advance_masks(self, masks, rng, steps):
+        """Same transition/RNG stream as advance, retaining component masks."""
+        current=masks.copy();limits=np.broadcast_to(steps,current.shape[:-1])
+        for move in range(int(np.max(limits,initial=0))):
+            legal=[(current[:,i,None]&g.tiles)==g.tiles for i,(g,_) in enumerate(self.parts)]
+            degrees=np.stack([v.sum(-1) for v in legal],-1);total=degrees.sum(-1)
+            active=(total>0)&(move<limits)
+            if not active.any():break
+            ids=np.flatnonzero(active)
+            choice=(rng.random(len(ids))*total[ids]).astype(np.int64)
+            ends=np.cumsum(degrees[ids],-1);selected=(choice[:,None]>=ends).sum(-1)
+            starts=np.column_stack((np.zeros(len(ids),dtype=np.int64),ends[:,:-1]))
+            offset=choice-starts[np.arange(len(ids)),selected]
+            for i,(graph,_) in enumerate(self.parts):
+                keep=np.flatnonzero(selected==i);rows=ids[keep]
+                if not len(rows):continue
+                tiles=(np.cumsum(legal[i][rows],-1)>offset[keep,None]).argmax(-1)
+                current[rows,i]^=graph.tiles[tiles]
         return current
 
 

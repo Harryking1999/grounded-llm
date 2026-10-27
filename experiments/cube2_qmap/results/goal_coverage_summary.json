@@ -1,7 +1,7 @@
 {
-  "date": "2026-10-24",
+  "date": "2026-10-28",
   "policy": "unchanged symmetric shared Q / Linf / six QTM actions / Q greedy horizon 32",
-  "conclusion": "原1–3步近目标配方未取得结构性改善。实际非复原目标族的拟合、覆盖与泛化结果分别记录。",
+  "conclusion": "绝对状态对编码在实际非复原目标族上仍弱；已知群运算的目标相对坐标可直接复用复原能力。",
   "historical_coverage": {
     "exposures": 768000,
     "unique_goals": 154,
@@ -4276,5 +4276,349 @@
       "optimizer_updates": 0
     },
     "assessment": "短预算诊断；训练充分性及原关系重放待补全。"
+  },
+  "actual_goal_family": {
+    "source_commit": "ef53934",
+    "config": "experiments/cube2_qmap/configs/goal_generalization.json",
+    "updates": 40000,
+    "best_step": 26000,
+    "cohorts": {
+      "initial": {
+        "original": {
+          "count": 500,
+          "solved": 385,
+          "shortest_action_rate": 0.766
+        },
+        "small_ood": {
+          "count": 500,
+          "solved": 0,
+          "shortest_action_rate": 0.512
+        },
+        "validation": {
+          "count": 500,
+          "solved": 0,
+          "shortest_action_rate": 0.532
+        }
+      },
+      "last": {
+        "original": {
+          "count": 500,
+          "solved": 369,
+          "shortest_action_rate": 0.766
+        },
+        "small_ood": {
+          "count": 500,
+          "solved": 0,
+          "shortest_action_rate": 0.52
+        },
+        "test": {
+          "count": 500,
+          "solved": 5,
+          "shortest_action_rate": 0.524
+        }
+      },
+      "final": {
+        "original": {
+          "count": 500,
+          "solved": 385,
+          "shortest_action_rate": 0.766
+        },
+        "small_ood": {
+          "count": 500,
+          "solved": 1,
+          "shortest_action_rate": 0.51
+        },
+        "validation": {
+          "count": 500,
+          "solved": 3,
+          "shortest_action_rate": 0.516
+        },
+        "test": {
+          "count": 500,
+          "solved": 4,
+          "shortest_action_rate": 0.526
+        }
+      }
+    },
+    "all_state_restoration": {
+      "initial_exhaustive_restoration": {
+        "count": 3674160,
+        "solved": 2846397,
+        "success_rate": 0.774706871774773
+      },
+      "final_exhaustive_restoration": {
+        "count": 3674160,
+        "solved": 2795063,
+        "success_rate": 0.7607352428854487
+      }
+    },
+    "training_probes": [
+      {
+        "step": 1000,
+        "training_probe": {
+          "noncanonical": {
+            "huber": 2.0971397757530212,
+            "rank": 1.8908868432044983,
+            "rank_kl": 0.48746177554130554,
+            "shortest_action_rate": 0.5361328125
+          },
+          "retention": {
+            "huber": 0.3933546841144562,
+            "rank": 1.728092074394226,
+            "rank_kl": 0.23751229047775269,
+            "shortest_action_rate": 0.7734375149011612
+          }
+        }
+      },
+      {
+        "step": 10000,
+        "training_probe": {
+          "noncanonical": {
+            "huber": 1.7336754500865936,
+            "rank": 1.8757592737674713,
+            "rank_kl": 0.47233420610427856,
+            "shortest_action_rate": 0.5859375
+          },
+          "retention": {
+            "huber": 0.3692592605948448,
+            "rank": 1.7228713631629944,
+            "rank_kl": 0.232291579246521,
+            "shortest_action_rate": 0.7828776240348816
+          }
+        }
+      },
+      {
+        "step": 20000,
+        "training_probe": {
+          "noncanonical": {
+            "huber": 1.6899970173835754,
+            "rank": 1.8670557141304016,
+            "rank_kl": 0.46363064646720886,
+            "shortest_action_rate": 0.5947265625
+          },
+          "retention": {
+            "huber": 0.3599925935268402,
+            "rank": 1.7195663154125214,
+            "rank_kl": 0.22898653149604797,
+            "shortest_action_rate": 0.7906901091337204
+          }
+        }
+      },
+      {
+        "step": 30000,
+        "training_probe": {
+          "noncanonical": {
+            "huber": 1.6156003177165985,
+            "rank": 1.8583404421806335,
+            "rank_kl": 0.4549153745174408,
+            "shortest_action_rate": 0.60546875
+          },
+          "retention": {
+            "huber": 0.3570821285247803,
+            "rank": 1.7170744836330414,
+            "rank_kl": 0.226494699716568,
+            "shortest_action_rate": 0.796223983168602
+          }
+        }
+      },
+      {
+        "step": 40000,
+        "training_probe": {
+          "noncanonical": {
+            "huber": 1.588271975517273,
+            "rank": 1.8510155081748962,
+            "rank_kl": 0.4475904405117035,
+            "shortest_action_rate": 0.6064453125
+          },
+          "retention": {
+            "huber": 0.3518945649266243,
+            "rank": 1.7154775559902191,
+            "rank_kl": 0.22489777207374573,
+            "shortest_action_rate": 0.802083358168602
+          }
+        }
+      }
+    ],
+    "exposure": {
+      "near_stars": 10240000,
+      "restoration_stars": 30720000,
+      "retention_path_pairs": 158582829,
+      "failure_stars": 1280000,
+      "unique_noncanonical_parents": 3022190,
+      "unique_retention_states": 3290701,
+      "distance_draws": [
+        0,
+        747193,
+        750364,
+        769413,
+        824680,
+        892466,
+        937533,
+        52025,
+        176810,
+        561638,
+        1436556,
+        1981124,
+        999221,
+        110625,
+        352
+      ],
+      "goal_exposure_minimum": 9521
+    },
+    "raw_result": "runs/qmap_goal_generalization_20261028/cube_result.json"
+  },
+  "goal_relative_coordinates": {
+    "formula": "score(s,g)=d_Q(Q(g^-1*s),Q(0))",
+    "condition": "Known environment group composition; adopted frozen restoration Q; six unchanged QTM action labels; horizon32.",
+    "cohorts": {
+      "original": {
+        "count": 500,
+        "solved": 385,
+        "decisions": {
+          "count": 500,
+          "shortest_action_rate": 0.766,
+          "uniform_tie_shortest_rate": 0.766,
+          "strict_candidate_order_accuracy": 0.7265017667844523
+        },
+        "by_goal_depth": {
+          "0": {
+            "count": 500,
+            "solved": 385
+          }
+        }
+      },
+      "small_ood": {
+        "count": 500,
+        "solved": 371,
+        "decisions": {
+          "count": 500,
+          "shortest_action_rate": 0.754,
+          "uniform_tie_shortest_rate": 0.754,
+          "strict_candidate_order_accuracy": 0.7330552659019812
+        },
+        "by_goal_depth": {
+          "6": {
+            "count": 32,
+            "solved": 22
+          },
+          "7": {
+            "count": 32,
+            "solved": 20
+          },
+          "8": {
+            "count": 75,
+            "solved": 58
+          },
+          "9": {
+            "count": 75,
+            "solved": 58
+          },
+          "10": {
+            "count": 75,
+            "solved": 60
+          },
+          "11": {
+            "count": 75,
+            "solved": 49
+          },
+          "12": {
+            "count": 74,
+            "solved": 55
+          },
+          "13": {
+            "count": 62,
+            "solved": 49
+          }
+        }
+      },
+      "validation": {
+        "count": 500,
+        "solved": 381,
+        "decisions": {
+          "count": 500,
+          "shortest_action_rate": 0.754,
+          "uniform_tie_shortest_rate": 0.754,
+          "strict_candidate_order_accuracy": 0.7246121297602257
+        },
+        "by_goal_depth": {
+          "6": {
+            "count": 9,
+            "solved": 6
+          },
+          "8": {
+            "count": 52,
+            "solved": 39
+          },
+          "9": {
+            "count": 13,
+            "solved": 10
+          },
+          "10": {
+            "count": 153,
+            "solved": 113
+          },
+          "11": {
+            "count": 88,
+            "solved": 73
+          },
+          "12": {
+            "count": 161,
+            "solved": 118
+          },
+          "13": {
+            "count": 24,
+            "solved": 22
+          }
+        }
+      },
+      "test": {
+        "count": 500,
+        "solved": 394,
+        "decisions": {
+          "count": 500,
+          "shortest_action_rate": 0.774,
+          "uniform_tie_shortest_rate": 0.774,
+          "strict_candidate_order_accuracy": 0.7505720823798627
+        },
+        "by_goal_depth": {
+          "6": {
+            "count": 3,
+            "solved": 1
+          },
+          "7": {
+            "count": 1,
+            "solved": 1
+          },
+          "8": {
+            "count": 47,
+            "solved": 39
+          },
+          "9": {
+            "count": 14,
+            "solved": 13
+          },
+          "10": {
+            "count": 155,
+            "solved": 118
+          },
+          "11": {
+            "count": 93,
+            "solved": 75
+          },
+          "12": {
+            "count": 166,
+            "solved": 128
+          },
+          "13": {
+            "count": 21,
+            "solved": 19
+          }
+        }
+      },
+      "condition": "Known algebraic goal-relative coordinates, adopted frozen Q; original action labels preserved, no oracle in action selection."
+    },
+    "original_action_transition_identity_checked": true,
+    "reader": "grounded_llm/tasks/cube2/model.py::MapReader(coordinate_frame=\"goal_relative\")",
+    "scope": "Task-specific pair-conditioned coordinates. Absolute state embeddings and their evaluation remain a separate condition."
   }
 }

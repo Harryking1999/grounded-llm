@@ -99,10 +99,27 @@ def summarize(rows):
             "all_first_errors_are_ranking_errors": all(e["chosen_truth"] < 0 and e["reachable_candidates"] > 0 for e in errors)}
 
 
-def training_cases(records, seed, per_root=2, goal_mode="witness", roots=None):
-    """Nonempty long goals from known legal tilings, without model-based filtering."""
+def training_cases(records, seed, per_root=2, goal_mode="witness", roots=None, goal_fractions=None):
+    """Generate training queries from declared source and goal coverage."""
     rng = random.Random(seed)
     for board, record in enumerate(records):
+        if goal_mode=='goal_fractions':
+            if not goal_fractions or any(not 0<f<1 for f in goal_fractions):
+                raise ValueError('Provide goal fractions strictly between zero and one')
+            exact=RootOracle(roots[board]);state=int(record['initial']);path=[state]
+            while state:
+                choices=successors(state);labels=exact.distances([s for _,s in choices],0)
+                depth=exact.distance(state,0)
+                state=next(s for (_,s),d in zip(choices,labels) if d==depth-1)
+                path.append(state)
+            for size,start in ((12,0),(8,max(0,len(path)-9))):
+                source=path[start];length=len(path)-1-start
+                yield dict(board=board,root_source=record['initial'],source=str(source),goal='0',query_group=f'clear{size}')
+                for fraction in goal_fractions:
+                    cut=max(1,min(length-1,round(length*fraction)))
+                    yield dict(board=board,root_source=record['initial'],source=str(source),
+                        goal=str(path[start+cut]),query_group=f'partial{size}',goal_fraction=fraction)
+            continue
         tiles = [blocks.PLACEMENTS[blocks.BY_ACTION[(a["shape_id"], a["row"], a["col"]) ]][0]
                  for a in record["construction"]]
         for number in range(per_root):
@@ -148,7 +165,7 @@ def training_cases(records, seed, per_root=2, goal_mode="witness", roots=None):
             yield {"board": board, "source": record["initial"], "goal": str(goal)}
 
 
-def run(checkpoint, graph_data, monitor_cases, out, seed, train_roots=1000, per_root=2, device="cpu", goal_mode="witness"):
+def run(checkpoint, graph_data, monitor_cases, out, seed, train_roots=1000, per_root=2, device="cpu", goal_mode="witness", goal_fractions=None):
     torch.set_num_threads(2)
     scorer = QScorer(checkpoint, device)
     records = json.loads((graph_data / "roots.json").read_text())
@@ -162,17 +179,18 @@ def run(checkpoint, graph_data, monitor_cases, out, seed, train_roots=1000, per_
               "seed": seed, "training_goal_mode": goal_mode,
               "scope": "Diagnostic only; monitoring failures never enter repair training"}
     for name, cases in (("monitor_long", monitor),
-                        ("training_long", training_cases(records[:train_roots], seed, per_root, goal_mode, roots))):
+                        ("training_long", training_cases(records[:train_roots], seed, per_root, goal_mode, roots,goal_fractions))):
         rows = []
         for index, row in enumerate(cases):
             truth_oracle = oracle if name == "monitor_long" else RootOracle(roots[row["board"]])
-            rows.append({"board": row["board"], "source": row["source"], "goal": row["goal"],
-                         **trace_error(scorer, int(row["source"]), int(row["goal"]), truth_oracle)})
+            rows.append({**row,**trace_error(scorer, int(row["source"]), int(row["goal"]), truth_oracle)})
             if (index + 1) % 100 == 0:
                 print(json.dumps({"section": name, "tasks": index + 1}), flush=True)
             if len(scorer.cache) > 200000:
                 scorer.cache.clear()
         result[name] = {"summary": summarize(rows), "rows": rows}
+        groups=sorted({r.get('query_group',r.get('group')) for r in rows if r.get('query_group',r.get('group'))})
+        if groups:result[name]['groups']={g:summarize([r for r in rows if r.get('query_group',r.get('group'))==g]) for g in groups}
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(json.dumps(result) + "\n")
     print(json.dumps({k: result[k]["summary"] for k in ("monitor_long", "training_long")}), flush=True)
@@ -188,10 +206,12 @@ def main():
     p.add_argument("--train-roots", type=int, default=1000)
     p.add_argument("--per-root", type=int, default=2)
     p.add_argument("--device", default="cpu")
-    p.add_argument("--goal-mode", choices=["witness", "random_path", "balanced6_13"], default="witness")
+    p.add_argument("--goal-mode", choices=["witness", "random_path", "balanced6_13", "goal_fractions"], default="witness")
+    p.add_argument('--profile-config',type=Path)
     args = p.parse_args()
+    profile=json.loads(args.profile_config.read_text())['diagnosis'] if args.profile_config else {}
     run(args.checkpoint, args.graph_data, args.monitor_cases, args.out, args.seed,
-        args.train_roots, args.per_root, args.device, args.goal_mode)
+        args.train_roots, args.per_root, args.device, profile.get('goal_mode',args.goal_mode),profile.get('goal_fractions'))
 
 
 if __name__ == "__main__":

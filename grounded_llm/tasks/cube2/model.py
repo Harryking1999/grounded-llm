@@ -44,7 +44,9 @@ class QMap(StateEncoder):
 
 class MapReader(EnvironmentQMap):
     """Reusable frozen inference API. Needs features/rules, never an oracle."""
-    def __init__(self, env, checkpoint, device="cpu"):
+    def __init__(self, env, checkpoint, device="cpu", *, coordinate_frame="absolute"):
+        if coordinate_frame not in ("absolute", "goal_relative"):
+            raise ValueError(f"Unknown cube coordinate frame: {coordinate_frame}")
         saved = torch.load(checkpoint, map_location=device, weights_only=False)
         if saved.get("model_type") != MODEL_TYPE:
             raise ValueError("Expected a pure-Q checkpoint")
@@ -53,3 +55,16 @@ class MapReader(EnvironmentQMap):
         model = QMap(env.feature_dim, **saved["model_config"], cap=saved["cap"]).to(device)
         model.load_state_dict(saved["model"])
         super().__init__(env, model, device)
+        self.coordinate_frame = coordinate_frame
+
+    def scores(self, source, goal):
+        """Goal-relative scoring uses the known group action before Q encoding.
+
+        Left multiplication by goal^-1 preserves the original action labels.
+        encode() continues to expose the checkpoint's ordinary state vectors;
+        this pair-conditioned option applies to scores() and choose().
+        """
+        if self.coordinate_frame == "goal_relative":
+            source = self.env.relative(goal, source)
+            goal = [0]
+        return super().scores(source, goal)

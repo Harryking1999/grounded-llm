@@ -20,6 +20,37 @@ from experiments.blocks_distance_map.src.full_graph_data import Root
 
 
 class FailureSamplingTest(unittest.TestCase):
+    def test_goal_fractions_cover_eight_and_twelve_step_sources(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path=Path(temp);build_symbolic(2,[3],path/'graphs/0',10000)
+            graph=SymbolicComponent(path/'graphs/0');parts=[];actions=[];initial=0
+            for row in (0,2,4,6):
+                for col in (0,3,6):
+                    cells=[row*10+col,row*10+col+1]
+                    initial|=sum(1<<c for c in cells)
+                    parts.append(dict(graph=0,cells=cells));actions.append(dict(shape_id=5,row=row,col=col))
+            record=dict(initial=str(initial),construction=actions,components=parts)
+            root=Root(record,{0:graph})
+            rows=list(training_cases([record],18,goal_mode='goal_fractions',roots=[root],goal_fractions=[.25,.5,.75]))
+            self.assertEqual(len(rows),8)
+            expected={'clear12':[12],'partial12':[3,6,9],'clear8':[8],'partial8':[2,4,6]}
+            for group,depths in expected.items():
+                selected=[r for r in rows if r['query_group']==group]
+                self.assertEqual([(int(r['source'])^int(r['goal'])).bit_count()//2 for r in selected],depths)
+            for row in rows:
+                self.assertEqual(row['root_source'],record['initial'])
+                row.update(success=True,trajectory=[dict(source=row['source'],goal=row['goal'])])
+            (path/'roots.json').write_text(json.dumps([record]))
+            (path/'summary.json').write_text(json.dumps(dict(complete=True,total_root_local_pairs=root.size**2,total_root_local_states=root.size)))
+            (path/'diagnosis.json').write_text(json.dumps(dict(training_long=dict(rows=rows))))
+            np.savez(path/'legacy.npz',states=np.asarray([str(initial),'0']),train=np.array([[0,0,0,0],[0,1,12,0],[1,0,-1,1],[1,1,0,0]]))
+            opt=dict(seed=18,boards_per_batch=1,legacy_fraction=.4,broad_fraction=.25,clear_fraction=.35,
+                failure_diagnosis=str(path/'diagnosis.json'),retention_diagnosis=str(path/'diagnosis.json'))
+            sampler=FailureData(path,path/'legacy.npz',opt)
+            self.assertEqual(len(sampler.packets[0]),8)
+            self.assertEqual(len(sampler.retention_packets[0]),8)
+            sampler.close()
+
     def test_balanced_goals_exact_medium_with_long_goals_retained(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp)

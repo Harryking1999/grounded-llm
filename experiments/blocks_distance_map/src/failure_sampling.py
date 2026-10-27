@@ -21,7 +21,7 @@ class FailureData(JointData):
         self.retention_packets = [[] for _ in self.roots]
         for row in rows:
             board = row["board"]
-            if row["source"] != self.roots[board].record["initial"]:
+            if row.get('root_source',row["source"]) != self.roots[board].record["initial"]:
                 raise ValueError("Repair rows must belong to the exact training root")
             root = self.roots[board]
             # Keep both first wrong forks and the actual on-policy contexts.
@@ -48,7 +48,7 @@ class FailureData(JointData):
             for row in retained:
                 if row["success"]:
                     root = self.roots[row["board"]]
-                    if row["source"] != root.record["initial"]:
+                    if row.get('root_source',row["source"]) != root.record["initial"]:
                         raise ValueError("Retention must use matching training roots")
                     for star in row["trajectory"]:
                         self.retention_packets[row["board"]].append(
@@ -108,36 +108,42 @@ class FailureData(JointData):
             self.retention_draws += retain
         if fresh:
             initial = np.tile([g.initial_id for g, _ in root.parts], (fresh, 1))
-            current = initial.copy()
-            zero = np.asarray([g.zero_id for g, _ in root.parts])
+            initial_masks=np.stack([g.states[initial[:,i]] for i,(g,_) in enumerate(root.parts)],-1)
+            current = initial_masks.copy()
             cycle = self.options.get("fresh_distance_cycle", [-1])
             wanted = np.asarray(cycle)[np.arange(fresh) % len(cycle)]
             frozen = np.zeros(fresh, dtype=bool)
             for _ in range(18):
-                child = root.advance(current, self.rng, (~frozen).astype(int))
-                keep = (child != zero).any(-1) & ~frozen
+                child = root.advance_masks(current, self.rng, (~frozen).astype(int))
+                keep = (child != 0).any(-1) & ~frozen
                 current[keep] = child[keep]
                 check = (wanted > 0) & ~frozen
                 if check.any():
-                    parts = root.distance_parts(initial[check], current[check])
+                    parts=np.stack([g.distance(initial_masks[check,i],current[check,i]) for i,(g,_) in enumerate(root.parts)],-1)
                     frozen[np.flatnonzero(check)] = parts.sum(-1) == wanted[check]
-            source[:fresh], goal[:fresh] = initial, current
+            source[:fresh]=initial
+            for i,(graph,_) in enumerate(root.parts):goal[:fresh,i]=graph.rank(current[:,i])
+        source_masks=np.stack([g.states[source[:,i]] for i,(g,_) in enumerate(root.parts)],-1)
+        goal_masks=np.stack([g.states[goal[:,i]] for i,(g,_) in enumerate(root.parts)],-1)
+        def physical_distances():
+            return np.stack([g.distance(source_masks[:,i],goal_masks[:,i]) for i,(g,_) in enumerate(root.parts)],-1)
         levels = np.asarray(self.options["repair_descendant_steps"])
         steps = levels[(np.arange(count) + int(self.rng.integers(len(levels)))) % len(levels)]
-        initial_parts = root.distance_parts(source, goal)
+        initial_parts = physical_distances()
         self.repair_initial_distances += np.bincount(initial_parts.sum(-1), minlength=64)
         preserve = np.arange(count) < round(count * self.options.get("long_context_fraction", 0))
         minimum = np.where(preserve, 6, 1)
         for depth in range(int(steps.max(initial=0))):
-            parts = root.distance_parts(source, goal)
+            parts = physical_distances()
             distances = np.where((parts < 0).any(-1), -1, parts.sum(-1))
             active = (depth < steps) & (distances > minimum)
             # Sample uniformly among every optimal outgoing action. This is a
             # label-side sampler, not search or filtering in the evaluated Q.
             choices = [[] for _ in range(count)]
             for i, (graph, _) in enumerate(root.parts):
-                parents, children = graph.star(source[:, i])
-                labels = graph.distance(graph.states[children], graph.states[goal[parents, i]])
+                parents,tiles=np.nonzero((source_masks[:,i,None]&graph.tiles)==graph.tiles)
+                children=source_masks[parents,i]^graph.tiles[tiles]
+                labels = graph.distance(children,goal_masks[parents,i])
                 good = (active[parents] & (labels >= 0) &
                         (parts[parents].sum(-1) - parts[parents, i] + labels == distances[parents] - 1))
                 for row, child in zip(parents[good], children[good]):
@@ -146,9 +152,12 @@ class FailureData(JointData):
                 if not choices[row]:
                     raise AssertionError("Exact reachable pair lacks optimal successor")
                 part, child = choices[row][int(self.rng.integers(len(choices[row])))]
-                source[row, part] = child
+                source_masks[row, part] = child
                 self.optimal_transition_draws += 1
-        labels = root.distance_parts(source, goal)
+        for i,(graph,_) in enumerate(root.parts):
+            original=graph.states[source[:,i]];changed=source_masks[:,i]!=original
+            source[changed,i]=graph.rank(source_masks[changed,i])
+        labels = physical_distances()
         distances = np.where((labels < 0).any(-1), -1, labels.sum(-1))
         if (distances < 0).any():
             raise AssertionError("Optimal continuation lost reachability")

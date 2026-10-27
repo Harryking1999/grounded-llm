@@ -13,6 +13,33 @@ from experiments.blocks_distance_map.src.symbolic_graph import build_symbolic, S
 
 
 class CompleteGraphTest(unittest.TestCase):
+    def test_mask_walk_matches_index_walk_and_random_stream(self):
+        with tempfile.TemporaryDirectory() as temp:
+            graphs={};parts=[]
+            for i in range(2):
+                path=Path(temp)/str(i)
+                builder,kind=(build_graph,Component) if i==0 else (build_symbolic,SymbolicComponent)
+                builder(6,[3,6,12,24,48,7,14,28,56],path,10000)
+                graphs[i]=kind(path);parts.append(dict(graph=i,cells=list(range(6))))
+            root=Root(dict(components=parts),graphs)
+            local=root.decode(np.arange(root.size));limits=np.arange(len(local))%5
+            expected=local.copy();rng=np.random.default_rng(18)
+            for move in range(int(limits.max())):
+                degrees=np.stack([g.degrees(expected[:,i]) for i,(g,_) in enumerate(root.parts)],-1)
+                total=degrees.sum(-1);ids=np.flatnonzero((total>0)&(move<limits))
+                if not len(ids):break
+                choice=(rng.random(len(ids))*total[ids]).astype(np.int64)
+                ends=np.cumsum(degrees[ids],-1);selected=(choice[:,None]>=ends).sum(-1)
+                starts=np.column_stack((np.zeros(len(ids),dtype=np.int64),ends[:,:-1]))
+                offset=choice-starts[np.arange(len(ids)),selected]
+                for i,(graph,_) in enumerate(root.parts):
+                    keep=np.flatnonzero(selected==i);rows=ids[keep]
+                    expected[rows,i]=graph.take(expected[rows,i],offset[keep])
+            actual_rng=np.random.default_rng(18)
+            np.testing.assert_array_equal(root.advance(local,actual_rng,limits),expected)
+            self.assertEqual(actual_rng.bit_generator.state,rng.bit_generator.state)
+            for graph in graphs.values():graph.close()
+
     def test_symbolic_all_states_pairs_and_actions_equal_explicit_bfs(self):
         tiles = [3, 6, 12, 24, 48, 7, 14, 28, 56]
         with tempfile.TemporaryDirectory() as temp:
@@ -24,6 +51,7 @@ class CompleteGraphTest(unittest.TestCase):
             masks = symbolic.states[ids]
             self.assertEqual(set(masks), set(dense.states))
             np.testing.assert_array_equal(symbolic.rank(masks), ids)
+            np.testing.assert_array_equal(dense.states[dense.rank(masks)],masks)
             source, goal = np.meshgrid(masks, masks, indexing="ij")
             np.testing.assert_array_equal(symbolic.distance(source, goal), dense.distance(source, goal))
             for i, mask in enumerate(masks):

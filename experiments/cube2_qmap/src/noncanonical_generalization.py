@@ -12,7 +12,7 @@ from grounded_llm.core.files import atomic_json, atomic_save
 from grounded_llm.tasks.cube2.environment import Cube2
 from grounded_llm.tasks.cube2.model import QMap
 from .coordinate_fit import initialize, subset_batch, fit_metrics
-from .coverage_data import CoverageGuard, keys_to_pairs, closure_keys, sample_cohort, hist
+from .coverage_data import CoverageGuard, keys_to_pairs, closure_keys, sample_cohort, hist, load_coverage_config
 from .coverage_train import Pool
 from .full_state_joint import fixed_batch, batch_losses
 from .near_goal_continuation import training_tasks, inspect
@@ -114,7 +114,7 @@ def main():
     for n in ('source','data','checkpoint'):p.add_argument('--'+n,type=Path)
     p.add_argument('--prepare',action='store_true');p.add_argument('--arm',choices=['inherited','reset_head'])
     p.add_argument('--source-commit',required=True);p.add_argument('--device',default='cuda:0');a=p.parse_args()
-    cfg=json.loads(a.config.read_text())
+    cfg=load_coverage_config(a.config)
     if a.prepare:prepare(cfg,a)
     else:train(cfg,a)
 

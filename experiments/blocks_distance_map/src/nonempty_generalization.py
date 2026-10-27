@@ -19,11 +19,16 @@ from .blocks12_eval import trace
 from .tree_supervision_eval import QScorer
 
 
-def prepare(cfg, out):
+def prepare(cfg, out, protected_data=None):
     out.mkdir(parents=True,exist_ok=False); opt=cfg['data']
     old=json.loads(Path(opt['excluded_roots']).read_text())
     if isinstance(old,dict): old=old.get('cases',old.get('roots'))
     excluded={int(r.get('initial',r.get('source',0))) for r in old}
+    protected_count=0
+    if protected_data is not None:
+        prior=json.loads((protected_data/'roots.json').read_text())
+        protected={int(r['initial']) for rows in prior.values() for r in rows}
+        excluded.update(protected);protected_count=len(protected)
     counts={role:opt[role+'_roots_per_size'] for role in ('train','development','test')}
     roots={role:[] for role in counts}; queries={role:[] for role in counts}
     oracle=DistanceOracle(cache_limit=opt['oracle_cache_limit'],seconds=opt['oracle_seconds'])
@@ -74,6 +79,7 @@ def prepare(cfg, out):
     atomic_json(out/'ready.json',dict(training_stars=len(rows),states=len(states),maximum_candidates=width,
         class_stars=dict(Counter(r['group'] for r in rows)),root_counts={k:len(v) for k,v in source_sets.items()},
         full_training_candidate_labels=int((children>=0).sum()),oracle_unknowns=0,
+        excluded_prior_stage_roots=protected_count,
         split='Current-stage source roots disjoint; older/descendant exposure not excluded'))
 
 
@@ -155,9 +161,13 @@ def train(cfg,args):
 def main():
     p=argparse.ArgumentParser(__doc__);p.add_argument('--config',type=Path,required=True);p.add_argument('--out',type=Path,required=True)
     p.add_argument('--prepare',action='store_true');p.add_argument('--data',type=Path);p.add_argument('--checkpoint',type=Path)
+    p.add_argument('--protected-data',type=Path)
     p.add_argument('--arm',choices=['clear_control','balanced_goals']);p.add_argument('--source-commit',required=True)
     p.add_argument('--device',default='cuda:0');a=p.parse_args();cfg=json.loads(a.config.read_text())
-    if a.prepare:prepare(cfg,a.out)
+    if 'parent_contract' in cfg:
+        parent=json.loads(Path(cfg['parent_contract']).read_text())
+        cfg={**parent,**cfg,**{key:{**parent[key],**cfg.get(key,{})} for key in ('data','training')}}
+    if a.prepare:prepare(cfg,a.out,a.protected_data)
     else:train(cfg,a)
 
 

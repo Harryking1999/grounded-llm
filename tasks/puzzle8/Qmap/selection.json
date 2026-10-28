@@ -21,6 +21,82 @@
       "count": 1024
     }
   },
-  "reason": "User selected98.28% restoration candidate and shifted optimization priority to blocks. Selection does not assert strict intermediate367/1024 guard was passed.",
-  "resume_checkpoint": "runs/qmap_dual_20261018/puzzle8/goal_expansion/stages/step_001000/checkpoint.pt"
+  "reason": "Retained restoration checkpoint; goal-normalized inference has a separately validated continuation below.",
+  "resume_checkpoint": "runs/qmap_dual_20261018/puzzle8/goal_expansion/stages/step_001000/checkpoint.pt",
+  "conditions": {
+    "goal_normalized": {
+      "status": "validated",
+      "checkpoint": "tasks/puzzle8/Qmap/checkpoints/goal_normalized_290000.pt",
+      "coordinate_frame": "goal_normalized",
+      "source_commit": "58b0ac5",
+      "checkpoint_step": 290000,
+      "config": "experiments/puzzle8_qmap/configs/goal_generalization.json",
+      "scope": "Known board symmetry and tile relabeling preserve legal moves; greedy62steps to arbitrary complete goals in the standard solvable component. Standard restoration and fixed goal-family cohorts evaluated separately.",
+      "resume_checkpoint": "/zhanghanyue/experiment/grounded_llm_puzzle_qmaps/runs/puzzle8_goal_generalization_20261028/train/stages/step_004000/checkpoint.pt",
+      "evidence": "experiments/puzzle8_qmap/results/goal_generalization_audit.json",
+      "metrics": {
+        "restoration_solved": 179496,
+        "nonterminal_states": 181439,
+        "anchor1_solved": 177763,
+        "anchor4_solved": 172201,
+        "actual_goal_family": {
+          "count": 1024,
+          "solved": 1009,
+          "success_rate": 0.9853515625,
+          "by_blank_orbit": {
+            "corner": {
+              "count": 364,
+              "solved": 362
+            },
+            "edge": {
+              "count": 544,
+              "solved": 538
+            },
+            "center": {
+              "count": 116,
+              "solved": 109
+            }
+          }
+        },
+        "old_validation": {
+          "count": 1024,
+          "solved": 995,
+          "success_rate": 0.9716796875,
+          "by_blank_orbit": {
+            "corner": {
+              "count": 233,
+              "solved": 231
+            },
+            "edge": {
+              "count": 258,
+              "solved": 253
+            },
+            "center": {
+              "count": 533,
+              "solved": 511
+            }
+          }
+        },
+        "old_test": {
+          "count": 1024,
+          "solved": 1015,
+          "success_rate": 0.9912109375,
+          "by_blank_orbit": {
+            "corner": {
+              "count": 270,
+              "solved": 267
+            },
+            "edge": {
+              "count": 754,
+              "solved": 748
+            },
+            "center": {
+              "count": 0,
+              "solved": 0
+            }
+          }
+        }
+      }
+    }
+  }
 }

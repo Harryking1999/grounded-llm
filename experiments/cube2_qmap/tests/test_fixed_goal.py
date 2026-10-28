@@ -6,7 +6,7 @@ from types import SimpleNamespace
 import numpy as np
 import torch
 
-from experiments.cube2_qmap.src.fixed_goal import FixedGoalReplicas, tensor_batch, balanced_parents, exhaustive_policy, make_batch, path_relations, prepare, reach_within_budget
+from experiments.cube2_qmap.src.fixed_goal import FixedGoalReplicas, tensor_batch, balanced_parents, exhaustive_policy, failure_pool, make_batch, path_relations, prepare, reach_within_budget
 from experiments.cube2_qmap.src.full_state_joint import batch_losses
 from experiments.puzzle_qmap.src.model import QMap
 from experiments.cube2_qmap.tests.test_full_state_joint import Ring
@@ -16,6 +16,24 @@ class FixedGoalTests(unittest.TestCase):
     def setUp(self):
         self.env = Ring()
         self.env.depth = self.env.distance(np.arange(self.env.size), 0).astype(np.uint8)
+
+    def test_failure_replay_uses_wrong_complete_training_stars_and_basin_sizes(self):
+        env=self.env;ids=np.arange(env.size);children=env.successors(ids)
+        pointer=children[ids,env.depth[children].argmin(-1)];pointer[0]=0
+        pointer[4],pointer[10]=5,11
+        parents,weights,report=failure_pool(env,np.zeros(env.size,dtype=bool),pointer)
+        np.testing.assert_array_equal(parents,[4,10])
+        from experiments.cube2_qmap.src.policy_audit import two_cycle_basins
+        labels=two_cycle_basins(pointer)
+        expected=1+np.log1p([(labels==p).sum() for p in parents]);expected/=expected.sum()
+        np.testing.assert_allclose(weights,expected)
+        self.assertEqual(report['cycle_exits'],2)
+        heldout=np.zeros(env.size,dtype=bool);heldout[5]=True
+        parents,weights,_=failure_pool(env,heldout,pointer)
+        np.testing.assert_array_equal(parents,[10]);np.testing.assert_array_equal(weights,[1])
+        pointer[4],pointer[10]=3,9
+        parents,weights,_=failure_pool(env,heldout,pointer)
+        self.assertEqual(len(parents),0);self.assertEqual(len(weights),0)
 
     def test_device_stars_and_replica_update_preserve_original_objective(self):
         torch.set_num_threads(1);torch.manual_seed(19)

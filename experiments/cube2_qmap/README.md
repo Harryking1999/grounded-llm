@@ -14,7 +14,8 @@
 |---|---|
 | 任务规则、精确距离和状态特征 | [environment.py](../../grounded_llm/tasks/cube2/environment.py) |
 | 共享MLP、轴对称适配与冻结读取 | [model.py](../../grounded_llm/tasks/cube2/model.py) |
-| 当前目标泛化训练 | [near_goal_continuation.py](src/near_goal_continuation.py)、[配置](configs/goal_generalization.json) |
+| 当前目标相对坐标训练 | [fixed_goal.py](src/fixed_goal.py)、[配置](configs/relative_goal.json) |
+| 绝对状态对目标泛化 | [near_goal_continuation.py](src/near_goal_continuation.py)、[配置](configs/goal_generalization.json) |
 | 全状态、多目标关系与原关系重放 | [full_state_joint.py](src/full_state_joint.py) |
 | 当前策略循环、出口与正确关系保持 | [cycle_repair.py](src/cycle_repair.py) |
 | 覆盖数据与固定池对照 | [coverage_data.py](src/coverage_data.py)、[coverage_train.py](src/coverage_train.py) |

@@ -844,6 +844,253 @@
     "inference_conditions": [
       "absolute shared state embedding",
       "known board symmetry and tile relabeling before shared Q scoring"
-    ]
+    ],
+    "matched_continuation_step4000": {
+      "scope": "Same fixed cohorts before/after training and coordinate transform; original physical legal actions; 62steps; no oracle loaded",
+      "models": {
+        "adopted": {
+          "absolute": {
+            "actual_goal_family": {
+              "count": 1024,
+              "solved": 145,
+              "success_rate": 0.1416015625,
+              "by_blank_orbit": {
+                "corner": {
+                  "count": 364,
+                  "solved": 57
+                },
+                "edge": {
+                  "count": 544,
+                  "solved": 65
+                },
+                "center": {
+                  "count": 116,
+                  "solved": 23
+                }
+              }
+            },
+            "old_validation": {
+              "count": 1024,
+              "solved": 352,
+              "success_rate": 0.34375,
+              "by_blank_orbit": {
+                "corner": {
+                  "count": 233,
+                  "solved": 59
+                },
+                "edge": {
+                  "count": 258,
+                  "solved": 80
+                },
+                "center": {
+                  "count": 533,
+                  "solved": 213
+                }
+              }
+            },
+            "old_test": {
+              "count": 1024,
+              "solved": 328,
+              "success_rate": 0.3203125,
+              "by_blank_orbit": {
+                "corner": {
+                  "count": 270,
+                  "solved": 79
+                },
+                "edge": {
+                  "count": 754,
+                  "solved": 249
+                },
+                "center": {
+                  "count": 0,
+                  "solved": 0
+                }
+              }
+            }
+          },
+          "goal_normalized": {
+            "actual_goal_family": {
+              "count": 1024,
+              "solved": 943,
+              "success_rate": 0.9208984375,
+              "by_blank_orbit": {
+                "corner": {
+                  "count": 364,
+                  "solved": 359
+                },
+                "edge": {
+                  "count": 544,
+                  "solved": 527
+                },
+                "center": {
+                  "count": 116,
+                  "solved": 57
+                }
+              }
+            },
+            "old_validation": {
+              "count": 1024,
+              "solved": 841,
+              "success_rate": 0.8212890625,
+              "by_blank_orbit": {
+                "corner": {
+                  "count": 233,
+                  "solved": 227
+                },
+                "edge": {
+                  "count": 258,
+                  "solved": 254
+                },
+                "center": {
+                  "count": 533,
+                  "solved": 360
+                }
+              }
+            },
+            "old_test": {
+              "count": 1024,
+              "solved": 1012,
+              "success_rate": 0.98828125,
+              "by_blank_orbit": {
+                "corner": {
+                  "count": 270,
+                  "solved": 266
+                },
+                "edge": {
+                  "count": 754,
+                  "solved": 746
+                },
+                "center": {
+                  "count": 0,
+                  "solved": 0
+                }
+              }
+            }
+          }
+        },
+        "step4000": {
+          "absolute": {
+            "actual_goal_family": {
+              "count": 1024,
+              "solved": 177,
+              "success_rate": 0.1728515625,
+              "by_blank_orbit": {
+                "corner": {
+                  "count": 364,
+                  "solved": 67
+                },
+                "edge": {
+                  "count": 544,
+                  "solved": 84
+                },
+                "center": {
+                  "count": 116,
+                  "solved": 26
+                }
+              }
+            },
+            "old_validation": {
+              "count": 1024,
+              "solved": 348,
+              "success_rate": 0.33984375,
+              "by_blank_orbit": {
+                "corner": {
+                  "count": 233,
+                  "solved": 63
+                },
+                "edge": {
+                  "count": 258,
+                  "solved": 82
+                },
+                "center": {
+                  "count": 533,
+                  "solved": 203
+                }
+              }
+            },
+            "old_test": {
+              "count": 1024,
+              "solved": 331,
+              "success_rate": 0.3232421875,
+              "by_blank_orbit": {
+                "corner": {
+                  "count": 270,
+                  "solved": 73
+                },
+                "edge": {
+                  "count": 754,
+                  "solved": 258
+                },
+                "center": {
+                  "count": 0,
+                  "solved": 0
+                }
+              }
+            }
+          },
+          "goal_normalized": {
+            "actual_goal_family": {
+              "count": 1024,
+              "solved": 1009,
+              "success_rate": 0.9853515625,
+              "by_blank_orbit": {
+                "corner": {
+                  "count": 364,
+                  "solved": 362
+                },
+                "edge": {
+                  "count": 544,
+                  "solved": 538
+                },
+                "center": {
+                  "count": 116,
+                  "solved": 109
+                }
+              }
+            },
+            "old_validation": {
+              "count": 1024,
+              "solved": 995,
+              "success_rate": 0.9716796875,
+              "by_blank_orbit": {
+                "corner": {
+                  "count": 233,
+                  "solved": 231
+                },
+                "edge": {
+                  "count": 258,
+                  "solved": 253
+                },
+                "center": {
+                  "count": 533,
+                  "solved": 511
+                }
+              }
+            },
+            "old_test": {
+              "count": 1024,
+              "solved": 1015,
+              "success_rate": 0.9912109375,
+              "by_blank_orbit": {
+                "corner": {
+                  "count": 270,
+                  "solved": 267
+                },
+                "edge": {
+                  "count": 754,
+                  "solved": 748
+                },
+                "center": {
+                  "count": 0,
+                  "solved": 0
+                }
+              }
+            }
+          }
+        }
+      },
+      "seconds": 58.36780261294916,
+      "oracle_loaded": false
+    }
   }
 }

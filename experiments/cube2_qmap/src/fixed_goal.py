@@ -178,8 +178,8 @@ def reach_within_budget(next_state, goal, horizon):
 
 
 @torch.no_grad()
-def exhaustive_policy(model, env, mask, config, device, feature_table=None):
-    """Cache network distances, choose each next state, then score all starts."""
+def restoration_policy(model, env, config, device, feature_table=None):
+    """Evaluate Q once per state and choose the original greedy successor."""
     goal = model.encode(feature_table[:1] if feature_table is not None else
                         torch.as_tensor(env.features([0]), device=device))
     predicted = np.empty(env.size, dtype=np.float32)
@@ -197,6 +197,36 @@ def exhaustive_policy(model, env, mask, config, device, feature_table=None):
         choice = predicted[children].argmin(-1)
         next_state[ids] = children[np.arange(len(ids)), choice]
     next_state[0] = 0
+    return predicted, next_state
+
+
+def failure_pool(env, heldout, pointer):
+    """Wrong training stars, with extra exposure for exits trapping many starts."""
+    from .policy_audit import two_cycle_basins
+    allowed = ~heldout.copy()
+    for start in range(0, env.size, 32768):
+        ids = np.arange(start, min(env.size, start + 32768))
+        allowed[ids] &= ~heldout[env.successors(ids)].any(-1)
+    wrong = env.depth[pointer].astype(int) != env.depth.astype(int) - 1
+    allowed[0] = False
+    parents = np.flatnonzero(allowed & wrong)
+    if not len(parents):
+        return parents, np.empty(0), dict(wrong_training_stars=0, cycle_exits=0)
+    labels = two_cycle_basins(pointer)
+    counts = np.bincount(labels[labels >= 0], minlength=env.size)
+    cyclic = pointer[pointer[parents]] == parents
+    representative = np.minimum(parents, pointer[parents])
+    weights = np.ones(len(parents), dtype=float)
+    weights[cyclic] += np.log1p(counts[representative[cyclic]])
+    return parents, weights / weights.sum(), dict(wrong_training_stars=len(parents),
+        cycle_exits=int(cyclic.sum()), failed_start_states=int((labels >= 0).sum()),
+        by_depth=np.bincount(env.depth[parents], minlength=env.diameter+1).tolist())
+
+
+@torch.no_grad()
+def exhaustive_policy(model, env, mask, config, device, feature_table=None):
+    """Cache network distances, choose each next state, then score all starts."""
+    predicted, next_state = restoration_policy(model,env,config,device,feature_table)
     steps = reach_within_budget(next_state, 0, config["evaluation"]["horizon"])
     error = np.abs(predicted - env.depth)
     good = env.depth[next_state].astype(int) == env.depth.astype(int) - 1
@@ -251,6 +281,7 @@ def main():
     options = config["training"]
     optimizer = torch.optim.Adam(model.parameters(), lr=options["learning_rate"])
     starting_epoch, starting_step = 0, 0
+    replay_parents, replay_probabilities, replay_report = np.empty(0,dtype=np.int64), np.empty(0), {}
     parent = None
     if args.checkpoint is not None:
         if args.resume_run is not None:raise ValueError('Use either warm start or interrupted-run resume')
@@ -261,6 +292,8 @@ def main():
         for group in optimizer.param_groups:group['lr'] = options['learning_rate']
         parent = dict(checkpoint=str(args.checkpoint),source_commit=saved['source_commit'],
                       optimizer_step=max(int(v['step']) for v in saved['optimizer']['state'].values()))
+        if saved.get('fixed_goal') == 0 and 'rng' in saved:
+            rng.bit_generator.state = saved['rng']
     if args.resume_run:
         if json.loads((args.resume_run / "contract.json").read_text()) != config:
             raise ValueError("Resume changed fixed-goal contract")
@@ -273,6 +306,8 @@ def main():
         model.load_state_dict(saved["model"])
         optimizer.load_state_dict(saved["optimizer"])
         rng.bit_generator.state = saved["rng"]
+        if saved.get('failure_replay'):
+            replay_parents, replay_probabilities, replay_report = saved['failure_replay']
     args.out.mkdir(parents=True, exist_ok=False)
     (args.out / "contract.json").write_text(json.dumps(config, indent=2) + "\n")
     np.savez_compressed(args.out / "split.npz", mask=mask, **cohorts)
@@ -332,6 +367,7 @@ def main():
             "model_config": config["model"], "source_commit": args.source_commit, "seed": config["seed"],
             "fixed_goal": 0, "epoch": epoch, "step": step+(parent['optimizer_step'] if parent else 0),
             'continuation_step':step,'parent':parent,"smoke_steps": args.smoke_steps,
+            'failure_replay':(replay_parents,replay_probabilities,replay_report),
             "model": model.state_dict(), "optimizer": optimizer.state_dict(), "rng": rng.bit_generator.state}, temporary)
         temporary.replace(args.out / filename)
 
@@ -339,11 +375,21 @@ def main():
         inspect(starting_epoch, log)
         completed = starting_epoch
         for epoch in range(starting_epoch + 1, options["epochs"] + 1):
+            if options.get('failure_replay_size') and (not replay_report or
+                    (epoch-1) % options['failure_refresh_every_epochs'] == 0):
+                _, pointer = restoration_policy(model,env,config,args.device,
+                                                  parallel.features[0] if parallel else None)
+                replay_parents,replay_probabilities,replay_report = failure_pool(env,heldout,pointer)
+                row = dict(epoch=epoch,failure_replay=replay_report)
+                log.write(json.dumps(row)+'\n');log.flush();print(json.dumps(row),flush=True)
             order = rng.permutation(env.size)
             for start in range(0, env.size, options["parent_batch_size"]):
                 parents = order[start:start + options["parent_batch_size"]]
                 replay = balanced_parents(layers, options["balanced_replay_size"], step * options["balanced_replay_size"], rng)
                 all_parents = np.r_[parents, replay]
+                if options.get('failure_replay_size') and len(replay_parents):
+                    failures = rng.choice(replay_parents,options['failure_replay_size'],p=replay_probabilities)
+                    all_parents = np.r_[all_parents,failures]
                 begin = time.monotonic()
                 if parallel:
                     huber,rank,batch = parallel.update(all_parents,optimizer,config)
@@ -379,7 +425,8 @@ def main():
                 result['stopped_on_target'] = True
                 break
         if config["evaluation"]["final_exhaustive_policy"] and not args.smoke_steps:
-            result["exhaustive_policy"] = exhaustive_policy(model, env, mask, config, args.device)
+            result["exhaustive_policy"] = exhaustive_policy(model, env, mask, config, args.device,
+                                                            parallel.features[0] if parallel else None)
     if parallel:parallel.close()
     result["completed_epochs"] = completed
     result["seconds"] = time.monotonic() - started

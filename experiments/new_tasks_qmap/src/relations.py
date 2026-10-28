@@ -91,6 +91,9 @@ def validate_continuation(previous,current,step):
     rank_change=current.get('continuation',{}).get('mode')=='rank_weight_change'
     for item in (old,new):
         for key in ('continuation','convergence','pilot'):item.pop(key,None)
+        if item.get('failure_diagnosis'):
+            # Reports moved their diagnostic references into archive/configs.
+            item['failure_diagnosis']=item['failure_diagnosis'].replace('/archive/configs/','/configs/')
         # Trace compression changes I/O scheduling only; checkpoint saves wait
         # for every pending trace and preserve optimizer/sampling/RNG state.
         workers=item['training'].pop('trace_write_workers',0)

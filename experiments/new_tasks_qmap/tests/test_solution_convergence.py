@@ -45,6 +45,11 @@ class ConvergenceTests(unittest.TestCase):
         validate_continuation(old,new,6)
         new['training']['trace_write_workers']=1
         validate_continuation(old,new,6)
+        old['failure_diagnosis']='experiments/new_tasks_qmap/configs/rush_hour/diagnosis.json'
+        new['failure_diagnosis']='experiments/new_tasks_qmap/archive/configs/rush_hour/diagnosis.json'
+        validate_continuation(old,new,6)
+        bad=deepcopy(new);bad['failure_diagnosis']='experiments/new_tasks_qmap/archive/configs/rush_hour/other.json'
+        with self.assertRaises(ValueError):validate_continuation(old,bad,6)
         bad=deepcopy(new);bad['training']['trace_write_workers']=2
         with self.assertRaises(ValueError):validate_continuation(old,bad,6)
         for change in [('training','learning_rate',.001),('data','source','other'),('evaluation','horizon',64)]:

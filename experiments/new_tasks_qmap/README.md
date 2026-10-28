@@ -1,12 +1,12 @@
 # 五类新任务 Qmap 实验工作区
 
-本目录维护推箱子、移车出库、棋子交换、过桥和21／24点的独立地图实验。**移车出库继续优化长程和新布局；推箱子搁置，其余任务保留已采用地图。** 八类任务、小类及可用能力从[任务总览](../../tasks/README.md)阅读；本页只提供实验和实现入口。
+本目录维护推箱子、移车出库、棋子交换、过桥和21／24点的独立地图实验。**移车出库继续优化长程和新布局；推箱子继续优化循环、死锁和目标迁移，其余任务保留已采用地图。** 八类任务、小类及可用能力从[任务总览](../../tasks/README.md)阅读；本页只提供实验和实现入口。
 
 ## 当前结果入口
 
 | 任务 | 当前采用情况 | 结果与限制 | 权重和正式配置 |
 |---|---|---|---|
-| 推箱子 | 固定墙体仍未通过，无采用地图 | [报告](results/sokoban/report.md) | [selection](../../tasks/sokoban/Qmap/selection.json)／[历史配置](archive/configs/sokoban/) |
+| 推箱子 | 固定墙体仍未通过，无采用地图 | [报告](results/sokoban/report.md) | [selection](../../tasks/sokoban/Qmap/selection.json)／[接续配置](configs/sokoban/sokoban_fixed_wall_902_width_wide4.json) |
 | 移车出库 | 原占格MLP限定选用；不覆盖可靠长程和新布局 | [报告](results/rush_hour/report.md) | [selection](../../tasks/rush_hour/Qmap/selection.json)／[配置](configs/rush_hour/) |
 | 棋子交换 | 两棵10顶点树各自采用；最优效率未通过 | [报告](results/token_swapping/report.md) | [selection](../../tasks/token_swapping/Qmap/selection.json)／[配置](configs/token_swapping/) |
 | 过桥 | 五人与六人分别采用，限定耗时分布 | [报告](results/bridge/report.md) | [selection](../../tasks/bridge/Qmap/selection.json)／[配置](configs/bridge/) |

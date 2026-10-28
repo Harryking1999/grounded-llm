@@ -116,6 +116,10 @@ def validate_continuation(previous,current,step):
         if old!=new:raise ValueError('Failure coverage continuation changes another training condition')
         return
     if current_failures:
+        if old.get('task')=='sokoban':
+            # The archived width comparison describes its historical arm;
+            # the resumed hypothesis is metadata, while all parameters stay checked.
+            old.pop('hypothesis',None);new.pop('hypothesis',None)
         if 'current_failure_replay' in old['training'] or not new['training'].pop('current_failure_replay',None):
             raise ValueError('Current-failure continuation must explicitly add its own replay stream')
         if not step<new['training']['steps'] or new['training']['steps']<old['training']['steps']:
@@ -171,7 +175,9 @@ def completion_acceptance(metrics,required,criteria,coverage):
 
 def completion_criteria(filename,task):
     """Keep a training summary's completion profile separate from cost suites."""
-    criteria=json.loads(Path(filename).read_text())
+    path=Path(filename)
+    if not path.exists():path=Path(str(path).replace('/configs/','/archive/configs/').replace('\\configs\\','\\archive\\configs\\'))
+    criteria=json.loads(path.read_text())
     if 'training_summary_criteria' in criteria:
         criteria=json.loads(Path(criteria['training_summary_criteria']).read_text())
     if (task not in criteria.get('required_test_cohorts',{})
@@ -460,8 +466,10 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
                        else 'Prior gradient endpoint exposure retained separately from fresh source-row coverage.'))))
     current_replay=None
     if options.get('current_failure_replay'):
-        if config['task']!='rush_hour' or relation_sampler is None or replay_sampler is None:
-            raise ValueError('Current Rush Hour failures augment the existing broad and path samplers')
+        if config['task'] not in ('rush_hour','sokoban') or relation_sampler is None:
+            raise ValueError('Current board failures require the original broad relation sampler')
+        if config['task']=='rush_hour' and replay_sampler is None:
+            raise ValueError('Current Rush Hour failures retain the original whole-path sampler')
         from .current_failures import CurrentFailureReplay
         current_replay=CurrentFailureReplay(corpus,data,options['current_failure_replay'],config['seed']+73103,out,
             saved.get('current_failure_state') if checkpoint is not None else None)

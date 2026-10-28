@@ -1,4 +1,4 @@
-"""Current Rush Hour cycle exits alongside the retained broad and path streams."""
+"""Current physical-board failures alongside retained broad relation streams."""
 from copy import deepcopy
 from pathlib import Path
 import numpy as np
@@ -89,6 +89,13 @@ class CurrentFailureReplay:
 
     def refresh(self, model, device, config, step):
         if step-self.last_refresh < self.options['refresh_every']: return
+        if config['task']=='sokoban':
+            from .sokoban_failures import mine_fixed_wall_failures
+            summary,bank=mine_fixed_wall_failures(model,self.corpus,self.data,device)
+            if len(bank['tasks']):self.set_bank(bank)
+            self.round+=1;self.last_refresh=step;self.save_bank()
+            atomic_json(self.out/f'current_failures_{self.round:04d}.json',dict(step=step,**summary))
+            return
         from .relation_diagnose import training_start_queries, training_failure_bank, policy_boundaries
         from .relation_evaluate import QCache, planning_ids, rollout
         rows, truth = training_start_queries(self.corpus, self.data, 'original_starts')

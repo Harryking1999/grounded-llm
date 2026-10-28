@@ -15372,5 +15372,71 @@
         "banks_groups_counts_ten_batches_and_rng_equal": true
       }
     }
+  },
+  "layout_matched_failure_structure": {
+    "step": 43000,
+    "selection": {
+      "held_queries": 1024,
+      "matched": 921,
+      "matching": [
+        "exact distance",
+        "vehicle count",
+        "initial legal candidate count"
+      ],
+      "training_queries_reused": false
+    },
+    "groups": {
+      "matched_training": {
+        "count": 921,
+        "solved": 884,
+        "cycles": 37,
+        "success_rate": 0.9598262757871878,
+        "two_step_cycles": 37,
+        "first_wrong_on_failed_queries": {
+          "count": 37,
+          "all_optimal_moves_increase_goal_position_error": 21,
+          "all_optimal_moves_unsettle_correct_vehicle": 12,
+          "chosen_one_cell_slide": 29,
+          "step_quantiles": [
+            1.0,
+            21.0,
+            43.0
+          ]
+        }
+      },
+      "matched_unseen_layout": {
+        "count": 921,
+        "solved": 49,
+        "cycles": 872,
+        "success_rate": 0.053203040173724216,
+        "two_step_cycles": 872,
+        "first_wrong_on_failed_queries": {
+          "count": 872,
+          "all_optimal_moves_increase_goal_position_error": 360,
+          "all_optimal_moves_unsettle_correct_vehicle": 92,
+          "chosen_one_cell_slide": 673,
+          "step_quantiles": [
+            0.0,
+            2.0,
+            21.0
+          ]
+        }
+      }
+    },
+    "condition": "Frozen-Q diagnostic with matched validation and permitted training starts; complete legal successors; zero optimizer updates; diagnostic rows are separate from training replay",
+    "training_failure_motif_exposure": {
+      "all_optimal_moves_increase_goal_position_error": {
+        "contexts": 4955,
+        "contexts_drawn": 4955,
+        "minimum_context_draws": 5
+      },
+      "all_optimal_moves_unsettle_correct_vehicle": {
+        "contexts": 2368,
+        "contexts_drawn": 2368,
+        "minimum_context_draws": 5
+      }
+    },
+    "source_commit": "ee701ee604ebd18d0d5988af74fe2b9384fdd924",
+    "raw_root": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/rush_hour_20261028/resume_40645_ee701ee"
   }
 }

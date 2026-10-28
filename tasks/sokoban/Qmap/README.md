@@ -1,6 +1,6 @@
 # 推箱子 Qmap
 
-**未通过，无采用权重；优化搁置。** 当前主条件为每套固定墙体独立训练Qmap，同墙体内改变箱子、玩家及完整目标；换墙体另训地图。保留MLP，CNN对照未显示优势。状态见[selection](selection.json)，结果见[报告](../../../experiments/new_tasks_qmap/results/sokoban/report.md)。
+**正在针对循环、死锁与目标迁移优化，无采用权重。** 先接续固定墙体的完整MLP断点，覆盖全部允许训练决策的当前循环出口和不可逆死锁分叉，同墙体内改变箱子、玩家及完整目标。状态见[selection](selection.json)，结果见[报告](../../../experiments/new_tasks_qmap/results/sokoban/report.md)。
 
 | 内容 | 定义 |
 |---|---|

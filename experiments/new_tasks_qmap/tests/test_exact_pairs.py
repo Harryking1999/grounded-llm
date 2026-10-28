@@ -830,6 +830,27 @@ class ExactPairTests(unittest.TestCase):
         bad={**edges,'parent_distance':np.array([99,99])}
         with self.assertRaisesRegex(ValueError,'labels differ'): training_failure_bank(corpus,data,bad)
 
+    def test_fixed_wall_failure_mining_preserves_dead_branch_and_cycle_successors(self):
+        from experiments.new_tasks_qmap.src.sokoban_failures import mine_fixed_wall_failures
+        children=np.array([[1,2],[0,2],[3,4],[3,-1],[4,-1]])
+        graph=UnitGraphOracle(children);truth=graph.to_goal(3)
+        scene=SimpleNamespace(states=np.arange(5)[:,None],children=children,goals=np.array([3]),
+            metadata=dict(split='train',training_goals=1),distance=lambda s,g:truth[s])
+        corpus=PhysicalCorpus.__new__(PhysicalCorpus);corpus.scenes=[scene];corpus.size=5;corpus.offsets=np.array([0,5]);corpus.max_candidates=2
+        data=dict(reserved_relations=np.empty(0,dtype=np.int64))
+        class Scores:
+            def __init__(self,*args):pass
+            def q(self,ids):return ids
+            def scores(self,source,goal):return np.array([0.,0.,10.,1.,0.])[source]
+        with patch('experiments.new_tasks_qmap.src.sokoban_failures.QCache',Scores):
+            summary,bank=mine_fixed_wall_failures(None,corpus,data,'cpu')
+        self.assertEqual(summary['queries'],3);self.assertEqual(summary['solved'],0)
+        self.assertEqual(summary['immediate_dead_decisions'],1)
+        np.testing.assert_array_equal(bank['tasks'],[[0,3],[1,3],[2,3]])
+        np.testing.assert_array_equal(bank['children'],children[:3])
+        self.assertTrue((bank['reason'][:2]&8).all());self.assertTrue(bank['reason'][2]&2)
+        self.assertTrue((bank['reason']&16).any())
+
     def test_current_failures_preserve_broad_points_old_paths_and_complete_resume(self):
         from copy import deepcopy
         from experiments.new_tasks_qmap.src.current_failures import CurrentFailureReplay

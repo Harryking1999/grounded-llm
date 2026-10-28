@@ -3614,5 +3614,83 @@
         "cycles": 2
       }
     }
+  },
+  "current_policy_structure": {
+    "checkpoint_step": 2000,
+    "source_commit": "3da22f2",
+    "states": 42840,
+    "training_goals": 532,
+    "seconds": 11.55188274383545,
+    "totals": {
+      "allowed_training_queries": 747780,
+      "solved": 238976,
+      "finite_cycle_basin": 431276,
+      "unreachable_cycle_basin": 77528,
+      "wrong_first_action": 94806,
+      "immediate_dead_choice": 9825,
+      "cycle_contexts": 47883,
+      "walk_cycle_contexts": 47883,
+      "cycle_with_boxes_already_matching_goal": 36,
+      "cycle_all_optimal_actions_push": 7252,
+      "cycle_all_optimal_actions_walk": 39033
+    },
+    "optimal_transition_fit": {
+      "optimal_walk": {
+        "edges": 697167,
+        "nonpositive_predicted_drop": 124620,
+        "mean_absolute_drop_error": 0.578802745004414
+      },
+      "optimal_push": {
+        "edges": 168900,
+        "nonpositive_predicted_drop": 34446,
+        "mean_absolute_drop_error": 1.1504012934084542
+      }
+    },
+    "original_training_goals": {
+      "count": 198,
+      "solved": 44,
+      "cycles": 154,
+      "entered_unreachable": 36
+    },
+    "critical_bank_contexts": 57708,
+    "condition": "Frozen independent400input128D directed-max Q; every legal successor; exact labels inspect policy after selection; training-only cycle/dead bank",
+    "raw_root": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/sokoban_targeted_20261028",
+    "validation": {
+      "sampling": {
+        "mining": {
+          "queries": 747780,
+          "solved": 238976,
+          "cycles": 508804,
+          "immediate_dead_decisions": 9825,
+          "cycle_decisions": 47883,
+          "critical_decisions": 57708,
+          "continuation_decisions": 8806,
+          "bank_decisions": 65434,
+          "full_permitted_training_graph": true,
+          "all_legal_candidates_preserved": true
+        },
+        "seconds": 12.04518747329712,
+        "sampling": {
+          "batches": 2000,
+          "critical_minimum_draws": 3,
+          "continuation_minimum_draws": 7,
+          "critical_never_drawn": 0,
+          "continuation_never_drawn": 0
+        },
+        "old_full_continuation_valid": true
+      },
+      "native_update": {
+        "step": 2002,
+        "optimizer_step": 2002,
+        "current_failure_draws": 512,
+        "current_failure_coverage_present": true,
+        "original_relation_coverage_restored": true,
+        "seconds": 17.753989934921265,
+        "point_pairs_per_batch": 32768,
+        "complete_decisions_per_batch": 8192,
+        "supplementary_decisions_per_batch": 256,
+        "formal": false
+      }
+    }
   }
 }

@@ -77,7 +77,7 @@
       ],
       "balance_layouts": true,
       "layouts_per_batch": 64,
-      "preparation_workers": 1
+      "preparation_workers": 8
     },
     "trace_write_workers": 1,
     "action_edge_fraction": 0.25,
@@ -101,6 +101,7 @@
       "queries": "all",
       "ranking_fraction": 0.03125,
       "critical_fraction": 0.75,
+      "coverage_fraction": 0.5,
       "distance_bin_upper_bounds": [
         1,
         5,

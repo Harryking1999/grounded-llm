@@ -15310,6 +15310,67 @@
           "success_rate": 0.0556640625
         }
       }
+    },
+    "hierarchical_exposure_probe": {
+      "simulated_batches": 2000,
+      "total_draws": 512000,
+      "theory": {
+        "critical": {
+          "contexts": 35650,
+          "min_expected_draws": 0.024245638626333037,
+          "median_expected_draws": 0.20320040640081283,
+          "expected_unseen_from_own_quota": 22450.65185057282
+        },
+        "continuation": {
+          "contexts": 22109,
+          "min_expected_draws": 0.40680120769108535,
+          "median_expected_draws": 2.293906810035842,
+          "expected_unseen_from_own_quota": 3262.3024195136563
+        }
+      },
+      "critical_never_drawn": 22369,
+      "all_contexts_never_drawn": 25360,
+      "critical_draw_quantiles": [
+        0.0,
+        0.0,
+        0.0,
+        11.0,
+        1682.0
+      ],
+      "seconds": 9.924415588378906
+    },
+    "coverage_sampling_validation": {
+      "sampling": {
+        "batches": 2000,
+        "added_contexts": 512000,
+        "critical_contexts": 35650,
+        "continuation_contexts": 22109,
+        "critical_never_drawn": 0,
+        "continuation_never_drawn": 0,
+        "minimum_critical_draws": 5,
+        "minimum_continuation_draws": 2,
+        "coverage": {
+          "fraction": 0.5,
+          "critical_passes": 5.385694249649369,
+          "continuation_passes": 2.894748744855036,
+          "minimum_critical_draws": 5,
+          "minimum_continuation_draws": 2
+        },
+        "default_ten_batches_and_rng_equal": true,
+        "resume_ten_batches_equal": true,
+        "seconds": 7.576765775680542
+      },
+      "preparation": {
+        "scenes": 4,
+        "states": 9233,
+        "point_relations": 159808,
+        "decision_relations": 151484,
+        "workers": [
+          1,
+          8
+        ],
+        "banks_groups_counts_ten_batches_and_rng_equal": true
+      }
     }
   }
 }

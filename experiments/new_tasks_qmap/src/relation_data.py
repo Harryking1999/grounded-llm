@@ -276,7 +276,8 @@ class BoardRelationSampler:
                 return result
             return local_groups(0,len(rows))
         def counts(labels,allowed):
-            return {f'({-1 if j==0 else float(edges[j-1])},{float(upper)}]':int((allowed & (np.searchsorted(edges,labels)==j)).sum())
+            values=np.bincount(np.searchsorted(edges,labels)[allowed],minlength=len(edges))
+            return {f'({-1 if j==0 else float(edges[j-1])},{float(upper)}]':int(values[j])
                     for j,upper in enumerate(edges)}
         self.point_groups=groups(point_labels,np.ones(len(point_labels),bool),self.points)
         self.unreachable_groups=(groups(np.zeros(len(self.unreachable_points),dtype=np.float32),

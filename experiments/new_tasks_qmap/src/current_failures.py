@@ -3,6 +3,7 @@ from copy import deepcopy
 from pathlib import Path
 import numpy as np
 from grounded_llm.core.files import atomic_json
+from grounded_llm.core.qmap.sampling import CoverageSampler
 from .relation_data import FailureReplaySampler, BoardRelationSampler
 
 
@@ -10,6 +11,9 @@ class CurrentFailureReplay:
     def __init__(self, corpus, data, options, seed, out, state=None):
         self.corpus, self.data, self.options, self.out = corpus, data, options, Path(out)
         self.rng = np.random.default_rng(seed)
+        self.coverage_rng = np.random.default_rng(seed+1000003)
+        self.coverage_fraction = options.get('coverage_fraction',0.)
+        if not 0<=self.coverage_fraction<=1:raise ValueError('Coverage fraction must be between zero and one')
         self.round = 0
         self.last_refresh = options.get('initial_step',0)
         self.total_draws = 0
@@ -23,6 +27,9 @@ class CurrentFailureReplay:
             self.draws = state['draws'].copy()
             self.rng.bit_generator.state = deepcopy(state['rng'])
             self.round, self.last_refresh, self.total_draws = state['round'], state['last_refresh'], state['total_draws']
+            if self.coverage_fraction and state.get('coverage'):
+                for sampler,saved in zip(self.coverage_samplers,state['coverage']['samplers']):sampler.load_state_dict(saved)
+                self.coverage_rng.bit_generator.state=deepcopy(state['coverage']['rng'])
         self.save_bank()
 
     def save_bank(self):
@@ -35,6 +42,18 @@ class CurrentFailureReplay:
         self.bank = bank
         self.sampler = FailureReplaySampler(self.corpus, self.data, bank, self.options)
         self.draws = np.zeros(len(self.sampler.tasks), dtype=np.uint32)
+        if self.coverage_fraction:
+            self.coverage_ids=[np.flatnonzero((self.sampler.reason&mask)>0) for mask in (15,16)]
+            self.coverage_samplers=[CoverageSampler(np.zeros(len(ids),dtype=np.uint8),self.coverage_rng,len(ids),1.)
+                                    for ids in self.coverage_ids]
+
+    def draw_contexts(self,nc,nr):
+        parts=[]
+        for i,(groups,count) in enumerate(zip((self.sampler.critical,self.sampler.continuations),(nc,nr))):
+            coverage=round(count*self.coverage_fraction)
+            if coverage:parts.append(self.coverage_ids[i][self.coverage_samplers[i].draw(coverage)])
+            parts.append(BoardRelationSampler._draw(groups,count-coverage,self.rng,self.options.get('layouts_per_batch')))
+        return np.concatenate(parts)
 
     def apply(self, pairs, point_indices, tasks, rank_indices, point_index, rank_index,
               point_origin, rank_origin, finite_fraction):
@@ -44,8 +63,7 @@ class CurrentFailureReplay:
         limit = int(retained[0]) if len(retained) else len(tasks)
         if n > limit: raise ValueError('Current failures exceed the non-path ranking quota')
         nc = round(n*self.options['critical_fraction'])
-        ids = np.r_[BoardRelationSampler._draw(self.sampler.critical, nc, self.rng, self.options.get('layouts_per_batch')),
-                    BoardRelationSampler._draw(self.sampler.continuations, n-nc, self.rng, self.options.get('layouts_per_batch'))]
+        ids = self.draw_contexts(nc,n-nc)
         self.rng.shuffle(ids)
         count = n+int((self.sampler.children[ids]>=0).sum())
         prefix = len(pairs)-round(len(pairs)*finite_fraction)
@@ -89,9 +107,19 @@ class CurrentFailureReplay:
             step=step,solved=metrics['solved'],queries=metrics['count'],cycles=metrics['cycles'],mining=summary))
 
     def state_dict(self):
-        return dict(bank=self.bank,draws=self.draws.copy(),rng=deepcopy(self.rng.bit_generator.state),
+        state=dict(bank=self.bank,draws=self.draws.copy(),rng=deepcopy(self.rng.bit_generator.state),
                     round=self.round,last_refresh=self.last_refresh,total_draws=self.total_draws)
+        if self.coverage_fraction:
+            state['coverage']=dict(rng=deepcopy(self.coverage_rng.bit_generator.state),
+                                   samplers=[sampler.state_dict() for sampler in self.coverage_samplers])
+        return state
 
     def report(self):
-        return dict(**self.sampler.summary,refresh_round=self.round,last_refresh=self.last_refresh,
+        result=dict(**self.sampler.summary,refresh_round=self.round,last_refresh=self.last_refresh,
                     total_context_draws=self.total_draws,unique_current_bank_contexts=int((self.draws>0).sum()))
+        if self.coverage_fraction:
+            result['coverage']=dict(fraction=self.coverage_fraction,
+                critical_passes=self.coverage_samplers[0].passes,continuation_passes=self.coverage_samplers[1].passes,
+                minimum_critical_draws=int(self.draws[self.coverage_ids[0]].min()),
+                minimum_continuation_draws=int(self.draws[self.coverage_ids[1]].min()))
+        return result

@@ -73,6 +73,9 @@ class ConvergenceTests(unittest.TestCase):
             current_failure_replay=dict(queries=4096,contexts_per_batch=256,refresh_every=2000)))
         new=deepcopy(old);new['training']['steps']=60000
         new['training']['current_failure_replay']['queries']='all'
+        new['training']['current_failure_replay']['coverage_fraction']=.5
+        new['training']['relation_sampling']=dict(preparation_workers=8)
+        old['training']['relation_sampling']=dict(preparation_workers=1)
         new['continuation']=dict(mode='current_failure_coverage')
         validate_continuation(old,new,40000)
         for key,value in [('batch_size',128),('rank_weight',1.),('steps',39000)]:

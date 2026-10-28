@@ -100,11 +100,16 @@ def validate_continuation(previous,current,step):
         # for every pending trace and preserve optimizer/sampling/RNG state.
         workers=item['training'].pop('trace_write_workers',0)
         if workers not in (0,1):raise ValueError('Only synchronous or one-worker trace writing is supported')
+        preparation=item['training'].get('relation_sampling',{}).pop('preparation_workers',1)
+        if not 1<=preparation<=32:raise ValueError('Preparation workers must be between1 and32')
     if failure_coverage:
         before=old['training'].get('current_failure_replay',{})
         after=new['training'].get('current_failure_replay',{})
         if not before or before.get('queries')=='all' or after.get('queries')!='all':
             raise ValueError('Failure coverage continuation expands the existing training-root query pool')
+        coverage=after.pop('coverage_fraction',0.)
+        if not 0<=coverage<=1:raise ValueError('Failure coverage fraction must be between zero and one')
+        if 'coverage_fraction' in before:after['coverage_fraction']=coverage
         if not step<=old['training']['steps']<=new['training']['steps'] or step>=new['training']['steps']:
             raise ValueError('Failure coverage continuation preserves remaining updates or explicitly extends them')
         after['queries']=before['queries'];new['training']['steps']=old['training']['steps']

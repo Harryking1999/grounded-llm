@@ -842,8 +842,8 @@ class ExactPairTests(unittest.TestCase):
         bank=dict(**materialize(corpus,rows),reason=np.array([9,9,16],dtype=np.uint8))
         with tempfile.TemporaryDirectory() as temp:
             out=Path(temp);np.savez(out/'bank.npz',**bank)
-            options=dict(bank='bank.npz',contexts_per_batch=2,refresh_every=2000,initial_step=8000,
-                ranking_fraction=.25,critical_fraction=.5,distance_bin_upper_bounds=[1,5],queries=4)
+            options=dict(bank='bank.npz',contexts_per_batch=4,refresh_every=2000,initial_step=8000,
+                ranking_fraction=.25,critical_fraction=.5,coverage_fraction=.5,distance_bin_upper_bounds=[1,5],queries=4)
             replay=CurrentFailureReplay(corpus,data,options,71,out)
             pairs=np.tile([0,3],(64,1));tasks=np.tile([0,3],(8,1));tasks[-2:]=[[1,3],[2,3]]
             po=np.zeros(64,dtype=np.uint8);po[-2:]=1
@@ -854,7 +854,7 @@ class ExactPairTests(unittest.TestCase):
             np.testing.assert_array_equal(result[0][-2:],pairs[-2:])
             np.testing.assert_array_equal(result[2][-2:],tasks[-2:])
             np.testing.assert_array_equal(result[5][-2:],ro[-2:])
-            self.assertEqual(int((result[5]==6).sum()),2)
+            self.assertEqual(int((result[5]==6).sum()),4)
             point_rows={tuple(x) for x in result[0][result[4]==6]}
             for s,g in result[2][result[5]==6]:
                 self.assertIn((s,g),point_rows)
@@ -867,6 +867,8 @@ class ExactPairTests(unittest.TestCase):
             for a,b in zip(expected,actual):np.testing.assert_array_equal(a,b)
             self.assertEqual(replay.state_dict()['rng'],restored.state_dict()['rng'])
             np.testing.assert_array_equal(replay.draws,restored.draws)
+            self.assertEqual(replay.state_dict()['coverage']['rng'],restored.state_dict()['coverage']['rng'])
+            self.assertGreater(replay.report()['coverage']['critical_passes'],0)
 
     def test_board_preparation_keeps_symmetric_protected_relations(self):
         from experiments.new_tasks_qmap.src.relation_data import BoardRelationSampler
@@ -909,7 +911,7 @@ class ExactPairTests(unittest.TestCase):
             training=dict(steps=4,batch_size=64,decision_batch_size=16,learning_rate=.0001,rank_weight=1.,
                 rank_temperature=1.,eval_every=2,cpu_threads=1,unreachable_target=15.,record_training_samples=True,
                 relation_sampling=dict(finite_point_fraction=.75,boundary_rank_fraction=0.,distance_bin_upper_bounds=[1,5]),
-                failure_replay=opts,current_failure_replay=dict(opts,contexts_per_batch=1,refresh_every=2,initial_step=0,queries='all')),
+                failure_replay=opts,current_failure_replay=dict(opts,contexts_per_batch=4,refresh_every=2,initial_step=0,queries='all',coverage_fraction=.5)),
             evaluation=dict(decision_count=4,rollout_count=1,horizon=8))
         prepared=(corpus,data,dict(states=corpus.size))
         original_save=__import__('experiments.new_tasks_qmap.src.relations',fromlist=['atomic_save']).atomic_save
@@ -929,6 +931,7 @@ class ExactPairTests(unittest.TestCase):
             self.assertEqual(a['current_failure_state']['rng'],b['current_failure_state']['rng'])
             self.assertEqual(a['current_failure_state']['round'],b['current_failure_state']['round'])
             np.testing.assert_array_equal(a['current_failure_state']['draws'],b['current_failure_state']['draws'])
+            self.assertEqual(a['current_failure_state']['coverage']['rng'],b['current_failure_state']['coverage']['rng'])
             self.assertEqual(json.loads((root/'full/current_failures_0001.json').read_text())['queries'],1)
 
     def test_trajectory_progress_checks_do_not_change_greedy_selection(self):

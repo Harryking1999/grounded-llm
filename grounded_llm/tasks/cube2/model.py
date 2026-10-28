@@ -15,7 +15,8 @@ def distance(source, goal, metric="l1", group_size=8):
 
 
 class QMap(StateEncoder):
-    def __init__(self, feature_dim, dimension, hidden, cap, metric="l1", group_size=8, symmetry=None):
+    def __init__(self, feature_dim, dimension, hidden, cap, metric="l1", group_size=8, symmetry=None,
+                 inverse_symmetry=False):
         if metric not in ("l1", "linf", "l2", "max_l1"):
             raise ValueError(f"Unknown Q distance: {metric}")
         if metric == "max_l1" and (group_size < 1 or dimension % group_size):
@@ -24,6 +25,11 @@ class QMap(StateEncoder):
         if symmetry not in (None, "cube_axis_permutation_average"):
             raise ValueError(f"Unknown Q symmetry: {symmetry}")
         self.symmetry = symmetry
+        self.inverse_symmetry = inverse_symmetry
+        if inverse_symmetry:
+            if feature_dim != 192:raise ValueError('Cube inverse projection requires192corner features')
+            from grounded_llm.tasks.cube2.symmetry import inverse_feature_indices
+            self.register_buffer('inverse_feature_gather',torch.as_tensor(inverse_feature_indices()),persistent=False)
         if symmetry is not None:
             if feature_dim != 192 or dimension != 128 or metric != "linf":
                 raise ValueError("Cube axis projection requires 192 inputs, 128 Q channels and Linf")
@@ -34,6 +40,12 @@ class QMap(StateEncoder):
                 self.register_buffer(name, torch.as_tensor(value), persistent=False)
 
     def encode(self, bits):
+        direct=self._encode_axes(bits)
+        if self.inverse_symmetry:
+            direct=.5*(direct+self._encode_axes(bits[...,self.inverse_feature_gather]))
+        return direct
+
+    def _encode_axes(self,bits):
         if self.symmetry is None:
             return super().encode(bits)
         presented = bits[..., self.axis_feature_gather]
@@ -54,6 +66,8 @@ class MapReader(EnvironmentQMap):
             raise ValueError("Expected a pure-Q checkpoint")
         if saved["task"] != env.name or saved["actions"] != list(env.actions):
             raise ValueError("Checkpoint belongs to a different task/action convention")
+        if saved['model_config'].get('inverse_symmetry') and coordinate_frame!='goal_relative':
+            raise ValueError('Inverse-projected Q is a goal-relative restoration map')
         model = QMap(env.feature_dim, **saved["model_config"], cap=saved["cap"]).to(device)
         model.load_state_dict(saved["model"])
         super().__init__(env, model, device)

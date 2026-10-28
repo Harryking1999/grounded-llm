@@ -10,4 +10,4 @@
 
 读取入口为 `grounded_llm.tasks.cube2.model.MapReader`。默认 `coordinate_frame="absolute"`；`coordinate_frame="goal_relative"` 在 `scores`／`choose` 中使用已知群运算转换到复原问题。两者共享同一权重，目标相对坐标条件单独标注。
 
-目标相对读取可加 `inverse_average=True`，对正反两个相对坐标的复原距离取均值，使状态对的读出距离对称；每个合法候选使用两次Q查询。`encode`继续提供原128维状态向量。这一额外读取条件的同权重比较见实验报告。
+新结构在模型配置中启用 `inverse_symmetry=true`，编码器内部对正反相对状态的Q向量求均值，严格保证 `Q(r)=Q(r⁻¹)`。仍输出128维，读取使用原L∞距离，并以 `coordinate_frame="goal_relative"` 加载。编码器内部处理两种对称呈现；历史距离均值读取 `inverse_average=True` 的对照见实验报告。

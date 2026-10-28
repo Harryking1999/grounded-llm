@@ -81,6 +81,15 @@ class FixedGoalTests(unittest.TestCase):
             changed=deepcopy(after);changed['training'][key]=value
             with self.assertRaises(ValueError):validate_resume_contract(before,changed,True)
 
+    def test_inverse_projection_resume_changes_only_structural_symmetry(self):
+        before={'model':{'dimension':128,'hidden':256},'training':{'epochs':500,'learning_rate':.0001}}
+        after=deepcopy(before);after['model']['inverse_symmetry']=True
+        validate_resume_contract(before,after,enforce_inverse=True)
+        with self.assertRaises(ValueError):validate_resume_contract(before,after)
+        for area,key,value in [('model','dimension',256),('training','epochs',600),('training','learning_rate',.0003)]:
+            changed=deepcopy(after);changed[area][key]=value
+            with self.assertRaises(ValueError):validate_resume_contract(before,changed,enforce_inverse=True)
+
     def test_fragile_correct_replay_keeps_original_total_quota_and_training_boundary(self):
         env=self.env;ids=np.arange(env.size);height=env.depth.astype(float)
         height[3]=10.;height[6]=4.15

@@ -10,6 +10,34 @@ from grounded_llm.tasks.cube2.model import MODEL_TYPE, MapReader, QMap
 
 
 class AxisSymmetryTests(unittest.TestCase):
+    def test_inverse_feature_projection_and_encoder_commute_with_axis_actions(self):
+        from grounded_llm.tasks.cube2.symmetry import inverse_feature_indices
+        env=Cube2(metric='QTM_URF_6');ids=np.random.default_rng(54).integers(env.size,size=512)
+        inv=env.relative(ids,0);features=env.features(ids);gather=inverse_feature_indices()
+        np.testing.assert_array_equal(features[...,gather],env.features(inv))
+        np.testing.assert_array_equal(gather[gather],np.arange(192))
+        torch.set_num_threads(1)
+        model=QMap(192,128,16,14,'linf',symmetry='cube_axis_permutation_average',inverse_symmetry=True)
+        bits=torch.as_tensor(features);inverse=torch.as_tensor(env.features(inv))
+        q=model.encode(bits);qi=model.encode(inverse)
+        self.assertEqual(q.shape,(512,128));torch.testing.assert_close(q,qi,rtol=0,atol=0)
+        for axis in range(6):
+            transformed=torch.as_tensor(env.features(env.axis_symmetry(ids,axis)))
+            torch.testing.assert_close(model.encode(transformed),q[...,model.axis_output_action[axis]],rtol=1e-5,atol=1e-6)
+        model.encode(bits[:4]).sum().backward()
+        self.assertTrue(all(p.grad is not None and torch.isfinite(p.grad).all() for p in model.parameters()))
+        with tempfile.TemporaryDirectory() as temp:
+            checkpoint=Path(temp)/'projected.pt'
+            torch.save(dict(model_type=MODEL_TYPE,task=env.name,actions=list(env.actions),cap=14,
+                model_config=dict(dimension=128,hidden=16,metric='linf',symmetry='cube_axis_permutation_average',inverse_symmetry=True),
+                model=model.state_dict()),checkpoint)
+            reader=MapReader(env,checkpoint,coordinate_frame='goal_relative')
+            torch.testing.assert_close(reader.encode(ids),q,rtol=0,atol=0)
+            self.assertFalse(reader.inverse_average)
+            children=env.successors(ids[:8]);scores=reader.scores(children.ravel(),[0]).reshape(8,6)
+            self.assertTrue(np.isfinite(scores).all())
+            with self.assertRaises(ValueError):MapReader(env,checkpoint)
+
     def test_goal_relative_reader_preserves_actions_and_restoration_without_oracle(self):
         env=Cube2(metric="QTM_URF_6")
         source,goal=np.random.default_rng(32).integers(env.size,size=(2,1000))

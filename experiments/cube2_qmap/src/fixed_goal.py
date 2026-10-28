@@ -266,7 +266,11 @@ def failure_pool(env, heldout, pointer, *, predicted=None, retention_fraction=0.
     return parents,weights,report
 
 
-def validate_resume_contract(previous, current, retarget_replay=False):
+def validate_resume_contract(previous, current, retarget_replay=False, enforce_inverse=False):
+    previous,current=deepcopy(previous),deepcopy(current)
+    if enforce_inverse:
+        if previous['model'].pop('inverse_symmetry',False) or current['model'].pop('inverse_symmetry',False) is not True:
+            raise ValueError('Inverse projection continuation must explicitly enable the structural symmetry')
     if retarget_replay:
         previous, current = deepcopy(previous), deepcopy(current)
         previous['training'].pop('failure_cycle_fraction',None)
@@ -319,11 +323,12 @@ def main():
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--resume-run", type=Path)
     parser.add_argument('--retarget-replay',action='store_true',help='Change only the cycle replay quota at a complete epoch')
+    parser.add_argument('--enforce-inverse',action='store_true',help='Enable exact inverse-vector projection at a complete epoch')
     parser.add_argument('--checkpoint',type=Path,help='Warm-start a new fixed-goal condition with its Adam state')
     parser.add_argument('--devices',nargs='+')
     parser.add_argument("--smoke-steps", type=int, default=0)
     args = parser.parse_args()
-    if args.retarget_replay and args.resume_run is None:raise ValueError('Replay retargeting requires a complete run to resume')
+    if (args.retarget_replay or args.enforce_inverse) and args.resume_run is None:raise ValueError('Structural or replay continuation requires a complete run to resume')
     config = json.loads(args.contract.read_text())
     if config["rules"]["fixed_goal"] != 0:
         raise ValueError("This task is restoration to canonical solved state zero")
@@ -351,7 +356,7 @@ def main():
         if saved.get('fixed_goal') == 0 and 'rng' in saved:
             rng.bit_generator.state = saved['rng']
     if args.resume_run:
-        validate_resume_contract(json.loads((args.resume_run / "contract.json").read_text()),config,args.retarget_replay)
+        validate_resume_contract(json.loads((args.resume_run / "contract.json").read_text()),config,args.retarget_replay,args.enforce_inverse)
         saved = torch.load(args.resume_run / "last.pt", map_location="cpu", weights_only=False)
         starting_epoch, starting_step = saved["epoch"], saved.get('continuation_step',saved['step'])
         parent = saved.get('parent')
@@ -363,7 +368,7 @@ def main():
         rng.bit_generator.state = saved["rng"]
         if saved.get('failure_replay'):
             replay_parents, replay_probabilities, replay_report = saved['failure_replay']
-        if args.retarget_replay:replay_report={}
+        if args.retarget_replay or args.enforce_inverse:replay_report={}
     args.out.mkdir(parents=True, exist_ok=False)
     (args.out / "contract.json").write_text(json.dumps(config, indent=2) + "\n")
     np.savez_compressed(args.out / "split.npz", mask=mask, **cohorts)
@@ -384,7 +389,7 @@ def main():
         if options['paths_per_batch']:raise ValueError('Device-resident restoration uses solved-goal labels only')
         parallel = FixedGoalReplicas(model,env,heldout,args.devices)
     best_validation = (-1,float('-inf'))
-    if args.resume_run:
+    if args.resume_run and not args.enforce_inverse:
         previous_summary=json.loads((args.resume_run/'summary.json').read_text())
         best_validation=tuple(previous_summary.get('best_validation') or max(
             (row['metrics']['validation']['rollout']['solved'],-row['metrics']['validation']['pairs']['mae'])
@@ -489,7 +494,8 @@ def main():
             save(completed)
             if args.smoke_steps:
                 break
-            if (options.get('stop_on_target') and completed >= options.get('minimum_epochs',0)
+            minimum=options.get('minimum_epochs',0)+(starting_epoch if args.enforce_inverse else 0)
+            if (options.get('stop_on_target') and completed >= minimum
                     and result['last'].get('target_met')):
                 result['stopped_on_target'] = True
                 break

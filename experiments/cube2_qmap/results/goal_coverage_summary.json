@@ -4964,5 +4964,60 @@
       },
       "direct_reader_rollouts_match_cached_policy": 16
     }
+  },
+  "forced_inverse_vector_projection": {
+    "evaluation": {
+      "epoch": 464,
+      "optimizer_step": 66366,
+      "baseline": {
+        "solved": 3321700,
+        "count": 3674160,
+        "success_rate": 0.904070590284582
+      },
+      "forced_vector_projection": {
+        "solved": 3403967,
+        "count": 3674160,
+        "success_rate": 0.92646128638927
+      },
+      "projection_encode_and_policy_seconds": 4.667751312255859,
+      "fixed_cohorts": {
+        "original": {
+          "count": 500,
+          "baseline": 454,
+          "forced": 457
+        },
+        "small_ood": {
+          "count": 500,
+          "baseline": 451,
+          "forced": 459
+        },
+        "validation": {
+          "count": 500,
+          "baseline": 454,
+          "forced": 467
+        },
+        "test": {
+          "count": 500,
+          "baseline": 460,
+          "forced": 461
+        }
+      },
+      "q_dimension": 128,
+      "network_parameters_unchanged": true,
+      "maximum_inverse_vector_difference": 0.0
+    },
+    "resume_validation": {
+      "parent_epoch": 470,
+      "parent_optimizer_step": 66708,
+      "new_optimizer_step": 66709,
+      "optimizer_counter": 66709,
+      "q_dimension": 128,
+      "inverse_symmetry": true,
+      "rng_present": true,
+      "formal": false
+    },
+    "raw_parent": "/tmp/qmaps_resume_40645_ee701ee/cube/forced_inverse_parent.pt",
+    "persistent_root": "/zhanghanyue/experiment/grounded_llm_puzzle_qmaps/runs/cube_relative_goal_20261028/resume_40645_ee701ee",
+    "definition": "Qsym(r)=(Qaxis(r)+Qaxis(r^-1))/2; exact inverse-invariant128D output, original Linf readout"
   }
 }

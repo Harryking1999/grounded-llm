@@ -4,6 +4,11 @@ import numpy as np
 from grounded_llm.tasks.cube2.environment import Cube2
 
 
+def inverse_feature_indices():
+    """The inverse swaps position/piece and negates each corner twist."""
+    return np.arange(192).reshape(8,8,3).transpose(1,0,2)[...,[0,2,1]].ravel()
+
+
 def axis_projection_indices():
     env = Cube2(metric="QTM_URF_6")
     maps = env.axis_corner_map

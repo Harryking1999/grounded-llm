@@ -81,9 +81,10 @@ class QScorer:
         if self.coordinate_frame == "goal_residual":
             # A legal removal preserving G acts on S\G exactly as a clearing
             # removal. Losing any goal cell is irreversible under these rules.
-            valid = np.asarray([(mask & goal) == goal for mask in masks])
+            goals=np.broadcast_to(np.asarray(goal,dtype=object),(len(masks),))
+            valid = np.asarray([(mask & target) == target for mask,target in zip(masks,goals)],dtype=bool)
             result = np.full(len(masks), np.inf, dtype=np.float32)
-            residual = [mask ^ goal for mask, keep in zip(masks, valid) if keep]
+            residual = [mask ^ target for mask,target,keep in zip(masks,goals,valid) if keep]
             if residual:
                 result[valid] = self.absolute_scores(residual, 0)
             return result

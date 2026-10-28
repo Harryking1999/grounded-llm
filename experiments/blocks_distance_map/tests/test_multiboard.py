@@ -21,6 +21,10 @@ class MultiboardTests(unittest.TestCase):
             torch.save(dict(config={'model':dict(state_dim=8,encoder_hidden_dim=16)},
                 cap=13,metric=model.metric,model=model.state_dict(),source_commit='fixture',step=0),path)
             raw=QScorer(path,'cpu');relative=QScorer(path,'cpu',coordinate_frame='goal_residual')
+            masks=[63,31,47,0];goals=[3,3,15,1]
+            batch=relative.scores(masks,goals)
+            for i,(source,goal) in enumerate(zip(masks,goals)):
+                np.testing.assert_array_equal(batch[i:i+1],relative.scores([source],goal))
             for source in range(64):
                 children=[s for _,s in successors(source)]
                 np.testing.assert_array_equal(relative.scores(children,0),raw.scores(children,0))

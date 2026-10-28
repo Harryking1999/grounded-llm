@@ -858,14 +858,40 @@ class ExactPairTests(unittest.TestCase):
             def __init__(self,*args):pass
             def q(self,ids):return ids
             def scores(self,source,goal):return np.array([0.,0.,10.,1.,0.])[source]
+        records=[]
         with patch('experiments.new_tasks_qmap.src.sokoban_failures.QCache',Scores):
-            summary,bank=mine_fixed_wall_failures(None,corpus,data,'cpu')
+            summary,bank=mine_fixed_wall_failures(None,corpus,data,'cpu',policy_records=records)
         self.assertEqual(summary['queries'],3);self.assertEqual(summary['solved'],0)
         self.assertEqual(summary['immediate_dead_decisions'],1)
         np.testing.assert_array_equal(bank['tasks'],[[0,3],[1,3],[2,3]])
         np.testing.assert_array_equal(bank['children'],children[:3])
         self.assertTrue((bank['reason'][:2]&8).all());self.assertTrue(bank['reason'][2]&2)
         self.assertTrue((bank['reason']&16).any())
+        np.testing.assert_array_equal(records[0]['tasks'],[[0,3],[1,3],[2,3]])
+        np.testing.assert_array_equal(records[0]['successor'],[1,0,4])
+        self.assertEqual(int(records[0]['solved'].sum()),summary['solved'])
+
+    def test_paired_sokoban_tracking_exposes_losses_hidden_by_equal_success_counts(self):
+        from experiments.new_tasks_qmap.src.sokoban_tracking import paired_summary,evaluation_retention
+        tasks=np.column_stack([np.arange(5),np.full(5,9)])
+        before=dict(tasks=tasks,distance=np.arange(1,6),solved=np.array([1,1,1,0,0],bool),
+            cycle_member=np.array([0,0,0,1,1],bool),successor=np.array([9,9,9,4,3]),
+            dead_basin=np.zeros(5,bool),budget_exhausted=np.zeros(5,bool),optimal_action=np.array([1,1,1,0,0],bool))
+        after={**before,'solved':np.array([1,0,0,1,1],bool),'cycle_member':np.array([0,1,0,0,0],bool),
+            'successor':np.array([9,8,7,9,9]),'dead_basin':np.array([0,0,1,0,0],bool),'optimal_action':np.array([1,0,0,1,1],bool)}
+        result=paired_summary(before,after)
+        self.assertEqual(result['before_solved'],result['after_solved'])
+        self.assertEqual(result['previously_solved_lost'],2);self.assertEqual(result['newly_solved'],2)
+        self.assertEqual(result['previously_solved_retained'],1)
+        self.assertEqual(result['lost_to_dead_basin'],1);self.assertEqual(result['lost_to_finite_cycle'],1)
+        self.assertEqual(result['cycle_identities'],dict(before=1,after=1,persistent=0,disappeared=1,new=1))
+        self.assertEqual(result['original_cycle_contexts']['now_solved'],2)
+        old_eval=dict(tasks=tasks,solved=before['solved'],dead=np.zeros(5,bool),cycles=before['cycle_member'])
+        new_eval=dict(tasks=tasks,solved=after['solved'],dead=after['dead_basin'],cycles=after['cycle_member'])
+        held=evaluation_retention({'held_goal':old_eval},{'held_goal':new_eval})['held_goal']
+        self.assertEqual(held['newly_solved'],2);self.assertEqual(held['previously_solved_lost'],2)
+        self.assertEqual(held['lost_entered_unreachable'],1)
+        with self.assertRaises(ValueError):paired_summary(before,{**after,'tasks':tasks[::-1]})
 
     def test_sokoban_failed_branch_continuation_preserves_original_supervision(self):
         from copy import deepcopy

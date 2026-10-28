@@ -4263,5 +4263,332 @@
     },
     "condition": "Frozen21000 model. Actual exposure covers12001-21000. Gradient checks use fixed weights and Adam moments on actual20999-21000 batches, with zero optimizer updates. Prefix groups are prepared offline while the current32000-step training condition continues.",
     "raw_root": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/sokoban_failed_branches_20261029/analysis_coverage_20261029"
+  },
+  "paired_policy_tracking": {
+    "snapshots": [
+      {
+        "step": 12000,
+        "source_commit": "72ec344888cae73c38d97719113268a901115783",
+        "queries": 747780,
+        "solved": 345490,
+        "success_rate": 0.462020915242451,
+        "two_cycle_contexts": 35035,
+        "two_cycle_identities": 17518,
+        "unreachable_basins": 52968,
+        "budget_exhausted": 0
+      },
+      {
+        "step": 21000,
+        "source_commit": "5a57762aad163b2270fb96469ce0e47c5f9b0258",
+        "queries": 747780,
+        "solved": 406214,
+        "success_rate": 0.5432266174543315,
+        "two_cycle_contexts": 29600,
+        "two_cycle_identities": 14800,
+        "unreachable_basins": 43266,
+        "budget_exhausted": 0
+      },
+      {
+        "step": 29000,
+        "source_commit": "5a57762aad163b2270fb96469ce0e47c5f9b0258",
+        "queries": 747780,
+        "solved": 441415,
+        "success_rate": 0.5903006231779401,
+        "two_cycle_contexts": 27588,
+        "two_cycle_identities": 13794,
+        "unreachable_basins": 34153,
+        "budget_exhausted": 0
+      },
+      {
+        "step": 25000,
+        "source_commit": "5a57762aad163b2270fb96469ce0e47c5f9b0258",
+        "queries": 747780,
+        "solved": 421024,
+        "success_rate": 0.5630319077803632,
+        "two_cycle_contexts": 28648,
+        "two_cycle_identities": 14324,
+        "unreachable_basins": 39100,
+        "budget_exhausted": 0
+      }
+    ],
+    "comparisons": [
+      {
+        "before": 0,
+        "after": 2,
+        "queries": 747780,
+        "before_solved": 345490,
+        "after_solved": 441415,
+        "newly_solved": 145612,
+        "previously_solved_lost": 49687,
+        "previously_solved_retained": 295803,
+        "retention_rate": 0.8561839705924918,
+        "lost_to_dead_basin": 1236,
+        "lost_to_budget": 0,
+        "lost_to_finite_cycle": 48451,
+        "cycle_identities": {
+          "before": 17518,
+          "after": 13794,
+          "persistent": 4914,
+          "disappeared": 12604,
+          "new": 8880
+        },
+        "original_cycle_contexts": {
+          "count": 35035,
+          "now_solved": 11878,
+          "same_cycle": 9828,
+          "different_two_cycle": 1887,
+          "left_two_cycle_but_still_failed": 11442
+        },
+        "previously_correct_first_actions_lost": 15585,
+        "evaluation_retention": {
+          "validation": {
+            "queries": 16,
+            "before_solved": 12,
+            "after_solved": 16,
+            "newly_solved": 4,
+            "previously_solved_lost": 0,
+            "previously_solved_retained": 12,
+            "lost_entered_unreachable": 0,
+            "lost_entered_cycle": 0
+          },
+          "test": {
+            "queries": 16,
+            "before_solved": 14,
+            "after_solved": 14,
+            "newly_solved": 1,
+            "previously_solved_lost": 1,
+            "previously_solved_retained": 13,
+            "lost_entered_unreachable": 0,
+            "lost_entered_cycle": 1
+          },
+          "unseen_goal_validation": {
+            "queries": 96,
+            "before_solved": 58,
+            "after_solved": 78,
+            "newly_solved": 25,
+            "previously_solved_lost": 5,
+            "previously_solved_retained": 53,
+            "lost_entered_unreachable": 0,
+            "lost_entered_cycle": 5
+          },
+          "unseen_goal_test": {
+            "queries": 94,
+            "before_solved": 21,
+            "after_solved": 22,
+            "newly_solved": 7,
+            "previously_solved_lost": 6,
+            "previously_solved_retained": 15,
+            "lost_entered_unreachable": 0,
+            "lost_entered_cycle": 6
+          },
+          "original_training_goals": {
+            "queries": 198,
+            "before_solved": 63,
+            "after_solved": 84,
+            "newly_solved": 31,
+            "previously_solved_lost": 10,
+            "previously_solved_retained": 53,
+            "lost_entered_unreachable": 0,
+            "lost_entered_cycle": 10
+          },
+          "original_unseen_goals": {
+            "queries": 4,
+            "before_solved": 2,
+            "after_solved": 3,
+            "newly_solved": 1,
+            "previously_solved_lost": 0,
+            "previously_solved_retained": 2,
+            "lost_entered_unreachable": 0,
+            "lost_entered_cycle": 0
+          }
+        }
+      },
+      {
+        "before": 0,
+        "after": 3,
+        "queries": 747780,
+        "before_solved": 345490,
+        "after_solved": 421024,
+        "newly_solved": 128309,
+        "previously_solved_lost": 52775,
+        "previously_solved_retained": 292715,
+        "retention_rate": 0.8472459405482069,
+        "lost_to_dead_basin": 1522,
+        "lost_to_budget": 0,
+        "lost_to_finite_cycle": 51253,
+        "cycle_identities": {
+          "before": 17518,
+          "after": 14324,
+          "persistent": 5598,
+          "disappeared": 11920,
+          "new": 8726
+        },
+        "original_cycle_contexts": {
+          "count": 35035,
+          "now_solved": 10588,
+          "same_cycle": 11196,
+          "different_two_cycle": 1961,
+          "left_two_cycle_but_still_failed": 11290
+        },
+        "previously_correct_first_actions_lost": 15278,
+        "evaluation_retention": {
+          "validation": {
+            "queries": 16,
+            "before_solved": 12,
+            "after_solved": 14,
+            "newly_solved": 3,
+            "previously_solved_lost": 1,
+            "previously_solved_retained": 11,
+            "lost_entered_unreachable": 0,
+            "lost_entered_cycle": 1
+          },
+          "test": {
+            "queries": 16,
+            "before_solved": 14,
+            "after_solved": 13,
+            "newly_solved": 0,
+            "previously_solved_lost": 1,
+            "previously_solved_retained": 13,
+            "lost_entered_unreachable": 0,
+            "lost_entered_cycle": 1
+          },
+          "unseen_goal_validation": {
+            "queries": 96,
+            "before_solved": 58,
+            "after_solved": 72,
+            "newly_solved": 17,
+            "previously_solved_lost": 3,
+            "previously_solved_retained": 55,
+            "lost_entered_unreachable": 0,
+            "lost_entered_cycle": 3
+          },
+          "unseen_goal_test": {
+            "queries": 94,
+            "before_solved": 21,
+            "after_solved": 18,
+            "newly_solved": 3,
+            "previously_solved_lost": 6,
+            "previously_solved_retained": 15,
+            "lost_entered_unreachable": 0,
+            "lost_entered_cycle": 6
+          },
+          "original_training_goals": {
+            "queries": 198,
+            "before_solved": 63,
+            "after_solved": 81,
+            "newly_solved": 25,
+            "previously_solved_lost": 7,
+            "previously_solved_retained": 56,
+            "lost_entered_unreachable": 0,
+            "lost_entered_cycle": 7
+          },
+          "original_unseen_goals": {
+            "queries": 4,
+            "before_solved": 2,
+            "after_solved": 2,
+            "newly_solved": 0,
+            "previously_solved_lost": 0,
+            "previously_solved_retained": 2,
+            "lost_entered_unreachable": 0,
+            "lost_entered_cycle": 0
+          }
+        }
+      }
+    ],
+    "selected_at_snapshot_step": 29000,
+    "selected_checkpoint_step": 25000,
+    "query_identity_verified": true,
+    "horizon": 256,
+    "optimizer_updates": 0,
+    "cycle_identity": "Complete goal plus the unordered pair of physical states; individual cycle-member contexts are separately counted.",
+    "raw_root": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/sokoban_failed_branches_20261029/tracking_20261029/paired_with_evaluation",
+    "stratified_retention": {
+      "before_step": 12000,
+      "after_step": 29000,
+      "distance_strata": {
+        "1_5": {
+          "queries": 16067,
+          "before_solved": 15869,
+          "after_solved": 16012,
+          "newly_solved": 187,
+          "previously_solved_lost": 44,
+          "previously_solved_retained": 15825
+        },
+        "6_10": {
+          "queries": 72606,
+          "before_solved": 61370,
+          "after_solved": 65954,
+          "newly_solved": 7762,
+          "previously_solved_lost": 3178,
+          "previously_solved_retained": 58192
+        },
+        "11_20": {
+          "queries": 331053,
+          "before_solved": 179928,
+          "after_solved": 222060,
+          "newly_solved": 70079,
+          "previously_solved_lost": 27947,
+          "previously_solved_retained": 151981
+        },
+        "21_40": {
+          "queries": 309127,
+          "before_solved": 83765,
+          "after_solved": 130368,
+          "newly_solved": 64689,
+          "previously_solved_lost": 18086,
+          "previously_solved_retained": 65679
+        },
+        "41_128": {
+          "queries": 18927,
+          "before_solved": 4558,
+          "after_solved": 7021,
+          "newly_solved": 2895,
+          "previously_solved_lost": 432,
+          "previously_solved_retained": 4126
+        }
+      },
+      "boxes_matching_query_goal": {
+        "0": {
+          "queries": 112685,
+          "before_solved": 38193,
+          "after_solved": 53415,
+          "newly_solved": 23246,
+          "previously_solved_lost": 8024,
+          "previously_solved_retained": 30169
+        },
+        "1": {
+          "queries": 310050,
+          "before_solved": 122362,
+          "after_solved": 164304,
+          "newly_solved": 63761,
+          "previously_solved_lost": 21819,
+          "previously_solved_retained": 100543
+        },
+        "2": {
+          "queries": 248494,
+          "before_solved": 126855,
+          "after_solved": 159486,
+          "newly_solved": 49420,
+          "previously_solved_lost": 16789,
+          "previously_solved_retained": 110066
+        },
+        "3": {
+          "queries": 70237,
+          "before_solved": 51852,
+          "after_solved": 57955,
+          "newly_solved": 9137,
+          "previously_solved_lost": 3034,
+          "previously_solved_retained": 48818
+        },
+        "4": {
+          "queries": 6314,
+          "before_solved": 6228,
+          "after_solved": 6255,
+          "newly_solved": 48,
+          "previously_solved_lost": 21,
+          "previously_solved_retained": 6207
+        }
+      }
+    }
   }
 }

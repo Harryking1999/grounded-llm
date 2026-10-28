@@ -4,7 +4,7 @@ from .relation_data import materialize, training_decision_mask
 from .relation_evaluate import QCache
 
 
-def mine_fixed_wall_failures(model,corpus,data,device,maximum_steps=256,include_failed_nonoptimal=False):
+def mine_fixed_wall_failures(model,corpus,data,device,maximum_steps=256,include_failed_nonoptimal=False,policy_records=None):
     if len(corpus.scenes)!=1 or corpus.scenes[0].metadata['split']!='train':
         raise ValueError('Fixed-wall failure mining requires one original training scene')
     scene=corpus.scenes[0];n=corpus.size;ids=np.arange(n)
@@ -25,6 +25,12 @@ def mine_fixed_wall_failures(model,corpus,data,device,maximum_steps=256,include_
         cycle=(nxt[nxt]==ids)&(nxt!=ids)&allowed
         dead=allowed&~np.isfinite(truth[nxt])
         failed_nonoptimal=allowed&~solved&(truth[nxt]+1!=truth)
+        if policy_records is not None:
+            policy_records.append(dict(tasks=rows[allowed],solved=solved[allowed],
+                cycle_member=cycle[allowed],successor=nxt[allowed],dead_choice=dead[allowed],
+                dead_basin=~np.isfinite(truth[endpoint[allowed]]),
+                budget_exhausted=(endpoint[allowed]==goal)&(hops[allowed]>maximum_steps),
+                optimal_action=(truth[nxt[allowed]]+1==truth[allowed]),distance=truth[allowed]))
         selected=cycle|dead|(failed_nonoptimal if include_failed_nonoptimal else False)
         take=rows[selected]
         reason=np.where(cycle[selected],np.uint8(8),np.uint8(0))|np.where(dead[selected],np.uint8(2),np.uint8(0))

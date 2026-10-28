@@ -93,6 +93,7 @@ def validate_continuation(previous,current,step):
     failure_coverage=current.get('continuation',{}).get('mode')=='current_failure_coverage'
     structural=current.get('continuation',{}).get('mode')=='structural_replay'
     failed_branches=current.get('continuation',{}).get('mode')=='sokoban_failed_branches'
+    retention_paths=current.get('continuation',{}).get('mode')=='sokoban_retention_paths'
     for item in (old,new):
         for key in ('continuation','convergence','pilot'):item.pop(key,None)
         if item.get('failure_diagnosis'):
@@ -104,6 +105,25 @@ def validate_continuation(previous,current,step):
         if workers not in (0,1):raise ValueError('Only synchronous or one-worker trace writing is supported')
         preparation=item['training'].get('relation_sampling',{}).pop('preparation_workers',1)
         if not 1<=preparation<=32:raise ValueError('Preparation workers must be between1 and32')
+    if retention_paths:
+        before=old['training'].get('current_failure_replay',{})
+        after=new['training'].get('current_failure_replay',{})
+        retained=after.pop('retained_replay',None);paths=after.pop('path_groups',None)
+        if (old.get('task')!='sokoban' or not before or not retained or not paths
+                or 'retained_replay' in before or 'path_groups' in before):
+            raise ValueError('Sokoban continuation adds retained decisions and complete walking-to-push groups')
+        if set(retained)!={'bank','contexts_per_batch','critical_fraction'} or not 0<retained['critical_fraction']<1:
+            raise ValueError('Retained replay declares its fixed bank, quota and critical fraction')
+        if paths['mode']!='joint' or paths['finite_point_fraction']!=new['training']['relation_sampling']['finite_point_fraction']:
+            raise ValueError('Whole walking-to-push groups share the original finite point supplement')
+        if not 0<retained['contexts_per_batch']<before['contexts_per_batch']-paths['groups_per_batch']*paths['maximum_steps']:
+            raise ValueError('Retained decisions and whole paths share the existing supplemental quota')
+        if not step<=old['training']['steps']<new['training']['steps']:
+            raise ValueError('Retention/path continuation requires an explicit additional update budget')
+        new['training']['steps']=old['training']['steps']
+        for item in (old,new):item.pop('hypothesis',None)
+        if old!=new:raise ValueError('Retention/path continuation changes another training condition')
+        return
     if failed_branches:
         before=old['training'].get('current_failure_replay',{})
         after=new['training'].get('current_failure_replay',{})
@@ -438,6 +458,8 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
                     if continuation.get('mode')=='current_failure_replay' else
                     'Full optimizer/samplers/RNG/counters restored; include upstream nonoptimal decisions whose current policy fails, together with walking cycles and irreversible dead branches.'
                     if continuation.get('mode')=='sokoban_failed_branches' else
+                    'Full optimizer/samplers/RNG/counters restored; share the existing supplemental quota among retained decisions, complete walking-to-push paths and current failures.'
+                    if continuation.get('mode')=='sokoban_retention_paths' else
                     'Full optimizer/samplers/RNG/counters restored; share the existing supplemental quota between current failures and paired cross-layout training contexts.'
                     if continuation.get('mode')=='structural_replay' else
                     'Full optimizer/samplers/RNG/counters restored; refresh current failures over every permitted original training root.'
@@ -503,6 +525,13 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
         if config['task']=='rush_hour' and replay_sampler is None:
             raise ValueError('Current Rush Hour failures retain the original whole-path sampler')
         from .current_failures import CurrentFailureReplay
+        if options['current_failure_replay'].get('path_groups') and (config['task']!='sokoban' or replay_sampler):
+            raise ValueError('Supplemental walking-to-push paths use the existing Sokoban failure quota')
+        if resume:
+            prior=saved.get('current_failure_state') or {}
+            for option,key in [('retained_replay','retained'),('path_groups','path_groups')]:
+                if options['current_failure_replay'].get(option) and not prior.get(key):
+                    raise ValueError(('Resume checkpoint is missing a supplemental stream',key))
         current_replay=CurrentFailureReplay(corpus,data,options['current_failure_replay'],config['seed']+73103,out,
             saved.get('current_failure_state') if checkpoint is not None else None)
         if checkpoint is not None and not saved.get('current_failure_state'):
@@ -684,6 +713,7 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
                 row.update(rank_current_failure_index=current_ids.copy(),
                            rank_current_failure_round=np.full(len(tasks),current_replay.round,dtype=np.int32))
                 if current_replay.structural:row.update({key:value.copy() for key,value in current_replay.structural.last_annotations.items()})
+                row.update({key:value.copy() for key,value in current_replay.last_annotations.items()})
             trace.append(row)
             if len(trace)>=100: flush_trace()
         ids=np.concatenate([pair[:,0],pair[:,1],children[valid],tasks[:,1]])

@@ -927,6 +927,25 @@ class ExactPairTests(unittest.TestCase):
         self.assertFalse(bank['reason'][at[0]]&10)
         np.testing.assert_array_equal(bank['children'][at[0]],[0,6])
 
+    def test_sokoban_retention_paths_continuation_shares_original_quota(self):
+        from copy import deepcopy
+        from experiments.new_tasks_qmap.src.relations import validate_continuation
+        old=dict(task='sokoban',training=dict(steps=32000,batch_size=32768,
+            relation_sampling=dict(finite_point_fraction=.75),
+            current_failure_replay=dict(contexts_per_batch=256,include_failed_nonoptimal=True)))
+        new=deepcopy(old);new['training']['steps']=52000
+        new['training']['current_failure_replay'].update(
+            retained_replay=dict(bank='retained.npz',contexts_per_batch=64,critical_fraction=.5),
+            path_groups=dict(bank='paths.npz',groups_per_batch=8,maximum_steps=13,mode='joint',finite_point_fraction=.75))
+        new['continuation']=dict(mode='sokoban_retention_paths')
+        validate_continuation(old,new,32000)
+        for mutation in ('quota','learning_rate','paths'):
+            changed=deepcopy(new)
+            if mutation=='quota':changed['training']['current_failure_replay']['contexts_per_batch']=512
+            elif mutation=='learning_rate':changed['training']['learning_rate']=1e-4
+            else:changed['training']['current_failure_replay']['path_groups']['groups_per_batch']=32
+            with self.assertRaises(ValueError):validate_continuation(old,changed,32000)
+
     def test_current_failures_preserve_broad_points_old_paths_and_complete_resume(self):
         from copy import deepcopy
         from experiments.new_tasks_qmap.src.current_failures import CurrentFailureReplay
@@ -1137,6 +1156,41 @@ class ExactPairTests(unittest.TestCase):
         np.testing.assert_array_equal(kept[0][:16],near_anchors[:16])
         np.testing.assert_array_equal(kept[0][50:55],near_anchors[50:55])
         self.assertFalse(kept[4][50:55].any())
+        # Share the original supplemental quota among complete paths, a fixed
+        # historical stream and changing current failures, with exact recovery.
+        from experiments.new_tasks_qmap.src.current_failures import CurrentFailureReplay
+        with tempfile.TemporaryDirectory() as temp:
+            out=Path(temp);np.savez(out/'bank.npz',**bank)
+            options=dict(bank='bank.npz',contexts_per_batch=24,refresh_every=2000,
+                ranking_fraction=.25,critical_fraction=.75,coverage_fraction=.5,
+                distance_bin_upper_bounds=[1,5,10],queries='all',
+                retained_replay=dict(bank='bank.npz',contexts_per_batch=6,critical_fraction=.5),
+                path_groups=dict(opts,mode='joint',bank='bank.npz',finite_point_fraction=.75))
+            replay=CurrentFailureReplay(corpus,data,options,71,out)
+            point_rows=np.tile([0,10],(512,1));rank_rows=np.tile([0,10],(64,1))
+            args=(point_rows,np.arange(512),rank_rows,np.arange(64),lookup,lookup,
+                  np.zeros(512,dtype=np.uint8),np.zeros(64,dtype=np.uint8),.75)
+            result=replay.apply(*args)
+            self.assertEqual(int((result[5]!=0).sum()),24)
+            self.assertEqual(int((result[5]==9).sum()),6)
+            np.testing.assert_array_equal(result[2][:32],rank_rows[:32])
+            np.testing.assert_array_equal(result[0][:128],point_rows[:128])
+            points={tuple(row) for row in result[0][result[4]!=0]}
+            for source,goal in result[2][result[5]!=0]:
+                self.assertIn((source,goal),points)
+                for child in corpus.successors(np.array([source]))[0]:
+                    if child>=0:self.assertIn((child,goal),points)
+            path_ids=replay.last_annotations['rank_walk_push_id']
+            for path_id in np.unique(path_ids[path_ids>=0]):
+                rows=result[2][path_ids==path_id]
+                np.testing.assert_array_equal(rows,bank['path_tasks'][path_id,:bank['path_lengths'][path_id]])
+            state=deepcopy(replay.state_dict());expected=replay.apply(*args)
+            restored=CurrentFailureReplay(corpus,data,options,999,out,state=state);actual=restored.apply(*args)
+            for left,right in zip(expected,actual):np.testing.assert_array_equal(left,right)
+            for key in replay.last_annotations:np.testing.assert_array_equal(replay.last_annotations[key],restored.last_annotations[key])
+            np.testing.assert_array_equal(replay.retained.draws,restored.retained.draws)
+            retained_before=restored.retained.draws.copy();restored.set_bank(bank)
+            np.testing.assert_array_equal(retained_before,restored.retained.draws)
         for path,length in enumerate(bank['path_lengths']):
             length=int(length);rows=bank['path_tasks'][path,:length];kids=bank['path_children'][path,:length]
             np.testing.assert_array_equal(kids,corpus.successors(rows[:,0]))

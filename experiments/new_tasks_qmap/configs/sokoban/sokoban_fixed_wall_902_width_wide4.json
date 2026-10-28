@@ -44,7 +44,7 @@
     "metric": "directed_max"
   },
   "training": {
-    "steps": 32000,
+    "steps": 72000,
     "batch_size": 32768,
     "decision_batch_size": 8192,
     "learning_rate": 3e-05,
@@ -106,7 +106,23 @@
         128
       ],
       "layouts_per_batch": 1,
-      "include_failed_nonoptimal": true
+      "include_failed_nonoptimal": true,
+      "retained_replay": {
+        "bank": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/sokoban_failed_branches_20261029/retention_paths_preparation/retained.npz",
+        "contexts_per_batch": 64,
+        "critical_fraction": 0.5
+      },
+      "path_groups": {
+        "bank": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/sokoban_failed_branches_20261029/retention_paths_preparation/paths.npz",
+        "minimum_steps": 1,
+        "maximum_steps": 13,
+        "groups_per_batch": 8,
+        "block_batches": 100,
+        "mode": "joint",
+        "layouts_per_batch": 1,
+        "preserve_point_distances_up_to": 5,
+        "finite_point_fraction": 0.75
+      }
     }
   },
   "relations": {
@@ -129,12 +145,12 @@
   "schema": "exact_state_pairs",
   "selection": "Lowest validation finite Huber plus candidate soft-rank CE, equally averaging predeclared validation cohorts; no test checkpoint selection.",
   "scope": "One Qmap for exactly one fixed wall orientation and original static board markers; player and four-box complete states and query goals vary. No cross-wall generalization claim. All legal successors, no oracle features, no pruning/search or LLM training.",
-  "hypothesis": "Preserve the complete fixed-wall400-input128D directed-max MLP and Adam,532complete training goals,wide/point/ranking/transition supervision and original relation traversal. Add256current walking-cycle and irreversible-dead-branch decisions perbatch,each with its parent and every legal successor. Half of each supplemental quota traverses its entire pool; the other half balances distance strata. Refresh from every permitted training decision every2000updates. Continue10000updates after the full2000checkpoint, and inspect full training execution and held complete goals separately.",
+  "hypothesis": "Preserve the complete fixed-wall400-input128D encoder, Adam, original broad relations, ranking coverage and transition supervision. Share the existing256 supplemental decisions among64 historical-error/fragile-old-success decisions,8 complete optimal walking-to-push groups, and the remaining current failures. Historical decisions and path groups retain their coverage progress across current-pool refreshes. Test complete-query retention, cycle migration and held complete goals.",
   "acceptance": "experiments/new_tasks_qmap/configs/sokoban/sokoban_fixed_wall_acceptance.json",
   "continuation": {
-    "checkpoint": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/sokoban_targeted_20261028/sokoban_fixed_wall_902_width_wide4/last.pt",
-    "reason": "Continue the complete 12000-step model, Adam, sampling progress and RNG for 20000 updates. Expand the existing 256-context failure stream with upstream nonoptimal actions whose policy fails. Retain broad relations, exhaustive ranking traversal, walking-cycle and irreversible-dead branches, parent labels and every legal successor.",
+    "checkpoint": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/sokoban_failed_branches_20261029/sokoban_fixed_wall_902_width_wide4/last.pt",
     "source_cuda_device": 0,
-    "mode": "sokoban_failed_branches"
+    "mode": "sokoban_retention_paths",
+    "reason": "Continue from the full32000-step state for40000 updates. Retain earlier errors and fragile previously successful relations, and supervise whole optimal walking prefixes through the next push within the original256 supplemental quota."
   }
 }

@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 from grounded_llm.core.files import atomic_json
 from grounded_llm.core.qmap.sampling import CoverageSampler
-from .relation_data import FailureReplaySampler, BoardRelationSampler
+from .relation_data import FailureReplaySampler, BoardRelationSampler, LocalPathSampler
 
 
 class CurrentFailureReplay:
@@ -40,6 +40,26 @@ class CurrentFailureReplay:
             else:bank=prior['bank']
             self.structural=StructuralReplaySampler(corpus,data,bank,spec['groups_per_batch'],seed+2000003,prior)
             if 2*spec['groups_per_batch']>=options['contexts_per_batch']:raise ValueError('Structural pairs must leave current failures in the same quota')
+        self.retained=None;self.paths=None;self.last_annotations={}
+        if options.get('retained_replay'):
+            spec=options['retained_replay'];target=self.out/'retained';target.mkdir(exist_ok=True)
+            retained_options={k:v for k,v in options.items() if k not in ('retained_replay','path_groups','structural_groups')}
+            retained_options.update(spec,bank=str((self.out/spec['bank']).resolve()))
+            self.retained=CurrentFailureReplay(corpus,data,retained_options,seed+3000017,target,
+                                               state.get('retained') if state else None)
+        if options.get('path_groups'):
+            spec=options['path_groups'];prior=state.get('path_groups') if state else None
+            if prior is None:
+                with np.load((self.out/spec['bank']).resolve()) as archive:self.path_bank=dict(archive)
+            else:self.path_bank=prior['bank']
+            self.path_rng=np.random.default_rng(seed+4000037)
+            self.paths=LocalPathSampler(corpus,data,self.path_bank,spec,self.path_rng,spec['finite_point_fraction'])
+            if prior:
+                self.paths.load_state_dict(prior['sampler']);self.path_rng.bit_generator.state=deepcopy(prior['rng'])
+        maximum_paths=self.paths.options['groups_per_batch']*self.paths.options['maximum_steps'] if self.paths else 0
+        retained_count=self.retained.options['contexts_per_batch'] if self.retained else 0
+        if maximum_paths+retained_count>=options['contexts_per_batch']:
+            raise ValueError('Whole paths and retention must leave current failures in the same supplemental quota')
 
     def save_bank(self):
         target=self.out/f'current_failure_bank_{self.round:04d}.npz'
@@ -67,6 +87,22 @@ class CurrentFailureReplay:
     def apply(self, pairs, point_indices, tasks, rank_indices, point_index, rank_index,
               point_origin, rank_origin, finite_fraction):
         n = self.options['contexts_per_batch']-(2*self.structural.groups_per_batch if self.structural else 0)
+        self.last_annotations={}
+        if self.paths:
+            if np.any(point_origin) or np.any(rank_origin):
+                raise ValueError('Supplemental path groups require the original board streams before other replay')
+            pairs,point_indices,tasks,rank_indices,po,ro,_=self.paths.apply(
+                pairs,point_indices,tasks,rank_indices,point_index,rank_index,self.path_rng)
+            point_origin=point_origin.copy();rank_origin=rank_origin.copy()
+            point_origin[po>0]=8;rank_origin[ro>0]=8;n-=int((ro>0).sum())
+            self.last_annotations.update({key.replace('rank_path_','rank_walk_push_'):value.copy()
+                                          for key,value in self.paths.last_annotations.items()})
+        if self.retained:
+            pairs,point_indices,tasks,rank_indices,point_origin,rank_origin,ids=self.retained.apply(
+                pairs,point_indices,tasks,rank_indices,point_index,rank_index,point_origin,rank_origin,finite_fraction)
+            point_origin[point_origin==6]=9;rank_origin[rank_origin==6]=9
+            self.last_annotations['rank_retained_index']=ids
+            n-=self.retained.options['contexts_per_batch']
         # Existing whole paths occupy a suffix. Keep every original path intact.
         retained = np.flatnonzero(rank_origin != 0)
         limit = int(retained[0]) if len(retained) else len(tasks)
@@ -133,6 +169,9 @@ class CurrentFailureReplay:
             state['coverage']=dict(rng=deepcopy(self.coverage_rng.bit_generator.state),
                                    samplers=[sampler.state_dict() for sampler in self.coverage_samplers])
         if self.structural:state['structural']=self.structural.state_dict()
+        if self.retained:state['retained']=self.retained.state_dict()
+        if self.paths:state['path_groups']=dict(bank=self.path_bank,sampler=self.paths.state_dict(),
+                                               rng=deepcopy(self.path_rng.bit_generator.state))
         return state
 
     def report(self):
@@ -144,4 +183,10 @@ class CurrentFailureReplay:
                 minimum_critical_draws=int(self.draws[self.coverage_ids[0]].min()),
                 minimum_continuation_draws=int(self.draws[self.coverage_ids[1]].min()))
         if self.structural:result['structural_groups']=self.structural.report()
+        if self.retained:result['retained_replay']=self.retained.report()
+        if self.paths:result['path_groups']=dict(**self.paths.summary,
+            coverage_passes=float((self.paths.actual_path_steps/self.paths.lengths).sum()/len(self.paths.paths)),
+            minimum_path_replays=int((self.paths.actual_path_steps/self.paths.lengths).min()),
+            minimum_path_context_draws=int(self.paths.actual_path_steps.min()),
+            unique_paths_drawn=int((self.paths.actual_path_steps>0).sum()))
         return result

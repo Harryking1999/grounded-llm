@@ -4885,5 +4885,105 @@
       }
     },
     "raw_root": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/sokoban_failed_branches_20261029"
+  },
+  "retention_and_paths": {
+    "status": "prepared",
+    "parent_step": 32000,
+    "source_steps": [
+      12000,
+      21000,
+      32000
+    ],
+    "preparation": {
+      "parent_step": 32000,
+      "queries_lost": 49206,
+      "lost_first_wrong_contexts": 6077,
+      "lost_paths_crossing_protected_boundary": 3,
+      "historical_critical_queries": 109874,
+      "fragile_previously_successful_queries": 40065,
+      "retained_queries": 146840,
+      "retention_threshold": 1.0,
+      "threshold_unit": "one physical action cost",
+      "retention_distance_counts": {
+        "1-5": 1281,
+        "6-10": 14180,
+        "11-20": 69549,
+        "21-40": 59928,
+        "41+": 1902
+      },
+      "historical_cycle_roots": 59886,
+      "complete_paths": 59885,
+      "path_queries": 98376,
+      "path_maximum_steps": 13,
+      "path_length_counts": {
+        "1": 12351,
+        "2": 17358,
+        "3": 10746,
+        "4": 6672,
+        "5": 5252,
+        "6": 3454,
+        "7": 2098,
+        "8": 963,
+        "9": 565,
+        "10": 274,
+        "11": 106,
+        "12": 37,
+        "13": 9
+      },
+      "paths_blocked_by_training_boundary": 1,
+      "bank_training_boundaries_checked": true,
+      "every_legal_candidate_preserved": true,
+      "optimizer_updates": 0,
+      "path_options": {
+        "bank": "/tmp/sokoban_failed_5a57762/retention_paths_preparation/paths.npz",
+        "minimum_steps": 1,
+        "maximum_steps": 13,
+        "groups_per_batch": 8,
+        "block_batches": 100,
+        "mode": "joint",
+        "layouts_per_batch": 1,
+        "preserve_point_distances_up_to": 5,
+        "finite_point_fraction": 0.75
+      }
+    },
+    "validation": {
+      "parent_step": 32000,
+      "validation_terminal_step": 32002,
+      "optimizer_step": 32002,
+      "original_checkpoint_unchanged": true,
+      "actual_batch_origin_counts": [
+        {
+          "0": 7936,
+          "6": 176,
+          "8": 16,
+          "9": 64
+        },
+        {
+          "0": 7936,
+          "6": 163,
+          "8": 29,
+          "9": 64
+        }
+      ],
+      "exact256_supplemental_decisions": true,
+      "fixed64_retained_decisions": true,
+      "whole_paths_stay_in_one_batch": true,
+      "all_parent_and_legal_child_point_labels_present": true,
+      "original_rank_coverage_prefix_preserved": true,
+      "broad_point_prefix_preserved": true,
+      "next_batch_exact_after_restore": true,
+      "full_optimizer_and_sampling_state_saved": true,
+      "validation_optimizer_updates": 2,
+      "formal_training_updates": 0
+    },
+    "guaranteed_coverage_at_proposed_budget": {
+      "historical_critical_complete_passes": 5,
+      "fragile_previous_success_complete_passes": 15,
+      "whole_path_complete_passes": 5,
+      "original_ranking_additional_passes": 219
+    },
+    "config": "experiments/new_tasks_qmap/configs/sokoban/sokoban_fixed_wall_902_width_wide4.json",
+    "evidence_root": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/sokoban_failed_branches_20261029",
+    "result": "Complete path grouping and retention sampling passed native two-update and next-batch restoration checks. Formal optimization for this condition is pending."
   }
 }

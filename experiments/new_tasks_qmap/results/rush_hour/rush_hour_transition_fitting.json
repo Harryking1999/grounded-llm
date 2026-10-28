@@ -16284,7 +16284,22 @@
       "catalogue_groups": 322,
       "all_training_boundaries_valid": true,
       "all_legal_candidates_preserved": true,
-      "optimizer_updates": 0
+      "optimizer_updates": 0,
+      "sampling_validation": {
+        "checkpoint_step": 80000,
+        "batches": 2000,
+        "failure_and_retention_contexts_per_batch": 128,
+        "original_structural_contexts_per_batch": 128,
+        "critical_queries": 6971,
+        "retention_queries": 28557,
+        "minimum_critical_draws": 13,
+        "minimum_retention_draws": 1,
+        "unseen_critical": 0,
+        "unseen_retention": 0,
+        "checkpoint_rng_loaded": true,
+        "all_native_labels_and_candidates_equal": true,
+        "optimizer_updates": 0
+      }
     }
   }
 }

@@ -3972,5 +3972,296 @@
         "entered_unreachable": 1
       }
     }
+  },
+  "upstream_failure_refinement": {
+    "checkpoint_step": 21000,
+    "source_commit": "5a57762aad163b2270fb96469ce0e47c5f9b0258",
+    "totals": {
+      "allowed_training_queries": 747780,
+      "solved": 406214,
+      "finite_cycle_basin": 298300,
+      "unreachable_cycle_basin": 43266,
+      "wrong_first_action": 57931,
+      "immediate_dead_choice": 5578,
+      "cycle_contexts": 29600,
+      "walk_cycle_contexts": 29600,
+      "cycle_with_boxes_already_matching_goal": 6,
+      "cycle_all_optimal_actions_push": 5032,
+      "cycle_all_optimal_actions_walk": 23544
+    },
+    "optimal_transition_fit": {
+      "optimal_walk": {
+        "edges": 697167,
+        "nonpositive_predicted_drop": 81063,
+        "mean_absolute_drop_error": 0.4518015050807285
+      },
+      "optimal_push": {
+        "edges": 168900,
+        "nonpositive_predicted_drop": 27872,
+        "mean_absolute_drop_error": 0.8954705745839311
+      }
+    },
+    "original_training_goals": {
+      "count": 198,
+      "solved": 80,
+      "cycles": 118,
+      "entered_unreachable": 18
+    },
+    "original_failure_forks": {
+      "initial_walk_cycle": {
+        "queries": 35035,
+        "solved": 8922,
+        "correct_first_action": 24474,
+        "immediate_dead_choice": 242,
+        "current_two_cycle": 15259,
+        "chosen_push": 3657
+      },
+      "initial_immediate_dead": {
+        "queries": 6812,
+        "solved": 795,
+        "correct_first_action": 2234,
+        "immediate_dead_choice": 4444,
+        "current_two_cycle": 293,
+        "chosen_push": 4615
+      },
+      "initial_upstream_error": {
+        "queries": 39160,
+        "solved": 8016,
+        "correct_first_action": 12758,
+        "immediate_dead_choice": 57,
+        "current_two_cycle": 3766,
+        "chosen_push": 7451
+      }
+    },
+    "by_distance": {
+      "1_5": {
+        "count": 16067,
+        "solved": 15973
+      },
+      "6_10": {
+        "count": 72606,
+        "solved": 64851
+      },
+      "11_20": {
+        "count": 331053,
+        "solved": 209540
+      },
+      "21_40": {
+        "count": 309127,
+        "solved": 110509
+      },
+      "41_256": {
+        "count": 18927,
+        "solved": 5341
+      }
+    },
+    "actual_fork_exposure": {
+      "checkpoint_step": 21000,
+      "actual_batches": 9000,
+      "total_current_failure_draws": 2304000,
+      "groups": {
+        "initial_walk_cycle": {
+          "queries": 35035,
+          "queries_drawn": 35035,
+          "draws": 604187,
+          "draw_quantiles": [
+            2.0,
+            4.0,
+            14.0,
+            24.0,
+            1310.0
+          ]
+        },
+        "initial_immediate_dead": {
+          "queries": 6812,
+          "queries_drawn": 6812,
+          "draws": 141614,
+          "draw_quantiles": [
+            2.0,
+            6.0,
+            15.0,
+            22.0,
+            174.0
+          ]
+        },
+        "initial_upstream_error": {
+          "queries": 39160,
+          "queries_drawn": 39160,
+          "draws": 687189,
+          "draw_quantiles": [
+            2.0,
+            5.0,
+            15.0,
+            22.0,
+            1477.0
+          ]
+        },
+        "original_continuations": {
+          "queries": 8955,
+          "queries_drawn": 8955,
+          "draws": 349832,
+          "draw_quantiles": [
+            7.0,
+            10.0,
+            27.0,
+            72.60000000000036,
+            1255.0
+          ]
+        }
+      },
+      "seconds": 3.080312967300415,
+      "original_rank_traversal": {
+        "relations": 747780,
+        "completed_passes": 115,
+        "position": 21300
+      },
+      "optimizer_updates": 0
+    },
+    "actual_batch_gradients": {
+      "checkpoint_step": 21000,
+      "actual_batches": [
+        {
+          "attempt": "attempt_000",
+          "batch_step": 20999,
+          "point_count": 32768,
+          "finite_count": 24764,
+          "components": {
+            "finite_point": {
+              "weighted_loss": 0.45001503825187683,
+              "gradient_l2": 19.262025833129883,
+              "cosine_to_total": 0.8493743361086927,
+              "projection_on_total": 0.688586361407184,
+              "adam_first_order_loss_change": -0.012074319645762444
+            },
+            "unreachable_point": {
+              "weighted_loss": 2.738319158554077,
+              "gradient_l2": 10.281411170959473,
+              "cosine_to_total": 0.22997405353373954,
+              "projection_on_total": 0.09951507823791488,
+              "adam_first_order_loss_change": -0.008538016118109226
+            },
+            "ranking": {
+              "weighted_loss": 0.5160588026046753,
+              "gradient_l2": 3.763878345489502,
+              "cosine_to_total": 0.4341353508417465,
+              "projection_on_total": 0.06877301274139322,
+              "adam_first_order_loss_change": -0.002409639535471797
+            },
+            "transition_difference": {
+              "weighted_loss": 0.2051975131034851,
+              "gradient_l2": 6.140635967254639,
+              "cosine_to_total": 0.5537920723159496,
+              "projection_on_total": 0.1431256287013916,
+              "adam_first_order_loss_change": -0.0043839355930686
+            }
+          },
+          "total_gradient_l2": 23.759794444212897,
+          "component_cosines": {
+            "finite_point:unreachable_point": -0.18710985779762268,
+            "finite_point:ranking": 0.2458459734916687,
+            "finite_point:transition_difference": 0.3122401237487793,
+            "unreachable_point:ranking": -0.15243947505950928,
+            "unreachable_point:transition_difference": -0.10412540286779404,
+            "ranking:transition_difference": 0.5509021282196045
+          },
+          "frozen_adam_direction_l2": 0.007479105610400438,
+          "point_huber_abs_derivative_mean": {
+            "finite": 0.4685856103897095,
+            "unreachable": 0.41437211632728577
+          },
+          "positive_finite_predicted_zero_fraction": 0.0
+        },
+        {
+          "attempt": "attempt_000",
+          "batch_step": 21000,
+          "point_count": 32768,
+          "finite_count": 24773,
+          "components": {
+            "finite_point": {
+              "weighted_loss": 0.4523318111896515,
+              "gradient_l2": 17.31093978881836,
+              "cosine_to_total": 0.8047770120427513,
+              "projection_on_total": 0.6795911407734205,
+              "adam_first_order_loss_change": -0.009969286620616913
+            },
+            "unreachable_point": {
+              "weighted_loss": 2.9759249687194824,
+              "gradient_l2": 10.920368194580078,
+              "cosine_to_total": 0.22230384651561347,
+              "projection_on_total": 0.118422918283055,
+              "adam_first_order_loss_change": -0.007381366565823555
+            },
+            "ranking": {
+              "weighted_loss": 0.5088881850242615,
+              "gradient_l2": 3.8284196853637695,
+              "cosine_to_total": 0.3733748690300137,
+              "projection_on_total": 0.06972943147961005,
+              "adam_first_order_loss_change": -0.0028658080846071243
+            },
+            "transition_difference": {
+              "weighted_loss": 0.20202188193798065,
+              "gradient_l2": 5.928439617156982,
+              "cosine_to_total": 0.45732538050723825,
+              "projection_on_total": 0.13225655485108215,
+              "adam_first_order_loss_change": -0.005028595682233572
+            }
+          },
+          "total_gradient_l2": 20.499746925838803,
+          "component_cosines": {
+            "finite_point:unreachable_point": -0.2336653620004654,
+            "finite_point:ranking": 0.15771779417991638,
+            "finite_point:transition_difference": 0.1913972944021225,
+            "unreachable_point:ranking": -0.26206499338150024,
+            "unreachable_point:transition_difference": -0.22180098295211792,
+            "ranking:transition_difference": 0.6675066947937012
+          },
+          "frozen_adam_direction_l2": 0.007535270415246487,
+          "point_huber_abs_derivative_mean": {
+            "finite": 0.46703219413757324,
+            "unreachable": 0.4091520309448242
+          },
+          "positive_finite_predicted_zero_fraction": 0.0
+        }
+      ],
+      "note": "Frozen weights on the specified recorded actual batches; no optimizer step. Components use the original full-batch denominator and rank weight. Optional Adam directions use the supplied frozen moments; their component loss changes are local first-order estimates. Gradient norms are not additive shares; signed projections onto the total sum to one and may be negative. Historical optimizer-time gradients were not recorded.",
+      "transition_loss_included": true,
+      "optimizer_updates": 0
+    },
+    "walking_push_prefix_preparation": {
+      "checkpoint_step": 21000,
+      "cycle_roots": 29600,
+      "complete_allowed_prefixes": 29600,
+      "blocked_by_protected_relations": 0,
+      "training_goals": 472,
+      "prefix_goals": 472,
+      "queries": 54168,
+      "complete_goal_prefixes": 0,
+      "path_length_counts": {
+        "1": 6056,
+        "2": 8677,
+        "3": 5135,
+        "4": 3225,
+        "5": 2543,
+        "6": 1809,
+        "7": 1162,
+        "8": 488,
+        "9": 282,
+        "10": 156,
+        "11": 55,
+        "12": 10,
+        "13": 2
+      },
+      "at_least_two_walking_steps_before_push": 14867,
+      "all_global_optimal_steps_verified": true,
+      "all_legal_candidates_preserved": true,
+      "training_boundaries_checked": true,
+      "optimizer_updates": 0,
+      "prefixes_ending_in_push": 29600,
+      "native_local_path_interface_valid": true,
+      "maximum_path_length": 13,
+      "push_also_reaches_complete_goal": 10
+    },
+    "condition": "Frozen21000 model. Actual exposure covers12001-21000. Gradient checks use fixed weights and Adam moments on actual20999-21000 batches, with zero optimizer updates. Prefix groups are prepared offline while the current32000-step training condition continues.",
+    "raw_root": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/sokoban_failed_branches_20261029/analysis_coverage_20261029"
   }
 }

@@ -696,14 +696,17 @@ def stream_statistics(corpus,data,run,out):
         note='Each CSV row is one saved actual optimizer batch. Repeated steps across attempts are retained explicitly. No historical per-step gradient was recorded or reconstructed here.')
 
 
-def batch_gradient_probe(model,corpus,batch,config):
+def batch_gradient_probe(model,corpus,batch,config,optimizer_state=None):
     """Loss components on one actual batch at fixed weights, without an update."""
     import torch
     from torch.nn import functional as F
-    from grounded_llm.core.qmap.model import soft_rank_loss
+    from grounded_llm.core.qmap.model import soft_rank_loss,transition_difference_loss
+    from grounded_llm.core.qmap.exact_graph import edge_costs
     device=next(model.parameters()).device; model.eval()
     pairs=batch['pairs']; tasks=batch['tasks']; children=batch['children']; valid=children>=0
+    transition_weight=config['training'].get('transition_difference_weight',0.)
     ids=np.concatenate([pairs[:,0],pairs[:,1],children[valid],tasks[:,1]])
+    if transition_weight:ids=np.r_[ids,tasks[:,0]]
     unique,inverse=np.unique(ids,return_inverse=True)
     vectors=model.encode(torch.as_tensor(corpus.features(unique),device=device))
     b=len(pairs); nchild=int(valid.sum()); options=config['training']
@@ -711,13 +714,20 @@ def batch_gradient_probe(model,corpus,batch,config):
     finite=np.isfinite(batch['point_distance']); mask=torch.as_tensor(finite,device=device)
     targets=np.where(finite,batch['point_distance'],options['unreachable_target']).astype(np.float32)
     per_point=F.smooth_l1_loss(predictions,torch.as_tensor(targets,device=device),reduction='none')
-    child=vectors[inverse[2*b:2*b+nchild]]; goal=vectors[inverse[2*b+nchild:]]
+    child=vectors[inverse[2*b:2*b+nchild]]; goal=vectors[inverse[2*b+nchild:2*b+nchild+len(tasks)]]
     legal=torch.as_tensor(valid,device=device); scores=torch.zeros(children.shape,device=device)
-    scores[legal]=1+model.distance(child,goal[:,None].expand(-1,children.shape[1],-1)[legal])
+    costs=edge_costs(corpus,tasks[:,0]);tensor_costs=torch.as_tensor(costs,device=device)
+    scores[legal]=tensor_costs[legal]+model.distance(child,goal[:,None].expand(-1,children.shape[1],-1)[legal])
     truth=np.where(np.isfinite(batch['child_distance']),batch['child_distance'],options['unreachable_target'])
-    rank=soft_rank_loss(scores,torch.as_tensor(1+truth,device=device),legal,options['rank_temperature'])
+    rank=soft_rank_loss(scores,torch.as_tensor(costs+truth,device=device),legal,options['rank_temperature'],
+        target_mode=options.get('rank_target_mode','soft_distance'))
     losses=dict(finite_point=per_point[mask].sum()/b,unreachable_point=per_point[~mask].sum()/b,
                 ranking=options['rank_weight']*rank)
+    if transition_weight:
+        parent=model.distance(vectors[inverse[-len(tasks):]],goal)
+        losses['transition_difference']=transition_weight*transition_difference_loss(parent,scores-tensor_costs,
+            torch.as_tensor(corpus.distance(tasks[:,0],tasks[:,1]),device=device),
+            torch.as_tensor(batch['child_distance'],device=device),legal)
     parameters=list(model.parameters()); gradients={}
     for name,loss in losses.items():
         parts=torch.autograd.grad(loss,parameters,retain_graph=True,allow_unused=True)
@@ -729,9 +739,16 @@ def batch_gradient_probe(model,corpus,batch,config):
         metrics[name]=dict(weighted_loss=float(losses[name].detach()),gradient_l2=norm,
             cosine_to_total=dot/(norm*squared**.5) if norm and squared else None,
             projection_on_total=dot/squared if squared else None)
+    from itertools import combinations
     result=dict(point_count=b,finite_count=int(finite.sum()),components=metrics,total_gradient_l2=squared**.5,
         component_cosines={a+':'+b:float(torch.nn.functional.cosine_similarity(gradients[a],gradients[b],dim=0))
-                           for a,b in (('finite_point','unreachable_point'),('finite_point','ranking'),('unreachable_point','ranking'))})
+                           for a,b in combinations(gradients,2)})
+    if optimizer_state is not None:
+        from .solution_gradient_diagnosis import frozen_adam_direction
+        direction=frozen_adam_direction(parameters,total,optimizer_state)
+        result['frozen_adam_direction_l2']=float(direction.norm())
+        for name,gradient in gradients.items():
+            metrics[name]['adam_first_order_loss_change']=float(torch.dot(gradient,direction))
     with torch.no_grad():
         residual=(predictions-torch.as_tensor(targets,device=device)).abs()
         derivative=residual.clamp_max(1)
@@ -742,7 +759,7 @@ def batch_gradient_probe(model,corpus,batch,config):
     return result
 
 
-def gradient_probe(model,corpus,run,config,checkpoint_step,count):
+def gradient_probe(model,corpus,run,config,checkpoint_step,count,optimizer_state=None):
     # Frozen checkpoint on recorded batches ending at its step. This is not a
     # reconstruction of optimizer-time gradients and never changes weights.
     rows=[]; first=max(1,checkpoint_step-count+1)
@@ -756,10 +773,10 @@ def gradient_probe(model,corpus,run,config,checkpoint_step,count):
             batch={key:x[key][point if key in ('pairs','point_distance') else rank]
                    for key in ('pairs','tasks','children','point_distance','child_distance')}
             rows.append(dict(attempt=path.parent.name,batch_step=int(step),
-                             **batch_gradient_probe(model,corpus,batch,config)))
+                             **batch_gradient_probe(model,corpus,batch,config,optimizer_state)))
     if len(rows)!=count: raise ValueError(('Expected unique contiguous actual batches',first,checkpoint_step,len(rows)))
     return dict(checkpoint_step=checkpoint_step,actual_batches=rows,
-        note='Frozen weights on the specified recorded actual batches; no optimizer step. Components use the original full-batch denominator and rank weight. Gradient norms are not additive shares; signed projections onto the total sum to one and may be negative. Historical optimizer-time gradients were not recorded.')
+        note='Frozen weights on the specified recorded actual batches; no optimizer step. Components use the original full-batch denominator and rank weight. Optional Adam directions use the supplied frozen moments; their component loss changes are local first-order estimates. Gradient norms are not additive shares; signed projections onto the total sum to one and may be negative. Historical optimizer-time gradients were not recorded.')
 
 
 def encoder_axes(model,corpus,data,config,cohorts):

@@ -779,6 +779,22 @@ class ExactPairTests(unittest.TestCase):
         qg=model.encode(torch.as_tensor(corpus.features(pairs[:,1])))
         loss=torch.nn.functional.smooth_l1_loss(model.distance(qa,qg),torch.as_tensor(np.where(np.isfinite(truth),truth,30.)))
         self.assertAlmostEqual(float(loss.detach()),sum(result['components'][k]['weighted_loss'] for k in ('finite_point','unreachable_point')),places=5)
+        config['training']['transition_difference_weight']=2.
+        with_transition=batch_gradient_probe(model,corpus,row,config)
+        self.assertIn('transition_difference',with_transition['components'])
+        self.assertGreater(with_transition['components']['transition_difference']['gradient_l2'],0)
+        self.assertAlmostEqual(sum(v['projection_on_total'] for v in with_transition['components'].values()),1,places=5)
+        qa=model.encode(torch.as_tensor(corpus.features(row['tasks'][:,0])))
+        qg=model.encode(torch.as_tensor(corpus.features(row['tasks'][:,1])))
+        kids=np.maximum(row['children'],0);legal=row['children']>=0
+        qc=model.encode(torch.as_tensor(corpus.features(kids.ravel()))).reshape(*kids.shape,-1)
+        predictions=model.distance(qc,qg[:,None])
+        parent_truth=corpus.distance(row['tasks'][:,0],row['tasks'][:,1])
+        finite=legal&np.isfinite(row['child_distance'])&np.isfinite(parent_truth[:,None])
+        residual=model.distance(qa,qg)[:,None]-predictions
+        target=np.where(finite,parent_truth[:,None]-row['child_distance'],0.)
+        expected=2*torch.nn.functional.smooth_l1_loss(residual[finite],torch.as_tensor(target[finite]))
+        self.assertAlmostEqual(float(expected.detach()),with_transition['components']['transition_difference']['weighted_loss'],places=5)
 
     def test_failure_mining_keeps_cycle_members_branches_and_training_boundaries(self):
         from experiments.new_tasks_qmap.src.relation_data import training_decision_mask

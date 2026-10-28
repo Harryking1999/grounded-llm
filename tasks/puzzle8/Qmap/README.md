@@ -7,3 +7,5 @@
 原复原权重为 `checkpoints/selected_98_28.pt`。目标规范化条件的已验证权重为 `checkpoints/goal_normalized_290000.pt`：实际换目标1009/1024（98.54%），角、边、中央三组均超过90%；原固定中间目标测试1015/1024（99.12%）。权重与读取条件由[selection.json](selection.json)维护，分项比较见[当前报告](../../../experiments/puzzle8_qmap/results/report.md)。
 
 目标坐标读取通过 `MapReader(env, checkpoint, coordinate_frame="goal_normalized")` 启用，使用已知棋盘对称及数字重命名；默认绝对状态编码保持原条件。比较及机制见[实验报告](../../../experiments/puzzle8_qmap/results/report.md)。
+
+后续新建的测试与训练可采用 `goal_normalized` 及selection中的对应权重，当前、目标和全部合法后继在同一目标坐标系中读取。当前4／5／6类FLAN实验使用已冻结的旧地图数据，仍为原绝对状态编码；其中5／6类训练华容道，4类将其作为整类OOD。配套评测沿用该批训练的旧地图条件，见[FLAN说明](../../../experiments/map_sft_baselines/README.md#训练什么给模型看什么)。

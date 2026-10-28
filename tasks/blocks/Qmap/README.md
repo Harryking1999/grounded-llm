@@ -9,3 +9,5 @@
 [简明报告](../../../experiments/blocks_distance_map/results/blocks12_joint_report.md)与[能力总表](../../README.md#任务能力总表)维护当前成绩；过程断点、日志和曝光留在忽略runtime。当前地图的文字40题、1.5B／7B接图成绩未测。
 
 非空目标使用selection中的 `goal_xor` 条件：将当前、目标和全部真实后继分别与目标异或，复用原清空Q。删除目标格的合法动作保留完整后继向量与有限评分，输入仍为100格、Q仍为128维。固定非空监测191/192，训练初盘上的8／12块、三种目标比例六组为97.8%–100%；原FLAN的12块非空目标122/125。目标为0时保持原清空向量与评分。调用 `FrozenBoardMap.load(checkpoint, coordinate_frame="goal_xor")`，详细比较见简明报告。
+
+后续新建的测试与训练可采用此异或读取条件，地图权重按selection选择，数据准备时使用相同坐标生成Q向量和排序监督。当前4／5／6类FLAN训练使用已冻结的旧地图数据，仍为原绝对状态编码；这批训练及其配套评测的条件见[FLAN说明](../../../experiments/map_sft_baselines/README.md#训练什么给模型看什么)。

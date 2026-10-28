@@ -45,7 +45,7 @@
     "architecture": "mlp"
   },
   "training": {
-    "steps": 8000,
+    "steps": 40000,
     "batch_size": 65536,
     "decision_batch_size": 8192,
     "learning_rate": 0.0003,
@@ -116,8 +116,8 @@
   "failure_diagnosis": "experiments/new_tasks_qmap/archive/configs/rush_hour/rush_hour_training_root_failures.json",
   "input_encoding": "geometry_order",
   "continuation": {
-    "checkpoint": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/followup_35016_5d41460/rush_hour_geometry_grid_mlp_fit/last.pt",
-    "reason": "Continue the completed4000-update condition on the user-restarted35016 three-A800 node. Restore complete weights, Adam, source/rank/replay samplers, RNG and exposure; only total update budget increases. Preserve current data, frozen queries, inputs, losses and batch sizes. Prior best models and negative results remain. No inference search or test checkpoint selection.",
-    "source_cuda_device": 2
+    "checkpoint": "/tmp/rush_hour_qmap_20261028/parent/last.pt",
+    "reason": "Extend8000 to40000 updates, retaining weights, Adam, all samplers, RNG and exposure. Original data, losses and batch sizes are preserved.",
+    "source_cuda_device": 0
   }
 }

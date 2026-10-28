@@ -76,5 +76,95 @@
     "count": 1000,
     "historical_floor": 421,
     "passed": false
+  },
+  "conditions": {
+    "goal_xor": {
+      "status": "validated",
+      "checkpoint": "checkpoints/decision_clear_300_4f413b5.pt",
+      "source_commit": "4f413b5",
+      "coordinate_frame": "goal_xor",
+      "reader": "grounded_llm.tasks.blocks.qmap.FrozenBoardMap",
+      "scope": "S XOR G for current, goal and every physical legal successor; original 100-cell input and 128-dimensional Q; original finite metric scores; goal0 preserves clearing vectors and scores.",
+      "metrics": {
+        "training_long": {
+          "count": 8000,
+          "solved": 7817,
+          "groups": {
+            "clear12|None": {
+              "count": 1000,
+              "solved": 881
+            },
+            "partial12|0.25": {
+              "count": 1000,
+              "solved": 1000
+            },
+            "partial12|0.5": {
+              "count": 1000,
+              "solved": 987
+            },
+            "partial12|0.75": {
+              "count": 1000,
+              "solved": 978
+            },
+            "clear8|None": {
+              "count": 1000,
+              "solved": 978
+            },
+            "partial8|0.25": {
+              "count": 1000,
+              "solved": 1000
+            },
+            "partial8|0.5": {
+              "count": 1000,
+              "solved": 1000
+            },
+            "partial8|0.75": {
+              "count": 1000,
+              "solved": 993
+            }
+          }
+        },
+        "monitor_long": {
+          "count": 192,
+          "solved": 191,
+          "groups": {
+            "None|None": {
+              "count": 192,
+              "solved": 191
+            }
+          }
+        },
+        "fixed_clear1000": {
+          "count": 1000,
+          "solved": 889,
+          "groups": {
+            "None|None": {
+              "count": 1000,
+              "solved": 889
+            }
+          }
+        },
+        "actual_flan250": {
+          "id|partial8": {
+            "count": 41,
+            "solved": 41
+          },
+          "id|clear8": {
+            "count": 42,
+            "solved": 42
+          },
+          "id|clear12": {
+            "count": 42,
+            "solved": 38
+          },
+          "small_ood|partial12_ood": {
+            "count": 125,
+            "solved": 122
+          }
+        }
+      },
+      "evidence": "experiments/blocks_distance_map/results/blocks12_joint_summary.json",
+      "raw_result": "runs/qmap_goal_generalization_20261028/blocks_xor_broad.json"
+    }
   }
 }

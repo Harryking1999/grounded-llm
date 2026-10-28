@@ -53,3 +53,8 @@ class CachedQMap:
             vectors=self.qmap.encode(missing)
             self.cache.update(zip(missing,vectors))
         return torch.stack([self.cache[s] for s in states])
+
+    def query_vectors(self,states,goal):
+        if hasattr(self.qmap, 'query_states'):
+            states = self.qmap.query_states(states, goal)
+        return self.encode(states)

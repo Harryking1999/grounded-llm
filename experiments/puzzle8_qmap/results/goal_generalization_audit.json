@@ -1091,6 +1091,129 @@
       },
       "seconds": 58.36780261294916,
       "oracle_loaded": false
+    },
+    "continuation_step8000": {
+      "continuation_step": 8000,
+      "checkpoint_step": 294000,
+      "source_commit": "58b0ac5",
+      "analysis_commit": "ea9436a",
+      "oracle_loaded": false,
+      "metrics": {
+        "validation": {
+          "count": 1024,
+          "solved": 1011,
+          "success_rate": 0.9873046875,
+          "horizon": 62,
+          "coordinate_frame": "goal_normalized",
+          "by_blank_orbit": {
+            "corner": {
+              "count": 233,
+              "solved": 231
+            },
+            "edge": {
+              "count": 258,
+              "solved": 256
+            },
+            "center": {
+              "count": 533,
+              "solved": 524
+            }
+          }
+        },
+        "test": {
+          "count": 1024,
+          "solved": 1022,
+          "success_rate": 0.998046875,
+          "horizon": 62,
+          "coordinate_frame": "goal_normalized",
+          "by_blank_orbit": {
+            "corner": {
+              "count": 270,
+              "solved": 268
+            },
+            "edge": {
+              "count": 754,
+              "solved": 754
+            },
+            "center": {
+              "count": 0,
+              "solved": 0
+            }
+          }
+        },
+        "actual_goal_family": {
+          "count": 1024,
+          "solved": 1008,
+          "success_rate": 0.984375,
+          "horizon": 62,
+          "coordinate_frame": "goal_normalized",
+          "by_blank_orbit": {
+            "corner": {
+              "count": 364,
+              "solved": 360
+            },
+            "edge": {
+              "count": 544,
+              "solved": 538
+            },
+            "center": {
+              "count": 116,
+              "solved": 110
+            }
+          }
+        }
+      }
     }
+  },
+  "selected_normalized_actual_flan250": {
+    "checkpoint": "tasks/puzzle8/Qmap/checkpoints/goal_normalized_290000.pt",
+    "checkpoint_step": 290000,
+    "source_commit": "58b0ac5",
+    "metrics": {
+      "id": {
+        "count": 125,
+        "solved": 124,
+        "success_rate": 0.992,
+        "horizon": 32,
+        "coordinate_frame": "goal_normalized",
+        "by_blank_orbit": {
+          "corner": {
+            "count": 125,
+            "solved": 124
+          },
+          "edge": {
+            "count": 0,
+            "solved": 0
+          },
+          "center": {
+            "count": 0,
+            "solved": 0
+          }
+        }
+      },
+      "small_ood": {
+        "count": 125,
+        "solved": 123,
+        "success_rate": 0.984,
+        "horizon": 32,
+        "coordinate_frame": "goal_normalized",
+        "by_blank_orbit": {
+          "corner": {
+            "count": 45,
+            "solved": 44
+          },
+          "edge": {
+            "count": 63,
+            "solved": 63
+          },
+          "center": {
+            "count": 17,
+            "solved": 16
+          }
+        }
+      }
+    },
+    "oracle_loaded": false,
+    "raw_result": "runs/puzzle8_goal_diagnostic_20261028/selected_actual_flan_same250.json"
   }
 }

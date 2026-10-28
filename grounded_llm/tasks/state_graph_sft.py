@@ -47,7 +47,8 @@ def frozen_reader(task, checkpoint, context, device):
     context = json.loads(context)
     if task == 'blocks':
         from .blocks.qmap import FrozenBoardMap
-        return FrozenBoardMap.load(Path(checkpoint), device)
+        return FrozenBoardMap.load(Path(checkpoint), device,
+                                   coordinate_frame=context.get('coordinate_frame', 'absolute'))
     if task == 'bridge':
         from .bridge.environment import Bridge
         from .bridge.qmap import MapReader
@@ -193,7 +194,9 @@ class StateTask:
 
     def make_step(self, state, goal):
         candidates = list(self.transitions(state))
-        vectors = self.reader.encode([state,goal,*[c[1] for c in candidates]]).cpu()
+        states = [state,goal,*[c[1] for c in candidates]]
+        vectors = (self.reader.query_vectors(states, goal) if self.task == 'blocks'
+                   else self.reader.encode(states)).cpu()
         scores = self.reader.distance(vectors,vectors[1]).cpu().numpy()
         totals = np.asarray([c[2] for c in candidates])+scores[2:]
         optimal = np.flatnonzero(np.isclose(totals,totals.min())).tolist() if len(totals) else []

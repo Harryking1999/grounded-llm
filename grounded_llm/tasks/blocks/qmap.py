@@ -8,7 +8,7 @@ import torch
 from grounded_llm.core.qmap.reader import FrozenQMap
 
 from grounded_llm.tasks.blocks.model import BoardEncoder
-from grounded_llm.tasks.blocks.model import board_bits
+from grounded_llm.tasks.blocks.model import board_bits, goal_relative_boards
 from grounded_llm.core.qmap.model import distance
 from grounded_llm.tasks.blocks.oracle import successors
 import grounded_llm.tasks.blocks.rules as rules
@@ -18,17 +18,36 @@ from grounded_llm.core.reader.memory import MapBatch, q_map_batch
 class FrozenBoardMap(FrozenQMap):
     """Use the shared Q encoder and its original metric without retraining it."""
 
-    def __init__(self, encoder: BoardEncoder, device="cpu"):
+    def __init__(self, encoder: BoardEncoder, device="cpu", *, coordinate_frame="absolute"):
+        if coordinate_frame not in ("absolute", "goal_xor"):
+            raise ValueError(f"Unknown blocks coordinate frame: {coordinate_frame}")
         super().__init__(encoder, self.features, device, cpu_output=True)
+        self.coordinate_frame = coordinate_frame
 
     @classmethod
-    def load(cls, checkpoint: Path, device="cpu"):
+    def load(cls, checkpoint: Path, device="cpu", *, coordinate_frame="absolute"):
         saved = torch.load(checkpoint, map_location="cpu", weights_only=True)
         config = saved["config"]["model"]
         encoder = BoardEncoder(config["state_dim"], config["encoder_hidden_dim"],
                                saved["cap"], saved["metric"])
         encoder.load_state_dict(saved["model"])
-        return cls(encoder, device)
+        return cls(encoder, device, coordinate_frame=coordinate_frame)
+
+    def query_states(self, masks, goal):
+        """Map every physical state into the shared query frame."""
+        if self.coordinate_frame == "goal_xor":
+            return goal_relative_boards(masks, goal)
+        return masks
+
+    def query_vectors(self, masks, goal):
+        return self.encode(self.query_states(masks, goal))
+
+    @torch.no_grad()
+    def scores(self, masks, goal):
+        if self.coordinate_frame == "goal_xor":
+            return self.distance(self.query_vectors(masks, goal), self.encode([0])).cpu().numpy()
+        targets = [goal] if isinstance(goal, (int, np.integer)) else goal
+        return super().scores(masks, targets)
 
     @staticmethod
     def features(masks):
@@ -65,7 +84,7 @@ def blocks_step(qmap: FrozenBoardMap, current: int, goal: int,
     actions = tuple(action for action, _ in candidates)
     destinations = tuple(state for _, state in candidates)
     # V(o,a) = Q(T(o,a)) - Q(o); passing Q(T(o,a)) supplies Q(o) + V(o,a).
-    vectors = qmap.encode([current, goal, *destinations])
+    vectors = qmap.query_vectors([current, goal, *destinations], goal)
     scores = distance(vectors, vectors[1], qmap.metric)
     distances = tuple(map(float, scores[2:]))
     minimum = min(distances, default=float("inf"))

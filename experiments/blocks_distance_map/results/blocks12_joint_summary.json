@@ -3760,7 +3760,7 @@
         "success_rate": 0.9166666666666666
       }
     },
-    "assessment": "\u77ed\u9884\u7b97\u8bca\u65ad\uff1b\u539f\u5173\u7cfb\u4fdd\u7559\u3001\u5e7f\u57df\u8986\u76d6\u4e0e\u8bad\u7ec3\u7a33\u5b9a\u6027\u9700\u8054\u5408\u68c0\u67e5\u3002",
+    "assessment": "短预算诊断；原关系保留、广域覆盖与训练稳定性需联合检查。",
     "goal_fraction_profile": {
       "scope": "1000 exact training roots, one canonical shortest clearing trajectory per root; 8-placement sources are residuals along the same trajectory. Matching source/goal questions for both checkpoints. Training-root diagnostics and fixed monitor outcomes are separate.",
       "adopted": {
@@ -3896,5 +3896,221 @@
     },
     "speedup": 3.78177841552644,
     "all_arrays_rng_and_complete_sampler_state_equal": true
+  },
+  "goal_residual_reading": {
+    "analysis_commit": "5af47b5",
+    "condition": "goal_residual; known goal-cell containment; original physical candidates; greedy clearing Q; occupied-cell action bound; no oracle/search",
+    "adopted_prototype_outcomes_identical": true,
+    "models": {
+      "adopted": {
+        "training_long": {
+          "count": 8000,
+          "solved": 7826,
+          "groups": {
+            "clear12|None": {
+              "count": 1000,
+              "solved": 881
+            },
+            "partial12|0.25": {
+              "count": 1000,
+              "solved": 1000
+            },
+            "partial12|0.5": {
+              "count": 1000,
+              "solved": 989
+            },
+            "partial12|0.75": {
+              "count": 1000,
+              "solved": 985
+            },
+            "clear8|None": {
+              "count": 1000,
+              "solved": 978
+            },
+            "partial8|0.25": {
+              "count": 1000,
+              "solved": 1000
+            },
+            "partial8|0.5": {
+              "count": 1000,
+              "solved": 1000
+            },
+            "partial8|0.75": {
+              "count": 1000,
+              "solved": 993
+            }
+          }
+        },
+        "monitor_long": {
+          "count": 192,
+          "solved": 191,
+          "groups": {
+            "None|None": {
+              "count": 192,
+              "solved": 191
+            }
+          }
+        },
+        "fixed_clear1000": {
+          "count": 1000,
+          "solved": 889,
+          "groups": {
+            "None|None": {
+              "count": 1000,
+              "solved": 889
+            }
+          }
+        }
+      },
+      "original_step4000": {
+        "training_long": {
+          "count": 8000,
+          "solved": 7829,
+          "groups": {
+            "clear12|None": {
+              "count": 1000,
+              "solved": 897
+            },
+            "partial12|0.25": {
+              "count": 1000,
+              "solved": 1000
+            },
+            "partial12|0.5": {
+              "count": 1000,
+              "solved": 987
+            },
+            "partial12|0.75": {
+              "count": 1000,
+              "solved": 961
+            },
+            "clear8|None": {
+              "count": 1000,
+              "solved": 991
+            },
+            "partial8|0.25": {
+              "count": 1000,
+              "solved": 1000
+            },
+            "partial8|0.5": {
+              "count": 1000,
+              "solved": 998
+            },
+            "partial8|0.75": {
+              "count": 1000,
+              "solved": 995
+            }
+          }
+        },
+        "monitor_long": {
+          "count": 192,
+          "solved": 191,
+          "groups": {
+            "None|None": {
+              "count": 192,
+              "solved": 191
+            }
+          }
+        },
+        "fixed_clear1000": {
+          "count": 1000,
+          "solved": 875,
+          "groups": {
+            "None|None": {
+              "count": 1000,
+              "solved": 875
+            }
+          }
+        }
+      }
+    },
+    "raw_result": "runs/qmap_goal_generalization_20261028/blocks_native_residual_matched_step4000.json"
+  },
+  "goal_xor": {
+    "coordinate_frame": "goal_xor",
+    "checkpoint": "tasks/blocks/Qmap/checkpoints/decision_clear_300_4f413b5.pt",
+    "metrics": {
+      "training_long": {
+        "count": 8000,
+        "solved": 7817,
+        "groups": {
+          "clear12|None": {
+            "count": 1000,
+            "solved": 881
+          },
+          "partial12|0.25": {
+            "count": 1000,
+            "solved": 1000
+          },
+          "partial12|0.5": {
+            "count": 1000,
+            "solved": 987
+          },
+          "partial12|0.75": {
+            "count": 1000,
+            "solved": 978
+          },
+          "clear8|None": {
+            "count": 1000,
+            "solved": 978
+          },
+          "partial8|0.25": {
+            "count": 1000,
+            "solved": 1000
+          },
+          "partial8|0.5": {
+            "count": 1000,
+            "solved": 1000
+          },
+          "partial8|0.75": {
+            "count": 1000,
+            "solved": 993
+          }
+        }
+      },
+      "monitor_long": {
+        "count": 192,
+        "solved": 191,
+        "groups": {
+          "None|None": {
+            "count": 192,
+            "solved": 191
+          }
+        }
+      },
+      "fixed_clear1000": {
+        "count": 1000,
+        "solved": 889,
+        "groups": {
+          "None|None": {
+            "count": 1000,
+            "solved": 889
+          }
+        }
+      },
+      "actual_flan250": {
+        "id|partial8": {
+          "count": 41,
+          "solved": 41
+        },
+        "id|clear8": {
+          "count": 42,
+          "solved": 42
+        },
+        "id|clear12": {
+          "count": 42,
+          "solved": 38
+        },
+        "small_ood|partial12_ood": {
+          "count": 125,
+          "solved": 122
+        }
+      }
+    },
+    "comparison_to_masked_residual": {
+      "training_nonempty_lost": 9,
+      "all_nine_have_worse_exact_clearing_successor": true,
+      "raw": "runs/qmap_goal_generalization_20261028/blocks_xor_regressions.json"
+    },
+    "raw_result": "runs/qmap_goal_generalization_20261028/blocks_xor_broad.json"
   }
 }

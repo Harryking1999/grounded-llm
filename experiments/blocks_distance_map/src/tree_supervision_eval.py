@@ -10,6 +10,7 @@ import torch
 import grounded_llm.tasks.blocks.rules as blocks
 from .hardbranch_failure import summarize, trace
 from .model import BoardEncoder, board_bits, distance
+from grounded_llm.tasks.blocks.model import goal_relative_boards
 from grounded_llm.tasks.blocks.multiboard_data import official_boards, sample_paths
 from grounded_llm.tasks.blocks.oracle import DistanceOracle
 
@@ -58,7 +59,7 @@ def fresh_tasks(data, contract, official_path, board_count, tasks_per_board, see
 
 class QScorer:
     def __init__(self, checkpoint, device, *, coordinate_frame="absolute"):
-        if coordinate_frame not in ("absolute", "goal_residual"):
+        if coordinate_frame not in ("absolute", "goal_residual", "goal_xor"):
             raise ValueError(f"Unknown blocks coordinate frame: {coordinate_frame}")
         saved = torch.load(checkpoint, map_location=device, weights_only=True)
         config = saved["config"]
@@ -78,6 +79,8 @@ class QScorer:
 
     @torch.no_grad()
     def scores(self, masks, goal):
+        if self.coordinate_frame == "goal_xor":
+            return self.absolute_scores(goal_relative_boards(masks, goal), 0)
         if self.coordinate_frame == "goal_residual":
             # A legal removal preserving G acts on S\G exactly as a clearing
             # removal. Losing any goal cell is irreversible under these rules.

@@ -10,5 +10,11 @@ def board_bits(masks):
                                         dtype=np.float32, count=len(values) * 100).reshape(-1, 100))
 
 
+def goal_relative_boards(masks, goals):
+    """Binary differences for every physical state, including missing goal cells."""
+    goals = np.broadcast_to(np.asarray(goals, dtype=object), (len(masks),))
+    return [int(state) ^ int(goal) for state, goal in zip(masks, goals)]
+
+
 class BoardEncoder(StateEncoder):
     """Historical constructor name; state_dict keys and outputs are preserved."""

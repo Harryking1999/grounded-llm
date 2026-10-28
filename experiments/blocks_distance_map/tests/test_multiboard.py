@@ -12,6 +12,57 @@ from experiments.blocks_distance_map.src.oracle import DistanceOracle
 
 
 class MultiboardTests(unittest.TestCase):
+    def test_xor_query_retains_physical_successors_and_original_q_width(self):
+        from grounded_llm.tasks.blocks.model import BoardEncoder, goal_relative_boards
+        from grounded_llm.tasks.blocks.qmap import FrozenBoardMap, blocks_step
+        from grounded_llm.tasks.blocks.oracle import successors
+        from grounded_llm.tasks.blocks.rules import PLACEMENTS
+        torch.manual_seed(8)
+        model = BoardEncoder(128, 16, 13, 'directed_sum')
+        raw = FrozenBoardMap(model)
+        relative = FrozenBoardMap(model, coordinate_frame='goal_xor')
+        for source in range(64):
+            for goal in range(64):
+                encoded = goal_relative_boards([source], goal)[0]
+                self.assertEqual(encoded ^ goal, source)
+                if source & goal == goal:
+                    self.assertEqual(encoded, source & ~goal)
+                for action, child in successors(source):
+                    self.assertEqual(child ^ goal, encoded ^ PLACEMENTS[action][0])
+        # A legal removal can erase goal cells; it still has a finite, full Q slot.
+        source, goal = 7, 4
+        step = blocks_step(relative, source, goal)
+        self.assertEqual(list(zip(step.candidate_actions, step.candidate_destinations)), successors(source))
+        self.assertEqual(step.map_batch.vectors.shape[-1], 128)
+        step.map_batch.validate(1000)
+        torch.testing.assert_close(step.map_batch.vectors[0], raw.encode([source ^ goal, 0, *[s ^ goal for _, s in successors(source)]]))
+        self.assertTrue(np.isfinite(step.candidate_map_distances).all())
+        for i, pair in enumerate(successors(source), 1):
+            self.assertEqual(step.execute(i), pair)
+        for source in (0, 7, 31, 63):
+            a, b = blocks_step(raw, source, 0), blocks_step(relative, source, 0)
+            torch.testing.assert_close(a.map_batch.vectors, b.map_batch.vectors, rtol=0, atol=0)
+            self.assertEqual(a.candidate_map_distances, b.candidate_map_distances)
+        self.assertTrue(blocks_step(relative, goal, goal).done)
+        self.assertFalse(blocks_step(relative, 0, goal).done)
+        from grounded_llm.core.qmap.reader import CachedQMap
+        for reader in (raw, relative):
+            cached = CachedQMap(reader)
+            for target in (0, goal, 3, goal):
+                actual, expected = blocks_step(cached, 7, target), blocks_step(reader, 7, target)
+                torch.testing.assert_close(actual.map_batch.vectors, expected.map_batch.vectors)
+                self.assertEqual(actual.candidate_map_distances, expected.candidate_map_distances)
+        from grounded_llm.tasks.state_graph_sft import StateTask
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / 'q.pt'
+            torch.save(dict(config={'model': dict(state_dim=128, encoder_hidden_dim=16)},
+                            cap=13, metric=model.metric, model=model.state_dict()), path)
+            task = StateTask(dict(task='blocks', map_checkpoint='q.pt',
+                                  context={'coordinate_frame': 'goal_xor'}), temp)
+            flan_step = task.make_step(7, goal)
+            torch.testing.assert_close(flan_step.map_batch.vectors, step.map_batch.vectors)
+            self.assertEqual(flan_step.candidate_destinations, step.candidate_destinations)
+
     def test_residual_query_preserves_clearing_and_goal_preserving_transitions(self):
         from experiments.blocks_distance_map.src.tree_supervision_eval import QScorer
         from grounded_llm.tasks.blocks.model import BoardEncoder

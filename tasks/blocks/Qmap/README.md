@@ -7,3 +7,5 @@
 原两层MLP、128维Q、Huber、soft-rank、Adam与纯贪心不变，参见[统一方法](../../QMAP_METHOD.md)。仅沿用已授权不可达19。训练模块`experiments.blocks_distance_map.src.full_graph_run`，固定验收模块`blocks12_eval`；续训显式传入正式合同中的`continuation_checkpoint`作`--resume`，兼容原`FrozenBoardMap`加载。
 
 [简明报告](../../../experiments/blocks_distance_map/results/blocks12_joint_report.md)与[能力总表](../../README.md#任务能力总表)维护当前成绩；过程断点、日志和曝光留在忽略runtime。当前地图的文字40题、1.5B／7B接图成绩未测。
+
+非空目标使用selection中的 `goal_xor` 条件：将当前、目标和全部真实后继分别与目标异或，复用原清空Q。删除目标格的合法动作保留完整后继向量与有限评分，输入仍为100格、Q仍为128维。固定非空监测191/192，训练初盘上的8／12块、三种目标比例六组为97.8%–100%；原FLAN的12块非空目标122/125。目标为0时保持原清空向量与评分。调用 `FrozenBoardMap.load(checkpoint, coordinate_frame="goal_xor")`，详细比较见简明报告。

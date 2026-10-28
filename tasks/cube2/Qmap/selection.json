@@ -8,5 +8,21 @@
   "selection": "user_adopted_repair_guard_final_checkpoint_not_global_optimum_claim",
   "config": "experiments/cube2_qmap/configs/cycle_repair.json",
   "scope": "fixed_goal_restoration_current_symmetric_Q_Linf",
-  "evidence": "experiments/cube2_qmap/README.md"
+  "evidence": "experiments/cube2_qmap/README.md",
+  "conditions": {
+    "goal_relative_inverse": {
+      "status": "selected_by_validation",
+      "checkpoint": "checkpoints/goal_relative_inverse_486.pt",
+      "source_commit": "90b809cb4cc71c919f042079c05184719e431133",
+      "source_run": "/zhanghanyue/experiment/grounded_llm_puzzle_qmaps/runs/cube_relative_goal_20261028/forced_inverse_90b809c",
+      "source_checkpoint": "train/best.pt",
+      "source_epoch": 486,
+      "config": "experiments/cube2_qmap/configs/relative_goal.json",
+      "coordinate_frame": "goal_relative",
+      "model_inverse_symmetry": true,
+      "selection": "validation solved count, then distance MAE",
+      "scope": "Six-action QTM,128D inverse-invariant Q and original Linf readout; all legal physical successors",
+      "evidence": "experiments/cube2_qmap/results/goal_coverage_summary.json#forced_inverse_vector_projection"
+    }
+  }
 }

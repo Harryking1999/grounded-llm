@@ -11,3 +11,5 @@
 读取入口为 `grounded_llm.tasks.cube2.model.MapReader`。默认 `coordinate_frame="absolute"`；`coordinate_frame="goal_relative"` 在 `scores`／`choose` 中使用已知群运算转换到复原问题。两者共享同一权重，目标相对坐标条件单独标注。
 
 新结构在模型配置中启用 `inverse_symmetry=true`，编码器内部对正反相对状态的Q向量求均值，严格保证 `Q(r)=Q(r⁻¹)`。仍输出128维，读取使用原L∞距离，并以 `coordinate_frame="goal_relative"` 加载。编码器内部处理两种对称呈现；历史距离均值读取 `inverse_average=True` 的对照见实验报告。
+
+后续目标相对读取采用selection的`goal_relative_inverse`条件：验证选出的第486轮权重，全状态94.90%，四组固定题分别93.2%、93.4%、95.2%、94.4%；当前FLAN仍使用原冻结权重和绝对读取。

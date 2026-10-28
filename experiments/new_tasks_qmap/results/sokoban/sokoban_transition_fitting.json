@@ -3691,6 +3691,42 @@
         "supplementary_decisions_per_batch": 256,
         "formal": false
       }
+    },
+    "early_fitting": {
+      "step": 3000,
+      "full_training_policy": {
+        "queries": 747780,
+        "solved": 253213,
+        "cycles": 494567,
+        "immediate_dead_decisions": 9291,
+        "cycle_decisions": 45742,
+        "critical_decisions": 55033,
+        "continuation_decisions": 8785,
+        "bank_decisions": 62738,
+        "full_permitted_training_graph": true,
+        "all_legal_candidates_preserved": true
+      },
+      "validation": {
+        "validation": {
+          "count": 16,
+          "solved": 13,
+          "cycles": 3,
+          "entered_unreachable": 0
+        },
+        "unseen_goal_validation": {
+          "count": 96,
+          "solved": 55,
+          "cycles": 41,
+          "entered_unreachable": 18
+        },
+        "original_training_goals": {
+          "count": 198,
+          "solved": 41,
+          "cycles": 157,
+          "entered_unreachable": 38
+        }
+      },
+      "condition": "Frozen diagnostic of current full checkpoint; no optimizer update, bank replacement, or test-based selection"
     }
   }
 }

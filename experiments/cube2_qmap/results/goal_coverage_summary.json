@@ -5018,6 +5018,114 @@
     },
     "raw_parent": "/tmp/qmaps_resume_40645_ee701ee/cube/forced_inverse_parent.pt",
     "persistent_root": "/zhanghanyue/experiment/grounded_llm_puzzle_qmaps/runs/cube_relative_goal_20261028/resume_40645_ee701ee",
-    "definition": "Qsym(r)=(Qaxis(r)+Qaxis(r^-1))/2; exact inverse-invariant128D output, original Linf readout"
+    "definition": "Qsym(r)=(Qaxis(r)+Qaxis(r^-1))/2; exact inverse-invariant128D output, original Linf readout",
+    "selected_evaluation": {
+      "checkpoint": "best.pt",
+      "selection": "predeclared validation solved count then distance MAE",
+      "epoch": 486,
+      "step": 67620,
+      "source_commit": "90b809cb4cc71c919f042079c05184719e431133",
+      "inverse_symmetry": true,
+      "q_dimension": 128,
+      "inverse_average_reader": false,
+      "all_states": {
+        "count": 3674160,
+        "solved": 3486784,
+        "success_rate": 0.949001676573693,
+        "by_depth": {
+          "0": {
+            "count": 1,
+            "solved": 1
+          },
+          "1": {
+            "count": 6,
+            "solved": 6
+          },
+          "2": {
+            "count": 27,
+            "solved": 27
+          },
+          "3": {
+            "count": 120,
+            "solved": 120
+          },
+          "4": {
+            "count": 534,
+            "solved": 534
+          },
+          "5": {
+            "count": 2256,
+            "solved": 2256
+          },
+          "6": {
+            "count": 8969,
+            "solved": 8969
+          },
+          "7": {
+            "count": 33058,
+            "solved": 33058
+          },
+          "8": {
+            "count": 114149,
+            "solved": 114149
+          },
+          "9": {
+            "count": 360508,
+            "solved": 357070
+          },
+          "10": {
+            "count": 930588,
+            "solved": 900954
+          },
+          "11": {
+            "count": 1350852,
+            "solved": 1272041
+          },
+          "12": {
+            "count": 782536,
+            "solved": 716573
+          },
+          "13": {
+            "count": 90280,
+            "solved": 80788
+          },
+          "14": {
+            "count": 276,
+            "solved": 238
+          }
+        }
+      },
+      "fixed_cohorts": {
+        "original": {
+          "count": 500,
+          "solved": 466
+        },
+        "small_ood": {
+          "count": 500,
+          "solved": 467
+        },
+        "validation": {
+          "count": 500,
+          "solved": 476
+        },
+        "test": {
+          "count": 500,
+          "solved": 472
+        }
+      },
+      "actual_flan_same250": {
+        "id|id": {
+          "count": 125,
+          "solved": 117
+        },
+        "small_ood|noncanonical_goal_ood": {
+          "count": 125,
+          "solved": 119
+        }
+      },
+      "maximum_inverse_vector_difference": 0.0,
+      "all_legal_successor_scores_finite": true,
+      "maximum_cached_reader_score_difference": 0.0
+    }
   }
 }

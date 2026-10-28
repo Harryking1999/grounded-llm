@@ -74,8 +74,9 @@ class CurrentFailureReplay:
         from .relation_diagnose import training_start_queries, training_failure_bank, policy_boundaries
         from .relation_evaluate import QCache, planning_ids, rollout
         rows, truth = training_start_queries(self.corpus, self.data, 'original_starts')
-        ids = planning_ids(self.corpus, rows, truth, self.options['queries'],
-                           np.random.default_rng(config['seed']+51003), [1,2,5,10,20,40,80,256])
+        ids = (np.arange(len(rows)) if self.options['queries']=='all' else
+               planning_ids(self.corpus, rows, truth, self.options['queries'],
+                            np.random.default_rng(config['seed']+51003), [1,2,5,10,20,40,80,256]))
         records = []
         metrics = rollout(self.corpus, QCache(model,self.corpus,device), rows[ids], 256, 'q', edge_records=records)
         _, edges = policy_boundaries(records)

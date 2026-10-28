@@ -90,6 +90,7 @@ def validate_continuation(previous,current,step):
     resize=current.get('continuation',{}).get('mode')=='batch_resize'
     rank_change=current.get('continuation',{}).get('mode')=='rank_weight_change'
     current_failures=current.get('continuation',{}).get('mode')=='current_failure_replay'
+    failure_coverage=current.get('continuation',{}).get('mode')=='current_failure_coverage'
     for item in (old,new):
         for key in ('continuation','convergence','pilot'):item.pop(key,None)
         if item.get('failure_diagnosis'):
@@ -99,6 +100,16 @@ def validate_continuation(previous,current,step):
         # for every pending trace and preserve optimizer/sampling/RNG state.
         workers=item['training'].pop('trace_write_workers',0)
         if workers not in (0,1):raise ValueError('Only synchronous or one-worker trace writing is supported')
+    if failure_coverage:
+        before=old['training'].get('current_failure_replay',{})
+        after=new['training'].get('current_failure_replay',{})
+        if not before or before.get('queries')=='all' or after.get('queries')!='all':
+            raise ValueError('Failure coverage continuation expands the existing training-root query pool')
+        if not step<=old['training']['steps']<=new['training']['steps'] or step>=new['training']['steps']:
+            raise ValueError('Failure coverage continuation preserves remaining updates or explicitly extends them')
+        after['queries']=before['queries'];new['training']['steps']=old['training']['steps']
+        if old!=new:raise ValueError('Failure coverage continuation changes another training condition')
+        return
     if current_failures:
         if 'current_failure_replay' in old['training'] or not new['training'].pop('current_failure_replay',None):
             raise ValueError('Current-failure continuation must explicitly add its own replay stream')
@@ -386,6 +397,8 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
                 batch_sizes={k:dict(previous=saved['config']['training'][k],current=options[k]) for k in ('batch_size','decision_batch_size')},
                 meaning=('Original optimizer/samplers/RNG/counters restored; add current failure forks with a separate recoverable stream.'
                     if continuation.get('mode')=='current_failure_replay' else
+                    'Full optimizer/samplers/RNG/counters restored; refresh current failures over every permitted original training root.'
+                    if continuation.get('mode')=='current_failure_coverage' else
                     'Full optimizer/RNG/counter restoration; only ranking weight changes explicitly, with the same future samples.'
                     if continuation.get('mode')=='rank_weight_change' else
                     'Full optimizer/RNG/counter restoration; batch sizes change explicitly, so the update trajectory changes.'
@@ -449,6 +462,8 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
             saved.get('current_failure_state') if checkpoint is not None else None)
         if checkpoint is not None and not saved.get('current_failure_state'):
             current_replay.last_refresh=start_step
+        if (continuation or {}).get('mode')=='current_failure_coverage' and not resume:
+            current_replay.last_refresh=start_step-options['current_failure_replay']['refresh_every']
         atomic_json(out/'current_failure_summary.json',current_replay.report())
     if not (out/'initial.json').exists():
         initial_started=time.monotonic()

@@ -4709,5 +4709,100 @@
     },
     "raw_root": "/tmp/cube_relative_final_ea9436a",
     "persistent_root": "/zhanghanyue/experiment/grounded_llm_puzzle_qmaps/runs/cube_relative_goal_20261028/refinement"
+  },
+  "failure_targeting_diagnosis": {
+    "epoch": 85,
+    "optimizer_step": 44763,
+    "report": {
+      "wrong_training_stars": 471819,
+      "cycle_exits": 35380,
+      "failed_start_states": 475208,
+      "by_depth": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        444,
+        32512,
+        180675,
+        231120,
+        27068,
+        0,
+        0
+      ],
+      "retained_correct_stars": 28163,
+      "retention_fraction": 0.25,
+      "retention_max_margin": 0.5,
+      "retained_correct_by_depth": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1949,
+        6554,
+        6554,
+        6553,
+        6553,
+        0,
+        0
+      ]
+    },
+    "replay_groups": {
+      "cycle_exits": {
+        "parents": 35380,
+        "probability": 0.15908125567323672,
+        "expected_per_batch": 5212.774585900621
+      },
+      "other_wrong_failed": {
+        "parents": 98016,
+        "probability": 0.1327092483575759,
+        "expected_per_batch": 4348.616650181047
+      },
+      "other_wrong_recovering": {
+        "parents": 338423,
+        "probability": 0.4582094959691874,
+        "expected_per_batch": 15014.608763918333
+      },
+      "fragile_correct": {
+        "parents": 28163,
+        "probability": 0.25,
+        "expected_per_batch": 8192.0
+      }
+    },
+    "failed_starts": 475208,
+    "failed_starts_behind_trainable_cycle_exits": 404889,
+    "candidate_sampling": {
+      "epoch": 85,
+      "optimizer_step": 44763,
+      "cycle_probability": 0.5,
+      "other_failed_probability": 0.25,
+      "correct_probability": 0.25,
+      "heldout_labels_absent": true,
+      "epochs_budget": 500,
+      "resume_continuation_step": 4845
+    },
+    "source_commit": "7c1ab24",
+    "raw_root": "/zhanghanyue/experiment/grounded_llm_puzzle_qmaps/runs/cube_relative_goal_20261028/retention",
+    "resume_validation": {
+      "parent_epoch": 147,
+      "saved_epoch": 147,
+      "parent_optimizer_step": 48297,
+      "new_optimizer_step": 48298,
+      "optimizer_counter": 48298,
+      "total_epoch_budget": 500,
+      "historical_best_preserved": true,
+      "parent_lineage_preserved": true,
+      "rng_present": true,
+      "replay_cycle_probability": 0.49999999999999994,
+      "formal": false
+    }
   }
 }

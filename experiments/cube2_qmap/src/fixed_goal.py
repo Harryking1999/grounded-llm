@@ -3,6 +3,7 @@ import argparse
 import json
 from pathlib import Path
 import time
+import shutil
 from copy import deepcopy
 from concurrent.futures import ThreadPoolExecutor
 
@@ -200,7 +201,7 @@ def restoration_policy(model, env, config, device, feature_table=None):
     return predicted, next_state
 
 
-def failure_pool(env, heldout, pointer, *, predicted=None, retention_fraction=0.,
+def failure_pool(env, heldout, pointer, *, predicted=None, retention_fraction=0., cycle_fraction=None,
                  retention_limit=32768, retention_max_margin=.5):
     """Wrong training stars, with extra exposure for exits trapping many starts."""
     from .policy_audit import two_cycle_basins
@@ -220,6 +221,15 @@ def failure_pool(env, heldout, pointer, *, predicted=None, retention_fraction=0.
     weights = np.ones(len(parents), dtype=float)
     weights[cyclic] += np.log1p(counts[representative[cyclic]])
     weights /= weights.sum()
+    if cycle_fraction is not None:
+        if not 0<cycle_fraction<1:raise ValueError('Cycle quota must lie strictly between zero and one')
+        other=~cyclic & (labels[parents]>=0)
+        if not other.any():other=~cyclic
+        if cyclic.any() and other.any():
+            focused=np.zeros_like(weights)
+            focused[cyclic]=cycle_fraction*weights[cyclic]/weights[cyclic].sum()
+            focused[other]=(1-cycle_fraction)*weights[other]/weights[other].sum()
+            weights=focused
     report = dict(wrong_training_stars=len(parents),
         cycle_exits=int(cyclic.sum()), failed_start_states=int((labels >= 0).sum()),
         by_depth=np.bincount(env.depth[parents], minlength=env.diameter+1).tolist())
@@ -251,7 +261,20 @@ def failure_pool(env, heldout, pointer, *, predicted=None, retention_fraction=0.
         report.update(retained_correct_stars=len(retained),retention_fraction=retention_fraction if retained else 0.,
                       retention_max_margin=retention_max_margin,
                       retained_correct_by_depth=np.bincount(env.depth[retained],minlength=env.diameter+1).tolist() if retained else [])
+    cycle_mask=(pointer[pointer[parents]]==parents) & (env.depth[pointer[parents]].astype(int)!=env.depth[parents].astype(int)-1)
+    report['cycle_probability']=float(weights[cycle_mask].sum())
     return parents,weights,report
+
+
+def validate_resume_contract(previous, current, retarget_replay=False):
+    if retarget_replay:
+        previous, current = deepcopy(previous), deepcopy(current)
+        previous['training'].pop('failure_cycle_fraction',None)
+        changed=current['training'].pop('failure_cycle_fraction',None)
+        if changed is None or not 0<changed<1:
+            raise ValueError('Replay retargeting requires an explicit bounded cycle quota')
+    if previous != current:
+        raise ValueError('Resume changed a fixed-goal condition beyond the requested cycle quota')
 
 
 @torch.no_grad()
@@ -295,10 +318,12 @@ def main():
     parser.add_argument("--source-commit", required=True)
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--resume-run", type=Path)
+    parser.add_argument('--retarget-replay',action='store_true',help='Change only the cycle replay quota at a complete epoch')
     parser.add_argument('--checkpoint',type=Path,help='Warm-start a new fixed-goal condition with its Adam state')
     parser.add_argument('--devices',nargs='+')
     parser.add_argument("--smoke-steps", type=int, default=0)
     args = parser.parse_args()
+    if args.retarget_replay and args.resume_run is None:raise ValueError('Replay retargeting requires a complete run to resume')
     config = json.loads(args.contract.read_text())
     if config["rules"]["fixed_goal"] != 0:
         raise ValueError("This task is restoration to canonical solved state zero")
@@ -326,8 +351,7 @@ def main():
         if saved.get('fixed_goal') == 0 and 'rng' in saved:
             rng.bit_generator.state = saved['rng']
     if args.resume_run:
-        if json.loads((args.resume_run / "contract.json").read_text()) != config:
-            raise ValueError("Resume changed fixed-goal contract")
+        validate_resume_contract(json.loads((args.resume_run / "contract.json").read_text()),config,args.retarget_replay)
         saved = torch.load(args.resume_run / "last.pt", map_location="cpu", weights_only=False)
         starting_epoch, starting_step = saved["epoch"], saved.get('continuation_step',saved['step'])
         parent = saved.get('parent')
@@ -339,6 +363,7 @@ def main():
         rng.bit_generator.state = saved["rng"]
         if saved.get('failure_replay'):
             replay_parents, replay_probabilities, replay_report = saved['failure_replay']
+        if args.retarget_replay:replay_report={}
     args.out.mkdir(parents=True, exist_ok=False)
     (args.out / "contract.json").write_text(json.dumps(config, indent=2) + "\n")
     np.savez_compressed(args.out / "split.npz", mask=mask, **cohorts)
@@ -359,6 +384,14 @@ def main():
         if options['paths_per_batch']:raise ValueError('Device-resident restoration uses solved-goal labels only')
         parallel = FixedGoalReplicas(model,env,heldout,args.devices)
     best_validation = (-1,float('-inf'))
+    if args.resume_run:
+        previous_summary=json.loads((args.resume_run/'summary.json').read_text())
+        best_validation=tuple(previous_summary.get('best_validation') or max(
+            (row['metrics']['validation']['rollout']['solved'],-row['metrics']['validation']['pairs']['mae'])
+            for row in previous_summary['evaluations']))
+        result['best_epoch']=previous_summary.get('best_epoch')
+        result['best_validation']=list(best_validation)
+        if (args.resume_run/'best.pt').exists():shutil.copy2(args.resume_run/'best.pt',args.out/'best.pt')
 
     def inspect(epoch, log):
         nonlocal best_validation
@@ -370,6 +403,7 @@ def main():
             best_validation = score
             save(epoch,'best.pt')
             result['best_epoch'] = epoch
+            result['best_validation'] = list(score)
         interval = config['evaluation'].get('exhaustive_every_epochs')
         if interval and epoch % interval == 0:
             row['exhaustive_policy'] = exhaustive_policy(model,env,mask,config,args.device,
@@ -412,6 +446,7 @@ def main():
                                                   parallel.features[0] if parallel else None)
                 replay_parents,replay_probabilities,replay_report = failure_pool(env,heldout,pointer,
                     predicted=predicted,retention_fraction=options.get('failure_retention_fraction',0.),
+                    cycle_fraction=options.get('failure_cycle_fraction'),
                     retention_limit=options.get('failure_retention_limit',32768),
                     retention_max_margin=options.get('failure_retention_max_margin',.5))
                 row = dict(epoch=epoch,failure_replay=replay_report)

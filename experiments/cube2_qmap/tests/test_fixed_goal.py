@@ -6,7 +6,7 @@ from types import SimpleNamespace
 import numpy as np
 import torch
 
-from experiments.cube2_qmap.src.fixed_goal import FixedGoalReplicas, tensor_batch, balanced_parents, exhaustive_policy, failure_pool, make_batch, path_relations, prepare, reach_within_budget
+from experiments.cube2_qmap.src.fixed_goal import FixedGoalReplicas, tensor_batch, balanced_parents, exhaustive_policy, failure_pool, make_batch, path_relations, prepare, reach_within_budget, validate_resume_contract
 from experiments.cube2_qmap.src.full_state_joint import batch_losses
 from experiments.puzzle_qmap.src.model import QMap
 from experiments.cube2_qmap.tests.test_full_state_joint import Ring
@@ -57,6 +57,29 @@ class FixedGoalTests(unittest.TestCase):
                     torch.testing.assert_close(x.grad,y.grad,rtol=1e-5,atol=1e-7)
                     torch.testing.assert_close(x,y,rtol=1e-5,atol=1e-7)
         finally:parallel.close()
+
+    def test_cycle_focused_replay_preserves_correct_relations_and_total_quota(self):
+        env=self.env;ids=np.arange(env.size);children=env.successors(ids)
+        pointer=children[ids,env.depth[children].argmin(-1)];pointer[0]=0
+        pointer[[4,7,8,9,10,20]]=[5,8,9,10,11,21]
+        parents,weights,report=failure_pool(env,np.zeros(env.size,bool),pointer,
+            predicted=env.depth.astype(float)*.1,retention_fraction=.25,cycle_fraction=2/3)
+        from experiments.cube2_qmap.src.policy_audit import two_cycle_basins
+        labels=two_cycle_basins(pointer)
+        wrong=env.depth[pointer[parents]].astype(int)!=env.depth[parents].astype(int)-1
+        cycle=wrong&(pointer[pointer[parents]]==parents)
+        self.assertAlmostEqual(float(weights[cycle].sum()),.5)
+        self.assertAlmostEqual(float(weights[wrong&~cycle&(labels[parents]>=0)].sum()),.25)
+        self.assertAlmostEqual(float(weights[~wrong].sum()),.25)
+        self.assertEqual(float(weights[wrong&(labels[parents]==-1)].sum()),0.)
+        self.assertAlmostEqual(report['cycle_probability'],.5)
+        before={'training':{'epochs':500,'learning_rate':.0001}}
+        after=deepcopy(before);after['training']['failure_cycle_fraction']=2/3
+        validate_resume_contract(before,after,True)
+        with self.assertRaises(ValueError):validate_resume_contract(before,after)
+        for key,value in [('epochs',501),('learning_rate',.0003)]:
+            changed=deepcopy(after);changed['training'][key]=value
+            with self.assertRaises(ValueError):validate_resume_contract(before,changed,True)
 
     def test_fragile_correct_replay_keeps_original_total_quota_and_training_boundary(self):
         env=self.env;ids=np.arange(env.size);height=env.depth.astype(float)

@@ -68,6 +68,19 @@ class ConvergenceTests(unittest.TestCase):
             bad=deepcopy(new);bad['training'][key]=value
             with self.assertRaises(ValueError):validate_continuation(old,bad,9000)
 
+    def test_failure_coverage_continuation_preserves_every_other_sampler_condition(self):
+        old=dict(task='rush_hour',training=dict(steps=40000,batch_size=64,rank_weight=4.,
+            current_failure_replay=dict(queries=4096,contexts_per_batch=256,refresh_every=2000)))
+        new=deepcopy(old);new['training']['steps']=60000
+        new['training']['current_failure_replay']['queries']='all'
+        new['continuation']=dict(mode='current_failure_coverage')
+        validate_continuation(old,new,40000)
+        for key,value in [('batch_size',128),('rank_weight',1.),('steps',39000)]:
+            bad=deepcopy(new);bad['training'][key]=value
+            with self.assertRaises(ValueError):validate_continuation(old,bad,40000)
+        bad=deepcopy(new);bad['training']['current_failure_replay']['contexts_per_batch']=512
+        with self.assertRaises(ValueError):validate_continuation(old,bad,40000)
+
     def test_full_continuation_and_observation_preserve_update_trajectory(self):
         corpus,original=bank();data={k:np.concatenate([v,v]) for k,v in original.items() if k.endswith('_train')}
         data.update(broad_point_count=len(original['pairs_train']),broad_rank_count=len(original['tasks_train']))

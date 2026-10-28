@@ -45,7 +45,7 @@
     "architecture": "mlp"
   },
   "training": {
-    "steps": 40000,
+    "steps": 60000,
     "batch_size": 65536,
     "decision_batch_size": 8192,
     "learning_rate": 0.0003,
@@ -98,7 +98,7 @@
       "bank": "../../logs/rush_current_failure.bank.npz",
       "contexts_per_batch": 256,
       "refresh_every": 2000,
-      "queries": 4096,
+      "queries": "all",
       "ranking_fraction": 0.03125,
       "critical_fraction": 0.75,
       "distance_bin_upper_bounds": [
@@ -133,9 +133,9 @@
   "failure_diagnosis": "experiments/new_tasks_qmap/archive/configs/rush_hour/rush_hour_training_root_failures.json",
   "input_encoding": "geometry_order",
   "continuation": {
-    "checkpoint": "/tmp/rush_hour_qmap_targeted_20261028/parent/last.pt",
-    "reason": "Continue the full original state and its retained broad/path streams; add current training-only failed forks and complete successors using a separate recoverable stream. Keep the total40000-update budget.",
+    "checkpoint": "/tmp/rush_hour_qmap_targeted_20261028/runs/rush_hour_geometry_grid_mlp_convergence/last.pt",
+    "reason": "After the existing40000-step phase, continue complete model/Adam/samplers/RNG for20000updates. Refresh failed forks over every permitted original training root; retain broad/path streams,256supplementary contexts and complete legal successors.",
     "source_cuda_device": 0,
-    "mode": "current_failure_replay"
+    "mode": "current_failure_coverage"
   }
 }

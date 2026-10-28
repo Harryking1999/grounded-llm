@@ -909,7 +909,7 @@ class ExactPairTests(unittest.TestCase):
             training=dict(steps=4,batch_size=64,decision_batch_size=16,learning_rate=.0001,rank_weight=1.,
                 rank_temperature=1.,eval_every=2,cpu_threads=1,unreachable_target=15.,record_training_samples=True,
                 relation_sampling=dict(finite_point_fraction=.75,boundary_rank_fraction=0.,distance_bin_upper_bounds=[1,5]),
-                failure_replay=opts,current_failure_replay=dict(opts,contexts_per_batch=1,refresh_every=2,initial_step=0,queries=1)),
+                failure_replay=opts,current_failure_replay=dict(opts,contexts_per_batch=1,refresh_every=2,initial_step=0,queries='all')),
             evaluation=dict(decision_count=4,rollout_count=1,horizon=8))
         prepared=(corpus,data,dict(states=corpus.size))
         original_save=__import__('experiments.new_tasks_qmap.src.relations',fromlist=['atomic_save']).atomic_save
@@ -929,6 +929,7 @@ class ExactPairTests(unittest.TestCase):
             self.assertEqual(a['current_failure_state']['rng'],b['current_failure_state']['rng'])
             self.assertEqual(a['current_failure_state']['round'],b['current_failure_state']['round'])
             np.testing.assert_array_equal(a['current_failure_state']['draws'],b['current_failure_state']['draws'])
+            self.assertEqual(json.loads((root/'full/current_failures_0001.json').read_text())['queries'],1)
 
     def test_trajectory_progress_checks_do_not_change_greedy_selection(self):
         with tempfile.TemporaryDirectory() as tmp, ExitStack() as stack:

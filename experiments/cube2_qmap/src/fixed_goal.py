@@ -200,7 +200,8 @@ def restoration_policy(model, env, config, device, feature_table=None):
     return predicted, next_state
 
 
-def failure_pool(env, heldout, pointer):
+def failure_pool(env, heldout, pointer, *, predicted=None, retention_fraction=0.,
+                 retention_limit=32768, retention_max_margin=.5):
     """Wrong training stars, with extra exposure for exits trapping many starts."""
     from .policy_audit import two_cycle_basins
     allowed = ~heldout.copy()
@@ -218,9 +219,39 @@ def failure_pool(env, heldout, pointer):
     representative = np.minimum(parents, pointer[parents])
     weights = np.ones(len(parents), dtype=float)
     weights[cyclic] += np.log1p(counts[representative[cyclic]])
-    return parents, weights / weights.sum(), dict(wrong_training_stars=len(parents),
+    weights /= weights.sum()
+    report = dict(wrong_training_stars=len(parents),
         cycle_exits=int(cyclic.sum()), failed_start_states=int((labels >= 0).sum()),
         by_depth=np.bincount(env.depth[parents], minlength=env.diameter+1).tolist())
+    if retention_fraction:
+        if predicted is None or not 0<retention_fraction<1 or retention_limit<1 or retention_max_margin<=0:
+            raise ValueError('Fragile-correct replay requires predictions and positive bounded quotas')
+        retained,retained_weights=[],[]
+        candidates=np.flatnonzero(allowed & ~wrong)
+        margins=np.full(len(candidates),np.inf,dtype=np.float32)
+        for start in range(0,len(candidates),32768):
+            ids=candidates[start:start+32768];children=env.successors(ids)
+            optimal=env.depth[children].astype(int)==env.depth[ids,None].astype(int)-1
+            good=np.where(optimal,predicted[children],np.inf).min(-1)
+            other=np.where(~optimal,predicted[children],np.inf).min(-1)
+            margins[start:start+len(ids)]=other-good
+        eligible=(margins>=0)&(margins<=retention_max_margin)
+        depths=np.unique(env.depth[candidates[eligible]])
+        quota,remainder=divmod(retention_limit,max(1,len(depths)))
+        for i,depth in enumerate(depths):
+            local=np.flatnonzero(eligible&(env.depth[candidates]==depth))
+            selected=local[np.argsort(margins[local],kind='stable')[:quota+(i<remainder)]]
+            if not len(selected):continue
+            retained.extend(candidates[selected])
+            retained_weights.extend(np.full(len(selected),1/len(selected)))
+        if retained:
+            parents=np.r_[parents,np.asarray(retained,dtype=np.int64)]
+            retained_weights=np.asarray(retained_weights);retained_weights/=retained_weights.sum()
+            weights=np.r_[(1-retention_fraction)*weights,retention_fraction*retained_weights]
+        report.update(retained_correct_stars=len(retained),retention_fraction=retention_fraction if retained else 0.,
+                      retention_max_margin=retention_max_margin,
+                      retained_correct_by_depth=np.bincount(env.depth[retained],minlength=env.diameter+1).tolist() if retained else [])
+    return parents,weights,report
 
 
 @torch.no_grad()
@@ -377,9 +408,12 @@ def main():
         for epoch in range(starting_epoch + 1, options["epochs"] + 1):
             if options.get('failure_replay_size') and (not replay_report or
                     (epoch-1) % options['failure_refresh_every_epochs'] == 0):
-                _, pointer = restoration_policy(model,env,config,args.device,
+                predicted, pointer = restoration_policy(model,env,config,args.device,
                                                   parallel.features[0] if parallel else None)
-                replay_parents,replay_probabilities,replay_report = failure_pool(env,heldout,pointer)
+                replay_parents,replay_probabilities,replay_report = failure_pool(env,heldout,pointer,
+                    predicted=predicted,retention_fraction=options.get('failure_retention_fraction',0.),
+                    retention_limit=options.get('failure_retention_limit',32768),
+                    retention_max_margin=options.get('failure_retention_max_margin',.5))
                 row = dict(epoch=epoch,failure_replay=replay_report)
                 log.write(json.dumps(row)+'\n');log.flush();print(json.dumps(row),flush=True)
             order = rng.permutation(env.size)

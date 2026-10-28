@@ -1,5 +1,5 @@
 {
-  "hypothesis": "Goal-relative coordinates reduce arbitrary goals to restoration. Preserve full parent traversal and depth-balanced replay, while repeating current wrong complete stars and emphasizing exits by the number of starts trapped in their cycle. Reuse the selected Q, Adam, original Huber and six-candidate soft-rank with four GPU-resident replicas.",
+  "hypothesis": "Goal-relative coordinates reduce arbitrary goals to restoration. Preserve full parent traversal and depth-balanced replay. Within the existing targeted replay quota, repeat wrong complete stars and retain fragile correct stars; emphasize exits by the number of starts trapped in their cycle. Reuse the complete Q, Adam, original Huber and six-candidate soft-rank with four GPU-resident replicas.",
   "rules": {
     "metric": "QTM_URF_6",
     "fixed_goal": 0
@@ -30,7 +30,10 @@
     "minimum_epochs": 20,
     "stop_on_target": true,
     "failure_replay_size": 32768,
-    "failure_refresh_every_epochs": 5
+    "failure_refresh_every_epochs": 5,
+    "failure_retention_fraction": 0.25,
+    "failure_retention_limit": 32768,
+    "failure_retention_max_margin": 0.5
   },
   "evaluation": {
     "states_per_layer": 128,
@@ -42,7 +45,7 @@
     "minimum_success_rate": 0.9
   },
   "initialization": "Selected restoration Q and complete Adam state.",
-  "supervision": "Every epoch traverses physical parents with depth-balanced replay. Add current wrong complete training stars, weighted by1+log(1+cycle basin size) for cycle exits; refresh every5epochs. All replay stars omit heldout parent and candidate labels. The same distance Huber and complete six-candidate soft-rank supervise every source.",
+  "supervision": "Every epoch traverses physical parents with depth-balanced replay. Within the fixed extra replay quota, mix current wrong complete stars weighted by1+log(1+cycle basin size) with depth-balanced fragile-correct stars; refresh every5epochs. All replay stars omit heldout parent and candidate labels. The same distance Huber and complete six-candidate soft-rank supervise every source.",
   "split": "Fixed state-to-solved validation and test relations are omitted from continuation supervision. The warm-start model has already seen states from the original training distribution.",
   "selection": "validation",
   "scope": "Goal-relative coordinates, six QTM actions, frozen-Q greedy execution. Continue complete Q, Adam and sampling RNG from the preceding complete epoch; train20to500 complete epochs, checking the90percent target for every fixed cohort and all-state restoration."

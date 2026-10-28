@@ -4620,5 +4620,94 @@
     "original_action_transition_identity_checked": true,
     "reader": "grounded_llm/tasks/cube2/model.py::MapReader(coordinate_frame=\"goal_relative\")",
     "scope": "Task-specific pair-conditioned coordinates. Absolute state embeddings and their evaluation remain a separate condition."
+  },
+  "goal_relative_refinement": {
+    "source_commit": "ea9436a",
+    "completed_epochs": 500,
+    "optimizer_step": 39918,
+    "checkpoint": "runs/cube_relative_goal_20261028/refinement/train/last.pt",
+    "condition": "Goal-relative coordinates; frozen Q greedy; six QTM actions; horizon32",
+    "all_states": {
+      "solved": 3191283,
+      "count": 3674160,
+      "success_rate": 0.8685748579267097
+    },
+    "fixed_500_cohorts": {
+      "original": {
+        "solved": 427,
+        "count": 500
+      },
+      "small_ood": {
+        "solved": 432,
+        "count": 500
+      },
+      "validation": {
+        "solved": 431,
+        "count": 500
+      },
+      "test": {
+        "solved": 445,
+        "count": 500
+      }
+    },
+    "actual_flan_same250": {
+      "id|id": {
+        "count": 125,
+        "solved": 114
+      },
+      "small_ood|noncanonical_goal_ood": {
+        "count": 125,
+        "solved": 115
+      }
+    },
+    "training_failure_inventory": {
+      "wrong_training_stars": 486828,
+      "cycle_exits": 35405,
+      "failed_start_states": 482877,
+      "by_depth": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1053,
+        37352,
+        185376,
+        233463,
+        29584,
+        0,
+        0
+      ],
+      "retained_correct_stars": 26753,
+      "retention_fraction": 0.25,
+      "retention_max_margin": 0.5,
+      "retained_correct_by_depth": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        107,
+        4802,
+        5461,
+        5461,
+        5461,
+        5461,
+        0,
+        0
+      ]
+    },
+    "retention_sampling_check": {
+      "correct_probability": 0.25,
+      "wrong_probability": 0.7500000000000004,
+      "heldout_labels_absent": true
+    },
+    "raw_root": "/tmp/cube_relative_final_ea9436a",
+    "persistent_root": "/zhanghanyue/experiment/grounded_llm_puzzle_qmaps/runs/cube_relative_goal_20261028/refinement"
   }
 }

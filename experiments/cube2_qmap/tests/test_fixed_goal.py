@@ -58,6 +58,25 @@ class FixedGoalTests(unittest.TestCase):
                     torch.testing.assert_close(x,y,rtol=1e-5,atol=1e-7)
         finally:parallel.close()
 
+    def test_fragile_correct_replay_keeps_original_total_quota_and_training_boundary(self):
+        env=self.env;ids=np.arange(env.size);height=env.depth.astype(float)
+        height[3]=10.;height[6]=4.15
+        children=env.successors(ids);pointer=children[ids,height[children].argmin(-1)];pointer[0]=0
+        held=np.zeros(env.size,dtype=bool)
+        parents,weights,report=failure_pool(env,held,pointer,predicted=height,retention_fraction=.25)
+        correct=env.depth[pointer[parents]].astype(int)==env.depth[parents].astype(int)-1
+        self.assertTrue(correct.any());self.assertTrue((~correct).any())
+        self.assertAlmostEqual(float(weights[correct].sum()),.25)
+        self.assertAlmostEqual(float(weights[~correct].sum()),.75)
+        self.assertEqual(int(correct.sum()),report['retained_correct_stars'])
+        self.assertEqual(len(parents),len(np.unique(parents)))
+        self.assertFalse(held[parents].any());self.assertFalse(held[env.successors(parents)].any())
+        held[5]=True
+        parents,weights,report=failure_pool(env,held,pointer,predicted=height,retention_fraction=.25)
+        self.assertFalse(held[parents].any());self.assertFalse(held[env.successors(parents)].any())
+        if len(weights):self.assertAlmostEqual(float(weights.sum()),1.)
+        else:self.assertEqual(report['wrong_training_stars'],0)
+
     def test_heldout_labels_are_absent_from_both_loss_families(self):
         heldout = np.zeros(self.env.size, dtype=bool)
         heldout[[5, 10]] = True

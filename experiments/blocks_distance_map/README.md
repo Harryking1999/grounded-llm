@@ -48,6 +48,15 @@ python -m experiments.blocks_distance_map.src.blocks12_eval \
 
 机器、环境与传输方法见[开发机手册](../../DEVELOPMENT_MACHINES.md)。数据、断点、逐题结果及曝光记录留在 Git 外运行目录；README 不保存启动时间线或另抄采样比例。
 
+Linux运行时可编译现有BDD查询的整数内核，供同一训练入口使用：
+
+```bash
+gcc -O3 -std=c99 -shared -fPIC experiments/blocks_distance_map/src/symbolic_kernel.c -o tmp/blocks_symbolic.so
+export GROUNDED_BLOCKS_SYMBOLIC_LIBRARY="$PWD/tmp/blocks_symbolic.so"
+```
+
+该变量指定运行时库；普通NumPy查询仍是默认实现。两种实现保持状态编号、精确标签与采样进度一致，比较结果见[积木报告](results/blocks12_joint_report.md)。
+
 ## 独立最终评测
 
 独立最终评测的准备入口为 [blocks12_sealed.py](src/blocks12_sealed.py)，参数见[配置](configs/blocks12_sealed_final.json)。`prepare` 必须显式提供 `--excluded-training-roots` 和 `--excluded-monitoring-cases`（各可传多个文件，监测集包含 `clear1000.json`），只生成冻结题集，不读取模型。确定候选后，`final-evaluate` 再显式指定 `--checkpoint` 与 `--parent-checkpoint`。题集排除所提供的训练和监测初盘，分别报告清空与非空目标；最终能力结果待取得。

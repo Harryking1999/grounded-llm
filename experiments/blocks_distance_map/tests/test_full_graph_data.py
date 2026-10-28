@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 import numpy as np
 
@@ -10,9 +11,44 @@ from experiments.blocks_distance_map.src.full_graph_data import (
 )
 from experiments.blocks_distance_map.src.oracle import DistanceOracle, successors
 from experiments.blocks_distance_map.src.symbolic_graph import build_symbolic, SymbolicComponent
+from experiments.blocks_distance_map.src import symbolic_graph
 
 
 class CompleteGraphTest(unittest.TestCase):
+    def test_native_integer_queries_match_numpy_shapes_errors_and_broadcasts(self):
+        if symbolic_graph.native_kernel() is None:
+            self.skipTest('Exact native kernel is exercised in the Linux runtime')
+        with tempfile.TemporaryDirectory() as temp:
+            build_symbolic(6,[3,6,12,24,48,7,14,28,56],Path(temp)/'graph',10000)
+            graph=SymbolicComponent(Path(temp)/'graph');ids=np.arange(graph.size);masks=graph.unrank(ids)
+            queries=[ids[:0],ids[:1].reshape(()),ids[::-2],ids[:4].reshape(2,2)]
+            for values in queries:
+                actual=graph.unrank(values)
+                with patch.object(symbolic_graph,'native_kernel',return_value=None):expected=graph.unrank(values)
+                np.testing.assert_array_equal(actual,expected)
+                np.testing.assert_array_equal(graph.rank(actual),values)
+            all_masks=np.arange(64,dtype=np.uint64)
+            for root in graph.layers:
+                actual=graph.contains(all_masks,root)
+                with patch.object(symbolic_graph,'native_kernel',return_value=None):expected=graph.contains(all_masks,root)
+                np.testing.assert_array_equal(actual,expected)
+            actual=graph.distance(masks[:,None],masks[None,:])
+            with patch.object(symbolic_graph,'native_kernel',return_value=None):expected=graph.distance(masks[:,None],masks[None,:])
+            np.testing.assert_array_equal(actual,expected)
+            invalid=np.setdiff1d(all_masks,masks)
+            if len(invalid):
+                with self.assertRaises(ValueError):graph.rank(invalid[:1])
+            with self.assertRaises(ValueError):graph.unrank([graph.size])
+            wide=object.__new__(SymbolicComponent);wide.width=63;wide.root=1;wide.size=1<<63
+            wide.level=np.array([63,63],dtype=np.int16)
+            wide.low=wide.high=np.array([0,1],dtype=np.int32);wide.counts=np.array([0,1],dtype=np.uint64)
+            ids=np.array([0,1,1<<32,1<<62,(1<<63)-1],dtype=np.uint64)
+            masks=wide.unrank(ids)
+            np.testing.assert_array_equal(wide.rank(masks),ids.astype(np.int64))
+            with patch.object(symbolic_graph,'native_kernel',return_value=None):
+                np.testing.assert_array_equal(wide.unrank(ids),masks)
+                np.testing.assert_array_equal(wide.rank(masks),ids.astype(np.int64))
+
     def test_mask_walk_matches_index_walk_and_random_stream(self):
         with tempfile.TemporaryDirectory() as temp:
             graphs={};parts=[]

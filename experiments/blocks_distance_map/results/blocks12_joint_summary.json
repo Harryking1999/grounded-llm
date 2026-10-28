@@ -3760,7 +3760,7 @@
         "success_rate": 0.9166666666666666
       }
     },
-    "assessment": "短预算诊断；原关系保留、广域覆盖与训练稳定性需联合检查。",
+    "assessment": "\u77ed\u9884\u7b97\u8bca\u65ad\uff1b\u539f\u5173\u7cfb\u4fdd\u7559\u3001\u5e7f\u57df\u8986\u76d6\u4e0e\u8bad\u7ec3\u7a33\u5b9a\u6027\u9700\u8054\u5408\u68c0\u67e5\u3002",
     "goal_fraction_profile": {
       "scope": "1000 exact training roots, one canonical shortest clearing trajectory per root; 8-placement sources are residuals along the same trajectory. Matching source/goal questions for both checkpoints. Training-root diagnostics and fixed monitor outcomes are separate.",
       "adopted": {
@@ -3884,5 +3884,17 @@
       },
       "raw_result": "runs/qmap_goal_generalization_20261028/blocks_profiles.json"
     }
+  },
+  "native_symbolic_sampling": {
+    "batches": 25,
+    "roots": 10000,
+    "point_pairs_per_rank": 16384,
+    "rank_contexts_per_rank": 2048,
+    "seconds": {
+      "numpy": 34.42721821460873,
+      "native": 9.103446694090962
+    },
+    "speedup": 3.78177841552644,
+    "all_arrays_rng_and_complete_sampler_state_equal": true
   }
 }

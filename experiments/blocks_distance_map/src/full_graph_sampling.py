@@ -1,6 +1,7 @@
 """Broad root-local pair traversal, complete forks and multiscale descendants."""
 import json
 import math
+from functools import lru_cache
 from pathlib import Path
 
 import numpy as np
@@ -12,6 +13,17 @@ from .multiboard_eval import listwise_groups
 
 def packed_masks(masks):
     return np.asarray([(int(mask) & ((1 << 64) - 1), int(mask) >> 64) for mask in masks], dtype=np.uint64)
+
+
+@lru_cache(maxsize=4)
+def legacy_source(path, seed):
+    """Logical sampler shards share immutable legacy rows and deterministic groups."""
+    with np.load(path,allow_pickle=False) as stored:
+        legacy=dict(stored)
+    masks=packed_masks(legacy['states'])
+    groups=listwise_groups(legacy['train'],seed,per_anchor=4)
+    for array in list(legacy.values())+[masks,groups]:array.setflags(write=False)
+    return legacy,masks,groups
 
 
 class JointData:
@@ -43,11 +55,9 @@ class JointData:
                     a += 1
                 factors.extend((a, int(rng.integers(root.size))))
             self.affine.append(factors)
-        legacy = dict(np.load(legacy_path, allow_pickle=False))
+        legacy, self.legacy_masks, self.legacy_groups = legacy_source(str(legacy_path),options['seed'])
         self.legacy = legacy
-        self.legacy_masks = packed_masks(legacy["states"])
         self.legacy_rows = legacy["train"]
-        self.legacy_groups = listwise_groups(self.legacy_rows, options["seed"], per_anchor=4)
         long_rows = (self.legacy_rows[:, 2] >= 6) & (self.legacy_rows[:, 2] <= 13)
         self.legacy_long_pairs = np.flatnonzero(long_rows)
         self.legacy_long_groups = np.flatnonzero(long_rows[self.legacy_groups].any(-1))

@@ -1,8 +1,30 @@
 """Exact symbolic BFS and vectorized indexing of complete removal graphs."""
 import json
+import ctypes
+from functools import lru_cache
+import os
 from pathlib import Path
 
 import numpy as np
+
+
+@lru_cache(maxsize=1)
+def native_kernel():
+    """Use an explicitly built exact-integer kernel; ordinary NumPy is default."""
+    path = os.environ.get('GROUNDED_BLOCKS_SYMBOLIC_LIBRARY')
+    if not path:
+        return None
+    lib = ctypes.CDLL(path)
+    def array(dtype):return np.ctypeslib.ndpointer(dtype=dtype,flags='C_CONTIGUOUS')
+    tree = [array(np.int16),array(np.int32),array(np.int32)]
+    index = tree+[array(np.uint64),ctypes.c_int32,ctypes.c_int,ctypes.c_size_t,array(np.uint64)]
+    lib.bdd_rank.argtypes = index+[array(np.int64)]
+    lib.bdd_unrank.argtypes = index+[array(np.uint64)]
+    lib.bdd_contains.argtypes = tree+[ctypes.c_int32,ctypes.c_size_t,array(np.uint64),array(np.uint8)]
+    lib.bdd_distance.argtypes = tree+[array(np.int32),ctypes.c_int,ctypes.c_int,ctypes.c_size_t,
+                                    array(np.uint64),array(np.uint64),array(np.int16)]
+    lib.bdd_contains.restype = lib.bdd_distance.restype = None
+    return lib
 
 
 def build_symbolic(width, tiles, out, maximum_nodes):
@@ -110,6 +132,12 @@ class SymbolicComponent:
         ids = np.asarray(ids, dtype=np.uint64).copy()
         if np.any(ids >= self.size):
             raise ValueError("State index out of range")
+        lib = native_kernel()
+        if lib is not None:
+            flat=np.ascontiguousarray(ids).reshape(-1);result=np.empty(len(flat),dtype=np.uint64)
+            if lib.bdd_unrank(self.level,self.low,self.high,self.counts,self.root,self.width,len(flat),flat,result):
+                raise ValueError('State index is outside the reachable graph')
+            return result.reshape(ids.shape)
         nodes = np.full(ids.shape, self.root, dtype=np.int32)
         masks = np.zeros(ids.shape, dtype=np.uint64)
         for bit in range(self.width):
@@ -123,6 +151,12 @@ class SymbolicComponent:
 
     def rank(self, masks):
         masks = np.asarray(masks, dtype=np.uint64)
+        lib = native_kernel()
+        if lib is not None:
+            flat=np.ascontiguousarray(masks).reshape(-1);result=np.empty(len(flat),dtype=np.int64)
+            if lib.bdd_rank(self.level,self.low,self.high,self.counts,self.root,self.width,len(flat),flat,result):
+                raise ValueError('State is outside the reachable graph')
+            return result.reshape(masks.shape)
         nodes = np.full(masks.shape, self.root, dtype=np.int32)
         ids = np.zeros(masks.shape, dtype=np.uint64)
         for bit in range(self.width):
@@ -136,6 +170,11 @@ class SymbolicComponent:
 
     def contains(self, masks, root):
         masks = np.asarray(masks, dtype=np.uint64)
+        lib = native_kernel()
+        if lib is not None:
+            flat=np.ascontiguousarray(masks).reshape(-1);result=np.empty(len(flat),dtype=np.uint8)
+            lib.bdd_contains(self.level,self.low,self.high,int(root),len(flat),flat,result)
+            return result.astype(bool).reshape(masks.shape)
         nodes = np.full(masks.shape, int(root), dtype=np.int32)
         for _ in range(self.width):
             active = nodes >= 2
@@ -148,6 +187,13 @@ class SymbolicComponent:
 
     def distance(self, source, goal):
         source, goal = np.broadcast_arrays(np.asarray(source, dtype=np.uint64), np.asarray(goal, dtype=np.uint64))
+        lib = native_kernel()
+        if lib is not None:
+            source_flat=np.ascontiguousarray(source).reshape(-1);goal_flat=np.ascontiguousarray(goal).reshape(-1)
+            result=np.empty(len(source_flat),dtype=np.int16)
+            lib.bdd_distance(self.level,self.low,self.high,self.layers,len(self.layers),self.width,
+                             len(source_flat),source_flat,goal_flat,result)
+            return result.reshape(source.shape)
         target = np.uint64((1 << self.width) - 1) ^ (source ^ goal)
         valid = (source & goal) == goal
         result = np.full(source.shape, -1, dtype=np.int16)

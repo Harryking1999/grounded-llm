@@ -339,5 +339,511 @@
       }
     },
     "all_preserved_union": 181351
+  },
+  "actual_goal_family": {
+    "date": "2026-10-28",
+    "checkpoint": "tasks/puzzle8/Qmap/checkpoints/selected_98_28.pt",
+    "baseline_source_commit": "caf87d7",
+    "profile": {
+      "scope": "Read-only actual FLAN goal-ID family1..999; fixed random1024 query pairs. Goal normalization uses tile relabeling and board symmetry; action scores use frozen Q only.",
+      "anchors": [
+        0,
+        1,
+        4
+      ],
+      "anchor_blank_positions": [
+        8,
+        5,
+        4
+      ],
+      "goal_blank_histogram": [
+        90,
+        141,
+        87,
+        135,
+        113,
+        124,
+        87,
+        138,
+        84
+      ],
+      "standard_depth_histogram": [
+        0,
+        2,
+        4,
+        8,
+        16,
+        20,
+        39,
+        62,
+        116,
+        152,
+        286,
+        294,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "anchor_full_state": [
+        {
+          "goal": 0,
+          "solved": 178326,
+          "nonterminal": 181439,
+          "mean_absolute_distance_error": 0.5576116442680359
+        },
+        {
+          "goal": 1,
+          "solved": 177124,
+          "nonterminal": 181439,
+          "mean_absolute_distance_error": 1.0526353120803833
+        },
+        {
+          "goal": 4,
+          "solved": 90608,
+          "nonterminal": 181439,
+          "mean_absolute_distance_error": 1.6330846548080444
+        }
+      ],
+      "absolute": {
+        "count": 1024,
+        "solved": 145,
+        "shortest_first_action_rate": 0.7109375,
+        "by_blank_orbit": {
+          "corner": {
+            "count": 364,
+            "solved": 57
+          },
+          "edge": {
+            "count": 544,
+            "solved": 65
+          },
+          "center": {
+            "count": 116,
+            "solved": 23
+          }
+        },
+        "by_true_distance": {
+          "1-5": {
+            "count": 0,
+            "solved": 0
+          },
+          "6-10": {
+            "count": 8,
+            "solved": 8
+          },
+          "11-15": {
+            "count": 53,
+            "solved": 22
+          },
+          "16-20": {
+            "count": 248,
+            "solved": 55
+          },
+          "21-25": {
+            "count": 590,
+            "solved": 53
+          },
+          "26-31": {
+            "count": 125,
+            "solved": 7
+          }
+        }
+      },
+      "goal_normalized": {
+        "count": 1024,
+        "solved": 943,
+        "shortest_first_action_rate": 0.951171875,
+        "by_blank_orbit": {
+          "corner": {
+            "count": 364,
+            "solved": 359
+          },
+          "edge": {
+            "count": 544,
+            "solved": 527
+          },
+          "center": {
+            "count": 116,
+            "solved": 57
+          }
+        },
+        "by_true_distance": {
+          "1-5": {
+            "count": 0,
+            "solved": 0
+          },
+          "6-10": {
+            "count": 8,
+            "solved": 8
+          },
+          "11-15": {
+            "count": 53,
+            "solved": 51
+          },
+          "16-20": {
+            "count": 248,
+            "solved": 232
+          },
+          "21-25": {
+            "count": 590,
+            "solved": 537
+          },
+          "26-31": {
+            "count": 125,
+            "solved": 115
+          }
+        }
+      },
+      "seconds": 1.577999999979511
+    },
+    "reader_verification": {
+      "count": 1024,
+      "solved": 943,
+      "oracle_loaded": false,
+      "seconds": 0.4529999999795109
+    },
+    "mechanism": {
+      "policies": {
+        "0": {
+          "within_budget": 178326,
+          "wrong_decisions": 1865,
+          "two_cycles": 426,
+          "other_cycle_nodes": 0,
+          "largest_cycles": [
+            {
+              "basin_states": 166,
+              "parents": [
+                4948,
+                7613
+              ],
+              "remaining_distance": [
+                15,
+                16
+              ]
+            },
+            {
+              "basin_states": 66,
+              "parents": [
+                5224,
+                8118
+              ],
+              "remaining_distance": [
+                15,
+                16
+              ]
+            },
+            {
+              "basin_states": 58,
+              "parents": [
+                24467,
+                35091
+              ],
+              "remaining_distance": [
+                18,
+                19
+              ]
+            },
+            {
+              "basin_states": 44,
+              "parents": [
+                21151,
+                31270
+              ],
+              "remaining_distance": [
+                18,
+                19
+              ]
+            },
+            {
+              "basin_states": 43,
+              "parents": [
+                22416,
+                32677
+              ],
+              "remaining_distance": [
+                18,
+                19
+              ]
+            },
+            {
+              "basin_states": 42,
+              "parents": [
+                34663,
+                50121
+              ],
+              "remaining_distance": [
+                19,
+                20
+              ]
+            },
+            {
+              "basin_states": 41,
+              "parents": [
+                2561,
+                4190
+              ],
+              "remaining_distance": [
+                13,
+                14
+              ]
+            },
+            {
+              "basin_states": 37,
+              "parents": [
+                21979,
+                32192
+              ],
+              "remaining_distance": [
+                18,
+                19
+              ]
+            }
+          ]
+        },
+        "1": {
+          "within_budget": 177124,
+          "wrong_decisions": 9941,
+          "two_cycles": 476,
+          "other_cycle_nodes": 0,
+          "largest_cycles": [
+            {
+              "basin_states": 192,
+              "parents": [
+                7233,
+                11686
+              ],
+              "remaining_distance": [
+                16,
+                17
+              ]
+            },
+            {
+              "basin_states": 153,
+              "parents": [
+                7287,
+                11775
+              ],
+              "remaining_distance": [
+                15,
+                16
+              ]
+            },
+            {
+              "basin_states": 151,
+              "parents": [
+                6535,
+                10461
+              ],
+              "remaining_distance": [
+                16,
+                17
+              ]
+            },
+            {
+              "basin_states": 101,
+              "parents": [
+                3098,
+                5072
+              ],
+              "remaining_distance": [
+                13,
+                14
+              ]
+            },
+            {
+              "basin_states": 72,
+              "parents": [
+                16844,
+                26050
+              ],
+              "remaining_distance": [
+                18,
+                19
+              ]
+            },
+            {
+              "basin_states": 71,
+              "parents": [
+                10325,
+                15624
+              ],
+              "remaining_distance": [
+                17,
+                18
+              ]
+            },
+            {
+              "basin_states": 65,
+              "parents": [
+                5224,
+                8118
+              ],
+              "remaining_distance": [
+                14,
+                15
+              ]
+            },
+            {
+              "basin_states": 63,
+              "parents": [
+                24467,
+                35091
+              ],
+              "remaining_distance": [
+                19,
+                20
+              ]
+            }
+          ]
+        },
+        "4": {
+          "within_budget": 90608,
+          "wrong_decisions": 20256,
+          "two_cycles": 697,
+          "other_cycle_nodes": 0,
+          "largest_cycles": [
+            {
+              "basin_states": 81169,
+              "parents": [
+                2,
+                5
+              ],
+              "remaining_distance": [
+                3,
+                4
+              ]
+            },
+            {
+              "basin_states": 903,
+              "parents": [
+                888,
+                1445
+              ],
+              "remaining_distance": [
+                9,
+                10
+              ]
+            },
+            {
+              "basin_states": 486,
+              "parents": [
+                710,
+                1110
+              ],
+              "remaining_distance": [
+                9,
+                10
+              ]
+            },
+            {
+              "basin_states": 387,
+              "parents": [
+                1892,
+                2955
+              ],
+              "remaining_distance": [
+                13,
+                14
+              ]
+            },
+            {
+              "basin_states": 182,
+              "parents": [
+                4244,
+                6596
+              ],
+              "remaining_distance": [
+                16,
+                17
+              ]
+            },
+            {
+              "basin_states": 170,
+              "parents": [
+                7233,
+                11686
+              ],
+              "remaining_distance": [
+                17,
+                18
+              ]
+            },
+            {
+              "basin_states": 149,
+              "parents": [
+                2597,
+                4256
+              ],
+              "remaining_distance": [
+                15,
+                16
+              ]
+            },
+            {
+              "basin_states": 146,
+              "parents": [
+                6433,
+                10280
+              ],
+              "remaining_distance": [
+                17,
+                18
+              ]
+            }
+          ]
+        }
+      },
+      "gradient_probe": {
+        "count": 2048,
+        "losses": {
+          "0": {
+            "huber": 0.2296617031097412,
+            "rank": 0.6979960203170776
+          },
+          "1": {
+            "huber": 0.6488337516784668,
+            "rank": 0.7371894717216492
+          },
+          "4": {
+            "huber": 1.1926418542861938,
+            "rank": 0.7754329442977905
+          },
+          "422": {
+            "huber": 1.2486718893051147,
+            "rank": 0.8945834636688232
+          }
+        },
+        "cosine": {
+          "0|1": 0.6360920667648315,
+          "0|4": 0.5586477518081665,
+          "0|422": 0.34821879863739014,
+          "1|4": 0.8231797814369202,
+          "1|422": 0.442050039768219,
+          "4|422": 0.40476495027542114
+        }
+      }
+    },
+    "raw_result": "runs/puzzle8_goal_diagnostic_20261028/",
+    "inference_conditions": [
+      "absolute shared state embedding",
+      "known board symmetry and tile relabeling before shared Q scoring"
+    ]
   }
 }

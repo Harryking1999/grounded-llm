@@ -60,6 +60,20 @@ class FailureReplayTest(unittest.TestCase):
                 np.testing.assert_array_equal(masks[2][k], masks[0][k] | masks[1][k])
             _, state = audit(model, env, "cpu")
             sampler.mine(model, torch.as_tensor(env.features(np.arange(8))), state)
+            repair.update(goal_id_range=[1,4],focus_goals=[4],focus_fraction=1.,focus_cycle_weighting=True)
+            sampler.mine(model, features, state)
+            self.assertTrue(sampler.repair_middle[:,1].max() <= 4)
+            original_middle = sampler.repair_middle.copy()
+            original_weights = sampler.middle_weights.copy()
+            self.assertAlmostEqual(float(original_weights.sum()),1.)
+            original_options = dict(repair)
+            sampler.repair_middle = np.array([[1,1],[1,4],[5,4]])
+            sampler.middle_weights = None
+            repair.update(restoration_fraction=0.,retention_fraction=0.,descendant_steps=[0])
+            self.assertTrue((sampler.repair_rows(128,True)[:,1] == 4).all())
+            sampler.repair_middle = original_middle
+            sampler.middle_weights = original_weights
+            repair.update(original_options)
             for pool in (sampler.repair_middle, sampler.repair_restore):
                 self.assertTrue(sampler.allowed[pool[:, 0]].all())
                 self.assertFalse(np.isin(pool[:, 1], sampler.protected).any())

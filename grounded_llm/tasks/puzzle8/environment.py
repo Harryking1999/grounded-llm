@@ -54,6 +54,36 @@ class Puzzle8:
     def features(self, ids):
         return np.eye(9, dtype=np.float32)[self.positions[np.asarray(ids)]].reshape(-1, 81)
 
+    def goal_frame(self, source, goal):
+        """Known graph symmetry: normalize goals within each blank-position orbit."""
+        source, goal = np.broadcast_arrays(source, goal)
+        self.validate(source); self.validate(goal)
+        if not hasattr(self, '_goal_targets'):
+            self._goal_targets = np.full(self.size, -1, dtype=np.int32)
+            self._goal_gathers = np.empty((self.size, 9), dtype=np.int8)
+            self._goal_labels = np.empty((self.size, 9), dtype=np.int8)
+            self._goal_anchors = [0, self.step(0, 'Up'), self.step(self.step(0, 'Up'), 'Left')]
+            square = np.arange(9).reshape(3, 3)
+            self._board_frames = [np.rot90(square, k).ravel() for k in range(4)]
+            self._board_frames += [np.fliplr(np.rot90(square, k)).ravel() for k in range(4)]
+        flat_source, flat_goal = source.ravel(), goal.ravel()
+        for g in np.unique(flat_goal):
+            if self._goal_targets[g] < 0:
+                board = self.positions[g]
+                blank = int(np.argmin(board))
+                kind = 0 if blank in (0, 2, 6, 8) else 2 if blank == 4 else 1
+                anchor = self._goal_anchors[kind]
+                target = self.positions[anchor]
+                frame = next(t for t in self._board_frames if np.argmin(board[t]) == np.argmin(target))
+                labels = np.empty(9, dtype=np.int8)
+                labels[board[frame]] = target
+                self._goal_gathers[g], self._goal_labels[g], self._goal_targets[g] = frame, labels, anchor
+        boards = np.take_along_axis(self.positions[flat_source], self._goal_gathers[flat_goal], axis=1)
+        boards = np.take_along_axis(self._goal_labels[flat_goal], boards, axis=1)
+        normalized = np.asarray([self.index[tuple(board)] for board in boards], dtype=np.int64)
+        targets = self._goal_targets[flat_goal]
+        return normalized.reshape(source.shape), targets.reshape(goal.shape)
+
     def baseline(self, source, goal):
         return (self.positions[np.asarray(source)] != self.positions[np.asarray(goal)]).sum(-1)
 

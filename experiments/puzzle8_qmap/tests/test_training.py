@@ -18,6 +18,29 @@ from torch.nn import functional as F
 
 
 class PuzzleMapTest(unittest.TestCase):
+    def test_goal_frame_preserves_legal_successors_and_standard_restoration(self):
+        env = Puzzle8()
+        source, goal = np.random.default_rng(20261028).integers(env.size, size=(2, 300))
+        normalized, targets = env.goal_frame(source, goal)
+        mapped_goals, _ = env.goal_frame(goal, goal)
+        np.testing.assert_array_equal(mapped_goals, targets)
+        np.testing.assert_array_equal(env.goal_frame(source, 0)[0], source)
+        self.assertEqual(set(targets), {0, 1, 4})
+        for s, g, n in zip(source, goal, normalized):
+            children = env.successors(s);children = children[children >= 0]
+            transformed, _ = env.goal_frame(children, g)
+            expected = env.successors(n)
+            self.assertEqual(set(transformed), set(expected[expected >= 0]))
+        with tempfile.TemporaryDirectory() as temp:
+            checkpoint = Path(temp)/'q.pt';model = QMap(dimension=8, hidden=16)
+            from grounded_llm.tasks.puzzle8.model import MODEL_TYPE
+            torch.save(dict(model_type=MODEL_TYPE,actions=list(env.actions),
+                config=dict(model=dict(dimension=8,hidden=16)),model=model.state_dict()),checkpoint)
+            original = MapReader(env,checkpoint)
+            adapted = MapReader(env,checkpoint,coordinate_frame='goal_normalized')
+            np.testing.assert_array_equal(adapted.scores(source,goal),original.scores(normalized,targets))
+            np.testing.assert_array_equal(adapted.scores(source,0),original.scores(source,0))
+
     def test_interrupted_resume_keeps_absolute_steps_sampler_and_adam(self):
         class Cycle:
             size, diameter, name, actions = 8, 4, "puzzle8", ("left", "right")

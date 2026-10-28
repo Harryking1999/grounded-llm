@@ -4,22 +4,22 @@ import numpy as np
 import torch
 
 
-def resolve(pointer, horizon):
+def resolve(pointer, horizon, goal=0):
     """Exact eventual reachability and path lengths in a finite functional graph."""
     pointer = np.asarray(pointer, dtype=np.int64)
-    if pointer[0] != 0 or np.any((pointer < 0) | (pointer >= len(pointer))):
-        raise ValueError("Expected a finite policy with absorbing goal zero")
+    if pointer[goal] != goal or np.any((pointer < 0) | (pointer >= len(pointer))):
+        raise ValueError("Expected a finite policy with the specified absorbing goal")
     jump = pointer.copy()
     length = np.ones(len(pointer), dtype=np.int64)
-    length[0] = 0
+    length[goal] = 0
     for _ in range(len(pointer).bit_length()):
         length, jump = length + length[jump], jump[jump]
-    solved = jump == 0
+    solved = jump == goal
     within = solved & (length <= horizon)
     return solved, within, np.where(solved, length, -1)
 
 
-def cycle_nodes(pointer):
+def cycle_nodes(pointer, goal=0):
     """Peel incoming trees; residual non-goal vertices are actual cycle members."""
     degree = np.bincount(pointer, minlength=len(pointer))
     queue = deque(np.flatnonzero(degree == 0).tolist())
@@ -30,46 +30,47 @@ def cycle_nodes(pointer):
         if degree[child] == 0:
             queue.append(child)
     result = degree > 0
-    result[0] = False
+    result[goal] = False
     return result
 
 
 @torch.no_grad()
-def audit(model, env, device, reference=None, cohort=None, horizon=62):
+def audit(model, env, device, reference=None, cohort=None, horizon=62, goal=0):
     model.eval()
     height = np.empty(env.size, dtype=np.float32)
-    goal = model.encode(torch.as_tensor(env.features([0]), device=device))
+    target = model.encode(torch.as_tensor(env.features([goal]), device=device))
     for begin in range(0, env.size, 8192):
         ids = np.arange(begin, min(begin + 8192, env.size))
         values = model.encode(torch.as_tensor(env.features(ids), device=device))
-        height[ids] = model.distance(values, goal).cpu().numpy()
+        height[ids] = model.distance(values, target).cpu().numpy()
     valid = env.next >= 0
     scores = np.where(valid, height[np.maximum(env.next, 0)], np.inf)
     action = scores.argmin(-1)
     pointer = env.next[np.arange(env.size), action].astype(np.int64)
-    pointer[0] = 0
-    depth = env.distance(np.arange(env.size), 0)
+    pointer[goal] = goal
+    depth = env.distance(np.arange(env.size), goal)
     correct = depth[pointer] == depth - 1
-    correct[0] = True
+    correct[goal] = True
     good = valid & (depth[np.maximum(env.next, 0)] == depth[:, None] - 1)
     margin = np.where(valid & ~good, scores, np.inf).min(-1) - np.where(good, scores, np.inf).min(-1)
-    solved, within, lengths = resolve(pointer, horizon)
-    cyclic = cycle_nodes(pointer)
+    solved, within, lengths = resolve(pointer, horizon, goal)
+    cyclic = cycle_nodes(pointer, goal)
     ids = np.arange(env.size)
-    pairs = np.flatnonzero((pointer[pointer] == ids) & (ids < pointer) & (ids != 0))
+    pairs = np.flatnonzero((pointer[pointer] == ids) & (ids < pointer) & (ids != goal))
+    nonterminal = ids != goal
     report = {"nonterminal_states": env.size - 1, "horizon": horizon,
-              "eventually_solved": int(solved[1:].sum()), "within_budget": int(within[1:].sum()),
-              "within_budget_rate": float(within[1:].mean()), "shortest_action_rate": float(correct[1:].mean()),
-              "wrong_decisions": int((~correct[1:]).sum()), "two_cycles": len(pairs),
+              "eventually_solved": int(solved[nonterminal].sum()), "within_budget": int(within[nonterminal].sum()),
+              "within_budget_rate": float(within[nonterminal].mean()), "shortest_action_rate": float(correct[nonterminal].mean()),
+              "wrong_decisions": int((~correct[nonterminal]).sum()), "two_cycles": len(pairs),
               "cycle_nodes": int(cyclic.sum()), "other_cycle_nodes": int(cyclic.sum() - 2 * len(pairs)),
-              "local_minima": int((scores[1:].min(-1) >= height[1:]).sum()),
+              "local_minima": int((scores[nonterminal].min(-1) >= height[nonterminal]).sum()),
               "restoration_mae": float(np.abs(height - depth).mean()),
               "cycle_examples": [{"states": [int(s), int(pointer[s])],
                   "depth": depth[[s, pointer[s]]].tolist(), "q_distance": height[[s, pointer[s]]].tolist(),
                   "exit_candidates": env.next[s][good[s]].tolist()} for s in pairs[:5]]}
     if reference is not None:
-        report["previously_solved_lost"] = int((reference[1:] & ~within[1:]).sum())
-        report["previously_failed_gained"] = int((~reference[1:] & within[1:]).sum())
+        report["previously_solved_lost"] = int((reference[nonterminal] & ~within[nonterminal]).sum())
+        report["previously_failed_gained"] = int((~reference[nonterminal] & within[nonterminal]).sum())
     if cohort is not None:
         report["same1024"] = {"count": len(cohort), "solved": int(within[cohort].sum()),
                               "cycle_count": int((~solved[cohort]).sum()),

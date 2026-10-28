@@ -26,11 +26,11 @@ def same_tasks(before, after):
             "previously_failed_gained": gained, "net_gain": gained - lost}
 
 
-def cycle_ranking(env, state):
+def cycle_ranking(env, state, goal=0):
     """All cycle stars and exact basin sizes, including errors outside short cycles."""
     pointer, height = state["pointer"], state["height"]
     from grounded_llm.tasks.puzzle8.policy_audit import cycle_nodes
-    cyclic = cycle_nodes(pointer)
+    cyclic = cycle_nodes(pointer, goal=goal)
     representatives = np.full(env.size, -1, dtype=np.int64)
     for start in np.flatnonzero(cyclic):
         if representatives[start] >= 0:
@@ -49,7 +49,7 @@ def cycle_ranking(env, state):
     reached = representatives[destinations]
     valid = failed & (reached >= 0)
     counts = np.bincount(reached[valid], minlength=env.size)
-    depth = env.distance(np.arange(env.size), 0)
+    depth = env.distance(np.arange(env.size), goal)
     rows = []
     for representative in np.flatnonzero(counts):
         members = np.flatnonzero(representatives == representative)

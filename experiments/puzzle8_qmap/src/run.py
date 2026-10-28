@@ -33,6 +33,9 @@ def intermediate_stage(model, env, data, config, device, reference=None):
             values["same_tasks"] = same_tasks(reference[split]["per_task"]["solved"],
                                               values["per_task"]["solved"])
         result[split] = values
+    if config['evaluation'].get('goal_anchors'):
+        result['goal_anchors'] = {str(goal):audit(model,env,device,goal=int(goal))[0]
+                                  for goal in config['evaluation']['goal_anchors']}
     return result
 
 

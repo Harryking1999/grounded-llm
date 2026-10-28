@@ -4,6 +4,14 @@ from experiments.puzzle8_qmap.src.policy_audit import resolve, cycle_nodes
 
 
 class PolicyAuditTest(unittest.TestCase):
+    def test_nonzero_goal_is_excluded_from_cycles_and_path_length(self):
+        pointer = np.array([1, 2, 2, 4, 3, 0])
+        solved, within, length = resolve(pointer, 2, goal=2)
+        np.testing.assert_array_equal(solved, [1,1,1,0,0,1])
+        np.testing.assert_array_equal(within, [1,1,1,0,0,0])
+        np.testing.assert_array_equal(length, [2,1,0,-1,-1,3])
+        np.testing.assert_array_equal(cycle_nodes(pointer, goal=2), [0,0,0,1,1,0])
+
     def test_long_paths_cycles_and_budget(self):
         pointer = np.array([0, 0, 1, 2, 5, 4, 5, 8, 9, 7])
         solved, within, length = resolve(pointer, 2)

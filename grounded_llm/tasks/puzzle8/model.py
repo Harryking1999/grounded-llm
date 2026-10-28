@@ -14,14 +14,22 @@ class QMap(StateEncoder):
 
 
 class MapReader(EnvironmentQMap):
-    def __init__(self, env, checkpoint, device="cpu"):
+    def __init__(self, env, checkpoint, device="cpu", *, coordinate_frame="absolute"):
+        if coordinate_frame not in ("absolute", "goal_normalized"):
+            raise ValueError(f"Unknown Puzzle8 coordinate frame: {coordinate_frame}")
         saved = torch.load(checkpoint, map_location=device, weights_only=False)
         if saved["model_type"] != MODEL_TYPE or saved["actions"] != list(env.actions):
             raise ValueError("Expected matching Puzzle8 Q checkpoint")
         model = QMap(**saved["config"]["model"]).to(device)
         model.load_state_dict(saved["model"])
         super().__init__(env, model, device)
+        self.coordinate_frame = coordinate_frame
 
+    def scores(self, source, goal):
+        """Optional task symmetry applies to pair scoring; encode stays unchanged."""
+        if self.coordinate_frame == "goal_normalized":
+            source, goal = self.env.goal_frame(source, goal)
+        return super().scores(source, goal)
 
     def choose(self, state, goal=0):
         return super().choose(state, goal)

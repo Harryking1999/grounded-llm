@@ -45,7 +45,7 @@
     "architecture": "mlp"
   },
   "training": {
-    "steps": 60000,
+    "steps": 80000,
     "batch_size": 65536,
     "decision_batch_size": 8192,
     "learning_rate": 0.0003,
@@ -110,7 +110,11 @@
         40,
         80
       ],
-      "layouts_per_batch": 64
+      "layouts_per_batch": 64,
+      "structural_groups": {
+        "bank": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/rush_hour_20261028/resume_40645_ee701ee/blocking_transfer_broad_groups/training_structure_groups.npz",
+        "groups_per_batch": 64
+      }
     }
   },
   "relations": {
@@ -134,9 +138,9 @@
   "failure_diagnosis": "experiments/new_tasks_qmap/archive/configs/rush_hour/rush_hour_training_root_failures.json",
   "input_encoding": "geometry_order",
   "continuation": {
-    "checkpoint": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/rush_hour_20261028/coverage/parent/last.pt",
-    "reason": "After the existing40000-step phase, continue complete model/Adam/samplers/RNG for20000updates. Refresh failed forks over every permitted original training root; retain broad/path streams,256supplementary contexts and complete legal successors.",
-    "source_cuda_device": 0,
-    "mode": "current_failure_coverage"
+    "checkpoint": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/rush_hour_20261028/resume_40645_ee701ee/rush_hour_geometry_grid_mlp_convergence/last.pt",
+    "reason": "Continue the complete60000-step model/Adam/samplers/RNG for20000updates. Share the existing256 supplementary decisions between128current failures and64paired cross-layout groups; retain broad relationships, complete paths and every legal successor.",
+    "source_cuda_device": 3,
+    "mode": "structural_replay"
   }
 }

@@ -89,6 +89,7 @@ def validate_continuation(previous,current,step):
     old,new=deepcopy(previous),deepcopy(current)
     resize=current.get('continuation',{}).get('mode')=='batch_resize'
     rank_change=current.get('continuation',{}).get('mode')=='rank_weight_change'
+    current_failures=current.get('continuation',{}).get('mode')=='current_failure_replay'
     for item in (old,new):
         for key in ('continuation','convergence','pilot'):item.pop(key,None)
         if item.get('failure_diagnosis'):
@@ -98,6 +99,14 @@ def validate_continuation(previous,current,step):
         # for every pending trace and preserve optimizer/sampling/RNG state.
         workers=item['training'].pop('trace_write_workers',0)
         if workers not in (0,1):raise ValueError('Only synchronous or one-worker trace writing is supported')
+    if current_failures:
+        if 'current_failure_replay' in old['training'] or not new['training'].pop('current_failure_replay',None):
+            raise ValueError('Current-failure continuation must explicitly add its own replay stream')
+        if not step<new['training']['steps'] or new['training']['steps']<old['training']['steps']:
+            raise ValueError('Current-failure continuation preserves the remaining update budget')
+        new['training']['steps']=old['training']['steps']
+        if old!=new:raise ValueError('Current-failure continuation changes an original training condition')
+        return
     if resize:
         if not step<new['training']['steps']<=old['training']['steps']:
             raise ValueError('Batch resize must stay within the original update budget')
@@ -375,7 +384,9 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
                 cuda_rng_restoration=cuda_restoration,
                 rank_weight=dict(previous=saved['config']['training']['rank_weight'],current=options['rank_weight']),
                 batch_sizes={k:dict(previous=saved['config']['training'][k],current=options[k]) for k in ('batch_size','decision_batch_size')},
-                meaning=('Full optimizer/RNG/counter restoration; only ranking weight changes explicitly, with the same future samples.'
+                meaning=('Original optimizer/samplers/RNG/counters restored; add current failure forks with a separate recoverable stream.'
+                    if continuation.get('mode')=='current_failure_replay' else
+                    'Full optimizer/RNG/counter restoration; only ranking weight changes explicitly, with the same future samples.'
                     if continuation.get('mode')=='rank_weight_change' else
                     'Full optimizer/RNG/counter restoration; batch sizes change explicitly, so the update trajectory changes.'
                     if continuation.get('mode')=='batch_resize' else
@@ -429,6 +440,16 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
                           else 'Weights warm start; fresh optimizer and sampling phase, not an exact continuation. ')
                     + ('Small corpus has remapped state IDs; prior endpoint counters are not transferable.' if structure_options
                        else 'Prior gradient endpoint exposure retained separately from fresh source-row coverage.'))))
+    current_replay=None
+    if options.get('current_failure_replay'):
+        if config['task']!='rush_hour' or relation_sampler is None or replay_sampler is None:
+            raise ValueError('Current Rush Hour failures augment the existing broad and path samplers')
+        from .current_failures import CurrentFailureReplay
+        current_replay=CurrentFailureReplay(corpus,data,options['current_failure_replay'],config['seed']+73103,out,
+            saved.get('current_failure_state') if checkpoint is not None else None)
+        if checkpoint is not None and not saved.get('current_failure_state'):
+            current_replay.last_refresh=start_step
+        atomic_json(out/'current_failure_summary.json',current_replay.report())
     if not (out/'initial.json').exists():
         initial_started=time.monotonic()
         initial=evaluate(model,corpus,data,config,cohorts=validation if options.get('validation_only_initial') else None)
@@ -505,6 +526,7 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
             replay_rng=replay_rng.bit_generator.state,replay_draws=replay_draws,
             replay_tasks=replay_sampler.tasks if replay_sampler else None,replay_reasons=replay_sampler.reason if replay_sampler else None,
             replay_sampler_state=replay_sampler.state_dict() if isinstance(replay_sampler,LocalPathSampler) else None,
+            current_failure_state=current_replay.state_dict() if current_replay else None,
             relation_coverage=relation_sampler.coverage_state_dict() if relation_sampler else None,
             training_probe_batches=probe_batches,loss_window=loss_window,
             anchor_probe_ids=profile_probe_ids,anchor_loss_window=profile_window,
@@ -535,6 +557,12 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
         if replay_sampler:
             pair,p,tasks,r,point_origin,rank_origin,replay_ids=replay_sampler.apply(pair,p,tasks,r,
                 relation_sampler.point_index,relation_sampler.rank_index,replay_rng)
+            children=corpus.successors(tasks[:,0])
+        current_ids=None
+        if current_replay:
+            pair,p,tasks,r,point_origin,rank_origin,current_ids=current_replay.apply(
+                pair,p,tasks,r,relation_sampler.point_index,relation_sampler.rank_index,
+                point_origin,rank_origin,relation_sampler.finite_fraction)
             children=corpus.successors(tasks[:,0])
         valid=children>=0
         costs=edge_costs(corpus,tasks[:,0])
@@ -589,6 +617,9 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
                 point_reachability=np.isfinite(point_true),point_origin=point_origin,rank_origin=rank_origin,rank_replay_index=replay_ids,
                 optimal=valid & (child_truth+costs==parent_true[:,None]),edge_costs=costs)
             if isinstance(replay_sampler,LocalPathSampler):row.update({key:value.copy() for key,value in replay_sampler.last_annotations.items()})
+            if current_ids is not None:
+                row.update(rank_current_failure_index=current_ids.copy(),
+                           rank_current_failure_round=np.full(len(tasks),current_replay.round,dtype=np.int32))
             trace.append(row)
             if len(trace)>=100: flush_trace()
         ids=np.concatenate([pair[:,0],pair[:,1],children[valid],tasks[:,1]])
@@ -642,6 +673,7 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
             window_seconds=max(time.monotonic()-window_started,1e-9)
             planning=bool(convergence or (options.get('rollout_eval_every') and (step%options['rollout_eval_every']==0 or step==options['steps'])))
             values=evaluate(model,corpus,data,config,cohorts=validation,exposure=exposure,planning=planning)
+            if current_replay:current_replay.refresh(model,device,config,step)
             if options.get('token_cycle_replay') and step%options['eval_every']==0:
                 if config['task']!='token_swapping':raise ValueError('Permutation-cycle replay requires token swapping')
                 from .relation_evaluate import QCache,rollout
@@ -705,6 +737,7 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
                 atomic_json(out/'branch_fit_latest.json',dict(step=step,metrics=fitting,passed=record.get('branch_fit_passed'),
                     scope='Training-only seed and branch fitting diagnostics; never checkpoint selection or independent validation.'))
             loss_window[:]=0
+            if current_replay:record['current_failure_replay']=current_replay.report()
             with (out/'progress.jsonl').open('a') as stream: stream.write(json.dumps(record)+'\n')
             atomic_json(out/'validation_latest.json',values)
             if improved:

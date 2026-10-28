@@ -830,6 +830,106 @@ class ExactPairTests(unittest.TestCase):
         bad={**edges,'parent_distance':np.array([99,99])}
         with self.assertRaisesRegex(ValueError,'labels differ'): training_failure_bank(corpus,data,bad)
 
+    def test_current_failures_preserve_broad_points_old_paths_and_complete_resume(self):
+        from copy import deepcopy
+        from experiments.new_tasks_qmap.src.current_failures import CurrentFailureReplay
+        children=np.array([[1,2],[0,2],[3,-1],[-1,-1]])
+        truth=UnitGraphOracle(children).to_goal(3)
+        scene=SimpleNamespace(states=np.arange(4)[:,None],children=children,goals=np.array([3]),
+            metadata=dict(split='train',training_goals=1),features=lambda ids:np.eye(4)[ids],distance=lambda s,g:truth[s])
+        corpus=PhysicalCorpus([scene]);data=dict(reserved_relations=np.empty(0,dtype=np.int64))
+        rows=np.array([[0,3],[1,3],[2,3]])
+        bank=dict(**materialize(corpus,rows),reason=np.array([9,9,16],dtype=np.uint8))
+        with tempfile.TemporaryDirectory() as temp:
+            out=Path(temp);np.savez(out/'bank.npz',**bank)
+            options=dict(bank='bank.npz',contexts_per_batch=2,refresh_every=2000,initial_step=8000,
+                ranking_fraction=.25,critical_fraction=.5,distance_bin_upper_bounds=[1,5],queries=4)
+            replay=CurrentFailureReplay(corpus,data,options,71,out)
+            pairs=np.tile([0,3],(64,1));tasks=np.tile([0,3],(8,1));tasks[-2:]=[[1,3],[2,3]]
+            po=np.zeros(64,dtype=np.uint8);po[-2:]=1
+            ro=np.zeros(8,dtype=np.uint8);ro[-2:]=2
+            args=(pairs,np.arange(64),tasks,np.arange(8),np.arange(4),np.arange(4),po,ro,.75)
+            result=replay.apply(*args)
+            np.testing.assert_array_equal(result[0][:16],pairs[:16])
+            np.testing.assert_array_equal(result[0][-2:],pairs[-2:])
+            np.testing.assert_array_equal(result[2][-2:],tasks[-2:])
+            np.testing.assert_array_equal(result[5][-2:],ro[-2:])
+            self.assertEqual(int((result[5]==6).sum()),2)
+            point_rows={tuple(x) for x in result[0][result[4]==6]}
+            for s,g in result[2][result[5]==6]:
+                self.assertIn((s,g),point_rows)
+                for child in corpus.successors(np.array([s]))[0]:
+                    if child>=0:self.assertIn((child,g),point_rows)
+            state=deepcopy(replay.state_dict())
+            expected=replay.apply(*args)
+            restored=CurrentFailureReplay(corpus,data,options,999,out,state=state)
+            actual=restored.apply(*args)
+            for a,b in zip(expected,actual):np.testing.assert_array_equal(a,b)
+            self.assertEqual(replay.state_dict()['rng'],restored.state_dict()['rng'])
+            np.testing.assert_array_equal(replay.draws,restored.draws)
+
+    def test_board_preparation_keeps_symmetric_protected_relations(self):
+        from experiments.new_tasks_qmap.src.relation_data import BoardRelationSampler
+        children=np.array([[1,-1],[0,2],[1,3],[2,-1]])
+        oracle=UnitGraphOracle(children);goals=np.array([0,3])
+        distances=np.stack([oracle.to_goal(int(g)) for g in goals])
+        scene=SimpleNamespace(states=np.arange(4)[:,None],children=children,goals=goals,distances=distances,
+            metadata=dict(split='train',training_goals=2),features=lambda ids:np.eye(4)[ids])
+        corpus=PhysicalCorpus([scene]);rows=np.array([[s,g] for g in goals for s in range(4)])
+        held=keys(np.array([0]),np.array([2]),4)
+        data=dict(pairs_train=rows,tasks_train=rows,reserved_relations=held)
+        sampler=BoardRelationSampler(corpus,data,dict(finite_point_fraction=.75,boundary_rank_fraction=0.,distance_bin_upper_bounds=[1,5]))
+        expected_points=[];expected_ranks=[]
+        for s,g in rows:
+            if s==g or keys(s,g,4) in held:continue
+            expected_points.append([s,g])
+            if all(keys(c,g,4) not in held for c in children[s] if c>=0):expected_ranks.append([s,g])
+        np.testing.assert_array_equal(sampler.points,expected_points)
+        np.testing.assert_array_equal(sampler.ranks,expected_ranks)
+
+    def test_current_failure_training_checkpoint_resumes_model_and_both_streams(self):
+        from copy import deepcopy
+        children=np.array([[1,2],[0,2],[3,-1],[-1,-1]])
+        truth=UnitGraphOracle(children).to_goal(3)
+        scene=SimpleNamespace(states=np.arange(4)[:,None],children=children,goals=np.array([3]),
+            metadata=dict(split='train',training_goals=1,original_state=0,source={}),
+            distances=truth[None,:],
+            reverse=lambda s,g:UnitGraphOracle(children).from_goal(3)[s],
+            features=lambda ids:np.eye(4,dtype=np.float32)[ids],distance=lambda s,g:truth[s],
+            heuristic=lambda s,g:np.zeros(len(s)),decode=lambda rows:[tuple(map(int,r)) for r in rows],
+            env=SimpleNamespace(actions=[0,1]))
+        corpus=PhysicalCorpus([scene]);rows=np.array([[0,3],[1,3],[2,3]])
+        packed=materialize(corpus,rows)
+        data={k+'_train':v for k,v in packed.items()}
+        data.update(pairs_train=rows,pair_distances_train=truth[:3],reserved_relations=np.empty(0,dtype=np.int64))
+        data.update({k+'_validation':v for k,v in materialize(corpus,rows[:1]).items()})
+        bank=dict(**packed,reason=np.array([9,9,16],dtype=np.uint8))
+        opts=dict(bank='../bank.npz',ranking_fraction=.25,critical_fraction=.5,distance_bin_upper_bounds=[1,5],layouts_per_batch=1)
+        config=dict(task='rush_hour',seed=19,model=dict(dimension=8,hidden=16,cap=16,metric='l1'),
+            training=dict(steps=4,batch_size=64,decision_batch_size=16,learning_rate=.0001,rank_weight=1.,
+                rank_temperature=1.,eval_every=2,cpu_threads=1,unreachable_target=15.,record_training_samples=True,
+                relation_sampling=dict(finite_point_fraction=.75,boundary_rank_fraction=0.,distance_bin_upper_bounds=[1,5]),
+                failure_replay=opts,current_failure_replay=dict(opts,contexts_per_batch=1,refresh_every=2,initial_step=0,queries=1)),
+            evaluation=dict(decision_count=4,rollout_count=1,horizon=8))
+        prepared=(corpus,data,dict(states=corpus.size))
+        original_save=__import__('experiments.new_tasks_qmap.src.relations',fromlist=['atomic_save']).atomic_save
+        def interrupt(value,path):
+            original_save(value,path)
+            if Path(path).name=='last.pt' and value['step']==2:raise RuntimeError('fixture interruption')
+        with tempfile.TemporaryDirectory() as temp:
+            root=Path(temp);np.savez(root/'bank.npz',**bank)
+            with patch('experiments.new_tasks_qmap.src.relations.prepare',return_value=prepared):
+                train(config,root/'full','fixture','cpu')
+                with patch('experiments.new_tasks_qmap.src.relations.atomic_save',side_effect=interrupt):
+                    with self.assertRaisesRegex(RuntimeError,'fixture interruption'):train(config,root/'resumed','fixture','cpu')
+                train(config,root/'resumed','fixture','cpu',resume=True)
+            a=torch.load(root/'full/last.pt',weights_only=False);b=torch.load(root/'resumed/last.pt',weights_only=False)
+            for key in a['model']:torch.testing.assert_close(a['model'][key],b['model'][key],rtol=0,atol=0)
+            self.assertEqual(a['rng'],b['rng']);self.assertEqual(a['replay_rng'],b['replay_rng'])
+            self.assertEqual(a['current_failure_state']['rng'],b['current_failure_state']['rng'])
+            self.assertEqual(a['current_failure_state']['round'],b['current_failure_state']['round'])
+            np.testing.assert_array_equal(a['current_failure_state']['draws'],b['current_failure_state']['draws'])
+
     def test_trajectory_progress_checks_do_not_change_greedy_selection(self):
         with tempfile.TemporaryDirectory() as tmp, ExitStack() as stack:
             path=Path(tmp); small_oracle(path,3,[[0,1],[1,2]])

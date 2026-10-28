@@ -93,6 +93,23 @@
       "layouts_per_batch": 64,
       "preserve_point_distances_up_to": 5,
       "mode": "joint"
+    },
+    "current_failure_replay": {
+      "bank": "../../logs/rush_current_failure.bank.npz",
+      "contexts_per_batch": 256,
+      "refresh_every": 2000,
+      "queries": 4096,
+      "ranking_fraction": 0.03125,
+      "critical_fraction": 0.75,
+      "distance_bin_upper_bounds": [
+        1,
+        5,
+        10,
+        20,
+        40,
+        80
+      ],
+      "layouts_per_batch": 64
     }
   },
   "relations": {
@@ -116,8 +133,9 @@
   "failure_diagnosis": "experiments/new_tasks_qmap/archive/configs/rush_hour/rush_hour_training_root_failures.json",
   "input_encoding": "geometry_order",
   "continuation": {
-    "checkpoint": "/tmp/rush_hour_qmap_20261028/parent/last.pt",
-    "reason": "Extend8000 to40000 updates, retaining weights, Adam, all samplers, RNG and exposure. Original data, losses and batch sizes are preserved.",
-    "source_cuda_device": 0
+    "checkpoint": "/tmp/rush_hour_qmap_targeted_20261028/parent/last.pt",
+    "reason": "Continue the full original state and its retained broad/path streams; add current training-only failed forks and complete successors using a separate recoverable stream. Keep the total40000-update budget.",
+    "source_cuda_device": 0,
+    "mode": "current_failure_replay"
   }
 }

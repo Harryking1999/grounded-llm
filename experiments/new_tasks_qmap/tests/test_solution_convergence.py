@@ -50,6 +50,7 @@ class ConvergenceTests(unittest.TestCase):
         validate_continuation(old,new,6)
         bad=deepcopy(new);bad['failure_diagnosis']='experiments/new_tasks_qmap/archive/configs/rush_hour/other.json'
         with self.assertRaises(ValueError):validate_continuation(old,bad,6)
+
         bad=deepcopy(new);bad['training']['trace_write_workers']=2
         with self.assertRaises(ValueError):validate_continuation(old,bad,6)
         for change in [('training','learning_rate',.001),('data','source','other'),('evaluation','horizon',64)]:
@@ -57,6 +58,15 @@ class ConvergenceTests(unittest.TestCase):
             with self.assertRaises(ValueError):validate_continuation(old,bad,6)
         bad=deepcopy(new);bad['training']['solution_structure']['graph_fraction']=.5
         with self.assertRaises(ValueError):validate_continuation(old,bad,6)
+
+    def test_current_failure_replay_addition_preserves_original_training(self):
+        old=dict(task='rush_hour',training=dict(steps=40000,batch_size=64,rank_weight=4.),data=dict(source='fixed'))
+        new=deepcopy(old);new['training']['current_failure_replay']=dict(contexts_per_batch=2)
+        new['continuation']=dict(mode='current_failure_replay')
+        validate_continuation(old,new,9000)
+        for key,value in [('steps',39000),('batch_size',128),('rank_weight',1.)]:
+            bad=deepcopy(new);bad['training'][key]=value
+            with self.assertRaises(ValueError):validate_continuation(old,bad,9000)
 
     def test_full_continuation_and_observation_preserve_update_trajectory(self):
         corpus,original=bank();data={k:np.concatenate([v,v]) for k,v in original.items() if k.endswith('_train')}

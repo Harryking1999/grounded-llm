@@ -15134,5 +15134,55 @@
       "evaluated_training_scenes": 1003,
       "scope": "All original starts to every complete training goal in the original1000-catalogue corpus, excluding identity pairs. Includes protected relation contexts, separately counted; not pure gradient-fitting accuracy, not all starts and not every possible target. No model selection, training or oracle action filtering."
     }
+  },
+  "current_failure_structure": {
+    "checkpoint_step": 8000,
+    "queries": 4096,
+    "solved": 3709,
+    "cycle_lengths": {
+      "2": 387
+    },
+    "distinct_cycles": 387,
+    "first_wrong_on_failed_queries": {
+      "count": 387,
+      "queries": 387,
+      "shortest_action_rate": 0.0,
+      "chosen_moves_settled_car": 92,
+      "chosen_increases_position_error": 159,
+      "every_optimal_action_moves_settled_car": 105,
+      "some_optimal_action_moves_settled_car": 141,
+      "every_optimal_action_increases_position_error": 176,
+      "goal_car_already_correct": 62,
+      "represented_in_original_replay": 6,
+      "optimal_margin_quantiles": [
+        -2.633695602416992,
+        -0.8278633117675781,
+        -0.2566795349121094,
+        -0.04108123779296872,
+        -0.000392913818359375
+      ],
+      "optimal_exit_reduces_more_direct_blockers": 122
+    },
+    "cycle_members": {
+      "count": 774,
+      "queries": 387,
+      "shortest_action_rate": 0.28036175710594313,
+      "chosen_moves_settled_car": 211,
+      "chosen_increases_position_error": 384,
+      "every_optimal_action_moves_settled_car": 304,
+      "some_optimal_action_moves_settled_car": 401,
+      "every_optimal_action_increases_position_error": 450,
+      "goal_car_already_correct": 172,
+      "represented_in_original_replay": 8,
+      "optimal_margin_quantiles": [
+        -2.446565628051758,
+        -0.7973899841308594,
+        -0.15553665161132812,
+        0.4749897003173831,
+        1.8969917297363281
+      ],
+      "optimal_exit_reduces_more_direct_blockers": 155
+    },
+    "evidence": "runs/new_tasks_qmap/rush_hour_20261028/structure_diagnostic.json"
   }
 }

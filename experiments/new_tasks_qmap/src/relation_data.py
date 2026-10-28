@@ -180,31 +180,33 @@ class BoardRelationSampler:
             scene=corpus.scenes[sid];offset=corpus.offsets[sid]
             start,stop=np.searchsorted(all_reserved,[offset*corpus.size,(offset+len(scene.states))*corpus.size])
             reserved=all_reserved[start:stop]
-            def forbidden(values):
-                if not len(reserved):return np.zeros(values.shape,dtype=bool)
-                at=np.searchsorted(reserved,values)
-                return (at<len(reserved)) & (reserved[np.minimum(at,len(reserved)-1)]==values)
+            reserved_source=reserved//corpus.size-offset;reserved_goal=reserved%corpus.size
+            local_children=np.asarray(scene.children,dtype=np.int64)
+            child_valid=local_children>=0
             points=[];ranks=[];point_labels=[];rank_labels=[];boundaries=[];unreachable=[]
             for j,g in enumerate(scene.goals[:scene.metadata['training_goals']]):
+                # The physical graph is shared by all goals. Mark protected
+                # sources once at this goal rather than encoding every edge
+                # into a global relation key and searching it again.
+                forbidden_source=np.zeros(len(scene.states)+1,dtype=bool)
+                forbidden_source[reserved_source[reserved_goal==g+offset]]=True
+                forbidden_source[reserved_goal[reserved_source==g]-offset]=True
                 if self.unreachable_fraction:
                     source=np.flatnonzero(~np.isfinite(scene.distances[j]))+offset;goal=np.full(len(source),g+offset)
-                    safe=(self.point_index[source]>=0)&~forbidden(keys(source,goal,corpus.size))
+                    safe=(self.point_index[source]>=0)&~forbidden_source[source-offset]
                     unreachable.append(np.column_stack([source[safe],goal[safe]]))
                 source=np.flatnonzero(np.isfinite(scene.distances[j]))+offset; goal=np.full(len(source),g+offset)
                 labels=scene.distances[j,source-offset]
                 # Q(s) versus itself is identically zero under the distance
                 # readout; do not spend the supplemental quota on zero-gradient
                 # identity pairs. Incidental zeros remain in broad traversal.
-                safe=(self.point_index[source]>=0) & (labels>0) & ~forbidden(keys(source,goal,corpus.size))
+                safe=(self.point_index[source]>=0) & (labels>0) & ~forbidden_source[source-offset]
                 points.append(np.column_stack([source[safe],goal[safe]])); point_labels.append(labels[safe])
-                safe=(self.rank_index[source]>=0) & (labels>0) & ~forbidden(keys(source,goal,corpus.size))
+                safe=(self.rank_index[source]>=0) & (labels>0) & ~forbidden_source[source-offset]
                 source,goal,labels=source[safe],goal[safe],labels[safe]
-                child=corpus.successors(source); valid=child>=0
-                related=np.full(child.shape,-1,dtype=np.int64)
-                related[valid]=keys(child[valid],np.broadcast_to(goal[:,None],child.shape)[valid],corpus.size)
-                safe=~forbidden(related).any(axis=1)
-                child_truth=np.full(child.shape,np.inf,dtype=np.float32)
-                child_truth[valid]=scene.distances[j,child[valid]-offset]
+                child=local_children[source-offset];valid=child_valid[source-offset]
+                safe=~forbidden_source[child].any(axis=1)
+                child_truth=scene.distances[j,np.maximum(child,0)]
                 boundary=(valid & np.isfinite(child_truth)).any(axis=1) & (valid & ~np.isfinite(child_truth)).any(axis=1)
                 ranks.append(np.column_stack([source[safe],goal[safe]])); rank_labels.append(labels[safe]); boundaries.append(boundary[safe])
             return [np.concatenate(values) for values in (points,ranks,point_labels,rank_labels,boundaries)]+[

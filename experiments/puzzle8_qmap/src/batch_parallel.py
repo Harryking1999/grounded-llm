@@ -7,6 +7,7 @@ import torch
 from torch.nn import functional as F
 
 from grounded_llm.tasks.puzzle8.model import soft_rank_loss
+from grounded_llm.core.qmap.parallel import replica_step
 
 
 class BatchParallel:
@@ -21,10 +22,6 @@ class BatchParallel:
         if min(len(rows), len(tasks)) < len(self.models):
             raise ValueError("Every replica needs both distance and ranking examples")
         partitions = [np.array_split(values, len(self.models)) for values in (rows, tasks, children, labels)]
-        for model in self.models:
-            model.train()
-            model.zero_grad(set_to_none=True)
-
         def worker(index):
             model, features = self.models[index], self.features[index]
             device = features.device
@@ -44,16 +41,7 @@ class BatchParallel:
             (pair_part + rank_weight * rank_part).backward()
             return float(pair_part.detach()), float(rank_part.detach())
 
-        values = list(self.pool.map(worker, range(len(self.models))))
-        primary = self.models[0]
-        for replica in self.models[1:]:
-            for source, target in zip(replica.parameters(), primary.parameters()):
-                target.grad.add_(source.grad.to(target.device))
-        # Clip and update once, after the complete original global gradient.
-        torch.nn.utils.clip_grad_norm_(primary.parameters(), 5.)
-        optimizer.step()
-        for replica in self.models[1:]:
-            replica.load_state_dict(primary.state_dict())
+        values = replica_step(self.models, optimizer, worker, self.pool, 5.)
         return tuple(torch.tensor(sum(value[k] for value in values), device=self.features[0].device,
                                   dtype=self.features[0].dtype)
                      for k in range(2))

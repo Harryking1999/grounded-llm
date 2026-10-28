@@ -50,6 +50,14 @@ def relation_losses(scores, truth, rt, order, slots, shape, temperature):
     return point, ranking, rank_scores, rank_truth, valid
 
 
+def scheduled_sampler(step, samplers, originals, schedule):
+    cycles, offset = divmod(step - 1, len(schedule))
+    stream = schedule[offset]
+    previous = cycles * schedule.count(stream) + schedule[:offset].count(stream)
+    pool = originals if stream == 'original' else samplers
+    return pool[previous % len(pool)], stream
+
+
 def run(config, out, source_commit, smoke_steps=None, resume=None):
     world = int(os.environ.get("WORLD_SIZE", 1))
     rank = int(os.environ.get("RANK", 0))
@@ -85,6 +93,21 @@ def run(config, out, source_commit, smoke_steps=None, resume=None):
     shard_ids = list(range(sampler_world)) if world == 1 else [rank]
     samplers = [sampler_type(config["graph_data"], config["legacy_data"], options, shard, sampler_world)
                 for shard in shard_ids]
+    original = config.get('original_sampling')
+    originals, original_ids = [], []
+    schedule = config.get('data_schedule', ['repair'])
+    if not schedule or set(schedule) - {'original', 'repair'} or ('original' in schedule and original is None):
+        raise ValueError('Data schedule requires the declared original and repair streams')
+    if original is not None:
+        original_config = json.loads(Path(original['config']).read_text())
+        original_options = {**original_config['training'], **original.get('overrides', {})}
+        original_world = original['sampler_shards']
+        if original_world % world:
+            raise ValueError('Original sampler shards must divide evenly across physical ranks')
+        original_ids = list(range(rank, original_world, world))
+        originals = [BroadData(original['graph_data'], original['legacy_data'], original_options,
+                              shard, original_world) for shard in original_ids]
+    all_samplers = samplers + originals
     sampler = samplers[0]
     out = Path(out)
     first_step = 0
@@ -96,6 +119,9 @@ def run(config, out, source_commit, smoke_steps=None, resume=None):
         for shard, sampler in zip(shard_ids, samplers):
             sampler.load_state_dict(torch.load(out / f"sampler_{first_step:06d}_rank{shard}.pt",
                                               map_location="cpu", weights_only=False))
+        for shard, sampler in zip(original_ids, originals):
+            sampler.load_state_dict(torch.load(out / f"original_sampler_{first_step:06d}_rank{shard}.pt",
+                                              map_location='cpu', weights_only=False))
     if rank == 0:
         if resume is None:
             out.mkdir(parents=True, exist_ok=False)
@@ -107,19 +133,30 @@ def run(config, out, source_commit, smoke_steps=None, resume=None):
     started = time.monotonic()
     last = smoke_steps or options["steps"]
     probe = None
+    stream_probes = {}
     probe_path=out/f'training_probe_rank{rank}.pt'
     if options.get('training_probe') and resume is not None and probe_path.exists():
         probe=torch.load(probe_path,map_location=device,weights_only=False)
+    if originals and options.get('training_probe') and resume is not None:
+        for name in set(schedule):
+            path = out/f'training_probe_{name}_rank{rank}.pt'
+            if path.exists():stream_probes[name] = torch.load(path,map_location=device,weights_only=False)
     for step in range(first_step + 1, last + 1):
         # A single idle GPU can alternate both retained distributed data streams.
         # Each update still uses the original Huber+soft-rank on one full batch.
-        sampler = samplers[(step - 1) % len(samplers)]
+        sampler, stream = scheduled_sampler(step, samplers, originals, schedule)
+        stream_options = original_options if stream == 'original' else options
         begin = time.monotonic()
         arrays = sampler.batch(options["batch_size_per_rank"], options["rank_contexts_per_rank"])
         bits, pairs, truth, rt, order, slots, shape = relation_batch(
             arrays, device, options.get("unreachable_label", parent.get("unreachable_label", parent["cap"])))
         prepared = time.monotonic()
-        if probe is None and options.get('training_probe'):
+        if originals and options.get('training_probe'):
+            if stream not in stream_probes:
+                stream_probes[stream] = (bits, pairs, truth, rt, order, slots, shape)
+                atomic_save(stream_probes[stream],out/f'training_probe_{stream}_rank{rank}.pt')
+            probe = stream_probes[stream]
+        elif probe is None and options.get('training_probe'):
             probe = (bits, pairs, truth, rt, order, slots, shape)
             atomic_save(probe,probe_path)
         scores = model(bits, pairs)
@@ -145,13 +182,15 @@ def run(config, out, source_commit, smoke_steps=None, resume=None):
             rank_nonzero[order] = nonzero.reshape(-1)[slots]
             sampler.record_update(arrays, (scores[:len(truth)].detach() != truth).cpu().numpy(),
                                   rank_nonzero.cpu().numpy())
-        if step == 1 or step % options["log_every"] == 0 or step == smoke_steps:
+        if step == 1 or step % options["log_every"] == 0 or step == smoke_steps or (originals and step % options['log_every'] == 1):
             if rank == 0:
                 record = {"step": step, "seconds": time.monotonic() - started,
                           "sampling_seconds": prepared - begin,
                           "pointwise": point.item(), "soft_rank": ranking.item(),
                           "unique_batch_states": len(bits), "exposure": sampler.report()}
-                if probe is not None and (step == 1 or step % options['checkpoint_every'] == 0 or step == last):
+                if originals:record.update(data_stream=stream,sampler_shard=sampler.rank)
+                if probe is not None and (step == 1 or step % options['checkpoint_every'] == 0 or step == last
+                                          or (originals and step % options['checkpoint_every'] == 1)):
                     with torch.no_grad():
                         pb, pp, pt, prt, po, ps, pshape = probe
                         probe_prediction=raw(pb,pp)
@@ -165,8 +204,8 @@ def run(config, out, source_commit, smoke_steps=None, resume=None):
                         record['training_probe'] = dict(huber=float(ph),rank=float(pr),rank_kl=float(pr-entropy),
                             sampler_rank=rank,
                             nontrivial_decisions=int(nontrivial.sum()))
-                        legacy_pairs=round(len(pt)*options['legacy_fraction'])
-                        legacy_rank=round(options['rank_contexts_per_rank']*options['legacy_fraction'])
+                        legacy_pairs=round(len(pt)*stream_options['legacy_fraction'])
+                        legacy_rank=round(options['rank_contexts_per_rank']*stream_options['legacy_fraction'])
                         record['training_probe']['legacy_huber']=float(F.smooth_l1_loss(
                             probe_prediction[:legacy_pairs],pt[:legacy_pairs]))
                         record['training_probe']['root_huber']=float(F.smooth_l1_loss(
@@ -184,19 +223,28 @@ def run(config, out, source_commit, smoke_steps=None, resume=None):
             # inference checkpoints loaded by the existing weights-only reader.
             for shard, local_sampler in zip(shard_ids, samplers):
                 atomic_save(local_sampler.state_dict(), out / f"sampler_{step:06d}_rank{shard}.pt")
-            actions = torch.as_tensor(np.logical_or.reduce([s.action_exposed for s in samplers]),
+            for shard, local_sampler in zip(original_ids, originals):
+                atomic_save(local_sampler.state_dict(),out/f'original_sampler_{step:06d}_rank{shard}.pt')
+            checkpoint_sampler = samplers[0] if originals else sampler
+            actions = torch.as_tensor(np.logical_or.reduce([s.action_exposed for s in all_samplers]),
                                       device=device, dtype=torch.int32)
             if world > 1:
                 dist.all_reduce(actions, op=dist.ReduceOp.MAX)
             reports = [None] * world if rank == 0 else None
             if world > 1:
-                dist.gather_object(sampler.report(), reports, dst=0)
+                dist.gather_object(checkpoint_sampler.report(), reports, dst=0)
             else:
                 reports = [s.report() for s in samplers]
             sketches = None
-            if hasattr(sampler, "sketch_state"):
+            original_reports = None
+            if originals:
+                local_reports = [dict(shard=shard,report=s.report()) for shard,s in zip(original_ids,originals)]
+                original_reports = [None]*world if rank == 0 else None
+                if world > 1:dist.gather_object(local_reports,original_reports,dst=0)
+                else:original_reports = [local_reports]
+            if hasattr(checkpoint_sampler, "sketch_state"):
                 sketches = [None] * world if rank == 0 else None
-                local_sketch = {"sketches": sampler.sketch_state(), "roots": sampler.phase_roots}
+                local_sketch = {"sketches": checkpoint_sampler.sketch_state(), "roots": checkpoint_sampler.phase_roots}
                 if world > 1:
                     dist.gather_object(local_sketch, sketches, dst=0)
                 else:
@@ -209,14 +257,17 @@ def run(config, out, source_commit, smoke_steps=None, resume=None):
                              "unreachable_label": options.get("unreachable_label", parent.get("unreachable_label", parent["cap"])),
                              "config": {"model": model_config, "training": options},
                              "source_commit": source_commit}, path)
-                exposure = sampler.report()
+                exposure = checkpoint_sampler.report()
                 exposure["all_rank_action_types_in_candidate_rows"] = int(actions.sum().item())
                 exposure["physical_world_size"] = world
                 exposure["sampler_shards"] = sampler_world
                 exposure["per_rank_draw_reports" if world > 1 or sampler_world == 1
                          else "serialized_sampler_shard_reports"] = reports
+                if original_reports is not None:
+                    exposure['original_sampling'] = original_reports
+                    exposure['data_schedule'] = schedule
                 if sketches is not None:
-                    exposure["global_stream_phase"] = sampler.merged_exposure([s["sketches"] for s in sketches])
+                    exposure["global_stream_phase"] = checkpoint_sampler.merged_exposure([s["sketches"] for s in sketches])
                     exposure["global_stream_phase"]["distinct_roots"] = int(np.logical_or.reduce([s["roots"] for s in sketches]).sum())
                     exposure["global_stream_phase"]["distance_by_goal_draws"] = {}
                     for report in reports:
@@ -238,7 +289,7 @@ def run(config, out, source_commit, smoke_steps=None, resume=None):
                 (out / f"exposure_{step:06d}.json").write_text(json.dumps(exposure, indent=2) + "\n")
             if world > 1:
                 dist.barrier()
-    for sampler in samplers:
+    for sampler in all_samplers:
         sampler.close()
     if world > 1:
         dist.destroy_process_group()

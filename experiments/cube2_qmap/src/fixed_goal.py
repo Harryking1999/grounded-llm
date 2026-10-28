@@ -3,6 +3,8 @@ import argparse
 import json
 from pathlib import Path
 import time
+from copy import deepcopy
+from concurrent.futures import ThreadPoolExecutor
 
 import numpy as np
 import torch
@@ -11,6 +13,62 @@ from grounded_llm.tasks.cube2.evaluate import decisions, pair_metrics, rollout
 from grounded_llm.tasks.cube2.model import MODEL_TYPE, QMap
 from grounded_llm.tasks.cube2.environment import Cube2
 from .full_state_joint import batch_losses
+from grounded_llm.core.qmap.parallel import replica_step
+
+
+def tensor_batch(parents, successors, depth, heldout):
+    """The existing complete fixed-goal stars, prepared on the tensor device."""
+    stars = torch.cat((parents[:, None], successors[parents]), dim=1)
+    states, inverse = torch.unique(torch.cat((parents.new_zeros(1), stars.flatten())),
+                                   sorted=True, return_inverse=True)
+    indices = inverse[1:].reshape(stars.shape)
+    allowed = ~heldout[stars]
+    source = indices[allowed]
+    live = allowed.all(-1) & (parents != 0)
+    children = indices[live, 1:]
+    if not len(children):raise ValueError('No complete nonterminal ranking task in replica')
+    return dict(states=states, pairs=torch.stack((source, torch.zeros_like(source)), -1),
+                labels=depth[stars[allowed]].float(), children=children,
+                goals=torch.zeros_like(indices[live, 0]), truth=depth[stars[live, 1:]])
+
+
+class FixedGoalReplicas:
+    """Split one original objective over replicas with device-resident rule data."""
+    def __init__(self, model, env, heldout, devices):
+        if str(next(model.parameters()).device) != str(torch.device(devices[0])):
+            raise ValueError('The primary replica must own the existing optimizer')
+        self.models = [model]+[deepcopy(model).to(d) for d in devices[1:]]
+        features = torch.as_tensor(env.features(np.arange(env.size)),device=devices[0],
+                                   dtype=next(model.parameters()).dtype)
+        self.features = [features]+[features.to(d) for d in devices[1:]]
+        children = env.successors(np.arange(env.size))
+        self.children = [torch.as_tensor(children,device=d) for d in devices]
+        self.depth = [torch.as_tensor(env.depth,device=d) for d in devices]
+        self.heldout = [torch.as_tensor(heldout,device=d) for d in devices]
+        self.pool = ThreadPoolExecutor(max_workers=len(devices))
+
+    def update(self, parents, optimizer, config):
+        partitions = np.array_split(parents,len(self.models))
+        def prepare_replica(i):
+            ids = torch.as_tensor(partitions[i],device=self.features[i].device)
+            return tensor_batch(ids,self.children[i],self.depth[i],self.heldout[i])
+        batches = list(self.pool.map(prepare_replica,range(len(self.models))))
+        pairs = sum(len(b['pairs']) for b in batches)
+        tasks = sum(len(b['goals']) for b in batches)
+        def worker(i):
+            batch = batches[i]
+            h,r = batch_losses(self.models[i],self.features[i][batch['states']],batch,config)
+            h,r = h*(len(batch['pairs'])/pairs),r*(len(batch['goals'])/tasks)
+            (h+config['training']['rank_weight']*r).backward()
+            return float(h.detach()),float(r.detach())
+        values = replica_step(self.models,optimizer,worker,self.pool,config['training']['clip_norm'])
+        device = self.features[0].device
+        return (torch.tensor(sum(v[0] for v in values),device=device),
+                torch.tensor(sum(v[1] for v in values),device=device),
+                dict(goal_pair_count=pairs,path_pair_count=0))
+
+    def close(self):
+        self.pool.shutdown()
 
 
 def prepare(env, config):
@@ -120,14 +178,17 @@ def reach_within_budget(next_state, goal, horizon):
 
 
 @torch.no_grad()
-def exhaustive_policy(model, env, mask, config, device):
+def exhaustive_policy(model, env, mask, config, device, feature_table=None):
     """Cache network distances, choose each next state, then score all starts."""
-    goal = model.encode(torch.as_tensor(env.features([0]), device=device))
+    goal = model.encode(feature_table[:1] if feature_table is not None else
+                        torch.as_tensor(env.features([0]), device=device))
     predicted = np.empty(env.size, dtype=np.float32)
     next_state = np.empty(env.size, dtype=np.int32)
-    for start in range(0, env.size, 8192):
-        ids = np.arange(start, min(env.size, start + 8192))
-        q = model.encode(torch.as_tensor(env.features(ids), device=device))
+    width = config['evaluation'].get('encode_batch_size',8192)
+    for start in range(0, env.size, width):
+        ids = np.arange(start, min(env.size, start + width))
+        q = model.encode(feature_table[start:start+width] if feature_table is not None else
+                         torch.as_tensor(env.features(ids), device=device))
         predicted[ids] = model.distance(q, goal).cpu().numpy()
     # Action selection reads learned distances only, never env.depth.
     for start in range(0, env.size, 32768):
@@ -173,6 +234,8 @@ def main():
     parser.add_argument("--source-commit", required=True)
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--resume-run", type=Path)
+    parser.add_argument('--checkpoint',type=Path,help='Warm-start a new fixed-goal condition with its Adam state')
+    parser.add_argument('--devices',nargs='+')
     parser.add_argument("--smoke-steps", type=int, default=0)
     args = parser.parse_args()
     config = json.loads(args.contract.read_text())
@@ -188,11 +251,22 @@ def main():
     options = config["training"]
     optimizer = torch.optim.Adam(model.parameters(), lr=options["learning_rate"])
     starting_epoch, starting_step = 0, 0
+    parent = None
+    if args.checkpoint is not None:
+        if args.resume_run is not None:raise ValueError('Use either warm start or interrupted-run resume')
+        saved = torch.load(args.checkpoint,map_location='cpu',weights_only=False)
+        if saved['task'] != env.name or saved['model_config'] != config['model'] or 'optimizer' not in saved:
+            raise ValueError('Warm start requires the matching complete selected Q and Adam')
+        model.load_state_dict(saved['model']);optimizer.load_state_dict(saved['optimizer'])
+        for group in optimizer.param_groups:group['lr'] = options['learning_rate']
+        parent = dict(checkpoint=str(args.checkpoint),source_commit=saved['source_commit'],
+                      optimizer_step=max(int(v['step']) for v in saved['optimizer']['state'].values()))
     if args.resume_run:
         if json.loads((args.resume_run / "contract.json").read_text()) != config:
             raise ValueError("Resume changed fixed-goal contract")
         saved = torch.load(args.resume_run / "last.pt", map_location="cpu", weights_only=False)
-        starting_epoch, starting_step = saved["epoch"], saved["step"]
+        starting_epoch, starting_step = saved["epoch"], saved.get('continuation_step',saved['step'])
+        parent = saved.get('parent')
         expected = starting_epoch * ((env.size + options["parent_batch_size"] - 1) // options["parent_batch_size"])
         if saved["fixed_goal"] != 0 or starting_step != expected or saved["smoke_steps"]:
             raise ValueError("Resume requires a complete formal fixed-goal epoch")
@@ -206,10 +280,42 @@ def main():
     result = {"source_commit": args.source_commit, "fixed_goal": 0, "seed": config["seed"],
               "starting_epoch": starting_epoch, "supervised_state_count": int((mask == 0).sum()),
               "heldout_state_count": int(heldout.sum()), "evaluations": []}
+    result['parent'] = parent
+    relative_cohorts = {}
+    if config['evaluation'].get('relative_tasks'):
+        with np.load(config['evaluation']['relative_tasks']) as packed:
+            for name in ('original','small_ood','validation','test'):
+                tasks = packed[name]
+                relative_cohorts[name] = np.column_stack((env.relative(tasks[:,1],tasks[:,0]),
+                                                         np.zeros(len(tasks),dtype=np.int64)))
+    parallel = None
+    if args.devices:
+        if options['paths_per_batch']:raise ValueError('Device-resident restoration uses solved-goal labels only')
+        parallel = FixedGoalReplicas(model,env,heldout,args.devices)
+    best_validation = (-1,float('-inf'))
 
     def inspect(epoch, log):
+        nonlocal best_validation
         row = {"epoch": epoch, "step": step, "seconds": time.monotonic() - started,
                "metrics": evaluate(model, env, cohorts, config, args.device)}
+        validation = row['metrics']['validation']
+        score = (validation['rollout']['solved'],-validation['pairs']['mae'])
+        if config.get('selection') == 'validation' and score > best_validation:
+            best_validation = score
+            save(epoch,'best.pt')
+            result['best_epoch'] = epoch
+        interval = config['evaluation'].get('exhaustive_every_epochs')
+        if interval and epoch % interval == 0:
+            row['exhaustive_policy'] = exhaustive_policy(model,env,mask,config,args.device,
+                                                        parallel.features[0] if parallel else None)
+        if relative_cohorts:
+            row['relative_goals'] = {name:rollout(model,env,tasks,args.device,2,
+                                                  horizon=config['evaluation']['horizon'])['q']
+                                     for name,tasks in relative_cohorts.items()}
+        if 'exhaustive_policy' in row and relative_cohorts:
+            target = config['evaluation'].get('minimum_success_rate',1.)
+            row['target_met'] = (row['exhaustive_policy']['cohorts']['all_states']['success_rate'] >= target
+                                 and all(v['success_rate'] >= target for v in row['relative_goals'].values()))
         result["evaluations"].append(row)
         result["last"] = row
         (args.out / "summary.json").write_text(json.dumps(result, indent=2) + "\n")
@@ -220,13 +326,14 @@ def main():
             "test_solved": row["metrics"]["test"]["rollout"]["solved"],
             "test_count": row["metrics"]["test"]["rollout"]["count"]}), flush=True)
 
-    def save(epoch):
-        temporary = args.out / "last.pt.tmp"
+    def save(epoch,filename='last.pt'):
+        temporary = args.out / (filename+'.tmp')
         torch.save({"model_type": MODEL_TYPE, "task": env.name, "actions": list(env.actions), "cap": env.diameter,
             "model_config": config["model"], "source_commit": args.source_commit, "seed": config["seed"],
-            "fixed_goal": 0, "epoch": epoch, "step": step, "smoke_steps": args.smoke_steps,
+            "fixed_goal": 0, "epoch": epoch, "step": step+(parent['optimizer_step'] if parent else 0),
+            'continuation_step':step,'parent':parent,"smoke_steps": args.smoke_steps,
             "model": model.state_dict(), "optimizer": optimizer.state_dict(), "rng": rng.bit_generator.state}, temporary)
-        temporary.replace(args.out / "last.pt")
+        temporary.replace(args.out / filename)
 
     with (args.out / "progress.jsonl").open("w") as log:
         inspect(starting_epoch, log)
@@ -237,20 +344,25 @@ def main():
                 parents = order[start:start + options["parent_batch_size"]]
                 replay = balanced_parents(layers, options["balanced_replay_size"], step * options["balanced_replay_size"], rng)
                 all_parents = np.r_[parents, replay]
-                path_roots = rng.choice(all_parents, min(len(all_parents), options["paths_per_batch"]), replace=False)
-                batch = make_batch(env, all_parents, heldout, path_roots, rng)
-                features = torch.as_tensor(env.features(batch["states"]), device=args.device)
-                huber, rank = batch_losses(model, features, batch, config)
-                loss = huber + options["rank_weight"] * rank
-                optimizer.zero_grad(set_to_none=True)
-                loss.backward()
-                torch.nn.utils.clip_grad_norm_(model.parameters(), options["clip_norm"])
-                optimizer.step()
+                begin = time.monotonic()
+                if parallel:
+                    huber,rank,batch = parallel.update(all_parents,optimizer,config)
+                else:
+                    path_roots = rng.choice(all_parents,min(len(all_parents),options['paths_per_batch']),replace=False)
+                    batch = make_batch(env, all_parents, heldout, path_roots, rng)
+                    features = torch.as_tensor(env.features(batch["states"]), device=args.device)
+                    huber, rank = batch_losses(model, features, batch, config)
+                    loss = huber + options["rank_weight"] * rank
+                    optimizer.zero_grad(set_to_none=True)
+                    loss.backward()
+                    torch.nn.utils.clip_grad_norm_(model.parameters(), options["clip_norm"])
+                    optimizer.step()
                 step += 1
                 if step % options["log_every"] == 0:
                     row = {"epoch": epoch, "step": step, "seconds": time.monotonic() - started,
                            "huber": float(huber.detach()), "rank_ce": float(rank.detach()),
-                           "goal_pairs": batch["goal_pair_count"], "path_pairs": batch["path_pair_count"]}
+                           "goal_pairs": batch["goal_pair_count"], "path_pairs": batch["path_pair_count"],
+                           'update_seconds':time.monotonic()-begin,'replicas':len(parallel.models) if parallel else 1}
                     log.write(json.dumps(row) + "\n")
                     log.flush()
                     print(json.dumps(row), flush=True)
@@ -262,8 +374,13 @@ def main():
             save(completed)
             if args.smoke_steps:
                 break
+            if (options.get('stop_on_target') and completed >= options.get('minimum_epochs',0)
+                    and result['last'].get('target_met')):
+                result['stopped_on_target'] = True
+                break
         if config["evaluation"]["final_exhaustive_policy"] and not args.smoke_steps:
             result["exhaustive_policy"] = exhaustive_policy(model, env, mask, config, args.device)
+    if parallel:parallel.close()
     result["completed_epochs"] = completed
     result["seconds"] = time.monotonic() - started
     (args.out / "summary.json").write_text(json.dumps(result, indent=2) + "\n")

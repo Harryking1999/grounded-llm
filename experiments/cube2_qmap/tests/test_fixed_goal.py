@@ -1,11 +1,12 @@
 """Fixed-goal supervision must not leak heldout labels via candidates."""
 import unittest
+from copy import deepcopy
 from types import SimpleNamespace
 
 import numpy as np
 import torch
 
-from experiments.cube2_qmap.src.fixed_goal import balanced_parents, exhaustive_policy, make_batch, path_relations, prepare, reach_within_budget
+from experiments.cube2_qmap.src.fixed_goal import FixedGoalReplicas, tensor_batch, balanced_parents, exhaustive_policy, make_batch, path_relations, prepare, reach_within_budget
 from experiments.cube2_qmap.src.full_state_joint import batch_losses
 from experiments.puzzle_qmap.src.model import QMap
 from experiments.cube2_qmap.tests.test_full_state_joint import Ring
@@ -15,6 +16,29 @@ class FixedGoalTests(unittest.TestCase):
     def setUp(self):
         self.env = Ring()
         self.env.depth = self.env.distance(np.arange(self.env.size), 0).astype(np.uint8)
+
+    def test_device_stars_and_replica_update_preserve_original_objective(self):
+        torch.set_num_threads(1);torch.manual_seed(19)
+        parents=np.arange(self.env.size);heldout=np.zeros(self.env.size,dtype=bool);heldout[[5,10]]=True
+        original=make_batch(self.env,parents,heldout)
+        packed=tensor_batch(torch.as_tensor(parents),torch.as_tensor(self.env.successors(parents)),
+                            torch.as_tensor(self.env.depth),torch.as_tensor(heldout))
+        for key in ('states','pairs','labels','children','goals','truth'):
+            np.testing.assert_array_equal(packed[key],original[key])
+        model=QMap(self.env.size,dimension=8,hidden=16,metric='linf',cap=self.env.diameter).double()
+        replica=deepcopy(model);a=torch.optim.Adam(model.parameters(),lr=.0003);b=torch.optim.Adam(replica.parameters(),lr=.0003)
+        config=dict(training=dict(temperature=1.,rank_weight=1.,clip_norm=5.))
+        parallel=FixedGoalReplicas(replica,self.env,heldout,['cpu','cpu'])
+        try:
+            for _ in range(3):
+                h,r=batch_losses(model,torch.as_tensor(self.env.features(original['states'])).double(),original,config)
+                a.zero_grad();(h+r).backward();torch.nn.utils.clip_grad_norm_(model.parameters(),5.);a.step()
+                ph,pr,_=parallel.update(parents,b,config)
+                torch.testing.assert_close(ph+pr,(h+r).detach(),rtol=1e-6,atol=1e-6,check_dtype=False)
+                for x,y in zip(model.parameters(),replica.parameters()):
+                    torch.testing.assert_close(x.grad,y.grad,rtol=1e-5,atol=1e-7)
+                    torch.testing.assert_close(x,y,rtol=1e-5,atol=1e-7)
+        finally:parallel.close()
 
     def test_heldout_labels_are_absent_from_both_loss_families(self):
         heldout = np.zeros(self.env.size, dtype=bool)

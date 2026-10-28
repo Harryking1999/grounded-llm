@@ -1,0 +1,47 @@
+{
+  "hypothesis": "Known goal-relative coordinates reduce arbitrary cube goals to the same restoration policy. Continue the selected Q and Adam on all-state solved-goal distances and full legal candidate ranking, with rule tables and features resident on four GPU replicas.",
+  "rules": {
+    "metric": "QTM_URF_6",
+    "fixed_goal": 0
+  },
+  "model": {
+    "dimension": 128,
+    "hidden": 256,
+    "metric": "linf",
+    "symmetry": "cube_axis_permutation_average"
+  },
+  "seed": 2026102821,
+  "data": {
+    "seed": 20261023,
+    "first_heldout_depth": 4,
+    "heldout_fraction_per_split": 0.01,
+    "minimum_heldout_per_layer": 16
+  },
+  "training": {
+    "epochs": 100,
+    "parent_batch_size": 65536,
+    "balanced_replay_size": 32768,
+    "paths_per_batch": 0,
+    "learning_rate": 0.0003,
+    "rank_weight": 1.0,
+    "temperature": 1.0,
+    "clip_norm": 5.0,
+    "log_every": 10,
+    "minimum_epochs": 20,
+    "stop_on_target": true
+  },
+  "evaluation": {
+    "states_per_layer": 128,
+    "horizon": 32,
+    "final_exhaustive_policy": true,
+    "encode_batch_size": 65536,
+    "exhaustive_every_epochs": 5,
+    "relative_tasks": "runs/cube_relative_goals/cohorts.npz",
+    "minimum_success_rate": 0.9
+  },
+  "initialization": "Selected restoration Q and complete Adam state.",
+  "supervision": "Existing Huber to solved0 plus existing complete six-candidate soft-rank. Physical parents are fully traversed every epoch, with the existing depth-balanced replay. Goal-relative inference uses the known common-left group action.",
+  "split": "Fixed state-to-solved validation and test relations are omitted from continuation supervision. The warm-start model has already seen states from the original training distribution.",
+  "selection": "validation",
+  "scope": "Goal-relative coordinates, six QTM actions, frozen-Q greedy execution. Evaluate each fixed cohort and all-state restoration against the90percent target; train20to100 complete epochs."
+}

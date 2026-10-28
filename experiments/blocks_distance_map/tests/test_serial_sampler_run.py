@@ -1,4 +1,6 @@
 import json
+import contextlib
+import io
 from pathlib import Path
 import tempfile
 import unittest
@@ -39,29 +41,42 @@ class SerialSamplerRunTest(unittest.TestCase):
                        'broad_fraction': .25, 'clear_fraction': .5, 'expanded_stream': True,
                        'learning_rate': .0003, 'temperature': 1., 'listwise_weight': 1.,
                        'original_cap': 13, 'unreachable_label': 19, 'cpu_threads': 1,
-                       'steps': 4, 'batch_size_per_rank': 32, 'rank_contexts_per_rank': 16,
-                       'log_every': 100, 'checkpoint_every': 2, 'sampler_shards': 2}
+                       'steps': 8, 'batch_size_per_rank': 32, 'rank_contexts_per_rank': 16,
+                       'log_every': 100, 'checkpoint_every': 2, 'sampler_shards': 2, 'training_probe': True}
             torch.save({'model': model.state_dict(), 'optimizer': optimizer.state_dict(),
                         'config': {'model': settings, 'training': options}, 'step': 0,
                         'cap': 13, 'metric': 'directed_sum'}, root / 'parent.pt')
             config = {'parent_checkpoint': str(root / 'parent.pt'), 'graph_data': str(root / 'data'),
                       'legacy_data': str(root / 'legacy.npz'), 'training': options}
-            with patch('torch.cuda.is_available', return_value=False):
-                run(config, root / 'resumed', 'test', smoke_steps=2)
-                run(config, root / 'resumed', 'test', resume=root / 'resumed/checkpoints/step_000002.pt')
-                run(config, root / 'continuous', 'test')
-            a = torch.load(root / 'resumed/checkpoints/step_000004.pt', weights_only=False)
-            b = torch.load(root / 'continuous/checkpoints/step_000004.pt', weights_only=False)
-            for key in a['model']:
-                torch.testing.assert_close(a['model'][key], b['model'][key], rtol=0, atol=0)
-            for shard in (0, 1):
-                state = torch.load(root / f'resumed/sampler_000004_rank{shard}.pt', weights_only=False)
-                self.assertGreater(state['pair_counts']['clear'], 0)
-                self.assertEqual(int(next(iter(a['optimizer']['state'].values()))['step']), 4)
-            exposure = json.loads((root / 'resumed/exposure_000004.json').read_text())
-            self.assertEqual(exposure['physical_world_size'], 1)
-            self.assertEqual(len(exposure['serialized_sampler_shard_reports']), 2)
-            self.assertGreater(exposure['global_stream_phase']['estimated_distinct_relations'], 0)
+            original_config = root/'original.json'
+            original_config.write_text(json.dumps(dict(training=options)))
+            for mixed in (False, True):
+                if mixed:
+                    config['original_sampling'] = dict(config=str(original_config),graph_data=str(root/'data'),
+                                                       legacy_data=str(root/'legacy.npz'),sampler_shards=4)
+                    config['data_schedule'] = ['original','repair']
+                with patch('torch.cuda.is_available', return_value=False), contextlib.redirect_stdout(io.StringIO()):
+                    run(config, root / f'resumed_{mixed}', 'test', smoke_steps=4)
+                    run(config, root / f'resumed_{mixed}', 'test', resume=root / f'resumed_{mixed}/checkpoints/step_000004.pt')
+                    run(config, root / f'continuous_{mixed}', 'test')
+                a = torch.load(root / f'resumed_{mixed}/checkpoints/step_000008.pt', weights_only=False)
+                b = torch.load(root / f'continuous_{mixed}/checkpoints/step_000008.pt', weights_only=False)
+                for key in a['model']:
+                    torch.testing.assert_close(a['model'][key], b['model'][key], rtol=0, atol=0)
+                for shard in (0, 1):
+                    state = torch.load(root / f'resumed_{mixed}/sampler_000008_rank{shard}.pt', weights_only=False)
+                    self.assertGreater(state['pair_counts']['clear'], 0)
+                    self.assertEqual(int(next(iter(a['optimizer']['state'].values()))['step']), 8)
+                exposure = json.loads((root / f'resumed_{mixed}/exposure_000008.json').read_text())
+                self.assertEqual(exposure['physical_world_size'], 1)
+                self.assertEqual(len(exposure['serialized_sampler_shard_reports']), 2)
+                self.assertGreater(exposure['global_stream_phase']['estimated_distinct_relations'], 0)
+                if mixed:
+                    for shard in range(4):
+                        state = torch.load(root/f'resumed_{mixed}/original_sampler_000008_rank{shard}.pt',weights_only=False)
+                        self.assertGreater(state['pair_counts']['legacy'],0)
+                    self.assertEqual(len(exposure['original_sampling'][0]),4)
+
 
 
 if __name__ == '__main__':

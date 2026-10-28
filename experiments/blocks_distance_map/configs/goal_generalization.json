@@ -1,6 +1,6 @@
 {
   "study": "blocks_goal_generalization",
-  "parent_checkpoint": "runs/blocks_goal_generalization/train/checkpoints/step_003000.pt",
+  "parent_checkpoint": "runs/blocks_goal_generalization/goal_fraction_continuation/checkpoints/step_002000.pt",
   "graph_data": "data/blocks12_graphs",
   "legacy_data": "data/legacy_tree.npz",
   "baseline_cases": "tasks/blocks/data/clear1000.json",
@@ -15,9 +15,9 @@
   "training": {
     "seed": 2026102810,
     "learning_rate": 0.0003,
-    "steps": 37000,
-    "batch_size_per_rank": 4096,
-    "rank_contexts_per_rank": 512,
+    "steps": 35000,
+    "batch_size_per_rank": 16384,
+    "rank_contexts_per_rank": 2048,
     "boards_per_batch": 8,
     "legacy_fraction": 0.4,
     "broad_fraction": 0.25,
@@ -28,7 +28,7 @@
     "unreachable_label": 19,
     "failure_diagnosis": "runs/blocks_goal_generalization/step1000_goal_fractions.json",
     "retention_diagnosis": "runs/blocks_goal_generalization/adopted_goal_fractions.json",
-    "failure_fraction": 0.25,
+    "failure_fraction": 1.0,
     "repair_descendant_steps": [
       0,
       0,
@@ -55,13 +55,34 @@
     "checkpoint_every": 1000,
     "sampler_shards": 2,
     "training_probe": true,
-    "previous_sampler_root": "runs/blocks_goal_generalization/train",
-    "previous_sampler_step": 3000,
+    "previous_sampler_root": "runs/blocks_goal_generalization/goal_fraction_continuation",
+    "previous_sampler_step": 2000,
     "additional_failure_diagnoses": [
       "runs/blocks_goal_generalization/diagnosis.json"
     ]
   },
-  "data_distribution": "Original legacy relations, broad exact pairs, clearing, structural relations, training-policy failures across 8/12-placement sources and three goal fractions, and adopted-policy successful trajectories. Historical long-goal failures remain in the repair pool.",
+  "data_distribution": "Four original-distribution updates for each targeted repair update. The original source restores the selected map's10000 roots, exact deep-clearing index, full forks, retained successes and original historical relation pool with four complete sampler states. Repair uses the existing actual goal fractions, full legal candidates and optimal descendants. Both sources share the original Q, Adam and Huber/soft-rank objective.",
   "training_assessment": "Inspect actual root,goal,distance,action and relation exposure with training-loss stability and frozen greedy execution. Evaluate old relations,clearing and nonempty goals together throughout the declared training window.",
-  "total_continuation_updates": 40000
+  "total_continuation_updates": 40000,
+  "completed_updates_before_stage": 5000,
+  "data_schedule": [
+    "original",
+    "original",
+    "original",
+    "original",
+    "repair"
+  ],
+  "original_sampling": {
+    "config": "experiments/blocks_distance_map/configs/blocks12_decision_clear.json",
+    "graph_data": "runs/blocks_original_distribution/data/blocks12_graphs_10000",
+    "legacy_data": "runs/blocks_original_distribution/legacy_4f413b5.npz",
+    "sampler_shards": 4,
+    "overrides": {
+      "previous_sampler_root": "runs/blocks_original_distribution/runs/blocks12_decision_clear/run",
+      "previous_sampler_step": 300,
+      "previous_sampler_world": 4,
+      "clear_index_data": "runs/blocks_original_distribution/data/blocks12_clear_distance_10000",
+      "clear_retention_pool": "runs/blocks_original_distribution/runs/blocks12_decision_clear/retention_pool.json"
+    }
+  }
 }

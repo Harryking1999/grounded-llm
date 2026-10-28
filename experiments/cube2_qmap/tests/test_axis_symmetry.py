@@ -28,6 +28,26 @@ class AxisSymmetryTests(unittest.TestCase):
                 self.assertEqual(action,absolute.choose(int(r),0)[0])
                 self.assertEqual(child,env.step(int(s),action))
 
+    def test_inverse_average_is_symmetric_and_keeps_encodings_and_all_successors(self):
+        env=Cube2(metric='QTM_URF_6')
+        source,goal=np.random.default_rng(41).integers(env.size,size=(2,64))
+        with tempfile.TemporaryDirectory() as temp:
+            checkpoint=Path(temp)/'q.pt';model=QMap(env.feature_dim,128,16,14,'linf')
+            torch.save(dict(model_type=MODEL_TYPE,task=env.name,actions=list(env.actions),
+                model_config=dict(dimension=128,hidden=16,metric='linf'),cap=14,model=model.state_dict()),checkpoint)
+            ordinary=MapReader(env,checkpoint,coordinate_frame='goal_relative')
+            averaged=MapReader(env,checkpoint,coordinate_frame='goal_relative',inverse_average=True)
+            np.testing.assert_array_equal(averaged.scores(source,goal),averaged.scores(goal,source))
+            torch.testing.assert_close(averaged.encode(source),ordinary.encode(source),rtol=0,atol=0)
+            children=env.successors(source);targets=np.broadcast_to(goal[:,None],children.shape)
+            scores=averaged.scores(children.ravel(),targets.ravel()).reshape(children.shape)
+            self.assertEqual(scores.shape,(64,6));self.assertTrue(np.isfinite(scores).all())
+            for i,(s,g) in enumerate(zip(source[:5],goal[:5])):
+                action,child=averaged.choose(int(s),int(g))
+                self.assertEqual(child,env.step(int(s),action))
+                self.assertEqual(action,env.actions[int(scores[i].argmin())])
+            with self.assertRaises(ValueError):MapReader(env,checkpoint,inverse_average=True)
+
     def test_all_six_maps_preserve_solved_and_relabel_every_action_transition(self):
         for metric in ("QTM_URF_6", "HTM_URF_9"):
             env = Cube2(metric=metric)

@@ -4804,5 +4804,165 @@
       "replay_cycle_probability": 0.49999999999999994,
       "formal": false
     }
+  },
+  "goal_relative_inverse_average": {
+    "checkpoint_source_commit": "ee701ee604ebd18d0d5988af74fe2b9384fdd924",
+    "checkpoint_epoch": 257,
+    "optimizer_step": 54567,
+    "reader": {
+      "coordinate_frame": "goal_relative",
+      "inverse_average": true,
+      "q_dimension": 128,
+      "restoration_queries_per_candidate": 2
+    },
+    "raw_checkpoint": "/zhanghanyue/experiment/grounded_llm_puzzle_qmaps/runs/cube_relative_goal_20261028/resume_40645_ee701ee/inverse_audit_parent.pt",
+    "audit": {
+      "checkpoint_epoch": 257,
+      "optimizer_step": 54567,
+      "seconds": 6.271833658218384,
+      "states": 3674160,
+      "inverse_preserves_exact_distance": true,
+      "mean_inverse_height_disagreement": 0.40116921067237854,
+      "baseline": {
+        "solved": 3297360,
+        "success_rate": 0.8974459468286629,
+        "mae": 0.706663966178894
+      },
+      "averaged_inverse_heights": {
+        "solved": 3385923,
+        "success_rate": 0.9215502318897381,
+        "mae": 0.6758458614349365
+      },
+      "recovered": 286750,
+      "lost": 198187,
+      "by_depth": {
+        "0": {
+          "count": 1,
+          "baseline_solved": 1,
+          "averaged_solved": 1
+        },
+        "1": {
+          "count": 6,
+          "baseline_solved": 6,
+          "averaged_solved": 6
+        },
+        "2": {
+          "count": 27,
+          "baseline_solved": 27,
+          "averaged_solved": 27
+        },
+        "3": {
+          "count": 120,
+          "baseline_solved": 120,
+          "averaged_solved": 120
+        },
+        "4": {
+          "count": 534,
+          "baseline_solved": 534,
+          "averaged_solved": 534
+        },
+        "5": {
+          "count": 2256,
+          "baseline_solved": 2256,
+          "averaged_solved": 2256
+        },
+        "6": {
+          "count": 8969,
+          "baseline_solved": 8969,
+          "averaged_solved": 8969
+        },
+        "7": {
+          "count": 33058,
+          "baseline_solved": 33058,
+          "averaged_solved": 33058
+        },
+        "8": {
+          "count": 114149,
+          "baseline_solved": 114107,
+          "averaged_solved": 114137
+        },
+        "9": {
+          "count": 360508,
+          "baseline_solved": 352006,
+          "averaged_solved": 354703
+        },
+        "10": {
+          "count": 930588,
+          "baseline_solved": 866847,
+          "averaged_solved": 883968
+        },
+        "11": {
+          "count": 1350852,
+          "baseline_solved": 1190114,
+          "averaged_solved": 1229625
+        },
+        "12": {
+          "count": 782536,
+          "baseline_solved": 657026,
+          "averaged_solved": 683217
+        },
+        "13": {
+          "count": 90280,
+          "baseline_solved": 72063,
+          "averaged_solved": 75082
+        },
+        "14": {
+          "count": 276,
+          "baseline_solved": 226,
+          "averaged_solved": 220
+        }
+      },
+      "condition": "Read-only mean of learned heights at a state and its group inverse; greedy horizon32; separate from the single-Q policy; zero optimizer updates"
+    },
+    "evaluation": {
+      "checkpoint_epoch": 257,
+      "condition": "Goal-relative inverse-average scalar readout; same128-dimensional Q; two restoration queries per candidate; greedy horizon32",
+      "all_states": {
+        "count": 3674160,
+        "ordinary_solved": 3297360,
+        "inverse_average_solved": 3385923
+      },
+      "fixed_cohorts": {
+        "original": {
+          "count": 500,
+          "ordinary_solved": 455,
+          "inverse_average_solved": 457
+        },
+        "small_ood": {
+          "count": 500,
+          "ordinary_solved": 445,
+          "inverse_average_solved": 466
+        },
+        "validation": {
+          "count": 500,
+          "ordinary_solved": 448,
+          "inverse_average_solved": 462
+        },
+        "test": {
+          "count": 500,
+          "ordinary_solved": 445,
+          "inverse_average_solved": 464
+        }
+      },
+      "actual_flan_same250": {
+        "id|id": {
+          "count": 125,
+          "ordinary_solved": 115,
+          "inverse_average_solved": 113
+        },
+        "small_ood|noncanonical_goal_ood": {
+          "count": 125,
+          "ordinary_solved": 112,
+          "inverse_average_solved": 115
+        }
+      },
+      "physical_successor_scores": {
+        "queries": 250,
+        "candidates_per_query": 6,
+        "all_finite": true,
+        "maximum_difference_from_cached_policy": 0.0
+      },
+      "direct_reader_rollouts_match_cached_policy": 16
+    }
   }
 }

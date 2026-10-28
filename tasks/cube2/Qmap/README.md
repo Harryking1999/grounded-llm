@@ -9,3 +9,5 @@
 当前采用循环修复对照的 `repair_guard` 复原权重，保留对称 Q 与 L∞。绝对状态编码的非复原目标能力仍弱；目标相对坐标的冻结Q读取结果见[实验报告](../../../experiments/cube2_qmap/results/report.md)。
 
 读取入口为 `grounded_llm.tasks.cube2.model.MapReader`。默认 `coordinate_frame="absolute"`；`coordinate_frame="goal_relative"` 在 `scores`／`choose` 中使用已知群运算转换到复原问题。两者共享同一权重，目标相对坐标条件单独标注。
+
+目标相对读取可加 `inverse_average=True`，对正反两个相对坐标的复原距离取均值，使状态对的读出距离对称；每个合法候选使用两次Q查询。`encode`继续提供原128维状态向量。这一额外读取条件的同权重比较见实验报告。

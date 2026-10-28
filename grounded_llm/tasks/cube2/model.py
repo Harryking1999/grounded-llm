@@ -44,9 +44,11 @@ class QMap(StateEncoder):
 
 class MapReader(EnvironmentQMap):
     """Reusable frozen inference API. Needs features/rules, never an oracle."""
-    def __init__(self, env, checkpoint, device="cpu", *, coordinate_frame="absolute"):
+    def __init__(self, env, checkpoint, device="cpu", *, coordinate_frame="absolute", inverse_average=False):
         if coordinate_frame not in ("absolute", "goal_relative"):
             raise ValueError(f"Unknown cube coordinate frame: {coordinate_frame}")
+        if inverse_average and coordinate_frame != 'goal_relative':
+            raise ValueError('Inverse averaging requires goal-relative coordinates')
         saved = torch.load(checkpoint, map_location=device, weights_only=False)
         if saved.get("model_type") != MODEL_TYPE:
             raise ValueError("Expected a pure-Q checkpoint")
@@ -56,6 +58,7 @@ class MapReader(EnvironmentQMap):
         model.load_state_dict(saved["model"])
         super().__init__(env, model, device)
         self.coordinate_frame = coordinate_frame
+        self.inverse_average = inverse_average
 
     def scores(self, source, goal):
         """Goal-relative scoring uses the known group action before Q encoding.
@@ -63,8 +66,13 @@ class MapReader(EnvironmentQMap):
         Left multiplication by goal^-1 preserves the original action labels.
         encode() continues to expose the checkpoint's ordinary state vectors;
         this pair-conditioned option applies to scores() and choose().
+        inverse_average additionally averages the two relative directions to
+        enforce the reversible task's distance symmetry, using two Q queries.
         """
         if self.coordinate_frame == "goal_relative":
             source = self.env.relative(goal, source)
             goal = [0]
-        return super().scores(source, goal)
+        scores = super().scores(source, goal)
+        if self.inverse_average:
+            scores = .5*(scores+super().scores(self.env.relative(source,0),[0]))
+        return scores

@@ -1,8 +1,8 @@
 {
   "study": "flan_generalization_4_5_6_50k",
-  "observed_utc": "2026-10-28T21:30:27.823765+00:00",
+  "observed_utc": "2026-10-28T22:24:10.720925+00:00",
   "source_run": "runs/flan_generalization_6f2af92",
-  "best_selection": "Maximum arrival over complete ID RO only; incomplete checkpoints excluded; OOD fixed at250000",
+  "best_selection": "Task-specific descriptive best: maximum completed-and-stopped ID count, tie earliest step. Study-level ID selection: maximum arrival, tie earliest step. OOD stays at250000.",
   "raw_verification": "Completed shards only; no duplicate task/trajectory_id within complete sets; counts match shard summaries",
   "cohorts": {
     "4": {
@@ -12,152 +12,246 @@
         "50000": {
           "tasks": 1000,
           "arrival": 655,
-          "arrival_and_stop": 654
+          "arrival_and_stop": 654,
+          "map_optimal": {
+            "numerator": 4716,
+            "denominator": 10760,
+            "value": 0.4382899628252788
+          },
+          "optimal": {
+            "numerator": 7189,
+            "denominator": 10800,
+            "value": 0.6656481481481481
+          }
         },
         "100000": {
           "tasks": 1000,
           "arrival": 900,
-          "arrival_and_stop": 885
+          "arrival_and_stop": 885,
+          "map_optimal": {
+            "numerator": 6972,
+            "denominator": 8433,
+            "value": 0.8267520455353966
+          },
+          "optimal": {
+            "numerator": 7507,
+            "denominator": 8437,
+            "value": 0.8897712457034491
+          }
         },
         "150000": {
           "tasks": 1000,
           "arrival": 924,
-          "arrival_and_stop": 912
+          "arrival_and_stop": 912,
+          "map_optimal": {
+            "numerator": 7495,
+            "denominator": 8623,
+            "value": 0.8691870578684913
+          },
+          "optimal": {
+            "numerator": 7651,
+            "denominator": 8625,
+            "value": 0.887072463768116
+          }
         },
         "200000": {
           "tasks": 1000,
           "arrival": 912,
-          "arrival_and_stop": 894
+          "arrival_and_stop": 894,
+          "map_optimal": {
+            "numerator": 7624,
+            "denominator": 8744,
+            "value": 0.8719121683440073
+          },
+          "optimal": {
+            "numerator": 7669,
+            "denominator": 8747,
+            "value": 0.8767577455127472
+          }
         },
         "237500": {
           "tasks": 1000,
           "arrival": 917,
-          "arrival_and_stop": 902
+          "arrival_and_stop": 902,
+          "map_optimal": {
+            "numerator": 7580,
+            "denominator": 8687,
+            "value": 0.8725682053643375
+          },
+          "optimal": {
+            "numerator": 7643,
+            "denominator": 8693,
+            "value": 0.8792131600138042
+          }
         },
         "250000": {
           "tasks": 1000,
           "arrival": 909,
-          "arrival_and_stop": 896
+          "arrival_and_stop": 896,
+          "map_optimal": {
+            "numerator": 7612,
+            "denominator": 8692,
+            "value": 0.8757478140819144
+          },
+          "optimal": {
+            "numerator": 7625,
+            "denominator": 8699,
+            "value": 0.8765375330497759
+          }
         }
       },
       "incomplete_id_points": {
         "12500": {
           "tasks": 320,
           "arrival": 12,
-          "arrival_and_stop": 12
+          "arrival_and_stop": 12,
+          "map_optimal": {
+            "numerator": 697,
+            "denominator": 3837,
+            "value": 0.1816523325514725
+          },
+          "optimal": {
+            "numerator": 1643,
+            "denominator": 3954,
+            "value": 0.4155285786545271
+          }
         },
         "25000": {
           "tasks": 544,
           "arrival": 105,
-          "arrival_and_stop": 104
+          "arrival_and_stop": 104,
+          "map_optimal": {
+            "numerator": 2176,
+            "denominator": 9158,
+            "value": 0.23760646429351387
+          },
+          "optimal": {
+            "numerator": 4659,
+            "denominator": 9283,
+            "value": 0.5018851664332651
+          }
         },
         "37500": {
           "tasks": 608,
           "arrival": 234,
-          "arrival_and_stop": 223
+          "arrival_and_stop": 223,
+          "map_optimal": {
+            "numerator": 2587,
+            "denominator": 8958,
+            "value": 0.2887921411029248
+          },
+          "optimal": {
+            "numerator": 5103,
+            "denominator": 9022,
+            "value": 0.5656173797384172
+          }
         },
         "75000": {
           "tasks": 32,
           "arrival": 22,
-          "arrival_and_stop": 22
+          "arrival_and_stop": 22,
+          "map_optimal": {
+            "numerator": 109,
+            "denominator": 276,
+            "value": 0.39492753623188404
+          },
+          "optimal": {
+            "numerator": 229,
+            "denominator": 278,
+            "value": 0.8237410071942446
+          }
         },
         "87500": {
           "tasks": 736,
           "arrival": 480,
-          "arrival_and_stop": 446
+          "arrival_and_stop": 446,
+          "map_optimal": {
+            "numerator": 3917,
+            "denominator": 9095,
+            "value": 0.4306761957119296
+          },
+          "optimal": {
+            "numerator": 6189,
+            "denominator": 9099,
+            "value": 0.6801846356742499
+          }
         },
         "125000": {
           "tasks": 192,
           "arrival": 156,
-          "arrival_and_stop": 156
+          "arrival_and_stop": 156,
+          "map_optimal": {
+            "numerator": 891,
+            "denominator": 1550,
+            "value": 0.5748387096774193
+          },
+          "optimal": {
+            "numerator": 1442,
+            "denominator": 1551,
+            "value": 0.9297227595099935
+          }
         },
         "137500": {
           "tasks": 768,
           "arrival": 677,
-          "arrival_and_stop": 664
+          "arrival_and_stop": 664,
+          "map_optimal": {
+            "numerator": 6350,
+            "denominator": 7437,
+            "value": 0.8538389135404061
+          },
+          "optimal": {
+            "numerator": 6466,
+            "denominator": 7441,
+            "value": 0.8689692245665905
+          }
         },
         "175000": {
           "tasks": 288,
           "arrival": 231,
-          "arrival_and_stop": 231
+          "arrival_and_stop": 231,
+          "map_optimal": {
+            "numerator": 1791,
+            "denominator": 2612,
+            "value": 0.6856814701378254
+          },
+          "optimal": {
+            "numerator": 2286,
+            "denominator": 2615,
+            "value": 0.874187380497132
+          }
         },
         "187500": {
           "tasks": 480,
           "arrival": 401,
-          "arrival_and_stop": 400
+          "arrival_and_stop": 400,
+          "map_optimal": {
+            "numerator": 4612,
+            "denominator": 5582,
+            "value": 0.8262271587244715
+          },
+          "optimal": {
+            "numerator": 4662,
+            "denominator": 5585,
+            "value": 0.8347358997314235
+          }
         },
         "225000": {
           "tasks": 704,
           "arrival": 624,
-          "arrival_and_stop": 612
+          "arrival_and_stop": 612,
+          "map_optimal": {
+            "numerator": 6248,
+            "denominator": 7217,
+            "value": 0.8657336843563808
+          },
+          "optimal": {
+            "numerator": 6224,
+            "denominator": 7219,
+            "value": 0.8621692755229257
+          }
         }
       },
-      "best_id_by_subclass": [
-        {
-          "cohort": "id",
-          "task": "blocks",
-          "variant": "clear12",
-          "tasks": 83,
-          "arrival": 77,
-          "arrival_and_stop": 77
-        },
-        {
-          "cohort": "id",
-          "task": "blocks",
-          "variant": "clear8",
-          "tasks": 84,
-          "arrival": 84,
-          "arrival_and_stop": 84
-        },
-        {
-          "cohort": "id",
-          "task": "blocks",
-          "variant": "partial8",
-          "tasks": 83,
-          "arrival": 47,
-          "arrival_and_stop": 46
-        },
-        {
-          "cohort": "id",
-          "task": "bridge",
-          "variant": "five_all_right",
-          "tasks": 88,
-          "arrival": 88,
-          "arrival_and_stop": 88
-        },
-        {
-          "cohort": "id",
-          "task": "bridge",
-          "variant": "five_intermediate_start",
-          "tasks": 79,
-          "arrival": 79,
-          "arrival_and_stop": 79
-        },
-        {
-          "cohort": "id",
-          "task": "bridge",
-          "variant": "five_partial_goal",
-          "tasks": 83,
-          "arrival": 83,
-          "arrival_and_stop": 83
-        },
-        {
-          "cohort": "id",
-          "task": "cube2",
-          "variant": "id",
-          "tasks": 250,
-          "arrival": 216,
-          "arrival_and_stop": 216
-        },
-        {
-          "cohort": "id",
-          "task": "path",
-          "variant": "id",
-          "tasks": 250,
-          "arrival": 250,
-          "arrival_and_stop": 239
-        }
-      ],
       "final": {
         "tasks": 2000,
         "arrival": 509,
@@ -348,6 +442,1190 @@
             "arrival_and_stop": 36
           }
         ]
+      },
+      "id_curve": {
+        "50000": {
+          "metrics": {
+            "tasks": 1000,
+            "arrival": 655,
+            "arrival_and_stop": 654,
+            "map_optimal": {
+              "numerator": 4716,
+              "denominator": 10760,
+              "value": 0.4382899628252788
+            },
+            "optimal": {
+              "numerator": 7189,
+              "denominator": 10800,
+              "value": 0.6656481481481481
+            }
+          },
+          "by_task": {
+            "blocks": {
+              "tasks": 250,
+              "arrival": 121,
+              "arrival_and_stop": 121,
+              "map_optimal": {
+                "numerator": 645,
+                "denominator": 2068,
+                "value": 0.3118955512572534
+              },
+              "optimal": {
+                "numerator": 1408,
+                "denominator": 2108,
+                "value": 0.6679316888045541
+              }
+            },
+            "cube2": {
+              "tasks": 250,
+              "arrival": 47,
+              "arrival_and_stop": 47,
+              "map_optimal": {
+                "numerator": 1411,
+                "denominator": 5754,
+                "value": 0.24522071602363574
+              },
+              "optimal": {
+                "numerator": 3012,
+                "denominator": 5754,
+                "value": 0.5234619395203337
+              }
+            },
+            "path": {
+              "tasks": 250,
+              "arrival": 237,
+              "arrival_and_stop": 236,
+              "map_optimal": {
+                "numerator": 1604,
+                "denominator": 1746,
+                "value": 0.9186712485681557
+              },
+              "optimal": {
+                "numerator": 1587,
+                "denominator": 1746,
+                "value": 0.9089347079037801
+              }
+            },
+            "bridge": {
+              "tasks": 250,
+              "arrival": 250,
+              "arrival_and_stop": 250,
+              "map_optimal": {
+                "numerator": 1056,
+                "denominator": 1192,
+                "value": 0.8859060402684564
+              },
+              "optimal": {
+                "numerator": 1182,
+                "denominator": 1192,
+                "value": 0.9916107382550335
+              }
+            }
+          }
+        },
+        "100000": {
+          "metrics": {
+            "tasks": 1000,
+            "arrival": 900,
+            "arrival_and_stop": 885,
+            "map_optimal": {
+              "numerator": 6972,
+              "denominator": 8433,
+              "value": 0.8267520455353966
+            },
+            "optimal": {
+              "numerator": 7507,
+              "denominator": 8437,
+              "value": 0.8897712457034491
+            }
+          },
+          "by_task": {
+            "blocks": {
+              "tasks": 250,
+              "arrival": 178,
+              "arrival_and_stop": 178,
+              "map_optimal": {
+                "numerator": 1012,
+                "denominator": 2049,
+                "value": 0.49389946315275746
+              },
+              "optimal": {
+                "numerator": 1792,
+                "denominator": 2053,
+                "value": 0.8728689722357525
+              }
+            },
+            "cube2": {
+              "tasks": 250,
+              "arrival": 223,
+              "arrival_and_stop": 221,
+              "map_optimal": {
+                "numerator": 3289,
+                "denominator": 3516,
+                "value": 0.9354379977246872
+              },
+              "optimal": {
+                "numerator": 2962,
+                "denominator": 3516,
+                "value": 0.8424345847554039
+              }
+            },
+            "path": {
+              "tasks": 250,
+              "arrival": 249,
+              "arrival_and_stop": 236,
+              "map_optimal": {
+                "numerator": 1606,
+                "denominator": 1680,
+                "value": 0.955952380952381
+              },
+              "optimal": {
+                "numerator": 1575,
+                "denominator": 1680,
+                "value": 0.9375
+              }
+            },
+            "bridge": {
+              "tasks": 250,
+              "arrival": 250,
+              "arrival_and_stop": 250,
+              "map_optimal": {
+                "numerator": 1065,
+                "denominator": 1188,
+                "value": 0.8964646464646465
+              },
+              "optimal": {
+                "numerator": 1178,
+                "denominator": 1188,
+                "value": 0.9915824915824916
+              }
+            }
+          }
+        },
+        "150000": {
+          "metrics": {
+            "tasks": 1000,
+            "arrival": 924,
+            "arrival_and_stop": 912,
+            "map_optimal": {
+              "numerator": 7495,
+              "denominator": 8623,
+              "value": 0.8691870578684913
+            },
+            "optimal": {
+              "numerator": 7651,
+              "denominator": 8625,
+              "value": 0.887072463768116
+            }
+          },
+          "by_task": {
+            "blocks": {
+              "tasks": 250,
+              "arrival": 208,
+              "arrival_and_stop": 207,
+              "map_optimal": {
+                "numerator": 1240,
+                "denominator": 2028,
+                "value": 0.611439842209073
+              },
+              "optimal": {
+                "numerator": 1856,
+                "denominator": 2030,
+                "value": 0.9142857142857143
+              }
+            },
+            "cube2": {
+              "tasks": 250,
+              "arrival": 216,
+              "arrival_and_stop": 216,
+              "map_optimal": {
+                "numerator": 3579,
+                "denominator": 3743,
+                "value": 0.9561848784397542
+              },
+              "optimal": {
+                "numerator": 3032,
+                "denominator": 3743,
+                "value": 0.8100454181138125
+              }
+            },
+            "path": {
+              "tasks": 250,
+              "arrival": 250,
+              "arrival_and_stop": 239,
+              "map_optimal": {
+                "numerator": 1608,
+                "denominator": 1666,
+                "value": 0.9651860744297719
+              },
+              "optimal": {
+                "numerator": 1586,
+                "denominator": 1666,
+                "value": 0.9519807923169268
+              }
+            },
+            "bridge": {
+              "tasks": 250,
+              "arrival": 250,
+              "arrival_and_stop": 250,
+              "map_optimal": {
+                "numerator": 1068,
+                "denominator": 1186,
+                "value": 0.9005059021922428
+              },
+              "optimal": {
+                "numerator": 1177,
+                "denominator": 1186,
+                "value": 0.9924114671163575
+              }
+            }
+          }
+        },
+        "200000": {
+          "metrics": {
+            "tasks": 1000,
+            "arrival": 912,
+            "arrival_and_stop": 894,
+            "map_optimal": {
+              "numerator": 7624,
+              "denominator": 8744,
+              "value": 0.8719121683440073
+            },
+            "optimal": {
+              "numerator": 7669,
+              "denominator": 8747,
+              "value": 0.8767577455127472
+            }
+          },
+          "by_task": {
+            "blocks": {
+              "tasks": 250,
+              "arrival": 204,
+              "arrival_and_stop": 203,
+              "map_optimal": {
+                "numerator": 1247,
+                "denominator": 2037,
+                "value": 0.6121747668139421
+              },
+              "optimal": {
+                "numerator": 1859,
+                "denominator": 2040,
+                "value": 0.9112745098039216
+              }
+            },
+            "cube2": {
+              "tasks": 250,
+              "arrival": 209,
+              "arrival_and_stop": 208,
+              "map_optimal": {
+                "numerator": 3698,
+                "denominator": 3850,
+                "value": 0.9605194805194806
+              },
+              "optimal": {
+                "numerator": 3056,
+                "denominator": 3850,
+                "value": 0.7937662337662338
+              }
+            },
+            "path": {
+              "tasks": 250,
+              "arrival": 249,
+              "arrival_and_stop": 233,
+              "map_optimal": {
+                "numerator": 1617,
+                "denominator": 1671,
+                "value": 0.9676840215439856
+              },
+              "optimal": {
+                "numerator": 1575,
+                "denominator": 1671,
+                "value": 0.9425493716337523
+              }
+            },
+            "bridge": {
+              "tasks": 250,
+              "arrival": 250,
+              "arrival_and_stop": 250,
+              "map_optimal": {
+                "numerator": 1062,
+                "denominator": 1186,
+                "value": 0.8954468802698144
+              },
+              "optimal": {
+                "numerator": 1179,
+                "denominator": 1186,
+                "value": 0.9940978077571669
+              }
+            }
+          }
+        },
+        "237500": {
+          "metrics": {
+            "tasks": 1000,
+            "arrival": 917,
+            "arrival_and_stop": 902,
+            "map_optimal": {
+              "numerator": 7580,
+              "denominator": 8687,
+              "value": 0.8725682053643375
+            },
+            "optimal": {
+              "numerator": 7643,
+              "denominator": 8693,
+              "value": 0.8792131600138042
+            }
+          },
+          "by_task": {
+            "blocks": {
+              "tasks": 250,
+              "arrival": 206,
+              "arrival_and_stop": 206,
+              "map_optimal": {
+                "numerator": 1243,
+                "denominator": 2029,
+                "value": 0.6126170527353376
+              },
+              "optimal": {
+                "numerator": 1842,
+                "denominator": 2035,
+                "value": 0.9051597051597051
+              }
+            },
+            "cube2": {
+              "tasks": 250,
+              "arrival": 212,
+              "arrival_and_stop": 212,
+              "map_optimal": {
+                "numerator": 3672,
+                "denominator": 3814,
+                "value": 0.9627687467226009
+              },
+              "optimal": {
+                "numerator": 3052,
+                "denominator": 3814,
+                "value": 0.800209753539591
+              }
+            },
+            "path": {
+              "tasks": 250,
+              "arrival": 249,
+              "arrival_and_stop": 234,
+              "map_optimal": {
+                "numerator": 1612,
+                "denominator": 1660,
+                "value": 0.9710843373493976
+              },
+              "optimal": {
+                "numerator": 1571,
+                "denominator": 1660,
+                "value": 0.9463855421686747
+              }
+            },
+            "bridge": {
+              "tasks": 250,
+              "arrival": 250,
+              "arrival_and_stop": 250,
+              "map_optimal": {
+                "numerator": 1053,
+                "denominator": 1184,
+                "value": 0.8893581081081081
+              },
+              "optimal": {
+                "numerator": 1178,
+                "denominator": 1184,
+                "value": 0.9949324324324325
+              }
+            }
+          }
+        },
+        "250000": {
+          "metrics": {
+            "tasks": 1000,
+            "arrival": 909,
+            "arrival_and_stop": 896,
+            "map_optimal": {
+              "numerator": 7612,
+              "denominator": 8692,
+              "value": 0.8757478140819144
+            },
+            "optimal": {
+              "numerator": 7625,
+              "denominator": 8699,
+              "value": 0.8765375330497759
+            }
+          },
+          "by_task": {
+            "blocks": {
+              "tasks": 250,
+              "arrival": 198,
+              "arrival_and_stop": 198,
+              "map_optimal": {
+                "numerator": 1268,
+                "denominator": 2024,
+                "value": 0.6264822134387352
+              },
+              "optimal": {
+                "numerator": 1815,
+                "denominator": 2031,
+                "value": 0.8936484490398818
+              }
+            },
+            "cube2": {
+              "tasks": 250,
+              "arrival": 211,
+              "arrival_and_stop": 211,
+              "map_optimal": {
+                "numerator": 3697,
+                "denominator": 3844,
+                "value": 0.9617585848074922
+              },
+              "optimal": {
+                "numerator": 3057,
+                "denominator": 3844,
+                "value": 0.7952653485952134
+              }
+            },
+            "path": {
+              "tasks": 250,
+              "arrival": 250,
+              "arrival_and_stop": 237,
+              "map_optimal": {
+                "numerator": 1590,
+                "denominator": 1640,
+                "value": 0.9695121951219512
+              },
+              "optimal": {
+                "numerator": 1575,
+                "denominator": 1640,
+                "value": 0.9603658536585366
+              }
+            },
+            "bridge": {
+              "tasks": 250,
+              "arrival": 250,
+              "arrival_and_stop": 250,
+              "map_optimal": {
+                "numerator": 1057,
+                "denominator": 1184,
+                "value": 0.8927364864864865
+              },
+              "optimal": {
+                "numerator": 1178,
+                "denominator": 1184,
+                "value": 0.9949324324324325
+              }
+            }
+          }
+        }
+      },
+      "best_id_by_task": {
+        "blocks": {
+          "tasks": 250,
+          "arrival": 208,
+          "arrival_and_stop": 207,
+          "map_optimal": {
+            "numerator": 1240,
+            "denominator": 2028,
+            "value": 0.611439842209073
+          },
+          "optimal": {
+            "numerator": 1856,
+            "denominator": 2030,
+            "value": 0.9142857142857143
+          }
+        },
+        "cube2": {
+          "tasks": 250,
+          "arrival": 216,
+          "arrival_and_stop": 216,
+          "map_optimal": {
+            "numerator": 3579,
+            "denominator": 3743,
+            "value": 0.9561848784397542
+          },
+          "optimal": {
+            "numerator": 3032,
+            "denominator": 3743,
+            "value": 0.8100454181138125
+          }
+        },
+        "path": {
+          "tasks": 250,
+          "arrival": 250,
+          "arrival_and_stop": 239,
+          "map_optimal": {
+            "numerator": 1608,
+            "denominator": 1666,
+            "value": 0.9651860744297719
+          },
+          "optimal": {
+            "numerator": 1586,
+            "denominator": 1666,
+            "value": 0.9519807923169268
+          }
+        },
+        "bridge": {
+          "tasks": 250,
+          "arrival": 250,
+          "arrival_and_stop": 250,
+          "map_optimal": {
+            "numerator": 1068,
+            "denominator": 1186,
+            "value": 0.9005059021922428
+          },
+          "optimal": {
+            "numerator": 1177,
+            "denominator": 1186,
+            "value": 0.9924114671163575
+          }
+        }
+      },
+      "best_per_task": {
+        "blocks": {
+          "step": 225000,
+          "tasks": 250,
+          "arrival": 208,
+          "arrival_and_stop": 208,
+          "map_optimal": {
+            "numerator": 1252,
+            "denominator": 2033,
+            "value": 0.6158386620757501
+          },
+          "optimal": {
+            "numerator": 1881,
+            "denominator": 2035,
+            "value": 0.9243243243243243
+          }
+        },
+        "bridge": {
+          "step": 50000,
+          "tasks": 250,
+          "arrival": 250,
+          "arrival_and_stop": 250,
+          "map_optimal": {
+            "numerator": 1056,
+            "denominator": 1192,
+            "value": 0.8859060402684564
+          },
+          "optimal": {
+            "numerator": 1182,
+            "denominator": 1192,
+            "value": 0.9916107382550335
+          }
+        },
+        "cube2": {
+          "step": 100000,
+          "tasks": 250,
+          "arrival": 223,
+          "arrival_and_stop": 221,
+          "map_optimal": {
+            "numerator": 3289,
+            "denominator": 3516,
+            "value": 0.9354379977246872
+          },
+          "optimal": {
+            "numerator": 2962,
+            "denominator": 3516,
+            "value": 0.8424345847554039
+          }
+        },
+        "path": {
+          "step": 150000,
+          "tasks": 250,
+          "arrival": 250,
+          "arrival_and_stop": 239,
+          "map_optimal": {
+            "numerator": 1608,
+            "denominator": 1666,
+            "value": 0.9651860744297719
+          },
+          "optimal": {
+            "numerator": 1586,
+            "denominator": 1666,
+            "value": 0.9519807923169268
+          }
+        }
+      },
+      "task_curves": {
+        "blocks": {
+          "12500": {
+            "tasks": 250,
+            "arrival": 10,
+            "arrival_and_stop": 10,
+            "map_optimal": {
+              "numerator": 340,
+              "denominator": 1931,
+              "value": 0.17607457276022787
+            },
+            "optimal": {
+              "numerator": 694,
+              "denominator": 2048,
+              "value": 0.3388671875
+            }
+          },
+          "25000": {
+            "tasks": 250,
+            "arrival": 53,
+            "arrival_and_stop": 52,
+            "map_optimal": {
+              "numerator": 552,
+              "denominator": 2029,
+              "value": 0.2720551996057171
+            },
+            "optimal": {
+              "numerator": 984,
+              "denominator": 2154,
+              "value": 0.4568245125348189
+            }
+          },
+          "37500": {
+            "tasks": 250,
+            "arrival": 104,
+            "arrival_and_stop": 103,
+            "map_optimal": {
+              "numerator": 630,
+              "denominator": 2065,
+              "value": 0.3050847457627119
+            },
+            "optimal": {
+              "numerator": 1291,
+              "denominator": 2129,
+              "value": 0.6063879755753875
+            }
+          },
+          "50000": {
+            "tasks": 250,
+            "arrival": 121,
+            "arrival_and_stop": 121,
+            "map_optimal": {
+              "numerator": 645,
+              "denominator": 2068,
+              "value": 0.3118955512572534
+            },
+            "optimal": {
+              "numerator": 1408,
+              "denominator": 2108,
+              "value": 0.6679316888045541
+            }
+          },
+          "87500": {
+            "tasks": 250,
+            "arrival": 184,
+            "arrival_and_stop": 183,
+            "map_optimal": {
+              "numerator": 937,
+              "denominator": 2065,
+              "value": 0.45375302663438255
+            },
+            "optimal": {
+              "numerator": 1796,
+              "denominator": 2069,
+              "value": 0.8680521991300145
+            }
+          },
+          "100000": {
+            "tasks": 250,
+            "arrival": 178,
+            "arrival_and_stop": 178,
+            "map_optimal": {
+              "numerator": 1012,
+              "denominator": 2049,
+              "value": 0.49389946315275746
+            },
+            "optimal": {
+              "numerator": 1792,
+              "denominator": 2053,
+              "value": 0.8728689722357525
+            }
+          },
+          "137500": {
+            "tasks": 250,
+            "arrival": 197,
+            "arrival_and_stop": 196,
+            "map_optimal": {
+              "numerator": 1206,
+              "denominator": 2030,
+              "value": 0.594088669950739
+            },
+            "optimal": {
+              "numerator": 1825,
+              "denominator": 2034,
+              "value": 0.8972468043264503
+            }
+          },
+          "150000": {
+            "tasks": 250,
+            "arrival": 208,
+            "arrival_and_stop": 207,
+            "map_optimal": {
+              "numerator": 1240,
+              "denominator": 2028,
+              "value": 0.611439842209073
+            },
+            "optimal": {
+              "numerator": 1856,
+              "denominator": 2030,
+              "value": 0.9142857142857143
+            }
+          },
+          "175000": {
+            "tasks": 250,
+            "arrival": 199,
+            "arrival_and_stop": 199,
+            "map_optimal": {
+              "numerator": 1221,
+              "denominator": 2027,
+              "value": 0.6023680315737543
+            },
+            "optimal": {
+              "numerator": 1823,
+              "denominator": 2030,
+              "value": 0.8980295566502463
+            }
+          },
+          "187500": {
+            "tasks": 250,
+            "arrival": 205,
+            "arrival_and_stop": 204,
+            "map_optimal": {
+              "numerator": 1203,
+              "denominator": 2031,
+              "value": 0.5923190546528804
+            },
+            "optimal": {
+              "numerator": 1832,
+              "denominator": 2034,
+              "value": 0.9006882989183874
+            }
+          },
+          "200000": {
+            "tasks": 250,
+            "arrival": 204,
+            "arrival_and_stop": 203,
+            "map_optimal": {
+              "numerator": 1247,
+              "denominator": 2037,
+              "value": 0.6121747668139421
+            },
+            "optimal": {
+              "numerator": 1859,
+              "denominator": 2040,
+              "value": 0.9112745098039216
+            }
+          },
+          "225000": {
+            "tasks": 250,
+            "arrival": 208,
+            "arrival_and_stop": 208,
+            "map_optimal": {
+              "numerator": 1252,
+              "denominator": 2033,
+              "value": 0.6158386620757501
+            },
+            "optimal": {
+              "numerator": 1881,
+              "denominator": 2035,
+              "value": 0.9243243243243243
+            }
+          },
+          "237500": {
+            "tasks": 250,
+            "arrival": 206,
+            "arrival_and_stop": 206,
+            "map_optimal": {
+              "numerator": 1243,
+              "denominator": 2029,
+              "value": 0.6126170527353376
+            },
+            "optimal": {
+              "numerator": 1842,
+              "denominator": 2035,
+              "value": 0.9051597051597051
+            }
+          },
+          "250000": {
+            "tasks": 250,
+            "arrival": 198,
+            "arrival_and_stop": 198,
+            "map_optimal": {
+              "numerator": 1268,
+              "denominator": 2024,
+              "value": 0.6264822134387352
+            },
+            "optimal": {
+              "numerator": 1815,
+              "denominator": 2031,
+              "value": 0.8936484490398818
+            }
+          }
+        },
+        "bridge": {
+          "50000": {
+            "tasks": 250,
+            "arrival": 250,
+            "arrival_and_stop": 250,
+            "map_optimal": {
+              "numerator": 1056,
+              "denominator": 1192,
+              "value": 0.8859060402684564
+            },
+            "optimal": {
+              "numerator": 1182,
+              "denominator": 1192,
+              "value": 0.9916107382550335
+            }
+          },
+          "100000": {
+            "tasks": 250,
+            "arrival": 250,
+            "arrival_and_stop": 250,
+            "map_optimal": {
+              "numerator": 1065,
+              "denominator": 1188,
+              "value": 0.8964646464646465
+            },
+            "optimal": {
+              "numerator": 1178,
+              "denominator": 1188,
+              "value": 0.9915824915824916
+            }
+          },
+          "150000": {
+            "tasks": 250,
+            "arrival": 250,
+            "arrival_and_stop": 250,
+            "map_optimal": {
+              "numerator": 1068,
+              "denominator": 1186,
+              "value": 0.9005059021922428
+            },
+            "optimal": {
+              "numerator": 1177,
+              "denominator": 1186,
+              "value": 0.9924114671163575
+            }
+          },
+          "200000": {
+            "tasks": 250,
+            "arrival": 250,
+            "arrival_and_stop": 250,
+            "map_optimal": {
+              "numerator": 1062,
+              "denominator": 1186,
+              "value": 0.8954468802698144
+            },
+            "optimal": {
+              "numerator": 1179,
+              "denominator": 1186,
+              "value": 0.9940978077571669
+            }
+          },
+          "237500": {
+            "tasks": 250,
+            "arrival": 250,
+            "arrival_and_stop": 250,
+            "map_optimal": {
+              "numerator": 1053,
+              "denominator": 1184,
+              "value": 0.8893581081081081
+            },
+            "optimal": {
+              "numerator": 1178,
+              "denominator": 1184,
+              "value": 0.9949324324324325
+            }
+          },
+          "250000": {
+            "tasks": 250,
+            "arrival": 250,
+            "arrival_and_stop": 250,
+            "map_optimal": {
+              "numerator": 1057,
+              "denominator": 1184,
+              "value": 0.8927364864864865
+            },
+            "optimal": {
+              "numerator": 1178,
+              "denominator": 1184,
+              "value": 0.9949324324324325
+            }
+          }
+        },
+        "cube2": {
+          "25000": {
+            "tasks": 250,
+            "arrival": 9,
+            "arrival_and_stop": 9,
+            "map_optimal": {
+              "numerator": 1311,
+              "denominator": 6719,
+              "value": 0.19511832117874683
+            },
+            "optimal": {
+              "numerator": 3344,
+              "denominator": 6719,
+              "value": 0.49769310909361514
+            }
+          },
+          "37500": {
+            "tasks": 250,
+            "arrival": 23,
+            "arrival_and_stop": 22,
+            "map_optimal": {
+              "numerator": 1226,
+              "denominator": 6080,
+              "value": 0.20164473684210527
+            },
+            "optimal": {
+              "numerator": 3083,
+              "denominator": 6080,
+              "value": 0.5070723684210526
+            }
+          },
+          "50000": {
+            "tasks": 250,
+            "arrival": 47,
+            "arrival_and_stop": 47,
+            "map_optimal": {
+              "numerator": 1411,
+              "denominator": 5754,
+              "value": 0.24522071602363574
+            },
+            "optimal": {
+              "numerator": 3012,
+              "denominator": 5754,
+              "value": 0.5234619395203337
+            }
+          },
+          "87500": {
+            "tasks": 250,
+            "arrival": 62,
+            "arrival_and_stop": 61,
+            "map_optimal": {
+              "numerator": 1459,
+              "denominator": 5378,
+              "value": 0.27129044254369655
+            },
+            "optimal": {
+              "numerator": 2878,
+              "denominator": 5378,
+              "value": 0.5351431759018223
+            }
+          },
+          "100000": {
+            "tasks": 250,
+            "arrival": 223,
+            "arrival_and_stop": 221,
+            "map_optimal": {
+              "numerator": 3289,
+              "denominator": 3516,
+              "value": 0.9354379977246872
+            },
+            "optimal": {
+              "numerator": 2962,
+              "denominator": 3516,
+              "value": 0.8424345847554039
+            }
+          },
+          "137500": {
+            "tasks": 250,
+            "arrival": 214,
+            "arrival_and_stop": 214,
+            "map_optimal": {
+              "numerator": 3475,
+              "denominator": 3659,
+              "value": 0.9497130363487292
+            },
+            "optimal": {
+              "numerator": 2981,
+              "denominator": 3659,
+              "value": 0.8147034708936868
+            }
+          },
+          "150000": {
+            "tasks": 250,
+            "arrival": 216,
+            "arrival_and_stop": 216,
+            "map_optimal": {
+              "numerator": 3579,
+              "denominator": 3743,
+              "value": 0.9561848784397542
+            },
+            "optimal": {
+              "numerator": 3032,
+              "denominator": 3743,
+              "value": 0.8100454181138125
+            }
+          },
+          "200000": {
+            "tasks": 250,
+            "arrival": 209,
+            "arrival_and_stop": 208,
+            "map_optimal": {
+              "numerator": 3698,
+              "denominator": 3850,
+              "value": 0.9605194805194806
+            },
+            "optimal": {
+              "numerator": 3056,
+              "denominator": 3850,
+              "value": 0.7937662337662338
+            }
+          },
+          "225000": {
+            "tasks": 250,
+            "arrival": 213,
+            "arrival_and_stop": 213,
+            "map_optimal": {
+              "numerator": 3676,
+              "denominator": 3822,
+              "value": 0.9618001046572475
+            },
+            "optimal": {
+              "numerator": 3061,
+              "denominator": 3822,
+              "value": 0.8008895866038723
+            }
+          },
+          "237500": {
+            "tasks": 250,
+            "arrival": 212,
+            "arrival_and_stop": 212,
+            "map_optimal": {
+              "numerator": 3672,
+              "denominator": 3814,
+              "value": 0.9627687467226009
+            },
+            "optimal": {
+              "numerator": 3052,
+              "denominator": 3814,
+              "value": 0.800209753539591
+            }
+          },
+          "250000": {
+            "tasks": 250,
+            "arrival": 211,
+            "arrival_and_stop": 211,
+            "map_optimal": {
+              "numerator": 3697,
+              "denominator": 3844,
+              "value": 0.9617585848074922
+            },
+            "optimal": {
+              "numerator": 3057,
+              "denominator": 3844,
+              "value": 0.7952653485952134
+            }
+          }
+        },
+        "path": {
+          "50000": {
+            "tasks": 250,
+            "arrival": 237,
+            "arrival_and_stop": 236,
+            "map_optimal": {
+              "numerator": 1604,
+              "denominator": 1746,
+              "value": 0.9186712485681557
+            },
+            "optimal": {
+              "numerator": 1587,
+              "denominator": 1746,
+              "value": 0.9089347079037801
+            }
+          },
+          "100000": {
+            "tasks": 250,
+            "arrival": 249,
+            "arrival_and_stop": 236,
+            "map_optimal": {
+              "numerator": 1606,
+              "denominator": 1680,
+              "value": 0.955952380952381
+            },
+            "optimal": {
+              "numerator": 1575,
+              "denominator": 1680,
+              "value": 0.9375
+            }
+          },
+          "137500": {
+            "tasks": 250,
+            "arrival": 248,
+            "arrival_and_stop": 236,
+            "map_optimal": {
+              "numerator": 1597,
+              "denominator": 1669,
+              "value": 0.956860395446375
+            },
+            "optimal": {
+              "numerator": 1581,
+              "denominator": 1669,
+              "value": 0.9472738166566806
+            }
+          },
+          "150000": {
+            "tasks": 250,
+            "arrival": 250,
+            "arrival_and_stop": 239,
+            "map_optimal": {
+              "numerator": 1608,
+              "denominator": 1666,
+              "value": 0.9651860744297719
+            },
+            "optimal": {
+              "numerator": 1586,
+              "denominator": 1666,
+              "value": 0.9519807923169268
+            }
+          },
+          "200000": {
+            "tasks": 250,
+            "arrival": 249,
+            "arrival_and_stop": 233,
+            "map_optimal": {
+              "numerator": 1617,
+              "denominator": 1671,
+              "value": 0.9676840215439856
+            },
+            "optimal": {
+              "numerator": 1575,
+              "denominator": 1671,
+              "value": 0.9425493716337523
+            }
+          },
+          "237500": {
+            "tasks": 250,
+            "arrival": 249,
+            "arrival_and_stop": 234,
+            "map_optimal": {
+              "numerator": 1612,
+              "denominator": 1660,
+              "value": 0.9710843373493976
+            },
+            "optimal": {
+              "numerator": 1571,
+              "denominator": 1660,
+              "value": 0.9463855421686747
+            }
+          },
+          "250000": {
+            "tasks": 250,
+            "arrival": 250,
+            "arrival_and_stop": 237,
+            "map_optimal": {
+              "numerator": 1590,
+              "denominator": 1640,
+              "value": 0.9695121951219512
+            },
+            "optimal": {
+              "numerator": 1575,
+              "denominator": 1640,
+              "value": 0.9603658536585366
+            }
+          }
+        }
       }
     },
     "5": {
@@ -357,135 +1635,171 @@
         "50000": {
           "tasks": 1250,
           "arrival": 854,
-          "arrival_and_stop": 854
+          "arrival_and_stop": 854,
+          "map_optimal": {
+            "numerator": 10169,
+            "denominator": 17294,
+            "value": 0.5880074014108939
+          },
+          "optimal": {
+            "numerator": 12917,
+            "denominator": 17369,
+            "value": 0.7436812712303529
+          }
         },
         "100000": {
           "tasks": 1250,
           "arrival": 964,
-          "arrival_and_stop": 962
+          "arrival_and_stop": 962,
+          "map_optimal": {
+            "numerator": 10566,
+            "denominator": 16919,
+            "value": 0.624504994385011
+          },
+          "optimal": {
+            "numerator": 13365,
+            "denominator": 16926,
+            "value": 0.7896136121942574
+          }
         },
         "150000": {
           "tasks": 1250,
           "arrival": 1167,
-          "arrival_and_stop": 1160
+          "arrival_and_stop": 1160,
+          "map_optimal": {
+            "numerator": 12209,
+            "denominator": 14242,
+            "value": 0.8572531947760146
+          },
+          "optimal": {
+            "numerator": 13248,
+            "denominator": 14246,
+            "value": 0.929945247788853
+          }
         },
         "200000": {
           "tasks": 1250,
           "arrival": 1158,
-          "arrival_and_stop": 1153
+          "arrival_and_stop": 1153,
+          "map_optimal": {
+            "numerator": 12441,
+            "denominator": 14337,
+            "value": 0.8677547604101277
+          },
+          "optimal": {
+            "numerator": 13273,
+            "denominator": 14338,
+            "value": 0.9257218579997211
+          }
         },
         "237500": {
           "tasks": 1250,
           "arrival": 1155,
-          "arrival_and_stop": 1148
+          "arrival_and_stop": 1148,
+          "map_optimal": {
+            "numerator": 12424,
+            "denominator": 14282,
+            "value": 0.8699061756056574
+          },
+          "optimal": {
+            "numerator": 13217,
+            "denominator": 14284,
+            "value": 0.9253010361243349
+          }
         },
         "250000": {
           "tasks": 1250,
           "arrival": 1156,
-          "arrival_and_stop": 1151
+          "arrival_and_stop": 1151,
+          "map_optimal": {
+            "numerator": 12473,
+            "denominator": 14241,
+            "value": 0.8758514149287269
+          },
+          "optimal": {
+            "numerator": 13189,
+            "denominator": 14243,
+            "value": 0.9259987362213017
+          }
         }
       },
       "incomplete_id_points": {
         "12500": {
           "tasks": 448,
           "arrival": 30,
-          "arrival_and_stop": 28
+          "arrival_and_stop": 28,
+          "map_optimal": {
+            "numerator": 1533,
+            "denominator": 8137,
+            "value": 0.1883986727295072
+          },
+          "optimal": {
+            "numerator": 3794,
+            "denominator": 8281,
+            "value": 0.45815722738799664
+          }
         },
         "25000": {
           "tasks": 448,
           "arrival": 38,
-          "arrival_and_stop": 38
+          "arrival_and_stop": 38,
+          "map_optimal": {
+            "numerator": 1482,
+            "denominator": 7184,
+            "value": 0.20629175946547884
+          },
+          "optimal": {
+            "numerator": 3514,
+            "denominator": 7308,
+            "value": 0.48084291187739464
+          }
         },
         "37500": {
           "tasks": 544,
           "arrival": 140,
-          "arrival_and_stop": 139
+          "arrival_and_stop": 139,
+          "map_optimal": {
+            "numerator": 2388,
+            "denominator": 9950,
+            "value": 0.24
+          },
+          "optimal": {
+            "numerator": 5153,
+            "denominator": 10022,
+            "value": 0.5141688285771303
+          }
         },
         "137500": {
           "tasks": 64,
           "arrival": 48,
-          "arrival_and_stop": 48
+          "arrival_and_stop": 48,
+          "map_optimal": {
+            "numerator": 268,
+            "denominator": 565,
+            "value": 0.4743362831858407
+          },
+          "optimal": {
+            "numerator": 506,
+            "denominator": 566,
+            "value": 0.8939929328621908
+          }
         },
         "187500": {
           "tasks": 384,
           "arrival": 307,
-          "arrival_and_stop": 306
+          "arrival_and_stop": 306,
+          "map_optimal": {
+            "numerator": 2733,
+            "denominator": 3917,
+            "value": 0.6977278529486852
+          },
+          "optimal": {
+            "numerator": 3419,
+            "denominator": 3921,
+            "value": 0.8719714358581995
+          }
         }
       },
-      "best_id_by_subclass": [
-        {
-          "cohort": "id",
-          "task": "blocks",
-          "variant": "clear12",
-          "tasks": 83,
-          "arrival": 79,
-          "arrival_and_stop": 79
-        },
-        {
-          "cohort": "id",
-          "task": "blocks",
-          "variant": "clear8",
-          "tasks": 84,
-          "arrival": 84,
-          "arrival_and_stop": 84
-        },
-        {
-          "cohort": "id",
-          "task": "blocks",
-          "variant": "partial8",
-          "tasks": 83,
-          "arrival": 18,
-          "arrival_and_stop": 16
-        },
-        {
-          "cohort": "id",
-          "task": "bridge",
-          "variant": "five_all_right",
-          "tasks": 88,
-          "arrival": 88,
-          "arrival_and_stop": 88
-        },
-        {
-          "cohort": "id",
-          "task": "bridge",
-          "variant": "five_intermediate_start",
-          "tasks": 79,
-          "arrival": 79,
-          "arrival_and_stop": 79
-        },
-        {
-          "cohort": "id",
-          "task": "bridge",
-          "variant": "five_partial_goal",
-          "tasks": 83,
-          "arrival": 83,
-          "arrival_and_stop": 83
-        },
-        {
-          "cohort": "id",
-          "task": "cube2",
-          "variant": "id",
-          "tasks": 250,
-          "arrival": 242,
-          "arrival_and_stop": 241
-        },
-        {
-          "cohort": "id",
-          "task": "path",
-          "variant": "id",
-          "tasks": 250,
-          "arrival": 250,
-          "arrival_and_stop": 246
-        },
-        {
-          "cohort": "id",
-          "task": "puzzle8",
-          "variant": "id",
-          "tasks": 250,
-          "arrival": 244,
-          "arrival_and_stop": 244
-        }
-      ],
       "final": {
         "tasks": 2000,
         "arrival": 670,
@@ -684,180 +1998,1502 @@
             "arrival_and_stop": 0
           }
         ]
+      },
+      "id_curve": {
+        "50000": {
+          "metrics": {
+            "tasks": 1250,
+            "arrival": 854,
+            "arrival_and_stop": 854,
+            "map_optimal": {
+              "numerator": 10169,
+              "denominator": 17294,
+              "value": 0.5880074014108939
+            },
+            "optimal": {
+              "numerator": 12917,
+              "denominator": 17369,
+              "value": 0.7436812712303529
+            }
+          },
+          "by_task": {
+            "blocks": {
+              "tasks": 250,
+              "arrival": 91,
+              "arrival_and_stop": 91,
+              "map_optimal": {
+                "numerator": 595,
+                "denominator": 2055,
+                "value": 0.2895377128953771
+              },
+              "optimal": {
+                "numerator": 1240,
+                "denominator": 2130,
+                "value": 0.5821596244131455
+              }
+            },
+            "cube2": {
+              "tasks": 250,
+              "arrival": 41,
+              "arrival_and_stop": 41,
+              "map_optimal": {
+                "numerator": 1409,
+                "denominator": 5992,
+                "value": 0.23514686248331107
+              },
+              "optimal": {
+                "numerator": 3114,
+                "denominator": 5992,
+                "value": 0.5196929238985314
+              }
+            },
+            "path": {
+              "tasks": 250,
+              "arrival": 236,
+              "arrival_and_stop": 236,
+              "map_optimal": {
+                "numerator": 1649,
+                "denominator": 2029,
+                "value": 0.8127156234598324
+              },
+              "optimal": {
+                "numerator": 1671,
+                "denominator": 2029,
+                "value": 0.8235584031542632
+              }
+            },
+            "bridge": {
+              "tasks": 250,
+              "arrival": 250,
+              "arrival_and_stop": 250,
+              "map_optimal": {
+                "numerator": 1017,
+                "denominator": 1186,
+                "value": 0.857504215851602
+              },
+              "optimal": {
+                "numerator": 1180,
+                "denominator": 1186,
+                "value": 0.9949409780775716
+              }
+            },
+            "puzzle8": {
+              "tasks": 250,
+              "arrival": 236,
+              "arrival_and_stop": 236,
+              "map_optimal": {
+                "numerator": 5499,
+                "denominator": 6032,
+                "value": 0.9116379310344828
+              },
+              "optimal": {
+                "numerator": 5712,
+                "denominator": 6032,
+                "value": 0.946949602122016
+              }
+            }
+          }
+        },
+        "100000": {
+          "metrics": {
+            "tasks": 1250,
+            "arrival": 964,
+            "arrival_and_stop": 962,
+            "map_optimal": {
+              "numerator": 10566,
+              "denominator": 16919,
+              "value": 0.624504994385011
+            },
+            "optimal": {
+              "numerator": 13365,
+              "denominator": 16926,
+              "value": 0.7896136121942574
+            }
+          },
+          "by_task": {
+            "blocks": {
+              "tasks": 250,
+              "arrival": 161,
+              "arrival_and_stop": 160,
+              "map_optimal": {
+                "numerator": 796,
+                "denominator": 2070,
+                "value": 0.38454106280193234
+              },
+              "optimal": {
+                "numerator": 1661,
+                "denominator": 2077,
+                "value": 0.7997111218103033
+              }
+            },
+            "cube2": {
+              "tasks": 250,
+              "arrival": 66,
+              "arrival_and_stop": 66,
+              "map_optimal": {
+                "numerator": 1607,
+                "denominator": 6041,
+                "value": 0.2660155603376924
+              },
+              "optimal": {
+                "numerator": 3268,
+                "denominator": 6041,
+                "value": 0.5409700380731667
+              }
+            },
+            "bridge": {
+              "tasks": 250,
+              "arrival": 249,
+              "arrival_and_stop": 249,
+              "map_optimal": {
+                "numerator": 1056,
+                "denominator": 1183,
+                "value": 0.8926458157227388
+              },
+              "optimal": {
+                "numerator": 1176,
+                "denominator": 1183,
+                "value": 0.9940828402366864
+              }
+            },
+            "puzzle8": {
+              "tasks": 250,
+              "arrival": 238,
+              "arrival_and_stop": 238,
+              "map_optimal": {
+                "numerator": 5512,
+                "denominator": 5946,
+                "value": 0.9270097544567777
+              },
+              "optimal": {
+                "numerator": 5676,
+                "denominator": 5946,
+                "value": 0.9545913218970736
+              }
+            },
+            "path": {
+              "tasks": 250,
+              "arrival": 250,
+              "arrival_and_stop": 249,
+              "map_optimal": {
+                "numerator": 1595,
+                "denominator": 1679,
+                "value": 0.9499702203692674
+              },
+              "optimal": {
+                "numerator": 1584,
+                "denominator": 1679,
+                "value": 0.9434187016081
+              }
+            }
+          }
+        },
+        "150000": {
+          "metrics": {
+            "tasks": 1250,
+            "arrival": 1167,
+            "arrival_and_stop": 1160,
+            "map_optimal": {
+              "numerator": 12209,
+              "denominator": 14242,
+              "value": 0.8572531947760146
+            },
+            "optimal": {
+              "numerator": 13248,
+              "denominator": 14246,
+              "value": 0.929945247788853
+            }
+          },
+          "by_task": {
+            "blocks": {
+              "tasks": 250,
+              "arrival": 181,
+              "arrival_and_stop": 179,
+              "map_optimal": {
+                "numerator": 964,
+                "denominator": 2070,
+                "value": 0.46570048309178746
+              },
+              "optimal": {
+                "numerator": 1787,
+                "denominator": 2074,
+                "value": 0.8616200578592093
+              }
+            },
+            "cube2": {
+              "tasks": 250,
+              "arrival": 242,
+              "arrival_and_stop": 241,
+              "map_optimal": {
+                "numerator": 3100,
+                "denominator": 3509,
+                "value": 0.8834425762325449
+              },
+              "optimal": {
+                "numerator": 3060,
+                "denominator": 3509,
+                "value": 0.872043317184383
+              }
+            },
+            "path": {
+              "tasks": 250,
+              "arrival": 250,
+              "arrival_and_stop": 246,
+              "map_optimal": {
+                "numerator": 1587,
+                "denominator": 1656,
+                "value": 0.9583333333333334
+              },
+              "optimal": {
+                "numerator": 1578,
+                "denominator": 1656,
+                "value": 0.9528985507246377
+              }
+            },
+            "bridge": {
+              "tasks": 250,
+              "arrival": 250,
+              "arrival_and_stop": 250,
+              "map_optimal": {
+                "numerator": 1039,
+                "denominator": 1184,
+                "value": 0.8775337837837838
+              },
+              "optimal": {
+                "numerator": 1179,
+                "denominator": 1184,
+                "value": 0.995777027027027
+              }
+            },
+            "puzzle8": {
+              "tasks": 250,
+              "arrival": 244,
+              "arrival_and_stop": 244,
+              "map_optimal": {
+                "numerator": 5519,
+                "denominator": 5823,
+                "value": 0.9477932337283187
+              },
+              "optimal": {
+                "numerator": 5644,
+                "denominator": 5823,
+                "value": 0.9692598317018719
+              }
+            }
+          }
+        },
+        "200000": {
+          "metrics": {
+            "tasks": 1250,
+            "arrival": 1158,
+            "arrival_and_stop": 1153,
+            "map_optimal": {
+              "numerator": 12441,
+              "denominator": 14337,
+              "value": 0.8677547604101277
+            },
+            "optimal": {
+              "numerator": 13273,
+              "denominator": 14338,
+              "value": 0.9257218579997211
+            }
+          },
+          "by_task": {
+            "blocks": {
+              "tasks": 250,
+              "arrival": 181,
+              "arrival_and_stop": 181,
+              "map_optimal": {
+                "numerator": 1049,
+                "denominator": 2067,
+                "value": 0.5074987905176584
+              },
+              "optimal": {
+                "numerator": 1804,
+                "denominator": 2068,
+                "value": 0.8723404255319149
+              }
+            },
+            "cube2": {
+              "tasks": 250,
+              "arrival": 234,
+              "arrival_and_stop": 232,
+              "map_optimal": {
+                "numerator": 3222,
+                "denominator": 3554,
+                "value": 0.9065841305571187
+              },
+              "optimal": {
+                "numerator": 3037,
+                "denominator": 3554,
+                "value": 0.8545301069217783
+              }
+            },
+            "path": {
+              "tasks": 250,
+              "arrival": 250,
+              "arrival_and_stop": 247,
+              "map_optimal": {
+                "numerator": 1581,
+                "denominator": 1625,
+                "value": 0.9729230769230769
+              },
+              "optimal": {
+                "numerator": 1565,
+                "denominator": 1625,
+                "value": 0.963076923076923
+              }
+            },
+            "bridge": {
+              "tasks": 250,
+              "arrival": 250,
+              "arrival_and_stop": 250,
+              "map_optimal": {
+                "numerator": 1055,
+                "denominator": 1186,
+                "value": 0.8895446880269815
+              },
+              "optimal": {
+                "numerator": 1178,
+                "denominator": 1186,
+                "value": 0.9932546374367622
+              }
+            },
+            "puzzle8": {
+              "tasks": 250,
+              "arrival": 243,
+              "arrival_and_stop": 243,
+              "map_optimal": {
+                "numerator": 5534,
+                "denominator": 5905,
+                "value": 0.9371718882303133
+              },
+              "optimal": {
+                "numerator": 5689,
+                "denominator": 5905,
+                "value": 0.9634208298052498
+              }
+            }
+          }
+        },
+        "237500": {
+          "metrics": {
+            "tasks": 1250,
+            "arrival": 1155,
+            "arrival_and_stop": 1148,
+            "map_optimal": {
+              "numerator": 12424,
+              "denominator": 14282,
+              "value": 0.8699061756056574
+            },
+            "optimal": {
+              "numerator": 13217,
+              "denominator": 14284,
+              "value": 0.9253010361243349
+            }
+          },
+          "by_task": {
+            "blocks": {
+              "tasks": 250,
+              "arrival": 180,
+              "arrival_and_stop": 180,
+              "map_optimal": {
+                "numerator": 1047,
+                "denominator": 2057,
+                "value": 0.5089936801166748
+              },
+              "optimal": {
+                "numerator": 1783,
+                "denominator": 2059,
+                "value": 0.8659543467702768
+              }
+            },
+            "cube2": {
+              "tasks": 250,
+              "arrival": 231,
+              "arrival_and_stop": 229,
+              "map_optimal": {
+                "numerator": 3227,
+                "denominator": 3555,
+                "value": 0.9077355836849508
+              },
+              "optimal": {
+                "numerator": 3023,
+                "denominator": 3555,
+                "value": 0.850351617440225
+              }
+            },
+            "path": {
+              "tasks": 250,
+              "arrival": 250,
+              "arrival_and_stop": 245,
+              "map_optimal": {
+                "numerator": 1579,
+                "denominator": 1631,
+                "value": 0.9681177191906806
+              },
+              "optimal": {
+                "numerator": 1569,
+                "denominator": 1631,
+                "value": 0.9619865113427345
+              }
+            },
+            "bridge": {
+              "tasks": 250,
+              "arrival": 250,
+              "arrival_and_stop": 250,
+              "map_optimal": {
+                "numerator": 1049,
+                "denominator": 1184,
+                "value": 0.8859797297297297
+              },
+              "optimal": {
+                "numerator": 1175,
+                "denominator": 1184,
+                "value": 0.9923986486486487
+              }
+            },
+            "puzzle8": {
+              "tasks": 250,
+              "arrival": 244,
+              "arrival_and_stop": 244,
+              "map_optimal": {
+                "numerator": 5522,
+                "denominator": 5855,
+                "value": 0.9431255337318531
+              },
+              "optimal": {
+                "numerator": 5667,
+                "denominator": 5855,
+                "value": 0.9678906917164817
+              }
+            }
+          }
+        },
+        "250000": {
+          "metrics": {
+            "tasks": 1250,
+            "arrival": 1156,
+            "arrival_and_stop": 1151,
+            "map_optimal": {
+              "numerator": 12473,
+              "denominator": 14241,
+              "value": 0.8758514149287269
+            },
+            "optimal": {
+              "numerator": 13189,
+              "denominator": 14243,
+              "value": 0.9259987362213017
+            }
+          },
+          "by_task": {
+            "blocks": {
+              "tasks": 250,
+              "arrival": 176,
+              "arrival_and_stop": 176,
+              "map_optimal": {
+                "numerator": 1070,
+                "denominator": 2058,
+                "value": 0.5199222546161322
+              },
+              "optimal": {
+                "numerator": 1763,
+                "denominator": 2060,
+                "value": 0.8558252427184466
+              }
+            },
+            "cube2": {
+              "tasks": 250,
+              "arrival": 234,
+              "arrival_and_stop": 232,
+              "map_optimal": {
+                "numerator": 3255,
+                "denominator": 3544,
+                "value": 0.9184537246049661
+              },
+              "optimal": {
+                "numerator": 3027,
+                "denominator": 3544,
+                "value": 0.8541196388261851
+              }
+            },
+            "path": {
+              "tasks": 250,
+              "arrival": 250,
+              "arrival_and_stop": 247,
+              "map_optimal": {
+                "numerator": 1583,
+                "denominator": 1630,
+                "value": 0.9711656441717792
+              },
+              "optimal": {
+                "numerator": 1568,
+                "denominator": 1630,
+                "value": 0.9619631901840491
+              }
+            },
+            "bridge": {
+              "tasks": 250,
+              "arrival": 250,
+              "arrival_and_stop": 250,
+              "map_optimal": {
+                "numerator": 1050,
+                "denominator": 1184,
+                "value": 0.8868243243243243
+              },
+              "optimal": {
+                "numerator": 1178,
+                "denominator": 1184,
+                "value": 0.9949324324324325
+              }
+            },
+            "puzzle8": {
+              "tasks": 250,
+              "arrival": 246,
+              "arrival_and_stop": 246,
+              "map_optimal": {
+                "numerator": 5515,
+                "denominator": 5825,
+                "value": 0.9467811158798283
+              },
+              "optimal": {
+                "numerator": 5653,
+                "denominator": 5825,
+                "value": 0.9704721030042919
+              }
+            }
+          }
+        }
+      },
+      "best_id_by_task": {
+        "blocks": {
+          "tasks": 250,
+          "arrival": 181,
+          "arrival_and_stop": 179,
+          "map_optimal": {
+            "numerator": 964,
+            "denominator": 2070,
+            "value": 0.46570048309178746
+          },
+          "optimal": {
+            "numerator": 1787,
+            "denominator": 2074,
+            "value": 0.8616200578592093
+          }
+        },
+        "cube2": {
+          "tasks": 250,
+          "arrival": 242,
+          "arrival_and_stop": 241,
+          "map_optimal": {
+            "numerator": 3100,
+            "denominator": 3509,
+            "value": 0.8834425762325449
+          },
+          "optimal": {
+            "numerator": 3060,
+            "denominator": 3509,
+            "value": 0.872043317184383
+          }
+        },
+        "path": {
+          "tasks": 250,
+          "arrival": 250,
+          "arrival_and_stop": 246,
+          "map_optimal": {
+            "numerator": 1587,
+            "denominator": 1656,
+            "value": 0.9583333333333334
+          },
+          "optimal": {
+            "numerator": 1578,
+            "denominator": 1656,
+            "value": 0.9528985507246377
+          }
+        },
+        "bridge": {
+          "tasks": 250,
+          "arrival": 250,
+          "arrival_and_stop": 250,
+          "map_optimal": {
+            "numerator": 1039,
+            "denominator": 1184,
+            "value": 0.8775337837837838
+          },
+          "optimal": {
+            "numerator": 1179,
+            "denominator": 1184,
+            "value": 0.995777027027027
+          }
+        },
+        "puzzle8": {
+          "tasks": 250,
+          "arrival": 244,
+          "arrival_and_stop": 244,
+          "map_optimal": {
+            "numerator": 5519,
+            "denominator": 5823,
+            "value": 0.9477932337283187
+          },
+          "optimal": {
+            "numerator": 5644,
+            "denominator": 5823,
+            "value": 0.9692598317018719
+          }
+        }
+      },
+      "best_per_task": {
+        "blocks": {
+          "step": 200000,
+          "tasks": 250,
+          "arrival": 181,
+          "arrival_and_stop": 181,
+          "map_optimal": {
+            "numerator": 1049,
+            "denominator": 2067,
+            "value": 0.5074987905176584
+          },
+          "optimal": {
+            "numerator": 1804,
+            "denominator": 2068,
+            "value": 0.8723404255319149
+          }
+        },
+        "bridge": {
+          "step": 50000,
+          "tasks": 250,
+          "arrival": 250,
+          "arrival_and_stop": 250,
+          "map_optimal": {
+            "numerator": 1017,
+            "denominator": 1186,
+            "value": 0.857504215851602
+          },
+          "optimal": {
+            "numerator": 1180,
+            "denominator": 1186,
+            "value": 0.9949409780775716
+          }
+        },
+        "cube2": {
+          "step": 150000,
+          "tasks": 250,
+          "arrival": 242,
+          "arrival_and_stop": 241,
+          "map_optimal": {
+            "numerator": 3100,
+            "denominator": 3509,
+            "value": 0.8834425762325449
+          },
+          "optimal": {
+            "numerator": 3060,
+            "denominator": 3509,
+            "value": 0.872043317184383
+          }
+        },
+        "path": {
+          "step": 100000,
+          "tasks": 250,
+          "arrival": 250,
+          "arrival_and_stop": 249,
+          "map_optimal": {
+            "numerator": 1595,
+            "denominator": 1679,
+            "value": 0.9499702203692674
+          },
+          "optimal": {
+            "numerator": 1584,
+            "denominator": 1679,
+            "value": 0.9434187016081
+          }
+        },
+        "puzzle8": {
+          "step": 250000,
+          "tasks": 250,
+          "arrival": 246,
+          "arrival_and_stop": 246,
+          "map_optimal": {
+            "numerator": 5515,
+            "denominator": 5825,
+            "value": 0.9467811158798283
+          },
+          "optimal": {
+            "numerator": 5653,
+            "denominator": 5825,
+            "value": 0.9704721030042919
+          }
+        }
+      },
+      "task_curves": {
+        "blocks": {
+          "12500": {
+            "tasks": 250,
+            "arrival": 23,
+            "arrival_and_stop": 21,
+            "map_optimal": {
+              "numerator": 359,
+              "denominator": 1956,
+              "value": 0.18353783231083845
+            },
+            "optimal": {
+              "numerator": 679,
+              "denominator": 2100,
+              "value": 0.3233333333333333
+            }
+          },
+          "25000": {
+            "tasks": 250,
+            "arrival": 33,
+            "arrival_and_stop": 33,
+            "map_optimal": {
+              "numerator": 458,
+              "denominator": 1959,
+              "value": 0.23379275140377745
+            },
+            "optimal": {
+              "numerator": 932,
+              "denominator": 2083,
+              "value": 0.4474315890542487
+            }
+          },
+          "37500": {
+            "tasks": 250,
+            "arrival": 101,
+            "arrival_and_stop": 101,
+            "map_optimal": {
+              "numerator": 591,
+              "denominator": 2054,
+              "value": 0.28773125608568645
+            },
+            "optimal": {
+              "numerator": 1192,
+              "denominator": 2126,
+              "value": 0.5606773283160865
+            }
+          },
+          "50000": {
+            "tasks": 250,
+            "arrival": 91,
+            "arrival_and_stop": 91,
+            "map_optimal": {
+              "numerator": 595,
+              "denominator": 2055,
+              "value": 0.2895377128953771
+            },
+            "optimal": {
+              "numerator": 1240,
+              "denominator": 2130,
+              "value": 0.5821596244131455
+            }
+          },
+          "100000": {
+            "tasks": 250,
+            "arrival": 161,
+            "arrival_and_stop": 160,
+            "map_optimal": {
+              "numerator": 796,
+              "denominator": 2070,
+              "value": 0.38454106280193234
+            },
+            "optimal": {
+              "numerator": 1661,
+              "denominator": 2077,
+              "value": 0.7997111218103033
+            }
+          },
+          "150000": {
+            "tasks": 250,
+            "arrival": 181,
+            "arrival_and_stop": 179,
+            "map_optimal": {
+              "numerator": 964,
+              "denominator": 2070,
+              "value": 0.46570048309178746
+            },
+            "optimal": {
+              "numerator": 1787,
+              "denominator": 2074,
+              "value": 0.8616200578592093
+            }
+          },
+          "187500": {
+            "tasks": 250,
+            "arrival": 179,
+            "arrival_and_stop": 179,
+            "map_optimal": {
+              "numerator": 1037,
+              "denominator": 2058,
+              "value": 0.5038872691933917
+            },
+            "optimal": {
+              "numerator": 1793,
+              "denominator": 2062,
+              "value": 0.8695441319107663
+            }
+          },
+          "200000": {
+            "tasks": 250,
+            "arrival": 181,
+            "arrival_and_stop": 181,
+            "map_optimal": {
+              "numerator": 1049,
+              "denominator": 2067,
+              "value": 0.5074987905176584
+            },
+            "optimal": {
+              "numerator": 1804,
+              "denominator": 2068,
+              "value": 0.8723404255319149
+            }
+          },
+          "237500": {
+            "tasks": 250,
+            "arrival": 180,
+            "arrival_and_stop": 180,
+            "map_optimal": {
+              "numerator": 1047,
+              "denominator": 2057,
+              "value": 0.5089936801166748
+            },
+            "optimal": {
+              "numerator": 1783,
+              "denominator": 2059,
+              "value": 0.8659543467702768
+            }
+          },
+          "250000": {
+            "tasks": 250,
+            "arrival": 176,
+            "arrival_and_stop": 176,
+            "map_optimal": {
+              "numerator": 1070,
+              "denominator": 2058,
+              "value": 0.5199222546161322
+            },
+            "optimal": {
+              "numerator": 1763,
+              "denominator": 2060,
+              "value": 0.8558252427184466
+            }
+          }
+        },
+        "bridge": {
+          "50000": {
+            "tasks": 250,
+            "arrival": 250,
+            "arrival_and_stop": 250,
+            "map_optimal": {
+              "numerator": 1017,
+              "denominator": 1186,
+              "value": 0.857504215851602
+            },
+            "optimal": {
+              "numerator": 1180,
+              "denominator": 1186,
+              "value": 0.9949409780775716
+            }
+          },
+          "100000": {
+            "tasks": 250,
+            "arrival": 249,
+            "arrival_and_stop": 249,
+            "map_optimal": {
+              "numerator": 1056,
+              "denominator": 1183,
+              "value": 0.8926458157227388
+            },
+            "optimal": {
+              "numerator": 1176,
+              "denominator": 1183,
+              "value": 0.9940828402366864
+            }
+          },
+          "150000": {
+            "tasks": 250,
+            "arrival": 250,
+            "arrival_and_stop": 250,
+            "map_optimal": {
+              "numerator": 1039,
+              "denominator": 1184,
+              "value": 0.8775337837837838
+            },
+            "optimal": {
+              "numerator": 1179,
+              "denominator": 1184,
+              "value": 0.995777027027027
+            }
+          },
+          "200000": {
+            "tasks": 250,
+            "arrival": 250,
+            "arrival_and_stop": 250,
+            "map_optimal": {
+              "numerator": 1055,
+              "denominator": 1186,
+              "value": 0.8895446880269815
+            },
+            "optimal": {
+              "numerator": 1178,
+              "denominator": 1186,
+              "value": 0.9932546374367622
+            }
+          },
+          "237500": {
+            "tasks": 250,
+            "arrival": 250,
+            "arrival_and_stop": 250,
+            "map_optimal": {
+              "numerator": 1049,
+              "denominator": 1184,
+              "value": 0.8859797297297297
+            },
+            "optimal": {
+              "numerator": 1175,
+              "denominator": 1184,
+              "value": 0.9923986486486487
+            }
+          },
+          "250000": {
+            "tasks": 250,
+            "arrival": 250,
+            "arrival_and_stop": 250,
+            "map_optimal": {
+              "numerator": 1050,
+              "denominator": 1184,
+              "value": 0.8868243243243243
+            },
+            "optimal": {
+              "numerator": 1178,
+              "denominator": 1184,
+              "value": 0.9949324324324325
+            }
+          }
+        },
+        "cube2": {
+          "37500": {
+            "tasks": 250,
+            "arrival": 25,
+            "arrival_and_stop": 24,
+            "map_optimal": {
+              "numerator": 1354,
+              "denominator": 6770,
+              "value": 0.2
+            },
+            "optimal": {
+              "numerator": 3432,
+              "denominator": 6770,
+              "value": 0.5069423929098966
+            }
+          },
+          "50000": {
+            "tasks": 250,
+            "arrival": 41,
+            "arrival_and_stop": 41,
+            "map_optimal": {
+              "numerator": 1409,
+              "denominator": 5992,
+              "value": 0.23514686248331107
+            },
+            "optimal": {
+              "numerator": 3114,
+              "denominator": 5992,
+              "value": 0.5196929238985314
+            }
+          },
+          "100000": {
+            "tasks": 250,
+            "arrival": 66,
+            "arrival_and_stop": 66,
+            "map_optimal": {
+              "numerator": 1607,
+              "denominator": 6041,
+              "value": 0.2660155603376924
+            },
+            "optimal": {
+              "numerator": 3268,
+              "denominator": 6041,
+              "value": 0.5409700380731667
+            }
+          },
+          "150000": {
+            "tasks": 250,
+            "arrival": 242,
+            "arrival_and_stop": 241,
+            "map_optimal": {
+              "numerator": 3100,
+              "denominator": 3509,
+              "value": 0.8834425762325449
+            },
+            "optimal": {
+              "numerator": 3060,
+              "denominator": 3509,
+              "value": 0.872043317184383
+            }
+          },
+          "200000": {
+            "tasks": 250,
+            "arrival": 234,
+            "arrival_and_stop": 232,
+            "map_optimal": {
+              "numerator": 3222,
+              "denominator": 3554,
+              "value": 0.9065841305571187
+            },
+            "optimal": {
+              "numerator": 3037,
+              "denominator": 3554,
+              "value": 0.8545301069217783
+            }
+          },
+          "237500": {
+            "tasks": 250,
+            "arrival": 231,
+            "arrival_and_stop": 229,
+            "map_optimal": {
+              "numerator": 3227,
+              "denominator": 3555,
+              "value": 0.9077355836849508
+            },
+            "optimal": {
+              "numerator": 3023,
+              "denominator": 3555,
+              "value": 0.850351617440225
+            }
+          },
+          "250000": {
+            "tasks": 250,
+            "arrival": 234,
+            "arrival_and_stop": 232,
+            "map_optimal": {
+              "numerator": 3255,
+              "denominator": 3544,
+              "value": 0.9184537246049661
+            },
+            "optimal": {
+              "numerator": 3027,
+              "denominator": 3544,
+              "value": 0.8541196388261851
+            }
+          }
+        },
+        "path": {
+          "50000": {
+            "tasks": 250,
+            "arrival": 236,
+            "arrival_and_stop": 236,
+            "map_optimal": {
+              "numerator": 1649,
+              "denominator": 2029,
+              "value": 0.8127156234598324
+            },
+            "optimal": {
+              "numerator": 1671,
+              "denominator": 2029,
+              "value": 0.8235584031542632
+            }
+          },
+          "100000": {
+            "tasks": 250,
+            "arrival": 250,
+            "arrival_and_stop": 249,
+            "map_optimal": {
+              "numerator": 1595,
+              "denominator": 1679,
+              "value": 0.9499702203692674
+            },
+            "optimal": {
+              "numerator": 1584,
+              "denominator": 1679,
+              "value": 0.9434187016081
+            }
+          },
+          "150000": {
+            "tasks": 250,
+            "arrival": 250,
+            "arrival_and_stop": 246,
+            "map_optimal": {
+              "numerator": 1587,
+              "denominator": 1656,
+              "value": 0.9583333333333334
+            },
+            "optimal": {
+              "numerator": 1578,
+              "denominator": 1656,
+              "value": 0.9528985507246377
+            }
+          },
+          "200000": {
+            "tasks": 250,
+            "arrival": 250,
+            "arrival_and_stop": 247,
+            "map_optimal": {
+              "numerator": 1581,
+              "denominator": 1625,
+              "value": 0.9729230769230769
+            },
+            "optimal": {
+              "numerator": 1565,
+              "denominator": 1625,
+              "value": 0.963076923076923
+            }
+          },
+          "237500": {
+            "tasks": 250,
+            "arrival": 250,
+            "arrival_and_stop": 245,
+            "map_optimal": {
+              "numerator": 1579,
+              "denominator": 1631,
+              "value": 0.9681177191906806
+            },
+            "optimal": {
+              "numerator": 1569,
+              "denominator": 1631,
+              "value": 0.9619865113427345
+            }
+          },
+          "250000": {
+            "tasks": 250,
+            "arrival": 250,
+            "arrival_and_stop": 247,
+            "map_optimal": {
+              "numerator": 1583,
+              "denominator": 1630,
+              "value": 0.9711656441717792
+            },
+            "optimal": {
+              "numerator": 1568,
+              "denominator": 1630,
+              "value": 0.9619631901840491
+            }
+          }
+        },
+        "puzzle8": {
+          "50000": {
+            "tasks": 250,
+            "arrival": 236,
+            "arrival_and_stop": 236,
+            "map_optimal": {
+              "numerator": 5499,
+              "denominator": 6032,
+              "value": 0.9116379310344828
+            },
+            "optimal": {
+              "numerator": 5712,
+              "denominator": 6032,
+              "value": 0.946949602122016
+            }
+          },
+          "100000": {
+            "tasks": 250,
+            "arrival": 238,
+            "arrival_and_stop": 238,
+            "map_optimal": {
+              "numerator": 5512,
+              "denominator": 5946,
+              "value": 0.9270097544567777
+            },
+            "optimal": {
+              "numerator": 5676,
+              "denominator": 5946,
+              "value": 0.9545913218970736
+            }
+          },
+          "150000": {
+            "tasks": 250,
+            "arrival": 244,
+            "arrival_and_stop": 244,
+            "map_optimal": {
+              "numerator": 5519,
+              "denominator": 5823,
+              "value": 0.9477932337283187
+            },
+            "optimal": {
+              "numerator": 5644,
+              "denominator": 5823,
+              "value": 0.9692598317018719
+            }
+          },
+          "200000": {
+            "tasks": 250,
+            "arrival": 243,
+            "arrival_and_stop": 243,
+            "map_optimal": {
+              "numerator": 5534,
+              "denominator": 5905,
+              "value": 0.9371718882303133
+            },
+            "optimal": {
+              "numerator": 5689,
+              "denominator": 5905,
+              "value": 0.9634208298052498
+            }
+          },
+          "237500": {
+            "tasks": 250,
+            "arrival": 244,
+            "arrival_and_stop": 244,
+            "map_optimal": {
+              "numerator": 5522,
+              "denominator": 5855,
+              "value": 0.9431255337318531
+            },
+            "optimal": {
+              "numerator": 5667,
+              "denominator": 5855,
+              "value": 0.9678906917164817
+            }
+          },
+          "250000": {
+            "tasks": 250,
+            "arrival": 246,
+            "arrival_and_stop": 246,
+            "map_optimal": {
+              "numerator": 5515,
+              "denominator": 5825,
+              "value": 0.9467811158798283
+            },
+            "optimal": {
+              "numerator": 5653,
+              "denominator": 5825,
+              "value": 0.9704721030042919
+            }
+          }
+        }
       }
     },
     "6": {
       "training_end_step": 250000,
-      "best_completed_id_step": 250000,
+      "best_completed_id_step": 237500,
       "complete_id_points": {
         "50000": {
           "tasks": 1500,
           "arrival": 866,
-          "arrival_and_stop": 851
+          "arrival_and_stop": 851,
+          "map_optimal": {
+            "numerator": 14217,
+            "denominator": 26614,
+            "value": 0.5341925302472383
+          },
+          "optimal": {
+            "numerator": 18210,
+            "denominator": 26727,
+            "value": 0.6813334829947244
+          }
         },
         "100000": {
           "tasks": 1500,
           "arrival": 1133,
-          "arrival_and_stop": 1131
+          "arrival_and_stop": 1131,
+          "map_optimal": {
+            "numerator": 14319,
+            "denominator": 23513,
+            "value": 0.6089822651299281
+          },
+          "optimal": {
+            "numerator": 17924,
+            "denominator": 23544,
+            "value": 0.7612979952429494
+          }
         },
         "150000": {
           "tasks": 1500,
           "arrival": 1191,
-          "arrival_and_stop": 1187
+          "arrival_and_stop": 1187,
+          "map_optimal": {
+            "numerator": 14455,
+            "denominator": 22987,
+            "value": 0.6288336886066037
+          },
+          "optimal": {
+            "numerator": 17968,
+            "denominator": 23012,
+            "value": 0.7808100121675647
+          }
         },
         "200000": {
           "tasks": 1500,
           "arrival": 1172,
-          "arrival_and_stop": 1167
+          "arrival_and_stop": 1167,
+          "map_optimal": {
+            "numerator": 14409,
+            "denominator": 22982,
+            "value": 0.6269689322078148
+          },
+          "optimal": {
+            "numerator": 17842,
+            "denominator": 23018,
+            "value": 0.77513250499609
+          }
+        },
+        "237500": {
+          "tasks": 1500,
+          "arrival": 1202,
+          "arrival_and_stop": 1196,
+          "map_optimal": {
+            "numerator": 14510,
+            "denominator": 22662,
+            "value": 0.6402788809460771
+          },
+          "optimal": {
+            "numerator": 17883,
+            "denominator": 22693,
+            "value": 0.7880403648702243
+          }
         },
         "250000": {
           "tasks": 1500,
           "arrival": 1192,
-          "arrival_and_stop": 1188
+          "arrival_and_stop": 1188,
+          "map_optimal": {
+            "numerator": 14451,
+            "denominator": 22654,
+            "value": 0.6379005915070186
+          },
+          "optimal": {
+            "numerator": 17786,
+            "denominator": 22685,
+            "value": 0.7840423187128058
+          }
         }
       },
       "incomplete_id_points": {
         "12500": {
           "tasks": 576,
           "arrival": 17,
-          "arrival_and_stop": 16
+          "arrival_and_stop": 16,
+          "map_optimal": {
+            "numerator": 2378,
+            "denominator": 11221,
+            "value": 0.21192407093841903
+          },
+          "optimal": {
+            "numerator": 4845,
+            "denominator": 11375,
+            "value": 0.4259340659340659
+          }
         },
         "25000": {
           "tasks": 672,
           "arrival": 52,
-          "arrival_and_stop": 48
+          "arrival_and_stop": 48,
+          "map_optimal": {
+            "numerator": 3493,
+            "denominator": 13741,
+            "value": 0.25420275089149263
+          },
+          "optimal": {
+            "numerator": 6147,
+            "denominator": 13898,
+            "value": 0.4422938552309685
+          }
         },
         "37500": {
           "tasks": 736,
           "arrival": 124,
-          "arrival_and_stop": 123
+          "arrival_and_stop": 123,
+          "map_optimal": {
+            "numerator": 4111,
+            "denominator": 14876,
+            "value": 0.27635116966926593
+          },
+          "optimal": {
+            "numerator": 6989,
+            "denominator": 14991,
+            "value": 0.46621306117003536
+          }
         },
         "75000": {
           "tasks": 64,
           "arrival": 45,
-          "arrival_and_stop": 45
+          "arrival_and_stop": 45,
+          "map_optimal": {
+            "numerator": 214,
+            "denominator": 555,
+            "value": 0.3855855855855856
+          },
+          "optimal": {
+            "numerator": 451,
+            "denominator": 564,
+            "value": 0.799645390070922
+          }
         },
         "87500": {
           "tasks": 672,
           "arrival": 326,
-          "arrival_and_stop": 322
+          "arrival_and_stop": 322,
+          "map_optimal": {
+            "numerator": 3740,
+            "denominator": 11339,
+            "value": 0.32983508245877063
+          },
+          "optimal": {
+            "numerator": 6503,
+            "denominator": 11379,
+            "value": 0.5714913437033131
+          }
         },
         "125000": {
           "tasks": 288,
           "arrival": 198,
-          "arrival_and_stop": 198
+          "arrival_and_stop": 198,
+          "map_optimal": {
+            "numerator": 1008,
+            "denominator": 2824,
+            "value": 0.35694050991501414
+          },
+          "optimal": {
+            "numerator": 2174,
+            "denominator": 2852,
+            "value": 0.7622720897615708
+          }
         },
         "137500": {
           "tasks": 864,
           "arrival": 570,
-          "arrival_and_stop": 568
+          "arrival_and_stop": 568,
+          "map_optimal": {
+            "numerator": 4843,
+            "denominator": 12048,
+            "value": 0.4019754316069057
+          },
+          "optimal": {
+            "numerator": 7599,
+            "denominator": 12070,
+            "value": 0.6295774647887324
+          }
         },
         "175000": {
           "tasks": 64,
           "arrival": 57,
-          "arrival_and_stop": 57
+          "arrival_and_stop": 57,
+          "map_optimal": {
+            "numerator": 230,
+            "denominator": 550,
+            "value": 0.41818181818181815
+          },
+          "optimal": {
+            "numerator": 504,
+            "denominator": 553,
+            "value": 0.9113924050632911
+          }
         },
         "187500": {
           "tasks": 864,
           "arrival": 558,
-          "arrival_and_stop": 550
-        },
-        "237500": {
-          "tasks": 1248,
-          "arrival": 950,
-          "arrival_and_stop": 944
+          "arrival_and_stop": 550,
+          "map_optimal": {
+            "numerator": 4919,
+            "denominator": 12204,
+            "value": 0.4030645689937725
+          },
+          "optimal": {
+            "numerator": 7646,
+            "denominator": 12237,
+            "value": 0.6248263463267141
+          }
         }
       },
-      "best_id_by_subclass": [
-        {
-          "cohort": "id",
-          "task": "blocks",
-          "variant": "clear12",
-          "tasks": 83,
-          "arrival": 67,
-          "arrival_and_stop": 67
-        },
-        {
-          "cohort": "id",
-          "task": "blocks",
-          "variant": "clear8",
-          "tasks": 84,
-          "arrival": 70,
-          "arrival_and_stop": 70
-        },
-        {
-          "cohort": "id",
-          "task": "blocks",
-          "variant": "partial8",
-          "tasks": 83,
-          "arrival": 60,
-          "arrival_and_stop": 59
-        },
-        {
-          "cohort": "id",
-          "task": "bridge",
-          "variant": "five_all_right",
-          "tasks": 88,
-          "arrival": 88,
-          "arrival_and_stop": 88
-        },
-        {
-          "cohort": "id",
-          "task": "bridge",
-          "variant": "five_intermediate_start",
-          "tasks": 79,
-          "arrival": 79,
-          "arrival_and_stop": 79
-        },
-        {
-          "cohort": "id",
-          "task": "bridge",
-          "variant": "five_partial_goal",
-          "tasks": 83,
-          "arrival": 83,
-          "arrival_and_stop": 83
-        },
-        {
-          "cohort": "id",
-          "task": "cube2",
-          "variant": "id",
-          "tasks": 250,
-          "arrival": 52,
-          "arrival_and_stop": 52
-        },
-        {
-          "cohort": "id",
-          "task": "path",
-          "variant": "id",
-          "tasks": 250,
-          "arrival": 210,
-          "arrival_and_stop": 207
-        },
-        {
-          "cohort": "id",
-          "task": "puzzle8",
-          "variant": "id",
-          "tasks": 250,
-          "arrival": 233,
-          "arrival_and_stop": 233
-        },
-        {
-          "cohort": "id",
-          "task": "token_swapping",
-          "variant": "original_tree_arbitrary",
-          "tasks": 125,
-          "arrival": 125,
-          "arrival_and_stop": 125
-        },
-        {
-          "cohort": "id",
-          "task": "token_swapping",
-          "variant": "original_tree_home",
-          "tasks": 125,
-          "arrival": 125,
-          "arrival_and_stop": 125
-        }
-      ],
       "final": {
         "tasks": 2000,
         "arrival": 811,
@@ -1064,6 +3700,1631 @@
             "arrival_and_stop": 0
           }
         ]
+      },
+      "id_curve": {
+        "50000": {
+          "metrics": {
+            "tasks": 1500,
+            "arrival": 866,
+            "arrival_and_stop": 851,
+            "map_optimal": {
+              "numerator": 14217,
+              "denominator": 26614,
+              "value": 0.5341925302472383
+            },
+            "optimal": {
+              "numerator": 18210,
+              "denominator": 26727,
+              "value": 0.6813334829947244
+            }
+          },
+          "by_task": {
+            "blocks": {
+              "tasks": 250,
+              "arrival": 79,
+              "arrival_and_stop": 79,
+              "map_optimal": {
+                "numerator": 527,
+                "denominator": 1973,
+                "value": 0.26710593005575267
+              },
+              "optimal": {
+                "numerator": 1213,
+                "denominator": 2086,
+                "value": 0.5814956855225312
+              }
+            },
+            "cube2": {
+              "tasks": 250,
+              "arrival": 23,
+              "arrival_and_stop": 23,
+              "map_optimal": {
+                "numerator": 1300,
+                "denominator": 6226,
+                "value": 0.20880179890780598
+              },
+              "optimal": {
+                "numerator": 3151,
+                "denominator": 6226,
+                "value": 0.5061034371988435
+              }
+            },
+            "path": {
+              "tasks": 250,
+              "arrival": 50,
+              "arrival_and_stop": 49,
+              "map_optimal": {
+                "numerator": 2457,
+                "denominator": 7000,
+                "value": 0.351
+              },
+              "optimal": {
+                "numerator": 3037,
+                "denominator": 7000,
+                "value": 0.43385714285714283
+              }
+            },
+            "bridge": {
+              "tasks": 250,
+              "arrival": 247,
+              "arrival_and_stop": 247,
+              "map_optimal": {
+                "numerator": 999,
+                "denominator": 1197,
+                "value": 0.8345864661654135
+              },
+              "optimal": {
+                "numerator": 1175,
+                "denominator": 1197,
+                "value": 0.9816207184628237
+              }
+            },
+            "puzzle8": {
+              "tasks": 250,
+              "arrival": 217,
+              "arrival_and_stop": 216,
+              "map_optimal": {
+                "numerator": 5463,
+                "denominator": 6244,
+                "value": 0.8749199231262011
+              },
+              "optimal": {
+                "numerator": 5749,
+                "denominator": 6244,
+                "value": 0.9207238949391415
+              }
+            },
+            "token_swapping": {
+              "tasks": 250,
+              "arrival": 250,
+              "arrival_and_stop": 237,
+              "map_optimal": {
+                "numerator": 3471,
+                "denominator": 3974,
+                "value": 0.873427277302466
+              },
+              "optimal": {
+                "numerator": 3885,
+                "denominator": 3974,
+                "value": 0.9776044287871163
+              }
+            }
+          }
+        },
+        "100000": {
+          "metrics": {
+            "tasks": 1500,
+            "arrival": 1133,
+            "arrival_and_stop": 1131,
+            "map_optimal": {
+              "numerator": 14319,
+              "denominator": 23513,
+              "value": 0.6089822651299281
+            },
+            "optimal": {
+              "numerator": 17924,
+              "denominator": 23544,
+              "value": 0.7612979952429494
+            }
+          },
+          "by_task": {
+            "blocks": {
+              "tasks": 250,
+              "arrival": 190,
+              "arrival_and_stop": 189,
+              "map_optimal": {
+                "numerator": 805,
+                "denominator": 2016,
+                "value": 0.3993055555555556
+              },
+              "optimal": {
+                "numerator": 1763,
+                "denominator": 2047,
+                "value": 0.8612603810454323
+              }
+            },
+            "cube2": {
+              "tasks": 250,
+              "arrival": 29,
+              "arrival_and_stop": 29,
+              "map_optimal": {
+                "numerator": 1282,
+                "denominator": 5811,
+                "value": 0.22061607296506625
+              },
+              "optimal": {
+                "numerator": 2909,
+                "denominator": 5811,
+                "value": 0.5006023059714335
+              }
+            },
+            "path": {
+              "tasks": 250,
+              "arrival": 181,
+              "arrival_and_stop": 180,
+              "map_optimal": {
+                "numerator": 2180,
+                "denominator": 4509,
+                "value": 0.48347748946551344
+              },
+              "optimal": {
+                "numerator": 2505,
+                "denominator": 4509,
+                "value": 0.5555555555555556
+              }
+            },
+            "bridge": {
+              "tasks": 250,
+              "arrival": 250,
+              "arrival_and_stop": 250,
+              "map_optimal": {
+                "numerator": 1053,
+                "denominator": 1188,
+                "value": 0.8863636363636364
+              },
+              "optimal": {
+                "numerator": 1178,
+                "denominator": 1188,
+                "value": 0.9915824915824916
+              }
+            },
+            "puzzle8": {
+              "tasks": 250,
+              "arrival": 233,
+              "arrival_and_stop": 233,
+              "map_optimal": {
+                "numerator": 5484,
+                "denominator": 6037,
+                "value": 0.9083982110319695
+              },
+              "optimal": {
+                "numerator": 5695,
+                "denominator": 6037,
+                "value": 0.9433493457015074
+              }
+            },
+            "token_swapping": {
+              "tasks": 250,
+              "arrival": 250,
+              "arrival_and_stop": 250,
+              "map_optimal": {
+                "numerator": 3515,
+                "denominator": 3952,
+                "value": 0.8894230769230769
+              },
+              "optimal": {
+                "numerator": 3874,
+                "denominator": 3952,
+                "value": 0.9802631578947368
+              }
+            }
+          }
+        },
+        "150000": {
+          "metrics": {
+            "tasks": 1500,
+            "arrival": 1191,
+            "arrival_and_stop": 1187,
+            "map_optimal": {
+              "numerator": 14455,
+              "denominator": 22987,
+              "value": 0.6288336886066037
+            },
+            "optimal": {
+              "numerator": 17968,
+              "denominator": 23012,
+              "value": 0.7808100121675647
+            }
+          },
+          "by_task": {
+            "blocks": {
+              "tasks": 250,
+              "arrival": 203,
+              "arrival_and_stop": 203,
+              "map_optimal": {
+                "numerator": 856,
+                "denominator": 1996,
+                "value": 0.4288577154308617
+              },
+              "optimal": {
+                "numerator": 1807,
+                "denominator": 2021,
+                "value": 0.8941118258287977
+              }
+            },
+            "cube2": {
+              "tasks": 250,
+              "arrival": 54,
+              "arrival_and_stop": 54,
+              "map_optimal": {
+                "numerator": 1455,
+                "denominator": 5721,
+                "value": 0.254326166754064
+              },
+              "optimal": {
+                "numerator": 3039,
+                "denominator": 5721,
+                "value": 0.5312008390141584
+              }
+            },
+            "path": {
+              "tasks": 250,
+              "arrival": 199,
+              "arrival_and_stop": 195,
+              "map_optimal": {
+                "numerator": 2163,
+                "denominator": 4177,
+                "value": 0.5178357672971032
+              },
+              "optimal": {
+                "numerator": 2411,
+                "denominator": 4177,
+                "value": 0.577208522863299
+              }
+            },
+            "bridge": {
+              "tasks": 250,
+              "arrival": 249,
+              "arrival_and_stop": 249,
+              "map_optimal": {
+                "numerator": 1041,
+                "denominator": 1191,
+                "value": 0.8740554156171285
+              },
+              "optimal": {
+                "numerator": 1181,
+                "denominator": 1191,
+                "value": 0.9916036943744753
+              }
+            },
+            "puzzle8": {
+              "tasks": 250,
+              "arrival": 236,
+              "arrival_and_stop": 236,
+              "map_optimal": {
+                "numerator": 5458,
+                "denominator": 5952,
+                "value": 0.917002688172043
+              },
+              "optimal": {
+                "numerator": 5657,
+                "denominator": 5952,
+                "value": 0.9504368279569892
+              }
+            },
+            "token_swapping": {
+              "tasks": 250,
+              "arrival": 250,
+              "arrival_and_stop": 250,
+              "map_optimal": {
+                "numerator": 3482,
+                "denominator": 3950,
+                "value": 0.8815189873417721
+              },
+              "optimal": {
+                "numerator": 3873,
+                "denominator": 3950,
+                "value": 0.9805063291139241
+              }
+            }
+          }
+        },
+        "200000": {
+          "metrics": {
+            "tasks": 1500,
+            "arrival": 1172,
+            "arrival_and_stop": 1167,
+            "map_optimal": {
+              "numerator": 14409,
+              "denominator": 22982,
+              "value": 0.6269689322078148
+            },
+            "optimal": {
+              "numerator": 17842,
+              "denominator": 23018,
+              "value": 0.77513250499609
+            }
+          },
+          "by_task": {
+            "cube2": {
+              "tasks": 250,
+              "arrival": 51,
+              "arrival_and_stop": 51,
+              "map_optimal": {
+                "numerator": 1446,
+                "denominator": 5846,
+                "value": 0.24734861443722203
+              },
+              "optimal": {
+                "numerator": 3063,
+                "denominator": 5846,
+                "value": 0.523947998631543
+              }
+            },
+            "path": {
+              "tasks": 250,
+              "arrival": 200,
+              "arrival_and_stop": 196,
+              "map_optimal": {
+                "numerator": 2128,
+                "denominator": 4005,
+                "value": 0.5313358302122347
+              },
+              "optimal": {
+                "numerator": 2353,
+                "denominator": 4005,
+                "value": 0.5875156054931335
+              }
+            },
+            "bridge": {
+              "tasks": 250,
+              "arrival": 250,
+              "arrival_and_stop": 249,
+              "map_optimal": {
+                "numerator": 1040,
+                "denominator": 1188,
+                "value": 0.8754208754208754
+              },
+              "optimal": {
+                "numerator": 1179,
+                "denominator": 1188,
+                "value": 0.9924242424242424
+              }
+            },
+            "puzzle8": {
+              "tasks": 250,
+              "arrival": 234,
+              "arrival_and_stop": 234,
+              "map_optimal": {
+                "numerator": 5460,
+                "denominator": 5994,
+                "value": 0.9109109109109109
+              },
+              "optimal": {
+                "numerator": 5660,
+                "denominator": 5994,
+                "value": 0.9442776109442776
+              }
+            },
+            "token_swapping": {
+              "tasks": 250,
+              "arrival": 250,
+              "arrival_and_stop": 250,
+              "map_optimal": {
+                "numerator": 3525,
+                "denominator": 3964,
+                "value": 0.8892532795156408
+              },
+              "optimal": {
+                "numerator": 3880,
+                "denominator": 3964,
+                "value": 0.9788092835519677
+              }
+            },
+            "blocks": {
+              "tasks": 250,
+              "arrival": 187,
+              "arrival_and_stop": 187,
+              "map_optimal": {
+                "numerator": 810,
+                "denominator": 1985,
+                "value": 0.4080604534005038
+              },
+              "optimal": {
+                "numerator": 1707,
+                "denominator": 2021,
+                "value": 0.8446313706086096
+              }
+            }
+          }
+        },
+        "237500": {
+          "metrics": {
+            "tasks": 1500,
+            "arrival": 1202,
+            "arrival_and_stop": 1196,
+            "map_optimal": {
+              "numerator": 14510,
+              "denominator": 22662,
+              "value": 0.6402788809460771
+            },
+            "optimal": {
+              "numerator": 17883,
+              "denominator": 22693,
+              "value": 0.7880403648702243
+            }
+          },
+          "by_task": {
+            "blocks": {
+              "tasks": 250,
+              "arrival": 198,
+              "arrival_and_stop": 198,
+              "map_optimal": {
+                "numerator": 863,
+                "denominator": 2001,
+                "value": 0.4312843578210895
+              },
+              "optimal": {
+                "numerator": 1762,
+                "denominator": 2032,
+                "value": 0.8671259842519685
+              }
+            },
+            "cube2": {
+              "tasks": 250,
+              "arrival": 63,
+              "arrival_and_stop": 63,
+              "map_optimal": {
+                "numerator": 1515,
+                "denominator": 5663,
+                "value": 0.26752604626523047
+              },
+              "optimal": {
+                "numerator": 3063,
+                "denominator": 5663,
+                "value": 0.5408793925481193
+              }
+            },
+            "path": {
+              "tasks": 250,
+              "arrival": 207,
+              "arrival_and_stop": 201,
+              "map_optimal": {
+                "numerator": 2098,
+                "denominator": 3862,
+                "value": 0.5432418436043501
+              },
+              "optimal": {
+                "numerator": 2331,
+                "denominator": 3862,
+                "value": 0.6035732780942517
+              }
+            },
+            "bridge": {
+              "tasks": 250,
+              "arrival": 250,
+              "arrival_and_stop": 250,
+              "map_optimal": {
+                "numerator": 1053,
+                "denominator": 1186,
+                "value": 0.887858347386172
+              },
+              "optimal": {
+                "numerator": 1182,
+                "denominator": 1186,
+                "value": 0.9966273187183811
+              }
+            },
+            "puzzle8": {
+              "tasks": 250,
+              "arrival": 234,
+              "arrival_and_stop": 234,
+              "map_optimal": {
+                "numerator": 5480,
+                "denominator": 6000,
+                "value": 0.9133333333333333
+              },
+              "optimal": {
+                "numerator": 5672,
+                "denominator": 6000,
+                "value": 0.9453333333333334
+              }
+            },
+            "token_swapping": {
+              "tasks": 250,
+              "arrival": 250,
+              "arrival_and_stop": 250,
+              "map_optimal": {
+                "numerator": 3501,
+                "denominator": 3950,
+                "value": 0.8863291139240507
+              },
+              "optimal": {
+                "numerator": 3873,
+                "denominator": 3950,
+                "value": 0.9805063291139241
+              }
+            }
+          }
+        },
+        "250000": {
+          "metrics": {
+            "tasks": 1500,
+            "arrival": 1192,
+            "arrival_and_stop": 1188,
+            "map_optimal": {
+              "numerator": 14451,
+              "denominator": 22654,
+              "value": 0.6379005915070186
+            },
+            "optimal": {
+              "numerator": 17786,
+              "denominator": 22685,
+              "value": 0.7840423187128058
+            }
+          },
+          "by_task": {
+            "blocks": {
+              "tasks": 250,
+              "arrival": 197,
+              "arrival_and_stop": 196,
+              "map_optimal": {
+                "numerator": 834,
+                "denominator": 1996,
+                "value": 0.41783567134268534
+              },
+              "optimal": {
+                "numerator": 1762,
+                "denominator": 2027,
+                "value": 0.8692649235323138
+              }
+            },
+            "cube2": {
+              "tasks": 250,
+              "arrival": 52,
+              "arrival_and_stop": 52,
+              "map_optimal": {
+                "numerator": 1492,
+                "denominator": 5741,
+                "value": 0.25988503744992164
+              },
+              "optimal": {
+                "numerator": 3010,
+                "denominator": 5741,
+                "value": 0.5242989026302038
+              }
+            },
+            "path": {
+              "tasks": 250,
+              "arrival": 210,
+              "arrival_and_stop": 207,
+              "map_optimal": {
+                "numerator": 2104,
+                "denominator": 3791,
+                "value": 0.5549986810867845
+              },
+              "optimal": {
+                "numerator": 2312,
+                "denominator": 3791,
+                "value": 0.6098654708520179
+              }
+            },
+            "bridge": {
+              "tasks": 250,
+              "arrival": 250,
+              "arrival_and_stop": 250,
+              "map_optimal": {
+                "numerator": 1058,
+                "denominator": 1186,
+                "value": 0.8920741989881956
+              },
+              "optimal": {
+                "numerator": 1181,
+                "denominator": 1186,
+                "value": 0.9957841483979764
+              }
+            },
+            "puzzle8": {
+              "tasks": 250,
+              "arrival": 233,
+              "arrival_and_stop": 233,
+              "map_optimal": {
+                "numerator": 5446,
+                "denominator": 5986,
+                "value": 0.9097895088539927
+              },
+              "optimal": {
+                "numerator": 5646,
+                "denominator": 5986,
+                "value": 0.9432008018710324
+              }
+            },
+            "token_swapping": {
+              "tasks": 250,
+              "arrival": 250,
+              "arrival_and_stop": 250,
+              "map_optimal": {
+                "numerator": 3517,
+                "denominator": 3954,
+                "value": 0.8894790085988872
+              },
+              "optimal": {
+                "numerator": 3875,
+                "denominator": 3954,
+                "value": 0.9800202326757713
+              }
+            }
+          }
+        }
+      },
+      "best_id_by_task": {
+        "blocks": {
+          "tasks": 250,
+          "arrival": 198,
+          "arrival_and_stop": 198,
+          "map_optimal": {
+            "numerator": 863,
+            "denominator": 2001,
+            "value": 0.4312843578210895
+          },
+          "optimal": {
+            "numerator": 1762,
+            "denominator": 2032,
+            "value": 0.8671259842519685
+          }
+        },
+        "cube2": {
+          "tasks": 250,
+          "arrival": 63,
+          "arrival_and_stop": 63,
+          "map_optimal": {
+            "numerator": 1515,
+            "denominator": 5663,
+            "value": 0.26752604626523047
+          },
+          "optimal": {
+            "numerator": 3063,
+            "denominator": 5663,
+            "value": 0.5408793925481193
+          }
+        },
+        "path": {
+          "tasks": 250,
+          "arrival": 207,
+          "arrival_and_stop": 201,
+          "map_optimal": {
+            "numerator": 2098,
+            "denominator": 3862,
+            "value": 0.5432418436043501
+          },
+          "optimal": {
+            "numerator": 2331,
+            "denominator": 3862,
+            "value": 0.6035732780942517
+          }
+        },
+        "bridge": {
+          "tasks": 250,
+          "arrival": 250,
+          "arrival_and_stop": 250,
+          "map_optimal": {
+            "numerator": 1053,
+            "denominator": 1186,
+            "value": 0.887858347386172
+          },
+          "optimal": {
+            "numerator": 1182,
+            "denominator": 1186,
+            "value": 0.9966273187183811
+          }
+        },
+        "puzzle8": {
+          "tasks": 250,
+          "arrival": 234,
+          "arrival_and_stop": 234,
+          "map_optimal": {
+            "numerator": 5480,
+            "denominator": 6000,
+            "value": 0.9133333333333333
+          },
+          "optimal": {
+            "numerator": 5672,
+            "denominator": 6000,
+            "value": 0.9453333333333334
+          }
+        },
+        "token_swapping": {
+          "tasks": 250,
+          "arrival": 250,
+          "arrival_and_stop": 250,
+          "map_optimal": {
+            "numerator": 3501,
+            "denominator": 3950,
+            "value": 0.8863291139240507
+          },
+          "optimal": {
+            "numerator": 3873,
+            "denominator": 3950,
+            "value": 0.9805063291139241
+          }
+        }
+      },
+      "best_per_task": {
+        "blocks": {
+          "step": 137500,
+          "tasks": 250,
+          "arrival": 205,
+          "arrival_and_stop": 204,
+          "map_optimal": {
+            "numerator": 871,
+            "denominator": 2010,
+            "value": 0.43333333333333335
+          },
+          "optimal": {
+            "numerator": 1809,
+            "denominator": 2032,
+            "value": 0.890255905511811
+          }
+        },
+        "bridge": {
+          "step": 100000,
+          "tasks": 250,
+          "arrival": 250,
+          "arrival_and_stop": 250,
+          "map_optimal": {
+            "numerator": 1053,
+            "denominator": 1188,
+            "value": 0.8863636363636364
+          },
+          "optimal": {
+            "numerator": 1178,
+            "denominator": 1188,
+            "value": 0.9915824915824916
+          }
+        },
+        "cube2": {
+          "step": 237500,
+          "tasks": 250,
+          "arrival": 63,
+          "arrival_and_stop": 63,
+          "map_optimal": {
+            "numerator": 1515,
+            "denominator": 5663,
+            "value": 0.26752604626523047
+          },
+          "optimal": {
+            "numerator": 3063,
+            "denominator": 5663,
+            "value": 0.5408793925481193
+          }
+        },
+        "path": {
+          "step": 250000,
+          "tasks": 250,
+          "arrival": 210,
+          "arrival_and_stop": 207,
+          "map_optimal": {
+            "numerator": 2104,
+            "denominator": 3791,
+            "value": 0.5549986810867845
+          },
+          "optimal": {
+            "numerator": 2312,
+            "denominator": 3791,
+            "value": 0.6098654708520179
+          }
+        },
+        "puzzle8": {
+          "step": 150000,
+          "tasks": 250,
+          "arrival": 236,
+          "arrival_and_stop": 236,
+          "map_optimal": {
+            "numerator": 5458,
+            "denominator": 5952,
+            "value": 0.917002688172043
+          },
+          "optimal": {
+            "numerator": 5657,
+            "denominator": 5952,
+            "value": 0.9504368279569892
+          }
+        },
+        "token_swapping": {
+          "step": 100000,
+          "tasks": 250,
+          "arrival": 250,
+          "arrival_and_stop": 250,
+          "map_optimal": {
+            "numerator": 3515,
+            "denominator": 3952,
+            "value": 0.8894230769230769
+          },
+          "optimal": {
+            "numerator": 3874,
+            "denominator": 3952,
+            "value": 0.9802631578947368
+          }
+        }
+      },
+      "task_curves": {
+        "blocks": {
+          "12500": {
+            "tasks": 250,
+            "arrival": 4,
+            "arrival_and_stop": 3,
+            "map_optimal": {
+              "numerator": 355,
+              "denominator": 2014,
+              "value": 0.176266137040715
+            },
+            "optimal": {
+              "numerator": 401,
+              "denominator": 2168,
+              "value": 0.1849630996309963
+            }
+          },
+          "25000": {
+            "tasks": 250,
+            "arrival": 15,
+            "arrival_and_stop": 13,
+            "map_optimal": {
+              "numerator": 425,
+              "denominator": 2000,
+              "value": 0.2125
+            },
+            "optimal": {
+              "numerator": 597,
+              "denominator": 2157,
+              "value": 0.2767732962447844
+            }
+          },
+          "37500": {
+            "tasks": 250,
+            "arrival": 56,
+            "arrival_and_stop": 56,
+            "map_optimal": {
+              "numerator": 519,
+              "denominator": 2042,
+              "value": 0.2541625857002938
+            },
+            "optimal": {
+              "numerator": 1001,
+              "denominator": 2157,
+              "value": 0.46407046824292997
+            }
+          },
+          "50000": {
+            "tasks": 250,
+            "arrival": 79,
+            "arrival_and_stop": 79,
+            "map_optimal": {
+              "numerator": 527,
+              "denominator": 1973,
+              "value": 0.26710593005575267
+            },
+            "optimal": {
+              "numerator": 1213,
+              "denominator": 2086,
+              "value": 0.5814956855225312
+            }
+          },
+          "87500": {
+            "tasks": 250,
+            "arrival": 173,
+            "arrival_and_stop": 172,
+            "map_optimal": {
+              "numerator": 814,
+              "denominator": 2000,
+              "value": 0.407
+            },
+            "optimal": {
+              "numerator": 1656,
+              "denominator": 2040,
+              "value": 0.8117647058823529
+            }
+          },
+          "100000": {
+            "tasks": 250,
+            "arrival": 190,
+            "arrival_and_stop": 189,
+            "map_optimal": {
+              "numerator": 805,
+              "denominator": 2016,
+              "value": 0.3993055555555556
+            },
+            "optimal": {
+              "numerator": 1763,
+              "denominator": 2047,
+              "value": 0.8612603810454323
+            }
+          },
+          "125000": {
+            "tasks": 250,
+            "arrival": 193,
+            "arrival_and_stop": 193,
+            "map_optimal": {
+              "numerator": 826,
+              "denominator": 2000,
+              "value": 0.413
+            },
+            "optimal": {
+              "numerator": 1767,
+              "denominator": 2028,
+              "value": 0.871301775147929
+            }
+          },
+          "137500": {
+            "tasks": 250,
+            "arrival": 205,
+            "arrival_and_stop": 204,
+            "map_optimal": {
+              "numerator": 871,
+              "denominator": 2010,
+              "value": 0.43333333333333335
+            },
+            "optimal": {
+              "numerator": 1809,
+              "denominator": 2032,
+              "value": 0.890255905511811
+            }
+          },
+          "150000": {
+            "tasks": 250,
+            "arrival": 203,
+            "arrival_and_stop": 203,
+            "map_optimal": {
+              "numerator": 856,
+              "denominator": 1996,
+              "value": 0.4288577154308617
+            },
+            "optimal": {
+              "numerator": 1807,
+              "denominator": 2021,
+              "value": 0.8941118258287977
+            }
+          },
+          "187500": {
+            "tasks": 250,
+            "arrival": 190,
+            "arrival_and_stop": 190,
+            "map_optimal": {
+              "numerator": 883,
+              "denominator": 2002,
+              "value": 0.44105894105894106
+            },
+            "optimal": {
+              "numerator": 1751,
+              "denominator": 2035,
+              "value": 0.8604422604422605
+            }
+          },
+          "200000": {
+            "tasks": 250,
+            "arrival": 187,
+            "arrival_and_stop": 187,
+            "map_optimal": {
+              "numerator": 810,
+              "denominator": 1985,
+              "value": 0.4080604534005038
+            },
+            "optimal": {
+              "numerator": 1707,
+              "denominator": 2021,
+              "value": 0.8446313706086096
+            }
+          },
+          "237500": {
+            "tasks": 250,
+            "arrival": 198,
+            "arrival_and_stop": 198,
+            "map_optimal": {
+              "numerator": 863,
+              "denominator": 2001,
+              "value": 0.4312843578210895
+            },
+            "optimal": {
+              "numerator": 1762,
+              "denominator": 2032,
+              "value": 0.8671259842519685
+            }
+          },
+          "250000": {
+            "tasks": 250,
+            "arrival": 197,
+            "arrival_and_stop": 196,
+            "map_optimal": {
+              "numerator": 834,
+              "denominator": 1996,
+              "value": 0.41783567134268534
+            },
+            "optimal": {
+              "numerator": 1762,
+              "denominator": 2027,
+              "value": 0.8692649235323138
+            }
+          }
+        },
+        "bridge": {
+          "50000": {
+            "tasks": 250,
+            "arrival": 247,
+            "arrival_and_stop": 247,
+            "map_optimal": {
+              "numerator": 999,
+              "denominator": 1197,
+              "value": 0.8345864661654135
+            },
+            "optimal": {
+              "numerator": 1175,
+              "denominator": 1197,
+              "value": 0.9816207184628237
+            }
+          },
+          "100000": {
+            "tasks": 250,
+            "arrival": 250,
+            "arrival_and_stop": 250,
+            "map_optimal": {
+              "numerator": 1053,
+              "denominator": 1188,
+              "value": 0.8863636363636364
+            },
+            "optimal": {
+              "numerator": 1178,
+              "denominator": 1188,
+              "value": 0.9915824915824916
+            }
+          },
+          "150000": {
+            "tasks": 250,
+            "arrival": 249,
+            "arrival_and_stop": 249,
+            "map_optimal": {
+              "numerator": 1041,
+              "denominator": 1191,
+              "value": 0.8740554156171285
+            },
+            "optimal": {
+              "numerator": 1181,
+              "denominator": 1191,
+              "value": 0.9916036943744753
+            }
+          },
+          "200000": {
+            "tasks": 250,
+            "arrival": 250,
+            "arrival_and_stop": 249,
+            "map_optimal": {
+              "numerator": 1040,
+              "denominator": 1188,
+              "value": 0.8754208754208754
+            },
+            "optimal": {
+              "numerator": 1179,
+              "denominator": 1188,
+              "value": 0.9924242424242424
+            }
+          },
+          "237500": {
+            "tasks": 250,
+            "arrival": 250,
+            "arrival_and_stop": 250,
+            "map_optimal": {
+              "numerator": 1053,
+              "denominator": 1186,
+              "value": 0.887858347386172
+            },
+            "optimal": {
+              "numerator": 1182,
+              "denominator": 1186,
+              "value": 0.9966273187183811
+            }
+          },
+          "250000": {
+            "tasks": 250,
+            "arrival": 250,
+            "arrival_and_stop": 250,
+            "map_optimal": {
+              "numerator": 1058,
+              "denominator": 1186,
+              "value": 0.8920741989881956
+            },
+            "optimal": {
+              "numerator": 1181,
+              "denominator": 1186,
+              "value": 0.9957841483979764
+            }
+          }
+        },
+        "cube2": {
+          "12500": {
+            "tasks": 250,
+            "arrival": 2,
+            "arrival_and_stop": 2,
+            "map_optimal": {
+              "numerator": 1288,
+              "denominator": 7057,
+              "value": 0.1825138160691512
+            },
+            "optimal": {
+              "numerator": 3515,
+              "denominator": 7057,
+              "value": 0.4980870058098342
+            }
+          },
+          "25000": {
+            "tasks": 250,
+            "arrival": 4,
+            "arrival_and_stop": 4,
+            "map_optimal": {
+              "numerator": 1265,
+              "denominator": 6741,
+              "value": 0.1876576175641596
+            },
+            "optimal": {
+              "numerator": 3337,
+              "denominator": 6741,
+              "value": 0.4950304109182614
+            }
+          },
+          "37500": {
+            "tasks": 250,
+            "arrival": 18,
+            "arrival_and_stop": 18,
+            "map_optimal": {
+              "numerator": 1210,
+              "denominator": 6049,
+              "value": 0.20003306331625062
+            },
+            "optimal": {
+              "numerator": 3024,
+              "denominator": 6049,
+              "value": 0.49991734170937346
+            }
+          },
+          "50000": {
+            "tasks": 250,
+            "arrival": 23,
+            "arrival_and_stop": 23,
+            "map_optimal": {
+              "numerator": 1300,
+              "denominator": 6226,
+              "value": 0.20880179890780598
+            },
+            "optimal": {
+              "numerator": 3151,
+              "denominator": 6226,
+              "value": 0.5061034371988435
+            }
+          },
+          "87500": {
+            "tasks": 250,
+            "arrival": 36,
+            "arrival_and_stop": 36,
+            "map_optimal": {
+              "numerator": 1334,
+              "denominator": 5872,
+              "value": 0.2271798365122616
+            },
+            "optimal": {
+              "numerator": 2987,
+              "denominator": 5872,
+              "value": 0.5086852861035422
+            }
+          },
+          "100000": {
+            "tasks": 250,
+            "arrival": 29,
+            "arrival_and_stop": 29,
+            "map_optimal": {
+              "numerator": 1282,
+              "denominator": 5811,
+              "value": 0.22061607296506625
+            },
+            "optimal": {
+              "numerator": 2909,
+              "denominator": 5811,
+              "value": 0.5006023059714335
+            }
+          },
+          "137500": {
+            "tasks": 250,
+            "arrival": 46,
+            "arrival_and_stop": 46,
+            "map_optimal": {
+              "numerator": 1357,
+              "denominator": 5498,
+              "value": 0.24681702437249908
+            },
+            "optimal": {
+              "numerator": 2867,
+              "denominator": 5498,
+              "value": 0.5214623499454347
+            }
+          },
+          "150000": {
+            "tasks": 250,
+            "arrival": 54,
+            "arrival_and_stop": 54,
+            "map_optimal": {
+              "numerator": 1455,
+              "denominator": 5721,
+              "value": 0.254326166754064
+            },
+            "optimal": {
+              "numerator": 3039,
+              "denominator": 5721,
+              "value": 0.5312008390141584
+            }
+          },
+          "187500": {
+            "tasks": 250,
+            "arrival": 53,
+            "arrival_and_stop": 53,
+            "map_optimal": {
+              "numerator": 1446,
+              "denominator": 5707,
+              "value": 0.25337305063956544
+            },
+            "optimal": {
+              "numerator": 3025,
+              "denominator": 5707,
+              "value": 0.5300508147888557
+            }
+          },
+          "200000": {
+            "tasks": 250,
+            "arrival": 51,
+            "arrival_and_stop": 51,
+            "map_optimal": {
+              "numerator": 1446,
+              "denominator": 5846,
+              "value": 0.24734861443722203
+            },
+            "optimal": {
+              "numerator": 3063,
+              "denominator": 5846,
+              "value": 0.523947998631543
+            }
+          },
+          "237500": {
+            "tasks": 250,
+            "arrival": 63,
+            "arrival_and_stop": 63,
+            "map_optimal": {
+              "numerator": 1515,
+              "denominator": 5663,
+              "value": 0.26752604626523047
+            },
+            "optimal": {
+              "numerator": 3063,
+              "denominator": 5663,
+              "value": 0.5408793925481193
+            }
+          },
+          "250000": {
+            "tasks": 250,
+            "arrival": 52,
+            "arrival_and_stop": 52,
+            "map_optimal": {
+              "numerator": 1492,
+              "denominator": 5741,
+              "value": 0.25988503744992164
+            },
+            "optimal": {
+              "numerator": 3010,
+              "denominator": 5741,
+              "value": 0.5242989026302038
+            }
+          }
+        },
+        "path": {
+          "50000": {
+            "tasks": 250,
+            "arrival": 50,
+            "arrival_and_stop": 49,
+            "map_optimal": {
+              "numerator": 2457,
+              "denominator": 7000,
+              "value": 0.351
+            },
+            "optimal": {
+              "numerator": 3037,
+              "denominator": 7000,
+              "value": 0.43385714285714283
+            }
+          },
+          "100000": {
+            "tasks": 250,
+            "arrival": 181,
+            "arrival_and_stop": 180,
+            "map_optimal": {
+              "numerator": 2180,
+              "denominator": 4509,
+              "value": 0.48347748946551344
+            },
+            "optimal": {
+              "numerator": 2505,
+              "denominator": 4509,
+              "value": 0.5555555555555556
+            }
+          },
+          "137500": {
+            "tasks": 250,
+            "arrival": 205,
+            "arrival_and_stop": 204,
+            "map_optimal": {
+              "numerator": 2133,
+              "denominator": 3996,
+              "value": 0.5337837837837838
+            },
+            "optimal": {
+              "numerator": 2385,
+              "denominator": 3996,
+              "value": 0.5968468468468469
+            }
+          },
+          "150000": {
+            "tasks": 250,
+            "arrival": 199,
+            "arrival_and_stop": 195,
+            "map_optimal": {
+              "numerator": 2163,
+              "denominator": 4177,
+              "value": 0.5178357672971032
+            },
+            "optimal": {
+              "numerator": 2411,
+              "denominator": 4177,
+              "value": 0.577208522863299
+            }
+          },
+          "187500": {
+            "tasks": 250,
+            "arrival": 201,
+            "arrival_and_stop": 194,
+            "map_optimal": {
+              "numerator": 2118,
+              "denominator": 3951,
+              "value": 0.5360668185269551
+            },
+            "optimal": {
+              "numerator": 2333,
+              "denominator": 3951,
+              "value": 0.5904834219185017
+            }
+          },
+          "200000": {
+            "tasks": 250,
+            "arrival": 200,
+            "arrival_and_stop": 196,
+            "map_optimal": {
+              "numerator": 2128,
+              "denominator": 4005,
+              "value": 0.5313358302122347
+            },
+            "optimal": {
+              "numerator": 2353,
+              "denominator": 4005,
+              "value": 0.5875156054931335
+            }
+          },
+          "237500": {
+            "tasks": 250,
+            "arrival": 207,
+            "arrival_and_stop": 201,
+            "map_optimal": {
+              "numerator": 2098,
+              "denominator": 3862,
+              "value": 0.5432418436043501
+            },
+            "optimal": {
+              "numerator": 2331,
+              "denominator": 3862,
+              "value": 0.6035732780942517
+            }
+          },
+          "250000": {
+            "tasks": 250,
+            "arrival": 210,
+            "arrival_and_stop": 207,
+            "map_optimal": {
+              "numerator": 2104,
+              "denominator": 3791,
+              "value": 0.5549986810867845
+            },
+            "optimal": {
+              "numerator": 2312,
+              "denominator": 3791,
+              "value": 0.6098654708520179
+            }
+          }
+        },
+        "puzzle8": {
+          "50000": {
+            "tasks": 250,
+            "arrival": 217,
+            "arrival_and_stop": 216,
+            "map_optimal": {
+              "numerator": 5463,
+              "denominator": 6244,
+              "value": 0.8749199231262011
+            },
+            "optimal": {
+              "numerator": 5749,
+              "denominator": 6244,
+              "value": 0.9207238949391415
+            }
+          },
+          "100000": {
+            "tasks": 250,
+            "arrival": 233,
+            "arrival_and_stop": 233,
+            "map_optimal": {
+              "numerator": 5484,
+              "denominator": 6037,
+              "value": 0.9083982110319695
+            },
+            "optimal": {
+              "numerator": 5695,
+              "denominator": 6037,
+              "value": 0.9433493457015074
+            }
+          },
+          "150000": {
+            "tasks": 250,
+            "arrival": 236,
+            "arrival_and_stop": 236,
+            "map_optimal": {
+              "numerator": 5458,
+              "denominator": 5952,
+              "value": 0.917002688172043
+            },
+            "optimal": {
+              "numerator": 5657,
+              "denominator": 5952,
+              "value": 0.9504368279569892
+            }
+          },
+          "200000": {
+            "tasks": 250,
+            "arrival": 234,
+            "arrival_and_stop": 234,
+            "map_optimal": {
+              "numerator": 5460,
+              "denominator": 5994,
+              "value": 0.9109109109109109
+            },
+            "optimal": {
+              "numerator": 5660,
+              "denominator": 5994,
+              "value": 0.9442776109442776
+            }
+          },
+          "237500": {
+            "tasks": 250,
+            "arrival": 234,
+            "arrival_and_stop": 234,
+            "map_optimal": {
+              "numerator": 5480,
+              "denominator": 6000,
+              "value": 0.9133333333333333
+            },
+            "optimal": {
+              "numerator": 5672,
+              "denominator": 6000,
+              "value": 0.9453333333333334
+            }
+          },
+          "250000": {
+            "tasks": 250,
+            "arrival": 233,
+            "arrival_and_stop": 233,
+            "map_optimal": {
+              "numerator": 5446,
+              "denominator": 5986,
+              "value": 0.9097895088539927
+            },
+            "optimal": {
+              "numerator": 5646,
+              "denominator": 5986,
+              "value": 0.9432008018710324
+            }
+          }
+        },
+        "token_swapping": {
+          "50000": {
+            "tasks": 250,
+            "arrival": 250,
+            "arrival_and_stop": 237,
+            "map_optimal": {
+              "numerator": 3471,
+              "denominator": 3974,
+              "value": 0.873427277302466
+            },
+            "optimal": {
+              "numerator": 3885,
+              "denominator": 3974,
+              "value": 0.9776044287871163
+            }
+          },
+          "100000": {
+            "tasks": 250,
+            "arrival": 250,
+            "arrival_and_stop": 250,
+            "map_optimal": {
+              "numerator": 3515,
+              "denominator": 3952,
+              "value": 0.8894230769230769
+            },
+            "optimal": {
+              "numerator": 3874,
+              "denominator": 3952,
+              "value": 0.9802631578947368
+            }
+          },
+          "150000": {
+            "tasks": 250,
+            "arrival": 250,
+            "arrival_and_stop": 250,
+            "map_optimal": {
+              "numerator": 3482,
+              "denominator": 3950,
+              "value": 0.8815189873417721
+            },
+            "optimal": {
+              "numerator": 3873,
+              "denominator": 3950,
+              "value": 0.9805063291139241
+            }
+          },
+          "200000": {
+            "tasks": 250,
+            "arrival": 250,
+            "arrival_and_stop": 250,
+            "map_optimal": {
+              "numerator": 3525,
+              "denominator": 3964,
+              "value": 0.8892532795156408
+            },
+            "optimal": {
+              "numerator": 3880,
+              "denominator": 3964,
+              "value": 0.9788092835519677
+            }
+          },
+          "237500": {
+            "tasks": 250,
+            "arrival": 250,
+            "arrival_and_stop": 250,
+            "map_optimal": {
+              "numerator": 3501,
+              "denominator": 3950,
+              "value": 0.8863291139240507
+            },
+            "optimal": {
+              "numerator": 3873,
+              "denominator": 3950,
+              "value": 0.9805063291139241
+            }
+          },
+          "250000": {
+            "tasks": 250,
+            "arrival": 250,
+            "arrival_and_stop": 250,
+            "map_optimal": {
+              "numerator": 3517,
+              "denominator": 3954,
+              "value": 0.8894790085988872
+            },
+            "optimal": {
+              "numerator": 3875,
+              "denominator": 3954,
+              "value": 0.9800202326757713
+            }
+          }
+        }
       }
     }
   },
@@ -3933,9 +8194,8 @@
   },
   "failure_classification": "Mutually exclusive priority: completed, arrival_without_stop, output_error, premature_done, executed_unreachable_transition, repeated_state_and_budget, remaining_budget_or_no_successor. Last scored but unexecuted budget action excluded from unreachable detection.",
   "notes": [
-    "读表：完成数单元格为“到达 / 到达且正确停止（题数）”；跟图率为动作选择地图最小预测剩余成本候选的比例（过桥加入即时耗时，并列最小均算跟图），按原评测的可评分非终止决策统计。4类训练积木、魔方、寻路、过桥；5类加8-Puzzle；6类加棋子交换。最佳点按已完成ID到达数选择，OOD统一用250K终点。终点RO每组2000题已齐，历史ID与部分TF仍在补评。",
-    "覆盖：三组各有5万个不同起终点查询，每条都有终点停止示范；训练小类实际为8／9／11个。均分轨迹没有均分决策量：5类中华容道占动作示范43.6%，6类中为34.9%，棋子交换占19.9%。魔方训练路线12–14步、华容道24–30步，目标均为复原；寻路只见一张底图，棋子交换只见原树。扩类同时减少了每类样本，6类魔方的跟图率也从5类92.0%降至27.1%。",
-    "失败集中在三处：①目标停止沿用旧规则——4／5类魔方小OOD有107／114题在旧复原态停止，5／6类华容道有121／108题如此；积木小OOD提前停止124／125／106题。②新类别输出与动作映射失效——4／5类移车250题全部输出格式错误，6类改为主要循环；算术主要生成超出候选范围的动作。③新地图读取弱——新树地图贪心125/125，6类LLM跟图率8.1%、完成0/125。旧图换目标本身也弱：魔方0/125、华容道21/125。后继重点是换目标停止、新地图特征读取和候选动作对应。",
-    "核对于2026-10-29。表内来自028／4090的runs/flan_generalization_6f2af92，完成分片已按题去重，汇总与答卷一致；覆盖来自同名data目录的dataset.json及acceptance.json。本轮使用旧冻结地图；新地图比较见Qmap优化结果子页。详细计数与来源保存在experiments/map_sft_baselines/results/flan_generalization_results.json。"
+    "完成率为到达且正确停止，跟图率使用原评测map_optimal口径。首表各任务独立选择ID正确完成数最高的已评点，同分取较早点，跟图率来自同一点。",
+    "Curves are strictly task-specific: every plotted checkpoint must contain the complete250-case ID set for that task; other tasks may still be incomplete at that checkpoint.",
+    "原始RO分片以跨节点相同名称去重，区间连续覆盖全题集；6类237500步另核对1500条答卷，1202到达、1196正确完成且无重复。"
   ]
 }

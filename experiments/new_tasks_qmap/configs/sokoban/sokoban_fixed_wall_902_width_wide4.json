@@ -44,7 +44,7 @@
     "metric": "directed_max"
   },
   "training": {
-    "steps": 12000,
+    "steps": 32000,
     "batch_size": 32768,
     "decision_batch_size": 8192,
     "learning_rate": 3e-05,
@@ -105,7 +105,8 @@
         80,
         128
       ],
-      "layouts_per_batch": 1
+      "layouts_per_batch": 1,
+      "include_failed_nonoptimal": true
     }
   },
   "relations": {
@@ -131,9 +132,9 @@
   "hypothesis": "Preserve the complete fixed-wall400-input128D directed-max MLP and Adam,532complete training goals,wide/point/ranking/transition supervision and original relation traversal. Add256current walking-cycle and irreversible-dead-branch decisions perbatch,each with its parent and every legal successor. Half of each supplemental quota traverses its entire pool; the other half balances distance strata. Refresh from every permitted training decision every2000updates. Continue10000updates after the full2000checkpoint, and inspect full training execution and held complete goals separately.",
   "acceptance": "experiments/new_tasks_qmap/configs/sokoban/sokoban_fixed_wall_acceptance.json",
   "continuation": {
-    "checkpoint": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/followup_5d41460/sokoban_fixed_wall_902_width_wide4/last.pt",
-    "reason": "Continue complete Q,Adam,source/ranking traversal and RNG for10000additionalupdates. Add256current fixed-wall cycle/dead contexts perbatch,complete legal successors and a shuffled coverage half-quota; refresh every2000updates over all permitted training decisions.",
-    "source_cuda_device": 3,
-    "mode": "current_failure_replay"
+    "checkpoint": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/sokoban_targeted_20261028/sokoban_fixed_wall_902_width_wide4/last.pt",
+    "reason": "Continue the complete 12000-step model, Adam, sampling progress and RNG for 20000 updates. Expand the existing 256-context failure stream with upstream nonoptimal actions whose policy fails. Retain broad relations, exhaustive ranking traversal, walking-cycle and irreversible-dead branches, parent labels and every legal successor.",
+    "source_cuda_device": 0,
+    "mode": "sokoban_failed_branches"
   }
 }

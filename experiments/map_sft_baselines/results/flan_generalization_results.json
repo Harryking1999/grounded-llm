@@ -1,0 +1,3941 @@
+{
+  "study": "flan_generalization_4_5_6_50k",
+  "observed_utc": "2026-10-28T21:30:27.823765+00:00",
+  "source_run": "runs/flan_generalization_6f2af92",
+  "best_selection": "Maximum arrival over complete ID RO only; incomplete checkpoints excluded; OOD fixed at250000",
+  "raw_verification": "Completed shards only; no duplicate task/trajectory_id within complete sets; counts match shard summaries",
+  "cohorts": {
+    "4": {
+      "training_end_step": 250000,
+      "best_completed_id_step": 150000,
+      "complete_id_points": {
+        "50000": {
+          "tasks": 1000,
+          "arrival": 655,
+          "arrival_and_stop": 654
+        },
+        "100000": {
+          "tasks": 1000,
+          "arrival": 900,
+          "arrival_and_stop": 885
+        },
+        "150000": {
+          "tasks": 1000,
+          "arrival": 924,
+          "arrival_and_stop": 912
+        },
+        "200000": {
+          "tasks": 1000,
+          "arrival": 912,
+          "arrival_and_stop": 894
+        },
+        "237500": {
+          "tasks": 1000,
+          "arrival": 917,
+          "arrival_and_stop": 902
+        },
+        "250000": {
+          "tasks": 1000,
+          "arrival": 909,
+          "arrival_and_stop": 896
+        }
+      },
+      "incomplete_id_points": {
+        "12500": {
+          "tasks": 320,
+          "arrival": 12,
+          "arrival_and_stop": 12
+        },
+        "25000": {
+          "tasks": 544,
+          "arrival": 105,
+          "arrival_and_stop": 104
+        },
+        "37500": {
+          "tasks": 608,
+          "arrival": 234,
+          "arrival_and_stop": 223
+        },
+        "75000": {
+          "tasks": 32,
+          "arrival": 22,
+          "arrival_and_stop": 22
+        },
+        "87500": {
+          "tasks": 736,
+          "arrival": 480,
+          "arrival_and_stop": 446
+        },
+        "125000": {
+          "tasks": 192,
+          "arrival": 156,
+          "arrival_and_stop": 156
+        },
+        "137500": {
+          "tasks": 768,
+          "arrival": 677,
+          "arrival_and_stop": 664
+        },
+        "175000": {
+          "tasks": 288,
+          "arrival": 231,
+          "arrival_and_stop": 231
+        },
+        "187500": {
+          "tasks": 480,
+          "arrival": 401,
+          "arrival_and_stop": 400
+        },
+        "225000": {
+          "tasks": 704,
+          "arrival": 624,
+          "arrival_and_stop": 612
+        }
+      },
+      "best_id_by_subclass": [
+        {
+          "cohort": "id",
+          "task": "blocks",
+          "variant": "clear12",
+          "tasks": 83,
+          "arrival": 77,
+          "arrival_and_stop": 77
+        },
+        {
+          "cohort": "id",
+          "task": "blocks",
+          "variant": "clear8",
+          "tasks": 84,
+          "arrival": 84,
+          "arrival_and_stop": 84
+        },
+        {
+          "cohort": "id",
+          "task": "blocks",
+          "variant": "partial8",
+          "tasks": 83,
+          "arrival": 47,
+          "arrival_and_stop": 46
+        },
+        {
+          "cohort": "id",
+          "task": "bridge",
+          "variant": "five_all_right",
+          "tasks": 88,
+          "arrival": 88,
+          "arrival_and_stop": 88
+        },
+        {
+          "cohort": "id",
+          "task": "bridge",
+          "variant": "five_intermediate_start",
+          "tasks": 79,
+          "arrival": 79,
+          "arrival_and_stop": 79
+        },
+        {
+          "cohort": "id",
+          "task": "bridge",
+          "variant": "five_partial_goal",
+          "tasks": 83,
+          "arrival": 83,
+          "arrival_and_stop": 83
+        },
+        {
+          "cohort": "id",
+          "task": "cube2",
+          "variant": "id",
+          "tasks": 250,
+          "arrival": 216,
+          "arrival_and_stop": 216
+        },
+        {
+          "cohort": "id",
+          "task": "path",
+          "variant": "id",
+          "tasks": 250,
+          "arrival": 250,
+          "arrival_and_stop": 239
+        }
+      ],
+      "final": {
+        "tasks": 2000,
+        "arrival": 509,
+        "arrival_and_stop": 493,
+        "by_subclass": [
+          {
+            "cohort": "big_ood",
+            "task": "game24",
+            "variant": "2_to21_big_ood",
+            "tasks": 25,
+            "arrival": 1,
+            "arrival_and_stop": 0
+          },
+          {
+            "cohort": "big_ood",
+            "task": "game24",
+            "variant": "2_to24_big_ood",
+            "tasks": 25,
+            "arrival": 1,
+            "arrival_and_stop": 0
+          },
+          {
+            "cohort": "big_ood",
+            "task": "game24",
+            "variant": "3_to21_big_ood",
+            "tasks": 50,
+            "arrival": 0,
+            "arrival_and_stop": 0
+          },
+          {
+            "cohort": "big_ood",
+            "task": "game24",
+            "variant": "3_to24_big_ood",
+            "tasks": 50,
+            "arrival": 2,
+            "arrival_and_stop": 0
+          },
+          {
+            "cohort": "big_ood",
+            "task": "game24",
+            "variant": "4_to21_big_ood",
+            "tasks": 50,
+            "arrival": 0,
+            "arrival_and_stop": 0
+          },
+          {
+            "cohort": "big_ood",
+            "task": "game24",
+            "variant": "4_to24_big_ood",
+            "tasks": 50,
+            "arrival": 0,
+            "arrival_and_stop": 0
+          },
+          {
+            "cohort": "big_ood",
+            "task": "puzzle8",
+            "variant": "id",
+            "tasks": 250,
+            "arrival": 0,
+            "arrival_and_stop": 0
+          },
+          {
+            "cohort": "big_ood",
+            "task": "rush_hour",
+            "variant": "familiar_complete_goal_big_ood",
+            "tasks": 123,
+            "arrival": 0,
+            "arrival_and_stop": 0
+          },
+          {
+            "cohort": "big_ood",
+            "task": "rush_hour",
+            "variant": "familiar_relation_big_ood",
+            "tasks": 127,
+            "arrival": 0,
+            "arrival_and_stop": 0
+          },
+          {
+            "cohort": "big_ood",
+            "task": "token_swapping",
+            "variant": "original_tree_arbitrary",
+            "tasks": 125,
+            "arrival": 0,
+            "arrival_and_stop": 0
+          },
+          {
+            "cohort": "big_ood",
+            "task": "token_swapping",
+            "variant": "original_tree_home",
+            "tasks": 125,
+            "arrival": 0,
+            "arrival_and_stop": 0
+          },
+          {
+            "cohort": "id",
+            "task": "blocks",
+            "variant": "clear12",
+            "tasks": 42,
+            "arrival": 36,
+            "arrival_and_stop": 36
+          },
+          {
+            "cohort": "id",
+            "task": "blocks",
+            "variant": "clear8",
+            "tasks": 42,
+            "arrival": 41,
+            "arrival_and_stop": 41
+          },
+          {
+            "cohort": "id",
+            "task": "blocks",
+            "variant": "partial8",
+            "tasks": 41,
+            "arrival": 27,
+            "arrival_and_stop": 27
+          },
+          {
+            "cohort": "id",
+            "task": "bridge",
+            "variant": "five_all_right",
+            "tasks": 44,
+            "arrival": 44,
+            "arrival_and_stop": 44
+          },
+          {
+            "cohort": "id",
+            "task": "bridge",
+            "variant": "five_intermediate_start",
+            "tasks": 40,
+            "arrival": 40,
+            "arrival_and_stop": 40
+          },
+          {
+            "cohort": "id",
+            "task": "bridge",
+            "variant": "five_partial_goal",
+            "tasks": 41,
+            "arrival": 41,
+            "arrival_and_stop": 41
+          },
+          {
+            "cohort": "id",
+            "task": "cube2",
+            "variant": "id",
+            "tasks": 125,
+            "arrival": 107,
+            "arrival_and_stop": 107
+          },
+          {
+            "cohort": "id",
+            "task": "path",
+            "variant": "id",
+            "tasks": 125,
+            "arrival": 125,
+            "arrival_and_stop": 120
+          },
+          {
+            "cohort": "small_ood",
+            "task": "blocks",
+            "variant": "partial12_ood",
+            "tasks": 125,
+            "arrival": 1,
+            "arrival_and_stop": 1
+          },
+          {
+            "cohort": "small_ood",
+            "task": "bridge",
+            "variant": "six_people_ood",
+            "tasks": 125,
+            "arrival": 2,
+            "arrival_and_stop": 0
+          },
+          {
+            "cohort": "small_ood",
+            "task": "cube2",
+            "variant": "noncanonical_goal_ood",
+            "tasks": 125,
+            "arrival": 0,
+            "arrival_and_stop": 0
+          },
+          {
+            "cohort": "small_ood",
+            "task": "path",
+            "variant": "new_graph_ood",
+            "tasks": 125,
+            "arrival": 41,
+            "arrival_and_stop": 36
+          }
+        ]
+      }
+    },
+    "5": {
+      "training_end_step": 250000,
+      "best_completed_id_step": 150000,
+      "complete_id_points": {
+        "50000": {
+          "tasks": 1250,
+          "arrival": 854,
+          "arrival_and_stop": 854
+        },
+        "100000": {
+          "tasks": 1250,
+          "arrival": 964,
+          "arrival_and_stop": 962
+        },
+        "150000": {
+          "tasks": 1250,
+          "arrival": 1167,
+          "arrival_and_stop": 1160
+        },
+        "200000": {
+          "tasks": 1250,
+          "arrival": 1158,
+          "arrival_and_stop": 1153
+        },
+        "237500": {
+          "tasks": 1250,
+          "arrival": 1155,
+          "arrival_and_stop": 1148
+        },
+        "250000": {
+          "tasks": 1250,
+          "arrival": 1156,
+          "arrival_and_stop": 1151
+        }
+      },
+      "incomplete_id_points": {
+        "12500": {
+          "tasks": 448,
+          "arrival": 30,
+          "arrival_and_stop": 28
+        },
+        "25000": {
+          "tasks": 448,
+          "arrival": 38,
+          "arrival_and_stop": 38
+        },
+        "37500": {
+          "tasks": 544,
+          "arrival": 140,
+          "arrival_and_stop": 139
+        },
+        "137500": {
+          "tasks": 64,
+          "arrival": 48,
+          "arrival_and_stop": 48
+        },
+        "187500": {
+          "tasks": 384,
+          "arrival": 307,
+          "arrival_and_stop": 306
+        }
+      },
+      "best_id_by_subclass": [
+        {
+          "cohort": "id",
+          "task": "blocks",
+          "variant": "clear12",
+          "tasks": 83,
+          "arrival": 79,
+          "arrival_and_stop": 79
+        },
+        {
+          "cohort": "id",
+          "task": "blocks",
+          "variant": "clear8",
+          "tasks": 84,
+          "arrival": 84,
+          "arrival_and_stop": 84
+        },
+        {
+          "cohort": "id",
+          "task": "blocks",
+          "variant": "partial8",
+          "tasks": 83,
+          "arrival": 18,
+          "arrival_and_stop": 16
+        },
+        {
+          "cohort": "id",
+          "task": "bridge",
+          "variant": "five_all_right",
+          "tasks": 88,
+          "arrival": 88,
+          "arrival_and_stop": 88
+        },
+        {
+          "cohort": "id",
+          "task": "bridge",
+          "variant": "five_intermediate_start",
+          "tasks": 79,
+          "arrival": 79,
+          "arrival_and_stop": 79
+        },
+        {
+          "cohort": "id",
+          "task": "bridge",
+          "variant": "five_partial_goal",
+          "tasks": 83,
+          "arrival": 83,
+          "arrival_and_stop": 83
+        },
+        {
+          "cohort": "id",
+          "task": "cube2",
+          "variant": "id",
+          "tasks": 250,
+          "arrival": 242,
+          "arrival_and_stop": 241
+        },
+        {
+          "cohort": "id",
+          "task": "path",
+          "variant": "id",
+          "tasks": 250,
+          "arrival": 250,
+          "arrival_and_stop": 246
+        },
+        {
+          "cohort": "id",
+          "task": "puzzle8",
+          "variant": "id",
+          "tasks": 250,
+          "arrival": 244,
+          "arrival_and_stop": 244
+        }
+      ],
+      "final": {
+        "tasks": 2000,
+        "arrival": 670,
+        "arrival_and_stop": 652,
+        "by_subclass": [
+          {
+            "cohort": "big_ood",
+            "task": "game24",
+            "variant": "2_to21_big_ood",
+            "tasks": 25,
+            "arrival": 0,
+            "arrival_and_stop": 0
+          },
+          {
+            "cohort": "big_ood",
+            "task": "game24",
+            "variant": "2_to24_big_ood",
+            "tasks": 25,
+            "arrival": 0,
+            "arrival_and_stop": 0
+          },
+          {
+            "cohort": "big_ood",
+            "task": "game24",
+            "variant": "3_to21_big_ood",
+            "tasks": 50,
+            "arrival": 0,
+            "arrival_and_stop": 0
+          },
+          {
+            "cohort": "big_ood",
+            "task": "game24",
+            "variant": "3_to24_big_ood",
+            "tasks": 50,
+            "arrival": 0,
+            "arrival_and_stop": 0
+          },
+          {
+            "cohort": "big_ood",
+            "task": "game24",
+            "variant": "4_to21_big_ood",
+            "tasks": 50,
+            "arrival": 0,
+            "arrival_and_stop": 0
+          },
+          {
+            "cohort": "big_ood",
+            "task": "game24",
+            "variant": "4_to24_big_ood",
+            "tasks": 50,
+            "arrival": 0,
+            "arrival_and_stop": 0
+          },
+          {
+            "cohort": "big_ood",
+            "task": "rush_hour",
+            "variant": "familiar_complete_goal_big_ood",
+            "tasks": 123,
+            "arrival": 0,
+            "arrival_and_stop": 0
+          },
+          {
+            "cohort": "big_ood",
+            "task": "rush_hour",
+            "variant": "familiar_relation_big_ood",
+            "tasks": 127,
+            "arrival": 0,
+            "arrival_and_stop": 0
+          },
+          {
+            "cohort": "big_ood",
+            "task": "token_swapping",
+            "variant": "original_tree_arbitrary",
+            "tasks": 125,
+            "arrival": 0,
+            "arrival_and_stop": 0
+          },
+          {
+            "cohort": "big_ood",
+            "task": "token_swapping",
+            "variant": "original_tree_home",
+            "tasks": 125,
+            "arrival": 0,
+            "arrival_and_stop": 0
+          },
+          {
+            "cohort": "id",
+            "task": "blocks",
+            "variant": "clear12",
+            "tasks": 42,
+            "arrival": 39,
+            "arrival_and_stop": 39
+          },
+          {
+            "cohort": "id",
+            "task": "blocks",
+            "variant": "clear8",
+            "tasks": 42,
+            "arrival": 40,
+            "arrival_and_stop": 40
+          },
+          {
+            "cohort": "id",
+            "task": "blocks",
+            "variant": "partial8",
+            "tasks": 41,
+            "arrival": 8,
+            "arrival_and_stop": 8
+          },
+          {
+            "cohort": "id",
+            "task": "bridge",
+            "variant": "five_all_right",
+            "tasks": 44,
+            "arrival": 44,
+            "arrival_and_stop": 44
+          },
+          {
+            "cohort": "id",
+            "task": "bridge",
+            "variant": "five_intermediate_start",
+            "tasks": 40,
+            "arrival": 40,
+            "arrival_and_stop": 40
+          },
+          {
+            "cohort": "id",
+            "task": "bridge",
+            "variant": "five_partial_goal",
+            "tasks": 41,
+            "arrival": 41,
+            "arrival_and_stop": 41
+          },
+          {
+            "cohort": "id",
+            "task": "cube2",
+            "variant": "id",
+            "tasks": 125,
+            "arrival": 119,
+            "arrival_and_stop": 118
+          },
+          {
+            "cohort": "id",
+            "task": "path",
+            "variant": "id",
+            "tasks": 125,
+            "arrival": 125,
+            "arrival_and_stop": 123
+          },
+          {
+            "cohort": "id",
+            "task": "puzzle8",
+            "variant": "id",
+            "tasks": 125,
+            "arrival": 123,
+            "arrival_and_stop": 123
+          },
+          {
+            "cohort": "small_ood",
+            "task": "blocks",
+            "variant": "partial12_ood",
+            "tasks": 125,
+            "arrival": 0,
+            "arrival_and_stop": 0
+          },
+          {
+            "cohort": "small_ood",
+            "task": "bridge",
+            "variant": "six_people_ood",
+            "tasks": 125,
+            "arrival": 37,
+            "arrival_and_stop": 23
+          },
+          {
+            "cohort": "small_ood",
+            "task": "cube2",
+            "variant": "noncanonical_goal_ood",
+            "tasks": 125,
+            "arrival": 0,
+            "arrival_and_stop": 0
+          },
+          {
+            "cohort": "small_ood",
+            "task": "path",
+            "variant": "new_graph_ood",
+            "tasks": 125,
+            "arrival": 54,
+            "arrival_and_stop": 53
+          },
+          {
+            "cohort": "small_ood",
+            "task": "puzzle8",
+            "variant": "noncanonical_goal_ood",
+            "tasks": 125,
+            "arrival": 0,
+            "arrival_and_stop": 0
+          }
+        ]
+      }
+    },
+    "6": {
+      "training_end_step": 250000,
+      "best_completed_id_step": 250000,
+      "complete_id_points": {
+        "50000": {
+          "tasks": 1500,
+          "arrival": 866,
+          "arrival_and_stop": 851
+        },
+        "100000": {
+          "tasks": 1500,
+          "arrival": 1133,
+          "arrival_and_stop": 1131
+        },
+        "150000": {
+          "tasks": 1500,
+          "arrival": 1191,
+          "arrival_and_stop": 1187
+        },
+        "200000": {
+          "tasks": 1500,
+          "arrival": 1172,
+          "arrival_and_stop": 1167
+        },
+        "250000": {
+          "tasks": 1500,
+          "arrival": 1192,
+          "arrival_and_stop": 1188
+        }
+      },
+      "incomplete_id_points": {
+        "12500": {
+          "tasks": 576,
+          "arrival": 17,
+          "arrival_and_stop": 16
+        },
+        "25000": {
+          "tasks": 672,
+          "arrival": 52,
+          "arrival_and_stop": 48
+        },
+        "37500": {
+          "tasks": 736,
+          "arrival": 124,
+          "arrival_and_stop": 123
+        },
+        "75000": {
+          "tasks": 64,
+          "arrival": 45,
+          "arrival_and_stop": 45
+        },
+        "87500": {
+          "tasks": 672,
+          "arrival": 326,
+          "arrival_and_stop": 322
+        },
+        "125000": {
+          "tasks": 288,
+          "arrival": 198,
+          "arrival_and_stop": 198
+        },
+        "137500": {
+          "tasks": 864,
+          "arrival": 570,
+          "arrival_and_stop": 568
+        },
+        "175000": {
+          "tasks": 64,
+          "arrival": 57,
+          "arrival_and_stop": 57
+        },
+        "187500": {
+          "tasks": 864,
+          "arrival": 558,
+          "arrival_and_stop": 550
+        },
+        "237500": {
+          "tasks": 1248,
+          "arrival": 950,
+          "arrival_and_stop": 944
+        }
+      },
+      "best_id_by_subclass": [
+        {
+          "cohort": "id",
+          "task": "blocks",
+          "variant": "clear12",
+          "tasks": 83,
+          "arrival": 67,
+          "arrival_and_stop": 67
+        },
+        {
+          "cohort": "id",
+          "task": "blocks",
+          "variant": "clear8",
+          "tasks": 84,
+          "arrival": 70,
+          "arrival_and_stop": 70
+        },
+        {
+          "cohort": "id",
+          "task": "blocks",
+          "variant": "partial8",
+          "tasks": 83,
+          "arrival": 60,
+          "arrival_and_stop": 59
+        },
+        {
+          "cohort": "id",
+          "task": "bridge",
+          "variant": "five_all_right",
+          "tasks": 88,
+          "arrival": 88,
+          "arrival_and_stop": 88
+        },
+        {
+          "cohort": "id",
+          "task": "bridge",
+          "variant": "five_intermediate_start",
+          "tasks": 79,
+          "arrival": 79,
+          "arrival_and_stop": 79
+        },
+        {
+          "cohort": "id",
+          "task": "bridge",
+          "variant": "five_partial_goal",
+          "tasks": 83,
+          "arrival": 83,
+          "arrival_and_stop": 83
+        },
+        {
+          "cohort": "id",
+          "task": "cube2",
+          "variant": "id",
+          "tasks": 250,
+          "arrival": 52,
+          "arrival_and_stop": 52
+        },
+        {
+          "cohort": "id",
+          "task": "path",
+          "variant": "id",
+          "tasks": 250,
+          "arrival": 210,
+          "arrival_and_stop": 207
+        },
+        {
+          "cohort": "id",
+          "task": "puzzle8",
+          "variant": "id",
+          "tasks": 250,
+          "arrival": 233,
+          "arrival_and_stop": 233
+        },
+        {
+          "cohort": "id",
+          "task": "token_swapping",
+          "variant": "original_tree_arbitrary",
+          "tasks": 125,
+          "arrival": 125,
+          "arrival_and_stop": 125
+        },
+        {
+          "cohort": "id",
+          "task": "token_swapping",
+          "variant": "original_tree_home",
+          "tasks": 125,
+          "arrival": 125,
+          "arrival_and_stop": 125
+        }
+      ],
+      "final": {
+        "tasks": 2000,
+        "arrival": 811,
+        "arrival_and_stop": 763,
+        "by_subclass": [
+          {
+            "cohort": "big_ood",
+            "task": "game24",
+            "variant": "2_to21_big_ood",
+            "tasks": 25,
+            "arrival": 3,
+            "arrival_and_stop": 0
+          },
+          {
+            "cohort": "big_ood",
+            "task": "game24",
+            "variant": "2_to24_big_ood",
+            "tasks": 25,
+            "arrival": 8,
+            "arrival_and_stop": 0
+          },
+          {
+            "cohort": "big_ood",
+            "task": "game24",
+            "variant": "3_to21_big_ood",
+            "tasks": 50,
+            "arrival": 0,
+            "arrival_and_stop": 0
+          },
+          {
+            "cohort": "big_ood",
+            "task": "game24",
+            "variant": "3_to24_big_ood",
+            "tasks": 50,
+            "arrival": 0,
+            "arrival_and_stop": 0
+          },
+          {
+            "cohort": "big_ood",
+            "task": "game24",
+            "variant": "4_to21_big_ood",
+            "tasks": 50,
+            "arrival": 1,
+            "arrival_and_stop": 0
+          },
+          {
+            "cohort": "big_ood",
+            "task": "game24",
+            "variant": "4_to24_big_ood",
+            "tasks": 50,
+            "arrival": 0,
+            "arrival_and_stop": 0
+          },
+          {
+            "cohort": "big_ood",
+            "task": "rush_hour",
+            "variant": "familiar_complete_goal_big_ood",
+            "tasks": 123,
+            "arrival": 17,
+            "arrival_and_stop": 0
+          },
+          {
+            "cohort": "big_ood",
+            "task": "rush_hour",
+            "variant": "familiar_relation_big_ood",
+            "tasks": 127,
+            "arrival": 9,
+            "arrival_and_stop": 0
+          },
+          {
+            "cohort": "id",
+            "task": "blocks",
+            "variant": "clear12",
+            "tasks": 42,
+            "arrival": 36,
+            "arrival_and_stop": 36
+          },
+          {
+            "cohort": "id",
+            "task": "blocks",
+            "variant": "clear8",
+            "tasks": 42,
+            "arrival": 37,
+            "arrival_and_stop": 37
+          },
+          {
+            "cohort": "id",
+            "task": "blocks",
+            "variant": "partial8",
+            "tasks": 41,
+            "arrival": 32,
+            "arrival_and_stop": 31
+          },
+          {
+            "cohort": "id",
+            "task": "bridge",
+            "variant": "five_all_right",
+            "tasks": 44,
+            "arrival": 44,
+            "arrival_and_stop": 44
+          },
+          {
+            "cohort": "id",
+            "task": "bridge",
+            "variant": "five_intermediate_start",
+            "tasks": 40,
+            "arrival": 40,
+            "arrival_and_stop": 40
+          },
+          {
+            "cohort": "id",
+            "task": "bridge",
+            "variant": "five_partial_goal",
+            "tasks": 41,
+            "arrival": 41,
+            "arrival_and_stop": 41
+          },
+          {
+            "cohort": "id",
+            "task": "cube2",
+            "variant": "id",
+            "tasks": 125,
+            "arrival": 32,
+            "arrival_and_stop": 32
+          },
+          {
+            "cohort": "id",
+            "task": "path",
+            "variant": "id",
+            "tasks": 125,
+            "arrival": 99,
+            "arrival_and_stop": 98
+          },
+          {
+            "cohort": "id",
+            "task": "puzzle8",
+            "variant": "id",
+            "tasks": 125,
+            "arrival": 120,
+            "arrival_and_stop": 120
+          },
+          {
+            "cohort": "id",
+            "task": "token_swapping",
+            "variant": "original_tree_arbitrary",
+            "tasks": 62,
+            "arrival": 62,
+            "arrival_and_stop": 62
+          },
+          {
+            "cohort": "id",
+            "task": "token_swapping",
+            "variant": "original_tree_home",
+            "tasks": 63,
+            "arrival": 63,
+            "arrival_and_stop": 63
+          },
+          {
+            "cohort": "small_ood",
+            "task": "blocks",
+            "variant": "partial12_ood",
+            "tasks": 125,
+            "arrival": 19,
+            "arrival_and_stop": 16
+          },
+          {
+            "cohort": "small_ood",
+            "task": "bridge",
+            "variant": "six_people_ood",
+            "tasks": 125,
+            "arrival": 106,
+            "arrival_and_stop": 103
+          },
+          {
+            "cohort": "small_ood",
+            "task": "cube2",
+            "variant": "noncanonical_goal_ood",
+            "tasks": 125,
+            "arrival": 0,
+            "arrival_and_stop": 0
+          },
+          {
+            "cohort": "small_ood",
+            "task": "path",
+            "variant": "new_graph_ood",
+            "tasks": 125,
+            "arrival": 42,
+            "arrival_and_stop": 40
+          },
+          {
+            "cohort": "small_ood",
+            "task": "puzzle8",
+            "variant": "noncanonical_goal_ood",
+            "tasks": 125,
+            "arrival": 0,
+            "arrival_and_stop": 0
+          },
+          {
+            "cohort": "small_ood",
+            "task": "token_swapping",
+            "variant": "alternate_tree_ood",
+            "tasks": 125,
+            "arrival": 0,
+            "arrival_and_stop": 0
+          }
+        ]
+      }
+    }
+  },
+  "diagnosis": {
+    "4": {
+      "all": {
+        "tasks": 2000,
+        "map_follow": {
+          "numerator": 7834,
+          "denominator": 21813
+        },
+        "exact_optimal": {
+          "numerator": 11271,
+          "denominator": 22064
+        },
+        "outcomes": {
+          "premature_done": 258,
+          "completed": 493,
+          "cycle_and_budget": 348,
+          "arrived_without_stop": 16,
+          "output_or_action_error": 885
+        },
+        "control_errors": {
+          "control_format": 615,
+          "illegal_action": 270
+        },
+        "cases_with_repeated_states": 527,
+        "premature_stop_at_state_zero": 107,
+        "context_overflow_cases": 0
+      },
+      "by_cohort": {
+        "id": {
+          "tasks": 500,
+          "map_follow": {
+            "numerator": 3785,
+            "denominator": 4318
+          },
+          "exact_optimal": {
+            "numerator": 3812,
+            "denominator": 4323
+          },
+          "outcomes": {
+            "premature_done": 22,
+            "completed": 456,
+            "cycle_and_budget": 17,
+            "arrived_without_stop": 5
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 25,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "small_ood": {
+          "tasks": 500,
+          "map_follow": {
+            "numerator": 1356,
+            "denominator": 6120
+          },
+          "exact_optimal": {
+            "numerator": 2566,
+            "denominator": 6120
+          },
+          "outcomes": {
+            "premature_done": 231,
+            "completed": 37,
+            "cycle_and_budget": 102,
+            "arrived_without_stop": 7,
+            "output_or_action_error": 123
+          },
+          "control_errors": {
+            "control_format": 123
+          },
+          "cases_with_repeated_states": 113,
+          "premature_stop_at_state_zero": 107,
+          "context_overflow_cases": 0
+        },
+        "big_ood": {
+          "tasks": 1000,
+          "map_follow": {
+            "numerator": 2693,
+            "denominator": 11375
+          },
+          "exact_optimal": {
+            "numerator": 4893,
+            "denominator": 11621
+          },
+          "outcomes": {
+            "cycle_and_budget": 229,
+            "output_or_action_error": 762,
+            "premature_done": 5,
+            "arrived_without_stop": 4
+          },
+          "control_errors": {
+            "illegal_action": 270,
+            "control_format": 492
+          },
+          "cases_with_repeated_states": 389,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        }
+      },
+      "by_task_cohort": {
+        "id/blocks": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 652,
+            "denominator": 1009
+          },
+          "exact_optimal": {
+            "numerator": 916,
+            "denominator": 1014
+          },
+          "outcomes": {
+            "premature_done": 21,
+            "completed": 104
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "id/bridge": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 525,
+            "denominator": 586
+          },
+          "exact_optimal": {
+            "numerator": 584,
+            "denominator": 586
+          },
+          "outcomes": {
+            "completed": 125
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "id/cube2": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 1808,
+            "denominator": 1899
+          },
+          "exact_optimal": {
+            "numerator": 1523,
+            "denominator": 1899
+          },
+          "outcomes": {
+            "completed": 107,
+            "cycle_and_budget": 17,
+            "premature_done": 1
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 25,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "id/path": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 800,
+            "denominator": 824
+          },
+          "exact_optimal": {
+            "numerator": 789,
+            "denominator": 824
+          },
+          "outcomes": {
+            "completed": 120,
+            "arrived_without_stop": 5
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "small_ood/blocks": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 183,
+            "denominator": 864
+          },
+          "exact_optimal": {
+            "numerator": 288,
+            "denominator": 864
+          },
+          "outcomes": {
+            "premature_done": 124,
+            "completed": 1
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "small_ood/bridge": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 30,
+            "denominator": 207
+          },
+          "exact_optimal": {
+            "numerator": 33,
+            "denominator": 207
+          },
+          "outcomes": {
+            "output_or_action_error": 123,
+            "arrived_without_stop": 2
+          },
+          "control_errors": {
+            "control_format": 123
+          },
+          "cases_with_repeated_states": 5,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "small_ood/cube2": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 129,
+            "denominator": 2003
+          },
+          "exact_optimal": {
+            "numerator": 939,
+            "denominator": 2003
+          },
+          "outcomes": {
+            "cycle_and_budget": 18,
+            "premature_done": 107
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 20,
+          "premature_stop_at_state_zero": 107,
+          "context_overflow_cases": 0
+        },
+        "small_ood/path": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 1014,
+            "denominator": 3046
+          },
+          "exact_optimal": {
+            "numerator": 1306,
+            "denominator": 3046
+          },
+          "outcomes": {
+            "arrived_without_stop": 5,
+            "cycle_and_budget": 84,
+            "completed": 36
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 88,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "big_ood/game24": {
+          "tasks": 250,
+          "map_follow": {
+            "numerator": 115,
+            "denominator": 550
+          },
+          "exact_optimal": {
+            "numerator": 34,
+            "denominator": 796
+          },
+          "outcomes": {
+            "output_or_action_error": 246,
+            "arrived_without_stop": 4
+          },
+          "control_errors": {
+            "illegal_action": 246
+          },
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "big_ood/puzzle8": {
+          "tasks": 250,
+          "map_follow": {
+            "numerator": 2116,
+            "denominator": 7541
+          },
+          "exact_optimal": {
+            "numerator": 3466,
+            "denominator": 7541
+          },
+          "outcomes": {
+            "cycle_and_budget": 220,
+            "output_or_action_error": 25,
+            "premature_done": 5
+          },
+          "control_errors": {
+            "illegal_action": 24,
+            "control_format": 1
+          },
+          "cases_with_repeated_states": 238,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "big_ood/rush_hour": {
+          "tasks": 250,
+          "map_follow": {
+            "numerator": 0,
+            "denominator": 250
+          },
+          "exact_optimal": {
+            "numerator": 0,
+            "denominator": 250
+          },
+          "outcomes": {
+            "output_or_action_error": 250
+          },
+          "control_errors": {
+            "control_format": 250
+          },
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "big_ood/token_swapping": {
+          "tasks": 250,
+          "map_follow": {
+            "numerator": 462,
+            "denominator": 3034
+          },
+          "exact_optimal": {
+            "numerator": 1393,
+            "denominator": 3034
+          },
+          "outcomes": {
+            "output_or_action_error": 241,
+            "cycle_and_budget": 9
+          },
+          "control_errors": {
+            "control_format": 241
+          },
+          "cases_with_repeated_states": 151,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        }
+      },
+      "by_subclass": {
+        "id/blocks/clear12": {
+          "tasks": 42,
+          "map_follow": {
+            "numerator": 324,
+            "denominator": 505
+          },
+          "exact_optimal": {
+            "numerator": 458,
+            "denominator": 509
+          },
+          "outcomes": {
+            "premature_done": 6,
+            "completed": 36
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "id/blocks/clear8": {
+          "tasks": 42,
+          "map_follow": {
+            "numerator": 236,
+            "denominator": 338
+          },
+          "exact_optimal": {
+            "numerator": 331,
+            "denominator": 338
+          },
+          "outcomes": {
+            "completed": 41,
+            "premature_done": 1
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "id/blocks/partial8": {
+          "tasks": 41,
+          "map_follow": {
+            "numerator": 92,
+            "denominator": 166
+          },
+          "exact_optimal": {
+            "numerator": 127,
+            "denominator": 167
+          },
+          "outcomes": {
+            "premature_done": 14,
+            "completed": 27
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "id/bridge/five_all_right": {
+          "tasks": 44,
+          "map_follow": {
+            "numerator": 273,
+            "denominator": 308
+          },
+          "exact_optimal": {
+            "numerator": 308,
+            "denominator": 308
+          },
+          "outcomes": {
+            "completed": 44
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "id/bridge/five_intermediate_start": {
+          "tasks": 40,
+          "map_follow": {
+            "numerator": 117,
+            "denominator": 127
+          },
+          "exact_optimal": {
+            "numerator": 126,
+            "denominator": 127
+          },
+          "outcomes": {
+            "completed": 40
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "id/bridge/five_partial_goal": {
+          "tasks": 41,
+          "map_follow": {
+            "numerator": 135,
+            "denominator": 151
+          },
+          "exact_optimal": {
+            "numerator": 150,
+            "denominator": 151
+          },
+          "outcomes": {
+            "completed": 41
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "id/cube2/id": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 1808,
+            "denominator": 1899
+          },
+          "exact_optimal": {
+            "numerator": 1523,
+            "denominator": 1899
+          },
+          "outcomes": {
+            "completed": 107,
+            "cycle_and_budget": 17,
+            "premature_done": 1
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 25,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "id/path/id": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 800,
+            "denominator": 824
+          },
+          "exact_optimal": {
+            "numerator": 789,
+            "denominator": 824
+          },
+          "outcomes": {
+            "completed": 120,
+            "arrived_without_stop": 5
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "small_ood/blocks/partial12_ood": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 183,
+            "denominator": 864
+          },
+          "exact_optimal": {
+            "numerator": 288,
+            "denominator": 864
+          },
+          "outcomes": {
+            "premature_done": 124,
+            "completed": 1
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "small_ood/bridge/six_people_ood": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 30,
+            "denominator": 207
+          },
+          "exact_optimal": {
+            "numerator": 33,
+            "denominator": 207
+          },
+          "outcomes": {
+            "output_or_action_error": 123,
+            "arrived_without_stop": 2
+          },
+          "control_errors": {
+            "control_format": 123
+          },
+          "cases_with_repeated_states": 5,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "small_ood/cube2/noncanonical_goal_ood": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 129,
+            "denominator": 2003
+          },
+          "exact_optimal": {
+            "numerator": 939,
+            "denominator": 2003
+          },
+          "outcomes": {
+            "cycle_and_budget": 18,
+            "premature_done": 107
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 20,
+          "premature_stop_at_state_zero": 107,
+          "context_overflow_cases": 0
+        },
+        "small_ood/path/new_graph_ood": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 1014,
+            "denominator": 3046
+          },
+          "exact_optimal": {
+            "numerator": 1306,
+            "denominator": 3046
+          },
+          "outcomes": {
+            "arrived_without_stop": 5,
+            "cycle_and_budget": 84,
+            "completed": 36
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 88,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "big_ood/game24/2_to21_big_ood": {
+          "tasks": 25,
+          "map_follow": {
+            "numerator": 1,
+            "denominator": 25
+          },
+          "exact_optimal": {
+            "numerator": 1,
+            "denominator": 49
+          },
+          "outcomes": {
+            "output_or_action_error": 24,
+            "arrived_without_stop": 1
+          },
+          "control_errors": {
+            "illegal_action": 24
+          },
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "big_ood/game24/2_to24_big_ood": {
+          "tasks": 25,
+          "map_follow": {
+            "numerator": 1,
+            "denominator": 25
+          },
+          "exact_optimal": {
+            "numerator": 1,
+            "denominator": 49
+          },
+          "outcomes": {
+            "output_or_action_error": 24,
+            "arrived_without_stop": 1
+          },
+          "control_errors": {
+            "illegal_action": 24
+          },
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "big_ood/game24/3_to21_big_ood": {
+          "tasks": 50,
+          "map_follow": {
+            "numerator": 12,
+            "denominator": 100
+          },
+          "exact_optimal": {
+            "numerator": 7,
+            "denominator": 150
+          },
+          "outcomes": {
+            "output_or_action_error": 50
+          },
+          "control_errors": {
+            "illegal_action": 50
+          },
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "big_ood/game24/3_to24_big_ood": {
+          "tasks": 50,
+          "map_follow": {
+            "numerator": 44,
+            "denominator": 100
+          },
+          "exact_optimal": {
+            "numerator": 8,
+            "denominator": 148
+          },
+          "outcomes": {
+            "output_or_action_error": 48,
+            "arrived_without_stop": 2
+          },
+          "control_errors": {
+            "illegal_action": 48
+          },
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "big_ood/game24/4_to21_big_ood": {
+          "tasks": 50,
+          "map_follow": {
+            "numerator": 17,
+            "denominator": 150
+          },
+          "exact_optimal": {
+            "numerator": 7,
+            "denominator": 200
+          },
+          "outcomes": {
+            "output_or_action_error": 50
+          },
+          "control_errors": {
+            "illegal_action": 50
+          },
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "big_ood/game24/4_to24_big_ood": {
+          "tasks": 50,
+          "map_follow": {
+            "numerator": 40,
+            "denominator": 150
+          },
+          "exact_optimal": {
+            "numerator": 10,
+            "denominator": 200
+          },
+          "outcomes": {
+            "output_or_action_error": 50
+          },
+          "control_errors": {
+            "illegal_action": 50
+          },
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "big_ood/puzzle8/id": {
+          "tasks": 250,
+          "map_follow": {
+            "numerator": 2116,
+            "denominator": 7541
+          },
+          "exact_optimal": {
+            "numerator": 3466,
+            "denominator": 7541
+          },
+          "outcomes": {
+            "cycle_and_budget": 220,
+            "output_or_action_error": 25,
+            "premature_done": 5
+          },
+          "control_errors": {
+            "illegal_action": 24,
+            "control_format": 1
+          },
+          "cases_with_repeated_states": 238,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "big_ood/rush_hour/familiar_complete_goal_big_ood": {
+          "tasks": 123,
+          "map_follow": {
+            "numerator": 0,
+            "denominator": 123
+          },
+          "exact_optimal": {
+            "numerator": 0,
+            "denominator": 123
+          },
+          "outcomes": {
+            "output_or_action_error": 123
+          },
+          "control_errors": {
+            "control_format": 123
+          },
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "big_ood/rush_hour/familiar_relation_big_ood": {
+          "tasks": 127,
+          "map_follow": {
+            "numerator": 0,
+            "denominator": 127
+          },
+          "exact_optimal": {
+            "numerator": 0,
+            "denominator": 127
+          },
+          "outcomes": {
+            "output_or_action_error": 127
+          },
+          "control_errors": {
+            "control_format": 127
+          },
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "big_ood/token_swapping/original_tree_arbitrary": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 257,
+            "denominator": 1616
+          },
+          "exact_optimal": {
+            "numerator": 741,
+            "denominator": 1616
+          },
+          "outcomes": {
+            "output_or_action_error": 122,
+            "cycle_and_budget": 3
+          },
+          "control_errors": {
+            "control_format": 122
+          },
+          "cases_with_repeated_states": 84,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "big_ood/token_swapping/original_tree_home": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 205,
+            "denominator": 1418
+          },
+          "exact_optimal": {
+            "numerator": 652,
+            "denominator": 1418
+          },
+          "outcomes": {
+            "output_or_action_error": 119,
+            "cycle_and_budget": 6
+          },
+          "control_errors": {
+            "control_format": 119
+          },
+          "cases_with_repeated_states": 67,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        }
+      }
+    },
+    "5": {
+      "all": {
+        "tasks": 2000,
+        "map_follow": {
+          "numerator": 10615,
+          "denominator": 21920
+        },
+        "exact_optimal": {
+          "numerator": 13974,
+          "denominator": 22187
+        },
+        "outcomes": {
+          "premature_done": 572,
+          "completed": 652,
+          "cycle_and_budget": 205,
+          "arrived_without_stop": 18,
+          "output_or_action_error": 547,
+          "budget_or_no_successor": 6
+        },
+        "control_errors": {
+          "illegal_action": 245,
+          "control_format": 302
+        },
+        "cases_with_repeated_states": 302,
+        "premature_stop_at_state_zero": 250,
+        "context_overflow_cases": 0
+      },
+      "by_cohort": {
+        "id": {
+          "tasks": 625,
+          "map_follow": {
+            "numerator": 6181,
+            "denominator": 7020
+          },
+          "exact_optimal": {
+            "numerator": 6543,
+            "denominator": 7022
+          },
+          "outcomes": {
+            "premature_done": 38,
+            "completed": 576,
+            "cycle_and_budget": 6,
+            "arrived_without_stop": 3,
+            "budget_or_no_successor": 2
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 14,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "small_ood": {
+          "tasks": 625,
+          "map_follow": {
+            "numerator": 3609,
+            "denominator": 9229
+          },
+          "exact_optimal": {
+            "numerator": 4987,
+            "denominator": 9244
+          },
+          "outcomes": {
+            "premature_done": 392,
+            "cycle_and_budget": 75,
+            "completed": 76,
+            "arrived_without_stop": 15,
+            "output_or_action_error": 63,
+            "budget_or_no_successor": 4
+          },
+          "control_errors": {
+            "illegal_action": 11,
+            "control_format": 52
+          },
+          "cases_with_repeated_states": 134,
+          "premature_stop_at_state_zero": 250,
+          "context_overflow_cases": 0
+        },
+        "big_ood": {
+          "tasks": 750,
+          "map_follow": {
+            "numerator": 825,
+            "denominator": 5671
+          },
+          "exact_optimal": {
+            "numerator": 2444,
+            "denominator": 5921
+          },
+          "outcomes": {
+            "premature_done": 142,
+            "cycle_and_budget": 124,
+            "output_or_action_error": 484
+          },
+          "control_errors": {
+            "control_format": 250,
+            "illegal_action": 234
+          },
+          "cases_with_repeated_states": 154,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        }
+      },
+      "by_task_cohort": {
+        "id/blocks": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 549,
+            "denominator": 1030
+          },
+          "exact_optimal": {
+            "numerator": 867,
+            "denominator": 1032
+          },
+          "outcomes": {
+            "premature_done": 38,
+            "completed": 87
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "id/bridge": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 528,
+            "denominator": 586
+          },
+          "exact_optimal": {
+            "numerator": 584,
+            "denominator": 586
+          },
+          "outcomes": {
+            "completed": 125
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "id/cube2": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 1562,
+            "denominator": 1698
+          },
+          "exact_optimal": {
+            "numerator": 1488,
+            "denominator": 1698
+          },
+          "outcomes": {
+            "completed": 118,
+            "cycle_and_budget": 6,
+            "arrived_without_stop": 1
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 14,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "id/path": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 791,
+            "denominator": 820
+          },
+          "exact_optimal": {
+            "numerator": 786,
+            "denominator": 820
+          },
+          "outcomes": {
+            "completed": 123,
+            "arrived_without_stop": 2
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "id/puzzle8": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 2751,
+            "denominator": 2886
+          },
+          "exact_optimal": {
+            "numerator": 2818,
+            "denominator": 2886
+          },
+          "outcomes": {
+            "completed": 123,
+            "budget_or_no_successor": 2
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "small_ood/blocks": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 139,
+            "denominator": 781
+          },
+          "exact_optimal": {
+            "numerator": 212,
+            "denominator": 796
+          },
+          "outcomes": {
+            "premature_done": 125
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 15,
+          "context_overflow_cases": 0
+        },
+        "small_ood/bridge": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 308,
+            "denominator": 753
+          },
+          "exact_optimal": {
+            "numerator": 390,
+            "denominator": 753
+          },
+          "outcomes": {
+            "premature_done": 22,
+            "arrived_without_stop": 14,
+            "completed": 23,
+            "cycle_and_budget": 5,
+            "output_or_action_error": 61
+          },
+          "control_errors": {
+            "control_format": 52,
+            "illegal_action": 9
+          },
+          "cases_with_repeated_states": 34,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "small_ood/cube2": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 109,
+            "denominator": 1892
+          },
+          "exact_optimal": {
+            "numerator": 884,
+            "denominator": 1892
+          },
+          "outcomes": {
+            "premature_done": 115,
+            "cycle_and_budget": 10
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 18,
+          "premature_stop_at_state_zero": 114,
+          "context_overflow_cases": 0
+        },
+        "small_ood/path": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 1002,
+            "denominator": 2696
+          },
+          "exact_optimal": {
+            "numerator": 1233,
+            "denominator": 2696
+          },
+          "outcomes": {
+            "completed": 53,
+            "cycle_and_budget": 60,
+            "premature_done": 9,
+            "arrived_without_stop": 1,
+            "output_or_action_error": 2
+          },
+          "control_errors": {
+            "illegal_action": 2
+          },
+          "cases_with_repeated_states": 81,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "small_ood/puzzle8": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 2051,
+            "denominator": 3107
+          },
+          "exact_optimal": {
+            "numerator": 2268,
+            "denominator": 3107
+          },
+          "outcomes": {
+            "premature_done": 121,
+            "budget_or_no_successor": 4
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 1,
+          "premature_stop_at_state_zero": 121,
+          "context_overflow_cases": 0
+        },
+        "big_ood/game24": {
+          "tasks": 250,
+          "map_follow": {
+            "numerator": 107,
+            "denominator": 550
+          },
+          "exact_optimal": {
+            "numerator": 52,
+            "denominator": 800
+          },
+          "outcomes": {
+            "output_or_action_error": 234,
+            "premature_done": 16
+          },
+          "control_errors": {
+            "illegal_action": 234
+          },
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "big_ood/rush_hour": {
+          "tasks": 250,
+          "map_follow": {
+            "numerator": 0,
+            "denominator": 250
+          },
+          "exact_optimal": {
+            "numerator": 0,
+            "denominator": 250
+          },
+          "outcomes": {
+            "output_or_action_error": 250
+          },
+          "control_errors": {
+            "control_format": 250
+          },
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "big_ood/token_swapping": {
+          "tasks": 250,
+          "map_follow": {
+            "numerator": 718,
+            "denominator": 4871
+          },
+          "exact_optimal": {
+            "numerator": 2392,
+            "denominator": 4871
+          },
+          "outcomes": {
+            "premature_done": 126,
+            "cycle_and_budget": 124
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 154,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        }
+      },
+      "by_subclass": {
+        "id/blocks/clear12": {
+          "tasks": 42,
+          "map_follow": {
+            "numerator": 284,
+            "denominator": 505
+          },
+          "exact_optimal": {
+            "numerator": 470,
+            "denominator": 507
+          },
+          "outcomes": {
+            "completed": 39,
+            "premature_done": 3
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "id/blocks/clear8": {
+          "tasks": 42,
+          "map_follow": {
+            "numerator": 212,
+            "denominator": 338
+          },
+          "exact_optimal": {
+            "numerator": 323,
+            "denominator": 338
+          },
+          "outcomes": {
+            "completed": 40,
+            "premature_done": 2
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "id/blocks/partial8": {
+          "tasks": 41,
+          "map_follow": {
+            "numerator": 53,
+            "denominator": 187
+          },
+          "exact_optimal": {
+            "numerator": 74,
+            "denominator": 187
+          },
+          "outcomes": {
+            "premature_done": 33,
+            "completed": 8
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "id/bridge/five_all_right": {
+          "tasks": 44,
+          "map_follow": {
+            "numerator": 277,
+            "denominator": 308
+          },
+          "exact_optimal": {
+            "numerator": 306,
+            "denominator": 308
+          },
+          "outcomes": {
+            "completed": 44
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "id/bridge/five_intermediate_start": {
+          "tasks": 40,
+          "map_follow": {
+            "numerator": 116,
+            "denominator": 127
+          },
+          "exact_optimal": {
+            "numerator": 127,
+            "denominator": 127
+          },
+          "outcomes": {
+            "completed": 40
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "id/bridge/five_partial_goal": {
+          "tasks": 41,
+          "map_follow": {
+            "numerator": 135,
+            "denominator": 151
+          },
+          "exact_optimal": {
+            "numerator": 151,
+            "denominator": 151
+          },
+          "outcomes": {
+            "completed": 41
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "id/cube2/id": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 1562,
+            "denominator": 1698
+          },
+          "exact_optimal": {
+            "numerator": 1488,
+            "denominator": 1698
+          },
+          "outcomes": {
+            "completed": 118,
+            "cycle_and_budget": 6,
+            "arrived_without_stop": 1
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 14,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "id/path/id": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 791,
+            "denominator": 820
+          },
+          "exact_optimal": {
+            "numerator": 786,
+            "denominator": 820
+          },
+          "outcomes": {
+            "completed": 123,
+            "arrived_without_stop": 2
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "id/puzzle8/id": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 2751,
+            "denominator": 2886
+          },
+          "exact_optimal": {
+            "numerator": 2818,
+            "denominator": 2886
+          },
+          "outcomes": {
+            "completed": 123,
+            "budget_or_no_successor": 2
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "small_ood/blocks/partial12_ood": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 139,
+            "denominator": 781
+          },
+          "exact_optimal": {
+            "numerator": 212,
+            "denominator": 796
+          },
+          "outcomes": {
+            "premature_done": 125
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 15,
+          "context_overflow_cases": 0
+        },
+        "small_ood/bridge/six_people_ood": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 308,
+            "denominator": 753
+          },
+          "exact_optimal": {
+            "numerator": 390,
+            "denominator": 753
+          },
+          "outcomes": {
+            "premature_done": 22,
+            "arrived_without_stop": 14,
+            "completed": 23,
+            "cycle_and_budget": 5,
+            "output_or_action_error": 61
+          },
+          "control_errors": {
+            "control_format": 52,
+            "illegal_action": 9
+          },
+          "cases_with_repeated_states": 34,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "small_ood/cube2/noncanonical_goal_ood": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 109,
+            "denominator": 1892
+          },
+          "exact_optimal": {
+            "numerator": 884,
+            "denominator": 1892
+          },
+          "outcomes": {
+            "premature_done": 115,
+            "cycle_and_budget": 10
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 18,
+          "premature_stop_at_state_zero": 114,
+          "context_overflow_cases": 0
+        },
+        "small_ood/path/new_graph_ood": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 1002,
+            "denominator": 2696
+          },
+          "exact_optimal": {
+            "numerator": 1233,
+            "denominator": 2696
+          },
+          "outcomes": {
+            "completed": 53,
+            "cycle_and_budget": 60,
+            "premature_done": 9,
+            "arrived_without_stop": 1,
+            "output_or_action_error": 2
+          },
+          "control_errors": {
+            "illegal_action": 2
+          },
+          "cases_with_repeated_states": 81,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "small_ood/puzzle8/noncanonical_goal_ood": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 2051,
+            "denominator": 3107
+          },
+          "exact_optimal": {
+            "numerator": 2268,
+            "denominator": 3107
+          },
+          "outcomes": {
+            "premature_done": 121,
+            "budget_or_no_successor": 4
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 1,
+          "premature_stop_at_state_zero": 121,
+          "context_overflow_cases": 0
+        },
+        "big_ood/game24/2_to21_big_ood": {
+          "tasks": 25,
+          "map_follow": {
+            "numerator": 0,
+            "denominator": 25
+          },
+          "exact_optimal": {
+            "numerator": 0,
+            "denominator": 50
+          },
+          "outcomes": {
+            "output_or_action_error": 25
+          },
+          "control_errors": {
+            "illegal_action": 25
+          },
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "big_ood/game24/2_to24_big_ood": {
+          "tasks": 25,
+          "map_follow": {
+            "numerator": 0,
+            "denominator": 25
+          },
+          "exact_optimal": {
+            "numerator": 0,
+            "denominator": 50
+          },
+          "outcomes": {
+            "output_or_action_error": 25
+          },
+          "control_errors": {
+            "illegal_action": 25
+          },
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "big_ood/game24/3_to21_big_ood": {
+          "tasks": 50,
+          "map_follow": {
+            "numerator": 2,
+            "denominator": 100
+          },
+          "exact_optimal": {
+            "numerator": 5,
+            "denominator": 150
+          },
+          "outcomes": {
+            "output_or_action_error": 50
+          },
+          "control_errors": {
+            "illegal_action": 50
+          },
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "big_ood/game24/3_to24_big_ood": {
+          "tasks": 50,
+          "map_follow": {
+            "numerator": 41,
+            "denominator": 100
+          },
+          "exact_optimal": {
+            "numerator": 13,
+            "denominator": 150
+          },
+          "outcomes": {
+            "output_or_action_error": 50
+          },
+          "control_errors": {
+            "illegal_action": 50
+          },
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "big_ood/game24/4_to21_big_ood": {
+          "tasks": 50,
+          "map_follow": {
+            "numerator": 14,
+            "denominator": 150
+          },
+          "exact_optimal": {
+            "numerator": 15,
+            "denominator": 200
+          },
+          "outcomes": {
+            "output_or_action_error": 44,
+            "premature_done": 6
+          },
+          "control_errors": {
+            "illegal_action": 44
+          },
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "big_ood/game24/4_to24_big_ood": {
+          "tasks": 50,
+          "map_follow": {
+            "numerator": 50,
+            "denominator": 150
+          },
+          "exact_optimal": {
+            "numerator": 19,
+            "denominator": 200
+          },
+          "outcomes": {
+            "premature_done": 10,
+            "output_or_action_error": 40
+          },
+          "control_errors": {
+            "illegal_action": 40
+          },
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "big_ood/rush_hour/familiar_complete_goal_big_ood": {
+          "tasks": 123,
+          "map_follow": {
+            "numerator": 0,
+            "denominator": 123
+          },
+          "exact_optimal": {
+            "numerator": 0,
+            "denominator": 123
+          },
+          "outcomes": {
+            "output_or_action_error": 123
+          },
+          "control_errors": {
+            "control_format": 123
+          },
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "big_ood/rush_hour/familiar_relation_big_ood": {
+          "tasks": 127,
+          "map_follow": {
+            "numerator": 0,
+            "denominator": 127
+          },
+          "exact_optimal": {
+            "numerator": 0,
+            "denominator": 127
+          },
+          "outcomes": {
+            "output_or_action_error": 127
+          },
+          "control_errors": {
+            "control_format": 127
+          },
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "big_ood/token_swapping/original_tree_arbitrary": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 399,
+            "denominator": 2476
+          },
+          "exact_optimal": {
+            "numerator": 1227,
+            "denominator": 2476
+          },
+          "outcomes": {
+            "cycle_and_budget": 64,
+            "premature_done": 61
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 74,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "big_ood/token_swapping/original_tree_home": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 319,
+            "denominator": 2395
+          },
+          "exact_optimal": {
+            "numerator": 1165,
+            "denominator": 2395
+          },
+          "outcomes": {
+            "premature_done": 65,
+            "cycle_and_budget": 60
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 80,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        }
+      }
+    },
+    "6": {
+      "all": {
+        "tasks": 2000,
+        "map_follow": {
+          "numerator": 13064,
+          "denominator": 33885
+        },
+        "exact_optimal": {
+          "numerator": 19970,
+          "denominator": 34135
+        },
+        "outcomes": {
+          "completed": 763,
+          "premature_done": 421,
+          "arrived_without_stop": 48,
+          "cycle_and_budget": 483,
+          "budget_or_no_successor": 47,
+          "output_or_action_error": 238
+        },
+        "control_errors": {
+          "illegal_action": 236,
+          "control_format": 2
+        },
+        "cases_with_repeated_states": 559,
+        "premature_stop_at_state_zero": 135,
+        "context_overflow_cases": 0
+      },
+      "by_cohort": {
+        "id": {
+          "tasks": 750,
+          "map_follow": {
+            "numerator": 7259,
+            "denominator": 11315
+          },
+          "exact_optimal": {
+            "numerator": 8957,
+            "denominator": 11326
+          },
+          "outcomes": {
+            "completed": 604,
+            "premature_done": 84,
+            "arrived_without_stop": 2,
+            "cycle_and_budget": 50,
+            "budget_or_no_successor": 10
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 84,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "small_ood": {
+          "tasks": 750,
+          "map_follow": {
+            "numerator": 4476,
+            "denominator": 14738
+          },
+          "exact_optimal": {
+            "numerator": 8270,
+            "denominator": 14740
+          },
+          "outcomes": {
+            "premature_done": 328,
+            "completed": 159,
+            "arrived_without_stop": 8,
+            "cycle_and_budget": 218,
+            "budget_or_no_successor": 37
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 247,
+          "premature_stop_at_state_zero": 135,
+          "context_overflow_cases": 0
+        },
+        "big_ood": {
+          "tasks": 500,
+          "map_follow": {
+            "numerator": 1329,
+            "denominator": 7832
+          },
+          "exact_optimal": {
+            "numerator": 2743,
+            "denominator": 8069
+          },
+          "outcomes": {
+            "cycle_and_budget": 215,
+            "arrived_without_stop": 38,
+            "premature_done": 9,
+            "output_or_action_error": 238
+          },
+          "control_errors": {
+            "illegal_action": 236,
+            "control_format": 2
+          },
+          "cases_with_repeated_states": 228,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        }
+      },
+      "by_task_cohort": {
+        "id/blocks": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 431,
+            "denominator": 1000
+          },
+          "exact_optimal": {
+            "numerator": 917,
+            "denominator": 1011
+          },
+          "outcomes": {
+            "completed": 104,
+            "premature_done": 20,
+            "arrived_without_stop": 1
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "id/bridge": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 519,
+            "denominator": 588
+          },
+          "exact_optimal": {
+            "numerator": 585,
+            "denominator": 588
+          },
+          "outcomes": {
+            "completed": 125
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "id/cube2": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 752,
+            "denominator": 2775
+          },
+          "exact_optimal": {
+            "numerator": 1490,
+            "denominator": 2775
+          },
+          "outcomes": {
+            "cycle_and_budget": 30,
+            "premature_done": 62,
+            "completed": 32,
+            "budget_or_no_successor": 1
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 56,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "id/path": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 1076,
+            "denominator": 2052
+          },
+          "exact_optimal": {
+            "numerator": 1211,
+            "denominator": 2052
+          },
+          "outcomes": {
+            "completed": 98,
+            "budget_or_no_successor": 5,
+            "cycle_and_budget": 19,
+            "premature_done": 2,
+            "arrived_without_stop": 1
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 27,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "id/puzzle8": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 2732,
+            "denominator": 2924
+          },
+          "exact_optimal": {
+            "numerator": 2813,
+            "denominator": 2924
+          },
+          "outcomes": {
+            "completed": 120,
+            "budget_or_no_successor": 4,
+            "cycle_and_budget": 1
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 1,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "id/token_swapping": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 1749,
+            "denominator": 1976
+          },
+          "exact_optimal": {
+            "numerator": 1941,
+            "denominator": 1976
+          },
+          "outcomes": {
+            "completed": 125
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "small_ood/blocks": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 189,
+            "denominator": 780
+          },
+          "exact_optimal": {
+            "numerator": 463,
+            "denominator": 782
+          },
+          "outcomes": {
+            "premature_done": 106,
+            "completed": 16,
+            "arrived_without_stop": 3
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 2,
+          "context_overflow_cases": 0
+        },
+        "small_ood/bridge": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 433,
+            "denominator": 561
+          },
+          "exact_optimal": {
+            "numerator": 512,
+            "denominator": 561
+          },
+          "outcomes": {
+            "completed": 103,
+            "premature_done": 19,
+            "arrived_without_stop": 3
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "small_ood/cube2": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 333,
+            "denominator": 2773
+          },
+          "exact_optimal": {
+            "numerator": 1342,
+            "denominator": 2773
+          },
+          "outcomes": {
+            "premature_done": 89,
+            "cycle_and_budget": 34,
+            "budget_or_no_successor": 2
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 55,
+          "premature_stop_at_state_zero": 25,
+          "context_overflow_cases": 0
+        },
+        "small_ood/path": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 1136,
+            "denominator": 3268
+          },
+          "exact_optimal": {
+            "numerator": 1485,
+            "denominator": 3268
+          },
+          "outcomes": {
+            "arrived_without_stop": 2,
+            "cycle_and_budget": 50,
+            "completed": 40,
+            "budget_or_no_successor": 28,
+            "premature_done": 5
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 57,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "small_ood/puzzle8": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 2053,
+            "denominator": 3241
+          },
+          "exact_optimal": {
+            "numerator": 2300,
+            "denominator": 3241
+          },
+          "outcomes": {
+            "budget_or_no_successor": 7,
+            "cycle_and_budget": 10,
+            "premature_done": 108
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 10,
+          "premature_stop_at_state_zero": 108,
+          "context_overflow_cases": 0
+        },
+        "small_ood/token_swapping": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 332,
+            "denominator": 4115
+          },
+          "exact_optimal": {
+            "numerator": 2168,
+            "denominator": 4115
+          },
+          "outcomes": {
+            "cycle_and_budget": 124,
+            "premature_done": 1
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 125,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "big_ood/game24": {
+          "tasks": 250,
+          "map_follow": {
+            "numerator": 128,
+            "denominator": 550
+          },
+          "exact_optimal": {
+            "numerator": 59,
+            "denominator": 787
+          },
+          "outcomes": {
+            "output_or_action_error": 238,
+            "arrived_without_stop": 12
+          },
+          "control_errors": {
+            "illegal_action": 236,
+            "control_format": 2
+          },
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "big_ood/rush_hour": {
+          "tasks": 250,
+          "map_follow": {
+            "numerator": 1201,
+            "denominator": 7282
+          },
+          "exact_optimal": {
+            "numerator": 2684,
+            "denominator": 7282
+          },
+          "outcomes": {
+            "cycle_and_budget": 215,
+            "arrived_without_stop": 26,
+            "premature_done": 9
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 228,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        }
+      },
+      "by_subclass": {
+        "id/blocks/clear12": {
+          "tasks": 42,
+          "map_follow": {
+            "numerator": 186,
+            "denominator": 500
+          },
+          "exact_optimal": {
+            "numerator": 466,
+            "denominator": 506
+          },
+          "outcomes": {
+            "completed": 36,
+            "premature_done": 6
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "id/blocks/clear8": {
+          "tasks": 42,
+          "map_follow": {
+            "numerator": 166,
+            "denominator": 334
+          },
+          "exact_optimal": {
+            "numerator": 311,
+            "denominator": 339
+          },
+          "outcomes": {
+            "completed": 37,
+            "premature_done": 5
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "id/blocks/partial8": {
+          "tasks": 41,
+          "map_follow": {
+            "numerator": 79,
+            "denominator": 166
+          },
+          "exact_optimal": {
+            "numerator": 140,
+            "denominator": 166
+          },
+          "outcomes": {
+            "completed": 31,
+            "premature_done": 9,
+            "arrived_without_stop": 1
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "id/bridge/five_all_right": {
+          "tasks": 44,
+          "map_follow": {
+            "numerator": 269,
+            "denominator": 308
+          },
+          "exact_optimal": {
+            "numerator": 307,
+            "denominator": 308
+          },
+          "outcomes": {
+            "completed": 44
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "id/bridge/five_intermediate_start": {
+          "tasks": 40,
+          "map_follow": {
+            "numerator": 121,
+            "denominator": 129
+          },
+          "exact_optimal": {
+            "numerator": 128,
+            "denominator": 129
+          },
+          "outcomes": {
+            "completed": 40
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "id/bridge/five_partial_goal": {
+          "tasks": 41,
+          "map_follow": {
+            "numerator": 129,
+            "denominator": 151
+          },
+          "exact_optimal": {
+            "numerator": 150,
+            "denominator": 151
+          },
+          "outcomes": {
+            "completed": 41
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "id/cube2/id": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 752,
+            "denominator": 2775
+          },
+          "exact_optimal": {
+            "numerator": 1490,
+            "denominator": 2775
+          },
+          "outcomes": {
+            "cycle_and_budget": 30,
+            "premature_done": 62,
+            "completed": 32,
+            "budget_or_no_successor": 1
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 56,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "id/path/id": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 1076,
+            "denominator": 2052
+          },
+          "exact_optimal": {
+            "numerator": 1211,
+            "denominator": 2052
+          },
+          "outcomes": {
+            "completed": 98,
+            "budget_or_no_successor": 5,
+            "cycle_and_budget": 19,
+            "premature_done": 2,
+            "arrived_without_stop": 1
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 27,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "id/puzzle8/id": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 2732,
+            "denominator": 2924
+          },
+          "exact_optimal": {
+            "numerator": 2813,
+            "denominator": 2924
+          },
+          "outcomes": {
+            "completed": 120,
+            "budget_or_no_successor": 4,
+            "cycle_and_budget": 1
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 1,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "id/token_swapping/original_tree_arbitrary": {
+          "tasks": 62,
+          "map_follow": {
+            "numerator": 818,
+            "denominator": 993
+          },
+          "exact_optimal": {
+            "numerator": 973,
+            "denominator": 993
+          },
+          "outcomes": {
+            "completed": 62
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "id/token_swapping/original_tree_home": {
+          "tasks": 63,
+          "map_follow": {
+            "numerator": 931,
+            "denominator": 983
+          },
+          "exact_optimal": {
+            "numerator": 968,
+            "denominator": 983
+          },
+          "outcomes": {
+            "completed": 63
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "small_ood/blocks/partial12_ood": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 189,
+            "denominator": 780
+          },
+          "exact_optimal": {
+            "numerator": 463,
+            "denominator": 782
+          },
+          "outcomes": {
+            "premature_done": 106,
+            "completed": 16,
+            "arrived_without_stop": 3
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 2,
+          "context_overflow_cases": 0
+        },
+        "small_ood/bridge/six_people_ood": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 433,
+            "denominator": 561
+          },
+          "exact_optimal": {
+            "numerator": 512,
+            "denominator": 561
+          },
+          "outcomes": {
+            "completed": 103,
+            "premature_done": 19,
+            "arrived_without_stop": 3
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "small_ood/cube2/noncanonical_goal_ood": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 333,
+            "denominator": 2773
+          },
+          "exact_optimal": {
+            "numerator": 1342,
+            "denominator": 2773
+          },
+          "outcomes": {
+            "premature_done": 89,
+            "cycle_and_budget": 34,
+            "budget_or_no_successor": 2
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 55,
+          "premature_stop_at_state_zero": 25,
+          "context_overflow_cases": 0
+        },
+        "small_ood/path/new_graph_ood": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 1136,
+            "denominator": 3268
+          },
+          "exact_optimal": {
+            "numerator": 1485,
+            "denominator": 3268
+          },
+          "outcomes": {
+            "arrived_without_stop": 2,
+            "cycle_and_budget": 50,
+            "completed": 40,
+            "budget_or_no_successor": 28,
+            "premature_done": 5
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 57,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "small_ood/puzzle8/noncanonical_goal_ood": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 2053,
+            "denominator": 3241
+          },
+          "exact_optimal": {
+            "numerator": 2300,
+            "denominator": 3241
+          },
+          "outcomes": {
+            "budget_or_no_successor": 7,
+            "cycle_and_budget": 10,
+            "premature_done": 108
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 10,
+          "premature_stop_at_state_zero": 108,
+          "context_overflow_cases": 0
+        },
+        "small_ood/token_swapping/alternate_tree_ood": {
+          "tasks": 125,
+          "map_follow": {
+            "numerator": 332,
+            "denominator": 4115
+          },
+          "exact_optimal": {
+            "numerator": 2168,
+            "denominator": 4115
+          },
+          "outcomes": {
+            "cycle_and_budget": 124,
+            "premature_done": 1
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 125,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "big_ood/game24/2_to21_big_ood": {
+          "tasks": 25,
+          "map_follow": {
+            "numerator": 3,
+            "denominator": 25
+          },
+          "exact_optimal": {
+            "numerator": 3,
+            "denominator": 46
+          },
+          "outcomes": {
+            "output_or_action_error": 22,
+            "arrived_without_stop": 3
+          },
+          "control_errors": {
+            "illegal_action": 22
+          },
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "big_ood/game24/2_to24_big_ood": {
+          "tasks": 25,
+          "map_follow": {
+            "numerator": 8,
+            "denominator": 25
+          },
+          "exact_optimal": {
+            "numerator": 8,
+            "denominator": 42
+          },
+          "outcomes": {
+            "output_or_action_error": 17,
+            "arrived_without_stop": 8
+          },
+          "control_errors": {
+            "illegal_action": 17
+          },
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "big_ood/game24/3_to21_big_ood": {
+          "tasks": 50,
+          "map_follow": {
+            "numerator": 12,
+            "denominator": 100
+          },
+          "exact_optimal": {
+            "numerator": 8,
+            "denominator": 150
+          },
+          "outcomes": {
+            "output_or_action_error": 50
+          },
+          "control_errors": {
+            "illegal_action": 49,
+            "control_format": 1
+          },
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "big_ood/game24/3_to24_big_ood": {
+          "tasks": 50,
+          "map_follow": {
+            "numerator": 42,
+            "denominator": 100
+          },
+          "exact_optimal": {
+            "numerator": 5,
+            "denominator": 150
+          },
+          "outcomes": {
+            "output_or_action_error": 50
+          },
+          "control_errors": {
+            "illegal_action": 50
+          },
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "big_ood/game24/4_to21_big_ood": {
+          "tasks": 50,
+          "map_follow": {
+            "numerator": 14,
+            "denominator": 150
+          },
+          "exact_optimal": {
+            "numerator": 22,
+            "denominator": 199
+          },
+          "outcomes": {
+            "output_or_action_error": 49,
+            "arrived_without_stop": 1
+          },
+          "control_errors": {
+            "illegal_action": 49
+          },
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "big_ood/game24/4_to24_big_ood": {
+          "tasks": 50,
+          "map_follow": {
+            "numerator": 49,
+            "denominator": 150
+          },
+          "exact_optimal": {
+            "numerator": 13,
+            "denominator": 200
+          },
+          "outcomes": {
+            "output_or_action_error": 50
+          },
+          "control_errors": {
+            "illegal_action": 49,
+            "control_format": 1
+          },
+          "cases_with_repeated_states": 0,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "big_ood/rush_hour/familiar_complete_goal_big_ood": {
+          "tasks": 123,
+          "map_follow": {
+            "numerator": 593,
+            "denominator": 3456
+          },
+          "exact_optimal": {
+            "numerator": 1217,
+            "denominator": 3456
+          },
+          "outcomes": {
+            "cycle_and_budget": 102,
+            "premature_done": 4,
+            "arrived_without_stop": 17
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 108,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        },
+        "big_ood/rush_hour/familiar_relation_big_ood": {
+          "tasks": 127,
+          "map_follow": {
+            "numerator": 608,
+            "denominator": 3826
+          },
+          "exact_optimal": {
+            "numerator": 1467,
+            "denominator": 3826
+          },
+          "outcomes": {
+            "cycle_and_budget": 113,
+            "arrived_without_stop": 9,
+            "premature_done": 5
+          },
+          "control_errors": {},
+          "cases_with_repeated_states": 120,
+          "premature_stop_at_state_zero": 0,
+          "context_overflow_cases": 0
+        }
+      }
+    }
+  },
+  "training_coverage": {
+    "4": {
+      "acceptance": {
+        "samples": 50000,
+        "by_task": {
+          "blocks": 12500,
+          "cube2": 12500,
+          "path": 12500,
+          "bridge": 12500
+        },
+        "by_subclass": {
+          "blocks/clear12": 4167,
+          "blocks/clear8": 4167,
+          "blocks/partial8": 4166,
+          "cube2/restoration": 12500,
+          "path/fixed_graph": 12500,
+          "bridge/five_all_right": 4167,
+          "bridge/five_intermediate_start": 4166,
+          "bridge/five_partial_goal": 4167
+        },
+        "shared_task_pool_across_training_sizes": true
+      },
+      "tasks": {
+        "blocks": {
+          "samples": 12500,
+          "unique_start_goal_context": 12500,
+          "unique_contexts": 1,
+          "unique_goals_with_context": 3742,
+          "action_decisions_per_epoch": 99149,
+          "length_histogram": {
+            "1": 702,
+            "2": 667,
+            "3": 619,
+            "4": 571,
+            "5": 548,
+            "6": 521,
+            "7": 538,
+            "8": 4167,
+            "12": 4167
+          },
+          "terminal_stop_examples_per_epoch": 12500
+        },
+        "bridge": {
+          "samples": 12500,
+          "unique_start_goal_context": 12500,
+          "unique_contexts": 4879,
+          "unique_goals_with_context": 12419,
+          "action_decisions_per_epoch": 56312,
+          "length_histogram": {
+            "1": 1504,
+            "2": 1972,
+            "3": 1690,
+            "4": 1195,
+            "5": 791,
+            "6": 695,
+            "7": 4372,
+            "8": 244,
+            "9": 37
+          },
+          "terminal_stop_examples_per_epoch": 12500
+        },
+        "cube2": {
+          "samples": 12500,
+          "unique_start_goal_context": 12500,
+          "unique_contexts": 1,
+          "unique_goals_with_context": 1,
+          "action_decisions_per_epoch": 158346,
+          "length_histogram": {
+            "12": 4184,
+            "13": 8286,
+            "14": 30
+          },
+          "terminal_stop_examples_per_epoch": 12500
+        },
+        "path": {
+          "samples": 12500,
+          "unique_start_goal_context": 12500,
+          "unique_contexts": 1,
+          "unique_goals_with_context": 256,
+          "action_decisions_per_epoch": 98551,
+          "length_histogram": {
+            "7": 3780,
+            "8": 6599,
+            "9": 1911,
+            "10": 210
+          },
+          "terminal_stop_examples_per_epoch": 12500
+        }
+      },
+      "total_action_decisions_per_epoch": 412358
+    },
+    "5": {
+      "acceptance": {
+        "samples": 50000,
+        "by_task": {
+          "blocks": 10000,
+          "cube2": 10000,
+          "path": 10000,
+          "bridge": 10000,
+          "puzzle8": 10000
+        },
+        "by_subclass": {
+          "blocks/clear12": 3334,
+          "blocks/clear8": 3333,
+          "blocks/partial8": 3333,
+          "cube2/restoration": 10000,
+          "path/fixed_graph": 10000,
+          "bridge/five_all_right": 3334,
+          "bridge/five_intermediate_start": 3333,
+          "bridge/five_partial_goal": 3333,
+          "puzzle8/restoration": 10000
+        },
+        "shared_task_pool_across_training_sizes": true
+      },
+      "tasks": {
+        "blocks": {
+          "samples": 10000,
+          "unique_start_goal_context": 10000,
+          "unique_contexts": 1,
+          "unique_goals_with_context": 3016,
+          "action_decisions_per_epoch": 79333,
+          "length_histogram": {
+            "1": 560,
+            "2": 533,
+            "3": 494,
+            "4": 457,
+            "5": 440,
+            "6": 418,
+            "7": 431,
+            "8": 3333,
+            "12": 3334
+          },
+          "terminal_stop_examples_per_epoch": 10000
+        },
+        "bridge": {
+          "samples": 10000,
+          "unique_start_goal_context": 10000,
+          "unique_contexts": 3922,
+          "unique_goals_with_context": 9944,
+          "action_decisions_per_epoch": 45025,
+          "length_histogram": {
+            "1": 1187,
+            "2": 1586,
+            "3": 1369,
+            "4": 959,
+            "5": 632,
+            "6": 551,
+            "7": 3497,
+            "8": 193,
+            "9": 26
+          },
+          "terminal_stop_examples_per_epoch": 10000
+        },
+        "cube2": {
+          "samples": 10000,
+          "unique_start_goal_context": 10000,
+          "unique_contexts": 1,
+          "unique_goals_with_context": 1,
+          "action_decisions_per_epoch": 126655,
+          "length_histogram": {
+            "12": 3372,
+            "13": 6601,
+            "14": 27
+          },
+          "terminal_stop_examples_per_epoch": 10000
+        },
+        "path": {
+          "samples": 10000,
+          "unique_start_goal_context": 10000,
+          "unique_contexts": 1,
+          "unique_goals_with_context": 256,
+          "action_decisions_per_epoch": 78895,
+          "length_histogram": {
+            "7": 3003,
+            "8": 5277,
+            "9": 1542,
+            "10": 178
+          },
+          "terminal_stop_examples_per_epoch": 10000
+        },
+        "puzzle8": {
+          "samples": 10000,
+          "unique_start_goal_context": 10000,
+          "unique_contexts": 1,
+          "unique_goals_with_context": 1,
+          "action_decisions_per_epoch": 254889,
+          "length_histogram": {
+            "24": 2690,
+            "25": 2783,
+            "26": 2567,
+            "27": 1086,
+            "28": 699,
+            "29": 132,
+            "30": 43
+          },
+          "terminal_stop_examples_per_epoch": 10000
+        }
+      },
+      "total_action_decisions_per_epoch": 584797
+    },
+    "6": {
+      "acceptance": {
+        "samples": 50000,
+        "by_task": {
+          "blocks": 8334,
+          "cube2": 8334,
+          "path": 8333,
+          "bridge": 8333,
+          "puzzle8": 8333,
+          "token_swapping": 8333
+        },
+        "by_subclass": {
+          "blocks/clear12": 2778,
+          "blocks/clear8": 2778,
+          "blocks/partial8": 2778,
+          "cube2/restoration": 8334,
+          "path/fixed_graph": 8333,
+          "bridge/five_all_right": 2778,
+          "bridge/five_intermediate_start": 2778,
+          "bridge/five_partial_goal": 2777,
+          "puzzle8/restoration": 8333,
+          "token_swapping/original_tree_arbitrary": 4166,
+          "token_swapping/original_tree_home": 4167
+        },
+        "shared_task_pool_across_training_sizes": true
+      },
+      "tasks": {
+        "blocks": {
+          "samples": 8334,
+          "unique_start_goal_context": 8334,
+          "unique_contexts": 1,
+          "unique_goals_with_context": 2526,
+          "action_decisions_per_epoch": 66095,
+          "length_histogram": {
+            "1": 470,
+            "2": 449,
+            "3": 410,
+            "4": 377,
+            "5": 364,
+            "6": 347,
+            "7": 361,
+            "8": 2778,
+            "12": 2778
+          },
+          "terminal_stop_examples_per_epoch": 8334
+        },
+        "bridge": {
+          "samples": 8333,
+          "unique_start_goal_context": 8333,
+          "unique_contexts": 3265,
+          "unique_goals_with_context": 8285,
+          "action_decisions_per_epoch": 37536,
+          "length_histogram": {
+            "1": 991,
+            "2": 1332,
+            "3": 1113,
+            "4": 798,
+            "5": 533,
+            "6": 474,
+            "7": 2916,
+            "8": 155,
+            "9": 21
+          },
+          "terminal_stop_examples_per_epoch": 8333
+        },
+        "cube2": {
+          "samples": 8334,
+          "unique_start_goal_context": 8334,
+          "unique_contexts": 1,
+          "unique_goals_with_context": 1,
+          "action_decisions_per_epoch": 105555,
+          "length_histogram": {
+            "12": 2814,
+            "13": 5493,
+            "14": 27
+          },
+          "terminal_stop_examples_per_epoch": 8334
+        },
+        "path": {
+          "samples": 8333,
+          "unique_start_goal_context": 8333,
+          "unique_contexts": 1,
+          "unique_goals_with_context": 256,
+          "action_decisions_per_epoch": 65732,
+          "length_histogram": {
+            "7": 2517,
+            "8": 4377,
+            "9": 1293,
+            "10": 146
+          },
+          "terminal_stop_examples_per_epoch": 8333
+        },
+        "puzzle8": {
+          "samples": 8333,
+          "unique_start_goal_context": 8333,
+          "unique_contexts": 1,
+          "unique_goals_with_context": 1,
+          "action_decisions_per_epoch": 212342,
+          "length_histogram": {
+            "24": 2267,
+            "25": 2328,
+            "26": 2109,
+            "27": 893,
+            "28": 591,
+            "29": 109,
+            "30": 36
+          },
+          "terminal_stop_examples_per_epoch": 8333
+        },
+        "token_swapping": {
+          "samples": 8333,
+          "unique_start_goal_context": 8333,
+          "unique_contexts": 1,
+          "unique_goals_with_context": 4166,
+          "action_decisions_per_epoch": 121280,
+          "length_histogram": {
+            "4": 1,
+            "5": 9,
+            "6": 19,
+            "7": 54,
+            "8": 107,
+            "9": 195,
+            "10": 307,
+            "11": 495,
+            "12": 709,
+            "13": 986,
+            "14": 1109,
+            "15": 1162,
+            "16": 1063,
+            "17": 823,
+            "18": 621,
+            "19": 407,
+            "20": 187,
+            "21": 58,
+            "22": 20,
+            "23": 1
+          },
+          "terminal_stop_examples_per_epoch": 8333
+        }
+      },
+      "total_action_decisions_per_epoch": 608540
+    }
+  },
+  "failure_classification": "Mutually exclusive priority: completed, arrival_without_stop, output_error, premature_done, executed_unreachable_transition, repeated_state_and_budget, remaining_budget_or_no_successor. Last scored but unexecuted budget action excluded from unreachable detection.",
+  "notes": [
+    "读表：完成数单元格为“到达 / 到达且正确停止（题数）”；跟图率为动作选择地图最小预测剩余成本候选的比例（过桥加入即时耗时，并列最小均算跟图），按原评测的可评分非终止决策统计。4类训练积木、魔方、寻路、过桥；5类加8-Puzzle；6类加棋子交换。最佳点按已完成ID到达数选择，OOD统一用250K终点。终点RO每组2000题已齐，历史ID与部分TF仍在补评。",
+    "覆盖：三组各有5万个不同起终点查询，每条都有终点停止示范；训练小类实际为8／9／11个。均分轨迹没有均分决策量：5类中华容道占动作示范43.6%，6类中为34.9%，棋子交换占19.9%。魔方训练路线12–14步、华容道24–30步，目标均为复原；寻路只见一张底图，棋子交换只见原树。扩类同时减少了每类样本，6类魔方的跟图率也从5类92.0%降至27.1%。",
+    "失败集中在三处：①目标停止沿用旧规则——4／5类魔方小OOD有107／114题在旧复原态停止，5／6类华容道有121／108题如此；积木小OOD提前停止124／125／106题。②新类别输出与动作映射失效——4／5类移车250题全部输出格式错误，6类改为主要循环；算术主要生成超出候选范围的动作。③新地图读取弱——新树地图贪心125/125，6类LLM跟图率8.1%、完成0/125。旧图换目标本身也弱：魔方0/125、华容道21/125。后继重点是换目标停止、新地图特征读取和候选动作对应。",
+    "核对于2026-10-29。表内来自028／4090的runs/flan_generalization_6f2af92，完成分片已按题去重，汇总与答卷一致；覆盖来自同名data目录的dataset.json及acceptance.json。本轮使用旧冻结地图；新地图比较见Qmap优化结果子页。详细计数与来源保存在experiments/map_sft_baselines/results/flan_generalization_results.json。"
+  ]
+}

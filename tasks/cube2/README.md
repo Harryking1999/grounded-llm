@@ -1,6 +1,6 @@
 # 二阶魔方任务工作区
 
-当前采用循环修复对照的 `repair_guard` 复原权重，保留对称 Q 与 L∞。目标相对坐标可复用该复原权重处理非复原目标，绝对状态对编码仍弱；两种读取条件及证据见[实验报告](../../experiments/cube2_qmap/results/report.md)。
+后继地图实验采用[selection](Qmap/selection.json)的 `goal_relative_inverse` 条件：目标相对坐标与编码器逆对称，全状态完成94.90%，Flan同题复原117/125、非复原目标119/125。已完成的Flan 4／5／6类实验仍使用旧 `repair_guard` 权重和绝对状态编码；新旧结果见[实验报告](../../experiments/cube2_qmap/results/report.md)。新条件已验收地图贪心，SFT入口的目标坐标槽位接入仍待实现，不能直接替换旧缓存。
 
 - [文字、规则与各组提示](prompts/README.md)：任务内原文；根目录 `TASK_TEXTS.md` 是自动集中副本。
 - [数据准备与示例](data/README.md)：小例说明字段。

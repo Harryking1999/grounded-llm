@@ -851,6 +851,40 @@ class ExactPairTests(unittest.TestCase):
         self.assertTrue((bank['reason'][:2]&8).all());self.assertTrue(bank['reason'][2]&2)
         self.assertTrue((bank['reason']&16).any())
 
+    def test_sokoban_failed_branch_continuation_preserves_original_supervision(self):
+        from copy import deepcopy
+        from experiments.new_tasks_qmap.src.relations import validate_continuation
+        old=dict(task='sokoban',training=dict(steps=12000,batch_size=32768,
+            current_failure_replay=dict(contexts_per_batch=256,queries='all')))
+        new=deepcopy(old);new['training']['steps']=32000
+        new['training']['current_failure_replay']['include_failed_nonoptimal']=True
+        new['continuation']=dict(mode='sokoban_failed_branches')
+        validate_continuation(old,new,12000)
+        changed=deepcopy(new);changed['training']['current_failure_replay']['contexts_per_batch']=512
+        with self.assertRaises(ValueError):validate_continuation(old,changed,12000)
+        changed=deepcopy(new);changed['training']['steps']=12000
+        with self.assertRaises(ValueError):validate_continuation(old,changed,12000)
+
+    def test_sokoban_failed_branch_mining_keeps_upstream_recoverable_wrong_action(self):
+        from experiments.new_tasks_qmap.src.sokoban_failures import mine_fixed_wall_failures
+        children=np.array([[1,2],[0,2],[3,4],[3,-1],[4,-1],[0,6],[3,-1]])
+        truth=UnitGraphOracle(children).to_goal(3)
+        scene=SimpleNamespace(states=np.arange(7)[:,None],children=children,goals=np.array([3]),
+            metadata=dict(split='train',training_goals=1),distance=lambda s,g:truth[s])
+        corpus=PhysicalCorpus.__new__(PhysicalCorpus);corpus.scenes=[scene];corpus.size=7;corpus.offsets=np.array([0,7]);corpus.max_candidates=2
+        data=dict(reserved_relations=np.empty(0,dtype=np.int64))
+        class Scores:
+            def __init__(self,*args):pass
+            def q(self,ids):return ids
+            def scores(self,source,goal):return np.array([0.,0.,10.,1.,0.,12.,10.])[source]
+        with patch('experiments.new_tasks_qmap.src.sokoban_failures.QCache',Scores):
+            summary,bank=mine_fixed_wall_failures(None,corpus,data,'cpu',include_failed_nonoptimal=True)
+        self.assertEqual(summary['additional_failed_nonoptimal_decisions'],1)
+        at=np.flatnonzero((bank['tasks']==[5,3]).all(-1))
+        self.assertEqual(len(at),1);self.assertTrue(bank['reason'][at[0]]&1)
+        self.assertFalse(bank['reason'][at[0]]&10)
+        np.testing.assert_array_equal(bank['children'][at[0]],[0,6])
+
     def test_current_failures_preserve_broad_points_old_paths_and_complete_resume(self):
         from copy import deepcopy
         from experiments.new_tasks_qmap.src.current_failures import CurrentFailureReplay

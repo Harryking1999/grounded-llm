@@ -3805,5 +3805,172 @@
       "target_reached": false
     },
     "raw_root": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/sokoban_targeted_20261028"
+  },
+  "targeted_continuation_exhaustive_fit": {
+    "selected8000": {
+      "checkpoint_step": 8000,
+      "source_commit": "72ec344888cae73c38d97719113268a901115783",
+      "states": 42840,
+      "training_goals": 532,
+      "seconds": 12.323907375335693,
+      "totals": {
+        "allowed_training_queries": 747780,
+        "solved": 313393,
+        "finite_cycle_basin": 375876,
+        "unreachable_cycle_basin": 58511,
+        "wrong_first_action": 77342,
+        "immediate_dead_choice": 7417,
+        "cycle_contexts": 38825,
+        "walk_cycle_contexts": 38825,
+        "cycle_with_boxes_already_matching_goal": 24,
+        "cycle_all_optimal_actions_push": 6245,
+        "cycle_all_optimal_actions_walk": 31287
+      },
+      "optimal_transition_fit": {
+        "optimal_walk": {
+          "edges": 697167,
+          "nonpositive_predicted_drop": 104274,
+          "mean_absolute_drop_error": 0.5224922701443927
+        },
+        "optimal_push": {
+          "edges": 168900,
+          "nonpositive_predicted_drop": 31586,
+          "mean_absolute_drop_error": 1.052255566790656
+        }
+      },
+      "original_training_goals": {
+        "count": 198,
+        "solved": 41,
+        "cycles": 157,
+        "entered_unreachable": 28
+      },
+      "critical_bank_contexts": 46242,
+      "condition": "Frozen independent400input128D directed-max Q; every legal successor; exact labels inspect policy after selection; training-only cycle/dead bank"
+    },
+    "last12000": {
+      "checkpoint_step": 12000,
+      "source_commit": "72ec344888cae73c38d97719113268a901115783",
+      "states": 42840,
+      "training_goals": 532,
+      "seconds": 12.602477312088013,
+      "totals": {
+        "allowed_training_queries": 747780,
+        "solved": 345490,
+        "finite_cycle_basin": 349322,
+        "unreachable_cycle_basin": 52968,
+        "wrong_first_action": 69929,
+        "immediate_dead_choice": 6812,
+        "cycle_contexts": 35035,
+        "walk_cycle_contexts": 35035,
+        "cycle_with_boxes_already_matching_goal": 10,
+        "cycle_all_optimal_actions_push": 5891,
+        "cycle_all_optimal_actions_walk": 27952
+      },
+      "optimal_transition_fit": {
+        "optimal_walk": {
+          "edges": 697167,
+          "nonpositive_predicted_drop": 95164,
+          "mean_absolute_drop_error": 0.4956180409556701
+        },
+        "optimal_push": {
+          "edges": 168900,
+          "nonpositive_predicted_drop": 30998,
+          "mean_absolute_drop_error": 0.9909941858649607
+        }
+      },
+      "original_training_goals": {
+        "count": 198,
+        "solved": 63,
+        "cycles": 135,
+        "entered_unreachable": 22
+      },
+      "critical_bank_contexts": 41847,
+      "condition": "Frozen independent400input128D directed-max Q; every legal successor; exact labels inspect policy after selection; training-only cycle/dead bank"
+    }
+  },
+  "failed_branch_coverage_preparation": {
+    "parent_step": 12000,
+    "adam_step": 12000,
+    "mining": {
+      "queries": 747780,
+      "solved": 345490,
+      "cycles": 402290,
+      "immediate_dead_decisions": 6812,
+      "cycle_decisions": 35035,
+      "failed_nonoptimal_decisions": 63489,
+      "additional_failed_nonoptimal_decisions": 39160,
+      "critical_decisions": 81007,
+      "continuation_decisions": 8955,
+      "bank_decisions": 88616,
+      "full_permitted_training_graph": true,
+      "all_legal_candidates_preserved": true,
+      "includes_failed_nonoptimal": true
+    },
+    "added_critical_contexts": 39160,
+    "added_contexts_with_push_candidate": 20469,
+    "added_contexts_all_optimal_exits_push": 7781,
+    "all_original_cycle_dead_contexts_retained": true,
+    "all_native_labels_and_candidates_equal": true,
+    "sampling": {
+      "batches": 2000,
+      "contexts_per_batch": 256,
+      "critical_contexts": 81007,
+      "continuation_contexts": 8955,
+      "minimum_critical_draws": 2,
+      "minimum_continuation_draws": 7,
+      "critical_unseen": 0,
+      "continuation_unseen": 0
+    },
+    "optimizer_updates": 0,
+    "parent12000_cohorts": {
+      "validation": {
+        "mae": 0.8390514254570007,
+        "count": 16,
+        "solved": 12,
+        "optimal": 12,
+        "cycles": 4,
+        "entered_unreachable": 0
+      },
+      "test": {
+        "mae": 1.07780122756958,
+        "count": 16,
+        "solved": 14,
+        "optimal": 14,
+        "cycles": 2,
+        "entered_unreachable": 1
+      },
+      "unseen_goal_validation": {
+        "mae": 1.4951447248458862,
+        "count": 96,
+        "solved": 58,
+        "optimal": 53,
+        "cycles": 38,
+        "entered_unreachable": 5
+      },
+      "unseen_goal_test": {
+        "mae": 4.8185248374938965,
+        "count": 94,
+        "solved": 21,
+        "optimal": 20,
+        "cycles": 73,
+        "entered_unreachable": 6
+      },
+      "original_training_goals": {
+        "mae": 5.772345066070557,
+        "count": 198,
+        "solved": 63,
+        "optimal": 60,
+        "cycles": 135,
+        "entered_unreachable": 22
+      },
+      "original_unseen_goals": {
+        "mae": 1.3218412399291992,
+        "count": 4,
+        "solved": 2,
+        "optimal": 2,
+        "cycles": 2,
+        "entered_unreachable": 1
+      }
+    }
   }
 }

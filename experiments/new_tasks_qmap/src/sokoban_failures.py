@@ -4,14 +4,15 @@ from .relation_data import materialize, training_decision_mask
 from .relation_evaluate import QCache
 
 
-def mine_fixed_wall_failures(model,corpus,data,device,maximum_steps=256):
+def mine_fixed_wall_failures(model,corpus,data,device,maximum_steps=256,include_failed_nonoptimal=False):
     if len(corpus.scenes)!=1 or corpus.scenes[0].metadata['split']!='train':
         raise ValueError('Fixed-wall failure mining requires one original training scene')
     scene=corpus.scenes[0];n=corpus.size;ids=np.arange(n)
     children=corpus.successors(ids);valid=children>=0;safe=np.maximum(children,0)
     cache=QCache(model,corpus,device);cache.q(ids)
     critical=[];flags=[];seeds=[]
-    report=dict(queries=0,solved=0,cycles=0,immediate_dead_decisions=0,cycle_decisions=0)
+    report=dict(queries=0,solved=0,cycles=0,immediate_dead_decisions=0,cycle_decisions=0,
+                failed_nonoptimal_decisions=0,additional_failed_nonoptimal_decisions=0)
     for goal in scene.goals[:scene.metadata['training_goals']]:
         goal=int(goal);rows=np.column_stack([ids,np.full(n,goal)])
         allowed=training_decision_mask(corpus,data,rows)
@@ -22,7 +23,9 @@ def mine_fixed_wall_failures(model,corpus,data,device,maximum_steps=256):
         for _ in range(n.bit_length()):hops+=hops[endpoint];endpoint=endpoint[endpoint]
         solved=(endpoint==goal)&(hops<=maximum_steps)
         cycle=(nxt[nxt]==ids)&(nxt!=ids)&allowed
-        dead=allowed&~np.isfinite(truth[nxt]);selected=cycle|dead
+        dead=allowed&~np.isfinite(truth[nxt])
+        failed_nonoptimal=allowed&~solved&(truth[nxt]+1!=truth)
+        selected=cycle|dead|(failed_nonoptimal if include_failed_nonoptimal else False)
         take=rows[selected]
         reason=np.where(cycle[selected],np.uint8(8),np.uint8(0))|np.where(dead[selected],np.uint8(2),np.uint8(0))
         reason|=np.where(truth[nxt[selected]]+1!=truth[selected],np.uint8(1),np.uint8(0))
@@ -35,6 +38,8 @@ def mine_fixed_wall_failures(model,corpus,data,device,maximum_steps=256):
         report['queries']+=int(allowed.sum());report['solved']+=int((allowed&solved).sum())
         report['cycles']+=int((allowed&~solved).sum())
         report['immediate_dead_decisions']+=int(dead.sum());report['cycle_decisions']+=int(cycle.sum())
+        report['failed_nonoptimal_decisions']+=int(failed_nonoptimal.sum())
+        report['additional_failed_nonoptimal_decisions']+=int((failed_nonoptimal&~cycle&~dead).sum())
     critical=np.concatenate(critical);flags=np.concatenate(flags)
     current=np.asarray(seeds,dtype=np.int64).reshape(-1,2);continuations=[]
     for _ in range(maximum_steps):
@@ -52,5 +57,6 @@ def mine_fixed_wall_failures(model,corpus,data,device,maximum_steps=256):
     reason[np.searchsorted(keys,extra[:,0]*np.int64(n)+extra[:,1])]|=16
     if not training_decision_mask(corpus,data,tasks).all():raise ValueError('Failure bank crosses a protected relation')
     report.update(critical_decisions=len(critical),continuation_decisions=len(extra),bank_decisions=len(tasks),
-                  full_permitted_training_graph=True,all_legal_candidates_preserved=True)
+                  full_permitted_training_graph=True,all_legal_candidates_preserved=True,
+                  includes_failed_nonoptimal=bool(include_failed_nonoptimal))
     return report,dict(**materialize(corpus,tasks),reason=reason)

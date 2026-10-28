@@ -92,6 +92,7 @@ def validate_continuation(previous,current,step):
     current_failures=current.get('continuation',{}).get('mode')=='current_failure_replay'
     failure_coverage=current.get('continuation',{}).get('mode')=='current_failure_coverage'
     structural=current.get('continuation',{}).get('mode')=='structural_replay'
+    failed_branches=current.get('continuation',{}).get('mode')=='sokoban_failed_branches'
     for item in (old,new):
         for key in ('continuation','convergence','pilot'):item.pop(key,None)
         if item.get('failure_diagnosis'):
@@ -103,6 +104,19 @@ def validate_continuation(previous,current,step):
         if workers not in (0,1):raise ValueError('Only synchronous or one-worker trace writing is supported')
         preparation=item['training'].get('relation_sampling',{}).pop('preparation_workers',1)
         if not 1<=preparation<=32:raise ValueError('Preparation workers must be between1 and32')
+    if failed_branches:
+        before=old['training'].get('current_failure_replay',{})
+        after=new['training'].get('current_failure_replay',{})
+        if old.get('task')!='sokoban' or not before or before.get('include_failed_nonoptimal',False):
+            raise ValueError('Failed-branch continuation expands the existing Sokoban failure pool')
+        if after.pop('include_failed_nonoptimal',False) is not True:
+            raise ValueError('Failed-branch continuation includes failed nonoptimal decisions')
+        if 'include_failed_nonoptimal' in before:after['include_failed_nonoptimal']=False
+        if not step<=old['training']['steps']<new['training']['steps']:
+            raise ValueError('Failed-branch continuation requires an explicit additional budget')
+        new['training']['steps']=old['training']['steps']
+        if old!=new:raise ValueError('Failed-branch continuation changes another training condition')
+        return
     if structural:
         before=old['training'].get('current_failure_replay',{})
         after=new['training'].get('current_failure_replay',{})
@@ -422,6 +436,8 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
                 batch_sizes={k:dict(previous=saved['config']['training'][k],current=options[k]) for k in ('batch_size','decision_batch_size')},
                 meaning=('Original optimizer/samplers/RNG/counters restored; add current failure forks with a separate recoverable stream.'
                     if continuation.get('mode')=='current_failure_replay' else
+                    'Full optimizer/samplers/RNG/counters restored; include upstream nonoptimal decisions whose current policy fails, together with walking cycles and irreversible dead branches.'
+                    if continuation.get('mode')=='sokoban_failed_branches' else
                     'Full optimizer/samplers/RNG/counters restored; share the existing supplemental quota between current failures and paired cross-layout training contexts.'
                     if continuation.get('mode')=='structural_replay' else
                     'Full optimizer/samplers/RNG/counters restored; refresh current failures over every permitted original training root.'
@@ -493,6 +509,9 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
             current_replay.last_refresh=start_step
         if (continuation or {}).get('mode')=='current_failure_coverage' and not resume:
             current_replay.last_refresh=start_step-options['current_failure_replay']['refresh_every']
+        if (continuation or {}).get('mode')=='sokoban_failed_branches' and not resume:
+            current_replay.last_refresh=start_step-options['current_failure_replay']['refresh_every']
+            current_replay.refresh(model,device,config,start_step)
         atomic_json(out/'current_failure_summary.json',current_replay.report())
     if not (out/'initial.json').exists():
         initial_started=time.monotonic()

@@ -15826,5 +15826,465 @@
       "optimizer_updates": 0
     },
     "raw_root": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/rush_hour_20261028/resume_40645_ee701ee/blocking_transfer_broad_groups"
+  },
+  "structural_replay_completion": {
+    "source_commit": "6e350ee01eedbcff1277693da7cb7b10fe55de15",
+    "last_step": 80000,
+    "selected_step": 54000,
+    "terminal_validation": {
+      "validation": {
+        "mae": 0.3880453109741211,
+        "shortest_action_rate": 0.99267578125,
+        "success_rate": 1.0
+      },
+      "unseen_goal_validation": {
+        "mae": 0.4639439284801483,
+        "shortest_action_rate": 0.99072265625,
+        "success_rate": 1.0
+      },
+      "unseen_layout_validation": {
+        "mae": 4.885032653808594,
+        "shortest_action_rate": 0.69873046875,
+        "success_rate": 0.5703125
+      },
+      "original_layout_validation": {
+        "mae": 17.867034912109375,
+        "shortest_action_rate": 0.59716796875,
+        "success_rate": 0.064453125
+      }
+    },
+    "terminal_training_probe": {
+      "batches": 4,
+      "point_count": 262144,
+      "decision_count": 32768,
+      "finite_mae": 0.3450588583946228,
+      "distance_huber": 0.10180766880512238,
+      "candidate_soft_rank_loss": 1.8235400915145874,
+      "shortest_action_rate": 0.995147705078125,
+      "by_distance": {
+        "1_5": {
+          "count": 130565,
+          "mae": 0.29851433634757996
+        },
+        "6_20": {
+          "count": 93931,
+          "mae": 0.36050716042518616
+        },
+        "21_plus": {
+          "count": 37522,
+          "mae": 0.4695054888725281
+        }
+      },
+      "role": "Fixed actual training batches; fitting diagnostic only, never checkpoint selection."
+    },
+    "structural_exposure": {
+      "groups": 70326,
+      "queries": 53802,
+      "contexts_per_batch": 128,
+      "group_draws": 1280000,
+      "minimum_group_draws": 18,
+      "unique_groups_drawn": 70326,
+      "passes": 18.200949862070928
+    },
+    "fixed_comparison": {
+      "parent60000": {
+        "step": 60000,
+        "source_commit": "ee701ee604ebd18d0d5988af74fe2b9384fdd924",
+        "group_fit": {
+          "global_context_contrast": {
+            "groups": 52751,
+            "queries": 47108,
+            "strict_pairs": 69532,
+            "strict_pair_correct": 68586,
+            "both_strict_members_correct": 16279,
+            "both_strict_groups": 16781,
+            "query_shortest_action_correct": 46279,
+            "query_shortest_action_rate": 0.9824021397639466,
+            "optimal_vs_other_margin_quantiles": [
+              -1.6641807556152344,
+              0.5022845268249512,
+              0.895749568939209,
+              1.1881890892982483,
+              3.095876455307007
+            ]
+          },
+          "retain_consistent_relation": {
+            "groups": 17198,
+            "queries": 23307,
+            "strict_pairs": 34396,
+            "strict_pair_correct": 34326,
+            "both_strict_members_correct": 17130,
+            "both_strict_groups": 17198,
+            "query_shortest_action_correct": 23091,
+            "query_shortest_action_rate": 0.9907323979920196,
+            "optimal_vs_other_margin_quantiles": [
+              -1.2894248962402344,
+              0.5780181884765625,
+              0.9112138748168945,
+              1.2542174816131593,
+              2.7376956939697266
+            ]
+          },
+          "training_rank_error": {
+            "groups": 377,
+            "queries": 703,
+            "strict_pairs": 754,
+            "strict_pair_correct": 553,
+            "both_strict_members_correct": 178,
+            "both_strict_groups": 377,
+            "query_shortest_action_correct": 664,
+            "query_shortest_action_rate": 0.9445234708392604,
+            "optimal_vs_other_margin_quantiles": [
+              -1.4253978729248047,
+              0.13851356506347656,
+              0.7733802795410156,
+              1.1522300720214849,
+              2.7376956939697266
+            ]
+          }
+        },
+        "group_fit_all": {
+          "groups": 70326,
+          "queries": 53802,
+          "strict_pairs": 104682,
+          "strict_pair_correct": 103465,
+          "both_strict_members_correct": 33587,
+          "both_strict_groups": 34356,
+          "query_shortest_action_correct": 52923,
+          "query_shortest_action_rate": 0.9836623173859708,
+          "optimal_vs_other_margin_quantiles": [
+            -1.6641807556152344,
+            0.5172389984130861,
+            0.9008851051330566,
+            1.2185401678085326,
+            3.095876455307007
+          ]
+        },
+        "supervision_scope": "Both full queries and all legal children from the fixed training bank; frozen diagnostic",
+        "query_fit_by_distance": {
+          "1_5": {
+            "count": 8180,
+            "correct": 8162
+          },
+          "6_10": {
+            "count": 10187,
+            "correct": 10047
+          },
+          "11_20": {
+            "count": 13860,
+            "correct": 13595
+          },
+          "21_40": {
+            "count": 17788,
+            "correct": 17414
+          },
+          "41_80": {
+            "count": 3787,
+            "correct": 3705
+          }
+        },
+        "all_permitted_training_roots": {
+          "count": 91267,
+          "solved": 90550,
+          "optimal": 67317,
+          "cycles": 717,
+          "distance_strata": {
+            "1_5": {
+              "count": 1212,
+              "solved": 1212,
+              "optimal": 1206
+            },
+            "6_10": {
+              "count": 3679,
+              "solved": 3675,
+              "optimal": 3544
+            },
+            "11_20": {
+              "count": 5574,
+              "solved": 5520,
+              "optimal": 4757
+            },
+            "21_40": {
+              "count": 8370,
+              "solved": 8269,
+              "optimal": 6544
+            },
+            "41_80": {
+              "count": 72432,
+              "solved": 71874,
+              "optimal": 51266
+            }
+          }
+        },
+        "fixed_matched": {
+          "matched_training": {
+            "count": 921,
+            "solved": 916,
+            "cycles": 5,
+            "cycle_length_counts": {
+              "2": 5
+            },
+            "first_wrong_steps": [
+              1.0,
+              13.0,
+              40.0
+            ],
+            "unique_cycle_contexts": 10,
+            "cycle_contexts_in_structural_bank": 0,
+            "trajectory_optimal_action_rate": 0.9930927739789318,
+            "cycle_closing_margin_quantiles": {
+              "0": -0.23532819747924805,
+              "0.1": -0.2165539711713791,
+              "0.5": -0.1882781982421875,
+              "0.9": 0.11995621025562286,
+              "1": 0.12066268920898438
+            }
+          },
+          "matched_unseen_layout": {
+            "count": 921,
+            "solved": 27,
+            "cycles": 894,
+            "cycle_length_counts": {
+              "2": 894
+            },
+            "first_wrong_steps": [
+              0.0,
+              2.0,
+              24.0
+            ],
+            "unique_cycle_contexts": 1788,
+            "cycle_contexts_in_structural_bank": 0,
+            "trajectory_optimal_action_rate": 0.7342412451361867,
+            "cycle_closing_margin_quantiles": {
+              "0": -2.782907485961914,
+              "0.1": -1.1153030395507812,
+              "0.5": -0.3361797332763672,
+              "0.9": 0.30518168210983276,
+              "1": 1.4091720581054688
+            }
+          }
+        }
+      },
+      "last80000": {
+        "step": 80000,
+        "source_commit": "6e350ee01eedbcff1277693da7cb7b10fe55de15",
+        "group_fit": {
+          "global_context_contrast": {
+            "groups": 52751,
+            "queries": 47108,
+            "strict_pairs": 69532,
+            "strict_pair_correct": 68977,
+            "both_strict_members_correct": 16471,
+            "both_strict_groups": 16781,
+            "query_shortest_action_correct": 46710,
+            "query_shortest_action_rate": 0.9915513288613399,
+            "optimal_vs_other_margin_quantiles": [
+              -1.5528011322021484,
+              0.6046266555786133,
+              0.923130989074707,
+              1.1676650643348694,
+              3.0157785415649414
+            ]
+          },
+          "retain_consistent_relation": {
+            "groups": 17198,
+            "queries": 23307,
+            "strict_pairs": 34396,
+            "strict_pair_correct": 34364,
+            "both_strict_members_correct": 17166,
+            "both_strict_groups": 17198,
+            "query_shortest_action_correct": 23205,
+            "query_shortest_action_rate": 0.9956236323851203,
+            "optimal_vs_other_margin_quantiles": [
+              -1.0920305252075195,
+              0.6447656631469726,
+              0.9349842071533203,
+              1.2297243356704715,
+              3.0157785415649414
+            ]
+          },
+          "training_rank_error": {
+            "groups": 377,
+            "queries": 703,
+            "strict_pairs": 754,
+            "strict_pair_correct": 641,
+            "both_strict_members_correct": 267,
+            "both_strict_groups": 377,
+            "query_shortest_action_correct": 685,
+            "query_shortest_action_rate": 0.9743954480796586,
+            "optimal_vs_other_margin_quantiles": [
+              -1.1293258666992188,
+              0.2701770782470703,
+              0.8366518020629883,
+              1.1349117279052738,
+              3.0157785415649414
+            ]
+          }
+        },
+        "group_fit_all": {
+          "groups": 70326,
+          "queries": 53802,
+          "strict_pairs": 104682,
+          "strict_pair_correct": 103982,
+          "both_strict_members_correct": 33904,
+          "both_strict_groups": 34356,
+          "query_shortest_action_correct": 53377,
+          "query_shortest_action_rate": 0.9921006654027731,
+          "optimal_vs_other_margin_quantiles": [
+            -1.5528011322021484,
+            0.6132418632507325,
+            0.9272732734680176,
+            1.1954429149627686,
+            3.0157785415649414
+          ]
+        },
+        "supervision_scope": "Both full queries and all legal children from the fixed training bank; frozen diagnostic",
+        "query_fit_by_distance": {
+          "1_5": {
+            "count": 8180,
+            "correct": 8171
+          },
+          "6_10": {
+            "count": 10187,
+            "correct": 10120
+          },
+          "11_20": {
+            "count": 13860,
+            "correct": 13698
+          },
+          "21_40": {
+            "count": 17788,
+            "correct": 17658
+          },
+          "41_80": {
+            "count": 3787,
+            "correct": 3730
+          }
+        },
+        "actual_group_exposure": {
+          "minimum": 18,
+          "maximum": 19,
+          "unseen": 0,
+          "total": 1280000
+        },
+        "all_permitted_training_roots": {
+          "count": 91267,
+          "solved": 91071,
+          "optimal": 74286,
+          "cycles": 196,
+          "distance_strata": {
+            "1_5": {
+              "count": 1212,
+              "solved": 1212,
+              "optimal": 1208
+            },
+            "6_10": {
+              "count": 3679,
+              "solved": 3676,
+              "optimal": 3567
+            },
+            "11_20": {
+              "count": 5574,
+              "solved": 5550,
+              "optimal": 4863
+            },
+            "21_40": {
+              "count": 8370,
+              "solved": 8334,
+              "optimal": 7017
+            },
+            "41_80": {
+              "count": 72432,
+              "solved": 72299,
+              "optimal": 57631
+            }
+          }
+        },
+        "fixed_matched": {
+          "matched_training": {
+            "count": 921,
+            "solved": 920,
+            "cycles": 1,
+            "cycle_length_counts": {
+              "2": 1
+            },
+            "first_wrong_steps": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "unique_cycle_contexts": 2,
+            "cycle_contexts_in_structural_bank": 0,
+            "trajectory_optimal_action_rate": 0.9952430435284609,
+            "cycle_closing_margin_quantiles": {
+              "0": 0.14853668212890625,
+              "0.1": 0.14853668212890625,
+              "0.5": 0.14853668212890625,
+              "0.9": 0.14853668212890625,
+              "1": 0.14853668212890625
+            }
+          },
+          "matched_unseen_layout": {
+            "count": 921,
+            "solved": 66,
+            "cycles": 855,
+            "cycle_length_counts": {
+              "2": 855
+            },
+            "first_wrong_steps": [
+              0.0,
+              3.0,
+              21.0
+            ],
+            "unique_cycle_contexts": 1710,
+            "cycle_contexts_in_structural_bank": 0,
+            "trajectory_optimal_action_rate": 0.7557531860273219,
+            "cycle_closing_margin_quantiles": {
+              "0": -2.581195831298828,
+              "0.1": -1.0198379755020142,
+              "0.5": -0.2938728332519531,
+              "0.9": 0.37370893359184265,
+              "1": 2.3756542205810547
+            }
+          }
+        }
+      }
+    },
+    "interpretation": "Frozen parent60000 versus terminal80000, same original-root and matched queries. The continuation adds updates and paired supervision together. The selected checkpoint remains54000 under the original validation criterion.",
+    "raw_root": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/rush_hour_20261028/structure_6e350ee/analysis_20261029",
+    "remaining_cycle_coverage": {
+      "step": 80000,
+      "count": 91267,
+      "solved": 91071,
+      "cycles": 196,
+      "unique_cycle_contexts": 392,
+      "allowed_cycle_contexts": 348,
+      "protected_cycle_contexts": 44,
+      "in_last_refreshed_pool": 0,
+      "in_any_current_phase_pool": 108,
+      "current_pool_exposure_quantiles": [],
+      "first_wrong_contexts": 196,
+      "first_wrong_training_allowed": 174,
+      "first_wrong_steps": [
+        1.0,
+        5.0,
+        60.0
+      ],
+      "seconds": 102.60121989250183
+    },
+    "retained_failure_preparation": {
+      "checkpoint_step": 80000,
+      "historical_critical_queries": 35079,
+      "queries": 35438,
+      "critical_queries": 6971,
+      "currently_optimal_retention_queries": 28557,
+      "fragile_retention_queries": 13255,
+      "current_allowed_cycle_contexts": 348,
+      "current_allowed_first_wrong_contexts": 174,
+      "catalogue_groups": 322,
+      "all_training_boundaries_valid": true,
+      "all_legal_candidates_preserved": true,
+      "optimizer_updates": 0
+    }
   }
 }

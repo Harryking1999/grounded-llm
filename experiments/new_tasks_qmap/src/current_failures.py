@@ -103,7 +103,8 @@ class CurrentFailureReplay:
         if step-self.last_refresh < self.options['refresh_every']: return
         if config['task']=='sokoban':
             from .sokoban_failures import mine_fixed_wall_failures
-            summary,bank=mine_fixed_wall_failures(model,self.corpus,self.data,device)
+            summary,bank=mine_fixed_wall_failures(model,self.corpus,self.data,device,
+                include_failed_nonoptimal=self.options.get('include_failed_nonoptimal',False))
             if len(bank['tasks']):self.set_bank(bank)
             self.round+=1;self.last_refresh=step;self.save_bank()
             atomic_json(self.out/f'current_failures_{self.round:04d}.json',dict(step=step,**summary))

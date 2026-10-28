@@ -1,6 +1,6 @@
 {
   "study": "blocks_goal_generalization",
-  "parent_checkpoint": "runs/blocks_goal_generalization/train/checkpoints/step_002000.pt",
+  "parent_checkpoint": "runs/blocks_goal_generalization/train/checkpoints/step_003000.pt",
   "graph_data": "data/blocks12_graphs",
   "legacy_data": "data/legacy_tree.npz",
   "baseline_cases": "tasks/blocks/data/clear1000.json",
@@ -15,7 +15,7 @@
   "training": {
     "seed": 2026102810,
     "learning_rate": 0.0003,
-    "steps": 38000,
+    "steps": 37000,
     "batch_size_per_rank": 4096,
     "rank_contexts_per_rank": 512,
     "boards_per_batch": 8,
@@ -56,7 +56,7 @@
     "sampler_shards": 2,
     "training_probe": true,
     "previous_sampler_root": "runs/blocks_goal_generalization/train",
-    "previous_sampler_step": 2000,
+    "previous_sampler_step": 3000,
     "additional_failure_diagnoses": [
       "runs/blocks_goal_generalization/diagnosis.json"
     ]

@@ -11,7 +11,7 @@ from grounded_llm.core.qmap.metrics import pair_metrics, decisions, ranking_loss
 from grounded_llm.tasks.puzzle8.environment import Puzzle8
 from grounded_llm.tasks.puzzle8.data import build
 from grounded_llm.tasks.puzzle8.model import QMap, MODEL_TYPE, soft_rank_loss
-from grounded_llm.tasks.puzzle8.evaluate import evaluate
+from grounded_llm.tasks.puzzle8.evaluate import evaluate, goal_normalized_rollouts
 from grounded_llm.tasks.puzzle8.policy_audit import audit
 from grounded_llm.tasks.puzzle8.data_sampling import DataMix
 from grounded_llm.tasks.puzzle8.branch_data import BranchData
@@ -36,6 +36,12 @@ def intermediate_stage(model, env, data, config, device, reference=None):
     if config['evaluation'].get('goal_anchors'):
         result['goal_anchors'] = {str(goal):audit(model,env,device,goal=int(goal))[0]
                                   for goal in config['evaluation']['goal_anchors']}
+    if config['evaluation'].get('goal_normalized'):
+        cohorts={split:data[f'tasks_{split}'][task_indices(env,data,split,
+                 config['evaluation']['rollout_count'],config)] for split in ('validation','test')}
+        rng=np.random.default_rng(20261028)
+        cohorts['actual_goal_family']=np.column_stack((rng.integers(1,env.size,1024),rng.integers(1,1000,1024)))
+        result['goal_normalized']=goal_normalized_rollouts(model,env,cohorts,device)
     return result
 
 

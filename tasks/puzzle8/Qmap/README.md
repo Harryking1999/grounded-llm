@@ -4,6 +4,6 @@
 
 与其他 Qmap 共享两层 MLP、128 维 Q、固定对称距离及距离／候选排序监督。输入为九位置的九类独热。完整覆盖全状态到复原终点，并构造全状态到多组中间目标的精确距离；最终以复原为主要 rollout，留出中间目标检查关系补全。
 
-用户已选用全状态复原98.28%的权重，入口见 [selection.json](selection.json)，本地推理文件为 `checkpoints/selected_98_28.pt`。固定中间目标328/1024，严格中间关系保持门槛尚未通过；具体能力范围见[当前报告](../../../experiments/puzzle8_qmap/results/report.md)。各任务后续安排以项目状态页为准。
+原复原权重为 `checkpoints/selected_98_28.pt`。目标规范化条件的已验证权重为 `checkpoints/goal_normalized_290000.pt`：实际换目标1009/1024（98.54%），角、边、中央三组均超过90%；原固定中间目标测试1015/1024（99.12%）。权重与读取条件由[selection.json](selection.json)维护，分项比较见[当前报告](../../../experiments/puzzle8_qmap/results/report.md)。
 
 目标坐标读取通过 `MapReader(env, checkpoint, coordinate_frame="goal_normalized")` 启用，使用已知棋盘对称及数字重命名；默认绝对状态编码保持原条件。比较及机制见[实验报告](../../../experiments/puzzle8_qmap/results/report.md)。

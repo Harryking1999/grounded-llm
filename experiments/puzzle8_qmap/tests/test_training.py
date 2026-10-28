@@ -41,6 +41,27 @@ class PuzzleMapTest(unittest.TestCase):
             np.testing.assert_array_equal(adapted.scores(source,goal),original.scores(normalized,targets))
             np.testing.assert_array_equal(adapted.scores(source,0),original.scores(source,0))
 
+    def test_goal_normalized_monitor_matches_reader_without_distance_labels(self):
+        from grounded_llm.tasks.puzzle8.evaluate import goal_normalized_rollouts
+        from grounded_llm.tasks.puzzle8.model import MODEL_TYPE,MapReader
+        torch.manual_seed(5);env=Puzzle8();model=QMap(dimension=8,hidden=16)
+        rng=np.random.default_rng(7);tasks=rng.integers(env.size,size=(12,2))
+        result=goal_normalized_rollouts(model,env,{'fixture':tasks},'cpu',horizon=8)['fixture']
+        with tempfile.TemporaryDirectory() as temp:
+            path=Path(temp)/'q.pt';torch.save(dict(model_type=MODEL_TYPE,actions=list(env.actions),
+                config=dict(model=dict(dimension=8,hidden=16)),model=model.state_dict()),path)
+            reader=MapReader(env,path,coordinate_frame='goal_normalized');solved=[];steps=[]
+            for source,goal in tasks:
+                state=int(source);seen={state};count=0
+                while state!=goal and count<8:
+                    _,state=reader.choose(state,int(goal));count+=1
+                    if state in seen:break
+                    seen.add(state)
+                solved.append(state==goal);steps.append(count)
+            self.assertEqual(result['per_task']['solved'],solved)
+            self.assertEqual(result['per_task']['steps'],steps)
+            self.assertIsNone(env.tables)
+
     def test_interrupted_resume_keeps_absolute_steps_sampler_and_adam(self):
         class Cycle:
             size, diameter, name, actions = 8, 4, "puzzle8", ("left", "right")

@@ -1,7 +1,10 @@
 """Checks for goal-dependent labels and grouped supervision."""
 import unittest
+import tempfile
+from pathlib import Path
 
 import numpy as np
+import torch
 
 from experiments.blocks_distance_map.src.multiboard_data import candidate_pairs, choose_landmarks, contrast_cases
 from experiments.blocks_distance_map.src.multiboard_eval import listwise_groups
@@ -9,6 +12,28 @@ from experiments.blocks_distance_map.src.oracle import DistanceOracle
 
 
 class MultiboardTests(unittest.TestCase):
+    def test_residual_query_preserves_clearing_and_goal_preserving_transitions(self):
+        from experiments.blocks_distance_map.src.tree_supervision_eval import QScorer
+        from grounded_llm.tasks.blocks.model import BoardEncoder
+        from grounded_llm.tasks.blocks.oracle import successors
+        with tempfile.TemporaryDirectory() as temp:
+            path=Path(temp)/'q.pt';model=BoardEncoder(8,16,13,'directed_sum')
+            torch.save(dict(config={'model':dict(state_dim=8,encoder_hidden_dim=16)},
+                cap=13,metric=model.metric,model=model.state_dict(),source_commit='fixture',step=0),path)
+            raw=QScorer(path,'cpu');relative=QScorer(path,'cpu',coordinate_frame='goal_residual')
+            for source in range(64):
+                children=[s for _,s in successors(source)]
+                np.testing.assert_array_equal(relative.scores(children,0),raw.scores(children,0))
+                for goal in range(64):
+                    if source&goal!=goal:continue
+                    preserved=[s for s in children if s&goal==goal]
+                    self.assertEqual({s^goal for s in preserved},{s for _,s in successors(source^goal)})
+                    scores=relative.scores(children,goal)
+                    valid=np.array([s&goal==goal for s in children],dtype=bool)
+                    self.assertTrue(np.isinf(scores[~valid]).all())
+                    np.testing.assert_array_equal(scores[valid],raw.scores([s^goal for s in preserved],0))
+                    if len(children) and len(preserved):self.assertIn(children[int(scores.argmin())],preserved)
+
     def test_dead_state_can_reach_a_nonempty_dead_goal(self):
         oracle = DistanceOracle()
         source, goal = 0b100011, 0b100000

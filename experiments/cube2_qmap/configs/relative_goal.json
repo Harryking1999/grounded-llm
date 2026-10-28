@@ -18,11 +18,11 @@
     "minimum_heldout_per_layer": 16
   },
   "training": {
-    "epochs": 100,
+    "epochs": 500,
     "parent_batch_size": 65536,
     "balanced_replay_size": 32768,
     "paths_per_batch": 0,
-    "learning_rate": 0.0003,
+    "learning_rate": 0.0001,
     "rank_weight": 1.0,
     "temperature": 1.0,
     "clip_norm": 5.0,
@@ -45,5 +45,5 @@
   "supervision": "Every epoch traverses physical parents with depth-balanced replay. Add current wrong complete training stars, weighted by1+log(1+cycle basin size) for cycle exits; refresh every5epochs. All replay stars omit heldout parent and candidate labels. The same distance Huber and complete six-candidate soft-rank supervise every source.",
   "split": "Fixed state-to-solved validation and test relations are omitted from continuation supervision. The warm-start model has already seen states from the original training distribution.",
   "selection": "validation",
-  "scope": "Goal-relative coordinates, six QTM actions, frozen-Q greedy execution. Evaluate each fixed cohort and all-state restoration against the90percent target; train20to100 complete epochs."
+  "scope": "Goal-relative coordinates, six QTM actions, frozen-Q greedy execution. Continue complete Q, Adam and sampling RNG from the preceding complete epoch; train20to500 complete epochs, checking the90percent target for every fixed cohort and all-state restoration."
 }

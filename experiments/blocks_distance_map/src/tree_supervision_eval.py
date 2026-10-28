@@ -57,7 +57,9 @@ def fresh_tasks(data, contract, official_path, board_count, tasks_per_board, see
 
 
 class QScorer:
-    def __init__(self, checkpoint, device):
+    def __init__(self, checkpoint, device, *, coordinate_frame="absolute"):
+        if coordinate_frame not in ("absolute", "goal_residual"):
+            raise ValueError(f"Unknown blocks coordinate frame: {coordinate_frame}")
         saved = torch.load(checkpoint, map_location=device, weights_only=True)
         config = saved["config"]
         self.model = BoardEncoder(config["model"]["state_dim"],
@@ -69,11 +71,28 @@ class QScorer:
         self.label_cap = saved.get("unreachable_label", saved["cap"])
         self.device = device
         self.cache = {}
+        self.coordinate_frame = coordinate_frame
         self.identity = {"checkpoint": str(checkpoint),
-                         "source_commit": saved["source_commit"], "step": saved["step"]}
+                         "source_commit": saved["source_commit"], "step": saved["step"],
+                         "coordinate_frame": coordinate_frame}
 
     @torch.no_grad()
     def scores(self, masks, goal):
+        if self.coordinate_frame == "goal_residual":
+            # A legal removal preserving G acts on S\G exactly as a clearing
+            # removal. Losing any goal cell is irreversible under these rules.
+            valid = np.asarray([(mask & goal) == goal for mask in masks])
+            result = np.full(len(masks), np.inf, dtype=np.float32)
+            residual = [mask ^ goal for mask, keep in zip(masks, valid) if keep]
+            if residual:
+                result[valid] = self.absolute_scores(residual, 0)
+            return result
+        return self.absolute_scores(masks, goal)
+
+    @torch.no_grad()
+    def absolute_scores(self, masks, goal):
+        if not len(masks):
+            return np.empty(0, dtype=np.float32)
         missing = [mask for mask in dict.fromkeys([*masks, goal]) if mask not in self.cache]
         for start in range(0, len(missing), 2048):
             chunk = missing[start:start + 2048]

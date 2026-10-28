@@ -91,6 +91,7 @@ def validate_continuation(previous,current,step):
     rank_change=current.get('continuation',{}).get('mode')=='rank_weight_change'
     current_failures=current.get('continuation',{}).get('mode')=='current_failure_replay'
     failure_coverage=current.get('continuation',{}).get('mode')=='current_failure_coverage'
+    structural=current.get('continuation',{}).get('mode')=='structural_replay'
     for item in (old,new):
         for key in ('continuation','convergence','pilot'):item.pop(key,None)
         if item.get('failure_diagnosis'):
@@ -102,6 +103,19 @@ def validate_continuation(previous,current,step):
         if workers not in (0,1):raise ValueError('Only synchronous or one-worker trace writing is supported')
         preparation=item['training'].get('relation_sampling',{}).pop('preparation_workers',1)
         if not 1<=preparation<=32:raise ValueError('Preparation workers must be between1 and32')
+    if structural:
+        before=old['training'].get('current_failure_replay',{})
+        after=new['training'].get('current_failure_replay',{})
+        spec=after.pop('structural_groups',None)
+        if old.get('task')!='rush_hour' or not before or 'structural_groups' in before or not spec:
+            raise ValueError('Structural continuation adds paired Rush Hour training groups')
+        if set(spec)!={'bank','groups_per_batch'} or not 0<2*spec['groups_per_batch']<before['contexts_per_batch']:
+            raise ValueError('Structural pairs share the existing supplemental quota with current failures')
+        if not step<=old['training']['steps']<new['training']['steps']:
+            raise ValueError('Structural continuation requires an explicit additional update budget')
+        new['training']['steps']=old['training']['steps']
+        if old!=new:raise ValueError('Structural continuation changes another training condition')
+        return
     if failure_coverage:
         before=old['training'].get('current_failure_replay',{})
         after=new['training'].get('current_failure_replay',{})
@@ -408,6 +422,8 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
                 batch_sizes={k:dict(previous=saved['config']['training'][k],current=options[k]) for k in ('batch_size','decision_batch_size')},
                 meaning=('Original optimizer/samplers/RNG/counters restored; add current failure forks with a separate recoverable stream.'
                     if continuation.get('mode')=='current_failure_replay' else
+                    'Full optimizer/samplers/RNG/counters restored; share the existing supplemental quota between current failures and paired cross-layout training contexts.'
+                    if continuation.get('mode')=='structural_replay' else
                     'Full optimizer/samplers/RNG/counters restored; refresh current failures over every permitted original training root.'
                     if continuation.get('mode')=='current_failure_coverage' else
                     'Full optimizer/RNG/counter restoration; only ranking weight changes explicitly, with the same future samples.'
@@ -648,6 +664,7 @@ def train(config,out,source_commit,device,resume=False,prepare_only=False):
             if current_ids is not None:
                 row.update(rank_current_failure_index=current_ids.copy(),
                            rank_current_failure_round=np.full(len(tasks),current_replay.round,dtype=np.int32))
+                if current_replay.structural:row.update({key:value.copy() for key,value in current_replay.structural.last_annotations.items()})
             trace.append(row)
             if len(trace)>=100: flush_trace()
         ids=np.concatenate([pair[:,0],pair[:,1],children[valid],tasks[:,1]])

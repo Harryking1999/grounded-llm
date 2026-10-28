@@ -3728,5 +3728,82 @@
       },
       "condition": "Frozen diagnostic of current full checkpoint; no optimizer update, bank replacement, or test-based selection"
     }
+  },
+  "targeted_continuation_completion": {
+    "source_commit": "72ec344888cae73c38d97719113268a901115783",
+    "last_step": 12000,
+    "selected_step": 8000,
+    "cohorts": {
+      "validation": {
+        "count": 16,
+        "solved": 15,
+        "optimal": 14,
+        "cycles": 1,
+        "entered_unreachable": 0
+      },
+      "test": {
+        "count": 16,
+        "solved": 14,
+        "optimal": 13,
+        "cycles": 2,
+        "entered_unreachable": 1
+      },
+      "unseen_goal_validation": {
+        "count": 96,
+        "solved": 60,
+        "optimal": 56,
+        "cycles": 36,
+        "entered_unreachable": 10
+      },
+      "unseen_goal_test": {
+        "count": 94,
+        "solved": 23,
+        "optimal": 21,
+        "cycles": 71,
+        "entered_unreachable": 6
+      },
+      "original_training_goals": {
+        "count": 198,
+        "solved": 41,
+        "optimal": 37,
+        "cycles": 157,
+        "entered_unreachable": 28
+      },
+      "original_unseen_goals": {
+        "count": 4,
+        "solved": 2,
+        "optimal": 2,
+        "cycles": 2,
+        "entered_unreachable": 1
+      }
+    },
+    "actual_exposure": {
+      "unique_gradient_states": 42840,
+      "available_states": 42840,
+      "unique_pair_rows": 42840,
+      "pair_rows": 42840,
+      "unique_decision_rows": 34012,
+      "decision_rows": 747780,
+      "minimum_pair_layer_passes": 2294.6778711484594,
+      "minimum_decision_layer_passes": null,
+      "ranking_bank_epochs": 65.7305624648961,
+      "ranking_bank_relations": 747780,
+      "epoch_scope": "Prepared finite training (state, goal) ranking bank; not all physical states or all Boxoban layouts."
+    },
+    "acceptance": {
+      "minimum": 0.8,
+      "target": 0.9,
+      "rates": {
+        "test": 0.875,
+        "unseen_goal_test": 0.24468085106382978,
+        "original_training_goals": 0.20707070707070707,
+        "original_unseen_goals": 0.5
+      },
+      "missing_required_cohorts": [],
+      "full_training_source_coverage": true,
+      "passed": false,
+      "target_reached": false
+    },
+    "raw_root": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/sokoban_targeted_20261028"
   }
 }

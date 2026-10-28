@@ -31,6 +31,15 @@ class CurrentFailureReplay:
                 for sampler,saved in zip(self.coverage_samplers,state['coverage']['samplers']):sampler.load_state_dict(saved)
                 self.coverage_rng.bit_generator.state=deepcopy(state['coverage']['rng'])
         self.save_bank()
+        self.structural=None
+        if options.get('structural_groups'):
+            from .rush_transfer import StructuralReplaySampler
+            spec=options['structural_groups'];prior=state.get('structural') if state else None
+            if prior is None:
+                with np.load((self.out/spec['bank']).resolve()) as archive:bank=dict(archive)
+            else:bank=prior['bank']
+            self.structural=StructuralReplaySampler(corpus,data,bank,spec['groups_per_batch'],seed+2000003,prior)
+            if 2*spec['groups_per_batch']>=options['contexts_per_batch']:raise ValueError('Structural pairs must leave current failures in the same quota')
 
     def save_bank(self):
         target=self.out/f'current_failure_bank_{self.round:04d}.npz'
@@ -57,7 +66,7 @@ class CurrentFailureReplay:
 
     def apply(self, pairs, point_indices, tasks, rank_indices, point_index, rank_index,
               point_origin, rank_origin, finite_fraction):
-        n = self.options['contexts_per_batch']
+        n = self.options['contexts_per_batch']-(2*self.structural.groups_per_batch if self.structural else 0)
         # Existing whole paths occupy a suffix. Keep every original path intact.
         retained = np.flatnonzero(rank_origin != 0)
         limit = int(retained[0]) if len(retained) else len(tasks)
@@ -85,6 +94,9 @@ class CurrentFailureReplay:
         annotations = np.full(len(tasks), -1, dtype=np.int64)
         annotations[:limit] = replay_ids
         np.add.at(self.draws, ids, 1); self.total_draws += n
+        if self.structural:
+            p,pi,tasks,rank_indices,point_origin,rank_origin=self.structural.apply(
+                p,pi,tasks,rank_indices,point_index,rank_index,point_origin,rank_origin,finite_fraction)
         return p, pi, tasks, rank_indices, point_origin, rank_origin, annotations
 
     def refresh(self, model, device, config, step):
@@ -119,6 +131,7 @@ class CurrentFailureReplay:
         if self.coverage_fraction:
             state['coverage']=dict(rng=deepcopy(self.coverage_rng.bit_generator.state),
                                    samplers=[sampler.state_dict() for sampler in self.coverage_samplers])
+        if self.structural:state['structural']=self.structural.state_dict()
         return state
 
     def report(self):
@@ -129,4 +142,5 @@ class CurrentFailureReplay:
                 critical_passes=self.coverage_samplers[0].passes,continuation_passes=self.coverage_samplers[1].passes,
                 minimum_critical_draws=int(self.draws[self.coverage_ids[0]].min()),
                 minimum_continuation_draws=int(self.draws[self.coverage_ids[1]].min()))
+        if self.structural:result['structural_groups']=self.structural.report()
         return result

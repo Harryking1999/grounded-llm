@@ -15437,6 +15437,394 @@
       }
     },
     "source_commit": "ee701ee604ebd18d0d5988af74fe2b9384fdd924",
+    "raw_root": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/rush_hour_20261028/resume_40645_ee701ee",
+    "latest_frozen_comparison": {
+      "step": 56500,
+      "selection": {
+        "held_queries": 1024,
+        "matched": 921,
+        "matching": [
+          "exact distance",
+          "vehicle count",
+          "initial legal candidate count"
+        ],
+        "training_queries_reused": false
+      },
+      "groups": {
+        "matched_training": {
+          "count": 921,
+          "solved": 912,
+          "cycles": 9,
+          "success_rate": 0.990228013029316,
+          "two_step_cycles": 9,
+          "first_wrong_on_failed_queries": {
+            "count": 9,
+            "all_optimal_moves_increase_goal_position_error": 3,
+            "all_optimal_moves_unsettle_correct_vehicle": 2,
+            "chosen_one_cell_slide": 5,
+            "step_quantiles": [
+              1.0,
+              38.0,
+              46.0
+            ]
+          }
+        },
+        "matched_unseen_layout": {
+          "count": 921,
+          "solved": 88,
+          "cycles": 833,
+          "success_rate": 0.09554831704668838,
+          "two_step_cycles": 833,
+          "first_wrong_on_failed_queries": {
+            "count": 833,
+            "all_optimal_moves_increase_goal_position_error": 340,
+            "all_optimal_moves_unsettle_correct_vehicle": 66,
+            "chosen_one_cell_slide": 693,
+            "step_quantiles": [
+              0.0,
+              3.0,
+              21.0
+            ]
+          }
+        }
+      },
+      "matched_comparison": {
+        "matched_training": {
+          "same_queries": true,
+          "before_solved": 884,
+          "after_solved": 912,
+          "gained": 33,
+          "lost": 5
+        },
+        "matched_unseen_layout": {
+          "same_queries": true,
+          "before_solved": 49,
+          "after_solved": 88,
+          "gained": 58,
+          "lost": 19
+        }
+      }
+    }
+  },
+  "coverage_continuation_completion": {
+    "source_commit": "ee701ee604ebd18d0d5988af74fe2b9384fdd924",
+    "last_step": 60000,
+    "selected_step": 54000,
+    "evaluated_checkpoint": "best.pt",
+    "cohorts": {
+      "validation": {
+        "finite_mae": 0.4636572599411011,
+        "count": 1024,
+        "solved": 1024,
+        "optimal": 1023,
+        "cycles": 0
+      },
+      "test": {
+        "finite_mae": 0.461205393075943,
+        "count": 1024,
+        "solved": 1024,
+        "optimal": 1023,
+        "cycles": 0
+      },
+      "unseen_goal_validation": {
+        "finite_mae": 0.5335848331451416,
+        "count": 1024,
+        "solved": 1024,
+        "optimal": 1024,
+        "cycles": 0
+      },
+      "unseen_goal_test": {
+        "finite_mae": 0.5880512595176697,
+        "count": 1024,
+        "solved": 1024,
+        "optimal": 1024,
+        "cycles": 0
+      },
+      "unseen_layout_validation": {
+        "finite_mae": 4.8213324546813965,
+        "count": 1024,
+        "solved": 578,
+        "optimal": 383,
+        "cycles": 446
+      },
+      "unseen_layout_test": {
+        "finite_mae": 4.23126220703125,
+        "count": 1024,
+        "solved": 601,
+        "optimal": 452,
+        "cycles": 423
+      },
+      "original_layout_test": {
+        "finite_mae": 18.645490646362305,
+        "count": 1024,
+        "solved": 88,
+        "optimal": 28,
+        "cycles": 936
+      },
+      "original_layout_validation": {
+        "finite_mae": 17.395437240600586,
+        "count": 1024,
+        "solved": 47,
+        "optimal": 0,
+        "cycles": 977
+      },
+      "diagnostic": {
+        "finite_mae": 5.280707359313965,
+        "count": 1024,
+        "solved": 328,
+        "optimal": 213,
+        "cycles": 696
+      },
+      "diagnostic_original": {
+        "finite_mae": 15.851106643676758,
+        "count": 8,
+        "solved": 0,
+        "optimal": 0,
+        "cycles": 8
+      }
+    },
+    "actual_exposure": {
+      "unique_gradient_states": 4752537,
+      "available_states": 5263995,
+      "unique_pair_rows": 4752513,
+      "pair_rows": 4752513,
+      "unique_decision_rows": 4689591,
+      "decision_rows": 4690868,
+      "minimum_pair_layer_passes": 20.095103954255922,
+      "minimum_decision_layer_passes": null
+    },
+    "acceptance": {
+      "minimum": 0.8,
+      "target": 0.9,
+      "rates": {
+        "test": 1.0,
+        "unseen_goal_test": 1.0,
+        "unseen_layout_test": 0.5869140625,
+        "diagnostic_original": 0.0,
+        "original_layout_test": 0.0859375
+      },
+      "missing_required_cohorts": [],
+      "full_training_source_coverage": true,
+      "passed": false,
+      "target_reached": false
+    },
     "raw_root": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/rush_hour_20261028/resume_40645_ee701ee"
+  },
+  "blocking_context_transfer": {
+    "checkpoint_step": 56500,
+    "source_commit": "ee701ee604ebd18d0d5988af74fe2b9384fdd924",
+    "sampling": {
+      "training": {
+        "queries": 16048,
+        "pairs": 183106,
+        "scenes": 1003,
+        "catalogue_groups": 1000
+      },
+      "held": {
+        "queries": 1024,
+        "pairs": 4856,
+        "scenes": 35,
+        "catalogue_groups": 35
+      }
+    },
+    "training_trace_sources": [
+      {
+        "path": "/tmp/qmaps_resume_40645_ee701ee/rush/runs/rush_hour_geometry_grid_mlp_convergence/samples/attempt_000/00000.npz",
+        "minimum_step": 40001,
+        "maximum_step": 40100,
+        "sampled": 4096
+      },
+      {
+        "path": "/tmp/qmaps_resume_40645_ee701ee/rush/runs/rush_hour_geometry_grid_mlp_convergence/samples/attempt_000/00064.npz",
+        "minimum_step": 46401,
+        "maximum_step": 46500,
+        "sampled": 4096
+      },
+      {
+        "path": "/tmp/qmaps_resume_40645_ee701ee/rush/runs/rush_hour_geometry_grid_mlp_convergence/samples/attempt_000/00124.npz",
+        "minimum_step": 52401,
+        "maximum_step": 52500,
+        "sampled": 4096
+      },
+      {
+        "path": "/tmp/qmaps_resume_40645_ee701ee/rush/runs/rush_hour_geometry_grid_mlp_convergence/samples/attempt_000/00164.npz",
+        "minimum_step": 56401,
+        "maximum_step": 56500,
+        "sampled": 4096
+      }
+    ],
+    "levels": {
+      "direct": {
+        "training_contexts": 85213,
+        "non_tie_held_pairs": 4856,
+        "matched_pairs": 2687,
+        "matched_across_multiple_training_layouts": 1952,
+        "training_label_varies": 1525,
+        "held_label_differs_from_consistent_training": 303,
+        "same_label": 124,
+        "train_fitted_pairs": 115,
+        "train_fitted_held_correct": 89,
+        "train_underfit_pairs": 9,
+        "train_underfit_held_correct": 4,
+        "matched_queries": 771,
+        "same_label_queries": 114,
+        "train_fitted_held_queries": 106,
+        "train_fitted_held_accuracy": 0.7739130434782608,
+        "train_underfit_held_accuracy": 0.4444444444444444
+      },
+      "neighborhood": {
+        "training_contexts": 172176,
+        "non_tie_held_pairs": 4856,
+        "matched_pairs": 249,
+        "matched_across_multiple_training_layouts": 139,
+        "training_label_varies": 91,
+        "held_label_differs_from_consistent_training": 30,
+        "same_label": 18,
+        "train_fitted_pairs": 18,
+        "train_fitted_held_correct": 15,
+        "train_underfit_pairs": 0,
+        "train_underfit_held_correct": 0,
+        "matched_queries": 170,
+        "same_label_queries": 12,
+        "train_fitted_held_queries": 12,
+        "train_fitted_held_accuracy": 0.8333333333333334,
+        "train_underfit_held_accuracy": 0.0
+      }
+    },
+    "method": "Exact rule-derived two-action contexts, canonical under ordinary vehicle renaming and action-pair order. Match at least two training catalogue groups; separate varying teacher labels, held label changes and underfitting. Fitted requires at least90% correct in each matched training catalogue.",
+    "interpretation": "Finite sample of actual supervision. A local context can admit different optimal orders because the full puzzle differs. Pair ordering and complete rollout are separate measurements.",
+    "raw_root": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/rush_hour_20261028/resume_40645_ee701ee/blocking_transfer_actual_trace"
+  },
+  "structural_training_preparation": {
+    "checkpoint_step": 56500,
+    "source_commit": "ee701ee604ebd18d0d5988af74fe2b9384fdd924",
+    "sampling": {
+      "queries": 74264,
+      "pairs": 798050,
+      "scenes": 1003,
+      "catalogue_groups": 1000
+    },
+    "training_trace_sources": [
+      {
+        "path": "/tmp/qmaps_resume_40645_ee701ee/rush/runs/rush_hour_geometry_grid_mlp_convergence/samples/attempt_000/00000.npz",
+        "minimum_step": 40001,
+        "maximum_step": 40100,
+        "sampled": 4096
+      },
+      {
+        "path": "/tmp/qmaps_resume_40645_ee701ee/rush/runs/rush_hour_geometry_grid_mlp_convergence/samples/attempt_000/00064.npz",
+        "minimum_step": 46401,
+        "maximum_step": 46500,
+        "sampled": 4096
+      },
+      {
+        "path": "/tmp/qmaps_resume_40645_ee701ee/rush/runs/rush_hour_geometry_grid_mlp_convergence/samples/attempt_000/00124.npz",
+        "minimum_step": 52401,
+        "maximum_step": 52500,
+        "sampled": 4096
+      },
+      {
+        "path": "/tmp/qmaps_resume_40645_ee701ee/rush/runs/rush_hour_geometry_grid_mlp_convergence/samples/attempt_000/00164.npz",
+        "minimum_step": 56401,
+        "maximum_step": 56500,
+        "sampled": 4096
+      }
+    ],
+    "additional_training_sources": [
+      {
+        "path": "/tmp/qmaps_resume_40645_ee701ee/rush/runs/rush_hour_geometry_grid_mlp_convergence/failure_replay_bank.npz",
+        "queries": 33112
+      },
+      {
+        "path": "/tmp/qmaps_resume_40645_ee701ee/rush/runs/rush_hour_geometry_grid_mlp_convergence/current_failure_bank_0015.npz",
+        "queries": 11377
+      },
+      {
+        "source": "permitted_original_training_roots",
+        "queries": 16384
+      }
+    ],
+    "prepared": {
+      "groups": 70326,
+      "queries": 53802,
+      "groups_by_kind": {
+        "global_context_contrast": 52751,
+        "retain_consistent_relation": 17198,
+        "training_rank_error": 377
+      },
+      "all_queries_training_allowed": true,
+      "all_legal_candidates_preserved": true,
+      "optimizer_updates": 0,
+      "grouping_uses_training_queries_only": true
+    },
+    "validation": {
+      "queries": 53802,
+      "groups": 70326,
+      "scenes": 1003,
+      "catalogue_groups": 1000,
+      "exact_native_labels_equal": true,
+      "all_training_boundaries_valid": true,
+      "all_physical_candidates_equal": true,
+      "compared_actions_legal": true,
+      "cross_catalogue_pairs": true,
+      "opposite_and_retained_teacher_orders_valid": true,
+      "distance_quantiles": [
+        1.0,
+        8.0,
+        15.0,
+        28.0,
+        70.0
+      ],
+      "distance_counts": {
+        "1_5": 8180,
+        "6_10": 10187,
+        "11_20": 13860,
+        "21_40": 17788,
+        "41_80": 3787
+      },
+      "groups_by_kind": {
+        "global_context_contrast": 52751,
+        "retain_consistent_relation": 17198,
+        "training_rank_error": 377
+      },
+      "coverage_simulation": {
+        "batches": 20000,
+        "groups_per_batch": 64,
+        "contexts_per_batch": 128,
+        "minimum_group_draws": 18,
+        "maximum_group_draws": 19,
+        "unseen_groups": 0,
+        "sampler": "Existing CoverageSampler, shuffled full-pool traversal"
+      },
+      "optimizer_updates": 0
+    },
+    "paired_sampling_validation": {
+      "parent_step": 60000,
+      "optimizer_step": 60000,
+      "original_batch": {
+        "points": 65536,
+        "decisions": 8192
+      },
+      "supplemental_decisions": {
+        "current_failures": 128,
+        "paired_structure": 128,
+        "total": 256
+      },
+      "legacy_path_and_point_labels_preserved": true,
+      "both_group_members_same_batch": true,
+      "resumed_ten_batches_and_annotations_equal": true,
+      "current_and_structural_rng_equal": true,
+      "structural": {
+        "groups": 70326,
+        "queries": 53802,
+        "contexts_per_batch": 128,
+        "group_draws": 704,
+        "minimum_group_draws": 0,
+        "unique_groups_drawn": 704,
+        "passes": 0.01001052242413901
+      },
+      "optimizer_updates": 0
+    },
+    "raw_root": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/rush_hour_20261028/resume_40645_ee701ee/blocking_transfer_broad_groups"
   }
 }

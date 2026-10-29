@@ -74,6 +74,14 @@ class MapReader(EnvironmentQMap):
         self.coordinate_frame = coordinate_frame
         self.inverse_average = inverse_average
 
+    def query_vectors(self, states, goal):
+        """Put every query slot in the same goal frame before Q encoding."""
+        if self.inverse_average:
+            raise ValueError('Score averaging has no single-vector readout; use an inverse-invariant Q checkpoint')
+        if self.coordinate_frame == 'goal_relative':
+            states = self.env.relative(goal, states)
+        return self.encode(states)
+
     def scores(self, source, goal):
         """Goal-relative scoring uses the known group action before Q encoding.
 

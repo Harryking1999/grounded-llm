@@ -13,6 +13,7 @@
 | 8-Puzzle Qmap | [puzzle8_qmap](puzzle8_qmap/README.md) | [报告](puzzle8_qmap/results/report.md) |
 | 推箱子／移车出库／棋子交换Qmap | [new_tasks_qmap](new_tasks_qmap/README.md) | [报告](new_tasks_qmap/results/report.md) |
 | 地图接入 LLM 与同数据 SFT | [map_sft_baselines](map_sft_baselines/README.md) | [主比较](map_sft_baselines/results/report.md)、[小数据诊断](map_sft_baselines/results/b2_four_controls.md) |
+| 地图特征encoder与主干适配 | [map_encoder_sft](map_encoder_sft/README.md)、[设计](map_encoder_sft/DESIGN.md) | 固定5类50k，新地图共同／配对编码、K/V来源与训练范围比较 |
 | 五任务纯文字基线 | [task_text_baselines](task_text_baselines/README.md) | [模型与预算比较](task_text_baselines/results/report.md) |
 
 ## 先复用这些实现

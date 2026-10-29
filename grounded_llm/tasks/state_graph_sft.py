@@ -66,6 +66,13 @@ def frozen_reader(task, checkpoint, context, device):
         from .game24.qmap import MapReader
         return MapReader(Game24(), checkpoint, device)
     from .restoration_sft import load_map
+    if task in ('cube2', 'puzzle8'):
+        if task == 'cube2':
+            from .cube2.model import MapReader
+        else:
+            from .puzzle8.model import MapReader
+        return MapReader(teacher_environment(task, context), checkpoint, device,
+                         coordinate_frame=context.get('coordinate_frame', 'absolute'))
     return load_map(task, teacher_environment(task, context), checkpoint, device)
 
 
@@ -195,7 +202,7 @@ class StateTask:
     def make_step(self, state, goal):
         candidates = list(self.transitions(state))
         states = [state,goal,*[c[1] for c in candidates]]
-        vectors = (self.reader.query_vectors(states, goal) if self.task == 'blocks'
+        vectors = (self.reader.query_vectors(states, goal) if self.task in ('blocks', 'cube2', 'puzzle8')
                    else self.reader.encode(states)).cpu()
         scores = self.reader.distance(vectors,vectors[1]).cpu().numpy()
         totals = np.asarray([c[2] for c in candidates])+scores[2:]

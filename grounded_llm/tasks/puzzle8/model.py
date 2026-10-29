@@ -25,6 +25,12 @@ class MapReader(EnvironmentQMap):
         super().__init__(env, model, device)
         self.coordinate_frame = coordinate_frame
 
+    def query_vectors(self, states, goal):
+        """Transform current, goal and successors with one goal coordinate frame."""
+        if self.coordinate_frame == 'goal_normalized':
+            states, _ = self.env.goal_frame(states, goal)
+        return self.encode(states)
+
     def scores(self, source, goal):
         """Optional task symmetry applies to pair scoring; encode stays unchanged."""
         if self.coordinate_frame == "goal_normalized":

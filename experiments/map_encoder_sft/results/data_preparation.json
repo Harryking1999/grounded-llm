@@ -1,0 +1,146 @@
+{
+  "source_commit": "80357b7",
+  "study_config": "experiments/map_encoder_sft/configs/five_task_50k.json",
+  "prepared_data": "data/map_encoder_80357b7",
+  "samples": 50000,
+  "by_task": {
+    "blocks": 10000,
+    "cube2": 10000,
+    "path": 10000,
+    "bridge": 10000,
+    "puzzle8": 10000
+  },
+  "candidate_queries": 57808,
+  "unique_queries": 50000,
+  "physical_shortest_map_greedy_verified": true,
+  "task_variant_exact_cost_histograms_match": true,
+  "original_query_retained": {
+    "blocks": 9973,
+    "cube2": 7661,
+    "path": 10000,
+    "bridge": 10000,
+    "puzzle8": 9570
+  },
+  "replacement_queries": {
+    "blocks": 27,
+    "cube2": 2339,
+    "path": 0,
+    "bridge": 0,
+    "puzzle8": 430
+  },
+  "coverage": {
+    "blocks": {
+      "old_states": 1110008,
+      "new_states": 1112290,
+      "shared_states": 1069492,
+      "old_state_goal_relations": 1355395,
+      "new_state_goal_relations": 1346987,
+      "shared_state_goal_relations": 1246007
+    },
+    "cube2": {
+      "old_states": 317090,
+      "new_states": 322056,
+      "shared_states": 154981,
+      "old_state_goal_relations": 317090,
+      "new_state_goal_relations": 322056,
+      "shared_state_goal_relations": 154981
+    },
+    "path": {
+      "old_states": 256,
+      "new_states": 256,
+      "shared_states": 256,
+      "old_state_goal_relations": 56757,
+      "new_state_goal_relations": 56757,
+      "shared_state_goal_relations": 56757
+    },
+    "bridge": {
+      "old_states": 212361,
+      "new_states": 212361,
+      "shared_states": 212361,
+      "old_state_goal_relations": 351424,
+      "new_state_goal_relations": 351424,
+      "shared_state_goal_relations": 351424
+    },
+    "puzzle8": {
+      "old_states": 103940,
+      "new_states": 103293,
+      "shared_states": 96166,
+      "old_state_goal_relations": 103940,
+      "new_state_goal_relations": 103293,
+      "shared_state_goal_relations": 96166
+    }
+  },
+  "endpoint_distributions": {
+    "blocks": {
+      "start": {
+        "original_unique": 6667,
+        "new_unique": 6667,
+        "shared_unique": 6667,
+        "frequency_total_variation": 0.0027
+      },
+      "goal": {
+        "original_unique": 3016,
+        "new_unique": 3015,
+        "shared_unique": 2996,
+        "frequency_total_variation": 0.0027
+      }
+    },
+    "cube2": {
+      "start": {
+        "original_unique": 10000,
+        "new_unique": 10000,
+        "shared_unique": 7661,
+        "frequency_total_variation": 0.23390000000000002
+      },
+      "goal": {
+        "original_unique": 1,
+        "new_unique": 1,
+        "shared_unique": 1,
+        "frequency_total_variation": 0.0
+      }
+    },
+    "path": {
+      "start": {
+        "original_unique": 256,
+        "new_unique": 256,
+        "shared_unique": 256,
+        "frequency_total_variation": 0.0
+      },
+      "goal": {
+        "original_unique": 256,
+        "new_unique": 256,
+        "shared_unique": 256,
+        "frequency_total_variation": 0.0
+      }
+    },
+    "bridge": {
+      "start": {
+        "original_unique": 7130,
+        "new_unique": 7130,
+        "shared_unique": 7130,
+        "frequency_total_variation": 0.0
+      },
+      "goal": {
+        "original_unique": 9944,
+        "new_unique": 9944,
+        "shared_unique": 9944,
+        "frequency_total_variation": 0.0
+      }
+    },
+    "puzzle8": {
+      "start": {
+        "original_unique": 10000,
+        "new_unique": 10000,
+        "shared_unique": 9570,
+        "frequency_total_variation": 0.043000000000000003
+      },
+      "goal": {
+        "original_unique": 1,
+        "new_unique": 1,
+        "shared_unique": 1,
+        "frequency_total_variation": 0.0
+      }
+    }
+  },
+  "evaluation_queries_unchanged": true
+}

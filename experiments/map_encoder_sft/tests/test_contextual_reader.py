@@ -1,6 +1,8 @@
 """Check cross-slot isolation, pairing, padding, and gradient flow to the encoder."""
 from dataclasses import replace
 import copy
+import json
+from pathlib import Path
 
 import pytest
 import torch
@@ -96,3 +98,69 @@ def test_timeline_backward_and_checkpoint_roundtrip(grouping, content, full_llm)
     other = reader(grouping,content); other.load_adapter_state_dict(state)
     for a,b in zip(model.memory_encoder.parameters(),other.memory_encoder.parameters()):
         torch.testing.assert_close(a,b)
+
+
+@pytest.mark.parametrize('baseline', list(json.loads(
+    (Path(__file__).parents[1] / 'configs/five_task_50k.json').read_text())['baselines']))
+def test_formal_config_reaches_the_expected_encoder_and_trainable_scope(monkeypatch, baseline):
+    from grounded_llm.core.sft import modeling
+    config = json.loads((Path(__file__).parents[1] / 'configs/five_task_50k.json').read_text())
+    base = Qwen2ForCausalLM(Qwen2Config(vocab_size=32, hidden_size=16,
+        intermediate_size=32, num_hidden_layers=2, num_attention_heads=2,
+        num_key_value_heads=1, pad_token_id=0))
+    monkeypatch.setattr(modeling.AutoModelForCausalLM, 'from_pretrained', lambda *a, **k: base)
+    model = modeling.build(config, baseline, 'unused')
+    spec = config['baselines'][baseline]
+    encoder = model.memory_encoder
+    assert encoder.grouping == spec['map']['encoder']['grouping']
+    assert len(encoder.blocks) == 4
+    assert encoder.content_keys == (spec['map']['memory_mode'] == 'joint_feature_kv')
+    assert all(p.requires_grad for p in encoder.parameters())
+    assert base.model.embed_tokens.weight.requires_grad == spec['full_llm']
+    assert base.lm_head.weight.requires_grad == spec['full_llm']
+    assert len(model.conditioned_layers) == base.config.num_hidden_layers
+    for layer in model.conditioned_layers:
+        assert all(p.requires_grad == spec['full_llm'] for p in layer.decoder_layer.parameters())
+        assert all(p.requires_grad for p in layer.map_attention.parameters())
+        assert layer.map_attention.to_key.in_features == (256 if encoder.content_keys else 64)
+        assert layer.map_attention.to_value.in_features == 256
+    data = batch()
+    memory = encoder(replace(data, vectors=torch.randn(2, 5, 128)))
+    assert memory.values.shape == (2, 5, 256)
+
+
+@pytest.mark.parametrize('grouping', ['joint', 'paired'])
+def test_zero_gate_can_open_and_then_train_encoder(grouping):
+    torch.manual_seed(17)
+    model = reader(grouping, True)
+    optimizer = torch.optim.SGD((p for p in model.parameters() if p.requires_grad), lr=.1)
+    inputs = dict(input_ids=torch.tensor([[1,2,3,4], [4,3,2,1]]),
+        attention_mask=torch.ones(2,4,dtype=torch.long),
+        labels=torch.tensor([[-100,2,3,4], [-100,3,2,1]]), use_cache=False)
+    data = batch()
+    model(map_batch=data, **inputs).loss.backward()
+    assert all(layer.map_attention.gate.grad.abs() > 0 for layer in model.conditioned_layers)
+    grad = model.memory_encoder.blocks[0].qkv.weight.grad
+    assert grad is not None and grad.abs().sum() == 0
+    optimizer.step(); optimizer.zero_grad(set_to_none=True)
+    model(map_batch=data, **inputs).loss.backward()
+    assert model.memory_encoder.blocks[0].qkv.weight.grad.abs().sum() > 0
+
+
+@pytest.mark.parametrize('grouping', ['joint', 'paired'])
+@pytest.mark.parametrize('content', [True, False])
+def test_future_snapshot_does_not_change_earlier_logits(grouping, content):
+    torch.manual_seed(23)
+    model = reader(grouping, content).eval()
+    for layer in model.conditioned_layers:
+        layer.map_attention.gate.data.fill_(.5)
+    data = batch()
+    from grounded_llm.core.reader.memory import MapTimeline
+    ids = torch.tensor([[0,0,1,1]])
+    inputs = dict(input_ids=torch.tensor([[1,2,3,4]]), use_cache=False)
+    with torch.no_grad():
+        initial = model(map_batch=MapTimeline(data, ids), **inputs).logits
+        changed = data.vectors.clone(); changed[1, :3] += torch.arange(8)
+        after = model(map_batch=MapTimeline(replace(data, vectors=changed), ids), **inputs).logits
+    torch.testing.assert_close(initial[:, :2], after[:, :2])
+    assert not torch.allclose(initial[:, 2:], after[:, 2:])

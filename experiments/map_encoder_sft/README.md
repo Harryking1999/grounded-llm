@@ -39,3 +39,17 @@ python -m experiments.map_sft_baselines.src.queue evaluate --config CONFIG --dat
 ```
 
 跨机评测使用原bridge与共同分片authority，避免重复领取；实际路径映射、认证和缓存限额由忽略的runtime profile提供。两层备用不会自动加入训练队列。
+
+## 终点 OOD 评测
+
+[终点评测入口](src/final_evaluation.py)读取每组 `finished.json` 指定的终点权重，复用原 `queue evaluate`，按[终点评测配置](configs/final_evaluation.json)运行已冻结的2,000题：五类各125题ID、各125题类内OOD，另三类各250题整类OOD。先评RO，再评TF；检查点选择不使用OOD结果。
+
+输出为028的 `runs/map_encoder_80357b7/final_evaluation/`，其中 `evaluation/` 保留逐题结果，`results/` 为完成RO与TF后的汇总，`controller.json` 记录交接状态。OOD直接读取028原终点权重，不占4090推理缓存。
+
+控制器让028已有ID分片完成并发布，再把6号卡交给OOD；4090继续原ID评测。当前一批终点的RO与TF完成后，028恢复ID。后续组训练结束时自动执行相同交接；训练队列独立运行。
+
+```bash
+python -m experiments.map_encoder_sft.src.final_evaluation --root RUN --data NEW_DATA --model-path MODEL --policy experiments/map_encoder_sft/configs/final_evaluation.json
+```
+
+该入口在028后台运行，沿用runtime中的跨机认证，凭据仅从stdin进入进程。

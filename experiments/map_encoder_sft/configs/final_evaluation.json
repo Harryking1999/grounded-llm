@@ -1,0 +1,12 @@
+{
+  "base_config": "experiments/map_encoder_sft/configs/five_task_50k.json",
+  "checkpoint": "finished_endpoint",
+  "data_subdirectory": "final_evaluation",
+  "output_subdirectory": "final_evaluation",
+  "tasks": 2000,
+  "cohort_counts": {"id": 625, "small_ood": 625, "big_ood": 750},
+  "modes": ["RO", "TF"],
+  "gpu": 6,
+  "poll_seconds": 30,
+  "drain_poll_seconds": 10
+}

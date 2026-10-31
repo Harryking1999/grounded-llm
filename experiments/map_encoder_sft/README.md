@@ -2,6 +2,8 @@
 
 固定5类版的50,000条轨迹预算，用当前采用的Qmap重新生成并认证完整轨迹、向量与排序，比较地图特征提取、cross-attention读取方式和主干训练范围。实验定义见[DESIGN](DESIGN.md)，正式参数与首批顺序见[配置](configs/five_task_50k.json)。
 
+三组已完成全参模型的最佳ID、终点OOD、跟图率、NDCG、最优解率与随机对照见[结果报告](results/report.md)，逐任务与小类指标见[数据表](results/scores.csv)。
+
 ## 路径与实现
 
 | 路径 | 职责 |

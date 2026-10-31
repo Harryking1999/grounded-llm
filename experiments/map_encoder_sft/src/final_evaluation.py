@@ -18,8 +18,6 @@ from types import SimpleNamespace
 
 from filelock import FileLock
 from grounded_llm.core.files import atomic_json
-from experiments.llm_task_sft.src.bridge import connect, execute
-from experiments.map_sft_baselines.src.bridge import publish, return_scores
 from experiments.map_sft_baselines.src.evaluation_queue import ExistingWorker, existing_jobs
 from experiments.map_sft_baselines.src.shard_pool import ShardPool
 
@@ -127,6 +125,7 @@ def drain_workers(root, base, pool, policy, status):
 
 
 def drain_id(root, base, profile, credentials, policy, status):
+    from experiments.llm_task_sft.src.bridge import connect
     jump, target = connect(profile, credentials)
     files = target.open_sftp()
     files.get_channel().settimeout(60)
@@ -137,6 +136,7 @@ def drain_id(root, base, profile, credentials, policy, status):
 
 
 def remote(target, script, **values):
+    from experiments.llm_task_sft.src.bridge import execute
     # All values are public runtime paths/configuration. Credentials never enter commands.
     python = values.pop('_python', 'python3')
     prefix = 'import json; v=json.loads(' + repr(json.dumps(values)) + ')\n'
@@ -176,6 +176,8 @@ def cache_evictions(entries, incoming_bytes, maximum_bytes, pending, archived):
 
 
 def run(args, credentials):
+    from experiments.llm_task_sft.src.bridge import connect
+    from experiments.map_sft_baselines.src.bridge import publish, return_scores
     root = args.root.resolve()
     policy = json.loads(args.policy.read_text())
     base = json.loads((root / 'config.json').read_text())

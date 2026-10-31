@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from experiments.map_encoder_sft.src.final_evaluation import completed, final_config
+from experiments.map_encoder_sft.src.final_evaluation import cache_evictions, completed, final_config
 from experiments.map_sft_baselines.src.queue import evaluation_jobs
 
 EXPERIMENT = Path(__file__).parents[1]
@@ -52,3 +52,24 @@ def test_endpoint_completion_requires_full_ro_and_tf(tmp_path):
     row['metrics']['TF']['tasks']=2000
     path.write_text(json.dumps(row))
     assert completed(tmp_path,'B4_paired_address_full',250000,config)
+
+
+def test_returned_remote_curve_confirms_endpoint_completion(tmp_path):
+    base,policy,records = configuration()
+    config = final_config(base,policy,records)
+    path=tmp_path/'results/B4_paired_address_full/curve.json'
+    path.parent.mkdir(parents=True)
+    path.write_text(json.dumps([dict(step=250000,metrics=dict(RO=dict(tasks=2000),TF=dict(tasks=2000)))]))
+    assert completed(tmp_path,'B4_paired_address_full',250000,config)
+    assert not completed(tmp_path,'B4_paired_address_full',200000,config)
+
+
+def test_cache_reuses_finished_weights_and_evicts_only_archived_id_entries():
+    old=dict(baseline='old',step=250000,size=4)
+    pending=dict(baseline='pending',step=250000,size=4)
+    selected=cache_evictions([old,pending],incoming_bytes=4,maximum_bytes=8,
+        pending={('pending',250000)},archived={('old',250000),('pending',250000)})
+    assert selected==[old]
+    with pytest.raises(RuntimeError):
+        cache_evictions([old,pending],4,8,{('pending',250000)},set())
+    assert cache_evictions([pending],0,8,{('pending',250000)},set())==[]

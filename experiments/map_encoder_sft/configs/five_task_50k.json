@@ -86,6 +86,7 @@
       }
     },
     "B4_joint_content_frozen": {
+      "training": {"world_size": 1, "gradient_accumulation_steps": 4},
       "interface": true,
       "real_map": true,
       "full_llm": false,
@@ -118,6 +119,7 @@
       }
     },
     "B4_joint_address_frozen": {
+      "training": {"world_size": 1, "gradient_accumulation_steps": 4},
       "interface": true,
       "real_map": true,
       "full_llm": false,
@@ -150,6 +152,7 @@
       }
     },
     "B4_paired_content_frozen": {
+      "training": {"world_size": 1, "gradient_accumulation_steps": 4},
       "interface": true,
       "real_map": true,
       "full_llm": false,
@@ -182,6 +185,7 @@
       }
     },
     "B4_paired_address_frozen": {
+      "training": {"world_size": 1, "gradient_accumulation_steps": 4},
       "interface": true,
       "real_map": true,
       "full_llm": false,
@@ -199,6 +203,8 @@
     }
   },
   "execution": {
+    "resume_existing": true,
+    "allow_frozen_topology_change": true,
     "initial_baselines": [
       "B4_joint_content_full",
       "B4_paired_content_full",
@@ -218,16 +224,16 @@
         1
       ],
       [
-        2,
-        3
+        2
       ],
       [
-        4,
-        5
-      ]
+        3
+      ],
+      [4],
+      [5]
     ],
     "evaluation_gpus": [
-      6
+      6, 7
     ],
     "poll_seconds": 60
   },
@@ -291,7 +297,7 @@
     },
     "final_only_ood": true,
     "selection_cohort": "id_only",
-    "spare_gpu": 7,
+    "spare_gpu": null,
     "stage": 5,
     "from_base_model": true
   },

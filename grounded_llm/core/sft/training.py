@@ -118,7 +118,8 @@ def train_update(model, microbatches, optimizer, scheduler, *, device,
 
 
 def train(config, baseline, model_path, data, out, *, pad_token_id,
-          smoke_steps=None, resume=None, extend_training=False, reinitialize_optimizer=False):
+          smoke_steps=None, resume=None, extend_training=False, reinitialize_optimizer=False,
+          allow_topology_change=False):
     cfg = config
     out = Path(out)
     resume = Path(resume) if resume is not None else None
@@ -132,7 +133,8 @@ def train(config, baseline, model_path, data, out, *, pad_token_id,
         raise ValueError('Optimizer reinitialization requires source weights and positive calibration steps')
     if resume:
         state = json.loads((resume / 'state.json').read_text())
-        validate_resume_contract(state, cfg, baseline, allow_horizon_extension=extend_training)
+        validate_resume_contract(state, cfg, baseline, allow_horizon_extension=extend_training,
+                                 allow_topology_change=allow_topology_change)
     rank,local,world=int(os.environ['RANK']),int(os.environ['LOCAL_RANK']),int(os.environ['WORLD_SIZE'])
     accumulation=t['gradient_accumulation_steps']
     if world!=t['world_size'] or world*t['micro_batch']*accumulation!=t['global_batch']:

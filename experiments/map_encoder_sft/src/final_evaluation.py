@@ -33,7 +33,7 @@ def final_config(base, policy, records):
     config = copy.deepcopy(base)
     config['data']['tasks'] = base['generalization']['task_pool']
     config['evaluation'].update(tasks=policy['tasks'], modes=policy['modes'], probe_tasks=0)
-    config['execution']['evaluation_gpus'] = [policy['gpu']]
+    config['execution']['evaluation_gpus'] = policy.get('gpus',[policy.get('gpu',6)])
     return config
 
 
@@ -215,7 +215,7 @@ def run(args, credentials):
             local_argv = [sys.executable,'-u','-m',QUEUE,'evaluate','--config',str(root/'config.json'),
                 '--root',str(root),'--data',str(args.data.resolve()),'--model-path',str(args.model_path),
                 '--q-checkpoint',str(args.data.resolve()/'blocks/qmap.pt'),'--node-id','028-map-encoder-id',
-                '--gpus',str(policy['gpu']),'--coordination-profile',str(root/'bridge_profile.json'),
+                '--gpus',','.join(map(str,config['execution']['evaluation_gpus'])),'--coordination-profile',str(root/'bridge_profile.json'),
                 '--resume-workers']
             remote_launch = json.loads(remote(target, """
 from pathlib import Path
@@ -231,6 +231,10 @@ print(json.dumps(dict(argv=[a for a in (p/'cmdline').read_bytes().decode().split
                 bridge=dict(argv=[a for a in (bridge_proc/'cmdline').read_bytes().decode().split('\0') if a],
                             code=str((bridge_proc/'cwd').resolve())), bridge_pid=bridge_pid, paused=False)
             atomic_json(saved,handoff)
+
+        local_args=handoff['local']['argv']
+        local_args[local_args.index('--gpus')+1]=','.join(map(str,config['execution']['evaluation_gpus']))
+        atomic_json(saved,handoff)
 
         def remote_spawn(argv, code, log):
             return int(remote(target, """
@@ -390,7 +394,7 @@ print((p/'weights.pt').exists())
                 argv = [sys.executable, '-u', '-m', QUEUE, 'evaluate', '--config',
                     str(final / 'config.json'), '--root', str(final), '--data', str(data),
                     '--model-path', str(args.model_path), '--q-checkpoint', str(data/'blocks/qmap.pt'),
-                    '--node-id', '028-map-encoder-final', '--gpus', str(policy['gpu']),
+                    '--node-id', '028-map-encoder-final', '--gpus', ','.join(map(str,config['execution']['evaluation_gpus'])),
                     '--coordination-profile',str(final/'coordination_profile.json'),'--resume-workers']
                 evaluator = spawn(argv, script_code, final / 'evaluation.log',credentials)
                 remote_argv=[remote_python,'-u','-m',QUEUE,'evaluate','--config',str(remote_final/'config.json'),

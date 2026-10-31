@@ -34,7 +34,26 @@ def learning_rate_factor(step,total,training):
     return scheduler_factor(step,total,warmup,training['cosine_minimum_ratio'])
 
 
-def validate_resume_contract(saved,config,baseline,allow_horizon_extension=False):
+def validate_resume_contract(saved,config,baseline,allow_horizon_extension=False,allow_topology_change=False):
+    if allow_topology_change:
+        from copy import deepcopy
+        previous=saved['config']
+        old=dict(previous['training'],**previous['baselines'][baseline].get('training',{}))
+        new=dict(config['training'],**config['baselines'][baseline].get('training',{}))
+        if (allow_horizon_extension or previous['baselines'][baseline]['full_llm'] or
+                config['baselines'][baseline]['full_llm'] or
+                old['world_size']!=2 or new['world_size']!=1 or
+                old['micro_batch']!=new['micro_batch'] or
+                old['global_batch']!=new['global_batch'] or
+                any(t.get('distributed_strategy','ddp')!='ddp' or
+                    t['world_size']*t['micro_batch']*t['gradient_accumulation_steps']!=t['global_batch']
+                    for t in (old,new))):
+            raise ValueError('Topology change requires frozen DDP 2-to-1 with unchanged effective batch')
+        saved=deepcopy(saved);config=deepcopy(config)
+        for cfg in (saved['config'],config):
+            for recipe in (cfg['training'],cfg['baselines'][baseline].get('training',{})):
+                for key in ('world_size','gradient_accumulation_steps'):recipe.pop(key,None)
+            if cfg['baselines'][baseline].get('training')=={}:cfg['baselines'][baseline].pop('training')
     if allow_horizon_extension:
         previous=saved['config']
         old_training,new_training=previous['training'],config['training']

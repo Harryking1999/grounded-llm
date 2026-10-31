@@ -42,13 +42,17 @@ python -m experiments.map_sft_baselines.src.queue evaluate --config CONFIG --dat
 
 跨机评测使用原bridge与共同分片authority，避免重复领取；实际路径映射、认证和缓存限额由忽略的runtime profile提供。两层备用不会自动加入训练队列。
 
+028采用六卡训练、两卡评测：全参组使用0—1号卡；四个冻结LLM组分别使用2、3、4、5号卡；6—7号卡评测。全参为2卡×micro-batch 1×累计2次，冻结组为1卡×micro-batch 1×累计4次，有效batch均为4。4090继续使用1—4号卡评测。
+
+冻结组由双卡续接单卡时，使用完整恢复断点，保留训练步数、AdamW状态、学习率调度与数据位置，恢复原rank 0随机状态。候选重编号按seed、epoch与样本index确定；每次全局更新的四条轨迹保持一致。浮点归约与随机运算按单卡拓扑继续。`--allow-topology-change`仅允许冻结DDP由2卡改为1卡、有效batch与其余训练条件相同的续训。
+
 ## 终点 OOD 评测
 
 [终点评测入口](src/final_evaluation.py)读取每组 `finished.json` 指定的终点权重，复用原 `queue evaluate`，按[终点评测配置](configs/final_evaluation.json)运行已冻结的2,000题：五类各125题ID、各125题类内OOD，另三类各250题整类OOD。先评RO，再评TF；检查点选择不使用OOD结果。
 
 输出为两机各自的 `runs/map_encoder_80357b7/final_evaluation/`。4090的 `evaluation/` 统一领取分片并保留完整逐题结果，`results/` 在完成RO与TF后汇总并回传028；028的 `controller.json` 记录交接状态。4090优先复用原缓存权重，通过硬链接供终点评测使用；必要时回收已有源权重的闲置ID推理缓存，总预算沿用[缓存配置](configs/evaluation_cache.json)。
 
-优先级为**终点评测 > 每50,000步整数节点 > 其他检查点**。有待评终点时，控制器让两机已有分片完成并发布，把028的6号卡与4090的1—4号卡都交给终点评测；ID权重桥接暂停。完成当前待评终点的RO与TF后，两机恢复ID及桥接。后续组训练结束时自动执行相同交接；训练队列独立运行。
+优先级为**终点评测 > 每50,000步整数节点 > 其他检查点**。有待评终点时，控制器让两机已有分片完成并发布，把028的6—7号卡与4090的1—4号卡都交给终点评测；ID权重桥接暂停。完成当前待评终点的RO与TF后，两机恢复ID及桥接。后续组训练结束时自动执行相同交接；训练队列独立运行。
 
 ```bash
 python -m experiments.map_encoder_sft.src.final_evaluation --root RUN --data NEW_DATA --model-path MODEL --policy experiments/map_encoder_sft/configs/final_evaluation.json

@@ -157,10 +157,20 @@ def main():
                     pending=pending,failed=failed));time.sleep(30);continue
             for lane,pair in enumerate(cfg['execution']['gpu_pairs']):
                 if lane in active or not pending or not all(free_gpu(gpu) for gpu in pair):continue
-                base=pending.pop(0);out=a.root/'training'/base;out.mkdir(parents=True,exist_ok=True)
+                compatible=[base for base in pending if len(pair)==dict(cfg['training'],**cfg['baselines'][base].get('training',{}))['world_size']]
+                if not compatible:continue
+                base=compatible[0];pending.remove(base);out=a.root/'training'/base;out.mkdir(parents=True,exist_ok=True)
                 log=(out/'launcher.log').open('a')
-                if len(pair)!=cfg['training']['world_size']:raise ValueError('GPU lane size differs from world size')
-                command=[sys.executable,'-u','-m','torch.distributed.run','--standalone',f"--nproc-per-node={cfg['training']['world_size']}",'-m','experiments.map_sft_baselines.src.train','--config',str(a.config),'--data',str(a.data),'--model-path',str(a.model_path),'--out',str(out),'--baseline',base]
+                command=[sys.executable,'-u','-m','torch.distributed.run','--standalone',f"--nproc-per-node={len(pair)}",'-m','experiments.map_sft_baselines.src.train','--config',str(a.config),'--data',str(a.data),'--model-path',str(a.model_path),'--out',str(out),'--baseline',base]
+                if cfg['execution'].get('resume_existing'):
+                    checkpoints=sorted((p for p in out.glob('checkpoint-*') if all((p/name).exists() for name in ('resume.pt','state.json','evaluation_ready.json','rng_0.pt'))),key=lambda p:int(p.name[11:]))
+                    if checkpoints:
+                        checkpoint=checkpoints[-1];command+=['--resume',str(checkpoint)]
+                        saved=json.loads((checkpoint/'state.json').read_text())['config']
+                        old=dict(saved['training'],**saved['baselines'][base].get('training',{}))
+                        if old['world_size']!=len(pair):
+                            if not cfg['execution'].get('allow_frozen_topology_change'):raise ValueError('Topology change requires explicit execution configuration')
+                            command.append('--allow-topology-change')
                 proc=subprocess.Popen(command,env=dict(os.environ,CUDA_VISIBLE_DEVICES=','.join(map(str,pair))),stdout=log,stderr=subprocess.STDOUT)
                 active[lane]=(proc,base,log)
             atomic_json(a.root/'training_queue.json',dict(status='running' if active else 'finished',active={str(k):dict(pid=v[0].pid,baseline=v[1],gpus=cfg['execution']['gpu_pairs'][k]) for k,v in active.items()},pending=pending,failed=failed))

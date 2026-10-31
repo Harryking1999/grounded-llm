@@ -1,5 +1,6 @@
 """Task-independent DDP/FSDP SFT on task-provided prepared trajectories."""
 from contextlib import nullcontext
+from itertools import islice
 from collections import deque
 import json, os, random, time
 from pathlib import Path
@@ -12,6 +13,17 @@ from grounded_llm.core.files import atomic_json
 from grounded_llm.core.reader.batching import collate_examples, to_device, pseudo_timeline
 from .modeling import build, infer_weights
 from .schedule import training_steps, learning_rate_factor, validate_resume_contract
+
+
+class OffsetDistributedSampler(DistributedSampler):
+    """Resume an index-deterministic dataset without loading discarded examples."""
+    offset = 0
+
+    def __iter__(self):
+        return islice(super().__iter__(), self.offset, None)
+
+    def __len__(self):
+        return max(0, super().__len__() - self.offset)
 
 
 def shard_model(model, local):
@@ -171,7 +183,7 @@ def train(config, baseline, model_path, data, out, *, pad_token_id,
         scheduler.load_state_dict(saved['scheduler']);step=state['step']
         rng=torch.load(resume/f'rng_{rank}.pt',weights_only=False,map_location='cpu');torch.set_rng_state(rng['torch']);torch.cuda.set_rng_state(rng['cuda']);random.setstate(rng['python']);np.random.set_state(rng['numpy'])
     out.mkdir(parents=True,exist_ok=True)
-    sampler=DistributedSampler(data,num_replicas=world,rank=rank,seed=cfg['seed'])
+    sampler=OffsetDistributedSampler(data,num_replicas=world,rank=rank,seed=cfg['seed'])
     def collate(rows):
         timeline,inputs=collate_examples(rows,pad_token_id)
         if spec['interface'] and not spec['real_map']:timeline=pseudo_timeline(timeline)
@@ -221,8 +233,11 @@ def train(config, baseline, model_path, data, out, *, pad_token_id,
                 rng_restored=False, calibration_weight_updates=0))
     windows=deque(maxlen=50);start=time.monotonic();limit=smoke_steps or total
     for epoch in range(step//max(1,steps_epoch),t['epochs']):
-        data.epoch=epoch;sampler.set_epoch(epoch);it=iter(loader);skip=(step%max(1,steps_epoch))*accumulation
-        for _ in range(skip):next(it)
+        data.epoch=epoch;sampler.set_epoch(epoch);skip=(step%max(1,steps_epoch))*accumulation
+        sampler.offset=skip*t['micro_batch'] if getattr(data,'deterministic_augmentation',False) else 0
+        it=iter(loader)
+        if not sampler.offset:
+            for _ in range(skip):next(it)
         while step<(epoch+1)*steps_epoch and step<limit:
             micro=[next(it) for _ in range(accumulation)]
             began=time.monotonic()

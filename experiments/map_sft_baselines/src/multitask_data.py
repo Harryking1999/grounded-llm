@@ -8,6 +8,8 @@ from grounded_llm.tasks.restoration_sft import environment, demonstration
 
 
 class Routes(PreparedRoutes):
+    # Renumbering is determined solely by seed, epoch and dataset index.
+    deterministic_augmentation = True
     def __init__(self, path, real_map, *, config, baseline, tokenizer):
         self.config, self.tokenizer = config, tokenizer
         renumber = config['baselines'][baseline].get('renumber_each_epoch', False)

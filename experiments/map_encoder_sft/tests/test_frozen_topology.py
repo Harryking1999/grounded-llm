@@ -4,6 +4,8 @@ from pathlib import Path
 import pytest
 from torch.utils.data import DistributedSampler
 from grounded_llm.core.sft.schedule import validate_resume_contract
+from grounded_llm.core.sft.training import OffsetDistributedSampler
+from torch.utils.data import DataLoader
 
 BASE='B4_joint_content_frozen'
 
@@ -33,3 +35,17 @@ def test_single_rank_accumulation_preserves_global_update_sample_sets():
         ranks=[list(s) for s in samplers];one=list(single)
         for update in range(10):
             assert set(one[4*update:4*update+4])==set(ranks[0][2*update:2*update+2]+ranks[1][2*update:2*update+2])
+
+def test_resume_offset_loads_only_the_remaining_examples():
+    class Data:
+        loaded=[]
+        def __len__(self):return 40
+        def __getitem__(self,index):self.loaded.append(index);return index
+    data=Data();sampler=OffsetDistributedSampler(data,num_replicas=1,rank=0,seed=23)
+    sampler.set_epoch(7);expected=list(sampler)[28:];sampler.offset=28
+    actual=[int(row) for row in DataLoader(data,sampler=sampler,batch_size=1)]
+    assert actual==expected==data.loaded
+    assert len(sampler)==12
+    sampler.offset=0;sampler.set_epoch(8)
+    reference=DistributedSampler(data,num_replicas=1,rank=0,seed=23);reference.set_epoch(8)
+    assert list(sampler)==list(reference)

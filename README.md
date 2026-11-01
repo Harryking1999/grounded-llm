@@ -6,6 +6,7 @@
 
 | 要了解什么 | 入口 |
 |---|---|
+| 项目背景、全部实验与主要数字 | [实验全景汇总](docs/EXPERIMENT_OVERVIEW.md) |
 | 主线、结论、接下来做什么 | [项目状态](docs/PROJECT_STATUS_AND_TODO.md) |
 | 任务规则、数据、能力和所选地图 | [任务索引](tasks/README.md) |
 | 代码在哪里、如何复用 | [实验与实现索引](experiments/README.md)、[Qmap方法](tasks/QMAP_METHOD.md) |
@@ -21,7 +22,7 @@
 | `grounded_llm/core/` | 公共Q编码器、距离与采样、地图读取、SFT基础 |
 | `grounded_llm/tasks/` | 任务规则、状态编码、标签、提示、数据适配与裁判 |
 | `experiments/` | 实验配置、独立编排、结果与必要证据 |
-| `docs/` | 研究定义、唯一状态页和文献报告；`archive/`与`meetings/`为历史材料 |
+| `docs/` | 研究定义、实验全景、唯一状态页和文献报告；`archive/`与`meetings/`为历史材料 |
 | `runs/`、`logs/`、`outputs/`、`tmp/` | Git外的运行产物和临时工作 |
 | `data/`、`literature_review/` | 大型数据和文献工作材料；小型正式题集按原路径保留 |
 

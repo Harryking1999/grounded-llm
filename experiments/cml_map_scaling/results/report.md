@@ -45,7 +45,7 @@ abstract graph 本来只有节点和 adjacency，没有真实二维坐标，左�
 
 两张图在三个训练节点的后继识别均为 100%。续训后，选中边的高维相对长度变化均低于 0.003%；全部节点对的归一化距离变化 RMS 也仅约 2×10⁻⁶。这说明现有训练在 20 轮时已基本稳定，继续降低转移误差没有明显改变地图几何。
 
-**因此，高维地图已经学到邻近关系，二维投影把部分邻边拉得很开。** 汇报时可以保留这些连线，并用上面的高维对照说明；若希望进一步改善地图几何或二维呈现，下一步应分别比较学习目标和投影设置，单纯增加现有训练轮数的收益很小。
+这批邻边在高维空间仍近，二维投影将其拉长。相同监督下20→100轮主要降低转移误差，地图几何基本稳定。
 
 本次未重新拟合 t-SNE，续训比较直接使用原始高维距离。正式合同见 [long_edge_diagnostic.json](../configs/long_edge_diagnostic.json)，逐边数值见 [CSV](long_edge_data.csv)，各轮指标见 [JSON](long_edge_summary.json)，图可导出为 [SVG](long_edge_projection.svg)／[PDF](long_edge_projection.pdf)。从已核对的本地 20 轮地图续训，源码版本 `6549dd2`，NumPy 2.3.5，额外训练合计约 39 秒 CPU；原始快照保存在本地 `runs/cml_long_edges_100`。
 
@@ -118,4 +118,4 @@ Q 空间距离排序也是
 - 本地与开发机 7 项检查通过，包括完整梯度的有限差分核对。另独立复核全部 64 张地图的图／轨迹匹配、同维初始化、全部动作 MSE，并直接重算 512 个后继识别样本，全部通过。
 - [逐图数据](exploration_data.csv)与[结构化摘要](exploration_summary.json)已保存。原始 Q/V 和轨迹在开发机 `/zhanghanyue/experiment/grounded_llm/runs/cml_step1_explore_d813282`。首轮数据仍保留在 [summary.json](summary.json)。
 
-本轮范围是固定图、探索已覆盖全部边的一步转移与地图结构。下一阶段的接入调研与待讨论选择见 [Step 2 讨论稿](../STEP2_DISCUSSION.md)。
+本轮范围是固定图、探索已覆盖全部边的一步转移与地图结构。后续连续token接口的已执行设计见[接口设计](../STEP2_RUNBOOK.md)，研究批注见[原讨论稿](../STEP2_DISCUSSION.md)。

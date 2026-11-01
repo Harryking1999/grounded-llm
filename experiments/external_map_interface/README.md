@@ -18,7 +18,7 @@
 
 本图已训练的 128 维地图在原始高维 Q 空间的距离秩相关为 0.575694；一步转移 MSE 为 `7.16e-12`，后继识别为 100%。对全部 65,280 个有序起终点，只按候选 learned-map 距离取最小值，44,530 个选择落在最短路方向（68.21%）。这是地图质量诊断，不是 LLM 成绩。训练摘要与 Q/V 存在开发节点忽略路径 `runs/external_map_interface/path256_local128_dd2e5f2/`。
 
-原三组各 128 条逐步轨迹已完成并重放裁判验收。两个 thinking 条件大量在单步输出预算处截断，thinking＋地图组未观察到成绩提升。数值、局限与下一步建议见 [path256 显式距离报告](results/path256_distance.md)。
+原三组各 128 条逐步轨迹已完成并重放裁判验收。两个 thinking 条件大量在单步输出预算处截断，thinking＋地图组未观察到成绩提升。完整数值见 [path256 显式距离报告](results/path256_distance.md)。
 
 补测条件 `plain_distance` 复用同一逐步入口、题集、采样参数与单动作 JSON 格式，关闭 thinking 并提供 learned-map 候选距离；它与已完成的 `plain` 只差这项距离信息。128 条已完成并通过裁判重放验收：到达 90/128、最短路 8/128；原始三组记录及其配置快照未改动。题目间差异与限制见 [path256 显式距离报告](results/path256_distance.md)。
 
@@ -45,7 +45,7 @@ python -m experiments.external_map_interface.src.evaluate \
 
 `src/blocks_dynamics.py` 实现 `δ=MLP([Q(o),E(a)])` 与 `Q̂(o′)=Q(o)+δ`。Q 仍按单张初始棋盘中采样到的完整状态建表；动作 embedding 使用原有 `shape_id,row,col` 编号，一个共享 MLP 预测位移，动作空间不增加。候选距离为 `||Q(o)+δ−Q(goal)||₂`，不查真实后继 Q 来代替预测。
 
-`src/train_blocks_dynamics.py` 复用下面旧试验的环境和转移采样，使用 [blocks_dynamics_pilot.json](configs/blocks_dynamics_pilot.json) 训练。采样包括构造解和随机合法 rollout，保留通向死局的合法动作；没有完整枚举状态图，也没有按好坏过滤转移。用户已确认首轮只训练转移 MSE，**不加入死局标签、路径距离或排序监督**。Q 的两个端点与 MLP 联合反向传播；这不同于旧图 `local_update` 只更新目标 Q 与动作 V 的规则。
+`src/train_blocks_dynamics.py` 复用下面旧试验的环境和转移采样，使用 [blocks_dynamics_pilot.json](configs/blocks_dynamics_pilot.json) 训练。采样包括构造解和随机合法 rollout，保留通向死局的合法动作；没有完整枚举状态图，也没有按好坏过滤转移。首轮目标为转移 MSE；死局标签、路径距离和排序用于独立诊断。Q 的两个端点与 MLP 联合反向传播；这不同于旧图 `local_update` 只更新目标 Q 与动作 V 的规则。
 
 训练保留连通 Q 状态的生成树和每个已出现动作，从剩余边留出一部分评测。这是已观察状态间的留出转移，`src/blocks_diagnostics.py` 分别测留出转移误差、相对不移动预测的误差、Q 尺度、从初始 Q 连续预测的逐深度偏移、候选预测距离以及死局排序。连续预测中不重置到真实 Q；缺少表内 Q 的实际后继只能统计覆盖缺口，立即死局与已有到目标路径的标签仅用于诊断。
 

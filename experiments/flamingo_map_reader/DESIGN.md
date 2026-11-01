@@ -1,6 +1,6 @@
 # 积木分离 K/V：重新训练
 
-本文件保存已完成的分离 K/V 重训协议；当前同数据多基线见 [新实验设计](../map_sft_baselines/DESIGN.md)。该历史协议依据[会议决议](../../docs/meetings/2026-10-08.md)及用户补充：停止融合 FFN 运行，复用物理任务、标签、地图与基座，从头初始化分离 K/V 接口。
+本文件保存已完成的分离 K/V 重训协议；当前同数据多基线见 [新实验设计](../map_sft_baselines/DESIGN.md)。实验复用物理任务、标签、地图与基座，从头初始化分离K/V接口；融合FFN为另一独立条件。
 
 ## 架构与代码来源
 
@@ -12,7 +12,7 @@ K 仅由角色和候选编号 embedding 拼接构成；V 为冻结地图状态�
 
 正式合同：[blocks_kv_restart.json](configs/blocks_kv_restart.json)。复用上一轮的已缓存数据，通过 `--prepared-manifest` 创建新清单和只读数据目录链接，不加载旧 adapter、optimizer 或 scheduler。
 
-物理任务仍为普通成功轨迹、初始即目标、失败上下文三类。仅普通轨迹保留旧编号增强；两个终止类别不增强。清单限制失败样本仅使用第一个已缓存编号版本，既有缓存保持原样。用户已明确两个终止类别保持一致；因此不继续沿用旧运行的失败样本增强。
+物理任务仍为普通成功轨迹、初始即目标、失败上下文三类。仅普通轨迹保留旧编号增强；两个终止类别不增强。清单限制失败样本仅使用第一个已缓存编号版本，既有缓存保持原样。两个终止类别均不作编号增强。
 
 失败上下文仍只监督末轮无解答案，之前 assistant 回答仅作为上下文。无解条件为尚未达标且没有合法动作，不要求中途识别全局死局。输出沿用：
 
@@ -26,7 +26,7 @@ No solution: no legal moves remain and the goal has not been reached.
 
 训练从零开始，四卡 DDP，每卡一条轨迹；每条轨迹按监督 token 平均，再跨卡等权平均。沿用逐层重计算和分块交叉熵以控制显存。学习率、warmup、训练预算、保存及生成预算以正式配置为准，不在说明中复制机器参数。完整断点可在同一运行目录恢复；新运行不能续接融合 FFN 权重。
 
-2026-10-09 用户授权将已完成的本轮训练继续到总计 20 epoch。[续训预算](configs/blocks_kv_twenty_epoch_extension.json)与[两节点安排](configs/blocks_kv_two_node_continuation.json)是新增合同；数据、现用 Q-map、监督和学习率沿用原合同。恢复分离 K/V 的完整断点，按最终确认的四卡每卡一条恢复原 global batch 4；保留原 warmup，不改写准备好的 manifest。续训写入独立的 `training_extension_20epoch/`，原 `training/models/final` 与 10 epoch 评测保持原身份。评测队列同时扫描两个权重目录，沿用每半个 epoch、最新优先、普通两模式与两类终止任务的规则，并等到续训 final 发布后才可结束。平台两卡主队列与 4090 单卡辅助队列按同一合同划分互斥分片；单卡按最新优先依次处理两种模式。跨机器只通过显式 source/destination 映射更换 manifest、模型和地图位置，其余监督合同仍严格匹配。
+训练总计20轮。接续沿用原数据、Qmap、监督、优化器与学习率时程，保持global batch 4；前10轮与接续结果按实际全局节点统计。正式预算分别见[接续配置](configs/blocks_kv_twenty_epoch_extension.json)与[评测配置](configs/blocks_kv_evaluation.json)。
 
 ## 评测与指标
 
@@ -37,7 +37,7 @@ No solution: no legal moves remain and the goal has not been reached.
 - 已达标任务：正确到达判断与停止率。
 - 无解任务：正确无解输出率；固定失败历史和自身 rollout 耗尽分开报告。
 
-NDCG 使用线性 gain 与标准 `1/log2(i+1)` 位置折扣。第一种 gain 为地图真实排序位置倒数 `1/r`，真实距离并列时取其所占位置 gain 的均值；第二种按用户 2026-10-09 决定改为状态内 Q-map 距离归一化 `(d_max-d)/(d_max-d_min)`，最小和最大距离取自该状态全部候选。距离全相等（含单候选）时所有 gain 为 1，这些状态另行计数。@1 为回答首位候选 gain 与真正最优 gain 的比值；首位并列取平均 gain。current 不参加候选 NDCG；无法解析计零，缺失位置计零。同状态精确随机期望与全部候选从远到近的反序作为基线；反序 @10 取最远的前 10 个。两种 NDCG 评价地图排序，不等同于真实可达性。
+NDCG 使用线性 gain 与标准 `1/log2(i+1)` 位置折扣。第一种 gain 为地图真实排序位置倒数 `1/r`，真实距离并列时取其所占位置 gain 的均值；第二种为状态内 Q-map 距离归一化 `(d_max-d)/(d_max-d_min)`，最小和最大距离取自该状态全部候选。距离全相等（含单候选）时所有 gain 为 1，这些状态另行计数。@1 为回答首位候选 gain 与真正最优 gain 的比值；首位并列取平均 gain。current 不参加候选 NDCG；无法解析计零，缺失位置计零。同状态精确随机期望与全部候选从远到近的反序作为基线；反序 @10 取最远的前 10 个。两种 NDCG 评价地图排序，不等同于真实可达性。
 
 地图排序以全部未达标且有候选的状态为分母，含 rollout 已走死的状态；单步可达率只在动作前仍可解的状态计分，非法动作和提前停止计错。另报逐轮结果以暴露早期错误。原始评测保留旧 rank-grade 与距离倒数 NDCG 兼容字段；正式汇总使用 `ndcg_inverse_rank_at_*` 与 `ndcg_minmax_distance_at_*`，旧回答通过 CPU 重评分转换，不修改历史报告的定义。
 

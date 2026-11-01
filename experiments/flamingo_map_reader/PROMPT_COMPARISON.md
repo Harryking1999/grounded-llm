@@ -1,30 +1,30 @@
-# 积木提示词对比：当前 1.5B、待定 Astra 与历史基线
+# 积木提示词对比：已使用的地图与文字协议
 
-本文用于审阅提示词和比较条件。当前 1.5B 与历史模板来自仓库实际代码；Astra 是待确认草案，尚未用于正式评测。研究进度只维护在[项目状态页](../../docs/PROJECT_STATUS_AND_TODO.md)，本文不维护训练进度或结果表。
+本页比较已实际使用的地图逐轮协议和历史完整计划协议。任务文字原文维护于各任务prompts目录。
 
-当前实验是 **Qwen2.5-1.5B-Instruct + 冻结 Q-map + 可训练地图读取接口**：基座语言模型和地图被冻结，训练读取接口。它逐步接收真实棋盘、合法动作与地图向量。历史 API／Qwen 基线一次输出完整序列，自行推演后续状态。Astra 拟在当前同一批题上做一次性纯文本规划；题目对齐，交互和输入信息不同，因此应单列报告。
+该历史地图实验使用 **Qwen2.5-1.5B-Instruct + 冻结 Q-map + 可训练地图读取接口**：基座语言模型和地图被冻结，训练读取接口。它逐步接收真实棋盘、合法动作与地图向量。历史 API／Qwen 基线一次输出完整序列，自行推演后续状态。
 
 ## 1. 一张表看区别
 
-| 对比项 | 当前 1.5B + Q-map | Astra 草案（待确认） | 最早 Luna API | 后续 Luna／DeepSeek Flash API | Sol API／Qwen3 4B、8B、32B |
-|---|---|---|---|---|---|
-| 项目内训练 | 训练读取接口，基座和地图冻结 | 无 | 无 | 无 | 无 |
-| 任务目标 | 从起点精确到达给定目标，可保留积木；优先到达，再偏好短解 | 同当前 | 清空棋盘 | 清空棋盘，不要求恢复原分解 | 清空棋盘，不要求最短或恢复原分解 |
-| 形状 | 8 种，含二格条 | 同当前 8 种 | 同一套 8 种 | 同一套 8 种 | 10 种：去掉二格条，增加四种 S/Z 形状；编号也改变 |
-| 普通题 | 510 题，最短距离 6–9 步 | 复用同一批 510 题 | 8 块构造的清空题 | 8／12 块构造的清空题 | 8／12 块构造的清空题 |
-| 终止题 | 已达目标 100 题；固定失败上下文 100 题 | 复用这两类各 100 题 | 未设置对应独立类别 | 未设置对应独立类别 | 未设置对应独立类别 |
-| 文本输入 | 初始／目标棋盘；每轮当前棋盘、实际动作历史和全部合法动作 | 当前起点／目标棋盘、实际动作历史 | 初始棋盘、规则 | 初始棋盘、规则 | 初始棋盘、规则 |
-| 合法动作候选 | 每轮提供全部候选及临时编号 | 不提供，首步也不提供 | 不提供 | 不提供 | 不提供 |
-| 地图信息 | 当前、目标与各合法后继的 Q 向量，经额外模型接口输入 | 不提供 | 无 | 无 | 无 |
-| 作答方式 | 每轮选择一步，环境执行后更新 | 一次输出全部剩余动作，无中间反馈 | 一次输出完整动作序列 | 一次输出完整动作序列，无中间反馈 | 一次输出完整动作序列，无中间反馈 |
-| 状态由谁维护 | 环境每轮提供真实当前棋盘 | 模型自行推演，裁判提交后回放 | 同 Astra | 同 Astra | 模型自行推演，并输出每步预测棋盘 |
-| 输出格式 | 排序文字、候选编号、`<action>`／`<done/>` | 动作 JSON、`solved/no_solution/unsolved`；不要求逐步棋盘 | 动作 JSON，可选短理由 | 动作 JSON，可选短理由 | 动作 JSON，每步必须含 `board_after` |
-| 动作预算 | 评测器最多执行 32 步；当前输入文本没有写出这个上限 | prompt 不写动作预算 | 最多 8 步 | 正式 pilot 不限动作数；生成器支持有上限条件 | 不限动作数 |
-| 评测重点 | rollout 到达与停止；reference 单步可达、地图排序；两类终止判断 | 拟报告完整到达、动作合法性与两类终止判断 | 合法执行并清空 | 合法执行并清空、失败类型 | 合法执行并清空；预测状态与格式另作诊断 |
+| 对比项 | 历史1.5B + Q-map | 最早 Luna API | 后续 Luna／DeepSeek Flash API | Sol API／Qwen3 4B、8B、32B |
+|---|---|---|---|---|
+| 项目内训练 | 训练读取接口，基座和地图冻结 | 无 | 无 | 无 |
+| 任务目标 | 从起点精确到达给定目标，可保留积木；优先到达，再偏好短解 | 清空棋盘 | 清空棋盘，不要求恢复原分解 | 清空棋盘，不要求最短或恢复原分解 |
+| 形状 | 8 种，含二格条 | 同一套 8 种 | 同一套 8 种 | 10 种：去掉二格条，增加四种 S/Z 形状；编号也改变 |
+| 普通题 | 510 题，最短距离 6–9 步 | 8 块构造的清空题 | 8／12 块构造的清空题 | 8／12 块构造的清空题 |
+| 终止题 | 已达目标 100 题；固定失败上下文 100 题 | 未设置对应独立类别 | 未设置对应独立类别 | 未设置对应独立类别 |
+| 文本输入 | 初始／目标棋盘；每轮当前棋盘、实际动作历史和全部合法动作 | 初始棋盘、规则 | 初始棋盘、规则 | 初始棋盘、规则 |
+| 合法动作候选 | 每轮提供全部候选及临时编号 | 不提供 | 不提供 | 不提供 |
+| 地图信息 | 当前、目标与各合法后继的 Q 向量，经额外模型接口输入 | 无 | 无 | 无 |
+| 作答方式 | 每轮选择一步，环境执行后更新 | 一次输出完整动作序列 | 一次输出完整动作序列，无中间反馈 | 一次输出完整动作序列，无中间反馈 |
+| 状态由谁维护 | 环境每轮提供真实当前棋盘 | 模型自行推演，裁判提交后回放 | 模型自行推演，裁判提交后回放 | 模型自行推演，并输出每步预测棋盘 |
+| 输出格式 | 排序文字、候选编号、`<action>`／`<done/>` | 动作 JSON，可选短理由 | 动作 JSON，可选短理由 | 动作 JSON，每步必须含 `board_after` |
+| 动作预算 | 评测器最多执行 32 步；当前输入文本没有写出这个上限 | 最多 8 步 | 正式 pilot 不限动作数；生成器支持有上限条件 | 不限动作数 |
+| 评测重点 | rollout 到达与停止；reference 单步可达、地图排序；两类终止判断 | 合法执行并清空 | 合法执行并清空、失败类型 | 合法执行并清空；预测状态与格式另作诊断 |
 
 ### 形状编号对应表
 
-| 形状 ID | 当前 1.5B／Astra／早期 API | 历史 Sol／Qwen |
+| 形状 ID | 当前1.5B／早期API | 历史 Sol／Qwen |
 |---|---|---|
 | 0–3 | `11/10`, `10/11`, `11/01`, `01/11` | 相同 |
 | 4 | `1/1` | `1/1/1` |
@@ -118,60 +118,9 @@ No solution: no legal moves remain and the goal has not been reached.
 
 两者都逐轮生成，来源：[trajectory_eval.py](src/trajectory_eval.py)。
 
-## 3. Astra：一次性输出完整草案，待确认
-
-这是本文整理的待确认版本：复用当前题集和 8 种形状；不提供首步候选、不输入地图、不要求 `board_after`。只提供一个当前起点棋盘和目标棋盘，删去重复的原始棋盘；规则沿用当前 1.5B 的措辞，输出约定压缩为动作 JSON 与终止状态。**这是待实施的配置草案，也不表示用户已经确认。**
-
-普通题从初始棋盘出发；初始已达目标题应直接停止；失败题从固定历史后的真实末态继续判断。失败题输入仅整理实际棋盘与动作历史，不添加示范排序、地图距离、答案标签或“这题无解”的类别提示。prompt 不写动作预算。
-
-### 拟发送的完整 prompt
-
-```text
-Find a valid sequence of removals from the current board to the goal board, as short as you can.
-Reaching the goal is the first priority; among valid solutions, prefer fewer moves.
-
-Rules: The board is a 10x10 binary grid. 1 means occupied and 0 means empty.
-An action remove(shape_id,row,col) removes one listed shape at its zero-based top-left anchor.
-Every occupied shape cell must overlap a currently occupied board cell and lie inside the board.
-Only those cells are removed. Empty shape cells impose no constraint.
-Use only the listed orientations. Shapes may be reused; there is no gravity or inventory limit.
-Reach the goal board exactly, including any occupied cells that must remain.
-Shapes (/ separates rows): 0=11/10; 1=10/11; 2=11/01; 3=01/11; 4=1/1; 5=11; 6=1/1/1; 7=111
-
-Current board:
-{CURRENT_BOARD_ROWS}
-
-Goal board:
-{GOAL_BOARD_ROWS}
-
-Actual executed actions: {EXECUTED_ACTIONS_OR_NONE}
-
-Plan the complete remaining sequence from the current board and output it once. There is no intermediate feedback; the judge stops at the first illegal action.
-
-Return JSON with "actions" (an array of objects with integer shape_id, row, col) and "final_status" ("solved", "no_solution", or "unsolved").
-Use "solved" when your sequence reaches the goal; if already at the goal, output an empty actions array. Use "no_solution" only when the goal is unreachable, not merely because you could not find a plan; otherwise use "unsolved".
-```
-
-### 相对当前 1.5B，改变了什么
-
-| 项目 | 保持一致 | 草案的改变及含义 |
-|---|---|---|
-| 物理任务 | 同一批普通题与终止题、同样的目标、形状和规则 | 历史清空题不会被混入这 710 题 |
-| 动作上限 | 沿用当前评测器上限 | 两者 prompt 均不写动作预算 |
-| 棋盘与历史 | 提供真实当前起点、目标及已执行动作 | 不重复原始棋盘；失败历史压成事实文本，不带示范 assistant 答案 |
-| 合法动作 | 仍由同一规则裁判验证 | 不列候选，模型自己判断首步及后续合法性 |
-| 地图 | — | 不输入 Q-map，测纯文本规划 |
-| 交互 | — | 整条序列一次提交，无逐步更新 |
-| 输出 | 动作与终止判断 | 用坐标 JSON；不输出候选编号或地图排序 |
-| 状态预测 | — | 不要求输出 `board_after` |
-
-拟优先报告完整到达、完整到达且正确声明成功、非法动作／格式错误，以及两类终止题准确率；无解结果仍只解释这 100 个已耗尽合法动作的失败末态。
-
-API 兼容性探测中曾出现请求输出限额未生效；正式预算与实际 token 用量在配置和结果中记录。
-
 ## 4. 历史一次性模板原文
 
-以下都是当时实际模板，不是为本次 Astra 重写的 prompt。Sol 与 Qwen 的任务文字相同；Qwen 外层使用自身 chat template，并开启 thinking。
+以下为实际使用过的模板。Sol 与 Qwen 的任务文字相同；Qwen 外层使用自身 chat template，并开启 thinking。
 
 ### 4.1 最早 Luna API：8 种形状，最多 8 步
 

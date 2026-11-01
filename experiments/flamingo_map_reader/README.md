@@ -4,7 +4,7 @@
 该实验冻结语言模型和地图，训练接口输出排序、动作与终止判断。积木按会议决议恢复分离 K/V、取消 FFN，保留普通任务编号增强和独立终止类别；这些是旧实验条件。
 
 - [该实验设计](DESIGN.md)、[训练合同](configs/blocks_kv_restart.json)、[评测合同](configs/blocks_kv_evaluation.json)、[结果](results/report.md)。
-- [历史积木提示词对比](PROMPT_COMPARISON.md)：该轮 1.5B 输入与监督答案、Astra 草案及 API／Qwen 模板；现行任务文字见 [tasks](../../tasks/README.md)。
+- [历史积木提示词对比](PROMPT_COMPARISON.md)：该轮1.5B输入与监督答案、API／Qwen实际模板；现行任务文字见 [tasks](../../tasks/README.md)。
 - 该轮既定训练与评测已完成；原扩展[预算](configs/blocks_kv_twenty_epoch_extension.json)与[两节点安排](configs/blocks_kv_two_node_continuation.json)保留用于复核。
 - [项目状态与 TODO](../../docs/PROJECT_STATUS_AND_TODO.md)为唯一当前状态页。
 - 已停止融合 FFN 的[设计](DESIGN_ffn_failure.md)、[epoch 5 报告](results/report_ffn_failure.md)及[结果摘要](results/blocks_ffn_failure_summary.json)。

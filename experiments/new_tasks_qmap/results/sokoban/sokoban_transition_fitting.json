@@ -4887,7 +4887,7 @@
     "raw_root": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/sokoban_failed_branches_20261029"
   },
   "retention_and_paths": {
-    "status": "prepared",
+    "status": "running",
     "parent_step": 32000,
     "source_steps": [
       12000,
@@ -4984,6 +4984,111 @@
     },
     "config": "experiments/new_tasks_qmap/configs/sokoban/sokoban_fixed_wall_902_width_wide4.json",
     "evidence_root": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/sokoban_failed_branches_20261029",
-    "result": "Complete path grouping and retention sampling passed native two-update and next-batch restoration checks. Formal optimization for this condition is pending."
+    "result": "Native whole-path and retained-decision continuation is running; the36000-step frozen snapshot has higher training completion and substantial query turnover.",
+    "progress_snapshot": {
+      "step": 36000,
+      "training_queries": 747780,
+      "training_solved": 456420,
+      "training_success_rate": 0.6103666853887507,
+      "evaluation_cohorts": {
+        "validation": {
+          "count": 16,
+          "solved": 14,
+          "optimal": 13,
+          "cycles": 2,
+          "entered_unreachable": 0
+        },
+        "test": {
+          "count": 16,
+          "solved": 13,
+          "optimal": 13,
+          "cycles": 3,
+          "entered_unreachable": 1
+        },
+        "unseen_goal_validation": {
+          "count": 96,
+          "solved": 67,
+          "optimal": 58,
+          "cycles": 29,
+          "entered_unreachable": 6
+        },
+        "unseen_goal_test": {
+          "count": 94,
+          "solved": 18,
+          "optimal": 18,
+          "cycles": 76,
+          "entered_unreachable": 5
+        },
+        "original_training_goals": {
+          "count": 198,
+          "solved": 85,
+          "optimal": 79,
+          "cycles": 113,
+          "entered_unreachable": 15
+        },
+        "original_unseen_goals": {
+          "count": 4,
+          "solved": 3,
+          "optimal": 2,
+          "cycles": 1,
+          "entered_unreachable": 0
+        }
+      },
+      "comparisons": [
+        {
+          "before_step": 12000,
+          "after_step": 36000,
+          "newly_solved": 158978,
+          "previously_solved_lost": 48048,
+          "previously_solved_retained": 297442,
+          "retention_rate": 0.8609279573938464,
+          "cycle_identities": {
+            "before": 17518,
+            "after": 13285,
+            "persistent": 4111,
+            "disappeared": 13407,
+            "new": 9174
+          },
+          "original_cycle_contexts": {
+            "count": 35035,
+            "now_solved": 13512,
+            "same_cycle": 8222,
+            "different_two_cycle": 1848,
+            "left_two_cycle_but_still_failed": 11453
+          }
+        },
+        {
+          "before_step": 32000,
+          "after_step": 36000,
+          "newly_solved": 57910,
+          "previously_solved_lost": 44879,
+          "previously_solved_retained": 398510,
+          "retention_rate": 0.8987818822749324,
+          "cycle_identities": {
+            "before": 13600,
+            "after": 13285,
+            "persistent": 8425,
+            "disappeared": 5175,
+            "new": 4860
+          },
+          "original_cycle_contexts": {
+            "count": 27200,
+            "now_solved": 4090,
+            "same_cycle": 16850,
+            "different_two_cycle": 1528,
+            "left_two_cycle_but_still_failed": 4732
+          }
+        }
+      ],
+      "recovery": {
+        "observed_unix": 1793215418.0270076,
+        "durable_complete_step": 36000,
+        "optimizer_step": 36000,
+        "retained_context_draws": 256000,
+        "whole_path_contexts": 98636,
+        "complete_recovery_verified": true
+      },
+      "evidence": "/zhanghanyue/experiment/grounded_llm_new_tasks_qmap/runs/sokoban_retention_paths_20261029/tracking_progress/36000/summary.json"
+    }
   }
 }

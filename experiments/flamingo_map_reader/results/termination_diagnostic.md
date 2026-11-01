@@ -189,14 +189,6 @@ Choose candidate 1 because its successor has the smallest map distance among the
 
 模型却输出 `The current board matches the goal.`、6 步成功总结和 `<done/>`。这是上述唯一仍可达的错误成功停止。
 
-## 7. 下一步：先验证解释，再选择补训
-
-最有区分力的检查是固定同一 current、goal、候选和当前 Q 输入，分别给真实自身历史、移除历史，以及可比的示范历史；涉及历史的改动必须同时处理对应历史地图，不能只交换文字却让地图错位。这样才能区分当前状态难度与历史影响。
-
-一个直接对应已观察缺口的补训方向，是在**训练题**上收集模型真实失败历史，只纠正末轮：无候选且未达标监督无解，真正到达监督成功停止；此前错误回复只作上下文。测试记录只用于诊断，不能回填训练。
-
-“有候选但已不可达”的提前无解判断属于额外能力，不能套用“没有合法动作”的现有标签。上述检查与补训尚未实施，不改变当前训练和评测。
-
 ## 证据来源
 
 运行 `blocks_kv_restart_36c213c` 的 `data/manifest.json`，以及 `evaluation_half_epoch/` 下 step-125000、step-181250 的完整 `cases.jsonl`，排除 `.interrupted`。固定无解用 `test_no_solution_reference`，自身执行用 `test_rollout`；三个例子分别位于 step-181250 的 `00000_00064`、`00000_00064`、`00448_00510` 分片。Q 分布由当前冻结的 `tree_1000_132f5a1/best.pt` 在 CPU 上计算，未调用 LLM。

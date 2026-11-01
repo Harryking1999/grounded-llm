@@ -59,10 +59,10 @@ suite；图为固定的 3-regular 连通图，节点行和邻居顺序按题目�
 
 ## Sol API 同题试点
 
-2026-09-14 用户授权通过 `https://jarodfund.xyz` 测试 `gpt-5.6-sol`，沿用上述
+2026-09-14的Sol小试使用`gpt-5.6-sol`，沿用上述
 path256 无向图与 16k 条件。已保存待运行的 suite 和提示词，并确认 suite 与三个 Qwen
 验收批次完全相同、邻接表对称、全部参考路径通过原裁判。发现网关参数未严格受控后，
-用户要求先试点几次；这次授权只推进小批试点，没有启动完整批次。
+该条件只完成小批试点，完整批次未运行。
 
 [接口探针摘要](results/sol_api_compatibility.json)记录了阻碍：Responses 的
 `max_output_tokens`、Chat Completions 的 `max_completion_tokens` 和 `max_tokens`

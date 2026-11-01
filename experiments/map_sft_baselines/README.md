@@ -171,7 +171,7 @@ python -m experiments.map_sft_baselines.src.small_ood_prepare --config experimen
 | 比较 | 正式配置 | 结果与解释 |
 |---|---|---|
 | 50k 主比较 | [study.json](configs/study.json) | [主报告](results/report.md) |
-| B1 恒定学习率与逐轮重编号 | [设计 §7.3](DESIGN.md#73-b1-改进恒定学习率与逐轮重编号) | [主报告](results/report.md) |
+| B1 恒定学习率与逐轮重编号 | [设计 §7](DESIGN.md#7-b1-改进恒定学习率与逐轮重编号) | [主报告](results/report.md) |
 | 10k 地图全参与7B无地图 SFT | [b2_10k.json](configs/b2_10k.json)、[qwen7b_ra_10k.json](configs/qwen7b_ra_10k.json) | [主报告](results/report.md)、[首步诊断](results/b2_10k_diagnosis.md) |
 | 学习率、覆盖、重编号、内容 MLP 四组诊断 | [b2_lr_match.json](configs/b2_lr_match.json)、[b2_coverage.json](configs/b2_coverage.json)、[b2_renumber.json](configs/b2_renumber.json)、[b2_mlp.json](configs/b2_mlp.json) | [同预算比较](results/b2_four_controls.md) |
 | 100k 嵌套数据对照 | [b2_100k.json](configs/b2_100k.json) | [诊断报告中的证据边界](results/b2_four_controls.md) |

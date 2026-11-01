@@ -24,7 +24,7 @@
 | 二阶魔方 | [独立训练](../experiments/cube2_qmap/src/run.py)、[循环修复](../experiments/cube2_qmap/src/cycle_repair.py) | [本任务QMap／MapReader](../grounded_llm/tasks/cube2/model.py) |
 | 8-Puzzle | [独立训练](../experiments/puzzle8_qmap/src/run.py) | [本任务QMap／MapReader](../grounded_llm/tasks/puzzle8/model.py) |
 | 寻路 | [纯Q训练](../experiments/path_qmap/src/run.py) | [reader.py](../grounded_llm/tasks/path/reader.py) |
-| 推箱子 | [完整状态对训练](../experiments/new_tasks_qmap/src/relations.py) | [任务MapReader](../grounded_llm/tasks/sokoban/qmap.py)；未采用、搁置 |
+| 推箱子 | [完整状态对训练](../experiments/new_tasks_qmap/src/relations.py) | [任务MapReader](../grounded_llm/tasks/sokoban/qmap.py)；未采用 |
 | 移车出库 | 同一完整状态对训练入口，独立任务配置 | [任务MapReader](../grounded_llm/tasks/rush_hour/qmap.py)；限定选用 |
 | 棋子交换 | 同一完整状态对训练入口，每棵树独立 | [任务MapReader](../grounded_llm/tasks/token_swapping/qmap.py) |
 | 过桥 | 同一完整状态对训练入口，每个人数独立 | [任务MapReader](../grounded_llm/tasks/bridge/qmap.py) |
@@ -64,7 +64,7 @@
 
 ## 任务扩展与训练安排
 
-当前八类范围及小OOD详见[任务总览](README.md#多任务扩展准备情况)。新任务优化已暂停；推箱子搁置。地图组织如下。
+八类范围及小OOD见[任务总览](README.md#多任务扩展准备情况)。各地图的采用范围和完成结果分别维护，地图组织如下。
 
 - 寻路每张固定图、棋子交换每棵底图分别提供独立Qmap；新图地图本身通过与原LLM会读取分开验收。
 - 推箱子当前按固定墙体对应地图，同墙体内改变箱子、玩家及完整目标；原跨墙共享条件仅保留为历史证据。
@@ -78,6 +78,6 @@
 
 Qmap、任务文字、正式SFT数据和LLM结果是不同阶段。联合训练按任务和小类组织，记录实际地图版本及曝光条件；新目标、同图新关系、新图新地图、未训练类别的比较分别定义。
 
-每个读取样本提供当前、一个完整目标及全部合法后继，保持动作编号与环境一致；地图标签与精确教师距离不写入推理文字。达到目标和正确停止分别评价。五类新任务尚无新增LLM读取验收，现有四任务SFT结果见[对应报告](../experiments/map_sft_baselines/results/report.md)。
+每个读取样本提供当前、一个完整目标及全部合法后继，保持动作编号与环境一致；地图标签与精确教师距离不写入推理文字。达到目标和正确停止分别评价。八类池的Flan4／5／6类已完成终点读取评测；新地图下三组encoder已有完整结果，其余组仍待完整评测，分别见[Flan报告](../experiments/map_sft_baselines/results/report.md)与[编码器报告](../experiments/map_encoder_sft/results/report.md)。
 
 当前研究安排只维护在[项目状态页](../docs/PROJECT_STATUS_AND_TODO.md)。新任务结果与配置从[实验入口](../experiments/new_tasks_qmap/README.md)进入；历史设计同步页保留为[来源材料](https://zcnhpsd26tyi.feishu.cn/wiki/LStDwGVEQiageEkHL7Ncl95QnDi)，不替代当前采用记录。

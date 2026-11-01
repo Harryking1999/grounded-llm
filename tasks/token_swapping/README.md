@@ -19,7 +19,7 @@ Qmap分别读取当前排列和目标排列，学习它们之间的最少交换�
 
 ## 来源与阅读入口
 
-底图来自[tket公开测试实例](https://github.com/Quantinuum/tket/blob/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.hpp)。这是软件测试题集，上游交换序列不保证最短；本项目独立计算最优距离。
+底图来自[tket公开测试实例](https://github.com/Quantinuum/tket/blob/4a554cbc2699de2f95da18eb3c30ff0961bcc536/libs/tktokenswap/test/src/Data/FixedCompleteSolutions.hpp)。这是软件测试题集，上游交换序列提供合法上界；本项目独立计算最优距离。
 
 - [数据来源与固定树](data/README.md)
 - [Qmap输入、目标与评测](Qmap/README.md)

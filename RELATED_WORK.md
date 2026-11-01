@@ -44,7 +44,7 @@ Devin Pereira、Willem Zuidema，arXiv 预印本，2026。
 
 [摘要](https://arxiv.org/abs/2608.07077) · [PDF](https://arxiv.org/pdf/2608.07077)
 
-**摘要。** 作者用汉诺塔检查 Transformer 的内部状态表示。小模型及两种 Qwen 系大推理模型在题目末尾已有可解码的状态空间结构，但长生成过程中表征会退化，读得出状态并不保证能完成规划。在四盘实验中，借助外部符号状态跟踪并持续注入对应状态表征，Qwen3.6-27B 的最优解数从 33/81 提升到 59/81；DeepSeek 蒸馏模型的恢复较弱。
+**摘要。** 作者用汉诺塔检查 Transformer 的内部状态表示。小模型及两种 Qwen 系大推理模型在题目末尾已有可解码的状态空间结构，长生成过程中表征会退化，状态解码与规划完成分别评估。在四盘实验中，借助外部符号状态跟踪并持续注入对应状态表征，Qwen3.6-27B 的最优解数从 33/81 提升到 59/81；DeepSeek 蒸馏模型的恢复较弱。
 
 ![汉诺塔论文 Fig. 1：tower-to-tower 与 flat-to-flat](docs/figures/related_work/hanoi_state_fig1.png)
 

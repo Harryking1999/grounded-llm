@@ -10,7 +10,7 @@
 
 二值棋盘已是完整状态，直接经过 MLP 映射为 Qwen 输入向量，无需学习 Step 1 的 Q roadmap。
 两组获得同一初始文字棋盘、规则、历史动作和自行报告的棋盘；+token 组额外获得同状态编码。
-使用用户确认的 Qwen3-4B-Instruct-2507；冻结 LLM，仅训练状态报告 adapter。
+使用 Qwen3-4B-Instruct-2507；冻结 LLM，仅训练状态报告 adapter。
 报告训练只提供状态 token，要求输出棋盘，防止 adapter 靠复制文字绕过像素；测试时加回相同文字。
 训练与规划存在任务切换，因此同时汇报独立棋盘读出准确率。
 
@@ -67,7 +67,7 @@ python -m grounded_llm.harness \
 
 ## 多样像素状态的报告训练
 
-按用户补充要求，[blocks_readout.json](configs/blocks_readout.json) 覆盖不同占据率、合法移除中间态、
+[blocks_readout.json](configs/blocks_readout.json) 覆盖不同占据率、合法移除中间态、
 多个不连通区域、孤立格、带孔洞局部区域及逐格破坏后的中间态。全空和全满是训练边界样本，
 不计作未见开发样本。像素读出不要求棋盘有解；后续规划题仍由原 `BlocksTask` 生成有解实例。
 生成器见 `grounded_llm/blocks_readout.py`，标签始终是完整二值棋盘，无动作或隐藏分解监督。
@@ -121,7 +121,7 @@ python -m grounded_llm.harness --config experiments/state_interface_pilot/config
 
 `--resume-checkpoint` 与 `--adapter-init` 互斥；前者恢复训练状态，后者只是加载权重重新优化。
 恢复后的预算轮数包括检查点已经完成的轮数，每轮查询由轮号确定，不重新抽取已完成轮次。
-小型确定性测试确认中断恢复后的参数与连续训练一致；不承诺不同 GPU／软件环境下逐位复现。
+同设备确定性测试中，中断恢复后的参数与连续训练一致；设备与软件版本另行记录。
 
 双卡使用 [blocks_cell_parallel.json](configs/blocks_cell_parallel.json)，两份持久冻结 LLM 分担同一批样本，
 仅保留一个 adapter、优化器和采样器。有效 batch 与原训练相同；单卡原先分两次累积的 microbatch

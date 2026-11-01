@@ -22,7 +22,7 @@ CUDA_VISIBLE_DEVICES=0 python -m experiments.llm_task_sft.src.evaluate --config 
 先用 `prepare --smoke-tasks 32` 检查真实标签，再用 `train --smoke-steps 20 --longest-smoke`
 在最长样本上完成四卡前后向、优化器更新和完整保存；正式训练不使用 smoke 数据。
 原始基座与 SFT 使用相同提示、候选编号和生成上限。前三轮原方案评 validation 并补齐与地图线相同的 510 题，
-历史回答与选模记录保留。用户随后授权继续训练，并指定后续仅评这 510 题，旧流程见下节。
+训练与接续使用固定510题评测，历史回答和选模结果保留，复现流程见下节。
 
 ## 历史半轮续训协议
 
